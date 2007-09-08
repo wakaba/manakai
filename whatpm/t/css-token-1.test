@@ -191,10 +191,6 @@
   "input": "a\\\u000C",
   "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"]]},
 
-  {"description": "-",
-  "input": "-",
-  "output": [["DELIM", "-"]]},
-
   {"description": "\\-",
   "input": "\\-",
   "output": [["IDENT", "-"]]},
@@ -225,7 +221,7 @@
 
   {"description": "-1",
   "input": "-1",
-  "output": [["DELIM", "-"], ["NUMBER", "1"]]},
+  "output": [["MINUS"], ["NUMBER", "1"]]},
 
   {"description": "\\-1",
   "input": "\\-1",
@@ -233,7 +229,7 @@
 
   {"description": "-1a",
   "input": "-1a",
-  "output": [["DELIM", "-"], ["DIMENSION", "1", "a"]]},
+  "output": [["MINUS"], ["DIMENSION", "1", "a"]]},
 
   {"description": "\\-1a",
   "input": "\\-1a",
@@ -257,7 +253,7 @@
 
   {"description": "-\\\u000D",
   "input": "-\\\u000D",
-  "output": [["DELIM", "-"], ["DELIM", "\\"], ["S"]]},
+  "output": [["MINUS"], ["DELIM", "\\"], ["S"]]},
 
   {"description": "\\-\\\u000D",
   "input": "\\-\\\u000D",
@@ -289,7 +285,7 @@
 
   {"description": "@-",
   "input": "@-",
-  "output": [["DELIM", "@"], ["DELIM", "-"]]},
+  "output": [["DELIM", "@"], ["MINUS"]]},
 
   {"description": "@\\-",
   "input": "@\\-",
@@ -313,19 +309,19 @@
 
   {"description": "@-1",
   "input": "@-1",
-  "output": [["DELIM", "@"], ["DELIM", "-"], ["NUMBER", "1"]]},
+  "output": [["DELIM", "@"], ["MINUS"], ["NUMBER", "1"]]},
 
   {"description": "@--",
   "input": "@--",
-  "output": [["DELIM", "@"], ["DELIM", "-"], ["DELIM", "-"]]},
+  "output": [["DELIM", "@"], ["MINUS"], ["MINUS"]]},
 
   {"description": "@--1",
   "input": "@--1",
-  "output": [["DELIM", "@"], ["DELIM", "-"], ["DELIM", "-"], ["NUMBER", "1"]]},
+  "output": [["DELIM", "@"], ["MINUS"], ["MINUS"], ["NUMBER", "1"]]},
 
   {"description": "@--a",
   "input": "@--a",
-  "output": [["DELIM", "@"], ["DELIM", "-"], ["IDENT", "-a"]]},
+  "output": [["DELIM", "@"], ["MINUS"], ["IDENT", "-a"]]},
 
   {"description": "@-\\-a",
   "input": "@-\\-a",
@@ -337,7 +333,7 @@
 
   {"description": "@--->",
   "input": "@--->",
-  "output": [["DELIM", "@"], ["DELIM", "-"], ["CDC"]]},
+  "output": [["DELIM", "@"], ["MINUS"], ["CDC"]]},
 
   {"description": "@\\41",
   "input": "@\\41",
@@ -737,7 +733,7 @@
 
   {"description": "#!",
   "input": "#!",
-  "output": [["DELIM", "#"], ["DELIM", "!"]]},
+  "output": [["DELIM", "#"], ["EXCLAMATION"]]},
 
   {"description": "#-",
   "input": "#-",
@@ -781,15 +777,15 @@
 
   {"description": "0.",
   "input": "0.",
-  "output": [["NUMBER", "0"], ["DELIM", "."]]},
+  "output": [["NUMBER", "0"], ["DOT"]]},
 
   {"description": "1.",
   "input": "1.",
-  "output": [["NUMBER", "1"], ["DELIM", "."]]},
+  "output": [["NUMBER", "1"], ["DOT"]]},
 
   {"description": "144.",
   "input": "144.",
-  "output": [["NUMBER", "144"], ["DELIM", "."]]},
+  "output": [["NUMBER", "144"], ["DOT"]]},
 
   {"description": "0.1",
   "input": "0.1",
@@ -809,7 +805,7 @@
 
   {"description": ".",
   "input": ".",
-  "output": [["DELIM", "."]]},
+  "output": [["DOT"]]},
 
   {"description": ".1",
   "input": ".1",
@@ -833,7 +829,7 @@
 
   {"description": ".a",
   "input": ".a",
-  "output": [["DELIM", "."], ["IDENT", "a"]]},
+  "output": [["DOT"], ["IDENT", "a"]]},
 
   {"description": "3.11.66",
   "input": "3.11.66",
@@ -841,19 +837,19 @@
 
   {"description": "..",
   "input": "..",
-  "output": [["DELIM", "."], ["DELIM", "."]]},
+  "output": [["DOT"], ["DOT"]]},
 
   {"description": "...",
   "input": "...",
-  "output": [["DELIM", "."], ["DELIM", "."], ["DELIM", "."]]},
+  "output": [["DOT"], ["DOT"], ["DOT"]]},
 
   {"description": "...1",
   "input": "...1",
-  "output": [["DELIM", "."], ["DELIM", "."], ["NUMBER", "0.1"]]},
+  "output": [["DOT"], ["DOT"], ["NUMBER", "0.1"]]},
 
   {"description": "...a",
   "input": "...a",
-  "output": [["DELIM", "."], ["DELIM", "."], ["DELIM", "."], ["IDENT", "a"]]},
+  "output": [["DOT"], ["DOT"], ["DOT"], ["IDENT", "a"]]},
 
   {"description": "+0",
   "input": "+0",
@@ -869,23 +865,23 @@
 
   {"description": "-.55",
   "input": "-.55",
-  "output": [["DELIM", "-"], ["NUMBER", "0.55"]]},
+  "output": [["MINUS"], ["NUMBER", "0.55"]]},
 
   {"description": "-0",
   "input": "-0",
-  "output": [["DELIM", "-"], ["NUMBER", "0"]]},
+  "output": [["MINUS"], ["NUMBER", "0"]]},
 
   {"description": "-0.2",
   "input": "-0.2",
-  "output": [["DELIM", "-"], ["NUMBER", "0.2"]]},
+  "output": [["MINUS"], ["NUMBER", "0.2"]]},
 
   {"description": "-.1",
   "input": "-.1",
-  "output": [["DELIM", "-"], ["NUMBER", "0.1"]]},
+  "output": [["MINUS"], ["NUMBER", "0.1"]]},
 
   {"description": "+-0",
   "input": "+-0",
-  "output": [["PLUS"], ["DELIM", "-"], ["NUMBER", "0"]]},
+  "output": [["PLUS"], ["MINUS"], ["NUMBER", "0"]]},
 
   {"description": "a-0",
   "input": "a-0",
@@ -901,7 +897,7 @@
 
   {"description": "<!-0",
   "input": "<!-0",
-  "output": [["DELIM", "<"], ["DELIM", "!"], ["DELIM", "-"], ["NUMBER", "0"]]},
+  "output": [["DELIM", "<"], ["EXCLAMATION"], ["MINUS"], ["NUMBER", "0"]]},
 
   {"description": "<!--0",
   "input": "<!--0",
@@ -909,7 +905,7 @@
 
   {"description": "<!---0",
   "input": "<!---0",
-  "output": [["CDO"], ["DELIM", "-"], ["NUMBER", "0"]]},
+  "output": [["CDO"], ["MINUS"], ["NUMBER", "0"]]},
 
   {"description": "0a",
   "input": "0a",
@@ -945,7 +941,7 @@
 
   {"description": "0.a",
   "input": "0.a",
-  "output": [["NUMBER", "0"], ["DELIM", "."], ["IDENT", "a"]]},
+  "output": [["NUMBER", "0"], ["DOT"], ["IDENT", "a"]]},
 
   {"description": ".0a",
   "input": ".0a",
@@ -965,7 +961,7 @@
 
   {"description": "0.\\1",
   "input": "0.\\1",
-  "output": [["NUMBER", "0"], ["DELIM", "."], ["IDENT", "\u0001"]]},
+  "output": [["NUMBER", "0"], ["DOT"], ["IDENT", "\u0001"]]},
 
   {"description": "0a\\X",
   "input": "0a\\X",
@@ -1049,11 +1045,11 @@
 
   {"description": "0-",
   "input": "0-",
-  "output": [["NUMBER", "0"], ["DELIM", "-"]]},
+  "output": [["NUMBER", "0"], ["MINUS"]]},
 
   {"description": "0.0-",
   "input": "0.0-",
-  "output": [["NUMBER", "0.0"], ["DELIM", "-"]]},
+  "output": [["NUMBER", "0.0"], ["MINUS"]]},
 
   {"description": "0\\-",
   "input": "0\\-",
@@ -1073,7 +1069,7 @@
 
   {"description": "0-\\",
   "input": "0-\\",
-  "output": [["NUMBER", "0"], ["DELIM", "-"], ["DELIM", "\\"]]},
+  "output": [["NUMBER", "0"], ["MINUS"], ["DELIM", "\\"]]},
 
   {"description": "0-\\9",
   "input": "0-\\9",
@@ -1101,23 +1097,23 @@
 
   {"description": "0-\\\u000d",
   "input": "0-\\\u000d",
-  "output": [["NUMBER", "0"], ["DELIM", "-"], ["DELIM", "\\"], ["S"]]},
+  "output": [["NUMBER", "0"], ["MINUS"], ["DELIM", "\\"], ["S"]]},
 
   {"description": "0-\\\u000d\u000a",
   "input": "0-\\\u000d\u000a",
-  "output": [["NUMBER", "0"], ["DELIM", "-"], ["DELIM", "\\"], ["S"]]},
+  "output": [["NUMBER", "0"], ["MINUS"], ["DELIM", "\\"], ["S"]]},
 
   {"description": "0-\\\u000a",
   "input": "0-\\\u000a",
-  "output": [["NUMBER", "0"], ["DELIM", "-"], ["DELIM", "\\"], ["S"]]},
+  "output": [["NUMBER", "0"], ["MINUS"], ["DELIM", "\\"], ["S"]]},
 
   {"description": "0-\\\u000c",
   "input": "0-\\\u000c",
-  "output": [["NUMBER", "0"], ["DELIM", "-"], ["DELIM", "\\"], ["S"]]},
+  "output": [["NUMBER", "0"], ["MINUS"], ["DELIM", "\\"], ["S"]]},
 
   {"description": "0--",
   "input": "0--",
-  "output": [["NUMBER", "0"], ["DELIM", "-"], ["DELIM", "-"]]},
+  "output": [["NUMBER", "0"], ["MINUS"], ["MINUS"]]},
 
   {"description": "0-->",
   "input": "0-->",
@@ -1173,11 +1169,11 @@
 
   {"description": "0.%",
   "input": "0.%",
-  "output": [["NUMBER", "0"], ["DELIM", "."], ["DELIM", "%"]]},
+  "output": [["NUMBER", "0"], ["DOT"], ["DELIM", "%"]]},
 
   {"description": "0.\\%",
   "input": "0.\\%",
-  "output": [["NUMBER", "0"], ["DELIM", "."], ["IDENT", "%"]]},
+  "output": [["NUMBER", "0"], ["DOT"], ["IDENT", "%"]]},
 
   {"description": "u",
   "input": "u",
@@ -1837,11 +1833,11 @@
 
   {"description": "u+4-",
   "input": "u+4-",
-  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"]]},
+  "output": [["UNICODE_RANGE", "4"], ["MINUS"]]},
 
   {"description": "u+4-?",
   "input": "u+4-?",
-  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["DELIM", "?"]]},
+  "output": [["UNICODE_RANGE", "4"], ["MINUS"], ["DELIM", "?"]]},
 
   {"description": "u+4-1",
   "input": "u+4-1",
@@ -1853,7 +1849,7 @@
 
   {"description": "u+4/**/-1",
   "input": "u+4/**/-1",
-  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["NUMBER", "1"]]},
+  "output": [["UNICODE_RANGE", "4"], ["MINUS"], ["NUMBER", "1"]]},
 
   {"description": "u+4-12",
   "input": "u+4-12",
@@ -1885,7 +1881,7 @@
 
   {"description": "u+4--",
   "input": "u+4--",
-  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["DELIM", "-"]]},
+  "output": [["UNICODE_RANGE", "4"], ["MINUS"], ["MINUS"]]},
 
   {"description": "u+4-->",
   "input": "u+4-->",
@@ -1893,12 +1889,12 @@
 
   {"description": "u+4-/**/->",
   "input": "u+4-/**/->",
-  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["DELIM", "-"],
+  "output": [["UNICODE_RANGE", "4"], ["MINUS"], ["MINUS"],
       ["GREATER"]]},
 
   {"description": "u+4--/**/>",
   "input": "u+4--/**/>",
-  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["DELIM", "-"],
+  "output": [["UNICODE_RANGE", "4"], ["MINUS"], ["MINUS"],
       ["GREATER"]]},
 
   {"description": "\\u+4",
@@ -1911,11 +1907,11 @@
 
   {"description": "<!",
   "input": "<!",
-  "output": [["DELIM", "<"], ["DELIM", "!"]]},
+  "output": [["DELIM", "<"], ["EXCLAMATION"]]},
 
   {"description": "<!-",
   "input": "<!-",
-  "output": [["DELIM", "<"], ["DELIM", "!"], ["DELIM", "-"]]},
+  "output": [["DELIM", "<"], ["EXCLAMATION"], ["MINUS"]]},
 
   {"description": "<!--",
   "input": "<!--",
@@ -1923,7 +1919,7 @@
 
   {"description": "\\<!--",
   "input": "\\<!--",
-  "output": [["IDENT", "<"], ["DELIM", "!"], ["DELIM", "-"], ["DELIM", "-"]]},
+  "output": [["IDENT", "<"], ["EXCLAMATION"], ["MINUS"], ["MINUS"]]},
 
   {"description": "<!--a",
   "input": "<!--a",
@@ -1935,7 +1931,7 @@
 
   {"description": "<!--->",
   "input": "<!--->",
-  "output": [["CDO"], ["DELIM", "-"], ["GREATER"]]},
+  "output": [["CDO"], ["MINUS"], ["GREATER"]]},
 
   {"description": "<!---->",
   "input": "<!---->",
@@ -1943,15 +1939,15 @@
 
   {"description": "<!>",
   "input": "<!>",
-  "output": [["DELIM", "<"], ["DELIM", "!"], ["GREATER"]]},
+  "output": [["DELIM", "<"], ["EXCLAMATION"], ["GREATER"]]},
 
   {"description": "-",
   "input": "-",
-  "output": [["DELIM", "-"]]},
+  "output": [["MINUS"]]},
 
   {"description": "--",
   "input": "--",
-  "output": [["DELIM", "-"], ["DELIM", "-"]]},
+  "output": [["MINUS"], ["MINUS"]]},
 
   {"description": "-->",
   "input": "-->",
@@ -2119,5 +2115,333 @@
 
   {"description": "/*/**/*/",
   "input": "/*/**/*/",
-  "output": [["DELIM", "*"], ["DELIM", "/"]]}
+  "output": [["STAR"], ["DELIM", "/"]]},
+
+  {"description": "a(",
+  "input": "a(",
+  "output": [["FUNCTION", "a"]]},
+
+  {"description": "A(",
+  "input": "A(",
+  "output": [["FUNCTION", "A"]]},
+
+  {"description": "abc(",
+  "input": "abc(",
+  "output": [["FUNCTION", "abc"]]},
+
+  {"description": "\\x(",
+  "input": "\\x(",
+  "output": [["FUNCTION", "x"]]},
+
+  {"description": "\\a(",
+  "input": "\\a(",
+  "output": [["FUNCTION", "\u000a"]]},
+
+  {"description": "a\\b(",
+  "input": "a\\b(",
+  "output": [["FUNCTION", "a\u000b"]]},
+
+  {"description": "a\\a(",
+  "input": "a\\a(",
+  "output": [["FUNCTION", "a\u000a"]]},
+
+  {"description": "a\\a b(",
+  "input": "a\\a b(",
+  "output": [["FUNCTION", "a\u000ab"]]},
+
+  {"description": "a\\\u000d(",
+  "input": "a\\\u000d(",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"], ["LPAREN"]]},
+
+  {"description": "a\\\u000a(",
+  "input": "a\\\u000a(",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"], ["LPAREN"]]},
+
+  {"description": "a\\\u000d\u000a(",
+  "input": "a\\\u000d\u000a(",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"], ["LPAREN"]]},
+
+  {"description": "a\\\u000c(",
+  "input": "a\\\u000c(",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"], ["LPAREN"]]},
+
+  {"description": "a (",
+  "input": "a (",
+  "output": [["IDENT", "a"], ["S"], ["LPAREN"]]},
+
+  {"description": "a\\ (",
+  "input": "a\\ (",
+  "output": [["FUNCTION", "a "]]},
+
+  {"description": "a\\  (",
+  "input": "a\\  (",
+  "output": [["IDENT", "a "], ["S"], ["LPAREN"]]},
+
+  {"description": "-(",
+  "input": "-(",
+  "output": [["MINUS"], ["LPAREN"]]},
+
+  {"description": "\\-(",
+  "input": "\\-(",
+  "output": [["FUNCTION", "-"]]},
+
+  {"description": "-a(",
+  "input": "-a(",
+  "output": [["FUNCTION", "-a"]]},
+
+  {"description": "-1(",
+  "input": "-1(",
+  "output": [["MINUS"], ["NUMBER", "1"], ["LPAREN"]]},
+
+  {"description": "-a_b(",
+  "input": "-a_b(",
+  "output": [["FUNCTION", "-a_b"]]},
+
+  {"description": "--(",
+  "input": "--(",
+  "output": [["MINUS"], ["MINUS"], ["LPAREN"]]},
+
+  {"description": "-->(",
+  "input": "-->(",
+  "output": [["CDC"], ["LPAREN"]]},
+
+  {"description": "~",
+  "input": "~",
+  "output": [["TILDE"]]},
+
+  {"description": " ~",
+  "input": " ~",
+  "output": [["TILDE"]]},
+
+  {"description": "  ~",
+  "input": "  ~",
+  "output": [["TILDE"]]},
+
+  {"description": "~a",
+  "input": "~a",
+  "output": [["TILDE"], ["IDENT", "a"]]},
+
+  {"description": "~=",
+  "input": "~=",
+  "output": [["INCLUDES"]]},
+
+  {"description": "~~=",
+  "input": "~~=",
+  "output": [["TILDE"], ["INCLUDES"]]},
+
+  {"description": "|",
+  "input": "|",
+  "output": [["VBAR"]]},
+
+  {"description": "||",
+  "input": "||",
+  "output": [["VBAR"], ["VBAR"]]},
+
+  {"description": "|=",
+  "input": "|=",
+  "output": [["DASHMATCH"]]},
+
+  {"description": "|= ",
+  "input": "|= ",
+  "output": [["DASHMATCH"], ["S"]]},
+
+  {"description": "|=  ",
+  "input": "|=  ",
+  "output": [["DASHMATCH"], ["S"]]},
+
+  {"description": "||=",
+  "input": "||=",
+  "output": [["VBAR"], ["DASHMATCH"]]},
+
+  {"description": "^",
+  "input": "^",
+  "output": [["DELIM", "^"]]},
+
+  {"description": "^^",
+  "input": "^^",
+  "output": [["DELIM", "^"], ["DELIM", "^"]]},
+
+  {"description": "^=",
+  "input": "^=",
+  "output": [["PREFIXMATCH"]]},
+
+  {"description": "^=\u0009",
+  "input": "^=\u0009",
+  "output": [["PREFIXMATCH"], ["S"]]},
+
+  {"description": "^=  ",
+  "input": "^=  ",
+  "output": [["PREFIXMATCH"], ["S"]]},
+
+  {"description": "^^=",
+  "input": "^^=",
+  "output": [["DELIM", "^"], ["PREFIXMATCH"]]},
+
+  {"description": "$",
+  "input": "$",
+  "output": [["DELIM", "$"]]},
+
+  {"description": "$$",
+  "input": "$$",
+  "output": [["DELIM", "$"], ["DELIM", "$"]]},
+
+  {"description": "$a",
+  "input": "$a",
+  "output": [["DELIM", "$"], ["IDENT", "a"]]},
+
+  {"description": "$=",
+  "input": "$=",
+  "output": [["SUFFIXMATCH"]]},
+
+  {"description": "$= ",
+  "input": "$= ",
+  "output": [["SUFFIXMATCH"], ["S"]]},
+
+  {"description": "$=  ",
+  "input": "$=  ",
+  "output": [["SUFFIXMATCH"], ["S"]]},
+
+  {"description": "$==",
+  "input": "$==",
+  "output": [["SUFFIXMATCH"], ["MATCH"]]},
+
+  {"description": "*",
+  "input": "*",
+  "output": [["STAR"]]},
+
+  {"description": "**",
+  "input": "**",
+  "output": [["STAR"], ["STAR"]]},
+
+  {"description": "*=",
+  "input": "*=",
+  "output": [["SUBSTRINGMATCH"]]},
+
+  {"description": "*/**/=",
+  "input": "*/**/=",
+  "output": [["STAR"], ["MATCH"]]},
+
+  {"description": "*= ",
+  "input": "*= ",
+  "output": [["SUBSTRINGMATCH"], ["S"]]},
+
+  {"description": "*=  ",
+  "input": "*=  ",
+  "output": [["SUBSTRINGMATCH"], ["S"]]},
+
+  {"description": "=",
+  "input": "=",
+  "output": [["MATCH"]]},
+
+  {"description": "!",
+  "input": "!",
+  "output": [["EXCLAMATION"]]},
+
+  {"description": "%",
+  "input": "%",
+  "output": [["DELIM", "%"]]},
+
+  {"description": "&",
+  "input": "&",
+  "output": [["DELIM", "&"]]},
+
+  {"description": ",",
+  "input": ",",
+  "output": [["COMMA"]]},
+
+  {"description": " ,",
+  "input": " ,",
+  "output": [["COMMA"]]},
+
+  {"description": "  ,",
+  "input": "  ,",
+  "output": [["COMMA"]]},
+
+  {"description": " /**/,",
+  "input": " /**/,",
+  "output": [["S"], ["COMMA"]]},
+
+  {"description": "+",
+  "input": "+",
+  "output": [["PLUS"]]},
+
+  {"description": "+ ",
+  "input": "+ ",
+  "output": [["PLUS"], ["S"]]},
+
+  {"description": " +",
+  "input": " +",
+  "output": [["PLUS"]]},
+
+  {"description": "\u0009+",
+  "input": "\u0009+",
+  "output": [["PLUS"]]},
+
+  {"description": "  +",
+  "input": "  +",
+  "output": [["PLUS"]]},
+
+  {"description": "/",
+  "input": "/",
+  "output": [["DELIM", "/"]]},
+
+  {"description": "<",
+  "input": "<",
+  "output": [["DELIM", "<"]]},
+
+  {"description": ">",
+  "input": ">",
+  "output": [["GREATER"]]},
+
+  {"description": " >",
+  "input": " >",
+  "output": [["GREATER"]]},
+
+  {"description": "   >",
+  "input": "   >",
+  "output": [["GREATER"]]},
+
+  {"description": ":",
+  "input": ":",
+  "output": [["COLON"]]},
+
+  {"description": "::",
+  "input": "::",
+  "output": [["COLON"], ["COLON"]]},
+
+  {"description": ":/**/:",
+  "input": ":/**/:",
+  "output": [["COLON"], ["COLON"]]},
+
+  {"description": "?",
+  "input": "?",
+  "output": [["DELIM", "?"]]},
+
+  {"description": "_",
+  "input": "_",
+  "output": [["IDENT", "_"]]},
+
+  {"description": "`",
+  "input": "`",
+  "output": [["DELIM", "`"]]},
+
+  {"description": "\u007f",
+  "input": "\u007f",
+  "output": [["DELIM", "\u007f"]]},
+
+  {"description": "\u0080",
+  "input": "\u0080",
+  "output": [["IDENT", "\u0080"]]},
+
+  {"description": ":not(",
+  "input": ":not(",
+  "output": [["COLON"], ["FUNCTION", "not"]]},
+
+  {"description": ":no\\t(",
+  "input": ":no\\t(",
+  "output": [["COLON"], ["FUNCTION", "not"]]},
+
+  {"description": ":/**/not(",
+  "input": ":/**/not(",
+  "output": [["COLON"], ["FUNCTION", "not"]]}
 ]}

@@ -76,20 +76,34 @@ for my $file_name (grep {$_} split /\s+/, qq[
             if defined $token->{value} and $token->{value} eq '';
       }
       unless ({
+               DOT => 1,
                LBRACE => 1, RBRACE => 1,
                LBRACKET => 1, RBRACKET => 1,
                CDO => 1, CDC => 1,
+               COLON => 1,
+               COMMA => 1,
                COMMENT_INVALID => 1,
+               DASHMATCH => 1,
                DIMENSION => (not defined $token->{value}),
+               EXCLAMATION => 1,
                GREATER => 1,
+               INCLUDES => 1,
+               MATCH => 1,
+               MINUS => 1,
                NUMBER => (not defined $token->{value}),
                LPAREN => 1, RPAREN => 1,
                PERCENTAGE => (not defined $token->{value}),
                PLUS => 1,
+               PREFIXMATCH => 1,
                S => 1,
                SEMICOLON => 1,
+               STAR => 1,
+               SUBSTRINGMATCH => 1,
+               SUFFIXMATCH => 1,
+               TILDE => 1,
                URI_INVALID => 1,
                URI_PREFIX_INVALID => 1,
+               VBAR => 1,
               }->{$test_token->[0]}) {
         push @$test_token, $token->{value};
       }
@@ -104,4 +118,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2007/09/08 16:43:52 $
+## $Date: 2007/09/08 17:43:41 $

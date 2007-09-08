@@ -59,6 +59,13 @@ sub CDC_TOKEN () { 35 }
 sub COMMENT_TOKEN () { 36 }
 sub COMMENT_INVALID_TOKEN () { 37 }
 sub EOF_TOKEN () { 38 }
+sub MINUS_TOKEN () { 39 }
+sub STAR_TOKEN () { 40 }
+sub VBAR_TOKEN () { 41 }
+sub DOT_TOKEN () { 42 }
+sub COLON_TOKEN () { 43 }
+sub MATCH_TOKEN () { 44 }
+sub EXCLAMATION_TOKEN () { 45 }
 
 our @TokenName = qw(
   0 IDENT ATKEYWORD HASH FUNCTION URI URI_INVALID URI_PREFIX URI_PREFIX_INVALID
@@ -66,7 +73,7 @@ our @TokenName = qw(
   0 DELIM PLUS GREATER COMMA TILDE DASHMATCH
   PREFIXMATCH SUFFIXMATCH SUBSTRINGMATCH INCLUDES SEMICOLON
   LBRACE RBRACE LPAREN RPAREN LBRACKET RBRACKET S CDO CDC COMMENT
-  COMMENT_INVALID EOF
+  COMMENT_INVALID EOF MINUS STAR VBAR DOT COLON MATCH EXCLAMATION
 );
 
 sub new ($) {
@@ -267,7 +274,7 @@ sub get_next_token ($) {
               return {type => CDO_TOKEN};
               #redo A;
             } else {
-              unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '!'};
+              unshift @{$self->{token}}, {type => EXCLAMATION_TOKEN};
               ## NOTE: |-| in |ident| in |IDENT|
               $self->{t} = {type => IDENT_TOKEN, value => '-'};
               $self->{state} = BEFORE_NMSTART_STATE;
@@ -276,7 +283,7 @@ sub get_next_token ($) {
               #redo A;
             }
           } else {
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '!'};
+            unshift @{$self->{token}}, {type => EXCLAMATION_TOKEN};
             $self->{state} = BEFORE_TOKEN_STATE;
             #reprocess
             return {type => DELIM_TOKEN, value => '<'};
@@ -289,13 +296,18 @@ sub get_next_token ($) {
           #redo A;
         }
       } elsif (my $t = {
-                0x003B => SEMICOLON_TOKEN, # ;
-                0x007B => LBRACE_TOKEN, # {
-                0x007D => RBRACE_TOKEN, # }
-                0x0028 => LPAREN_TOKEN, # (
-                0x0029 => RPAREN_TOKEN, # )
-                0x005B => LBRACKET_TOKEN, # [
-                0x005D => RBRACKET_TOKEN, # ]
+                        0x0021 => EXCLAMATION_TOKEN, # !
+                        0x002D => MINUS_TOKEN, # -
+                        0x002E => DOT_TOKEN, # .
+                        0x003A => COLON_TOKEN, # :
+                        0x003B => SEMICOLON_TOKEN, # ;
+                        0x003D => MATCH_TOKEN, # =
+                        0x007B => LBRACE_TOKEN, # {
+                        0x007D => RBRACE_TOKEN, # }
+                        0x0028 => LPAREN_TOKEN, # (
+                        0x0029 => RPAREN_TOKEN, # )
+                        0x005B => LBRACKET_TOKEN, # [
+                        0x005D => RBRACKET_TOKEN, # ]
                }->{$self->{c}}) {
         # stay in the state
         $self->{c} = $self->{get_char}->();
@@ -346,6 +358,14 @@ sub get_next_token ($) {
         if ($self->{c} == 0x003D) { # =
           # stay in the state
           $self->{c} = $self->{get_char}->();
+          return {type => $v};
+          #redo A;
+        } elsif ($v = {
+                       0x002A => STAR_TOKEN, # *
+                       0x007C => VBAR_TOKEN, # |
+                      }->{$c}) {
+          # stay in the state.
+          # reprocess
           return {type => $v};
           #redo A;
         } else {
@@ -424,7 +444,7 @@ sub get_next_token ($) {
             #$self->{t} = {type => IDENT_TOKEN, value => '-'};
             # stay in the state
             # reconsume
-            return {type => DELIM_TOKEN, value => '-'};
+            return {type => MINUS_TOKEN};
             #redo A;
           }
         } elsif ($self->{t}->{type} == DIMENSION_TOKEN) {
@@ -443,7 +463,7 @@ sub get_next_token ($) {
             $t->{type} = NUMBER_TOKEN;
             $t->{value} = '';
             $self->{t} = {type => IDENT_TOKEN, value => '-', hyphen => 1};
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
+            unshift @{$self->{token}}, {type => MINUS_TOKEN};
             # stay in the state
             # reconsume
             return $t;
@@ -458,7 +478,7 @@ sub get_next_token ($) {
       
       if ($self->{t}->{type} == DIMENSION_TOKEN) {
         ## NOTE: |-| after |NUMBER|.
-        unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
+        unshift @{$self->{token}}, {type => MINUS_TOKEN};
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
         $self->{t}->{type} = NUMBER_TOKEN;
@@ -468,7 +488,7 @@ sub get_next_token ($) {
         ## NOTE: |-| not followed by |nmstart|.
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
-        return {type => DELIM_TOKEN, value => '-'};
+        return {type => MINUS_TOKEN};
       }
     } elsif ($self->{state} == AFTER_AT_STATE) {
       if ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
@@ -511,7 +531,7 @@ sub get_next_token ($) {
           return {type => DELIM_TOKEN, value => '@'};
           #redo A;
         } else {
-          unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
+          unshift @{$self->{token}}, {type => MINUS_TOKEN};
           $self->{t} = {type => IDENT_TOKEN, value => '-'};
           $self->{state} = BEFORE_NMSTART_STATE;
           # reprocess
@@ -524,7 +544,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
+        unshift @{$self->{token}}, {type => MINUS_TOKEN};
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
         return {type => DELIM_TOKEN, value => '@'};
@@ -860,7 +880,7 @@ sub get_next_token ($) {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
             unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
+            unshift @{$self->{token}}, {type => MINUS_TOKEN};
             $self->{t}->{type} = NUMBER_TOKEN;
             $self->{t}->{value} = '';
             return $self->{t};
@@ -885,7 +905,7 @@ sub get_next_token ($) {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
             unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
-            return {type => DELIM_TOKEN, value => '-'};
+            return {type => MINUS_TOKEN};
             #redo A;
           } elsif (length $self->{t}->{value}) {
             $self->{state} = BEFORE_TOKEN_STATE;
@@ -1057,7 +1077,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '.'};
+        unshift @{$self->{token}}, {type => DOT_TOKEN};
         $self->{t}->{number} = $self->{t}->{value};
         $self->{t}->{value} = '';
         $self->{state} = BEFORE_TOKEN_STATE;
@@ -1075,7 +1095,7 @@ sub get_next_token ($) {
       } else {
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
-        return {type => DELIM_TOKEN, value => '.'};
+        return {type => DOT_TOKEN};
         #redo A;
       }
     } elsif ($self->{state} == NUMBER_DOT_NUMBER_STATE) {
@@ -1099,4 +1119,4 @@ sub get_next_token ($) {
 } # get_next_token
 
 1;
-# $Date: 2007/09/08 15:43:12 $
+# $Date: 2007/09/08 17:43:41 $
