@@ -1713,5 +1713,247 @@
 
   {"description": "url(\"\u000c\")",
   "input": "url(\"\u000c\")",
-  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]}
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]},
+
+  {"description": "url-prefix()",
+  "input": "url-prefix()",
+  "output": [["URI_PREFIX", ""]]},
+
+  {"description": "url-prefix(\"\")",
+  "input": "url-prefix(\"\")",
+  "output": [["URI_PREFIX", ""]]},
+
+  {"description": "url-prefix('')",
+  "input": "url-prefix('')",
+  "output": [["URI_PREFIX", ""]]},
+
+  {"description": "url-prefix(aaa)",
+  "input": "url-prefix(aaa)",
+  "output": [["URI_PREFIX", "aaa"]]},
+
+  {"description": "url-prefix(\"abc\")",
+  "input": "url-prefix(\"abc\")",
+  "output": [["URI_PREFIX", "abc"]]},
+
+  {"description": "url-prefix('abc')",
+  "input": "url-prefix('abc')",
+  "output": [["URI_PREFIX", "abc"]]},
+
+  {"description": "url-prefix(\\4e00)",
+  "input": "url-prefix(\\4e00)",
+  "output": [["URI_PREFIX", "\u4e00"]]},
+
+  {"description": "url-prefix(aa\"bb)",
+  "input": "url-prefix(aa\"bb)",
+  "output": [["URI_PREFIX_INVALID"]]},
+
+  {"description": "url-prefix(aa'bb)",
+  "input": "url-prefix(aa'bb)",
+  "output": [["URI_PREFIX_INVALID"]]},
+
+  {"description": "url-prefix(\"aa)",
+  "input": "url-prefix(\"aa)",
+  "output": [["URI_PREFIX_INVALID"]]},
+
+  {"description": "url-prefix('aaa)",
+  "input": "url-prefix('aaa)",
+  "output": [["URI_PREFIX_INVALID"]]},
+
+  {"description": "url-prefi\\x( a )",
+  "input": "url-prefi\\x( a )",
+  "output": [["URI_PREFIX", "a"]]},
+
+  {"description": "u+",
+  "input": "u+",
+  "output": [["IDENT", "u"], ["PLUS"]]},
+
+  {"description": "U+",
+  "input": "U+",
+  "output": [["IDENT", "U"], ["PLUS"]]},
+
+  {"description": "u\\+",
+  "input": "u\\+",
+  "output": [["IDENT", "u+"]]},
+
+  {"description": "u+4",
+  "input": "u+4",
+  "output": [["UNICODE_RANGE", "4"]]},
+
+  {"description": "u+a",
+  "input": "u+a",
+  "output": [["UNICODE_RANGE", "a"]]},
+
+  {"description": "u+B",
+  "input": "u+B",
+  "output": [["UNICODE_RANGE", "B"]]},
+
+  {"description": "u+?",
+  "input": "u+?",
+  "output": [["UNICODE_RANGE", "?"]]},
+
+  {"description": "u+X",
+  "input": "u+X",
+  "output": [["IDENT", "u"], ["PLUS"], ["IDENT", "X"]]},
+
+  {"description": "u+/**/4",
+  "input": "u+/**/4",
+  "output": [["IDENT", "u"], ["PLUS"], ["NUMBER", "4"]]},
+
+  {"description": "u+\\34",
+  "input": "u+\\34",
+  "output": [["IDENT", "u"], ["PLUS"], ["IDENT", "4"]]},
+
+  {"description": "u+42",
+  "input": "u+42",
+  "output": [["UNICODE_RANGE", "42"]]},
+
+  {"description": "u+4E0",
+  "input": "u+4E0",
+  "output": [["UNICODE_RANGE", "4E0"]]},
+
+  {"description": "u+4e00",
+  "input": "u+4e00",
+  "output": [["UNICODE_RANGE", "4e00"]]},
+
+  {"description": "u+4?2?",
+  "input": "u+4?2?",
+  "output": [["UNICODE_RANGE", "4?2?"]]},
+
+  {"description": "u+4???",
+  "input": "u+4???",
+  "output": [["UNICODE_RANGE", "4???"]]},
+
+  {"description": "u+4???12",
+  "input": "u+4???12",
+  "output": [["UNICODE_RANGE", "4???12"]]},
+
+  {"description": "u+4123456",
+  "input": "u+4123456",
+  "output": [["UNICODE_RANGE", "412345"], ["NUMBER", "6"]]},
+
+  {"description": "u+4123456em",
+  "input": "u+4123456em",
+  "output": [["UNICODE_RANGE", "412345"], ["DIMENSION", "6", "em"]]},
+
+  {"description": "u+4-",
+  "input": "u+4-",
+  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"]]},
+
+  {"description": "u+4-?",
+  "input": "u+4-?",
+  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["DELIM", "?"]]},
+
+  {"description": "u+4-1",
+  "input": "u+4-1",
+  "output": [["UNICODE_RANGE", "4-1"]]},
+
+  {"description": "u+4-x",
+  "input": "u+4-x",
+  "output": [["UNICODE_RANGE", "4"], ["IDENT", "-x"]]},
+
+  {"description": "u+4/**/-1",
+  "input": "u+4/**/-1",
+  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["NUMBER", "1"]]},
+
+  {"description": "u+4-12",
+  "input": "u+4-12",
+  "output": [["UNICODE_RANGE", "4-12"]]},
+
+  {"description": "u+4-eef",
+  "input": "u+4-eef",
+  "output": [["UNICODE_RANGE", "4-eef"]]},
+
+  {"description": "u+4-ffff",
+  "input": "u+4-ffff",
+  "output": [["UNICODE_RANGE", "4-ffff"]]},
+
+  {"description": "u+4-10000",
+  "input": "u+4-10000",
+  "output": [["UNICODE_RANGE", "4-10000"]]},
+
+  {"description": "u+4-ffffff",
+  "input": "u+4-ffffff",
+  "output": [["UNICODE_RANGE", "4-ffffff"]]},
+
+  {"description": "u+4-1234567",
+  "input": "u+4-1234567",
+  "output": [["UNICODE_RANGE", "4-123456"], ["NUMBER", "7"]]},
+
+  {"description": "u+4-123?56",
+  "input": "u+4-123?56",
+  "output": [["UNICODE_RANGE", "4-123"], ["DELIM", "?"], ["NUMBER", "56"]]},
+
+  {"description": "u+4--",
+  "input": "u+4--",
+  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["DELIM", "-"]]},
+
+  {"description": "u+4-->",
+  "input": "u+4-->",
+  "output": [["UNICODE_RANGE", "4"], ["CDC"]]},
+
+  {"description": "u+4-/**/->",
+  "input": "u+4-/**/->",
+  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["DELIM", "-"],
+      ["GREATER"]]},
+
+  {"description": "u+4--/**/>",
+  "input": "u+4--/**/>",
+  "output": [["UNICODE_RANGE", "4"], ["DELIM", "-"], ["DELIM", "-"],
+      ["GREATER"]]},
+
+  {"description": "\\u+4",
+  "input": "\\u+4",
+  "output": [["IDENT", "u"], ["PLUS"], ["NUMBER", "4"]]},
+
+  {"description": "<",
+  "input": "<",
+  "output": [["DELIM", "<"]]},
+
+  {"description": "<!",
+  "input": "<!",
+  "output": [["DELIM", "<"], ["DELIM", "!"]]},
+
+  {"description": "<!-",
+  "input": "<!-",
+  "output": [["DELIM", "<"], ["DELIM", "!"], ["DELIM", "-"]]},
+
+  {"description": "<!--",
+  "input": "<!--",
+  "output": [["CDO"]]},
+
+  {"description": "\\<!--",
+  "input": "\\<!--",
+  "output": [["IDENT", "<"], ["DELIM", "!"], ["DELIM", "-"], ["DELIM", "-"]]},
+
+  {"description": "<!--a",
+  "input": "<!--a",
+  "output": [["CDO"], ["IDENT", "a"]]},
+
+  {"description": "<!-->",
+  "input": "<!-->",
+  "output": [["CDO"], ["GREATER"]]},
+
+  {"description": "<!--->",
+  "input": "<!--->",
+  "output": [["CDO"], ["DELIM", "-"], ["GREATER"]]},
+
+  {"description": "<!---->",
+  "input": "<!---->",
+  "output": [["CDO"], ["CDC"]]},
+
+  {"description": "<!>",
+  "input": "<!>",
+  "output": [["DELIM", "<"], ["DELIM", "!"], ["GREATER"]]},
+
+  {"description": "-",
+  "input": "-",
+  "output": [["DELIM", "-"]]},
+
+  {"description": "--",
+  "input": "--",
+  "output": [["DELIM", "-"], ["DELIM", "-"]]},
+
+  {"description": "-->",
+  "input": "-->",
+  "output": [["CDC"]]}
 ]}

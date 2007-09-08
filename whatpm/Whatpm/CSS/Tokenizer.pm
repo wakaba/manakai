@@ -115,7 +115,7 @@ sub get_next_token ($) {
               (0x0041 <= $self->{c} and $self->{c} <= 0x0046) or # A..F
               (0x0061 <= $self->{c} and $self->{c} <= 0x0066) or # a..f
               $self->{c} == 0x003F) { # ?
-            $self->{t}->{value} .= '+' . chr $self->{c};
+            $self->{t}->{value} = chr $self->{c};
             $self->{t}->{type} = UNICODE_RANGE_TOKEN;
             $self->{c} = $self->{get_char}->();
             C: for (2..6) {
@@ -1099,4 +1099,4 @@ sub get_next_token ($) {
 } # get_next_token
 
 1;
-# $Date: 2007/09/08 15:20:41 $
+# $Date: 2007/09/08 15:43:12 $
