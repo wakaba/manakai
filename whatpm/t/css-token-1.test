@@ -1955,5 +1955,169 @@
 
   {"description": "-->",
   "input": "-->",
-  "output": [["CDC"]]}
+  "output": [["CDC"]]},
+
+  {"description": ";",
+  "input": ";",
+  "output": [["SEMICOLON"]]},
+
+  {"description": ";;",
+  "input": ";;",
+  "output": [["SEMICOLON"], ["SEMICOLON"]]},
+
+  {"description": "\\;",
+  "input": "\\;",
+  "output": [["IDENT", ";"]]},
+
+  {"description": "{",
+  "input": "{",
+  "output": [["LBRACE"]]},
+
+  {"description": "}",
+  "input": "}",
+  "output": [["RBRACE"]]},
+
+  {"description": "[",
+  "input": "[",
+  "output": [["LBRACKET"]]},
+
+  {"description": "]",
+  "input": "]",
+  "output": [["RBRACKET"]]},
+
+  {"description": "(",
+  "input": "(",
+  "output": [["LPAREN"]]},
+
+  {"description": ")",
+  "input": ")",
+  "output": [["RPAREN"]]},
+
+  {"description": "((",
+  "input": "((",
+  "output": [["LPAREN"], ["LPAREN"]]},
+
+  {"description": "()",
+  "input": "()",
+  "output": [["LPAREN"], ["RPAREN"]]},
+
+  {"description": "\u0000",
+  "input": "\u0000",
+  "output": [["DELIM", "\u0000"]]},
+
+  {"description": "\u0009",
+  "input": "\u0009",
+  "output": [["S"]]},
+
+  {"description": "\u0009\u0009",
+  "input": "\u0009\u0009",
+  "output": [["S"]]},
+
+  {"description": "\u0009 ",
+  "input": "\u0009 ",
+  "output": [["S"]]},
+
+  {"description": "\u000a",
+  "input": "\u000a",
+  "output": [["S"]]},
+
+  {"description": "\u000a\u000a",
+  "input": "\u000a\u000a",
+  "output": [["S"]]},
+
+  {"description": "\u000d",
+  "input": "\u000d",
+  "output": [["S"]]},
+
+  {"description": "\u000d\u000a",
+  "input": "\u000d\u000a",
+  "output": [["S"]]},
+
+  {"description": "\u0009\u000a",
+  "input": "\u0009\u000a",
+  "output": [["S"]]},
+
+  {"description": "\u000b",
+  "input": "\u000b",
+  "output": [["DELIM", "\u000b"]]},
+
+  {"description": "\u000c",
+  "input": "\u000c",
+  "output": [["S"]]},
+
+  {"description": "\u000f",
+  "input": "\u000f",
+  "output": [["DELIM", "\u000f"]]},
+
+  {"description": " ",
+  "input": " ",
+  "output": [["S"]]},
+
+  {"description": "   ",
+  "input": "   ",
+  "output": [["S"]]},
+
+  {"description": "\u0009 ",
+  "input": "\u0009 ",
+  "output": [["S"]]},
+
+  {"description": " \u0009",
+  "input": " \u0009",
+  "output": [["S"]]},
+
+  {"description": "X\u0009",
+  "input": "X\u0009",
+  "output": [["IDENT", "X"], ["S"]]},
+
+  {"description": "/",
+  "input": "/",
+  "output": [["DELIM", "/"]]},
+
+  {"description": "/*",
+  "input": "/*",
+  "output": [["COMMENT_INVALID"]]},
+
+  {"description": "/**",
+  "input": "/**",
+  "output": [["COMMENT_INVALID"]]},
+
+  {"description": "/***",
+  "input": "/***",
+  "output": [["COMMENT_INVALID"]]},
+
+  {"description": "/**/",
+  "input": "/**/",
+  "output": []},
+
+  {"description": "/***/",
+  "input": "/***/",
+  "output": []},
+
+  {"description": "/****/",
+  "input": "/****/",
+  "output": []},
+
+  {"description": "/*  */",
+  "input": "/*  */",
+  "output": []},
+
+  {"description": "/*\u000a*/",
+  "input": "/*\u000a*/",
+  "output": []},
+
+  {"description": "/**/ ",
+  "input": "/**/ ",
+  "output": [["S"]]},
+
+  {"description": " /**/ ",
+  "input": " /**/ ",
+  "output": [["S"], ["S"]]},
+
+  {"description": "/*/**/",
+  "input": "/*/**/",
+  "output": []},
+
+  {"description": "/*/**/*/",
+  "input": "/*/**/*/",
+  "output": [["DELIM", "*"], ["DELIM", "/"]]}
 ]}

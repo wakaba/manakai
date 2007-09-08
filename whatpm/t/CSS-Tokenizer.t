@@ -78,8 +78,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
       unless ({
                LBRACE => 1, RBRACE => 1,
                LBRACKET => 1, RBRACKET => 1,
-               CDC => 1,
-               CDO => 1,
+               CDO => 1, CDC => 1,
+               COMMENT_INVALID => 1,
                DIMENSION => (not defined $token->{value}),
                GREATER => 1,
                NUMBER => (not defined $token->{value}),
@@ -87,6 +87,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
                PERCENTAGE => (not defined $token->{value}),
                PLUS => 1,
                S => 1,
+               SEMICOLON => 1,
                URI_INVALID => 1,
                URI_PREFIX_INVALID => 1,
               }->{$test_token->[0]}) {
@@ -103,4 +104,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2007/09/08 15:20:41 $
+## $Date: 2007/09/08 16:43:52 $
