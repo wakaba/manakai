@@ -1013,7 +1013,14 @@ sub get_next_token ($) {
                $self->{c} == 0x000D or # \r
                $self->{c} == 0x000C or # \f
                $self->{c} == -1) {
-        $self->{t}->{type} = INVALID_TOKEN;
+        $self->{t}->{type} = {
+          STRING_TOKEN, INVALID_TOKEN,
+          INVALID_TOKEN, INVALID_TOKEN,
+          URI_TOKEN, URI_INVALID_TOKEN,
+          URI_INVALID_TOKEN, URI_INVALID_TOKEN,
+          URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
+          URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
+        }->{$self->{t}->{type}};
         $self->{state} = BEFORE_TOKEN_STATE;
         # reconsume
         return $self->{t};
@@ -1092,4 +1099,4 @@ sub get_next_token ($) {
 } # get_next_token
 
 1;
-# $Date: 2007/09/08 13:43:58 $
+# $Date: 2007/09/08 15:20:41 $

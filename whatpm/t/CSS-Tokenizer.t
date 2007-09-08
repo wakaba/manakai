@@ -66,12 +66,32 @@ for my $file_name (grep {$_} split /\s+/, qq[
       my $test_token;
       $test_token->[0] = $Whatpm::CSS::Tokenizer::TokenName[$token->{type}] ||
           $token->{type};
-      if ($test_token->[0] eq 'NUMBER' or $test_token->[0] eq 'DIMENSION') {
+      if ({
+           NUMBER => 1,
+           DIMENSION => 1,
+           PERCENTAGE => 1,
+          }->{$test_token->[0]}) {
         push @$test_token, $token->{number};
         delete $token->{value}
             if defined $token->{value} and $token->{value} eq '';
       }
-      push @$test_token, $token->{value} if defined $token->{value};
+      unless ({
+               LBRACE => 1, RBRACE => 1,
+               LBRACKET => 1, RBRACKET => 1,
+               CDC => 1,
+               CDO => 1,
+               DIMENSION => (not defined $token->{value}),
+               GREATER => 1,
+               NUMBER => (not defined $token->{value}),
+               LPAREN => 1, RPAREN => 1,
+               PERCENTAGE => (not defined $token->{value}),
+               PLUS => 1,
+               S => 1,
+               URI_INVALID => 1,
+               URI_PREFIX_INVALID => 1,
+              }->{$test_token->[0]}) {
+        push @$test_token, $token->{value};
+      }
       push @token, $test_token;
     }
      
@@ -83,4 +103,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2007/09/08 13:43:58 $
+## $Date: 2007/09/08 15:20:41 $

@@ -627,6 +627,38 @@
   "input": "'a\\\u000D\u000Ab",
   "output": [["INVALID", "a\u000D\u000Ab"]]},
 
+  {"description": "'\u000d'",
+  "input": "'\u000d'",
+  "output": [["INVALID", ""], ["S"], ["INVALID", ""]]},
+
+  {"description": "\"\u000d\"",
+  "input": "\"\u000d\"",
+  "output": [["INVALID", ""], ["S"], ["INVALID", ""]]},
+
+  {"description": "'\u000d\u000a'",
+  "input": "'\u000d\u000a'",
+  "output": [["INVALID", ""], ["S"], ["INVALID", ""]]},
+
+  {"description": "\"\u000d\u000a\"",
+  "input": "\"\u000d\u000a\"",
+  "output": [["INVALID", ""], ["S"], ["INVALID", ""]]},
+
+  {"description": "'\u000a'",
+  "input": "'\u000a'",
+  "output": [["INVALID", ""], ["S"], ["INVALID", ""]]},
+
+  {"description": "\"\u000a\"",
+  "input": "\"\u000a\"",
+  "output": [["INVALID", ""], ["S"], ["INVALID", ""]]},
+
+  {"description": "'\u000c'",
+  "input": "'\u000c'",
+  "output": [["INVALID", ""], ["S"], ["INVALID", ""]]},
+
+  {"description": "\"\u000c\"",
+  "input": "\"\u000c\"",
+  "output": [["INVALID", ""], ["S"], ["INVALID", ""]]},
+
   {"description": "#",
   "input": "#",
   "output": [["DELIM", "#"]]},
@@ -1097,5 +1129,589 @@
 
   {"description": "0-a-->",
   "input": "0-a-->",
-  "output": [["DIMENSION", "0", "-a--"], ["GREATER"]]}
+  "output": [["DIMENSION", "0", "-a--"], ["GREATER"]]},
+
+  {"description": "0%",
+  "input": "0%",
+  "output": [["PERCENTAGE", "0"]]},
+
+  {"description": "0\\%",
+  "input": "0\\%",
+  "output": [["DIMENSION", "0", "%"]]},
+
+  {"description": "0.0%",
+  "input": "0.0%",
+  "output": [["PERCENTAGE", "0.0"]]},
+
+  {"description": "0.0\\%",
+  "input": "0.0\\%",
+  "output": [["DIMENSION", "0.0", "%"]]},
+
+  {"description": ".0%",
+  "input": ".0%",
+  "output": [["PERCENTAGE", "0.0"]]},
+
+  {"description": ".0\\%",
+  "input": ".0\\%",
+  "output": [["DIMENSION", "0.0", "%"]]},
+
+  {"description": "0%a",
+  "input": "0%a",
+  "output": [["PERCENTAGE", "0"], ["IDENT", "a"]]},
+
+  {"description": "0\\%a",
+  "input": "0\\%a",
+  "output": [["DIMENSION", "0", "%a"]]},
+
+  {"description": "120%",
+  "input": "120%",
+  "output": [["PERCENTAGE", "120"]]},
+
+  {"description": "120\\%",
+  "input": "120\\%",
+  "output": [["DIMENSION", "120", "%"]]},
+
+  {"description": "0.%",
+  "input": "0.%",
+  "output": [["NUMBER", "0"], ["DELIM", "."], ["DELIM", "%"]]},
+
+  {"description": "0.\\%",
+  "input": "0.\\%",
+  "output": [["NUMBER", "0"], ["DELIM", "."], ["IDENT", "%"]]},
+
+  {"description": "u",
+  "input": "u",
+  "output": [["IDENT", "u"]]},
+
+  {"description": "U",
+  "input": "U",
+  "output": [["IDENT", "U"]]},
+
+  {"description": "\\u",
+  "input": "\\u",
+  "output": [["IDENT", "u"]]},
+
+  {"description": "ur",
+  "input": "ur",
+  "output": [["IDENT", "ur"]]},
+
+  {"description": "url",
+  "input": "url",
+  "output": [["IDENT", "url"]]},
+
+  {"description": "url(",
+  "input": "url(",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "uRl(",
+  "input": "uRl(",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "ur\\l(",
+  "input": "ur\\l(",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url\\(",
+  "input": "url\\(",
+  "output": [["IDENT", "url("]]},
+
+  {"description": "url()",
+  "input": "url()",
+  "output": [["URI", ""]]},
+
+  {"description": "url( )",
+  "input": "url( )",
+  "output": [["URI", ""]]},
+
+  {"description": "url(  )",
+  "input": "url(  )",
+  "output": [["URI", ""]]},
+
+  {"description": "url(\u0009)",
+  "input": "url(\u0009)",
+  "output": [["URI", ""]]},
+
+  {"description": "url(a)",
+  "input": "url(a)",
+  "output": [["URI", "a"]]},
+
+  {"description": "url(abcde)",
+  "input": "url(abcde)",
+  "output": [["URI", "abcde"]]},
+
+  {"description": "url( a)",
+  "input": "url( a)",
+  "output": [["URI", "a"]]},
+
+  {"description": "url(a )",
+  "input": "url(a )",
+  "output": [["URI", "a"]]},
+
+  {"description": "url( a )",
+  "input": "url( a )",
+  "output": [["URI", "a"]]},
+
+  {"description": "url( /**/a)",
+  "input": "url( /**/a)",
+  "output": [["URI", "/**/a"]]},
+
+  {"description": "url( /**/ a)",
+  "input": "url( /**/ a)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a b)",
+  "input": "url(a b)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url())",
+  "input": "url())",
+  "output": [["URI", ""], ["RPAREN"]]},
+
+  {"description": "url(()",
+  "input": "url(()",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\u0001)",
+  "input": "url(\u0001)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\u4e00)",
+  "input": "url(\u4e00)",
+  "output": [["URI", "\u4e00"]]},
+
+  {"description": "url(\u000d)",
+  "input": "url(\u000d)",
+  "output": [["URI", ""]]},
+
+  {"description": "url(\u000a)",
+  "input": "url(\u000a)",
+  "output": [["URI", ""]]},
+
+  {"description": "url(\u000d\u000a)",
+  "input": "url(\u000d\u000a)",
+  "output": [["URI", ""]]},
+
+  {"description": "url(\u000c)",
+  "input": "url(\u000c)",
+  "output": [["URI", ""]]},
+
+  {"description": "url(\u000b)",
+  "input": "url(\u000b)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(ad)",
+  "input": "url(ad)",
+  "output": [["URI", "ad"]]},
+
+  {"description": "url(a )",
+  "input": "url(a )",
+  "output": [["URI", "a"]]},
+
+  {"description": "url(a\u000d)",
+  "input": "url(a\u000d)",
+  "output": [["URI", "a"]]},
+
+  {"description": "url(a\u000a)",
+  "input": "url(a\u000a)",
+  "output": [["URI", "a"]]},
+
+  {"description": "url(a()",
+  "input": "url(a()",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a))",
+  "input": "url(a))",
+  "output": [["URI", "a"], ["RPAREN"]]},
+
+  {"description": "url(a\u4e00)",
+  "input": "url(a\u4e00)",
+  "output": [["URI", "a\u4e00"]]},
+
+  {"description": "url(\\)",
+  "input": "url(\\)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a\\)",
+  "input": "url(a\\)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\\x)",
+  "input": "url(\\x)",
+  "output": [["URI", "x"]]},
+
+  {"description": "url(a\\x)",
+  "input": "url(a\\x)",
+  "output": [["URI", "ax"]]},
+
+  {"description": "url(\\xyz)",
+  "input": "url(\\xyz)",
+  "output": [["URI", "xyz"]]},
+
+  {"description": "url(a\\xyz)",
+  "input": "url(a\\xyz)",
+  "output": [["URI", "axyz"]]},
+
+  {"description": "url(\\x yz)",
+  "input": "url(\\x yz)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a\\x yz)",
+  "input": "url(a\\x yz)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\\a)",
+  "input": "url(\\a)",
+  "output": [["URI", "\u000a"]]},
+
+  {"description": "url(\\a )",
+  "input": "url(\\a )",
+  "output": [["URI", "\u000a"]]},
+
+  {"description": "url(a\\a )",
+  "input": "url(a\\a )",
+  "output": [["URI", "a\u000a"]]},
+
+  {"description": "url(\\a b)",
+  "input": "url(\\a b)",
+  "output": [["URI", "\u000ab"]]},
+
+  {"description": "url(\\a  b)",
+  "input": "url(\\a  b)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a\\a  b)",
+  "input": "url(a\\a  b)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\\\u000d)",
+  "input": "url(\\\u000d)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a\\\u000d)",
+  "input": "url(a\\\u000d)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\\\u000a)",
+  "input": "url(\\\u000a)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a\\\u000a)",
+  "input": "url(a\\\u000a)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\\\u000d\u000a)",
+  "input": "url(\\\u000d\u000a)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a\\\u000d\u000a)",
+  "input": "url(a\\\u000d\u000a)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\\\u000c)",
+  "input": "url(\\\u000c)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a\\\u000c)",
+  "input": "url(a\\\u000c)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\\\u0001)",
+  "input": "url(\\\u0001)",
+  "output": [["URI", "\u0001"]]},
+
+  {"description": "url(a\\\u0001)",
+  "input": "url(a\\\u0001)",
+  "output": [["URI", "a\u0001"]]},
+
+  {"description": "url(\\4e00)",
+  "input": "url(\\4e00)",
+  "output": [["URI", "\u4e00"]]},
+
+  {"description": "url(a\\4e00)",
+  "input": "url(a\\4e00)",
+  "output": [["URI", "a\u4e00"]]},
+
+  {"description": "url(\\\u0028)",
+  "input": "url(\\\u0028)",
+  "output": [["URI", "("]]},
+
+  {"description": "url(a\\\u0028)",
+  "input": "url(a\\\u0028)",
+  "output": [["URI", "a("]]},
+
+  {"description": "url(\\\u0029)",
+  "input": "url(\\\u0029)",
+  "output": [["URI", ")"]]},
+
+  {"description": "url(a\\\u0029)",
+  "input": "url(a\\\u0029)",
+  "output": [["URI", "a)"]]},
+
+  {"description": "url(a\\(b\\)c)",
+  "input": "url(a\\(b\\)c)",
+  "output": [["URI", "a(b)c"]]},
+
+  {"description": "url(\\\\)",
+  "input": "url(\\\\)",
+  "output": [["URI", "\\"]]},
+
+  {"description": "url(a\\\\)",
+  "input": "url(a\\\\)",
+  "output": [["URI", "a\\"]]},
+
+  {"description": "url(a\\\\b)",
+  "input": "url(a\\\\b)",
+  "output": [["URI", "a\\b"]]},
+
+  {"description": "url(a b\\)c)",
+  "input": "url(a b\\c)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(a \"b)c\")",
+  "input": "url(a \"b)c\")",
+  "output": [["URI_INVALID"], ["IDENT", "c"], ["INVALID", ")"]]},
+
+  {"description": "url(\"",
+  "input": "url(\"",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url('",
+  "input": "url('",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\")",
+  "input": "url(\")",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(')",
+  "input": "url(')",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\"\"",
+  "input": "url(\"\"",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\"'",
+  "input": "url(\"'",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(''",
+  "input": "url(''",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url('\"",
+  "input": "url('\"",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url(\"\")",
+  "input": "url(\"\")",
+  "output": [["URI", ""]]},
+
+  {"description": "url(\"')",
+  "input": "url(\"')",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url('\")",
+  "input": "url('\")",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url('a')",
+  "input": "url('a')",
+  "output": [["URI", "a"]]},
+
+  {"description": "url(\"a\")",
+  "input": "url(\"a\")",
+  "output": [["URI", "a"]]},
+
+  {"description": "url('abcde')",
+  "input": "url('abcde')",
+  "output": [["URI", "abcde"]]},
+
+  {"description": "url(\"abcde\")",
+  "input": "url(\"abcde\")",
+  "output": [["URI", "abcde"]]},
+
+  {"description": "url( 'abcde')",
+  "input": "url( 'abcde')",
+  "output": [["URI", "abcde"]]},
+
+  {"description": "url( \"abcde\")",
+  "input": "url( \"abcde\")",
+  "output": [["URI", "abcde"]]},
+
+  {"description": "url('abcde' )",
+  "input": "url('abcde' )",
+  "output": [["URI", "abcde"]]},
+
+  {"description": "url(\"abcde\" )",
+  "input": "url(\"abcde\" )",
+  "output": [["URI", "abcde"]]},
+
+  {"description": "url( '\\'abcde')",
+  "input": "url( '\\'abcde')",
+  "output": [["URI", "'abcde"]]},
+
+  {"description": "url( \"\\'abcde\")",
+  "input": "url( \"\\'abcde\")",
+  "output": [["URI", "'abcde"]]},
+
+  {"description": "url( '\\\"abcde')",
+  "input": "url( '\\\"abcde')",
+  "output": [["URI", "\"abcde"]]},
+
+  {"description": "url( \"\\\"abcde\")",
+  "input": "url( \"\\\"abcde\")",
+  "output": [["URI", "\"abcde"]]},
+
+  {"description": "url( 'x\\'abcde')",
+  "input": "url( 'x\\'abcde')",
+  "output": [["URI", "x'abcde"]]},
+
+  {"description": "url( \"x\\'abcde\")",
+  "input": "url( \"x\\'abcde\")",
+  "output": [["URI", "x'abcde"]]},
+
+  {"description": "url( 'x\\\"abcde')",
+  "input": "url( 'x\\\"abcde')",
+  "output": [["URI", "x\"abcde"]]},
+
+  {"description": "url( \"x\\\"abcde\")",
+  "input": "url( \"x\\\"abcde\")",
+  "output": [["URI", "x\"abcde"]]},
+
+  {"description": "url( 'a(bcd)e')",
+  "input": "url( 'a(bcd)e')",
+  "output": [["URI", "a(bcd)e"]]},
+
+  {"description": "url( \"a(bcd)e\")",
+  "input": "url( \"a(bcd)e\")",
+  "output": [["URI", "a(bcd)e"]]},
+
+  {"description": "url( 'a(bcde')",
+  "input": "url( 'a(bcde')",
+  "output": [["URI", "a(bcde"]]},
+
+  {"description": "url( \"a(bcde\")",
+  "input": "url( \"a(bcde\")",
+  "output": [["URI", "a(bcde"]]},
+
+  {"description": "url( 'abcd)e')",
+  "input": "url( 'abcd)e')",
+  "output": [["URI", "abcd)e"]]},
+
+  {"description": "url( \"abcd)e\")",
+  "input": "url( \"abcd)e\")",
+  "output": [["URI", "abcd)e"]]},
+
+  {"description": "url( '\\a(bcd)e')",
+  "input": "url( '\\a(bcd)e')",
+  "output": [["URI", "\u000a(bcd)e"]]},
+
+  {"description": "url( \"\\a(bcd)e\")",
+  "input": "url( \"\\a(bcd)e\")",
+  "output": [["URI", "\u000a(bcd)e"]]},
+
+  {"description": "url( '\\a (bcd)e')",
+  "input": "url( '\\a (bcd)e')",
+  "output": [["URI", "\u000a(bcd)e"]]},
+
+  {"description": "url( \"\\a (bcd)e\")",
+  "input": "url( \"\\a (bcd)e\")",
+  "output": [["URI", "\u000a(bcd)e"]]},
+
+  {"description": "url( '\\Xa(bcd)e')",
+  "input": "url( '\\Xa(bcd)e')",
+  "output": [["URI", "Xa(bcd)e"]]},
+
+  {"description": "url( \"\\Xa(bcd)e\")",
+  "input": "url( \"\\Xa(bcd)e\")",
+  "output": [["URI", "Xa(bcd)e"]]},
+
+  {"description": "url( 'a b')",
+  "input": "url( 'a b')",
+  "output": [["URI", "a b"]]},
+
+  {"description": "url( \"a b\")",
+  "input": "url( \"a b\")",
+  "output": [["URI", "a b"]]},
+
+  {"description": "url( ' a b  ')",
+  "input": "url( ' a b  ')",
+  "output": [["URI", " a b  "]]},
+
+  {"description": "url( \" a b  \")",
+  "input": "url( \" a b  \")",
+  "output": [["URI", " a b  "]]},
+
+  {"description": "url( 'a b'c)",
+  "input": "url( 'a b'c)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url( \"a b\"c)",
+  "input": "url( \"a b\"c)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url( 'a b''c')",
+  "input": "url( 'a b''c')",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url( \"a b\"\"c\")",
+  "input": "url( \"a b\"\"c\")",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url( 'a b' c)",
+  "input": "url( 'a b' c)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url( \"a b\" c)",
+  "input": "url( \"a b\" c)",
+  "output": [["URI_INVALID"]]},
+
+  {"description": "url( '\\",
+  "input": "url( '\\",
+  "output": [["URI_INVALID"], ["DELIM", "\\"]]},
+
+  {"description": "url( \"\\)",
+  "input": "url( \"\\",
+  "output": [["URI_INVALID"], ["DELIM", "\\"]]},
+
+  {"description": "url( 'x\\",
+  "input": "url( 'x\\",
+  "output": [["URI_INVALID"], ["DELIM", "\\"]]},
+
+  {"description": "url( \"x\\)",
+  "input": "url( \"x\\",
+  "output": [["URI_INVALID"], ["DELIM", "\\"]]},
+
+  {"description": "url('\u000a')",
+  "input": "url('\u000a')",
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]},
+
+  {"description": "url(\"\u000a\")",
+  "input": "url(\"\u000a\")",
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]},
+
+  {"description": "url('\u000d')",
+  "input": "url('\u000d')",
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]},
+
+  {"description": "url(\"\u000d\")",
+  "input": "url(\"\u000d\")",
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]},
+
+  {"description": "url('\u000d\u000a')",
+  "input": "url('\u000d\u000a')",
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]},
+
+  {"description": "url(\"\u000d\u000a\")",
+  "input": "url(\"\u000d\u000a\")",
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]},
+
+  {"description": "url('\u000c')",
+  "input": "url('\u000c')",
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]},
+
+  {"description": "url(\"\u000c\")",
+  "input": "url(\"\u000c\")",
+  "output": [["URI_INVALID"], ["S"], ["INVALID", ")"]]}
 ]}
