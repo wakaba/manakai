@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>CSS Tokenizer Web Interface</title>
+<style type="text/css">
+  form {
+    display: block;
+    position: relative;
+    height: 20em;
+    margin-left: 1em;
+    margin-right: 1em;
+  }
+  form > fieldset {
+    display: block;
+    position: absolute;
+    top: 0; left: 0;
+    width: 40%; bottom: 0;
+    margin: 0;
+    border-style: none;
+    padding: 0;
+  }
+  iframe {
+    display: block;
+    position: absolute;
+    top: 0; right: 0;
+    width: 40%; bottom: 0;
+    margin: 0;
+  }
+  textarea {
+    width: 100%;
+    height: 19em;
+  }
+  button {
+    display: block;
+    position: absolute;
+    top: 9em;
+    left: 110%;
+  }
+  button:after {
+    content: " ->";
+  }
+  form > fieldset > fieldset {
+    display: block;
+    position: absolute;
+    top: 11em;
+    left: 103%;
+    border-style: none;
+    padding: 0;
+    min-width: 7em;
+  }
+  form > fieldset > fieldset fieldset {
+    font-size: 60%;
+  }
+  fieldset p {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+</style>
+</head>
+<body>
+<h1>CSS Tokenizer (<em>beta</em>) Web Interface</h1>
+
+<form action="parser/tokens"
+    method="post" accept-charset="utf-8" target="result">
+<fieldset>
+<p><textarea name="s">p + q {
+  color: blue /* red */;
+}
+</textarea></p>
+<p><button type="submit">Tokenize</button></p>
+</fieldset>
+
+<p><iframe name="result" src="about:blank"></iframe></p>
+</form>
+
+<address>Powered by 
+<a href="http://suika.fam.cx/www/markup/html/whatpm/readme">Whatpm</a></address>
+
+</body>
+</html>
