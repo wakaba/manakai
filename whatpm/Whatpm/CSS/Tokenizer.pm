@@ -102,7 +102,7 @@ sub get_next_token ($) {
     if ($self->{state} == BEFORE_TOKEN_STATE) {
       if ($self->{c} == 0x002D) { # -
         ## NOTE: |-| in |ident| in |IDENT|
-        $self->{t} = {type => IDENT_TOKEN, value => '-'};
+        $self->{t} = {type => IDENT_TOKEN, value => '-', hyphen => 1};
         $self->{state} = BEFORE_NMSTART_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -433,14 +433,14 @@ sub get_next_token ($) {
           ## NOTE: |-| after |NUMBER|.
           unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
           $self->{state} = BEFORE_TOKEN_STATE;
-          # reconsume
+          # reprocess
           $self->{t}->{value} = $self->{t}->{number};
           delete $self->{t}->{number};
           return $self->{t};
         } else {
           ## NOTE: |-| not followed by |nmstart|.
           $self->{state} = BEFORE_TOKEN_STATE;
-          $self->{c} = $self->{get_char}->();
+          # reprocess
           return {type => DELIM_TOKEN, value => '-'};
         }
       }
@@ -765,19 +765,14 @@ sub get_next_token ($) {
         redo A;
       } elsif (0x0061 <= $self->{c} and $self->{c} <= 0x0066) { # a..f
         ## NOTE: second character of |unicode| in |escape|.
-        $char = $self->{c} - 0x0061 - 0xA;
+        $char = $self->{c} - 0x0061 + 0xA;
         $self->{state} = ESCAPE_STATE; $i = 2;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x000A or # \n
                $self->{c} == 0x000C) { # \f
         if ($q == 0) {
-          ## NOTE: In |escape| in ... in |ident|.
-          $self->{state} = BEFORE_TOKEN_STATE;
-          unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
-          return $self->{t};
-          # reconsume
-          #redo A;
+          #
         } elsif ($q == 1) {
           ## NOTE: In |escape| in |URI|.
           $self->{t}->{type} = {
@@ -799,13 +794,9 @@ sub get_next_token ($) {
         }
       } elsif ($self->{c} == 0x000D) { # \r
         if ($q == 0) {
-          ## NOTE: In |escape| in ... in |ident|.
-          $self->{state} = BEFORE_TOKEN_STATE;
-          unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
-          return $self->{t};
-          # reconsume
-          #redo A;
+          #
         } elsif ($q == 1) {
+          ## NOTE: In |escape| in |URI|.
           $self->{t}->{type} = {
               URI_TOKEN, URI_INVALID_TOKEN,
               URI_INVALID_TOKEN, URI_INVALID_TOKEN,
@@ -823,11 +814,34 @@ sub get_next_token ($) {
           $self->{c} = $self->{get_char}->();
           redo A;
         }
+      } elsif ($self->{c} == -1) {
+        #
       } else {
         ## NOTE: second character of |escape|.
         $self->{t}->{value} .= chr $self->{c};
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
+        $self->{c} = $self->{get_char}->();
+        redo A;
+      }
+
+      if ($q == 0) {
+        $self->{state} = BEFORE_TOKEN_STATE;
+        # reprocess
+        if ($self->{t}->{hyphen} and $self->{t}->{value} eq '-') {
+          unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
+          return {type => DELIM_TOKEN, value => '-'};
+          #redo A;
+        } elsif (length $self->{t}->{value}) {
+          unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
+          return $self->{t};
+          #redo A;
+        } else {
+          return {type => DELIM_TOKEN, value => '\\'};
+          #redo A;
+        }
+      } else {
+        $self->{state} = $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       }
@@ -844,7 +858,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif (0x0061 <= $self->{c} and $self->{c} <= 0x0066) { # a..f
-        $char = $char * 0x10 + $self->{c} - 0x0061 - 0xA;
+        $char = $char * 0x10 + $self->{c} - 0x0061 + 0xA;
         $self->{state} = ++$i == 7 ? ESCAPE_BEFORE_NL_STATE : ESCAPE_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -1008,4 +1022,4 @@ sub get_next_token ($) {
 } # get_next_token
 
 1;
-# $Date: 2007/09/08 05:57:05 $
+# $Date: 2007/09/08 10:21:04 $

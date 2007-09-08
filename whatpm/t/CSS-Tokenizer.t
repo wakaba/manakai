@@ -67,7 +67,9 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $test_token->[0] = $Whatpm::CSS::Tokenizer::TokenName[$token->{type}] ||
           $token->{type};
       push @$test_token, $token->{number} if defined $token->{number};
-      push @$test_token, $token->{value} if defined $token->{value};
+      push @$test_token, $token->{value}
+          if defined $token->{value} and
+              (not $test_token->[0] eq 'NUMBER' or length $token->{value});
       push @token, $test_token;
     }
      
@@ -79,4 +81,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2007/09/08 05:57:05 $
+## $Date: 2007/09/08 10:21:04 $

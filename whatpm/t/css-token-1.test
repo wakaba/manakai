@@ -19,6 +19,10 @@
   "input": "ab",
   "output": [["IDENT", "ab"]]},
 
+  {"description": "\\",
+  "input": "\\",
+  "output": [["DELIM", "\\"]]},
+
   {"description": "IDENT started by escape 1",
   "input": "\\41",
   "output": [["IDENT", "A"]]},
@@ -65,5 +69,257 @@
 
   {"description": "IDENT started by escape followed by a space 5",
   "input": "\\000041\u000D\u000A",
-  "output": [["IDENT", "A"]]}
+  "output": [["IDENT", "A"]]},
+
+  {"description": "\\\u000D",
+  "input": "\\\u000D",
+  "output": [["DELIM", "\\"], ["S"]]},
+
+  {"description": "\\\u000D\u000A",
+  "input": "\\\u000D\u000A",
+  "output": [["DELIM", "\\"], ["S"]]},
+
+  {"description": "\\\u000D\\\u000A",
+  "input": "\\\u000D\\\u000A",
+  "output": [["DELIM", "\\"], ["S"], ["DELIM", "\\"], ["S"]]},
+
+  {"description": "\\\u000C",
+  "input": "\\\u000C",
+  "output": [["DELIM", "\\"], ["S"]]},
+
+  {"description": "\\\u000A",
+  "input": "\\\u000A",
+  "output": [["DELIM", "\\"], ["S"]]},
+
+  {"description": "\\ ",
+  "input": "\\ ",
+  "output": [["IDENT", " "]]},
+
+  {"description": "\\\\",
+  "input": "\\\\",
+  "output": [["IDENT", "\\"]]},
+
+  {"description": "\\\\\\",
+  "input": "\\\\\\",
+  "output": [["IDENT", "\\"], ["DELIM", "\\"]]},
+
+  {"description": "\\\u0009",
+  "input": "\\\u0009",
+  "output": [["IDENT", "\u0009"]]},
+
+  {"description": "\\X",
+  "input": "\\X",
+  "output": [["IDENT", "X"]]},
+
+  {"description": "a\\",
+  "input": "a\\",
+  "output": [["IDENT", "a"], ["DELIM", "\\"]]},
+
+  {"description": "a\\f1",
+  "input": "a\\f1",
+  "output": [["IDENT", "a\u00f1"]]},
+
+  {"description": "a\\F1",
+  "input": "a\\F1",
+  "output": [["IDENT", "a\u00f1"]]},
+
+  {"description": "a\\0f1",
+  "input": "a\\0f1",
+  "output": [["IDENT", "a\u00f1"]]},
+
+  {"description": "a\\0F1",
+  "input": "a\\0F1",
+  "output": [["IDENT", "a\u00f1"]]},
+
+  {"description": "a\\41",
+  "input": "a\\41",
+  "output": [["IDENT", "aA"]]},
+
+  {"description": "a\\41 b",
+  "input": "a\\41 b",
+  "output": [["IDENT", "aAb"]]},
+
+  {"description": "a\\41\u0009X",
+  "input": "a\\41\u0009X",
+  "output": [["IDENT", "aAX"]]},
+
+  {"description": "a\\4e00",
+  "input": "a\\4e00",
+  "output": [["IDENT", "a\u4e00"]]},
+
+  {"description": "a\\41  X",
+  "input": "a\\41  X",
+  "output": [["IDENT", "aA"], ["S"], ["IDENT", "X"]]},
+
+  {"description": "a\\ ",
+  "input": "a\\ ",
+  "output": [["IDENT", "a "]]},
+
+  {"description": "a\\ b",
+  "input": "a\\ b",
+  "output": [["IDENT", "a b"]]},
+
+  {"description": "a\\\\b",
+  "input": "a\\\\b",
+  "output": [["IDENT", "a\\b"]]},
+
+  {"description": "a\\\u0009b",
+  "input": "a\\\u0009b",
+  "output": [["IDENT", "a\u0009b"]]},
+
+  {"description": "a\\GB",
+  "input": "a\\GB",
+  "output": [["IDENT", "aGB"]]},
+
+  {"description": "a\\\u000D",
+  "input": "a\\\u000D",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"]]},
+
+  {"description": "a\\\u000A",
+  "input": "a\\\u000A",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"]]},
+
+  {"description": "a\\\u000D\u000A",
+  "input": "a\\\u000D\u000A",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"]]},
+
+  {"description": "a\\\u000D\\\u000A",
+  "input": "a\\\u000D\\\u000A",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"], ["DELIM", "\\"], ["S"]]},
+
+  {"description": "a\\\u000C",
+  "input": "a\\\u000C",
+  "output": [["IDENT", "a"], ["DELIM", "\\"], ["S"]]},
+
+  {"description": "-",
+  "input": "-",
+  "output": [["DELIM", "-"]]},
+
+  {"description": "\\-",
+  "input": "\\-",
+  "output": [["IDENT", "-"]]},
+
+  {"description": "-i",
+  "input": "-i",
+  "output": [["IDENT", "-i"]]},
+
+  {"description": "\\-i",
+  "input": "\\-i",
+  "output": [["IDENT", "-i"]]},
+
+  {"description": "-ident",
+  "input": "-ident",
+  "output": [["IDENT", "-ident"]]},
+
+  {"description": "\\-ident",
+  "input": "\\-ident",
+  "output": [["IDENT", "-ident"]]},
+
+  {"description": "-ident-ident",
+  "input": "-ident-ident",
+  "output": [["IDENT", "-ident-ident"]]},
+
+  {"description": "\\-ident-ident",
+  "input": "\\-ident-ident",
+  "output": [["IDENT", "-ident-ident"]]},
+
+  {"description": "-1",
+  "input": "-1",
+  "output": [["DELIM", "-"], ["NUMBER", "1"]]},
+
+  {"description": "\\-1",
+  "input": "\\-1",
+  "output": [["IDENT", "-1"]]},
+
+  {"description": "-1a",
+  "input": "-1a",
+  "output": [["DELIM", "-"], ["DIMENSION", "1", "a"]]},
+
+  {"description": "\\-1a",
+  "input": "\\-1a",
+  "output": [["IDENT", "-1a"]]},
+
+  {"description": "-\\31",
+  "input": "-\\31",
+  "output": [["IDENT", "-1"]]},
+
+  {"description": "\\-\\31",
+  "input": "\\-\\31",
+  "output": [["IDENT", "-1"]]},
+
+  {"description": "-\\41",
+  "input": "-\\41",
+  "output": [["IDENT", "-A"]]},
+
+  {"description": "\\-\\41",
+  "input": "\\-\\41",
+  "output": [["IDENT", "-A"]]},
+
+  {"description": "-\\\u000D",
+  "input": "-\\\u000D",
+  "output": [["DELIM", "-"], ["DELIM", "\\"], ["S"]]},
+
+  {"description": "\\-\\\u000D",
+  "input": "\\-\\\u000D",
+  "output": [["IDENT", "-"], ["DELIM", "\\"], ["S"]]},
+
+  {"description": "\u4e00",
+  "input": "\u4e00",
+  "output": [["IDENT", "\u4e00"]]},
+
+  {"description": "a\u4e00b",
+  "input": "a\u4e00b",
+  "output": [["IDENT", "a\u4e00b"]]},
+
+  {"description": "@",
+  "input": "@",
+  "output": [["DELIM", "@"]]},
+
+  {"description": "@a",
+  "input": "@a",
+  "output": [["ATKEYWORD", "a"]]},
+
+  {"description": "@A",
+  "input": "@A",
+  "output": [["ATKEYWORD", "A"]]},
+
+  {"description": "@abc",
+  "input": "@abc",
+  "output": [["ATKEYWORD", "abc"]]},
+
+  {"description": "@-",
+  "input": "@-",
+  "output": [["DELIM", "@"], ["DELIM", "-"]]},
+
+  {"description": "@-a",
+  "input": "@-a",
+  "output": [["ATKEYWORD", "-a"]]},
+
+  {"description": "@1",
+  "input": "@1",
+  "output": [["DELIM", "@"], ["NUMBER", "1"]]},
+
+  {"description": "@-1",
+  "input": "@-1",
+  "output": [["DELIM", "@"], ["DELIM", "-"], ["NUMBER", "1"]]},
+
+  {"description": "@\\41",
+  "input": "@\\41",
+  "output": [["ATKEYWORD", "A"]]},
+
+  {"description": "@\\61 b",
+  "input": "@\\61 b",
+  "output": [["ATKEYWORD", "ab"]]},
+
+  {"description": "@\\61  b",
+  "input": "@\\61  b",
+  "output": [["ATKEYWORD", "a"], ["S"], ["IDENT", "b"]]},
+
+  {"description": "@a\\41",
+  "input": "@aA",
+  "output": [["ATKEYWORD", "aA"]]},
+
+  {"description": "@a\\4e00X",
+  "input": "@a\\4e00X",
+  "output": [["ATKEYWORD", "a\u4e00X"]]}
 ]}
