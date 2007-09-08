@@ -1,0 +1,69 @@
+{"tests": [
+  {"description": "empty",
+  "input": "",
+  "output": []},
+
+  {"description": "length=1 IDENT (lowercase)",
+  "input": "a",
+  "output": [["IDENT", "a"]]},
+
+  {"description": "length=1 IDENT (uppercase)",
+  "input": "A",
+  "output": [["IDENT", "A"]]},
+
+  {"description": "length=2 IDENT (uppercase)",
+  "input": "AB",
+  "output": [["IDENT", "AB"]]},
+
+  {"description": "length=2 IDENT (lowercase)",
+  "input": "ab",
+  "output": [["IDENT", "ab"]]},
+
+  {"description": "IDENT started by escape 1",
+  "input": "\\41",
+  "output": [["IDENT", "A"]]},
+
+  {"description": "IDENT started by escape 2",
+  "input": "\\041",
+  "output": [["IDENT", "A"]]},
+
+  {"description": "IDENT started by escape 3",
+  "input": "\\0041",
+  "output": [["IDENT", "A"]]},
+
+  {"description": "IDENT started by escape 4",
+  "input": "\\00041",
+  "output": [["IDENT", "A"]]},
+
+  {"description": "IDENT started by escape 5",
+  "input": "\\000041",
+  "output": [["IDENT", "A"]]},
+
+  {"description": "IDENT started by escape 6",
+  "input": "\\0000041",
+  "output": [["IDENT", "\u00041"]]},
+
+  {"description": "IDENT started by escape 7",
+  "input": "\\00000041",
+  "output": [["IDENT", "\u000041"]]},
+
+  {"description": "IDENT started by escape followed by a space 1",
+  "input": "\\41 ",
+  "output": [["IDENT", "A"]]},
+
+  {"description": "IDENT started by escape followed by a space 2",
+  "input": "\\41 a",
+  "output": [["IDENT", "Aa"]]},
+
+  {"description": "IDENT started by escape followed by a space 3",
+  "input": "\\41\u0009a",
+  "output": [["IDENT", "Aa"]]},
+
+  {"description": "IDENT started by escape followed by a space 4",
+  "input": "\\000041 ",
+  "output": [["IDENT", "A"]]},
+
+  {"description": "IDENT started by escape followed by a space 5",
+  "input": "\\000041\u000D\u000A",
+  "output": [["IDENT", "A"]]}
+]}
