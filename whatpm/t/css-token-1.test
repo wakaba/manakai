@@ -589,5 +589,81 @@
 
   {"description": "'a\\\u000D\u000Ab",
   "input": "'a\\\u000D\u000Ab",
-  "output": [["INVALID", "a\u000D\u000Ab"]]}
+  "output": [["INVALID", "a\u000D\u000Ab"]]},
+
+  {"description": "#",
+  "input": "#",
+  "output": [["DELIM", "#"]]},
+
+  {"description": "\\#",
+  "input": "\\#",
+  "output": [["IDENT", "#"]]},
+
+  {"description": "#a",
+  "input": "#a",
+  "output": [["HASH", "a"]]},
+
+  {"description": "#A",
+  "input": "#A",
+  "output": [["HASH", "A"]]},
+
+  {"description": "##",
+  "input": "##",
+  "output": [["DELIM", "#"], ["DELIM", "#"]]},
+
+  {"description": "#\\#",
+  "input": "#\\#",
+  "output": [["HASH", "#"]]},
+
+  {"description": "#\\X",
+  "input": "#\\X",
+  "output": [["HASH", "X"]]},
+
+  {"description": "#\\a",
+  "input": "#\\a",
+  "output": [["HASH", "\u000a"]]},
+
+  {"description": "#\\-",
+  "input": "#\\-",
+  "output": [["HASH", "-"]]},
+
+  {"description": "#_",
+  "input": "#_",
+  "output": [["HASH", "_"]]},
+
+  {"description": "#0",
+  "input": "#0",
+  "output": [["HASH", "0"]]},
+
+  {"description": "#123456",
+  "input": "#123456",
+  "output": [["HASH", "123456"]]},
+
+  {"description": "#abc",
+  "input": "#abc",
+  "output": [["HASH", "abc"]]},
+
+  {"description": "#\\4e00XYZ",
+  "input": "#\\4e00XYZ",
+  "output": [["HASH", "\u4e00XYZ"]]},
+
+  {"description": "#\u4e00",
+  "input": "#\u4e00",
+  "output": [["HASH", "\u4e00"]]},
+
+  {"description": "#a\\100",
+  "input": "#a\\100",
+  "output": [["HASH", "a\u0100"]]},
+
+  {"description": "#1234567890",
+  "input": "#1234567890",
+  "output": [["HASH", "1234567890"]]},
+
+  {"description": "#1a",
+  "input": "#1a",
+  "output": [["HASH", "1a"]]},
+
+  {"description": "#\\a b",
+  "input": "#\\a b",
+  "output": [["HASH", "\u000ab"]]}
 ]}
