@@ -16,6 +16,7 @@ use encoding 'utf8', STDOUT => 'utf8';
 
 print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
 
+print "* RFC 4646\n\n";
 print "#errors\n";
 
 my $tag = $http->get_parameter ('t');
@@ -61,5 +62,21 @@ print "\n";
 print "#result\n";
 print "well-formed\t$wf\n";
 
+print "\n* RFC 3066\n\n";
+my $rfc3066conforming = 1;
+
+print "#errors\n";
+Whatpm::LangTag->check_rfc3066_language_tag ($tag, sub {
+  my %opt = @_;
+  print join "\t", %opt;
+  print "\n";
+  if ($opt{level} eq 'f' or $opt{level} eq 'm') {
+    $rfc3066conforming = 0;
+  }
+});
+
+print "\n#result\n";
+print "conforming\t$rfc3066conforming\n";
+
 ## License: Public Domain.
-# $Date: 2007/09/09 05:34:55 $
+# $Date: 2007/09/09 07:19:56 $
