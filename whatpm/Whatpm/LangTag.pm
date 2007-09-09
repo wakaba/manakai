@@ -125,6 +125,8 @@ sub check_rfc3066_language_tag ($$$;%) {
   ## NOTE: They are marked as $good_level for now, since
   ## RFC 3066 sais that there are "recommended" case for them
   ## and it itself does not "recommend" any case.
+  ## NOTE: In RFC 1766 case convention is "recommended", but
+  ## without RFC 2119 wording.
 
   my @tag = split /-/, $tag, -1;
 

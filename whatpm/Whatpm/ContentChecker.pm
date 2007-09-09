@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.46 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.47 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -33,12 +33,29 @@ our $AttrChecker = {
     },
     lang => sub {
       my ($self, $attr) = @_;
+      my $value = $attr->value;
+      if ($value eq '') {
+        #
+      } else {
+        require Whatpm::LangTag;
+        Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
+          my %opt = @_;
+          my $type = 'LangTag:'.$opt{type};
+          $type .= ':' . $opt{subtag} if defined $opt{subtag};
+          $self->{onerror}->(node => $attr, type => $type,
+                             value => $opt{value}, level => $opt{level});
+        });
+      }
+
       ## NOTE: "The values of the attribute are language identifiers
       ## as defined by [IETF RFC 3066], Tags for the Identification
       ## of Languages, or its successor; in addition, the empty string
       ## may be specified." ("may" in lower case)
-      $self->{onerror}->(node => $attr, level => 'unsupported',
-                         type => 'language tag');
+      ## NOTE: Is an RFC 3066-valid (but RFC 4647-invalid) language tag
+      ## allowed today?
+
+      ## TODO: test data
+
       if ($attr->owner_document->manakai_is_html) { # MUST NOT
         $self->{onerror}->(node => $attr, type => 'in HTML:xml:lang');
 ## TODO: Test data...
@@ -417,4 +434,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/17 11:53:52 $
+# $Date: 2007/09/09 07:57:32 $

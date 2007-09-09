@@ -720,13 +720,18 @@ my $HTMLIMTAttrChecker = sub {
 
 my $HTMLLanguageTagAttrChecker = sub {
   my ($self, $attr) = @_;
-  $self->{onerror}->(node => $attr, level => 'unsupported',
-                     type => 'language tag');
-  if ($attr->value eq '') {
-    $self->{onerror}->(node => $attr, type => 'language tag:syntax error');
-  }
-  ## TODO: RFC 3066 test
+  my $value = $attr->value;
+  require Whatpm::LangTag;
+  Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
+    my %opt = @_;
+    my $type = 'LangTag:'.$opt{type};
+    $type .= ':' . $opt{subtag} if defined $opt{subtag};
+    $self->{onerror}->(node => $attr, type => $type, value => $opt{value},
+                       level => $opt{level});
+  });
   ## ISSUE: RFC 4646 (3066bis)?
+
+  ## TODO: testdata
 }; # $HTMLLanguageTagAttrChecker
 
 ## "A valid media query [MQ]"
@@ -801,13 +806,25 @@ my $HTMLAttrChecker = {
   title => sub {}, ## NOTE: No conformance creteria
   lang => sub {
     my ($self, $attr) = @_;
-    $self->{onerror}->(node => $attr, level => 'unsupported',
-                       type => 'language tag');
-    ## TODO: RFC 3066 or empty test
+    my $value = $attr->value;
+    if ($value eq '') {
+      #
+    } else {
+      require Whatpm::LangTag;
+      Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
+        my %opt = @_;
+        my $type = 'LangTag:'.$opt{type};
+        $type .= ':' . $opt{subtag} if defined $opt{subtag};
+        $self->{onerror}->(node => $attr, type => $type, value => $opt{value},
+                           level => $opt{level});
+      });
+    }
     ## ISSUE: RFC 4646 (3066bis)?
     unless ($attr->owner_document->manakai_is_html) {
       $self->{onerror}->(node => $attr, type => 'in XML:lang');
     }
+
+    ## TODO: test data
   },
   dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
   class => sub {
