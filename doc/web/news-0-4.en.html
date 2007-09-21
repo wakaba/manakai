@@ -4,7 +4,7 @@
 <title>Changes in manakai 0.4</title>
 <link rel=author href="http://suika.fam.cx/~wakaba/who?" title=Wakaba>
 <link rel=license href="http://suika.fam.cx/c/pd" title="Public Domain">
-<link rel=prev href=news-0.3 title="Changes in manakai 0.3.*">
+<link rel=prev href=news-0-3 title="Changes in manakai 0.3.*">
 <link rel=stylesheet href="manakai-style">
 </head>
 <body>
@@ -22,7 +22,7 @@ For more information, see
 documentation for the <code>Message::DOM::DOMImplementation</code> 
 module</a>.</li>
 <li><strong class=caption><q>dis</q> Code Generator is
-No Longer Used</strong>.</li>
+No Longer Used</strong>.  DTD module generation is dropped as well.</li>
 <li><strong class=caption>Limited Support for DOM5 HTML</strong>,
 including <code>compat_mode</code>, <code>manakai_compat_mode</code>,
 and part of <code>inner_html</code> attributes.  Note
@@ -35,6 +35,11 @@ package.</li>
 character encoding modules</a> are no longer
 part of the manakai-core package, for some reason.  
 Sorry for inconvinience.</li>
+<li><code>TreeStore</code>, <code>XDP</code>, and <code>SuikaWiki</code>
+modules are dropped.  They might be eventually reimplemented
+if necessary.</li>
+<li>Support for Atom Threading Extension is dropped.  It is expected
+to be reimplemented in a future revision of manakai.</li>
 </ul>
 </div>
 
