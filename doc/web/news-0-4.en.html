@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang=en>
+<head>
+<title>Changes in manakai 0.4</title>
+<link rel=author href="http://suika.fam.cx/~wakaba/who?" title=Wakaba>
+<link rel=license href="http://suika.fam.cx/c/pd" title="Public Domain">
+<link rel=prev href=news-0.3 title="Changes in manakai 0.3.*">
+<link rel=stylesheet href="manakai-style">
+</head>
+<body>
+<h1>Changes in manakai 0.4</h1>
+
+<div class=section id=manakai-0-4-0>
+<h2>Changes from manakai 0.3.2 to 0.4.0</h2>
+
+<ul>
+<li><strong class=caption>DOM Implementation is rewritten</strong>.
+A DOM implementation can now be instantiated without
+meaningless <code>DOMImplementationRegistry</code> object!
+For more information, see 
+<a href="../../lib/Message/DOM/DOMImplementation.html#methods">the 
+documentation for the <code>Message::DOM::DOMImplementation</code> 
+module</a>.</li>
+<li><strong class=caption><q>dis</q> Code Generator is
+No Longer Used</strong>.</li>
+<li><strong class=caption>Limited Support for DOM5 HTML</strong>,
+including <code>compat_mode</code>, <code>manakai_compat_mode</code>,
+and part of <code>inner_html</code> attributes.  Note
+that the <code>inner_html</code> attribute relies on the HTML5
+parser and serializer that are part of the 
+<a href="http://suika.fam.cx/www/markup/html/whatpm/readme">Whatpm</a> 
+package.</li>
+<li><strong class=caption>DOM Internet Media Type Module Support</strong>.</li>
+<li><a href="http://suika.fam.cx/www/manakai-charlib/readme">Japanese 
+character encoding modules</a> are no longer
+part of the manakai-core package, for some reason.  
+Sorry for inconvinience.</li>
+</ul>
+</div>
+
+</body>
+</html>
