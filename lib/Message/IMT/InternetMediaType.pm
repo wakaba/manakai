@@ -1,8 +1,6 @@
 package Message::IMT::InternetMediaType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-
-require Message::Util::Error::DOMException;
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::DOM::IF::IMTImplementation;
 package Message::DOM::DOMImplementation;
@@ -41,13 +39,6 @@ sub __token_or_qs ($) {
 
 sub imt_text ($) {
   my $self = shift;
-  if (@_) {
-    report Message::Util::Error::DOMException::CoreException
-      -object => $self,
-      -type => 'NO_MODIFICATION_ALLOWED_ERR',
-      'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR',
-      'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'imt_text';
-  }
   my $r = __token_or_qs ($self->top_level_type) . '/' .
     __token_or_qs ($self->subtype);
   for (0 .. ($self->parameter_length - 1)) {
@@ -59,13 +50,6 @@ sub imt_text ($) {
 
 sub type ($) {
   my $self = shift;
-  if (@_) {
-    report Message::Util::Error::DOMException::CoreException
-      -object => $self,
-      -type => 'NO_MODIFICATION_ALLOWED_ERR',
-      'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR',
-      'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'type';
-  }
   return __token_or_qs ($self->top_level_type) . '/' .
     __token_or_qs ($self->subtype);
 } # type
@@ -182,4 +166,4 @@ sub ___report_error ($$) {
 } # ___report_error
 
 1;
-## $Date: 2007/06/13 12:04:51 $
+## $Date: 2007/09/21 08:09:16 $

@@ -38,12 +38,12 @@ Formatter/%.html: %.pm
 	$(POD2HTML2) $< > $@	
 
 clean:
-	$(RMALL) $(GENERATED_FILES)
 	$(RMALL) *.tmp .*.tmp *~ .*~
 	$(RMALL) Error/*~ Error/.*~
 	$(RMALL) Formatter/*~ Formatter/.*~
 
 distclean: clean
+	$(RMALL) $(GENERATED_FILES)
 
-## $Date: 2007/08/25 07:02:11 $
+## $Date: 2007/09/21 08:10:04 $
 ## License: Public Domain.

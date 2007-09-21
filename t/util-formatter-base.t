@@ -75,6 +75,7 @@ OK $f->replace (q(%foo({{attr{1}}} flag =>{{value{1}}} flag);)),
 use Message::Util::Error;
 try {
   $f->replace (q(%invalid));
+  OK 0, 1;
 } catch Message::Util::Formatter::Base::error with {
   my $err = shift;
   OK $err->text, qq(Semicolon (";") expected at "%invalid"**here**"<empty>");
@@ -82,6 +83,7 @@ try {
 
 try {
   $f->replace (q(Something, Something%invalid! Syntax error! Syntax error!));
+  OK 0, 2;
 } catch Message::Util::Formatter::Base::error with {
   my $err = shift;
   OK $err->text, q(Semicolon (";") expected at "g, Something%invalid"**here**"! Syntax error! Synt");
@@ -89,6 +91,7 @@ try {
 
 try {
   $f->replace (q(%invalid(a=>b!);));
+  OK 0, 3;
 } catch Message::Util::Formatter::error with {
   my $err = shift;
   OK $err->text, q[Separator ("," or ")") expected at "%invalid(a=>b"**here**"!);"];

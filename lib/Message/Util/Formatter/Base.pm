@@ -14,7 +14,7 @@ This module is part of manakai.
 
 package Message::Util::Formatter::Base;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub ___rule_def () {+{
   -bare_text => {
@@ -200,20 +200,20 @@ package Message::Util::Formatter::Base::error;
 push our @ISA, 'Message::Util::Formatter::error';
 sub ___error_def () {+{
   ATTR_SEPARATOR_NOT_FOUND => {
-    description => q[Separator ("," or ")") expected at "%t(name=>context-before);"**here**"%t(name=>context-after);"],  
+    -description => q[Separator ("," or ")") expected at "%t(name=>context-before);"**here**"%t(name=>context-after);"],  
   },
   SEMICOLON_NOT_FOUND => {
-    description => q(Semicolon (";") expected at "%t(name=>context-before);"**here**"%t(name=>context-after);"),
+    -description => q(Semicolon (";") expected at "%t(name=>context-before);"**here**"%t(name=>context-after);"),
   },
 }}
 
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003, 2007 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/04/25 07:15:49 $
+1; # $Date: 2007/09/21 08:11:37 $

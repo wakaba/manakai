@@ -1,40 +1,10 @@
-MANAKAI_ROOT_DIR = ../
-MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
-MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
+RM = rm
+RMALL = $(RM) -fv
 
-RM = rm -fv
-
-DIS_SUFFIX = .dis
-DAC_SUFFIX = .dae
-DAEM_SUFFIX = .daem
-
-PERL_OPTIONS =
-PERL = perl
-PERL_ = $(PERL) $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
-PERLC = $(PERL) -c -w
-PERLC_ = $(PERLC) $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
-
-DIS_OPTIONS = 
-DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
-  --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
-  --dis-file-suffix="$(DIS_SUFFIX)" \
-  --daem-file-suffix="$(DAEM_SUFFIX)"
-
-MKDOMMEMLIST_OPTIONS =
-MKDOMMEMLIST_PL = $(MANAKAI_BIN_DIR)mkdommemlist.pl
-MKDOMMEMLIST = $(PERL_) $(MKDOMMEMLIST_PL) $(MKDOMMEMLIST_OPTIONS) \
-  $(DIS_OPTIONS_ALL)
-
-DOMMEMLIST = dommemlist.pl.tmp
-GENERATED_FILES = $(DOMMEMLIST)
-
-DOM_DAC = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
-
-all: $(GENERATED_FILES)
-
-$(DOMMEMLIST): $(DOM_DAC) $(MKDOMMEMLIST_PL)
-	$(MKDOMMEMLIST) $< > $@
-	$(PERLC_) $@
+all:
 
 clean:
-	$(RM) $(GENERATED_FILES) *~ .*~ *.BAK .*.BAK
+	$(RMALL) *~ .*~ *.BAK .*.BAK
+
+## License: Public Domain.
+## $Date: 2007/09/21 08:09:16 $

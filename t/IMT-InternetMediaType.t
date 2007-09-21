@@ -1,6 +1,6 @@
 use strict;
 use Test;
-BEGIN { plan tests => 10 }
+BEGIN { plan tests => 27 }
 use Message::IMT::InternetMediaType;
 
 my $dom = 'Message::DOM::DOMImplementation'; ## TODO: use formal way to do this
@@ -53,4 +53,4 @@ $imt->add_parameter (charset => 'us-ascii');
 ok $imt.'', 'text/plain; charset=utf-8; charset=utf-8; format=fixed; charset=us-ascii';
 
 ## License: Public Domain.
-## $Date: 2007/06/13 12:04:51 $
+## $Date: 2007/09/21 08:11:37 $

@@ -36,9 +36,9 @@ DOMTS2PERL_PL = $(MANAKAI_BIN_DIR)domts2perl.pl
 DOMTS2PERL = $(PERL_) -I$(MANAKAI_BIN_DIR) $(DOMTS2PERL_PL)
 DOMTEST2PERL_PL = $(MANAKAI_BIN_DIR)domtest2perl.pl
 
-GENERATED_FILES = 
+PT_SUFFIX = .t
 
-all: $(GENERATED_FILES)
+all:
 
 dom1core-perl: $(DOMTS2PERL_PL)
 	$(MKDIR) $(DOMTEST_PERL_DIR)level1/core/
@@ -50,6 +50,9 @@ dom1core:
 	MANAKAI_DOMTEST_FILE_DIR=$(DOMTEST_TESTS_DIR)level1/core/files/ \
 	  $(PERL_TEST_) $(DOMTEST_PERL_DIR)level1/core/$(DOMTEST_FILE).pl
 
+test: 
+	$(PERL_TEST_) *$(PT_SUFFIX)
+
 test-module-all: \
   test-module-dom
 
@@ -57,7 +60,6 @@ test-module-dom:
 	$(PERL_TEST_) DOM-*$(PT_SUFFIX)
 
 clean: clean-dom1core-perl
-	$(RMALL) $(GENERATED_FILES)
 
 clean-dom1core-perl:
 	$(RMALL) $(DOMTEST_PERL_DIR)level1/core/*
