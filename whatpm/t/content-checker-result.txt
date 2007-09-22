@@ -1,7 +1,7 @@
 1..1180
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Aug 25 11:50:38 2007
-# Current time GMT:   Sat Aug 25 02:50:38 2007
+# Current time local: Sun Sep  9 17:23:50 2007
+# Current time GMT:   Sun Sep  9 08:23:50 2007
 # Using Test.pm version 1.25
 ok 1
 ok 2
@@ -475,17 +475,17 @@ ok 411
 ok 412
 ok 413
 not ok 414
-# Test 414 got: "/unknown/@lang;language tag;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 85 fail #414)
+# Test 414 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown;element;unsupported" (t/ContentChecker.t at line 85 fail #414)
 #     Expected: "/unknown/@lang;syntax error\n/unknown;element;unsupported" (<unknown xml:lang="!" xmlns=""></unknown>)
 not ok 415
-# Test 415 got: "/unknown/@lang;language tag;unsupported\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 85 fail #415)
+# Test 415 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 85 fail #415)
 #     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns=""></unknown>)
 ok 416
 not ok 417
-# Test 417 got: "/unknown/@lang;language tag;unsupported\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 85 fail #417)
+# Test 417 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 85 fail #417)
 #     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
 not ok 418
-# Test 418 got: "/unknown/@lang;language tag;unsupported\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 85 fail #418)
+# Test 418 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 85 fail #418)
 #     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
 ok 419
 ok 420
@@ -511,9 +511,15 @@ ok 439
 ok 440
 ok 441
 ok 442
-ok 443
-ok 444
-ok 445
+not ok 443
+# Test 443 got: "/p/@lang;in XML:lang" (t/ContentChecker.t at line 85 fail #443)
+#     Expected: "/p/@lang;in XML:lang\n/p/@lang;language tag;unsupported" (<p lang="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 444
+# Test 444 got: "" (t/ContentChecker.t at line 85 fail #444)
+#     Expected: "/p/@lang;language tag;unsupported" (<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 445
+# Test 445 got: "/html/body/p/@xml:lang;in HTML:xml:lang" (t/ContentChecker.t at line 85 fail #445)
+#     Expected: "/html/body/p/@xml:lang;in HTML:xml:lang\n/html/body/p/@xml:lang;language tag;unsupported" (<!DOCTYPE HTML><title></title><p xml:lang=""></p>)
 ok 446
 ok 447
 ok 448
@@ -629,8 +635,14 @@ ok 554
 ok 555
 ok 556
 ok 557
-ok 558
-ok 559
+not ok 558
+# Test 558 got: "/link/@hreflang;LangTag:nosemantics:language;m" (t/ContentChecker.t at line 85 fail #558)
+#     Expected: "/link/@hreflang;language tag:syntax error\n/link/@hreflang;language tag;unsupported" (<link rel="author" href="http://test/" hreflang=""
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 559
+# Test 559 got: "" (t/ContentChecker.t at line 85 fail #559)
+#     Expected: "/link/@hreflang;language tag;unsupported" (<link rel="author" href="http://test/" hreflang="en"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 560
 ok 561
 ok 562
@@ -723,8 +735,14 @@ ok 648
 ok 649
 ok 650
 ok 651
-ok 652
-ok 653
+not ok 652
+# Test 652 got: "/a/@hreflang;LangTag:nosemantics:language;m" (t/ContentChecker.t at line 85 fail #652)
+#     Expected: "/a/@hreflang;language tag:syntax error\n/a/@hreflang;language tag;unsupported" (<a href="http://test/" hreflang=""
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 653
+# Test 653 got: "" (t/ContentChecker.t at line 85 fail #653)
+#     Expected: "/a/@hreflang;language tag;unsupported" (<a href="http://test/" hreflang="en"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 654
 ok 655
 ok 656
@@ -738,7 +756,9 @@ ok 663
 ok 664
 ok 665
 ok 666
-ok 667
+not ok 667
+# Test 667 got: "/a/@hreflang;attribute not allowed" (t/ContentChecker.t at line 85 fail #667)
+#     Expected: "/a/@hreflang;attribute not allowed\n/a/@hreflang;language tag;unsupported" (<a hreflang="en" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 668
 ok 669
 ok 670
@@ -1046,9 +1066,20 @@ ok 902
 ok 903
 ok 904
 ok 905
-ok 906
-ok 907
-ok 908
+not ok 906
+# Test 906 got: "/area/@hreflang;LangTag:nosemantics:language;m" (t/ContentChecker.t at line 85 fail #906)
+#     Expected: "/area/@hreflang;language tag:syntax error\n/area/@hreflang;language tag;unsupported" (<area href="http://test/" alt="" coords="1,2,3,4"
+#    hreflang=""
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 907
+# Test 907 got: "" (t/ContentChecker.t at line 85 fail #907)
+#     Expected: "/area/@hreflang;language tag;unsupported" (<area href="http://test/" alt="" coords="1,2,3,4"
+#    hreflang="en"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 908
+# Test 908 got: "/area/@hreflang;attribute not allowed" (t/ContentChecker.t at line 85 fail #908)
+#     Expected: "/area/@hreflang;attribute not allowed\n/area/@hreflang;language tag;unsupported" (<area coords="1,2,3,4" hreflang="en"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 909
 ok 910
 ok 911
@@ -1266,9 +1297,15 @@ ok 1122
 ok 1123
 ok 1124
 ok 1125
-ok 1126
-ok 1127
-ok 1128
+not ok 1126
+# Test 1126 got: "" (t/ContentChecker.t at line 85 fail #1126)
+#      Expected: "/p/@lang;language tag;unsupported" (<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1127
+# Test 1127 got: "" (t/ContentChecker.t at line 85 fail #1127)
+#      Expected: "/p/@lang;language tag;unsupported" (<p xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1128
+# Test 1128 got: "" (t/ContentChecker.t at line 85 fail #1128)
+#      Expected: "/p/@lang;language tag;unsupported" (<p xml:lang="ja-JP" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1129
 ok 1130
 ok 1131
