@@ -62,6 +62,48 @@ if ($mode eq '/tokens') {
   }
   print STDOUT Encode::encode ('utf-8', $out);
   print STDOUT "\n";
+} elsif ($mode eq '/selectors') {
+  require Encode;
+  require Whatpm::CSS::SelectorsParser;
+
+  my $s = $http->get_parameter ('s');
+  if (length $s > 1000_000) {
+    print STDOUT "Status: 400 Document Too Long\nContent-Type: text/plain; charset=us-ascii\n\nToo long";
+    exit;
+  }
+
+  $s = Encode::decode ('utf-8', $s);
+  
+  print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
+
+  my $p = Whatpm::CSS::SelectorsParser->new;
+
+  print STDOUT "#errors\n";
+
+  $p->{onerror} = sub {
+    my (%opt) = @_;
+    print STDOUT "$opt{line},$opt{column},$opt{level},$opt{type}\n";
+  };
+
+  $p->{pseudo_class}->{$_} = 1 for qw/
+    active checked disabled empty enabled first-child first-of-type
+    focus hover indeterminate last-child last-of-type link only-child
+    only-of-type root target visited
+    lang nth-child nth-last-child nth-of-type nth-last-of-type not
+  /;
+  $p->{pseudo_element}->{$_} = 1 for qw/
+    after before first-letter first-line
+  /;
+
+  my $selectors = $p->parse_string ($s);
+  
+  require Whatpm::CSS::SelectorsSerializer;
+  my ($sel, $ns) = Whatpm::CSS::SelectorsSerializer->serialize_test
+      ($selectors);
+  my $out = "\n#namespaces\n" . $ns . "\n#selectors\n" . $sel;
+
+  print STDOUT Encode::encode ('utf-8', $out);
+  print STDOUT "\n";
 } else {
   print STDOUT "Status: 404 Not Found\nContent-Type: text/plain; charset=us-ascii\n\n404";
 }
@@ -81,4 +123,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/09/08 01:30:44 $
+## $Date: 2007/09/22 12:17:15 $

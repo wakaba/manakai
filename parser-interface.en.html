@@ -61,13 +61,30 @@
 <h1>CSS Tokenizer (<em>beta</em>) Web Interface</h1>
 
 <form action="parser/tokens"
-    method="post" accept-charset="utf-8" target="result">
+    method="post" accept-charset="utf-8" target="result"
+    onsubmit="
+      if (document.getElementById ('mode-tokenize').checked) {
+        action = 'parser/tokens';
+      } else {
+        action = 'parser/selectors';
+      }
+    ">
 <fieldset>
 <p><textarea name="s">p + q {
   color: blue /* red */;
 }
 </textarea></p>
-<p><button type="submit">Tokenize</button></p>
+<p><button type="submit">Parse</button></p>
+
+<fieldset>
+<fieldset>
+<p><label title="Tokenize input"><input type="radio" name="mode" value="tokenize" checked id=mode-tokenize>
+  Tokenize</label></p>
+<p><label title="Parse input as a group of selectors"><input type="radio" name="mode" value="selectors" id=mode-selectors>
+  Selectors</label></p>
+</fieldset>
+</fieldset>
+
 </fieldset>
 
 <p><iframe name="result" src="about:blank"></iframe></p>
