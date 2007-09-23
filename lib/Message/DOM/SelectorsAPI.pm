@@ -1,6 +1,6 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::DOM::Document;
 
@@ -21,9 +21,6 @@ sub query_selectors_all ($$;$) {
 #    after before first-letter first-line
   my $selectors = $p->parse_string (''.$_[1]);
   my $r = [];
-
-  use Whatpm::CSS::SelectorsSerializer;
-  warn Whatpm::CSS::SelectorsSerializer->serialize_test ($selectors);
 
   ## TODO: invalid selectors
 
@@ -133,4 +130,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/23 07:57:00 $
+## $Date: 2007/09/23 10:54:09 $

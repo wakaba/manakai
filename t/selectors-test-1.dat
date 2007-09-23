@@ -1,0 +1,195 @@
+#html 1
+<!DOCTYPE HTML>
+<p></p>
+
+#html 2
+<!DOCTYPE HTML>
+<q></q>
+
+#html 3
+<!DOCTYPE HTML>
+<p></p><p></p>
+
+#html 4
+<!DOCTYPE HTML>
+<p><q></q></p>
+
+#html 5
+<!DOCTYPE HTML>
+<p><p><p><p>
+
+#html 6
+<!DOCTYPE HTML>
+<p><p><p></p><q></q>
+
+#data
+*
+#result 1
+/2
+/2/1
+/2/2
+/2/2/1
+#result 2
+/2
+/2/1
+/2/2
+/2/2/1
+#result 3
+/2
+/2/1
+/2/2
+/2/2/1
+/2/2/2
+#result 4
+/2
+/2/1
+/2/2
+/2/2/1
+/2/2/1/1
+
+#data
+p
+#result 1
+/2/2/1
+#result 2
+#result 3
+/2/2/1
+/2/2/2
+#result 4
+/2/2/1
+
+#data
+q
+#result 1
+#result 2
+/2/2/1
+#result 3
+#result 4
+/2/2/1/1
+
+#data
+* *
+#result 1
+/2/1
+/2/2
+/2/2/1
+#result 2
+/2/1
+/2/2
+/2/2/1
+#result 3
+/2/1
+/2/2
+/2/2/1
+/2/2/2
+#result 4
+/2/1
+/2/2
+/2/2/1
+/2/2/1/1
+
+#data
+* > *
+#result 1
+/2/1
+/2/2
+/2/2/1
+#result 2
+/2/1
+/2/2
+/2/2/1
+#result 3
+/2/1
+/2/2
+/2/2/1
+/2/2/2
+#result 4
+/2/1
+/2/2
+/2/2/1
+/2/2/1/1
+
+
+#data
+* + *
+#result 1
+/2/2
+#result 2
+/2/2
+#result 3
+/2/2
+/2/2/2
+#result 4
+/2/2
+#result 5
+/2/2
+/2/2/2
+/2/2/3
+/2/2/4
+
+#data
+* ~ *
+#result 1
+/2/2
+#result 2
+/2/2
+#result 3
+/2/2
+/2/2/2
+#result 4
+/2/2
+#result 5
+/2/2
+/2/2/2
+/2/2/3
+/2/2/4
+
+#data
+* + p
+#result 1
+#result 2
+#result 3
+/2/2/2
+#result 4
+#result 5
+/2/2/2
+/2/2/3
+/2/2/4
+#result 6
+/2/2/2
+/2/2/3
+
+#data
+* ~ p
+#result 1
+#result 2
+#result 3
+/2/2/2
+#result 4
+#result 5
+/2/2/2
+/2/2/3
+/2/2/4
+#result 6
+/2/2/2
+/2/2/3
+
+#data
+* + q
+#result 6
+/2/2/4
+
+#data
+* ~ q
+#result 6
+/2/2/4
+
+#data
+p + q
+#result 6
+/2/2/4
+
+#data
+p ~ q
+#result 6
+/2/2/4
