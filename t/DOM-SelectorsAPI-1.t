@@ -5,7 +5,7 @@ use lib qw[/home/httpd/html/www/markup/html/whatpm]; ## TODO: ...
 
 use Test;
 
-BEGIN { plan tests => 1 }
+BEGIN { plan tests => 58 }
 
 require Message::DOM::DOMImplementation;
 require Message::DOM::SelectorsAPI; ## TODO: ...
@@ -33,6 +33,10 @@ for my $file_name (qw(
       $test->{result}->{$label} = [];
       $mode = 'result';
       $test->{data} =~ s/\x0D?\x0A\z//;       
+    } elsif (/^#ns (\S+)$/) {
+      $test->{ns}->{''} = $1;
+    } elsif (/^#ns (\S+) (\S+)$/) {
+      $test->{ns}->{$1} = $2;
     } elsif (/^#html (\S+)$/) {
       undef $test;
       $test->{format} = 'html';
@@ -71,7 +75,14 @@ for my $file_name (qw(
       }
       my $actual = join "\n", map {
         get_node_path ($_)
-      } @{$doc->query_selectors_all ($test->{data})};
+      } @{$doc->query_selectors_all ($test->{data}, sub {
+        my $prefix = shift;
+        if (defined $prefix) {
+          return $test->{ns}->{$prefix};
+        } else {
+          return $test->{ns}->{''};
+        }
+      })};
       ok $actual, $expected;
     }
   }

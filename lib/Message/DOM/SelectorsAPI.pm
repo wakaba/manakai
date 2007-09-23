@@ -1,6 +1,6 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::DOM::Document;
 
@@ -10,6 +10,7 @@ sub query_selectors_all ($$;$) {
   local $Error::Depth = $Error::Depth + 1;
 
   my $p = Whatpm::CSS::SelectorsParser->new;
+  $p->{lookup_namespace_uri} = $_[2] || sub { return undef }; ## TODO: ...
   $p->{pseudo_class}->{$_} = 1 for qw/
   /;
 #    active checked disabled empty enabled first-child first-of-type
@@ -23,6 +24,7 @@ sub query_selectors_all ($$;$) {
   my $r = [];
 
   ## TODO: invalid selectors
+  return $r unless defined $selectors;
 
   my $is_html = ($_[0]->owner_document || $_[0])->manakai_is_html;
   
@@ -56,6 +58,19 @@ sub query_selectors_all ($$;$) {
               }
             } else {
               $sss_matched = 0;
+            }
+          } elsif ($simple_selector->[0] == NAMESPACE_SELECTOR) {
+            my $nsuri = $node_cond->[0]->namespace_uri;
+            if (defined $simple_selector->[1]) {
+              if (defined $nsuri and $nsuri eq $simple_selector->[1]) {
+                #
+              } else {
+                $sss_matched = 0;
+              }
+            } else {
+              if (defined $nsuri) {
+                $sss_matched = 0;
+              }
             }
           } else {
             die "$0: $simple_selector->[0]: Unknown simple selector type";
@@ -130,4 +145,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/23 10:54:09 $
+## $Date: 2007/09/23 13:32:41 $
