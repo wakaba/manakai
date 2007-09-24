@@ -1,30 +1,99 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+require Message::DOM::DOMException;
 
 package Message::DOM::Document;
 
 use Whatpm::CSS::SelectorsParser qw(:match :combinator :selector);
 
-sub query_selectors_all ($$;$) {
+sub query_selector ($$;$) {
+  die "not implemented";
+} # query_selector
+
+sub query_selector_all ($$;$) {
   local $Error::Depth = $Error::Depth + 1;
 
   my $p = Whatpm::CSS::SelectorsParser->new;
-  $p->{lookup_namespace_uri} = $_[2] || sub { return undef }; ## TODO: ...
+
+  my $ns_error;
+  my $resolver = $_[2] || sub { return undef };
+  if (UNIVERSAL::can ($_[2], 'lookup_namespace_uri')) {
+    my $re = $resolver;
+    $resolver = sub {
+      local $Error::Depth = $Error::Depth + 1;
+      return $re->lookup_namespace_uri ($_[0]);
+    };
+  }
+  $p->{lookup_namespace_uri} = sub {
+    local $Error::Depth = $Error::Depth + 2;
+    ## NOTE: MAY assume that $resolver returns consistent results.
+    ## NOTE: MUST be case-sensitive.
+    if (defined $_[0] and $_[0] ne '') {
+      my $uri = $resolver->($_[0]);
+      if (defined $uri) {
+        $uri = ''.$uri;
+        if ($uri eq '') {
+          $ns_error = $_[0];
+          return undef;
+        } else {
+          return $uri;
+        }
+      } else {
+        $ns_error = $_[0];
+        return undef;
+      }
+    } else {
+      my $uri = $resolver->(undef);
+      if (defined $uri) {
+        $uri = ''.$uri;
+        if ($uri eq '') {
+          return undef;
+        } else {
+          return $uri;
+        }
+      } else {
+        return undef;
+      }
+    }
+  };
+
+  ## NOTE: SHOULD ensure to remain stable when facing a hostile $_[2].
+
   $p->{pseudo_class}->{$_} = 1 for qw/
   /;
 #    active checked disabled empty enabled first-child first-of-type
 #    focus hover indeterminate last-child last-of-type link only-child
 #    only-of-type root target visited
 #    lang nth-child nth-last-child nth-of-type nth-last-of-type not
-  $p->{pseudo_element}->{$_} = 1 for qw/
-  /;
-#    after before first-letter first-line
-  my $selectors = $p->parse_string (''.$_[1]);
-  my $r = [];
 
-  ## TODO: invalid selectors
-  return $r unless defined $selectors;
+  ## NOTE: MAY treat all links as :link rather than :visited
+
+  $p->{pseudo_element}->{$_} = 1 for qw/
+    after before first-letter first-line
+  /;
+
+  my $selectors = $p->parse_string (''.$_[1]);
+  unless (defined $selectors) {
+    local $Error::Depth = $Error::Depth - 1;
+    # MUST
+    if (defined $ns_error) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NAMESPACE_ERR',
+          -subtype => 'UNDECLARED_PREFIX_ERR',
+          namespace_prefix => $ns_error;
+    } else {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'SYNTAX_ERR',
+          -subtype => 'INVALID_SELECTORS_ERR';
+    }
+  }
+
+  # MUST
+  require Message::DOM::NodeList;
+  my $r = bless [], 'Message::DOM::NodeList::StaticNodeList';
 
   my $is_html = ($_[0]->owner_document || $_[0])->manakai_is_html;
   
@@ -72,8 +141,13 @@ sub query_selectors_all ($$;$) {
                 $sss_matched = 0;
               }
             }
+          } elsif ($simple_selector->[0] == PSEUDO_ELEMENT_SELECTOR) {
+            $sss_matched = 0;
           } else {
-            die "$0: $simple_selector->[0]: Unknown simple selector type";
+            ## NOTE: New simple selector type.
+            $sss_matched = 0;
+            @$r = ();
+            return $r;
           }
         }
         
@@ -95,6 +169,13 @@ sub query_selectors_all ($$;$) {
           push @new_cond, $selector;
         } elsif ($selector->[0] == GENERAL_SIBLING_COMBINATOR) {
           push @{$node_cond->[2]->[1] || []}, $selector;
+        } elsif ($selector->[0] == CHILD_COMBINATOR or
+                 $selector->[0] == ADJACENT_SIBLING_COMBINATOR) {
+          #
+        } else {
+          ## NOTE: New combinator.
+          @$r = ();
+          return $r;
         }
       }
 
@@ -128,12 +209,22 @@ sub query_selectors_all ($$;$) {
     }
   }
   return $r;
-} # get_elements_by_selectors
+} # query_selector_all
 
 package Message::DOM::Element;
 
-package Message::DOM::DocumentSelector;
-package Message::DOM::ElementSelector;
+sub query_selector ($$;$) {
+  die "not implemented";
+} # query_selector
+
+sub query_selector_all ($$;$) {
+  die "not implemented";
+} # query_selector_all
+
+=head1 SEE ALSO
+
+Selectors API Editor's Draft 29 August 2007
+<http://dev.w3.org/cvsweb/~checkout~/2006/webapi/selectors-api/Overview.html?rev=1.28&content-type=text/html;%20charset=utf-8>
 
 =head1 LICENSE
 
@@ -145,4 +236,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/23 13:32:41 $
+## $Date: 2007/09/24 10:16:14 $

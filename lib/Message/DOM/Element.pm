@@ -2,8 +2,9 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
+our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
+    'Message::IF::ElementSelector'; # MUST in Selectors API spec.
 require Message::DOM::Document;
 
 sub ____new ($$$$$) {
@@ -56,6 +57,12 @@ sub AUTOLOAD {
         return \${\$_[0]}->{$method_name};
       }
     };
+    goto &{ $AUTOLOAD };
+  } elsif (my $module_name = {
+    query_selector => 'Message::DOM::SelectorsAPI',
+    query_selector_all => 'Message::DOM::SelectorsAPI',
+  }->{$method_name}) {
+    eval qq{ require $module_name } or die $@;
     goto &{ $AUTOLOAD };
   } else {
     require Carp;
@@ -821,6 +828,7 @@ sub set_id_attribute_node ($$$$) {
 } # set_id_attribute_node
 
 package Message::IF::Element;
+package Message::IF::ElementSelector;
 
 package Message::DOM::Document;
 
@@ -1256,4 +1264,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/29 11:38:57 $
+## $Date: 2007/09/24 10:16:14 $

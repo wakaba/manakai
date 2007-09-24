@@ -5,10 +5,9 @@ use lib qw[/home/httpd/html/www/markup/html/whatpm]; ## TODO: ...
 
 use Test;
 
-BEGIN { plan tests => 58 }
+BEGIN { plan tests => 61 }
 
 require Message::DOM::DOMImplementation;
-require Message::DOM::SelectorsAPI; ## TODO: ...
 my $dom = Message::DOM::DOMImplementation->new;
 
 for my $file_name (qw(
@@ -75,7 +74,7 @@ for my $file_name (qw(
       }
       my $actual = join "\n", map {
         get_node_path ($_)
-      } @{$doc->query_selectors_all ($test->{data}, sub {
+      } @{$doc->query_selector_all ($test->{data}, sub {
         my $prefix = shift;
         if (defined $prefix) {
           return $test->{ns}->{$prefix};

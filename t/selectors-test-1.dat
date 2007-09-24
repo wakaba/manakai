@@ -264,3 +264,18 @@ p + q
 p ~ q
 #result 6
 /2/2/4
+
+#data
+::before
+#result 1
+
+#data
+p, ::before
+#result 1
+/2/2/1
+
+#data
+::before, p
+#result 1
+/2/2/1
+

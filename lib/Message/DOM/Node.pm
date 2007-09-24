@@ -1,7 +1,8 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-push our @ISA, 'Message::IF::Node';
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+push our @ISA, 'Message::IF::Node',
+    'Message::IF::NSResolver';
 require Scalar::Util;
 require Message::DOM::DOMException;
 
@@ -1386,6 +1387,7 @@ sub set_user_data ($$$;$) {
 } # set_user_data
 
 package Message::IF::Node;
+package Message::IF::NSResolver;
 
 =head1 LICENSE
 
@@ -1397,4 +1399,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/08/25 08:41:00 $
+## $Date: 2007/09/24 10:16:14 $

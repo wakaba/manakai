@@ -1,3 +1,20 @@
+2007-09-24  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMException.pm (SYNTAX_ERR): New subtype is defined.
+	(UNDECLARED_PREFIX_ERR): New subtype is defined.
+
+	* Document.pm (Document): Implements the |DocumentSelector|
+	interface.
+
+	* Element.pm (Element): Implements the |ElementSelector|
+	interface.
+
+	* Node.pm (Node): Implements the |NSResolver| interface.
+
+	* SelectorsAPI.pm: Now (hopefully) conform to the Selectors
+	API Editor's Draft (only |query_selector_all| on |Document|,
+	with limited selectors syntax support, though).
+
 2007-09-23  Wakaba  <wakaba@suika.fam.cx>
 
 	* SelectorsAPI.pm: Namespaced type/universal selectors

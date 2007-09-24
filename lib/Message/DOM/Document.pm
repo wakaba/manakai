@@ -2,9 +2,10 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
+    'Message::IF::DocumentSelector', # MUST in Selectors API spec
     'Message::IF::HTMLDocument';
 require Message::DOM::Node;
 use Char::Class::XML
@@ -116,6 +117,8 @@ sub AUTOLOAD {
     manakai_create_serial_walker => 'Message::DOM::SerialWalker',
     create_text_node => 'Message::DOM::Text',
     create_tree_walker => 'Message::DOM::TreeWalker',
+    query_selector => 'Message::DOM::SelectorsAPI',
+    query_selector_all => 'Message::DOM::SelectorsAPI',
   }->{$method_name}) {
     eval qq{ require $module_name } or die $@;
     goto &{ $AUTOLOAD };
@@ -1181,6 +1184,7 @@ sub manakai_is_html ($;$) {
 package Message::IF::Document;
 package Message::IF::DocumentTraversal;
 package Message::IF::DocumentXDoctype;
+package Message::IF::DocumentSelector;
 package Message::IF::HTMLDocument;
 
 package Message::DOM::DOMImplementation;
@@ -1225,4 +1229,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/29 08:31:14 $
+## $Date: 2007/09/24 10:16:14 $

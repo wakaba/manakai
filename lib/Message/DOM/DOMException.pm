@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -98,7 +98,14 @@ sub ___error_def () {+{
     -description => q(Attribute is already in use),
   },
   # INVALID_STATE_ERR == 11
-  # SYNTAX_ERR == 12
+  SYNTAX_ERR => {
+    -code => 12,
+    -subtype => {
+      INVALID_SELECTORS_ERR => {
+        -description => q(Invalid group of selectors),
+      },
+    },
+  },
   # INVALID_MODIFICATION_ERR == 13
   NAMESPACE_ERR => {
     -code => 14,
@@ -114,6 +121,10 @@ sub ___error_def () {+{
       },
       QNAME_NULLNS_ERR => {
         -description => q(Qualified name is not specified),
+      },
+      UNDECLARED_PREFIX_ERR => {
+        -description => q(Undeclared prefix
+            "%p (name => {namespace_prefix});"),
       },
       XMLNS_NONXMLNSNS_ERR => {
         -description => q(Qualified name "xmlns" can only be used with namespace URI <http://www.w3.org/2000/xmlns/>),
@@ -172,4 +183,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/09/24 10:16:14 $
