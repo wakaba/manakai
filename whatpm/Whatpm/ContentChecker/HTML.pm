@@ -719,6 +719,8 @@ my $HTMLIMTAttrChecker = sub {
 }; # $HTMLIMTAttrChecker
 
 my $HTMLLanguageTagAttrChecker = sub {
+  ## NOTE: See also $AtomLanguageTagAttrChecker in Atom.pm.
+
   my ($self, $attr) = @_;
   my $value = $attr->value;
   require Whatpm::LangTag;

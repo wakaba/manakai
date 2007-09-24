@@ -10,6 +10,8 @@ my @FILES = qw[
   t/content-model-3.dat
   t/content-model-4.dat
   t/table-1.dat
+  t/content-model-atom-1.dat
+  t/content-model-atom-2.dat
 ];
 
 require Whatpm::ContentChecker;
@@ -25,6 +27,7 @@ my $dom = Message::DOM::DOMImplementation->____new;
 
 for my $file_name (@FILES) {
   open my $file, '<', $file_name or die "$0: $file_name: $!";
+  print "# $file_name\n";
 
   my $test;
   my $mode = 'data';
@@ -112,4 +115,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/08/25 02:44:39 $
+## $Date: 2007/09/24 04:23:47 $

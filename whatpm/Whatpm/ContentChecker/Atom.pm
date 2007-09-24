@@ -40,6 +40,22 @@ my $GetAtomAttrsChecker = sub {
   };
 }; # $GetAtomAttrsChecker
 
+my $AtomLanguageTagAttrChecker = sub {
+  ## NOTE: See also $HTMLLanguageTagAttrChecker in HTML.pm.
+
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  require Whatpm::LangTag;
+  Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
+    my %opt = @_;
+    my $type = 'LangTag:'.$opt{type};
+    $type .= ':' . $opt{subtag} if defined $opt{subtag};
+    $self->{onerror}->(node => $attr, type => $type, value => $opt{value},
+                       level => $opt{level});
+  });
+  ## ISSUE: RFC 4646 (3066bis)?
+}; # $AtomLanguageTagAttrChecker
+
 my $AtomTextConstruct = {
   attrs_checker => $GetAtomAttrsChecker->({
     type => sub { 1 }, # checked in |checker|
@@ -358,8 +374,45 @@ my $AtomDateConstruct = {
       }
     }
 
-    ## TODO: $s =~ MUST RFC 3339 date-time, uppercase T, Z
-    # SHOULD be accurate as possible
+    ## MUST: RFC 3339 |date-time| with uppercase |T| and |Z|
+    if ($s =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(?>\.[0-9]+)?(?>Z|[+-]([0-9]{2}):([0-9]{2}))\z/) {
+      my ($y, $M, $d, $h, $m, $s, $zh, $zm)
+          = ($1, $2, $3, $4, $5, $6, $7, $8);
+      my $node = $todo->{node};
+
+      ## Check additional constraints described or referenced in
+      ## comments of ABNF rules for |date-time|.
+      my $level = $self->{must_level};
+      if (0 < $M and $M < 13) {      
+        $self->{onerror}->(node => $node, type => 'datetime:bad day',
+                           level => $level)
+            if $d < 1 or
+                $d > [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]->[$M];
+        $self->{onerror}->(node => $node, type => 'datetime:bad day',
+                           level => $level)
+            if $M == 2 and $d == 29 and
+                not ($y % 400 == 0 or ($y % 4 == 0 and $y % 100 != 0));
+      } else {
+        $self->{onerror}->(node => $node, type => 'datetime:bad month',
+                           level => $level);
+      }
+      $self->{onerror}->(node => $node, type => 'datetime:bad hour',
+                         level => $level) if $h > 23;
+      $self->{onerror}->(node => $node, type => 'datetime:bad minute',
+                         level => $level) if $m > 59;
+      $self->{onerror}->(node => $node, type => 'datetime:bad second',
+                         level => $level)
+          if $s > 60; ## NOTE: Validness of leap seconds are not checked.
+      $self->{onerror}->(node => $node, type => 'datetime:bad timezone hour',
+                         level => $level) if $zh > 23;
+      $self->{onerror}->(node => $node, type => 'datetime:bad timezone minute',
+                         level => $level) if $zm > 59;
+    } else {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'datetime:syntax error',
+                         level => $self->{must_level});
+    }
+    ## NOTE: SHOULD be accurate as possible (cannot be checked)
 
     return ($new_todos);
   },
@@ -1049,12 +1102,7 @@ $Element->{$ATOM_NS}->{link} = {
                            (defined $opt{position} ? ':'.$opt{position} : ''));
       });
     },
-    hreflang => sub {
-      my ($self, $attr) = @_;
-      ## TODO: MUST be an RFC 3066 language tag
-      $self->{onerror}->(node => $attr, level => 'unsupported',
-                         type => 'language tag');
-    },
+    hreflang => $AtomLanguageTagAttrChecker,
     length => sub { }, # No MUST; in octets.
     rel => sub { # MUST
       my ($self, $attr) = @_;

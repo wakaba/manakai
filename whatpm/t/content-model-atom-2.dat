@@ -1,0 +1,97 @@
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="en" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="!" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>
+#errors
+/feed/link/@hreflang;LangTag:syntax:illegal;m
+/feed/link/@hreflang;LangTag:nosemantics:language;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang=" en " href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>
+#errors
+/feed/link/@hreflang;LangTag:syntax:illegal;m
+/feed/link/@hreflang;LangTag:nosemantics:language;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>05-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:syntax error;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>12005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:syntax error;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31t12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:syntax error;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:syntax error;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:syntax error;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29.0120Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-17-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:bad month;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-32T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:bad day;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-02-29T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:bad day;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T24:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:bad hour;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:69:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:bad minute;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:69Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:bad second;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+24:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:bad timezone hour;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+02:60</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+/feed/updated;datetime:bad timezone minute;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>1972-12-31T23:59:60+00:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><updated>1973-01-01T00:59:60+00:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
+#errors
+

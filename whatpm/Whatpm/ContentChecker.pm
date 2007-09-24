@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.47 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.48 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -202,6 +202,11 @@ sub check_document ($$$) {
   $self = bless {}, $self unless ref $self;
   $self->{onerror} = $onerror;
 
+  $self->{must_level} = 'm';
+  $self->{fact_level} = 'f';
+  $self->{should_level} = 's';
+  $self->{good_level} = 'g';
+
   my $docel = $doc->document_element;
   unless (defined $docel) {
     ## ISSUE: Should we check content of Document node?
@@ -243,6 +248,11 @@ sub check_element ($$$) {
   my ($self, $el, $onerror) = @_;
   $self = bless {}, $self unless ref $self;
   $self->{onerror} = $onerror;
+
+  $self->{must_level} = 'm';
+  $self->{fact_level} = 'f';
+  $self->{should_level} = 's';
+  $self->{good_level} = 'g';
 
   $self->{minuses} = {};
   $self->{id} = {};
@@ -434,4 +444,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/09/09 07:57:32 $
+# $Date: 2007/09/24 04:23:44 $
