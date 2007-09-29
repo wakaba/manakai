@@ -5,7 +5,7 @@ use lib qw[/home/httpd/html/www/markup/html/whatpm]; ## TODO: ...
 
 use Test;
 
-BEGIN { plan tests => 61 }
+BEGIN { plan tests => 186 }
 
 require Message::DOM::DOMImplementation;
 my $dom = Message::DOM::DOMImplementation->new;
@@ -20,6 +20,7 @@ for my $file_name (qw(
   my $test;
   my $mode = 'data';
   my $label;
+  my $root;
   while (<$file>) {
     s/\x0D\x0A/\x0A/;
     if (/^#data$/) {
@@ -29,7 +30,14 @@ for my $file_name (qw(
       $mode = 'data';
     } elsif (/^#result (\S+)$/) {
       $label = $1;
-      $test->{result}->{$label} = [];
+      $root = '/';
+      $test->{result}->{$label}->{$root} = [];
+      $mode = 'result';
+      $test->{data} =~ s/\x0D?\x0A\z//;       
+    } elsif (/^#result (\S+) (\S+)$/) {
+      $label = $1;
+      $root = $2;
+      $test->{result}->{$label}->{$root} = [];
       $mode = 'result';
       $test->{data} =~ s/\x0D?\x0A\z//;       
     } elsif (/^#ns (\S+)$/) {
@@ -49,7 +57,7 @@ for my $file_name (qw(
         $test->{$mode} .= $_;
       } elsif ($mode eq 'result') {
         tr/\x0D\x0A//d;
-        push @{$test->{result}->{$label}}, $_;
+        push @{$test->{result}->{$label}->{$root}}, $_;
       }
     }
   }
@@ -80,19 +88,23 @@ for my $file_name (qw(
         }
       };
 
-      ## query_selector_all
-      my $expected = join "\n", @{$test->{result}->{$label}};
-      my $actual = join "\n", map {
-        get_node_path ($_)
-      } @{$doc->query_selector_all ($test->{data}, $ns)};
-      ok $actual, $expected;
+      for my $root (keys %{$test->{result}->{$label}}) {
+        my $root_node = get_node_by_path ($doc, $root);
 
-      ## query_selector
-      $expected = $test->{result}->{$label}->[0];
-      undef $actual;
-      my $node = $doc->query_selector ($test->{data}, $ns);
-      $actual = get_node_path ($node) if defined $node;
-      ok $actual, $expected;
+        ## query_selector_all
+        my $expected = join "\n", @{$test->{result}->{$label}->{$root}};
+        my $actual = join "\n", map {
+          get_node_path ($_)
+        } @{$root_node->query_selector_all ($test->{data}, $ns)};
+        ok $actual, $expected, "$test->{data} $label $root all";
+
+        ## query_selector
+        $expected = $test->{result}->{$label}->{$root}->[0];
+        undef $actual;
+        my $node = $root_node->query_selector ($test->{data}, $ns);
+        $actual = get_node_path ($node) if defined $node;
+        ok $actual, $expected, "$test->{data} $label $root one";
+      }
     }
   }
 }
@@ -113,3 +125,15 @@ sub get_node_path ($) {
   }
   return $r;
 } # get_node_path
+
+sub get_node_by_path ($$) {
+  my ($doc, $path) = @_;
+  if ($path eq '/') {
+    return $doc;
+  } else {
+    for (map {$_ - 1} grep {$_} split m#/#, $path) {
+      $doc = $doc->child_nodes->[$_];
+    }
+    return $doc;
+  }
+} # get_node_by_path

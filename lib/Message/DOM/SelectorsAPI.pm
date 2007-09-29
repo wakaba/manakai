@@ -1,6 +1,6 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::DOM::DOMException;
 
 package Message::DOM::Document;
@@ -8,7 +8,7 @@ package Message::DOM::Document;
 use Whatpm::CSS::SelectorsParser qw(:match :combinator :selector);
 
 my $get_elements_by_selectors = sub {
-  # $node, $selectors, $resolver, $candidates, $is_html, $all
+  # $node, $selectors, $resolver, $node_conds, $is_html, $all
 
   my $p = Whatpm::CSS::SelectorsParser->new;
 
@@ -95,7 +95,7 @@ my $get_elements_by_selectors = sub {
     $r = bless [], 'Message::DOM::NodeList::StaticNodeList';
   }
   
-  my @node_cond = map {[$_, [@$selectors]]} @{$_[3]};
+  my @node_cond = map {$_->[1] = [@$selectors]; $_} @{$_[3]};
   while (@node_cond) {
     my $node_cond = shift @node_cond;
     if ($node_cond->[0]->node_type == 1) { # ELEMENT_NODE
@@ -152,9 +152,11 @@ my $get_elements_by_selectors = sub {
         
         if ($sss_matched) {
           if (@$selector == 2) {
-            return $node_cond->[0] unless defined $r;
-            push @$r, $node_cond->[0] unless $matched;
-            $matched = 1;
+            unless ($node_cond->[3]) {
+              return $node_cond->[0] unless defined $r;
+              push @$r, $node_cond->[0] unless $matched;
+              $matched = 1;
+            }
           } else {
             my $new_selector = [@$selector[2..$#$selector]];
             if ($new_selector->[0] == DESCENDANT_COMBINATOR or
@@ -182,14 +184,21 @@ my $get_elements_by_selectors = sub {
       }
 
       if (@new_cond) {
-        my @children = grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
-          $_->node_type == 1 or $_->node_type == 5
-        } @{$node_cond->[0]->child_nodes};
-        my $next_sibling_cond;
-        for (reverse @children) {
-          my $new_node_cond = [$_, [@new_cond], $next_sibling_cond];
-          unshift @node_cond, $new_node_cond;
-          $next_sibling_cond = $new_node_cond;
+        unless ($node_cond->[3]) {
+          my @children = grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
+            $_->node_type == 1 or $_->node_type == 5
+          } @{$node_cond->[0]->child_nodes};
+          my $next_sibling_cond;
+          for (reverse @children) {
+            my $new_node_cond = [$_, [@new_cond], $next_sibling_cond];
+            unshift @node_cond, $new_node_cond;
+            $next_sibling_cond = $new_node_cond;
+          }
+        } else {
+          for (@{$node_cond->[4]}) {
+            $_->[1] = [@new_cond];
+          }
+          $node_cond->[4]->[0]->[1] = \@new_cond if @{$node_cond->[4]};
         }
       }
     } elsif ($node_cond->[0]->node_type == 5) { # ENTITY_REFERENCE_NODE
@@ -198,16 +207,23 @@ my $get_elements_by_selectors = sub {
         $_->[0] != ADJACENT_SIBLING_COMBINATOR and
         $_->[0] != GENERAL_SIBLING_COMBINATOR
       } @new_cond;
-      my @children = grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
-        $_->node_type == 1 or $_->node_type == 5
-      } @{$node_cond->[0]->child_nodes};
-      my $next_sibling_cond;
-      for (reverse @children) {
-        my $new_node_cond = [$_, \@new_cond2, $next_sibling_cond];
-        unshift @node_cond, $new_node_cond;
-        $next_sibling_cond = $new_node_cond;
+      unless ($node_cond->[3]) {
+        my @children = grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
+          $_->node_type == 1 or $_->node_type == 5
+        } @{$node_cond->[0]->child_nodes};
+        my $next_sibling_cond;
+        for (reverse @children) {
+          my $new_node_cond = [$_, [@new_cond2], $next_sibling_cond];
+          unshift @node_cond, $new_node_cond;
+          $next_sibling_cond = $new_node_cond;
+        }
+        $next_sibling_cond->[1] = \@new_cond;
+      } else {
+        for (@{$node_cond->[4]}) {
+          $_->[1] = [@new_cond2];
+        }
+        $node_cond->[4]->[0]->[1] = \@new_cond if @{$node_cond->[4]};
       }
-      $next_sibling_cond->[1] = \@new_cond;
     }
   }
   return $r;
@@ -216,27 +232,104 @@ my $get_elements_by_selectors = sub {
 sub query_selector ($$;$) {
   local $Error::Depth = $Error::Depth + 1;
 
+  ## Children of the Element.
+  my @node_cond;
+  my @children = grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
+    $_->node_type == 1 or $_->node_type == 5
+  } @{$_[0]->child_nodes};
+  my $next_sibling_cond;
+  for (reverse @children) {
+    my $new_node_cond = [$_, undef, $next_sibling_cond];
+    unshift @node_cond, $new_node_cond;
+    $next_sibling_cond = $new_node_cond;
+  }
+
   return $get_elements_by_selectors
-      ->($_[0], $_[1], $_[2], $_[0]->child_nodes,
+      ->($_[0], $_[1], $_[2], \@node_cond,
          $_[0]->manakai_is_html, 0);
 } # query_selector
 
 sub query_selector_all ($$;$) {
   local $Error::Depth = $Error::Depth + 1;
 
+  ## Children of the Element.
+  my @node_cond;
+  my @children = grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
+    $_->node_type == 1 or $_->node_type == 5
+  } @{$_[0]->child_nodes};
+  my $next_sibling_cond;
+  for (reverse @children) {
+    my $new_node_cond = [$_, undef, $next_sibling_cond];
+    unshift @node_cond, $new_node_cond;
+    $next_sibling_cond = $new_node_cond;
+  }
+
   return $get_elements_by_selectors
-      ->($_[0], $_[1], $_[2], $_[0]->child_nodes,
+      ->($_[0], $_[1], $_[2], \@node_cond,
          $_[0]->manakai_is_html, 1);
 } # query_selector_all
 
 package Message::DOM::Element;
 
+my $get_node_cond = sub {
+  my @node_cond;
+  my $child_conds = [];
+
+  ## Children of the Element.
+  my @children = grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
+    $_->node_type == 1 or $_->node_type == 5
+  } @{$_[0]->child_nodes};
+  my $next_sibling_cond;
+  for (reverse @children) {
+    my $new_node_cond = [$_, undef, $next_sibling_cond];
+    unshift @node_cond, $new_node_cond;
+    $next_sibling_cond = $new_node_cond;
+  }
+  @$child_conds = @node_cond;
+
+  ## Ancestors and previous siblings of ancestors
+  my $node = $_[0];
+  my $parent = $node->parent_node;
+  while (defined $parent) {
+    my $conds = [];
+    for (grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
+      $_->node_type == 1 or $_->node_type == 5
+    } @{$parent->child_nodes}) {
+      push @$conds, my $cond = [$_, undef, undef, 1, $child_conds];
+      if ($_ eq $node) {
+        $child_conds = $conds;
+        ($node, $parent) = ($parent, $parent->parent_node);
+        last;
+      }
+    }
+    my $nsib_cond;
+    for (reverse @$child_conds) {
+      $_->[2] = $nsib_cond;
+      $nsib_cond = $_;
+    }
+    unshift @node_cond, @$conds;
+  }
+  if ($node->node_type == 1) { # ELEMENT_NODE
+    unshift @node_cond, [$node, undef, undef, 1, $child_conds];
+  }
+
+  return \@node_cond;
+}; # $get_node_cond
+
 sub query_selector ($$;$) {
-  die "not implemented";
+  local $Error::Depth = $Error::Depth + 1;
+
+  return $get_elements_by_selectors
+      ->($_[0], $_[1], $_[2], $get_node_cond->($_[0]),
+         $_[0]->owner_document->manakai_is_html, 0);
 } # query_selector
 
 sub query_selector_all ($$;$) {
-  die "not implemented";
+  local $Error::Depth = $Error::Depth + 1;
+
+  return $get_elements_by_selectors
+      ->($_[0], $_[1], $_[2], $get_node_cond->($_[0]),
+         $_[0]->owner_document->manakai_is_html, 1);
 } # query_selector_all
 
 =head1 SEE ALSO
@@ -254,4 +347,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/29 05:30:07 $
+## $Date: 2007/09/29 08:29:41 $
