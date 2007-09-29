@@ -67,21 +67,31 @@ for my $file_name (qw(
 
   for my $test (@{$all_test->{test}}) {
     for my $label (keys %{$test->{result}}) {
-      my $expected = join "\n", @{$test->{result}->{$label}};
       my $doc = $all_test->{document}->{$label}->{document};
       unless ($doc) {
         die "Test document $label is not defined";
       }
-      my $actual = join "\n", map {
-        get_node_path ($_)
-      } @{$doc->query_selector_all ($test->{data}, sub {
+      my $ns = sub {
         my $prefix = shift;
         if (defined $prefix) {
           return $test->{ns}->{$prefix};
         } else {
           return $test->{ns}->{''};
         }
-      })};
+      };
+
+      ## query_selector_all
+      my $expected = join "\n", @{$test->{result}->{$label}};
+      my $actual = join "\n", map {
+        get_node_path ($_)
+      } @{$doc->query_selector_all ($test->{data}, $ns)};
+      ok $actual, $expected;
+
+      ## query_selector
+      $expected = $test->{result}->{$label}->[0];
+      undef $actual;
+      my $node = $doc->query_selector ($test->{data}, $ns);
+      $actual = get_node_path ($node) if defined $node;
       ok $actual, $expected;
     }
   }

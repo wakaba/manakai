@@ -1,15 +1,14 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::DOM::DOMException;
 
 package Message::DOM::Document;
 
 use Whatpm::CSS::SelectorsParser qw(:match :combinator :selector);
 
-
 my $get_elements_by_selectors = sub {
-  # $node, $selectors, $resolver, $candidates, $is_html
+  # $node, $selectors, $resolver, $candidates, $is_html, $all
 
   my $p = Whatpm::CSS::SelectorsParser->new;
 
@@ -88,11 +87,13 @@ my $get_elements_by_selectors = sub {
     }
   }
 
-  # MUST
-  require Message::DOM::NodeList;
-  my $r = bless [], 'Message::DOM::NodeList::StaticNodeList';
-
   my $is_html = $_[4];
+  my $r;
+  if ($_[5]) {
+    # MUST
+    require Message::DOM::NodeList;
+    $r = bless [], 'Message::DOM::NodeList::StaticNodeList';
+  }
   
   my @node_cond = map {[$_, [@$selectors]]} @{$_[3]};
   while (@node_cond) {
@@ -142,14 +143,16 @@ my $get_elements_by_selectors = sub {
             $sss_matched = 0;
           } else {
             ## NOTE: New simple selector type.
-            $sss_matched = 0;
-            @$r = ();
-            return $r;
+            report Message::DOM::DOMException
+                -object => $_[0],
+                -type => 'SYNTAX_ERR',
+                -subtype => 'INVALID_SELECTORS_ERR';
           }
         }
         
         if ($sss_matched) {
           if (@$selector == 2) {
+            return $node_cond->[0] unless defined $r;
             push @$r, $node_cond->[0] unless $matched;
             $matched = 1;
           } else {
@@ -171,8 +174,10 @@ my $get_elements_by_selectors = sub {
           #
         } else {
           ## NOTE: New combinator.
-          @$r = ();
-          return $r;
+          report Message::DOM::DOMException
+              -object => $_[0],
+              -type => 'SYNTAX_ERR',
+              -subtype => 'INVALID_SELECTORS_ERR';
         }
       }
 
@@ -209,7 +214,11 @@ my $get_elements_by_selectors = sub {
 }; # $get_elements_by_selectors
 
 sub query_selector ($$;$) {
-  die "not implemented";
+  local $Error::Depth = $Error::Depth + 1;
+
+  return $get_elements_by_selectors
+      ->($_[0], $_[1], $_[2], $_[0]->child_nodes,
+         $_[0]->manakai_is_html, 0);
 } # query_selector
 
 sub query_selector_all ($$;$) {
@@ -217,7 +226,7 @@ sub query_selector_all ($$;$) {
 
   return $get_elements_by_selectors
       ->($_[0], $_[1], $_[2], $_[0]->child_nodes,
-         $_[0]->manakai_is_html);
+         $_[0]->manakai_is_html, 1);
 } # query_selector_all
 
 package Message::DOM::Element;
@@ -245,4 +254,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/29 05:18:16 $
+## $Date: 2007/09/29 05:30:07 $
