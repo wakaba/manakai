@@ -5,7 +5,7 @@ use lib qw[/home/httpd/html/www/markup/html/whatpm]; ## TODO: ...
 
 use Test;
 
-BEGIN { plan tests => 186 }
+BEGIN { plan tests => 482 }
 
 require Message::DOM::DOMImplementation;
 my $dom = Message::DOM::DOMImplementation->new;

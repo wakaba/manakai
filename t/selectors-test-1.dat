@@ -374,3 +374,449 @@ p ~ p *
 /2/2/2/1
 /2/2/3/1
 
+#html 8
+<!DOCTYPE HTML>
+<p align>
+
+#html 9
+<!DOCTYPE HTML>
+<p align=left>
+
+#data
+[align]
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[align][align]
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[align]
+#ns http://www.w3.org/1999/xhtml
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[*|align]
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[|align]
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[html|align]
+#ns html http://www.w3.org/1999/xhtml
+#result 7
+#result 8
+#result 9
+
+#data
+[|Align]
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[*|Align]
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[|ALIGN]
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[*|ALIGN]
+#result 7
+#result 8
+/2/2/1
+#result 9
+/2/2/1
+
+#data
+[|align=""]
+#result 8
+/2/2/1
+#result 9
+
+#data
+[*|align=""]
+#result 8
+/2/2/1
+#result 9
+
+#data
+[|align="lef"]
+#result 8
+#result 9
+
+#data
+[*|align="lef"]
+#result 8
+#result 9
+
+#data
+[|align="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align="leftright"]
+#result 8
+#result 9
+
+#data
+[*|align="leftright"]
+#result 8
+#result 9
+
+#data
+[|align="center"]
+#result 8
+#result 9
+
+#data
+[*|align="center"]
+#result 8
+#result 9
+
+#data
+[|align^="l"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align^="l"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align^="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align^="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align^="leff"]
+#result 8
+#result 9
+
+#data
+[*|align^="leff"]
+#result 8
+#result 9
+
+#data
+[|align^="leftright"]
+#result 8
+#result 9
+
+#data
+[*|align^="leftright"]
+#result 8
+#result 9
+
+#data
+[|align^="t"]
+#result 8
+#result 9
+
+#data
+[*|align^="t"]
+#result 8
+#result 9
+
+#data
+[|align$="t"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align$="t"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align$="l"]
+#result 8
+#result 9
+
+#data
+[*|align$="l"]
+#result 8
+#result 9
+
+#data
+[|align$="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align$="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align$="leff"]
+#result 8
+#result 9
+
+#data
+[*|align$="leff"]
+#result 8
+#result 9
+
+#data
+[|align$="rightleft"]
+#result 8
+#result 9
+
+#data
+[*|align$="rightleft"]
+#result 8
+#result 9
+
+#data
+[|align*="l"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align*="l"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align*="t"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align*="t"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align*="ef"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align*="ef"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align*="eg"]
+#result 8
+#result 9
+
+#data
+[*|align*="eg"]
+#result 8
+#result 9
+
+#data
+[|align*="x"]
+#result 8
+#result 9
+
+#data
+[*|align*="x"]
+#result 8
+#result 9
+
+#data
+[|align*="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align*="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align*="leftright"]
+#result 8
+#result 9
+
+#data
+[*|align*="leftright"]
+#result 8
+#result 9
+
+#data
+[|align|="l"]
+#result 8
+#result 9
+
+#data
+[*|align|="l"]
+#result 8
+#result 9
+
+#data
+[|align|="x"]
+#result 8
+#result 9
+
+#data
+[*|align|="x"]
+#result 8
+#result 9
+
+#data
+[|align|="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[*|align|="left"]
+#result 8
+#result 9
+/2/2/1
+
+#data
+[|align|="lefa"]
+#result 8
+#result 9
+
+#data
+[*|align|="lefa"]
+#result 8
+#result 9
+
+#html 10
+<!DOCTYPE HTML>
+<p lang=en-US>
+
+#data
+[|lang|="en"]
+#result 10
+/2/2/1
+
+#data
+[*|lang|="en"]
+#result 10
+/2/2/1
+
+#data
+[|lang|="en-"]
+#result 10
+
+#data
+[*|lang|="en-"]
+#result 10
+
+#data
+[|lang|="en-US"]
+#result 10
+/2/2/1
+
+#data
+[*|lang|="en-US"]
+#result 10
+/2/2/1
+
+#html 11
+<!DOCTYPE HTML>
+<p class="aaa bbb ccc"><p class=aaa><p class=aaa-bbb>
+
+#data
+[|class~=a]
+#result 11
+
+#data
+[*|class~=a]
+#result 11
+
+#data
+[|class~=aaa]
+#result 11
+/2/2/1
+/2/2/2
+
+#data
+[*|class~=aaa]
+#result 11
+/2/2/1
+/2/2/2
+
+#data
+[|class~=bbb]
+#result 11
+/2/2/1
+
+#data
+[*|class~=bbb]
+#result 11
+/2/2/1
+
+#data
+[|class~=ccc]
+#result 11
+/2/2/1
+
+#data
+[*|class~=ccc]
+#result 11
+/2/2/1
+

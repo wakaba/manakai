@@ -1,6 +1,6 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::DOM::DOMException;
 
 package Message::DOM::Document;
@@ -137,6 +137,131 @@ my $get_elements_by_selectors = sub {
             } else {
               if (defined $nsuri) {
                 $sss_matched = 0;
+              }
+            }
+          } elsif ($simple_selector->[0] == ATTRIBUTE_SELECTOR) {
+            my @attr_node;
+            ## Namespace URI
+            if (not defined $simple_selector->[1]) {
+              my $ln = $simple_selector->[2];
+              if ($is_html) {
+                my $nsuri = $node_cond->[0]->namespace_uri;
+                if (defined $nsuri and
+                    $nsuri eq q<http://www.w3.org/1999/xhtml>) {
+                  $ln =~ tr/A-Z/a-z/; ## ISSUE: Case-insensitivity
+                }
+              }
+
+              ## Any Namespace, Local Name
+              M: {
+                for my $attr_node (@{$node_cond->[0]->attributes}) {
+                  my $node_ln = $attr_node->manakai_local_name;
+                  if ($node_ln eq $simple_selector->[2]) {
+                    push @attr_node, $attr_node;
+                    last M if $simple_selector->[3] == EXISTS_MATCH;
+                  } elsif (not defined $attr_node->namespace_uri and
+                           $node_ln eq $ln) {
+                    push @attr_node, $attr_node;
+                    last M if $simple_selector->[3] == EXISTS_MATCH;
+                  }
+                }
+                last M if @attr_node;
+                $sss_matched = 0;
+              } # M
+            } elsif ($simple_selector->[1] eq '') {
+              my $ln = $simple_selector->[2];
+              if ($is_html) {
+                my $nsuri = $node_cond->[0]->namespace_uri;
+                if (defined $nsuri and
+                    $nsuri eq q<http://www.w3.org/1999/xhtml>) {
+                  $ln =~ tr/A-Z/a-z/; ## ISSUE: Case-insensitivity
+                }
+              }
+
+              ## ISSUE: Does <p>.setAttributeNS (undef, 'Align')'ed <p>
+              ## match with [align]?
+
+              ## Null Namespace, Local Name
+              my $attr_node = $node_cond->[0]->get_attribute_node_ns
+                  (undef, $ln);
+              if ($attr_node) {
+                push @attr_node, $attr_node;
+              } else {
+                $sss_matched = 0;
+              }
+            } else {
+              ## Non-null Namespace, Local Name
+              my $attr_node = $node_cond->[0]->get_attribute_node_ns
+                      ($simple_selector->[1], $simple_selector->[2]);
+              if ($attr_node) {
+                push @attr_node, $attr_node;
+              } else {
+                $sss_matched = 0;
+              }
+            }
+
+            if ($sss_matched) {
+              if ($simple_selector->[3] == EXISTS_MATCH) {
+                #
+              } else {
+                for my $attr_node (@attr_node) {
+                  ## TODO: Attribute value case-insensitivility
+                  my $value = $attr_node->value;
+                  if ($simple_selector->[3] == EQUALS_MATCH) {
+                    if ($value eq $simple_selector->[4]) {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } elsif ($simple_selector->[3] == DASH_MATCH) {
+                    ## ISSUE: [a|=""] a="a--b" a="-" ?
+                    if ($value eq $simple_selector->[4]) {
+                      #
+                    } elsif (substr ($value, 0,
+                                     1 + length $simple_selector->[4]) eq
+                             $simple_selector->[4] . '-') {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } elsif ($simple_selector->[3] == INCLUDES_MATCH) {
+                    ## ISSUE: [a~=""] [a~=" "] [a~="b c"] [a~=" b"] [a~="b "] ?
+                    M: {
+                      for (split /[\x09\x0A\x0C\x0D\x20]+/, $value, -1) {
+                        if ($_ eq $simple_selector->[4]) {
+                          last M;
+                        }
+                      }
+                      $sss_matched = 0;
+                    } # M
+                  } elsif ($simple_selector->[3] == PREFIX_MATCH) {
+                    if (substr ($value, 0, length $simple_selector->[4]) eq
+                        $simple_selector->[4]) {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } elsif ($simple_selector->[3] == SUFFIX_MATCH) {
+                    if (substr ($value, -length $simple_selector->[4]) eq
+                        $simple_selector->[4]) {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } elsif ($simple_selector->[3] == SUBSTRING_MATCH) {
+                    if (index ($value, $simple_selector->[4]) > -1) {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } else {
+                    ## NOTE: New match type.
+                    report Message::DOM::DOMException
+                        -object => $_[0],
+                        -type => 'SYNTAX_ERR',
+                        -subtype => 'INVALID_SELECTORS_ERR';
+                  }
+                }
               }
             }
           } elsif ($simple_selector->[0] == PSEUDO_ELEMENT_SELECTOR) {
@@ -347,4 +472,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/29 08:29:41 $
+## $Date: 2007/09/29 14:03:04 $
