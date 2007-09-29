@@ -54,7 +54,10 @@ manakai の DOM 対応状況は次の各表をご覧下さい。</p>
 
 <ul lang=en>
 <li><a href="../../lib/Error.html"><code>Error</code></a>
-(Strictly speaking, this module is not part of manakai.)</li>
+(Strictly speaking, this module is not part of manakai, though 
+it is contained in the <a href="#download-manakai-core">manakai-core</a> 
+package.)</li>
+<li><a href="../../lib/Message/CGI/Carp.html"><code>Message::CGI::Carp</code></a></li>
 <li><a href="../../lib/Message/CGI/HTTP.html"><code>Message::CGI::HTTP</code></a></li>
 <li><a href="../../lib/Message/DOM/DOMImplementation.html"><code>Message::DOM::DOMImplementation</code></a></li>
 <li><a href="../../lib/Message/URI/URIReference.html"><code>Message::URI::URIReference</code></a></li>
@@ -114,13 +117,36 @@ parser (<em>beta</em>) Web interface (manakai version)</a></li>
 </dl>
 </div>
 
+<div class=section id=install>
+<h2 lang=en>インストール</h2>
+
+<ol>
+<li><a href="#download">配布ファイルを入手します</a>。</li>
+<li>配布ファイルを適切な場所で展開します。
+<code class=file>lib/</code> 以下の Perl モジュール・ファイルを Perl
+が見つけられる場所 (<code class="perl">@LIB</code> で指定されたディレクトリ)
+に置くだけで構いません。</li>
+</ol>
+</div>
+
 <div class="section" id="download">
 <h2 lang="en">ダウンロード</h2>
 
-<dl>
+<ul>
+<li><a href="#download-manakai-core" lang=en>manakai-core</a>
+(<abbr>DOM</abbr> 実装)</li>
+<li><a href="http://suika.fam.cx/www/markup/html/whatpm/readme#download" lang=en>Whatpm</a>
+(<abbr>HTML</abbr>, <abbr>XML</abbr>, <abbr>CSS</abbr> 実装)</li>
+<li><a href="http://suika.fam.cx/www/manakai-charlib/readme#modules" lang=en>manakai
+charlib</a> (日本語文字符号化対応)</li>
+</ul>
+
+<dl id=download-manakai-core>
 <dt>開発版スナップ写真</dt>
 	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-dev-latest">manakai
 	開発版スナップ写真 (最新版)</a></dd>
+	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.4.0"
+	>manakai 0.4.0 (2007年9月29日)</a></dd>
 	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.2"
 	>manakai 0.3.2 (2006年6月18日)</a></dd>
 	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.1"
