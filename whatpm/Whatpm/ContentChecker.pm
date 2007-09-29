@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.48 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.49 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -235,7 +235,7 @@ sub check_document ($$$) {
   if ($docel_def->{is_root}) {
     #
   } else {
-    $onerror->(node => $docel, type => 'element not allowed');
+    $onerror->(node => $docel, type => 'element not allowed:root');
   }
 
   ## TODO: Check for other items other than document element
@@ -444,4 +444,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/09/24 04:23:44 $
+# $Date: 2007/09/29 04:45:09 $

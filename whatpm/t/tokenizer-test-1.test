@@ -519,6 +519,54 @@
 
 {"description":"< in attribute value (double-unquoted) state",
 "input":"<p align=\u0022left<div>",
-"output":["ParseError", ["StartTag", "p", {"align":"left<div>"}]]}
+"output":["ParseError", ["StartTag", "p", {"align":"left<div>"}]]},
+
+{"description":"/''b=\"\"",
+"input": "<a /''b=\"\">",
+"output": ["ParseError", ["StartTag", "a", {"''b": ""}]]},
+
+{"description":"/\"\"b=\"\"",
+"input": "<a /\"\"b=\"\">",
+"output": ["ParseError", ["StartTag", "a", {"\"\"b": ""}]]},
+
+{"description":"\"b=\"\"",
+"input": "<a \"b=\"\">",
+"output": [["StartTag", "a", {"\"b": ""}]]},
+
+{"description":"\"\"b=\"\"",
+"input": "<a \"\"b=\"\">",
+"output": [["StartTag", "a", {"\"\"b": ""}]]},
+
+{"description":"'b=\"\"",
+"input": "<a 'b=\"\">",
+"output": [["StartTag", "a", {"'b": ""}]]},
+
+{"description":"''b=\"\"",
+"input": "<a ''b=\"\">",
+"output": [["StartTag", "a", {"''b": ""}]]},
+
+{"description":"/b=\"\"",
+"input": "<a /b=\"\">",
+"output": ["ParseError", ["StartTag", "a", {"b": ""}]]},
+
+{"description":"b/=\"\"",
+"input": "<a b/=\"\">",
+"output": ["ParseError", ["StartTag", "a", {"b": "", "=\"\"": ""}]]},
+
+{"description":"b/c=\"\"",
+"input": "<a b/c=\"\">",
+"output": ["ParseError", ["StartTag", "a", {"b": "", "c": ""}]]},
+
+{"description":"bc[NULL]=\"\"",
+"input": "<a bc\u0000=\"\">",
+"output": ["ParseError", ["StartTag", "a", {"bc\uFFFD": ""}]]},
+
+{"description":"b[NULL]c=\"\"",
+"input": "<a b\u0000c=\"\">",
+"output": ["ParseError", ["StartTag", "a", {"b\uFFFDc": ""}]]},
+
+{"description":"[NULL]bc=\"\"",
+"input": "<a \u0000bc=\"\">",
+"output": ["ParseError", ["StartTag", "a", {"\uFFFDbc": ""}]]}
 
 ]}

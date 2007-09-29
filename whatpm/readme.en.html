@@ -23,25 +23,28 @@ project.</p>
 <dd><dl>
 <dt><a href="Whatpm/ContentChecker.html"><code>Whatpm::ContentChecker</code></a></dt>
   <dd>A DOM5 HTML (in-memory representation of a document) conformance
-  checker with a partial support for Atom 1.0.</dd>
+  checker with a partial support for Atom 1.0.  (See also
+  <a href="#demo-html-parser">demo</a>.)</dd>
 <dt><a href="Whatpm/ContentType.html"><code>Whatpm::ContentType</code></a></dt>
   <dd>An implementation of HTML5 Content Type sniffing algorithm.</dd>
 <dt><a href="Whatpm/CSS/SelectorsParser.html"><code>Whatpm::CSS::SelectorsParser</code></a></dt>
   <dd>A <a href="http://www.w3.org/TR/css3-selectors/#grouping">group of
-  selectors</a> parser.</dd>
+  selectors</a> parser.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
 <dt><a href="Whatpm/CSS/SelectorsSerializer.html"><code>Whatpm::CSS::SelectorsSerializer</code></a></dt>
   <dd>A <a href="http://www.w3.org/TR/css3-selectors/#grouping">group of
-  selectors</a> serializer.</dd>
+  selectors</a> serializer.  (See also <a href="#spec-ssft">specification</a>
+  and <a href="#demo-css-parser">demo</a>.)</dd>
 <dt><a href="Whatpm/CSS/Tokenizer.html"><code>Whatpm::CSS::Tokenizer</code></a></dt>
-  <dd>A CSS tokenizer.</dd>
+  <dd>A CSS tokenizer.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
 <dt><a href="Whatpm/HTML.html"><code>Whatpm::HTML</code></a></dt>
   <dd>An implementation of HTML5 parsing algorithm, fragment
   parsing, and fragment serialization algorithms.  It can be used
-  to convert a string into DOM, or <i lang="">vice versa</i>.</dd>
+  to convert a string into DOM, or <i lang="">vice versa</i>.
+  (See also <a href="#demo-html-parser">demo</a>.)</dd>
 <dt><a href="Whatpm/HTMLTable.html"><code>Whatpm::HTMLTable</code></a></dt>
   <dd>An implementation of the HTML5 table algorithm.  It can be
   used to extract a table structure from a DOM <code>table</code>
-  element node.</dd>
+  element node.  (See also <a href="#demo-html-table">demo</a>.)</dd>
 <dt><a href="Whatpm/IMTChecker.html"><code>Whatpm::IMTChecker</code></a></dt>
   <dd>An Internet Media Type (<abbr>aka</abbr> MIME type) label
   conformance checker.</dd>
@@ -56,9 +59,9 @@ project.</p>
 
   <p>Note also that some modules have no documentation for now.</p>
   </dd>
-<dt>Specification</dt>
+<dt id=spec>Specification</dt>
   <dd><dl>
-    <dt><a href="http://suika.fam.cx/www/markup/selectors/ssft/ssft"><abbr title="Selectors Serialization Format for Testing">SSFT</abbr>
+    <dt id=spec-ssft><a href="http://suika.fam.cx/www/markup/selectors/ssft/ssft"><abbr title="Selectors Serialization Format for Testing">SSFT</abbr>
     Specification</a></dt>
       <dd>The specification for the serialization format used for
       testing Selectors-related modules.</dd>
@@ -76,14 +79,20 @@ project.</p>
 <h2>Demo</h2>
 
 <ul>
-<li><a href="http://suika.fam.cx/gate/2007/html/parser-interface">HTML5 parser 
-and checker demo</a></li>
-<li><a href="http://suika.fam.cx/gate/2007/html/parser-manakai-interface">HTML5
-parser and checker demo, with manakai's DOM implementation</a></li>
-<li><a href="http://suika.fam.cx/gate/2007/html/table-interface">HTML5 table
-structure visualization demo</a></li>
-<li><a href="http://suika.fam.cx/gate/2007/css/parser-interface">CSS tokenizer
-demo</a></li>
+<li id=demo-html-parser-nanodom><a href="http://suika.fam.cx/gate/2007/html/parser-interface">HTML5 parser 
+and checker demo</a>
+(<a href="http://suika.fam.cx/gate/cvs/*checkout*/webroot/gate/2007/html/parser.cgi">source</a>, 
+with <a href="Whatpm/NanoDOM.html">a lightweight non-conforming 
+DOM implementation</a>)</li>
+<li id=demo-html-parser-manakai><a href="http://suika.fam.cx/gate/2007/html/parser-manakai-interface">HTML5
+parser and checker demo, with manakai's DOM implementation</a>
+(<a href="http://suika.fam.cx/gate/cvs/*checkout*/webroot/gate/2007/html/parser-manakai.cgi">source</a>)</li>
+<li id=demo-html-table><a href="http://suika.fam.cx/gate/2007/html/table-interface">HTML5 table
+structure visualization demo</a>
+(<a href="http://suika.fam.cx/gate/cvs/*checkout*/webroot/gate/2007/html/table.cgi">source</a>)</li>
+<li id=demo-css-parser><a href="http://suika.fam.cx/gate/2007/css/parser-interface">CSS tokenizer
+demo</a>
+(<a href="http://suika.fam.cx/gate/cvs/*checkout*/webroot/gate/2007/css/parser.cgi">source</a>)</li>
 </ul>
 </div>
 
@@ -115,7 +124,8 @@ charlib</a></dt>
   in <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.
   They are not required in practice.</dd>
 <dt><a href="http://search.cpan.org/~makamaka/JSON-1.14/"><code>JSON</code></a></dt>
-  <dd><em>Testing</em> for <code>Whatpm::HTML</code>
+  <dd><em>Testing</em> for <code>Whatpm::HTML</code> and
+  <code>Whatpm::CSS::Tokenizer</code>
   depends on <a href="http://search.cpan.org/~makamaka/JSON-1.14/"><code>JSON</code> and related modules</a>.
   They are not required in practice.</dd>
 </dl>

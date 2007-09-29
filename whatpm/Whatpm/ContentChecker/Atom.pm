@@ -1121,6 +1121,7 @@ $Element->{$ATOM_NS}->{link} = {
 
       ## TODO: Warn if unregistered
     },
+    title => sub { }, # No MUST
     type => sub {
       ## NOTE: MUST be a MIME media type.  What is "MIME media type"?
       my ($self, $attr) = @_;

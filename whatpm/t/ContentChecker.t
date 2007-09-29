@@ -2,7 +2,7 @@
 use strict;
 
 use Test;
-BEGIN { plan tests => 1180 }
+BEGIN { plan tests => 1202 }
 
 my @FILES = qw[
   t/content-model-1.dat
@@ -23,7 +23,7 @@ require Message::DOM::XMLParserTemp;
 require Whatpm::HTML;
 require Whatpm::NanoDOM;
 
-my $dom = Message::DOM::DOMImplementation->____new;
+my $dom = Message::DOM::DOMImplementation->new;
 
 for my $file_name (@FILES) {
   open my $file, '<', $file_name or die "$0: $file_name: $!";
@@ -115,4 +115,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/09/24 04:23:47 $
+## $Date: 2007/09/29 04:45:10 $

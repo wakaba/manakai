@@ -92,7 +92,7 @@ sub parse_string ($$) {
   }; # $tt->{get_char}
   $tt->init;
 
-  my $default_namespace = $self->{lookup_namespace_uri}->(undef);
+  my $default_namespace = $self->{lookup_namespace_uri}->('');
 
   ## ISSUE: The Selectors spec only poorly defines how tokens are mapped
   ## to each component of selectors.  In addition, it does not well define
