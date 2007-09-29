@@ -1,18 +1,15 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::DOM::DOMException;
 
 package Message::DOM::Document;
 
 use Whatpm::CSS::SelectorsParser qw(:match :combinator :selector);
 
-sub query_selector ($$;$) {
-  die "not implemented";
-} # query_selector
 
-sub query_selector_all ($$;$) {
-  local $Error::Depth = $Error::Depth + 1;
+my $get_elements_by_selectors = sub {
+  # $node, $selectors, $resolver, $candidates, $is_html
 
   my $p = Whatpm::CSS::SelectorsParser->new;
 
@@ -95,9 +92,9 @@ sub query_selector_all ($$;$) {
   require Message::DOM::NodeList;
   my $r = bless [], 'Message::DOM::NodeList::StaticNodeList';
 
-  my $is_html = ($_[0]->owner_document || $_[0])->manakai_is_html;
+  my $is_html = $_[4];
   
-  my @node_cond = map {[$_, [@$selectors]]} @{$_[0]->child_nodes};
+  my @node_cond = map {[$_, [@$selectors]]} @{$_[3]};
   while (@node_cond) {
     my $node_cond = shift @node_cond;
     if ($node_cond->[0]->node_type == 1) { # ELEMENT_NODE
@@ -209,6 +206,18 @@ sub query_selector_all ($$;$) {
     }
   }
   return $r;
+}; # $get_elements_by_selectors
+
+sub query_selector ($$;$) {
+  die "not implemented";
+} # query_selector
+
+sub query_selector_all ($$;$) {
+  local $Error::Depth = $Error::Depth + 1;
+
+  return $get_elements_by_selectors
+      ->($_[0], $_[1], $_[2], $_[0]->child_nodes,
+         $_[0]->manakai_is_html);
 } # query_selector_all
 
 package Message::DOM::Element;
@@ -236,4 +245,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/24 10:16:14 $
+## $Date: 2007/09/29 05:18:16 $
