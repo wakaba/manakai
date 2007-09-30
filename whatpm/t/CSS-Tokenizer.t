@@ -9,7 +9,7 @@ $JSON::UnMapping = 1;
 $JSON::UTF8 = 1;
 
 use Test;
-BEGIN { plan tests => 347 }
+BEGIN { plan tests => 615 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -118,4 +118,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2007/09/08 17:43:41 $
+## $Date: 2007/09/30 12:03:09 $

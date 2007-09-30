@@ -549,79 +549,95 @@
 
   {"description": "\"\\\u000D",
   "input": "\"\\\u000D",
-  "output": [["INVALID", "\u000D"]]},
+  "output": [["INVALID", ""]]},
+
+  {"description": "url(\"\\\u000D)",
+  "input": "url(\"\\\u000D)",
+  "output": [["URI_INVALID"]]},
 
   {"description": "'\\\u000D",
   "input": "'\\\u000D",
-  "output": [["INVALID", "\u000D"]]},
+  "output": [["INVALID", ""]]},
+
+  {"description": "url('\\\u000D)",
+  "input": "url('\\\u000D)",
+  "output": [["URI_INVALID"]]},
 
   {"description": "\"a\\\u000D",
   "input": "\"a\\\u000D",
-  "output": [["INVALID", "a\u000D"]]},
+  "output": [["INVALID", "a"]]},
 
   {"description": "\"a\\\u000D\"",
   "input": "\"a\\\u000D\"",
-  "output": [["STRING", "a\u000D"]]},
+  "output": [["STRING", "a"]]},
+
+  {"description": "url(\"a\\\u000D\")",
+  "input": "url(\"a\\\u000D\")",
+  "output": [["URI", "a"]]},
 
   {"description": "'a\\\u000D'",
   "input": "'a\\\u000D'",
-  "output": [["STRING", "a\u000D"]]},
+  "output": [["STRING", "a"]]},
+
+  {"description": "url('a\\\u000D')",
+  "input": "url('a\\\u000D')",
+  "output": [["URI", "a"]]},
 
   {"description": "\"a\\\u000D\u000A",
   "input": "\"a\\\u000D\u000A",
-  "output": [["INVALID", "a\u000D\u000A"]]},
+  "output": [["INVALID", "a"]]},
 
   {"description": "\"a\\\u000D\u000A\"",
   "input": "\"a\\\u000D\u000A\"",
-  "output": [["STRING", "a\u000D\u000A"]]},
+  "output": [["STRING", "a"]]},
 
   {"description": "\"a\\\u000D\\\u000A",
   "input": "\"a\\\u000D\\\u000A",
-  "output": [["INVALID", "a\u000D\u000A"]]},
+  "output": [["INVALID", "a"]]},
 
   {"description": "'a\\\u000D\\\u000A",
   "input": "'a\\\u000D\\\u000A",
-  "output": [["INVALID", "a\u000D\u000A"]]},
+  "output": [["INVALID", "a"]]},
 
   {"description": "\"a\\\u000D\\\u000A\"",
   "input": "\"a\\\u000D\\\u000A\"",
-  "output": [["STRING", "a\u000D\u000A"]]},
+  "output": [["STRING", "a"]]},
 
   {"description": "\"a\\\u000A",
   "input": "\"a\\\u000A",
-  "output": [["INVALID", "a\u000A"]]},
+  "output": [["INVALID", "a"]]},
 
   {"description": "\"a\\\u000A\"",
   "input": "\"a\\\u000A\"",
-  "output": [["STRING", "a\u000A"]]},
+  "output": [["STRING", "a"]]},
 
   {"description": "'a\\\u000A'",
   "input": "'a\\\u000A'",
-  "output": [["STRING", "a\u000A"]]},
+  "output": [["STRING", "a"]]},
 
   {"description": "\"a\\\u000C",
   "input": "\"a\\\u000C",
-  "output": [["INVALID", "a\u000C"]]},
+  "output": [["INVALID", "a"]]},
 
   {"description": "\"a\\\u000C\"",
   "input": "\"a\\\u000C\"",
-  "output": [["STRING", "a\u000C"]]},
+  "output": [["STRING", "a"]]},
 
   {"description": "'a\\\u000C'",
   "input": "'a\\\u000C'",
-  "output": [["STRING", "a\u000C"]]},
+  "output": [["STRING", "a"]]},
 
   {"description": "\"a\\\u000Daa",
   "input": "\"a\\\u000Daa",
-  "output": [["INVALID", "a\u000Daa"]]},
+  "output": [["INVALID", "aaa"]]},
 
   {"description": "\"a\\\u000D\u000Ab",
   "input": "\"a\\\u000D\u000Ab",
-  "output": [["INVALID", "a\u000D\u000Ab"]]},
+  "output": [["INVALID", "ab"]]},
 
   {"description": "'a\\\u000D\u000Ab",
   "input": "'a\\\u000D\u000Ab",
-  "output": [["INVALID", "a\u000D\u000Ab"]]},
+  "output": [["INVALID", "ab"]]},
 
   {"description": "'\u000d'",
   "input": "'\u000d'",
