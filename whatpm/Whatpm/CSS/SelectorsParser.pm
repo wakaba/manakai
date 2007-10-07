@@ -769,7 +769,7 @@ sub parse_string ($$) {
         return undef;
       }
     } elsif ($state == BEFORE_CONTAINS_STRING_STATE) {
-      if ($t->{type} == STRING_TOKEN) {
+      if ($t->{type} == STRING_TOKEN or $t->{type} == IDENT_TOKEN) {
         push @$sss, [PSEUDO_CLASS_SELECTOR, '-manakai-contains', $t->{value}];
         
         $state = AFTER_LANG_TAG_STATE;
