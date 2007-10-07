@@ -90,6 +90,7 @@ if ($mode eq '/tokens') {
     focus hover indeterminate last-child last-of-type link only-child
     only-of-type root target visited
     lang nth-child nth-last-child nth-of-type nth-last-of-type not
+    -manakai-contains -manakai-current
   /;
   $p->{pseudo_element}->{$_} = 1 for qw/
     after before first-letter first-line
@@ -123,4 +124,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/09/22 12:17:15 $
+## $Date: 2007/10/07 04:56:22 $
