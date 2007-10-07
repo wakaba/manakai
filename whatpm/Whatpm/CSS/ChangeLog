@@ -1,7 +1,22 @@
+2007-10-07  Wakaba  <wakaba@suika.fam.cx>
+
+	* SelectorsParser.pm (BEFORE_CONTAINS_STRING_STATE): New state.
+	(parse_string): Support for |-manakai-current| 
+	and |-manakai-contains| pseudo-classes.
+
+	* SelectorsSerializer.pm: Support for |-manakai-current|
+	and |-manakai-contains| pseudo-classes.
+
 2007-09-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* Tokenizer.pm: |\\{nl}| incorrectly appended |{nl}| to
 	the string value of the token.
+
+2007-09-24  Wakaba  <wakaba@suika.fam.cx>
+
+	* SelectorsParser.pm: Pass an empty string as a prefix
+	for lookup namespace prefix callback, for loose compatibility
+	with the |NSResolver| interface.
 
 2007-09-22  Wakaba  <wakaba@suika.fam.cx>
 

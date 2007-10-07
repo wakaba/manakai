@@ -98,6 +98,8 @@ sub serialize_test ($$$) {
                     'nth-last-of-type' => 1}->{$v->[1]}) {
             ':' . $ident->($v->[1]) . '(' .
             ($v->[2] . 'n' . ($v->[3] < 0 ? $v->[3] : '+' . $v->[3])) . ')';
+          } elsif ($v->[1] eq '-manakai-contains') {
+            ':-manakai-contains(' . $str->($v->[2]) . ')';
           } else {
             ':' . $ident->($v->[1]);
           }

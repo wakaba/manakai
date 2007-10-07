@@ -35,6 +35,7 @@ sub AFTER_AN_STATE () { 19 }
 sub BEFORE_B_STATE () { 20 }
 sub AFTER_B_STATE () { 21 }
 sub AFTER_NEGATION_SIMPLE_SELECTOR_STATE () { 22 }
+sub BEFORE_CONTAINS_STRING_STATE () { 23 }
 
 sub NAMESPACE_SELECTOR () { 1 }
 sub LOCAL_NAME_SELECTOR () { 2 }
@@ -315,6 +316,7 @@ sub parse_string ($$) {
             {
               active => 1,
               checked => 1,
+              '-manakai-current' => 1,
               disabled => 1,
               empty => 1,
               enabled => 1,
@@ -374,6 +376,11 @@ sub parse_string ($$) {
           $t = $tt->get_next_token;
           ## TODO: syntax of value in the spec is vague; need to reverse
           ## engineer what Opera 9.5 does.
+          redo S;
+        } elsif ($class eq '-manakai-contains' and
+                 $self->{pseudo_class}->{$class}) {
+          $state = BEFORE_CONTAINS_STRING_STATE;
+          $t = $tt->get_next_token;
           redo S;
         } else {
           ## TODO: error
@@ -751,6 +758,21 @@ sub parse_string ($$) {
         push @$sss, $simple_selector;
         
         $state = BEFORE_SIMPLE_SELECTOR_STATE;
+        $t = $tt->get_next_token;
+        redo S;
+      } elsif ($t->{type} == S_TOKEN) {
+        ## Stay in the state.
+        $t = $tt->get_next_token;
+        redo S;
+      } else {
+        ## TODO: error
+        return undef;
+      }
+    } elsif ($state == BEFORE_CONTAINS_STRING_STATE) {
+      if ($t->{type} == STRING_TOKEN) {
+        push @$sss, [PSEUDO_CLASS_SELECTOR, '-manakai-contains', $t->{value}];
+        
+        $state = AFTER_LANG_TAG_STATE;
         $t = $tt->get_next_token;
         redo S;
       } elsif ($t->{type} == S_TOKEN) {
