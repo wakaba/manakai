@@ -374,6 +374,46 @@ p ~ p *
 /2/2/2/1
 /2/2/3/1
 
+#data
+:-manakai-current
+#result 7 /2
+#result 7 /2/1
+#result 7 /2/2
+#result 7 /2/2/1
+#result 7 /2/2/1/1
+
+#data
+* :-manakai-current
+#result 7 /2
+#result 7 /2/1
+#result 7 /2/2
+#result 7 /2/2/1
+#result 7 /2/2/1/1
+
+#data
+:-manakai-current *
+#result 7 /2/2
+/2/2/1
+/2/2/1/1
+/2/2/2
+/2/2/2/1
+/2/2/3
+/2/2/3/1
+
+#data
+:-manakai-current > *
+#result 7 /2/2
+/2/2/1
+/2/2/2
+/2/2/3
+
+#data
+:-manakai-current > * > *
+#result 7 /2/2
+/2/2/1/1
+/2/2/2/1
+/2/2/3/1
+
 #html 8
 <!DOCTYPE HTML>
 <p align>
@@ -819,4 +859,83 @@ p ~ p *
 [*|class~=ccc]
 #result 11
 /2/2/1
+
+#html 12
+<!DOCTYPE HTML>
+<p>aaaaaaaaaaaaaaaaaaaaaaaaaa
+<p>abcdefghijklmnopqrstuvwxyz
+<p>
+
+#html 13
+<!DOCTYPE HTML>
+<p>a<span>aa<!--xyz-->aaaaaaaaaaaaaaa</span>aaa<em>aaa</em>aa
+<p>ab<span><em>c</em>defghijklm</span>nopq<b>rstuvwx</b>y<img>z
+<p>
+
+#data
+p:-manakai-contains("")
+#result 12
+/2/2/1
+/2/2/2
+/2/2/3
+#result 13
+/2/2/1
+/2/2/2
+/2/2/3
+
+#data
+p:-manakai-contains("aaa")
+#result 12
+/2/2/1
+#result 13
+/2/2/1
+
+#data
+p:-manakai-contains("abc")
+#result 12
+/2/2/2
+#result 13
+/2/2/2
+
+#data
+p:-manakai-contains("qrstu")
+#result 12
+/2/2/2
+#result 13
+/2/2/2
+
+#data
+p:-manakai-contains("xyz")
+#result 12
+/2/2/2
+#result 13
+/2/2/2
+
+#data
+p:-manakai-contains("ABC")
+#result 12
+#result 13
+
+#data
+p:-manakai-contains("yza")
+#result 12
+#result 13
+
+#data
+:-manakai-contains("xyz") em
+#result 12
+#result 13
+/2/2/1/4
+/2/2/2/2/1
+
+#data
+:-manakai-contains("xyz") > em
+#result 12
+#result 13
+
+#data
+:-manakai-contains("xyz") > :-manakai-contains("cde") > em
+#result 12
+#result 13
+/2/2/2/2/1
 

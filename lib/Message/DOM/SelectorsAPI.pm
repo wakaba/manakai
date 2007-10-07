@@ -1,6 +1,6 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::DOM::DOMException;
 
 package Message::DOM::Document;
@@ -8,7 +8,7 @@ package Message::DOM::Document;
 use Whatpm::CSS::SelectorsParser qw(:match :combinator :selector);
 
 my $get_elements_by_selectors = sub {
-  # $node, $selectors, $resolver, $node_conds, $is_html, $all
+  # $node, $selectors, $resolver, $node_conds, $is_html, $all, $current
 
   my $p = Whatpm::CSS::SelectorsParser->new;
 
@@ -57,6 +57,7 @@ my $get_elements_by_selectors = sub {
   ## NOTE: SHOULD ensure to remain stable when facing a hostile $_[2].
 
   $p->{pseudo_class}->{$_} = 1 for qw/
+    -manakai-contains -manakai-current
   /;
 #    active checked disabled empty enabled first-child first-of-type
 #    focus hover indeterminate last-child last-of-type link only-child
@@ -264,6 +265,17 @@ my $get_elements_by_selectors = sub {
                 }
               }
             }
+          } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
+            if ($simple_selector->[1] eq '-manakai-current') {
+              $sss_matched = 0 if $_[6] ne $node_cond->[0];
+            } elsif ($simple_selector->[1] eq '-manakai-contains') {
+              $sss_matched = 0
+                  if index ($node_cond->[0]->text_content,
+                            $simple_selector->[2]) == -1;
+            } else {
+              ## This statement should never be executed.
+              die "$simple_selector->[1]: Bad pseudo-class";
+            }
           } elsif ($simple_selector->[0] == PSEUDO_ELEMENT_SELECTOR) {
             $sss_matched = 0;
           } else {
@@ -371,7 +383,7 @@ sub query_selector ($$;$) {
 
   return $get_elements_by_selectors
       ->($_[0], $_[1], $_[2], \@node_cond,
-         $_[0]->manakai_is_html, 0);
+         $_[0]->manakai_is_html, 0, 0);
 } # query_selector
 
 sub query_selector_all ($$;$) {
@@ -391,7 +403,7 @@ sub query_selector_all ($$;$) {
 
   return $get_elements_by_selectors
       ->($_[0], $_[1], $_[2], \@node_cond,
-         $_[0]->manakai_is_html, 1);
+         $_[0]->manakai_is_html, 1, 0);
 } # query_selector_all
 
 package Message::DOM::Element;
@@ -446,7 +458,7 @@ sub query_selector ($$;$) {
 
   return $get_elements_by_selectors
       ->($_[0], $_[1], $_[2], $get_node_cond->($_[0]),
-         $_[0]->owner_document->manakai_is_html, 0);
+         $_[0]->owner_document->manakai_is_html, 0, $_[0]);
 } # query_selector
 
 sub query_selector_all ($$;$) {
@@ -454,13 +466,19 @@ sub query_selector_all ($$;$) {
 
   return $get_elements_by_selectors
       ->($_[0], $_[1], $_[2], $get_node_cond->($_[0]),
-         $_[0]->owner_document->manakai_is_html, 1);
+         $_[0]->owner_document->manakai_is_html, 1, $_[0]);
 } # query_selector_all
 
 =head1 SEE ALSO
 
+Selectors Working Draft 15 December 2005
+<http://www.w3.org/TR/2005/WD-css3-selectors-20051215>
+
 Selectors API Editor's Draft 29 August 2007
 <http://dev.w3.org/cvsweb/~checkout~/2006/webapi/selectors-api/Overview.html?rev=1.28&content-type=text/html;%20charset=utf-8>
+
+manakai Selectors Extensions
+<http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions>
 
 =head1 LICENSE
 
@@ -472,4 +490,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/29 14:03:04 $
+## $Date: 2007/10/07 04:55:32 $
