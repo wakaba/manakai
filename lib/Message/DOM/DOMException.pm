@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -42,6 +42,9 @@ sub ___error_def () {+{
   INVALID_CHARACTER_ERR => {
     -code => 5,
     -subtype => {
+      MALFORMED_EVENT_TYPE_ERR => {
+        -description => q(Event type is not an XML Namespaces 1.1 |NCName|),
+      },
       MALFORMED_NAME_ERR => {
         -description => q(Not a legal XML |Name|),
       },
@@ -81,6 +84,13 @@ sub ___error_def () {+{
       },
       CONFIGURATION_PARAMETER_VALUE_ERR => {
         -description => q(Can't set the value to the configuration parameter),
+      },
+      EVENT_INTERFACE_NOT_SUPPORTED_ERR => {
+        -description => q(Can't instantiate specified event interface),
+      },
+      EXTERNAL_EVENT_ERR => {
+        -description => q(The event has not been created using create_event
+            method of this DOM implementation),
       },
       NON_HTML_OPERATION_ERR => {
         -description => q(Can't apply to HTML document),
@@ -183,4 +193,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/24 10:16:14 $
+## $Date: 2007/10/08 07:17:18 $

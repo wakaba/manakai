@@ -1,6 +1,6 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation',
     'Message::IF::AtomDOMImplementation';
 
@@ -40,6 +40,8 @@ $HasFeature->{core}->{''} = 1;
 $HasFeature->{core}->{'1.0'} = 1;
 $HasFeature->{core}->{'2.0'} = 1;
 $HasFeature->{core}->{'3.0'} = 1;
+$HasFeature->{events}->{''} = 1;
+$HasFeature->{events}->{'3.0'} = 1; ## TODO: 2.0?
 $HasFeature->{html}->{''} = 1;
 $HasFeature->{html}->{'5.0'} = 1; ## TODO: 1.0, 2.0
 $HasFeature->{xhtml}->{''} = 1;
@@ -112,4 +114,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/08/11 13:06:39 $
+## $Date: 2007/10/08 07:17:18 $

@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node',
     'Message::IF::NSResolver';
 require Scalar::Util;
@@ -98,6 +98,15 @@ sub AUTOLOAD {
         return \${\$_[0]}->{$method_name}; 
       }
     };
+    goto &{ $AUTOLOAD };
+  } elsif (my $module_name = {
+    add_event_listener => 'Message::DOM::EventTargetNode',
+    add_event_listener_ns => 'Message::DOM::EventTargetNode',
+    dispatch_event => 'Message::DOM::EventTargetNode',
+    remove_event_listener => 'Message::DOM::EventTargetNode',
+    remove_event_listener_ns => 'Message::DOM::EventTargetNode',
+  }->{$method_name}) {
+    eval qq{ require $module_name } or die $@;
     goto &{ $AUTOLOAD };
   } else {
     require Carp;
@@ -1399,4 +1408,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/24 10:16:14 $
+## $Date: 2007/10/08 07:17:18 $

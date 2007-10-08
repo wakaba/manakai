@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -100,6 +100,7 @@ sub AUTOLOAD {
     };
     goto &{ $AUTOLOAD };
   } elsif (my $module_name = {
+    can_dispatch => 'Message::DOM::EventTargetNode',
     create_attribute => 'Message::DOM::Attr',
     create_attribute_ns => 'Message::DOM::Attr',
     create_attribute_definition => 'Message::DOM::AttributeDefinition',
@@ -111,6 +112,7 @@ sub AUTOLOAD {
     create_element_ns => 'Message::DOM::Element',
     create_element_type_definition => 'Message::DOM::ElementTypeDefinition',
     create_entity_reference => 'Message::DOM::EntityReference',
+    create_event => 'Message::DOM::EventTargetNode',
     create_general_entity => 'Message::DOM::Entity',
     create_notation => 'Message::DOM::Notation',
     create_processing_instruction => 'Message::DOM::ProcessingInstruction',
@@ -1229,4 +1231,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/24 10:16:14 $
+## $Date: 2007/10/08 07:17:18 $

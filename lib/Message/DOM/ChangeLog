@@ -1,3 +1,18 @@
+2007-10-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* Event.pm, EventTarget.pm, EventTargetNode.pm,
+	EventException.pm: Implemented (but not tested!).
+
+	* DOMException.pm (MALFORMED_EVENT_TYPE_ERR,
+	EVENT_INTERFACE_NOT_SUPPORTED_ERR, EXTERNAL_EVENT_ERR): New
+	error subtypes.
+
+	* DOMImplementation.pm ($HasFeature): The |Event| feature,
+	version |3.0|, is added.
+
+	* Document.pm, Node.pm: Event attributes and
+	methods are implemented.
+
 2007-10-07  Wakaba  <wakaba@suika.fam.cx>
 
 	* SelectorsAPI.pm ($get_elements_by_selectors): Receive
