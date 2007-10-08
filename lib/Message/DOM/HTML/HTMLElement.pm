@@ -1,6 +1,6 @@
 package Message::DOM::HTML::HTMLElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
 require Message::DOM::Element;
 
@@ -70,6 +70,39 @@ sub AUTOLOAD {
 
         ## ISSUE: If missing?
         return \$_[0]->get_attribute_ns (undef, '$ln');
+      }
+    };
+    goto &{ $AUTOLOAD };
+  } elsif ($ln = {  ## Reflecting URI attribute
+    'Message::DOM::HTML::HTMLAnchorElement::href' => 'href',
+  }->{$method_name}) {
+    no strict 'refs';
+    eval qq{
+      sub $method_name (\$;\$) {
+        local \$Error::Depth = \$Error::Depth + 1;
+
+        ## TODO: Implement the spec...
+
+        if (\@_ > 1) {
+          if (defined \$_[1]) {
+            \$_[0]->set_attribute_ns (undef, '$ln', ''.\$_[1]);
+          } else {
+            \$_[0]->set_attribute_ns (undef, '$ln', '');
+          }
+          return unless defined wantarray;
+        }
+
+        if (defined wantarray) {
+          my \$uri = \$_[0]->get_attribute_ns (undef, '$ln');
+          if (defined \$uri) {
+            return \$_[0]->owner_document->implementation->create_uri_reference
+                (\$uri)->get_absolute_reference (\$_[0]->base_uri)
+                ->uri_reference;
+            ## TODO: If base_uri is undef...
+          } else {
+            return undef;
+          }
+        }
       }
     };
     goto &{ $AUTOLOAD };
@@ -459,5 +492,5 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/08/11 13:06:39 $
+## $Date: 2007/10/08 04:48:34 $
 

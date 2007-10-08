@@ -1,6 +1,6 @@
 package Message::DOM::Atom::AtomElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
 require Message::DOM::Element;
 
@@ -421,7 +421,24 @@ sub get_entry_element_by_id ($$) {
       }
     }
   }
-  return undef;
+
+  ## TODO: documentation
+  my $od = $_[0]->owner_document;
+  if ($od->dom_config->get_parameter ($CREATE_CHILD_URI)) {
+    my $r = $_[0]->append_child ($od->create_element_ns ($ATOM_NS, 'entry'));
+    $r->id ($id);
+
+    my $titlee = $od->create_element_ns ($ATOM_NS, 'title');
+    $r->append_child ($titlee);
+
+    my $updatede = $od->create_element_ns ($ATOM_NS, 'updated');
+    $updatede->value (scalar time);
+    $r->append_child ($updatede);
+
+    return $r;
+  } else {
+    return undef;
+  }
 } # get_entry_element_by_id
 
 sub icon ($;$);
@@ -747,4 +764,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/29 08:31:17 $
+## $Date: 2007/10/08 04:48:33 $
