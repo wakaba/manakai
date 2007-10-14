@@ -1,7 +1,7 @@
 1..1202
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Sep 30 20:38:28 2007
-# Current time GMT:   Sun Sep 30 11:38:28 2007
+# Current time local: Sun Oct 14 18:18:02 2007
+# Current time GMT:   Sun Oct 14 09:18:02 2007
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -472,23 +472,14 @@ ok 407
 ok 408
 ok 409
 ok 410
-# t/content-model-2.dat
 ok 411
 ok 412
 ok 413
-not ok 414
-# Test 414 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown;element;unsupported" (t/ContentChecker.t at line 88 fail #414)
-#     Expected: "/unknown/@lang;syntax error\n/unknown;element;unsupported" (<unknown xml:lang="!" xmlns=""></unknown>)
-not ok 415
-# Test 415 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 88 fail #415)
-#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns=""></unknown>)
+ok 414
+ok 415
 ok 416
-not ok 417
-# Test 417 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 88 fail #417)
-#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
-not ok 418
-# Test 418 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 88 fail #418)
-#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
+ok 417
+ok 418
 ok 419
 ok 420
 ok 421
@@ -513,23 +504,14 @@ ok 439
 ok 440
 ok 441
 ok 442
-not ok 443
-# Test 443 got: "/p/@lang;in XML:lang" (t/ContentChecker.t at line 88 fail #443)
-#     Expected: "/p/@lang;in XML:lang\n/p/@lang;language tag;unsupported" (<p lang="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 444
-# Test 444 got: "" (t/ContentChecker.t at line 88 fail #444)
-#     Expected: "/p/@lang;language tag;unsupported" (<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 445
-# Test 445 got: "/html/body/p/@xml:lang;in HTML:xml:lang" (t/ContentChecker.t at line 88 fail #445)
-#     Expected: "/html/body/p/@xml:lang;in HTML:xml:lang\n/html/body/p/@xml:lang;language tag;unsupported" (<!DOCTYPE HTML><title></title><p xml:lang=""></p>)
+ok 443
+ok 444
+ok 445
 ok 446
 ok 447
 ok 448
 ok 449
-not ok 450
-# Test 450 got: "/p/@dir;enumerated:invalid" (t/ContentChecker.t at line 88 fail #450)
-#     Expected: "" (<!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
-#<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 450
 ok 451
 ok 452
 ok 453
@@ -601,11 +583,15 @@ ok 518
 ok 519
 ok 520
 ok 521
-ok 522
+not ok 522
+# Test 522 got: "" (t/ContentChecker.t at line 88 fail #522)
+#     Expected: "/rule/footer/p;element not allowed" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><p/></footer></rule>)
 ok 523
 ok 524
 ok 525
-ok 526
+not ok 526
+# Test 526 got: "" (t/ContentChecker.t at line 88 fail #526)
+#     Expected: "/rule/footer/p;element not allowed" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><p/><nest/></footer></rule>)
 ok 527
 ok 528
 ok 529
@@ -637,14 +623,8 @@ ok 554
 ok 555
 ok 556
 ok 557
-not ok 558
-# Test 558 got: "/link/@hreflang;LangTag:nosemantics:language;m" (t/ContentChecker.t at line 88 fail #558)
-#     Expected: "/link/@hreflang;language tag:syntax error\n/link/@hreflang;language tag;unsupported" (<link rel="author" href="http://test/" hreflang=""
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 559
-# Test 559 got: "" (t/ContentChecker.t at line 88 fail #559)
-#     Expected: "/link/@hreflang;language tag;unsupported" (<link rel="author" href="http://test/" hreflang="en"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 558
+ok 559
 ok 560
 ok 561
 ok 562
@@ -695,14 +675,19 @@ ok 606
 ok 607
 ok 608
 ok 609
+# t/content-model-2.dat
 ok 610
 ok 611
 ok 612
 ok 613
 ok 614
 ok 615
-ok 616
-ok 617
+not ok 616
+# Test 616 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 88 fail #616)
+#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
+not ok 617
+# Test 617 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (t/ContentChecker.t at line 88 fail #617)
+#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute;unsupported\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
 ok 618
 ok 619
 ok 620
@@ -734,17 +719,14 @@ ok 645
 ok 646
 ok 647
 ok 648
-ok 649
+not ok 649
+# Test 649 got: "/p/@dir;enumerated:invalid" (t/ContentChecker.t at line 88 fail #649)
+#     Expected: "" (<!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
+#<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 650
 ok 651
-not ok 652
-# Test 652 got: "/a/@hreflang;LangTag:nosemantics:language;m" (t/ContentChecker.t at line 88 fail #652)
-#     Expected: "/a/@hreflang;language tag:syntax error\n/a/@hreflang;language tag;unsupported" (<a href="http://test/" hreflang=""
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 653
-# Test 653 got: "" (t/ContentChecker.t at line 88 fail #653)
-#     Expected: "/a/@hreflang;language tag;unsupported" (<a href="http://test/" hreflang="en"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 652
+ok 653
 ok 654
 ok 655
 ok 656
@@ -758,9 +740,7 @@ ok 663
 ok 664
 ok 665
 ok 666
-not ok 667
-# Test 667 got: "/a/@hreflang;attribute not allowed" (t/ContentChecker.t at line 88 fail #667)
-#     Expected: "/a/@hreflang;attribute not allowed\n/a/@hreflang;language tag;unsupported" (<a hreflang="en" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 667
 ok 668
 ok 669
 ok 670
@@ -918,93 +898,24 @@ ok 821
 ok 822
 ok 823
 ok 824
-not ok 825
-# Test 825 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #825)
-#     Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 826
-# Test 826 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #826)
-#     Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 827
-# Test 827 got: "/object/@data;URI::syntax error:iriref3987;m\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #827)
-#     Expected: "/object/@data;URI::syntax error:iriref3987;m" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 828
-# Test 828 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #828)
-#     Expected: "/object/@type;IMT:syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 829
-# Test 829 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #829)
-#     Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 830
-# Test 830 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #830)
-#     Expected: "" (<object type="text/css" data="http://test/"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 831
-# Test 831 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #831)
-#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap=""/></p>
-#</div>)
-not ok 832
-# Test 832 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #832)
-#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap="abc"/></p>
-#</div>)
-not ok 833
-# Test 833 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #833)
-#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap="abc#"/></p>
-#</div>)
-not ok 834
-# Test 834 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #834)
-#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
-#</div>)
-not ok 835
-# Test 835 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #835)
-#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap="#aa"/></p>
-#<map id="aa"/>
-#</div>)
-not ok 836
-# Test 836 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #836)
-#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="aa"/>
-#<p><object data="http://test/" usemap="#aa"/></p>
-#</div>)
-not ok 837
-# Test 837 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #837)
-#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="&#x4E00;"/>
-#<p><object data="http://test/" usemap="#&#x4E00;"/></p>
-#</div>)
-not ok 838
-# Test 838 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #838)
-#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="aa"/>
-#<p><object data="http://test/" usemap="#bb"/></p>
-#</div>)
-not ok 839
-# Test 839 got: "/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #839)
-#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="aa"/>
-#<p><object data="http://test/" usemap="#aa"/></p>
-#<p><object data="http://test/" usemap="#aa"/></p>
-#</div>)
-not ok 840
-# Test 840 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #840)
-#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="aa"/>
-#<p><object data="http://test/" usemap="#AA"/></p>
-#</div>)
-not ok 841
-# Test 841 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #841)
-#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="AA"/>
-#<p><object data="http://test/" usemap="#aa"/></p>
-#</div>)
-not ok 842
-# Test 842 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 88 fail #842)
-#     Expected: "/div/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<object data="" usemap="#a"/><menu id="a"/>
-#</div>)
+ok 825
+ok 826
+ok 827
+ok 828
+ok 829
+ok 830
+ok 831
+ok 832
+ok 833
+ok 834
+ok 835
+ok 836
+ok 837
+ok 838
+ok 839
+ok 840
+ok 841
+ok 842
 ok 843
 ok 844
 ok 845
@@ -1068,20 +979,9 @@ ok 902
 ok 903
 ok 904
 ok 905
-not ok 906
-# Test 906 got: "/area/@hreflang;LangTag:nosemantics:language;m" (t/ContentChecker.t at line 88 fail #906)
-#     Expected: "/area/@hreflang;language tag:syntax error\n/area/@hreflang;language tag;unsupported" (<area href="http://test/" alt="" coords="1,2,3,4"
-#    hreflang=""
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 907
-# Test 907 got: "" (t/ContentChecker.t at line 88 fail #907)
-#     Expected: "/area/@hreflang;language tag;unsupported" (<area href="http://test/" alt="" coords="1,2,3,4"
-#    hreflang="en"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 908
-# Test 908 got: "/area/@hreflang;attribute not allowed" (t/ContentChecker.t at line 88 fail #908)
-#     Expected: "/area/@hreflang;attribute not allowed\n/area/@hreflang;language tag;unsupported" (<area coords="1,2,3,4" hreflang="en"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 906
+ok 907
+ok 908
 ok 909
 ok 910
 ok 911
@@ -1197,24 +1097,93 @@ ok 1020
 ok 1021
 ok 1022
 ok 1023
-ok 1024
-ok 1025
-ok 1026
-ok 1027
-ok 1028
-ok 1029
-ok 1030
-ok 1031
-ok 1032
-ok 1033
-ok 1034
-ok 1035
-ok 1036
-ok 1037
-ok 1038
-ok 1039
-ok 1040
-ok 1041
+not ok 1024
+# Test 1024 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1024)
+#      Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1025
+# Test 1025 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1025)
+#      Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1026
+# Test 1026 got: "/object/@data;URI::syntax error:iriref3987;m\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1026)
+#      Expected: "/object/@data;URI::syntax error:iriref3987;m" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1027
+# Test 1027 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1027)
+#      Expected: "/object/@type;IMT:syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1028
+# Test 1028 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1028)
+#      Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1029
+# Test 1029 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1029)
+#      Expected: "" (<object type="text/css" data="http://test/"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1030
+# Test 1030 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1030)
+#      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap=""/></p>
+#</div>)
+not ok 1031
+# Test 1031 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1031)
+#      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap="abc"/></p>
+#</div>)
+not ok 1032
+# Test 1032 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1032)
+#      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap="abc#"/></p>
+#</div>)
+not ok 1033
+# Test 1033 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1033)
+#      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
+#</div>)
+not ok 1034
+# Test 1034 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1034)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap="#aa"/></p>
+#<map id="aa"/>
+#</div>)
+not ok 1035
+# Test 1035 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1035)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="aa"/>
+#<p><object data="http://test/" usemap="#aa"/></p>
+#</div>)
+not ok 1036
+# Test 1036 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1036)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="&#x4E00;"/>
+#<p><object data="http://test/" usemap="#&#x4E00;"/></p>
+#</div>)
+not ok 1037
+# Test 1037 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1037)
+#      Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="aa"/>
+#<p><object data="http://test/" usemap="#bb"/></p>
+#</div>)
+not ok 1038
+# Test 1038 got: "/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1038)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="aa"/>
+#<p><object data="http://test/" usemap="#aa"/></p>
+#<p><object data="http://test/" usemap="#aa"/></p>
+#</div>)
+not ok 1039
+# Test 1039 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1039)
+#      Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="aa"/>
+#<p><object data="http://test/" usemap="#AA"/></p>
+#</div>)
+not ok 1040
+# Test 1040 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1040)
+#      Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="AA"/>
+#<p><object data="http://test/" usemap="#aa"/></p>
+#</div>)
+not ok 1041
+# Test 1041 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1041)
+#      Expected: "/div/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<object data="" usemap="#a"/><menu id="a"/>
+#</div>)
 ok 1042
 ok 1043
 ok 1044
@@ -1294,21 +1263,14 @@ ok 1117
 ok 1118
 ok 1119
 ok 1120
-# t/content-model-3.dat
 ok 1121
 ok 1122
 ok 1123
 ok 1124
 ok 1125
-not ok 1126
-# Test 1126 got: "" (t/ContentChecker.t at line 88 fail #1126)
-#      Expected: "/p/@lang;language tag;unsupported" (<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1127
-# Test 1127 got: "" (t/ContentChecker.t at line 88 fail #1127)
-#      Expected: "/p/@lang;language tag;unsupported" (<p xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1128
-# Test 1128 got: "" (t/ContentChecker.t at line 88 fail #1128)
-#      Expected: "/p/@lang;language tag;unsupported" (<p xml:lang="ja-JP" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1126
+ok 1127
+ok 1128
 ok 1129
 ok 1130
 ok 1131
@@ -1322,7 +1284,6 @@ ok 1138
 ok 1139
 ok 1140
 ok 1141
-# t/content-model-4.dat
 ok 1142
 ok 1143
 ok 1144
@@ -1349,7 +1310,6 @@ ok 1164
 ok 1165
 ok 1166
 ok 1167
-# t/table-1.dat
 ok 1168
 ok 1169
 ok 1170
@@ -1363,8 +1323,6 @@ ok 1177
 ok 1178
 ok 1179
 ok 1180
-# t/content-model-atom-1.dat
-# t/content-model-atom-2.dat
 ok 1181
 ok 1182
 ok 1183
@@ -1387,3 +1345,217 @@ ok 1199
 ok 1200
 ok 1201
 ok 1202
+ok 1203
+ok 1204
+ok 1205
+ok 1206
+ok 1207
+ok 1208
+ok 1209
+ok 1210
+ok 1211
+ok 1212
+ok 1213
+ok 1214
+ok 1215
+ok 1216
+ok 1217
+ok 1218
+ok 1219
+ok 1220
+ok 1221
+ok 1222
+ok 1223
+ok 1224
+ok 1225
+ok 1226
+ok 1227
+ok 1228
+ok 1229
+ok 1230
+ok 1231
+ok 1232
+ok 1233
+ok 1234
+ok 1235
+ok 1236
+ok 1237
+ok 1238
+ok 1239
+ok 1240
+ok 1241
+ok 1242
+ok 1243
+ok 1244
+ok 1245
+ok 1246
+ok 1247
+ok 1248
+ok 1249
+ok 1250
+ok 1251
+ok 1252
+ok 1253
+ok 1254
+ok 1255
+ok 1256
+ok 1257
+ok 1258
+ok 1259
+ok 1260
+ok 1261
+ok 1262
+ok 1263
+ok 1264
+ok 1265
+ok 1266
+ok 1267
+ok 1268
+ok 1269
+ok 1270
+ok 1271
+ok 1272
+ok 1273
+ok 1274
+ok 1275
+ok 1276
+ok 1277
+ok 1278
+ok 1279
+ok 1280
+ok 1281
+ok 1282
+ok 1283
+ok 1284
+ok 1285
+ok 1286
+ok 1287
+ok 1288
+ok 1289
+ok 1290
+ok 1291
+ok 1292
+ok 1293
+ok 1294
+ok 1295
+ok 1296
+ok 1297
+ok 1298
+ok 1299
+ok 1300
+ok 1301
+ok 1302
+ok 1303
+ok 1304
+ok 1305
+ok 1306
+ok 1307
+ok 1308
+ok 1309
+ok 1310
+ok 1311
+ok 1312
+ok 1313
+ok 1314
+ok 1315
+ok 1316
+ok 1317
+ok 1318
+ok 1319
+ok 1320
+ok 1321
+ok 1322
+ok 1323
+ok 1324
+ok 1325
+ok 1326
+ok 1327
+ok 1328
+ok 1329
+# t/content-model-3.dat
+ok 1330
+ok 1331
+ok 1332
+ok 1333
+ok 1334
+ok 1335
+ok 1336
+ok 1337
+ok 1338
+ok 1339
+ok 1340
+ok 1341
+ok 1342
+ok 1343
+ok 1344
+ok 1345
+ok 1346
+ok 1347
+ok 1348
+ok 1349
+ok 1350
+# t/content-model-4.dat
+ok 1351
+ok 1352
+ok 1353
+ok 1354
+ok 1355
+ok 1356
+ok 1357
+ok 1358
+ok 1359
+ok 1360
+ok 1361
+ok 1362
+ok 1363
+ok 1364
+ok 1365
+ok 1366
+ok 1367
+ok 1368
+ok 1369
+ok 1370
+ok 1371
+ok 1372
+ok 1373
+ok 1374
+ok 1375
+ok 1376
+# t/table-1.dat
+ok 1377
+ok 1378
+ok 1379
+ok 1380
+ok 1381
+ok 1382
+ok 1383
+ok 1384
+ok 1385
+ok 1386
+ok 1387
+ok 1388
+ok 1389
+# t/content-model-atom-1.dat
+# t/content-model-atom-2.dat
+ok 1390
+ok 1391
+ok 1392
+ok 1393
+ok 1394
+ok 1395
+ok 1396
+ok 1397
+ok 1398
+ok 1399
+ok 1400
+ok 1401
+ok 1402
+ok 1403
+ok 1404
+ok 1405
+ok 1406
+ok 1407
+ok 1408
+ok 1409
+ok 1410
+ok 1411

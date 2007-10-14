@@ -285,8 +285,13 @@ $Element->{$ATOM_NS}->{uri} = {
         
       my $nt = $node->node_type;
       if ($nt == 1) {
-        ## NOTE: Not explicitly disallowed.
-        $self->{onerror}->(node => $node, type => 'element not allowed');
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        unless ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          ## NOTE: Not explicitly disallowed.
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        }
         my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
@@ -326,8 +331,13 @@ $Element->{$ATOM_NS}->{email} = {
         
       my $nt = $node->node_type;
       if ($nt == 1) {
-        ## NOTE: Not explicitly disallowed.
-        $self->{onerror}->(node => $node, type => 'element not allowed');
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        unless ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          ## NOTE: Not explicitly disallowed.
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        }
         my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
@@ -362,8 +372,13 @@ my $AtomDateConstruct = {
         
       my $nt = $node->node_type;
       if ($nt == 1) {
-        ## NOTE: It does not explicitly say that there MUST NOT be any element.
-        $self->{onerror}->(node => $node, type => 'element not allowed');
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        unless ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          ## NOTE: It does not explicitly say that there MUST NOT be any element.
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        }
         my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
@@ -440,9 +455,11 @@ $Element->{$ATOM_NS}->{entry} = {
         # MUST
         my $nsuri = $node->namespace_uri;
         $nsuri = '' unless defined $nsuri;
+        my $ln = $node->manakai_local_name;
         my $not_allowed;
-        if ($nsuri eq $ATOM_NS) {
-          my $ln = $node->manakai_local_name;
+        if ($self->{pluses}->{$nsuri}->{$ln}) {
+          #
+        } elsif ($nsuri eq $ATOM_NS) {
           if ({ # MUST (0, 1)
                content => 1,
                id => 1,
@@ -550,9 +567,11 @@ $Element->{$ATOM_NS}->{feed} = {
       if ($nt == 1) {
         my $nsuri = $node->namespace_uri;
         $nsuri = '' unless defined $nsuri;
+        my $ln = $node->manakai_local_name;
         my $not_allowed;
-        if ($nsuri eq $ATOM_NS) {
-          my $ln = $node->manakai_local_name;
+        if ($self->{pluses}->{$nsuri}->{$ln}) {
+          #
+        } elsif ($nsuri eq $ATOM_NS) {
           if ($ln eq 'entry') {
             $has_element->{entry} = 1;
           } elsif ({ # MUST (0, 1)
@@ -724,8 +743,15 @@ $Element->{$ATOM_NS}->{content} = {
         
         my $nt = $node->node_type;
         if ($nt == 1) {
-          # MUST NOT
-          $self->{onerror}->(node => $node, type => 'element not allowed');
+          my $node_ns = $node->namespace_uri;
+          $node_ns = '' unless defined $node_ns;
+          my $node_ln = $node->manakai_local_name;
+          if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+            #
+          } else {
+            # MUST NOT
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          }
           my ($sib, $ch) = $self->_check_get_children ($node, $todo);
           unshift @nodes, @$sib;
           push @$new_todos, @$ch;
@@ -750,8 +776,15 @@ $Element->{$ATOM_NS}->{content} = {
         
         my $nt = $node->node_type;
         if ($nt == 1) {
-          # MUST NOT
-          $self->{onerror}->(node => $node, type => 'element not allowed');
+          my $node_ns = $node->namespace_uri;
+          $node_ns = '' unless defined $node_ns;
+          my $node_ln = $node->manakai_local_name;
+          if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+            #
+          } else {
+            # MUST NOT
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          }
           my ($sib, $ch) = $self->_check_get_children ($node, $todo);
           unshift @nodes, @$sib;
           push @$new_todos, @$ch;
@@ -783,10 +816,12 @@ $Element->{$ATOM_NS}->{content} = {
         if ($nt == 1) {
           # MUST
           my $nsuri = $node->namespace_uri;
-          if (defined $nsuri and
-              $nsuri eq q<http://www.w3.org/1999/xhtml> and
-              $node->manakai_local_name eq 'div' and
-              not $has_div) {
+          $nsuri = '' unless defined $nsuri;
+          my $node_ln = $node->manakai_local_name;
+          if ($self->{pluses}->{$nsuri}->{$node_ln}) {
+            #
+          } elsif ($nsuri eq q<http://www.w3.org/1999/xhtml> and
+                   $node_ln eq 'div' and not $has_div) {
             ## TODO: SHOULD be suitable for handling as HTML [XHTML10]
             $has_div = 1;
             $self->{onerror}->(node => $node, type => 'element not allowed')
@@ -825,8 +860,16 @@ $Element->{$ATOM_NS}->{content} = {
         my $nt = $node->node_type;
         if ($nt == 1) {
           ## MAY contain elements
-          $self->{onerror}->(node => $node, type => 'element not allowed')
-              if $src_attr;
+          if ($src_attr) {
+            my $node_ns = $node->namespace_uri;
+            $node_ns = '' unless defined $node_ns;
+            my $node_ln = $node->manakai_local_name;
+            if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+              #
+            } else {
+              $self->{onerror}->(node => $node, type => 'element not allowed');
+            }
+          }
           my ($sib, $ch) = $self->_check_get_children ($node, $todo);
           unshift @nodes, @$sib;
           push @$new_todos, @$ch;
@@ -855,8 +898,15 @@ $Element->{$ATOM_NS}->{content} = {
         
         my $nt = $node->node_type;
         if ($nt == 1) {
-          # MUST NOT
-          $self->{onerror}->(node => $node, type => 'element not allowed');
+          my $node_ns = $node->namespace_uri;
+          $node_ns = '' unless defined $node_ns;
+          my $node_ln = $node->manakai_local_name;
+          if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+            #
+          } else {
+            # MUST NOT
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          }
           my ($sib, $ch) = $self->_check_get_children ($node, $todo);
           unshift @nodes, @$sib;
           push @$new_todos, @$ch;
@@ -912,6 +962,7 @@ $Element->{$ATOM_NS}->{content} = {
     }
   },
 };
+## TODO: Tests for <html:nest/> in <atom:content/>
 
 $Element->{$ATOM_NS}->{author} = $AtomPersonConstruct;
 
@@ -962,6 +1013,8 @@ $Element->{$ATOM_NS}->{category} = {
 };
 
 $Element->{$ATOM_NS}->{contributor} = $AtomPersonConstruct;
+
+## TODO: Anything below does not support <html:nest/> yet.
 
 $Element->{$ATOM_NS}->{generator} = {
   attrs_checker => $GetAtomAttrsChecker->({

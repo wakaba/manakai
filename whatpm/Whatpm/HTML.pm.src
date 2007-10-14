@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.59 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.60 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2106,6 +2106,7 @@ sub _tree_construction_root_element ($) {
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
+      ## TODO: application cache selection algorithm
       my $root_element; !!!create-element ($root_element, 'html');
       $self->{document}->append_child ($root_element);
       push @{$self->{open_elements}}, [$root_element, 'html'];
@@ -5447,4 +5448,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/09/08 01:31:44 $
+# $Date: 2007/10/14 09:21:46 $

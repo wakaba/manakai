@@ -7,7 +7,7 @@ my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 my $HTMLMetadataElements = {
   $HTML_NS => {
     qw/link 1 meta 1 style 1 script 1 event-source 1 command 1 base 1 title 1
-       noscript 1
+       noscript 1 datatemplate 1
       /,
   },
 };
@@ -24,6 +24,7 @@ my $HTMLBlockLevelElements = {
       address 1 p 1 hr 1 dialog 1 pre 1 ol 1 ul 1 dl 1
       ins 1 del 1 figure 1 map 1 table 1 script 1 noscript 1
       event-source 1 details 1 datagrid 1 menu 1 div 1 font 1
+      datatemplate 1
     /,
   },
 };
@@ -73,8 +74,15 @@ my $HTMLEmptyChecker = sub {
 
     my $nt = $node->node_type;
     if ($nt == 1) {
-      ## NOTE: |minuses| list is not checked since redundant
-      $self->{onerror}->(node => $node, type => 'element not allowed');
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+        #
+      } else {
+        ## NOTE: |minuses| list is not checked since redundant
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
@@ -102,8 +110,15 @@ my $HTMLTextChecker = sub {
 
     my $nt = $node->node_type;
     if ($nt == 1) {
-      ## NOTE: |minuses| list is not checked since redundant
-      $self->{onerror}->(node => $node, type => 'element not allowed');
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+        #
+      } else {
+        ## NOTE: |minuses| list is not checked since redundant
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
@@ -138,6 +153,8 @@ my $HTMLStylableBlockChecker = sub {
             not $node->has_attribute_ns (undef, 'scoped');
       } elsif ($HTMLBlockLevelElements->{$node_ns}->{$node_ln}) {
         $has_non_style = 1;
+      } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
+        #
       } else {
         $has_non_style = 1;
         $not_allowed = 1;
@@ -176,7 +193,8 @@ my $HTMLBlockChecker = sub {
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
       $not_allowed = 1
-        unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+        unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln} or
+            $self->{pluses}->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
@@ -212,7 +230,8 @@ my $HTMLInlineChecker = sub {
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
       $not_allowed = 1
         unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-          $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
+            $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
+            $self->{pluses}->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
@@ -250,7 +269,8 @@ my $HTMLStrictlyInlineChecker = sub {
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
       $not_allowed = 1
-        unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln};
+        unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
+            $self->{pluses}->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
@@ -271,7 +291,7 @@ my $HTMLStrictlyInlineChecker = sub {
 my $HTMLSignificantStrictlyInlineChecker = $HTMLStrictlyInlineChecker;
 ## TODO: check significant content
 
-## Inline-level or strictly inline-kevek content
+## Inline-level or strictly inline-level content
 my $HTMLInlineOrStrictlyInlineChecker = sub {
   my ($self, $todo) = @_;
   my $el = $todo->{node};
@@ -290,11 +310,13 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
       if ($todo->{strictly_inline}) {
         $not_allowed = 1
-          unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln};
+          unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
+              $self->{pluses}->{$node_ns}->{$node_ln};
       } else {
         $not_allowed = 1
           unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-            $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
+              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
+              $self->{pluses}->{$node_ns}->{$node_ln};
       }
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
@@ -317,6 +339,7 @@ my $HTMLSignificantInlineOrStrictlyInlineChecker
     = $HTMLInlineOrStrictlyInlineChecker;
 ## TODO: check significant content
 
+## Block-level content or inline-level content (i.e. bimorphic content model)
 my $HTMLBlockOrInlineChecker = sub {
   my ($self, $todo) = @_;
   my $el = $todo->{node};
@@ -329,6 +352,9 @@ my $HTMLBlockOrInlineChecker = sub {
     my $node = shift @nodes;
     $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
 
+    ## ISSUE: It is unclear whether "<rule><div><p/><nest/></div></rule>"
+    ## is conforming or not.
+
     my $nt = $node->node_type;
     if ($nt == 1) {
       my $node_ns = $node->namespace_uri;
@@ -337,11 +363,13 @@ my $HTMLBlockOrInlineChecker = sub {
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
       if ($content eq 'block') {
         $not_allowed = 1
-          unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+          unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln} or
+              $self->{pluses}->{$node_ns}->{$node_ln};
       } elsif ($content eq 'inline') {
         $not_allowed = 1
           unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-            $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
+              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
+              $self->{pluses}->{$node_ns}->{$node_ln};
       } else {
         my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
         my $is_inline
@@ -350,7 +378,7 @@ my $HTMLBlockOrInlineChecker = sub {
         
         push @block_not_inline, $node
           if $is_block and not $is_inline and not $not_allowed;
-        unless ($is_block) {
+        if (not $is_block and not $self->{pluses}->{$node_ns}->{$node_ln}) {
           $content = 'inline';
           for (@block_not_inline) {
             $self->{onerror}->(node => $_, type => 'element not allowed');
@@ -418,14 +446,16 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
         } elsif ($content eq 'block') {
           $has_non_style = 1;
           $not_allowed = 1
-            unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+            unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln} or
+                $self->{pluses}->{$node_ns}->{$node_ln};
         } elsif ($content eq 'inline') {
           $has_non_style = 1;
           $not_allowed = 1
             unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
+                $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
+                $self->{pluses}->{$node_ns}->{$node_ln};
         } else {
-          $has_non_style = 1;
+          $has_non_style = 1 unless $self->{pluses}->{$node_ns}->{$node_ln};
           my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
           my $is_inline
             = $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} ||
@@ -433,7 +463,7 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
             
           push @block_not_inline, $node
             if $is_block and not $is_inline and not $not_allowed;
-          unless ($is_block) {
+          if (not $is_block and not $self->{pluses}->{$node_ns}->{$node_ln}) {
             $content = 'inline';
             for (@block_not_inline) {
               $self->{onerror}->(node => $_, type => 'element not allowed');
@@ -501,6 +531,19 @@ my $GetHTMLBooleanAttrChecker = sub {
     }
   };
 }; # $GetHTMLBooleanAttrChecker
+
+## Unordered set of space-separated tokens
+my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
+  my ($self, $attr) = @_;
+  my %word;
+  for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
+    unless ($word{$word}) {
+      $word{$word} = 1;
+    } else {
+      $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
+    }
+  }
+}; # $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker
 
 ## |rel| attribute (unordered set of space separated tokens,
 ## whose allowed values are defined by the section on link types)
@@ -851,7 +894,8 @@ my $HTMLAttrChecker = {
     ## belong to another Document tree is in the DOM?
   },
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
-  tabindex => $HTMLIntegerAttrChecker,
+  tabindex => $HTMLIntegerAttrChecker
+## TODO: ref, template, registrationmark
 };
 
 for (qw/
@@ -932,7 +976,9 @@ $Element->{$HTML_NS}->{html} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($phase eq 'before head') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($phase eq 'before head') {
           if ($node_ns eq $HTML_NS and $node_ln eq 'head') {
             $phase = 'after head';            
           } elsif ($node_ns eq $HTML_NS and $node_ln eq 'body') {
@@ -998,7 +1044,9 @@ $Element->{$HTML_NS}->{head} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($node_ns eq $HTML_NS and $node_ln eq 'title') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'title') {
           $phase = 'after base';
           unless ($has_title) {
             $has_title = 1;
@@ -1383,11 +1431,13 @@ $Element->{$HTML_NS}->{footer} = {
         }
         if ($content eq 'block') {
           $not_allowed = 1
-            unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+            unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln} or
+                $self->{pluses}->{$node_ns}->{$node_ln};
         } elsif ($content eq 'inline') {
           $not_allowed = 1
             unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
+                $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
+                $self->{pluses}->{$node_ns}->{$node_ln};
         } else {
           my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
           my $is_inline
@@ -1396,7 +1446,7 @@ $Element->{$HTML_NS}->{footer} = {
           
           push @block_not_inline, $node
             if $is_block and not $is_inline and not $not_allowed;
-          unless ($is_block) {
+          if (not $is_block and not $self->{pluses}->{$node_ns}->{$node_ln}) {
             $content = 'inline';
             for (@block_not_inline) {
               $self->{onerror}->(node => $_, type => 'element not allowed');
@@ -1479,7 +1529,9 @@ $Element->{$HTML_NS}->{dialog} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        if ($phase eq 'before dt') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($phase eq 'before dt') {
           if ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
             $phase = 'before dd';
           } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
@@ -1512,7 +1564,7 @@ $Element->{$HTML_NS}->{dialog} = {
       }
     }
     if ($phase eq 'before dd') {
-      $self->{onerror}->(node => $el, type => 'ps element missing:dd');
+      $self->{onerror}->(node => $el, type => 'child element missing:dd');
     }
     return ($new_todos);
   },
@@ -1543,7 +1595,9 @@ $Element->{$HTML_NS}->{ol} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        unless ($node_ns eq $HTML_NS and $node_ln eq 'li') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif (not ($node_ns eq $HTML_NS and $node_ln eq 'li')) {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
         my ($sib, $ch) = $self->_check_get_children ($node, $todo);
@@ -1571,7 +1625,6 @@ $Element->{$HTML_NS}->{ul} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $Element->{$HTML_NS}->{ol}->{checker},
 };
-
 
 $Element->{$HTML_NS}->{li} = {
   attrs_checker => $GetHTMLAttrsChecker->({
@@ -1619,7 +1672,9 @@ $Element->{$HTML_NS}->{dl} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        if ($phase eq 'in dds') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($phase eq 'in dds') {
           if ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
             #$phase = 'in dds';
           } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
@@ -1658,7 +1713,7 @@ $Element->{$HTML_NS}->{dl} = {
       }
     }
     if ($phase eq 'in dts') {
-      $self->{onerror}->(node => $el, type => 'ps element missing:dd');
+      $self->{onerror}->(node => $el, type => 'child element missing:dd');
     }
 
     if ($todo->{inline}) {
@@ -2085,6 +2140,7 @@ $Element->{$HTML_NS}->{del} = {
 };
 
 ## TODO: figure
+## TODO: Test for <nest/> in <figure/>
 
 ## TODO: |alt|
 $Element->{$HTML_NS}->{img} = {
@@ -2180,6 +2236,7 @@ $Element->{$HTML_NS}->{object} = {
     }
   },
   checker => $ElementDefault->{checker}, ## TODO
+## TODO: Tests for <nest/> in <object/>
 };
 
 $Element->{$HTML_NS}->{param} = {
@@ -2457,7 +2514,9 @@ $Element->{$HTML_NS}->{table} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        if ($phase eq 'in tbodys') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($phase eq 'in tbodys') {
           if ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
             #$phase = 'in tbodys';
           } elsif (not $has_tfoot and
@@ -2576,7 +2635,9 @@ $Element->{$HTML_NS}->{colgroup} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        unless ($node_ns eq $HTML_NS and $node_ln eq 'col') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif (not ($node_ns eq $HTML_NS and $node_ln eq 'col')) {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
         my ($sib, $ch) = $self->_check_get_children ($node, $todo);
@@ -2620,7 +2681,9 @@ $Element->{$HTML_NS}->{tbody} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        if ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
           $has_tr = 1;
         } else {
           $self->{onerror}->(node => $node, type => 'element not allowed');
@@ -2672,7 +2735,10 @@ $Element->{$HTML_NS}->{tr} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        if ($node_ns eq $HTML_NS and ($node_ln eq 'td' or $node_ln eq 'th')) {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($node_ns eq $HTML_NS and
+                 ($node_ln eq 'td' or $node_ln eq 'th')) {
           $has_td = 1;
         } else {
           $self->{onerror}->(node => $node, type => 'element not allowed');
@@ -2714,6 +2780,7 @@ $Element->{$HTML_NS}->{th} = {
 };
 
 ## TODO: forms
+## TODO: Tests for <nest/> in form elements
 
 $Element->{$HTML_NS}->{script} = {
   attrs_checker => sub {
@@ -2788,7 +2855,9 @@ $Element->{$HTML_NS}->{noscript} = {
           my $node_ns = $node->namespace_uri;
           $node_ns = '' unless defined $node_ns;
           my $node_ln = $node->manakai_local_name;
-          if ($node_ns eq $HTML_NS) {
+          if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+            #
+          } elsif ($node_ns eq $HTML_NS) {
             if ({link => 1, style => 1}->{$node_ln}) {
               #
             } elsif ($node_ln eq 'meta') {
@@ -2876,7 +2945,9 @@ $Element->{$HTML_NS}->{datagrid} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($mode eq 'block') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($mode eq 'block') {
           $not_allowed = 1
               unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
         } elsif ($mode eq 'any') {
@@ -2975,7 +3046,9 @@ $Element->{$HTML_NS}->{menu} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($node_ns eq $HTML_NS and $node_ln eq 'li') {
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'li') {
           if ($content eq 'inline') {
             $not_allowed = 1;
           } elsif ($content eq 'li or inline') {
@@ -3012,6 +3085,72 @@ $Element->{$HTML_NS}->{menu} = {
     }
     return ($new_todos);
   },
+};
+
+$Element->{$HTML_NS}->{datatemplate} = {
+  attrs_checker => $GetHTMLAttrsChecker->({}),
+  checker => sub {
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
+    my @nodes = (@{$el->child_nodes});
+
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        ## NOTE: |minuses| list is not checked since redundant
+        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } elsif (not ($node_ns eq $HTML_NS and $node_ln eq 'rule')) {
+          $self->{onerror}->(node => $node,
+                             type => 'element not allowed:datatemplate');
+        }
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $self->{onerror}->(node => $node, type => 'character not allowed');
+        }
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+    return ($new_todos);
+  },
+  is_xml_root => 1,
+};
+
+$Element->{$HTML_NS}->{rule} = {
+  attrs_checker => $GetHTMLAttrsChecker->({
+    ## TODO: |condition| attribute
+    mode => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
+  }),
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    my $end = $self->_add_pluses ({$HTML_NS => {nest => 1}});
+    my ($sib, $ch) = $AnyChecker->($self, $todo);
+    push @$sib, $end;
+    return ($sib, $ch);
+  },
+  ## NOTE: "MAY be anything that, when the parent |datatemplate|
+  ## is applied to some conforming data, results in a conforming DOM tree.":
+  ## We don't check against this.
+};
+
+$Element->{$HTML_NS}->{nest} = {
+  attrs_checker => $GetHTMLAttrsChecker->({
+    ## TODO: |filter| attribute
+    mode => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
+  }),
+  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{legend} = {

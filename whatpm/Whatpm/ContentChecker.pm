@@ -1,11 +1,13 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.49 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.50 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
 ## ISSUE: How XML and XML Namespaces conformance can (or cannot)
 ## be applied to an in-memory representation (i.e. DOM)?
+
+## TODO: Conformance of an HTML document with non-html root element.
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
@@ -234,6 +236,12 @@ sub check_document ($$$) {
     $ElementDefault;
   if ($docel_def->{is_root}) {
     #
+  } elsif ($docel_def->{is_xml_root}) {
+    unless ($doc->manakai_is_html) {
+      #
+    } else {
+      $onerror->(node => $docel, type => 'element not allowed:root:xml');
+    }
   } else {
     $onerror->(node => $docel, type => 'element not allowed:root');
   }
@@ -254,6 +262,7 @@ sub check_element ($$$) {
   $self->{should_level} = 's';
   $self->{good_level} = 'g';
 
+  $self->{pluses} = {};
   $self->{minuses} = {};
   $self->{id} = {};
   $self->{term} = {};
@@ -316,7 +325,7 @@ sub check_element ($$$) {
         $Element->{$nsuri}->{''} ||
           $ElementDefault;
       $eldef->{attrs_checker}->($self, $todo);
-    } elsif ($todo->{type} eq 'plus') {
+    } elsif ($todo->{type} eq 'plus' or $todo->{type} eq 'minus') {
       $self->_remove_minuses ($todo);
     } elsif ($todo->{type} eq 'code') {
       $todo->{code}->();
@@ -337,6 +346,7 @@ sub check_element ($$$) {
     }
   }
 
+  delete $self->{pluses};
   delete $self->{minuses};
   delete $self->{onerror};
   delete $self->{id};
@@ -361,15 +371,45 @@ sub _add_minuses ($@) {
   return {type => 'plus', list => $r};
 } # _add_minuses
 
+sub _add_pluses ($@) {
+  my $self = shift;
+  my $r = {};
+  for my $list (@_) {
+    for my $ns (keys %$list) {
+      for my $ln (keys %{$list->{$ns}}) {
+        unless ($self->{pluses}->{$ns}->{$ln}) {
+          $self->{pluses}->{$ns}->{$ln} = 1;
+          $r->{$ns}->{$ln} = 1;
+        }
+      }
+    }
+  }
+  return {type => 'minus', list => $r};
+} # _add_pluses
+
 sub _remove_minuses ($$) {
   my ($self, $todo) = @_;
-  for my $ns (keys %{$todo->{list}}) {
-    for my $ln (keys %{$todo->{list}->{$ns}}) {
-      delete $self->{minuses}->{$ns}->{$ln} if $todo->{list}->{$ns}->{$ln};
+  if ($todo->{type} eq 'minus') {
+    for my $ns (keys %{$todo->{list}}) {
+      for my $ln (keys %{$todo->{list}->{$ns}}) {
+        delete $self->{pluses}->{$ns}->{$ln} if $todo->{list}->{$ns}->{$ln};
+      }
     }
+  } elsif ($todo->{type} eq 'plus') {
+    for my $ns (keys %{$todo->{list}}) {
+      for my $ln (keys %{$todo->{list}->{$ns}}) {
+        delete $self->{minuses}->{$ns}->{$ln} if $todo->{list}->{$ns}->{$ln};
+      }
+    }
+  } else {
+    die "$0: Unknown +- type: $todo->{type}";
   }
   1;
 } # _remove_minuses
+
+## NOTE: Priority for "minuses" and "pluses" are currently left
+## undefined and implemented inconsistently; it is not a problem for
+## now, since no element belongs to both lists.
 
 sub _check_get_children ($$$) {
   my ($self, $node, $parent_todo) = @_;
@@ -444,4 +484,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/09/29 04:45:09 $
+# $Date: 2007/10/14 09:21:46 $

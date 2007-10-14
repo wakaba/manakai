@@ -21,13 +21,15 @@
 <unknown xml:lang="!" xmlns=""></unknown>
 #errors
 /unknown;element;unsupported
-/unknown/@lang;syntax error
+/unknown/@lang;LangTag:nosemantics:language;m
+/unknown/@lang;LangTag:syntax:illegal;m
 
 #data
 <unknown u1="" xml:lang="!" xmlns=""></unknown>
 #errors
 /unknown;element;unsupported
-/unknown/@lang;syntax error
+/unknown/@lang;LangTag:nosemantics:language;m
+/unknown/@lang;LangTag:syntax:illegal;m
 /unknown/@u1;attribute;unsupported
 
 #data
@@ -200,18 +202,15 @@ id=""><span id=""></span></p>
 <p lang="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /p/@lang;in XML:lang
-/p/@lang;language tag;unsupported
 
 #data
 <p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/p/@lang;language tag;unsupported
 
 #data html
 <!DOCTYPE HTML><title></title><p xml:lang=""></p>
 #errors
 /html/body/p/@xml:lang;in HTML:xml:lang
-/html/body/p/@xml:lang;language tag;unsupported
 
 #data
 <p dir="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -916,14 +915,12 @@ id=""><span id=""></span></p>
 <link rel="author" href="http://test/" hreflang=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@hreflang;language tag:syntax error
-/link/@hreflang;language tag;unsupported
+/link/@hreflang;LangTag:nosemantics:language;m
 
 #data
 <link rel="author" href="http://test/" hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@hreflang;language tag;unsupported
 
 #data
 <link media="all"
@@ -1542,14 +1539,12 @@ id=""><span id=""></span></p>
 <a href="http://test/" hreflang=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@hreflang;language tag:syntax error
-/a/@hreflang;language tag;unsupported
+/a/@hreflang;LangTag:nosemantics:language;m
 
 #data
 <a href="http://test/" hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@hreflang;language tag;unsupported
 
 #data
 <a href="http://test/" media="all"
@@ -1624,7 +1619,6 @@ id=""><span id=""></span></p>
 <a hreflang="en" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@hreflang;attribute not allowed
-/a/@hreflang;language tag;unsupported
 
 #data
 <a media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2888,22 +2882,19 @@ id=""><span id=""></span></p>
     hreflang=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@hreflang;language tag:syntax error
-/area/@hreflang;language tag;unsupported
+/area/@hreflang;LangTag:nosemantics:language;m
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
     hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@hreflang;language tag;unsupported
 
 #data
 <area coords="1,2,3,4" hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@hreflang;attribute not allowed
-/area/@hreflang;language tag;unsupported
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
@@ -3994,6 +3985,49 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/@contextmenu;no referenced menu
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode=""/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="  "/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a  b"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a A"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a a"/>
+#errors
+/rule/@mode;duplicate token:a
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
+#errors
+/rule/@mode;duplicate token:a
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode=""/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
+#errors
+/nest/@mode;duplicate token:a
 
 #data
 <div align="center" xmlns="http://www.w3.org/1999/xhtml"/>
