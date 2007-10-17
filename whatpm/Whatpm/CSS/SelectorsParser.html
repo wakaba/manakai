@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::CSS::SelectorsParser - A Selectors Parser</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#constants">CONSTANTS</a></li>
+	<ul>
+
+		<li><a href="#simple_selector_types">Simple Selector Types</a></li>
+		<li><a href="#combinator_types">Combinator Types</a></li>
+		<li><a href="#match_types">Match Types</a></li>
+	</ul>
+
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::CSS::SelectorsParser - A Selectors Parser</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>@@ TBD</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>@@ TBD</p>
+<p>
+</p>
+<hr />
+<h1><a name="constants">CONSTANTS</a></h1>
+<p>
+</p>
+<h2><a name="simple_selector_types">Simple Selector Types</a></h2>
+<p>The constants below represent the types of simple selectors (or parts
+of simple selectors).</p>
+<dl>
+<dt><strong><a name="item_namespace_selector">NAMESPACE_SELECTOR</a></strong><br />
+</dt>
+<dd>
+Namespace specification.  It represents the namespace part
+of a universal or type selector.
+</dd>
+<p></p>
+<dt><strong><a name="item_local_name_selector">LOCAL_NAME_SELECTOR</a></strong><br />
+</dt>
+<dd>
+Local name specification.  It represents the local name part
+of a type selector.
+</dd>
+<p></p>
+<dt><strong><a name="item_id_selector">ID_SELECTOR</a></strong><br />
+</dt>
+<dd>
+An ID selector.
+</dd>
+<p></p>
+<dt><strong><a name="item_class_selector">CLASS_SELECTOR</a></strong><br />
+</dt>
+<dd>
+A class selector.
+</dd>
+<p></p>
+<dt><strong><a name="item_pseudo_class_selector">PSEUDO_CLASS_SELECTOR</a></strong><br />
+</dt>
+<dd>
+A pseudo-class selector.
+</dd>
+<p></p>
+<dt><strong><a name="item_pseudo_element_selector">PSEUDO_ELEMENT_SELECTOR</a></strong><br />
+</dt>
+<dd>
+A pseudo-element specification.
+</dd>
+<p></p>
+<dt><strong><a name="item_attribute_selector">ATTRIBUTE_SELECTOR</a></strong><br />
+</dt>
+<dd>
+An attribute selector.
+</dd>
+<p></p></dl>
+<p>The tag <code>:selector</code> can be used to export all of these
+constants as:</p>
+<pre>
+  use Whatpm::CSS::SelectorsParser qw(:selector);</pre>
+<p>
+</p>
+<h2><a name="combinator_types">Combinator Types</a></h2>
+<p>The constants below represent the types of combinators.</p>
+<dl>
+<dt><strong><a name="item_descendant_combinator">DESCENDANT_COMBINATOR</a></strong><br />
+</dt>
+<dd>
+A descendant combinator.
+</dd>
+<p></p>
+<dt><strong><a name="item_child_combinator">CHILD_COMBINATOR</a></strong><br />
+</dt>
+<dd>
+A child combinator.
+</dd>
+<p></p>
+<dt><strong><a name="item_adjacent_sibling_combinator">ADJACENT_SIBLING_COMBINATOR</a></strong><br />
+</dt>
+<dd>
+An adjacent sibling combinator.
+</dd>
+<p></p>
+<dt><strong><a name="item_general_sibling_combinator">GENERAL_SIBLING_COMBINATOR</a></strong><br />
+</dt>
+<dd>
+A general sibling combinator.
+</dd>
+<p></p></dl>
+<p>The tag <code>:combinator</code> can be used to export all of these
+constants as:</p>
+<pre>
+  use Whatpm::CSS::SelectorsParser qw(:combinator);</pre>
+<p>
+</p>
+<h2><a name="match_types">Match Types</a></h2>
+<p>The constants below represent the types of matches used
+in attribute selectors.</p>
+<dl>
+<dt><strong><a name="item_exists_match">EXISTS_MATCH</a></strong><br />
+</dt>
+<dd>
+Match by the existence of an attribute.
+</dd>
+<p></p>
+<dt><strong><a name="item_equals_match">EQUALS_MATCH</a></strong><br />
+</dt>
+<dd>
+Exact match.
+</dd>
+<p></p>
+<dt><strong><a name="item_includes_match">INCLUDES_MATCH</a></strong><br />
+</dt>
+<dd>
+Includes match (typically used for class attributes).
+</dd>
+<p></p>
+<dt><strong><a name="item_dash_match">DASH_MATCH</a></strong><br />
+</dt>
+<dd>
+Dash match (typically used for language tag attributes).
+</dd>
+<p></p>
+<dt><strong><a name="item_prefix_match">PREFIX_MATCH</a></strong><br />
+</dt>
+<dd>
+Prefix match.
+</dd>
+<p></p>
+<dt><strong><a name="item_suffix_match">SUFFIX_MATCH</a></strong><br />
+</dt>
+<dd>
+Suffix match.
+</dd>
+<p></p>
+<dt><strong><a name="item_substring_match">SUBSTRING_MATCH</a></strong><br />
+</dt>
+<dd>
+Substring match.
+</dd>
+<p></p></dl>
+<p>The tag <code>:match</code> can be used to export all of these
+constants as:</p>
+<pre>
+  use Whatpm::CSS::SelectorsParser qw(:match);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>@@ TBD</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>@@ TBD</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

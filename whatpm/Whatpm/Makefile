@@ -1,10 +1,15 @@
 POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
   --htmlroot ".."
 WGET = wget
+RM = rm
+RMALL = $(RM) -fr
 
-all: \
+all: CSS-all \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html
+
+CSS-all:
+	cd CSS && make all
 
 HTML.pm: HTML.pm.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
@@ -32,5 +37,11 @@ _LinkTypeList.pm: mklinktypelist.pl RelExtensions.html
 RelExtensions.html:
 	$(WGET) http://wiki.whatwg.org/wiki/RelExtensions -O $@
 
+clean: CSS-clean
+	$(RMALL) *~ *.bak *.tmp
+
+CSS-clean:
+	cd CSS && make clean
+
 ## License: Public Domain.
-## $Date: 2007/08/06 10:56:50 $
+## $Date: 2007/10/17 09:47:36 $

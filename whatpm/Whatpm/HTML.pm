@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.60 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.62 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -268,6 +268,21 @@ sub _initialize_tokenizer ($) {
 ## script in the "list of scripts that will execute asynchronously",
 ## has completed loading.  If one has, then it MUST be executed
 ## and removed from the list.
+
+## NOTE: HTML5 "Writing HTML documents" section, applied to
+## documents and not to user agents and conformance checkers,
+## contains some requirements that are not detected by the
+## parsing algorithm:
+## - Some requirements on character encoding declarations. ## TODO
+## - "Elements MUST NOT contain content that their content model disallows."
+##   ... Some are parse error, some are not (will be reported by c.c.).
+## - Polytheistic slash SHOULD NOT be used. (Applied only to atheists.) ## TODO
+## - Text (in elements, attributes, and comments) SHOULD NOT contain
+##   control characters other than space characters. ## TODO: (what is control character? C0, C1 and DEL?  Unicode control character?)
+
+## TODO: HTML5 poses authors two SHOULD-level requirements that cannot
+## be detected by the HTML5 parsing algorithm:
+## - Text, 
 
 sub _get_next_token ($) {
   my $self = shift;
@@ -2901,6 +2916,7 @@ sub _tree_construction_root_element ($) {
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
+      ## TODO: application cache selection algorithm
       my $root_element; 
       $root_element = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'html']);
@@ -6838,4 +6854,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/09/04 11:19:07 $
+# $Date: 2007/10/17 10:46:26 $

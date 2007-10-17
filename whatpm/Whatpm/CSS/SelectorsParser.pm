@@ -1,5 +1,6 @@
 package Whatpm::CSS::SelectorsParser;
 use strict;
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -789,4 +790,14 @@ sub parse_string ($$) {
   } # S
 } # parse_string
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
 1;
+# $Date: 2007/10/17 09:47:36 $

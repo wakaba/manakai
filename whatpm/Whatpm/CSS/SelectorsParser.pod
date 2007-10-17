@@ -1,0 +1,151 @@
+=head1 NAME
+
+Whatpm::CSS::SelectorsParser - A Selectors Parser
+
+=head1 SYNOPSIS
+
+@@ TBD
+
+=head1 DESCRIPTION
+
+@@ TBD
+
+=head1 CONSTANTS
+
+=head2 Simple Selector Types
+
+The constants below represent the types of simple selectors (or parts
+of simple selectors).
+
+=over 4
+
+=item NAMESPACE_SELECTOR
+
+Namespace specification.  It represents the namespace part
+of a universal or type selector.
+
+=item LOCAL_NAME_SELECTOR
+
+Local name specification.  It represents the local name part
+of a type selector.
+
+=item ID_SELECTOR
+
+An ID selector.
+
+=item CLASS_SELECTOR
+
+A class selector.
+
+=item PSEUDO_CLASS_SELECTOR
+
+A pseudo-class selector.
+
+=item PSEUDO_ELEMENT_SELECTOR
+
+A pseudo-element specification.
+
+=item ATTRIBUTE_SELECTOR
+
+An attribute selector.
+
+=back
+
+The tag C<:selector> can be used to export all of these
+constants as:
+
+  use Whatpm::CSS::SelectorsParser qw(:selector);
+
+=head2 Combinator Types
+
+The constants below represent the types of combinators.
+
+=over 4
+
+=item DESCENDANT_COMBINATOR
+
+A descendant combinator.
+
+=item CHILD_COMBINATOR
+
+A child combinator.
+
+=item ADJACENT_SIBLING_COMBINATOR
+
+An adjacent sibling combinator.
+
+=item GENERAL_SIBLING_COMBINATOR
+
+A general sibling combinator.
+
+=back
+
+The tag C<:combinator> can be used to export all of these
+constants as:
+
+  use Whatpm::CSS::SelectorsParser qw(:combinator);
+
+=head2 Match Types
+
+The constants below represent the types of matches used
+in attribute selectors.
+
+=over 4
+
+=item EXISTS_MATCH
+
+Match by the existence of an attribute.
+
+=item EQUALS_MATCH
+
+Exact match.
+
+=item INCLUDES_MATCH
+
+Includes match (typically used for class attributes).
+
+=item DASH_MATCH
+
+Dash match (typically used for language tag attributes).
+
+=item PREFIX_MATCH
+
+Prefix match.
+
+=item SUFFIX_MATCH
+
+Suffix match.
+
+=item SUBSTRING_MATCH
+
+Substring match.
+
+=back
+
+The tag C<:match> can be used to export all of these
+constants as:
+
+  use Whatpm::CSS::SelectorsParser qw(:match);
+
+=head1 METHODS
+
+@@ TBD
+
+=head1 SEE ALSO
+
+@@ TBD
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+## $Date: 2007/10/17 09:47:36 $
