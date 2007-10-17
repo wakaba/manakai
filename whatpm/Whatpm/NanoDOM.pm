@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -509,6 +509,16 @@ sub name ($) {
   return shift->{name};
 } # name
 
+sub public_id ($;$) {
+  $_[0]->{public_id} = $_[1] if @_ > 1;
+  return $_[0]->{public_id};
+} # public_id
+
+sub system_id ($;$) {
+  $_[0]->{system_id} = $_[1] if @_ > 1;
+  return $_[0]->{system_id};
+} # system_id
+
 =head1 SEE ALSO
 
 L<Whatpm::HTML>
@@ -527,4 +537,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/06 10:56:50 $
+# $Date: 2007/10/17 10:46:26 $

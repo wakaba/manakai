@@ -1,5 +1,6 @@
 package Whatpm::CSS::SelectorsSerializer;
 use strict;
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
@@ -57,6 +58,7 @@ sub serialize_test ($$$) {
           $v .= '*';
         }
 
+        ## BUG: sorting order is wrong (see editor's comment in the spec)
         $v .= join '', sort {$a cmp $b} map {
           '[' .
           (defined $_->[1] ?
@@ -126,4 +128,15 @@ sub serialize_test ($$$) {
   } sort {$a cmp $b} keys %$ns) : $r;
 } # serialize_test
 
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
 1;
+# $Date: 2007/10/17 10:46:26 $

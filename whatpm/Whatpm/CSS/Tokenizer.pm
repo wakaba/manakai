@@ -1,5 +1,6 @@
 package Whatpm::CSS::Tokenizer;
 use strict;
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -1132,5 +1133,14 @@ sub get_next_token ($) {
   } # A
 } # get_next_token
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-# $Date: 2007/09/30 12:03:09 $
+# $Date: 2007/10/17 10:46:26 $
