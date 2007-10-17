@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html lang=en>
+<head>
+<title>Whatpm's Selectors Object</title>
+<link rel=stylesheet href="http://suika.fam.cx/www/style/html/xhtml">
+<link rel=author title=Wakaba href="http://suika.fam.cx/~wakaba/who?" lang=ja>
+<link rel=license href="#license">
+<style>
+p.synopsis {
+  margin-left: 4em;
+  margin-right: 2em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-left: 3em;
+  padding-right: 1em;
+  text-indent: -2em;
+  background-color: #ffeeff;
+  color: black;
+  text-align: left;
+}
+.synopsis > code {
+  color: inherit;
+}
+</style>
+</head>
+<body>
+<h1>Selectors Object</h1>
+
+<div class=section id=structure>
+<h2>Structure of Selectors Object</h2>
+
+<p>A <dfn id=group-of-selectors-object>group of selectors object</dfn> is 
+represented as a reference to a Perl array, which contains zero or more 
+<a href="#selector-object">selector object</a>.</p>
+
+<p class=synopsis><code>$group_of_selectors = [$selector1, $selector2,
+<var>...</var>, $selectors<var>n</var>];</code></p>
+
+<p>A <dfn id=selector-object>selector object</dfn> is represented as a 
+reference to a Perl array, which contains zero or more sequence of a 
+<a href="#combinator-value">combinator value</a> followed by a 
+<a href="#sss-object">sequence of simple selectors object</a>.
+The first <a href="#combinator-value">combinator value</a>, if any, is always 
+(and <em class=rfc2119>MUST</em> be) 
+<a href="SelectorsParser.html#item_descendant_combinator"><code>DESCENDANT_COMBINATOR</code></a>.</p>
+
+<p class=synopsis><code>$selector = [$combinator1, $sss1, 
+$combinator2, $sss2, <var>...</var>, 
+$combinator<var>n</var>, $sss<var>n</var>];</code></p>
+
+<p>A <dfn id=combinator-value>combinator value</dfn> is one of 
+<a href="SelectorsParser.html#combinator_types">combinator types</a>.</p>
+
+<p>A <dfn id=sss-object>sequence of simple selectors pbject</dfn> is
+represented as a reference to a Perl array, which contains zero or
+more <a href="#simple-selector-object">simple selector object</a>.</p>
+
+<p class=synopsis><code>$sss = [$ss1, $ss2, <var>...</var>, 
+$ss<var>n</var>];</code></p>
+
+<p>A <dfn id=simple-selector-object>simple selector object</dfn> is one of 
+following objects:</p>
+<dl>
+<dt><dfn id=namespace-selector-object>Namespace selector object</dfn></dt>
+  <dd>
+    <p>Represented as a reference to a Perl array, which contains a value of
+    <a href="SelectorsParser.html#item_namespace_selector"><code>NAMESPACE_SELECTOR</code></a>,
+    followed by a scalar value.  The scalar value is either 
+    <code>undef</code>, which represents the null namespace (encoded as an
+    empty namespace prefix in Selectors), or a string, which represents
+    the namespace URI of an element.</p>
+
+    <p class=synopsis><code>$selector = [NAMESPACE_SELECTOR, undef]; <code class=comment>## null namespace</code></code></p>
+    <p class=synopsis><code>$selector = [NAMESPACE_SELECTOR, $nsuri]; <code class=comment>## non-null namespace</code></code></p>
+  </dd>
+</dl>
+
+<p class=ed>@@
+</div>
+
+<div class=section id=error>
+<h2>Error Handling Rule</h2>
+
+<p class=ed>@@
+</div>
+
+<div class=section id=see-also>
+<h2>See Also</h2>
+
+<ul>
+<li><a href="SelectorsParser.html"><code>Whatpm::CSS::SelectorsParser</code>
+documentation</a></li>
+</ul>
+</div>
+
+<div class=section id=author>
+<h2>Author</h2>
+
+<p><a href="http://suika.fam.cx/~wakaba/who?" rel=author>Wakaba</a>.</p>
+</div>
+
+<div class=section id=license>
+<h2>License</h2>
+
+<p>Copyright <time>2007</time> 
+<a href="http://suika.fam.cx/~wakaba/who?" rel=author lang=ja>Wakaba</a>
+<code class=mail>&lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>></code></p>
+
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+</div>
+
+</body>
+</html>
