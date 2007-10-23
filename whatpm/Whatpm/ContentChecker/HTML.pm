@@ -2783,22 +2783,12 @@ $Element->{$HTML_NS}->{th} = {
 ## TODO: Tests for <nest/> in form elements
 
 $Element->{$HTML_NS}->{script} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
-    $GetHTMLAttrsChecker->({
+  attrs_checker => $GetHTMLAttrsChecker->({
       src => $HTMLURIAttrChecker,
       defer => $GetHTMLBooleanAttrChecker->('defer'),
       async => $GetHTMLBooleanAttrChecker->('async'),
       type => $HTMLIMTAttrChecker,
-    })->($self, $todo);
-    if ($todo->{node}->has_attribute_ns (undef, 'defer')) {
-      my $async_attr = $todo->{node}->get_attribute_node_ns (undef, 'async');
-      if ($async_attr) {
-        $self->{onerror}->(node => $async_attr,
-                           type => 'attribute not allowed'); # MUST NOT
-      }
-    }
-  },
+  }),
   checker => sub {
     my ($self, $todo) = @_;
 

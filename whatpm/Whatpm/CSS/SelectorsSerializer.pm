@@ -1,6 +1,6 @@
 package Whatpm::CSS::SelectorsSerializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
@@ -15,9 +15,10 @@ sub serialize_test ($$$) {
       sprintf '\\%06X',$v > 0x10FFFF ? 0xFFFFFF : $v;
     }ge;
     $s =~ s/^([0-9])/\\00003$1/g;
-    $s =~ s/^-([^A-Za-z_])/\\00002D$1/g;
+    $s =~ s/^-([^A-Za-z\x80-\x{D7FF}\x{E000}-\x{10FFFF}_])/\\00002D$1/g;
+    $s = '\\00002D' if $s eq '-';
     return $s;
-  }; # $str
+  }; # $ident
   my $str = sub {
     my $s = shift;
     $s =~ s{([^\x20\x21\x23-\x5B\x5D-\x{D7FF}\x{E000}-\x{10FFFF}])}{
@@ -139,4 +140,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/10/17 10:46:26 $
+# $Date: 2007/10/23 11:32:57 $
