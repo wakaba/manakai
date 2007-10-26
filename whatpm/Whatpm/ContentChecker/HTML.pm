@@ -2266,6 +2266,8 @@ $Element->{$HTML_NS}->{video} = {
     ## ISSUE: loopcount has no conformance creteria
     autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
     controls => $GetHTMLBooleanAttrChecker->('controls'),
+    poster => $HTMLURIAttrChecker,
+    ## TODO: width, height
   }),
   checker => sub {
     my ($self, $todo) = @_;

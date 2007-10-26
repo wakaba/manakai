@@ -2640,6 +2640,19 @@ id=""><span id=""></span></p>
 /video/@controls;boolean:invalid
 
 #data
+<video poster="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<video poster="abc" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<video poster="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@poster;URI::syntax error:iriref3987;m
+
+#data
 <audio xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
