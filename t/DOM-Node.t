@@ -1816,6 +1816,7 @@ for my $node (create_nodes ()) {
        [Core => '', 1],
        [Core => undef, 1],
        [Core => 3, 0],
+       [Events => '3.0', 1], ['+Events' => '3.0', 1], ['Events' => '', 1],
        [Traversal => '2.0', 1], [Traversal => '', 1], [Traversal => '1.0', 0],
        [XML => '1.0', 1],
        [XML => '2.0', 1],
@@ -2106,4 +2107,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/08/25 08:41:01 $
+## $Date: 2007/10/27 13:07:27 $

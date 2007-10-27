@@ -53,6 +53,8 @@ sub __dispatch_event ($$) {
       }
     }
   }
+
+  ## TODO: stop_propagation
   
   ## ISSUE: Should we remove {current_target}?
 

@@ -1,6 +1,6 @@
 package Message::DOM::Event;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Event';
 
 ## The |Event| interface - constants
@@ -80,6 +80,7 @@ sub type ($);
 sub init_event ($$;$$) {
   my $self = $_[0];
   unless ($self->{manakai_dispatched}) {
+    delete $self->{namespace_uri};
     $self->{type} = ''.$_[1];
     $self->{bubbles} = $_[2];
     $self->{cancelable} = $_[3];
@@ -89,8 +90,10 @@ sub init_event ($$;$$) {
 sub init_event_ns ($$;$$) {
   my $self = $_[0];
   unless ($self->{manakai_dispatched}) {
-    if (not defined $_[1] or $_[1] eq '') {
+    unless (not defined $_[1] or $_[1] eq '') {
       $self->{namespace_uri} = $_[1];
+    } else {
+      delete $self->{namespace_uri};
     }
     $self->{type} = ''.$_[2];
     $self->{bubbles} = $_[3];
@@ -125,8 +128,10 @@ sub detail ($);
 sub init_custom_event_ns ($$$;$$$) {
   my $self = $_[0];
   unless ($self->{manakai_dispatched}) {
-    if (not defined $_[1] or $_[1] eq '') {
+    unless (not defined $_[1] or $_[1] eq '') {
       $self->{namespace_uri} = $_[1];
+    } else {
+      delete $self->{namespace_uri};
     }
     $self->{type} = ''.$_[2];
     $self->{bubbles} = $_[3];
