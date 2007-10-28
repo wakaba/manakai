@@ -2263,11 +2263,11 @@ $Element->{$HTML_NS}->{video} = {
     src => $HTMLURIAttrChecker,
     ## TODO: start, loopstart, loopend, end
     ## ISSUE: they MUST be "value time offset"s.  Value?
-    ## ISSUE: loopcount has no conformance creteria
+    ## ISSUE: playcount has no conformance creteria
     autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
     controls => $GetHTMLBooleanAttrChecker->('controls'),
-    poster => $HTMLURIAttrChecker,
-    ## TODO: width, height
+    poster => $HTMLURIAttrChecker, ## TODO: not for audio!
+    ## TODO: width, height (not for audio!)
   }),
   checker => sub {
     my ($self, $todo) = @_;

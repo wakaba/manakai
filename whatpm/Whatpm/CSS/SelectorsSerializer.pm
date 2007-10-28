@@ -1,12 +1,11 @@
 package Whatpm::CSS::SelectorsSerializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
-sub serialize_test ($$$) {
-  my (undef, $selectors, $ns) = @_;
-  $ns ||= {};
+sub serialize_test ($$) {
+  my (undef, $selectors) = @_;
   my $i = 0;
   my $ident = sub {
     my $s = shift;
@@ -45,10 +44,7 @@ sub serialize_test ($$$) {
         if (not defined $ss->[NAMESPACE_SELECTOR]) {
           $v .= '*|';
         } elsif (defined $ss->[NAMESPACE_SELECTOR]->[1]) {
-          unless (defined $ns->{$ss->[NAMESPACE_SELECTOR]->[1]}) {
-            $ns->{$ss->[NAMESPACE_SELECTOR]->[1]} = 'n' . ++$i;
-          }
-          $v .= $ns->{$ss->[NAMESPACE_SELECTOR]->[1]} . '|';
+          $v .= $ident->($ss->[NAMESPACE_SELECTOR]->[1]) . '|';
         } else {
           $v .= '|';
         }
@@ -59,11 +55,10 @@ sub serialize_test ($$$) {
           $v .= '*';
         }
 
-        ## BUG: sorting order is wrong (see editor's comment in the spec)
         $v .= join '', sort {$a cmp $b} map {
           '[' .
           (defined $_->[1] ?
-            $_->[1] eq '' ? '' : ($ns->{$_->[1]} ||= 'n'.++$i) : '*') .
+            $_->[1] eq '' ? '' : $ident->($_->[1]) : '*') .
           '|' .
           $ident->($_->[2]) .
           ($_->[3] != EXISTS_MATCH ?
@@ -92,7 +87,7 @@ sub serialize_test ($$$) {
             ':lang(' . $ident->($v->[2]) . ')';
           } elsif ($v->[1] eq 'not') {
             my $v = Whatpm::CSS::SelectorsSerializer->serialize_test
-                ([[DESCENDANT_COMBINATOR, [@{$v}[2..$#{$v}]]]], $ns);
+                ([[DESCENDANT_COMBINATOR, [@{$v}[2..$#{$v}]]]]);
             $v =~ s/^    \*\|\*(?!$)/    /;
             ":not(\n    " . $v . "    )";
           } elsif ({'nth-child' => 1,
@@ -124,11 +119,8 @@ sub serialize_test ($$$) {
     } @$_;
   } @$selectors;  
 
-  return wantarray ? ($r, join '', map {
-    '@namespace ' . $ns->{$_} . ' ' . $str->($_) . ";\n";
-  } sort {$a cmp $b} keys %$ns) : $r;
+  return $r;
 } # serialize_test
-
 
 =head1 LICENSE
 
@@ -140,4 +132,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/10/23 11:32:57 $
+# $Date: 2007/10/28 06:35:15 $
