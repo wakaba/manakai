@@ -67,7 +67,7 @@ stops.
 The method returns the DOM C<Document> object (i.e. the second argument).
 
 Note that the C<Whatpm::NanoDOM> module provides a non-conforming
-implementation of DOM that only implements the subset that
+implementation of DOM that only implements a subset that
 is necessary for the purpose of C<Whatpm::HTML>'s parsing and
 serializing.
 With this module, creating a new HTML C<Document> object
@@ -83,16 +83,16 @@ from a string containing HTML document might be coded as:
 Return the HTML serialization of a DOM node I<$node>.
 
 The first argument, I<$node>, MUST be a DOM C<Document>,
-C<Node>, or C<DocumentFragment> object.
+C<Element>, or C<DocumentFragment> node.
 
 The second argument, I<$onerror>, MUST be a reference to the
 error handling code.  This code will be invoked if a descendant
-of I<$node> is not of C<Element>, C<Text>, C<CDATASection>,
-C<Comment>, C<DocumentType>, or C<EntityReference> so
-that C<INVALID_STATE_ERR> MUST be thrown.
+of I<$node> is neither of C<Element>, C<Text>, C<CDATASection>,
+C<Comment>, C<DocumentType>, nor C<EntityReference>, so
+that an C<INVALID_STATE_ERR> exception MUST be thrown.
 The code will be invoked with an argument, which is the node
 whose type is invalid.  
-This argument is optional; if missing, any such
+The argument I<$onerror> is optional; if missing, any erroneous
 node is simply ignored.
 
 The method returns a reference to the C<inner_html> attribute
@@ -109,7 +109,7 @@ A method that accepts a byte stream as an input.
 
 Charset detection algorithm.
 
-Setting inner_html.
+Documentation for the setter of inner_html.
 
 And there are many "TODO"s and "ISSUE"s in the source code.
 
@@ -136,4 +136,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/05/02 13:44:34 $
+# $Date: 2007/11/04 03:20:34 $

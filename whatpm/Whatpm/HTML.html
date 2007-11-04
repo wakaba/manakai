@@ -102,7 +102,7 @@ stops.</p>
 </dd>
 <dd>
 <p>Note that the <code>Whatpm::NanoDOM</code> module provides a non-conforming
-implementation of DOM that only implements the subset that
+implementation of DOM that only implements a subset that
 is necessary for the purpose of <code>Whatpm::HTML</code>'s parsing and
 serializing.
 With this module, creating a new HTML <code>Document</code> object
@@ -123,17 +123,17 @@ Return the HTML serialization of a DOM node <em>$node</em>.
 </dd>
 <dd>
 <p>The first argument, <em>$node</em>, MUST be a DOM <code>Document</code>,
-<code>Node</code>, or <code>DocumentFragment</code> object.</p>
+<code>Element</code>, or <code>DocumentFragment</code> node.</p>
 </dd>
 <dd>
 <p>The second argument, <em>$onerror</em>, MUST be a reference to the
 error handling code.  This code will be invoked if a descendant
-of <em>$node</em> is not of <code>Element</code>, <code>Text</code>, <code>CDATASection</code>,
-<code>Comment</code>, <code>DocumentType</code>, or <code>EntityReference</code> so
-that <code>INVALID_STATE_ERR</code> MUST be thrown.
+of <em>$node</em> is neither of <code>Element</code>, <code>Text</code>, <code>CDATASection</code>,
+<code>Comment</code>, <code>DocumentType</code>, nor <code>EntityReference</code>, so
+that an <code>INVALID_STATE_ERR</code> exception MUST be thrown.
 The code will be invoked with an argument, which is the node
 whose type is invalid.  
-This argument is optional; if missing, any such
+The argument <em>$onerror</em> is optional; if missing, any erroneous
 node is simply ignored.</p>
 </dd>
 <dd>
@@ -149,7 +149,7 @@ value, i.e. the HTML serialization of the <em>$node</em>.</p>
 to improve performance.</p>
 <p>A method that accepts a byte stream as an input.</p>
 <p>Charset detection algorithm.</p>
-<p>Setting inner_html.</p>
+<p>Documentation for the setter of inner_html.</p>
 <p>And there are many ``TODO''s and ``ISSUE''s in the source code.</p>
 <p>
 </p>

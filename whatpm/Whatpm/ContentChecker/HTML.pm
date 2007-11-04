@@ -337,7 +337,8 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
 
 my $HTMLSignificantInlineOrStrictlyInlineChecker
     = $HTMLInlineOrStrictlyInlineChecker;
-## TODO: check significant content
+## TODO: "siginificant" concept has been gone.
+## Instead, we have another SHOULD-level requirement (revision 1114).
 
 ## Block-level content or inline-level content (i.e. bimorphic content model)
 my $HTMLBlockOrInlineChecker = sub {
@@ -615,6 +616,9 @@ my $HTMLLinkTypesAttrChecker = sub {
   ## include any string that matches to the pattern for the rel=pingback link,
   ## which again inpossible to test.
   ## ISSUE: rel=pingback href MUST NOT include entities other than predefined 4.
+
+  ## NOTE: <link rel="up index"><link rel="up up index"> is not an error.
+  ## ISSUE: <link rel="up up"> is non-conforming, since rel="" is unordered.
 }; # $HTMLLinkTypesAttrChecker
 
 ## URI (or IRI)
@@ -1146,6 +1150,8 @@ $Element->{$HTML_NS}->{base} = {
       href => $HTMLURIAttrChecker,
       target => $HTMLTargetAttrChecker,
     })->($self, $todo);
+
+    ## TOOD: <base/> is non-conforming (revision 1115)
   },
   checker => $HTMLEmptyChecker,
 };
@@ -1791,6 +1797,7 @@ $Element->{$HTML_NS}->{a} = {
     push @$new_todos, $end;
 
     $_->{flag}->{has_a} = 1 for @$new_todos;
+    ## TODO: <a> -> <a href> (revision 1115)
 
     return ($new_todos, $ch);
   },

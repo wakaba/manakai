@@ -88,6 +88,10 @@ my $LinkTypes = {
     status => 'accepted',
     effect => [undef, 'hyperlink'],
   },
+  noreferer => {
+    status => 'accepted',
+    effect => [undef, 'hyperlink'],
+  },
   pingback => {
     status => 'accepted',
     effect => ['external resource', undef],

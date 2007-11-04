@@ -1,7 +1,7 @@
 1..1202
 # Running under perl version 5.008007 for linux
-# Current time local: Fri Oct 26 23:19:35 2007
-# Current time GMT:   Fri Oct 26 14:19:35 2007
+# Current time local: Sun Nov  4 12:15:43 2007
+# Current time GMT:   Sun Nov  4 03:15:43 2007
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1524,24 +1524,107 @@ ok 1376
 ok 1377
 ok 1378
 ok 1379
-# t/table-1.dat
 ok 1380
-ok 1381
-ok 1382
-ok 1383
-ok 1384
-ok 1385
-ok 1386
-ok 1387
-ok 1388
+not ok 1381
+# Test 1381 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1381)
+#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
+#<a href="../../.." rel="up up up up">d</a>
+#<a href="../.." rel="up up up">c</a>
+#<a href=".." rel="up up">b</a>
+#<a href="." rel="up">a</a>
+#</p>)
+not ok 1382
+# Test 1382 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1382)
+#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
+#<a href="../../../.." rel="up up up up index">d</a>
+#<a href="../../.." rel="up up up">c</a>
+#<a href="../.." rel="up up">b</a>
+#<a href="." rel="up">a</a>
+#</p>)
+not ok 1383
+# Test 1383 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1383)
+#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
+#<a href="../../.." rel="up up up up index">d</a>
+#<a href="../.." rel="up up up">c</a>
+#<a href=".." rel="up up index">b</a>
+#<a href="." rel="up">a</a>
+#</p>)
+not ok 1384
+# Test 1384 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1384)
+#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
+#<a href="../../.." rel="up up up up">d</a>
+#<a href="../.." rel="up up up index">c</a>
+#<a href=".." rel="up up">b</a>
+#<a href="." rel="up">a</a>
+#</p>)
+not ok 1385
+# Test 1385 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1385)
+#      Expected: "" (<nav xmlns="http://www.w3.org/1999/xhtml">
+#<p>
+#<a href="../../../a" rel="up up up up">d</a>
+#<a href="../../a" rel="up up up">c</a>
+#<a href="../a" rel="up up">b</a>
+#<a href="." rel="up">a</a>
+#</p>
+#<p>
+#<a href="../../../.." rel="up up up up up">E</a>
+#<a href="../../.." rel="up up up up">D</a>
+#<a href="../.." rel="up up up">C</a>
+#<a href=".." rel="up up">B</a>
+#<a href="." rel="up">A</a>
+#</p>
+#</nav>)
+not ok 1386
+# Test 1386 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1386)
+#      Expected: "" (<nav xmlns="http://www.w3.org/1999/xhtml">
+#<p>
+#<a href="../../../a" rel="up up up up index">d</a>
+#<a href="../../a" rel="up up up">c</a>
+#<a href="../a" rel="up up">b</a>
+#<a href="." rel="up">a</a>
+#</p>
+#<p>
+#<a href="../../../.." rel="up up up up up index">E</a>
+#<a href="../../.." rel="up up up up">D</a>
+#<a href="../.." rel="up up up">C</a>
+#<a href=".." rel="up up">B</a>
+#<a href="." rel="up">A</a>
+#</p>
+#</nav>)
+not ok 1387
+# Test 1387 got: "/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1387)
+#      Expected: "" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<title/>
+#<link href="../../../a" rel="up up up up index" title="d"/>
+#<link href="../../a" rel="up up up" title="c"/>
+#<link href="../a" rel="up up" title="b"/>
+#<link href="." rel="up" title="a"/>
+#</head>)
+not ok 1388
+# Test 1388 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1388)
+#      Expected: "" (<!-- from spec -->
+#<nav xmlns="http://www.w3.org/1999/xhtml">
+# <p>
+#  <a href="/" rel="index up up up">Main</a> >
+#  <a href="/products/" rel="up up">Products</a> >
+#  <a href="/products/dishwashers/" rel="up">Dishwashers</a> >
+#  <a>Second hand</a>
+# </p>
+# <p>
+#  <a href="/" rel="index up up">Main</a> >
+#  <a href="/second-hand/" rel="up">Second hand</a> >
+#  <a>Dishwashers</a>
+# </p>
+#</nav>)
 ok 1389
 ok 1390
 ok 1391
 ok 1392
-# t/content-model-atom-1.dat
-# t/content-model-atom-2.dat
-ok 1393
+not ok 1393
+# Test 1393 got: "/link/@rel;link type:bad context:noreferer" (t/ContentChecker.t at line 88 fail #1393)
+#      Expected: "/link/@rel;link type:non-conforming:noreferer" (<link xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer"/>)
 ok 1394
+# t/table-1.dat
 ok 1395
 ok 1396
 ok 1397
@@ -1555,6 +1638,8 @@ ok 1404
 ok 1405
 ok 1406
 ok 1407
+# t/content-model-atom-1.dat
+# t/content-model-atom-2.dat
 ok 1408
 ok 1409
 ok 1410
@@ -1562,3 +1647,18 @@ ok 1411
 ok 1412
 ok 1413
 ok 1414
+ok 1415
+ok 1416
+ok 1417
+ok 1418
+ok 1419
+ok 1420
+ok 1421
+ok 1422
+ok 1423
+ok 1424
+ok 1425
+ok 1426
+ok 1427
+ok 1428
+ok 1429
