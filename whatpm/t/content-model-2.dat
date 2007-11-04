@@ -454,6 +454,41 @@ id=""><span id=""></span></p>
 </html>
 #errors
 
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    manifest="http://www.example.com/">
+<head><title>a</title></head>
+<body><p>a</p></body>
+</html>
+#errors
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    manifest="[http://www.example.com/]">
+<head><title>a</title></head>
+<body><p>a</p></body>
+</html>
+#errors
+/html/@manifest;URI::syntax error:iriref3987;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    manifest=" ">
+<head><title>a</title></head>
+<body><p>a</p></body>
+</html>
+#errors
+/html/@manifest;URI::syntax error:iriref3987;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    application="http://www.example.com/">
+<head><title>a</title></head>
+<body><p>a</p></body>
+</html>
+#errors
+/html/@application;attribute;unsupported
+
 #data html
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">

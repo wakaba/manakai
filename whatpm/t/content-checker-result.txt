@@ -1,7 +1,7 @@
 1..1202
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Nov  4 13:13:06 2007
-# Current time GMT:   Sun Nov  4 04:13:06 2007
+# Current time local: Sun Nov  4 13:33:04 2007
+# Current time GMT:   Sun Nov  4 04:33:04 2007
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1099,97 +1099,97 @@ ok 1022
 ok 1023
 ok 1024
 ok 1025
-not ok 1026
-# Test 1026 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1026)
-#      Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1027
-# Test 1027 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1027)
-#      Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1028
-# Test 1028 got: "/object/@data;URI::syntax error:iriref3987;m\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1028)
-#      Expected: "/object/@data;URI::syntax error:iriref3987;m" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1029
-# Test 1029 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1029)
-#      Expected: "/object/@type;IMT:syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1026
+ok 1027
+ok 1028
+ok 1029
 not ok 1030
-# Test 1030 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1030)
-#      Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
+# Test 1030 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1030)
+#      Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1031
 # Test 1031 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1031)
+#      Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1032
+# Test 1032 got: "/object/@data;URI::syntax error:iriref3987;m\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1032)
+#      Expected: "/object/@data;URI::syntax error:iriref3987;m" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1033
+# Test 1033 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1033)
+#      Expected: "/object/@type;IMT:syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1034
+# Test 1034 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1034)
+#      Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1035
+# Test 1035 got: "/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1035)
 #      Expected: "" (<object type="text/css" data="http://test/"
 #    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1032
-# Test 1032 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1032)
+not ok 1036
+# Test 1036 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1036)
 #      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap=""/></p>
 #</div>)
-not ok 1033
-# Test 1033 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1033)
+not ok 1037
+# Test 1037 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1037)
 #      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="abc"/></p>
 #</div>)
-not ok 1034
-# Test 1034 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1034)
+not ok 1038
+# Test 1038 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1038)
 #      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="abc#"/></p>
 #</div>)
-not ok 1035
-# Test 1035 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1035)
+not ok 1039
+# Test 1039 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1039)
 #      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
 #</div>)
-not ok 1036
-# Test 1036 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1036)
+not ok 1040
+# Test 1040 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1040)
 #      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="#aa"/></p>
 #<map id="aa"/>
 #</div>)
-not ok 1037
-# Test 1037 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1037)
+not ok 1041
+# Test 1041 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1041)
 #      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #</div>)
-not ok 1038
-# Test 1038 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1038)
+not ok 1042
+# Test 1042 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1042)
 #      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="&#x4E00;"/>
 #<p><object data="http://test/" usemap="#&#x4E00;"/></p>
 #</div>)
-not ok 1039
-# Test 1039 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1039)
+not ok 1043
+# Test 1043 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1043)
 #      Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#bb"/></p>
 #</div>)
-not ok 1040
-# Test 1040 got: "/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1040)
+not ok 1044
+# Test 1044 got: "/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1044)
 #      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #</div>)
-not ok 1041
-# Test 1041 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1041)
+not ok 1045
+# Test 1045 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1045)
 #      Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#AA"/></p>
 #</div>)
-not ok 1042
-# Test 1042 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1042)
+not ok 1046
+# Test 1046 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1046)
 #      Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="AA"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #</div>)
-not ok 1043
-# Test 1043 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1043)
+not ok 1047
+# Test 1047 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 88 fail #1047)
 #      Expected: "/div/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<object data="" usemap="#a"/><menu id="a"/>
 #</div>)
-ok 1044
-ok 1045
-ok 1046
-ok 1047
 ok 1048
 ok 1049
 ok 1050
@@ -1477,11 +1477,11 @@ ok 1331
 ok 1332
 ok 1333
 ok 1334
-# t/content-model-3.dat
 ok 1335
 ok 1336
 ok 1337
 ok 1338
+# t/content-model-3.dat
 ok 1339
 ok 1340
 ok 1341
@@ -1499,11 +1499,11 @@ ok 1352
 ok 1353
 ok 1354
 ok 1355
-# t/content-model-4.dat
 ok 1356
 ok 1357
 ok 1358
 ok 1359
+# t/content-model-4.dat
 ok 1360
 ok 1361
 ok 1362
@@ -1527,40 +1527,44 @@ ok 1379
 ok 1380
 ok 1381
 ok 1382
-not ok 1383
-# Test 1383 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1383)
+ok 1383
+ok 1384
+ok 1385
+ok 1386
+not ok 1387
+# Test 1387 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1387)
 #      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
 #<a href="../../.." rel="up up up up">d</a>
 #<a href="../.." rel="up up up">c</a>
 #<a href=".." rel="up up">b</a>
 #<a href="." rel="up">a</a>
 #</p>)
-not ok 1384
-# Test 1384 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1384)
+not ok 1388
+# Test 1388 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1388)
 #      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
 #<a href="../../../.." rel="up up up up index">d</a>
 #<a href="../../.." rel="up up up">c</a>
 #<a href="../.." rel="up up">b</a>
 #<a href="." rel="up">a</a>
 #</p>)
-not ok 1385
-# Test 1385 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1385)
+not ok 1389
+# Test 1389 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1389)
 #      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
 #<a href="../../.." rel="up up up up index">d</a>
 #<a href="../.." rel="up up up">c</a>
 #<a href=".." rel="up up index">b</a>
 #<a href="." rel="up">a</a>
 #</p>)
-not ok 1386
-# Test 1386 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1386)
+not ok 1390
+# Test 1390 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1390)
 #      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
 #<a href="../../.." rel="up up up up">d</a>
 #<a href="../.." rel="up up up index">c</a>
 #<a href=".." rel="up up">b</a>
 #<a href="." rel="up">a</a>
 #</p>)
-not ok 1387
-# Test 1387 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1387)
+not ok 1391
+# Test 1391 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1391)
 #      Expected: "" (<nav xmlns="http://www.w3.org/1999/xhtml">
 #<p>
 #<a href="../../../a" rel="up up up up">d</a>
@@ -1576,8 +1580,8 @@ not ok 1387
 #<a href="." rel="up">A</a>
 #</p>
 #</nav>)
-not ok 1388
-# Test 1388 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1388)
+not ok 1392
+# Test 1392 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1392)
 #      Expected: "" (<nav xmlns="http://www.w3.org/1999/xhtml">
 #<p>
 #<a href="../../../a" rel="up up up up index">d</a>
@@ -1593,8 +1597,8 @@ not ok 1388
 #<a href="." rel="up">A</a>
 #</p>
 #</nav>)
-not ok 1389
-# Test 1389 got: "/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1389)
+not ok 1393
+# Test 1393 got: "/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1393)
 #      Expected: "" (<head xmlns="http://www.w3.org/1999/xhtml">
 #<title/>
 #<link href="../../../a" rel="up up up up index" title="d"/>
@@ -1602,8 +1606,8 @@ not ok 1389
 #<link href="../a" rel="up up" title="b"/>
 #<link href="." rel="up" title="a"/>
 #</head>)
-not ok 1390
-# Test 1390 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1390)
+not ok 1394
+# Test 1394 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1394)
 #      Expected: "" (<!-- from spec -->
 #<nav xmlns="http://www.w3.org/1999/xhtml">
 # <p>
@@ -1618,17 +1622,13 @@ not ok 1390
 #  <a>Dishwashers</a>
 # </p>
 #</nav>)
-ok 1391
-ok 1392
-ok 1393
-ok 1394
 ok 1395
 ok 1396
-# t/table-1.dat
 ok 1397
 ok 1398
 ok 1399
 ok 1400
+# t/table-1.dat
 ok 1401
 ok 1402
 ok 1403
@@ -1638,12 +1638,12 @@ ok 1406
 ok 1407
 ok 1408
 ok 1409
-# t/content-model-atom-1.dat
-# t/content-model-atom-2.dat
 ok 1410
 ok 1411
 ok 1412
 ok 1413
+# t/content-model-atom-1.dat
+# t/content-model-atom-2.dat
 ok 1414
 ok 1415
 ok 1416
@@ -1662,3 +1662,7 @@ ok 1428
 ok 1429
 ok 1430
 ok 1431
+ok 1432
+ok 1433
+ok 1434
+ok 1435

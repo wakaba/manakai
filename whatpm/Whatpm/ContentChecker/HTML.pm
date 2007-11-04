@@ -942,6 +942,7 @@ $Element->{$HTML_NS}->{''} = {
 $Element->{$HTML_NS}->{html} = {
   is_root => 1,
   attrs_checker => $GetHTMLAttrsChecker->({
+    manifest => $HTMLURIAttrChecker,
     xmlns => sub {
       my ($self, $attr) = @_;
       my $value = $attr->value;

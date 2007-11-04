@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Whatpm::HTML - An HTML Parser</title>
+<title>Whatpm::HTML - An HTML Parser and Serializer</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
 <link rev="made" href="mailto:admin@suika.fam.cx" />
 </head>
@@ -23,6 +23,7 @@
 		<li><a href="#application_cache_selection_algorithm_hook">Application Cache Selection Algorithm Hook</a></li>
 	</ul>
 
+	<li><a href="#error_reports">ERROR REPORTS</a></li>
 	<li><a href="#to_do">TO DO</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
@@ -34,7 +35,7 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>Whatpm::HTML - An HTML Parser</p>
+<p>Whatpm::HTML - An HTML Parser and Serializer</p>
 <p>
 </p>
 <hr />
@@ -45,13 +46,13 @@
   my $s = q&lt;&lt;!DOCTYPE html&gt;&lt;html&gt;...&lt;/html&gt;&gt;;
   # $doc = an empty DOM |Document| object
   my $on_error = sub {
-    my $error_code = shift;
-    warn $error_code, &quot;\n&quot;;
+    my %error = @_;
+    warn $error{type}, &quot;\n&quot;;
   };
   
   Whatpm::HTML-&gt;parse_string ($s =&gt; $doc, $onerror);
   
-  ## Then, |$doc| is the DOM representation of |$s|.</pre>
+  ## Now, |$doc| is the DOM representation of |$s|.</pre>
 <p>
 </p>
 <hr />
@@ -156,10 +157,21 @@ value, i.e. the HTML serialization of the <em>$node</em>.</p>
 </p>
 <h2><a name="application_cache_selection_algorithm_hook">Application Cache Selection Algorithm Hook</a></h2>
 <p>Once a parser <em>$p</em> is instantiated by method <code>new</code>, 
-a <code>CODE</code> reference can be set to <code>$p-</code>{application_cache_selection}&gt;.
+a <code>CODE</code> reference can be set to <code>$p-&gt;{application_cache_selection}</code>.
 That <code>CODE</code> will be called back when the application cache selection
 algorithm MUST be run per HTML5.  By default,
-<code>$p-</code>{application_cache_selection}&gt; is set to an empty subroutine.</p>
+<code>$p-&gt;{application_cache_selection}</code> is set to an empty subroutine.</p>
+<p>The subroutine will be invoked with an argument <em>manifest_uri</em>, 
+which is set to the manifest URI when the algorithm MUST be invoked
+with a manifest URI, or is set to <code>undef</code> when the algorithm MUST
+be invoked without no manifest URI.</p>
+<p>
+</p>
+<hr />
+<h1><a name="error_reports">ERROR REPORTS</a></h1>
+<p>@@ TBW</p>
+<p>The list of the error types is available in
+Whatpm Error Types &lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
 <p>
 </p>
 <hr />
@@ -174,11 +186,12 @@ to improve performance.</p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p>Whatpm
-&lt;http://suika.fam.cx/www/markup/html/whatpm/readme&gt;</p>
-<p>Web Applications 1.0 Working Draft (aka HTML5)
-&lt;http://whatwg.org/html5&gt;.  (Revision 792, 1 May 2007)</p>
-<p><a href="../Whatpm/NanoDOM.html">the Whatpm::NanoDOM manpage</a></p>
+<p>Whatpm &lt;http://suika.fam.cx/www/markup/html/whatpm/readme&gt;.</p>
+<p>Whatpm Error Types
+&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
+<p>HTML5 &lt;http://whatwg.org/html5&gt;.</p>
+<p><a href="../Whatpm/NanoDOM.html">the Whatpm::NanoDOM manpage</a>.</p>
+<p><a href="../Whatpm/ContentChecker/HTML.html">the Whatpm::ContentChecker::HTML manpage</a>.</p>
 <p>
 </p>
 <hr />

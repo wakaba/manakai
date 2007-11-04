@@ -1,6 +1,6 @@
 =head1 NAME
 
-Whatpm::HTML - An HTML Parser
+Whatpm::HTML - An HTML Parser and Serializer
 
 =head1 SYNOPSIS
 
@@ -9,13 +9,13 @@ Whatpm::HTML - An HTML Parser
   my $s = q<<!DOCTYPE html><html>...</html>>;
   # $doc = an empty DOM |Document| object
   my $on_error = sub {
-    my $error_code = shift;
-    warn $error_code, "\n";
+    my %error = @_;
+    warn $error{type}, "\n";
   };
   
   Whatpm::HTML->parse_string ($s => $doc, $onerror);
   
-  ## Then, |$doc| is the DOM representation of |$s|.
+  ## Now, |$doc| is the DOM representation of |$s|.
 
 =head1 DESCRIPTION
 
@@ -107,10 +107,22 @@ value, i.e. the HTML serialization of the I<$node>.
 =head2 Application Cache Selection Algorithm Hook
 
 Once a parser I<$p> is instantiated by method C<new>, 
-a C<CODE> reference can be set to C<I<$p>->{application_cache_selection}>.
+a C<CODE> reference can be set to C<< I<$p>->{application_cache_selection} >>.
 That C<CODE> will be called back when the application cache selection
 algorithm MUST be run per HTML5.  By default,
-C<I<$p>->{application_cache_selection}> is set to an empty subroutine.
+C<< I<$p>->{application_cache_selection} >> is set to an empty subroutine.
+
+The subroutine will be invoked with an argument I<manifest_uri>, 
+which is set to the manifest URI when the algorithm MUST be invoked
+with a manifest URI, or is set to C<undef> when the algorithm MUST
+be invoked without no manifest URI.
+
+=head1 ERROR REPORTS
+
+@@ TBW
+
+The list of the error types is available in
+Whatpm Error Types <http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
 
 =head1 TO DO
 
@@ -127,13 +139,16 @@ And there are many "TODO"s and "ISSUE"s in the source code.
 
 =head1 SEE ALSO
 
-Whatpm
-<http://suika.fam.cx/www/markup/html/whatpm/readme>
+Whatpm <http://suika.fam.cx/www/markup/html/whatpm/readme>.
 
-Web Applications 1.0 Working Draft (aka HTML5)
-<http://whatwg.org/html5>.  (Revision 792, 1 May 2007)
+Whatpm Error Types
+<http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
 
-L<Whatpm::NanoDOM>
+HTML5 <http://whatwg.org/html5>.
+
+L<Whatpm::NanoDOM>.
+
+L<Whatpm::ContentChecker::HTML>.
 
 =head1 AUTHOR
 
@@ -148,4 +163,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/11/04 04:15:07 $
+# $Date: 2007/11/04 04:34:30 $
