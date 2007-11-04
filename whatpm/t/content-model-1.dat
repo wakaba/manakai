@@ -294,22 +294,26 @@
 <head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><base/><title></title></head>
 #errors
 /head/meta/@charset;in XML:charset
+/head/base;attribute missing:href|target
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><title/><base/></head>
 #errors
 /head/base;element not allowed
+/head/base;attribute missing:href|target
 /head/meta/@charset;in XML:charset
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><base/></head>
 #errors
 /head/base;element not allowed
+/head/base;attribute missing:href|target
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><base/><meta charset="us-ascii"/></head>
 #errors
 /head/base;element not allowed
+/head/base;attribute missing:href|target
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
 

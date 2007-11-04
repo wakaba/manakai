@@ -1109,8 +1109,10 @@ $Element->{$HTML_NS}->{base} = {
   attrs_checker => sub {
     my ($self, $todo) = @_;
 
-    if ($self->{has_uri_attr} and
-        $todo->{node}->has_attribute_ns (undef, 'href')) {
+    my $has_href = $todo->{node}->has_attribute_ns (undef, 'href');
+    my $has_target = $todo->{node}->has_attribute_ns (undef, 'target');
+
+    if ($self->{has_uri_attr} and $has_href) {
       ## ISSUE: Are these examples conforming?
       ## <head profile="a b c"><base href> (except for |profile|'s 
       ## non-conformance)
@@ -1121,11 +1123,12 @@ $Element->{$HTML_NS}->{base} = {
       ## NOTE: These are non-conformant anyway because of |head|'s content model:
       ## <style>@import 'relative';</style><base href>
       ## <script>location.href = 'relative';</script><base href>
+      ## NOTE: <html manifest=".."><head><base href=""/> is conforming as
+      ## an exception.
       $self->{onerror}->(node => $todo->{node},
                          type => 'basehref after URI attribute');
     }
-    if ($self->{has_hyperlink_element} and
-        $todo->{node}->has_attribute_ns (undef, 'target')) {
+    if ($self->{has_hyperlink_element} and $has_target) {
       ## ISSUE: Are these examples conforming?
       ## <head><title xlink:href=""/><base target="name"/></head>
       ## <xbl:xbl>...<svg:a href=""/>...</xbl:xbl><base target="name"/>
@@ -1137,12 +1140,15 @@ $Element->{$HTML_NS}->{base} = {
                          type => 'basetarget after hyperlink');
     }
 
+    if (not $has_href and not $has_target) {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'attribute missing:href|target');
+    }
+
     return $GetHTMLAttrsChecker->({
       href => $HTMLURIAttrChecker,
       target => $HTMLTargetAttrChecker,
     })->($self, $todo);
-
-    ## TOOD: <base/> is non-conforming (revision 1115)
   },
   checker => $HTMLEmptyChecker,
 };
