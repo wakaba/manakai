@@ -100,6 +100,18 @@ value, i.e. the HTML serialization of the I<$node>.
 
 =back
 
+=head1 LOW-LEVEL INTERFACE
+
+@@ TBW
+
+=head2 Application Cache Selection Algorithm Hook
+
+Once a parser I<$p> is instantiated by method C<new>, 
+a C<CODE> reference can be set to C<I<$p>->{application_cache_selection}>.
+That C<CODE> will be called back when the application cache selection
+algorithm MUST be run per HTML5.  By default,
+C<I<$p>->{application_cache_selection}> is set to an empty subroutine.
+
 =head1 TO DO
 
 Tokenizer should emit a sequence of character tokens as one token
@@ -136,4 +148,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/11/04 03:20:34 $
+# $Date: 2007/11/04 04:15:07 $

@@ -17,6 +17,12 @@
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#lowlevel_interface">LOW-LEVEL INTERFACE</a></li>
+	<ul>
+
+		<li><a href="#application_cache_selection_algorithm_hook">Application Cache Selection Algorithm Hook</a></li>
+	</ul>
+
 	<li><a href="#to_do">TO DO</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
@@ -141,6 +147,19 @@ node is simply ignored.</p>
 value, i.e. the HTML serialization of the <em>$node</em>.</p>
 </dd>
 <p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="lowlevel_interface">LOW-LEVEL INTERFACE</a></h1>
+<p>@@ TBW</p>
+<p>
+</p>
+<h2><a name="application_cache_selection_algorithm_hook">Application Cache Selection Algorithm Hook</a></h2>
+<p>Once a parser <em>$p</em> is instantiated by method <code>new</code>, 
+a <code>CODE</code> reference can be set to <code>$p-</code>{application_cache_selection}&gt;.
+That <code>CODE</code> will be called back when the application cache selection
+algorithm MUST be run per HTML5.  By default,
+<code>$p-</code>{application_cache_selection}&gt; is set to an empty subroutine.</p>
 <p>
 </p>
 <hr />

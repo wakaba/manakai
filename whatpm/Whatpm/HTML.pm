@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.62 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.63 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -146,6 +146,9 @@ sub new ($) {
   };
   $self->{parse_error} = sub {
     # 
+  };
+  $self->{application_cache_selection} = sub {
+    #
   };
   return $self;
 } # new
@@ -2905,18 +2908,34 @@ sub _tree_construction_root_element ($) {
             redo B;
           }
         }
+
+        $self->{application_cache_selection}->(undef);
+
+        #
+      } elsif ($token->{type} == START_TAG_TOKEN) {
+        if ($token->{tag_name} eq 'html' and
+            $token->{attributes}->{manifest}) { ## ISSUE: Spec spells as "application"
+          $self->{application_cache_selection}
+               ->($token->{attributes}->{manifest}->{value});
+          ## ISSUE: No relative reference resolution?
+        } else {
+          $self->{application_cache_selection}->(undef);
+        }
+
+        ## ISSUE: There is an issue in the spec
         #
       } elsif ({
-                START_TAG_TOKEN, 1,
                 END_TAG_TOKEN, 1,
                 END_OF_FILE_TOKEN, 1,
                }->{$token->{type}}) {
+        $self->{application_cache_selection}->(undef);
+ 
         ## ISSUE: There is an issue in the spec
         #
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
-      ## TODO: application cache selection algorithm
+
       my $root_element; 
       $root_element = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'html']);
@@ -6854,4 +6873,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/10/17 10:46:26 $
+# $Date: 2007/11/04 04:15:06 $
