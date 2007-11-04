@@ -7,7 +7,8 @@ RMALL = $(RM) -fr
 
 all: CSS-all \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
-  ContentType.html HTML.html NanoDOM.html ContentChecker.html
+  ContentType.html HTML.html NanoDOM.html ContentChecker.html \
+  CacheManifest.html
 
 CSS-all:
 	cd CSS && make all
@@ -24,7 +25,7 @@ HTML.pm: HTML.pm.src mkhtmlparser.pl
 %.html: %.pm
 	$(POD2HTML) $< > $@
 
-HTML.html ContentChecker.html:: %.html: %.pod
+HTML.html ContentChecker.html CacheManifest.html:: %.html: %.pod
 	$(POD2HTML) $< > $@
 
 _NamedEntityList.pm: mkentitylist.pl Entities.html
@@ -56,4 +57,4 @@ CSS-clean:
 	cd CSS && make clean
 
 ## License: Public Domain.
-## $Date: 2007/10/17 10:46:26 $
+## $Date: 2007/11/04 11:49:44 $

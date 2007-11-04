@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::CacheManifest - An HTML5 Cache Manifest Parser</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#manifest_data_structure">MANIFEST DATA STRUCTURE</a></li>
+	<li><a href="#dependency">DEPENDENCY</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#todo">TODO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::CacheManifest - An HTML5 Cache Manifest Parser</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Whatpm::CacheManifest;
+  
+  my $manifest_uri = q&lt;<a href="http://www.example.com/manifest&gt">http://www.example.com/manifest&gt</a>;;
+  my ($manifest_data, $manifest_base_uri)
+      = some_function_to_retrieve_content ($manifest_uri);
+  
+  # or,
+  
+  my $manifest = Whatpm::CacheManifest-&gt;parse_byte_string
+      ($manifest_data, $manifest_uri, $manifest_base_uri, sub {
+        my %err = @_;
+        warn $err{type}, &quot;\n&quot;;
+      });
+  
+  $manifest_data = Encode::decode ('utf-8', $manifest_data);
+  my $manifest = Whatpm::CacheManifest-&gt;parse_char_string
+      ($manifest_data, $manifest_uri, $manifest_base_uri, sub {
+        my %err = @_;
+        warn $err{type}, &quot;\n&quot;;
+      });
+  
+  # $manifest-&gt;[0]: Array reference of explicit URIs.
+  # $manifest-&gt;[1]: Hash reference of fallback URIs.
+  # $manifest-&gt;[2]: Array reference of online whitelist.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Whatpm::CacheManifest</code> module implements the parsing algorithm
+for HTML5 cache manifest format, used to describe an offline Web
+application.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>This module provides two class methods to parse cache manifests:</p>
+<dl>
+<dt><strong><a name="item_parse_byte_string"><em>$manifest</em> = Whatpm::CacheManifest-&gt;parse_byte_string (<em>$manifest_bytes</em>, <em>$manifest_uri</em>, <em>$manifest_base_uri</em>, <em>$onerror</em>)</a></strong><br />
+</dt>
+<dt><strong><a name="item_parse_char_string"><em>$manifest</em> = Whatpm::CacheManifest-&gt;parse_char_string (<em>$manifest_chars</em>, <em>$manifest_uri</em>, <em>$manifest_base_uri</em>, <em>$onerror</em>)</a></strong><br />
+</dt>
+</dl>
+<p>These methods parse a cache manifest and return that cache manifest
+in the <a href="#manifest_data_structure">MANIFEST DATA STRUCTURE</a>.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong><a name="item__24manifest_bytes"><em>$manifest_bytes</em></a></strong><br />
+</dt>
+<dd>
+The content of the manifest files, as a Perl byte string.
+It may or may not be a valid cache manifest.  It will be processed
+as defined by HTML5 cache manifest parsing specification.
+It will be interpreted as UTF-8 string, as defined in the specification.
+</dd>
+<p></p>
+<dt><strong><a name="item__24manfiest_chars"><em>$manfiest_chars</em></a></strong><br />
+</dt>
+<dd>
+The content of the manifest files, as a Perl character string.
+It may or may not be a valid cache manifest.  It will be processed
+as defined by HTML5 cache manifest parsing specification.  It may 
+contain <code>U+0000</code> <code>NULL</code> characters; they are converted to
+<code>U+FFFD</code> <code>REPLACEMENT CHARACTER</code>s as defined in the specification.
+</dd>
+<p></p>
+<dt><strong><a name="item__24manifest_uri"><em>$manifest_uri</em></a></strong><br />
+</dt>
+<dd>
+The IRI of the cache manifest.
+</dd>
+<p></p>
+<dt><strong><a name="item__24manifest_base_uri"><em>$manifest_base_uri</em></a></strong><br />
+</dt>
+<dd>
+The base IRI of the cache manifest.
+</dd>
+<p></p>
+<dt><strong><a name="item__24onerror"><em>$onerror</em></a></strong><br />
+</dt>
+<dd>
+The callback function that will be invoked if the manifest cache
+has an error (or a warning).  It may be omitted.  If omitted, 
+any error (or warning) is <code>warn</code>ed with its <code>type</code>.
+</dd>
+<dd>
+<p>@@ TBW</p>
+</dd>
+<dd>
+<p>For the list of the error types, see Whatpm Error Types
+&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
+</dd>
+<p></p></dl>
+<p>In addition, a class method to check conformance of cache manifests
+is provided:</p>
+<dl>
+<dt><strong><a name="item_check_manifest">Whatpm::CacheManifest-&gt;check_manifest (<em>$manifest</em>, <em>$onerror</em>)</a></strong><br />
+</dt>
+<dd>
+Check conformance of a cache manifest, given as <em>$manifest</em>.
+</dd>
+<dl>
+<dt><strong><a name="item__24manifest"><em>$manifest</em></a></strong><br />
+</dt>
+<dd>
+The cache manifest to check, in the <a href="#manifest_data_structure">MANIFEST DATA STRUCTURE</a>.
+</dd>
+<p></p>
+<dt><strong><em>$onerror</em></strong><br />
+</dt>
+<dd>
+The callback function that will be invoked if the manifest cache
+has an error (or a warning).  It may be omitted.  If omitted, 
+any error (or warning) is <code>warn</code>ed with its <code>type</code>.
+</dd>
+<dd>
+<p>@@ TBW</p>
+</dd>
+<dd>
+<p>For the list of the error types, see Whatpm Error Types
+&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
+</dd>
+<p></p></dl>
+<p>A cache manifest is conforming if (a) it is correctly labeled
+as a cache manifest (e.g. as Internet media type <code>text/cache-manifest</code>)
+in the transfer layer, (b) parsing the cache manifest by 
+<a href="#item_parse_byte_string"><code>parse_byte_string</code></a> or <a href="#item_parse_char_string"><code>parse_char_string</code></a> raises no error
+with level <code>m</code> or <code>s</code>, and (c) checking the cache manifest by
+<a href="#item_check_manifest"><code>check_manifest</code></a> raises no error with level <code>m</code> or <code>s</code>.</p>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="manifest_data_structure">MANIFEST DATA STRUCTURE</a></h1>
+<p>If <em>$m</em> is in manifest data structure, <em>$m</em> is a reference to
+the array with three items: <em>$explicit_uris</em>, <em>$fallback_uris</em>,
+and <em>$online_whitelist</em>.</p>
+<p><em>$explicit_uris</em> is a reference to the array, which
+contains zero or more strings.  The strings are IRI references
+of the explicit entries.</p>
+<p><em>$fallback_uris</em> is a reference to the hash, which
+contains zero or more mappings of strings (keys) to strings (values).
+The keys are IRI references of the oppotunistic caching namespaces.
+The values are IRI references of the fallback entries corresponding
+to the oppotunistic caching namespaces.</p>
+<p><em>$online_whitelist</em> is a reference to the array, which
+contains zero or more strings.  The strings are IRI references
+in the online whitelist.</p>
+<p>
+</p>
+<hr />
+<h1><a name="dependency">DEPENDENCY</a></h1>
+<p>This module depends on <a href="../Message/URI/URIReference.html">the Message::URI::URIReference manpage</a>, which is
+part of manakai.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Whatpm Error Types
+&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
+<p>HTML5
+&lt;http://whatwg.org/html5&gt;.</p>
+<p><a href="../Message/URI/URIReference.html">the Message::URI::URIReference manpage</a>
+&lt;http://suika.fam.cx/www/manakai-core/lib/Message/URI/URIReference.html&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="todo">TODO</a></h1>
+<p>``Same scheme/host/port'' comparison algorithm is not correctly implemented
+yet.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

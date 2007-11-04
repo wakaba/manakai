@@ -1,0 +1,186 @@
+=head1 NAME
+
+Whatpm::CacheManifest - An HTML5 Cache Manifest Parser
+
+=head1 SYNOPSIS
+
+  use Whatpm::CacheManifest;
+  
+  my $manifest_uri = q<http://www.example.com/manifest>;
+  my ($manifest_data, $manifest_base_uri)
+      = some_function_to_retrieve_content ($manifest_uri);
+  
+  # or,
+  
+  my $manifest = Whatpm::CacheManifest->parse_byte_string
+      ($manifest_data, $manifest_uri, $manifest_base_uri, sub {
+        my %err = @_;
+        warn $err{type}, "\n";
+      });
+  
+  $manifest_data = Encode::decode ('utf-8', $manifest_data);
+  my $manifest = Whatpm::CacheManifest->parse_char_string
+      ($manifest_data, $manifest_uri, $manifest_base_uri, sub {
+        my %err = @_;
+        warn $err{type}, "\n";
+      });
+  
+  # $manifest->[0]: Array reference of explicit URIs.
+  # $manifest->[1]: Hash reference of fallback URIs.
+  # $manifest->[2]: Array reference of online whitelist.
+
+=head1 DESCRIPTION
+
+The C<Whatpm::CacheManifest> module implements the parsing algorithm
+for HTML5 cache manifest format, used to describe an offline Web
+application.
+
+=head1 METHODS
+
+This module provides two class methods to parse cache manifests:
+
+=over 4
+
+=item I<$manifest> = Whatpm::CacheManifest->parse_byte_string (I<$manifest_bytes>, I<$manifest_uri>, I<$manifest_base_uri>, I<$onerror>)
+
+=item I<$manifest> = Whatpm::CacheManifest->parse_char_string (I<$manifest_chars>, I<$manifest_uri>, I<$manifest_base_uri>, I<$onerror>)
+
+=back
+
+These methods parse a cache manifest and return that cache manifest
+in the L<MANIFEST DATA STRUCTURE>.
+
+Parameters:
+
+=over 4
+
+=item I<$manifest_bytes>
+
+The content of the manifest files, as a Perl byte string.
+It may or may not be a valid cache manifest.  It will be processed
+as defined by HTML5 cache manifest parsing specification.
+It will be interpreted as UTF-8 string, as defined in the specification.
+
+=item I<$manfiest_chars>
+
+The content of the manifest files, as a Perl character string.
+It may or may not be a valid cache manifest.  It will be processed
+as defined by HTML5 cache manifest parsing specification.  It may 
+contain C<U+0000> C<NULL> characters; they are converted to
+C<U+FFFD> C<REPLACEMENT CHARACTER>s as defined in the specification.
+
+=item I<$manifest_uri>
+
+The IRI of the cache manifest.
+
+=item I<$manifest_base_uri>
+
+The base IRI of the cache manifest.
+
+=item I<$onerror>
+
+The callback function that will be invoked if the manifest cache
+has an error (or a warning).  It may be omitted.  If omitted, 
+any error (or warning) is C<warn>ed with its C<type>.
+
+@@ TBW
+
+For the list of the error types, see Whatpm Error Types
+<http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
+
+=back
+
+In addition, a class method to check conformance of cache manifests
+is provided:
+
+=over 4
+
+=item Whatpm::CacheManifest->check_manifest (I<$manifest>, I<$onerror>)
+
+Check conformance of a cache manifest, given as I<$manifest>.
+
+=over 4
+
+=item I<$manifest>
+
+The cache manifest to check, in the L<MANIFEST DATA STRUCTURE>.
+
+=item I<$onerror>
+
+
+The callback function that will be invoked if the manifest cache
+has an error (or a warning).  It may be omitted.  If omitted, 
+any error (or warning) is C<warn>ed with its C<type>.
+
+@@ TBW
+
+For the list of the error types, see Whatpm Error Types
+<http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
+
+=back
+
+A cache manifest is conforming if (a) it is correctly labeled
+as a cache manifest (e.g. as Internet media type C<text/cache-manifest>)
+in the transfer layer, (b) parsing the cache manifest by 
+C<parse_byte_string> or C<parse_char_string> raises no error
+with level C<m> or C<s>, and (c) checking the cache manifest by
+C<check_manifest> raises no error with level C<m> or C<s>.
+
+=back
+
+=head1 MANIFEST DATA STRUCTURE
+
+If I<$m> is in manifest data structure, I<$m> is a reference to
+the array with three items: I<$explicit_uris>, I<$fallback_uris>,
+and I<$online_whitelist>.
+
+I<$explicit_uris> is a reference to the array, which
+contains zero or more strings.  The strings are IRI references
+of the explicit entries.
+
+I<$fallback_uris> is a reference to the hash, which
+contains zero or more mappings of strings (keys) to strings (values).
+The keys are IRI references of the oppotunistic caching namespaces.
+The values are IRI references of the fallback entries corresponding
+to the oppotunistic caching namespaces.
+
+I<$online_whitelist> is a reference to the array, which
+contains zero or more strings.  The strings are IRI references
+in the online whitelist.
+
+=head1 DEPENDENCY
+
+This module depends on L<Message::URI::URIReference>, which is
+part of manakai.
+
+=head1 SEE ALSO
+
+Whatpm Error Types
+<http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
+
+HTML5
+<http://whatwg.org/html5>.
+
+L<Message::URI::URIReference>
+<http://suika.fam.cx/www/manakai-core/lib/Message/URI/URIReference.html>.
+
+=head1 TODO
+
+"Same scheme/host/port" comparison algorithm is not correctly implemented
+yet.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+# $Date: 2007/11/04 11:49:44 $
+
