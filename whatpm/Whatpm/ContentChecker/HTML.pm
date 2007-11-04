@@ -610,6 +610,8 @@ my $HTMLLinkTypesAttrChecker = sub {
 
   ## NOTE: <link rel="up index"><link rel="up up index"> is not an error.
   ## ISSUE: <link rel="up up"> is non-conforming, since rel="" is unordered.
+  ## NOTE: We can't check "If the page is part of multiple hierarchies,
+  ## then they SHOULD be described in different paragraphs.".
 }; # $HTMLLinkTypesAttrChecker
 
 ## URI (or IRI)
@@ -623,7 +625,7 @@ my $HTMLURIAttrChecker = sub {
                        type => 'URI::'.$opt{type}.
                        (defined $opt{position} ? ':'.$opt{position} : ''));
   });
-  $self->{has_uri_attr} = 1;
+  $self->{has_uri_attr} = 1; ## TODO: <html manifest>
 }; # $HTMLURIAttrChecker
 
 ## A space separated list of one or more URIs (or IRIs)
