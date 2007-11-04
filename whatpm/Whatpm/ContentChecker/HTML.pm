@@ -248,9 +248,6 @@ my $HTMLInlineChecker = sub {
   return ($new_todos);
 }; # $HTMLInlineChecker
 
-my $HTMLSignificantInlineChecker = $HTMLInlineChecker;
-## TODO: check significant content
-
 ## Strictly inline-level content
 my $HTMLStrictlyInlineChecker = sub {
   my ($self, $todo) = @_;
@@ -287,9 +284,6 @@ my $HTMLStrictlyInlineChecker = sub {
   }
   return ($new_todos);
 }; # $HTMLStrictlyInlineChecker
-
-my $HTMLSignificantStrictlyInlineChecker = $HTMLStrictlyInlineChecker;
-## TODO: check significant content
 
 ## Inline-level or strictly inline-level content
 my $HTMLInlineOrStrictlyInlineChecker = sub {
@@ -335,10 +329,7 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
   return ($new_todos);
 }; # $HTMLInlineOrStrictlyInlineChecker
 
-my $HTMLSignificantInlineOrStrictlyInlineChecker
-    = $HTMLInlineOrStrictlyInlineChecker;
-## TODO: "siginificant" concept has been gone.
-## Instead, we have another SHOULD-level requirement (revision 1114).
+## TODO: New "significant" SHOULD-level requirement (revision 1114).
 
 ## Block-level content or inline-level content (i.e. bimorphic content model)
 my $HTMLBlockOrInlineChecker = sub {
@@ -1351,7 +1342,7 @@ $Element->{$HTML_NS}->{h1} = {
   checker => sub {
     my ($self, $todo) = @_;
     $todo->{flag}->{has_heading}->[0] = 1;
-    return $HTMLSignificantStrictlyInlineChecker->($self, $todo);
+    return $HTMLStrictlyInlineChecker->($self, $todo);
   },
 };
 
@@ -1503,7 +1494,7 @@ $Element->{$HTML_NS}->{address} = {
 
 $Element->{$HTML_NS}->{p} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLSignificantInlineChecker,
+  checker => $HTMLInlineChecker,
 };
 
 $Element->{$HTML_NS}->{hr} = {
@@ -1793,7 +1784,7 @@ $Element->{$HTML_NS}->{a} = {
 
     my $end = $self->_add_minuses ($HTMLInteractiveElements);
     my ($new_todos, $ch)
-      = $HTMLSignificantInlineOrStrictlyInlineChecker->($self, $todo);
+      = $HTMLInlineOrStrictlyInlineChecker->($self, $todo);
     push @$new_todos, $end;
 
     $_->{flag}->{has_a} = 1 for @$new_todos;
@@ -2617,7 +2608,7 @@ $Element->{$HTML_NS}->{table} = {
 
 $Element->{$HTML_NS}->{caption} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLSignificantStrictlyInlineChecker,
+  checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{colgroup} = {
@@ -3165,7 +3156,7 @@ $Element->{$HTML_NS}->{legend} = {
       if ($nsuri eq $HTML_NS and $ln eq 'figure') {
         return $HTMLInlineChecker->($self, $todo);
       } else {
-        return $HTMLSignificantStrictlyInlineChecker->($self, $todo);
+        return $HTMLStrictlyInlineChecker->($self, $todo);
       }
     } else {
       return $HTMLInlineChecker->($self, $todo);
