@@ -1793,8 +1793,9 @@ $Element->{$HTML_NS}->{a} = {
       = $HTMLInlineOrStrictlyInlineChecker->($self, $todo);
     push @$new_todos, $end;
 
-    $_->{flag}->{has_a} = 1 for @$new_todos;
-    ## TODO: <a> -> <a href> (revision 1115)
+    if ($todo->{node}->has_attribute_ns (undef, 'href')) {
+      $_->{flag}->{in_a_href} = 1 for @$new_todos;
+    }
 
     return ($new_todos, $ch);
   },
@@ -2156,8 +2157,9 @@ $Element->{$HTML_NS}->{img} = {
       usemap => $HTMLUsemapAttrChecker,
       ismap => sub {
         my ($self, $attr, $parent_todo) = @_;
-        if (not $todo->{flag}->{has_a}) {
-          $self->{onerror}->(node => $attr, type => 'attribute not allowed');
+        if (not $todo->{flag}->{in_a_href}) {
+          $self->{onerror}->(node => $attr,
+                             type => 'attribute not allowed:ismap');
         }
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_todo);
       },
