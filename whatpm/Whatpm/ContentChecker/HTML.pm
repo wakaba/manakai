@@ -1279,6 +1279,10 @@ $Element->{$HTML_NS}->{meta} = {
            'default-style' => 1,
           }->{$keyword}) {
         #
+      } elsif ($keyword eq 'content-type') {
+        $self->{onerror}
+            ->(node => $http_equiv_attr,
+               type => 'enumerated:invalid:http-equiv:content-type');
       } else {
         $self->{onerror}->(node => $http_equiv_attr,
                            type => 'enumerated:invalid');
