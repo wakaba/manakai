@@ -1,7 +1,7 @@
-1..1202
+1..1435
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Nov  4 13:33:04 2007
-# Current time GMT:   Sun Nov  4 04:33:04 2007
+# Current time local: Wed Nov  7 19:52:58 2007
+# Current time GMT:   Wed Nov  7 10:52:58 2007
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1531,97 +1531,14 @@ ok 1383
 ok 1384
 ok 1385
 ok 1386
-not ok 1387
-# Test 1387 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1387)
-#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
-#<a href="../../.." rel="up up up up">d</a>
-#<a href="../.." rel="up up up">c</a>
-#<a href=".." rel="up up">b</a>
-#<a href="." rel="up">a</a>
-#</p>)
-not ok 1388
-# Test 1388 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1388)
-#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
-#<a href="../../../.." rel="up up up up index">d</a>
-#<a href="../../.." rel="up up up">c</a>
-#<a href="../.." rel="up up">b</a>
-#<a href="." rel="up">a</a>
-#</p>)
-not ok 1389
-# Test 1389 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1389)
-#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
-#<a href="../../.." rel="up up up up index">d</a>
-#<a href="../.." rel="up up up">c</a>
-#<a href=".." rel="up up index">b</a>
-#<a href="." rel="up">a</a>
-#</p>)
-not ok 1390
-# Test 1390 got: "/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up\n/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1390)
-#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
-#<a href="../../.." rel="up up up up">d</a>
-#<a href="../.." rel="up up up index">c</a>
-#<a href=".." rel="up up">b</a>
-#<a href="." rel="up">a</a>
-#</p>)
-not ok 1391
-# Test 1391 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1391)
-#      Expected: "" (<nav xmlns="http://www.w3.org/1999/xhtml">
-#<p>
-#<a href="../../../a" rel="up up up up">d</a>
-#<a href="../../a" rel="up up up">c</a>
-#<a href="../a" rel="up up">b</a>
-#<a href="." rel="up">a</a>
-#</p>
-#<p>
-#<a href="../../../.." rel="up up up up up">E</a>
-#<a href="../../.." rel="up up up up">D</a>
-#<a href="../.." rel="up up up">C</a>
-#<a href=".." rel="up up">B</a>
-#<a href="." rel="up">A</a>
-#</p>
-#</nav>)
-not ok 1392
-# Test 1392 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1392)
-#      Expected: "" (<nav xmlns="http://www.w3.org/1999/xhtml">
-#<p>
-#<a href="../../../a" rel="up up up up index">d</a>
-#<a href="../../a" rel="up up up">c</a>
-#<a href="../a" rel="up up">b</a>
-#<a href="." rel="up">a</a>
-#</p>
-#<p>
-#<a href="../../../.." rel="up up up up up index">E</a>
-#<a href="../../.." rel="up up up up">D</a>
-#<a href="../.." rel="up up up">C</a>
-#<a href=".." rel="up up">B</a>
-#<a href="." rel="up">A</a>
-#</p>
-#</nav>)
-not ok 1393
-# Test 1393 got: "/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up\n/head/link/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1393)
-#      Expected: "" (<head xmlns="http://www.w3.org/1999/xhtml">
-#<title/>
-#<link href="../../../a" rel="up up up up index" title="d"/>
-#<link href="../../a" rel="up up up" title="c"/>
-#<link href="../a" rel="up up" title="b"/>
-#<link href="." rel="up" title="a"/>
-#</head>)
-not ok 1394
-# Test 1394 got: "/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up\n/nav/p/a/@rel;duplicate token:up" (t/ContentChecker.t at line 88 fail #1394)
-#      Expected: "" (<!-- from spec -->
-#<nav xmlns="http://www.w3.org/1999/xhtml">
-# <p>
-#  <a href="/" rel="index up up up">Main</a> >
-#  <a href="/products/" rel="up up">Products</a> >
-#  <a href="/products/dishwashers/" rel="up">Dishwashers</a> >
-#  <a>Second hand</a>
-# </p>
-# <p>
-#  <a href="/" rel="index up up">Main</a> >
-#  <a href="/second-hand/" rel="up">Second hand</a> >
-#  <a>Dishwashers</a>
-# </p>
-#</nav>)
+ok 1387
+ok 1388
+ok 1389
+ok 1390
+ok 1391
+ok 1392
+ok 1393
+ok 1394
 ok 1395
 ok 1396
 ok 1397

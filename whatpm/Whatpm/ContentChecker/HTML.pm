@@ -525,7 +525,7 @@ my $GetHTMLBooleanAttrChecker = sub {
 }; # $GetHTMLBooleanAttrChecker
 
 ## Unordered set of space-separated tokens
-my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
+my $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
   my ($self, $attr) = @_;
   my %word;
   for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
@@ -535,7 +535,7 @@ my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
       $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
     }
   }
-}; # $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker
+}; # $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker
 
 ## |rel| attribute (unordered set of space separated tokens,
 ## whose allowed values are defined by the section on link types)
@@ -545,6 +545,8 @@ my $HTMLLinkTypesAttrChecker = sub {
   for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
     unless ($word{$word}) {
       $word{$word} = 1;
+    } elsif ($word eq 'up') {
+      #
     } else {
       $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
     }
@@ -609,7 +611,6 @@ my $HTMLLinkTypesAttrChecker = sub {
   ## ISSUE: rel=pingback href MUST NOT include entities other than predefined 4.
 
   ## NOTE: <link rel="up index"><link rel="up up index"> is not an error.
-  ## ISSUE: <link rel="up up"> is non-conforming, since rel="" is unordered.
   ## NOTE: We can't check "If the page is part of multiple hierarchies,
   ## then they SHOULD be described in different paragraphs.".
 }; # $HTMLLinkTypesAttrChecker
@@ -3131,7 +3132,7 @@ $Element->{$HTML_NS}->{datatemplate} = {
 $Element->{$HTML_NS}->{rule} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     ## TODO: |condition| attribute
-    mode => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
+    mode => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
   }),
   checker => sub {
     my ($self, $todo) = @_;
@@ -3149,7 +3150,7 @@ $Element->{$HTML_NS}->{rule} = {
 $Element->{$HTML_NS}->{nest} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     ## TODO: |filter| attribute
-    mode => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
+    mode => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
   }),
   checker => $HTMLEmptyChecker,
 };
