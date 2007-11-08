@@ -301,30 +301,30 @@
 #data
 <a xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer">.</a>
 #errors
+/a/@rel;link type:noreferer;unsupported
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer">.</a>
 #errors
-/a/@rel;link type:noreferrer;unsupported
 
 #data
 <area xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer" alt="X"
     coords="1,2,3,4"/>
 #errors
+/area/@rel;link type:noreferer;unsupported
 
 #data
 <area xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer" alt="X"
     coords="1,2,3,4"/>
 #errors
-/area/@rel;link type:noreferrer;unsupported
 
 #data
 <link xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer"/>
 #errors
-/link/@rel;link type:bad context:noreferer
+/link/@rel;link type:noreferer;unsupported
 
 #data
 <link xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer"/>
 #errors
-/link/@rel;link type:noreferrer;unsupported
+/link/@rel;link type:bad context:noreferrer
 

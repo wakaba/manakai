@@ -167,13 +167,13 @@ $Whatpm::ContentChecker::LinkType = {
                                       ],
                           'status' => 'accepted'
                         },
-          'noreferer' => {
-                           'effect' => [
-                                         undef,
-                                         'hyperlink'
-                                       ],
-                           'status' => 'accepted'
-                         },
+          'noreferrer' => {
+                            'effect' => [
+                                          undef,
+                                          'hyperlink'
+                                        ],
+                            'status' => 'accepted'
+                          },
           'openid.delegate' => {
                                  'effect' => [
                                                'external resource',

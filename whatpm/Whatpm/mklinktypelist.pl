@@ -88,7 +88,7 @@ my $LinkTypes = {
     status => 'accepted',
     effect => [undef, 'hyperlink'],
   },
-  noreferer => {
+  noreferrer => {
     status => 'accepted',
     effect => [undef, 'hyperlink'],
   },
