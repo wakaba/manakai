@@ -238,6 +238,13 @@ $Whatpm::ContentChecker::LinkType = {
                                      ],
                          'status' => 'synonym'
                        },
+          'service' => {
+                         'effect' => [
+                                       'hyperlink',
+                                       undef
+                                     ],
+                         'status' => 'proposal'
+                       },
           'sidebar' => {
                          'effect' => [
                                        'hyperlink',

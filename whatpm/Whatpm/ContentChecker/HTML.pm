@@ -573,6 +573,12 @@ my $HTMLLinkTypesAttrChecker = sub {
       } elsif ($def->{status} eq 'proposal') {
         $self->{onerror}->(node => $attr, level => 's',
                            type => 'link type:proposed:'.$word);
+        if (defined $def->{effect}->[$a_or_area]) {
+          #
+        } else {
+          $self->{onerror}->(node => $attr,
+                             type => 'link type:bad context:'.$word);
+        }
       } else { # rejected or synonym
         $self->{onerror}->(node => $attr,
                            type => 'link type:non-conforming:'.$word);
@@ -614,6 +620,8 @@ my $HTMLLinkTypesAttrChecker = sub {
   ## NOTE: We can't check "If the page is part of multiple hierarchies,
   ## then they SHOULD be described in different paragraphs.".
 }; # $HTMLLinkTypesAttrChecker
+
+## TODO: "When an author uses a new type not defined by either this specification or the Wiki page, conformance checkers should offer to add the value to the Wiki, with the details described above, with the "proposal" status."
 
 ## URI (or IRI)
 my $HTMLURIAttrChecker = sub {

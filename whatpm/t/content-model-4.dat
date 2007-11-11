@@ -328,3 +328,39 @@
 #errors
 /link/@rel;link type:bad context:noreferrer
 
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rel="openid.server"/>
+#errors
+/link/@rel;link type:proposed:openid.server;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="openid.server"/>
+#errors
+/a/@rel;link type:proposed:openid.server;s
+/a/@rel;link type:bad context:openid.server
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" href="" shape="default"
+    alt="" rel="openid.server"/>
+#errors
+/area/@rel;link type:proposed:openid.server;s
+/area/@rel;link type:bad context:openid.server
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rel="service"/>
+#errors
+/link/@rel;link type:proposed:service;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="service"/>
+#errors
+/a/@rel;link type:proposed:service;s
+/a/@rel;link type:bad context:service
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" href="" shape="default"
+    alt="" rel="service"/>
+#errors
+/area/@rel;link type:proposed:service;s
+/area/@rel;link type:bad context:service
+
