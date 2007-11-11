@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -1126,7 +1126,8 @@ sub inner_html ($;$) {
       return unless defined wantarray;
     }
 
-    return ${ Whatpm::HTML->get_inner_html ($self) };
+    require Whatpm::HTML::Serializer;
+    return ${ Whatpm::HTML::Serializer->get_inner_html ($self) };
   } else {
     if (@_ > 1) {
       ## Step 1
@@ -1231,4 +1232,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/10/08 07:17:18 $
+## $Date: 2007/11/11 04:23:32 $

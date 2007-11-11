@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
     'Message::IF::ElementSelector'; # MUST in Selectors API spec.
 require Message::DOM::Document;
@@ -172,8 +172,8 @@ sub inner_html ($;$) {
   ## TODO: Setter
 
   if (${$$self->{owner_document}}->{manakai_is_html}) {
-    require Whatpm::HTML;
-    return ${ Whatpm::HTML->get_inner_html ($self) };
+    require Whatpm::HTML::Serializer;
+    return ${ Whatpm::HTML::Serializer->get_inner_html ($self) };
   } else {
     ## TODO: This serializer is not currenly conformant to HTML5.
     require Whatpm::XMLSerializer;
@@ -1264,4 +1264,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/09/24 10:16:14 $
+## $Date: 2007/11/11 04:23:32 $
