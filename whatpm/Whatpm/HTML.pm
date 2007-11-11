@@ -1,6 +1,7 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.64 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.65 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use Error qw(:try);
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -84,12 +85,80 @@ my $formatting_category = {
 };
 # $phrasing_category: all other elements
 
+sub parse_byte_string ($$$$;$) {
+  my $self = ref $_[0] ? shift : shift->new;
+  my $charset = shift;
+  my $bytes_s = ref $_[0] ? $_[0] : \($_[0]);
+  my $s;
+  
+  if (defined $charset) {
+    require Encode;
+    $s = \ (Encode::decode ($charset, $$bytes_s));
+    $self->{input_encoding} = lc $charset; ## TODO: normalize name ## TODO: set $doc->input_encoding
+    $self->{confident} = 1;
+  } else {
+    $s = ref $_[0] ? $_[0] : \($_[0]);
+    $self->{confident} = 0;
+  }
+
+  $self->{change_encoding} = sub {
+    my $self = shift;
+    my $charset = lc shift;
+    ## TODO: if $charset is supported
+    ## TODO: normalize charset name
+
+    ## "Change the encoding" algorithm:
+
+    ## Step 1    
+    if ($charset eq 'utf-16') { ## ISSUE: UTF-16BE -> UTF-8? UTF-16LE -> UTF-8?
+      $charset = 'utf-8';
+    }
+
+    ## Step 2
+    if (defined $self->{input_encoding} and
+        $self->{input_encoding} eq $charset) {
+      $self->{confident} = 1;
+      return;
+    }
+
+    $self->{parse_error}-> (type => 'charset label detected', level => 'w');
+
+    ## Step 3
+    # if (can) {
+      ## change the encoding on the fly.
+      #$self->{confident} = 1;
+      #return;
+    # }
+
+    ## Step 4
+    throw Whatpm::HTML::RestartParser (charset => $charset);
+  }; # $self->{change_encoding}
+
+  my @args = @_; shift @args; # $s
+  my $return;
+  try {
+    $return = $self->parse_char_string ($s, @args);  
+  } catch Whatpm::HTML::RestartParser with {
+    my $charset = shift->{charset};
+    $s = \ (Encode::decode ($charset, $$bytes_s));    
+    $self->{input_encoding} = $charset; ## TODO: $doc->input_encoding;
+    $self->{confident} = 1;
+    $return = $self->parse_char_string ($s, @args);
+  };
+  return $return;
+} # parse_byte_string
+
+*parse_char_string = \&parse_string;
+
 sub parse_string ($$$;$) {
-  my $self = shift->new;
-  my $s = \$_[0];
+  my $self = ref $_[0] ? shift : shift->new;
+  my $s = ref $_[0] ? $_[0] : \($_[0]);
   $self->{document} = $_[1];
+  @{$self->{document}->child_nodes} = ();
 
   ## NOTE: |set_inner_html| copies most of this method's code
+
+  $self->{confident} = 1 unless exists $self->{confident};
 
   my $i = 0;
   my $line = 1;
@@ -146,6 +215,12 @@ sub new ($) {
   };
   $self->{parse_error} = sub {
     # 
+  };
+  $self->{change_encoding} = sub {
+    # if ($_[0] is a supported encoding) {
+    #   run "change the encoding" algorithm;
+    #   throw Whatpm::HTML::RestartParser (charset => $new_encoding);
+    # }
   };
   $self->{application_cache_selection} = sub {
     #
@@ -3683,23 +3758,21 @@ sub _tree_construction_main ($) {
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
 
               unless ($self->{confident}) {
-                my $charset;
                 if ($token->{attributes}->{charset}) { ## TODO: And if supported
-                  $charset = $token->{attributes}->{charset}->{value};
-                }
-                if ($token->{attributes}->{'http-equiv'}) {
+                  $self->{change_encoding}
+                      ->($self, $token->{attributes}->{charset}->{value});
+                } elsif ($token->{attributes}->{content}) {
                   ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
-                  if ($token->{attributes}->{'http-equiv'}->{value}
+                  if ($token->{attributes}->{content}->{value}
                       =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
                           [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                           ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
-                    $charset = defined $1 ? $1 : defined $2 ? $2 : $3;
-                  } ## TODO: And if supported
+                    $self->{change_encoding}
+                        ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
+                  }
                 }
-                ## TODO: Change the encoding
               }
 
-              ## TODO: Extracting |charset| from |meta|.
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               $token = $self->_get_next_token;
@@ -5512,20 +5585,19 @@ sub _tree_construction_main ($) {
         pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
 
         unless ($self->{confident}) {
-          my $charset;
           if ($token->{attributes}->{charset}) { ## TODO: And if supported
-            $charset = $token->{attributes}->{charset}->{value};
-          }
-          if ($token->{attributes}->{'http-equiv'}) {
+            $self->{change_encoding}
+                ->($self, $token->{attributes}->{charset}->{value});
+          } elsif ($token->{attributes}->{content}) {
             ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
-            if ($token->{attributes}->{'http-equiv'}->{value}
+            if ($token->{attributes}->{content}->{value}
                 =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
                     [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                     ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
-              $charset = defined $1 ? $1 : defined $2 ? $2 : $3;
-            } ## TODO: And if supported
+              $self->{change_encoding}
+                  ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
+            }
           }
-          ## TODO: Change the encoding
         }
 
         $token = $self->_get_next_token;
@@ -6620,6 +6692,8 @@ sub set_inner_html ($$$) {
   my $s = \$_[0];
   my $onerror = $_[1];
 
+  ## ISSUE: Should {confident} be true?
+
   my $nt = $node->node_type;
   if ($nt == 9) {
     # MUST
@@ -6772,5 +6846,8 @@ sub set_inner_html ($$$) {
 
 } # tree construction stage
 
+package Whatpm::HTML::RestartParser;
+push our @ISA, 'Error';
+
 1;
-# $Date: 2007/11/11 04:59:35 $
+# $Date: 2007/11/11 06:54:36 $

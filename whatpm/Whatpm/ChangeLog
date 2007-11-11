@@ -1,5 +1,13 @@
 2007-11-11  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src (parse_byte_string): New method.
+	(parse_char_string): New alias for |parse_string|.
+	(main phase): Invoking "change the encoding" algorithm if desired.
+
+	* HTML.pod: Updated.
+
+2007-11-11  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pod (get_inner_html): Removed.
 
 	* Makefile (HTML-all, HTML-clean): New.

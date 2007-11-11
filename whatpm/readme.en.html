@@ -122,9 +122,15 @@ demo</a>
 <h2>Dependency</h2>
 
 <dl>
-<dt>Perl 5.8 or later</dt>
+<dt id=dependency-perl>Perl 5.8 or later</dt>
   <dd>It is recommended to use newer stable release of Perl 5.8 (or
   later).</dd>
+  <dd id=dependency-encode>Some modules require <code>Encode</code>
+  modules, which are part of standard Perl distribution.</dd>
+<dt id=dependency-error><a href="http://search.cpan.org/author/SHLOMIF/Error-0.17009/lib/Error.pm"><code>Error</code></a></dt>
+  <dd>Module <code>Whatpm::HTML</code> requires <code>Error</code>,
+  which is bundled in
+  <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.</dd>
 <dt><code>Message::IMT::InternetMediaType</code></dt>
   <dd>Module <code>Whatpm::IMTChecker</code> depends on
   <code>Message::IMT::InternetMediaType</code>, which is part of 
@@ -189,7 +195,8 @@ repository</a>.</p>
 <h2>Acknowledgments</h2>
 
 <p>Thanks to the <a href="http://code.google.com/p/html5lib/">html5lib</a> 
-team for <a href="http://html5lib.googlecode.com/svn/trunk/testdata/">HTML5 
+team for their
+<a href="http://html5lib.googlecode.com/svn/trunk/testdata/">HTML5 
 parser test data</a>.</p>
 </div>
 

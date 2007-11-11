@@ -13,7 +13,7 @@ Whatpm::HTML - An HTML Parser and Serializer
     warn $error{type}, "\n";
   };
   
-  Whatpm::HTML->parse_string ($s => $doc, $onerror);
+  Whatpm::HTML->parse_char_string ($s => $doc, $onerror);
   
   ## Now, |$doc| is the DOM representation of |$s|.
 
@@ -37,7 +37,7 @@ Web Hypertext Application Technologies.
 
 =over 4
 
-=item [I<$doc> =] Whatpm::HTML->parse_string (I<$s>, I<$doc>[, I<$onerror>]);
+=item [I<$doc> =] Whatpm::HTML->parse_char_string (I<$s>, I<$doc>[, I<$onerror>]);
 
 Parse a string I<$s> as an HTML document.
 
@@ -75,7 +75,7 @@ from a string containing HTML document might be coded as:
 
   use Whatpm::HTML;
   use Whatpm::NanoDOM;
-  my $doc = Whatpm::HTML->parse_string
+  my $doc = Whatpm::HTML->parse_char_string
       ($s => Whatpm::NanoDOM::Document->new, $onerror);
 
 =back
@@ -106,6 +106,8 @@ Whatpm Error Types <http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
 
 =head1 TO DO
 
+Documentation for parse_byte_string.
+
 Tokenizer should emit a sequence of character tokens as one token
 to improve performance.
 
@@ -116,6 +118,13 @@ Charset detection algorithm.
 Documentation for the setter of inner_html.
 
 And there are many "TODO"s and "ISSUE"s in the source code.
+
+=head1 DEPENDENCY
+
+This module requires L<Error>.  That module is available at CPAN
+<http://search.cpan.org/author/SHLOMIF/Error-0.17009/lib/Error.pm>.
+It is also part of manakai-core distribution
+<http://suika.fam.cx/www/2006/manakai/>.
 
 =head1 SEE ALSO
 
@@ -145,4 +154,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/11/11 04:59:36 $
+# $Date: 2007/11/11 06:54:36 $
