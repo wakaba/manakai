@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::HTML::Serializer - HTML DOM Serializer</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::HTML::Serializer - HTML DOM Serializer</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  require Whatpm::HTML::Serializer;
+  
+  ## Serialize an HTML document
+  my $html = Whatpm::HTML::Serializer-&gt;get_inner_html ($doc);
+  ## NOTE: $html = $doc-&gt;inner_html is preferred.
+  
+  ## Serialize an HTML element
+  my $html = Whatpm::HTML::Serializer-&gt;get_inner_html ($el);
+  ## NOTE: $html = $el-&gt;inner_html is preferred.
+  
+  ## Serialize an HTML document fragment
+  my $html = Whatpm::HTML::Serializer-&gt;get_inner_html ($df);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Whatpm::HTML::Serializer</code> module provides a function that
+implements the fragment serialization algorithm of HTML5.  It can
+be used to serialize a HTML <code>Document</code> or <code>Element</code> node into
+an HTML document or fragment.</p>
+<p>Note that the algorithm cannot be used to serialize an arbitrary 
+DOM tree; an attempt to serialize a DOM that cannot be represented
+in a static HTML document (fragment) will result in an invalid 
+document or in a document representing different DOM tree.</p>
+<p>For example, the DOM tree:</p>
+<pre>
+  +- Element |p|
+       +- Element |ul|</pre>
+<p>... cannot be represented in HTML serialization.  The serialization
+algorithm will generate an invalid HTML fragment:</p>
+<pre>
+  &lt;p&gt;&lt;ul&gt;&lt;/ul&gt;&lt;/p&gt;</pre>
+<p>... which represents another DOM tree:</p>
+<pre>
+  +- Element |p|
+  +- Element |ul|
+  (with &quot;invalid &lt;/p&gt;&quot; error)</pre>
+<p>... without raising any error or warning.  This is a limitation of
+the HTML serialization format and the fragment serialization algorithm.</p>
+<p><strong>NOTE</strong>: Usually you don't have to call this module directly,
+since <a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a> and <a href="../../Message/DOM/Element.html">the Message::DOM::Element manpage</a>
+modules implement the <code>inner_html</code> attribute for
+DOM <code>Document</code> and <code>Element</code> nodes.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_get_inner_html"><em>$html</em> = Whatpm::HTML::Serializer-&gt;get_inner_html (<em>$node</em>, [<em>$onerror</em>])</a></strong><br />
+</dt>
+<dd>
+Serialize a node by the HTML fragment serialization algorithm.
+</dd>
+<dl>
+<dt><strong><a name="item__24node"><em>$node</em></a></strong><br />
+</dt>
+<dd>
+The node to serialize.  The node must be a DOM <code>Document</code>,
+<code>DocumentFragment</code>, or <code>Element</code> node.
+</dd>
+<p></p>
+<dt><strong><a name="item__24onerror"><em>$onerror</em></a></strong><br />
+</dt>
+<dd>
+A reference to <code>CODE</code>, which will be invoked when an error occurs.
+If the algorithm is required to raise an <code>INVALID_STATE_ERR</code> error,
+i.e. if the algorithm is faced to a <code>Node</code> whose type is different
+from any of ones supported by the algorithm, the <code>CODE</code> is
+invoked with that <code>Node</code> as an argument.  It is expected for the
+<code>CODE</code> to raise an exception.  If no exception is raised,
+the <code>Node</code> is ignored for the purpose of the algorithm.
+</dd>
+<dd>
+<p>If <em>$onerror</em> is omitted, an empty <code>CODE</code> (which does nothing)
+is assumed.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item__24html"><em>$html</em></a></strong><br />
+</dt>
+<dd>
+A <code>SCALAR</code> reference to the result of the HTML fragment serialization 
+algorithm.
+</dd>
+<p></p></dl>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Whatpm &lt;http://suika.fam.cx/www/markup/html/whatpm/readme&gt;.</p>
+<p>HTML5 &lt;http://whatwg.org/html5&gt;.</p>
+<p>manakai's <a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a> and <a href="../../Message/DOM/Element.html">the Message::DOM::Element manpage</a>
+modules are implementing the <code>inner_html</code> attribute.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

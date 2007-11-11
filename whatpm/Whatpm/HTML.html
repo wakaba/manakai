@@ -122,31 +122,6 @@ from a string containing HTML document might be coded as:</p>
   my $doc = Whatpm::HTML-&gt;parse_string
       ($s =&gt; Whatpm::NanoDOM::Document-&gt;new, $onerror);</pre>
 </dd>
-<p></p>
-<dt><strong><a name="item_get_inner_html"><em>$s</em> = Whatpm::HTML-&gt;get_inner_html (<em>$node</em>[, <em>$onerror</em>]);</a></strong><br />
-</dt>
-<dd>
-Return the HTML serialization of a DOM node <em>$node</em>.
-</dd>
-<dd>
-<p>The first argument, <em>$node</em>, MUST be a DOM <code>Document</code>,
-<code>Element</code>, or <code>DocumentFragment</code> node.</p>
-</dd>
-<dd>
-<p>The second argument, <em>$onerror</em>, MUST be a reference to the
-error handling code.  This code will be invoked if a descendant
-of <em>$node</em> is neither of <code>Element</code>, <code>Text</code>, <code>CDATASection</code>,
-<code>Comment</code>, <code>DocumentType</code>, nor <code>EntityReference</code>, so
-that an <code>INVALID_STATE_ERR</code> exception MUST be thrown.
-The code will be invoked with an argument, which is the node
-whose type is invalid.  
-The argument <em>$onerror</em> is optional; if missing, any erroneous
-node is simply ignored.</p>
-</dd>
-<dd>
-<p>The method returns a reference to the <code>inner_html</code> attribute
-value, i.e. the HTML serialization of the <em>$node</em>.</p>
-</dd>
 <p></p></dl>
 <p>
 </p>
@@ -190,6 +165,7 @@ to improve performance.</p>
 <p>Whatpm Error Types
 &lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
 <p>HTML5 &lt;http://whatwg.org/html5&gt;.</p>
+<p><a href="../Whatpm/HTML/Serializer.html">the Whatpm::HTML::Serializer manpage</a>.</p>
 <p><a href="../Whatpm/NanoDOM.html">the Whatpm::NanoDOM manpage</a>.</p>
 <p><a href="../Whatpm/ContentChecker/HTML.html">the Whatpm::ContentChecker::HTML manpage</a>.</p>
 <p>

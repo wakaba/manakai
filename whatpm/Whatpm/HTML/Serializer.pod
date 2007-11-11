@@ -1,0 +1,115 @@
+=head1 NAME
+
+Whatpm::HTML::Serializer - HTML DOM Serializer
+
+=head1 SYNOPSIS
+
+  require Whatpm::HTML::Serializer;
+  
+  ## Serialize an HTML document
+  my $html = Whatpm::HTML::Serializer->get_inner_html ($doc);
+  ## NOTE: $html = $doc->inner_html is preferred.
+  
+  ## Serialize an HTML element
+  my $html = Whatpm::HTML::Serializer->get_inner_html ($el);
+  ## NOTE: $html = $el->inner_html is preferred.
+  
+  ## Serialize an HTML document fragment
+  my $html = Whatpm::HTML::Serializer->get_inner_html ($df);
+
+=head1 DESCRIPTION
+
+The C<Whatpm::HTML::Serializer> module provides a function that
+implements the fragment serialization algorithm of HTML5.  It can
+be used to serialize a HTML C<Document> or C<Element> node into
+an HTML document or fragment.
+
+Note that the algorithm cannot be used to serialize an arbitrary 
+DOM tree; an attempt to serialize a DOM that cannot be represented
+in a static HTML document (fragment) will result in an invalid 
+document or in a document representing different DOM tree.
+
+For example, the DOM tree:
+
+  +- Element |p|
+       +- Element |ul|
+
+... cannot be represented in HTML serialization.  The serialization
+algorithm will generate an invalid HTML fragment:
+
+  <p><ul></ul></p>
+
+... which represents another DOM tree:
+
+  +- Element |p|
+  +- Element |ul|
+  (with "invalid </p>" error)
+
+... without raising any error or warning.  This is a limitation of
+the HTML serialization format and the fragment serialization algorithm.
+
+B<NOTE>: Usually you don't have to call this module directly,
+since L<Message::DOM::Document> and L<Message::DOM::Element>
+modules implement the C<inner_html> attribute for
+DOM C<Document> and C<Element> nodes.
+
+=head1 METHODS
+
+=over 4
+
+=item I<$html> = Whatpm::HTML::Serializer->get_inner_html (I<$node>, [I<$onerror>])
+
+Serialize a node by the HTML fragment serialization algorithm.
+
+=over 4
+
+=item I<$node>
+
+The node to serialize.  The node must be a DOM C<Document>,
+C<DocumentFragment>, or C<Element> node.
+
+=item I<$onerror>
+
+A reference to C<CODE>, which will be invoked when an error occurs.
+If the algorithm is required to raise an C<INVALID_STATE_ERR> error,
+i.e. if the algorithm is faced to a C<Node> whose type is different
+from any of ones supported by the algorithm, the C<CODE> is
+invoked with that C<Node> as an argument.  It is expected for the
+C<CODE> to raise an exception.  If no exception is raised,
+the C<Node> is ignored for the purpose of the algorithm.
+
+If I<$onerror> is omitted, an empty C<CODE> (which does nothing)
+is assumed.
+
+=item I<$html>
+
+A C<SCALAR> reference to the result of the HTML fragment serialization 
+algorithm.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+Whatpm <http://suika.fam.cx/www/markup/html/whatpm/readme>.
+
+HTML5 <http://whatwg.org/html5>.
+
+manakai's L<Message::DOM::Document> and L<Message::DOM::Element>
+modules are implementing the C<inner_html> attribute.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+## $Date: 2007/11/11 04:59:36 $

@@ -78,26 +78,6 @@ from a string containing HTML document might be coded as:
   my $doc = Whatpm::HTML->parse_string
       ($s => Whatpm::NanoDOM::Document->new, $onerror);
 
-=item I<$s> = Whatpm::HTML->get_inner_html (I<$node>[, I<$onerror>]);
-
-Return the HTML serialization of a DOM node I<$node>.
-
-The first argument, I<$node>, MUST be a DOM C<Document>,
-C<Element>, or C<DocumentFragment> node.
-
-The second argument, I<$onerror>, MUST be a reference to the
-error handling code.  This code will be invoked if a descendant
-of I<$node> is neither of C<Element>, C<Text>, C<CDATASection>,
-C<Comment>, C<DocumentType>, nor C<EntityReference>, so
-that an C<INVALID_STATE_ERR> exception MUST be thrown.
-The code will be invoked with an argument, which is the node
-whose type is invalid.  
-The argument I<$onerror> is optional; if missing, any erroneous
-node is simply ignored.
-
-The method returns a reference to the C<inner_html> attribute
-value, i.e. the HTML serialization of the I<$node>.
-
 =back
 
 =head1 LOW-LEVEL INTERFACE
@@ -146,6 +126,8 @@ Whatpm Error Types
 
 HTML5 <http://whatwg.org/html5>.
 
+L<Whatpm::HTML::Serializer>.
+
 L<Whatpm::NanoDOM>.
 
 L<Whatpm::ContentChecker::HTML>.
@@ -163,4 +145,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/11/04 04:34:30 $
+# $Date: 2007/11/11 04:59:36 $
