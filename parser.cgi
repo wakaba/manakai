@@ -51,7 +51,8 @@ if ($mode eq '/html' or $mode eq '/test') {
   my $out;
   $time1 = time;
   if ($mode eq '/html') {
-    $out = Whatpm::HTML->get_inner_html ($doc);
+    require Whatpm::HTML::Serializer;
+    $out = Whatpm::HTML::Serializer->get_inner_html ($doc);
   } else { # test
     $out = test_serialize ($doc);
   }
@@ -160,4 +161,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/08/11 13:54:55 $
+## $Date: 2007/11/11 04:18:27 $
