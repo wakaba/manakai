@@ -1,5 +1,10 @@
 2007-11-11  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src (parse_char_string): Set |inner_encoding|
+	attribute if possible.
+
+2007-11-11  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src (parse_byte_string): New method.
 	(parse_char_string): New alias for |parse_string|.
 	(main phase): Invoking "change the encoding" algorithm if desired.

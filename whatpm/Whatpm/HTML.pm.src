@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.63 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.64 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -92,12 +92,14 @@ sub parse_byte_string ($$$$;$) {
   my $s;
   
   if (defined $charset) {
-    require Encode;
+    require Encode; ## TODO: decode(utf8) don't delete BOM
     $s = \ (Encode::decode ($charset, $$bytes_s));
-    $self->{input_encoding} = lc $charset; ## TODO: normalize name ## TODO: set $doc->input_encoding
+    $self->{input_encoding} = lc $charset; ## TODO: normalize name
     $self->{confident} = 1;
   } else {
-    $s = ref $_[0] ? $_[0] : \($_[0]);
+    $charset = 'windows-1252'; ## TODO: for now.
+    $s = \ (Encode::decode ($charset, $$bytes_s));
+    $self->{input_encoding} = $charset;
     $self->{confident} = 0;
   }
 
@@ -121,7 +123,8 @@ sub parse_byte_string ($$$$;$) {
       return;
     }
 
-    !!!parse-error (type => 'charset label detected', level => 'w');
+    !!!parse-error (type => 'charset label detected:'.$self->{input_encoding}.
+        ':'.$charset, level => 'w');
 
     ## Step 3
     # if (can) {
@@ -141,7 +144,7 @@ sub parse_byte_string ($$$$;$) {
   } catch Whatpm::HTML::RestartParser with {
     my $charset = shift->{charset};
     $s = \ (Encode::decode ($charset, $$bytes_s));    
-    $self->{input_encoding} = $charset; ## TODO: $doc->input_encoding;
+    $self->{input_encoding} = $charset; ## TODO: normalize
     $self->{confident} = 1;
     $return = $self->parse_char_string ($s, @args);
   };
@@ -159,6 +162,8 @@ sub parse_string ($$$;$) {
   ## NOTE: |set_inner_html| copies most of this method's code
 
   $self->{confident} = 1 unless exists $self->{confident};
+  $self->{document}->input_encoding ($self->{input_encoding})
+      if defined $self->{input_encoding};
 
   my $i = 0;
   my $line = 1;
@@ -5444,4 +5449,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2007/11/11 06:54:36 $
+# $Date: 2007/11/11 08:39:42 $

@@ -25,6 +25,7 @@
 
 	<li><a href="#error_reports">ERROR REPORTS</a></li>
 	<li><a href="#to_do">TO DO</a></li>
+	<li><a href="#dependency">DEPENDENCY</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
@@ -50,7 +51,7 @@
     warn $error{type}, &quot;\n&quot;;
   };
   
-  Whatpm::HTML-&gt;parse_string ($s =&gt; $doc, $onerror);
+  Whatpm::HTML-&gt;parse_char_string ($s =&gt; $doc, $onerror);
   
   ## Now, |$doc| is the DOM representation of |$s|.</pre>
 <p>
@@ -72,7 +73,7 @@ Web Hypertext Application Technologies.</p>
 <hr />
 <h1><a name="methods">METHODS</a></h1>
 <dl>
-<dt><strong><a name="item_parse_string">[<em>$doc</em> =] Whatpm::HTML-&gt;parse_string (<em>$s</em>, <em>$doc</em>[, <em>$onerror</em>]);</a></strong><br />
+<dt><strong><a name="item_parse_char_string">[<em>$doc</em> =] Whatpm::HTML-&gt;parse_char_string (<em>$s</em>, <em>$doc</em>[, <em>$onerror</em>]);</a></strong><br />
 </dt>
 <dd>
 Parse a string <em>$s</em> as an HTML document.
@@ -119,7 +120,7 @@ from a string containing HTML document might be coded as:</p>
 <pre>
   use Whatpm::HTML;
   use Whatpm::NanoDOM;
-  my $doc = Whatpm::HTML-&gt;parse_string
+  my $doc = Whatpm::HTML-&gt;parse_char_string
       ($s =&gt; Whatpm::NanoDOM::Document-&gt;new, $onerror);</pre>
 </dd>
 <p></p></dl>
@@ -151,12 +152,21 @@ Whatpm Error Types &lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&g
 </p>
 <hr />
 <h1><a name="to_do">TO DO</a></h1>
+<p>Documentation for parse_byte_string.</p>
 <p>Tokenizer should emit a sequence of character tokens as one token
 to improve performance.</p>
 <p>A method that accepts a byte stream as an input.</p>
 <p>Charset detection algorithm.</p>
 <p>Documentation for the setter of inner_html.</p>
 <p>And there are many ``TODO''s and ``ISSUE''s in the source code.</p>
+<p>
+</p>
+<hr />
+<h1><a name="dependency">DEPENDENCY</a></h1>
+<p>This module requires <em>Error</em>.  That module is available at CPAN
+&lt;http://search.cpan.org/author/SHLOMIF/Error-0.17009/lib/Error.pm&gt;.
+It is also part of manakai-core distribution
+&lt;http://suika.fam.cx/www/2006/manakai/&gt;.</p>
 <p>
 </p>
 <hr />
