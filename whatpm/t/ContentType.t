@@ -2,7 +2,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 1377 }
+BEGIN { plan tests => 1734 }
 
 use Whatpm::ContentType;
 
@@ -260,9 +260,51 @@ for my $v (
     q<text/html>,
   ],
   [
-    qq<<html>\x0A...>,
+    qq< <!DOCTYPE HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(SP)<!DOCTYPE HTML>(LF)...',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<     \x0A\x0B \x0D\x0A\x09<!DOCTYPE HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(WS)<!DOCTYPE HTML>(LF)...',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0A<!DOCTYPE HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(LF)<!DOCTYPE HTML>(LF)...',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq[<html],
+    q<text/plain>, 0,
+    q<text/plain>, '<html',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<htmlplus],
+    q<text/plain>, 0,
+    q<text/plain>, '<htmlplus',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<<html>>,
     q<text/plain>, 0,
     q<text/plain>, '<html>',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<<html>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '<html>(LF)...',
     q<text/html>,
     q<text/html>,
   ],
@@ -292,6 +334,34 @@ for my $v (
     q<text/plain>, 0,
     q<text/plain>, '<html xmlns="...">',
     q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq< <HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(SP)<HTML>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0A<HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(LF)<HTML>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0B\x0D\x0A<HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(WS)<HTML>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0AB\x0D<HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(WS)B(WS)<HTML>(LF)...',
+    q<text/plain>,
     q<text/html>,
   ],
   [
@@ -344,6 +414,34 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq< <HEAD>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(SP)<HEAD>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0A<head>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(LF)<head>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0B\x0D\x0A<head>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(WS)<head>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0AB\x0D<Head>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(WS)B(WS)<Head>(LF)...',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
     qq[<script],
     q<text/plain>, 0,
     q<text/plain>, '<script',
@@ -383,6 +481,34 @@ for my $v (
     q<text/plain>, 0,
     q<text/plain>, '<script language="JavaScript">',
     q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq< <script>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(SP)<script>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0A<script>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(LF)<script>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0B\x0D\x0A<script>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(WS)<script>(LF)...',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0AB\x0D<SCRIPT>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(WS)B(WS)<SCRIPT>(LF)...',
+    q<text/plain>,
     q<text/html>,
   ],
   [
@@ -466,12 +592,41 @@ for my $v (
     q<text/html>,
   ],
   [
+    x (qw(20 09
+          47 49 46 38 39 61 eb 00 36 00 87 00 00 57 3b 23
+          74 34 00 78 38 00 7d 3d 00 7a 55 32 7e 5a 36 7e
+          5a 3a 80 40 01 84 44 05 89 49 0a 8c 4c 0d 83 4b)),
+    q<text/plain>, 0,
+    q<application/octet-stream>, '(WS)GIF89a',
+    q<application/octet-stream>,
+    q<text/html>,
+  ],
+  [
     x (qw(89 50 4e 47 0d 0a 1a 0a 00 00 00 0d 49 48 44 52
           00 00 00 61 00 00 00 2a 08 03 00 00 00 94 47 c5
           3e 00 00 03 00 50 4c 54 45 ff ff ff fc 12 3c 1c)),
     q<text/plain>, 0,
     q<application/octet-stream>, 'PNG',
     q<image/png>,
+    q<text/html>,
+  ],
+  [
+    x (qw(0d 0a
+          89 50 4e 47 0d 0a 1a 0a 00 00 00 0d 49 48 44 52
+          00 00 00 61 00 00 00 2a 08 03 00 00 00 94 47 c5
+          3e 00 00 03 00 50 4c 54 45 ff ff ff fc 12 3c 1c)),
+    q<text/plain>, 0,
+    q<application/octet-stream>, '(CR)(LF)PNG',
+    q<application/octet-stream>,
+    q<text/html>,
+  ],
+  [
+    x (qw(89 50 4e 47 0d 0a 1a 0d 0a 00 00 00 0d 0a 49 48 44 52
+          00 00 00 61 00 00 00 2a 08 03 00 00 00 94 47 c5
+          3e 00 00 03 00 50 4c 54 45 ff ff ff fc 12 3c 1c)),
+    q<text/plain>, 0,
+    q<application/octet-stream>, 'PNG (CR|LF->CRLF)',
+    q<application/octet-stream>,
     q<text/html>,
   ],
   [
@@ -665,5 +820,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2007/11/18 04:26:50 $
+## $Date: 2007/11/18 04:48:36 $
 1;

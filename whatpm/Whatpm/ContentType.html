@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Whatpm::ContentType - Content Type and Character Encoding Sniffer</title>
+<title>Whatpm::ContentType - HTML5 Content Type Sniffer</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
 <link rev="made" href="mailto:admin@suika.fam.cx" />
 </head>
@@ -17,7 +17,6 @@
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#method">METHOD</a></li>
-	<li><a href="#to_do">TO DO</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
@@ -28,7 +27,7 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>Whatpm::ContentType - Content Type and Character Encoding Sniffer</p>
+<p>Whatpm::ContentType - HTML5 Content Type Sniffer</p>
 <p>
 </p>
 <hr />
@@ -48,22 +47,13 @@
       'image/jpeg' =&gt; 1, 'image/png' =&gt; 1, 'image/gif' =&gt; 1, # for example
     },
   );</pre>
-<pre>
-  ## Character Encoding Sniffing for HTML Documents
-  
-  ## NOT IMPLEMENTED YET!</pre>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
 <p>The <code>Whatpm::ContentType</code> module contains media type sniffer
-for Web user agents.  It implements the content type detecting
-algorithm as defined in the Web Applications 1.0 specification.</p>
-<p>In addition, a future version of this module is expected
-to also implement the character encoding detection algorithm
-for HTML documents as described in that specification.</p>
-<p>This module is part of Whatpm - Perl Modules for 
-Web Hypertext Application Technologies.</p>
+for Web user agents.  It implements the content type sniffing
+algorithm as defined in the HTML5 specification.</p>
 <p>
 </p>
 <hr />
@@ -82,16 +72,16 @@ this method MUST be specified as name-value pairs.
 <dt><strong><a name="item_content_type_metadata">content_type_metadata</a></strong><br />
 </dt>
 <dd>
-The Content-Type metadata as defined in Web Applications 1.0.
+The Content-Type metadata, in character string, as defined in HTML5.
 The value of this parameter MUST be an Internet Media Type (with
 any parameters), that match to the <code>media-type</code> rule
 defined in RFC 2616.
 </dd>
 <dd>
 <p>If the <a href="#item_http_content_type_byte"><code>http_content_type_byte</code></a> parameter is specified,
-then this parameter has no effect.  Otherwise,
-this parameter MUST be specified if and only if any Content-Type metadata
-is available.</p>
+then the <a href="#item_content_type_metadata"><code>content_type_metadata</code></a> parameter has no effect.  Otherwise,
+the <a href="#item_content_type_metadata"><code>content_type_metadata</code></a> parameter MUST be specified if and only
+if any Content-Type metadata is available.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_get_file_head">get_file_head</a></strong><br />
@@ -163,16 +153,9 @@ considered as supported.</p>
 <p>
 </p>
 <hr />
-<h1><a name="to_do">TO DO</a></h1>
-<p>Add method for charset detection.</p>
-<p>
-</p>
-<hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p>HTML 5 Working Draft - 
-Determining the type of a new resource in a browsing context
-&lt;http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing&gt;
-(Revision 999, 10 Aug 2007)</p>
+<p>HTML5 - Determining the type of a new resource in a browsing context
+&lt;http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing&gt;</p>
 <p>
 </p>
 <hr />

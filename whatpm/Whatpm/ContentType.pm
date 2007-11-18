@@ -1,6 +1,6 @@
 =head1 NAME
 
-Whatpm::ContentType - Content Type and Character Encoding Sniffer
+Whatpm::ContentType - HTML5 Content Type Sniffer
 
 =head1 SYNOPSIS
 
@@ -19,30 +19,17 @@ Whatpm::ContentType - Content Type and Character Encoding Sniffer
     },
   );
 
-  ## Character Encoding Sniffing for HTML Documents
-  
-  ## NOT IMPLEMENTED YET!
-
 =head1 DESCRIPTION
 
 The C<Whatpm::ContentType> module contains media type sniffer
-for Web user agents.  It implements the content type detecting
-algorithm as defined in the Web Applications 1.0 specification.
-
-In addition, a future version of this module is expected
-to also implement the character encoding detection algorithm
-for HTML documents as described in that specification.
-
-This module is part of Whatpm - Perl Modules for 
-Web Hypertext Application Technologies.
+for Web user agents.  It implements the content type sniffing
+algorithm as defined in the HTML5 specification.
 
 =cut
 
-## TODO: HTML5 revision 1013
-
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -53,7 +40,7 @@ our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r}
 ## determine that content is not HTML and thus safe from XSS attacks, but
 ## then a user agent detects it as HTML anyway and allows script to execute)."
 our @UnknownSniffingTable = (
-  ## Mask, Pattern, Sniffed Type
+  ## Mask, Pattern, Sniffed Type, Has leading "WS" flag
   [
     "\xFF\xFF\xDF\xDF\xDF\xDF\xDF\xDF\xDF\xFF\xDF\xDF\xDF\xDF",
     "\x3C\x21\x44\x4F\x43\x54\x59\x50\x45\x20\x48\x54\x4D\x4C",
@@ -63,16 +50,19 @@ our @UnknownSniffingTable = (
     "\xFF\xDF\xDF\xDF\xDF",
     "\x3C\x48\x54\x4D\x4C", # "<HTML"
     "text/html",
+    1,
   ],
   [
     "\xFF\xDF\xDF\xDF\xDF",
     "\x3C\x48\x45\x41\x44", # "<HEAD"
     "text/html",
+    1,
   ],
   [
     "\xFF\xDF\xDF\xDF\xDF\xDF\xDF",
     "\x3C\x53\x43\x52\x49\x50\x54", # "<SCRIPT"
     "text/html",
+    1,
   ],
   [
     "\xFF\xFF\xFF\xFF\xFF",
@@ -250,11 +240,14 @@ sub get_sniffed_type ($%) {
                 $by =~ /^\xFF\xFE/ or
                 $by =~ /^\x00\x00\xFE\xFF/ or
                 $by =~ /^\xEF\xBB\xBF/;
+        ## ISSUE: There is an ISSUE in the spec.
       }
 
       ## Step 4
       return 'application/octet-stream'
           if $bytes =~ /[\x00-\x08\x0E-\x1A\x1C-\x1F]/;
+
+      ## ISSUE: There is an ISSUE in the spec.
 
       ## Step 5
       return 'text/plain';
@@ -296,10 +289,15 @@ sub get_sniffed_type ($%) {
     my $stream_length = length $bytes;
 
     ## Step 3
-    ROW: for my $row (@UnknownSniffingTable) { # Mask, Pattern, Sniffed Type
+    ROW: for my $row (@UnknownSniffingTable) {
+      ## $row = [Mask, Pattern, Sniffed Type, Has leading WS flag];
+      my $pos = 0;
+      if ($row->[3]) {
+        $pos++ while substr ($bytes, $pos, 1) =~ /^[\x09-\x0D\x20]/;
+      }
       my $pattern_length = length $row->[1];
-      next ROW if $pattern_length > $stream_length;
-      my $data = substr ($bytes, 0, $pattern_length) & $row->[0];
+      next ROW if $pos + $pattern_length > $stream_length;
+      my $data = substr ($bytes, $pos, $pattern_length) & $row->[0];
       return $row->[2] if $data eq $row->[1];
     }
 
@@ -398,16 +396,10 @@ sub get_sniffed_type ($%) {
 
 =back
 
-=head1 TO DO
-
-Add method for charset detection.
-
 =head1 SEE ALSO
 
-HTML 5 Working Draft - 
-Determining the type of a new resource in a browsing context
+HTML5 - Determining the type of a new resource in a browsing context
 <http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing>
-(Revision 999, 10 Aug 2007)
 
 =head1 AUTHOR
 
@@ -423,4 +415,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/18 04:26:50 $
+# $Date: 2007/11/18 04:48:36 $
