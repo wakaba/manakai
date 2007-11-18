@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 128 } 
+BEGIN { plan tests => 139 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
 
 ## TODO: |create_document| tests
 
-my $dom = Message::DOM::DOMImplementation->____new;
+my $dom = Message::DOM::DOMImplementation->new;
 my $doc = $dom->create_document;
 
 ## AUTOLOAD test
@@ -156,7 +156,7 @@ my $html_doc = $doc->implementation->create_document;
   $doc->strict_error_checking (1);
 }
 
-for my $prop (qw/document_uri input_encoding/) {
+for my $prop (qw/document_uri input_encoding manakai_charset/) {
   ok $doc->can ($prop) ? 1 : 0, 1, 'can ' . $prop;
   
   for ('http://absuri.test/', 'reluri', 0, '') {
@@ -168,7 +168,7 @@ for my $prop (qw/document_uri input_encoding/) {
   ok $doc->$prop, undef, $prop . ' undef';
 }
 
-for my $prop (qw/all_declarations_processed/) {
+for my $prop (qw/all_declarations_processed manakai_has_bom/) {
   ok $doc->can ($prop) ? 1 : 0, 1, 'can ' . $prop;
   
   for (1, 0, '') {
@@ -381,4 +381,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/11/18 11:08:43 $

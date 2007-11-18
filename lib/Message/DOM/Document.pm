@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -50,6 +50,7 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    manakai_charset => 1,
     document_uri => 1,
     input_encoding => 1,
   }->{$method_name}) {
@@ -77,6 +78,7 @@ sub AUTOLOAD {
   } elsif ({
     ## Read-write attributes (boolean, trivial accessors)
     all_declarations_processed => 1,
+    manakai_has_bom => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -814,6 +816,9 @@ sub replace_child ($$) {
 ## NOTE: A manakai extension.
 sub all_declarations_processed ($;$);
 
+## TODO: documentation
+sub manakai_charset ($;$);
+
 sub doctype ($) {
   my $self = $_[0];
   for (@{$self->child_nodes}) {
@@ -865,6 +870,9 @@ sub manakai_entity_base_uri ($;$) {
     return $$self->{document_uri};
   }
 } # manakai_entity_base_uri
+
+## TODO: documentation
+sub manakai_has_bom ($;$);
 
 sub input_encoding ($;$);
 
@@ -1232,4 +1240,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/11/11 04:23:32 $
+## $Date: 2007/11/18 11:08:41 $

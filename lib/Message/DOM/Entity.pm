@@ -1,6 +1,6 @@
 package Message::DOM::Entity;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Entity';
 require Message::DOM::Node;
 
@@ -31,6 +31,7 @@ sub AUTOLOAD {
   } elsif ({
     ## Read-write attributes (boolean, trivial accessors)
     has_replacement_tree => 1,
+    manakai_has_bom => 1,
     is_externally_declared => 1,
   }->{$method_name}) {
     no strict 'refs';
@@ -56,6 +57,7 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    manakai_charset => 1,
     input_encoding => 1,
     notation_name => 1,
     public_id => 1,
@@ -97,6 +99,9 @@ sub node_name ($); # read-only trivial accessor
 sub node_type () { 6 } # ENTITY_NODE
 
 ## |Entity| attributes
+
+## TODO: documentation
+sub manakai_charset ($;$);
 
 sub manakai_declaration_base_uri ($;$) {
   ## NOTE: Same as |Notation|'s.
@@ -194,6 +199,9 @@ sub manakai_entity_uri ($;$) {
   }
 } # manakai_entity_uri
 
+## TODO: documentation
+sub manakai_has_bom ($;$);
+
 ## NOTE: Setter is a manakai extension.
 ## TODO: Document it.
 sub input_encoding ($;$);
@@ -277,4 +285,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/11/18 11:08:41 $
