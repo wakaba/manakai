@@ -1,7 +1,8 @@
+#!/usr/bin/perl
 use strict;
 use Test;
 
-BEGIN { plan tests => 888 }
+BEGIN { plan tests => 1377 }
 
 use Whatpm::ContentType;
 
@@ -294,6 +295,55 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq[<head],
+    q<text/plain>, 0,
+    q<text/plain>, '<head',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<HEAD],
+    q<text/plain>, 0,
+    q<text/plain>, '<HEAD',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<head>],
+    q<text/plain>, 0,
+    q<text/plain>, '<head>',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<heaD>],
+    q<text/plain>, 0,
+    q<text/plain>, '<heaD>',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<headache>],
+    q<text/plain>, 0,
+    q<text/plain>, '<headache>',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<head><html>],
+    q<text/plain>, 0,
+    q<text/plain>, '<head><html>',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<head profile="">],
+    q<text/plain>, 0,
+    q<text/plain>, '<head profile="">',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
     qq[<script],
     q<text/plain>, 0,
     q<text/plain>, '<script',
@@ -566,11 +616,15 @@ for my $v (
   ok $st, $v->[3], 'Text or binary: ' . $v->[4];
 
   ## Unknown type
-  $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
-    return $v->[0]; 
-  },
-  supported_image_types => {'image/jpeg' => 1});
-  ok $st, $v->[5], 'Unknown type: ' . $v->[4];
+  for my $ct (undef, 'application/unknown', 'unknown/unknown',
+              'text', '{content_type}', 'text/html; charset=euc-jp;') {
+    $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
+      return $v->[0]; 
+    },
+    http_content_type_byte => $ct,
+    supported_image_types => {'image/jpeg' => 1});
+    ok $st, $v->[5], 'Unknown type: ' . $v->[4];
+  }
 
   ## Image
   for my $img_type (qw(image/png image/gif image/jpeg)) {
@@ -611,5 +665,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2007/08/11 05:44:51 $
+## $Date: 2007/11/18 04:26:50 $
 1;

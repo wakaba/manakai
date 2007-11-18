@@ -42,7 +42,7 @@ Web Hypertext Application Technologies.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -61,12 +61,17 @@ our @UnknownSniffingTable = (
   ],
   [
     "\xFF\xDF\xDF\xDF\xDF",
-    "\x3C\x48\x54\x4D\x4C",
+    "\x3C\x48\x54\x4D\x4C", # "<HTML"
+    "text/html",
+  ],
+  [
+    "\xFF\xDF\xDF\xDF\xDF",
+    "\x3C\x48\x45\x41\x44", # "<HEAD"
     "text/html",
   ],
   [
     "\xFF\xDF\xDF\xDF\xDF\xDF\xDF",
-    "\x3C\x53\x43\x52\x49\x50\x54",
+    "\x3C\x53\x43\x52\x49\x50\x54", # "<SCRIPT"
     "text/html",
   ],
   [
@@ -151,15 +156,15 @@ Named parameters defined for this method:
 
 =item content_type_metadata
 
-The Content-Type metadata as defined in Web Applications 1.0.
+The Content-Type metadata, in character string, as defined in HTML5.
 The value of this parameter MUST be an Internet Media Type (with
 any parameters), that match to the C<media-type> rule
 defined in RFC 2616.
 
 If the C<http_content_type_byte> parameter is specified,
-then this parameter has no effect.  Otherwise,
-this parameter MUST be specified if and only if any Content-Type metadata
-is available.
+then the C<content_type_metadata> parameter has no effect.  Otherwise,
+the C<content_type_metadata> parameter MUST be specified if and only
+if any Content-Type metadata is available.
 
 =item get_file_head
 
@@ -258,18 +263,31 @@ sub get_sniffed_type ($%) {
 
   ## Step 2
   my $official_type = $opt{content_type_metadata};
-  $official_type = $opt{http_content_type_byte} unless defined $official_type;
-  ## ISSUE: RFC 2616 defines no error handling rules
-  if (defined $official_type and
-      $official_type =~ m#^[\x09\x0A\x0D\x20]*([^/;,\s]+/[^/;,\s]+)#) {
-    $official_type = lc $1;
-  } else {
-    ## ISSUE: If there is Content-Type but it has an error, then unknown type?
+  if (defined $opt{http_content_type_byte}) {
+    my $lws = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
+    my $token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+/;
+    if ($opt{http_content_type_byte} =~ m#^$lws($token/$token)$lws(?>;$lws$token=(?>$token|"(?>[\x21\x23-\x5B\x5D-\x7E\x80-\xFF]|$lws|\\[\x00-\x7F])*")$lws)*\z#) {
+      ## Strip parameters
+      $official_type = $1;
+      $official_type =~ tr/A-Z/a-z/;
+    }
+    ## If there is an error, no official type.
+  } elsif (defined $official_type) {
+    ## Strip parameters
+    if ($official_type =~ m#^[\x09\x0A\x0D\x20]*([^/;,\s]+/[^/;,\s]+)#) {
+      $official_type = $1;
+      $official_type =~ tr/A-Z/a-z/;
+    }
+  }
+
+  ## Step 2 ("If") and Step 3
+  if (not defined $official_type or
+      $official_type eq 'unknown/unknown' or
+      $official_type eq 'application/unknown') {
     ## ISSUE: Use of extension (of filename?) is disallowed (WA1 4.7.5)
     ## even if there is no Content-Type header field (RFC 2616 7.2.1)?
 
-    ## Content-Type sniffing: unknown type
-    ## <http://www.whatwg.org/specs/web-apps/current-work/#content-type5>
+    ## Algorithm: "Content-Type sniffing: unknown type"
 
     ## Step 1
     my $bytes = substr $opt{get_file_head}->(512), 0, 512;
@@ -306,14 +324,14 @@ sub get_sniffed_type ($%) {
     return 'text/plain';
   }
 
-  ## Step 3
+  ## Step 4
   if ($official_type =~ /\+xml$/ or 
       $official_type eq 'text/xml' or
       $official_type eq 'application/xml') {
     return $official_type;
   }
 
-  ## Step 4
+  ## Step 5
   if ($opt{supported_image_types}->{$official_type}) {
     ## Content-Type sniffing: image
     ## <http://www.whatwg.org/specs/web-apps/current-work/#content-type6>
@@ -331,7 +349,7 @@ sub get_sniffed_type ($%) {
     return $official_type;
   }
 
-  ## Step 5
+  ## Step 6
   if ($official_type eq 'text/html') {
     ## Content-Type sniffing: feed or HTML
     ## <http://www.whatwg.org/specs/web-apps/current-work/#content-type7>
@@ -374,6 +392,7 @@ sub get_sniffed_type ($%) {
     return 'text/html';
   }
 
+  ## Step 7
   return $official_type;
 } # get_sniffed_type
 
@@ -404,4 +423,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/25 02:44:38 $
+# $Date: 2007/11/18 04:26:50 $
