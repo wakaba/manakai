@@ -62,11 +62,18 @@ algorithm as defined in the HTML5 specification.</p>
 <dt><strong><a name="item_get_sniffed_type"><em>$sniffed_type</em> = Whatpm::ContentType-&gt;get_sniffed_type (<em>named-parameters</em>)</a></strong><br />
 </dt>
 <dd>
-Returns the sniffed type of an entity.  Arguments to
-this method MUST be specified as name-value pairs.
+Returns the sniffed type of an entity.  The sniffed type
+is always represented in lowercase.
 </dd>
 <dd>
-<p>Named parameters defined for this method:</p>
+<p><strong>In list context</strong>, this method returns a list of 
+official type and sniffed type.  Official type is the media
+type as specified in the transfer protocol metadata,
+without any parameters and in lowercase.</p>
+</dd>
+<dd>
+<p>Arguments to this method MUST be specified as name-value pairs.
+Named parameters defined for this method:</p>
 </dd>
 <dl>
 <dt><strong><a name="item_content_type_metadata">content_type_metadata</a></strong><br />

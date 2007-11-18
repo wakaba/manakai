@@ -29,7 +29,7 @@ algorithm as defined in the HTML5 specification.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -137,9 +137,15 @@ my @ImageSniffingTable = (
 
 =item I<$sniffed_type> = Whatpm::ContentType->get_sniffed_type (I<named-parameters>)
 
-Returns the sniffed type of an entity.  Arguments to
-this method MUST be specified as name-value pairs.
+Returns the sniffed type of an entity.  The sniffed type
+is always represented in lowercase.
 
+B<In list context>, this method returns a list of 
+official type and sniffed type.  Official type is the media
+type as specified in the transfer protocol metadata,
+without any parameters and in lowercase.
+
+Arguments to this method MUST be specified as name-value pairs.
 Named parameters defined for this method:
 
 =over 4
@@ -244,13 +250,13 @@ sub get_sniffed_type ($%) {
       }
 
       ## Step 4
-      return 'application/octet-stream'
+      return ('text/plain', 'application/octet-stream')
           if $bytes =~ /[\x00-\x08\x0E-\x1A\x1C-\x1F]/;
 
       ## ISSUE: There is an ISSUE in the spec.
 
       ## Step 5
-      return 'text/plain';
+      return ('text/plain', 'text/plain');
     }
   }
 
@@ -298,7 +304,7 @@ sub get_sniffed_type ($%) {
       my $pattern_length = length $row->[1];
       next ROW if $pos + $pattern_length > $stream_length;
       my $data = substr ($bytes, $pos, $pattern_length) & $row->[0];
-      return $row->[2] if $data eq $row->[1];
+      return ($official_type, $row->[2]) if $data eq $row->[1];
     }
 
     ## Step 4
@@ -307,7 +313,7 @@ sub get_sniffed_type ($%) {
     ## Step 3
     if ($stream_length >= 4) {
       my $by = substr $bytes, 0, 4;
-      return 'text/plain'
+      return ($official_type, 'text/plain')
           if $by =~ /^\xFE\xFF/ or
               $by =~ /^\xFF\xFE/ or
               $by =~ /^\x00\x00\xFE\xFF/ or
@@ -315,18 +321,18 @@ sub get_sniffed_type ($%) {
     }
 
     ## Step 4
-    return 'application/octet-stream'
+    return ($official_type, 'application/octet-stream')
         if $bytes =~ /[\x00-\x08\x0E-\x1A\x1C-\x1F]/;
 
     ## Step 5
-    return 'text/plain';
+    return ($official_type, 'text/plain');
   }
 
   ## Step 4
   if ($official_type =~ /\+xml$/ or 
       $official_type eq 'text/xml' or
       $official_type eq 'application/xml') {
-    return $official_type;
+    return ($official_type, $official_type);
   }
 
   ## Step 5
@@ -338,13 +344,13 @@ sub get_sniffed_type ($%) {
 
     ## Table
     for my $row (@ImageSniffingTable) { # Pattern, Sniffed Type
-      return $row->[1]
+      return ($official_type, $row->[1])
           if substr ($bytes, 0, length $row->[0]) eq $row->[0] and
               $opt{supported_image_types}->{$row->[1]};
     }
 
     ## Otherwise
-    return $official_type;
+    return ($official_type, $official_type);
   }
 
   ## Step 6
@@ -363,17 +369,17 @@ sub get_sniffed_type ($%) {
 
     ## Step 5-8
     1 while $bytes =~ /\G(?:[\x09\x20\x0A\x0D]+|<!--.*?-->|<![^>]*>|<\?.*?\?>)/gcs;
-    return 'text/html' unless $bytes =~ /\G</gc;
+    return ($official_type, 'text/html') unless $bytes =~ /\G</gc;
 
     ## Step 9
     if ($bytes =~ /\Grss/gc) {
-      return 'application/rss+xml';
+      return ($official_type, 'application/rss+xml');
     } elsif ($bytes =~ /\Gfeed/gc) {
-      return 'application/atom+xml';
+      return ($official_type, 'application/atom+xml');
     } elsif ($bytes and $bytes =~ /\Grdf:RDF/gc) {
       # 
     } else {
-      return 'text/html';
+      return ($official_type, 'text/html');
     }
 
     ## Step 10
@@ -382,16 +388,16 @@ sub get_sniffed_type ($%) {
       my $by = $1;
       if ($by =~ m!xmlns[^>=]*=[\x20\x0A\x0D\x09]*["']http://www\.w3\.org/1999/02/22-rdf-syntax-ns#["']! and
           $by =~ m!xmlns[^>=]*=[\x20\x0A\x0D\x09]*["']http://purl\.org/rss/1\.0/["']!) {
-        return 'application/rss+xml';
+        return ($official_type, 'application/rss+xml');
       }
     }
 
     ## Step 11
-    return 'text/html';
+    return ($official_type, 'text/html');
   }
 
   ## Step 7
-  return $official_type;
+  return ($official_type, $official_type);
 } # get_sniffed_type
 
 =back
@@ -415,4 +421,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/18 04:48:36 $
+# $Date: 2007/11/18 05:29:22 $
