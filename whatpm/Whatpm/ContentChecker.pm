@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.50 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.51 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -207,7 +207,7 @@ sub check_document ($$$) {
   $self->{must_level} = 'm';
   $self->{fact_level} = 'f';
   $self->{should_level} = 's';
-  $self->{good_level} = 'g';
+  $self->{good_level} = 'w';
 
   my $docel = $doc->document_element;
   unless (defined $docel) {
@@ -249,7 +249,52 @@ sub check_document ($$$) {
   ## TODO: Check for other items other than document element
   ## (second (errorous) element, text nodes, PI nodes, doctype nodes)
 
-  return $self->check_element ($docel, $onerror);
+  my $return = $self->check_element ($docel, $onerror);
+
+  my $charset_name = $doc->input_encoding;
+  if (defined $charset_name) {
+    require Message::Charset::Info;
+    my $charset = $Message::Charset::Info::IANACharset->{$charset_name};
+
+    if ($doc->manakai_is_html and
+        not $doc->manakai_has_bom and
+        not defined $doc->manakai_charset) {
+      unless ($charset->{is_html_ascii_superset}) {
+        $onerror->(node => $doc, level => $self->{must_level},
+                   type => 'non ascii superset:'.$charset_name);
+      }
+      
+      if (not $self->{has_charset} and
+          not $charset->{iana_names}->{'us-ascii'}) {
+        $onerror->(node => $doc, level => $self->{must_level},
+                   type => 'no character encoding declaration:'.$charset_name);
+      }
+    }
+
+    if ($charset->{iana_names}->{'utf-8'}) {
+      #
+    } elsif ($charset->{iana_names}->{'jis_x0212-1990'} or
+             $charset->{iana_names}->{'x-jis0208'} or
+             $charset->{iana_names}->{'utf-32'} or ## ISSUE: UTF-32BE? UTF-32LE?
+             $charset->{is_ebcdic_based}) {
+      $onerror->(node => $doc,
+                 type => 'character encoding:'.$charset_name,
+                 level => $self->{should_level});
+    } elsif ($charset->{iana_names}->{'cesu-8'} or
+             $charset->{iana_names}->{'utf-8'} or ## ISSUE: UNICODE-1-1-UTF-7?
+             $charset->{iana_names}->{'bocu-1'} or
+             $charset->{iana_names}->{'scsu'}) {
+      $onerror->(node => $doc,
+                 type => 'character encoding:'.$charset_name,
+                 level => $self->{must_level});
+    } else {
+      $onerror->(node => $doc,
+                 type => 'character encoding:'.$charset_name,
+                 level => $self->{good_level});
+    }
+  }
+
+  return $return;
 } # check_document
 
 sub check_element ($$$) {
@@ -260,7 +305,7 @@ sub check_element ($$$) {
   $self->{must_level} = 'm';
   $self->{fact_level} = 'f';
   $self->{should_level} = 's';
-  $self->{good_level} = 'g';
+  $self->{good_level} = 'w';
 
   $self->{pluses} = {};
   $self->{minuses} = {};
@@ -273,6 +318,7 @@ sub check_element ($$$) {
   $self->{has_link_type} = {};
   #$self->{has_uri_attr};
   #$self->{has_hyperlink_element};
+  #$self->{has_charset};
   $self->{return} = {
     class => {},
     id => $self->{id}, table => [], term => $self->{term},
@@ -484,4 +530,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/10/14 09:21:46 $
+# $Date: 2007/11/18 11:06:14 $
