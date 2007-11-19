@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet
+Character Encoding Detection</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#method">METHOD</a></li>
+	<li><a href="#dependency">DEPENDENCY</a></li>
+	<li><a href="#troubleshooting">TROUBLESHOOTING</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet
+Character Encoding Detection</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  require Whatpm::Charset::UniversalCharDet;
+  $charset_name = Whatpm::Charset::UniversalCharDet
+      -&gt;detect_byte_string ($byte_string);
+  # $charset_name: charset name (in lowercase) or undef</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Whatpm::Charset::UniversalCharDet</code> module is a Perl interface to
+the universalchardet character encoding detection.</p>
+<p>The universalchardet is originally developed by Mozilla project
+and then ported to other platforms.  The <code>Whatpm::Charset::UniversalCharDet</code>
+module provides a Perl interface to Universal Encoding Detector,
+a Python port of the Mozilla's universalchardet code.  Future
+version of this module might provide an interface to another
+port of the universalchardet.</p>
+<p>
+</p>
+<hr />
+<h1><a name="method">METHOD</a></h1>
+<dl>
+<dt><strong><a name="item_detect_byte_string"><em>$charset</em> = Whatpm::Charset::UniversalCharDet-&gt;detect_byte_string (<em>$s</em>)</a></strong><br />
+</dt>
+<dd>
+Detect the character encoding of the specified byte string.
+</dd>
+<dl>
+<dt><strong><a name="item__24s"><em>$s</em></a></strong><br />
+</dt>
+<dd>
+The byte string.
+</dd>
+<p></p>
+<dt><strong><a name="item__24charset"><em>$charset</em></a></strong><br />
+</dt>
+<dd>
+The name of the character encoding, detected by universalchardet,
+in lowercase.
+If no character encoding can be detected, because, e.g., no implementation
+for universalchardet is found, <code>undef</code> is returned.
+</dd>
+<dd>
+<p>For the list of supported encodings, see documentation for
+Universal Encoding Detector
+&lt;http://chardet.feedparser.org/docs/supported-encodings.html&gt;.</p>
+</dd>
+<p></p></dl>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="dependency">DEPENDENCY</a></h1>
+<dl>
+<dt><strong><a name="item_inline_3a_3apython"><a href="../../Inline/Python.html">the Inline::Python manpage</a></a></strong><br />
+</dt>
+<dd>
+A Perl module available at CPAN
+&lt;http://search.cpan.org/~neilw/Inline-Python-0.22/&gt;.
+</dd>
+<dd>
+<p>To install the module using <em>CPAN.pm</em>:</p>
+</dd>
+<dd>
+<pre>
+  root# perl -MCPAN -eshell
+  cpan&gt; install Inline::Python</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_python">Python</a></strong><br />
+</dt>
+<dd>
+Available at &lt;http://www.python.org/download/&gt;.
+</dd>
+<p></p>
+<dt><strong><a name="item_universal_encoding_detector">Universal Encoding Detector</a></strong><br />
+</dt>
+<dd>
+Available at &lt;http://chardet.feedparser.org/download/&gt;.
+</dd>
+<dd>
+<p>Expand the archive and then execute <code>python setup.py install</code>
+in the expanded directory.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="troubleshooting">TROUBLESHOOTING</a></h1>
+<p>The <code>Whatpm::Charset::UniversalCharDet</code> module does not raise
+error even when it fails to load the universalchardet library;
+it simply <code>warn</code>s the error message.</p>
+<p>This behavior can be changed by setting a true value to the 
+flag <code>$Whatpm::Charset::UniversalCharDet</code> - it will make any
+error <code>die</code> rather than <code>warn</code>.</p>
+<p>Common error messages are following:</p>
+<dl>
+<dt><strong><a name="item_can_27t_locate_inlinea_2epm_in__40inc">Can't locate Inlinea.pm in @INC</a></strong><br />
+</dt>
+<dd>
+<em>Inline</em> is not installed.
+</dd>
+<p></p>
+<dt><strong><a name="item_error_2e_you_have_specified__27python_27_as_an_inl">Error. You have specified 'Python' as an Inline programming language.</a></strong><br />
+</dt>
+<dd>
+<a href="../../Inline/Python.html">the Inline::Python manpage</a> is not installed.
+</dd>
+<p></p>
+<dt><strong><a name="item_couldn_27t_find_an_appropriate_directory_for_inlin">Couldn't find an appropriate DIRECTORY for Inline to use.</a></strong><br />
+</dt>
+<dd>
+The temporary directory for the <em>Inline</em> module is not available.
+See <a href="../../Inline/Python.html#the_inline_directory">The Inline DIRECTORY in the Inline::Python manpage</a> or
+&lt;http://search.cpan.org/~ingy/Inline-0.44/Inline.pod#The_Inline_DIRECTORY&gt;.
+</dd>
+<p></p>
+<dt><strong><a name="item_error__2d_2d_py_eval_raised_an_exception">Error -- py_eval raised an exception</a></strong><br />
+</dt>
+<dd>
+Universal Encoding Detector is not installed.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>UNIVCHARDET - SuikaWiki
+&lt;http://suika.fam.cx/gate/2005/sw/UNIVCHARDET&gt;</p>
+<p>Universal Encoding Detector: character encoding auto-detection in Python
+&lt;http://chardet.feedparser.org/&gt;</p>
+<p>A composite approach to language/encoding detection
+&lt;http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

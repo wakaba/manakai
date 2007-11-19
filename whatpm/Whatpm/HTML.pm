@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.66 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.67 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -97,7 +97,11 @@ sub parse_byte_string ($$$$;$) {
     $self->{input_encoding} = lc $charset; ## TODO: normalize name
     $self->{confident} = 1;
   } else {
-    $charset = 'windows-1252'; ## TODO: for now.
+    ## TODO: Implement HTML5 detection algorithm
+    require Whatpm::Charset::UniversalCharDet;
+    $charset = Whatpm::Charset::UniversalCharDet->detect_byte_string
+        (substr ($$bytes_s, 0, 1024));
+    $charset ||= 'windows-1252';
     $s = \ (Encode::decode ($charset, $$bytes_s));
     $self->{input_encoding} = $charset;
     $self->{confident} = 0;
@@ -6855,4 +6859,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2007/11/11 08:39:42 $
+# $Date: 2007/11/19 12:18:26 $

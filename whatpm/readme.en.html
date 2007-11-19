@@ -26,6 +26,9 @@ project.</p>
   <dd>An
   <a href="http://www.whatwg.org/specs/web-apps/current-work/#manifests">HTML5
   cache manifest</a> parser.</dd>
+<dt id=whatpm-charset-universalchardet><a href="Whatpm/Charset/UniversalCharDet.html"><code>Whatpm::Charset::UniversalCharDet</code></a></dt>
+  <dd>A Perl interface to universalchardet character encoding detection
+  library.</dd>
 <dt><a href="Whatpm/ContentChecker.html"><code>Whatpm::ContentChecker</code></a></dt>
   <dd>A DOM5 HTML (in-memory representation of a document) conformance
   checker with a partial support for Atom 1.0.  (See also
@@ -127,33 +130,47 @@ demo</a>
   later).</dd>
   <dd id=dependency-encode>Some modules require <code>Encode</code>
   modules, which are part of standard Perl distribution.</dd>
+<dt id=dependency-manakai-core>Modules from
+<a href="http://suika.fam.cx/www/2006/manakai/">manakai-core</a></dt>
+  <dd>
+    <dl>
 <dt id=dependency-error><a href="http://search.cpan.org/author/SHLOMIF/Error-0.17009/lib/Error.pm"><code>Error</code></a></dt>
   <dd>Module <code>Whatpm::HTML</code> requires <code>Error</code>,
   which is bundled in
-  <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.</dd>
+  <a href="http://suika.fam.cx/www/2006/manakai/">manakai-core</a>.</dd>
 <dt><code>Message::IMT::InternetMediaType</code></dt>
   <dd>Module <code>Whatpm::IMTChecker</code> depends on
   <code>Message::IMT::InternetMediaType</code>, which is part of 
-  <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.</dd>
+  <a href="http://suika.fam.cx/www/2006/manakai/">manakai-core</a>.</dd>
 <dt><code>Message::URI::URIReference</code></dt>
   <dd>Modules <code>Whatpm::URIChecker</code> and 
   <code>Whatpm::CacheManifest</code> depend on
   <a href="http://suika.fam.cx/www/manakai-core/lib/Message/URI/URIReference.html"><code>Message::URI::URIReference</code></a>,
   which is part of 
-  <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.</dd>
+  <a href="http://suika.fam.cx/www/2006/manakai/">manakai-core</a>.</dd>
+<dt><code>Message::DOM::DOMImplementation</code> and related modules</dt>
+  <dd><em>Testing</em> for module <code>Whatpm::ContentChecker</code>
+  depends on <code>Message::DOM::DOMImplementation</code> and related modules
+  in <a href="http://suika.fam.cx/www/2006/manakai/">manakai-core</a>.
+  They are not required in practice.</dd>
+    </dl>
+  </dd>
 <dt><a href="http://suika.fam.cx/www/manakai-charlib/readme">manakai 
 charlib</a></dt>
-  <dd>Module <code>Whatpm::Charset::DeocdeHandle</code> depends on
+  <dd>Module <code>Whatpm::Charset::DecodeHandle</code> depends on
   modules in <a href="http://suika.fam.cx/www/manakai-charlib/readme">manakai
   charlib</a> for decoding of <em>Japanese character encodings</em>.
   See the documentation for 
   <a href="http://suika.fam.cx/www/manakai-charlib/readme">manakai
   charlib</a> for more information.</dd>
-<dt><code>Message::DOM::DOMImplementation</code> and related modules</dt>
-  <dd><em>Testing</em> for module <code>Whatpm::ContentChecker</code>
-  depends on <code>Message::DOM::DOMImplementation</code> and related modules
-  in <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.
-  They are not required in practice.</dd>
+<dt><a href="http://www.python.org/">Python</a>, Perl 
+<a href="http://search.cpan.org/~neilw/Inline-Python-0.22/"><code>Inline::Python</code></a>
+module, and <a href="http://chardet.feedparser.org/">Universal Encoding
+Detector</a></dt>
+  <dd>For the module <code>Whatpm::Charset::UniversalCharDet</code> being
+  meaningful, these softwares are requires on the system.  See the
+  <a href="Whatpm/Charset/UniversalCharDet.html#dependency">documentation</a>
+  for more information.</dd>
 <dt><a href="http://search.cpan.org/~makamaka/JSON-1.14/"><code>JSON</code></a></dt>
   <dd><em>Testing</em> for modules <code>Whatpm::HTML</code> and
   <code>Whatpm::CSS::Tokenizer</code>

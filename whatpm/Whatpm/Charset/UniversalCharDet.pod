@@ -1,0 +1,139 @@
+=head1 NAME
+
+Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet
+Character Encoding Detection
+
+=head1 SYNOPSIS
+
+  require Whatpm::Charset::UniversalCharDet;
+  $charset_name = Whatpm::Charset::UniversalCharDet
+      ->detect_byte_string ($byte_string);
+  # $charset_name: charset name (in lowercase) or undef
+
+=head1 DESCRIPTION
+
+The C<Whatpm::Charset::UniversalCharDet> module is a Perl interface to
+the universalchardet character encoding detection.
+
+The universalchardet is originally developed by Mozilla project
+and then ported to other platforms.  The C<Whatpm::Charset::UniversalCharDet>
+module provides a Perl interface to Universal Encoding Detector,
+a Python port of the Mozilla's universalchardet code.  Future
+version of this module might provide an interface to another
+port of the universalchardet.
+
+=head1 METHOD
+
+=over 4
+
+=item I<$charset> = Whatpm::Charset::UniversalCharDet->detect_byte_string (I<$s>)
+
+Detect the character encoding of the specified byte string.
+
+=over 4
+
+=item I<$s>
+
+The byte string.
+
+=item I<$charset>
+
+The name of the character encoding, detected by universalchardet,
+in lowercase.
+If no character encoding can be detected, because, e.g., no implementation
+for universalchardet is found, C<undef> is returned.
+
+For the list of supported encodings, see documentation for
+Universal Encoding Detector
+<http://chardet.feedparser.org/docs/supported-encodings.html>.
+
+=back
+
+=back
+
+=head1 DEPENDENCY
+
+=over 4
+
+=item L<Inline::Python>
+
+A Perl module available at CPAN
+<http://search.cpan.org/~neilw/Inline-Python-0.22/>.
+
+To install the module using L<CPAN.pm>:
+
+  root# perl -MCPAN -eshell
+  cpan> install Inline::Python
+
+=item Python
+
+Available at <http://www.python.org/download/>.
+
+=item Universal Encoding Detector
+
+Available at <http://chardet.feedparser.org/download/>.
+
+Expand the archive and then execute C<python setup.py install>
+in the expanded directory.
+
+=back
+
+=head1 TROUBLESHOOTING
+
+The C<Whatpm::Charset::UniversalCharDet> module does not raise
+error even when it fails to load the universalchardet library;
+it simply C<warn>s the error message.
+
+This behavior can be changed by setting a true value to the 
+flag C<$Whatpm::Charset::UniversalCharDet> - it will make any
+error C<die> rather than C<warn>.
+
+Common error messages are following:
+
+=over 4
+
+=item Can't locate Inlinea.pm in @INC
+
+L<Inline> is not installed.
+
+=item Error. You have specified 'Python' as an Inline programming language.
+
+L<Inline::Python> is not installed.
+
+=item Couldn't find an appropriate DIRECTORY for Inline to use.
+
+The temporary directory for the L<Inline> module is not available.
+See L<Inline::Python/"The Inline DIRECTORY"> or
+<http://search.cpan.org/~ingy/Inline-0.44/Inline.pod#The_Inline_DIRECTORY>.
+
+=item Error -- py_eval raised an exception
+
+Universal Encoding Detector is not installed.
+
+=back
+
+=head1 SEE ALSO
+
+UNIVCHARDET - SuikaWiki
+<http://suika.fam.cx/gate/2005/sw/UNIVCHARDET>
+
+Universal Encoding Detector: character encoding auto-detection in Python
+<http://chardet.feedparser.org/>
+
+A composite approach to language/encoding detection
+<http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html>
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+## $Date: 2007/11/19 12:18:27 $
