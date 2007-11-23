@@ -1023,6 +1023,7 @@ id=""><span id=""></span></p>
 #errors
 /meta/@charset;attribute not allowed
 /meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta http-equiv="refresh" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1046,6 +1047,7 @@ id=""><span id=""></span></p>
 #errors
 /meta/@charset;attribute not allowed
 /meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta http-equiv="" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1064,6 +1066,7 @@ id=""><span id=""></span></p>
 #errors
 /meta/@content;attribute not allowed
 /meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1074,11 +1077,66 @@ id=""><span id=""></span></p>
 #data html
 <!DOCTYPE HTML><html><head><meta charset="us-ascii"><title></title></head><body>
 #errors
+/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+
+#data
+<meta charset="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::;unsupported
+/meta/@charset;charset:syntax error:;m
+/meta/@charset;charset:not registered:;w
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
+
+#data
+<meta charset="US-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
+
+#data
+<meta charset="csiso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::csiso2022jp;unsupported
+/meta/@charset;charset:not preferred:csiso2022jp;m
+
+#data
+<meta charset="iso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::iso2022jp;unsupported
+/meta/@charset;charset:not preferred:iso2022jp;m
+/meta/@charset;charset:not registered:iso2022jp;w
+
+#data
+<meta charset="x-utf-8" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::x-utf-8;unsupported
+/meta/@charset;charset:not preferred:x-utf-8;m
+/meta/@charset;charset:private:x-utf-8;w
+
+#data
+<meta charset="utf-8n" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::utf-8n;unsupported
+/meta/@charset;charset:not preferred:utf-8n;m
+/meta/@charset;charset:not registered:utf-8n;w
+
+#data
+<meta charset="x-sjis" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::x-sjis;unsupported
+/meta/@charset;charset:not preferred:x-sjis;m
+/meta/@charset;charset:private:x-sjis;w
 
 #data
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>

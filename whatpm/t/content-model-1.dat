@@ -120,6 +120,7 @@
 #errors
 /head;child element missing:title
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -222,6 +223,7 @@
 </head>
 #errors
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -231,6 +233,7 @@
 #errors
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -294,6 +297,7 @@
 <head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><base/><title></title></head>
 #errors
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 /head/base;attribute missing:href|target
 
 #data
@@ -302,6 +306,7 @@
 /head/base;element not allowed
 /head/base;attribute missing:href|target
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><base/></head>
@@ -316,6 +321,7 @@
 /head/base;attribute missing:href|target
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -326,6 +332,7 @@
 #errors
 /head/base;element not allowed
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -336,6 +343,7 @@
 #errors
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -346,6 +354,7 @@
 #errors
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -372,6 +381,7 @@
 #errors
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -381,6 +391,7 @@
 </head>
 #errors
 /head/meta/@charset;in XML:charset
+/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"></base>
@@ -426,23 +437,27 @@
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"></meta>
 #errors
 /meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"> </meta>
 #errors
 /meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">a</meta>
 #errors
 /meta/"a";character not allowed
 /meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"><p/></meta>
 #errors
 /meta/p;element not allowed
 /meta/@charset;in XML:charset
+/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -455,6 +470,7 @@
 /head/noscript;in XML:noscript
 /head/noscript/meta;element not allowed
 /head/noscript/meta/@charset;in XML:charset
+/head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -3002,6 +3018,7 @@ aaa
 /head/noscript/noscript;element not allowed
 /head/noscript/noscript/meta;element not allowed
 /head/noscript/noscript/meta/@charset;in XML:charset
+/head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -3044,6 +3061,7 @@ aaa
 /noscript;in XML:noscript
 /noscript/meta;element not allowed
 /noscript/meta/@charset;in XML:charset
+/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -3607,6 +3625,7 @@ aaa
 </rule>
 #errors
 /rule/head/meta/@charset;in XML:charset
+/rule/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3614,6 +3633,7 @@ aaa
 </rule>
 #errors
 /rule/head/meta/@charset;in XML:charset
+/rule/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><style><nest/></style></rule>

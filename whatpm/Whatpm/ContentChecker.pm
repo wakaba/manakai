@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.51 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.52 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -251,6 +251,7 @@ sub check_document ($$$) {
 
   my $return = $self->check_element ($docel, $onerror);
 
+  ## TODO: Test for these checks are necessary.
   my $charset_name = $doc->input_encoding;
   if (defined $charset_name) {
     require Message::Charset::Info;
@@ -292,6 +293,12 @@ sub check_document ($$$) {
                  type => 'character encoding:'.$charset_name,
                  level => $self->{good_level});
     }
+  } elsif ($doc->manakai_is_html) {
+    ## NOTE: MUST and SHOULD requirements above cannot be tested,
+    ## since the document has no input charset encoding information.
+    $onerror->(node => $doc,
+               type => 'character encoding:',
+               level => 'unsupported');
   }
 
   return $return;
@@ -530,4 +537,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/18 11:06:14 $
+# $Date: 2007/11/23 05:39:43 $

@@ -2,7 +2,7 @@
 use strict;
 
 use Test;
-BEGIN { plan tests => 1441 }
+BEGIN { plan tests => 1448 }
 
 my @FILES = qw[
   t/content-model-1.dat
@@ -17,7 +17,7 @@ my @FILES = qw[
 require Whatpm::ContentChecker;
 
 ## ISSUE: Currently we require manakai XML parser to test arbitrary XML tree.
-use lib qw[/home/wakaba/work/manakai/lib];
+use lib qw[/home/wakaba/work/manakai2/lib];
 require Message::DOM::DOMImplementation;
 require Message::DOM::XMLParserTemp;
 require Whatpm::HTML;
@@ -69,6 +69,7 @@ sub test ($) {
     open my $fh, '<', \($test->{data});
     $doc = Message::DOM::XMLParserTemp->parse_byte_stream
       ($fh => $dom, sub { }, charset => 'utf-8');
+    $doc->input_encoding (undef);
     ## NOTE: There should be no well-formedness error; if there is,
     ## then it is an error of the test case itself.
   } else {
@@ -115,4 +116,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/11/11 02:25:51 $
+## $Date: 2007/11/23 05:39:43 $

@@ -1302,7 +1302,81 @@ $Element->{$HTML_NS}->{meta} = {
         $self->{onerror}->(node => $charset_attr,
                            type => 'in XML:charset');
       }
-      ## TODO: charset
+
+      my $charset_value = $charset_attr->value;
+      ## NOTE: Though the case-sensitivility of |charset| attribute value
+      ## is not explicitly spelled in the HTML5 spec, the Character Set
+      ## registry of IANA, which is referenced from HTML5 spec, says that
+      ## charset name is case-insensitive.
+      $charset_value =~ tr/A-Z/a-z/; ## NOTE: ASCII Case-insensitive.
+
+      require Message::Charset::Info;
+      my $charset = $Message::Charset::Info::IANACharset->{$charset_value};
+      my $ic = $todo->{node}->owner_document->input_encoding;
+      if (defined $ic) {
+        ## TODO: Test for this case
+        my $ic_charset = $Message::Charset::Info::IANACharset->{$ic};
+        if ($charset ne $ic_charset) {
+          $self->{onerror}->(node => $charset_attr,
+                             type => 'mismatched charset name:'.$ic.
+                                 ':'.$charset_value,
+                             level => 'm');
+        }
+      } else {
+        ## NOTE: MUST, but not checkable, since the document is not originally
+        ## in serialized form (or the parser does not preserve the input
+        ## encoding information).
+        $self->{onerror}->(node => $charset_attr,
+                           type => 'mismatched charset name::'.$charset_value,
+                           level => 'unsupported');
+      }
+      
+      ## ISSUE: What is "valid character encoding name"?  Syntactically valid?
+      ## Syntactically valid and registered?  What about x-charset names?
+      unless (Message::Charset::Info::is_syntactically_valid_iana_charset_name
+                  ($charset_value)) {
+        $self->{onerror}->(node => $charset_attr,
+                           type => 'charset:syntax error:'.$charset_value,
+                           level => 'm');
+      }
+
+      if ($charset) {
+        ## ISSUE: What is "the preferred name for that encoding" (for a charset
+        ## with no "preferred MIME name" label)?
+        my $charset_status = $charset->{iana_names}->{$charset_value} || 0;
+        if (($charset_status &
+             Message::Charset::Info::PREFERRED_CHARSET_NAME ())
+                != Message::Charset::Info::PREFERRED_CHARSET_NAME ()) {
+          $self->{onerror}->(node => $charset_attr,
+                             type => 'charset:not preferred:'.
+                                 $charset_value,
+                             level => 'm');
+        }
+        if (($charset_status &
+             Message::Charset::Info::REGISTERED_CHARSET_NAME ())
+                != Message::Charset::Info::REGISTERED_CHARSET_NAME ()) {
+          if ($charset_value =~ /^x-/) {
+            $self->{onerror}->(node => $charset_attr,
+                               type => 'charset:private:'.$charset_value,
+                               level => $self->{good_level});
+          } else {
+            $self->{onerror}->(node => $charset_attr,
+                               type => 'charset:not registered:'.
+                                   $charset_value,
+                               level => $self->{good_level});
+          }
+        }
+      } elsif ($charset_value =~ /^x-/) {
+        $self->{onerror}->(node => $charset_attr,
+                             type => 'charset:private:'.$charset_value,
+                             level => $self->{good_level});
+      } else {
+        $self->{onerror}->(node => $charset_attr,
+                             type => 'charset:not registered:'.$charset_value,
+                             level => $self->{good_level});
+      }
+
+      ## TODO: no character reference - not checkable at this stage.
     }
   },
   checker => $HTMLEmptyChecker,

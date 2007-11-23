@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -271,6 +271,21 @@ sub manakai_compat_mode ($;$) {
     return 'no quirks';
   }
 } # manakai_compat_mode
+
+sub input_encoding ($;$) {
+  $_[0]->{input_encoding} = $_[1] if @_ > 1;
+  return $_[0]->{input_encoding};
+}
+
+sub manakai_charset ($;$) {
+  $_[0]->{manakai_charset} = $_[1] if @_ > 1;
+  return $_[0]->{manakai_charset};
+}
+
+sub manakai_has_bom ($;$) {
+  $_[0]->{manakai_has_bom} = $_[1] if @_ > 1;
+  return $_[0]->{manakai_has_bom};
+}
 
 package Whatpm::NanoDOM::Element;
 push our @ISA, 'Whatpm::NanoDOM::Node';
@@ -537,4 +552,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/10/17 10:46:26 $
+# $Date: 2007/11/23 05:39:43 $
