@@ -9,16 +9,27 @@ our $Type;
 
 my $application_xml_charset = { ## TODO: ...
   syntax => 'token',
+  registered => 1,
 };
 
 $Type->{application}->{registered} = 1;
+
+$Type->{application}->{subtype}->{'atom+xml'} = { ## NOTE: RFC 4287
+  parameter => {
+    type => { ## NOTE: RFC 5023
+      ## TODO: "entry"|"feed" (case-insensitive)
+      registered => 1,
+      ## NOTE: SHOULD for Atom Entry Document.
+    },
+  },
+  registered => 1,
+};
 
 $Type->{application}->{subtype}->{'rdf+xml'} = { # RFC 3870
   parameter => {
     charset => $application_xml_charset,
   },
   registered => 1,
-
   ## RECOMMENDED that an RDF document follows new RDF/XML spec
   ## rather than 1999 spec - this is not testable in this layer.
 };
@@ -43,29 +54,29 @@ $Type->{text}->{registered} = 1;
 
 $Type->{text}->{subtype}->{plain} = {
   parameter => {
-    charset => {syntax => 'token'}, # RFC 2046 ## TODO: registered?
-    'charset-edition' => {}, # RFC 1922
-    'charset-extension' => {syntax => 'token'}, # RFC 1922 ## TODO: registered?
+    charset => {syntax => 'token', registered => 1}, # RFC 2046 ## TODO: registered?
+    'charset-edition' => {registered => 1}, # RFC 1922
+    'charset-extension' => {syntax => 'token', registered => 1}, # RFC 1922 ## TODO: registered?
   },
   registered => 1,
 };
 $Type->{text}->{subtype}->{html} = { # RFC 2854
   parameter => {
-    charset => {}, ## TODO: UTF-8 is preferred ## TODO: strongly recommended that it always be present ## NOTE: Syntax and range are not defined.
-    level => {obsolete =>1}, # RFC 1866
+    charset => {registered => 1}, ## TODO: UTF-8 is preferred ## TODO: strongly recommended that it always be present ## NOTE: Syntax and range are not defined.
+    level => {obsolete => 1}, # RFC 1866
     version => {obsolete => 1}, # HTML 3.0
   },
   registered => 1,
 };
 $Type->{text}->{subtype}->{css} = { # RFC 2318
   parameter => {
-    charset => {}, ## TODO: US-ASCII, iso-8859-X, utf-8 are recommended ## TODO: Any charset that is a superset of US-ASCII may be used ## NOTE: Syntax and range are not defined.
+    charset => {registered => 1}, ## TODO: US-ASCII, iso-8859-X, utf-8 are recommended ## TODO: Any charset that is a superset of US-ASCII may be used ## NOTE: Syntax and range are not defined.
   },
   registered => 1,
 };
 $Type->{text}->{subtype}->{javascript} = { # RFC 4329
   parameter => {
-    charset => {syntax => 'mime-charset'}, ## TODO: SHOULD be registered
+    charset => {syntax => 'mime-charset', registered => 1}, ## TODO: SHOULD be registered
     e4x => {checker => sub { # HTML5 (but informative?)
       my ($value, $onerror) = @_;
       unless ($value eq '1') {
@@ -89,6 +100,7 @@ $Type->{audio}->{subtype}->{mpeg} = { # RFC 3003
 };
 my $CodecsParameter = { # RFC 4281
   ## TODO: syntax and value check
+  registered => 1,
 };
 $Type->{audio}->{subtype}->{'3gpp'} = {
   parameter => {
@@ -119,10 +131,10 @@ $Type->{video}->{subtype}->{'3gpp2'} = { # RFC 4393
 };
 $Type->{application}->{subtype}->{'octet-stream'} = {
   parameter => {
-    conversions => {obsolete => 1}, # RFC 1341 ## TODO: syntax
-    name => {obsolete => 1}, # RFC 1341
-    padding => {}, # RFC 2046
-    type => {}, # RFC 2046
+    conversions => {obsolete => 1, registered => 1}, # RFC 1341 ## TODO: syntax
+    name => {obsolete => 1, registered => 1}, # RFC 1341
+    padding => {registered => 1}, # RFC 2046
+    type => {registered => 1}, # RFC 2046
   },
   registered => 1,
 };
@@ -146,12 +158,13 @@ $Type->{multipart}->{parameter}->{boundary} = {
     }
   },
   required => 1,
+  registered => 1,
 };
 $Type->{message}->{subtype}->{partial} = {
   parameter => {
-    id => {required => 1}, # RFC 2046
-    number => {required => 1}, # RFC 2046
-    total => {}, # RFC 2046 # required for the last fragment
+    id => {required => 1, registered => 1}, # RFC 2046
+    number => {required => 1, registered => 1}, # RFC 2046
+    total => {registered => 1}, # RFC 2046 # required for the last fragment
   },
   registered => 1,
 };
@@ -160,20 +173,24 @@ $Type->{message}->{subtype}->{'external-body'} = {
     'access-type' => {
       required => 1,
       syntax => 'token', ## TODO: registry?
+      registered => 1,
     }, # RFC 2046
-    expiration => {syntax => 'MIME date-time'}, # RFC 2046
-    permission => {}, # RFC 2046
-    size => {}, # RFC 2046
+    expiration => {syntax => 'MIME date-time', registered => 1}, # RFC 2046
+    permission => {registered => 1}, # RFC 2046
+    size => {registered => 1}, # RFC 2046
     ## TODO: access-type dependent parameters
   },
   registered => 1,
 };
 
+our $MUSTLevel = 'm'; ## NOTE: RFC 2119 "MUST".
+our $StronglyDiscouragedLevel = 's'; ## NOTE: "strongly discouraged".
+
 sub check_imt ($$$$@) {
   my (undef, $onerror, $type, $subtype, @parameter) = @_;
 
-  require Message::IMT::InternetMediaType; ## From manakai
-  my $dom = 'Message::DOM::DOMImplementation'; ## ISSUE: This is not a formal way to instantiate it.
+  require Message::IMT::InternetMediaType;
+  my $dom = Message::DOM::DOMImplementation->new;
 
   local $Error::Depth = $Error::Depth + 1;
 
@@ -188,41 +205,73 @@ sub check_imt ($$$$@) {
   my $type = $imt->top_level_type;
   my $subtype = $imt->subtype;
 
+  ## NOTE: RFC 2045 (MIME), RFC 2616 (HTTP/1.1), and RFC 4288 (IMT
+  ## registration) have different requirements on type and subtype names.
+  if ($type !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
+    $onerror->(type => 'type:syntax error:'.$type, level => $MUSTLevel);
+  }
+  if ($subtype !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
+    $onerror->(type => 'subtype:syntax error:'.$subtype, level => $MUSTLevel);
+  }
+
   my $type_def = $Type->{$type};
   my $has_param;
 
-  if ($type =~ /^x[-\.]/) { ## TODO: Is there x. tree?
-    $onerror->(type => 'private type', level => 's'); ## TODO: What level?
-  } elsif ($type_def and not $type_def->{registered}) {
-    $onerror->(type => 'unregistered type', level => 's'); ## TODO: What level?
+  if ($type =~ /^x-/) {
+    $onerror->(type => 'private type', level => $StronglyDiscouragedLevel);
+  } elsif (not $type_def or not $type_def->{registered}) {
+  #} elsif ($type_def and not $type_def->{registered}) {
+    ## NOTE: Top-level type is seldom added.
+    
+    ## NOTE: RFC 2046 6. "Any format without a rigorous and public
+    ## definition must be named with an "X-" prefix" (strictly, this
+    ## is not an author requirement, but a requirement for media
+    ## type specfication author and it does not restrict use of 
+    ## unregistered value).
+    $onerror->(type => 'unregistered type', level => 'w');
   }
 
   if ($type_def) {
     my $subtype_def = $type_def->{subtype}->{$subtype};
 
     if ($subtype =~ /^x[-\.]/) {
-      $onerror->(type => 'private subtype', level => 's'); ## TODO: What level?
+      $onerror->(type => 'private subtype', level => 'w');
+      ## NOTE: "x." is discouraged in RFC 4288.
     } elsif ($subtype_def and not $subtype_def->{registered}) {
-      $onerror->(type => 'unregistered subtype', level => 's'); ## TODO: What level?
-    }
-    if ($subtype_def->{obsolete}) {
-      $onerror->(type => 'obsolete subtype', level => 's');
+      ## NOTE: RFC 2046 6. "Any format without a rigorous and public
+      ## definition must be named with an "X-" prefix" (strictly, this
+      ## is not an author requirement, but a requirement for media
+      ## type specfication author and it does not restrict use of
+      ## unregistered value).
+      $onerror->(type => 'unregistered subtype', level => 'w');
     }
     
     if ($subtype_def) {
+      if ($subtype_def->{obsolete}) {
+        $onerror->(type => 'obsolete subtype', level => 'w');
+      }
+
       for (0..$imt->parameter_length-1) {
         my $attr = $imt->get_attribute ($_);
         my $value = $imt->get_value ($_);
+
+        if ($attr !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
+          $onerror->(type => 'attribute:syntax error:'.$attr,
+                     level => $MUSTLevel);
+        }
+
         $has_param->{$attr} = 1;
         my $param_def = $subtype_def->{parameter}->{$attr}
           || $type_def->{parameter}->{$attr};
         if ($param_def) {
           if (defined $param_def->{syntax}) {
             if ($param_def->{syntax} eq 'mime-charset') { # RFC 2978
+              ## TODO: ...
               if ($value =~ /[^A-Za-z0-9!#\x23%&'+^_`{}~-]/) {
                 $onerror->(type => 'value syntax error:'.$attr, level => 'm');
               }
             } elsif ($param_def->{syntax} eq 'token') { # RFC 2046
+              ## TODO: ...
               if ($value =~ /[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/) {
                 $onerror->(type => 'value syntax error:'.$attr, level => 'm');
               }
@@ -232,11 +281,24 @@ sub check_imt ($$$$@) {
               $param_def->{checker}->($value, $onerror);
             }
             if ($param_def->{obsolete}) {
+              ## TODO: error level
               $onerror->(type => 'obsolete parameter:'.$attr, level => 'm');
             }
           }
-        } else {
-          $onerror->(type => 'parameter:'.$attr, level => 'unsupported');
+        }
+        if (not $param_def or not $param_def->{registered}) {
+          if ($subtype =~ /\./ or $subtype =~ /^x-/ or $type =~ /^x-/) {
+            ## NOTE: The parameter names SHOULD be fully specified for
+            ## personal or vendor tree subtype [RFC 4288].  Therefore, there
+            ## might be unknown parameters and still conforming.
+            $onerror->(type => 'parameter:'.$attr, level => 'unsupported');
+          } else {
+            ## NOTE: The parameter names MUST be fully specified for
+            ## standard tree.  Therefore, unknown parameter is non-conforming,
+            ## unless it is standardized later.
+            $onerror->(type => 'parameter not allowed:'.$attr,
+                       level => $MUSTLevel);
+          }
         }
       }
 
@@ -262,4 +324,4 @@ sub check_imt ($$$$@) {
 } # check_imt
 
 1;
-## $Date: 2007/06/30 13:12:33 $
+## $Date: 2007/11/23 14:47:49 $

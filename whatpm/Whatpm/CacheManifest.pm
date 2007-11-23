@@ -1,6 +1,6 @@
 package Whatpm::CacheManifest;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::URI::URIReference;
 
 sub parse_byte_string ($$$$$) {
@@ -27,6 +27,8 @@ sub _parse ($$$$$) {
   ## NOTE: No "MUST" for being UTF-8.
   ## NOTE: A |text/cache-manifest| MUST be a cache manifest.
   ## NOTE: Newlines MUST be CR/CRLF/LF.  (We don't and can't check this.)
+
+  ## ISSUE: In RFC 2046: "The specification for any future subtypes of "text" must specify whether or not they will also utilize a "charset" parameter"
 
   my $m_uri = Message::DOM::DOMImplementation->create_uri_reference ($_[2]);
   my $m_scheme = $m_uri->uri_scheme;
@@ -342,4 +344,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/04 11:49:44 $
+# $Date: 2007/11/23 14:47:49 $

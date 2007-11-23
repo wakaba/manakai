@@ -3637,47 +3637,77 @@ id=""><span id=""></span></p>
 #data
 <script type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:obsolete subtype;s
+/script/@type;IMT:obsolete subtype;w
 /script;script:text/javascript;unsupported
 
 #data
 <script type="text/javascript;e4x=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:obsolete subtype;s
+/script/@type;IMT:obsolete subtype;w
+/script/@type;IMT:parameter not allowed:e4x;m
 /script;script:text/javascript;e4x=1;unsupported
 
 #data
 <script type="text/JavaScript;E4X=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:obsolete subtype;s
+/script/@type;IMT:obsolete subtype;w
+/script/@type;IMT:parameter not allowed:e4x;m
 /script;script:text/JavaScript;E4X=1;unsupported
 
 #data
 <script type="text/javascript;e4x=&quot;1&quot;"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:obsolete subtype;s
+/script/@type;IMT:obsolete subtype;w
+/script/@type;IMT:parameter not allowed:e4x;m
 /script;script:text/javascript;e4x="1";unsupported
 
 #data
 <script type="text/javascript;e4x=&quot;\1&quot;"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:obsolete subtype;s
+/script/@type;IMT:obsolete subtype;w
+/script/@type;IMT:parameter not allowed:e4x;m
 /script;script:text/javascript;e4x="\1";unsupported
+
+#data
+<script type="text/javascript; ~=a"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@type;IMT:obsolete subtype;w
+/script/@type;IMT:attribute:syntax error:~;m
+/script/@type;IMT:parameter not allowed:~;m
+/script;script:text/javascript; ~=a;unsupported
+
+#data
+<script type="text~/javascript"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@type;IMT:type;unsupported
+/script/@type;IMT:unregistered type;w
+/script/@type;IMT:type:syntax error:text~;m
+/script;script:text~/javascript;unsupported
+
+#data
+<script type="text/javascript~"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@type;IMT:subtype;unsupported
+/script/@type;IMT:subtype:syntax error:javascript~;m
+/script;script:text/javascript~;unsupported
 
 #data
 <script src="http://test/" type="text/javascript"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:obsolete subtype;s
+/script/@type;IMT:obsolete subtype;w
 
 #data
 <script src="http://test/%" type="text/javascript"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@src;URI::syntax error:iriref3987;m
-/script/@type;IMT:obsolete subtype;s
+/script/@type;IMT:obsolete subtype;w
 
 #data
 <script defer="" xmlns="http://www.w3.org/1999/xhtml"/>
