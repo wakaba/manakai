@@ -1376,7 +1376,11 @@ $Element->{$HTML_NS}->{meta} = {
                              level => $self->{good_level});
       }
 
-      ## TODO: no character reference - not checkable at this stage.
+      if ($charset_attr->get_user_data ('manakai_has_reference')) {
+        $self->{onerror}->(node => $charset_attr,
+                             type => 'character reference in charset',
+                             level => $self->{must_level});
+      }
     }
   },
   checker => $HTMLEmptyChecker,

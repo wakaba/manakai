@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.65 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.66 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -340,6 +340,9 @@ sub _initialize_tokenizer ($) {
 ##   ->{system_identifier} (DOCTYPE_TOKEN)
 ##   ->{correct} == 1 or 0 (DOCTYPE_TOKEN)
 ##   ->{attributes} isa HASH (START_TAG_TOKEN, END_TAG_TOKEN)
+##        ->{name}
+##        ->{value}
+##        ->{has_reference} == 1 or 0
 ##   ->{data} (COMMENT_TOKEN, CHARACTER_TOKEN)
 
 ## Emitted token MUST immediately be handled by the tree construction state.
@@ -1115,6 +1118,7 @@ sub _get_next_token ($) {
         $self->{current_attribute}->{value} .= '&';
       } else {
         $self->{current_attribute}->{value} .= $token->{data};
+	$self->{current_attribute}->{has_reference} = $token->{has_reference};
         ## ISSUE: spec says "append the returned character token to the current attribute's value"
       }
 
@@ -1841,7 +1845,8 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
           $code = $c1_entity_char->{$code};
         }
 
-        return {type => CHARACTER_TOKEN, data => chr $code};
+        return {type => CHARACTER_TOKEN, data => chr $code,
+                has_reference => 1};
       } # X
     } elsif (0x0030 <= $self->{next_input_character} and
              $self->{next_input_character} <= 0x0039) { # 0..9
@@ -1876,7 +1881,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
         $code = $c1_entity_char->{$code};
       }
       
-      return {type => CHARACTER_TOKEN, data => chr $code};
+      return {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1};
     } else {
       !!!parse-error (type => 'bare nero');
       !!!back-next-input-character ($self->{next_input_character});
@@ -1924,17 +1929,17 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
     }
     
     if ($match > 0) {
-      return {type => CHARACTER_TOKEN, data => $value};
+      return {type => CHARACTER_TOKEN, data => $value, has_reference => 1};
     } elsif ($match < 0) {
       !!!parse-error (type => 'no refc');
       if ($in_attr and $match < -1) {
         return {type => CHARACTER_TOKEN, data => '&'.$entity_name};
       } else {
-        return {type => CHARACTER_TOKEN, data => $value};
+        return {type => CHARACTER_TOKEN, data => $value, has_reference => 1};
       }
     } else {
       !!!parse-error (type => 'bare ero');
-      ## NOTE: No characters are consumed in the spec.
+      ## NOTE: "No characters are consumed" in the spec.
       return {type => CHARACTER_TOKEN, data => '&'.$value};
     }
   } else {
@@ -2866,12 +2871,17 @@ sub _tree_construction_main ($) {
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
               !!!insert-element ($token->{tag_name}, $token->{attributes});
-              pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
 
               unless ($self->{confident}) {
                 if ($token->{attributes}->{charset}) { ## TODO: And if supported
                   $self->{change_encoding}
                       ->($self, $token->{attributes}->{charset}->{value});
+                  
+                  $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
+                      ->set_user_data (manakai_has_reference =>
+                                           $token->{attributes}->{charset}
+                                               ->{has_reference});
                 } elsif ($token->{attributes}->{content}) {
                   ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
                   if ($token->{attributes}->{content}->{value}
@@ -2881,6 +2891,13 @@ sub _tree_construction_main ($) {
                     $self->{change_encoding}
                         ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
                   }
+                }
+              } else {
+                if ($token->{attributes}->{charset}) {
+                  $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
+                      ->set_user_data (manakai_has_reference =>
+                                           $token->{attributes}->{charset}
+                                               ->{has_reference});
                 }
               }
 
@@ -4454,12 +4471,17 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'meta') {
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
         !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+        my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
 
         unless ($self->{confident}) {
           if ($token->{attributes}->{charset}) { ## TODO: And if supported
             $self->{change_encoding}
                 ->($self, $token->{attributes}->{charset}->{value});
+            
+            $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
+                ->set_user_data (manakai_has_reference =>
+                                     $token->{attributes}->{charset}
+                                         ->{has_reference});
           } elsif ($token->{attributes}->{content}) {
             ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
             if ($token->{attributes}->{content}->{value}
@@ -4469,6 +4491,13 @@ sub _tree_construction_main ($) {
               $self->{change_encoding}
                   ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
             }
+          }
+        } else {
+          if ($token->{attributes}->{charset}) {
+            $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
+                ->set_user_data (manakai_has_reference =>
+                                     $token->{attributes}->{charset}
+                                         ->{has_reference});
           }
         }
 
@@ -5453,4 +5482,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2007/11/19 12:18:26 $
+# $Date: 2007/11/23 07:35:02 $

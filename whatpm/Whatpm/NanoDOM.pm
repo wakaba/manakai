@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -149,6 +149,14 @@ sub prefix ($;$) {
   }
   return $self->{prefix};
 } # prefix
+
+sub get_user_data ($$) {
+  return $_[0]->{$_[1]};
+} # get_user_data
+
+sub set_user_data ($$;$$) {
+  $_[0]->{$_[1]} = $_[2];
+} # set_user_data
 
 sub ELEMENT_NODE () { 1 }
 sub ATTRIBUTE_NODE () { 2 }
@@ -552,4 +560,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/23 05:39:43 $
+# $Date: 2007/11/23 07:35:03 $

@@ -1138,6 +1138,51 @@ id=""><span id=""></span></p>
 /meta/@charset;charset:not preferred:x-sjis;m
 /meta/@charset;charset:private:x-sjis;w
 
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-ascii">
+<title></title>
+<body></body>
+#errors
+/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&#x41;scii">
+<title></title>
+<body></body>
+#errors
+/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;character reference in charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&#x61;scii">
+<title></title>
+<body></body>
+#errors
+/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;character reference in charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&scii">
+<title></title>
+<body></body>
+#errors
+/html/head/meta/@charset;mismatched charset name::us-&scii;unsupported
+/html/head/meta/@charset;charset:not registered:us-&scii;w
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&amp;scii">
+<title></title>
+<body></body>
+#errors
+/html/head/meta/@charset;mismatched charset name::us-&scii;unsupported
+/html/head/meta/@charset;charset:not registered:us-&scii;w
+/html/head/meta/@charset;character reference in charset;m
+
 #data
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
