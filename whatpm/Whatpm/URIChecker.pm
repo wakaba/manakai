@@ -7,6 +7,9 @@ our $DefaultPort = {
   http => 80,
 };
 
+our $MustLevel = 'm'; ## Non-RFC 2119 "must" (or fact)
+our $ShouldLevel = 'w'; ## Non-RFC 2119 "should"
+
 sub check_iri ($$$) {
   require Message::URI::URIReference;
   my $dom = Message::DOM::DOMImplementation->new;
@@ -16,7 +19,7 @@ sub check_iri ($$$) {
   local $Error::Depth = $Error::Depth + 1;
 
   unless ($uri_o->is_iri_3987) {
-    $_[2]->(type => 'syntax error:iri3987', level => 'm');
+    $_[2]->(type => 'syntax error:iri3987', level => $MustLevel);
     ## MUST
   }
 
@@ -35,7 +38,7 @@ sub check_iri_reference ($$$) {
 
   ## RFC 3987 4.1.
   unless ($uri_o->is_iri_reference_3987) {
-    $onerror->(type => 'syntax error:iriref3987', level => 'm');
+    $onerror->(type => 'syntax error:iriref3987', level => $MustLevel);
     ## MUST
   }
   
@@ -43,7 +46,7 @@ sub check_iri_reference ($$$) {
   pos ($uri_s) = 0;
   while ($uri_s =~ /%([a-f][0-9A-Fa-f]|[0-9A-F][a-f])/g) {
     $onerror->(type => 'lowercase hexadecimal digit',
-               position => $-[0] + 1, level => 's');
+               position => $-[0] + 1, level => $ShouldLevel);
     ## shoult not
   }
 
@@ -55,7 +58,7 @@ sub check_iri_reference ($$$) {
   pos ($uri_s) = 0;
   while ($uri_s =~ /%(2[DdEe]|4[1-9A-Fa-f]|5[AaFf]|6[1-9A-Fa-f]|7[AaEe])/g) {
     $onerror->(type => 'percent-encoded unreserved',
-               position => $-[0] + 1, level => 's');
+               position => $-[0] + 1, level => $ShouldLevel);
     ## should
     ## should
   }
@@ -71,7 +74,7 @@ sub check_iri_reference ($$$) {
     $scheme_canon = Encode::encode ('utf8', $scheme);
     $scheme_canon =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'C', hex $1/ge;
     if ($scheme_canon =~ tr/A-Z/a-z/) {
-      $onerror->(type => 'uppercase scheme name', level => 's');
+      $onerror->(type => 'uppercase scheme name', level => $ShouldLevel);
       ## should
     }
   }
@@ -82,7 +85,7 @@ sub check_iri_reference ($$$) {
   ## RFC 3986 3.2.1., 7.5.
   my $ui = $uri_o->uri_userinfo;
   if (defined $ui and $ui =~ /:/) {
-    $onerror->(type => 'password', level => 's');
+    $onerror->(type => 'password', level => $ShouldLevel);
     ## deprecated
   }
 
@@ -95,8 +98,7 @@ sub check_iri_reference ($$$) {
     my $hostnp = $host;
     $hostnp =~ s/%([0-9A-Fa-f][0-9A-Fa-f])//g;
     if ($hostnp =~ /[A-Z]/) {
-      $onerror->(type => 'uppercase host',
-                 level => 's');
+      $onerror->(type => 'uppercase host', level => $ShouldLevel);
       ## should
     }
       
@@ -111,13 +113,13 @@ sub check_iri_reference ($$$) {
         ## should be considered as an exception for the recommendation
         ## that a host "should" be a DNS name.
       } elsif ($host !~ /\A(?>[A-Za-z0-9](?>[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?>\.(?>[A-Za-z0-9](?>[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*\.?\z/) {
-        $onerror->(type => 'non-DNS host', level => 's');
+        $onerror->(type => 'non-DNS host', level => $ShouldLevel);
         ## should
         ## should be IDNA encoding if wish to maximize interoperability
       } elsif (length $host > 255) {
         ## NOTE: This length might be incorrect if there were percent-encoded
         ## UTF-8 bytes; however, the above condition catches all non-ASCII.
-        $onerror->(type => 'long host', level => 's');
+        $onerror->(type => 'long host', level => $ShouldLevel);
         ## should
       }
       
@@ -135,7 +137,7 @@ sub check_iri_reference ($$$) {
           [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
           [\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF]           # UTF8-4
       )*\z/x) {
-        $onerror->(type => 'non UTF-8 host', level => 'm');
+        $onerror->(type => 'non UTF-8 host', level => $MustLevel);
         # must
       }
     }
@@ -146,11 +148,11 @@ sub check_iri_reference ($$$) {
   if (defined $port) {
     if ($port =~ /\A([0-9]+)\z/) {
       if ($DefaultPort->{$scheme_canon} == $1) {
-        $onerror->(type => 'default port', level => 's');
+        $onerror->(type => 'default port', level => $ShouldLevel);
         ## should
       }
     } elsif ($port eq '') {
-      $onerror->(type => 'empty port', level => 's');
+      $onerror->(type => 'empty port', level => $ShouldLevel);
       ## should
     }
   }
@@ -188,7 +190,7 @@ sub check_iri_reference ($$$) {
         $path eq '.,' or
         $path eq '.'
        ) {
-      $onerror->(type => 'dot-segment', level => 's');
+      $onerror->(type => 'dot-segment', level => $ShouldLevel);
       ## should
     }
   }
@@ -197,7 +199,7 @@ sub check_iri_reference ($$$) {
   my $authority = $uri_o->uri_authority;
   if (defined $authority) {
     if ($path eq '') {
-      $onerror->(type => 'empty path', level => 's');
+      $onerror->(type => 'empty path', level => $ShouldLevel);
       ## should
     }
   }
@@ -208,7 +210,7 @@ sub check_iri_reference ($$$) {
   ## RFC 3986 6.2.3., RFC 3987 5.3.3.
   if (defined $host and $host eq '' and
       (defined $ui or defined $port)) {
-    $onerror->(type => 'empty host', level => 's');
+    $onerror->(type => 'empty host', level => $ShouldLevel);
     ## should # when empty authority is allowed
   }
 
@@ -245,4 +247,4 @@ sub check_iri_reference ($$$) {
 } # check_iri_reference
 
 1;
-## $Date: 2007/08/05 07:12:45 $
+## $Date: 2007/11/23 12:01:20 $
