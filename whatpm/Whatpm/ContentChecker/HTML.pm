@@ -834,6 +834,36 @@ my $HTMLTargetAttrChecker = sub {
   }
 }; # $HTMLTargetAttrChecker
 
+my $HTMLSelectorsAttrChecker = sub {
+  my ($self, $attr) = @_;
+
+  ## ISSUE: Namespace resolution?
+  
+  my $value = $attr->value;
+  
+  require Whatpm::CSS::SelectorsParser;
+  my $p = Whatpm::CSS::SelectorsParser->new;
+  $p->{pseudo_class}->{$_} = 1 for qw/
+    active checked disabled empty enabled first-child first-of-type
+    focus hover indeterminate last-child last-of-type link only-child
+    only-of-type root target visited
+    lang nth-child nth-last-child nth-of-type nth-last-of-type not
+    -manakai-contains -manakai-current
+  /;
+
+  $p->{pseudo_element}->{$_} = 1 for qw/
+    after before first-letter first-line
+  /;
+
+  $p->{must_level} = $self->{must_level};
+  $p->{onerror} = sub {
+    my %opt = @_;
+    $opt{type} = 'selectors:'.$opt{type};
+    $self->{onerror}->(%opt, node => $attr);
+  };
+  $p->parse_string ($value);
+}; # $HTMLSelectorsAttrChecker
+
 my $HTMLAttrChecker = {
   id => sub {
     ## NOTE: |map| has its own variant of |id=""| checker
@@ -3221,7 +3251,7 @@ $Element->{$HTML_NS}->{datatemplate} = {
 
 $Element->{$HTML_NS}->{rule} = {
   attrs_checker => $GetHTMLAttrsChecker->({
-    ## TODO: |condition| attribute
+    condition => $HTMLSelectorsAttrChecker,
     mode => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
   }),
   checker => sub {
@@ -3239,8 +3269,14 @@ $Element->{$HTML_NS}->{rule} = {
 
 $Element->{$HTML_NS}->{nest} = {
   attrs_checker => $GetHTMLAttrsChecker->({
-    ## TODO: |filter| attribute
-    mode => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
+    filter => $HTMLSelectorsAttrChecker,
+    mode => sub {
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      if ($value !~ /\A[^\x09-\x0D\x20]+\z/) {
+        $self->{onerror}->(node => $attr, type => 'mode:syntax error');
+      }
+    },
   }),
   checker => $HTMLEmptyChecker,
 };

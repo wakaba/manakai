@@ -4187,6 +4187,10 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a"/>
+#errors
+
+#data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
 #errors
 
@@ -4209,17 +4213,101 @@ id=""><span id=""></span></p>
 /rule/@mode;duplicate token:a
 
 #data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition=""/>
+#errors
+/rule/@condition;selectors:syntax error:before type selector;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="  "/>
+#errors
+/rule/@condition;selectors:syntax error:before type selector;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a b "/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a, b"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
+#errors
+/rule/@condition;selectors:namespace prefix:not declared;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a["/>
+#errors
+/rule/@condition;selectors:syntax error:before attr name;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="*/**/*"/>
+#errors
+/rule/@condition;selectors:syntax error:before combinator;m
+
+#data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode=""/>
 #errors
+/nest/@mode;mode:syntax error
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode=" "/>
+#errors
+/nest/@mode;mode:syntax error
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a "/>
+#errors
+/nest/@mode;mode:syntax error
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
 #errors
+/nest/@mode;mode:syntax error
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
 #errors
-/nest/@mode;duplicate token:a
+/nest/@mode;mode:syntax error
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="&#x3000;"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter=""/>
+#errors
+/nest/@filter;selectors:syntax error:before type selector;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="  "/>
+#errors
+/nest/@filter;selectors:syntax error:before type selector;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="a b"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="a + b"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="a.b#c[d]"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="a|b"/>
+#errors
+/nest/@filter;selectors:namespace prefix:not declared;m
 
 #data
 <div align="center" xmlns="http://www.w3.org/1999/xhtml"/>
