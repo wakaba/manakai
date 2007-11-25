@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.52 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.53 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -378,6 +378,16 @@ sub check_element ($$$) {
         $Element->{$nsuri}->{''} ||
           $ElementDefault;
       $eldef->{attrs_checker}->($self, $todo);
+    } elsif ($todo->{type} eq 'descendant') {
+      for my $key (keys %{$todo->{errors}}) {
+        unless ($todo->{flag}->{has_descendant}->{$key}) {
+          $todo->{errors}->{$key}->($self, $todo);
+        }
+        for my $key (keys %{$todo->{old_values}}) {
+          $todo->{flag}->{has_descendant}->{$key}
+              ||= $todo->{old_values}->{$key};
+        }
+      }
     } elsif ($todo->{type} eq 'plus' or $todo->{type} eq 'minus') {
       $self->_remove_minuses ($todo);
     } elsif ($todo->{type} eq 'code') {
@@ -537,4 +547,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/23 05:39:43 $
+# $Date: 2007/11/25 03:46:07 $

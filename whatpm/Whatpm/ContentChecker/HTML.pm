@@ -1471,7 +1471,7 @@ $Element->{$HTML_NS}->{h1} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
-    $todo->{flag}->{has_heading}->[0] = 1;
+    $todo->{flag}->{has_descendant}->{hn} = 1;
     return $HTMLStrictlyInlineChecker->($self, $todo);
   },
 };
@@ -1505,24 +1505,27 @@ $Element->{$HTML_NS}->{header} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
-    my $old_flag = $todo->{flag}->{has_heading} || [];
-    my $new_flag = [];
-    local $todo->{flag}->{has_heading} = $new_flag;
-    my $node = $todo->{node};
+
+    my $old_flags = {hn => $todo->{flag}->{has_descendant}->{hn}};
+    $todo->{flag}->{has_descendant}->{hn} = 0;
 
     my $end = $self->_add_minuses
         ({$HTML_NS => {qw/header 1 footer 1/}},
          $HTMLSectioningElements);
     my ($new_todos, $ch) = $HTMLBlockChecker->($self, $todo);
-    push @$new_todos, $end, 
-        {type => 'code', code => sub {
-           if ($new_flag->[0]) {
-             $old_flag->[0] = 1;
-           } else {
-             $self->{onerror}->(node => $node, type => 'element missing:hn');
-           }
+    push @$new_todos, $end,
+        {type => 'descendant', node => $todo->{node},
+         flag => $todo->{flag}, old_values => $old_flags,
+         errors => {
+           hn => sub {
+             my ($self, $todo) = @_;
+             $self->{onerror}->(node => $todo->{node},
+                                type => 'element missing:hn');
+           },
          }};
     return ($new_todos, $ch);
+
+    ## ISSUE: <header><del><h1>...</h1></del></header> is conforming?
   },
 };
 
