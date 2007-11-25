@@ -34,18 +34,22 @@
 #errors
 /table;table:no cell in last row
 /table/tbody/tr;child element missing:td|th
+/table/tbody/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td rowspan="2"/></tr><tr/></tbody></table>
 #errors
 /table/tbody/tr;child element missing:td|th
+/table/tbody/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td/></tr><tr/><tr><td/></tr></tbody></table>
 #errors
 /table/tbody/tr;child element missing:td|th
+/table/tbody/tr/td;no significant content;s
+/table/tbody/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -54,6 +58,7 @@
 /table/tbody/tr;child element missing:td|th
 /table/tbody/tr;child element missing:td|th
 /table;table:no cell in last row
+/table/tbody/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -61,6 +66,7 @@
 #errors
 /table;table:no cell in last row
 /table/tbody/tr;child element missing:td|th
+/table/thead/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">

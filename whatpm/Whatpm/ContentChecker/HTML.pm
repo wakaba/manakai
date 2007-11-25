@@ -60,6 +60,35 @@ my $HTMLInteractiveElements = {
 my $HTMLEmbededElements = {
   $HTML_NS => {qw/img 1 iframe 1 embed 1 object 1 video 1 audio 1 canvas 1/},
 };
+## NOTE: When an element is added to this list, make sure that
+## the element's checker set |has_descendant| flag for |significant| content
+## as true.
+
+our $AnyChecker;
+my $HTMLAnyChecker = sub {
+  my ($self, $todo) = @_;
+
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
+  
+  my ($new_todos) = $AnyChecker->($self, $todo);
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => {
+      significant => sub {
+        my ($self, $todo) = @_;
+        $self->{onerror}->(node => $todo->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      },
+    },
+  };
+
+  return ($new_todos);
+}; # $HTMLAnyChecker
 
 ## Empty
 my $HTMLEmptyChecker = sub {
@@ -89,6 +118,7 @@ my $HTMLEmptyChecker = sub {
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $node, type => 'character not allowed');
+        $todo->{flag}->{has_descendant}->{significant} = 1;
       }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
@@ -103,6 +133,10 @@ my $HTMLTextChecker = sub {
   my $el = $todo->{node};
   my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
+
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
 
   while (@nodes) {
     my $node = shift @nodes;
@@ -122,10 +156,28 @@ my $HTMLTextChecker = sub {
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
+    } elsif ($nt == 3 or $nt == 4) {
+      if ($node->data =~ /[^\x09-\x0D\x20]/) {
+        $todo->{flag}->{has_descendant}->{significant} = 1;
+      }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
   }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => {
+      significant => sub {
+        my ($self, $todo) = @_;
+        $self->{onerror}->(node => $todo->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      },
+    },
+  };
+
   return ($new_todos);
 };
 
@@ -136,6 +188,10 @@ my $HTMLStylableBlockChecker = sub {
   my $el = $todo->{node};
   my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
+
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
   
   my $has_non_style;
   while (@nodes) {
@@ -167,11 +223,26 @@ my $HTMLStylableBlockChecker = sub {
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $node, type => 'character not allowed');
+        $todo->{flag}->{has_descendant}->{significant} = 1;
       }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
   }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => {
+      significant => sub {
+        my ($self, $todo) = @_;
+        $self->{onerror}->(node => $todo->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      },
+    },
+  };
+
   return ($new_todos);
 }; # $HTMLStylableBlockChecker
 
@@ -182,6 +253,10 @@ my $HTMLBlockChecker = sub {
   my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
   
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
+
   while (@nodes) {
     my $node = shift @nodes;
     $self->_remove_minuses ($node) and next if ref $node eq 'HASH'; 
@@ -203,11 +278,26 @@ my $HTMLBlockChecker = sub {
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $node, type => 'character not allowed');
+        $todo->{flag}->{has_descendant}->{significant} = 1;
       }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
   }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => {
+      significant => sub {
+        my ($self, $todo) = @_;
+        $self->{onerror}->(node => $todo->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      },
+    },
+  };
+
   return ($new_todos);
 }; # $HTMLBlockChecker
 
@@ -218,6 +308,10 @@ my $HTMLInlineChecker = sub {
   my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
   
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
+
   while (@nodes) {
     my $node = shift @nodes;
     $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
@@ -237,6 +331,10 @@ my $HTMLInlineChecker = sub {
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
+    } elsif ($nt == 3 or $nt == 4) {
+      if ($node->data =~ /[^\x09-\x0D\x20]/) {
+        $todo->{flag}->{has_descendant}->{significant} = 1;
+      }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -245,6 +343,20 @@ my $HTMLInlineChecker = sub {
   for (@$new_todos) {
     $_->{inline} = 1;
   }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => {
+      significant => sub {
+        my ($self, $todo) = @_;
+        $self->{onerror}->(node => $todo->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      },
+    },
+  };
+
   return ($new_todos);
 }; # $HTMLInlineChecker
 
@@ -254,6 +366,10 @@ my $HTMLStrictlyInlineChecker = sub {
   my $el = $todo->{node};
   my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
+
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
   
   while (@nodes) {
     my $node = shift @nodes;
@@ -273,6 +389,10 @@ my $HTMLStrictlyInlineChecker = sub {
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
+    } elsif ($nt == 3 or $nt == 4) {
+      if ($node->data =~ /[^\x09-\x0D\x20]/) {
+        $todo->{flag}->{has_descendant}->{significant} = 1;
+      }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -282,6 +402,20 @@ my $HTMLStrictlyInlineChecker = sub {
     $_->{inline} = 1;
     $_->{strictly_inline} = 1;
   }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => {
+      significant => sub {
+        my ($self, $todo) = @_;
+        $self->{onerror}->(node => $todo->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      },
+    },
+  };
+
   return ($new_todos);
 }; # $HTMLStrictlyInlineChecker
 
@@ -291,6 +425,10 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
   my $el = $todo->{node};
   my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
+
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
   
   while (@nodes) {
     my $node = shift @nodes;
@@ -317,6 +455,10 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
+    } elsif ($nt == 3 or $nt == 4) {
+      if ($node->data =~ /[^\x09-\x0D\x20]/) {
+        $todo->{flag}->{has_descendant}->{significant} = 1;
+      }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -326,10 +468,22 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
     $_->{inline} = 1;
     $_->{strictly_inline} = 1;
   }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => {
+      significant => sub {
+        my ($self, $todo) = @_;
+        $self->{onerror}->(node => $todo->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      },
+    },
+  };
+
   return ($new_todos);
 }; # $HTMLInlineOrStrictlyInlineChecker
-
-## TODO: New "significant" SHOULD-level requirement (revision 1114).
 
 ## Block-level content or inline-level content (i.e. bimorphic content model)
 my $HTMLBlockOrInlineChecker = sub {
@@ -337,6 +491,10 @@ my $HTMLBlockOrInlineChecker = sub {
   my $el = $todo->{node};
   my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
+
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
   
   my $content = 'block-or-inline'; # or 'block' or 'inline'
   my @block_not_inline;
@@ -393,6 +551,7 @@ my $HTMLBlockOrInlineChecker = sub {
             $self->{onerror}->(node => $_, type => 'element not allowed');
           }
         }
+        $todo->{flag}->{has_descendant}->{significant} = 1;
       }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
@@ -404,6 +563,20 @@ my $HTMLBlockOrInlineChecker = sub {
       $_->{inline} = 1;
     }
   }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => {
+      significant => sub {
+        my ($self, $todo) = @_;
+        $self->{onerror}->(node => $todo->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      },
+    },
+  };
+
   return ($new_todos);
 };
 
@@ -415,6 +588,10 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
     my $el = $todo->{node};
     my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
+
+    my $old_values = {significant =>
+                          $todo->{flag}->{has_descendant}->{significant}};
+    $todo->{flag}->{has_descendant}->{significant} = 0;
     
     my $has_non_style;
     my $content = 'block-or-inline'; # or 'block' or 'inline'
@@ -479,6 +656,7 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
               $self->{onerror}->(node => $_, type => 'element not allowed');
             }
           }
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -490,11 +668,27 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
         $_->{inline} = 1;
       }
     }
+
+    push @$new_todos, {
+      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+      old_values => $old_values,
+      errors => {
+        significant => sub {
+          my ($self, $todo) = @_;
+          $self->{onerror}->(node => $todo->{node},
+                             level => $self->{should_level},
+                             type => 'no significant content');
+        },
+      },
+    };
+
     return ($new_todos);
   };
 }; # $GetHTMLZeroOrMoreThenBlockOrInlineChecker
 
 my $HTMLTransparentChecker = $HTMLBlockOrInlineChecker;
+## ISSUE: Significant content rule should be applied to transparent element
+## with parent?  Currently, applied to |video| but not to others.
 
 our $AttrChecker;
 
@@ -973,7 +1167,6 @@ my $GetHTMLAttrsChecker = sub {
 
 our $Element;
 our $ElementDefault;
-our $AnyChecker;
 
 $Element->{$HTML_NS}->{''} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
@@ -1001,6 +1194,10 @@ $Element->{$HTML_NS}->{html} = {
     my $el = $todo->{node};
     my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
+
+    my $old_values = {significant =>
+                          $todo->{flag}->{has_descendant}->{significant}};
+    $todo->{flag}->{has_descendant}->{significant} = 0;
 
     my $phase = 'before head';
     while (@nodes) {
@@ -1044,6 +1241,7 @@ $Element->{$HTML_NS}->{html} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -1056,6 +1254,21 @@ $Element->{$HTML_NS}->{html} = {
     } elsif ($phase eq 'after head') {
       $self->{onerror}->(node => $el, type => 'child element missing:body');
     }
+
+    ## NOTE: Significant content check - this is performed here since
+    ## |html| content model allows a block-level element - |body|.
+    push @$new_todos, {
+      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+      old_values => $old_values,
+      errors => {
+        significant => sub {
+          my ($self, $todo) = @_;  
+          $self->{onerror}->(node => $todo->{node},
+                             level => $self->{should_level},
+                             type => 'no significant content');
+        },
+      },
+    };
 
     return ($new_todos);
   },
@@ -1130,6 +1343,7 @@ $Element->{$HTML_NS}->{head} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -1434,6 +1648,7 @@ $Element->{$HTML_NS}->{style} = {
     return $AnyChecker->($self, $todo);
   },
 };
+## ISSUE: Relationship to significant content check?
 
 $Element->{$HTML_NS}->{body} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
@@ -1536,6 +1751,10 @@ $Element->{$HTML_NS}->{footer} = {
     my $el = $todo->{node};
     my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
+
+    my $old_values = {significant =>
+                          $todo->{flag}->{has_descendant}->{significant}};
+    $todo->{flag}->{has_descendant}->{significant} = 0;
   
     my $content = 'block-or-inline'; # or 'block' or 'inline'
     my @block_not_inline;
@@ -1599,6 +1818,7 @@ $Element->{$HTML_NS}->{footer} = {
               $self->{onerror}->(node => $_, type => 'element not allowed');
             }
           }
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -1615,6 +1835,19 @@ $Element->{$HTML_NS}->{footer} = {
         $_->{inline} = 1;
       }
     }
+
+    push @$new_todos, {
+      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+      old_values => $old_values,
+      errors => {
+        significant => sub {
+          my ($self, $todo) = @_;
+          $self->{onerror}->(node => $todo->{node},
+                             level => $self->{should_level},
+                             type => 'no significant content');
+        },
+      },
+    };
 
     return ($new_todos);
   },
@@ -1688,6 +1921,7 @@ $Element->{$HTML_NS}->{dialog} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -1736,6 +1970,7 @@ $Element->{$HTML_NS}->{ol} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -1837,6 +2072,7 @@ $Element->{$HTML_NS}->{dl} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -2258,13 +2494,18 @@ $Element->{$HTML_NS}->{del} = {
 
     my $parent = $todo->{node}->manakai_parent_element;
     if (defined $parent) {
+      my $sig_flag = $todo->{flag}->{has_descendant}->{significant};
       my $nsuri = $parent->namespace_uri;
       $nsuri = '' unless defined $nsuri;
       my $ln = $parent->manakai_local_name;
       my $eldef = $Element->{$nsuri}->{$ln} ||
         $Element->{$nsuri}->{''} ||
         $ElementDefault;
-      return $eldef->{checker}->($self, $todo);
+      my ($new_todos) =  $eldef->{checker}->($self, $todo);
+      push @$new_todos, {type => 'code', code => sub {
+        $todo->{flag}->{has_descendant}->{significant} = 0;
+      }} if not $sig_flag;
+      return $new_todos;
     } else {
       return $HTMLBlockOrInlineChecker->($self, $todo);
     }
@@ -2300,14 +2541,22 @@ $Element->{$HTML_NS}->{img} = {
       $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:src');
     }
   },
-  checker => $HTMLEmptyChecker,
+  checker => sub {
+    my ($self, $todo) = @_;
+    $todo->{flag}->{has_descendant}->{significant} = 1;
+    return $HTMLEmptyChecker->($self, $todo);
+  },
 };
 
 $Element->{$HTML_NS}->{iframe} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     src => $HTMLURIAttrChecker,
   }),
-  checker => $HTMLTextChecker,
+  checker => sub {
+    my ($self, $todo) = @_;
+    $todo->{flag}->{has_descendant}->{significant} = 1;
+    return $HTMLTextChecker->($self, $todo);
+  },
 };
 
 $Element->{$HTML_NS}->{embed} = {
@@ -2348,7 +2597,11 @@ $Element->{$HTML_NS}->{embed} = {
                          type => 'attribute missing:src');
     }
   },
-  checker => $HTMLEmptyChecker,
+  checker => sub {
+    my ($self, $todo) = @_;
+    $todo->{flag}->{has_descendant}->{significant} = 1;
+    return $HTMLEmptyChecker->($self, $todo);
+  },
 };
 
 $Element->{$HTML_NS}->{object} = {
@@ -2368,7 +2621,11 @@ $Element->{$HTML_NS}->{object} = {
       }
     }
   },
-  checker => $ElementDefault->{checker}, ## TODO
+  checker => sub {
+    my ($self, $todo) = @_;
+    $todo->{flag}->{has_descendant}->{significant} = 1;
+    return $ElementDefault->{checker}->($self, $todo); ## TODO
+  },
 ## TODO: Tests for <nest/> in <object/>
 };
 
@@ -2404,6 +2661,7 @@ $Element->{$HTML_NS}->{video} = {
   }),
   checker => sub {
     my ($self, $todo) = @_;
+    $todo->{flag}->{has_descendant}->{significant} = 1;
 
     if ($todo->{node}->has_attribute_ns (undef, 'src')) {
       return $HTMLBlockOrInlineChecker->($self, $todo);
@@ -2440,7 +2698,11 @@ $Element->{$HTML_NS}->{canvas} = {
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }),
-  checker => $HTMLInlineChecker,
+  checker => sub {
+    my ($self, $todo) = @_;
+    $todo->{flag}->{has_descendant}->{significant} = 1;
+    return $HTMLInlineChecker->($self, $todo);
+  },
 };
 
 $Element->{$HTML_NS}->{map} = {
@@ -2723,6 +2985,7 @@ $Element->{$HTML_NS}->{table} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -2781,6 +3044,7 @@ $Element->{$HTML_NS}->{colgroup} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -2829,6 +3093,7 @@ $Element->{$HTML_NS}->{tbody} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -2884,6 +3149,7 @@ $Element->{$HTML_NS}->{tr} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -2949,6 +3215,7 @@ $Element->{$HTML_NS}->{script} = {
     }
   },
 };
+## ISSUE: Significant check and text child node
 
 ## NOTE: When script is disabled.
 $Element->{$HTML_NS}->{noscript} = {
@@ -3005,6 +3272,7 @@ $Element->{$HTML_NS}->{noscript} = {
         } elsif ($nt == 3 or $nt == 4) {
           if ($node->data =~ /[^\x09-\x0D\x20]/) {
             $self->{onerror}->(node => $node, type => 'character not allowed');
+            $todo->{flag}->{has_descendant}->{significant} = 1;
           }
         } elsif ($nt == 5) {
           unshift @nodes, @{$node->child_nodes};
@@ -3056,6 +3324,10 @@ $Element->{$HTML_NS}->{datagrid} = {
     my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
+    my $old_values = {significant =>
+                          $todo->{flag}->{has_descendant}->{significant}};
+    $todo->{flag}->{has_descendant}->{significant} = 0;
+
     my $end = $self->_add_minuses ({$HTML_NS => {a => 1, datagrid => 1}});
     
     ## Block-table Block* | table | select | datalist | Empty
@@ -3095,6 +3367,7 @@ $Element->{$HTML_NS}->{datagrid} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -3102,6 +3375,20 @@ $Element->{$HTML_NS}->{datagrid} = {
     }
 
     push @$new_todos, $end;
+
+    push @$new_todos, {
+      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+      old_values => $old_values,
+      errors => {
+        significant => sub {
+          my ($self, $todo) = @_;
+          $self->{onerror}->(node => $todo->{node},
+                             level => $self->{should_level},
+                             type => 'no significant content');
+        },
+      },
+    };
+
     return ($new_todos);
   },
 };
@@ -3159,6 +3446,10 @@ $Element->{$HTML_NS}->{menu} = {
     my $el = $todo->{node};
     my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
+
+    my $old_values = {significant =>
+                          $todo->{flag}->{has_descendant}->{significant}};
+    $todo->{flag}->{has_descendant}->{significant} = 0;
     
     my $content = 'li or inline';
     while (@nodes) {
@@ -3199,6 +3490,7 @@ $Element->{$HTML_NS}->{menu} = {
           } elsif ($content eq 'li or inline') {
             $content = 'inline';
           }
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -3208,6 +3500,20 @@ $Element->{$HTML_NS}->{menu} = {
     for (@$new_todos) {
       $_->{inline} = 1;
     }
+
+    push @$new_todos, {
+      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+      old_values => $old_values,
+      errors => {
+        significant => sub {
+          my ($self, $todo) = @_;
+          $self->{onerror}->(node => $todo->{node},
+                             level => $self->{should_level},
+                             type => 'no significant content');
+        },
+      },
+    };
+  
     return ($new_todos);
   },
 };
@@ -3242,6 +3548,7 @@ $Element->{$HTML_NS}->{datatemplate} = {
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -3261,7 +3568,7 @@ $Element->{$HTML_NS}->{rule} = {
     my ($self, $todo) = @_;
 
     my $end = $self->_add_pluses ({$HTML_NS => {nest => 1}});
-    my ($sib, $ch) = $AnyChecker->($self, $todo);
+    my ($sib, $ch) = $HTMLAnyChecker->($self, $todo);
     push @$sib, $end;
     return ($sib, $ch);
   },

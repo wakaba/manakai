@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.53 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.54 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -158,7 +158,13 @@ our $AnyChecker = sub {
       if ($self->{minuses}->{$node_ns}->{$node_ln}) {
         $self->{onerror}->(node => $node, type => 'element not allowed');
       }
-      push @$new_todos, {type => 'element', node => $node};
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+      unshift @nodes, @$sib;
+      push @$new_todos, @$ch;
+    } elsif ($nt == 3 or $nt == 4) {
+      if ($node->data =~ /[^\x09-\x0D\x20]/) {
+        $todo->{flag}->{has_descendant}->{significant} = 1;
+      }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -547,4 +553,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/25 03:46:07 $
+# $Date: 2007/11/25 08:04:20 $

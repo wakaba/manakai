@@ -1,5 +1,15 @@
 2007-11-25  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: Support for checking for significant content (HTML5
+	revision 1114).  Note that the current implementation has
+	an issue on treatment for transparent or semi-transparent
+	elements.
+
+	* Atom.pm: Support for significant content checking (for composed
+	HTML-Atom documents).
+
+2007-11-25  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm (header): Descendant constraint is redefined by
 	new todo item type |descendant|.
 

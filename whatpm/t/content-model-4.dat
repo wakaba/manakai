@@ -3,12 +3,16 @@
   <dfn/>
 </p>
 #errors
+/p;no significant content;s
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
   <dfn> </dfn>
 </p>
 #errors
+/p;no significant content;s
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -17,6 +21,9 @@
 </p>
 #errors
 /p/dfn;duplicate term
+/p;no significant content;s
+/p/dfn;no significant content;s
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -24,6 +31,9 @@
   <dfn> </dfn>
 </p>
 #errors
+/p;no significant content;s
+/p/dfn;no significant content;s
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -92,6 +102,9 @@
 #errors
 /p/dfn/dfn;element not allowed
 /p/dfn/dfn;duplicate term
+/p;no significant content;s
+/p/dfn;no significant content;s
+/p/dfn/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -174,6 +187,9 @@
   <dfn><span><abbr title="a"/></span></dfn>
 </p>
 #errors
+/p/dfn;no significant content;s
+/p/dfn/span;no significant content;s
+/p/dfn/span/abbr;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -190,6 +206,7 @@
 </p>
 #errors
 /p/dfn;duplicate term
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -198,6 +215,7 @@
 </p>
 #errors
 /p/dfn;duplicate term
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -273,7 +291,7 @@
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
-<title/>
+<title>x</title>
 <link href="../../../a" rel="up up up up index" title="d"/>
 <link href="../../a" rel="up up up" title="c"/>
 <link href="../a" rel="up up" title="b"/>
@@ -334,7 +352,7 @@
 /link/@rel;link type:proposed:openid.server;s
 
 #data
-<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="openid.server"/>
+<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="openid.server">a</a>
 #errors
 /a/@rel;link type:proposed:openid.server;s
 /a/@rel;link type:bad context:openid.server
@@ -352,7 +370,7 @@
 /link/@rel;link type:proposed:service;s
 
 #data
-<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="service"/>
+<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="service">a</a>
 #errors
 /a/@rel;link type:proposed:service;s
 /a/@rel;link type:bad context:service

@@ -54,85 +54,85 @@
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-    a:b="" xmlns:a="http://www.example.test/"/>
+    a:b="" xmlns:a="http://www.example.test/">a</p>
 #errors
 /p/@b;attribute;unsupported
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id=""></p>
+id="">a</p>
 #errors
 /p/@id;empty attribute value
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="a"></p>
+id="a">a</p>
 #errors
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id=" "></p>
-#errors
-/p/@id;space in ID
-
-#data
-<p xmlns="http://www.w3.org/1999/xhtml"
-id="&#x9;"></p>
+id=" ">a</p>
 #errors
 /p/@id;space in ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="&#xA;"></p>
+id="&#x9;">a</p>
 #errors
 /p/@id;space in ID
 
 #data
-<?xml version="1.1"?>
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="&#xB;"></p>
+id="&#xA;">a</p>
 #errors
 /p/@id;space in ID
 
 #data
 <?xml version="1.1"?>
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="&#xC;"></p>
+id="&#xB;">a</p>
+#errors
+/p/@id;space in ID
+
+#data
+<?xml version="1.1"?>
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="&#xC;">a</p>
 #errors
 /p/@id;space in ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="&#xD;"></p>
+id="&#xD;">a</p>
 #errors
 /p/@id;space in ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="a "></p>
+id="a ">a</p>
 #errors
 /p/@id;space in ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="a b"></p>
+id="a b">a</p>
 #errors
 /p/@id;space in ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="aaaaaaa"></p>
+id="aaaaaaa">a</p>
 #errors
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="a"><span id="a"></span></p>
+id="a"><span id="a">a</span></p>
 #errors
 /p/span/@id;duplicate ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id="a b"><span id="a b"></span></p>
+id="a b"><span id="a b">x</span></p>
 #errors
 /p/@id;space in ID
 /p/span/@id;duplicate ID
@@ -140,24 +140,24 @@ id="a b"><span id="a b"></span></p>
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
-id=""><span id=""></span></p>
+id=""><span id="">x</span></p>
 #errors
 /p/@id;empty attribute value
 /p/span/@id;empty attribute value
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-  <span id="a"/>
-  <span id="b"/>
-  <span id="c"/>
+  <span id="a">x</span>
+  <span id="b">x</span>
+  <span id="c">x</span>
 </p>
 #errors
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-  <span id="a "/>
-  <span id=" a"/>
-  <span id=" a "/>
+  <span id="a ">x</span>
+  <span id=" a">x</span>
+  <span id=" a ">x</span>
 </p>
 #errors
 /p/span/@id;space in ID
@@ -166,293 +166,294 @@ id=""><span id=""></span></p>
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-  <span id="i"/>
-  <span id="I"/>
-  <span id="&#x0131;"/>
+  <span id="i">x</span>
+  <span id="I">x</span>
+  <span id="&#x0131;">x</span>
 </p>
 #errors
 
 #data
-<p title="" xmlns="http://www.w3.org/1999/xhtml"/>
+<p title="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p title="a" xmlns="http://www.w3.org/1999/xhtml"/>
+<p title="a" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p title="AAAAAA" xmlns="http://www.w3.org/1999/xhtml"/>
+<p title="AAAAAA" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p title="XXXX&#x0A;YYYY" xmlns="http://www.w3.org/1999/xhtml"/>
+<p title="XXXX&#x0A;YYYY" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p title="" xmlns="http://www.w3.org/1999/xhtml"/>
+<p title="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
 <p title="AAA" xmlns="http://www.w3.org/1999/xhtml">
-  <span title="BBB"/>
+  <span title="BBB">x</span>
 </p>
 #errors
 
 #data
-<p lang="" xmlns="http://www.w3.org/1999/xhtml"/>
+<p lang="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@lang;in XML:lang
 
 #data
-<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>
+<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data html
-<!DOCTYPE HTML><title></title><p xml:lang=""></p>
+<!DOCTYPE HTML><title>x</title><p xml:lang="">x</p>
 #errors
 /html/body/p/@xml:lang;in HTML:xml:lang
 
 #data
-<p dir="" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@dir;enumerated:invalid
 
 #data
-<p dir="ltr" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="ltr" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p dir=" ltr" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir=" ltr" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@dir;enumerated:invalid
 
 #data
-<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@dir;enumerated:invalid
 
 #data
 <!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
-<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
 <?xml version="1.1"?>
 <!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
-<p dir="ltr&#x0C;" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="ltr&#x0C;" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@dir;enumerated:invalid
 
 #data
-<p dir="LTR" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="LTR" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p dir="LtR" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="LtR" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p dir="rtl" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="rtl" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p dir="Rtl" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="Rtl" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p dir="rtltr" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-/p/@dir;enumerated:invalid
-
-#data
-<p dir="XXXXXX" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="rtltr" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@dir;enumerated:invalid
 
 #data
-<p class="" xmlns="http://www.w3.org/1999/xhtml"/>
+<p dir="XXXXXX" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@dir;enumerated:invalid
+
+#data
+<p class="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p class="  " xmlns="http://www.w3.org/1999/xhtml"/>
+<p class="  " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
 <?xml version="1.1"?>
-<p class="&#xD;&#xB;" xmlns="http://www.w3.org/1999/xhtml"/>
+<p class="&#xD;&#xB;" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p class="a b c d ef g h" xmlns="http://www.w3.org/1999/xhtml"/>
+<p class="a b c d ef g h" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
 <?xml version="1.1"?>
-<p class="  a b c  d   &#xC;  efg h &#xC;" xmlns="http://www.w3.org/1999/xhtml"/>
+<p class="  a b c  d   &#xC;  efg h &#xC;" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p class="a a" xmlns="http://www.w3.org/1999/xhtml"/>
+<p class="a a" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@class;duplicate token:a
 
 #data
 <?xml version="1.1"?>
-<p class="  aa&#xC; aa" xmlns="http://www.w3.org/1999/xhtml"/>
+<p class="  aa&#xC; aa" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@class;duplicate token:aa
 
 #data
-<p class="a a a" xmlns="http://www.w3.org/1999/xhtml"/>
+<p class="a a a" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@class;duplicate token:a
 /p/@class;duplicate token:a
 
 #data
-<p class="I i &#x0131;" xmlns="http://www.w3.org/1999/xhtml"/>
+<p class="I i &#x0131;" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p irrelevant="" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p irrelevant=" " xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-/p/@irrelevant;boolean:invalid
-
-#data
-<p irrelevant="irrelevant" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-
-#data
-<p irrelevant=" irrelevant" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant=" " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="irrelevant " xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p irrelevant=" irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant=" irrelevant " xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="irrelevant " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="Irrelevant" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant=" irrelevant " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="IRRELEVANT" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="Irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="relevant" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="IRRELEVANT" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="irrelevants" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="relevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="false" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="irrelevants" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="true" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="false" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="yes" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="true" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p irrelevant="on" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="yes" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid
 
 #data
-<p tabindex="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+<p irrelevant="on" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@irrelevant;boolean:invalid
+
+#data
+<p tabindex="-1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p tabindex="0" xmlns="http://www.w3.org/1999/xhtml"/>
+<p tabindex="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p tabindex="1" xmlns="http://www.w3.org/1999/xhtml"/>
+<p tabindex="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p tabindex="10000" xmlns="http://www.w3.org/1999/xhtml"/>
+<p tabindex="10000" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p tabindex="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+<p tabindex="1.0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@tabindex;integer:syntax error
 
 #data
-<p tabindex="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+<p tabindex="+1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@tabindex;integer:syntax error
 
 #data
-<p tabindex="1 " xmlns="http://www.w3.org/1999/xhtml"/>
+<p tabindex="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@tabindex;integer:syntax error
 
 #data
-<p tabindex="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+<p tabindex="+1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@tabindex;integer:syntax error
 
 #data
-<p onabort="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+<p onabort="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@onabort;event handler;unsupported
 
 #data
-<p onbeforeunload="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+<p onbeforeunload="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@onbeforeunload;event handler;unsupported
 
 #data
-<p onblur="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+<p onblur="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@onblur;event handler;unsupported
 
 #data
-<p onchange="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+<p onchange="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@onchange;event handler;unsupported
 
 #data
-<p onclick="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+<p onclick="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@onclick;event handler;unsupported
 
 #data
-<p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+<p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@onxxxx;attribute;unsupported
 
 #data html
 <!DOCTYPE html>
 <html>
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -492,75 +493,83 @@ id=""><span id=""></span></p>
 #data html
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
+/html/body;no significant content;s
 
 #data html
 <!DOCTYPE html>
 <html xmlns="">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
 /html/@xmlns;invalid attribute value
+/html/body;no significant content;s
 
 #data html
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/TR/xhtml1/strict">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
 /html/@xmlns;invalid attribute value
+/html/body;no significant content;s
 
 #data html
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/TR/REC-html40">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
 /html/@xmlns;invalid attribute value
+/html/body;no significant content;s
 
 #data html
 <!DOCTYPE html>
 <html xmlns=" http://www.w3.org/1999/xhtml ">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
 /html/@xmlns;invalid attribute value
+/html/body;no significant content;s
 
 #data html
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/XHTML">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
 /html/@xmlns;invalid attribute value
+/html/body;no significant content;s
 
 #data html
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
 /html/@xmlns;invalid attribute value
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml ">
-<head><title></title></head>
+<head><title>x</title></head>
 <body></body>
 </html>
 #errors
@@ -572,11 +581,12 @@ id=""><span id=""></span></p>
 #data html
 <!DOCTYPE html>
 <html>
-<head xmlns="http://www.w3.org/1999/xhtml"><title></title></head>
+<head xmlns="http://www.w3.org/1999/xhtml"><title>x</title></head>
 <body></body>
 </html>
 #errors
 /html/head/@xmlns;attribute;unsupported
+/html/body;no significant content;s
 
 #data
 <head profile="http://www.test/" xmlns="http://www.w3.org/1999/xhtml">
@@ -584,6 +594,7 @@ id=""><span id=""></span></p>
 </head>
 #errors
 /head/@profile;attribute;unsupported
+/head/title;no significant content;s
 
 #data
 <base xmlns="http://www.w3.org/1999/xhtml"/>
@@ -638,6 +649,7 @@ id=""><span id=""></span></p>
 #errors
 /head/base;element not allowed
 /head/base;basehref after URI attribute
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -646,6 +658,7 @@ id=""><span id=""></span></p>
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -655,6 +668,7 @@ id=""><span id=""></span></p>
 </head>
 #errors
 /head/base;element not allowed
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -663,6 +677,7 @@ id=""><span id=""></span></p>
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -671,6 +686,7 @@ id=""><span id=""></span></p>
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 /head/base;element not allowed
 /head/base;basehref after URI attribute
 
@@ -681,6 +697,7 @@ id=""><span id=""></span></p>
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -691,6 +708,7 @@ id=""><span id=""></span></p>
 #errors
 /head/base;element not allowed
 /head/base;basehref after URI attribute
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -699,6 +717,7 @@ id=""><span id=""></span></p>
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -709,6 +728,7 @@ id=""><span id=""></span></p>
 #errors
 /head/base;element not allowed
 /head/base;basetarget after hyperlink
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -717,6 +737,7 @@ id=""><span id=""></span></p>
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -728,6 +749,7 @@ id=""><span id=""></span></p>
 /head/base;element not allowed
 /head/base;basehref after URI attribute
 /head/base;basetarget after hyperlink
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -736,6 +758,7 @@ id=""><span id=""></span></p>
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -745,6 +768,7 @@ id=""><span id=""></span></p>
 </head>
 #errors
 /head/base;element not allowed
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -754,6 +778,7 @@ id=""><span id=""></span></p>
 </head>
 #errors
 /head/base;element not allowed
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -764,6 +789,7 @@ id=""><span id=""></span></p>
 #errors
 /head/base;element not allowed
 /head/link/@rel;duplicate token:stylesheet
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -774,6 +800,7 @@ id=""><span id=""></span></p>
 #errors
 /head/base;element not allowed
 /head/base;basetarget after hyperlink
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -784,6 +811,7 @@ id=""><span id=""></span></p>
 #errors
 /head/base;element not allowed
 /head/base;basetarget after hyperlink
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -794,6 +822,7 @@ id=""><span id=""></span></p>
 #errors
 /head/base;element not allowed
 /head/base;basetarget after hyperlink
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -804,6 +833,8 @@ id=""><span id=""></span></p>
 #errors
 /head/a;element not allowed
 /head/base;basetarget after hyperlink
+/head/a;no significant content;s
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -814,6 +845,7 @@ id=""><span id=""></span></p>
 #errors
 /head/area;element not allowed
 /head/base;basetarget after hyperlink
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -824,6 +856,7 @@ id=""><span id=""></span></p>
 #errors
 /head/area;element not allowed
 /head/base;basehref after URI attribute
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -834,6 +867,7 @@ id=""><span id=""></span></p>
 #errors
 /head/video;element not allowed
 /head/base;basehref after URI attribute
+/head/title;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -842,10 +876,11 @@ id=""><span id=""></span></p>
 <title/>
 </head>
 <body>
-<p><a href=""/></p>
+<p><a href="">x</a></p>
 </body>
 </html>
 #errors
+/html/head/title;no significant content;s
 
 #data
 <link xmlns="http://www.w3.org/1999/xhtml"/>
@@ -987,7 +1022,7 @@ id=""><span id=""></span></p>
 <head xmlns="http://www.w3.org/1999/xhtml">
   <link rel="pingback" href="a"/>
   <link rel="pingback" href="b"/>
-  <title/>
+  <title>x</title>
 </head>
 #errors
 /head/link/@rel;link type:duplicate:pingback
@@ -996,7 +1031,7 @@ id=""><span id=""></span></p>
 <head xmlns="http://www.w3.org/1999/xhtml">
   <link rel="pingback" href="a"/>
   <link rel="pingback feed" href="b"/>
-  <title/>
+  <title>x</title>
 </head>
 #errors
 /head/link/@rel;link type:duplicate:pingback
@@ -1075,7 +1110,7 @@ id=""><span id=""></span></p>
 /meta;attribute missing:name|http-equiv
 
 #data html
-<!DOCTYPE HTML><html><head><meta charset="us-ascii"><title></title></head><body>
+<!DOCTYPE HTML><html><head><meta charset="us-ascii"><title>x</title></head><body><p>x
 #errors
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
@@ -1141,16 +1176,16 @@ id=""><span id=""></span></p>
 #data html
 <!DOCTYPE HTML>
 <meta charset="us-ascii">
-<title></title>
-<body></body>
+<title>x</title>
+<body><p>b</p></body>
 #errors
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data html
 <!DOCTYPE HTML>
 <meta charset="us-&#x41;scii">
-<title></title>
-<body></body>
+<title>x</title>
+<body><p>x</p></body>
 #errors
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 /html/head/meta/@charset;character reference in charset;m
@@ -1158,8 +1193,8 @@ id=""><span id=""></span></p>
 #data html
 <!DOCTYPE HTML>
 <meta charset="us-&#x61;scii">
-<title></title>
-<body></body>
+<title>x</title>
+<body><p>x</p></body>
 #errors
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 /html/head/meta/@charset;character reference in charset;m
@@ -1167,8 +1202,8 @@ id=""><span id=""></span></p>
 #data html
 <!DOCTYPE HTML>
 <meta charset="us-&scii">
-<title></title>
-<body></body>
+<title>x</title>
+<body><p>x</p></body>
 #errors
 /html/head/meta/@charset;mismatched charset name::us-&scii;unsupported
 /html/head/meta/@charset;charset:not registered:us-&scii;w
@@ -1176,8 +1211,8 @@ id=""><span id=""></span></p>
 #data html
 <!DOCTYPE HTML>
 <meta charset="us-&amp;scii">
-<title></title>
-<body></body>
+<title>x</title>
+<body><p>x</p></body>
 #errors
 /html/head/meta/@charset;mismatched charset name::us-&scii;unsupported
 /html/head/meta/@charset;charset:not registered:us-&scii;w
@@ -1232,7 +1267,7 @@ id=""><span id=""></span></p>
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
-<title/>
+<title>x</title>
 <style scoped=""/>
 </head>
 #errors
@@ -1246,6 +1281,7 @@ id=""><span id=""></span></p>
 #errors
 /article/style;element not allowed
 /article/style;style:text/css;unsupported
+/article;no significant content;s
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml">
@@ -1253,6 +1289,7 @@ id=""><span id=""></span></p>
 </article>
 #errors
 /article/style;style:text/css;unsupported
+/article;no significant content;s
 
 #data
 <aside xmlns="http://www.w3.org/1999/xhtml">
@@ -1261,6 +1298,7 @@ id=""><span id=""></span></p>
 #errors
 /aside/style;element not allowed
 /aside/style;style:text/css;unsupported
+/aside;no significant content;s
 
 #data
 <aside xmlns="http://www.w3.org/1999/xhtml">
@@ -1268,6 +1306,7 @@ id=""><span id=""></span></p>
 </aside>
 #errors
 /aside/style;style:text/css;unsupported
+/aside;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1276,6 +1315,7 @@ id=""><span id=""></span></p>
 #errors
 /div/style;element not allowed
 /div/style;style:text/css;unsupported
+/div;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1283,6 +1323,7 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/style;style:text/css;unsupported
+/div;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -1291,6 +1332,7 @@ id=""><span id=""></span></p>
 #errors
 /section/style;element not allowed
 /section/style;style:text/css;unsupported
+/section;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -1298,35 +1340,42 @@ id=""><span id=""></span></p>
 </section>
 #errors
 /section/style;style:text/css;unsupported
+/section;no significant content;s
 
 #data
 <body text="red" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /body/@text;attribute;unsupported
+/body;no significant content;s
 
 #data
 <blockquote cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/blockquote;no significant content;s
 
 #data
 <blockquote cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /blockquote/@cite;URI::syntax error:iriref3987;m
+/blockquote;no significant content;s
 
 #data
 <h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /h1/@align;attribute;unsupported
+/h1;no significant content;s
 
 #data
 <address align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /address/@align;attribute;unsupported
+/address;no significant content;s
 
 #data
 <p align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /p/@align;attribute;unsupported
+/p;no significant content;s
 
 #data
 <hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1347,14 +1396,17 @@ id=""><span id=""></span></p>
 <pre width="4" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /pre/@width;attribute;unsupported
+/pre;no significant content;s
 
 #data
 <pre xml:space="preserve" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/pre;no significant content;s
 
 #data
 <pre xml:space="default" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/pre;no significant content;s
 
 #data
 <ol start="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1485,30 +1537,35 @@ id=""><span id=""></span></p>
 </ol>
 #error
 /ol/li/@value;integer:syntax error
+/ol/li;no significant content;s
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
 <li value="1"/>
 </ol>
 #error
+/ol/li;no significant content;s
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
 <li value="0"/>
 </ol>
 #error
+/ol/li;no significant content;s
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
 <li value="-1"/>
 </ol>
 #error
+/ol/li;no significant content;s
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
 <li value="+1"/>
 </ol>
 #error
+/ol/li;no significant content;s
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
@@ -1516,6 +1573,7 @@ id=""><span id=""></span></p>
 </ol>
 #error
 /ol/li/@value;integer:syntax error
+/ol/li;no significant content;s
 
 #data
 <ul xmlns="http://www.w3.org/1999/xhtml">
@@ -1524,6 +1582,7 @@ id=""><span id=""></span></p>
 #error
 /ul/li/@value;attribute;unsupported
 /ul/li/@value;integer:syntax error
+/ul/li;no significant content;s
 
 #data
 <ul xmlns="http://www.w3.org/1999/xhtml">
@@ -1531,6 +1590,7 @@ id=""><span id=""></span></p>
 </ul>
 #error
 /ul/li/@value;attribute;unsupported
+/ul/li;no significant content;s
 
 #data
 <ul xmlns="http://www.w3.org/1999/xhtml">
@@ -1538,6 +1598,7 @@ id=""><span id=""></span></p>
 </ul>
 #error
 /ul/li/@value;attribute;unsupported
+/ul/li;no significant content;s
 
 #data
 <ul xmlns="http://www.w3.org/1999/xhtml">
@@ -1545,6 +1606,7 @@ id=""><span id=""></span></p>
 </ul>
 #error
 /ul/li/@value;attribute;unsupported
+/ul/li;no significant content;s
 
 #data
 <ul xmlns="http://www.w3.org/1999/xhtml">
@@ -1552,6 +1614,7 @@ id=""><span id=""></span></p>
 </ul>
 #error
 /ul/li/@value;attribute;unsupported
+/ul/li;no significant content;s
 
 #data
 <ul xmlns="http://www.w3.org/1999/xhtml">
@@ -1560,38 +1623,45 @@ id=""><span id=""></span></p>
 #error
 /ul/li/@value;attribute;unsupported
 /ul/li/@value;integer:syntax error
+/ul/li;no significant content;s
 
 #data
 <li value="" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /li/@value;attribute;unsupported
 /li/@value;integer:syntax error
+/li;no significant content;s
 
 #data
 <li value="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /li/@value;attribute;unsupported
+/li;no significant content;s
 
 #data
 <li value="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /li/@value;attribute;unsupported
+/li;no significant content;s
 
 #data
 <li value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /li/@value;attribute;unsupported
+/li;no significant content;s
 
 #data
 <li value="+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /li/@value;attribute;unsupported
+/li;no significant content;s
 
 #data
 <li value="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /li/@value;attribute;unsupported
 /li/@value;integer:syntax error
+/li;no significant content;s
 
 #data
 <dl compact="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1601,195 +1671,230 @@ id=""><span id=""></span></p>
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/[44::]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@href;URI::syntax error:iriref3987;m
+/a;no significant content;s
 
 #data
 <a href="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@type;IMT:syntax error
+/a;no significant content;s
 
 #data
 <a href="http://test/" type="text/html" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="author contact"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="author author" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;duplicate token:author
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="bookmark" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="previous" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;link type:non-conforming:previous
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="edit" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;link type:proposed:edit;s
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="script" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;link type:non-conforming:script
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;link type:bad context:stylesheet
+/a;no significant content;s
 
 #data
 <a href="http://test/" rel="test-type" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;link type:test-type;unsupported
+/a;no significant content;s
 
 #data
 <a href="http://test/" ping="http://a.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" ping="http://a.test/ http://b.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" ping="http://a.test/ [b.test]"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@ping;URIs::syntax error:iriref3987:1;m
+/a;no significant content;s
 
 #data
 <a href="http://test/" hreflang=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@hreflang;LangTag:nosemantics:language;m
+/a;no significant content;s
 
 #data
 <a href="http://test/" hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" media="all"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@media;media query;unsupported
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="_self"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="_parent"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="_top"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="_Top"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="_TOP"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="_blank"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@target;reserved browsing context name
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="_main"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@target;reserved browsing context name
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="abcde"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" target="_"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@target;reserved browsing context name
+/a;no significant content;s
 
 #data
 <a type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@type;attribute not allowed
+/a;no significant content;s
 
 #data
 <a rel="author" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;attribute not allowed
+/a;no significant content;s
 
 #data
 <a ping="a" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@ping;attribute not allowed
+/a;no significant content;s
 
 #data
 <a hreflang="en" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@hreflang;attribute not allowed
+/a;no significant content;s
 
 #data
 <a media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@media;attribute not allowed
 /a/@media;media query;unsupported
+/a;no significant content;s
 
 #data
 <a target="_self"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@target;attribute not allowed
+/a;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-  <b><a href=""/></b>
-  <i><a type="text/plain"/></i>
+  <b><a href="">a</a></b>
+  <i><a type="text/plain">x</a></i>
 </p>
 #errors
 /p/i/a/@type;attribute not allowed
 
 #data
-<q cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+<q cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</q>
 #errors
 
 #data
-<q cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
+<q cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml">x</q>
 #errors
 /q/@cite;URI::syntax error:iriref3987;m
 
@@ -1797,577 +1902,627 @@ id=""><span id=""></span></p>
 <meter value="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="111" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="0001" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="-1000" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="-0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="0000" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="0.1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="1.1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value=".1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value=".0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="1." xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="1.0000" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="123." xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="-.1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="-1." xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="1aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value="1&#x0D;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value="1&#x0A;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value="+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value="+1.2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value=".-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value="0.-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter value="." xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter min="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter min="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@min;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter low="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter low="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@low;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter high="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter high="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@high;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter max="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@max;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter optimum="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter optimum="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@optimum;float:syntax error
+/meter;no significant content;s
 
 #data
 <meter min="43" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <meter value="43" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meter;no significant content;s
 
 #data
 <progress max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/progress;no significant content;s
 
 #data
 <progress max="0.0001" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/progress;no significant content;s
 
 #data
 <progress max="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@max;float:out of range
+/progress;no significant content;s
 
 #data
 <progress max="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@max;float:out of range
+/progress;no significant content;s
 
 #data
 <progress max="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@max;float:syntax error
+/progress;no significant content;s
 
 #data
 <progress value="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/progress;no significant content;s
 
 #data
 <progress value="0.0001" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/progress;no significant content;s
 
 #data
 <progress value="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/progress;no significant content;s
 
 #data
 <progress value="100" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/progress;no significant content;s
 
 #data
 <progress value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@value;float:out of range
+/progress;no significant content;s
 
 #data
 <progress value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@value;float:syntax error
+/progress;no significant content;s
 
 #data
-<bdo xmlns="http://www.w3.org/1999/xhtml"/>
+<bdo xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
 /bdo;attribute missing:dir
 
 #data
-<bdo dir="ltr" xmlns="http://www.w3.org/1999/xhtml"/>
+<bdo dir="ltr" xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
 
 #data
-<bdo dir="rtl" xmlns="http://www.w3.org/1999/xhtml"/>
+<bdo dir="rtl" xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
 
 #data
-<bdo dir="RTL" xmlns="http://www.w3.org/1999/xhtml"/>
+<bdo dir="RTL" xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
 
 #data
-<bdo dir="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
+<bdo dir="xxx" xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
 /bdo/@dir;enumerated:invalid
 
 #data
-<ins cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+<ins cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</ins>
 #errors
 
 #data
-<ins cite="http://test/100%/" xmlns="http://www.w3.org/1999/xhtml"/>
+<ins cite="http://test/100%/" xmlns="http://www.w3.org/1999/xhtml">x</ins>
 #errors
 /ins/@cite;URI::syntax error:iriref3987;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime=""/>
+    datetime="">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-05"/>
+    datetime="2007-05">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-06"/>
+    datetime="2007-06">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-08-09"/>
+    datetime="2007-08-09">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-09-10T00:12"/>
+    datetime="2007-09-10T00:12">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-09-23T33:34:23"/>
+    datetime="2007-09-23T33:34:23">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-04-31T33:11:00+09"/>
+    datetime="2007-04-31T33:11:00+09">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="0037-12-13 00:00 Z"/>
+    datetime="0037-12-13 00:00 Z">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="1979-10-14T12:00:00.001-04:00"/>
+    datetime="1979-10-14T12:00:00.001-04:00">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="8592-01-01 T 02:09 +02:09"/>
+    datetime="8592-01-01 T 02:09 +02:09">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-04-12T00:00Z"/>
+    datetime="2007-04-12T00:00Z">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="10000-10-31T00:44Z"/>
-#errors
-/ins/@datetime;datetime:syntax error
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="-3333-03-14T14:33Z"/>
+    datetime="10000-10-31T00:44Z">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="1999-06-23  T04:44Z"/>
-#errors
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="4444-06-22  T  11:22Z"/>
-#errors
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="98-02-12T11:22Z"/>
+    datetime="-3333-03-14T14:33Z">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-29T00:00Z"/>
+    datetime="1999-06-23  T04:44Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="4444-06-22  T  11:22Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="98-02-12T11:22Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-29T00:00Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad day
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2008-02-29T00:00Z"/>
+    datetime="2008-02-29T00:00Z">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2000-02-29T00:00Z"/>
+    datetime="2000-02-29T00:00Z">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="1900-02-29T00:00Z"/>
-#errors
-/ins/@datetime;datetime:bad day
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-30T00:00Z"/>
+    datetime="1900-02-29T00:00Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad day
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2000-02-30T00:00Z"/>
+    datetime="2007-02-30T00:00Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad day
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-01-32T00:00Z"/>
+    datetime="2000-02-30T00:00Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad day
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-01-00T00:00Z"/>
+    datetime="2007-01-32T00:00Z">xM</ins>
 #errors
 /ins/@datetime;datetime:bad day
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-00-29T00:00Z"/>
+    datetime="2007-01-00T00:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad day
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-00-29T00:00Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad month
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-13-29T00:00Z"/>
+    datetime="2007-13-29T00:00Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad month
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00Z"/>
+    datetime="2007-02-21T23:00Z">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T24:00Z"/>
+    datetime="2007-02-21T24:00Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad hour
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:59Z"/>
+    datetime="2007-02-21T23:59Z">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:60Z"/>
+    datetime="2007-02-21T23:60Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad minute
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00:60Z"/>
+    datetime="2007-02-21T23:00:60Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad second
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00:61Z"/>
+    datetime="2007-02-21T23:00:61Z">x</ins>
 #errors
 /ins/@datetime;datetime:bad second
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00:00.123Z"/>
+    datetime="2007-02-21T23:00:00.123Z">xM</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00.124444Z"/>
+    datetime="2007-02-21T23:00.124444Z">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00.Z"/>
-#errors
-/ins/@datetime;datetime:syntax error
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00+09:00"/>
-#errors
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00-09:00"/>
-#errors
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00 +09:00"/>
-#errors
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00+0900"/>
+    datetime="2007-02-21T23:00.Z">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00A"/>
+    datetime="2007-02-21T23:00+09:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00-09:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00 +09:00">xm</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+0900">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00z"/>
+    datetime="2007-02-21T23:00A">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21t23:00Z"/>
+    datetime="2007-02-21T23:00z">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00+23:00"/>
+    datetime="2007-02-21t23:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+23:00">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00+24:00"/>
+    datetime="2007-02-21T23:00+24:00">x</ins>
 #errors
 /ins/@datetime;datetime:bad timezone hour
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00-23:00"/>
+    datetime="2007-02-21T23:00-23:00">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00-24:00"/>
+    datetime="2007-02-21T23:00-24:00">x</ins>
 #errors
 /ins/@datetime;datetime:bad timezone hour
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00-00:00"/>
+    datetime="2007-02-21T23:00-00:00">x</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00+00:14.5"/>
+    datetime="2007-02-21T23:00+00:14.5">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00+00:59"/>
+    datetime="2007-02-21T23:00+00:59">xM</ins>
 #errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00+00:60"/>
+    datetime="2007-02-21T23:00+00:60">x</ins>
 #errors
 /ins/@datetime;datetime:bad timezone minute
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00-00:60"/>
+    datetime="2007-02-21T23:00-00:60">x</ins>
 #errors
 /ins/@datetime;datetime:bad timezone minute
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00 00:00"/>
+    datetime="2007-02-21T23:00 00:00">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00Z "/>
+    datetime="2007-02-21T23:00Z ">x</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime=" 2007-02-21T23:00Z"/>
+    datetime=" 2007-02-21T23:00Z">s</ins>
 #errors
 /ins/@datetime;datetime:syntax error
 
 #data
-<del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+<del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</del>
 #errors
 
 #data
-<del cite='"about:"' xmlns="http://www.w3.org/1999/xhtml"/>
+<del cite='"about:"' xmlns="http://www.w3.org/1999/xhtml">x</del>
 #errors
 /del/@cite;URI::syntax error:iriref3987;m
 
 #data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-21T23:00Z"/>
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00Z">x</del>
 #errors
 
 #data
-<ins xmlns="http://www.w3.org/1999/xhtml"
-    datetime="2007-02-31T23:00Z"/>
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-31T23:00Z">x</del>
 #errors
-/ins/@datetime;datetime:bad day
+/del/@datetime;datetime:bad day
 
 #data
 <img xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2408,7 +2563,7 @@ id=""><span id=""></span></p>
 
 #data
 <span xmlns="http://www.w3.org/1999/xhtml">
-<a/>
+<a>a</a>
 <img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
 </span>
 #errors
@@ -2481,6 +2636,7 @@ id=""><span id=""></span></p>
 <map id="aa"/>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2488,6 +2644,7 @@ id=""><span id=""></span></p>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2496,6 +2653,7 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/map/@id;space in ID
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2504,6 +2662,7 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/map/@id;space in ID
+/div/map;no significant content;s
 /div/p/img/@usemap;no referenced map
 
 #data
@@ -2512,6 +2671,7 @@ id=""><span id=""></span></p>
 <p><img src="http://test/" alt="" usemap="#&#x4E00;"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2520,6 +2680,7 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/img/@usemap;no referenced map
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2528,6 +2689,7 @@ id=""><span id=""></span></p>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2536,6 +2698,7 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/img/@usemap;no referenced map
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2544,6 +2707,7 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/img/@usemap;no referenced map
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2552,19 +2716,23 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/img/@usemap;no referenced map
+/div/p;no significant content;s
 
 #data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/iframe;no significant content;s
 
 #data
 <iframe src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/iframe;no significant content;s
 
 #data
 <iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /iframe/@src;URI::syntax error:iriref3987;m
+/iframe;no significant content;s
 
 #data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2611,114 +2779,127 @@ id=""><span id=""></span></p>
 <object xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;attribute missing:data|type
+/object;no significant content;s
 
 #data
 <object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/object;no significant content;s
 
 #data
 <object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@data;URI::syntax error:iriref3987;m
+/object;no significant content;s
 
 #data
 <object type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@type;IMT:syntax error
+/object;no significant content;s
 
 #data
 <object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/object;no significant content;s
 
 #data
 <object type="text/css" data="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/object;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<p><object data="http://test/" usemap=""/></p>
+<p><object data="http://test/" usemap="">x</object></p>
 </div>
 #errors
 /div/p/object/@usemap;#idref:syntax error
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<p><object data="http://test/" usemap="abc"/></p>
+<p><object data="http://test/" usemap="abc">x</object></p>
 </div>
 #errors
 /div/p/object/@usemap;#idref:syntax error
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<p><object data="http://test/" usemap="abc#"/></p>
+<p><object data="http://test/" usemap="abc#">x</object></p>
 </div>
 #errors
 /div/p/object/@usemap;#idref:syntax error
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
+<p><object data="http://test/" usemap="&#x0A;#abc">x</object></p>
 </div>
 #errors
 /div/p/object/@usemap;#idref:syntax error
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<p><object data="http://test/" usemap="#aa"/></p>
+<p><object data="http://test/" usemap="#aa">x</object></p>
 <map id="aa"/>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="aa"/>
-<p><object data="http://test/" usemap="#aa"/></p>
+<p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="&#x4E00;"/>
-<p><object data="http://test/" usemap="#&#x4E00;"/></p>
+<p><object data="http://test/" usemap="#&#x4E00;">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="aa"/>
-<p><object data="http://test/" usemap="#bb"/></p>
+<p><object data="http://test/" usemap="#bb">x</object></p>
 </div>
 #errors
 /div/p/object/@usemap;no referenced map
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="aa"/>
-<p><object data="http://test/" usemap="#aa"/></p>
-<p><object data="http://test/" usemap="#aa"/></p>
+<p><object data="http://test/" usemap="#aa">x</object></p>
+<p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="aa"/>
-<p><object data="http://test/" usemap="#AA"/></p>
+<p><object data="http://test/" usemap="#AA">x</object></p>
 </div>
 #errors
 /div/p/object/@usemap;no referenced map
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="AA"/>
-<p><object data="http://test/" usemap="#aa"/></p>
+<p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
 /div/p/object/@usemap;no referenced map
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<object data="" usemap="#a"/><menu id="a"/>
+<object data="" usemap="#a">x</object><menu id="a">x</menu>
 </div>
 #errors
 /div/object/@usemap;no referenced map
@@ -2755,93 +2936,114 @@ id=""><span id=""></span></p>
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 
 #data
 <video src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 
 #data
 <video src="``http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video/@src;URI::syntax error:iriref3987;m
+/video;no significant content;s
 
 #data
 <video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 
 #data
 <video autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 
 #data
 <video autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 /video/@autoplay;boolean:invalid
 
 #data
 <video controls="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 
 #data
 <video controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 
 #data
 <video controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video/@controls;boolean:invalid
+/video;no significant content;s
 
 #data
 <video poster="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 
 #data
 <video poster="abc" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;no significant content;s
 
 #data
 <video poster="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video/@poster;URI::syntax error:iriref3987;m
+/video;no significant content;s
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/audio;no significant content;s
 
 #data
 <audio src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/audio;no significant content;s
 
 #data
 <audio src="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio/@src;URI::syntax error:iriref3987;m
+/audio;no significant content;s
 
 #data
 <audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/audio;no significant content;s
 
 #data
 <audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/audio;no significant content;s
 
 #data
 <audio autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio/@autoplay;boolean:invalid
+/audio;no significant content;s
 
 #data
 <audio controls="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/audio;no significant content;s
 
 #data
 <audio controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/audio;no significant content;s
 
 #data
 <audio controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio/@controls;boolean:invalid
+/audio;no significant content;s
 
 #data
 <source xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2903,111 +3105,133 @@ id=""><span id=""></span></p>
 #data
 <canvas xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 
 #data
 <canvas width="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 /canvas/@width;nninteger:syntax error
 
 #data
 <canvas width="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 
 #data
 <canvas width="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 
 #data
 <canvas width="100" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 
 #data
 <canvas width="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 /canvas/@width;nninteger:syntax error
 
 #data
 <canvas width="saaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas/@width;nninteger:syntax error
+/canvas;no significant content;s
 
 #data
 <canvas width="1&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas/@width;nninteger:syntax error
+/canvas;no significant content;s
 
 #data
 <canvas width="13344aa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas/@width;nninteger:syntax error
+/canvas;no significant content;s
 
 #data
 <canvas height="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas/@height;nninteger:syntax error
+/canvas;no significant content;s
 
 #data
 <canvas height="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 
 #data
 <canvas height="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 
 #data
 <canvas height="-2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas/@height;nninteger:syntax error
+/canvas;no significant content;s
 
 #data
 <canvas height="1&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas/@height;nninteger:syntax error
+/canvas;no significant content;s
 
 #data
 <canvas height="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas/@height;nninteger:syntax error
+/canvas;no significant content;s
 
 #data
 <canvas width="44" height="14" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/canvas;no significant content;s
 
 #data
 <map xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /map;attribute missing:id
+/map;no significant content;s
 
 #data
 <map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /map;attribute missing:id
 /map/@name;attribute;unsupported
+/map;no significant content;s
 
 #data
 <map id="aa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="aa"/>
-<p id="aa"/>
+<p id="aa">x</p>
 </div>
 #errors
 /div/p/@id;duplicate ID
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<p id="aa"/>
+<p id="aa">x</p>
 <map id="aa"/>
 </div>
 #errors
 /div/map/@id;duplicate ID
+/div/map;no significant content;s
 
 #data
 <map id="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /map/@id;empty attribute value
+/map;no significant content;s
 
 #data
 <area xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3483,6 +3707,7 @@ id=""><span id=""></span></p>
 <caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /caption/@align;attribute;unsupported
+/caption;no significant content;s
 
 #data
 <colgroup xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3560,68 +3785,83 @@ id=""><span id=""></span></p>
 #data
 <td colspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/td;no significant content;s
 
 #data
 <td colspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /td/@colspan;nninteger:out of range
+/td;no significant content;s
 
 #data
 <td rowspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/td;no significant content;s
 
 #data
 <td rowspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /td/@rowspan;nninteger:out of range
+/td;no significant content;s
 
 #data
 <th colspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/th;no significant content;s
 
 #data
 <th colspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/th;no significant content;s
 /th/@colspan;nninteger:out of range
 
 #data
 <th rowspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/th;no significant content;s
 
 #data
 <th rowspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /th/@rowspan;nninteger:out of range
+/th;no significant content;s
 
 #data
 <th scope="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /th/@scope;enumerated:invalid
+/th;no significant content;s
 
 #data
 <th scope="row" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/th;no significant content;s
 
 #data
 <th scope="col" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/th;no significant content;s
 
 #data
 <th scope="Col" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/th;no significant content;s
 
 #data
 <th scope="rowgroup" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/th;no significant content;s
 
 #data
 <th scope="colgroup" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/th;no significant content;s
 
 #data
 <td scope="row" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /td/@scope;attribute;unsupported
+/td;no significant content;s
 
 #data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3803,54 +4043,66 @@ id=""><span id=""></span></p>
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/details;no significant content;s
 
 #data
 <details open="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/details;no significant content;s
 
 #data
 <details open="open" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/details;no significant content;s
 
 #data
 <details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/details;no significant content;s
 /details/@open;boolean:invalid
 
 #data
 <details open="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details/@open;boolean:invalid
+/details;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid disabled="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid disabled="disabled" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid/@disabled;boolean:invalid
+/datagrid;no significant content;s
 
 #data
 <datagrid multiple="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid multiple="multiple" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid multiple="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid/@multiple;boolean:invalid
+/datagrid;no significant content;s
 
 #data
 <command xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4034,82 +4286,100 @@ id=""><span id=""></span></p>
 #data
 <menu xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu label="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu label=" " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu label="aa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /menu/@type;enumerated:invalid
+/menu;no significant content;s
 
 #data
 <menu type="type" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 /menu/@type;enumerated:invalid
 
 #data
 <menu type="toolbar" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu type="Toolbar" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu type=" toolbar" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /menu/@type;enumerated:invalid
+/menu;no significant content;s
 
 #data
 <menu type="context" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu type="conteXt" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu type="context " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /menu/@type;enumerated:invalid
+/menu;no significant content;s
 
 #data
 <menu autosubmit="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu autosubmit="autosubmit" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/menu;no significant content;s
 
 #data
 <menu autosubmit="yes" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /menu/@autosubmit;boolean:invalid
+/menu;no significant content;s
 
 #data
 <menu autosubmit="AutoSubmit" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /menu/@autosubmit;boolean:invalid
+/menu;no significant content;s
 
 #data
 <p contextmenu="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /p/@contextmenu;no referenced menu
+/p;no significant content;s
 
 #data
 <p contextmenu="aaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /p/@contextmenu;no referenced menu
+/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4117,12 +4387,18 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/menu/@id;empty attribute value
+/div;no significant content;s
+/div/p;no significant content;s
+/div/menu;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p contextmenu="a"/><menu id="a"/>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/menu;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4130,24 +4406,34 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/@contextmenu;no referenced menu
+/div;no significant content;s
+/div/p;no significant content;s
+/div/menu;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <menu id="a"/><p contextmenu="a"/>
 </div>
 #errors
+/div;no significant content;s
+/div/menu;no significant content;s
+/div/p;no significant content;s
 
 #data
 <div contextmenu="a" xmlns="http://www.w3.org/1999/xhtml">
 <menu id="a"/>
 </div>
 #errors
+/div;no significant content;s
+/div/menu;no significant content;s
 
 #data
 <menu id="a" xmlns="http://www.w3.org/1999/xhtml">
 <span contextmenu="a"/>
 </menu>
 #errors
+/menu;no significant content;s
+/menu/span;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4155,6 +4441,9 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/menu/@id;space in ID
+/div;no significant content;s
+/div/p;no significant content;s
+/div/menu;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4162,6 +4451,9 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/@contextmenu;no referenced menu
+/div;no significant content;s
+/div/p;no significant content;s
+/div/menu;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4170,6 +4462,9 @@ id=""><span id=""></span></p>
 #errors
 /div/p/@contextmenu;no referenced menu
 /div/menu/@id;space in ID
+/div;no significant content;s
+/div/p;no significant content;s
+/div/menu;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4177,76 +4472,94 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/@contextmenu;no referenced menu
+/div;no significant content;s
+/div/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode=""/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="  "/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a"/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a  b"/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a A"/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a a"/>
 #errors
+/rule;no significant content;s
 /rule/@mode;duplicate token:a
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
 #errors
+/rule;no significant content;s
 /rule/@mode;duplicate token:a
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition=""/>
 #errors
+/rule;no significant content;s
 /rule/@condition;selectors:syntax error:before type selector;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="  "/>
 #errors
+/rule;no significant content;s
 /rule/@condition;selectors:syntax error:before type selector;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a"/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a b "/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a, b"/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
 #errors
 /rule/@condition;selectors:namespace prefix:not declared;m
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a["/>
 #errors
+/rule;no significant content;s
 /rule/@condition;selectors:syntax error:before attr name;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="*/**/*"/>
 #errors
+/rule;no significant content;s
 /rule/@condition;selectors:syntax error:before combinator;m
 
 #data
@@ -4313,4 +4626,5 @@ id=""><span id=""></span></p>
 <div align="center" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /div/@align;attribute;unsupported
+/div;no significant content;s
 

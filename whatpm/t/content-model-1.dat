@@ -13,23 +13,28 @@
 #errors
 /p/unknown;element not allowed
 /p/unknown;element;unsupported
+/p;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"></html>
 #errors
 /html;child element missing:head
 /html;child element missing:body
+/html;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head></html>
 #errors
 /html;child element missing:body
 /html/head;child element missing:title
+/html;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><body></body></html>
 #errors
 /html/body;ps element missing:head
+/html;no significant content;s
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><p></p></html>
@@ -37,6 +42,8 @@
 /html/p;element not allowed
 /html;child element missing:head
 /html;child element missing:body
+/html;no significant content;s
+/html/p;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">a</html>
@@ -50,40 +57,51 @@
 #errors
 /html;child element missing:head
 /html;child element missing:body
+/html;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>
 #errors
 /html/head;child element missing:title
+/html;no significant content;s
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head>a<body></body></html>
 #errors
 /html/head;child element missing:title
 /html/"a";character not allowed
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">a<head></head><body></body></html>
 #errors
 /html/"a";character not allowed
 /html/head;child element missing:title
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body>a</html>
 #errors
 /html/head;child element missing:title
 /html/"a";character not allowed
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"> <head></head> <body></body> </html>
 #errors
 /html/head;child element missing:title
+/html;no significant content;s
+/html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body><p></p></html>
 #errors
 /html/head;child element missing:title
 /html/p;element not allowed
+/html;no significant content;s
+/html/body;no significant content;s
+/html/p;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -149,6 +167,9 @@
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title></title></head><body></body></html>
 #errors
+/html;no significant content;s
+/html/head/title;no significant content;s
+/html/body;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -156,6 +177,7 @@
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -164,6 +186,7 @@
 </head>
 #errors
 /head/base;element not allowed
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -171,6 +194,7 @@
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -178,6 +202,7 @@
 <command/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -185,6 +210,7 @@
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -192,6 +218,7 @@
 <event-source/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -199,6 +226,7 @@
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -206,6 +234,7 @@
 <link rel="author" href="mailto:a@example.com"/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -215,6 +244,7 @@
 #errors
 /head/meta;element not allowed
 /head/meta;attribute missing:name|http-equiv|charset
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -224,6 +254,7 @@
 #errors
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -234,6 +265,7 @@
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -241,6 +273,7 @@
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -248,6 +281,7 @@
 <meta name="keywords" content="html5"/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -257,6 +291,7 @@
 #errors
 /head/script/@type;IMT:obsolete subtype;w
 /head/script;script:text/javascript;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -266,6 +301,7 @@
 #errors
 /head/script/@type;IMT:obsolete subtype;w
 /head/script;script:text/javascript;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -274,6 +310,7 @@
 </head>
 #errors
 /head/style;style:text/css;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -282,16 +319,25 @@
 </head>
 #errors
 /head/style;style:text/css;unsupported
+/head/title;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title></title><title></title></head><body></body></html>
 #errors
 /html/head/title;element not allowed
+/html/head/title;no significant content;s
+/html/head/title;no significant content;s
+/html/body;no significant content;s
+/html;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title></title><p></p></head><body></body></html>
 #errors
 /html/head/p;element not allowed
+/html;no significant content;s
+/html/head/title;no significant content;s
+/html/head/p;no significant content;s
+/html/body;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><base/><title></title></head>
@@ -299,6 +345,7 @@
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
 /head/base;attribute missing:href|target
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><title/><base/></head>
@@ -307,12 +354,14 @@
 /head/base;attribute missing:href|target
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><base/></head>
 #errors
 /head/base;element not allowed
 /head/base;attribute missing:href|target
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><base/><meta charset="us-ascii"/></head>
@@ -322,6 +371,7 @@
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -333,6 +383,7 @@
 /head/base;element not allowed
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -344,6 +395,7 @@
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -355,6 +407,7 @@
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -363,6 +416,7 @@
 <title/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -371,6 +425,7 @@
 <meta name="keywords" content="html5"/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -382,6 +437,7 @@
 /head/meta;element not allowed
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -392,6 +448,7 @@
 #errors
 /head/meta/@charset;in XML:charset
 /head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"></base>
@@ -410,6 +467,7 @@
 <base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"><p/></base>
 #errors
 /base/p;element not allowed
+/base/p;no significant content;s
 
 #data
 <link rel="author" href="mailto:a@example.com"
@@ -432,6 +490,7 @@
     xmlns="http://www.w3.org/1999/xhtml"><p/></link>
 #errors
 /link/p;element not allowed
+/link/p;no significant content;s
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"></meta>
@@ -458,6 +517,7 @@
 /meta/p;element not allowed
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/p;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -471,6 +531,7 @@
 /head/noscript/meta;element not allowed
 /head/noscript/meta/@charset;in XML:charset
 /head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -483,6 +544,7 @@
 /head/noscript;in XML:noscript
 /head/noscript/meta;element not allowed
 /head/noscript/meta;attribute missing:name|http-equiv|charset
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -495,6 +557,7 @@
 /head/noscript;in XML:noscript
 /head/noscript/meta;element not allowed
 /head/noscript/meta/@http-equiv;enumerated:invalid
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -505,6 +568,7 @@
 </head>
 #errors
 /head/noscript;in XML:noscript
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -517,6 +581,7 @@
 /head/noscript;in XML:noscript
 /head/noscript/meta/@http-equiv;attribute not allowed
 /head/noscript/meta/@http-equiv;enumerated:invalid
+/head/title;no significant content;s
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>
@@ -533,10 +598,12 @@ p {color: green}
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"></body>
 #errors
+/body;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"> </body>
 #errors
+/body;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">a</body>
@@ -546,14 +613,20 @@ p {color: green}
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><p/></body>
 #errors
+/body;no significant content;s
+/body/p;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><blockquote/></body>
 #errors
+/body;no significant content;s
+/body/blockquote;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><div/></body>
 #errors
+/body;no significant content;s
+/body/div;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -562,19 +635,24 @@ p {color: green}
 #errors
 /body/script/@type;IMT:obsolete subtype;w
 /body/script;script:text/javascript;unsupported
+/body;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><b/></body>
 #errors
 /body/b;element not allowed
+/body;no significant content;s
+/body/b;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"></section>
 #errors
+/section;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"> </section>
 #errors
+/section;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">a</section>
@@ -584,14 +662,20 @@ p {color: green}
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><p/></section>
 #errors
+/section;no significant content;s
+/section/p;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><blockquote/></section>
 #errors
+/section;no significant content;s
+/section/blockquote;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><div/></section>
 #errors
+/section;no significant content;s
+/section/div;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -600,11 +684,14 @@ p {color: green}
 #errors
 /section/script/@type;IMT:obsolete subtype;w
 /section/script;script:text/javascript;unsupported
+/section;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><b/></section>
 #errors
 /section/b;element not allowed
+/section;no significant content;s
+/section/b;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -612,6 +699,7 @@ p {color: green}
 </section>
 #errors
 /section/style;style:text/css;unsupported
+/section;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -620,6 +708,8 @@ p {color: green}
 </section>
 #errors
 /section/style;style:text/css;unsupported
+/section;no significant content;s
+/section/p;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -629,6 +719,8 @@ p {color: green}
 #errors
 /section/style;element not allowed
 /section/style;style:text/css;unsupported
+/section;no significant content;s
+/section/p;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -638,6 +730,8 @@ p {color: green}
 #errors
 /section/b;element not allowed
 /section/style;style:text/css;unsupported
+/section;no significant content;s
+/section/b;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -648,6 +742,8 @@ p {color: green}
 /section/b;element not allowed
 /section/style;element not allowed
 /section/style;style:text/css;unsupported
+/section;no significant content;s
+/section/b;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -672,6 +768,8 @@ p {color: green}
 #errors
 /section/style;style:text/css;unsupported
 /section/style;style:text/css;unsupported
+/section;no significant content;s
+/section/p;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -680,6 +778,9 @@ p {color: green}
 </section>
 #errors
 /section/style;style:text/css;unsupported
+/section;no significant content;s
+/section/p;no significant content;s
+/section/p;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -698,95 +799,153 @@ p {color: green}
 <header xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /header;element missing:hn
+/header;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/></header>
 #errors
+/header;no significant content;s
+/header/h1;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h2/></header>
 #errors
+/header;no significant content;s
+/header/h2;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h3/></header>
 #errors
+/header;no significant content;s
+/header/h3;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h4/></header>
 #errors
+/header;no significant content;s
+/header/h4;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h5/></header>
 #errors
+/header;no significant content;s
+/header/h5;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h6/></header>
 #errors
+/header;no significant content;s
+/header/h6;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><div><h1/></div></header>
 #errors
+/header;no significant content;s
+/header/div;no significant content;s
+/header/div/h1;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><div><h2/></div></header>
 #errors
+/header;no significant content;s
+/header/div;no significant content;s
+/header/div/h2;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><div><h3/></div></header>
 #errors
+/header;no significant content;s
+/header/div;no significant content;s
+/header/div/h3;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><div><h4/></div></header>
 #errors
+/header;no significant content;s
+/header/div;no significant content;s
+/header/div/h4;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><div><h5/></div></header>
 #errors
+/header;no significant content;s
+/header/div;no significant content;s
+/header/div/h5;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><div><h6/></div></header>
 #errors
+/header;no significant content;s
+/header/div;no significant content;s
+/header/div/h6;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><div><div><h1/></div></div></header>
 #errors
+/header;no significant content;s
+/header/div;no significant content;s
+/header/div/div;no significant content;s
+/header/div/div/h1;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><header><h1/></header></header>
 #errors
 /header/header;element not allowed
+/header;no significant content;s
+/header/header;no significant content;s
+/header/header/h1;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><header/></header>
 #errors
 /header/header;element not allowed
 /header/header;element missing:hn
+/header;no significant content;s
+/header/h1;no significant content;s
+/header/header;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><header><h1/></header></div>
 #errors
+/div;no significant content;s
+/div/header;no significant content;s
+/div/header/h1;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><h1/><header></header></div>
 #errors
 /div/header;element missing:hn
+/div;no significant content;s
+/div/h1;no significant content;s
+/div/header;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><header></header><h1/></div>
 #errors
 /div/header;element missing:hn
+/div;no significant content;s
+/div/header;no significant content;s
+/div/h1;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><header><h1/></header>
 <header></header></div>
 #errors
+/div;no significant content;s
 /div/header;element missing:hn
+/div/header;no significant content;s
+/div/header/h1;no significant content;s
+/div/header;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><header></header>
 <header><h1/></header></div>
 #errors
 /div/header;element missing:hn
+/div;no significant content;s
+/div/header;no significant content;s
+/div/header;no significant content;s
+/div/header/h1;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -794,6 +953,10 @@ p {color: green}
 #errors
 /div/header/header;element not allowed
 /div/header/header;element missing:hn
+/div;no significant content;s
+/div/header;no significant content;s
+/div/header/h1;no significant content;s
+/div/header/header;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><header>
@@ -801,6 +964,10 @@ p {color: green}
 #errors
 /div/header/header;element not allowed
 /div/header/header;element missing:hn
+/div;no significant content;s
+/div/header;no significant content;s
+/div/header/header;no significant content;s
+/div/header/h1;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -808,58 +975,93 @@ p {color: green}
 #errors
 /div/header/h1/header;element missing:hn
 /div/header/h1/header;element not allowed
+/div;no significant content;s
+/div/header;no significant content;s
+/div/header/h1;no significant content;s
+/div/header/h1/header;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><footer/></header>
 #errors
 /header/footer;element not allowed
+/header;no significant content;s
+/header/h1;no significant content;s
+/header/footer;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><footer><h1/></footer></header>
 #errors
 /header/footer;element not allowed
 /header/footer/h1;element not allowed
+/header;no significant content;s
+/header/footer;no significant content;s
+/header/footer/h1;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/></header>
 #errors
+/header;no significant content;s
+/header/h1;no significant content;s
+/header/p;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/><blockquote/></header>
 #errors
 /header/blockquote;element not allowed
+/header;no significant content;s
+/header/h1;no significant content;s
+/header/p;no significant content;s
+/header/blockquote;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/><p/></header>
 #errors
+/header;no significant content;s
+/header/h1;no significant content;s
+/header/p;no significant content;s
+/header/p;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><h2/><h4/></header>
 #errors
+/header;no significant content;s
+/header/h1;no significant content;s
+/header/h2;no significant content;s
+/header/h4;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><section/></header>
 #errors
 /header/section;element not allowed
+/header;no significant content;s
+/header/h1;no significant content;s
+/header/section;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><section><h1/></section></header>
 #errors
 /header/section;element not allowed
+/header;no significant content;s
+/header/section;no significant content;s
+/header/section/h1;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><aside/></header>
 #errors
 /header/aside;element not allowed
 /header;element missing:hn
+/header;no significant content;s
+/header/aside;no significant content;s
 
 #data
 <li xmlns="http://www.w3.org/1999/xhtml"></li>
 #errors
+/li;no significant content;s
 
 #data
 <li xmlns="http://www.w3.org/1999/xhtml"> </li>
 #errors
+/li;no significant content;s
 
 #data
 <li xmlns="http://www.w3.org/1999/xhtml">XXX</li>
@@ -884,12 +1086,14 @@ p {color: green}
 <li></li>
 </ul>
 #errors
+/ul/li;no significant content;s
 
 #data
 <ul xmlns="http://www.w3.org/1999/xhtml">
 <li> </li>
 </ul>
 #errors
+/ul/li;no significant content;s
 
 #data
 <ul xmlns="http://www.w3.org/1999/xhtml">
@@ -922,12 +1126,14 @@ p {color: green}
 <li></li>
 </ol>
 #errors
+/ol/li;no significant content;s
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
 <li> </li>
 </ol>
 #errors
+/ol/li;no significant content;s
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
@@ -960,12 +1166,16 @@ p {color: green}
 <li></li>
 </menu>
 #errors
+/menu;no significant content;s
+/menu/li;no significant content;s
 
 #data
 <menu xmlns="http://www.w3.org/1999/xhtml">
 <li> </li>
 </menu>
 #errors
+/menu;no significant content;s
+/menu/li;no significant content;s
 
 #data
 <menu xmlns="http://www.w3.org/1999/xhtml">
@@ -1001,6 +1211,8 @@ p {color: green}
 </ul>
 </body>
 #errors
+/body;no significant content;s
+/body/ul/li;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -1009,6 +1221,8 @@ p {color: green}
 </ul>
 </body>
 #errors
+/body;no significant content;s
+/body/ul/li;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -1051,6 +1265,8 @@ p {color: green}
 </ol>
 </body>
 #errors
+/body;no significant content;s
+/body/ol/li;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -1059,6 +1275,8 @@ p {color: green}
 </ol>
 </body>
 #errors
+/body;no significant content;s
+/body/ol/li;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -1080,15 +1298,6 @@ p {color: green}
 <body xmlns="http://www.w3.org/1999/xhtml">
 <ol>
 <li>XXX<p>YYY</p></li>
-</ol>
-</body>
-#errors
-/body/ol/li/p;element not allowed
-
-#data
-<body xmlns="http://www.w3.org/1999/xhtml">
-<ol>
-<li><p>XXX</p>YYY</li>
 </ol>
 </body>
 #errors
@@ -1096,11 +1305,23 @@ p {color: green}
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
+<ol>
+<li><p>XXX</p>YYY</li>
+</ol>
+</body>
+#errors
+/body/ol/li/p;element not allowed
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
 <menu>
 <li></li>
 </menu>
 </body>
 #errors
+/body;no significant content;s
+/body/menu;no significant content;s
+/body/menu/li;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -1109,6 +1330,9 @@ p {color: green}
 </menu>
 </body>
 #errors
+/body;no significant content;s
+/body/menu;no significant content;s
+/body/menu/li;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -1152,6 +1376,8 @@ p {color: green}
 </ul>
 </div>
 #errors
+/div;no significant content;s
+/div/ul/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1160,6 +1386,8 @@ p {color: green}
 </ul>
 </div>
 #errors
+/div;no significant content;s
+/div/ul/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1202,6 +1430,8 @@ p {color: green}
 </ol>
 </div>
 #errors
+/div;no significant content;s
+/div/ol/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1210,6 +1440,8 @@ p {color: green}
 </ol>
 </div>
 #errors
+/div;no significant content;s
+/div/ol/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1252,6 +1484,9 @@ p {color: green}
 </menu>
 </div>
 #errors
+/div;no significant content;s
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1260,6 +1495,9 @@ p {color: green}
 </menu>
 </div>
 #errors
+/div;no significant content;s
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1304,6 +1542,9 @@ p {color: green}
 </ul>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/ul/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1313,6 +1554,9 @@ p {color: green}
 </ul>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/ul/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1322,6 +1566,7 @@ p {color: green}
 </ul>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1331,6 +1576,7 @@ p {color: green}
 </ul>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1341,6 +1587,7 @@ p {color: green}
 </div>
 #errors
 /div/ul/li/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1351,6 +1598,7 @@ p {color: green}
 </div>
 #errors
 /div/ul/li/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1360,6 +1608,9 @@ p {color: green}
 </ol>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/ol/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1369,6 +1620,9 @@ p {color: green}
 </ol>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/ol/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1378,6 +1632,7 @@ p {color: green}
 </ol>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1387,6 +1642,7 @@ p {color: green}
 </ol>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1397,6 +1653,7 @@ p {color: green}
 </div>
 #errors
 /div/ol/li/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1407,6 +1664,7 @@ p {color: green}
 </div>
 #errors
 /div/ol/li/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1416,6 +1674,10 @@ p {color: green}
 </menu>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1425,6 +1687,10 @@ p {color: green}
 </menu>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1434,6 +1700,7 @@ p {color: green}
 </menu>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1444,6 +1711,7 @@ p {color: green}
 </div>
 #errors
 /div/menu/li/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1454,10 +1722,392 @@ p {color: green}
 </div>
 #errors
 /div/menu/li/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p/>
+<menu>
+<li><p>XXX</p>YYY</li>
+</menu>
+</div>
+#errors
+/div/menu/li/p;element not allowed
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ul>
+<li></li>
+</ul>
+<p/>
+</div>
+#errors
+/div;no significant content;s
+/div/ul/li;no significant content;s
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ul>
+<li> </li>
+</ul>
+<p/>
+</div>
+#errors
+/div;no significant content;s
+/div/ul/li;no significant content;s
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ul>
+<li>XXX</li>
+</ul>
+<p/>
+</div>
+#errors
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ul>
+<li><p>XXX</p></li>
+</ul>
+<p/>
+</div>
+#errors
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ul>
+<li>XXX<p>YYY</p></li>
+</ul>
+<p/>
+</div>
+#errors
+/div/ul/li/p;element not allowed
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ul>
+<li><p>XXX</p>YYY</li>
+</ul>
+<p/>
+</div>
+#errors
+/div/ul/li/p;element not allowed
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ol>
+<li></li>
+</ol>
+<p/>
+</div>
+#errors
+/div;no significant content;s
+/div/ol/li;no significant content;s
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ol>
+<li> </li>
+</ol>
+<p/>
+</div>
+#errors
+/div;no significant content;s
+/div/ol/li;no significant content;s
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ol>
+<li>XXX</li>
+</ol>
+<p/>
+</div>
+#errors
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ol>
+<li><p>XXX</p></li>
+</ol>
+<p/>
+</div>
+#errors
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ol>
+<li>XXX<p>YYY</p></li>
+</ol>
+<p/>
+</div>
+#errors
+/div/ol/li/p;element not allowed
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<ol>
+<li><p>XXX</p>YYY</li>
+</ol>
+<p/>
+</div>
+#errors
+/div/ol/li/p;element not allowed
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<menu>
+<li></li>
+</menu>
+<p/>
+</div>
+#errors
+/div;no significant content;s
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<menu>
+<li> </li>
+</menu>
+<p/>
+</div>
+#errors
+/div;no significant content;s
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<menu>
+<li>XXX</li>
+</menu>
+<p/>
+</div>
+#errors
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<menu>
+<li><p>XXX</p></li>
+</menu>
+<p/>
+</div>
+#errors
+/div/menu/li/p;element not allowed
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<menu>
+<li>XXX<p>YYY</p></li>
+</menu>
+<p/>
+</div>
+#errors
+/div/menu/li/p;element not allowed
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<menu>
+<li><p>XXX</p>YYY</li>
+</menu>
+<p/>
+</div>
+#errors
+/div/menu/li/p;element not allowed
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ul>
+<li></li>
+</ul>
+</div>
+#errors
+/div/ul/li;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ul>
+<li> </li>
+</ul>
+</div>
+#errors
+/div/ul/li;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ul>
+<li>XXX</li>
+</ul>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ul>
+<li><p>XXX</p></li>
+</ul>
+</div>
+#errors
+/div/ul/li/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ul>
+<li>XXX<p>YYY</p></li>
+</ul>
+</div>
+#errors
+/div/ul/li/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ul>
+<li><p>XXX</p>YYY</li>
+</ul>
+</div>
+#errors
+/div/ul/li/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ol>
+<li></li>
+</ol>
+</div>
+#errors
+/div/ol/li;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ol>
+<li> </li>
+</ol>
+</div>
+#errors
+/div/ol/li;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ol>
+<li>XXX</li>
+</ol>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ol>
+<li><p>XXX</p></li>
+</ol>
+</div>
+#errors
+/div/ol/li/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ol>
+<li>XXX<p>YYY</p></li>
+</ol>
+</div>
+#errors
+/div/ol/li/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<ol>
+<li><p>XXX</p>YYY</li>
+</ol>
+</div>
+#errors
+/div/ol/li/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<menu>
+<li></li>
+</menu>
+</div>
+#errors
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<menu>
+<li> </li>
+</menu>
+</div>
+#errors
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<menu>
+<li>XXX</li>
+</menu>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<menu>
+<li><p>XXX</p></li>
+</menu>
+</div>
+#errors
+/div/menu/li/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
+<menu>
+<li>XXX<p>YYY</p></li>
+</menu>
+</div>
+#errors
+/div/menu/li/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aaa
 <menu>
 <li><p>XXX</p>YYY</li>
 </menu>
@@ -1470,349 +2120,10 @@ p {color: green}
 <ul>
 <li></li>
 </ul>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ul>
-<li> </li>
-</ul>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ul>
-<li>XXX</li>
-</ul>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ul>
-<li><p>XXX</p></li>
-</ul>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ul>
-<li>XXX<p>YYY</p></li>
-</ul>
-<p/>
-</div>
-#errors
-/div/ul/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ul>
-<li><p>XXX</p>YYY</li>
-</ul>
-<p/>
-</div>
-#errors
-/div/ul/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ol>
-<li></li>
-</ol>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ol>
-<li> </li>
-</ol>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ol>
-<li>XXX</li>
-</ol>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ol>
-<li><p>XXX</p></li>
-</ol>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ol>
-<li>XXX<p>YYY</p></li>
-</ol>
-<p/>
-</div>
-#errors
-/div/ol/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ol>
-<li><p>XXX</p>YYY</li>
-</ol>
-<p/>
-</div>
-#errors
-/div/ol/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<menu>
-<li></li>
-</menu>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<menu>
-<li> </li>
-</menu>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<menu>
-<li>XXX</li>
-</menu>
-<p/>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<menu>
-<li><p>XXX</p></li>
-</menu>
-<p/>
-</div>
-#errors
-/div/menu/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<menu>
-<li>XXX<p>YYY</p></li>
-</menu>
-<p/>
-</div>
-#errors
-/div/menu/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<menu>
-<li><p>XXX</p>YYY</li>
-</menu>
-<p/>
-</div>
-#errors
-/div/menu/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ul>
-<li></li>
-</ul>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ul>
-<li> </li>
-</ul>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ul>
-<li>XXX</li>
-</ul>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ul>
-<li><p>XXX</p></li>
-</ul>
-</div>
-#errors
-/div/ul/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ul>
-<li>XXX<p>YYY</p></li>
-</ul>
-</div>
-#errors
-/div/ul/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ul>
-<li><p>XXX</p>YYY</li>
-</ul>
-</div>
-#errors
-/div/ul/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ol>
-<li></li>
-</ol>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ol>
-<li> </li>
-</ol>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ol>
-<li>XXX</li>
-</ol>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ol>
-<li><p>XXX</p></li>
-</ol>
-</div>
-#errors
-/div/ol/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ol>
-<li>XXX<p>YYY</p></li>
-</ol>
-</div>
-#errors
-/div/ol/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<ol>
-<li><p>XXX</p>YYY</li>
-</ol>
-</div>
-#errors
-/div/ol/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<menu>
-<li></li>
-</menu>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<menu>
-<li> </li>
-</menu>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<menu>
-<li>XXX</li>
-</menu>
-</div>
-#errors
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<menu>
-<li><p>XXX</p></li>
-</menu>
-</div>
-#errors
-/div/menu/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<menu>
-<li>XXX<p>YYY</p></li>
-</menu>
-</div>
-#errors
-/div/menu/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-aaa
-<menu>
-<li><p>XXX</p>YYY</li>
-</menu>
-</div>
-#errors
-/div/menu/li/p;element not allowed
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<ul>
-<li></li>
-</ul>
 aaa
 </div>
 #errors
+/div/ul/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1822,6 +2133,7 @@ aaa
 aaa
 </div>
 #errors
+/div/ul/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1870,6 +2182,7 @@ aaa
 aaa
 </div>
 #errors
+/div/ol/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1879,6 +2192,7 @@ aaa
 aaa
 </div>
 #errors
+/div/ol/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1927,6 +2241,8 @@ aaa
 aaa
 </div>
 #errors
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1936,6 +2252,8 @@ aaa
 aaa
 </div>
 #errors
+/div/menu;no significant content;s
+/div/menu/li;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1979,10 +2297,12 @@ aaa
 #data
 <dd xmlns="http://www.w3.org/1999/xhtml"></dd>
 #errors
+/dd;no significant content;s
 
 #data
 <dd xmlns="http://www.w3.org/1999/xhtml"> </dd>
 #errors
+/dd;no significant content;s
 
 #data
 <dd xmlns="http://www.w3.org/1999/xhtml">XXX</dd>
@@ -2010,6 +2330,7 @@ aaa
   </dl>
 </body>
 #errors
+/body/dl/dd;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -2019,6 +2340,7 @@ aaa
   </dl>
 </body>
 #errors
+/body/dl/dd;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -2064,6 +2386,7 @@ aaa
   <dd></dd>
 </dl>
 #errors
+/dl/dd;no significant content;s
 
 #data
 <dl xmlns="http://www.w3.org/1999/xhtml">
@@ -2071,6 +2394,7 @@ aaa
   <dd> </dd>
 </dl>
 #errors
+/dl/dd;no significant content;s
 
 #data
 <dl xmlns="http://www.w3.org/1999/xhtml">
@@ -2110,6 +2434,7 @@ aaa
   </dl>
 </p>
 #errors
+/p/dl/dd;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2119,6 +2444,7 @@ aaa
   </dl>
 </p>
 #errors
+/p/dl/dd;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2158,6 +2484,8 @@ aaa
   </dl>
 </div>
 #errors
+/div/p;no significant content;s
+/div/dl/dd;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2168,6 +2496,8 @@ aaa
   </dl>
 </div>
 #errors
+/div/p;no significant content;s
+/div/dl/dd;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2178,6 +2508,7 @@ aaa
   </dl>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2188,6 +2519,7 @@ aaa
   </dl>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2199,6 +2531,7 @@ aaa
 </div>
 #errors
 /div/dl/dd/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2209,6 +2542,8 @@ aaa
   <p/>
 </div>
 #errors
+/div/dl/dd;no significant content;s
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2219,6 +2554,8 @@ aaa
   <p/>
 </div>
 #errors
+/div/dl/dd;no significant content;s
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2229,6 +2566,7 @@ aaa
   <p/>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2239,6 +2577,7 @@ aaa
   <p/>
 </div>
 #errors
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2250,6 +2589,7 @@ aaa
 </div>
 #errors
 /div/dl/dd/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2261,6 +2601,7 @@ aaa
 </div>
 #errors
 /div/dl/dd/p;element not allowed
+/div/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2271,6 +2612,7 @@ aaa
   </dl>
 </div>
 #errors
+/div/dl/dd;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2281,6 +2623,7 @@ aaa
   </dl>
 </div>
 #errors
+/div/dl/dd;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2323,6 +2666,7 @@ aaa
   aaa
 </div>
 #errors
+/div/dl/dd;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2333,6 +2677,7 @@ aaa
   aaa
 </div>
 #errors
+/div/dl/dd;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2382,6 +2727,7 @@ aaa
   <dd></dd>
 </dialog>
 #errors
+/dialog/dd;no significant content;s
 
 #data
 <dialog xmlns="http://www.w3.org/1999/xhtml">
@@ -2389,6 +2735,7 @@ aaa
   <dd> </dd>
 </dialog>
 #errors
+/dialog/dd;no significant content;s
 
 #data
 <dialog xmlns="http://www.w3.org/1999/xhtml">
@@ -2423,10 +2770,12 @@ aaa
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"></a>
 #errors
+/a;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"> </a>
 #errors
+/a;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">XXX</a>
@@ -2443,10 +2792,13 @@ aaa
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"><blockquote/></a>
 #errors
+/a;no significant content;s
+/a/blockquote;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">XXX<blockquote/></a>
 #errors
+/a/blockquote;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"><a>XXX</a></a>
@@ -2468,18 +2820,33 @@ aaa
 <p><a></a></p><ul><li><a></a></li></ul>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/p/a;no significant content;s
+/div/ul/li;no significant content;s
+/div/ul/li/a;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><a></a></p><ol><li><a></a></li></ol>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/p/a;no significant content;s
+/div/ol/li;no significant content;s
+/div/ol/li/a;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><a></a></p><ol><li><datagrid/></li></ol>
 </div>
 #errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/p/a;no significant content;s
+/div/ol/li;no significant content;s
+/div/ol/li/datagrid;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -2488,6 +2855,10 @@ aaa
 </details>
 #errors
 /details/p/a;element not allowed
+/details;no significant content;s
+/details/legend;no significant content;s
+/details/p;no significant content;s
+/details/p/a;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -2495,14 +2866,19 @@ aaa
 </details>
 #errors
 /details/legend/a;element not allowed
+/details;no significant content;s
+/details/legend;no significant content;s
+/details/legend/a;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">  </datagrid>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">aaa</datagrid>
@@ -2512,50 +2888,69 @@ aaa
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/></datagrid>
 #errors
+/datagrid;no significant content;s
+/datagrid/p;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/><p/></datagrid>
 #errors
+/datagrid;no significant content;s
+/datagrid/p;no significant content;s
+/datagrid/p;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">  <p/>  <p/> </datagrid>
 #errors
+/datagrid;no significant content;s
+/datagrid/p;no significant content;s
+/datagrid/p;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/>&amp;<p/></datagrid>
 #errors
 /datagrid/"&";character not allowed
+/datagrid/p;no significant content;s
+/datagrid/p;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/><table/></datagrid>
 #errors
+/datagrid;no significant content;s
+/datagrid/p;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><ul/></datagrid>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/></datagrid>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/><table/></datagrid>
 #errors
 /datagrid/table;element not allowed
+/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/><p/><table/></datagrid>
 #errors
 /datagrid/p;element not allowed
 /datagrid/table;element not allowed
+/datagrid;no significant content;s
+/datagrid/p;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>
 #errors
+/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/>aa</datagrid>
@@ -2576,11 +2971,16 @@ aaa
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datagrid/></datagrid>
 #errors
 /datagrid/datagrid;element not allowed
+/datagrid;no significant content;s
+/datagrid/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><div><datagrid/></div></datagrid>
 #errors
 /datagrid/div/datagrid;element not allowed
+/datagrid;no significant content;s
+/datagrid/div;no significant content;s
+/datagrid/div/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">
@@ -2588,12 +2988,18 @@ aaa
 </datagrid>
 #errors
 /datagrid/p/a;element not allowed
+/datagrid;no significant content;s
+/datagrid/p;no significant content;s
+/datagrid/p/a;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">
 <details><legend/></details>
 </datagrid>
 #errors
+/datagrid;no significant content;s
+/datagrid/details;no significant content;s
+/datagrid/details/legend;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -2603,6 +3009,9 @@ aaa
 </a>
 #errors
 /a/details;element not allowed
+/a;no significant content;s
+/a/details;no significant content;s
+/a/details/legend;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -2612,6 +3021,10 @@ aaa
 </a>
 #errors
 /a/span/details;element not allowed
+/a;no significant content;s
+/a/span;no significant content;s
+/a/span/details;no significant content;s
+/a/span/details/legend;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -2619,6 +3032,8 @@ aaa
 </a>
 #errors
 /a/datagrid;element not allowed
+/a;no significant content;s
+/a/datagrid;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -2626,14 +3041,19 @@ aaa
 </a>
 #errors
 /a/span/datagrid;element not allowed
+/a;no significant content;s
+/a/span;no significant content;s
+/a/span/datagrid;no significant content;s
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"></em>
 #errors
+/em;no significant content;s
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"> </em>
 #errors
+/em;no significant content;s
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml">XXX</em>
@@ -2642,27 +3062,36 @@ aaa
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><blockquote/></em>
 #errors
+/em;no significant content;s
+/em/blockquote;no significant content;s
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml">XXX<blockquote/></em>
 #errors
+/em/blockquote;no significant content;s
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><p/></em>
 #errors
 /em/p;element not allowed
+/em;no significant content;s
+/em/p;no significant content;s
 
 #data
 <code xmlns="http://www.w3.org/1999/xhtml">
   <em></em>
 </code>
 #errors
+/code;no significant content;s
+/code/em;no significant content;s
 
 #data
 <code xmlns="http://www.w3.org/1999/xhtml">
   <em> </em>
 </code>
 #errors
+/code;no significant content;s
+/code/em;no significant content;s
 
 #data
 <code xmlns="http://www.w3.org/1999/xhtml">
@@ -2675,6 +3104,7 @@ aaa
   <em>XXX<b/></em>
 </code>
 #errors
+/code/em/b;no significant content;s
 
 #data
 <code xmlns="http://www.w3.org/1999/xhtml">
@@ -2682,18 +3112,23 @@ aaa
 </code>
 #errors
 /code/em/blockquote;element not allowed
+/code/em/blockquote;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
   <em></em>
 </p>
 #errors
+/p;no significant content;s
+/p/em;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
   <em> </em>
 </p>
 #errors
+/p;no significant content;s
+/p/em;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2712,6 +3147,7 @@ aaa
   <em>XXX<blockquote/></em>
 </p>
 #errors
+/p/em/blockquote;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2724,12 +3160,16 @@ aaa
 <dfn></dfn>
 </p>
 #errors
+/p;no significant content;s
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
 <dfn> </dfn>
 </p>
 #errors
+/p;no significant content;s
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2749,6 +3189,10 @@ aaa
 </p>
 #errors
 /p/dfn/em/blockquote;element not allowed
+/p;no significant content;s
+/p/dfn;no significant content;s
+/p/dfn/em;no significant content;s
+/p/dfn/em/blockquote;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2756,6 +3200,9 @@ aaa
 </p>
 #errors
 /p/dfn/blockquote;element not allowed
+/p;no significant content;s
+/p/dfn;no significant content;s
+/p/dfn/blockquote;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2763,6 +3210,9 @@ aaa
 </p>
 #errors
 /p/dfn/h1;element not allowed
+/p;no significant content;s
+/p/dfn;no significant content;s
+/p/dfn/h1;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2778,6 +3228,9 @@ aaa
 </p>
 #errors
 /p/dfn;duplicate term
+/p;no significant content;s
+/p/dfn;no significant content;s
+/p/dfn;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2786,6 +3239,10 @@ aaa
 #errors
 /p/dfn/em/dfn;element not allowed
 /p/dfn/em/dfn;duplicate term
+/p;no significant content;s
+/p/dfn;no significant content;s
+/p/dfn/em;no significant content;s
+/p/dfn/em/dfn;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -2794,6 +3251,9 @@ aaa
 <tfoot><tr><td/></tr></tfoot>
 </table>
 #errors
+/table/thead/tr/td;no significant content;s
+/table/tbody/tr/td;no significant content;s
+/table/tfoot/tr/td;no significant content;s
 
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml">
@@ -2870,6 +3330,8 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/p;element not allowed
+/head/title;no significant content;s
+/head/noscript/p;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2881,6 +3343,7 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/noscript;element not allowed
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2891,6 +3354,7 @@ aaa
 </head>
 #errors
 /head/noscript;in XML:noscript
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2902,6 +3366,7 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/style;style:text/css;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2914,6 +3379,7 @@ aaa
 /head/noscript;in XML:noscript
 /head/noscript/script;element not allowed
 /head/noscript/script;script:text/javascript;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2924,6 +3390,7 @@ aaa
 </head>
 #errors
 /head/noscript;in XML:noscript
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2935,6 +3402,7 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/base;element not allowed
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2946,6 +3414,7 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/event-source;element not allowed
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2957,6 +3426,8 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/title;element not allowed
+/head/title;no significant content;s
+/head/noscript/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2969,6 +3440,7 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/style;style:text/css;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2985,6 +3457,7 @@ aaa
 /head/noscript/noscript;in XML:noscript
 /head/noscript/noscript;element not allowed
 /head/noscript/noscript/style;style:text/css;unsupported
+/head/title;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -3001,6 +3474,8 @@ aaa
 /head/noscript/noscript;in XML:noscript
 /head/noscript/noscript;element not allowed
 /head/noscript/noscript/p;element not allowed
+/head/title;no significant content;s
+/head/noscript/noscript/p;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -3019,6 +3494,7 @@ aaa
 /head/noscript/noscript/meta;element not allowed
 /head/noscript/noscript/meta/@charset;in XML:charset
 /head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/title;no significant content;s
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -3026,6 +3502,7 @@ aaa
 </noscript>
 #errors
 /noscript;in XML:noscript
+/noscript;no significant content;s
 /noscript/meta;element not allowed
 
 #data
@@ -3033,14 +3510,17 @@ aaa
 <title/>
 </noscript>
 #errors
+/noscript;no significant content;s
 /noscript;in XML:noscript
 /noscript/title;element not allowed
+/noscript/title;no significant content;s
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
 <link rel="stylesheet" href=""/>
 </noscript>
 #errors
+/noscript;no significant content;s
 /noscript;in XML:noscript
 /noscript/link;element not allowed
 
@@ -3049,6 +3529,7 @@ aaa
 <style/>
 </noscript>
 #errors
+/noscript;no significant content;s
 /noscript;in XML:noscript
 /noscript/style;element not allowed
 /noscript/style;style:text/css;unsupported
@@ -3058,6 +3539,7 @@ aaa
 <meta charset="us-ascii"/>
 </noscript>
 #errors
+/noscript;no significant content;s
 /noscript;in XML:noscript
 /noscript/meta;element not allowed
 /noscript/meta/@charset;in XML:charset
@@ -3068,6 +3550,7 @@ aaa
 <noscript/>
 </noscript>
 #errors
+/noscript;no significant content;s
 /noscript;in XML:noscript
 /noscript/noscript;element not allowed
 /noscript/noscript;in XML:noscript
@@ -3079,33 +3562,39 @@ aaa
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><rule/></datatemplate>
 #errors
+/datatemplate/rule;no significant content;s
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml">
   <rule/>
 </datatemplate>
 #errors
+/datatemplate/rule;no significant content;s
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml">
   <rule/><!-- -->
 </datatemplate>
 #errors
+/datatemplate/rule;no significant content;s
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><rule/>aa</datatemplate>
 #errors
 /datatemplate/"aa";character not allowed
+/datatemplate/rule;no significant content;s
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml">aa<rule/></datatemplate>
 #errors
 /datatemplate/"aa";character not allowed
+/datatemplate/rule;no significant content;s
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><p/></datatemplate>
 #errors
 /datatemplate/p;element not allowed:datatemplate
+/datatemplate/p;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -3113,18 +3602,21 @@ aaa
 <datatemplate/>
 </head>
 #errors
+/head/title;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate/>
 </body>
 #errors
+/body;no significant content;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate/>
 </section>
 #errors
+/section;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -3132,14 +3624,18 @@ aaa
 </p>
 #errors
 /p/datatemplate;element not allowed
+/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p/></rule>
 #errors
+/rule;no significant content;s
+/rule/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">aa</rule>
@@ -3148,16 +3644,19 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><!----><?a?></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><unknownelement/></rule>
 #errors
 /rule/unknownelement;element;unsupported
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><unknown xmlns=""/></rule>
 #errors
 /rule/unknown;element;unsupported
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3165,21 +3664,28 @@ aaa
 </rule>
 #errors
 /rule/unknown;element;unsupported
+/rule;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><rule/></p>
 #errors
 /p/rule;element not allowed
+/p;no significant content;s
+/p/rule;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><rule/></body>
 #errors
 /body/rule;element not allowed
+/body;no significant content;s
+/body/rule;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><rule/></head>
 #errors
 /head/rule;element not allowed
+/head/title;no significant content;s
+/head/rule;no significant content;s
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3198,6 +3704,7 @@ aaa
 <nest xmlns="http://www.w3.org/1999/xhtml"><p/></nest>
 #errors
 /nest/p;element not allowed
+/nest/p;no significant content;s
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml"><!----></nest>
@@ -3212,16 +3719,19 @@ aaa
 <p xmlns="http://www.w3.org/1999/xhtml"><nest/></p>
 #errors
 /p/nest;element not allowed
+/p;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><nest/></head>
 #errors
 /head/nest;element not allowed
+/head/title;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><nest/></div>
 #errors
 /div/nest;element not allowed
+/div;no significant content;s
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><nest/></datatemplate>
@@ -3231,10 +3741,12 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><nest/></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><br><nest/></br></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><br><nest/>a</br></rule>
@@ -3244,6 +3756,8 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><title><nest/></title></rule>
 #errors
+/rule;no significant content;s
+/rule/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><title><nest/>aa</title></rule>
@@ -3255,15 +3769,19 @@ aaa
 </rule>
 #errors
 /rule/plaintext;element;unsupported
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><textarea><nest/></textarea></rule>
 #errors
 /rule/textarea;element;unsupported
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><section><nest/></section></rule>
 #errors
+/rule;no significant content;s
+/rule/section;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3271,6 +3789,8 @@ aaa
 </rule>
 #errors
 /rule/section/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/section;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3278,6 +3798,8 @@ aaa
 </rule>
 #errors
 /rule/section/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/section;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3285,6 +3807,9 @@ aaa
 </rule>
 #errors
 /rule/section/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/section;no significant content;s
+/rule/section/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3293,10 +3818,15 @@ aaa
 #errors
 /rule/section/style;element not allowed
 /rule/section/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/section;no significant content;s
+/rule/section/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p><nest/></p></rule>
 #errors
+/rule;no significant content;s
+/rule/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p><nest/>aaa</p></rule>
@@ -3305,14 +3835,20 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p><!----><nest/></p></rule>
 #errors
+/rule;no significant content;s
+/rule/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><body><nest/></body></rule>
 #errors
+/rule;no significant content;s
+/rule/body;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><em><nest/></em></rule>
 #errors
+/rule;no significant content;s
+/rule/em;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><em>aa<nest/></em></rule>
@@ -3321,30 +3857,49 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><em><nest/><i/></em></rule>
 #errors
+/rule;no significant content;s
+/rule/em;no significant content;s
+/rule/em/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><sub><nest/></sub></rule>
 #errors
+/rule;no significant content;s
+/rule/sub;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><sup><nest/><sub/></sup></rule>
 #errors
+/rule;no significant content;s
+/rule/sup;no significant content;s
+/rule/sup/sub;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><sub><em><nest/></em></sub></rule>
 #errors
+/rule;no significant content;s
+/rule/sub;no significant content;s
+/rule/sub/em;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/></div></rule>
 #errors
+/rule;no significant content;s
+/rule/div;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><p/></div></rule>
 #errors
+/rule;no significant content;s
+/rule/div;no significant content;s
+/rule/div/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><i/></div></rule>
 #errors
+/rule;no significant content;s
+/rule/div;no significant content;s
+/rule/div/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/>aa</div></rule>
@@ -3354,14 +3909,24 @@ aaa
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><p/><i/></div></rule>
 #errors
 /rule/div/p;element not allowed
+/rule;no significant content;s
+/rule/div;no significant content;s
+/rule/div/p;no significant content;s
+/rule/div/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><p/><nest/></div></rule>
 #errors
+/rule;no significant content;s
+/rule/div;no significant content;s
+/rule/div/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><i/><nest/></div></rule>
 #errors
+/rule;no significant content;s
+/rule/div;no significant content;s
+/rule/div/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div>aa<nest/></div></rule>
@@ -3371,10 +3936,13 @@ aaa
 <rule xmlns="http://www.w3.org/1999/xhtml"><div>aa<nest/><p/></div></rule>
 #errors
 /rule/div/p;element not allowed
+/rule/div/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/></aside></rule>
 #errors
+/rule;no significant content;s
+/rule/aside;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/>aa</aside></rule>
@@ -3383,10 +3951,16 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/><i/></aside></rule>
 #errors
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/><p/></aside></rule>
 #errors
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside>aa<nest/></aside></rule>
@@ -3395,10 +3969,16 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><i/><nest/></aside></rule>
 #errors
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><p/><nest/></aside></rule>
 #errors
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3406,6 +3986,8 @@ aaa
 </rule>
 #errors
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3420,6 +4002,9 @@ aaa
 </rule>
 #errors
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3427,6 +4012,9 @@ aaa
 </rule>
 #errors
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3434,6 +4022,10 @@ aaa
 </rule>
 #errors
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
+/rule/aside/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3441,6 +4033,10 @@ aaa
 </rule>
 #errors
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
+/rule/aside/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3448,6 +4044,9 @@ aaa
 </rule>
 #errors
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3464,6 +4063,9 @@ aaa
 #errors
 /rule/aside/style;element not allowed
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3472,6 +4074,9 @@ aaa
 #errors
 /rule/aside/style;element not allowed
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3484,18 +4089,27 @@ aaa
 <aside><i/><nest/></aside>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <aside><blockquote/><nest/></aside>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <aside><p/><nest/></aside>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3512,6 +4126,9 @@ aaa
 #errors
 /rule/aside/style;element not allowed
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3520,6 +4137,9 @@ aaa
 #errors
 /rule/aside/style;element not allowed
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3528,38 +4148,58 @@ aaa
 #errors
 /rule/aside/style;element not allowed
 /rule/aside/style;style:text/css;unsupported
+/rule;no significant content;s
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ins><nest/></ins></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p><ins><nest/></ins></p></rule>
 #errors
+/rule;no significant content;s
+/rule/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html><nest/></html></rule>
 #errors
 /rule/html;child element missing:head
 /rule/html;child element missing:body
+/rule;no significant content;s
+/rule/html;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
 <head><title/></head><body/><nest/>
 </html></rule>
 #errors
+/rule;no significant content;s
+/rule/html;no significant content;s
+/rule/html/head/title;no significant content;s
+/rule/html/body;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
 <head><title/></head><nest/><body/>
 </html></rule>
 #errors
+/rule;no significant content;s
+/rule/html;no significant content;s
+/rule/html/head/title;no significant content;s
+/rule/html/body;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
 <nest/><head><title/></head><body/>
 </html></rule>
 #errors
+/rule;no significant content;s
+/rule/html;no significant content;s
+/rule/html/head/title;no significant content;s
+/rule/html/body;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -3567,6 +4207,11 @@ aaa
 </html></rule>
 #errors
 /rule/html/body;element not allowed
+/rule;no significant content;s
+/rule/html;no significant content;s
+/rule/html/head/title;no significant content;s
+/rule/html/body;no significant content;s
+/rule/html/body;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -3574,6 +4219,9 @@ aaa
 </html></rule>
 #errors
 /rule/html;child element missing:body
+/rule;no significant content;s
+/rule/html;no significant content;s
+/rule/html/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -3581,12 +4229,19 @@ aaa
 </html></rule>
 #errors
 /rule/html/body;ps element missing:head
+/rule;no significant content;s
+/rule/html;no significant content;s
+/rule/html/body;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
 <head><title/></head><body/><nest/>
 </html></rule>
 #errors
+/rule;no significant content;s
+/rule/html;no significant content;s
+/rule/html/head/title;no significant content;s
+/rule/html/body;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3594,30 +4249,39 @@ aaa
 </rule>
 #errors
 /rule/head;child element missing:title
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <head><title/><nest/></head>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <head><nest/><title/></head>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <head><nest/><base href="http://www.example.com/"/><title/></head>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <head><base href="http://www.example.com/"/><nest/><title/></head>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3626,6 +4290,8 @@ aaa
 #errors
 /rule/head/meta/@charset;in XML:charset
 /rule/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/rule;no significant content;s
+/rule/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3634,20 +4300,26 @@ aaa
 #errors
 /rule/head/meta/@charset;in XML:charset
 /rule/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/rule;no significant content;s
+/rule/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><style><nest/></style></rule>
 #errors
 /rule/style;style:text/css;unsupported
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><script><nest/></script></rule>
 #errors
 /rule/script;script:text/javascript;unsupported
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/></footer></rule>
 #errors
+/rule;no significant content;s
+/rule/footer;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/>a</footer></rule>
@@ -3656,15 +4328,23 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><i/></footer></rule>
 #errors
+/rule;no significant content;s
+/rule/footer;no significant content;s
+/rule/footer/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><ul/></footer></rule>
 #errors
+/rule;no significant content;s
+/rule/footer;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><p/></footer></rule>
 #errors
 /rule/footer/p;element not allowed
+/rule;no significant content;s
+/rule/footer;no significant content;s
+/rule/footer/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer>a<nest/></footer></rule>
@@ -3673,34 +4353,48 @@ aaa
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><i/><nest/></footer></rule>
 #errors
+/rule;no significant content;s
+/rule/footer;no significant content;s
+/rule/footer/i;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><ol/><nest/></footer></rule>
 #errors
+/rule;no significant content;s
+/rule/footer;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><p/><nest/></footer></rule>
 #errors
 /rule/footer/p;element not allowed
+/rule;no significant content;s
+/rule/footer;no significant content;s
+/rule/footer/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer>a<nest/><p/></footer></rule>
 #errors
 /rule/footer/p;element not allowed
+/rule/footer/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><p/><nest/>a</footer></rule>
 #errors
 /rule/footer/p;element not allowed
+/rule/footer/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>
 #errors
 /rule/footer/h1;element not allowed
+/rule;no significant content;s
+/rule/footer;no significant content;s
+/rule/footer/h1;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dialog><nest/></dialog></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3708,12 +4402,17 @@ aaa
 </rule>
 #errors
 /rule/dialog;child element missing:dd
+/rule;no significant content;s
+/rule/dialog/dt;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <dialog><dt/><dd/><nest/></dialog>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3721,18 +4420,30 @@ aaa
 </rule>
 #errors
 /rule/dialog;child element missing:dd
+/rule;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+/rule/dialog/dt;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <dialog><dt/><dd/><dt/><dd/><nest/></dialog>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <dialog><dt/><nest/><dd/></dialog>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3740,6 +4451,10 @@ aaa
 </rule>
 #errors
 /rule/dialog/dt;ps element missing:dd
+/rule;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3747,132 +4462,187 @@ aaa
 </rule>
 #errors
 /rule/dialog;child element missing:dd
+/rule;no significant content;s
+/rule/dialog/dt;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <dialog><nest/><dt/><dd/></dialog>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ul><nest/></ul></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ul><li/><nest/></ul></rule>
 #errors
+/rule;no significant content;s
+/rule/ul/li;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ul><nest/><li/></ul></rule>
 #errors
+/rule;no significant content;s
+/rule/ul/li;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ol><nest/></ol></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/></dl></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/><dt/></dl></rule>
 #errors
+/rule;no significant content;s
 /rule/dl;child element missing:dd
+/rule/dl/dt;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><nest/></dl></rule>
 #errors
 /rule/dl;child element missing:dd
+/rule;no significant content;s
+/rule/dl/dt;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><nest/><dd/></dl></rule>
 #errors
+/rule;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><dd/><nest/></dl></rule>
 #errors
+/rule;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/><dt/><dd/></dl></rule>
 #errors
+/rule;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <dl><dt/><dd/><nest/><dt/><dd/></dl>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <dl><dt/><nest/><dt/><dd/></dl>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <dl><dt/><dd/><nest/><dd/></dl>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+/rule/dl/dd;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/></del></rule>
 #errors
+/rule;no significant content;s
+/rule/del;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/>aa</del></rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/><p/></del></rule>
 #errors
+/rule;no significant content;s
+/rule/del;no significant content;s
+/rule/del/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video src="/"><nest/></video>
 </rule>
 #errors
+/rule/video;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><nest/><source src="/"/></video>
 </rule>
 #errors
+/rule/video;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><source src="/"/><nest/><source src="/"/></video>
 </rule>
 #errors
+/rule/video;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><source src="/"/><nest/></video>
 </rule>
 #errors
+/rule/video;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <table><nest/></table>
 </rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <table><nest/><tr><td/></tr></table>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/table/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <table><nest/><tbody><tr><td/></tr></tbody></table>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/table/tbody/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <table><tbody><tr><td/></tr></tbody><nest/></table>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/table/tbody/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3880,30 +4650,38 @@ aaa
 </rule>
 #errors
 /rule/table/caption;element not allowed
+/rule;no significant content;s
+/rule/table/caption;no significant content;s
+/rule/table/caption;no significant content;s
+/rule/table/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <colgroup><nest/></colgroup>
 </rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <colgroup><col/><nest/></colgroup>
 </rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <colgroup><nest/><col/></colgroup>
 </rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <colgroup><col/><nest/><col/></colgroup>
 </rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3911,18 +4689,23 @@ aaa
 </rule>
 #errors
 /rule/tbody;child element missing:tr
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <tbody><nest/><tr><td/></tr></tbody>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/tbody/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td/></tr><nest/></tbody>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/tbody/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3930,30 +4713,40 @@ aaa
 </rule>
 #errors
 /rule/tr;child element missing:td|th
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <tr><td/><nest/></tr>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <tr><nest/><td/></tr>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <tr><th/><nest/></tr>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/tr/th;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <tr><th/><nest/><td/></tr>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/tr/th;no significant content;s
+/rule/tr/td;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3961,6 +4754,8 @@ aaa
 </rule>
 #errors
 /rule/head/noscript;in XML:noscript
+/rule;no significant content;s
+/rule/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><head><title/>
@@ -3968,18 +4763,24 @@ aaa
 </head></rule>
 #errors
 /rule/head/noscript;in XML:noscript
+/rule;no significant content;s
+/rule/head/title;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datagrid><nest/></datagrid>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/datagrid;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datagrid><nest/><table/></datagrid>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/datagrid;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -3987,12 +4788,18 @@ aaa
 </rule>
 #errors
 /rule/datagrid/p;element not allowed
+/rule;no significant content;s
+/rule/datagrid;no significant content;s
+/rule/datagrid/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datagrid><p/><nest/><table/></datagrid>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/datagrid;no significant content;s
+/rule/datagrid/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -4000,30 +4807,45 @@ aaa
 </rule>
 #errors
 /rule/datagrid/p;element not allowed
+/rule;no significant content;s
+/rule/datagrid;no significant content;s
+/rule/datagrid/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <menu><nest/></menu>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/menu;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <menu><li/><nest/></menu>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/menu;no significant content;s
+/rule/menu/li;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <menu><nest/><li/></menu>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/menu;no significant content;s
+/rule/menu/li;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <menu><li/><nest/><li/></menu>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/menu;no significant content;s
+/rule/menu/li;no significant content;s
+/rule/menu/li;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -4049,6 +4871,7 @@ aaa
 </rule>
 #errors
 /rule/menu/li;element not allowed
+/rule/menu/li;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -4056,36 +4879,45 @@ aaa
 </rule>
 #errors
 /rule/menu/"aa";character not allowed
+/rule/menu/li;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate><nest/></datatemplate>
 </rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate><nest/><rule/></datatemplate>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/datatemplate/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate><rule/><nest/></datatemplate>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/datatemplate/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <rule><nest/></rule>
 </rule>
 #errors
+/rule;no significant content;s
+/rule/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name><nest/></a:name></a:author>
 </rule>
 #errors
+/rule;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -4163,6 +4995,8 @@ aaa
 /div/datatemplate/nest;element not allowed:datatemplate
 /div/datatemplate;element not allowed
 /div/nest;element not allowed
+/div;no significant content;s
+/div/datatemplate/rule;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4170,4 +5004,6 @@ aaa
 </div>
 #errors
 /div/datatemplate/nest;element not allowed:datatemplate
+/div;no significant content;s
+/div/datatemplate/rule;no significant content;s
 

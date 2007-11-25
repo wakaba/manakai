@@ -1,46 +1,46 @@
 #data
-<p xml:space="default" xmlns="http://www.w3.org/1999/xhtml"/>
+<p xml:space="default" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p xml:space="preserve" xmlns="http://www.w3.org/1999/xhtml"/>
+<p xml:space="preserve" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p xml:space=" default" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-/p/@space;invalid attribute value;error
-
-#data
-<p xml:space="DEfault" xmlns="http://www.w3.org/1999/xhtml"/>
+<p xml:space=" default" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@space;invalid attribute value;error
 
 #data
-<p xml:space="normal" xmlns="http://www.w3.org/1999/xhtml"/>
+<p xml:space="DEfault" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@space;invalid attribute value;error
 
 #data
-<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>
+<p xml:space="normal" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@space;invalid attribute value;error
+
+#data
+<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"/>
+<p xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
-<p xml:lang="ja-JP" xmlns="http://www.w3.org/1999/xhtml"/>
+<p xml:lang="ja-JP" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
 <p xmlns:xml="http://www.w3.org/XML/1998/namespace"
-    xmlns="http://www.w3.org/1999/xhtml"/>
+    xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
 <p xmlns:a="http://www.example.org/"
-    xmlns="http://www.w3.org/1999/xhtml"/>
+    xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
@@ -55,45 +55,45 @@
 /xmlns;element;unsupported
 
 #data
-<p xmlns="http://www.w3.org/1999/xhtml" xml:base=""/>
+<p xmlns="http://www.w3.org/1999/xhtml" xml:base="">x</p>
 #errors
 
 #data
-<p xmlns="http://www.w3.org/1999/xhtml" xml:base="http://test/"/>
+<p xmlns="http://www.w3.org/1999/xhtml" xml:base="http://test/">x</p>
 #errors
 
 #data
-<p xmlns="http://www.w3.org/1999/xhtml" xml:base="test"/>
+<p xmlns="http://www.w3.org/1999/xhtml" xml:base="test">x</p>
 #errors
 
 #data
-<p xmlns="http://www.w3.org/1999/xhtml" xml:base="&#x4E00;"/>
+<p xmlns="http://www.w3.org/1999/xhtml" xml:base="&#x4E00;">x</p>
 #errors
 
 #data
-<p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa"/>
+<p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa">x</p>
 #errors
 
 #data
-<p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa" id="bb"/>
+<p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa" id="bb">x</p>
 #errors
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa">
-  <span id="bb"/>
+  <span id="bb">x</span>
 </p>
 #errors
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa">
-  <span id="aa"/>
+  <span id="aa">x</span>
 </p>
 #errors
 /p/span/@id;duplicate ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" id="aa">
-  <span xml:id="aa"/>
+  <span xml:id="aa">x</span>
 </p>
 #errors
 /p/span/@id;duplicate ID;error

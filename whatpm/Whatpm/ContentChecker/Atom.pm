@@ -221,6 +221,9 @@ my $AtomPersonConstruct = {
       } elsif ($nt == 3 or $nt == 4) {
         ## TODO: Are white spaces allowed?
         $self->{onerror}->(node => $node, type => 'character not allowed');
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -258,7 +261,7 @@ $Element->{$ATOM_NS}->{name} = {
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
-        #
+        $todo->{flag}->{has_descendant}->{significant} = 1;
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -297,6 +300,7 @@ $Element->{$ATOM_NS}->{uri} = {
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         $s .= $node->data;
+        $todo->{flag}->{has_descendant}->{significant} = 1;
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -343,6 +347,7 @@ $Element->{$ATOM_NS}->{email} = {
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         $s .= $node->data;
+        $todo->{flag}->{has_descendant}->{significant} = 1;
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -384,6 +389,7 @@ my $AtomDateConstruct = {
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         $s .= $node->data;
+        $todo->{flag}->{has_descendant}->{significant} = 1;
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -516,6 +522,9 @@ $Element->{$ATOM_NS}->{entry} = {
       } elsif ($nt == 3 or $nt == 4) {
         ## TODO: Are white spaces allowed?
         $self->{onerror}->(node => $node, type => 'character not allowed');
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -631,6 +640,9 @@ $Element->{$ATOM_NS}->{feed} = {
       } elsif ($nt == 3 or $nt == 4) {
         ## TODO: Are white spaces allowed?
         $self->{onerror}->(node => $node, type => 'character not allowed');
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -758,6 +770,9 @@ $Element->{$ATOM_NS}->{content} = {
         } elsif ($nt == 3 or $nt == 4) {
           $self->{onerror}->(node => $node, type => 'character not allowed')
               if $src_attr;
+          if ($node->data =~ /[^\x09-\x0D\x20]/) {
+            $todo->{flag}->{has_descendant}->{significant} = 1;
+          }             
         } elsif ($nt == 5) {
           unshift @nodes, @{$node->child_nodes};
         }
@@ -791,6 +806,9 @@ $Element->{$ATOM_NS}->{content} = {
         } elsif ($nt == 3 or $nt == 4) {
           $self->{onerror}->(node => $node, type => 'character not allowed')
               if $src_attr;
+          if ($node->data =~ /[^\x09-\x0D\x20]/) {
+            $todo->{flag}->{has_descendant}->{significant} = 1;
+          }
         } elsif ($nt == 5) {
           unshift @nodes, @{$node->child_nodes};
         }
@@ -835,6 +853,9 @@ $Element->{$ATOM_NS}->{content} = {
         } elsif ($nt == 3 or $nt == 4) {
           ## TODO: Are white spaces allowed?
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          if ($node->data =~ /[^\x09-\x0D\x20]/) {
+            $todo->{flag}->{has_descendant}->{significant} = 1;
+          }
         } elsif ($nt == 5) {
           unshift @nodes, @{$node->child_nodes};
         }
@@ -876,6 +897,9 @@ $Element->{$ATOM_NS}->{content} = {
         } elsif ($nt == 3 or $nt == 4) {
           ## TODO: Are white spaces allowed?
           $self->{onerror}->(node => $node, type => 'character not allowed');
+          if ($node->data =~ /[^\x09-\x0D\x20]/) {
+            $todo->{flag}->{has_descendant}->{significant} = 1;
+          }
         } elsif ($nt == 5) {
           unshift @nodes, @{$node->child_nodes};
         }
@@ -913,6 +937,9 @@ $Element->{$ATOM_NS}->{content} = {
         } elsif ($nt == 3 or $nt == 4) {
           $self->{onerror}->(node => $node, type => 'character not allowed')
               if $src_attr;
+          if ($node->data =~ /[^\x09-\x0D\x20]/) {
+            $todo->{flag}->{has_descendant}->{significant} = 1;
+          }
         } elsif ($nt == 5) {
           unshift @nodes, @{$node->child_nodes};
         }
@@ -945,6 +972,9 @@ $Element->{$ATOM_NS}->{content} = {
           $s .= $node->data;
           $self->{onerror}->(node => $node, type => 'character not allowed')
               if $src_attr;
+          if ($node->data =~ /[^\x09-\x0D\x20]/) {
+            $todo->{flag}->{has_descendant}->{significant} = 1;
+          }
         } elsif ($nt == 5) {
           unshift @nodes, @{$node->child_nodes};
         }
@@ -1002,7 +1032,9 @@ $Element->{$ATOM_NS}->{category} = {
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
-        #
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -1052,6 +1084,9 @@ $Element->{$ATOM_NS}->{generator} = {
       } elsif ($nt == 3 or $nt == 4) {
         ## MUST be a string that is a human-readable name for
         ## the generating agent
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -1083,6 +1118,9 @@ $Element->{$ATOM_NS}->{icon} = {
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         $s .= $node->data;
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -1125,6 +1163,9 @@ $Element->{$ATOM_NS}->{id} = {
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         $s .= $node->data;
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -1233,7 +1274,9 @@ $Element->{$ATOM_NS}->{link} = {
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
-        #
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -1265,6 +1308,9 @@ $Element->{$ATOM_NS}->{logo} = {
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         $s .= $node->data;
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
@@ -1362,6 +1408,9 @@ $Element->{$ATOM_NS}->{source} = {
       } elsif ($nt == 3 or $nt == 4) {
         ## TODO: Are white spaces allowed?
         $self->{onerror}->(node => $node, type => 'character not allowed');
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
