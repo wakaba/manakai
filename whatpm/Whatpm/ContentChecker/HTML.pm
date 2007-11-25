@@ -64,6 +64,15 @@ my $HTMLEmbededElements = {
 ## the element's checker set |has_descendant| flag for |significant| content
 ## as true.
 
+my $HTMLSignificantContentErrors = {
+  significant => sub {
+    my ($self, $todo) = @_;
+    $self->{onerror}->(node => $todo->{node},
+                       level => $self->{should_level},
+                       type => 'no significant content');
+  },
+}; # $HTMLSignificantContentErrors
+
 our $AnyChecker;
 my $HTMLAnyChecker = sub {
   my ($self, $todo) = @_;
@@ -77,14 +86,7 @@ my $HTMLAnyChecker = sub {
   push @$new_todos, {
     type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
     old_values => $old_values,
-    errors => {
-      significant => sub {
-        my ($self, $todo) = @_;
-        $self->{onerror}->(node => $todo->{node},
-                           level => $self->{should_level},
-                           type => 'no significant content');
-      },
-    },
+    errors => $HTMLSignificantContentErrors,
   };
 
   return ($new_todos);
@@ -168,14 +170,7 @@ my $HTMLTextChecker = sub {
   push @$new_todos, {
     type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
     old_values => $old_values,
-    errors => {
-      significant => sub {
-        my ($self, $todo) = @_;
-        $self->{onerror}->(node => $todo->{node},
-                           level => $self->{should_level},
-                           type => 'no significant content');
-      },
-    },
+    errors => $HTMLSignificantContentErrors,
   };
 
   return ($new_todos);
@@ -233,14 +228,7 @@ my $HTMLStylableBlockChecker = sub {
   push @$new_todos, {
     type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
     old_values => $old_values,
-    errors => {
-      significant => sub {
-        my ($self, $todo) = @_;
-        $self->{onerror}->(node => $todo->{node},
-                           level => $self->{should_level},
-                           type => 'no significant content');
-      },
-    },
+    errors => $HTMLSignificantContentErrors,
   };
 
   return ($new_todos);
@@ -288,14 +276,7 @@ my $HTMLBlockChecker = sub {
   push @$new_todos, {
     type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
     old_values => $old_values,
-    errors => {
-      significant => sub {
-        my ($self, $todo) = @_;
-        $self->{onerror}->(node => $todo->{node},
-                           level => $self->{should_level},
-                           type => 'no significant content');
-      },
-    },
+    errors => $HTMLSignificantContentErrors,
   };
 
   return ($new_todos);
@@ -347,14 +328,7 @@ my $HTMLInlineChecker = sub {
   push @$new_todos, {
     type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
     old_values => $old_values,
-    errors => {
-      significant => sub {
-        my ($self, $todo) = @_;
-        $self->{onerror}->(node => $todo->{node},
-                           level => $self->{should_level},
-                           type => 'no significant content');
-      },
-    },
+    errors => $HTMLSignificantContentErrors,
   };
 
   return ($new_todos);
@@ -406,14 +380,7 @@ my $HTMLStrictlyInlineChecker = sub {
   push @$new_todos, {
     type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
     old_values => $old_values,
-    errors => {
-      significant => sub {
-        my ($self, $todo) = @_;
-        $self->{onerror}->(node => $todo->{node},
-                           level => $self->{should_level},
-                           type => 'no significant content');
-      },
-    },
+    errors => $HTMLSignificantContentErrors,
   };
 
   return ($new_todos);
@@ -472,14 +439,7 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
   push @$new_todos, {
     type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
     old_values => $old_values,
-    errors => {
-      significant => sub {
-        my ($self, $todo) = @_;
-        $self->{onerror}->(node => $todo->{node},
-                           level => $self->{should_level},
-                           type => 'no significant content');
-      },
-    },
+    errors => $HTMLSignificantContentErrors,
   };
 
   return ($new_todos);
@@ -567,14 +527,7 @@ my $HTMLBlockOrInlineChecker = sub {
   push @$new_todos, {
     type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
     old_values => $old_values,
-    errors => {
-      significant => sub {
-        my ($self, $todo) = @_;
-        $self->{onerror}->(node => $todo->{node},
-                           level => $self->{should_level},
-                           type => 'no significant content');
-      },
-    },
+    errors => $HTMLSignificantContentErrors,
   };
 
   return ($new_todos);
@@ -672,14 +625,7 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
     push @$new_todos, {
       type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
       old_values => $old_values,
-      errors => {
-        significant => sub {
-          my ($self, $todo) = @_;
-          $self->{onerror}->(node => $todo->{node},
-                             level => $self->{should_level},
-                             type => 'no significant content');
-        },
-      },
+      errors => $HTMLSignificantContentErrors,
     };
 
     return ($new_todos);
@@ -1260,14 +1206,7 @@ $Element->{$HTML_NS}->{html} = {
     push @$new_todos, {
       type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
       old_values => $old_values,
-      errors => {
-        significant => sub {
-          my ($self, $todo) = @_;  
-          $self->{onerror}->(node => $todo->{node},
-                             level => $self->{should_level},
-                             type => 'no significant content');
-        },
-      },
+      errors => $HTMLSignificantContentErrors,
     };
 
     return ($new_todos);
@@ -1839,14 +1778,7 @@ $Element->{$HTML_NS}->{footer} = {
     push @$new_todos, {
       type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
       old_values => $old_values,
-      errors => {
-        significant => sub {
-          my ($self, $todo) = @_;
-          $self->{onerror}->(node => $todo->{node},
-                             level => $self->{should_level},
-                             type => 'no significant content');
-        },
-      },
+      errors => $HTMLSignificantContentErrors,
     };
 
     return ($new_todos);
@@ -3379,14 +3311,7 @@ $Element->{$HTML_NS}->{datagrid} = {
     push @$new_todos, {
       type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
       old_values => $old_values,
-      errors => {
-        significant => sub {
-          my ($self, $todo) = @_;
-          $self->{onerror}->(node => $todo->{node},
-                             level => $self->{should_level},
-                             type => 'no significant content');
-        },
-      },
+      errors => $HTMLSignificantContentErrors,
     };
 
     return ($new_todos);
@@ -3504,14 +3429,7 @@ $Element->{$HTML_NS}->{menu} = {
     push @$new_todos, {
       type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
       old_values => $old_values,
-      errors => {
-        significant => sub {
-          my ($self, $todo) = @_;
-          $self->{onerror}->(node => $todo->{node},
-                             level => $self->{should_level},
-                             type => 'no significant content');
-        },
-      },
+      errors => $HTMLSignificantContentErrors,
     };
   
     return ($new_todos);
