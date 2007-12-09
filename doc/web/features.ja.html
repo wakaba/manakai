@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<title>manakai 0.4.0 が実装している機能</title>
+<title>manakai 0.4.1 が実装している機能</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
 <link rel="license" href="http://suika.fam.cx/c/pd" title="Public Domain">
 <link rel="contents" href="./">
@@ -16,9 +16,9 @@
 </style>
 </head>
 <body>
-<h1>manakai 0.4.0 の機能</h1>
+<h1>manakai 0.4.1 の機能</h1>
 
-<p>manakai 0.4.0 は、次の表に示す DOM モジュールを実装しています。</p>
+<p>manakai 0.4.1 は、次の表に示す DOM モジュールを実装しています。</p>
 
 <table>
 <thead>
@@ -59,7 +59,8 @@
 </td>
 </tr>
 <tr>
-<td>manakai 拡張</td>
+<td><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Extensions">manakai
+拡張</a></td>
 <td></td>
 </tr>
 <tr>
@@ -71,21 +72,28 @@
 <td>実装済</td>
 </tr>
 <tr>
-<td>manakai 拡張</td>
+<td><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Extensions">manakai
+拡張</a></td>
 <td></td>
 </tr>
 <tr>
-<th scope="row">XML 文書型定義</th>
-<td>水準 3 案 (manakai 独自)</td>
+<th scope="row">文書型定義</th>
+<td><a href="http://suika.fam.cx/www/markup/xml/domdtdef/domdtdef">水準
+3 (manakai 独自)</a></td>
+<td>実装済</td>
+</tr>
+<tr>
+<th scope=row rowspan=2>事象</th>
+<td><a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/DOM-Level-3-Events/html/DOM3-Events.html?rev=1.8&amp;content-type=text/html;%20charset=utf-8">水準
+3 編集者案</td>
 <td>
-  <p>次のすべてを実装:</p>
-  <ul>
-  <li><code class="DOMi" lang="en">DocumentTypeDefinition</code></li>
-  <li><code class="DOMi" lang="en">ElementTypeDefinition</code></li>
-  <li><code class="DOMi" lang="en">AttributeDefinition</code></li>
-  <li><code class="DOMi" lang="en">DocumentXDoctype</code></li>
-  </ul>
+  <a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/DOM-Level-3-Events/html/DOM3-Events.html?rev=1.8&amp;content-type=text/html;%20charset=iso-8859-1#events-Events-flow"><abbr>DOM</abbr>
+  事象フロー</a>と<a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/DOM-Level-3-Events/html/DOM3-Events.html?rev=1.8&amp;content-type=text/html;%20charset=iso-8859-1#events-Events-interface">基本界面</a>を実装。
 </td>
+</tr>
+<tr>
+<td><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Extensions">manakai
+拡張</a></td>
 </tr>
 <!--
 <tr>
@@ -206,12 +214,13 @@
 </tr>
 <tr>
 <th scope=row lang=en rowspan=2>HTML</th>
-<td>HTML5</td>
+<td><a href="http://whatwg.org/html5"><abbr>HTML</abbr>5</a></td>
 <td><code>compat_mode</code> を実装。
 <code>inner_html</code> を一部実装。</td>
 </tr>
 <tr>
-<td>manakai 拡張</td>
+<td><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Extensions">manakai
+拡張</a></td>
 <td></td>
 </tr>
 <tr>
@@ -226,17 +235,25 @@
 <td>第 1.0 版案 (manakai 独自)</td>
 <td></td>
 </tr>
--->
 <tr>
 <th scope="row"><a href="http://suika.fam.cx/gate/2005/sw/H2H"
     title="SuikaWiki : H2H">H2H</a> 構文解析</th>
 <td>第 1.0 版案 (manakai 独自)</td>
 <td></td>
 </tr>
+-->
 <tr>
-<th scope=row colspan=2><a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/selectors-api/Overview.html">選択子
-<abbr>API</abbr></a></th>
-<td>普遍選択子、型選択子に対応 (名前空間を含みます)。</td>
+<th scope=row>選択子 <abbr>API</abbr></th>
+<td><a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/selectors-api/Overview.html">編集者案</a></td>
+<td>普遍選択子、型選択子、属性選択子に対応 (名前空間を含みます)。
+<a href="http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions">manakai
+拡張</a>を含みます。</td>
+</tbody>
+<tbody>
+<tr>
+<th scope=row colspan=2><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Perl%20Binding">manakai
+の <abbr>DOM</abbr> Perl 束縛</a></th>
+</tr>
 </tbody>
 </table>
 
