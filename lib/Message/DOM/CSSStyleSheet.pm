@@ -1,10 +1,18 @@
 package Message::DOM::CSSStyleSheet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleSheet';
+require Message::DOM::DOMException;
+require Scalar::Util;
 
-sub new ($) {
-  return bless \{css_rules => []}, shift;
+sub new ($;%) {
+  my $class = shift;
+  my $self = bless \{@_}, $class;
+  for (@{$$self->{css_rules}}) {
+    ${$_}->{parent_style_sheet} = $self;
+    Scalar::Util::weaken (${$_}->{parent_style_sheet});
+  }
+  return $self;
 } # new
 
 sub AUTOLOAD {
@@ -48,7 +56,13 @@ sub disabled ($;$) {
 
 sub href ($);
 
-## TODO: media
+sub media ($;$) {
+  if (@_ > 1) {
+    local $Error::Depth = $Error::Depth + 1;
+    ${+shift}->{media}->media_text (@_);
+  }
+  return ${$_[0]}->{media};
+} # media
 
 sub owner_node ($);
 
@@ -78,7 +92,18 @@ sub owner_rule ($);
 
 ## |CSSStyleSheet| methods
 
-## TODO: delete_rule
+sub delete_rule ($$) {
+  if ($_[1] < 0 or $_[1] > @{${$_[0]}->{css_rules}}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'INDEX_SIZE_ERR',
+        -subtype => 'INDEX_OUT_OF_BOUND_ERR';
+  } else {
+    my $rule = ${$_[0]}->{css_rules}->[$_[1]];
+    delete $rule->{parent_rule};
+    delete ${$_[0]}->{css_rules}->[$_[1]];
+  }
+} # delete_rule
 
 ## TODO: insert_rule
 
@@ -86,4 +111,4 @@ package Message::IF::StyleSheet;
 package Message::IF::CSSStyleSheet;
 
 1;
-## $Date: 2007/12/22 06:29:32 $
+## $Date: 2007/12/22 06:57:46 $
