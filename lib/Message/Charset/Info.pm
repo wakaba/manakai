@@ -1,6 +1,6 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub UNREGISTERED_CHARSET_NAME () { 0b1 }
 sub REGISTERED_CHARSET_NAME () { 0b10 }
@@ -186,6 +186,8 @@ $Charset->{'iso-8859-6'}
   is_html_ascii_superset => 1,
       ## NOTE: 3/0..3/9 have different semantics from U+0030..0039,
       ## but have same character names (maybe).
+      ## NOTE: According to RFC 2046, charset left-hand half of "iso-8859-6"
+      ## is same as "us-ascii".
 };
 
 $Charset->{'iso-8859-7'}
@@ -322,10 +324,20 @@ $Charset->{'shift_jis'}
   mime_text_suitable => 1,
 };
 
+$Charset->{'x-sjis'}
+= $IANACharset->{'x-sjis'}
+= {
+  iana_names => {
+    'x-sjis' => UNREGISTERED_CHARSET_NAME,
+  },
+  mime_text_suitable => 1,
+};
+
 $Charset->{'euc-jp'}
 = $IANACharset->{'extended_unix_code_packed_format_for_japanese'}
 = $IANACharset->{'cseucpkdfmtjapanese'}
 = $IANACharset->{'euc-jp'}
+= $IANACharset->{'x-euc-jp'}
 = {
   iana_names => {
     'extended_unix_code_packed_format_for_japanese' => PRIMARY_CHARSET_NAME,
@@ -333,6 +345,17 @@ $Charset->{'euc-jp'}
     'euc-jp' => PREFERRED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
+  mime_text_suitable => 1,
+};
+
+$Charset->{'x-euc-jp'}
+= $IANACharset->{'x-euc-jp'}
+= {
+  iana_names => {
+    'x-euc-jp' => UNREGISTERED_CHARSET_NAME,
+  },
+  is_html_ascii_superset => 1,
+  mime_text_suitable => 1,
 };
 
 $Charset->{'extended_unix_code_fixed_width_for_japanese'}
@@ -361,10 +384,14 @@ $Charset->{'euc-kr'}
 $Charset->{'iso-2022-jp'}
 = $IANACharset->{'iso-2022-jp'}
 = $IANACharset->{'csiso2022jp'}
+= $IANACharset->{'iso2022jp'}
+= $IANACharset->{'junet-code'}
 = {
   iana_names => {
     'iso-2022-jp' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME,
     'csiso2022jp' => REGISTERED_CHARSET_NAME,
+    'iso2022jp' => UNREGISTERED_CHARSET_NAME,
+    'junet-code' => UNREGISTERED_CHARSET_NAME,
   },
   mime_text_suitable => 1,
 };
@@ -384,11 +411,24 @@ $Charset->{'iso-2022-jp-2'}
 
 $Charset->{'utf-8'}
 = $IANACharset->{'utf-8'}
+= $IANACharset->{'x-utf-8'}
 = {
   iana_names => {
     'utf-8' => PRIMARY_CHARSET_NAME,
+    'x-utf-8' => UNREGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
+  mime_text_suitable => 1,
+};
+
+$Charset->{'utf-8n'}
+= $IANACharset->{'utf-8n'}
+= {
+  iana_names => {
+    'utf-8n' => UNREGISTERED_CHARSET_NAME,
+  },
+  is_html_ascii_superset => 1,
+  mime_text_suitable => 1,
 };
 
 ## TODO: ...
@@ -506,11 +546,11 @@ $Charset->{'windows-1252'}
 
 ## TODO: ...
 
-sub is_syntactically_iana_charset_name ($) {
+sub is_syntactically_valid_iana_charset_name ($) {
   my $name = shift;
   return $name =~ /\A[\x20-\x7E]{1,40}\z/;
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2007/11/21 12:47:22 $
+## $Date: 2007/12/22 06:29:32 $
 

@@ -1,6 +1,6 @@
 package Message::DOM::Entity;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Entity';
 require Message::DOM::Node;
 
@@ -202,26 +202,15 @@ sub manakai_entity_uri ($;$) {
 ## TODO: documentation
 sub manakai_has_bom ($;$);
 
+## NOTE: A manakai extension
+sub has_replacement_tree ($;$);
+
 ## NOTE: Setter is a manakai extension.
 ## TODO: Document it.
 sub input_encoding ($;$);
 
-## NOTE: Setter is a manakai extension.
-## TODO: Document it.
+## NOTE: A manakai extension.
 sub is_externally_declared ($;$);
-#    @@enDesc:
-#      Whether the entity is declared by an external markup declaration,
-#      i.e. a markup declaration occuring in the external subset or
-#      in a parameter entity.
-#    @@Type: boolean
-#    @@TrueCase:
-#      @@@enDesc:
-#        If the entity is declared by an external markup declaration.
-#    @@FalseCase:
-#      @@@enDesc:
-#        If the entity is declared by a markup declaration in
-#        the internal subset, or if the <IF::Entity> node
-#        is created in memory.
 
 ## NOTE: Setter is a manakai extension.
 sub notation_name ($;$);
@@ -243,11 +232,6 @@ sub xml_encoding ($;$);
 ## TODO: Spec does not mention |null| case
 ## TODO: Should we provide default?
 sub xml_version ($;$);
-
-## |Entity| methods
-
-## NOTE: A manakai extension
-sub has_replacement_tree ($;$);
 
 package Message::IF::Entity;
 
@@ -285,4 +269,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/11/18 11:08:41 $
+## $Date: 2007/12/22 06:29:32 $

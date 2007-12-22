@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -216,7 +216,6 @@ sub adopt_node ($$) {
         -object => $self,
         -type => 'NOT_SUPPORTED_ERR',
         -subtype => 'ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR';
-    ## ISSUE: Define ELEMENT_TYPE_DEFINITION_NODE and ATTRIBUTE_DEFINITION_NODE
   }
 
   my @change_od;
@@ -1240,4 +1239,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/11/18 11:08:41 $
+## $Date: 2007/12/22 06:29:32 $

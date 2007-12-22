@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -40,7 +40,7 @@ sub child_nodes ($) {
   return bless \\($_[0]), 'Message::DOM::NodeList::EmptyNodeList';
 } # child_nodes
 
-sub node_name ($); # read-only trivial accessor
+sub node_name ($);
 
 sub node_type () { 81001 } # ELEMENT_TYPE_DEFINITION_NODE
 
@@ -168,4 +168,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/12/22 06:29:32 $

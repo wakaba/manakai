@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -83,9 +83,6 @@ sub implementation ($) {
     die "DocumentType with no implementation, no owner_document";
   }
 } # implementation
-
-## The document type name [DOM1, DOM2].
-## Same as |DocumentType.name| [DOM3].
 
 *node_name = \&name;
 
@@ -426,7 +423,6 @@ sub entities ($) {
 } # entities
 
 ## NOTE: Setter is a manakai extension.
-## TODO: Document it.
 sub internal_subset ($;$);
 
 sub notations ($) {
@@ -680,4 +676,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/12/22 06:29:32 $

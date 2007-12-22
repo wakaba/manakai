@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node',
     'Message::IF::NSResolver';
 require Scalar::Util;
@@ -437,11 +437,11 @@ sub append_child ($$) {
 sub clone_node ($;$) {
   my ($self, $deep) = @_;
 
-  ## ISSUE: Need definitions for the cloning operation
+  ## TODO: Cloning operation
   ## for ElementTypeDefinition, and AttributeDefinition nodes,
   ## as well as new attributes introduced in DOM XML Document Type Definition
   ## module.
-  ## ISSUE: Define if default attributes and attributedefinition are inconsistent
+  ## TODO: if default attributes and attributedefinition are inconsistent
 
   local $Error::Depth = $Error::Depth + 1;
   my $od = $self->owner_document;
@@ -600,8 +600,7 @@ sub compare_document_position ($$) {
   ## Too many thing to be done by a method!
   ## Maybe we should import simpler method implemented by IE.
 
-  ## ISSUE: Need documentation for ElementTypeDefinition and AttributeDefinition
-  ## concerns
+  ## TODO: ElementTypeDefinition and AttributeDefinition
 
   my @acontainer = ($_[0]);
   my @bcontainer = ($_[1]);
@@ -959,9 +958,6 @@ sub manakai_append_text ($$) {
 } # manakai_append_text
 
 sub is_default_namespace ($$) {
-  ## TODO: Document that ElementTypeDefinition and AttributeDefinition
-  ## are same as DocumentType
-
   local $Error::Depth = $Error::Depth + 1;
   my $namespace_uri = defined $_[1] ? $_[1] : '';
   my $nt = $_[0]->node_type;
@@ -1004,8 +1000,6 @@ sub is_default_namespace ($$) {
 } # is_default_namespace
 
 sub lookup_namespace_uri ($$) {
-  ## TODO: Need definition for ElementTypeDefinition and AttributeDefinition
-
   my ($self, $prefix) = @_;
   $prefix = undef if defined $prefix and $prefix eq '';
       ## NOTE: Implementation dependent.
@@ -1062,9 +1056,6 @@ sub lookup_namespace_uri ($$) {
 } # lookup_namespace_uri
 
 sub lookup_prefix ($$) {
-  ## ISSUE: Document ElementTypeDefinition and AttributeDefinition
-  ## behavior (i.e. same as DocumentType)
-
   my $namespace_uri = defined $_[1] ? $_[1] : '';
   if ($namespace_uri eq '') {
     return undef;
@@ -1152,7 +1143,6 @@ sub normalize ($) {
     ## Attributes
     $_->normalize for @{$self->attributes};
   } elsif ($nt == DOCUMENT_TYPE_NODE) {
-    ## ISSUE: Document these explicitly in DOM XML Document Type Definitions spec
     ## Element type definitions
     $_->normalize for @{$self->element_types};
     ## General entities
@@ -1366,7 +1356,7 @@ sub manakai_set_read_only ($;$$) {
 #                registered to a node is later unregistered by setting
 #                <DOM::null> as a data for the same key.
 #
-sub set_user_data ($$$;$) {
+sub set_user_data ($$;$$) {
   my ($self, $key, $data, $handler) = @_;
 
   my $v = ($$self->{user_data} ||= {});
@@ -1408,4 +1398,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/10/08 07:17:18 $
+## $Date: 2007/12/22 06:29:32 $

@@ -1,6 +1,6 @@
 package Message::DOM::NodeList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Tie::Array', 'Message::IF::NodeList';
 require Message::DOM::DOMException;
 require Tie::Array;
@@ -41,6 +41,8 @@ sub TIEARRAY ($$) { $_[1] }
 
 package Message::DOM::NodeList::ChildNodeList;
 push our @ISA, 'Message::DOM::NodeList';
+
+## NOTE: |Message::DOM::CSSRuleList| has similar codes to this package.
 
 sub ___report_error ($$) {
   $_[1]->throw;
@@ -282,4 +284,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 05:18:46 $
+## $Date: 2007/12/22 06:29:32 $
