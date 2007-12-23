@@ -4,7 +4,8 @@ use Whatpm::CSS::Tokenizer qw(:token);
 require Whatpm::CSS::SelectorsParser;
 
 sub new ($) {
-  my $self = bless {onerror => sub { }, must_level => 'm'}, shift;
+  my $self = bless {onerror => sub { }, must_level => 'm',
+                    unsupported_level => 'unsupported'}, shift;
 
   return $self;
 } # new
@@ -74,6 +75,7 @@ sub parse_char_string ($$) {
   my $current_rules = $open_rules->[-1];
   my $current_decls;
   my $closing_tokens = [];
+  my $charset_allowed = 1;
 
   S: {
     if ($state == BEFORE_STATEMENT_STATE) {
@@ -83,7 +85,49 @@ sub parse_char_string ($$) {
               $t->{type} == CDC_TOKEN;
 
       if ($t->{type} == ATKEYWORD_TOKEN) {
-        ## TODO: supported...
+        if ($t->{value} eq 'charset') {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+          if ($t->{type} == STRING_TOKEN) {
+            my $encoding = $t->{value};
+            
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            
+            if ($t->{type} == SEMICOLON_TOKEN) {
+              if ($charset_allowed) {
+                push @$current_rules,
+                    Message::DOM::CSSCharsetRule->____new ($encoding);
+                undef $charset_allowed;
+              } else {
+                 $onerror->(type => 'at:charset:not allowed',
+                            level => $self->{must_level},
+                            token => $t);
+              }
+
+              ## TODO: Detect the conformance errors for @charset...
+              
+              $t = $tt->get_next_token;
+              ## Stay in the state.
+              redo S;
+            } else {
+              #
+            }
+          } else {
+            #
+          }
+
+          $onerror->(type => 'syntax error:at:charset',
+                     level => $self->{must_level},
+                     token => $t);
+        ## NOTE: When adding support for new at-rule, insert code
+        ## "undef $charset_allowed" as appropriate.
+        } else {
+          $onerror->(type => 'not supported:at:'.$t->{value},
+                     level => $self->{unsupported_level},
+                     token => $t);
+        }
 
         $t = $tt->get_next_token;
         $state = IGNORED_STATEMENT_STATE;
@@ -102,6 +146,8 @@ sub parse_char_string ($$) {
 
         last S;
       } else {
+        undef $charset_allowed;
+
         ($t, my $selectors) = $sp->_parse_selectors_with_tokenizer
             ($tt, LBRACE_TOKEN, $t);
 
@@ -236,4 +282,4 @@ sub parse_char_string ($$) {
 } # parse_char_string
 
 1;
-## $Date: 2007/12/23 08:33:55 $
+## $Date: 2007/12/23 11:19:23 $
