@@ -1,11 +1,11 @@
 package Message::DOM::CSSStyleSheet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleSheet';
 require Message::DOM::DOMException;
 require Scalar::Util;
 
-sub new ($;%) {
+sub ____new ($;%) {
   my $class = shift;
   my $self = bless \{@_}, $class;
   for (@{$$self->{css_rules}}) {
@@ -13,7 +13,7 @@ sub new ($;%) {
     Scalar::Util::weaken (${$_}->{parent_style_sheet});
   }
   return $self;
-} # new
+} # ____new
 
 sub AUTOLOAD {
   my $method_name = our $AUTOLOAD;
@@ -88,6 +88,18 @@ sub css_rules ($) {
   return bless \\($_[0]), 'Message::DOM::CSSRuleList';
 } # css_rules
 
+## NOTE: This is a manakai extension.
+sub css_text ($;$) {
+  ## TODO: setter
+
+  my $r = '';
+  local $Error::Depth = $Error::Depth + 1;
+  for my $rule (@{$_[0]->css_rules}) {
+    $r .= $rule->css_text;
+  }
+  return $r;
+} # css_text
+
 sub owner_rule ($);
 
 ## |CSSStyleSheet| methods
@@ -111,4 +123,4 @@ package Message::IF::StyleSheet;
 package Message::IF::CSSStyleSheet;
 
 1;
-## $Date: 2007/12/22 06:57:46 $
+## $Date: 2007/12/23 08:18:59 $

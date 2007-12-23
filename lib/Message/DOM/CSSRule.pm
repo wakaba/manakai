@@ -1,6 +1,6 @@
 package Message::DOM::CSSRule;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSRule';
 require Scalar::Util;
 
@@ -17,7 +17,7 @@ sub NAMESPACE_RULE () { 7 }
 ## |CSSRule| attributes
 
 sub css_text ($) {
-  die "$0: ".(ref $self)."->css_text: Not implemented";
+  die "$0: ".(ref $_[0])."->css_text: Not implemented";
 } # css_text
 
 sub parent_rule ($) {
@@ -42,14 +42,14 @@ sub parent_style_sheet ($) {
 } # parent_style_sheet
 
 sub type ($) {
-  die "$0: ".(ref $self)."->type: Not implemented";
+  die "$0: ".(ref $_[0])."->type: Not implemented";
 } # type
 
 package Message::DOM::CSSStyleRule;
 push our @ISA, 'Message::DOM::CSSRule', 'Message::IF::CSSStyleRule';
 
 sub ____new ($$$) {
-  my $self = bless \{_selector => $_[1], style => $_[2]}, $_[0];
+  my $self = bless \{_selectors => $_[1], style => $_[2]}, $_[0];
   ${$_[2]}->{parent_rule} = $self;
   Scalar::Util::weaken (${$_[2]}->{parent_rule});
   return $self;
@@ -57,13 +57,26 @@ sub ____new ($$$) {
 
 ## |CSSRule| attributes
 
-## TODO: |css_text|
+sub css_text ($;$) {
+  ## TODO: setter
+
+  ## TODO: Browser compatibility
+  local $Error::Depth = $Error::Depth + 1;
+  return $_[0]->selector_text . " {\n" . $_[0]->style->css_text . "}\n";
+} # css_text
 
 sub type ($) { Message::DOM::CSSRule::STYLE_RULE }
 
 ## |CSSStyleRule| attributes
 
-## TODO: |selector_text|
+sub selector_text ($;$) {
+  ## TODO: setter
+
+  ## TODO: Browser-compatible serializer
+  require Whatpm::CSS::SelectorsSerializer;
+  return Whatpm::CSS::SelectorsSerializer->serialize_test
+      (${$_[0]}->{_selectors});
+} # selector_text
 
 sub style ($) {
   return ${$_[0]}->{style};
@@ -173,7 +186,7 @@ package Message::DOM::CSSPageRule;
 push our @ISA, 'Message::DOM::CSSRule', 'Message::IF::CSSPageRule';
 
 sub ____new ($$$) {
-  my $self = bless \{_selector => $_[1], style => $_[2]}, $_[0];
+  my $self = bless \{_selectors => $_[1], style => $_[2]}, $_[0];
   ${$_[2]}->{parent_rule} = $self;
   Scalar::Util::weaken (${$_[2]}->{parent_rule});
   return $self;
@@ -187,7 +200,13 @@ sub type ($) { Message::DOM::CSSRule::PAGE_RULE }
 
 ## |CSSPageRule| attributes
 
-## TODO: |selector_text|
+sub selector_text ($;$) {
+  ## TODO: setter
+
+  ## TODO: Browser-compatible serializer
+  require Whatpm::CSS::SelectorsSerializer;
+  return Whatpm::CSS::SelectorsSerializer->serialize_test (${$_[0]}->{_selectors});
+} # selector_text
 
 sub style ($) {
   return ${$_[0]}->{style};
@@ -225,4 +244,4 @@ package Message::IF::CSSFontFaceRule;
 package Message::IF::CSSPageRule;
 
 1;
-## $Date: 2007/12/22 06:57:46 $
+## $Date: 2007/12/23 08:18:59 $
