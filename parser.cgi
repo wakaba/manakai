@@ -29,13 +29,24 @@ if ($mode eq '/csstext') {
 
   print STDOUT "#errors\n";
 
-  my $parser = Whatpm::CSS::Parser->new;
-  $parser->{onerror} = sub {
+  my $p = Whatpm::CSS::Parser->new;
+  $p->{onerror} = sub {
     my (%opt) = @_;
     print STDOUT "$opt{line},$opt{column},$opt{level},$opt{type}\n";
   };
   
-  my $ss = $parser->parse_char_string ($s);
+  $p->{pseudo_class}->{$_} = 1 for qw/
+    active checked disabled empty enabled first-child first-of-type
+    focus hover indeterminate last-child last-of-type link only-child
+    only-of-type root target visited
+    lang nth-child nth-last-child nth-of-type nth-last-of-type not
+    -manakai-contains -manakai-current
+  /;
+  $p->{pseudo_element}->{$_} = 1 for qw/
+    after before first-letter first-line
+  /;
+
+  my $ss = $p->parse_char_string ($s);
 
   print "#csstext\n";
   my $out = $ss->css_text;
@@ -151,4 +162,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/12/23 08:19:43 $
+## $Date: 2007/12/23 08:32:44 $
