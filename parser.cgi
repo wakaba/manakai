@@ -13,7 +13,34 @@ my $http = Message::CGI::HTTP->new;
 my $mode = $http->get_meta_variable ('PATH_INFO');
 ## TODO: decode unreserved characters
 
-if ($mode eq '/tokens') {
+if ($mode eq '/csstext') {
+  require Encode;
+  require Whatpm::CSS::Parser;
+
+  my $s = $http->get_parameter ('s');
+  if (length $s > 1000_000) {
+    print STDOUT "Status: 400 Document Too Long\nContent-Type: text/plain; charset=us-ascii\n\nToo long";
+    exit;
+  }
+
+  $s = Encode::decode ('utf-8', $s);
+  
+  print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
+
+  print STDOUT "#errors\n";
+
+  my $parser = Whatpm::CSS::Parser->new;
+  $parser->{onerror} = sub {
+    my (%opt) = @_;
+    print STDOUT "$opt{line},$opt{column},$opt{level},$opt{type}\n";
+  };
+  
+  my $ss = $parser->parse_char_string ($s);
+
+  print "#csstext\n";
+  my $out = $ss->css_text;
+  print STDOUT Encode::encode ('utf-8', $out);
+} elsif ($mode eq '/tokens') {
   require Encode;
   require Whatpm::CSS::Tokenizer;
 
@@ -124,4 +151,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/10/07 04:56:22 $
+## $Date: 2007/12/23 08:19:43 $
