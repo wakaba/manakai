@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleSheet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleSheet';
 require Message::DOM::DOMException;
 require Scalar::Util;
@@ -95,7 +95,7 @@ sub css_text ($;$) {
   my $r = '';
   local $Error::Depth = $Error::Depth + 1;
   for my $rule (@{$_[0]->css_rules}) {
-    $r .= $rule->css_text;
+    $r .= $rule->css_text . "\n"; ## TODO: \x0D\x0A? \x0A?
   }
   return $r;
 } # css_text
@@ -123,4 +123,4 @@ package Message::IF::StyleSheet;
 package Message::IF::CSSStyleSheet;
 
 1;
-## $Date: 2007/12/23 08:18:59 $
+## $Date: 2007/12/23 11:20:08 $

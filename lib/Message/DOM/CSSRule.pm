@@ -1,6 +1,6 @@
 package Message::DOM::CSSRule;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSRule';
 require Scalar::Util;
 
@@ -91,7 +91,13 @@ sub ____new ($$) {
 
 ## |CSSRule| attributes
 
-## TODO: |css_text|
+sub css_text ($;$) {
+  ## TODO: setter
+
+  ## NOTE: It will be broken if |encoding| contains |"| or |\|, but this
+  ## is what browsers do.
+  return '@charset "'.${$_[0]}->{encoding}.'";';
+} # css_text
 
 sub type ($) { Message::DOM::CSSRule::CHARSET_RULE }
 
@@ -244,4 +250,4 @@ package Message::IF::CSSFontFaceRule;
 package Message::IF::CSSPageRule;
 
 1;
-## $Date: 2007/12/23 08:18:59 $
+## $Date: 2007/12/23 11:20:08 $
