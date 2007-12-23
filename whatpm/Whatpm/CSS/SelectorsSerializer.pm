@@ -1,11 +1,11 @@
 package Whatpm::CSS::SelectorsSerializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
-sub serialize_test ($$) {
-  my (undef, $selectors) = @_;
+sub serialize_test ($$;$) {
+  my (undef, $selectors, $lookup_prefix) = @_;
   my $i = 0;
   my $ident = sub {
     my $s = shift;
@@ -26,6 +26,12 @@ sub serialize_test ($$) {
     }ge;
     return '"'.$s.'"';
   }; # $str
+
+  my $lp = $lookup_prefix ? sub {
+    my $v = $lookup_prefix->($_[0]);
+    return $ident->(defined $v ? $v : $_[0]);
+  } : $ident; # $lp
+
   my $r = join ",\n", map {
     join "", map {
       if (ref $_) {
@@ -44,7 +50,7 @@ sub serialize_test ($$) {
         if (not defined $ss->[NAMESPACE_SELECTOR]) {
           $v .= '*|';
         } elsif (defined $ss->[NAMESPACE_SELECTOR]->[1]) {
-          $v .= $ident->($ss->[NAMESPACE_SELECTOR]->[1]) . '|';
+          $v .= $lp->($ss->[NAMESPACE_SELECTOR]->[1]) . '|';
         } else {
           $v .= '|';
         }
@@ -58,7 +64,7 @@ sub serialize_test ($$) {
         $v .= join '', sort {$a cmp $b} map {
           '[' .
           (defined $_->[1] ?
-            $_->[1] eq '' ? '' : $ident->($_->[1]) : '*') .
+            $_->[1] eq '' ? '' : $lp->($_->[1]) : '*') .
           '|' .
           $ident->($_->[2]) .
           ($_->[3] != EXISTS_MATCH ?
@@ -132,4 +138,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/10/28 06:35:15 $
+# $Date: 2007/12/23 15:47:09 $

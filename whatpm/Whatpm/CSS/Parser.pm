@@ -59,8 +59,10 @@ sub parse_char_string ($$) {
   $sp->{pseudo_element} = $self->{pseudo_element};
   $sp->{pseudo_class} = $self->{pseudo_class};
 
-  ## TODO:
-  #$sp->{lookup_namespace_uri} = ...;
+  my $nsmap = {};
+  $sp->{lookup_namespace_uri} = sub {
+    return $nsmap->{$_[0]}; # $_[0] is '' (default namespace) or prefix
+  }; # $sp->{lookup_namespace_uri}
 
   ## TODO: Supported pseudo classes and elements...
 
@@ -76,6 +78,7 @@ sub parse_char_string ($$) {
   my $current_decls;
   my $closing_tokens = [];
   my $charset_allowed = 1;
+  my $namespace_allowed = 1;
 
   S: {
     if ($state == BEFORE_STATEMENT_STATE) {
@@ -85,7 +88,57 @@ sub parse_char_string ($$) {
               $t->{type} == CDC_TOKEN;
 
       if ($t->{type} == ATKEYWORD_TOKEN) {
-        if ($t->{value} eq 'charset') {
+        if ($t->{value} eq 'namespace') {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+          my $prefix;
+          if ($t->{type} == IDENT_TOKEN) {
+            $prefix = lc $t->{value};
+            ## TODO: Unicode lowercase
+            
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          }
+
+          if ($t->{type} == STRING_TOKEN or $t->{type} == URI_TOKEN) {
+            my $uri = $t->{value};
+            
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+            ## ISSUE: On handling of empty namespace URI, Firefox 2 and
+            ## Opera 9 work differently (See SuikaWiki:namespace).
+            ## TODO: We need to check what we do once it is specced.
+
+            if ($t->{type} == SEMICOLON_TOKEN) {
+              if ($namespace_allowed) {
+                $nsmap->{defined $prefix ? $prefix : ''} = $uri;
+                push @$current_rules,
+                    Message::DOM::CSSNamespaceRule->____new ($prefix, $uri);
+                undef $charset_allowed;
+                undef $namespace_allowed;
+              } else {
+                $onerror->(type => 'at:namespace:not allowed',
+                           level => $self->{must_level},
+                           token => $t);
+              }
+              
+              $t = $tt->get_next_token;
+              ## Stay in the state.
+              redo S;
+            } else {
+              #
+            }
+          } else {
+            #
+          }
+
+          $onerror->(type => 'syntax error:at:namespace',
+                     level => $self->{must_level},
+                     token => $t);
+          #
+        } elsif ($t->{value} eq 'charset') {
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
 
@@ -121,8 +174,10 @@ sub parse_char_string ($$) {
           $onerror->(type => 'syntax error:at:charset',
                      level => $self->{must_level},
                      token => $t);
+          #
         ## NOTE: When adding support for new at-rule, insert code
-        ## "undef $charset_allowed" as appropriate.
+        ## "undef $charset_allowed" and "undef $namespace_token" as
+        ## appropriate.
         } else {
           $onerror->(type => 'not supported:at:'.$t->{value},
                      level => $self->{unsupported_level},
@@ -147,6 +202,7 @@ sub parse_char_string ($$) {
         last S;
       } else {
         undef $charset_allowed;
+        undef $namespace_allowed;
 
         ($t, my $selectors) = $sp->_parse_selectors_with_tokenizer
             ($tt, LBRACE_TOKEN, $t);
@@ -282,4 +338,4 @@ sub parse_char_string ($$) {
 } # parse_char_string
 
 1;
-## $Date: 2007/12/23 11:19:23 $
+## $Date: 2007/12/23 15:47:09 $
