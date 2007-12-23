@@ -1,6 +1,6 @@
 package Message::DOM::CSSRule;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSRule';
 require Scalar::Util;
 
@@ -73,9 +73,17 @@ sub selector_text ($;$) {
   ## TODO: setter
 
   ## TODO: Browser-compatible serializer
+  ## TODO: This code does not work for cases where default namespace
+  ## has no namespace prefix declared.
+  my $self = $_[0];
   require Whatpm::CSS::SelectorsSerializer;
   return Whatpm::CSS::SelectorsSerializer->serialize_test
-      (${$_[0]}->{_selectors});
+      ($$self->{_selectors}, sub {
+        ## TODO: We should have some caching mechanism, otherwise
+        ## too many computation for complex selectors in long style sheet.
+        return $self->parent_style_sheet->manakai_lookup_namespace_prefix
+            ($_[0]);
+      });
 } # selector_text
 
 sub style ($) {
@@ -227,7 +235,14 @@ sub ____new ($$$) {
 
 ## |CSSRule| attributes
 
-## TODO: |css_text|
+sub css_text ($;$) {
+  ## TODO: Setter
+
+  ## NOTE: Sometimes ugly, but this is what Firefox does.
+  my $prefix = ${$_[0]}->{prefix};
+  return '@namespace '.($prefix ne '' ? $prefix.' ' : '').
+      'url('.${$_[0]}->{namespace_uri}.');';
+} # css_text
 
 sub type ($) { Message::DOM::CSSRule::NAMESPACE_RULE }
 
@@ -250,4 +265,4 @@ package Message::IF::CSSFontFaceRule;
 package Message::IF::CSSPageRule;
 
 1;
-## $Date: 2007/12/23 11:20:08 $
+## $Date: 2007/12/23 15:45:49 $

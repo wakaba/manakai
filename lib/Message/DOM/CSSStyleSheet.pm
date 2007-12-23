@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleSheet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleSheet';
 require Message::DOM::DOMException;
 require Scalar::Util;
@@ -119,8 +119,45 @@ sub delete_rule ($$) {
 
 ## TODO: insert_rule
 
+## TODO: Documentation
+sub manakai_is_default_namespace ($$) {
+  my $uri = $_[1];
+  for my $rule (@{$_[0]->css_rules}) {
+    next if $rule->type == 2 or $rule->type == 3; # CHARSET_RULE or IMPORT_RULE
+    return 0 if $rule->type != 7; # NAMESPACE_RULE
+
+    ## TODO: Can we insert NAMESPACE_RULE after other kinds of rules
+    ## by insert_rule?
+
+    if ($uri eq $rule->namespace_uri) {
+      return 1 if $rule->prefix eq '';
+    }
+  }
+
+  return 0;
+} # manakai_is_default_namespace
+
+## TODO: Documentation
+sub manakai_lookup_namespace_prefix ($$) {
+  my $uri = $_[1];
+  for my $rule (@{$_[0]->css_rules}) {
+    next if $rule->type == 2 or $rule->type == 3; # CHARSET_RULE or IMPORT_RULE
+    return undef if $rule->type != 7; # NAMESPACE_RULE
+
+    ## TODO: Can we insert NAMESPACE_RULE after other kinds of rules
+    ## by insert_rule?
+
+    if ($uri eq $rule->namespace_uri) {
+      my $prefix = $rule->prefix;
+      return $prefix if $prefix ne '';
+    }
+  }
+
+  return undef;
+} # manakai_lookup_namespace_prefix
+
 package Message::IF::StyleSheet;
 package Message::IF::CSSStyleSheet;
 
 1;
-## $Date: 2007/12/23 11:20:08 $
+## $Date: 2007/12/23 15:45:49 $
