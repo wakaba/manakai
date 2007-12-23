@@ -19,12 +19,33 @@ sub parse_char_string ($$) {
 
   my $s = $_[1];
   pos ($s) = 0;
+  my $line = 1;
+  my $column = 0;
+
+  my $_onerror = $self->{onerror};
+  my $onerror = sub {
+    $_onerror->(@_, line => $line, column => $column);
+  };
   
   my $tt = Whatpm::CSS::Tokenizer->new;
-  $tt->{onerror} = $self->{onerror};
+  $tt->{onerror} = $onerror;
   $tt->{get_char} = sub {
     if (pos $s < length $s) {
-      return ord substr $s, pos ($s)++, 1;
+      my $c = ord substr $s, pos ($s)++, 1;
+      if ($c == 0x000A) {
+        $line++;
+        $column = 0;
+      } elsif ($c == 0x000D) {
+        unless (substr ($s, pos ($s), 1) eq "\x0A") {
+          $line++;
+          $column = 0;
+        } else {
+          $column++;
+        }
+      } else {
+        $column++;
+      }
+      return $c;
     } else {
       return -1;
     }
@@ -32,8 +53,10 @@ sub parse_char_string ($$) {
   $tt->init;
 
   my $sp = Whatpm::CSS::SelectorsParser->new;
-  $sp->{onerror} = $self->{onerror};
+  $sp->{onerror} = $onerror;
   $sp->{must_level} = $self->{must_level};
+  $sp->{pseudo_element} = $self->{pseudo_element};
+  $sp->{pseudo_class} = $self->{pseudo_class};
 
   ## TODO:
   #$sp->{lookup_namespace_uri} = ...;
@@ -72,9 +95,9 @@ sub parse_char_string ($$) {
         redo S;
       } elsif ($t->{type} == EOF_TOKEN) {
         if (@$open_rules > 1) {
-          $self->{onerror}->(type => 'syntax error:block not closed',
-                             level => $self->{must_level},
-                             token => $t);
+          $onerror->(type => 'syntax error:block not closed',
+                     level => $self->{must_level},
+                     token => $t);
         }
 
         last S;
@@ -95,9 +118,9 @@ sub parse_char_string ($$) {
           $t = $tt->get_next_token;
           redo S;
         } else {
-          $self->{onerror}->(type => 'syntax error:after selectors',
-                             level => $self->{must_level},
-                             token => $t);
+          $onerror->(type => 'syntax error:after selectors',
+                     level => $self->{must_level},
+                     token => $t);
 
           ## Stay in the state.
           $t = $tt->get_next_token;
@@ -119,9 +142,9 @@ sub parse_char_string ($$) {
         $state = BEFORE_STATEMENT_STATE;
         redo S;
       } elsif ($t->{type} == EOF_TOKEN) {
-        $self->{onerror}->(type => 'syntax error:ruleset not closed',
-                           level => $self->{must_level},
-                           token => $t);
+        $onerror->(type => 'syntax error:ruleset not closed',
+                   level => $self->{must_level},
+                   token => $t);
         ## Reprocess.
         $state = BEFORE_STATEMENT_STATE;
         redo S;
@@ -213,4 +236,4 @@ sub parse_char_string ($$) {
 } # parse_char_string
 
 1;
-## $Date: 2007/12/23 08:16:26 $
+## $Date: 2007/12/23 08:33:55 $
