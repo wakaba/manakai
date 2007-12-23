@@ -1,3 +1,12 @@
+2007-12-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* Parser.pm: New module.
+
+	* SelectorsParser.pm (parse_string): Split into |parse_string|
+	and |_parse_selectors_with_tokenizer|.  Support for "end by
+	token T" option.  Return the last token as well as the
+	parsed selectors pbject.
+
 2007-11-24  Wakaba  <wakaba@suika.fam.cx>
 
 	* SelectorsParser.pm (parse_string): Raise errors if appropriate.

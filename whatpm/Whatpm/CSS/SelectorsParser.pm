@@ -1,6 +1,6 @@
 package Whatpm::CSS::SelectorsParser;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -94,6 +94,15 @@ sub parse_string ($$) {
   }; # $tt->{get_char}
   $tt->init;
 
+  $self->_parse_selectors_with_tokenizer ($tt, EOF_TOKEN);
+} # parse_string
+
+sub _parse_selectors_with_tokenizer ($$$;$) {
+  my $self = $_[0];
+  my $tt = $_[1];
+  # $_[2] : End token (other than EOF_TOKEN - may be EOF_TOKEN if no other).
+  # $_[3] : The first token, or undef
+
   my $default_namespace = $self->{lookup_namespace_uri}->('');
 
   ## ISSUE: The Selectors spec only poorly defines how tokens are mapped
@@ -108,7 +117,7 @@ sub parse_string ($$) {
   my $in_negation;
 
   my $state = BEFORE_TYPE_SELECTOR_STATE;
-  my $t = $tt->get_next_token;
+  my $t = $_[3] || $tt->get_next_token;
   my $name;
   S: {
     if ($state == BEFORE_TYPE_SELECTOR_STATE) {
@@ -153,7 +162,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before type selector',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_SIMPLE_SELECTOR_STATE) {
       if ($in_negation and $in_negation++ == 2) {
@@ -167,7 +176,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'syntax error:after pseudo element',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
         $state = BEFORE_CLASS_NAME_STATE;
         $t = $tt->get_next_token;
@@ -177,7 +186,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'syntax error:after pseudo element',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
         push @$sss, [ID_SELECTOR, $t->{value}];
         $state = BEFORE_SIMPLE_SELECTOR_STATE;
@@ -188,7 +197,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'syntax error:after pseudo element',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
         $state = AFTER_COLON_STATE;
         $t = $tt->get_next_token;
@@ -198,7 +207,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'syntax error:after pseudo element',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
         $state = AFTER_LBRACKET_STATE;
         $t = $tt->get_next_token;
@@ -230,7 +239,7 @@ sub parse_string ($$) {
             $self->{onerror}->(type => 'namespace prefix:not declared',
                                level => $self->{must_level},
                                token => $t);
-            return undef;
+            return ($t, undef);
           }
           push @$sss, [NAMESPACE_SELECTOR, $uri];
         }
@@ -246,7 +255,7 @@ sub parse_string ($$) {
             $self->{onerror}->(type => 'namespace prefix:not declared',
                                level => $self->{must_level},
                                token => $t);
-            return undef;
+            return ($t, undef);
           }
           push @$sss, [NAMESPACE_SELECTOR, $uri];
         }
@@ -257,7 +266,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:after namespace prefix',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_CLASS_NAME_STATE) {
       if ($t->{type} == IDENT_TOKEN) {
@@ -270,7 +279,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before class name',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_COMBINATOR_STATE) {
       push @$selector, $sss;
@@ -286,6 +295,7 @@ sub parse_string ($$) {
                 TILDE_TOKEN, 1,
                 COMMA_TOKEN, 1,
                 EOF_TOKEN, 1,
+                $_[2], 1,
                }->{$t->{type}}) {
         $state = COMBINATOR_STATE;
         ## Reprocess.
@@ -294,7 +304,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before combinator',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == COMBINATOR_STATE) {
       if ($state == S_TOKEN) {
@@ -311,9 +321,9 @@ sub parse_string ($$) {
         $state = BEFORE_TYPE_SELECTOR_STATE;
         $t = $tt->get_next_token;
         redo S;
-      } elsif ($t->{type} == EOF_TOKEN) {
+      } elsif ($t->{type} == EOF_TOKEN or $t->{type} == $_[2]) {
         push @$selectors, $selector;
-        return $selectors;
+        return ($t, $selectors);
       } elsif ($t->{type} == COMMA_TOKEN) {
         push @$selectors, $selector;
         $selector = [DESCENDANT_COMBINATOR];
@@ -367,7 +377,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'pseudo class:not allowed',
                              level => $self->{must_level},
                              token => $t, value => $class);
-          return undef;
+          return ($t, undef);
         }
 
         $state = BEFORE_SIMPLE_SELECTOR_STATE;
@@ -411,7 +421,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'pseudo class:not allowed',
                              level => $self->{must_level},
                              token => $t, value => $class);
-          return undef;
+          return ($t, undef);
         }
       } elsif ($t->{type} == COLON_TOKEN and
                not $in_negation) { ## Pseudo-element
@@ -422,7 +432,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:after colon',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == AFTER_LBRACKET_STATE) { ## Attribute selector
       $simple_selector = [ATTRIBUTE_SELECTOR];
@@ -452,7 +462,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before attr name',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == AFTER_ATTR_NAME_STATE) {
       if ($t->{type} == VBAR_TOKEN) {
@@ -462,7 +472,7 @@ sub parse_string ($$) {
             $self->{onerror}->(type => 'namespace prefix:not declared',
                                level => $self->{must_level},
                                token => $t);
-            return undef;
+            return ($t, undef);
           }
           $simple_selector->[1] = $uri;
         }
@@ -475,7 +485,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'syntax error:after attr star',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
         $simple_selector->[1] = ''; # null namespace
         $simple_selector->[2] = $name;
@@ -495,7 +505,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before attr local name',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_MATCH_STATE) {
       if ({
@@ -525,7 +535,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before match',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_VALUE_STATE) {
       if ($t->{type} == IDENT_TOKEN or $t->{type} == STRING_TOKEN) {
@@ -543,7 +553,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before attr value',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == AFTER_VALUE_STATE) {
       if ($t->{type} == RBRACKET_TOKEN) {
@@ -554,7 +564,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:after attr value',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == AFTER_DOUBLE_COLON_STATE) {
       if ($t->{type} == IDENT_TOKEN) {
@@ -573,13 +583,13 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'pseudo element:not allowed',
                              level => $self->{must_level},
                              token => $t, value => $pe);
-          return undef;
+          return ($t, undef);
         }
       } else {
         $self->{onerror}->(type => 'syntax error:after double colon',
                            level => $self->{must_level},
                            token => $t);
-        return undef
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_LANG_TAG_STATE) {
       if ($t->{type} == IDENT_TOKEN) {
@@ -596,7 +606,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before lang tag',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == AFTER_LANG_TAG_STATE) {
       if ($t->{type} == RPAREN_TOKEN) {
@@ -611,7 +621,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:after lang tag',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_AN_STATE) {
       if ($t->{type} == DIMENSION_TOKEN) {
@@ -635,13 +645,13 @@ sub parse_string ($$) {
             $self->{onerror}->(type => 'syntax error:an+b',
                                level => $self->{must_level},
                                token => $t);
-            return undef;
+            return ($t, undef);
           }
         } else {
           $self->{onerror}->(type => 'syntax error:an+b',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
       } elsif ($t->{type} == NUMBER_TOKEN) {
         if (int $t->{number} == $t->{number}) {
@@ -654,7 +664,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'not integer',
                              level => $self->{must_level},
                              token => $t, value => $t->{number});
-          return undef;
+          return ($t, undef);
         }
       } elsif ($t->{type} == IDENT_TOKEN) {
         my $value = $t->{value};
@@ -690,7 +700,7 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'syntax error:an+b',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
       } elsif ($t->{type} == MINUS_TOKEN) {
         ## ISSUE: Is :nth-child(- 1) allowed?
@@ -719,13 +729,13 @@ sub parse_string ($$) {
               $self->{onerror}->(type => 'syntax error:an+b',
                                  level => $self->{must_level},
                                  token => $t);
-              return undef;
+              return ($t, undef);
             }
           } else {
             $self->{onerror}->(type => 'syntax error:an+b',
                                level => $self->{must_level},
                                token => $t);
-            return undef;
+            return ($t, undef);
           }
         } elsif ($t->{type} == NUMBER_TOKEN) {
           if (int $t->{number} == $t->{number}) {
@@ -738,13 +748,13 @@ sub parse_string ($$) {
             $self->{onerror}->(type => 'syntax error:an+b',
                                level => $self->{must_level},
                                token => $t);
-            return undef;
+            return ($t, undef);
           }
         } else {
           $self->{onerror}->(type => 'syntax error:an+b',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
       } elsif ($t->{type} == S_TOKEN) {
         ## Stay in the state.
@@ -754,7 +764,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:an+b',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == AFTER_AN_STATE) {
       ## ISSUE: :nth-child(1n +2) is allowed.
@@ -785,7 +795,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:an+b',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_B_STATE) {
       ## ISSUE: Is S allowed?
@@ -801,13 +811,13 @@ sub parse_string ($$) {
           $self->{onerror}->(type => 'syntax error:an+b',
                              level => $self->{must_level},
                              token => $t);
-          return undef;
+          return ($t, undef);
         }
       } else {
         $self->{onerror}->(type => 'syntax error:an+b',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == AFTER_B_STATE) {
       if ($t->{type} == RPAREN_TOKEN) {
@@ -822,7 +832,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:after an+b',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == AFTER_NEGATION_SIMPLE_SELECTOR_STATE) {
       if ($t->{type} == RPAREN_TOKEN) {
@@ -845,7 +855,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:after not simple selector',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } elsif ($state == BEFORE_CONTAINS_STRING_STATE) {
       if ($t->{type} == STRING_TOKEN or $t->{type} == IDENT_TOKEN) {
@@ -862,7 +872,7 @@ sub parse_string ($$) {
         $self->{onerror}->(type => 'syntax error:before contains string',
                            level => $self->{must_level},
                            token => $t);
-        return undef;
+        return ($t, undef);
       }
     } else {
       die "$0: Selectors Parser: $state: Unknown state";
@@ -880,4 +890,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/24 11:21:04 $
+# $Date: 2007/12/23 08:16:09 $
