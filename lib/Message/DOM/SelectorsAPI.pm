@@ -1,11 +1,200 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::DOM::DOMException;
 
 package Message::DOM::Document;
 
 use Whatpm::CSS::SelectorsParser qw(:match :combinator :selector);
+
+my $sss_match = sub ($$$$) {
+  my ($self, $sss, $node, $current_node, $is_html) = @_;
+
+        my $sss_matched = 1;
+        for my $simple_selector (@{$sss}) {
+          if ($simple_selector->[0] == LOCAL_NAME_SELECTOR) {
+            if ($simple_selector->[1] eq
+                $node->manakai_local_name) {
+              #
+            } elsif ($is_html) {
+              my $nsuri = $node->namespace_uri;
+              if (defined $nsuri and
+                  $nsuri eq q<http://www.w3.org/1999/xhtml>) {
+                if (lc $simple_selector->[1] eq
+                    $node->manakai_local_name) {
+                  ## TODO: What kind of case-insensitivility?
+                  ## TODO: Is this checking method OK?
+                  #
+                } else {
+                  $sss_matched = 0;
+                }
+              } else {
+                $sss_matched = 0;
+              }
+            } else {
+              $sss_matched = 0;
+            }
+          } elsif ($simple_selector->[0] == NAMESPACE_SELECTOR) {
+            my $nsuri = $node->namespace_uri;
+            if (defined $simple_selector->[1]) {
+              if (defined $nsuri and $nsuri eq $simple_selector->[1]) {
+                #
+              } else {
+                $sss_matched = 0;
+              }
+            } else {
+              if (defined $nsuri) {
+                $sss_matched = 0;
+              }
+            }
+          } elsif ($simple_selector->[0] == ATTRIBUTE_SELECTOR) {
+            my @attr_node;
+            ## Namespace URI
+            if (not defined $simple_selector->[1]) {
+              my $ln = $simple_selector->[2];
+              if ($is_html) {
+                my $nsuri = $node->namespace_uri;
+                if (defined $nsuri and
+                    $nsuri eq q<http://www.w3.org/1999/xhtml>) {
+                  $ln =~ tr/A-Z/a-z/; ## ISSUE: Case-insensitivity
+                }
+              }
+
+              ## Any Namespace, Local Name
+              M: {
+                for my $attr_node (@{$node->attributes}) {
+                  my $node_ln = $attr_node->manakai_local_name;
+                  if ($node_ln eq $simple_selector->[2]) {
+                    push @attr_node, $attr_node;
+                    last M if $simple_selector->[3] == EXISTS_MATCH;
+                  } elsif (not defined $attr_node->namespace_uri and
+                           $node_ln eq $ln) {
+                    push @attr_node, $attr_node;
+                    last M if $simple_selector->[3] == EXISTS_MATCH;
+                  }
+                }
+                last M if @attr_node;
+                $sss_matched = 0;
+              } # M
+            } elsif ($simple_selector->[1] eq '') {
+              my $ln = $simple_selector->[2];
+              if ($is_html) {
+                my $nsuri = $node->namespace_uri;
+                if (defined $nsuri and
+                    $nsuri eq q<http://www.w3.org/1999/xhtml>) {
+                  $ln =~ tr/A-Z/a-z/; ## ISSUE: Case-insensitivity
+                }
+              }
+
+              ## ISSUE: Does <p>.setAttributeNS (undef, 'Align')'ed <p>
+              ## match with [align]?
+
+              ## Null Namespace, Local Name
+              my $attr_node = $node->get_attribute_node_ns
+                  (undef, $ln);
+              if ($attr_node) {
+                push @attr_node, $attr_node;
+              } else {
+                $sss_matched = 0;
+              }
+            } else {
+              ## Non-null Namespace, Local Name
+              my $attr_node = $node->get_attribute_node_ns
+                      ($simple_selector->[1], $simple_selector->[2]);
+              if ($attr_node) {
+                push @attr_node, $attr_node;
+              } else {
+                $sss_matched = 0;
+              }
+            }
+
+            if ($sss_matched) {
+              if ($simple_selector->[3] == EXISTS_MATCH) {
+                #
+              } else {
+                for my $attr_node (@attr_node) {
+                  ## TODO: Attribute value case-insensitivility
+                  my $value = $attr_node->value;
+                  if ($simple_selector->[3] == EQUALS_MATCH) {
+                    if ($value eq $simple_selector->[4]) {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } elsif ($simple_selector->[3] == DASH_MATCH) {
+                    ## ISSUE: [a|=""] a="a--b" a="-" ?
+                    if ($value eq $simple_selector->[4]) {
+                      #
+                    } elsif (substr ($value, 0,
+                                     1 + length $simple_selector->[4]) eq
+                             $simple_selector->[4] . '-') {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } elsif ($simple_selector->[3] == INCLUDES_MATCH) {
+                    ## ISSUE: [a~=""] [a~=" "] [a~="b c"] [a~=" b"] [a~="b "] ?
+                    M: {
+                      for (split /[\x09\x0A\x0C\x0D\x20]+/, $value, -1) {
+                        if ($_ eq $simple_selector->[4]) {
+                          last M;
+                        }
+                      }
+                      $sss_matched = 0;
+                    } # M
+                  } elsif ($simple_selector->[3] == PREFIX_MATCH) {
+                    if (substr ($value, 0, length $simple_selector->[4]) eq
+                        $simple_selector->[4]) {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } elsif ($simple_selector->[3] == SUFFIX_MATCH) {
+                    if (substr ($value, -length $simple_selector->[4]) eq
+                        $simple_selector->[4]) {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } elsif ($simple_selector->[3] == SUBSTRING_MATCH) {
+                    if (index ($value, $simple_selector->[4]) > -1) {
+                      #
+                    } else {
+                      $sss_matched = 0;
+                    }
+                  } else {
+                    ## NOTE: New match type.
+                    report Message::DOM::DOMException
+                        -object => $self,
+                        -type => 'SYNTAX_ERR',
+                        -subtype => 'INVALID_SELECTORS_ERR';
+                  }
+                }
+              }
+            }
+          } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
+            if ($simple_selector->[1] eq '-manakai-current') {
+              $sss_matched = 0 if $current_node ne $node;
+            } elsif ($simple_selector->[1] eq '-manakai-contains') {
+              $sss_matched = 0
+                  if index ($node->text_content,
+                            $simple_selector->[2]) == -1;
+            } else {
+              ## This statement should never be executed.
+              die "$simple_selector->[1]: Bad pseudo-class";
+            }
+          } elsif ($simple_selector->[0] == PSEUDO_ELEMENT_SELECTOR) {
+            $sss_matched = 0;
+          } else {
+            ## NOTE: New simple selector type.
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'SYNTAX_ERR',
+                -subtype => 'INVALID_SELECTORS_ERR';
+          }
+        }
+  return $sss_matched;
+}; # $sss_match
 
 my $get_elements_by_selectors = sub {
   # $node, $selectors, $resolver, $node_conds, $is_html, $all, $current
@@ -103,191 +292,8 @@ my $get_elements_by_selectors = sub {
       my @new_cond;
       my $matched;
       for my $selector (@{$node_cond->[1]}) {
-        my $sss_matched = 1;
-        for my $simple_selector (@{$selector->[1]}) {
-          if ($simple_selector->[0] == LOCAL_NAME_SELECTOR) {
-            if ($simple_selector->[1] eq
-                $node_cond->[0]->manakai_local_name) {
-              #
-            } elsif ($is_html) {
-              my $nsuri = $node_cond->[0]->namespace_uri;
-              if (defined $nsuri and
-                  $nsuri eq q<http://www.w3.org/1999/xhtml>) {
-                if (lc $simple_selector->[1] eq
-                    $node_cond->[0]->manakai_local_name) {
-                  ## TODO: What kind of case-insensitivility?
-                  ## TODO: Is this checking method OK?
-                  #
-                } else {
-                  $sss_matched = 0;
-                }
-              } else {
-                $sss_matched = 0;
-              }
-            } else {
-              $sss_matched = 0;
-            }
-          } elsif ($simple_selector->[0] == NAMESPACE_SELECTOR) {
-            my $nsuri = $node_cond->[0]->namespace_uri;
-            if (defined $simple_selector->[1]) {
-              if (defined $nsuri and $nsuri eq $simple_selector->[1]) {
-                #
-              } else {
-                $sss_matched = 0;
-              }
-            } else {
-              if (defined $nsuri) {
-                $sss_matched = 0;
-              }
-            }
-          } elsif ($simple_selector->[0] == ATTRIBUTE_SELECTOR) {
-            my @attr_node;
-            ## Namespace URI
-            if (not defined $simple_selector->[1]) {
-              my $ln = $simple_selector->[2];
-              if ($is_html) {
-                my $nsuri = $node_cond->[0]->namespace_uri;
-                if (defined $nsuri and
-                    $nsuri eq q<http://www.w3.org/1999/xhtml>) {
-                  $ln =~ tr/A-Z/a-z/; ## ISSUE: Case-insensitivity
-                }
-              }
-
-              ## Any Namespace, Local Name
-              M: {
-                for my $attr_node (@{$node_cond->[0]->attributes}) {
-                  my $node_ln = $attr_node->manakai_local_name;
-                  if ($node_ln eq $simple_selector->[2]) {
-                    push @attr_node, $attr_node;
-                    last M if $simple_selector->[3] == EXISTS_MATCH;
-                  } elsif (not defined $attr_node->namespace_uri and
-                           $node_ln eq $ln) {
-                    push @attr_node, $attr_node;
-                    last M if $simple_selector->[3] == EXISTS_MATCH;
-                  }
-                }
-                last M if @attr_node;
-                $sss_matched = 0;
-              } # M
-            } elsif ($simple_selector->[1] eq '') {
-              my $ln = $simple_selector->[2];
-              if ($is_html) {
-                my $nsuri = $node_cond->[0]->namespace_uri;
-                if (defined $nsuri and
-                    $nsuri eq q<http://www.w3.org/1999/xhtml>) {
-                  $ln =~ tr/A-Z/a-z/; ## ISSUE: Case-insensitivity
-                }
-              }
-
-              ## ISSUE: Does <p>.setAttributeNS (undef, 'Align')'ed <p>
-              ## match with [align]?
-
-              ## Null Namespace, Local Name
-              my $attr_node = $node_cond->[0]->get_attribute_node_ns
-                  (undef, $ln);
-              if ($attr_node) {
-                push @attr_node, $attr_node;
-              } else {
-                $sss_matched = 0;
-              }
-            } else {
-              ## Non-null Namespace, Local Name
-              my $attr_node = $node_cond->[0]->get_attribute_node_ns
-                      ($simple_selector->[1], $simple_selector->[2]);
-              if ($attr_node) {
-                push @attr_node, $attr_node;
-              } else {
-                $sss_matched = 0;
-              }
-            }
-
-            if ($sss_matched) {
-              if ($simple_selector->[3] == EXISTS_MATCH) {
-                #
-              } else {
-                for my $attr_node (@attr_node) {
-                  ## TODO: Attribute value case-insensitivility
-                  my $value = $attr_node->value;
-                  if ($simple_selector->[3] == EQUALS_MATCH) {
-                    if ($value eq $simple_selector->[4]) {
-                      #
-                    } else {
-                      $sss_matched = 0;
-                    }
-                  } elsif ($simple_selector->[3] == DASH_MATCH) {
-                    ## ISSUE: [a|=""] a="a--b" a="-" ?
-                    if ($value eq $simple_selector->[4]) {
-                      #
-                    } elsif (substr ($value, 0,
-                                     1 + length $simple_selector->[4]) eq
-                             $simple_selector->[4] . '-') {
-                      #
-                    } else {
-                      $sss_matched = 0;
-                    }
-                  } elsif ($simple_selector->[3] == INCLUDES_MATCH) {
-                    ## ISSUE: [a~=""] [a~=" "] [a~="b c"] [a~=" b"] [a~="b "] ?
-                    M: {
-                      for (split /[\x09\x0A\x0C\x0D\x20]+/, $value, -1) {
-                        if ($_ eq $simple_selector->[4]) {
-                          last M;
-                        }
-                      }
-                      $sss_matched = 0;
-                    } # M
-                  } elsif ($simple_selector->[3] == PREFIX_MATCH) {
-                    if (substr ($value, 0, length $simple_selector->[4]) eq
-                        $simple_selector->[4]) {
-                      #
-                    } else {
-                      $sss_matched = 0;
-                    }
-                  } elsif ($simple_selector->[3] == SUFFIX_MATCH) {
-                    if (substr ($value, -length $simple_selector->[4]) eq
-                        $simple_selector->[4]) {
-                      #
-                    } else {
-                      $sss_matched = 0;
-                    }
-                  } elsif ($simple_selector->[3] == SUBSTRING_MATCH) {
-                    if (index ($value, $simple_selector->[4]) > -1) {
-                      #
-                    } else {
-                      $sss_matched = 0;
-                    }
-                  } else {
-                    ## NOTE: New match type.
-                    report Message::DOM::DOMException
-                        -object => $_[0],
-                        -type => 'SYNTAX_ERR',
-                        -subtype => 'INVALID_SELECTORS_ERR';
-                  }
-                }
-              }
-            }
-          } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
-            if ($simple_selector->[1] eq '-manakai-current') {
-              $sss_matched = 0 if $_[6] ne $node_cond->[0];
-            } elsif ($simple_selector->[1] eq '-manakai-contains') {
-              $sss_matched = 0
-                  if index ($node_cond->[0]->text_content,
-                            $simple_selector->[2]) == -1;
-            } else {
-              ## This statement should never be executed.
-              die "$simple_selector->[1]: Bad pseudo-class";
-            }
-          } elsif ($simple_selector->[0] == PSEUDO_ELEMENT_SELECTOR) {
-            $sss_matched = 0;
-          } else {
-            ## NOTE: New simple selector type.
-            report Message::DOM::DOMException
-                -object => $_[0],
-                -type => 'SYNTAX_ERR',
-                -subtype => 'INVALID_SELECTORS_ERR';
-          }
-        }
-        
-        if ($sss_matched) {
+        if ($sss_match->($_[0], $selector->[1], $node_cond->[0], $_[6],
+                         $is_html)) {
           if (@$selector == 2) {
             unless ($node_cond->[3]) {
               return $node_cond->[0] unless defined $r;
@@ -490,4 +496,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/10/07 04:55:32 $
+## $Date: 2007/12/31 10:47:00 $
