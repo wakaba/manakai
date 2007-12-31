@@ -5,6 +5,7 @@ require Whatpm::CSS::SelectorsParser;
 
 sub new ($) {
   my $self = bless {onerror => sub { }, must_level => 'm',
+                    message_level => 'w',
                     unsupported_level => 'unsupported'}, shift;
 
   return $self;
@@ -14,6 +15,10 @@ sub BEFORE_STATEMENT_STATE () { 0 }
 sub BEFORE_DECLARATION_STATE () { 1 }
 sub IGNORED_STATEMENT_STATE () { 2 }
 sub IGNORED_DECLARATION_STATE () { 3 }
+
+our $Prop; ## By CSS property name
+our $Attr; ## By CSSOM attribute name
+our $Key; ## By internal key
 
 sub parse_char_string ($$) {
   my $self = $_[0];
@@ -88,7 +93,7 @@ sub parse_char_string ($$) {
               $t->{type} == CDC_TOKEN;
 
       if ($t->{type} == ATKEYWORD_TOKEN) {
-        if ($t->{value} eq 'namespace') {
+        if (lc $t->{value} eq 'namespace') { ## TODO: case folding
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
 
@@ -138,7 +143,7 @@ sub parse_char_string ($$) {
                      level => $self->{must_level},
                      token => $t);
           #
-        } elsif ($t->{value} eq 'charset') {
+        } elsif (lc $t->{value} eq 'charset') { ## TODO: case folding
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
 
@@ -233,27 +238,109 @@ sub parse_char_string ($$) {
       ## NOTE: DELIM? in declaration will be removed:
       ## <http://csswg.inkedblade.net/spec/css2.1?s=declaration%20delim#issue-2>.
 
+      my $prop_def;
+      my $prop_value;
+      my $prop_flag;
       $t = $tt->get_next_token while $t->{type} == S_TOKEN;
       if ($t->{type} == IDENT_TOKEN) { # property
-        ## TODO: If supported, ...
-
+        my $prop_name = lc $t->{value}; ## TODO: case folding
         $t = $tt->get_next_token;
-        #
-      } elsif ($t->{type} == RBRACE_TOKEN) {
+        if ($t->{type} == COLON_TOKEN) {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+          $prop_def = $Prop->{$prop_name};
+          if ($prop_def) {
+            ($t, $prop_value)
+                = $prop_def->{parse}->($self, $prop_name, $tt, $t, $onerror);
+            if ($prop_value) {
+              ## NOTE: {parse} don't have to consume trailing spaces.
+              $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+              if ($t->{type} == EXCLAMATION_TOKEN) {
+                $t = $tt->get_next_token;
+                $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+                if ($t->{type} == IDENT_TOKEN and
+                    lc $t->{value} eq 'important') { ## TODO: case folding
+                  $prop_flag = 'important';
+                  
+                  $t = $tt->get_next_token;
+                  $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+                  #
+                } else {
+                  $onerror->(type => 'syntax error:important',
+                             level => $self->{must_level},
+                             token => $t);
+                  
+                  ## Reprocess.
+                  $state = IGNORED_DECLARATION_STATE;
+                  redo S;
+                }
+              }
+
+              #
+            } else {
+              ## Syntax error.
+        
+              ## Reprocess.
+              $state = IGNORED_DECLARATION_STATE;
+              redo S;
+            }
+          } else {
+            $onerror->(type => 'not supported:property',
+                       level => $self->{unsupported_level},
+                       token => $t, value => $prop_name);
+
+            #
+            $state = IGNORED_DECLARATION_STATE;
+            redo S;
+          }
+        } else {
+          $onerror->(type => 'syntax error:property colon',
+                     level => $self->{must_level},
+                     token => $t);
+
+          #
+          $state = IGNORED_DECLARATION_STATE;
+          redo S;
+        }
+      }
+
+      if ($t->{type} == RBRACE_TOKEN) {
         $t = $tt->get_next_token;
         $state = BEFORE_STATEMENT_STATE;
-        redo S;
+        #redo S;
+      } elsif ($t->{type} == SEMICOLON_TOKEN) {
+        $t = $tt->get_next_token;
+        ## Stay in the state.
+        #redo S;
       } elsif ($t->{type} == EOF_TOKEN) {
         $onerror->(type => 'syntax error:ruleset not closed',
                    level => $self->{must_level},
                    token => $t);
         ## Reprocess.
         $state = BEFORE_STATEMENT_STATE;
+        #redo S;
+      } else {
+        if ($prop_value) {
+          $onerror->(type => 'syntax error:property semicolon',
+                     level => $self->{must_level},
+                     token => $t);
+        } else {
+          $onerror->(type => 'syntax error:property name',
+                     level => $self->{must_level},
+                     token => $t);
+        }
+
+        #
+        $state = IGNORED_DECLARATION_STATE;
         redo S;
       }
 
-      #
-      $state = IGNORED_DECLARATION_STATE;
+      if ($prop_value) {
+        $$current_decls->{$prop_def->{key}} = [$prop_value, $prop_flag];
+      }
       redo S;
     } elsif ($state == IGNORED_STATEMENT_STATE or
              $state == IGNORED_DECLARATION_STATE) {
@@ -337,5 +424,41 @@ sub parse_char_string ($$) {
   return $ss;
 } # parse_char_string
 
+$Prop->{color} = {
+  css => 'color',
+  dom => 'color',
+  key => 'color',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == IDENT_TOKEN) {
+      if (lc $t->{value} eq 'blue') { ## TODO: case folding
+        $t = $tt->get_next_token;
+        return ($t, ["RGBA", 0, 0, 255, 0]);
+      } else {
+        #
+      }
+    } else {
+      #
+    }
+
+    $onerror->(type => 'syntax error:color',
+               level => $self->{must_level},
+               token => $t);
+    
+    return ($t, undef);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    if ($value->[0] eq 'RGBA') { ## TODO: %d? %f?
+      return sprintf 'rgba(%d, %d, %d, %f)', @$value[1, 2, 3, 4];
+    } else {
+      return undef;
+    }
+  },
+};
+$Attr->{color} = $Prop->{color};
+$Key->{color} = $Prop->{color};
+
 1;
-## $Date: 2007/12/23 15:47:09 $
+## $Date: 2007/12/31 03:00:42 $
