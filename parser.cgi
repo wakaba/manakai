@@ -36,6 +36,8 @@ if ($mode eq '/csstext') {
   };
 
   $p->{prop}->{$_} = 1 for qw/
+    border-bottom-style border-left-style border-right-style
+    border-style border-top-style
     clear color display float position unicode-bidi
   /;
   $p->{prop_value}->{display}->{$_} = 1 for qw/
@@ -57,6 +59,12 @@ if ($mode eq '/csstext') {
   $p->{prop_value}->{'unicode-bidi'}->{$_} = 1 for qw/
     normal bidi-override embed
   /;
+  for my $prop (qw/border-top-style border-left-style
+                   border-bottom-style border-right-style/) {
+    $p->{prop_value}->{$prop}->{$_} = 1 for qw/
+      none hidden dotted dashed solid double groove ridge inset outset
+    /;
+  }
   $p->{pseudo_class}->{$_} = 1 for qw/
     active checked disabled empty enabled first-child first-of-type
     focus hover indeterminate last-child last-of-type link only-child
@@ -184,4 +192,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/12/31 07:27:35 $
+## $Date: 2007/12/31 08:03:49 $
