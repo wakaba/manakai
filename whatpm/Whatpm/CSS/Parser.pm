@@ -250,7 +250,7 @@ sub parse_char_string ($$) {
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
 
           $prop_def = $Prop->{$prop_name};
-          if ($prop_def) {
+          if ($prop_def and $self->{prop}->{$prop_name}) {
             ($t, $prop_value)
                 = $prop_def->{parse}->($self, $prop_name, $tt, $t, $onerror);
             if ($prop_value) {
@@ -434,7 +434,7 @@ $Prop->{color} = {
     if ($t->{type} == IDENT_TOKEN) {
       if (lc $t->{value} eq 'blue') { ## TODO: case folding
         $t = $tt->get_next_token;
-        return ($t, ["RGBA", 0, 0, 255, 0]);
+        return ($t, ["RGBA", 0, 0, 255, 1]);
       } else {
         #
       }
@@ -460,5 +460,117 @@ $Prop->{color} = {
 $Attr->{color} = $Prop->{color};
 $Key->{color} = $Prop->{color};
 
+my $one_keyword_parser = sub {
+  my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+  if ($t->{type} == IDENT_TOKEN) {
+    my $prop_value = lc $t->{value}; ## TODO: case folding
+    $t = $tt->get_next_token;
+    if ($Prop->{$prop_name}->{keyword}->{$prop_value} and
+        $self->{prop_value}->{$prop_name}->{$prop_value}) {
+      return ($t, ["KEYWORD", $prop_value]);
+    } elsif ($prop_value eq 'inherit') {
+      return ($t, ["KEYWORD", $prop_value]);
+    }
+  }
+  
+  $onerror->(type => 'syntax error:keyword',
+             level => $self->{must_level},
+             token => $t);
+  return ($t, undef);
+};
+
+my $one_keyword_serializer = sub {
+  my ($self, $prop_name, $value) = @_;
+  if ($value->[0] eq 'KEYWORD') {
+    return $value->[1];
+  } else {
+    return undef;
+  }
+};
+
+$Prop->{display} = {
+  css => 'display',
+  dom => 'display',
+  key => 'display',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => {
+    block => 1, inline => 1, 'inline-block' => 1, 'inline-table' => 1,
+    'list-item' => 1, none => 1,
+    table => 1, 'table-caption' => 1, 'table-cell' => 1, 'table-column' => 1,
+    'table-column-group' => 1, 'table-header-group' => 1,
+    'table-footer-group' => 1, 'table-row' => 1, 'table-row-group' => 1,
+  },
+};
+$Attr->{display} = $Prop->{display};
+$Key->{display} = $Prop->{display};
+
+$Prop->{position} = {
+  css => 'position',
+  dom => 'position',
+  key => 'position',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => {
+    static => 1, relative => 1, absolute => 1, fixed => 1,
+  },
+};
+$Attr->{position} = $Prop->{position};
+$Key->{position} = $Prop->{position};
+
+$Prop->{float} = {
+  css => 'float',
+  dom => 'css_float',
+  key => 'float',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => {
+    left => 1, right => 1, none => 1,
+  },
+};
+$Attr->{css_float} = $Prop->{float};
+$Attr->{style_float} = $Prop->{float}; ## NOTE: IEism
+$Key->{float} = $Prop->{float};
+
+$Prop->{clear} = {
+  css => 'clear',
+  dom => 'clear',
+  key => 'clear',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => {
+    left => 1, right => 1, none => 1, both => 1,
+  },
+};
+$Attr->{clear} = $Prop->{clear};
+$Key->{clear} = $Prop->{clear};
+
+$Prop->{direction} = {
+  css => 'direction',
+  dom => 'direction',
+  key => 'direction',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => {
+    ltr => 1, rtl => 1,
+  },
+};
+$Attr->{direction} = $Prop->{direction};
+$Key->{direction} = $Prop->{direction};
+
+$Prop->{'unicode-bidi'} = {
+  css => 'unicode-bidi',
+  dom => 'unicode_bidi',
+  key => 'unicode_bidi',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => {
+    normal => 1, embed => 1, 'bidi-override' => 1,
+  },
+};
+$Attr->{unicode_bidi} = $Prop->{'unicode-bidi'};
+$Key->{unicode_bidi} = $Prop->{'unicode-bidi'};
+
 1;
-## $Date: 2007/12/31 03:00:42 $
+## $Date: 2007/12/31 07:26:35 $
