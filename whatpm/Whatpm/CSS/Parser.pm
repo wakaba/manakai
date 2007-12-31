@@ -122,7 +122,6 @@ sub parse_char_string ($$) {
                 push @$current_rules,
                     Message::DOM::CSSNamespaceRule->____new ($prefix, $uri);
                 undef $charset_allowed;
-                undef $namespace_allowed;
               } else {
                 $onerror->(type => 'at:namespace:not allowed',
                            level => $self->{must_level},
@@ -732,4 +731,4 @@ $Prop->{'border-style'} = {
 $Attr->{border_style} = $Prop->{'border-style'};
 
 1;
-## $Date: 2007/12/31 09:09:23 $
+## $Date: 2007/12/31 13:47:49 $
