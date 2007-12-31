@@ -1,6 +1,6 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::DOM::DOMException;
 
 package Message::DOM::Document;
@@ -201,8 +201,12 @@ my $get_elements_by_selectors = sub {
 
   my $p = Whatpm::CSS::SelectorsParser->new;
 
-  my $ns_error;
-  my $resolver = $_[2] || sub { return undef };
+  my $selectors;
+  if (ref $_[1] eq 'ARRAY') {
+    $selectors = $_[1];
+  } else {
+    my $ns_error;
+    my $resolver = $_[2] || sub { return undef };
   if (UNIVERSAL::can ($_[2], 'lookup_namespace_uri')) {
     my $re = $resolver;
     $resolver = sub {
@@ -259,7 +263,7 @@ my $get_elements_by_selectors = sub {
     after before first-letter first-line
   /;
 
-  my $selectors = $p->parse_string (''.$_[1]);
+  $selectors = $p->parse_string (''.$_[1]);
   unless (defined $selectors) {
     local $Error::Depth = $Error::Depth - 1;
     # MUST
@@ -275,6 +279,7 @@ my $get_elements_by_selectors = sub {
           -type => 'SYNTAX_ERR',
           -subtype => 'INVALID_SELECTORS_ERR';
     }
+  }
   }
 
   my $is_html = $_[4];
@@ -388,7 +393,7 @@ sub query_selector ($$;$) {
   }
 
   return $get_elements_by_selectors
-      ->($_[0], $_[1], $_[2], \@node_cond,
+      ->($_[0], ''.$_[1], $_[2], \@node_cond,
          $_[0]->manakai_is_html, 0, 0);
 } # query_selector
 
@@ -408,9 +413,30 @@ sub query_selector_all ($$;$) {
   }
 
   return $get_elements_by_selectors
-      ->($_[0], $_[1], $_[2], \@node_cond,
+      ->($_[0], ''.$_[1], $_[2], \@node_cond,
          $_[0]->manakai_is_html, 1, 0);
 } # query_selector_all
+
+## NOTE: For internal use - $_[1] is a selectors object.
+sub ___query_selector_all ($$) {
+  local $Error::Depth = $Error::Depth + 1;
+
+  ## Children of the Element.
+  my @node_cond;
+  my @children = grep { # ELEMENT_NODE or ENTITY_REFERENCE_NODE
+    $_->node_type == 1 or $_->node_type == 5
+  } @{$_[0]->child_nodes};
+  my $next_sibling_cond;
+  for (reverse @children) {
+    my $new_node_cond = [$_, undef, $next_sibling_cond];
+    unshift @node_cond, $new_node_cond;
+    $next_sibling_cond = $new_node_cond;
+  }
+
+  return $get_elements_by_selectors
+      ->($_[0], $_[1], undef, \@node_cond,
+         $_[0]->manakai_is_html, 1, 0);
+} # ___query_selector_all
 
 package Message::DOM::Element;
 
@@ -463,7 +489,7 @@ sub query_selector ($$;$) {
   local $Error::Depth = $Error::Depth + 1;
 
   return $get_elements_by_selectors
-      ->($_[0], $_[1], $_[2], $get_node_cond->($_[0]),
+      ->($_[0], ''.$_[1], $_[2], $get_node_cond->($_[0]),
          $_[0]->owner_document->manakai_is_html, 0, $_[0]);
 } # query_selector
 
@@ -471,7 +497,7 @@ sub query_selector_all ($$;$) {
   local $Error::Depth = $Error::Depth + 1;
 
   return $get_elements_by_selectors
-      ->($_[0], $_[1], $_[2], $get_node_cond->($_[0]),
+      ->($_[0], ''.$_[1], $_[2], $get_node_cond->($_[0]),
          $_[0]->owner_document->manakai_is_html, 1, $_[0]);
 } # query_selector_all
 
@@ -496,4 +522,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/12/31 10:47:00 $
+## $Date: 2007/12/31 13:46:25 $

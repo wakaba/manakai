@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -123,6 +123,7 @@ sub AUTOLOAD {
     create_tree_walker => 'Message::DOM::TreeWalker',
     query_selector => 'Message::DOM::SelectorsAPI',
     query_selector_all => 'Message::DOM::SelectorsAPI',
+    ___query_selector_all => 'Message::DOM::SelectorsAPI',
   }->{$method_name}) {
     eval qq{ require $module_name } or die $@;
     goto &{ $AUTOLOAD };
@@ -1239,4 +1240,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/12/22 06:29:32 $
+## $Date: 2007/12/31 13:46:25 $
