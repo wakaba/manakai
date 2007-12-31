@@ -338,8 +338,14 @@ sub parse_char_string ($$) {
         redo S;
       }
 
-      if ($prop_value) {
-        $$current_decls->{$prop_def->{key}} = [$prop_value, $prop_flag];
+      my $important = (defined $prop_flag and $prop_flag eq 'important');
+      for my $set_prop_name (keys %{$prop_value or {}}) {
+        my $set_prop_def = $Prop->{$set_prop_name};
+        $$current_decls->{$set_prop_def->{key}}
+            = [$prop_value->{$set_prop_name}, $prop_flag]
+            if $important or
+                not $$current_decls->{$set_prop_def->{key}} or
+                not defined $$current_decls->{$set_prop_def->{key}}->[1];
       }
       redo S;
     } elsif ($state == IGNORED_STATEMENT_STATE or
@@ -434,7 +440,7 @@ $Prop->{color} = {
     if ($t->{type} == IDENT_TOKEN) {
       if (lc $t->{value} eq 'blue') { ## TODO: case folding
         $t = $tt->get_next_token;
-        return ($t, ["RGBA", 0, 0, 255, 1]);
+        return ($t, {$prop_name => ["RGBA", 0, 0, 255, 1]});
       } else {
         #
       }
@@ -468,13 +474,13 @@ my $one_keyword_parser = sub {
     $t = $tt->get_next_token;
     if ($Prop->{$prop_name}->{keyword}->{$prop_value} and
         $self->{prop_value}->{$prop_name}->{$prop_value}) {
-      return ($t, ["KEYWORD", $prop_value]);
+      return ($t, {$prop_name => ["KEYWORD", $prop_value]});
     } elsif ($prop_value eq 'inherit') {
-      return ($t, ["KEYWORD", $prop_value]);
+      return ($t, {$prop_name => ["KEYWORD", $prop_value]});
     }
   }
   
-  $onerror->(type => 'syntax error:keyword',
+  $onerror->(type => 'syntax error:keyword:'.$prop_name,
              level => $self->{must_level},
              token => $t);
   return ($t, undef);
@@ -572,5 +578,158 @@ $Prop->{'unicode-bidi'} = {
 $Attr->{unicode_bidi} = $Prop->{'unicode-bidi'};
 $Key->{unicode_bidi} = $Prop->{'unicode-bidi'};
 
+my $border_style_keyword = {
+  none => 1, hidden => 1, dotted => 1, dashed => 1, solid => 1,
+  double => 1, groove => 1, ridge => 1, inset => 1, outset => 1,
+};
+
+$Prop->{'border-top-style'} = {
+  css => 'border-top-style',
+  dom => 'border_top_style',
+  key => 'border_top_style',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => $border_style_keyword,
+};
+$Attr->{border_top_style} = $Prop->{'border-top-style'};
+$Key->{border_top_style} = $Prop->{'border-top-style'};
+
+$Prop->{'border-right-style'} = {
+  css => 'border-right-style',
+  dom => 'border_right_style',
+  key => 'border_right_style',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => $border_style_keyword,
+};
+$Attr->{border_right_style} = $Prop->{'border-right-style'};
+$Key->{border_right_style} = $Prop->{'border-right-style'};
+
+$Prop->{'border-bottom-style'} = {
+  css => 'border-bottom-style',
+  dom => 'border_bottom_style',
+  key => 'border_bottom_style',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => $border_style_keyword,
+};
+$Attr->{border_bottom_style} = $Prop->{'border-bottom-style'};
+$Key->{border_bottom_style} = $Prop->{'border-bottom-style'};
+
+$Prop->{'border-left-style'} = {
+  css => 'border-left-style',
+  dom => 'border_left_style',
+  key => 'border_left_style',
+  parse => $one_keyword_parser,
+  serialize => $one_keyword_serializer,
+  keyword => $border_style_keyword,
+};
+$Attr->{border_left_style} = $Prop->{'border-left-style'};
+$Key->{border_left_style} = $Prop->{'border-left-style'};
+
+$Prop->{'border-style'} = {
+  css => 'border-style',
+  dom => 'border_style',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my %prop_value;
+    my $has_inherit;
+    if ($t->{type} == IDENT_TOKEN) {
+      my $prop_value = lc $t->{value}; ## TODO: case folding
+      $t = $tt->get_next_token;
+      if ($border_style_keyword->{$prop_value} and
+          $self->{prop_value}->{'border-top-style'}->{$prop_value}) {
+        $prop_value{'border-top-style'} = ["KEYWORD", $prop_value];
+      } elsif ($prop_value eq 'inherit') {
+        $prop_value{'border-top-style'} = ["KEYWORD", $prop_value];
+        $has_inherit = 1;
+      } else {
+        $onerror->(type => 'syntax error:keyword:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+      $prop_value{'border-right-style'} = $prop_value{'border-top-style'};
+      $prop_value{'border-bottom-style'} = $prop_value{'border-top-style'};
+      $prop_value{'border-left-style'} = $prop_value{'border-right-style'};
+    } else {
+      $onerror->(type => 'syntax error:keyword:'.$prop_name,
+                 level => $self->{must_level},
+                 token => $t);
+      return ($t, undef);
+    }
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    if ($t->{type} == IDENT_TOKEN) {
+      my $prop_value = lc $t->{value}; ## TODO: case folding
+      $t = $tt->get_next_token;
+      if (not $has_inherit and
+          $border_style_keyword->{$prop_value} and
+          $self->{prop_value}->{'border-right-style'}->{$prop_value}) {
+        $prop_value{'border-right-style'} = ["KEYWORD", $prop_value];
+      } else {
+        $onerror->(type => 'syntax error:keyword:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+      $prop_value{'border-left-style'} = $prop_value{'border-right-style'};
+
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      if ($t->{type} == IDENT_TOKEN) {
+        my $prop_value = lc $t->{value}; ## TODO: case folding
+        $t = $tt->get_next_token;
+        if ($border_style_keyword->{$prop_value} and
+            $self->{prop_value}->{'border-bottom-style'}->{$prop_value}) {
+          $prop_value{'border-bottom-style'} = ["KEYWORD", $prop_value];
+        } else {
+          $onerror->(type => 'syntax error:keyword:'.$prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+          return ($t, undef);
+        }
+        
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == IDENT_TOKEN) {
+          my $prop_value = lc $t->{value}; ## TODO: case folding
+          $t = $tt->get_next_token;
+          if ($border_style_keyword->{$prop_value} and
+              $self->{prop_value}->{'border-left-style'}->{$prop_value}) {
+            $prop_value{'border-left-style'} = ["KEYWORD", $prop_value];
+          } else {
+            $onerror->(type => 'syntax error:keyword:'.$prop_name,
+                       level => $self->{must_level},
+                       token => $t);
+            return ($t, undef);
+          }
+        }
+      }
+    }        
+
+    return ($t, \%prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my @v;
+    push @v, $self->border_top_style;
+    return undef unless defined $v[-1];
+    push @v, $self->border_right_style;
+    return undef unless defined $v[-1];
+    push @v, $self->border_bottom_style;
+    return undef unless defined $v[-1];
+    push @v, $self->border_bottom_style;
+    return undef unless defined $v[-1];
+
+    pop @v if $v[1] eq $v[3];
+    pop @v if $v[0] eq $v[2];
+    pop @v if $v[0] eq $v[1];
+    return join ' ', @v;
+  },
+};
+$Attr->{border_style} = $Prop->{'border-style'};
+
 1;
-## $Date: 2007/12/31 07:26:35 $
+## $Date: 2007/12/31 09:09:23 $
