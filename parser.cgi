@@ -34,7 +34,29 @@ if ($mode eq '/csstext') {
     my (%opt) = @_;
     print STDOUT "$opt{line},$opt{column},$opt{level},$opt{type}\n";
   };
-  
+
+  $p->{prop}->{$_} = 1 for qw/
+    clear color display float position unicode-bidi
+  /;
+  $p->{prop_value}->{display}->{$_} = 1 for qw/
+    block inline inline-block inline-table list-item none
+    table table-caption table-cell table-column table-column-group
+    table-header-group table-footer-group table-row table-row-group
+  /;
+  $p->{prop_value}->{position}->{$_} = 1 for qw/
+    absolute fixed relative static
+  /;
+  $p->{prop_value}->{float}->{$_} = 1 for qw/
+    left right none
+  /;
+  $p->{prop_value}->{clear}->{$_} = 1 for qw/
+    left right none both
+  /;
+  $p->{prop_value}->{direction}->{ltr} = 1;
+  $p->{prop_value}->{direction}->{rtl} = 1;
+  $p->{prop_value}->{'unicode-bidi'}->{$_} = 1 for qw/
+    normal bidi-override embed
+  /;
   $p->{pseudo_class}->{$_} = 1 for qw/
     active checked disabled empty enabled first-child first-of-type
     focus hover indeterminate last-child last-of-type link only-child
@@ -162,4 +184,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/12/23 08:32:44 $
+## $Date: 2007/12/31 07:27:35 $
