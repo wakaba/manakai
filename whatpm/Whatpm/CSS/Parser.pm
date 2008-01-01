@@ -907,14 +907,10 @@ $Prop->{widows} = {
 $Attr->{widows} = $Prop->{widows};
 $Key->{widows} = $Prop->{widows};
 
-$Prop->{'list-style-image'} = {
-  css => 'list-style-image',
-  dom => 'list_style_image',
-  key => 'list_style_image',
-  parse => sub {
+my $uri_or_none_parser = sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
-    if ($t->{type} == URI_TOKEN) { ## TODO: resolve URI
+    if ($t->{type} == URI_TOKEN) {
       my $value = $t->{value};
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ['URI', $value, \($self->{base_uri})]});
@@ -945,7 +941,13 @@ $Prop->{'list-style-image'} = {
                level => $self->{must_level},
                token => $t);
     return ($t, undef);
-  },
+}; # $uri_or_none_parser
+
+$Prop->{'list-style-image'} = {
+  css => 'list-style-image',
+  dom => 'list_style_image',
+  key => 'list_style_image',
+  parse => $uri_or_none_parser,
   serialize => $default_serializer,
   initial => ['KEYWORD', 'none'],
   inherited => 1,
@@ -1196,7 +1198,7 @@ $Prop->{'list-style'} = {
         }
         
         $prop_value{'list-style-image'}
-            = ['URI', $t->{value}, $self->{base_uri}];
+            = ['URI', $t->{value}, \($self->{base_uri})];
         $t = $tt->get_next_token;
       } else {
         if ($f == 1) {
@@ -1272,4 +1274,4 @@ $Prop->{'list-style'} = {
 $Attr->{list_style} = $Prop->{'list-style'};
 
 1;
-## $Date: 2008/01/01 11:21:15 $
+## $Date: 2008/01/01 11:25:34 $
