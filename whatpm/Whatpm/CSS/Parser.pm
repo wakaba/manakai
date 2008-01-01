@@ -483,7 +483,7 @@ my $one_keyword_parser = sub {
         $self->{prop_value}->{$prop_name}->{$prop_value}) {
       return ($t, {$prop_name => ["KEYWORD", $prop_value]});
     } elsif ($prop_value eq 'inherit') {
-      return ($t, {$prop_name => ["KEYWORD", $prop_value]});
+      return ($t, {$prop_name => ['INHERIT']});
     }
   }
   
@@ -497,6 +497,8 @@ my $one_keyword_serializer = sub {
   my ($self, $prop_name, $value) = @_;
   if ($value->[0] eq 'KEYWORD') {
     return $value->[1];
+  } elsif ($value->[0] eq 'INHERIT') {
+    return 'inherit';
   } else {
     return undef;
   }
@@ -582,7 +584,7 @@ $Prop->{position} = {
   keyword => {
     static => 1, relative => 1, absolute => 1, fixed => 1,
   },
-  initial => ["KEYWORD", "initial"],
+  initial => ["KEYWORD", "static"],
   #inherited => 0,
   compute => $compute_as_specified,
 };
@@ -757,7 +759,7 @@ $Prop->{'border-style'} = {
           $self->{prop_value}->{'border-top-style'}->{$prop_value}) {
         $prop_value{'border-top-style'} = ["KEYWORD", $prop_value];
       } elsif ($prop_value eq 'inherit') {
-        $prop_value{'border-top-style'} = ["KEYWORD", $prop_value];
+        $prop_value{'border-top-style'} = ["INHERIT"];
         $has_inherit = 1;
       } else {
         $onerror->(type => 'syntax error:keyword:'.$prop_name,
@@ -847,4 +849,4 @@ $Prop->{'border-style'} = {
 $Attr->{border_style} = $Prop->{'border-style'};
 
 1;
-## $Date: 2008/01/01 07:07:28 $
+## $Date: 2008/01/01 07:39:05 $

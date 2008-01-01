@@ -1,5 +1,14 @@
 2008-01-01  Wakaba  <wakaba@suika.fam.cx>
 
+	* Cascade.pm: The |use strict| line was missing!!!!!!!!!11
+	(get_computed_value): Support for the |inherit| value.
+
+	* Parser.pm: The |inherit| value is represented by new |INHERIT|
+	value type, rather than |KEYWORD|.
+	(position): The initial value was incorrect.
+
+2008-01-01  Wakaba  <wakaba@suika.fam.cx>
+
 	* Cascade.pm (get_cascaded_value): It now should return |undef|
 	for shorthand properties.
 	(get_specified_value, get_computed_value): New methods.

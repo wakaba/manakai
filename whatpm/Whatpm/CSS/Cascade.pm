@@ -1,4 +1,5 @@
 package Whatpm::CSS::Cascade;
+use strict;
 
 require Whatpm::CSS::Parser; ## NOTE: For property definitions.
 require Whatpm::CSS::SelectorsSerializer;
@@ -151,10 +152,20 @@ sub get_computed_value ($$$) {
   unless (exists $self->{computed_value}->{$eid}->{$prop_name}) {
     my $prop_def = $Whatpm::CSS::Parser::Prop->{$prop_name};
     if (defined $prop_def) {
-      $self->{computed_value}->{$eid}->{$prop_name}
-          = $prop_def->{compute}->($self, $element, $prop_name,
-                                   $self->get_specified_value
-                                       ($element, $prop_name));
+      my $specified = $self->get_specified_value ($element, $prop_name);
+      if (defined $specified and $specified->[0] eq 'INHERIT') {
+        my $parent_element = $element->manakai_parent_element;
+        if (defined $parent_element) {
+          $self->{computed_value}->{$eid}->{$prop_name}
+              = $self->get_computed_value ($parent_element, $prop_name);
+        } else {
+          $self->{computed_value}->{$eid}->{$prop_name}
+              = $prop_def->{initial};
+        }
+      } else {
+        $self->{computed_value}->{$eid}->{$prop_name}
+            = $prop_def->{compute}->($self, $element, $prop_name, $specified);
+      }
     } else {
       $self->{computed_value}->{$eid}->{$prop_name} = undef;
     }
@@ -166,4 +177,4 @@ sub get_computed_value ($$$) {
 } # get_computed_value
 
 1;
-## $Date: 2008/01/01 07:07:28 $
+## $Date: 2008/01/01 07:39:05 $
