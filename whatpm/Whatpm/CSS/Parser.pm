@@ -761,6 +761,54 @@ $Prop->{'list-style-position'} = {
 $Attr->{list_style_position} = $Prop->{'list-style-position'};
 $Key->{list_style_position} = $Prop->{'list-style-position'};
 
+$Prop->{'page-break-before'} = {
+  css => 'page-break-before',
+  dom => 'page_break_before',
+  key => 'page_break_before',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    auto => 1, always => 1, avoid => 1, left => 1, right => 1,
+  },
+  initial => ["KEYWORD", 'auto'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{page_break_before} = $Prop->{'page-break-before'};
+$Key->{page_break_before} = $Prop->{'page-break-before'};
+
+$Prop->{'page-break-after'} = {
+  css => 'page-break-after',
+  dom => 'page_break_after',
+  key => 'page_break_after',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    auto => 1, always => 1, avoid => 1, left => 1, right => 1,
+  },
+  initial => ["KEYWORD", 'auto'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{page_break_after} = $Prop->{'page-break-after'};
+$Key->{page_break_after} = $Prop->{'page-break-after'};
+
+$Prop->{'page-break-inside'} = {
+  css => 'page-break-inside',
+  dom => 'page_break_inside',
+  key => 'page_break_inside',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    auto => 1, avoid => 1,
+  },
+  initial => ["KEYWORD", 'auto'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{page_break_inside} = $Prop->{'page-break-inside'};
+$Key->{page_break_inside} = $Prop->{'page-break-inside'};
+
 $Prop->{'z-index'} = {
   css => 'z-index',
   dom => 'z_index',
@@ -768,13 +816,19 @@ $Prop->{'z-index'} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $sign = -1;
+      $t = $tt->get_next_token;
+    }
+
     if ($t->{type} == NUMBER_TOKEN) {
       ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/z-index> for
       ## browser compatibility issue.
       my $value = $t->{number};
       $t = $tt->get_next_token;
-      return ($t, {$prop_name => ["NUMBER", int ($value / 1)]});
-    } elsif ($t->{type} == IDENT_TOKEN) {
+      return ($t, {$prop_name => ["NUMBER", $sign * int ($value / 1)]});
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
       $t = $tt->get_next_token;
       if ($value eq 'auto') {
@@ -798,6 +852,60 @@ $Prop->{'z-index'} = {
 };
 $Attr->{z_index} = $Prop->{'z-index'};
 $Key->{z_index} = $Prop->{'z-index'};
+
+$Prop->{orphans} = {
+  css => 'orphans',
+  dom => 'orphans',
+  key => 'orphans',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == NUMBER_TOKEN) {
+      ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/orphans> and
+      ## <http://suika.fam.cx/gate/2005/sw/widows> for
+      ## browser compatibility issue.
+      my $value = $t->{number};
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ["NUMBER", $sign * int ($value / 1)]});
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['NUMBER', 2],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{orphans} = $Prop->{orphans};
+$Key->{orphans} = $Prop->{orphans};
+
+$Prop->{widows} = {
+  css => 'widows',
+  dom => 'widows',
+  key => 'widows',
+  parse => $Prop->{orphans}->{parse},
+  serialize => $default_serializer,
+  initial => ['NUMBER', 2],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{widows} = $Prop->{widows};
+$Key->{widows} = $Prop->{widows};
 
 $Prop->{'list-style-image'} = {
   css => 'list-style-image',
@@ -1027,5 +1135,141 @@ $Prop->{'border-style'} = {
 };
 $Attr->{border_style} = $Prop->{'border-style'};
 
+$Prop->{'list-style'} = {
+  css => 'list-style',
+  dom => 'list_style',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my %prop_value;
+    my $none = 0;
+
+    F: for my $f (1..3) {
+      if ($t->{type} == IDENT_TOKEN) {
+        my $prop_value = lc $t->{value}; ## TODO: case folding
+        $t = $tt->get_next_token;
+
+        if ($prop_value eq 'none') {
+          $none++;
+        } elsif ($Prop->{'list-style-type'}->{keyword}->{$prop_value}) {
+          if (exists $prop_value{'list-style-type'}) {
+            $onerror->(type => q[syntax error:duplicate:'list-style-type':].
+                           $prop_name,
+                       level => $self->{must_level},
+                       token => $t);
+            return ($t, undef);
+          } else {
+            $prop_value{'list-style-type'} = ['KEYWORD', $prop_value];
+          }
+        } elsif ($Prop->{'list-style-position'}->{keyword}->{$prop_value}) {
+          if (exists $prop_value{'list-style-position'}) {
+            $onerror->(type => q[syntax error:duplicate:'list-style-position':].
+                           $prop_name,
+                       level => $self->{must_level},
+                       token => $t);
+            return ($t, undef);
+          }
+
+          $prop_value{'list-style-position'} = ['KEYWORD', $prop_value];
+        } elsif ($f == 1 and $prop_value eq 'inherit') {
+          $prop_value{'list-style-type'} = ["INHERIT"];
+          $prop_value{'list-style-position'} = ["INHERIT"];
+          $prop_value{'list-style-image'} = ["INHERIT"];
+          last F;
+        } else {
+          if ($f == 1) {
+            $onerror->(type => 'syntax error:'.$prop_name,
+                       level => $self->{must_level},
+                       token => $t);
+            return ($t, undef);
+          } else {
+            last F;
+          }
+        }
+      } elsif ($t->{type} == URI_TOKEN) {
+        if (exists $prop_value{'list-style-image'}) {
+          $onerror->(type => q[syntax error:duplicate:'list-style-image':].
+                         $prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+          return ($t, undef);
+        }
+        
+        $prop_value{'list-style-image'}
+            = ['URI', $t->{value}, $self->{base_uri}];
+        $t = $tt->get_next_token;
+      } else {
+        if ($f == 1) {
+          $onerror->(type => 'syntax error:keyword:'.$prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+          return ($t, undef);
+        } else {
+          last F;
+        }
+      }
+
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    } # F
+    ## NOTE: No browser support |list-style: url(xxx|{EOF}.
+
+    if ($none == 1) {
+      if (exists $prop_value{'list-style-type'}) {
+        if (exists $prop_value{'list-style-image'}) {
+          $onerror->(type => q[syntax error:duplicate:'list-style-image':].
+                         $prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+          return ($t, undef);
+        } else {
+          $prop_value{'list-style-image'} = ['KEYWORD', 'none'];
+        }
+      } else {
+        $prop_value{'list-style-type'} = ['KEYWORD', 'none'];
+        $prop_value{'list-style-image'} = ['KEYWORD', 'none']
+            unless exists $prop_value{'list-style-image'};
+      }
+    } elsif ($none == 2) {
+      if (exists $prop_value{'list-style-type'}) {
+        $onerror->(type => q[syntax error:duplicate:'list-style-type':].
+                       $prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+      if (exists $prop_value{'list-style-image'}) {
+        $onerror->(type => q[syntax error:duplicate:'list-style-image':].
+                       $prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+      
+      $prop_value{'list-style-type'} = ['KEYWORD', 'none'];
+      $prop_value{'list-style-image'} = ['KEYWORD', 'none'];
+    } elsif ($none == 3) {
+      $onerror->(type => q[syntax error:duplicate:'list-style-type':].
+                     $prop_name,
+                 level => $self->{must_level},
+                 token => $t);
+      return ($t, undef);
+    }
+
+    for (qw/list-style-type list-style-position list-style-image/) {
+      $prop_value{$_} = $Prop->{$_}->{initial} unless exists $prop_value{$_};
+    }
+
+    return ($t, \%prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    return $self->list_style_type . ' ' . $self->list_style_position .
+        ' ' . $self->list_style_image;
+  },
+};
+$Attr->{list_style} = $Prop->{'list-style'};
+
 1;
-## $Date: 2008/01/01 09:08:08 $
+## $Date: 2008/01/01 11:21:15 $
