@@ -1,5 +1,12 @@
 2008-01-02  Wakaba  <wakaba@suika.fam.cx>
 
+	* Cascade.pm (get_computed_value): Even when |inherit| is specified
+	the value is resolved into the computed value by the |{compute}|
+	code to support edge cases not mentioned in the CSS 2.1 spec (see
+	<http://suika.fam.cx/gate/2005/sw/inherit>).
+
+2008-01-02  Wakaba  <wakaba@suika.fam.cx>
+
 	* Cascade.pm (get_computed_value): Resolve initial value referred
 	when |inherit| is specified as if it were the specified value.
 
