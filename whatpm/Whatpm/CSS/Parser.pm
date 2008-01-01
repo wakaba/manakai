@@ -943,15 +943,7 @@ my $uri_or_none_parser = sub {
     return ($t, undef);
 }; # $uri_or_none_parser
 
-$Prop->{'list-style-image'} = {
-  css => 'list-style-image',
-  dom => 'list_style_image',
-  key => 'list_style_image',
-  parse => $uri_or_none_parser,
-  serialize => $default_serializer,
-  initial => ['KEYWORD', 'none'],
-  inherited => 1,
-  compute => sub {
+my $compute_uri_or_none = sub {
     my ($self, $element, $prop_name, $specified_value) = @_;
     
     if (defined $specified_value and
@@ -967,7 +959,17 @@ $Prop->{'list-style-image'} = {
     }
 
     return $specified_value;
-  },
+}; # $compute_uri_or_none
+
+$Prop->{'list-style-image'} = {
+  css => 'list-style-image',
+  dom => 'list_style_image',
+  key => 'list_style_image',
+  parse => $uri_or_none_parser,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'none'],
+  inherited => 1,
+  compute => $compute_uri_or_none,
 };
 $Attr->{list_style_image} = $Prop->{'list-style-image'};
 $Key->{list_style_image} = $Prop->{'list-style-image'};
@@ -1274,4 +1276,4 @@ $Prop->{'list-style'} = {
 $Attr->{list_style} = $Prop->{'list-style'};
 
 1;
-## $Date: 2008/01/01 11:25:34 $
+## $Date: 2008/01/01 11:27:42 $
