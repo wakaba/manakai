@@ -38,7 +38,11 @@ if ($mode eq '/csstext') {
   $p->{prop}->{$_} = 1 for qw/
     border-bottom-style border-left-style border-right-style
     border-style border-top-style
-    clear color display float position unicode-bidi
+    clear color direction display float
+    list-style list-style-image list-style-position list-style-type
+    orphans overflow
+    page-break-after page-break-before page-break-inside
+    position unicode-bidi visibility widows z-index
   /;
   $p->{prop_value}->{display}->{$_} = 1 for qw/
     block inline inline-block inline-table list-item none
@@ -59,6 +63,27 @@ if ($mode eq '/csstext') {
   $p->{prop_value}->{'unicode-bidi'}->{$_} = 1 for qw/
     normal bidi-override embed
   /;
+  $p->{prop_value}->{overflow}->{$_} = 1 for qw/
+    visible hidden scroll auto
+  /;
+  $p->{prop_value}->{visibility}->{$_} = 1 for qw/
+    visible hidden collapse
+  /;
+  $p->{prop_value}->{'list-style-type'}->{$_} = 1 for qw/
+    disc circle square decimal decimal-leading-zero
+    lower-roman upper-roman lower-greek lower-latin
+    upper-latin armenian georgian lower-alpha upper-alpha none
+  /;
+  $p->{prop_value}->{'list-style-position'}->{outside} = 1;
+  $p->{prop_value}->{'list-style-position'}->{inside} = 1;
+  $p->{prop_value}->{'page-break-before'}->{$_} = 1 for qw/
+    auto always avoid left right
+  /;
+  $p->{prop_value}->{'page-break-after'}->{$_} = 1 for qw/
+    auto always avoid left right
+  /;
+  $p->{prop_value}->{'page-break-inside'}->{auto} = 1;
+  $p->{prop_value}->{'page-break-inside'}->{avoid} = 1;
   for my $prop (qw/border-top-style border-left-style
                    border-bottom-style border-right-style/) {
     $p->{prop_value}->{$prop}->{$_} = 1 for qw/
@@ -76,11 +101,37 @@ if ($mode eq '/csstext') {
     after before first-letter first-line
   /;
 
+  $p->{href} = 'thismessage:/';
+
   my $ss = $p->parse_char_string ($s);
 
   print "#csstext\n";
   my $out = $ss->css_text;
   print STDOUT Encode::encode ('utf-8', $out);
+
+  ## NOTE: Codes below are for debugging of Cascade module.
+  require Message::DOM::DOMImplementation;
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  $doc->manakai_is_html (1);
+  $doc->inner_html (q[<p>xxxx</p><div>yyyy</div>]);
+
+  require Whatpm::CSS::Cascade;
+  my $cas = Whatpm::CSS::Cascade->new ($doc);
+  $cas->add_style_sheets ([$ss]);
+  $cas->___associate_rules;
+
+#  use Data::Dumper;
+#  print (Dumper $cas);
+
+  my $p = $doc->get_elements_by_tag_name ('p')->[0];
+
+  require Message::DOM::CSSStyleDeclaration;
+  my $cd = Message::DOM::CSSComputedStyleDeclaration->____new ($cas, $p);
+  print "#...\n";
+  print $cd->css_text;
+
+
 } elsif ($mode eq '/tokens') {
   require Encode;
   require Whatpm::CSS::Tokenizer;
@@ -192,4 +243,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/12/31 08:03:49 $
+## $Date: 2008/01/01 11:21:46 $
