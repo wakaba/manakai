@@ -1,3 +1,13 @@
+2008-01-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* Cascade.pm (get_computed_value): Resolve initial value referred
+	when |inherit| is specified as if it were the specified value.
+
+	* Parser.pm: Some properties were incorrectly marked as
+	inherited.
+	(background-repeat, background-attachment, font-style,
+	font-variant, font-weight, background-image, font-family): Implemented.
+
 2008-01-01  Wakaba  <wakaba@suika.fam.cx>
 
 	* Parser.pm: Give |list-style-image|'s compute function a name.

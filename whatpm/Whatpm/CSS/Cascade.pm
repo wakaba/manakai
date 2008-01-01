@@ -159,8 +159,12 @@ sub get_computed_value ($$$) {
           $self->{computed_value}->{$eid}->{$prop_name}
               = $self->get_computed_value ($parent_element, $prop_name);
         } else {
+          ## ISSUE: CSS 2.1 says that the computed value is the initial
+          ## value in this case.  However, the initial value is not
+          ## necessariliy a computed value.
           $self->{computed_value}->{$eid}->{$prop_name}
-              = $prop_def->{initial};
+              = $prop_def->{compute}->($self, $element, $prop_name,
+                                       $prop_def->{initial});
         }
       } else {
         $self->{computed_value}->{$eid}->{$prop_name}
@@ -177,4 +181,4 @@ sub get_computed_value ($$$) {
 } # get_computed_value
 
 1;
-## $Date: 2008/01/01 07:39:05 $
+## $Date: 2008/01/01 15:43:47 $

@@ -440,7 +440,10 @@ my $compute_as_specified = sub ($$$$) {
 
 my $default_serializer = sub {
   my ($self, $prop_name, $value) = @_;
-  if ($value->[0] eq 'NUMBER') {
+  if ($value->[0] eq 'NUMBER' or $value->[0] eq 'WEIGHT') {
+    ## TODO: What we currently do for 'font-weight' is different from
+    ## any browser for lighter/bolder cases.  We need to fix this, but
+    ## how?
     return $value->[1]; ## TODO: big or small number cases?
   } elsif ($value->[0] eq 'KEYWORD') {
     return $value->[1];
@@ -771,7 +774,7 @@ $Prop->{'page-break-before'} = {
     auto => 1, always => 1, avoid => 1, left => 1, right => 1,
   },
   initial => ["KEYWORD", 'auto'],
-  inherited => 1,
+  #inherited => 0,
   compute => $compute_as_specified,
 };
 $Attr->{page_break_before} = $Prop->{'page-break-before'};
@@ -787,7 +790,7 @@ $Prop->{'page-break-after'} = {
     auto => 1, always => 1, avoid => 1, left => 1, right => 1,
   },
   initial => ["KEYWORD", 'auto'],
-  inherited => 1,
+  #inherited => 0,
   compute => $compute_as_specified,
 };
 $Attr->{page_break_after} = $Prop->{'page-break-after'};
@@ -808,6 +811,70 @@ $Prop->{'page-break-inside'} = {
 };
 $Attr->{page_break_inside} = $Prop->{'page-break-inside'};
 $Key->{page_break_inside} = $Prop->{'page-break-inside'};
+
+$Prop->{'background-repeat'} = {
+  css => 'background-repeat',
+  dom => 'background_repeat',
+  key => 'background_repeat',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    repeat => 1, 'repeat-x' => 1, 'repeat-y' => 1, 'no-repeat' => 1,
+  },
+  initial => ["KEYWORD", 'repeat'],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{background_repeat} = $Prop->{'background-repeat'};
+$Key->{backgroud_repeat} = $Prop->{'background-repeat'};
+
+$Prop->{'background-attachment'} = {
+  css => 'background-attachment',
+  dom => 'background_attachment',
+  key => 'background_attachment',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    scroll => 1, fixed => 1,
+  },
+  initial => ["KEYWORD", 'scroll'],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{background_attachment} = $Prop->{'background-attachment'};
+$Key->{backgroud_attachment} = $Prop->{'background-attachment'};
+
+$Prop->{'font-style'} = {
+  css => 'font-style',
+  dom => 'font_size',
+  key => 'font_size',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    normal => 1, italic => 1, oblique => 1,
+  },
+  initial => ["KEYWORD", 'normal'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{font_style} = $Prop->{'font-style'};
+$Key->{font_style} = $Prop->{'font-style'};
+
+$Prop->{'font-variant'} = {
+  css => 'font-variant',
+  dom => 'font_variant',
+  key => 'font_variant',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    normal => 1, 'small-caps' => 1,
+  },
+  initial => ["KEYWORD", 'normal'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{font_variant} = $Prop->{'font-variant'};
+$Key->{font_variant} = $Prop->{'font-variant'};
 
 $Prop->{'z-index'} = {
   css => 'z-index',
@@ -907,6 +974,78 @@ $Prop->{widows} = {
 $Attr->{widows} = $Prop->{widows};
 $Key->{widows} = $Prop->{widows};
 
+$Prop->{'font-weight'} = {
+  css => 'font-weight',
+  dom => 'font_weight',
+  key => 'font_weight',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == NUMBER_TOKEN) {
+      ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/font-weight> for
+      ## browser compatibility issue.
+      my $value = $t->{number};
+      $t = $tt->get_next_token;
+      if ($value % 100 == 0 and 100 <= $value and $value <= 900) {
+        return ($t, {$prop_name => ['WEIGHT', $value, 0]});
+      }
+    } elsif ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ({
+           normal => 1, bold => 1, bolder => 1, lighter => 1,
+          }->{$value}) {
+        return ($t, {$prop_name => ['KEYWORD', $value]});
+      } elsif ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'normal'],
+  inherited => 1,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    if ($specified_value->[0] eq 'KEYWORD') {
+      if ($specified_value->[1] eq 'normal') {
+        return ['WEIGHT', 400, 0];
+      } elsif ($specified_value->[1] eq 'bold') {
+        return ['WEIGHT', 700, 0];
+      } elsif ($specified_value->[1] eq 'bolder') {
+        my $parent_element = $element->manakai_parent_element;
+        if (defined $parent_element) {
+          my $parent_value = $self->get_cascaded_value
+              ($parent_element, $prop_name); ## NOTE: What Firefox does.
+          return ['WEIGHT', $parent_value->[1], $parent_value->[2] + 1];
+        } else {
+          return ['WEIGHT', 400, 1];
+        }
+      } elsif ($specified_value->[1] eq 'lighter') {
+        my $parent_element = $element->manakai_parent_element;
+        if (defined $parent_element) {
+          my $parent_value = $self->get_cascaded_value
+              ($parent_element, $prop_name); ## NOTE: What Firefox does.
+          return ['WEIGHT', $parent_value->[1], $parent_value->[2] - 1];
+        } else {
+          return ['WEIGHT', 400, 1];
+        }
+      }
+    } elsif ($specified_value->[0] eq 'WEIGHT') {
+      #
+    }
+
+    return $specified_value;
+  },
+};
+$Attr->{font_weight} = $Prop->{'font-weight'};
+$Key->{font_weight} = $Prop->{'font-weight'};
+
 my $uri_or_none_parser = sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
@@ -974,6 +1113,19 @@ $Prop->{'list-style-image'} = {
 $Attr->{list_style_image} = $Prop->{'list-style-image'};
 $Key->{list_style_image} = $Prop->{'list-style-image'};
 
+$Prop->{'background-image'} = {
+  css => 'background-image',
+  dom => 'background_image',
+  key => 'background_image',
+  parse => $uri_or_none_parser,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'none'],
+  #inherited => 0,
+  compute => $compute_uri_or_none,
+};
+$Attr->{background_image} = $Prop->{'background-image'};
+$Key->{background_image} = $Prop->{'background-image'};
+
 my $border_style_keyword = {
   none => 1, hidden => 1, dotted => 1, dashed => 1, solid => 1,
   double => 1, groove => 1, ridge => 1, inset => 1, outset => 1,
@@ -1034,6 +1186,113 @@ $Prop->{'border-left-style'} = {
 };
 $Attr->{border_left_style} = $Prop->{'border-left-style'};
 $Key->{border_left_style} = $Prop->{'border-left-style'};
+
+$Prop->{'font-family'} = {
+  css => 'font-family',
+  dom => 'font_family',
+  key => 'font_family',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    ## NOTE: See <http://suika.fam.cx/gate/2005/sw/font-family> for
+    ## how chaotic browsers are!
+
+    my @prop_value;
+
+    my $font_name = '';
+    my $may_be_generic = 1;
+    my $may_be_inherit = 1;
+    my $has_s = 0;
+    F: {
+      if ($t->{type} == IDENT_TOKEN) {
+        undef $may_be_inherit if $has_s or length $font_name;
+        undef $may_be_generic if $has_s or length $font_name;
+        $font_name .= ' ' if $has_s;
+        $font_name .= $t->{value};
+        undef $has_s;
+        $t = $tt->get_next_token;
+      } elsif ($t->{type} == STRING_TOKEN) {
+        $font_name .= ' ' if $has_s;
+        $font_name .= $t->{value};
+        undef $may_be_inherit;
+        undef $may_be_generic;
+        undef $has_s;
+        $t = $tt->get_next_token;
+      } elsif ($t->{type} == COMMA_TOKEN) {
+        if ($may_be_generic and
+            {
+              serif => 1, 'sans-serif' => 1, cursive => 1,
+              fantasy => 1, monospace => 1, '-manakai-default' => 1,
+            }->{lc $font_name}) { ## TODO: case
+          push @prop_value, ['KEYWORD', $font_name];
+        } elsif (not $may_be_generic or length $font_name) {
+          push @prop_value, ["STRING", $font_name];
+        }
+        undef $may_be_inherit;
+        $may_be_generic = 1;
+        undef $has_s;
+        $font_name = '';
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      } elsif ($t->{type} == S_TOKEN) {
+        $has_s = 1;
+        $t = $tt->get_next_token;
+      } else {
+        if ($may_be_generic and
+            {
+              serif => 1, 'sans-serif' => 1, cursive => 1,
+              fantasy => 1, monospace => 1, '-manakai-default' => 1,
+            }->{lc $font_name}) { ## TODO: case
+          push @prop_value, ['KEYWORD', $font_name];
+        } elsif (not $may_be_generic or length $font_name) {
+          push @prop_value, ['STRING', $font_name];
+        } else {
+          $onerror->(type => 'syntax error:'.$prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+          return ($t, undef);
+        }
+        last F;
+      }
+      redo F;
+    } # F
+
+    if ($may_be_inherit and
+        @prop_value == 1 and
+        $prop_value[0]->[0] eq 'STRING' and
+        lc $prop_value[0]->[1] eq 'inherit') { ## TODO: case
+      return ($t, {$prop_name => ['INHERIT']});
+    } else {
+      unshift @prop_value, 'FONT';
+      return ($t, {$prop_name => \@prop_value});
+    }
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+
+    if ($value->[0] eq 'FONT') {
+      return join ', ', map {
+        if ($_->[0] eq 'STRING') {
+          '"'.$_->[1].'"'; ## NOTE: This is what Firefox does.
+        } elsif ($_->[0] eq 'KEYWORD') {
+          $_->[1]; ## NOTE: This is what Firefox does.
+        } else {
+          ## NOTE: This should be an error.
+          '""';
+        }
+      } @$value[1..$#$value];
+    } elsif ($value->[0] eq 'INHERIT') {
+      return 'inherit';
+    } else {
+      return undef;
+    }
+  },
+  initial => ['FONT', ['KEYWORD', '-manakai-default']],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{font_family} = $Prop->{'font-family'};
+$Key->{font_family} = $Prop->{'font-family'};
 
 $Prop->{'border-style'} = {
   css => 'border-style',
@@ -1276,4 +1535,4 @@ $Prop->{'list-style'} = {
 $Attr->{list_style} = $Prop->{'list-style'};
 
 1;
-## $Date: 2008/01/01 11:27:42 $
+## $Date: 2008/01/01 15:43:47 $
