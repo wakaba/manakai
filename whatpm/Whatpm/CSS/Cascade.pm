@@ -41,19 +41,48 @@ sub ___associate_rules ($) {
     for my $rule (@{$sheet->css_rules}) {
       next if $rule->type != 1; # STYLE_RULE
 
-      my $selectors_str = Whatpm::CSS::SelectorsSerializer->serialize_test
-          ($$rule->{_selectors});
-      unless ($selectors_to_elements->{$selectors_str}) {
-        $selectors_to_elements->{$selectors_str}
-            = $self->{document}->___query_selector_all ($$rule->{_selectors});
+      my $elements_to_specificity = {};
+
+      for my $selector (@{$$rule->{_selectors}}) {
+        my $selector_str = Whatpm::CSS::SelectorsSerializer->serialize_test
+            ([$selector]);
+        unless ($selectors_to_elements->{$selector_str}) {
+          $selectors_to_elements->{$selector_str}
+              = $self->{document}->___query_selector_all ([$selector]);
+        }
+        next unless @{$selectors_to_elements->{$selector_str}};
+
+        my $selector_specificity
+            = Whatpm::CSS::SelectorsParser->get_selector_specificity
+                ($selector);
+        for (@{$selectors_to_elements->{$selector_str}}) {
+          my $current_specificity = $elements_to_specificity->{refaddr $_};
+          if ($selector_specificity->[0] > $current_specificity->[0] or
+              $selector_specificity->[1] > $current_specificity->[1] or
+              $selector_specificity->[2] > $current_specificity->[2] or
+              $selector_specificity->[3] > $current_specificity->[3]) {
+            $elements_to_specificity->{refaddr $_} = $selector_specificity;
+          }
+        }
       }
-      
-      push @{$self->{element_to_sd}->{refaddr $_} ||= []}, $rule->style
-          for @{$selectors_to_elements->{$selectors_str}};
-      ## TODO: specificity
+
+      my $sd = $rule->style;
+      for (keys %$elements_to_specificity) {
+        push @{$self->{element_to_sds}->{$_} ||= []},
+            [$sd, $elements_to_specificity->{$_}];
+      }
     }
   }
 
+  for my $eid (keys %{$self->{element_to_sds} or {}}) {
+    $self->{element_to_sds}->{$eid} = [sort {
+      $a->[1]->[0] <=> $b->[1]->[0] or
+      $a->[1]->[1] <=> $b->[1]->[1] or
+      $a->[1]->[2] <=> $b->[1]->[2] or 
+      $a->[1]->[3] <=> $b->[1]->[3]
+      ## NOTE: Perl |sort| is stable.
+    } @{$self->{element_to_sds}->{$eid} or []}];
+  }
 } # associate_rules
 
 sub get_cascaded_value ($$$) {
@@ -62,15 +91,19 @@ sub get_cascaded_value ($$$) {
 
   my $key = $Whatpm::CSS::Parser::Prop->{$prop_name}->{key};
 
-  ## TODO: cascading order
-  for my $sd (reverse @{$self->{element_to_sd}->{refaddr $element} or []}) {
-    my $vp = $$sd->{$key};
-    return $vp->[0] if defined $vp;
+  my $value;
+  for my $sds (reverse @{$self->{element_to_sds}->{refaddr $element} or []}) {
+    my $vp = ${$sds->[0]}->{$key};
+    if (defined $vp->[1] and $vp->[1] eq 'important') {
+      return $vp->[0];
+    } else {
+      $value = $vp->[0] unless defined $value;
+    }
   }
 
-  return undef;
+  return $value; # might be |undef|.
 } # get_cascaded_value
 
 
 1;
-## $Date: 2007/12/31 13:47:49 $
+## $Date: 2008/01/01 02:54:35 $

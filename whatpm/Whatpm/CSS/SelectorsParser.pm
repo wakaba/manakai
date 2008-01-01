@@ -1,6 +1,6 @@
 package Whatpm::CSS::SelectorsParser;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -880,6 +880,45 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
   } # S
 } # parse_string
 
+## NOTE: Specificity in CSS 2.1 and Selectors 3 are incompatible.
+## What is implemented by this method is CSS 2.1's one.
+## (With Selectors 3 terminology and with Selectors 3 additions.)
+sub get_selector_specificity ($$) {
+  my (undef, $selector) = @_;
+
+  my $r = [0, 0, 0, 0]; # a, b, c, d
+
+  ## a = 1 iff style="" attribute
+  ## b += 1 for ID attribute selectors
+  ## c += 1 for attribute, class, and pseudo-class selectors
+  ## d += 1 for type selectors and pseudo-elements
+
+  for my $sss (@$selector) {
+    next unless ref $sss; # combinator
+    my @sss = @$sss;
+    while (@sss) {
+      my $ss = shift @sss;
+      if ($ss->[0] == LOCAL_NAME_SELECTOR or
+          $ss->[0] == PSEUDO_ELEMENT_SELECTOR) {
+        $r->[3]++;
+      } elsif ($ss->[0] == ATTRIBUTE_SELECTOR or
+               $ss->[0] == PSEUDO_CLASS_SELECTOR) {
+        $r->[2]++;
+      } elsif ($ss->[0] == CLASS_SELECTOR) {
+        if ($ss->[1] eq 'not') {
+          push @sss, @$ss[2..$#$ss];
+        } else {
+          $r->[2]++;
+        }
+      } elsif ($ss->[0] == ID_SELECTOR) {
+        $r->[1]++;
+      }
+    }
+  }
+
+  return $r;
+} # get_selector_specificity
+
 =head1 LICENSE
 
 Copyright 2007 Wakaba <w@suika.fam.cx>
@@ -890,4 +929,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/12/23 08:16:09 $
+# $Date: 2008/01/01 02:54:35 $
