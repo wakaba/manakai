@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration';
 
 sub ____new ($) {
@@ -65,7 +65,40 @@ sub parent_rule ($) {
 
 ## TODO: Implement other methods and attributes
 
+package Message::DOM::CSSComputedStyleDeclaration;
+push our @ISA, 'Message::IF::CSSStyleDeclaration';
+
+sub ____new ($$$) {
+  my $self = bless \{}, shift;
+  $$self->{cascade} = shift; # Whatpm::CSS::Cascade object.
+  $$self->{element} = shift; ## TODO: This link should be weaken?
+  return $self;
+} # ____new
+
+sub css_text ($;$) {
+  ## TODO: error if modified
+
+  my $self = shift;
+  require Whatpm::CSS::Parser;
+
+  ## TODO: ordering
+  ## TODO: any spec?
+  my $r = '';
+  for my $prop_def (grep {$_->{compute}} values %$Whatpm::CSS::Parser::Prop) {
+    my $prop_value = $$self->{cascade}->get_computed_value
+        ($$self->{element}, $prop_def->{css});
+    my $s = $prop_def->{serialize}->($self, $prop_def->{css}, $prop_value);
+    if (defined $s) {
+      $r .= '  ' . $prop_def->{css} . ': ' . $s;
+      $r .= ";\n";
+    }
+  }
+  return $r;
+} # css_text
+
+## TODO: members
+
 package Message::IF::CSSStyleDeclaration;
 
 1;
-## $Date: 2007/12/31 03:02:29 $
+## $Date: 2008/01/01 07:06:04 $
