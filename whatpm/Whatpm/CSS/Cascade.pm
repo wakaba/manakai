@@ -90,6 +90,7 @@ sub get_cascaded_value ($$$) {
   return undef unless $Whatpm::CSS::Parser::Prop->{$prop_name};
 
   my $key = $Whatpm::CSS::Parser::Prop->{$prop_name}->{key};
+  return undef unless defined $key; ## Shorthand property or some.
 
   my $value;
   for my $sds (reverse @{$self->{element_to_sds}->{refaddr $element} or []}) {
@@ -104,6 +105,65 @@ sub get_cascaded_value ($$$) {
   return $value; # might be |undef|.
 } # get_cascaded_value
 
+sub get_specified_value ($$$) {
+  my ($self, $element, $prop_name) = @_;
+
+  ## TODO: Remove {specified_value} caching, once we implement most
+  ## of CSS 2.1 properties and confirm that it makes almost non sence
+  ## because of its duplication with {computed_value} caching.
+  
+  my $eid = refaddr $element;
+  unless (exists $self->{specified_value}->{$eid}->{$prop_name}) {
+    my $cascaded = $self->get_cascaded_value ($element, $prop_name);
+    $self->{specified_value}->{$eid}->{$prop_name} = $cascaded;
+    
+    unless (defined $cascaded) {
+      my $prop_def = $Whatpm::CSS::Parser::Prop->{$prop_name};
+      if (defined $prop_def) {
+        if ($prop_def->{inherited}) {
+          my $parent_element = $element->manakai_parent_element;
+          if (defined $parent_element) {
+            $self->{specified_value}->{$eid}->{$prop_name}
+                = $self->get_computed_value ($parent_element, $prop_name);
+          } else {
+            $self->{specified_value}->{$eid}->{$prop_name}
+                = $prop_def->{initial};
+          }
+        } else {
+          $self->{specified_value}->{$eid}->{$prop_name}
+              = $prop_def->{initial};
+        }
+      } else {
+        $self->{specified_value}->{$eid}->{$prop_name} = undef;
+      }
+    }
+  }
+
+  ## NOTE: Always |undef| for shorthand properties.
+
+  return $self->{specified_value}->{$eid}->{$prop_name};
+} # get_specified_value
+
+sub get_computed_value ($$$) {
+  my ($self, $element, $prop_name) = @_;
+
+  my $eid = refaddr $element;
+  unless (exists $self->{computed_value}->{$eid}->{$prop_name}) {
+    my $prop_def = $Whatpm::CSS::Parser::Prop->{$prop_name};
+    if (defined $prop_def) {
+      $self->{computed_value}->{$eid}->{$prop_name}
+          = $prop_def->{compute}->($self, $element, $prop_name,
+                                   $self->get_specified_value
+                                       ($element, $prop_name));
+    } else {
+      $self->{computed_value}->{$eid}->{$prop_name} = undef;
+    }
+  }
+
+  ## NOTE: Always |undef| for shorthand properties.
+
+  return $self->{computed_value}->{$eid}->{$prop_name};
+} # get_computed_value
 
 1;
-## $Date: 2008/01/01 02:54:35 $
+## $Date: 2008/01/01 07:07:28 $

@@ -1,5 +1,14 @@
 2008-01-01  Wakaba  <wakaba@suika.fam.cx>
 
+	* Cascade.pm (get_cascaded_value): It now should return |undef|
+	for shorthand properties.
+	(get_specified_value, get_computed_value): New methods.
+
+	* Parser.pm: |initial|, |inherited|, and |compute| properties
+	are added to property definitions.
+
+2008-01-01  Wakaba  <wakaba@suika.fam.cx>
+
 	* Cascade.pm: Specificity and priority are now supported.
 
 	* Parser.pm (get_selector_specificity): New method.

@@ -429,6 +429,11 @@ sub parse_char_string ($$) {
   return $ss;
 } # parse_char_string
 
+my $compute_as_specified = sub ($$$$) {
+  #my ($self, $element, $prop_name, $specified_value) = @_;
+  return $_[3];
+}; # $compute_as_specified
+
 $Prop->{color} = {
   css => 'color',
   dom => 'color',
@@ -461,6 +466,9 @@ $Prop->{color} = {
       return undef;
     }
   },
+  initial => ["KEYWORD", "-manakai-initial-color"], ## NOTE: UA-dependent in CSS 2.1.
+  inherited => 1,
+  compute => $compute_as_specified,
 };
 $Attr->{color} = $Prop->{color};
 $Key->{color} = $Prop->{color};
@@ -507,6 +515,60 @@ $Prop->{display} = {
     'table-column-group' => 1, 'table-header-group' => 1,
     'table-footer-group' => 1, 'table-row' => 1, 'table-row-group' => 1,
   },
+  initial => ["KEYWORD", "inline"],
+  #inherited => 0,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+    ## NOTE: CSS 2.1 Section 9.7.
+
+    ## WARNING: |compute| for 'float' property invoke this CODE
+    ## in some case.  Careless modification might cause a infinite loop.
+
+    if ($specified_value->[0] eq 'KEYWORD') {
+      if ($specified_value->[1] eq 'none') {
+        ## Case 1 [CSS 2.1]
+        return $specified_value;
+      } else {
+        my $position = $self->get_computed_value ($element, 'position');
+        if ($position->[0] eq 'KEYWORD' and 
+            ($position->[1] eq 'absolute' or 
+             $position->[1] eq 'fixed')) {
+          ## Case 2 [CSS 2.1]
+          #
+        } else {
+          my $float = $self->get_computed_value ($element, 'float');
+          if ($float->[0] eq 'KEYWORD' and $float->[1] ne 'none') {
+            ## Caes 3 [CSS 2.1]
+            #
+          } elsif (not defined $element->manakai_parent_element) {
+            ## Case 4 [CSS 2.1]
+            #
+          } else {
+            ## Case 5 [CSS 2.1]
+            return $specified_value;
+          }
+        }
+        
+        return ["KEYWORD",
+                {
+                 'inline-table' => 'table',
+                 inline => 'block',
+                 'run-in' => 'block',
+                 'table-row-group' => 'block',
+                 'table-column' => 'block',
+                 'table-column-group' => 'block',
+                 'table-header-group' => 'block',
+                 'table-footer-group' => 'block',
+                 'table-row' => 'block',
+                 'table-cell' => 'block',
+                 'table-caption' => 'block',
+                 'inline-block' => 'block',
+                }->{$specified_value->[1]} || $specified_value->[1]];
+      }
+    } else {
+      return $specified_value; ## Maybe an error of the implementation.
+    }
+  },
 };
 $Attr->{display} = $Prop->{display};
 $Key->{display} = $Prop->{display};
@@ -520,6 +582,9 @@ $Prop->{position} = {
   keyword => {
     static => 1, relative => 1, absolute => 1, fixed => 1,
   },
+  initial => ["KEYWORD", "initial"],
+  #inherited => 0,
+  compute => $compute_as_specified,
 };
 $Attr->{position} = $Prop->{position};
 $Key->{position} = $Prop->{position};
@@ -532,6 +597,36 @@ $Prop->{float} = {
   serialize => $one_keyword_serializer,
   keyword => {
     left => 1, right => 1, none => 1,
+  },
+  initial => ["KEYWORD", "none"],
+  #inherited => 0,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+    ## NOTE: CSS 2.1 Section 9.7.
+
+    ## WARNING: |compute| for 'display' property invoke this CODE
+    ## in some case.  Careless modification might cause a infinite loop.
+    
+    if ($specified_value->[0] eq 'KEYWORD') {
+      if ($specified_value->[1] eq 'none') {
+        ## Case 1 [CSS 2.1]
+        return $specified_value;
+      } else {
+        my $position = $self->get_computed_value ($element, 'position');
+        if ($position->[0] eq 'KEYWORD' and 
+            ($position->[1] eq 'absolute' or 
+             $position->[1] eq 'fixed')) {
+          ## Case 2 [CSS 2.1]
+          return ["KEYWORD", "none"];
+        }
+      }
+    }
+
+    ## ISSUE: CSS 2.1 section 9.7 and 9.5.1 ('float' definition) disagree
+    ## on computed value of 'float' property.
+    
+    ## Case 3, 4, and 5 [CSS 2.1]
+    return $specified_value;
   },
 };
 $Attr->{css_float} = $Prop->{float};
@@ -547,6 +642,9 @@ $Prop->{clear} = {
   keyword => {
     left => 1, right => 1, none => 1, both => 1,
   },
+  initial => ["KEYWORD", "none"],
+  #inherited => 0,
+  compute => $compute_as_specified,
 };
 $Attr->{clear} = $Prop->{clear};
 $Key->{clear} = $Prop->{clear};
@@ -560,6 +658,9 @@ $Prop->{direction} = {
   keyword => {
     ltr => 1, rtl => 1,
   },
+  initial => ["KEYWORD", "ltr"],
+  inherited => 1,
+  compute => $compute_as_specified,
 };
 $Attr->{direction} = $Prop->{direction};
 $Key->{direction} = $Prop->{direction};
@@ -573,6 +674,9 @@ $Prop->{'unicode-bidi'} = {
   keyword => {
     normal => 1, embed => 1, 'bidi-override' => 1,
   },
+  initial => ["KEYWORD", "normal"],
+  #inherited => 0,
+  compute => $compute_as_specified,
 };
 $Attr->{unicode_bidi} = $Prop->{'unicode-bidi'};
 $Key->{unicode_bidi} = $Prop->{'unicode-bidi'};
@@ -589,6 +693,9 @@ $Prop->{'border-top-style'} = {
   parse => $one_keyword_parser,
   serialize => $one_keyword_serializer,
   keyword => $border_style_keyword,
+  initial => ["KEYWORD", "none"],
+  #inherited => 0,
+  compute => $compute_as_specified,
 };
 $Attr->{border_top_style} = $Prop->{'border-top-style'};
 $Key->{border_top_style} = $Prop->{'border-top-style'};
@@ -600,6 +707,9 @@ $Prop->{'border-right-style'} = {
   parse => $one_keyword_parser,
   serialize => $one_keyword_serializer,
   keyword => $border_style_keyword,
+  initial => ["KEYWORD", "none"],
+  #inherited => 0,
+  compute => $compute_as_specified,
 };
 $Attr->{border_right_style} = $Prop->{'border-right-style'};
 $Key->{border_right_style} = $Prop->{'border-right-style'};
@@ -611,6 +721,9 @@ $Prop->{'border-bottom-style'} = {
   parse => $one_keyword_parser,
   serialize => $one_keyword_serializer,
   keyword => $border_style_keyword,
+  initial => ["KEYWORD", "none"],
+  #inherited => 0,
+  compute => $compute_as_specified,
 };
 $Attr->{border_bottom_style} = $Prop->{'border-bottom-style'};
 $Key->{border_bottom_style} = $Prop->{'border-bottom-style'};
@@ -622,6 +735,9 @@ $Prop->{'border-left-style'} = {
   parse => $one_keyword_parser,
   serialize => $one_keyword_serializer,
   keyword => $border_style_keyword,
+  initial => ["KEYWORD", "none"],
+  #inherited => 0,
+  compute => $compute_as_specified,
 };
 $Attr->{border_left_style} = $Prop->{'border-left-style'};
 $Key->{border_left_style} = $Prop->{'border-left-style'};
@@ -731,4 +847,4 @@ $Prop->{'border-style'} = {
 $Attr->{border_style} = $Prop->{'border-style'};
 
 1;
-## $Date: 2007/12/31 13:47:49 $
+## $Date: 2008/01/01 07:07:28 $
