@@ -7,6 +7,7 @@ sub new ($) {
   my $self = bless {onerror => sub { }, must_level => 'm',
                     message_level => 'w',
                     unsupported_level => 'unsupported'}, shift;
+  # $self->{base_uri}
 
   return $self;
 } # new
@@ -74,6 +75,8 @@ sub parse_char_string ($$) {
   require Message::DOM::CSSStyleSheet;
   require Message::DOM::CSSRule;
   require Message::DOM::CSSStyleDeclaration;
+
+  $self->{base_uri} = $self->{href} unless defined $self->{base_uri};
 
   my $state = BEFORE_STATEMENT_STATE;
   my $t = $tt->get_next_token;
@@ -420,7 +423,8 @@ sub parse_char_string ($$) {
   } # S
 
   my $ss = Message::DOM::CSSStyleSheet->____new
-      (css_rules => $open_rules->[0],
+      (manakai_base_uri => $self->{base_uri},
+       css_rules => $open_rules->[0],
        ## TODO: href
        ## TODO: owner_node
        ## TODO: media
@@ -433,6 +437,22 @@ my $compute_as_specified = sub ($$$$) {
   #my ($self, $element, $prop_name, $specified_value) = @_;
   return $_[3];
 }; # $compute_as_specified
+
+my $default_serializer = sub {
+  my ($self, $prop_name, $value) = @_;
+  if ($value->[0] eq 'NUMBER') {
+    return $value->[1]; ## TODO: big or small number cases?
+  } elsif ($value->[0] eq 'KEYWORD') {
+    return $value->[1];
+  } elsif ($value->[0] eq 'URI') {
+    ## NOTE: This is what browsers do.
+    return 'url('.$value->[1].')';
+  } elsif ($value->[0] eq 'INHERIT') {
+    return 'inherit';
+  } else {
+    return undef;
+  }
+}; # $default_serializer
 
 $Prop->{color} = {
   css => 'color',
@@ -493,23 +513,12 @@ my $one_keyword_parser = sub {
   return ($t, undef);
 };
 
-my $one_keyword_serializer = sub {
-  my ($self, $prop_name, $value) = @_;
-  if ($value->[0] eq 'KEYWORD') {
-    return $value->[1];
-  } elsif ($value->[0] eq 'INHERIT') {
-    return 'inherit';
-  } else {
-    return undef;
-  }
-};
-
 $Prop->{display} = {
   css => 'display',
   dom => 'display',
   key => 'display',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => {
     block => 1, inline => 1, 'inline-block' => 1, 'inline-table' => 1,
     'list-item' => 1, none => 1,
@@ -580,7 +589,7 @@ $Prop->{position} = {
   dom => 'position',
   key => 'position',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => {
     static => 1, relative => 1, absolute => 1, fixed => 1,
   },
@@ -596,7 +605,7 @@ $Prop->{float} = {
   dom => 'css_float',
   key => 'float',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => {
     left => 1, right => 1, none => 1,
   },
@@ -640,7 +649,7 @@ $Prop->{clear} = {
   dom => 'clear',
   key => 'clear',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => {
     left => 1, right => 1, none => 1, both => 1,
   },
@@ -656,7 +665,7 @@ $Prop->{direction} = {
   dom => 'direction',
   key => 'direction',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => {
     ltr => 1, rtl => 1,
   },
@@ -672,7 +681,7 @@ $Prop->{'unicode-bidi'} = {
   dom => 'unicode_bidi',
   key => 'unicode_bidi',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => {
     normal => 1, embed => 1, 'bidi-override' => 1,
   },
@@ -682,6 +691,176 @@ $Prop->{'unicode-bidi'} = {
 };
 $Attr->{unicode_bidi} = $Prop->{'unicode-bidi'};
 $Key->{unicode_bidi} = $Prop->{'unicode-bidi'};
+
+$Prop->{overflow} = {
+  css => 'overflow',
+  dom => 'overflow',
+  key => 'overflow',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    visible => 1, hidden => 1, scroll => 1, auto => 1,
+  },
+  initial => ["KEYWORD", "visible"],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{overflow} = $Prop->{overflow};
+$Key->{overflow} = $Prop->{overflow};
+
+$Prop->{visibility} = {
+  css => 'visibility',
+  dom => 'visibility',
+  key => 'visibility',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    visible => 1, hidden => 1, collapse => 1,
+  },
+  initial => ["KEYWORD", "visible"],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{visibility} = $Prop->{visibility};
+$Key->{visibility} = $Prop->{visibility};
+
+$Prop->{'list-style-type'} = {
+  css => 'list-style-type',
+  dom => 'list_style_type',
+  key => 'list_style_type',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    qw/
+      disc 1 circle 1 square 1 decimal 1 decimal-leading-zero 1 
+      lower-roman 1 upper-roman 1 lower-greek 1 lower-latin 1
+      upper-latin 1 armenian 1 georgian 1 lower-alpha 1 upper-alpha 1
+      none 1
+    /,
+  },
+  initial => ["KEYWORD", 'disc'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{list_style_type} = $Prop->{'list-style-type'};
+$Key->{list_style_type} = $Prop->{'list-style-type'};
+
+$Prop->{'list-style-position'} = {
+  css => 'list-style-position',
+  dom => 'list_style_position',
+  key => 'list_style_position',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    inside => 1, outside => 1,
+  },
+  initial => ["KEYWORD", 'outside'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{list_style_position} = $Prop->{'list-style-position'};
+$Key->{list_style_position} = $Prop->{'list-style-position'};
+
+$Prop->{'z-index'} = {
+  css => 'z-index',
+  dom => 'z_index',
+  key => 'z_index',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == NUMBER_TOKEN) {
+      ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/z-index> for
+      ## browser compatibility issue.
+      my $value = $t->{number};
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ["NUMBER", int ($value / 1)]});
+    } elsif ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($value eq 'auto') {
+        ## NOTE: |z-index| is the default value and therefore it must be
+        ## supported anyway.
+        return ($t, {$prop_name => ["KEYWORD", 'auto']});
+      } elsif ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{z_index} = $Prop->{'z-index'};
+$Key->{z_index} = $Prop->{'z-index'};
+
+$Prop->{'list-style-image'} = {
+  css => 'list-style-image',
+  dom => 'list_style_image',
+  key => 'list_style_image',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == URI_TOKEN) { ## TODO: resolve URI
+      my $value = $t->{value};
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['URI', $value, \($self->{base_uri})]});
+    } elsif ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($value eq 'none') {
+        ## NOTE: |none| is the default value and therefore it must be
+        ## supported anyway.
+        return ($t, {$prop_name => ["KEYWORD", 'none']});
+      } elsif ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    ## NOTE: None of Firefox2, WinIE6, and Opera9 support this case.
+    #} elsif ($t->{type} == URI_INVALID_TOKEN) {
+    #  my $value = $t->{value};
+    #  $t = $tt->get_next_token;
+    #  if ($t->{type} == EOF_TOKEN) {
+    #    $onerror->(type => 'syntax error:eof:'.$prop_name,
+    #               level => $self->{must_level},
+    #               token => $t);
+    #    
+    #    return ($t, {$prop_name => ['URI', $value, \($self->{base_uri})]});
+    #  }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'none'],
+  inherited => 1,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+    
+    if (defined $specified_value and
+        $specified_value->[0] eq 'URI' and
+        defined $specified_value->[2]) {
+      require Message::DOM::DOMImplementation;
+      return ['URI',
+              Message::DOM::DOMImplementation->create_uri_reference
+                  ($specified_value->[1])
+                  ->get_absolute_reference (${$specified_value->[2]})
+                  ->get_uri_reference,
+              $specified_value->[2]];
+    }
+
+    return $specified_value;
+  },
+};
+$Attr->{list_style_image} = $Prop->{'list-style-image'};
+$Key->{list_style_image} = $Prop->{'list-style-image'};
 
 my $border_style_keyword = {
   none => 1, hidden => 1, dotted => 1, dashed => 1, solid => 1,
@@ -693,7 +872,7 @@ $Prop->{'border-top-style'} = {
   dom => 'border_top_style',
   key => 'border_top_style',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
@@ -707,7 +886,7 @@ $Prop->{'border-right-style'} = {
   dom => 'border_right_style',
   key => 'border_right_style',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
@@ -721,7 +900,7 @@ $Prop->{'border-bottom-style'} = {
   dom => 'border_bottom_style',
   key => 'border_bottom_style',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
@@ -735,7 +914,7 @@ $Prop->{'border-left-style'} = {
   dom => 'border_left_style',
   key => 'border_left_style',
   parse => $one_keyword_parser,
-  serialize => $one_keyword_serializer,
+  serialize => $default_serializer,
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
@@ -849,4 +1028,4 @@ $Prop->{'border-style'} = {
 $Attr->{border_style} = $Prop->{'border-style'};
 
 1;
-## $Date: 2008/01/01 07:39:05 $
+## $Date: 2008/01/01 09:08:08 $
