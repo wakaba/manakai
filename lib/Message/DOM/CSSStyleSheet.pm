@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleSheet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleSheet';
 require Message::DOM::DOMException;
 require Scalar::Util;
@@ -42,6 +42,15 @@ sub AUTOLOAD {
 } # AUTOLOAD
 
 ## |StyleSheet| attributes
+
+## TODO: documentation
+sub manakai_base_uri ($) {
+  if (defined ${$_[0]}->{manakai_base_uri}) {
+    return ${$_[0]}->{manakai_base_uri};
+  } else {
+    return ${$_[0]}->{href}; ## NOTE: Might be |undef|.
+  }
+} # manakai_base_uri
 
 sub disabled ($;$) {
   if (@_ > 1) {
@@ -160,4 +169,4 @@ package Message::IF::StyleSheet;
 package Message::IF::CSSStyleSheet;
 
 1;
-## $Date: 2007/12/23 15:45:49 $
+## $Date: 2008/01/01 09:09:16 $

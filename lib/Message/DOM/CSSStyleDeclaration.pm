@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration';
 
 sub ____new ($) {
@@ -91,6 +91,9 @@ sub css_text ($;$) {
     if (defined $s) {
       $r .= '  ' . $prop_def->{css} . ': ' . $s;
       $r .= ";\n";
+    } else {
+      ## NOTE: This should be an error of the implementation.
+      $r .= "  /* $prop_def->{css}: ???; */\n";
     }
   }
   return $r;
@@ -101,4 +104,4 @@ sub css_text ($;$) {
 package Message::IF::CSSStyleDeclaration;
 
 1;
-## $Date: 2008/01/01 07:06:04 $
+## $Date: 2008/01/01 09:09:16 $
