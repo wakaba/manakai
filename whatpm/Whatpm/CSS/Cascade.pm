@@ -58,7 +58,8 @@ sub ___associate_rules ($) {
                 ($selector);
         for (@{$selectors_to_elements->{$selector_str}}) {
           my $current_specificity = $elements_to_specificity->{refaddr $_};
-          if ($selector_specificity->[0] > $current_specificity->[0] or
+          if (not defined $current_specificity or ## "*"-only case.
+              $selector_specificity->[0] > $current_specificity->[0] or
               $selector_specificity->[1] > $current_specificity->[1] or
               $selector_specificity->[2] > $current_specificity->[2] or
               $selector_specificity->[3] > $current_specificity->[3]) {
@@ -182,4 +183,4 @@ sub get_computed_value ($$$) {
 } # get_computed_value
 
 1;
-## $Date: 2008/01/01 15:56:24 $
+## $Date: 2008/01/02 07:39:21 $

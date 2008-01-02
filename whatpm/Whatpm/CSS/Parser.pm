@@ -546,7 +546,7 @@ $Prop->{display} = {
     ## WARNING: |compute| for 'float' property invoke this CODE
     ## in some case.  Careless modification might cause a infinite loop.
 
-    if ($specified_value->[0] eq 'KEYWORD') {
+    if (defined $specified_value and $specified_value->[0] eq 'KEYWORD') {
       if ($specified_value->[1] eq 'none') {
         ## Case 1 [CSS 2.1]
         return $specified_value;
@@ -629,7 +629,7 @@ $Prop->{float} = {
     ## WARNING: |compute| for 'display' property invoke this CODE
     ## in some case.  Careless modification might cause a infinite loop.
     
-    if ($specified_value->[0] eq 'KEYWORD') {
+    if (defined $specified_value and $specified_value->[0] eq 'KEYWORD') {
       if ($specified_value->[1] eq 'none') {
         ## Case 1 [CSS 2.1]
         return $specified_value;
@@ -1133,7 +1133,7 @@ $Prop->{'font-weight'} = {
   compute => sub {
     my ($self, $element, $prop_name, $specified_value) = @_;
 
-    if ($specified_value->[0] eq 'KEYWORD') {
+    if (defined $specified_value and $specified_value->[0] eq 'KEYWORD') {
       if ($specified_value->[1] eq 'normal') {
         return ['WEIGHT', 400, 0];
       } elsif ($specified_value->[1] eq 'bold') {
@@ -1157,7 +1157,7 @@ $Prop->{'font-weight'} = {
           return ['WEIGHT', 400, 1];
         }
       }
-    } elsif ($specified_value->[0] eq 'WEIGHT') {
+    #} elsif (defined $specified_value and $specified_value->[0] eq 'WEIGHT') {
       #
     }
 
@@ -1428,6 +1428,112 @@ $Prop->{'font-family'} = {
 };
 $Attr->{font_family} = $Prop->{'font-family'};
 $Key->{font_family} = $Prop->{'font-family'};
+
+$Prop->{cursor} = {
+  css => 'cursor',
+  dom => 'cursor',
+  key => 'cursor',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    ## NOTE: See <http://suika.fam.cx/gate/2005/sw/cursor> for browser
+    ## compatibility issues.
+
+    my @prop_value = ('CURSOR');
+
+    F: {
+      if ($t->{type} == IDENT_TOKEN) {
+        my $v = lc $t->{value}; ## TODO: case
+        $t = $tt->get_next_token;
+        if ($Prop->{$prop_name}->{keyword}->{$v}) {
+          push @prop_value, ['KEYWORD', $v];
+          last F;
+        } elsif ($v eq 'inherit' and @prop_value == 1) {
+          return ($t, {$prop_name => ['INHERIT']});
+        } else {
+          $onerror->(type => 'syntax error:'.$prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+          return ($t, undef);
+        }
+      } elsif ($t->{type} == URI_TOKEN) {
+        push @prop_value, ['URI', $t->{value}, \($self->{base_uri})];
+        $t = $tt->get_next_token;
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      if ($t->{type} == COMMA_TOKEN) {
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        redo F;
+      }
+    } # F
+
+    return ($t, {$prop_name => \@prop_value});
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+
+    if ($value->[0] eq 'CURSOR') {
+      return join ', ', map {
+        if ($_->[0] eq 'URI') {
+          'url('.$_->[1].')'; ## NOTE: This is what Firefox does.
+        } elsif ($_->[0] eq 'KEYWORD') {
+          $_->[1];
+        } else {
+          ## NOTE: This should be an error.
+          '""';
+        }
+      } @$value[1..$#$value];
+    } elsif ($value->[0] eq 'INHERIT') {
+      return 'inherit';
+    } else {
+      return undef;
+    }
+  },
+  keyword => {
+    auto => 1, crosshair => 1, default => 1, pointer => 1, move => 1,
+    'e-resize' => 1, 'ne-resize' => 1, 'nw-resize' => 1, 'n-resize' => 1,
+    'n-resize' => 1, 'se-resize' => 1, 'sw-resize' => 1, 's-resize' => 1,
+    'w-resize' => 1, text => 1, wait => 1, help => 1, progress => 1,
+  },
+  initial => ['CURSOR', ['KEYWORD', 'auto']],
+  inherited => 1,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    if (defined $specified_value and $specified_value->[0] eq 'CURSOR') {
+      my @new_value = ('CURSOR');
+      for my $value (@$specified_value[1..$#$specified_value]) {
+        if ($value->[0] eq 'URI') {
+          if (defined $value->[2]) {
+            require Message::DOM::DOMImplementation;
+            push @new_value, ['URI',
+                              Message::DOM::DOMImplementation
+                                  ->create_uri_reference ($value->[1])
+                                  ->get_absolute_reference (${$value->[2]})
+                                  ->get_uri_reference,
+                              $value->[2]];
+          } else {
+            push @new_value, $value;
+          }
+        } else {
+          push @new_value, $value;
+        }
+      }
+      return \@new_value;
+    }
+
+    return $specified_value;
+  },
+};
+$Attr->{cursor} = $Prop->{cursor};
+$Key->{cursor} = $Prop->{cursor};
 
 $Prop->{'border-style'} = {
   css => 'border-style',
@@ -1743,4 +1849,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/02 03:56:29 $
+## $Date: 2008/01/02 07:39:22 $
