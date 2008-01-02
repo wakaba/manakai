@@ -36,13 +36,17 @@ if ($mode eq '/csstext') {
   };
 
   $p->{prop}->{$_} = 1 for qw/
-    border-bottom-style border-left-style border-right-style
+    background-attachment background-image background-repeat
+    border-bottom-style border-collapse border-left-style border-right-style
     border-style border-top-style
-    clear color direction display float
+    caption-side clear color direction display empty-cells float
+    font-family font-style font-variant font-weight
     list-style list-style-image list-style-position list-style-type
-    orphans overflow
+    orphans outline-style overflow
     page-break-after page-break-before page-break-inside
-    position unicode-bidi visibility widows z-index
+    position table-layout
+    text-align text-decoration text-transform
+    unicode-bidi visibility white-space widows z-index
   /;
   $p->{prop_value}->{display}->{$_} = 1 for qw/
     block inline inline-block inline-table list-item none
@@ -84,8 +88,39 @@ if ($mode eq '/csstext') {
   /;
   $p->{prop_value}->{'page-break-inside'}->{auto} = 1;
   $p->{prop_value}->{'page-break-inside'}->{avoid} = 1;
+  $p->{prop_value}->{'background-repeat'}->{$_} = 1 for qw/
+    repeat repeat-x repeat-y no-repeat
+  /;
+  $p->{prop_value}->{'background-attachment'}->{scroll} = 1;
+  $p->{prop_value}->{'background-attachment'}->{fixed} = 1;
+  $p->{prop_value}->{'font-style'}->{normal} = 1;
+  $p->{prop_value}->{'font-style'}->{italic} = 1;
+  $p->{prop_value}->{'font-style'}->{oblique} = 1;
+  $p->{prop_value}->{'font-variant'}->{normal} = 1;
+  $p->{prop_value}->{'font-variant'}->{'small-caps'} = 1;
+  $p->{prop_value}->{'text-align'}->{$_} = 1 for qw/
+    left right center justify begin end
+  /;
+  $p->{prop_value}->{'text-transform'}->{$_} = 1 for qw/
+    capitalize uppercase lowercase none
+  /;
+  $p->{prop_value}->{'white-space'}->{$_} = 1 for qw/
+    normal pre nowrap pre-line pre-wrap
+  /;
+  $p->{prop_value}->{'text-decoration'}->{$_} = 1 for qw/
+    none blink underline overline line-through
+  /;
+  $p->{prop_value}->{'caption-side'}->{$_} = 1 for qw/
+    top bottom
+  /;
+  $p->{prop_value}->{'table-layout'}->{auto} = 1;
+  $p->{prop_value}->{'table-layout'}->{fixed} = 1;
+  $p->{prop_value}->{'border-collapse'}->{collapase} = 1;
+  $p->{prop_value}->{'border-collapse'}->{separate} = 1;
+  $p->{prop_value}->{'empty-cells'}->{show} = 1;
+  $p->{prop_value}->{'empty-cells'}->{hide} = 1;
   for my $prop (qw/border-top-style border-left-style
-                   border-bottom-style border-right-style/) {
+                   border-bottom-style border-right-style outline-style/) {
     $p->{prop_value}->{$prop}->{$_} = 1 for qw/
       none hidden dotted dashed solid double groove ridge inset outset
     /;
@@ -243,4 +278,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/01 11:21:46 $
+## $Date: 2008/01/02 03:56:59 $
