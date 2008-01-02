@@ -452,6 +452,14 @@ my $default_serializer = sub {
     return 'url('.$value->[1].')';
   } elsif ($value->[0] eq 'INHERIT') {
     return 'inherit';
+  } elsif ($value->[0] eq 'DECORATION') {
+    my @v = ();
+    push @v, 'underline' if $value->[1];
+    push @v, 'overline' if $value->[2];
+    push @v, 'line-through' if $value->[3];
+    push @v, 'blink' if $value->[4];
+    return 'none' unless @v;
+    return join ' ', @v;
   } else {
     return undef;
   }
@@ -876,6 +884,119 @@ $Prop->{'font-variant'} = {
 $Attr->{font_variant} = $Prop->{'font-variant'};
 $Key->{font_variant} = $Prop->{'font-variant'};
 
+$Prop->{'text-align'} = {
+  css => 'text-align',
+  dom => 'text_align',
+  key => 'text_align',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    left => 1, right => 1, center => 1, justify => 1, ## CSS 2
+    begin => 1, end => 1, ## CSS 3
+  },
+  initial => ["KEYWORD", 'begin'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{text_align} = $Prop->{'text-align'};
+$Key->{text_align} = $Prop->{'text-align'};
+
+$Prop->{'text-transform'} = {
+  css => 'text-transform',
+  dom => 'text_transform',
+  key => 'text_transform',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    capitalize => 1, uppercase => 1, lowercase => 1, none => 1,
+  },
+  initial => ["KEYWORD", 'none'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{text_transform} = $Prop->{'text-transform'};
+$Key->{text_transform} = $Prop->{'text-transform'};
+
+$Prop->{'white-space'} = {
+  css => 'white-space',
+  dom => 'white_space',
+  key => 'white_space',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    normal => 1, pre => 1, nowrap => 1, 'pre-wrap' => 1, 'pre-line' => 1,
+  },
+  initial => ["KEYWORD", 'normal'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{white_space} = $Prop->{'white-space'};
+$Key->{white_space} = $Prop->{'white-space'};
+
+$Prop->{'caption-side'} = {
+  css => 'caption-side',
+  dom => 'caption_side',
+  key => 'caption_side',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    top => 1, bottom => 1,
+  },
+  initial => ['KEYWORD', 'top'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{caption_side} = $Prop->{'caption-side'};
+$Key->{caption_side} = $Prop->{'caption-side'};
+
+$Prop->{'table-layout'} = {
+  css => 'table-layout',
+  dom => 'table_layout',
+  key => 'table_layout',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    auto => 1, fixed => 1,
+  },
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{table_layout} = $Prop->{'table-layout'};
+$Key->{table_layout} = $Prop->{'table-layout'};
+
+$Prop->{'border-collapse'} = {
+  css => 'border-collapse',
+  dom => 'border_collapse',
+  key => 'border_collapse',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    collapse => 1, separate => 1,
+  },
+  initial => ['KEYWORD', 'separate'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{border_collapse} = $Prop->{'border-collapse'};
+$Key->{border_collapse} = $Prop->{'border-collapse'};
+
+$Prop->{'empty-cells'} = {
+  css => 'empty-cells',
+  dom => 'empty_cells',
+  key => 'empty_cells',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => {
+    show => 1, hide => 1,
+  },
+  initial => ['KEYWORD', 'show'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{empty_cells} = $Prop->{'empty-cells'};
+$Key->{empty_cells} = $Prop->{'empty-cells'};
+
 $Prop->{'z-index'} = {
   css => 'z-index',
   dom => 'z_index',
@@ -1186,6 +1307,20 @@ $Prop->{'border-left-style'} = {
 };
 $Attr->{border_left_style} = $Prop->{'border-left-style'};
 $Key->{border_left_style} = $Prop->{'border-left-style'};
+
+$Prop->{'outline-style'} = {
+  css => 'outline-style',
+  dom => 'outline_style',
+  key => 'outline_style',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  keyword => $border_style_keyword,
+  initial => ['KEYWORD', 'none'],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{outline_style} = $Prop->{'outline-style'};
+$Key->{outline_style} = $Prop->{'outline-style'};
 
 $Prop->{'font-family'} = {
   css => 'font-family',
@@ -1534,5 +1669,78 @@ $Prop->{'list-style'} = {
 };
 $Attr->{list_style} = $Prop->{'list-style'};
 
+## NOTE: Future version of the implementation will change the way to
+## store the parsed value to support CSS 3 properties.
+$Prop->{'text-decoration'} = {
+  css => 'text-decoration',
+  dom => 'text_decoration',
+  key => 'text_decoration',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my $value = ['DECORATION']; # , underline, overline, line-through, blink
+
+    if ($t->{type} == IDENT_TOKEN) {
+      my $v = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($v eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      } elsif ($v eq 'none') {
+        return ($t, {$prop_name => $value});
+      } elsif ($v eq 'underline' and
+               $self->{prop_value}->{$prop_name}->{$v}) {
+        $value->[1] = 1;
+      } elsif ($v eq 'overline' and
+               $self->{prop_value}->{$prop_name}->{$v}) {
+        $value->[2] = 1;
+      } elsif ($v eq 'line-through' and
+               $self->{prop_value}->{$prop_name}->{$v}) {
+        $value->[3] = 1;
+      } elsif ($v eq 'blink' and
+               $self->{prop_value}->{$prop_name}->{$v}) {
+        $value->[4] = 1;
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    }
+
+    F: {
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      last F unless $t->{type} == IDENT_TOKEN;
+
+      my $v = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($v eq 'underline' and
+          $self->{prop_value}->{$prop_name}->{$v}) {
+        $value->[1] = 1;
+      } elsif ($v eq 'overline' and
+               $self->{prop_value}->{$prop_name}->{$v}) {
+        $value->[1] = 2;
+      } elsif ($v eq 'line-through' and
+               $self->{prop_value}->{$prop_name}->{$v}) {
+        $value->[1] = 3;
+      } elsif ($v eq 'blink' and
+               $self->{prop_value}->{$prop_name}->{$v}) {
+        $value->[1] = 4;
+      } else {
+        last F;
+      }
+
+      redo F;
+    } # F
+
+    return ($t, {$prop_name => $value});
+  },
+  serialize => $default_serializer,
+  initial => ["KEYWORD", "none"],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{text_decoration} = $Prop->{'text-decoration'};
+$Key->{text_decoration} = $Prop->{'text-decoration'};
+
 1;
-## $Date: 2008/01/01 15:43:47 $
+## $Date: 2008/01/02 03:56:29 $
