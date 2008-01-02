@@ -39,7 +39,7 @@ if ($mode eq '/csstext') {
     background-attachment background-image background-repeat
     border-bottom-style border-collapse border-left-style border-right-style
     border-style border-top-style
-    caption-side clear color direction display empty-cells float
+    caption-side clear color cursor direction display empty-cells float
     font-family font-style font-variant font-weight
     list-style list-style-image list-style-position list-style-type
     orphans outline-style overflow
@@ -119,6 +119,10 @@ if ($mode eq '/csstext') {
   $p->{prop_value}->{'border-collapse'}->{separate} = 1;
   $p->{prop_value}->{'empty-cells'}->{show} = 1;
   $p->{prop_value}->{'empty-cells'}->{hide} = 1;
+  $p->{prop_value}->{cursor}->{$_} = 1 for qw/
+    auto crosshair default pointer move e-resize ne-resize nw-resize n-resize
+    se-resize sw-resize s-resize w-resize text wait help progress
+  /;
   for my $prop (qw/border-top-style border-left-style
                    border-bottom-style border-right-style outline-style/) {
     $p->{prop_value}->{$prop}->{$_} = 1 for qw/
@@ -278,4 +282,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/02 03:56:59 $
+## $Date: 2008/01/02 07:38:28 $
