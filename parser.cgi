@@ -42,7 +42,9 @@ if ($mode eq '/csstext') {
     caption-side clear color cursor direction display empty-cells float
     font-family font-size font-style font-variant font-weight
     list-style list-style-image list-style-position list-style-type
+    margin margin-bottom margin-left margin-right margin-top
     orphans outline-style overflow
+    padding padding-bottom padding-left padding-right padding-top
     page-break-after page-break-before page-break-inside
     position table-layout
     text-align text-decoration text-transform
@@ -282,4 +284,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/03 08:37:48 $
+## $Date: 2008/01/03 10:01:23 $
