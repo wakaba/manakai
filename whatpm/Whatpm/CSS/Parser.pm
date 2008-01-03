@@ -1098,6 +1098,11 @@ $Prop->{widows} = {
 $Attr->{widows} = $Prop->{widows};
 $Key->{widows} = $Prop->{widows};
 
+my $length_unit = {
+  em => 1, ex => 1, px => 1,
+  in => 1, cm => 1, mm => 1, pt => 1, pc => 1,
+};
+
 $Prop->{'font-size'} = {
   css => 'font-size',
   dom => 'font_size',
@@ -1115,15 +1120,15 @@ $Prop->{'font-size'} = {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
       $t = $tt->get_next_token;
-      if ({in => 1, cm => 1, mm => 1, pt => 1, pc => 1,
-           em => 1, ex => 1, pt => 1}->{$unit} and $value >= 0) {
+      if ($length_unit->{$unit} and $value >= 0) {
         return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
       }
     } elsif ($t->{type} == PERCENTAGE_TOKEN) {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ['PERCENTAGE', $value]}) if $value >= 0;
-    } elsif ($self->{unitless_px} and $t->{type} == NUMBER_TOKEN) {
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ['DIMENSION', $value, 'px']}) if $value >= 0;
@@ -1178,6 +1183,7 @@ $Prop->{'font-size'} = {
           ($value *= 10, $unit = 'mm') if $unit eq 'cm';
           ($value /= 0.26, $unit = 'px') if $unit eq 'mm';
         }
+        ## else: consistency error
 
         return ['DIMENSION', $value, $unit];
       } elsif ($specified_value->[0] eq 'PERCENTAGE') {
@@ -1234,6 +1240,216 @@ $Prop->{'font-size'} = {
 };
 $Attr->{font_size} = $Prop->{'font-size'};
 $Key->{font_size} = $Prop->{'font-size'};
+
+my $compute_length = sub {
+  my ($self, $element, $prop_name, $specified_value) = @_;
+  
+  if (defined $specified_value) {
+    if ($specified_value->[0] eq 'DIMENSION') {
+      my $unit = $specified_value->[2];
+      my $value = $specified_value->[1];
+
+      if ($unit eq 'em' or $unit eq 'ex') {
+        $value *= 0.5 if $unit eq 'ex';
+        ## TODO: Preferred way to determine the |ex| size is defined
+        ## in CSS 2.1.
+
+        $value *= $self->get_computed_value ($element, 'font-size')->[1];
+        $unit = 'px';
+      } elsif ({in => 1, cm => 1, mm => 1, pt => 1, pc => 1}->{$unit}) {
+        ($value *= 12, $unit = 'pc') if $unit eq 'pc';
+        ($value /= 72, $unit = 'in') if $unit eq 'pt';
+        ($value *= 2.54, $unit = 'cm') if $unit eq 'in';
+        ($value *= 10, $unit = 'mm') if $unit eq 'cm';
+        ($value /= 0.26, $unit = 'px') if $unit eq 'mm';
+      }
+
+      return ['DIMENSION', $value, $unit];
+    }
+  }
+  
+  return $specified_value;
+}; # $compute_length
+
+$Prop->{'margin-top'} = {
+  css => 'margin-top',
+  dom => 'margin_top',
+  key => 'margin_top',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit}) {
+        return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['PERCENTAGE', $value]});
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($value eq 'auto') {
+        return ($t, {$prop_name => ['KEYWORD', $value]});        
+      } elsif ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{margin_top} = $Prop->{'margin-top'};
+$Key->{margin_top} = $Prop->{'margin-top'};
+
+$Prop->{'margin-bottom'} = {
+  css => 'margin-bottom',
+  dom => 'margin_bottom',
+  key => 'margin_bottom',
+  parse => $Prop->{'margin-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{margin_bottom} = $Prop->{'margin-bottom'};
+$Key->{margin_bottom} = $Prop->{'margin-bottom'};
+
+$Prop->{'margin-right'} = {
+  css => 'margin-right',
+  dom => 'margin_right',
+  key => 'margin_right',
+  parse => $Prop->{'margin-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{margin_right} = $Prop->{'margin-right'};
+$Key->{margin_right} = $Prop->{'margin-right'};
+
+$Prop->{'margin-left'} = {
+  css => 'margin-left',
+  dom => 'margin_left',
+  key => 'margin_left',
+  parse => $Prop->{'margin-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{margin_left} = $Prop->{'margin-left'};
+$Key->{margin_left} = $Prop->{'margin-left'};
+
+$Prop->{'padding-top'} = {
+  css => 'padding-top',
+  dom => 'padding_top',
+  key => 'padding_top',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit} and $value >= 0) {
+        return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['PERCENTAGE', $value]}) if $value >= 0;
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['DIMENSION', $value, 'px']}) if $value >= 0;
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{padding_top} = $Prop->{'padding-top'};
+$Key->{padding_top} = $Prop->{'padding-top'};
+
+$Prop->{'padding-bottom'} = {
+  css => 'padding-bottom',
+  dom => 'padding_bottom',
+  key => 'padding_bottom',
+  parse => $Prop->{'padding-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{padding_bottom} = $Prop->{'padding-bottom'};
+$Key->{padding_bottom} = $Prop->{'padding-bottom'};
+
+$Prop->{'padding-right'} = {
+  css => 'padding-right',
+  dom => 'padding_right',
+  key => 'padding_right',
+  parse => $Prop->{'padding-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{padding_right} = $Prop->{'padding-right'};
+$Key->{padding_right} = $Prop->{'padding-right'};
+
+$Prop->{'padding-left'} = {
+  css => 'padding-left',
+  dom => 'padding_left',
+  key => 'padding_left',
+  parse => $Prop->{'padding-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{padding_left} = $Prop->{'padding-left'};
+$Key->{padding_left} = $Prop->{'padding-left'};
 
 $Prop->{'font-weight'} = {
   css => 'font-weight',
@@ -1682,7 +1898,6 @@ $Prop->{'border-style'} = {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
     my %prop_value;
-    my $has_inherit;
     if ($t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
       $t = $tt->get_next_token;
@@ -1691,7 +1906,10 @@ $Prop->{'border-style'} = {
         $prop_value{'border-top-style'} = ["KEYWORD", $prop_value];
       } elsif ($prop_value eq 'inherit') {
         $prop_value{'border-top-style'} = ["INHERIT"];
-        $has_inherit = 1;
+        $prop_value{'border-right-style'} = $prop_value{'border-top-style'};
+        $prop_value{'border-bottom-style'} = $prop_value{'border-top-style'};
+        $prop_value{'border-left-style'} = $prop_value{'border-right-style'};
+        return ($t, \%prop_value);
       } else {
         $onerror->(type => 'syntax error:keyword:'.$prop_name,
                    level => $self->{must_level},
@@ -1712,8 +1930,7 @@ $Prop->{'border-style'} = {
     if ($t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
       $t = $tt->get_next_token;
-      if (not $has_inherit and
-          $border_style_keyword->{$prop_value} and
+      if ($border_style_keyword->{$prop_value} and
           $self->{prop_value}->{'border-right-style'}->{$prop_value}) {
         $prop_value{'border-right-style'} = ["KEYWORD", $prop_value];
       } else {
@@ -1768,7 +1985,7 @@ $Prop->{'border-style'} = {
     return undef unless defined $v[-1];
     push @v, $self->border_bottom_style;
     return undef unless defined $v[-1];
-    push @v, $self->border_bottom_style;
+    push @v, $self->border_left_style;
     return undef unless defined $v[-1];
 
     pop @v if $v[1] eq $v[3];
@@ -1778,6 +1995,451 @@ $Prop->{'border-style'} = {
   },
 };
 $Attr->{border_style} = $Prop->{'border-style'};
+
+$Prop->{margin} = {
+  css => 'margin',
+  dom => 'margin',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my %prop_value;
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit}) {
+        $prop_value{'margin-top'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'margin-top'} = ['PERCENTAGE', $value];
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'margin-top'} = ['DIMENSION', $value, 'px'];
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $prop_value = lc $t->{value}; ## TODO: case folding
+      $t = $tt->get_next_token;
+      if ($prop_value eq 'auto') {
+        $prop_value{'margin-top'} = ['KEYWORD', $prop_value];
+      } elsif ($prop_value eq 'inherit') {
+        $prop_value{'margin-top'} = ['INHERIT'];
+        $prop_value{'margin-right'} = $prop_value{'margin-top'};
+        $prop_value{'margin-bottom'} = $prop_value{'margin-top'};
+        $prop_value{'margin-left'} = $prop_value{'margin-right'};
+        return ($t, \%prop_value);
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      $onerror->(type => 'syntax error:'.$prop_name,
+                 level => $self->{must_level},
+                 token => $t);
+      return ($t, undef);
+    }
+    $prop_value{'margin-right'} = $prop_value{'margin-top'};
+    $prop_value{'margin-bottom'} = $prop_value{'margin-top'};
+    $prop_value{'margin-left'} = $prop_value{'margin-right'};
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit}) {
+        $prop_value{'margin-right'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'margin-right'} = ['PERCENTAGE', $value];
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'margin-right'} = ['DIMENSION', $value, 'px'];
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $prop_value = lc $t->{value}; ## TODO: case folding
+      $t = $tt->get_next_token;
+      if ($prop_value eq 'auto') {
+        $prop_value{'margin-right'} = ['KEYWORD', $prop_value];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      return ($t, \%prop_value);
+    }
+    $prop_value{'margin-left'} = $prop_value{'margin-right'};
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit}) {
+        $prop_value{'margin-bottom'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'margin-bottom'} = ['PERCENTAGE', $value];
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'margin-bottom'} = ['DIMENSION', $value, 'px'];
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $prop_value = lc $t->{value}; ## TODO: case folding
+      $t = $tt->get_next_token;
+      if ($prop_value eq 'auto') {
+        $prop_value{'margin-bottom'} = ['KEYWORD', $prop_value];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      return ($t, \%prop_value);
+    }
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit}) {
+        $prop_value{'margin-left'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'margin-left'} = ['PERCENTAGE', $value];
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'margin-left'} = ['DIMENSION', $value, 'px'];
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $prop_value = lc $t->{value}; ## TODO: case folding
+      $t = $tt->get_next_token;
+      if ($prop_value eq 'auto') {
+        $prop_value{'margin-left'} = ['KEYWORD', $prop_value];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      return ($t, \%prop_value);
+    }
+
+    return ($t, \%prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my @v;
+    push @v, $self->margin_top;
+    return undef unless defined $v[-1];
+    push @v, $self->margin_right;
+    return undef unless defined $v[-1];
+    push @v, $self->margin_bottom;
+    return undef unless defined $v[-1];
+    push @v, $self->margin_left;
+    return undef unless defined $v[-1];
+
+    pop @v if $v[1] eq $v[3];
+    pop @v if $v[0] eq $v[2];
+    pop @v if $v[0] eq $v[1];
+    return join ' ', @v;
+  },
+};
+$Attr->{margin} = $Prop->{margin};
+
+$Prop->{padding} = {
+  css => 'padding',
+  dom => 'padding',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my %prop_value;
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit} and $value >= 0) {
+        $prop_value{'padding-top'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'padding-top'} = ['PERCENTAGE', $value];
+      unless ($value >= 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'padding-top'} = ['DIMENSION', $value, 'px'];
+      unless ($value >= 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $prop_value = lc $t->{value}; ## TODO: case folding
+      $t = $tt->get_next_token;
+      if ($prop_value eq 'inherit') {
+        $prop_value{'padding-top'} = ['INHERIT'];
+        $prop_value{'padding-right'} = $prop_value{'padding-top'};
+        $prop_value{'padding-bottom'} = $prop_value{'padding-top'};
+        $prop_value{'padding-left'} = $prop_value{'padding-right'};
+        return ($t, \%prop_value);
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      $onerror->(type => 'syntax error:'.$prop_name,
+                 level => $self->{must_level},
+                 token => $t);
+      return ($t, undef);
+    }
+    $prop_value{'padding-right'} = $prop_value{'padding-top'};
+    $prop_value{'padding-bottom'} = $prop_value{'padding-top'};
+    $prop_value{'padding-left'} = $prop_value{'padding-right'};
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit} and $value >= 0) {
+        $prop_value{'padding-right'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'padding-right'} = ['PERCENTAGE', $value];
+      unless ($value >= 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'padding-right'} = ['DIMENSION', $value, 'px'];
+      unless ($value >= 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      return ($t, \%prop_value);
+    }
+    $prop_value{'padding-left'} = $prop_value{'padding-right'};
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit} and $value >= 0) {
+        $prop_value{'padding-bottom'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'padding-bottom'} = ['PERCENTAGE', $value];
+      unless ($value >= 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'padding-bottom'} = ['DIMENSION', $value, 'px'];
+      unless ($value >= 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      return ($t, \%prop_value);
+    }
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit} and $value >= 0) {
+        $prop_value{'padding-left'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'padding-left'} = ['PERCENTAGE', $value];
+      unless ($value >= 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == NUMBER_TOKEN or
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'padding-left'} = ['DIMENSION', $value, 'px'];
+      unless ($value >= 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      return ($t, \%prop_value);
+    }
+
+    return ($t, \%prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my @v;
+    push @v, $self->padding_top;
+    return undef unless defined $v[-1];
+    push @v, $self->padding_right;
+    return undef unless defined $v[-1];
+    push @v, $self->padding_bottom;
+    return undef unless defined $v[-1];
+    push @v, $self->padding_left;
+    return undef unless defined $v[-1];
+
+    pop @v if $v[1] eq $v[3];
+    pop @v if $v[0] eq $v[2];
+    pop @v if $v[0] eq $v[1];
+    return join ' ', @v;
+  },
+};
+$Attr->{padding} = $Prop->{padding};
 
 $Prop->{'list-style'} = {
   css => 'list-style',
@@ -1989,4 +2651,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/03 08:37:22 $
+## $Date: 2008/01/03 10:02:08 $
