@@ -1278,6 +1278,9 @@ $Prop->{'margin-top'} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
+    ## NOTE: Used for 'margin-top', 'margin-right', 'margin-bottom',
+    ## 'margin-left', 'top', 'right', 'bottom', and 'left'.
+
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
@@ -1361,6 +1364,174 @@ $Prop->{'margin-left'} = {
 };
 $Attr->{margin_left} = $Prop->{'margin-left'};
 $Key->{margin_left} = $Prop->{'margin-left'};
+
+$Prop->{top} = {
+  css => 'top',
+  dom => 'top',
+  key => 'top',
+  parse => $Prop->{'margin-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute_multiple => sub {
+    my ($self, $element, $eid, $prop_name) = @_;
+
+    my $pos_value = $self->get_computed_value ($element, 'position');
+    if (defined $pos_value and $pos_value->[0] eq 'KEYWORD') {
+      if ($pos_value->[1] eq 'static') {
+        $self->{computed_value}->{$eid}->{top} = ['KEYWORD', 'auto'];
+        $self->{computed_value}->{$eid}->{bottom} = ['KEYWORD', 'auto'];
+        return;
+      } elsif ($pos_value->[1] eq 'relative') {
+        my $top_specified = $self->get_specified_value_no_inherit
+          ($element, 'top');
+        if (defined $top_specified and
+            ($top_specified->[0] eq 'DIMENSION' or
+             $top_specified->[0] eq 'PERCENTAGE')) {
+          my $tv = $self->{computed_value}->{$eid}->{top}
+              = $compute_length->($self, $element, 'top', $top_specified);
+          $self->{computed_value}->{$eid}->{bottom}
+              = [$tv->[0], -$tv->[1], $tv->[2]];
+        } else { # top: auto
+          my $bottom_specified = $self->get_specified_value_no_inherit
+              ($element, 'bottom');
+          if (defined $bottom_specified and
+              ($bottom_specified->[0] eq 'DIMENSION' or
+               $bottom_specified->[0] eq 'PERCENTAGE')) {
+            my $tv = $self->{computed_value}->{$eid}->{bottom}
+                = $compute_length->($self, $element, 'bottom',
+                                    $bottom_specified);
+            $self->{computed_value}->{$eid}->{top}
+                = [$tv->[0], -$tv->[1], $tv->[2]];
+          } else { # bottom: auto
+            $self->{computed_value}->{$eid}->{top} = ['DIMENSION', 0, 'px'];
+            $self->{computed_value}->{$eid}->{bottom} = ['DIMENSION', 0, 'px'];
+          }
+        }
+        return;
+      }
+    }
+
+    my $top_specified = $self->get_specified_value_no_inherit
+        ($element, 'top');
+    $self->{computed_value}->{$eid}->{top}
+        = $compute_length->($self, $element, 'top', $top_specified);
+    my $bottom_specified = $self->get_specified_value_no_inherit
+        ($element, 'bottom');
+    $self->{computed_value}->{$eid}->{bottom}
+        = $compute_length->($self, $element, 'bottom', $bottom_specified);
+  },
+};
+$Attr->{top} = $Prop->{top};
+$Key->{top} = $Prop->{top};
+
+$Prop->{bottom} = {
+  css => 'bottom',
+  dom => 'bottom',
+  key => 'bottom',
+  parse => $Prop->{'margin-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute_multiple => $Prop->{top}->{compute_multiple},
+};
+$Attr->{bottom} = $Prop->{bottom};
+$Key->{bottom} = $Prop->{bottom};
+
+$Prop->{left} = {
+  css => 'left',
+  dom => 'left',
+  key => 'left',
+  parse => $Prop->{'margin-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute_multiple => sub {
+    my ($self, $element, $eid, $prop_name) = @_;
+
+    my $pos_value = $self->get_computed_value ($element, 'position');
+    if (defined $pos_value and $pos_value->[0] eq 'KEYWORD') {
+      if ($pos_value->[1] eq 'static') {
+        $self->{computed_value}->{$eid}->{left} = ['KEYWORD', 'auto'];
+        $self->{computed_value}->{$eid}->{right} = ['KEYWORD', 'auto'];
+        return;
+      } elsif ($pos_value->[1] eq 'relative') {
+        my $left_specified = $self->get_specified_value_no_inherit
+            ($element, 'left');
+        if (defined $left_specified and
+            ($left_specified->[0] eq 'DIMENSION' or
+             $left_specified->[0] eq 'PERCENTAGE')) {
+          my $right_specified = $self->get_specified_value_no_inherit
+              ($element, 'right');
+          if (defined $right_specified and
+              ($right_specified->[0] eq 'DIMENSION' or
+               $right_specified->[0] eq 'PERCENTAGE')) {
+            my $direction = $self->get_computed_value ($element, 'direction');
+            if (defined $direction and $direction->[0] eq 'KEYWORD' and
+                $direction->[0] eq 'ltr') {
+              my $tv = $self->{computed_value}->{$eid}->{left}
+                  = $compute_length->($self, $element, 'left',
+                                      $left_specified);
+              $self->{computed_value}->{$eid}->{right}
+                  = [$tv->[0], -$tv->[1], $tv->[2]];
+            } else {
+              my $tv = $self->{computed_value}->{$eid}->{right}
+                  = $compute_length->($self, $element, 'right',
+                                      $right_specified);
+              $self->{computed_value}->{$eid}->{left}
+                  = [$tv->[0], -$tv->[1], $tv->[2]];
+            }
+          } else {
+            my $tv = $self->{computed_value}->{$eid}->{left}
+                = $compute_length->($self, $element, 'left', $left_specified);
+            $self->{computed_value}->{$eid}->{right}
+                = [$tv->[0], -$tv->[1], $tv->[2]];
+          }
+        } else { # left: auto
+          my $right_specified = $self->get_specified_value_no_inherit
+              ($element, 'right');
+          if (defined $right_specified and
+              ($right_specified->[0] eq 'DIMENSION' or
+               $right_specified->[0] eq 'PERCENTAGE')) {
+            my $tv = $self->{computed_value}->{$eid}->{right}
+                = $compute_length->($self, $element, 'right',
+                                    $right_specified);
+            $self->{computed_value}->{$eid}->{left}
+                = [$tv->[0], -$tv->[1], $tv->[2]];
+          } else { # right: auto
+            $self->{computed_value}->{$eid}->{left} = ['DIMENSION', 0, 'px'];
+            $self->{computed_value}->{$eid}->{right} = ['DIMENSION', 0, 'px'];
+          }
+        }
+        return;
+      }
+    }
+
+    my $left_specified = $self->get_specified_value_no_inherit
+        ($element, 'left');
+    $self->{computed_value}->{$eid}->{left}
+        = $compute_length->($self, $element, 'left', $left_specified);
+    my $right_specified = $self->get_specified_value_no_inherit
+        ($element, 'right');
+    $self->{computed_value}->{$eid}->{right}
+        = $compute_length->($self, $element, 'right', $right_specified);
+  },
+};
+$Attr->{left} = $Prop->{left};
+$Key->{left} = $Prop->{left};
+
+$Prop->{right} = {
+  css => 'right',
+  dom => 'right',
+  key => 'right',
+  parse => $Prop->{'margin-top'}->{parse},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute_multiple => $Prop->{left}->{compute_multiple},
+};
+$Attr->{right} = $Prop->{right};
+$Key->{right} = $Prop->{right};
 
 $Prop->{'padding-top'} = {
   css => 'padding-top',
@@ -2969,4 +3140,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/03 12:23:46 $
+## $Date: 2008/01/03 13:51:41 $

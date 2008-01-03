@@ -128,7 +128,10 @@ sub get_specified_value ($$$) {
   ## TODO: Remove {specified_value} caching, once we implement most
   ## of CSS 2.1 properties and confirm that it makes almost non sence
   ## because of its duplication with {computed_value} caching.
-  
+
+  ## NOTE: |top| computation refers |bottom| and vice versa.
+  ## |left| does |right| and vice versa.
+
   my $eid = refaddr $element;
   unless (exists $self->{specified_value}->{$eid}->{$prop_name}) {
     my $cascaded = $self->get_cascaded_value ($element, $prop_name);
@@ -161,6 +164,28 @@ sub get_specified_value ($$$) {
   return $self->{specified_value}->{$eid}->{$prop_name};
 } # get_specified_value
 
+sub get_specified_value_no_inherit ($$$) {
+  my ($self, $element, $prop_name) = @_;
+
+  my $specified = $self->get_specified_value ($element, $prop_name);
+  if (defined $specified and $specified->[0] eq 'INHERIT') {
+    ## ISSUE: CSS 2.1 does not say to resolve computed value of the parent.
+    ## However, it is necessary for some cases (see
+    ## <http://suika.fam.cx/gate/2005/sw/inherit>).  In addition,
+    ## the initial value is not a computed value for some properties.
+    my $parent_element = $element->manakai_parent_element;
+    if (defined $parent_element) {
+      $specified = $self->get_computed_value ($parent_element, $prop_name);
+    } else {
+      my $prop_def = $Whatpm::CSS::Parser::Prop->{$prop_name};
+      $specified = $prop_def->{initial};
+    }
+    ## NOTE: Because of this handling, {compute} codes must be
+    ## idempotent.
+  }
+  return $specified;
+} # get_specified_value_no_inherit
+
 sub get_computed_value ($$$) {
   my ($self, $element, $prop_name) = @_;
 
@@ -168,25 +193,14 @@ sub get_computed_value ($$$) {
   unless (exists $self->{computed_value}->{$eid}->{$prop_name}) {
     my $prop_def = $Whatpm::CSS::Parser::Prop->{$prop_name};
     if (defined $prop_def) {
-      my $specified = $self->get_specified_value ($element, $prop_name);
-      if (defined $specified and $specified->[0] eq 'INHERIT') {
-        ## ISSUE: CSS 2.1 does not say to resolve computed value of the parent.
-        ## However, it is necessary for some cases (see
-        ## <http://suika.fam.cx/gate/2005/sw/inherit>).  In addition,
-        ## the initial value is not a computed value for some properties.
-        my $parent_element = $element->manakai_parent_element;
-        if (defined $parent_element) {
-          $specified = $self->get_computed_value ($parent_element, $prop_name);
-        } else {
-          $specified = $prop_def->{compute}->($self, $element, $prop_name,
-                                              $prop_def->{initial});
-        }
-        ## NOTE: Because of this handling, {compute} codes must be
-        ## idempotent.
+      if ($prop_def->{compute_multiple}) {
+        $prop_def->{compute_multiple}->($self, $element, $eid, $prop_name);
+      } else {
+        my $specified = $self->get_specified_value_no_inherit
+            ($element, $prop_name);
+        $self->{computed_value}->{$eid}->{$prop_name}
+            = $prop_def->{compute}->($self, $element, $prop_name, $specified);
       }
-       
-      $self->{computed_value}->{$eid}->{$prop_name}
-          = $prop_def->{compute}->($self, $element, $prop_name, $specified);
     } else {
       $self->{computed_value}->{$eid}->{$prop_name} = undef;
     }
@@ -198,4 +212,4 @@ sub get_computed_value ($$$) {
 } # get_computed_value
 
 1;
-## $Date: 2008/01/03 08:37:22 $
+## $Date: 2008/01/03 13:51:41 $
