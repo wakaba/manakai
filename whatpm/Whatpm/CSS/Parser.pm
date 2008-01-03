@@ -8,6 +8,7 @@ sub new ($) {
                     message_level => 'w',
                     unsupported_level => 'unsupported'}, shift;
   # $self->{base_uri}
+  # $self->{unitless_px} = 1/0
 
   return $self;
 } # new
@@ -445,6 +446,8 @@ my $default_serializer = sub {
     ## any browser for lighter/bolder cases.  We need to fix this, but
     ## how?
     return $value->[1]; ## TODO: big or small number cases?
+  } elsif ($value->[0] eq 'DIMENSION') {
+    return $value->[1] . $value->[2]; ## NOTE: This is what browsers do.
   } elsif ($value->[0] eq 'KEYWORD') {
     return $value->[1];
   } elsif ($value->[0] eq 'URI') {
@@ -854,8 +857,8 @@ $Key->{backgroud_attachment} = $Prop->{'background-attachment'};
 
 $Prop->{'font-style'} = {
   css => 'font-style',
-  dom => 'font_size',
-  key => 'font_size',
+  dom => 'font_style',
+  key => 'font_style',
   parse => $one_keyword_parser,
   serialize => $default_serializer,
   keyword => {
@@ -1094,6 +1097,143 @@ $Prop->{widows} = {
 };
 $Attr->{widows} = $Prop->{widows};
 $Key->{widows} = $Prop->{widows};
+
+$Prop->{'font-size'} = {
+  css => 'font-size',
+  dom => 'font_size',
+  key => 'font_size',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ({in => 1, cm => 1, mm => 1, pt => 1, pc => 1,
+           em => 1, ex => 1, pt => 1}->{$unit} and $value >= 0) {
+        return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['PERCENTAGE', $value]}) if $value >= 0;
+    } elsif ($self->{unitless_px} and $t->{type} == NUMBER_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['DIMENSION', $value, 'px']}) if $value >= 0;
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ({
+           'xx-small' => 1, 'x-small' => 1, small => 1, medium => 1,
+           large => 1, 'x-large' => 1, 'xx-large' => 1, 
+           '-manakai-xxx-large' => 1, # -webkit-xxx-large
+           larger => 1, smaller => 1,
+          }->{$value}) {
+        return ($t, {$prop_name => ['KEYWORD', $value]});        
+      } elsif ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'medium'],
+  inherited => 1,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+    
+    if (defined $specified_value) {
+      if ($specified_value->[0] eq 'DIMENSION') {
+        my $unit = $specified_value->[2];
+        my $value = $specified_value->[1];
+
+        if ($unit eq 'em' or $unit eq 'ex') {
+          $value *= 0.5 if $unit eq 'ex';
+          ## TODO: Preferred way to determine the |ex| size is defined
+          ## in CSS 2.1.
+
+          my $parent_element = $element->manakai_parent_element;
+          if (defined $parent_element) {
+            $value *= $self->get_computed_value ($parent_element, $prop_name)
+                ->[1];
+          } else {
+            $value *= $self->{font_size}->[3]; # medium
+          }
+          $unit = 'px';
+        } elsif ({in => 1, cm => 1, mm => 1, pt => 1, pc => 1}->{$unit}) {
+          ($value *= 12, $unit = 'pc') if $unit eq 'pc';
+          ($value /= 72, $unit = 'in') if $unit eq 'pt';
+          ($value *= 2.54, $unit = 'cm') if $unit eq 'in';
+          ($value *= 10, $unit = 'mm') if $unit eq 'cm';
+          ($value /= 0.26, $unit = 'px') if $unit eq 'mm';
+        }
+
+        return ['DIMENSION', $value, $unit];
+      } elsif ($specified_value->[0] eq 'PERCENTAGE') {
+        my $parent_element = $element->manakai_parent_element;
+        my $parent_cv;
+        if (defined $parent_element) {
+          $parent_cv = $self->get_computed_value
+              ($parent_element, $prop_name);
+        } else {
+          $parent_cv = [undef, $self->{font_size}->[3]];
+        }
+        return ['DIMENSION', $parent_cv->[1] * $specified_value->[1] / 100,
+                'px'];
+      } elsif ($specified_value->[0] eq 'KEYWORD') {
+        if ($specified_value->[1] eq 'larger') {
+          my $parent_element = $element->manakai_parent_element;
+          if (defined $parent_element) {
+            my $parent_cv = $self->get_computed_value
+                ($parent_element, $prop_name);
+            return ['DIMENSION',
+                    $self->{get_larger_font_size}->($self, $parent_cv->[1]),
+                    'px'];
+          } else { ## 'larger' relative to 'medium', initial of 'font-size'
+            return ['DIMENSION', $self->{font_size}->[4], 'px'];
+          }
+        } elsif ($specified_value->[1] eq 'smaller') {
+          my $parent_element = $element->manakai_parent_element;
+          if (defined $parent_element) {
+            my $parent_cv = $self->get_computed_value
+                ($parent_element, $prop_name);
+            return ['DIMENSION',
+                    $self->{get_smaller_font_size}->($self, $parent_cv->[1]),
+                    'px'];
+          } else { ## 'smaller' relative to 'medium', initial of 'font-size'
+            return ['DIMENSION', $self->{font_size}->[2], 'px'];
+          }
+        } else {
+          return ['DIMENSION', $self->{font_size}->[{
+            'xx-small' => 0,
+            'x-small' => 1,
+            small => 2,
+            medium => 3,
+            large => 4,
+            'x-large' => 5,
+            'xx-large' => 6,
+            '-manakai-xxx-large' => 7,
+          }->{$specified_value->[1]}], 'px'];
+        }
+      }
+    }
+    
+    return $specified_value;
+  },
+};
+$Attr->{font_size} = $Prop->{'font-size'};
+$Key->{font_size} = $Prop->{'font-size'};
 
 $Prop->{'font-weight'} = {
   css => 'font-weight',
@@ -1849,4 +1989,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/02 07:39:22 $
+## $Date: 2008/01/03 08:37:22 $

@@ -10,6 +10,21 @@ use Scalar::Util qw/refaddr/;
 sub new ($$) {
   my $self = bless {style_sheets => []}, shift;
   $self->{document} = shift;
+
+  ## Device dependent font size parameters
+  my @scale = (3/5, 3/4, 8/9, 1, 6/5, 3/2, 2/1, 3/1); ## From css3-fonts
+  $self->{font_size}->[$_] = 16 * $scale[$_] for 0..$#scale;
+  ## TODO: Provide better default
+  $self->{get_smaller_font_size} = sub ($$) {
+    #my ($self, $original_px) = @_;
+    return $_[1] / 1.1;
+  };
+  ## TODO: Provide better default
+  $self->{get_larger_font_size} = sub ($$) {
+    #my ($self, $original_px) = @_;
+    return $_[1] * 1.1;
+  };
+
   return $self;
 } # new
 
@@ -183,4 +198,4 @@ sub get_computed_value ($$$) {
 } # get_computed_value
 
 1;
-## $Date: 2008/01/02 07:39:21 $
+## $Date: 2008/01/03 08:37:22 $
