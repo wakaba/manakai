@@ -39,17 +39,19 @@ if ($mode eq '/csstext') {
     background-attachment background-image background-repeat
     border-bottom-style border-bottom-width border-collapse border-left-style
     border-left-width border-right-style border-right-width
-    border-style border-top-style border-top-width border-width
+    border-style border-top-style border-top-width border-width bottom
     caption-side clear color cursor direction display empty-cells float
-    font-family font-size font-style font-variant font-weight
+    font-family font-size font-style font-variant font-weight height left
+    line-height
     list-style list-style-image list-style-position list-style-type
     margin margin-bottom margin-left margin-right margin-top
+    max-height max-width min-height min-width
     orphans outline-style overflow
     padding padding-bottom padding-left padding-right padding-top
     page-break-after page-break-before page-break-inside
-    position table-layout
+    position right table-layout
     text-align text-decoration text-transform
-    unicode-bidi visibility white-space widows z-index
+    top unicode-bidi vertical-align visibility white-space width widows z-index
   /;
   $p->{prop_value}->{display}->{$_} = 1 for qw/
     block inline inline-block inline-table list-item none
@@ -285,4 +287,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/03 12:24:19 $
+## $Date: 2008/01/04 05:37:26 $
