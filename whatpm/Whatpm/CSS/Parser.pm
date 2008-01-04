@@ -448,6 +448,8 @@ my $default_serializer = sub {
     return $value->[1]; ## TODO: big or small number cases?
   } elsif ($value->[0] eq 'DIMENSION') {
     return $value->[1] . $value->[2]; ## NOTE: This is what browsers do.
+  } elsif ($value->[0] eq 'PERCENTAGE') {
+    return $value->[1] . '%';
   } elsif ($value->[0] eq 'KEYWORD') {
     return $value->[1];
   } elsif ($value->[0] eq 'URI') {
@@ -1279,34 +1281,40 @@ $Prop->{'margin-top'} = {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
     ## NOTE: Used for 'margin-top', 'margin-right', 'margin-bottom',
-    ## 'margin-left', 'top', 'right', 'bottom', and 'left'.
+    ## 'margin-left', 'top', 'right', 'bottom', 'left', 'padding-top',
+    ## 'padding-right', 'padding-bottom', 'padding-left',
+    ## 'border-top-width', 'border-right-width', 'border-bottom-width',
+    ## and 'border-left-width'.
 
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
       $sign = -1;
     }
+    my $allow_negative = $Prop->{$prop_name}->{allow_negative};
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
       $t = $tt->get_next_token;
-      if ($length_unit->{$unit}) {
+      if ($length_unit->{$unit} and ($allow_negative or $value >= 0)) {
         return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
       }
     } elsif ($t->{type} == PERCENTAGE_TOKEN) {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
-      return ($t, {$prop_name => ['PERCENTAGE', $value]});
+      return ($t, {$prop_name => ['PERCENTAGE', $value]})
+          if $allow_negative or $value >= 0;
     } elsif ($t->{type} == NUMBER_TOKEN and
              ($self->{unitless_px} or $t->{number} == 0)) {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
-      return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
+      return ($t, {$prop_name => ['DIMENSION', $value, 'px']})
+          if $allow_negative or $value >= 0;
     } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
       $t = $tt->get_next_token;
-      if ($value eq 'auto') {
+      if ($Prop->{$prop_name}->{keyword}->{$value}) {
         return ($t, {$prop_name => ['KEYWORD', $value]});        
       } elsif ($value eq 'inherit') {
         return ($t, {$prop_name => ['INHERIT']});
@@ -1318,6 +1326,8 @@ $Prop->{'margin-top'} = {
                token => $t);
     return ($t, undef);
   },
+  allow_negative => 1,
+  keyword => {auto => 1},
   serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -1331,6 +1341,8 @@ $Prop->{'margin-bottom'} = {
   dom => 'margin_bottom',
   key => 'margin_bottom',
   parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {auto => 1},
   serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -1344,6 +1356,8 @@ $Prop->{'margin-right'} = {
   dom => 'margin_right',
   key => 'margin_right',
   parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {auto => 1},
   serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -1357,6 +1371,8 @@ $Prop->{'margin-left'} = {
   dom => 'margin_left',
   key => 'margin_left',
   parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {auto => 1},
   serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -1370,6 +1386,8 @@ $Prop->{top} = {
   dom => 'top',
   key => 'top',
   parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {auto => 1},
   serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
@@ -1430,6 +1448,8 @@ $Prop->{bottom} = {
   dom => 'bottom',
   key => 'bottom',
   parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {auto => 1},
   serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
@@ -1443,6 +1463,8 @@ $Prop->{left} = {
   dom => 'left',
   key => 'left',
   parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {auto => 1},
   serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
@@ -1533,18 +1555,116 @@ $Prop->{right} = {
 $Attr->{right} = $Prop->{right};
 $Key->{right} = $Prop->{right};
 
-$Prop->{'padding-top'} = {
-  css => 'padding-top',
-  dom => 'padding_top',
-  key => 'padding_top',
+$Prop->{width} = {
+  css => 'width',
+  dom => 'width',
+  key => 'width',
+  parse => $Prop->{'margin-top'}->{parse},
+  #allow_negative => 0,
+  keyword => {auto => 1},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute => $compute_length,
+      ## NOTE: See <http://suika.fam.cx/gate/2005/sw/width> for
+      ## browser compatibility issues.
+};
+$Attr->{width} = $Prop->{width};
+$Key->{width} = $Prop->{width};
+
+$Prop->{'min-width'} = {
+  css => 'min-width',
+  dom => 'min_width',
+  key => 'min_width',
+  parse => $Prop->{'margin-top'}->{parse},
+  #allow_negative => 0,
+  #keyword => {},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{min_width} = $Prop->{'min-width'};
+$Key->{min_width} = $Prop->{'min-width'};
+
+$Prop->{'max-width'} = {
+  css => 'max-width',
+  dom => 'max_width',
+  key => 'max_width',
+  parse => $Prop->{'margin-top'}->{parse},
+  #allow_negative => 0,
+  keyword => {none => 1},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'none'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{max_width} = $Prop->{'max-width'};
+$Key->{max_width} = $Prop->{'max-width'};
+
+$Prop->{height} = {
+  css => 'height',
+  dom => 'height',
+  key => 'height',
+  parse => $Prop->{'margin-top'}->{parse},
+  #allow_negative => 0,
+  keyword => {auto => 1},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute => $compute_length,
+      ## NOTE: See <http://suika.fam.cx/gate/2005/sw/height> for
+      ## browser compatibility issues.
+};
+$Attr->{height} = $Prop->{height};
+$Key->{height} = $Prop->{height};
+
+$Prop->{'min-height'} = {
+  css => 'min-height',
+  dom => 'min_height',
+  key => 'min_height',
+  parse => $Prop->{'margin-top'}->{parse},
+  #allow_negative => 0,
+  #keyword => {},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{min_height} = $Prop->{'min-height'};
+$Key->{min_height} = $Prop->{'min-height'};
+
+$Prop->{'max-height'} = {
+  css => 'max-height',
+  dom => 'max_height',
+  key => 'max_height',
+  parse => $Prop->{'margin-top'}->{parse},
+  #allow_negative => 0,
+  keyword => {none => 1},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'none'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+$Attr->{max_height} = $Prop->{'max-height'};
+$Key->{max_height} = $Prop->{'max-height'};
+
+$Prop->{'line-height'} = {
+  css => 'line-height',
+  dom => 'line_height',
+  key => 'line_height',
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    ## NOTE: Similar to 'margin-top', but different handling
+    ## for unitless numbers.
 
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
       $sign = -1;
     }
+    my $allow_negative = $Prop->{$prop_name}->{allow_negative};
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
@@ -1556,16 +1676,18 @@ $Prop->{'padding-top'} = {
     } elsif ($t->{type} == PERCENTAGE_TOKEN) {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
-      return ($t, {$prop_name => ['PERCENTAGE', $value]}) if $value >= 0;
-    } elsif ($t->{type} == NUMBER_TOKEN and
-             ($self->{unitless_px} or $t->{number} == 0)) {
+      return ($t, {$prop_name => ['PERCENTAGE', $value]})
+          if $value >= 0;
+    } elsif ($t->{type} == NUMBER_TOKEN) {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
-      return ($t, {$prop_name => ['DIMENSION', $value, 'px']}) if $value >= 0;
+      return ($t, {$prop_name => ['NUMBER', $value]}) if $value >= 0;
     } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
       $t = $tt->get_next_token;
-      if ($value eq 'inherit') {
+      if ($value eq 'normal') {
+        return ($t, {$prop_name => ['KEYWORD', $value]});        
+      } elsif ($value eq 'inherit') {
         return ($t, {$prop_name => ['INHERIT']});
       }
     }
@@ -1575,6 +1697,45 @@ $Prop->{'padding-top'} = {
                token => $t);
     return ($t, undef);
   },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'normal'],
+  inherited => 1,
+  compute => $compute_length,
+};
+$Attr->{line_height} = $Prop->{'line-height'};
+$Key->{line_height} = $Prop->{'line-height'};
+
+$Prop->{'vertical-align'} = {
+  css => 'vertical-align',
+  dom => 'vertical_align',
+  key => 'vertical_align',
+  parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {
+    baseline => 1, sub => 1, super => 1, top => 1, 'text-top' => 1,
+    middle => 1, bottom => 1, 'text-bottom' => 1,
+  },
+  ## NOTE: Currently, we don't support option to select subset of keywords
+  ## supported by application (i.e. 
+  ## $parser->{prop_value}->{'line-height'->{$keyword}).  Should we support
+  ## it?
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'baseline'],
+  #inherited => 0,
+  compute => $compute_length,
+      ## NOTE: See <http://suika.fam.cx/gate/2005/sw/vertical-align> for
+      ## browser compatibility issues.
+};
+$Attr->{vertical_align} = $Prop->{'vertical-align'};
+$Key->{vertical_align} = $Prop->{'vertical-align'};
+
+$Prop->{'padding-top'} = {
+  css => 'padding-top',
+  dom => 'padding_top',
+  key => 'padding_top',
+  parse => $Prop->{'margin-top'}->{parse},
+  #allow_negative => 0,
+  #keyword => {},
   serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -1588,6 +1749,8 @@ $Prop->{'padding-bottom'} = {
   dom => 'padding_bottom',
   key => 'padding_bottom',
   parse => $Prop->{'padding-top'}->{parse},
+  #allow_negative => 0,
+  #keyword => {},
   serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -1601,6 +1764,8 @@ $Prop->{'padding-right'} = {
   dom => 'padding_right',
   key => 'padding_right',
   parse => $Prop->{'padding-top'}->{parse},
+  #allow_negative => 0,
+  #keyword => {},
   serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -1614,6 +1779,8 @@ $Prop->{'padding-left'} = {
   dom => 'padding_left',
   key => 'padding_left',
   parse => $Prop->{'padding-top'}->{parse},
+  #allow_negative => 0,
+  #keyword => {},
   serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -1626,42 +1793,9 @@ $Prop->{'border-top-width'} = {
   css => 'border-top-width',
   dom => 'border_top_width',
   key => 'border_top_width',
-  parse => sub {
-    my ($self, $prop_name, $tt, $t, $onerror) = @_;
-
-    my $sign = 1;
-    if ($t->{type} == MINUS_TOKEN) {
-      $t = $tt->get_next_token;
-      $sign = -1;
-    }
-
-    if ($t->{type} == DIMENSION_TOKEN) {
-      my $value = $t->{number} * $sign;
-      my $unit = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
-      if ($length_unit->{$unit} and $value >= 0) {
-        return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
-      }
-    } elsif ($t->{type} == NUMBER_TOKEN and
-             ($self->{unitless_px} or $t->{number} == 0)) {
-      my $value = $t->{number} * $sign;
-      $t = $tt->get_next_token;
-      return ($t, {$prop_name => ['DIMENSION', $value, 'px']}) if $value >= 0;
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
-      my $value = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
-      if ({thin => 1, medium => 1, thick => 1}->{$value}) {
-        return ($t, {$prop_name => ['KEYWORD', $value]});
-      } elsif ($value eq 'inherit') {
-        return ($t, {$prop_name => ['INHERIT']});
-      }
-    }
-    
-    $onerror->(type => 'syntax error:'.$prop_name,
-               level => $self->{must_level},
-               token => $t);
-    return ($t, undef);
-  },
+  parse => $Prop->{'margin-top'}->{parse},
+  #allow_negative => 0,
+  keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -1697,6 +1831,8 @@ $Prop->{'border-right-width'} = {
   dom => 'border_right_width',
   key => 'border_right_width',
   parse => $Prop->{'border-top-width'}->{parse},
+  #allow_negative => 0,
+  keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -1710,6 +1846,8 @@ $Prop->{'border-bottom-width'} = {
   dom => 'border_bottom_width',
   key => 'border_bottom_width',
   parse => $Prop->{'border-top-width'}->{parse},
+  #allow_negative => 0,
+  keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -1723,6 +1861,8 @@ $Prop->{'border-left-width'} = {
   dom => 'border_left_width',
   key => 'border_left_width',
   parse => $Prop->{'border-top-width'}->{parse},
+  #allow_negative => 0,
+  keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -3140,4 +3280,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/03 13:51:41 $
+## $Date: 2008/01/04 05:36:36 $
