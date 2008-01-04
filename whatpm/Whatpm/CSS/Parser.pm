@@ -1273,6 +1273,70 @@ my $compute_length = sub {
   return $specified_value;
 }; # $compute_length
 
+$Prop->{'letter-spacing'} = {
+  css => 'letter-spacing',
+  dom => 'letter_spacing',
+  key => 'letter_spacing',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    ## NOTE: Used also for 'word-spacing'.
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+    my $allow_negative = $Prop->{$prop_name}->{allow_negative};
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit}) {
+        return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
+      }
+    } elsif ($t->{type} == NUMBER_TOKEN and
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($value eq 'normal') {
+        return ($t, {$prop_name => ['KEYWORD', $value]});        
+      } elsif ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'normal'],
+  inherited => 1,
+  compute => $compute_length,
+};
+$Attr->{letter_spacing} = $Prop->{'letter-spacing'};
+$Key->{letter_spacing} = $Prop->{'letter-spacing'};
+
+$Prop->{'word-spacing'} = {
+  css => 'word-spacing',
+  dom => 'word_spacing',
+  key => 'word_spacing',
+  parse => $Prop->{'letter-spacing'}->{parse},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'normal'],
+  inherited => 1,
+  compute => $compute_length,
+};
+$Attr->{word_spacing} = $Prop->{'word-spacing'};
+$Key->{word_spacing} = $Prop->{'word-spacing'};
+
 $Prop->{'margin-top'} = {
   css => 'margin-top',
   dom => 'margin_top',
@@ -1284,7 +1348,7 @@ $Prop->{'margin-top'} = {
     ## 'margin-left', 'top', 'right', 'bottom', 'left', 'padding-top',
     ## 'padding-right', 'padding-bottom', 'padding-left',
     ## 'border-top-width', 'border-right-width', 'border-bottom-width',
-    ## and 'border-left-width'.
+    ## 'border-left-width', and 'text-indent'.
 
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
@@ -1729,6 +1793,21 @@ $Prop->{'vertical-align'} = {
 $Attr->{vertical_align} = $Prop->{'vertical-align'};
 $Key->{vertical_align} = $Prop->{'vertical-align'};
 
+$Prop->{'text-indent'} = {
+  css => 'text-indent',
+  dom => 'text_indent',
+  key => 'text_indent',
+  parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {},
+  serialize => $default_serializer,
+  initial => ['DIMENSION', 0, 'px'],
+  inherited => 1,
+  compute => $compute_length,
+};
+$Attr->{text_indent} = $Prop->{'text-indent'};
+$Key->{text_indent} = $Prop->{'text-indent'};
+
 $Prop->{'padding-top'} = {
   css => 'padding-top',
   dom => 'padding_top',
@@ -1802,6 +1881,10 @@ $Prop->{'border-top-width'} = {
   compute => sub {
     my ($self, $element, $prop_name, $specified_value) = @_;
 
+    ## NOTE: Used for 'border-top-width', 'border-right-width',
+    ## 'border-bottom-width', 'border-right-width', and
+    ## 'outline-width'.
+
     my $style_prop = $prop_name;
     $style_prop =~ s/width/style/;
     my $style = $self->get_computed_value ($element, $style_prop);
@@ -1822,6 +1905,8 @@ $Prop->{'border-top-width'} = {
     }
     return $value;
   },
+  ## NOTE: CSS3 will allow <percentage> as an option in <border-width>.
+  ## Opera 9 has already implemented it.
 };
 $Attr->{border_top_width} = $Prop->{'border-top-width'};
 $Key->{border_top_width} = $Prop->{'border-top-width'};
@@ -1870,6 +1955,21 @@ $Prop->{'border-left-width'} = {
 };
 $Attr->{border_left_width} = $Prop->{'border-left-width'};
 $Key->{border_left_width} = $Prop->{'border-left-width'};
+
+$Prop->{'outline-width'} = {
+  css => 'outline-width',
+  dom => 'outline_width',
+  key => 'outline_width',
+  parse => $Prop->{'border-top-width'}->{parse},
+  #allow_negative => 0,
+  keyword => {thin => 1, medium => 1, thick => 1},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'medium'],
+  #inherited => 0,
+  compute => $Prop->{'border-top-width'}->{compute},
+};
+$Attr->{outline_width} = $Prop->{'outline-width'};
+$Key->{outline_width} = $Prop->{'outline-width'};
 
 $Prop->{'font-weight'} = {
   css => 'font-weight',
@@ -2090,13 +2190,14 @@ $Prop->{'outline-style'} = {
   key => 'outline_style',
   parse => $one_keyword_parser,
   serialize => $default_serializer,
-  keyword => $border_style_keyword,
+  keyword => {%$border_style_keyword},
   initial => ['KEYWORD', 'none'],
   #inherited => 0,
   compute => $compute_as_specified,
 };
 $Attr->{outline_style} = $Prop->{'outline-style'};
 $Key->{outline_style} = $Prop->{'outline-style'};
+delete $Prop->{'outline-style'}->{keyword}->{hidden};
 
 $Prop->{'font-family'} = {
   css => 'font-family',
@@ -3280,4 +3381,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/04 05:36:36 $
+## $Date: 2008/01/04 14:43:44 $
