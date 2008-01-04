@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration';
 
 sub ____new ($) {
@@ -84,7 +84,9 @@ sub css_text ($;$) {
   ## TODO: ordering
   ## TODO: any spec?
   my $r = '';
-  for my $prop_def (grep {$_->{compute}} values %$Whatpm::CSS::Parser::Prop) {
+  for my $prop_def (sort {$a->{css} cmp $b->{css}}
+                    grep {$_->{compute} or $_->{compute_multiple}}
+                    values %$Whatpm::CSS::Parser::Prop) {
     my $prop_value = $$self->{cascade}->get_computed_value
         ($$self->{element}, $prop_def->{css});
     my $s = $prop_def->{serialize}->($self, $prop_def->{css}, $prop_value);
@@ -96,6 +98,9 @@ sub css_text ($;$) {
       $r .= "  /* $prop_def->{css}: ???; */\n";
     }
   }
+
+  ## ISSUE: Should we include CSS properties that are not supported?
+
   return $r;
 } # css_text
 
@@ -104,4 +109,4 @@ sub css_text ($;$) {
 package Message::IF::CSSStyleDeclaration;
 
 1;
-## $Date: 2008/01/01 09:09:16 $
+## $Date: 2008/01/04 14:45:29 $
