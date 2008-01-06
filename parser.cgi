@@ -36,20 +36,22 @@ if ($mode eq '/csstext') {
   };
 
   $p->{prop}->{$_} = 1 for qw/
-    background-attachment background-image
+    background-attachment background-color background-image
     background-position background-position-x background-position-y
-    background-repeat
-    border-bottom-style border-bottom-width border-collapse border-left-style
-    border-left-width border-right-style border-right-width
+    background-repeat border-bottom-color
+    border-bottom-style border-bottom-width border-collapse border-left-color
+    border-left-style border-left-width border-right-color border-right-style
+    border-right-width
     border-spacing -manakai-border-spacing-x -manakai-border-spacing-y
-    border-style border-top-style border-top-width border-width bottom
+    border-style border-top-color border-top-style border-top-width
+    border-width bottom
     caption-side clear color cursor direction display empty-cells float
     font-family font-size font-style font-variant font-weight height left
     letter-spacing line-height
     list-style list-style-image list-style-position list-style-type
     margin margin-bottom margin-left margin-right margin-top
     max-height max-width min-height min-width
-    orphans outline-style outline-width overflow
+    orphans outline-color outline-style outline-width overflow
     padding padding-bottom padding-left padding-right padding-top
     page-break-after page-break-before page-break-inside
     position right table-layout
@@ -138,6 +140,15 @@ if ($mode eq '/csstext') {
       none hidden dotted dashed solid double groove ridge inset outset
     /;
   }
+  for my $prop (qw/color background-color
+                   border-bottom-color border-left-color border-right-color
+                   border-top-color/) {
+    $p->{prop_value}->{$prop}->{transparent} = 1;
+    $p->{prop_value}->{$prop}->{flavor} = 1;
+    $p->{prop_value}->{$prop}->{'-manakai-default'} = 1;
+  }
+  $p->{prop_value}->{'outline-color'}->{invert} = 1;
+  $p->{prop_value}->{'outline-color'}->{'-manakai-invert-or-currentcolor'} = 1;
   $p->{pseudo_class}->{$_} = 1 for qw/
     active checked disabled empty enabled first-child first-of-type
     focus hover indeterminate last-child last-of-type link only-child
@@ -166,6 +177,7 @@ if ($mode eq '/csstext') {
 
   require Whatpm::CSS::Cascade;
   my $cas = Whatpm::CSS::Cascade->new ($doc);
+  $cas->{has_invert} = $p->{prop_value}->{'outline-color'}->{invert};
   $cas->add_style_sheets ([$ss]);
   $cas->___associate_rules;
 
@@ -291,4 +303,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/06 10:33:33 $
+## $Date: 2008/01/06 14:12:41 $
