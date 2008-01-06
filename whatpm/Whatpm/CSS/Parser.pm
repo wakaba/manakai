@@ -1363,7 +1363,7 @@ $Prop->{'-manakai-border-spacing-x'} = {
     $yi = ' !' . $yi if length $yi;
     if (defined $x) {
       if (defined $y) {
-        if ($xi and $yi) {
+        if ($xi eq $yi) {
           if ($x eq $y) {
             return {'border-spacing' => $x . $xi};
           } else {
@@ -3626,4 +3626,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/06 04:30:59 $
+## $Date: 2008/01/06 04:35:18 $
