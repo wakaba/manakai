@@ -9,6 +9,21 @@ sub new ($) {
                     unsupported_level => 'unsupported'}, shift;
   # $self->{base_uri}
   # $self->{unitless_px} = 1/0
+  # $self->{hashless_rgb} = 1/0
+
+  ## Media-dependent RGB color range clipper
+  $self->{clip_color} = sub {
+    shift; #my $self = shift;
+    my $value = shift;
+    if (defined $value and $value->[0] eq 'RGBA') {
+      my ($r, $g, $b) = @$value[1, 2, 3];
+      $r = 0 if $r < 0;  $r = 255 if $r > 255;
+      $g = 0 if $g < 0;  $g = 255 if $g > 255;
+      $b = 0 if $b < 0;  $b = 255 if $b > 255;
+      return ['RGBA', $r, $g, $b, $value->[4]];
+    }
+    return $value;
+  };
 
   return $self;
 } # new
@@ -373,6 +388,15 @@ sub parse_char_string ($$) {
             ## Stay in the state.
             redo S;
           }
+        } elsif ({
+          RBRACE_TOKEN, 1,
+          #RBRACKET_TOKEN, 1,
+          #RPAREN_TOKEN, 1,
+          SEMICOLON_TOKEN, 1,
+        }->{$t->{type}}) {
+          $t = $tt->get_next_token;
+          ## Stay in the state.
+          #
         } else {
           #
         }
@@ -382,16 +406,26 @@ sub parse_char_string ($$) {
           $state = $state == IGNORED_STATEMENT_STATE
               ? BEFORE_STATEMENT_STATE : BEFORE_DECLARATION_STATE;
           redo S;
-        } elsif ($state == IGNORED_DECLARATION_STATE and
-                 $t->{type} == RBRACE_TOKEN) {
-          $t = $tt->get_next_token;
-          $state = BEFORE_STATEMENT_STATE;
-          redo S;
+        } elsif ($t->{type} == RBRACE_TOKEN) {
+          if ($state == IGNORED_DECLARATION_STATE) {
+            $t = $tt->get_next_token;
+            $state = BEFORE_STATEMENT_STATE;
+            redo S;
+          } else {
+            ## NOTE: Maybe this state cannot be reached.
+            $t = $tt->get_next_token;
+            ## Stay in the state.
+            redo S;
+          }
         } elsif ($t->{type} == EOF_TOKEN) {
           ## Reprocess.
           $state = $state == IGNORED_STATEMENT_STATE
               ? BEFORE_STATEMENT_STATE : BEFORE_DECLARATION_STATE;
           redo S;
+        #} elsif ($t->{type} == RBRACKET_TOKEN or $t->{type} == RPAREN_TOKEN) {
+        #  $t = $tt->get_next_token;
+        #  ## Stay in the state.
+        #  #
         } else {
           #
         }
@@ -400,16 +434,17 @@ sub parse_char_string ($$) {
       while (not {
         EOF_TOKEN, 1,
         RBRACE_TOKEN, 1,
-        RBRACKET_TOKEN, 1,
-        RPAREN_TOKEN, 1,
+        ## NOTE: ']' and ')' are disabled for browser compatibility.
+        #RBRACKET_TOKEN, 1,
+        #RPAREN_TOKEN, 1,
         SEMICOLON_TOKEN, 1,
       }->{$t->{type}}) {
         if ($t->{type} == LBRACE_TOKEN) {
           push @$closing_tokens, RBRACE_TOKEN;
-        } elsif ($t->{type} == LBRACKET_TOKEN) {
-          push @$closing_tokens, RBRACKET_TOKEN;
-        } elsif ($t->{type} == LPAREN_TOKEN or $t->{type} == FUNCTION_TOKEN) {
-          push @$closing_tokens, RPAREN_TOKEN;
+        #} elsif ($t->{type} == LBRACKET_TOKEN) {
+        #  push @$closing_tokens, RBRACKET_TOKEN;
+        #} elsif ($t->{type} == LPAREN_TOKEN or $t->{type} == FUNCTION_TOKEN) {
+        #  push @$closing_tokens, RPAREN_TOKEN;
         }
 
         $t = $tt->get_next_token;
@@ -455,6 +490,16 @@ my $default_serializer = sub {
   } elsif ($value->[0] eq 'URI') {
     ## NOTE: This is what browsers do.
     return 'url('.$value->[1].')';
+  } elsif ($value->[0] eq 'RGBA') {
+    if ($value->[4] == 1) {
+      return 'rgb('.$value->[1].', '.$value->[2].', '.$value->[3].')';
+    } elsif ($value->[4] == 0) {
+      ## TODO: check what browsers do...
+      return 'transparent';
+    } else {
+      return 'rgba('.$value->[1].', '.$value->[2].', '.$value->[3].', '
+          .$value->[4].')';
+    }
   } elsif ($value->[0] eq 'INHERIT') {
     return 'inherit';
   } elsif ($value->[0] eq 'DECORATION') {
@@ -470,44 +515,508 @@ my $default_serializer = sub {
   }
 }; # $default_serializer
 
+my $x11_colors = {
+                  'aliceblue' =>	[0xf0, 0xf8, 0xff],
+                  'antiquewhite' =>	[0xfa, 0xeb, 0xd7],
+                  'aqua' =>	[0x00, 0xff, 0xff],
+                  'aquamarine' =>	[0x7f, 0xff, 0xd4],
+                  'azure' =>	[0xf0, 0xff, 0xff],
+                  'beige' =>	[0xf5, 0xf5, 0xdc],
+                  'bisque' =>	[0xff, 0xe4, 0xc4],
+                  'black' =>	[0x00, 0x00, 0x00],
+                  'blanchedalmond' =>	[0xff, 0xeb, 0xcd],
+                  'blue' =>	[0x00, 0x00, 0xff],
+                  'blueviolet' =>	[0x8a, 0x2b, 0xe2],
+                  'brown' =>	[0xa5, 0x2a, 0x2a],
+                  'burlywood' =>	[0xde, 0xb8, 0x87],
+                  'cadetblue' =>	[0x5f, 0x9e, 0xa0],
+                  'chartreuse' =>	[0x7f, 0xff, 0x00],
+                  'chocolate' =>	[0xd2, 0x69, 0x1e],
+                  'coral' =>	[0xff, 0x7f, 0x50],
+                  'cornflowerblue' =>	[0x64, 0x95, 0xed],
+                  'cornsilk' =>	[0xff, 0xf8, 0xdc],
+                  'crimson' =>	[0xdc, 0x14, 0x3c],
+                  'cyan' =>	[0x00, 0xff, 0xff],
+                  'darkblue' =>	[0x00, 0x00, 0x8b],
+                  'darkcyan' =>	[0x00, 0x8b, 0x8b],
+                  'darkgoldenrod' =>	[0xb8, 0x86, 0x0b],
+                  'darkgray' =>	[0xa9, 0xa9, 0xa9],
+                  'darkgreen' =>	[0x00, 0x64, 0x00],
+                  'darkgrey' =>	[0xa9, 0xa9, 0xa9],
+                  'darkkhaki' =>	[0xbd, 0xb7, 0x6b],
+                  'darkmagenta' =>	[0x8b, 0x00, 0x8b],
+                  'darkolivegreen' =>	[0x55, 0x6b, 0x2f],
+                  'darkorange' =>	[0xff, 0x8c, 0x00],
+                  'darkorchid' =>	[0x99, 0x32, 0xcc],
+                  'darkred' =>	[0x8b, 0x00, 0x00],
+                  'darksalmon' =>	[0xe9, 0x96, 0x7a],
+                  'darkseagreen' =>	[0x8f, 0xbc, 0x8f],
+                  'darkslateblue' =>	[0x48, 0x3d, 0x8b],
+                  'darkslategray' =>	[0x2f, 0x4f, 0x4f],
+                  'darkslategrey' =>	[0x2f, 0x4f, 0x4f],
+                  'darkturquoise' =>	[0x00, 0xce, 0xd1],
+                  'darkviolet' =>	[0x94, 0x00, 0xd3],
+                  'deeppink' =>	[0xff, 0x14, 0x93],
+                  'deepskyblue' =>	[0x00, 0xbf, 0xff],
+                  'dimgray' =>	[0x69, 0x69, 0x69],
+                  'dimgrey' =>	[0x69, 0x69, 0x69],
+                  'dodgerblue' =>	[0x1e, 0x90, 0xff],
+                  'firebrick' =>	[0xb2, 0x22, 0x22],
+                  'floralwhite' =>	[0xff, 0xfa, 0xf0],
+                  'forestgreen' =>	[0x22, 0x8b, 0x22],
+                  'fuchsia' =>	[0xff, 0x00, 0xff],
+                  'gainsboro' =>	[0xdc, 0xdc, 0xdc],
+                  'ghostwhite' =>	[0xf8, 0xf8, 0xff],
+                  'gold' =>	[0xff, 0xd7, 0x00],
+                  'goldenrod' =>	[0xda, 0xa5, 0x20],
+                  'gray' =>	[0x80, 0x80, 0x80],
+                  'green' =>	[0x00, 0x80, 0x00],
+                  'greenyellow' =>	[0xad, 0xff, 0x2f],
+                  'grey' =>	[0x80, 0x80, 0x80],
+                  'honeydew' =>	[0xf0, 0xff, 0xf0],
+                  'hotpink' =>	[0xff, 0x69, 0xb4],
+                  'indianred' =>	[0xcd, 0x5c, 0x5c],
+                  'indigo' =>	[0x4b, 0x00, 0x82],
+                  'ivory' =>	[0xff, 0xff, 0xf0],
+                  'khaki' =>	[0xf0, 0xe6, 0x8c],
+                  'lavender' =>	[0xe6, 0xe6, 0xfa],
+                  'lavenderblush' =>	[0xff, 0xf0, 0xf5],
+                  'lawngreen' =>	[0x7c, 0xfc, 0x00],
+                  'lemonchiffon' =>	[0xff, 0xfa, 0xcd],
+                  'lightblue' =>	[0xad, 0xd8, 0xe6],
+                  'lightcoral' =>	[0xf0, 0x80, 0x80],
+                  'lightcyan' =>	[0xe0, 0xff, 0xff],
+                  'lightgoldenrodyellow' =>	[0xfa, 0xfa, 0xd2],
+                  'lightgray' =>	[0xd3, 0xd3, 0xd3],
+                  'lightgreen' =>	[0x90, 0xee, 0x90],
+                  'lightgrey' =>	[0xd3, 0xd3, 0xd3],
+                  'lightpink' =>	[0xff, 0xb6, 0xc1],
+                  'lightsalmon' =>	[0xff, 0xa0, 0x7a],
+                  'lightseagreen' =>	[0x20, 0xb2, 0xaa],
+                  'lightskyblue' =>	[0x87, 0xce, 0xfa],
+                  'lightslategray' =>	[0x77, 0x88, 0x99],
+                  'lightslategrey' =>	[0x77, 0x88, 0x99],
+                  'lightsteelblue' =>	[0xb0, 0xc4, 0xde],
+                  'lightyellow' =>	[0xff, 0xff, 0xe0],
+                  'lime' =>	[0x00, 0xff, 0x00],
+                  'limegreen' =>	[0x32, 0xcd, 0x32],
+                  'linen' =>	[0xfa, 0xf0, 0xe6],
+                  'magenta' =>	[0xff, 0x00, 0xff],
+                  'maroon' =>	[0x80, 0x00, 0x00],
+                  'mediumaquamarine' =>	[0x66, 0xcd, 0xaa],
+                  'mediumblue' =>	[0x00, 0x00, 0xcd],
+                  'mediumorchid' =>	[0xba, 0x55, 0xd3],
+                  'mediumpurple' =>	[0x93, 0x70, 0xdb],
+                  'mediumseagreen' =>	[0x3c, 0xb3, 0x71],
+                  'mediumslateblue' =>	[0x7b, 0x68, 0xee],
+                  'mediumspringgreen' =>	[0x00, 0xfa, 0x9a],
+                  'mediumturquoise' =>	[0x48, 0xd1, 0xcc],
+                  'mediumvioletred' =>	[0xc7, 0x15, 0x85],
+                  'midnightblue' =>	[0x19, 0x19, 0x70],
+                  'mintcream' =>	[0xf5, 0xff, 0xfa],
+                  'mistyrose' =>	[0xff, 0xe4, 0xe1],
+                  'moccasin' =>	[0xff, 0xe4, 0xb5],
+                  'navajowhite' =>	[0xff, 0xde, 0xad],
+                  'navy' =>	[0x00, 0x00, 0x80],
+                  'oldlace' =>	[0xfd, 0xf5, 0xe6],
+                  'olive' =>	[0x80, 0x80, 0x00],
+                  'olivedrab' =>	[0x6b, 0x8e, 0x23],
+                  'orange' =>	[0xff, 0xa5, 0x00],
+                  'orangered' =>	[0xff, 0x45, 0x00],
+                  'orchid' =>	[0xda, 0x70, 0xd6],
+                  'palegoldenrod' =>	[0xee, 0xe8, 0xaa],
+                  'palegreen' =>	[0x98, 0xfb, 0x98],
+                  'paleturquoise' =>	[0xaf, 0xee, 0xee],
+                  'palevioletred' =>	[0xdb, 0x70, 0x93],
+                  'papayawhip' =>	[0xff, 0xef, 0xd5],
+                  'peachpuff' =>	[0xff, 0xda, 0xb9],
+                  'peru' =>	[0xcd, 0x85, 0x3f],
+                  'pink' =>	[0xff, 0xc0, 0xcb],
+                  'plum' =>	[0xdd, 0xa0, 0xdd],
+                  'powderblue' =>	[0xb0, 0xe0, 0xe6],
+                  'purple' =>	[0x80, 0x00, 0x80],
+                  'red' =>	[0xff, 0x00, 0x00],
+                  'rosybrown' =>	[0xbc, 0x8f, 0x8f],
+                  'royalblue' =>	[0x41, 0x69, 0xe1],
+                  'saddlebrown' =>	[0x8b, 0x45, 0x13],
+                  'salmon' =>	[0xfa, 0x80, 0x72],
+                  'sandybrown' =>	[0xf4, 0xa4, 0x60],
+                  'seagreen' =>	[0x2e, 0x8b, 0x57],
+                  'seashell' =>	[0xff, 0xf5, 0xee],
+                  'sienna' =>	[0xa0, 0x52, 0x2d],
+                  'silver' =>	[0xc0, 0xc0, 0xc0],
+                  'skyblue' =>	[0x87, 0xce, 0xeb],
+                  'slateblue' =>	[0x6a, 0x5a, 0xcd],
+                  'slategray' =>	[0x70, 0x80, 0x90],
+                  'slategrey' =>	[0x70, 0x80, 0x90],
+                  'snow' =>	[0xff, 0xfa, 0xfa],
+                  'springgreen' =>	[0x00, 0xff, 0x7f],
+                  'steelblue' =>	[0x46, 0x82, 0xb4],
+                  'tan' =>	[0xd2, 0xb4, 0x8c],
+                  'teal' =>	[0x00, 0x80, 0x80],
+                  'thistle' =>	[0xd8, 0xbf, 0xd8],
+                  'tomato' =>	[0xff, 0x63, 0x47],
+                  'turquoise' =>	[0x40, 0xe0, 0xd0],
+                  'violet' =>	[0xee, 0x82, 0xee],
+                  'wheat' =>	[0xf5, 0xde, 0xb3],
+                  'white' =>	[0xff, 0xff, 0xff],
+                  'whitesmoke' =>	[0xf5, 0xf5, 0xf5],
+                  'yellow' =>	[0xff, 0xff, 0x00],
+                  'yellowgreen' =>	[0x9a, 0xcd, 0x32],
+}; # $x11_colors
+
+my $system_colors = {
+  activeborder => 1, activecaption => 1, appworkspace => 1, background => 1,
+  buttonface => 1, buttonhighlight => 1, buttonshadow => 1, buttontext => 1,
+  captiontext => 1, graytext => 1, highlight => 1, highlighttext => 1,
+  inactiveborder => 1, inactivecaption => 1, inactivecaptiontext => 1,
+  infobackground => 1, infotext => 1, menu => 1, menutext => 1, 
+  scrollbar => 1, threeddarkshadow => 1, threedface => 1, threedhighlight => 1,
+  threedlightshadow => 1, threedshadow => 1, window => 1, windowframe => 1,
+  windowtext => 1,
+}; # $system_colors
+
+my $parse_color = sub {
+  my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+  ## See
+  ## <http://suika.fam.cx/gate/2005/sw/%3Ccolor%3E>,
+  ## <http://suika.fam.cx/gate/2005/sw/rgb>,
+  ## <http://suika.fam.cx/gate/2005/sw/-moz-rgba>,
+  ## <http://suika.fam.cx/gate/2005/sw/hsl>,
+  ## <http://suika.fam.cx/gate/2005/sw/-moz-hsla>, and
+  ## <http://suika.fam.cx/gate/2005/sw/color>
+  ## for browser compatibility issue.
+
+  ## NOTE: Implementing CSS3 Color CR (2003), except for attr(),
+  ## rgba(), and hsla().
+  ## NOTE: rgb(...{EOF} is not supported (only Opera does).
+
+  if ($t->{type} == IDENT_TOKEN) {
+    my $value = lc $t->{value}; ## TODO: case
+    if ($x11_colors->{$value} or
+        $system_colors->{$value}) {
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['KEYWORD', $value]});
+    } elsif ({
+      transparent => 1, ## For 'background-color' in CSS2.1, everywhre in CSS3.
+      flavor => 1, ## CSS3.
+      invert => 1, ## For 'outline-color' in CSS2.1.
+      '-moz-use-text-color' => 1, ## For <border-color> in Gecko.
+      '-manakai-default' => 1, ## CSS2.1 initial for 'color'
+      '-manakai-invert-or-currentcolor' => 1, ## CSS2.1 initial4'outline-color'
+    }->{$value} and $self->{prop_value}->{$prop_name}->{$value}) {
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['KEYWORD', $value]});
+    } elsif ($value eq 'currentcolor' or $value eq '-moz-use-text-color') {
+      $t = $tt->get_next_token;
+      if ($prop_name eq 'color') {
+        return ($t, {$prop_name => ['INHERIT']});
+      } else {
+        return ($t, {$prop_name => ['KEYWORD', $value]});
+      }
+    } elsif ($value eq 'inherit') {
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['INHERIT']});
+    }
+  }
+
+  if ($t->{type} == HASH_TOKEN or
+      ($self->{hashless_rgb} and $t->{type} == IDENT_TOKEN)) {
+    my $v = lc $t->{value}; ## TODO: case
+    if ($v =~ /\A([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})\z/) {
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['RGBA', hex $1, hex $2, hex $3, 1]});
+    } elsif ($v =~ /\A([0-9a-f])([0-9a-f])([0-9a-f])\z/) {
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ['RGBA', hex $1.$1, hex $2.$2,
+                                  hex $3.$3, 1]});
+    }
+  }
+
+  if ($t->{type} == FUNCTION_TOKEN) {
+    my $func = lc $t->{value}; ## TODO: case
+    if ($func eq 'rgb') {
+      $t = $tt->get_next_token;
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      my $sign = 1;
+      if ($t->{type} == MINUS_TOKEN) {
+        $sign = -1;
+        $t = $tt->get_next_token;
+      }
+      if ($t->{type} == NUMBER_TOKEN) {
+        my $r = $t->{number} * $sign;
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == COMMA_TOKEN) {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          $sign = 1;
+          if ($t->{type} == MINUS_TOKEN) {
+            $sign = -1;
+            $t = $tt->get_next_token;
+          } 
+          if ($t->{type} == NUMBER_TOKEN) {
+            my $g = $t->{number} * $sign;
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            if ($t->{type} == COMMA_TOKEN) {
+              $t = $tt->get_next_token;
+              $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+              $sign = 1;
+              if ($t->{type} == MINUS_TOKEN) {
+                $sign = -1;
+                $t = $tt->get_next_token;
+              } 
+              if ($t->{type} == NUMBER_TOKEN) {
+                my $b = $t->{number} * $sign;
+                $t = $tt->get_next_token;
+                $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+                if ($t->{type} == RPAREN_TOKEN) {
+                  $t = $tt->get_next_token;
+                  return ($t,
+                          {$prop_name =>
+                           $self->{clip_color}->($self,
+                                                 ['RGBA', $r, $g, $b, 1])});
+                }
+              }
+            }
+          }
+        }
+      } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+        my $r = $t->{number} * 255 / 100 * $sign;
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == COMMA_TOKEN) {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          $sign = 1;
+          if ($t->{type} == MINUS_TOKEN) {
+            $sign = -1;
+            $t = $tt->get_next_token;
+          }           
+          if ($t->{type} == PERCENTAGE_TOKEN) {
+            my $g = $t->{number} * 255 / 100 * $sign;
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            if ($t->{type} == COMMA_TOKEN) {
+              $t = $tt->get_next_token;
+              $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+              $sign = 1;
+              if ($t->{type} == MINUS_TOKEN) {
+                $sign = -1;
+                $t = $tt->get_next_token;
+              } 
+              if ($t->{type} == PERCENTAGE_TOKEN) {
+                my $b = $t->{number} * 255 / 100 * $sign;
+                $t = $tt->get_next_token;
+                $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+                if ($t->{type} == RPAREN_TOKEN) {
+                  $t = $tt->get_next_token;
+                  return ($t,
+                          {$prop_name =>
+                           $self->{clip_color}->($self,
+                                                 ['RGBA', $r, $g, $b, 1])});
+                }
+              }
+            }
+          }
+        }
+      }
+    } elsif ($func eq 'hsl') {
+      $t = $tt->get_next_token;
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      my $sign = 1;
+      if ($t->{type} == MINUS_TOKEN) {
+        $sign = -1;
+        $t = $tt->get_next_token;
+      }
+      if ($t->{type} == NUMBER_TOKEN) {
+        my $h = (((($t->{number} * $sign) % 360) + 360) % 360) / 360;
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == COMMA_TOKEN) {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          $sign = 1;
+          if ($t->{type} == MINUS_TOKEN) {
+            $sign = -1;
+            $t = $tt->get_next_token;
+          } 
+          if ($t->{type} == PERCENTAGE_TOKEN) {
+            my $s = $t->{number} * $sign / 100;
+            $s = 0 if $s < 0;
+            $s = 1 if $s > 1;
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            if ($t->{type} == COMMA_TOKEN) {
+              $t = $tt->get_next_token;
+              $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+              $sign = 1;
+              if ($t->{type} == MINUS_TOKEN) {
+                $sign = -1;
+                $t = $tt->get_next_token;
+              } 
+              if ($t->{type} == PERCENTAGE_TOKEN) {
+                my $l = $t->{number} * $sign / 100;
+                $l = 0 if $l < 0;
+                $l = 1 if $l > 1;
+                $t = $tt->get_next_token;
+                $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+                if ($t->{type} == RPAREN_TOKEN) {
+                  my $m2 = $l <= 0.5 ? $l * ($s + 1) : $l + $s - $l * $s;
+                  my $m1 = $l * 2 - $m2;
+                  my $hue2rgb = sub ($$$) {
+                    my ($m1, $m2, $h) = @_;
+                    $h++ if $h < 0;
+                    $h-- if $h > 1;
+                    return $m1 + ($m2 - $m1) * $h * 6 if $h * 6 < 1;
+                    return $m2 if $h * 2 < 1;
+                    return $m1 + ($m2 - $m1) * (2/3 - $h) * 6 if $h * 3 < 2;
+                    return $m1;
+                  };
+                  $t = $tt->get_next_token;
+                  return ($t,
+                          {$prop_name =>
+                           $self->{clip_color}
+                               ->($self,
+                                  ['RGBA',
+                                   $hue2rgb->($m1, $m2, $h + 1/3),
+                                   $hue2rgb->($m1, $m2, $h),
+                                   $hue2rgb->($m1, $m2, $h - 1/3), 1])});
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  $onerror->(type => 'syntax error:'.$prop_name,
+             level => $self->{must_level},
+             token => $t);
+  
+  return ($t, undef);
+}; # $parse_color
+
 $Prop->{color} = {
   css => 'color',
   dom => 'color',
   key => 'color',
-  parse => sub {
-    my ($self, $prop_name, $tt, $t, $onerror) = @_;
-
-    if ($t->{type} == IDENT_TOKEN) {
-      if (lc $t->{value} eq 'blue') { ## TODO: case folding
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ["RGBA", 0, 0, 255, 1]});
-      } else {
-        #
-      }
-    } else {
-      #
-    }
-
-    $onerror->(type => 'syntax error:color',
-               level => $self->{must_level},
-               token => $t);
-    
-    return ($t, undef);
-  },
-  serialize => sub {
-    my ($self, $prop_name, $value) = @_;
-    if ($value->[0] eq 'RGBA') { ## TODO: %d? %f?
-      return sprintf 'rgba(%d, %d, %d, %f)', @$value[1, 2, 3, 4];
-    } else {
-      return undef;
-    }
-  },
-  initial => ["KEYWORD", "-manakai-initial-color"], ## NOTE: UA-dependent in CSS 2.1.
+  parse => $parse_color,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', '-manakai-default'],
   inherited => 1,
-  compute => $compute_as_specified,
+  compute => sub ($$$$) {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    if (defined $specified_value) {
+      if ($specified_value->[0] eq 'KEYWORD') {
+        if ($x11_colors->{$specified_value->[1]}) {
+          return ['RGBA', @{$x11_colors->{$specified_value->[1]}}, 1];
+        } elsif ($specified_value->[1] eq 'transparent') {
+          return ['RGBA', 0, 0, 0, 0];
+        } elsif ($specified_value->[1] eq 'currentcolor' or
+                 $specified_value->[1] eq '-moz-use-text-color' or
+                 ($specified_value->[1] eq '-manakai-invert-or-currentcolor'and
+                  not $self->{has_invert})) {
+          unless ($prop_name eq 'color') {
+            return $self->get_computed_value ($element, 'color');
+          } else {
+            ## NOTE: This is an error, since it should have been
+            ## converted to 'inherit' at parse time.
+            return ['KEYWORD', '-manakai-default'];
+          }
+        } elsif ($specified_value->[1] eq '-manakai-invert-or-currentcolor') {
+          return ['KEYWORD', 'invert'];
+        }
+      }
+    }
+    
+    return $specified_value;
+  },
 };
 $Attr->{color} = $Prop->{color};
 $Key->{color} = $Prop->{color};
+
+$Prop->{'background-color'} = {
+  css => 'background-color',
+  dom => 'background_color',
+  key => 'background_color',
+  parse => $parse_color,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'transparent'],
+  #inherited => 0,
+  compute => $Prop->{color}->{compute},
+};
+$Attr->{background_color} = $Prop->{'background-color'};
+$Key->{background_color} = $Prop->{'background-color'};
+
+$Prop->{'border-top-color'} = {
+  css => 'border-top-color',
+  dom => 'border_top_color',
+  key => 'border_top_color',
+  parse => $parse_color,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'currentcolor'],
+  #inherited => 0,
+  compute => $Prop->{color}->{compute},
+};
+$Attr->{border_top_color} = $Prop->{'border-top-color'};
+$Key->{border_top_color} = $Prop->{'border-top-color'};
+
+$Prop->{'border-right-color'} = {
+  css => 'border-right-color',
+  dom => 'border_right_color',
+  key => 'border_right_color',
+  parse => $parse_color,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'currentcolor'],
+  #inherited => 0,
+  compute => $Prop->{color}->{compute},
+};
+$Attr->{border_right} = $Prop->{'border-right-color'};
+$Key->{border_right} = $Prop->{'border-right-color'};
+
+$Prop->{'border-bottom-color'} = {
+  css => 'border-bottom-color',
+  dom => 'border_bottom_color',
+  key => 'border_bottom_color',
+  parse => $parse_color,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'currentcolor'],
+  #inherited => 0,
+  compute => $Prop->{color}->{compute},
+};
+$Attr->{border_bottom_color} = $Prop->{'border-bottom-color'};
+$Key->{border_bottom_color} = $Prop->{'border-bottom-color'};
+
+$Prop->{'border-left-color'} = {
+  css => 'border-left-color',
+  dom => 'border_left_color',
+  key => 'border_left_color',
+  parse => $parse_color,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'currentcolor'],
+  #inherited => 0,
+  compute => $Prop->{color}->{compute},
+};
+$Attr->{border_left_color} = $Prop->{'border-left-color'};
+$Key->{border_left_color} = $Prop->{'border-left-color'};
+
+$Prop->{'outline-color'} = {
+  css => 'outline-color',
+  dom => 'outline_color',
+  key => 'outline_color',
+  parse => $parse_color,
+  serialize => $default_serializer,
+  initial => ['KEYWORD', '-manakai-invert-or-currentcolor'],
+  #inherited => 0,
+  compute => $Prop->{color}->{compute},
+};
+$Attr->{outline_color} = $Prop->{'outline-color'};
+$Key->{outline_color} = $Prop->{'outline-color'};
 
 my $one_keyword_parser = sub {
   my ($self, $prop_name, $tt, $t, $onerror) = @_;
@@ -3838,4 +4347,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/06 10:33:01 $
+## $Date: 2008/01/06 14:15:36 $

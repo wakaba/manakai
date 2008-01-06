@@ -24,6 +24,8 @@ sub new ($$) {
     #my ($self, $original_px) = @_;
     return $_[1] * 1.1;
   };
+  ## $self->{has_invert}: Should be same as
+  ##     $parser->{prop_value}->{'outline-color'}->{invert}.
 
   return $self;
 } # new
@@ -212,4 +214,4 @@ sub get_computed_value ($$$) {
 } # get_computed_value
 
 1;
-## $Date: 2008/01/03 13:51:41 $
+## $Date: 2008/01/06 14:15:36 $

@@ -1,5 +1,20 @@
 2008-01-06  Wakaba  <wakaba@suika.fam.cx>
 
+	* Cascade.pm: The object now has new device-dependent
+	parameter, |has_invert|.
+
+	* Parser.pm: The object now has new device-dependent
+	parameter, |clip_color| function.
+	(parse_char_string): Inifinite-loop fixed for ignoring
+	states.  No longer check for '(' and '[' matchings for 
+	compatibility with browsers.
+	($default_serializer): Support for 'RGBA' data type.
+	(color): Reimplemented.
+	(backbround-color, border-top-color, border-right-color,
+	border-bottom-color, border-left-color, outline-color): Implemented.
+
+2008-01-06  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm (background-position, background-position-x,
 	background-position-y): Implemented.
 
