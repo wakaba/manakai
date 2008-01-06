@@ -36,7 +36,9 @@ if ($mode eq '/csstext') {
   };
 
   $p->{prop}->{$_} = 1 for qw/
-    background-attachment background-image background-repeat
+    background-attachment background-image
+    background-position background-position-x background-position-y
+    background-repeat
     border-bottom-style border-bottom-width border-collapse border-left-style
     border-left-width border-right-style border-right-width
     border-spacing -manakai-border-spacing-x -manakai-border-spacing-y
@@ -289,4 +291,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/06 02:57:07 $
+## $Date: 2008/01/06 10:33:33 $
