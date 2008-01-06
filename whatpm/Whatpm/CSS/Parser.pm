@@ -1351,6 +1351,39 @@ $Prop->{'-manakai-border-spacing-x'} = {
   #allow_negative => 0,
   #keyword => {},
   serialize => $default_serializer,
+  serialize_multiple => sub {
+    my $self = shift;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my $x = $self->_manakai_border_spacing_x;
+    my $y = $self->_manakai_border_spacing_y;
+    my $xi = $self->get_property_priority ('-manakai-border-spacing-x');
+    my $yi = $self->get_property_priority ('-manakai-border-spacing-y');
+    $xi = ' !' . $xi if length $xi;
+    $yi = ' !' . $yi if length $yi;
+    if (defined $x) {
+      if (defined $y) {
+        if ($xi and $yi) {
+          if ($x eq $y) {
+            return {'border-spacing' => $x . $xi};
+          } else {
+            return {'border-spacing' => $x . ' ' . $y . $xi};
+          }
+        } else {
+          return {'-manakai-border-spacing-x' => $x . $xi,
+                  '-manakai-border-spacing-y' => $y . $yi};
+        }
+      } else {
+        return {'-manakai-border-spacing-x' => $x . $xi};
+      }
+    } else {
+      if (defined $y) {
+        return {'-manakai-border-spacing-y' => $y . $yi};
+      } else {
+        return {};
+      }
+    }
+  },
   initial => ['DIMENSION', 0, 'px'],
   inherited => 1,
   compute => $compute_length,
@@ -1366,6 +1399,8 @@ $Prop->{'-manakai-border-spacing-y'} = {
   #allow_negative => 0,
   #keyword => {},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'-manakai-border-spacing-x'}
+      ->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   inherited => 1,
   compute => $compute_length,
@@ -3149,6 +3184,8 @@ $Prop->{'border-spacing'} = {
     pop @v if $v[0] eq $v[1];
     return join ' ', @v;
   },
+  serialize_multiple => $Prop->{'-manakai-border-spacing-x'}
+      ->{serialize_multiple},
 };
 $Attr->{border_spacing} = $Prop->{'border-spacing'};
 
@@ -3589,4 +3626,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/06 02:56:21 $
+## $Date: 2008/01/06 04:30:59 $
