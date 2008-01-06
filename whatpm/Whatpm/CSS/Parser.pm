@@ -1419,7 +1419,8 @@ $Prop->{'margin-top'} = {
     ## 'margin-left', 'top', 'right', 'bottom', 'left', 'padding-top',
     ## 'padding-right', 'padding-bottom', 'padding-left',
     ## 'border-top-width', 'border-right-width', 'border-bottom-width',
-    ## 'border-left-width', and 'text-indent'.
+    ## 'border-left-width', 'text-indent', 'background-position-x',
+    ## and 'background-position-y'.
 
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
@@ -1878,6 +1879,81 @@ $Prop->{'text-indent'} = {
 };
 $Attr->{text_indent} = $Prop->{'text-indent'};
 $Key->{text_indent} = $Prop->{'text-indent'};
+
+$Prop->{'background-position-x'} = {
+  css => 'background-position-x',
+  dom => 'background_position_x',
+  key => 'background_position_x',
+  parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {left => 1, center => 1, right => 1},
+  serialize => $default_serializer,
+  initial => ['PERCENTAGE', 0],
+  #inherited => 0,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    if (defined $specified_value and $specified_value->[0] eq 'KEYWORD') {
+      my $v = {
+        left => 0, center => 50, right => 100, top => 0, bottom => 100,
+      }->{$specified_value->[1]};
+      if (defined $v) {
+        return ['PERCENTAGE', $v];
+      } else {
+        return $specified_value;
+      }
+    } else {
+      return $compute_length->(@_);
+    }
+  },
+  serialize_multiple => sub {
+    my $self = shift;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my $x = $self->background_position_x;
+    my $y = $self->background_position_y;
+    my $xi = $self->get_property_priority ('background-position-x');
+    my $yi = $self->get_property_priority ('background-position-y');
+    $xi = ' !' . $xi if length $xi;
+    $yi = ' !' . $yi if length $yi;
+    if (defined $x) {
+      if (defined $y) {
+        if ($xi eq $yi) {
+          return {'background-position' => $x . ' ' . $y . $xi};
+        } else {
+          return {'background-position-x' => $x . $xi,
+                  'background-position-y' => $y . $yi};
+        }
+      } else {
+        return {'background-position-x' => $x . $xi};
+      }
+    } else {
+      if (defined $y) {
+        return {'background-position-y' => $y . $yi};
+      } else {
+        return {};
+      }
+    }
+  },
+};
+$Attr->{background_position_x} = $Prop->{'background-position-x'};
+$Key->{background_position_x} = $Prop->{'background-position-x'};
+
+$Prop->{'background-position-y'} = {
+  css => 'background-position-y',
+  dom => 'background_position_y',
+  key => 'background_position_y',
+  parse => $Prop->{'margin-top'}->{parse},
+  allow_negative => 1,
+  keyword => {top => 1, center => 1, bottom => 1},
+  serialize => $default_serializer,
+  serialize_multiple => $Prop->{'background-position-x'}->{serialize_multiple},
+  initial => ['PERCENTAGE', 0],
+  #inherited => 0,
+  compute => $Prop->{'background-position-x'}->{compute},
+};
+$Attr->{background_position_y} = $Prop->{'background-position-y'};
+$Key->{background_position_y} = $Prop->{'background-position-y'};
 
 $Prop->{'padding-top'} = {
   css => 'padding-top',
@@ -3189,6 +3265,142 @@ $Prop->{'border-spacing'} = {
 };
 $Attr->{border_spacing} = $Prop->{'border-spacing'};
 
+## NOTE: See <http://suika.fam.cx/gate/2005/sw/background-position> for
+## browser compatibility problems.
+$Prop->{'background-position'} = {
+  css => 'background-position',
+  dom => 'background_position',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my %prop_value;
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit}) {
+        $prop_value{'background-position-x'} = ['DIMENSION', $value, $unit];
+        $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'background-position-x'} = ['PERCENTAGE', $value];
+      $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
+    } elsif ($t->{type} == NUMBER_TOKEN and
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'background-position-x'} = ['DIMENSION', $value, 'px'];
+      $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $prop_value = lc $t->{value}; ## TODO: case folding
+      $t = $tt->get_next_token;
+      if ({left => 1, center => 1, right => 1}->{$prop_value}) {
+        $prop_value{'background-position-x'} = ['KEYWORD', $prop_value];
+        $prop_value{'background-position-y'} = ['KEYWORD', 'center'];
+      } elsif ($prop_value eq 'top' or $prop_value eq 'bottom') {
+        $prop_value{'background-position-y'} = ['KEYWORD', $prop_value];
+
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == IDENT_TOKEN) {
+          my $prop_value = lc $t->{value}; ## TODO: case folding
+          if ({left => 1, center => 1, right => 1}->{$prop_value}) {
+            $prop_value{'background-position-x'} = ['KEYWORD', $prop_value];
+            $t = $tt->get_next_token;
+            return ($t, \%prop_value);
+          }
+        }
+        $prop_value{'background-position-x'} = ['KEYWORD', 'center'];
+        return ($t, \%prop_value);
+      } elsif ($prop_value eq 'inherit') {
+        $prop_value{'background-position-x'} = ['INHERIT'];
+        $prop_value{'background-position-y'} = ['INHERIT'];
+        return ($t, \%prop_value);
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } else {
+      $onerror->(type => 'syntax error:'.$prop_name,
+                 level => $self->{must_level},
+                 token => $t);
+      return ($t, undef);
+    }
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($length_unit->{$unit}) {
+        $prop_value{'background-position-y'} = ['DIMENSION', $value, $unit];
+      } else {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'background-position-y'} = ['PERCENTAGE', $value];
+    } elsif ($t->{type} == NUMBER_TOKEN and $self->{unitless_px}) {
+      my $value = $t->{number} * $sign;
+      $t = $tt->get_next_token;
+      $prop_value{'background-position-y'} = ['DIMENSION', $value, 'px'];
+    } elsif ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ({top => 1, center => 1, bottom => 1}->{$value}) {
+        $prop_value{'background-position-y'} = ['KEYWORD', $value];
+        $t = $tt->get_next_token;
+      }
+    } else {
+      if ($sign < 0) {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+      return ($t, \%prop_value);
+    }
+
+    return ($t, \%prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my $x = $self->background_position_x;
+    my $y = $self->background_position_y;
+    return $x . ' ' . $y if defined $x and defined $y;
+    return undef;
+  },
+  serialize_multiple => $Prop->{'background-position-x'}
+      ->{serialize_multiple},
+};
+$Attr->{background_position} = $Prop->{'background-position'};
+
 $Prop->{'border-width'} = {
   css => 'border-width',
   dom => 'border_width',
@@ -3626,4 +3838,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/06 04:35:18 $
+## $Date: 2008/01/06 10:33:01 $
