@@ -1775,6 +1775,68 @@ $Prop->{widows} = {
 $Attr->{widows} = $Prop->{widows};
 $Key->{widows} = $Prop->{widows};
 
+$Prop->{opacity} = {
+  css => 'opacity',
+  dom => 'opacity',
+  key => 'opacity',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $sign = -1;
+    }
+
+    if ($t->{type} == NUMBER_TOKEN) {
+      ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/opacity> for
+      ## browser compatibility issue.
+      my $value = $t->{number};
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ["NUMBER", $sign * $value]});
+    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      $t = $tt->get_next_token;
+      if ($value eq 'inherit') {
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => 'syntax error:'.$prop_name,
+               level => $self->{must_level},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['NUMBER', 2],
+  inherited => 1,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    if (defined $specified_value) {
+      if ($specified_value->[0] eq 'NUMBER') {
+        if ($specified_value->[1] < 0) {
+          return ['NUMBER', 0];
+        } elsif ($specified_value->[1] > 1) {
+          return ['NUMBER', 1];
+        }
+      }
+    }
+
+    return $specified_value;
+  },
+  serialize_multiple => sub {
+    ## NOTE: This CODE is necessary to avoid two 'opacity' properties
+    ## are outputed in |cssText| (for 'opacity' and for '-moz-opacity').
+    return {opacity => shift->opacity},
+  },
+};
+$Attr->{opacity} = $Prop->{opacity};
+$Key->{opacity} = $Prop->{opacity};
+
+$Prop->{'-moz-opacity'} = $Prop->{opacity};
+$Attr->{MozOpacity} = $Attr->{opacity};
+
 my $length_unit = {
   em => 1, ex => 1, px => 1,
   in => 1, cm => 1, mm => 1, pt => 1, pc => 1,
@@ -5207,4 +5269,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/12 14:29:01 $
+## $Date: 2008/01/12 14:45:47 $
