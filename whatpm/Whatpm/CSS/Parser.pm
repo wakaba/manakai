@@ -263,6 +263,7 @@ sub parse_char_string ($$) {
       if ($t->{type} == IDENT_TOKEN) { # property
         my $prop_name = lc $t->{value}; ## TODO: case folding
         $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
         if ($t->{type} == COLON_TOKEN) {
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
@@ -722,8 +723,12 @@ my $parse_color = sub {
   }
 
   if ($t->{type} == HASH_TOKEN or
-      ($self->{hashless_rgb} and $t->{type} == IDENT_TOKEN)) {
-    my $v = lc $t->{value}; ## TODO: case
+      ($self->{hashless_rgb} and {
+        IDENT_TOKEN, 1,
+        NUMBER_TOKEN, 1,
+        DIMENSION_TOKEN, 1,
+      }->{$t->{type}})) {
+    my $v = lc (defined $t->{number} ? $t->{number} : '' . $t->{value}); ## TODO: case
     if ($v =~ /\A([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})\z/) {
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ['RGBA', hex $1, hex $2, hex $3, 1]});
@@ -959,6 +964,69 @@ $Prop->{'border-top-color'} = {
   key => 'border_top_color',
   parse => $parse_color,
   serialize => $default_serializer,
+  serialize_multiple => sub {
+    my $self = shift;
+    ## NOTE: This algorithm returns the same result as that of Firefox 2
+    ## in many case, but not always.
+    my $r = {
+      'border-top-color' => $self->border_top_color,
+      'border-top-style' => $self->border_top_style,
+      'border-top-width' => $self->border_top_width,
+      'border-right-color' => $self->border_right_color,
+      'border-right-style' => $self->border_right_style,
+      'border-right-width' => $self->border_right_width,
+      'border-bottom-color' => $self->border_bottom_color,
+      'border-bottom-style' => $self->border_bottom_style,
+      'border-bottom-width' => $self->border_bottom_width,
+      'border-left-color' => $self->border_left_color,
+      'border-left-style' => $self->border_left_style,
+      'border-left-width' => $self->border_left_width,
+    };
+    my $i = 0;
+    for my $prop (qw/border-top border-right border-bottom border-left/) {
+      if (defined $r->{$prop.'-color'} and
+          defined $r->{$prop.'-style'} and
+          defined $r->{$prop.'-width'}) {
+        $r->{$prop} = $r->{$prop.'-width'} . ' ' .
+              $r->{$prop.'-style'} . ' ' .
+              $r->{$prop.'-color'};
+        delete $r->{$prop.'-width'};
+        delete $r->{$prop.'-style'};
+        delete $r->{$prop.'-color'};
+        $i++;
+      }
+    }
+    if ($i == 4 and $r->{'border-top'} eq $r->{'border-right'} and
+        $r->{'border-right'} eq $r->{'border-bottom'} and
+        $r->{'border-bottom'} eq $r->{'border-left'}) {
+      return {border => $r->{'border-top'}};
+    }
+
+    unless ($i) {
+      for my $prop (qw/color style width/) {
+        if (defined $r->{'border-top-'.$prop} and
+            defined $r->{'border-bottom-'.$prop} and
+            defined $r->{'border-right-'.$prop} and
+            defined $r->{'border-left-'.$prop}) {
+          my @v = ($r->{'border-top-'.$prop},
+                   $r->{'border-right-'.$prop},
+                   $r->{'border-bottom-'.$prop},
+                   $r->{'border-left-'.$prop});
+          pop @v if $r->{'border-right-'.$prop} eq $r->{'border-left-'.$prop};
+          pop @v if $r->{'border-bottom-'.$prop} eq $r->{'border-top-'.$prop};
+          pop @v if $r->{'border-right-'.$prop} eq $r->{'border-top-'.$prop};
+          $r->{'border-'.$prop} = join ' ', @v;
+          delete $r->{'border-top-'.$prop};
+          delete $r->{'border-bottom-'.$prop};
+          delete $r->{'border-right-'.$prop};
+          delete $r->{'border-left-'.$prop};
+        }
+      }
+    }
+
+    delete $r->{$_} for grep {not defined $r->{$_}} keys %$r;
+    return $r;
+  },
   initial => ['KEYWORD', 'currentcolor'],
   #inherited => 0,
   compute => $Prop->{color}->{compute},
@@ -972,12 +1040,13 @@ $Prop->{'border-right-color'} = {
   key => 'border_right_color',
   parse => $parse_color,
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'currentcolor'],
   #inherited => 0,
   compute => $Prop->{color}->{compute},
 };
-$Attr->{border_right} = $Prop->{'border-right-color'};
-$Key->{border_right} = $Prop->{'border-right-color'};
+$Attr->{border_right_color} = $Prop->{'border-right-color'};
+$Key->{border_right_color} = $Prop->{'border-right-color'};
 
 $Prop->{'border-bottom-color'} = {
   css => 'border-bottom-color',
@@ -985,6 +1054,7 @@ $Prop->{'border-bottom-color'} = {
   key => 'border_bottom_color',
   parse => $parse_color,
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'currentcolor'],
   #inherited => 0,
   compute => $Prop->{color}->{compute},
@@ -998,6 +1068,7 @@ $Prop->{'border-left-color'} = {
   key => 'border_left_color',
   parse => $parse_color,
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'currentcolor'],
   #inherited => 0,
   compute => $Prop->{color}->{compute},
@@ -1011,6 +1082,21 @@ $Prop->{'outline-color'} = {
   key => 'outline_color',
   parse => $parse_color,
   serialize => $default_serializer,
+  serialize_multiple => sub {
+    my $self = shift;
+    my $oc = $self->outline_color;
+    my $os = $self->outline_style;
+    my $ow = $self->outline_width;
+    my $r = {};
+    if (defined $oc and defined $os and defined $ow) {
+      $r->{outline} = $ow . ' ' . $os . ' ' . $oc;
+    } else {
+      $r->{'outline-color'} = $oc if defined $oc;
+      $r->{'outline-style'} = $os if defined $os;
+      $r->{'outline-width'} = $ow if defined $ow;
+    }
+    return $r;
+  },
   initial => ['KEYWORD', '-manakai-invert-or-currentcolor'],
   #inherited => 0,
   compute => $Prop->{color}->{compute},
@@ -1958,12 +2044,15 @@ $Prop->{'margin-top'} = {
           if $allow_negative or $value >= 0;
     } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($Prop->{$prop_name}->{keyword}->{$value}) {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['KEYWORD', $value]});        
       } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['INHERIT']});
       }
+      ## NOTE: In the "else" case, don't procede the |$t| pointer
+      ## for the support of 'border-top' property (and similar ones).
     }
     
     $onerror->(type => 'syntax error:'.$prop_name,
@@ -2532,6 +2621,7 @@ $Prop->{'border-top-width'} = {
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
   compute => sub {
@@ -2575,6 +2665,7 @@ $Prop->{'border-right-width'} = {
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
   compute => $Prop->{'border-top-width'}->{compute},
@@ -2590,6 +2681,7 @@ $Prop->{'border-bottom-width'} = {
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
   compute => $Prop->{'border-top-width'}->{compute},
@@ -2605,6 +2697,7 @@ $Prop->{'border-left-width'} = {
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
   compute => $Prop->{'border-top-width'}->{compute},
@@ -2620,6 +2713,7 @@ $Prop->{'outline-width'} = {
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'outline-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
   compute => $Prop->{'border-top-width'}->{compute},
@@ -2790,6 +2884,7 @@ $Prop->{'border-top-style'} = {
   key => 'border_top_style',
   parse => $one_keyword_parser,
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
@@ -2804,6 +2899,7 @@ $Prop->{'border-right-style'} = {
   key => 'border_right_style',
   parse => $one_keyword_parser,
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
@@ -2818,6 +2914,7 @@ $Prop->{'border-bottom-style'} = {
   key => 'border_bottom_style',
   parse => $one_keyword_parser,
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
@@ -2832,6 +2929,7 @@ $Prop->{'border-left-style'} = {
   key => 'border_left_style',
   parse => $one_keyword_parser,
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
@@ -2846,6 +2944,7 @@ $Prop->{'outline-style'} = {
   key => 'outline_style',
   parse => $one_keyword_parser,
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'outline-color'}->{serialize_multiple},
   keyword => {%$border_style_keyword},
   initial => ['KEYWORD', 'none'],
   #inherited => 0,
@@ -3170,8 +3269,314 @@ $Prop->{'border-style'} = {
     pop @v if $v[0] eq $v[1];
     return join ' ', @v;
   },
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
 };
 $Attr->{border_style} = $Prop->{'border-style'};
+
+$Prop->{'border-color'} = {
+  css => 'border-color',
+  dom => 'border_color',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my %prop_value;
+    ($t, my $pv) = $parse_color->($self, 'border-color', $tt, $t, $onerror);
+    if (not defined $pv) {
+      return ($t, undef);
+    }
+    $prop_value{'border-top-color'} = $pv->{'border-color'};
+    $prop_value{'border-bottom-color'} = $prop_value{'border-top-color'};
+    $prop_value{'border-right-color'} = $prop_value{'border-top-color'};
+    $prop_value{'border-left-color'}= $prop_value{'border-right-color'};
+    if ($prop_value{'border-top-color'}->[0] eq 'INHERIT') {
+      return ($t, \%prop_value);
+    }
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    if ({
+         IDENT_TOKEN, 1,
+         HASH_TOKEN, 1, NUMBER_TOKEN, 1, DIMENSION_TOKEN, 1,
+         FUNCTION_TOKEN, 1,
+        }->{$t->{type}}) {
+      ($t, $pv) = $parse_color->($self, 'border-color', $tt, $t, $onerror);
+      if (not defined $pv) {
+        return ($t, undef);
+      } elsif ($pv->{'border-color'}->[0] eq 'INHERIT') {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+      $prop_value{'border-right-color'} = $pv->{'border-color'};
+      $prop_value{'border-left-color'}= $prop_value{'border-right-color'};
+
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      if ({
+           IDENT_TOKEN, 1,
+           HASH_TOKEN, 1, NUMBER_TOKEN, 1, DIMENSION_TOKEN, 1,
+           FUNCTION_TOKEN, 1,
+          }->{$t->{type}}) {
+        ($t, $pv) = $parse_color->($self, 'border-color', $tt, $t, $onerror);
+        if (not defined $pv) {
+          return ($t, undef);
+        } elsif ($pv->{'border-color'}->[0] eq 'INHERIT') {
+          $onerror->(type => 'syntax error:'.$prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+          return ($t, undef);
+        }
+        $prop_value{'border-bottom-color'} = $pv->{'border-color'};
+
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ({
+             IDENT_TOKEN, 1,
+             HASH_TOKEN, 1, NUMBER_TOKEN, 1, DIMENSION_TOKEN, 1,
+             FUNCTION_TOKEN, 1,
+            }->{$t->{type}}) {
+          ($t, $pv) = $parse_color->($self, 'border-color', $tt, $t, $onerror);
+          if (not defined $pv) {
+            return ($t, undef);
+          } elsif ($pv->{'border-color'}->[0] eq 'INHERIT') {
+            $onerror->(type => 'syntax error:'.$prop_name,
+                       level => $self->{must_level},
+                       token => $t);
+            return ($t, undef);
+          }
+          $prop_value{'border-left-color'} = $pv->{'border-color'};
+        }
+      }
+    }
+    
+    return ($t, \%prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my @v;
+    push @v, $self->border_top_color;
+    return undef unless defined $v[-1];
+    push @v, $self->border_right_color;
+    return undef unless defined $v[-1];
+    push @v, $self->border_bottom_color;
+    return undef unless defined $v[-1];
+    push @v, $self->border_left_color;
+    return undef unless defined $v[-1];
+
+    pop @v if $v[1] eq $v[3];
+    pop @v if $v[0] eq $v[2];
+    pop @v if $v[0] eq $v[1];
+    return join ' ', @v;
+  },
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
+};
+$Attr->{border_color} = $Prop->{'border-color'};
+
+$Prop->{'border-top'} = {
+  css => 'border-top',
+  dom => 'border_top',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my %prop_value;
+    my $pv;
+    ## NOTE: Since $onerror is disabled for three invocations below,
+    ## some informative warning messages (if they are added someday) will not
+    ## be reported.
+    ($t, $pv) = $parse_color->($self, $prop_name.'-color', $tt, $t, sub {});
+    if (defined $pv) {
+      if ($pv->{$prop_name.'-color'}->[0] eq 'INHERIT') {
+        return ($t, {$prop_name.'-color' => ['INHERIT'],
+                     $prop_name.'-style' => ['INHERIT'],
+                     $prop_name.'-width' => ['INHERIT']});
+      } else {
+        $prop_value{$prop_name.'-color'} = $pv->{$prop_name.'-color'};
+      }
+    } else {
+      ($t, $pv) = $Prop->{'border-top-width'}->{parse}
+          ->($self, $prop_name.'-width', $tt, $t, sub {});
+      if (defined $pv) {
+        $prop_value{$prop_name.'-width'} = $pv->{$prop_name.'-width'};
+      } else {
+        ($t, $pv) = $Prop->{'border-top-style'}->{parse}
+            ->($self, $prop_name.'-style', $tt, $t, sub {});
+        if (defined $pv) {
+          $prop_value{$prop_name.'-style'} = $pv->{$prop_name.'-style'};
+        } else {
+          $onerror->(type => 'syntax error:'.$prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+          return ($t, undef);
+        }
+      }
+    }
+
+    for (1..2) {
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      if ($t->{type} == IDENT_TOKEN) {
+        my $prop_value = lc $t->{value}; ## TODO: case
+        if ($border_style_keyword->{$prop_value} and
+            $self->{prop_value}->{'border-top-style'}->{$prop_value} and
+            not defined $prop_value{$prop_name.'-style'}) {
+          $prop_value{$prop_name.'-style'} = ['KEYWORD', $prop_value];
+          $t = $tt->get_next_token;
+          next;
+        } elsif ({thin => 1, medium => 1, thick => 1}->{$prop_value} and
+                 not defined $prop_value{$prop_name.'-width'}) {
+          $prop_value{$prop_name.'-width'} = ['KEYWORD', $prop_value];
+          $t = $tt->get_next_token;
+          next;
+        }
+      }
+
+      undef $pv;
+      ($t, $pv) = $parse_color->($self, $prop_name.'-color', $tt, $t, $onerror)
+          if not defined $prop_value{$prop_name.'-color'} and
+              {
+                IDENT_TOKEN, 1,
+                HASH_TOKEN, 1, NUMBER_TOKEN, 1, DIMENSION_TOKEN, 1,
+                FUNCTION_TOKEN, 1,
+              }->{$t->{type}};
+      if (defined $pv) {
+        if ($pv->{$prop_name.'-color'}->[0] eq 'INHERIT') {
+          $onerror->(type => 'syntax error:'.$prop_name,
+                     level => $self->{must_level},
+                     token => $t);
+        } else {
+          $prop_value{$prop_name.'-color'} = $pv->{$prop_name.'-color'};
+        }
+      } else {
+        undef $pv;
+        ($t, $pv) = $Prop->{'border-top-width'}->{parse}
+            ->($self, $prop_name.'-width',
+               $tt, $t, $onerror)
+            if not defined $prop_value{$prop_name.'-width'} and
+                {
+                  DIMENSION_TOKEN, 1,
+                  NUMBER_TOKEN, 1,
+                  IDENT_TOKEN, 1,
+                  MINUS_TOKEN, 1,
+                }->{$t->{type}};
+        if (defined $pv) {
+          if ($pv->{$prop_name.'-width'}->[0] eq 'INHERIT') {
+            $onerror->(type => 'syntax error:'.$prop_name,
+                       level => $self->{must_level},
+                       token => $t);
+          } else {
+            $prop_value{$prop_name.'-width'} = $pv->{$prop_name.'-width'};
+          }
+        } else {
+          last;
+        }
+      }    
+    }
+
+    $prop_value{$prop_name.'-color'}
+        ||= $Prop->{$prop_name.'-color'}->{initial};
+    $prop_value{$prop_name.'-width'}
+        ||= $Prop->{$prop_name.'-width'}->{initial};
+    $prop_value{$prop_name.'-style'}
+        ||= $Prop->{$prop_name.'-style'}->{initial};
+    
+    return ($t, \%prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my $width_prop = $prop_name . '_width';  $width_prop =~ tr/-/_/;
+    my $width_value = $self->$width_prop;
+    return undef unless defined $width_value;
+    my $style_prop = $prop_name . '_style';  $style_prop =~ tr/-/_/;
+    my $style_value = $self->$style_prop;
+    return undef unless defined $style_value;
+    my $color_prop = $prop_name . '_color';  $color_prop =~ tr/-/_/;
+    my $color_value = $self->$color_prop;
+    return undef unless defined $color_value;
+
+    return $width_value . ' ' . $style_value . ' ' . $color_value;
+  },
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
+};
+$Attr->{border_top} = $Prop->{'border-top'};
+
+$Prop->{'border-right'} = {
+  css => 'border-right',
+  dom => 'border_right',
+  parse => $Prop->{'border-top'}->{parse},
+  serialize => $Prop->{'border-top'}->{serialize},
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
+};
+$Attr->{border_right} = $Prop->{'border-right'};
+
+$Prop->{'border-bottom'} = {
+  css => 'border-bottom',
+  dom => 'border_bottom',
+  parse => $Prop->{'border-top'}->{parse},
+  serialize => $Prop->{'border-top'}->{serialize},
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
+};
+$Attr->{border_bottom} = $Prop->{'border-bottom'};
+
+$Prop->{'border-left'} = {
+  css => 'border-left',
+  dom => 'border_left',
+  parse => $Prop->{'border-top'}->{parse},
+  serialize => $Prop->{'border-top'}->{serialize},
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
+};
+$Attr->{border_left} = $Prop->{'border-left'};
+
+$Prop->{outline} = {
+  css => 'outline',
+  dom => 'outline',
+  parse => $Prop->{'border-top'}->{parse},
+  serialize => $Prop->{'border-top'}->{serialize},
+  serialize_multiple => $Prop->{'outline-color'}->{serialize_multiple},
+};
+$Attr->{outline} = $Prop->{outline};
+
+$Prop->{border} = {
+  css => 'border',
+  dom => 'border',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+    my $prop_value;
+    ($t, $prop_value) = $Prop->{'border-top'}->{parse}
+        ->($self, 'border-top', $tt, $t, $onerror);
+    return ($t, undef) unless defined $prop_value;
+    
+    for (qw/border-right border-bottom border-left/) {
+      $prop_value->{$_.'-color'} = $prop_value->{'border-top-color'}
+          if defined $prop_value->{'border-top-color'};
+      $prop_value->{$_.'-style'} = $prop_value->{'border-top-style'}
+          if defined $prop_value->{'border-top-style'};
+      $prop_value->{$_.'-width'} = $prop_value->{'border-top-width'}
+          if defined $prop_value->{'border-top-width'};
+    }
+    return ($t, $prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my $bt = $self->border_top;
+    return undef unless defined $bt;
+    my $br = $self->border_right;
+    return undef unless defined $br;
+    return undef unless $bt eq $br;
+    my $bb = $self->border_bottom;
+    return undef unless defined $bb;
+    return undef unless $bt eq $bb;
+    my $bl = $self->border_left;
+    return undef unless defined $bl;
+    return undef unless $bt eq $bl;
+
+    return $bt;
+  },
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
+};
+$Attr->{border} = $Prop->{border};
 
 $Prop->{margin} = {
   css => 'margin',
@@ -4134,6 +4539,7 @@ $Prop->{'border-width'} = {
     pop @v if $v[0] eq $v[1];
     return join ' ', @v;
   },
+  serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
 };
 $Attr->{border_width} = $Prop->{'border-width'};
 
@@ -4347,4 +4753,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/06 14:15:36 $
+## $Date: 2008/01/12 07:20:22 $
