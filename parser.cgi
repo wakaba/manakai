@@ -38,12 +38,13 @@ if ($mode eq '/csstext') {
   $p->{prop}->{$_} = 1 for qw/
     background-attachment background-color background-image
     background-position background-position-x background-position-y
-    background-repeat border-bottom-color
-    border-bottom-style border-bottom-width border-collapse border-left-color
-    border-left-style border-left-width border-right-color border-right-style
-    border-right-width
+    background-repeat border border-bottom border-bottom-color
+    border-bottom-style border-bottom-width border-collapse border-color
+    border-left border-left-color
+    border-left-style border-left-width border-right border-right-color
+    border-right-style border-right-width
     border-spacing -manakai-border-spacing-x -manakai-border-spacing-y
-    border-style border-top-color border-top-style border-top-width
+    border-style border-top border-top-color border-top-style border-top-width
     border-width bottom
     caption-side clear color cursor direction display empty-cells float
     font-family font-size font-style font-variant font-weight height left
@@ -51,7 +52,7 @@ if ($mode eq '/csstext') {
     list-style list-style-image list-style-position list-style-type
     margin margin-bottom margin-left margin-right margin-top
     max-height max-width min-height min-width
-    orphans outline-color outline-style outline-width overflow
+    orphans outline outline-color outline-style outline-width overflow
     padding padding-bottom padding-left padding-right padding-top
     page-break-after page-break-before page-break-inside
     position right table-layout
@@ -142,7 +143,7 @@ if ($mode eq '/csstext') {
   }
   for my $prop (qw/color background-color
                    border-bottom-color border-left-color border-right-color
-                   border-top-color/) {
+                   border-top-color border-color/) {
     $p->{prop_value}->{$prop}->{transparent} = 1;
     $p->{prop_value}->{$prop}->{flavor} = 1;
     $p->{prop_value}->{$prop}->{'-manakai-default'} = 1;
@@ -303,4 +304,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/06 14:12:41 $
+## $Date: 2008/01/12 07:20:58 $
