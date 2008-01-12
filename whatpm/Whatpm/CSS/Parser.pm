@@ -25,6 +25,13 @@ sub new ($) {
     return $value;
   };
 
+  ## System dependent font expander
+  $self->{get_system_font} = sub {
+    #my ($self, $normalized_system_font_name, $font_properties) = @_;
+    ## Modify $font_properties hash (except for 'font-family' property).
+    return $_[2];
+  };
+
   return $self;
 } # new
 
@@ -697,6 +704,9 @@ my $parse_color = sub {
     my $value = lc $t->{value}; ## TODO: case
     if ($x11_colors->{$value} or
         $system_colors->{$value}) {
+      ## NOTE: "For systems that do not have a corresponding value, the
+      ## specified value should be mapped to the nearest system value, or to
+      ## a default color." [CSS 2.1].
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ['KEYWORD', $value]});
     } elsif ({
@@ -2997,6 +3007,21 @@ $Attr->{outline_style} = $Prop->{'outline-style'};
 $Key->{outline_style} = $Prop->{'outline-style'};
 delete $Prop->{'outline-style'}->{keyword}->{hidden};
 
+my $generic_font_keywords => {
+  serif => 1, 'sans-serif' => 1, cursive => 1,
+  fantasy => 1, monospace => 1, '-manakai-default' => 1,
+  '-manakai-caption' => 1, '-manakai-icon' => 1,
+  '-manakai-menu' => 1, '-manakai-message-box' => 1, 
+  '-manakai-small-caption' => 1, '-manakai-status-bar' => 1,
+};
+## NOTE: "All five generic font families are defined to exist in all CSS
+## implementations (they need not necessarily map to five distinct actual
+## fonts)." [CSS 2.1].
+## NOTE: "If no font with the indicated characteristics exists on a given
+## platform, the user agent should either intelligently substitute (e.g., a
+## smaller version of the 'caption' font might be used for the 'small-caption'
+## font), or substitute a user agent default font." [CSS 2.1].
+
 $Prop->{'font-family'} = {
   css => 'font-family',
   dom => 'font_family',
@@ -3011,7 +3036,7 @@ $Prop->{'font-family'} = {
 
     my $font_name = '';
     my $may_be_generic = 1;
-    my $may_be_inherit = 1;
+    my $may_be_inherit = ($prop_name ne 'font');
     my $has_s = 0;
     F: {
       if ($t->{type} == IDENT_TOKEN) {
@@ -3028,12 +3053,8 @@ $Prop->{'font-family'} = {
         undef $may_be_generic;
         undef $has_s;
         $t = $tt->get_next_token;
-      } elsif ($t->{type} == COMMA_TOKEN) {
-        if ($may_be_generic and
-            {
-              serif => 1, 'sans-serif' => 1, cursive => 1,
-              fantasy => 1, monospace => 1, '-manakai-default' => 1,
-            }->{lc $font_name}) { ## TODO: case
+      } elsif ($t->{type} == COMMA_TOKEN) { ## TODO: case
+        if ($may_be_generic and $generic_font_keywords->{lc $font_name}) {
           push @prop_value, ['KEYWORD', $font_name];
         } elsif (not $may_be_generic or length $font_name) {
           push @prop_value, ["STRING", $font_name];
@@ -3048,12 +3069,8 @@ $Prop->{'font-family'} = {
         $has_s = 1;
         $t = $tt->get_next_token;
       } else {
-        if ($may_be_generic and
-            {
-              serif => 1, 'sans-serif' => 1, cursive => 1,
-              fantasy => 1, monospace => 1, '-manakai-default' => 1,
-            }->{lc $font_name}) { ## TODO: case
-          push @prop_value, ['KEYWORD', $font_name];
+        if ($may_be_generic and $generic_font_keywords->{lc $font_name}) {
+          push @prop_value, ['KEYWORD', $font_name]; ## TODO: case
         } elsif (not $may_be_generic or length $font_name) {
           push @prop_value, ['STRING', $font_name];
         } else {
@@ -4603,6 +4620,155 @@ $Prop->{background} = {
 };
 $Attr->{background} = $Prop->{background};
 
+$Prop->{font} = {
+  css => 'font',
+  dom => 'font',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my %prop_value;
+
+    A: for (1..3) {
+      if ($t->{type} == IDENT_TOKEN) {
+        my $value = lc $t->{value}; ## TODO: case
+        if ($value eq 'normal') {
+          $t = $tt->get_next_token;
+        } elsif ($Prop->{'font-style'}->{keyword}->{$value} and
+                 $self->{prop_value}->{'font-style'}->{$value} and
+                 not defined $prop_value{'font-style'}) {
+          $prop_value{'font-style'} = ['KEYWORD', $value];
+          $t = $tt->get_next_token;
+        } elsif ($Prop->{'font-variant'}->{keyword}->{$value} and
+                 $self->{prop_value}->{'font-variant'}->{$value} and
+                 not defined $prop_value{'font-variant'}) {
+          $prop_value{'font-variant'} = ['KEYWORD', $value];
+          $t = $tt->get_next_token;
+        } elsif ({normal => 1, bold => 1,
+                  bolder => 1, lighter => 1}->{$value} and
+                 not defined $prop_value{'font-weight'}) {
+          $prop_value{'font-weight'} = ['KEYWORD', $value];
+          $t = $tt->get_next_token;
+        } elsif ($value eq 'inherit' and 0 == keys %prop_value) {
+          $t = $tt->get_next_token;
+          return ($t, {'font-style' => ['INHERIT'],
+                       'font-variant' => ['INHERIT'],
+                       'font-weight' => ['INHERIT'],
+                       'font-size' => ['INHERIT'],
+                       'line-height' => ['INHERIT'],
+                       'font-family' => ['INHERIT']});
+        } elsif ({
+                  caption => 1, icon => 1, menu => 1, 
+                  'message-box' => 1, 'small-caption' => 1, 'status-bar' => 1,
+                 }->{$value} and 0 == keys %prop_value) {
+          $t = $tt->get_next_token;
+          return ($t, $self->{get_system_font}->($self, $value, {
+            'font-style' => $Prop->{'font-style'}->{initial},
+            'font-variant' => $Prop->{'font-variant'}->{initial},
+            'font-weight' => $Prop->{'font-weight'}->{initial},
+            'font-size' => $Prop->{'font-size'}->{initial},
+            'line-height' => $Prop->{'line-height'}->{initial},
+            'font-family' => ['FONT', ['KEYWORD', '-manakai-'.$value]],
+          }));
+        } else {
+          if (keys %prop_value) {
+            last A;
+          } else {
+            $onerror->(type => 'syntax error:'.$prop_name,
+                       level => $self->{must_level},
+                       token => $t);
+            return ($t, undef);
+          }
+        }
+      } elsif ($t->{type} == NUMBER_TOKEN) {
+        if ({100 => 1, 200 => 1, 300 => 1, 400 => 1, 500 => 1,
+             600 => 1, 700 => 1, 800 => 1, 900 => 1}->{$t->{value}}) {
+          $prop_value{'font-weight'} = ['NUMBER', $t->{value}];
+          $t = $tt->get_next_token;
+        } else {
+          last A;
+        }
+      }
+
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    } # A
+    
+    for (qw/font-style font-variant font-weight/) {
+      $prop_value{$_} = $Prop->{$_}->{initial} unless defined $prop_value{$_};
+    }
+      
+    ($t, my $pv) = $Prop->{'font-size'}->{parse}
+        ->($self, 'font', $tt, $t, $onerror);
+    return ($t, undef) unless defined $pv;
+    if ($pv->{font}->[0] eq 'INHERIT') {
+      $onerror->(type => 'syntax error:'.$prop_name,
+                 level => $self->{must_level},
+                 token => $t);
+      return ($t, undef);
+    }
+    $prop_value{'font-size'} = $pv->{font};
+
+    $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    if ($t->{type} == DELIM_TOKEN and $t->{value} eq '/') {
+      $t = $tt->get_next_token;
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      ($t, my $pv) = $Prop->{'line-height'}->{parse}
+          ->($self, 'font', $tt, $t, $onerror);
+      return ($t, undef) unless defined $pv;
+      if ($pv->{font}->[0] eq 'INHERIT') {
+        $onerror->(type => 'syntax error:'.$prop_name,
+                   level => $self->{must_level},
+                   token => $t);
+        return ($t, undef);
+      }
+      $prop_value{'line-height'} = $pv->{font};
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    } else {
+      $prop_value{'line-height'} = $Prop->{'line-height'}->{initial};
+    }
+
+    undef $pv;
+    ($t, $pv) = $Prop->{'font-family'}->{parse}
+        ->($self, 'font', $tt, $t, $onerror);
+    return ($t, undef) unless defined $pv;
+    $prop_value{'font-family'} = $pv->{font};
+
+    return ($t, \%prop_value);
+  },
+  serialize => sub {
+    my ($self, $prop_name, $value) = @_;
+    
+    local $Error::Depth = $Error::Depth + 1;
+    my $style = $self->font_style;
+    my $i = $self->get_property_priority ('font-style');
+    return undef unless defined $style;
+    my $variant = $self->font_variant;
+    return undef unless defined $variant;
+    return undef if $i ne $self->get_property_priority ('font-variant');
+    my $weight = $self->font_weight;
+    return undef unless defined $weight;
+    return undef if $i ne $self->get_property_priority ('font-weight');
+    my $size = $self->font_size;
+    return undef unless defined $size;
+    return undef if $i ne $self->get_property_priority ('font-size');
+    my $height = $self->line_height;
+    return undef unless defined $height;
+    return undef if $i ne $self->get_property_priority ('line-height');
+    my $family = $self->font_family;
+    return undef unless defined $family;
+    return undef if $i ne $self->get_property_priority ('font-family');
+    
+    my @v;
+    push @v, $style unless $style eq 'normal';
+    push @v, $variant unless $variant eq 'normal';
+    push @v, $weight unless $weight eq 'normal';
+    push @v, $size.($height eq 'normal' ? '' : '/'.$height);
+    push @v, $family;
+    push @v, '!'.$i if length $i;
+    return join ' ', @v;
+  },
+};
+$Attr->{font} = $Prop->{font};
+
 $Prop->{'border-width'} = {
   css => 'border-width',
   dom => 'border_width',
@@ -5041,4 +5207,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/12 10:40:58 $
+## $Date: 2008/01/12 14:29:01 $
