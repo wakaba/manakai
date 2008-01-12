@@ -46,7 +46,7 @@ if ($mode eq '/csstext') {
     border-spacing -manakai-border-spacing-x -manakai-border-spacing-y
     border-style border-top border-top-color border-top-style border-top-width
     border-width bottom
-    caption-side clear color cursor direction display empty-cells float
+    caption-side clear color cursor direction display empty-cells float font
     font-family font-size font-style font-variant font-weight height left
     letter-spacing line-height
     list-style list-style-image list-style-position list-style-type
@@ -304,4 +304,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/12 10:40:53 $
+## $Date: 2008/01/12 14:28:21 $
