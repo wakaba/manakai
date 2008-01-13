@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -39,6 +39,7 @@ sub AUTOLOAD {
 
   if ({
     ## Read-only attributes (trivial accessors)
+    default_view => 1,
     implementation => 1,
   }->{$method_name}) {
     no strict 'refs';
@@ -1084,6 +1085,10 @@ sub manakai_create_serial_walker ($$;$$$);
 
 sub create_tree_walker ($$;$$$);
 
+## |DocumentView| attribute
+
+sub default_view ($);
+
 ## |HTMLDocument| attributes
 
 sub compat_mode ($) {
@@ -1240,4 +1245,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/12/31 13:46:25 $
+## $Date: 2008/01/13 06:37:46 $

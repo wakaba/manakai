@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration';
 
 sub ____new ($) {
@@ -28,6 +28,7 @@ sub AUTOLOAD {
         return undef;
       }
       ## TODO: null? ""? ... if not set?
+      ## ISSUE: If one of shorthand component properties is !important?
     };
     goto &{ $AUTOLOAD };
   } else {
@@ -184,4 +185,4 @@ sub get_property_priority ($$) {
 package Message::IF::CSSStyleDeclaration;
 
 1;
-## $Date: 2008/01/06 04:32:56 $
+## $Date: 2008/01/13 06:37:44 $

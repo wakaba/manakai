@@ -2,9 +2,10 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
-    'Message::IF::ElementSelector'; # MUST in Selectors API spec.
+    'Message::IF::ElementSelector', # MUST in Selectors API spec.
+    'Message::IF::ElementCSSInlineStyle';
 require Message::DOM::Document;
 
 sub ____new ($$$$$) {
@@ -827,8 +828,28 @@ sub set_id_attribute_node ($$$$) {
   return;
 } # set_id_attribute_node
 
+## |ElementCSSInlineStyle| attributes
+
+sub current_style ($) {
+  ## TODO: If not part of document tree
+
+  ## ISSUE: Neither |getComputedStyle| nor |currentStyle| represent
+  ## the set of computed values in the real world (in fact what is
+  ## represented by them disagree in browsers and even |getComputedStyle|
+  ## and |currentStyle| are different in the same Opera browser).
+  
+  my $self = shift;
+  my $view = $self->owner_document->default_view;
+  return undef unless defined $view;  ## ISSUE: Not defined in the spec yet.
+  
+  return $view->get_computed_style ($self);
+} # current_style
+
+## TODO: |style|, |runtimeStyle|
+
 package Message::IF::Element;
 package Message::IF::ElementSelector;
+package Message::IF::ElementCSSInlineStyle;
 
 package Message::DOM::Document;
 
@@ -1264,4 +1285,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/11/11 04:23:32 $
+## $Date: 2008/01/13 06:37:47 $
