@@ -161,6 +161,13 @@ if ($mode eq '/csstext') {
     after before first-letter first-line
   /;
 
+  my $css_options = {
+    prop => $p->{prop},
+    prop_value => $p->{prop_value},
+    pseudo_class => $p->{pseudo_class},
+    pseudo_element => $p->{pseudo_element},
+  };
+
   $p->{href} = 'thismessage:/';
 
   my $ss = $p->parse_char_string ($s);
@@ -172,27 +179,22 @@ if ($mode eq '/csstext') {
   ## NOTE: Codes below are for debugging of Cascade module.
   require Message::DOM::DOMImplementation;
   my $dom = Message::DOM::DOMImplementation->new;
+
   my $doc = $dom->create_document;
   $doc->manakai_is_html (1);
   $doc->inner_html (q[<p>xxxx</p><div>yyyy</div>]);
 
-  require Whatpm::CSS::Cascade;
-  my $cas = Whatpm::CSS::Cascade->new ($doc);
-  $cas->{has_invert} = $p->{prop_value}->{'outline-color'}->{invert};
-  $cas->add_style_sheets ([$ss]);
-  $cas->___associate_rules;
-
-#  use Data::Dumper;
-#  print (Dumper $cas);
+  require Message::DOM::Window;
+  my $window = Message::DOM::Window->___new ($dom);
+  $window->___set_css_options ($css_options);
+  $window->set_document ($doc);
+  $window->___set_user_style_sheets ([$ss]);
 
   my $p = $doc->get_elements_by_tag_name ('p')->[0];
 
-  require Message::DOM::CSSStyleDeclaration;
-  my $cd = Message::DOM::CSSComputedStyleDeclaration->____new ($cas, $p);
-  print "#...\n";
+  print "#computed\n";
+  my $cd = $p->current_style;
   print $cd->css_text;
-
-
 } elsif ($mode eq '/tokens') {
   require Encode;
   require Whatpm::CSS::Tokenizer;
@@ -304,4 +306,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/12 14:45:50 $
+## $Date: 2008/01/13 06:38:44 $
