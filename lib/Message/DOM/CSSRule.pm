@@ -1,6 +1,6 @@
 package Message::DOM::CSSRule;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSRule';
 require Scalar::Util;
 
@@ -77,7 +77,7 @@ sub selector_text ($;$) {
   ## has no namespace prefix declared.
   my $self = $_[0];
   require Whatpm::CSS::SelectorsSerializer;
-  return Whatpm::CSS::SelectorsSerializer->serialize_test
+  return Whatpm::CSS::SelectorsSerializer->serialize_selector_text
       ($$self->{_selectors}, sub {
         ## TODO: We should have some caching mechanism, otherwise
         ## too many computation for complex selectors in long style sheet.
@@ -265,4 +265,4 @@ package Message::IF::CSSFontFaceRule;
 package Message::IF::CSSPageRule;
 
 1;
-## $Date: 2007/12/23 15:45:49 $
+## $Date: 2008/01/14 03:55:23 $
