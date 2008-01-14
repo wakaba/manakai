@@ -187,8 +187,8 @@ if ($mode eq '/csstext') {
   require Message::DOM::Window;
   my $window = Message::DOM::Window->___new ($dom);
   $window->___set_css_options ($css_options);
-  $window->set_document ($doc);
   $window->___set_user_style_sheets ([$ss]);
+  $window->set_document ($doc);
 
   my $p = $doc->get_elements_by_tag_name ('p')->[0];
 
@@ -309,4 +309,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/14 05:54:40 $
+## $Date: 2008/01/14 11:34:22 $
