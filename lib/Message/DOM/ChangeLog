@@ -1,5 +1,13 @@
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* CSSRule.pm (css_text): Trailing newline character is removed
+	to avoid double empty lines in CSSStyleSheet->css_text.
+	(selector_text): Namespace support is fixed.
+
+	* CSSStyleSheet.pm (___new): Now it accepts |_nsmap| option.
+
+2008-01-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* CSSRule.pm (selector_text): Use |serialize_selector_text|
 	to get better result.
 

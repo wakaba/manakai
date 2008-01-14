@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleSheet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleSheet';
 require Message::DOM::DOMException;
 require Scalar::Util;
@@ -12,6 +12,8 @@ sub ____new ($;%) {
     ${$_}->{parent_style_sheet} = $self;
     Scalar::Util::weaken (${$_}->{parent_style_sheet});
   }
+  # $self->{_parser} : Whatpm::CSS::Parser
+  # $self->{_nsmap} : $nsmap (see Whatpm::CSS::Parser)
   return $self;
 } # ____new
 
@@ -169,4 +171,4 @@ package Message::IF::StyleSheet;
 package Message::IF::CSSStyleSheet;
 
 1;
-## $Date: 2008/01/01 09:09:16 $
+## $Date: 2008/01/14 05:53:45 $

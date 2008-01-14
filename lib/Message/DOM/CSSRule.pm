@@ -1,6 +1,6 @@
 package Message::DOM::CSSRule;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSRule';
 require Scalar::Util;
 
@@ -60,9 +60,12 @@ sub ____new ($$$) {
 sub css_text ($;$) {
   ## TODO: setter
 
-  ## TODO: Browser compatibility
+  ## NOTE: Where and how white space characters are inserted are 
+  ## intentionally changed from those in browsers so that properties are
+  ## more prettily printed.
+  ## See <http://suika.fam.cx/gate/2005/sw/cssText> for what browsers do.
   local $Error::Depth = $Error::Depth + 1;
-  return $_[0]->selector_text . " {\n" . $_[0]->style->css_text . "}\n";
+  return $_[0]->selector_text . " {\n" . $_[0]->style->css_text . '}';
 } # css_text
 
 sub type ($) { Message::DOM::CSSRule::STYLE_RULE }
@@ -78,12 +81,7 @@ sub selector_text ($;$) {
   my $self = $_[0];
   require Whatpm::CSS::SelectorsSerializer;
   return Whatpm::CSS::SelectorsSerializer->serialize_selector_text
-      ($$self->{_selectors}, sub {
-        ## TODO: We should have some caching mechanism, otherwise
-        ## too many computation for complex selectors in long style sheet.
-        return $self->parent_style_sheet->manakai_lookup_namespace_prefix
-            ($_[0]);
-      });
+      ($$self->{_selectors}, ${$self->parent_style_sheet}->{_nsmap});
 } # selector_text
 
 sub style ($) {
@@ -265,4 +263,4 @@ package Message::IF::CSSFontFaceRule;
 package Message::IF::CSSPageRule;
 
 1;
-## $Date: 2008/01/14 03:55:23 $
+## $Date: 2008/01/14 05:53:44 $

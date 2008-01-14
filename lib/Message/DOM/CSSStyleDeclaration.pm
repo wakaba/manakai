@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration';
 
 sub ____new ($) {
@@ -42,6 +42,11 @@ sub AUTOLOAD {
 sub css_text ($;$) {
   ## TODO: setter
 
+  ## NOTE: Where and how white space characters are inserted are 
+  ## intentionally changed from those in browsers so that properties are
+  ## more prettily printed.
+  ## See <http://suika.fam.cx/gate/2005/sw/cssText> for what browsers do.
+  ## TODO: Ordering issue.
   require Whatpm::CSS::Parser;
   my $self = $_[0];
   my $r = '';
@@ -68,7 +73,6 @@ sub css_text ($;$) {
       }
     }
   }
-  ## TODO: shorthands
   return $r;
 } # css_text
 
@@ -138,6 +142,10 @@ sub css_text ($;$) {
   my $self = shift;
   require Whatpm::CSS::Parser;
 
+  ## NOTE: Where and how white space characters are inserted are 
+  ## intentionally changed from those in browsers so that properties are
+  ## more prettily printed.
+  ## See <http://suika.fam.cx/gate/2005/sw/cssText> for what browsers do.
   ## TODO: ordering
   ## TODO: any spec?
   my $r = '';
@@ -185,4 +193,4 @@ sub get_property_priority ($$) {
 package Message::IF::CSSStyleDeclaration;
 
 1;
-## $Date: 2008/01/13 06:37:44 $
+## $Date: 2008/01/14 05:53:45 $
