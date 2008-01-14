@@ -61,7 +61,7 @@ sub ___set_user_style_sheets ($$) {
 sub ___reset_css ($) {
   my $self = shift;
   require Whatpm::CSS::Cascade;
-  my $cas = Whatpm::CSS::Cascade->new (${$_[0]}->{document});
+  my $cas = Whatpm::CSS::Cascade->new ($$self->{document});
   $cas->{has_invert}
       = $$self->{___css_options}->{prop_value}->{'outline-color'}->{invert};
 
@@ -104,4 +104,4 @@ package Message::IF::ViewCSS;
 package Message::IF::Window;
 
 1;
-## $Date: 2008/01/13 06:37:47 $
+## $Date: 2008/01/14 11:33:48 $

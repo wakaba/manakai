@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
     'Message::IF::ElementSelector', # MUST in Selectors API spec.
     'Message::IF::ElementCSSInlineStyle';
@@ -838,6 +838,7 @@ sub current_style ($) {
   ## represented by them disagree in browsers and even |getComputedStyle|
   ## and |currentStyle| are different in the same Opera browser).
   
+  local $Error::Depth = $Error::Depth + 1;
   my $self = shift;
   my $view = $self->owner_document->default_view;
   return undef unless defined $view;  ## ISSUE: Not defined in the spec yet.
@@ -1285,4 +1286,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/01/13 06:37:47 $
+## $Date: 2008/01/14 11:33:48 $
