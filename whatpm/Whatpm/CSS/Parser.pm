@@ -283,7 +283,7 @@ sub parse_char_string ($$) {
 
       my $prop_def;
       my $prop_value;
-      my $prop_flag;
+      my $prop_flag = '';
       $t = $tt->get_next_token while $t->{type} == S_TOKEN;
       if ($t->{type} == IDENT_TOKEN) { # property
         my $prop_name = lc $t->{value}; ## TODO: case folding
@@ -382,7 +382,7 @@ sub parse_char_string ($$) {
         redo S;
       }
 
-      my $important = (defined $prop_flag and $prop_flag eq 'important');
+      my $important = ($prop_flag eq 'important');
       for my $set_prop_name (keys %{$prop_value or {}}) {
         my $set_prop_def = $Prop->{$set_prop_name};
         $$current_decls->{$set_prop_def->{key}}
@@ -5287,4 +5287,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/14 10:02:46 $
+## $Date: 2008/01/14 11:21:22 $

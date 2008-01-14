@@ -1,5 +1,13 @@
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* Cascade.pm (get_cascaded_value): No longer have to test
+	whether priority is defined.
+
+	* Parser.pm (parse_char_string): Set an empty string as the priority
+	if no priority was specified.
+
+2008-01-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm (serialize, serialize_multiple): Return an empty 
 	string (not undef) if the property has no assigned value.
 

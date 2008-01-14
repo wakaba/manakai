@@ -114,7 +114,7 @@ sub get_cascaded_value ($$$) {
   my $value;
   for my $sds (reverse @{$self->{element_to_sds}->{refaddr $element} or []}) {
     my $vp = ${$sds->[0]}->{$key};
-    if (defined $vp->[1] and $vp->[1] eq 'important') {
+    if ($vp->[1] eq 'important') {
       return $vp->[0];
     } else {
       $value = $vp->[0] unless defined $value;
@@ -214,4 +214,4 @@ sub get_computed_value ($$$) {
 } # get_computed_value
 
 1;
-## $Date: 2008/01/06 14:15:36 $
+## $Date: 2008/01/14 11:21:22 $
