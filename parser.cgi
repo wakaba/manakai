@@ -283,7 +283,10 @@ if ($mode eq '/csstext') {
   require Whatpm::CSS::SelectorsSerializer;
   my ($sel, $ns) = Whatpm::CSS::SelectorsSerializer->serialize_test
       ($selectors);
+  my ($sel2, $ns2) = Whatpm::CSS::SelectorsSerializer->serialize_selector_text
+      ($selectors);
   my $out = "\n#namespaces\n" . $ns . "\n#selectors\n" . $sel;
+  $out .= "\n#selector_text\n" . $sel2;
 
   print STDOUT Encode::encode ('utf-8', $out);
   print STDOUT "\n";
@@ -306,4 +309,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/13 06:38:44 $
+## $Date: 2008/01/14 05:54:40 $
