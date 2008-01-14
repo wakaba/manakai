@@ -88,12 +88,13 @@ sub parse_char_string ($$) {
   $sp->{pseudo_element} = $self->{pseudo_element};
   $sp->{pseudo_class} = $self->{pseudo_class};
 
-  my $nsmap = {};
+  my $nsmap = {prefix_to_uri => {}, uri_to_prefixes => {}};
+  # $nsmap->{prefix_to_uri}->{p/""} = uri/undef
+  # $nsmap->{uri_to_prefixes}->{uri} = ["p|"/"",...]/undef
+  # $nsmap->{has_namespace} = 1/0
   $sp->{lookup_namespace_uri} = sub {
-    return $nsmap->{$_[0]}; # $_[0] is '' (default namespace) or prefix
+    return $nsmap->{prefix_to_uri}->{$_[0]}; # $_[0] is '' (default) or prefix
   }; # $sp->{lookup_namespace_uri}
-
-  ## TODO: Supported pseudo classes and elements...
 
   require Message::DOM::CSSStyleSheet;
   require Message::DOM::CSSRule;
@@ -126,7 +127,7 @@ sub parse_char_string ($$) {
           my $prefix;
           if ($t->{type} == IDENT_TOKEN) {
             $prefix = lc $t->{value};
-            ## TODO: Unicode lowercase
+            ## TODO: case (Unicode lowercase)
             
             $t = $tt->get_next_token;
             $t = $tt->get_next_token while $t->{type} == S_TOKEN;
@@ -144,7 +145,24 @@ sub parse_char_string ($$) {
 
             if ($t->{type} == SEMICOLON_TOKEN) {
               if ($namespace_allowed) {
-                $nsmap->{defined $prefix ? $prefix : ''} = $uri;
+                my $p = $prefix;
+                $nsmap->{has_namespace} = 1;
+                if (defined $prefix) {
+                  $nsmap->{prefix_to_uri}->{$prefix} = $uri;
+                  $p .= '|';
+                } else {
+                  $nsmap->{prefix_to_uri}->{''} = $uri;
+                  $p = '';
+                }
+                for my $u (keys %{$nsmap->{uri_to_prefixes}}) {
+                  next if $u eq $uri;
+                  my $list = $nsmap->{uri_to_prefixes}->{$u};
+                  next unless $list;
+                  for (reverse 0..$#$list) {
+                    splice @$list, $_, 1, () if $list->[$_] eq $p;
+                  }
+                }
+                push @{$nsmap->{uri_to_prefixes}->{$uri} ||= []}, $p;
                 push @$current_rules,
                     Message::DOM::CSSNamespaceRule->____new ($prefix, $uri);
                 undef $charset_allowed;
@@ -473,7 +491,7 @@ sub parse_char_string ($$) {
        ## TODO: owner_node
        ## TODO: media
        type => 'text/css', ## TODO: OK?
-       _parser => $self);
+       _parser => $self, _nsmap => $nsmap);
   return $ss;
 } # parse_char_string
 
@@ -5269,4 +5287,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/12 14:45:47 $
+## $Date: 2008/01/14 05:57:35 $

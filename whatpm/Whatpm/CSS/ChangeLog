@@ -1,5 +1,16 @@
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm (parse_char_string): Namespace support is revised so
+	that more Gecko-like namespace serialization can be implemented.
+
+	* SelectorsSerializer.pm (serialize_selector_text): Revised.
+	Now it does almost same as what Gecko does for namespace
+	tratements, what Gecko does for universal selector omittion, and what
+	Opera does for ordering (i.e. no sorting).  Only one COLON
+	for pseudo-elements since Gecko and Opera do so.
+
+2008-01-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* SelectorsSerializer.pm (serialize_selector_text): New method.
 
 2008-01-12  Wakaba  <wakaba@suika.fam.cx>

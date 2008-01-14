@@ -1,6 +1,6 @@
 package Whatpm::CSS::SelectorsSerializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
@@ -128,24 +128,20 @@ sub serialize_test ($$;$) {
   return $r;
 } # serialize_test
 
-sub serialize_selector_text ($$;$) {
-  my (undef, $selectors, $lookup_prefix) = @_;
+sub serialize_selector_text ($$$) {
+  my (undef, $selectors, $nsmap) = @_;
   my $i = 0;
   my $ident = sub { $_[0] };
   my $str = sub { '"' . $_[0] . '"' };
 
-  ## TODO: namespace prefix <http://suika.fam.cx/gate/2005/sw/namespace>
-
-  my $lp = $lookup_prefix ? sub {
-    my $v = $lookup_prefix->($_[0]);
-    return $ident->(defined $v ? $v : $_[0]);
-  } : $ident; # $lp
+  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/namespace> for browser
+  ## implementation issues.
 
   my $r = join ", ", map {
     join "", map {
       if (ref $_) {
         my $ns_selector;
-        my $ln_selector = [LOCAL_NAME_SELECTOR, undef];
+        my $ln_selector;
         my $ss = [];
         for my $s (@$_) {
           if ($s->[0] == NAMESPACE_SELECTOR) {
@@ -159,26 +155,47 @@ sub serialize_selector_text ($$;$) {
         
         my $v = '';
         if (not defined $ns_selector) {
-          $v .= '*|';
+          $v .= '*|' if $nsmap->{has_namespace} and
+              (not @$ss or defined $ln_selector);
         } elsif (defined $ns_selector->[1]) {
-          $v .= $lp->($ns_selector->[1]) . '|';
+          my $list = $nsmap->{uri_to_prefixes}->{$ns_selector->[1]};
+          if ($list and @$list) {
+            $v .= $list->[0];
+            ## NOTE: It might be empty; it might not be an IDENT followed
+            ## by a '|' character.
+          } else {
+            #$v .= '';
+          }
         } else {
           $v .= '|';
         }
 
-        if (defined $ln_selector->[1]) {
+        if (defined $ln_selector) {
           $v .= $ident->($ln_selector->[1]);
         } else {
-          $v .= '*';
+          $v .= '*' if not @$ss or length $v;
         }
 
         for (@$ss) {
           if ($_->[0] == ATTRIBUTE_SELECTOR) {
-            $v .= '[' .
-            (defined $_->[1] ?
-              $_->[1] eq '' ? '' : $lp->($_->[1]) : '*') .
-            '|' .
-            $ident->($_->[2]) .
+            $v .= '[';
+            if (defined $_->[1]) {
+              if ($_->[1] eq '') {
+                #$v .= '|';
+              } else {
+                my $list = $nsmap->{uri_to_prefixes}->{$ns_selector->[1]};
+                if ($list and @$list) {
+                  $v .= $list->[0];
+                  ## NOTE: It might be empty; it might not be an IDENT followed
+                  ## by a '|' character.
+                } else {
+                  #$v .= '';
+                }
+              }
+            } else {
+              $v .= '*|';
+            }
+            $v .= $ident->($_->[2]) .
             ($_->[3] != EXISTS_MATCH ?
               {EQUALS_MATCH, '=',
                INCLUDES_MATCH, '~=',
@@ -217,7 +234,7 @@ sub serialize_selector_text ($$;$) {
               $v .= ':' . $ident->($vv->[1]);
             }
           } elsif ($_->[0] == PSEUDO_ELEMENT_SELECTOR) {
-            $v .= '::' . $ident->($_->[1]);
+            $v .= ':' . $ident->($_->[1]);
           }
           ## NOTE: else ... impl error
 
@@ -247,4 +264,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/01/14 03:54:45 $
+# $Date: 2008/01/14 05:57:35 $
