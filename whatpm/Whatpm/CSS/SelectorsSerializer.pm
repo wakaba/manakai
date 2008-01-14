@@ -1,6 +1,6 @@
 package Whatpm::CSS::SelectorsSerializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
@@ -128,9 +128,118 @@ sub serialize_test ($$;$) {
   return $r;
 } # serialize_test
 
+sub serialize_selector_text ($$;$) {
+  my (undef, $selectors, $lookup_prefix) = @_;
+  my $i = 0;
+  my $ident = sub { $_[0] };
+  my $str = sub { '"' . $_[0] . '"' };
+
+  ## TODO: namespace prefix <http://suika.fam.cx/gate/2005/sw/namespace>
+
+  my $lp = $lookup_prefix ? sub {
+    my $v = $lookup_prefix->($_[0]);
+    return $ident->(defined $v ? $v : $_[0]);
+  } : $ident; # $lp
+
+  my $r = join ", ", map {
+    join "", map {
+      if (ref $_) {
+        my $ns_selector;
+        my $ln_selector = [LOCAL_NAME_SELECTOR, undef];
+        my $ss = [];
+        for my $s (@$_) {
+          if ($s->[0] == NAMESPACE_SELECTOR) {
+            $ns_selector = $s;
+          } elsif ($s->[0] == LOCAL_NAME_SELECTOR) {
+            $ln_selector = $s;
+          } else {
+            push @$ss, $s;
+          }
+        }
+        
+        my $v = '';
+        if (not defined $ns_selector) {
+          $v .= '*|';
+        } elsif (defined $ns_selector->[1]) {
+          $v .= $lp->($ns_selector->[1]) . '|';
+        } else {
+          $v .= '|';
+        }
+
+        if (defined $ln_selector->[1]) {
+          $v .= $ident->($ln_selector->[1]);
+        } else {
+          $v .= '*';
+        }
+
+        for (@$ss) {
+          if ($_->[0] == ATTRIBUTE_SELECTOR) {
+            $v .= '[' .
+            (defined $_->[1] ?
+              $_->[1] eq '' ? '' : $lp->($_->[1]) : '*') .
+            '|' .
+            $ident->($_->[2]) .
+            ($_->[3] != EXISTS_MATCH ?
+              {EQUALS_MATCH, '=',
+               INCLUDES_MATCH, '~=',
+               DASH_MATCH, '|=',
+               PREFIX_MATCH, '^=',
+               SUFFIX_MATCH, '$=',
+               SUBSTRING_MATCH, '*='}->{$_->[3]} .
+              $str->($_->[4])
+            : '') .
+            ']';
+          } elsif ($_->[0] == CLASS_SELECTOR) {
+            $v .= '.' . $ident->($_->[1]);
+          } elsif ($_->[0] == ID_SELECTOR) {
+            $v .= '#' . $ident->($_->[1]);
+          } elsif ($_->[0] == PSEUDO_CLASS_SELECTOR) {
+            my $vv = $_;
+            if ($vv->[1] eq 'lang') {
+              ':lang(' . $ident->($vv->[2]) . ')';
+            } elsif ($vv->[1] eq 'not') {
+              my $vvv = Whatpm::CSS::SelectorsSerializer
+                  ->serialize_selector_text
+                  ([[DESCENDANT_COMBINATOR, [@{$vv}[2..$#{$vv}]]]]);
+              $vvv =~ s/^\*\|\*(?!$)//;
+              $v .= ":not(" . $vvv . ")";
+            } elsif ({'nth-child' => 1,
+                      'nth-last-child' => 1,
+                      'nth-of-type' => 1,
+                      'nth-last-of-type' => 1}->{$vv->[1]}) {
+              ## TODO: We should copy what new versions of browsers do.
+              $v .= ':' . $ident->($vv->[1]) . '(' .
+                  ($vv->[2] . 'n' .
+                  ($vv->[3] < 0 ? $vv->[3] : '+' . $vv->[3])) . ')';
+            } elsif ($vv->[1] eq '-manakai-contains') {
+              $v .= ':-manakai-contains(' . $str->($vv->[2]) . ')';
+            } else {
+              $v .= ':' . $ident->($vv->[1]);
+            }
+          } elsif ($_->[0] == PSEUDO_ELEMENT_SELECTOR) {
+            $v .= '::' . $ident->($_->[1]);
+          }
+          ## NOTE: else ... impl error
+
+        }
+        $v;
+      } else {
+        {
+          DESCENDANT_COMBINATOR, ' ',
+          CHILD_COMBINATOR, ' > ',
+          ADJACENT_SIBLING_COMBINATOR, ' + ',
+          GENERAL_SIBLING_COMBINATOR, ' ~ ',
+        }->{$_};
+      }
+    } @$_[1..$#$_];
+  } @$selectors;  
+
+  return $r;
+} # serialize_selector_text
+
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -138,4 +247,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/12/23 15:47:09 $
+# $Date: 2008/01/14 03:54:45 $
