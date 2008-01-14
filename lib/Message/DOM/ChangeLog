@@ -1,5 +1,11 @@
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* CSSStyleDeclaration.pm (attributes reflecting CSS properties): 
+	Return an empty string if no value is assigned to the property.  Insert
+	a SPACE before '!' for compatibility with Firefox.
+
+2008-01-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* CSSRule.pm (css_text): Trailing newline character is removed
 	to avoid double empty lines in CSSStyleSheet->css_text.
 	(selector_text): Namespace support is fixed.

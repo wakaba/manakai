@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration';
 
 sub ____new ($) {
@@ -25,9 +25,8 @@ sub AUTOLOAD {
       if ($value) {
         return $prop_def->{serialize}->($self, $prop_def->{css}, $value->[0]);
       } else {
-        return undef;
+        return "";
       }
-      ## TODO: null? ""? ... if not set?
       ## ISSUE: If one of shorthand component properties is !important?
     };
     goto &{ $AUTOLOAD };
@@ -66,9 +65,9 @@ sub css_text ($;$) {
     } else {
       my $value = $$self->{$_};
       my $s = $prop_def->{serialize}->($self, $prop_def->{css}, $value->[0]);
-      if (defined $s) {
+      if (length $s) {
         $r .= '  ' . $prop_def->{css} . ': ' . $s;
-        $r .= ' !' . $value->[1] if defined $value->[1];
+        $r .= ' ! ' . $value->[1] if length $value->[1];
         $r .= ";\n";
       }
     }
@@ -90,8 +89,7 @@ sub get_property_priority ($$) {
   return '' unless defined $prop_def;
 
   my $v = ${$_[0]}->{$prop_def->{key}};
-
-  return ((defined $v->[1] and $v->[1] eq 'important') ? 'important' : '');
+  return $v ? $v->[1] : '';
 } # get_property_priority
 
 ## TODO: Implement other methods and attributes
@@ -125,9 +123,8 @@ sub AUTOLOAD {
       if ($value) {
         return $prop_def->{serialize}->($self, $prop_def->{css}, $value);
       } else {
-        return undef;
+        return "";
       }
-      ## TODO: null? ""? ... if not set?
     };
     goto &{ $AUTOLOAD };
   } else {
@@ -167,7 +164,7 @@ sub css_text ($;$) {
       my $prop_value = $$self->{cascade}->get_computed_value
           ($$self->{element}, $prop_def->{css});
       my $s = $prop_def->{serialize}->($self, $prop_def->{css}, $prop_value);
-      if (defined $s) {
+      if (length $s) {
         $r .= '  ' . $prop_def->{css} . ': ' . $s;
         $r .= ";\n";
       } else {
@@ -184,13 +181,11 @@ sub css_text ($;$) {
 
 ## |CSSStyleDeclaration| methods
 
-sub get_property_priority ($$) {
-  return '';
-} # get_property_priority
+sub get_property_priority ($$) { '' }
 
 ## TODO: members
 
 package Message::IF::CSSStyleDeclaration;
 
 1;
-## $Date: 2008/01/14 05:53:45 $
+## $Date: 2008/01/14 10:04:40 $
