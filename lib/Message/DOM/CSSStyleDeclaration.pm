@@ -1,7 +1,8 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-push our @ISA, 'Message::IF::CSSStyleDeclaration';
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+push our @ISA, 'Message::IF::CSSStyleDeclaration',
+    'Message::IF::CSS2Properties';
 
 sub ____new ($) {
   return bless \{}, $_[0];
@@ -35,6 +36,15 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
+
+use overload
+    '@{}' => sub {
+      tie my @list, ref $_[0], $_[0];
+      return \@list;
+    },
+    fallback => 1;
+
+sub TIEARRAY ($$) { $_[1] }
 
 ## |CSSStyleDeclaration| attributes
 
@@ -75,6 +85,16 @@ sub css_text ($;$) {
   return $r;
 } # css_text
 
+sub length ($) {
+  require Whatpm::CSS::Parser;
+  return scalar @{[grep {$_}
+                   map { $Whatpm::CSS::Parser::Key->{$_} }
+                   keys %${$_[0]}]->[$_[1]]};
+} # length
+*FETCHSIZE = \&length;
+
+## TODO: STORESIZE
+
 sub parent_rule ($) {
   return ${$_[0]}->{parent_rule};
 } # parent_rule
@@ -92,10 +112,29 @@ sub get_property_priority ($$) {
   return $v ? $v->[1] : '';
 } # get_property_priority
 
+sub item ($$) {
+  require Whatpm::CSS::Parser;
+  return '' if $_[1] < 0;
+  ## TODO: ordering (should be same as that in |css_text|.
+  my $v = [map {$_->{key}}
+           grep {$_}
+           map { $Whatpm::CSS::Parser::Key->{$_} }
+           keys %${$_[0]}]->[$_[1]];
+  return defined $v ? $v : '';
+} # item
+*FETCH = \&item;
+
+## TODO: STORE, DELETE
+
+sub EXISTS ($$) {
+  return length $_[0]->item;
+} # EXISTS
+
 ## TODO: Implement other methods and attributes
 
 package Message::DOM::CSSComputedStyleDeclaration;
-push our @ISA, 'Message::IF::CSSStyleDeclaration';
+push our @ISA, 'Message::IF::CSSStyleDeclaration',
+    'Message::IF::CSS2Properties';
 
 sub ____new ($$$) {
   my $self = bless \{}, shift;
@@ -132,6 +171,17 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
+
+use overload
+    '@{}' => sub {
+      tie my @list, ref $_[0], $_[0];
+      return \@list;
+    },
+    fallback => 1;
+
+sub TIEARRAY ($$) { $_[1] }
+
+## |CSSStyleDeclaration| attributes
 
 sub css_text ($;$) {
   ## TODO: error if modified
@@ -179,13 +229,42 @@ sub css_text ($;$) {
   return $r;
 } # css_text
 
+## TODO: What should we enumerate is unclear.
+sub length ($) {
+  require Whatpm::CSS::Parser;
+  return scalar @{[grep {$_}
+                   values %$Whatpm::CSS::Parser::Key]};
+} # length
+*FETCHSIZE = \&length;
+
+## TODO: STORESIZE
+
 ## |CSSStyleDeclaration| methods
 
 sub get_property_priority ($$) { '' }
 
+sub item ($$) {
+  require Whatpm::CSS::Parser;
+  return '' if $_[1] < 0;
+  ## TODO: ordering (should be same as that in |css_text|.
+  my $v = [sort {$a cmp $b}
+           map {$_->{css}}
+           grep {$_}
+           values %$Whatpm::CSS::Parser::Key]->[$_[1]];
+  return defined $v ? $v : '';
+} # item
+*FETCH = \&item;
+
+## TODO: STORE, DELETE
+
+sub EXISTS ($$) {
+  return length $_[0]->item;
+} # EXISTS
+
 ## TODO: members
 
 package Message::IF::CSSStyleDeclaration;
+package Message::IF::CSS2Properties;
 
 1;
-## $Date: 2008/01/14 10:04:40 $
+## $Date: 2008/01/14 11:18:49 $

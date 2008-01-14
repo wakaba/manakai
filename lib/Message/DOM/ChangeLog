@@ -1,5 +1,11 @@
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* CSSStyleDeclaration.pm: The classes now explicitly implement
+	the |CSS2Properties| interface.
+	(@{}, TIEARRAY, FETCH, FETCHSIZE, EXISTS, item, length): Implemented.
+
+2008-01-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* CSSStyleDeclaration.pm (attributes reflecting CSS properties): 
 	Return an empty string if no value is assigned to the property.  Insert
 	a SPACE before '!' for compatibility with Firefox.
