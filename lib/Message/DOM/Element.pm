@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
     'Message::IF::ElementSelector', # MUST in Selectors API spec.
     'Message::IF::ElementCSSInlineStyle';
@@ -828,6 +828,12 @@ sub set_id_attribute_node ($$$$) {
   return;
 } # set_id_attribute_node
 
+## |ElementSelector| methods
+
+sub query_selector ($$;$);
+
+sub query_selector_all ($$;$);
+
 ## |ElementCSSInlineStyle| attributes
 
 sub current_style ($) {
@@ -1286,4 +1292,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/01/14 11:33:48 $
+## $Date: 2008/01/14 13:56:35 $

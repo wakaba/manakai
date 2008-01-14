@@ -1,5 +1,14 @@
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* CSSStyleDeclaration.pm (AUTOLOAD): DOM attributes reflecting
+	shorthand properties did croak (fixed but still they does not 
+	return correct result - they need to be fixed later).
+
+	* Element.pm (query_selector, query_selector_all): Prototypes
+	were missing.
+
+2008-01-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* Window.pm (___reset_css): Typo fixed.
 
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>

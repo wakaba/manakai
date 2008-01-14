@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration',
     'Message::IF::CSS2Properties';
 
@@ -157,12 +157,29 @@ sub AUTOLOAD {
       ## TODO: setter
 
       my $self = $_[0];
-      my $value = $$self->{cascade}->get_computed_value
-          ($$self->{element}, $prop_def->{css});
-      if ($value) {
-        return $prop_def->{serialize}->($self, $prop_def->{css}, $value);
+      if ($prop_def->{compute} or $prop_def->{compute_multiple}) {
+        my $value = $$self->{cascade}->get_computed_value
+            ($$self->{element}, $prop_def->{css});
+        if ($value) {
+          return $prop_def->{serialize}->($self, $prop_def->{css}, $value);
+        } else {
+          return '';
+        }
+      } elsif ($prop_def->{serialize_multiple}) {
+        my $v = $prop_def->{serialize_multiple}->($self);
+        if (defined $v->{$prop_def->{css}}) {
+          return $v->{$prop_def->{css}};
+        } else {
+          return '';
+        }
       } else {
-        return "";
+        ## TODO: This should be an error of the implementation.
+        ## However, currently some shorthand properties does not have
+        ## serializer.
+        ## TODO: Remove {serialize} from shorthand properties, since
+        ## they have no effect.
+        warn "$0: No computed value function for $method_name";
+        #die "$0: No computed value function for $method_name";
       }
     };
     goto &{ $AUTOLOAD };
@@ -267,4 +284,4 @@ package Message::IF::CSSStyleDeclaration;
 package Message::IF::CSS2Properties;
 
 1;
-## $Date: 2008/01/14 11:18:49 $
+## $Date: 2008/01/14 13:56:35 $

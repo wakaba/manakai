@@ -1,8 +1,10 @@
 package Message::DOM::HTML::HTMLElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
 require Message::DOM::Element;
+
+## TODO: interface
 
 sub AUTOLOAD {
   my $method_name = our $AUTOLOAD;
@@ -492,5 +494,5 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/10/08 04:48:34 $
+## $Date: 2008/01/14 13:56:35 $
 
