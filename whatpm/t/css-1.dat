@@ -1,0 +1,85 @@
+#data
+p {
+  color: blue;
+}
+q {
+  color: green;
+}
+#cssom
+| <p>
+|   color: blue
+| <q>
+|   color: green
+#csstext
+p {
+  color: blue;
+}
+q {
+  color: green;
+}
+
+#data
+p {
+  color: blue !important;
+}
+#cssom
+| <p>
+|   color: blue !important
+#csstext
+p {
+  color: blue ! important;
+}
+
+#data
+p {
+  margin: 1px;
+}
+#cssom
+| <p>
+|   margin: 1px
+|   margin-bottom: 1px
+|   margin-left: 1px
+|   margin-right: 1px
+|   margin-top: 1px
+#csstext
+p {
+  margin: 1px;
+}
+
+#html 1
+<!DOCTYPE HTML><p>
+
+#data
+p {
+  color: blue;
+}
+#computed 1 p
+-| color: -manakai-default
++| color: rgb(0, 0, 255)
+-| border: 0px none -manakai-default
++| border: 0px none rgb(0, 0, 255)
+-| border-bottom: 0px none -manakai-default
++| border-bottom: 0px none rgb(0, 0, 255)
+-| border-bottom-color: -manakai-default
++| border-bottom-color: rgb(0, 0, 255)
+-| border-color: -manakai-default
++| border-color: rgb(0, 0, 255)
+-| border-left: 0px none -manakai-default
++| border-left: 0px none rgb(0, 0, 255)
+-| border-left-color: -manakai-default
++| border-left-color: rgb(0, 0, 255)
+-| border-right: 0px none -manakai-default
++| border-right: 0px none rgb(0, 0, 255)
+-| border-right-color: -manakai-default
++| border-right-color: rgb(0, 0, 255)
+-| border-top: 0px none -manakai-default
++| border-top: 0px none rgb(0, 0, 255)
+-| border-top-color: -manakai-default
++| border-top-color: rgb(0, 0, 255)
+#computedtext 1 p
+-  color: -manakai-default;
++  color: rgb(0, 0, 255);
+-  border: 0px none -manakai-default;
++  border: 0px none rgb(0, 0, 255);
+
+

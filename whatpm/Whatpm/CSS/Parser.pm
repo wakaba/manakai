@@ -1853,7 +1853,7 @@ $Attr->{opacity} = $Prop->{opacity};
 $Key->{opacity} = $Prop->{opacity};
 
 $Prop->{'-moz-opacity'} = $Prop->{opacity};
-$Attr->{MozOpacity} = $Attr->{opacity};
+$Attr->{_moz_opacity} = $Attr->{opacity};
 
 my $length_unit = {
   em => 1, ex => 1, px => 1,
@@ -5287,4 +5287,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/14 11:21:22 $
+## $Date: 2008/01/14 13:53:50 $

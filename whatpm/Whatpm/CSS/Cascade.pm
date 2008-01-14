@@ -62,6 +62,7 @@ sub ___associate_rules ($) {
       my $elements_to_specificity = {};
 
       for my $selector (@{$$rule->{_selectors}}) {
+        ## TODO: Data::Dumper is faster?
         my $selector_str = Whatpm::CSS::SelectorsSerializer->serialize_test
             ([$selector]);
         unless ($selectors_to_elements->{$selector_str}) {
@@ -214,4 +215,4 @@ sub get_computed_value ($$$) {
 } # get_computed_value
 
 1;
-## $Date: 2008/01/14 11:21:22 $
+## $Date: 2008/01/14 13:53:50 $
