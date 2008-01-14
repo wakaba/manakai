@@ -537,7 +537,7 @@ my $default_serializer = sub {
     return 'none' unless @v;
     return join ' ', @v;
   } else {
-    return undef;
+    return '';
   }
 }; # $default_serializer
 
@@ -994,8 +994,8 @@ $Prop->{'background-color'} = {
     my $yi = $self->get_property_priority ('background-position-y');
     $xi = ' !' . $xi if length $xi;
     $yi = ' !' . $yi if length $yi;
-    if (defined $x) {
-      if (defined $y) {
+    if (length $x) {
+      if (length $y) {
         if ($xi eq $yi) {
           $r->{'background-position'} = $x . ' ' . $y . $xi;
           $has_all = 1;
@@ -1007,7 +1007,7 @@ $Prop->{'background-color'} = {
         $r->{'background-position-x'} = $x . $xi;
       }
     } else {
-      if (defined $y) {
+      if (length $y) {
         $r->{'background-position-y'} = $y . $yi;
       } else {
         #
@@ -1017,7 +1017,7 @@ $Prop->{'background-color'} = {
     for my $prop (qw/color image repeat attachment/) {
       my $prop_name = 'background_'.$prop;
       my $value = $self->$prop_name;
-      if (defined $value) {
+      if (length $value) {
         $r->{'background-'.$prop} = $value;
         my $i = $self->get_property_priority ('background-'.$prop);
         $r->{'background-'.$prop} .= ' !'.$i if length $i;
@@ -1184,12 +1184,12 @@ $Prop->{'outline-color'} = {
     my $os = $self->outline_style;
     my $ow = $self->outline_width;
     my $r = {};
-    if (defined $oc and defined $os and defined $ow) {
+    if (length $oc and length $os and length $ow) {
       $r->{outline} = $ow . ' ' . $os . ' ' . $oc;
     } else {
-      $r->{'outline-color'} = $oc if defined $oc;
-      $r->{'outline-style'} = $os if defined $os;
-      $r->{'outline-width'} = $ow if defined $ow;
+      $r->{'outline-color'} = $oc if length $oc;
+      $r->{'outline-style'} = $os if length $os;
+      $r->{'outline-width'} = $ow if length $ow;
     }
     return $r;
   },
@@ -2116,8 +2116,8 @@ $Prop->{'-manakai-border-spacing-x'} = {
     my $yi = $self->get_property_priority ('-manakai-border-spacing-y');
     $xi = ' !' . $xi if length $xi;
     $yi = ' !' . $yi if length $yi;
-    if (defined $x) {
-      if (defined $y) {
+    if (length $x) {
+      if (length $y) {
         if ($xi eq $yi) {
           if ($x eq $y) {
             return {'border-spacing' => $x . $xi};
@@ -2132,7 +2132,7 @@ $Prop->{'-manakai-border-spacing-x'} = {
         return {'-manakai-border-spacing-x' => $x . $xi};
       }
     } else {
-      if (defined $y) {
+      if (length $y) {
         return {'-manakai-border-spacing-y' => $y . $yi};
       } else {
         return {};
@@ -3191,7 +3191,7 @@ $Prop->{'font-family'} = {
     } elsif ($value->[0] eq 'INHERIT') {
       return 'inherit';
     } else {
-      return undef;
+      return '';
     }
   },
   initial => ['FONT', ['KEYWORD', '-manakai-default']],
@@ -3265,7 +3265,7 @@ $Prop->{cursor} = {
     } elsif ($value->[0] eq 'INHERIT') {
       return 'inherit';
     } else {
-      return undef;
+      return '';
     }
   },
   keyword => {
@@ -3396,13 +3396,13 @@ $Prop->{'border-style'} = {
     local $Error::Depth = $Error::Depth + 1;
     my @v;
     push @v, $self->border_top_style;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_right_style;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_bottom_style;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_left_style;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
 
     pop @v if $v[1] eq $v[3];
     pop @v if $v[0] eq $v[2];
@@ -3495,13 +3495,13 @@ $Prop->{'border-color'} = {
     local $Error::Depth = $Error::Depth + 1;
     my @v;
     push @v, $self->border_top_color;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_right_color;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_bottom_color;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_left_color;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
 
     pop @v if $v[1] eq $v[3];
     pop @v if $v[0] eq $v[2];
@@ -3626,13 +3626,13 @@ $Prop->{'border-top'} = {
     local $Error::Depth = $Error::Depth + 1;
     my $width_prop = $prop_name . '_width';  $width_prop =~ tr/-/_/;
     my $width_value = $self->$width_prop;
-    return undef unless defined $width_value;
+    return '' unless length $width_value;
     my $style_prop = $prop_name . '_style';  $style_prop =~ tr/-/_/;
     my $style_value = $self->$style_prop;
-    return undef unless defined $style_value;
+    return '' unless length $style_value;
     my $color_prop = $prop_name . '_color';  $color_prop =~ tr/-/_/;
     my $color_value = $self->$color_prop;
-    return undef unless defined $color_value;
+    return '' unless length $color_value;
 
     return $width_value . ' ' . $style_value . ' ' . $color_value;
   },
@@ -3701,16 +3701,16 @@ $Prop->{border} = {
     
     local $Error::Depth = $Error::Depth + 1;
     my $bt = $self->border_top;
-    return undef unless defined $bt;
+    return '' unless length $bt;
     my $br = $self->border_right;
-    return undef unless defined $br;
-    return undef unless $bt eq $br;
+    return '' unless length $br;
+    return '' unless $bt eq $br;
     my $bb = $self->border_bottom;
-    return undef unless defined $bb;
-    return undef unless $bt eq $bb;
+    return '' unless length $bb;
+    return '' unless $bt eq $bb;
     my $bl = $self->border_left;
-    return undef unless defined $bl;
-    return undef unless $bt eq $bl;
+    return '' unless length $bl;
+    return '' unless $bt eq $bl;
 
     return $bt;
   },
@@ -3936,13 +3936,13 @@ $Prop->{margin} = {
     local $Error::Depth = $Error::Depth + 1;
     my @v;
     push @v, $self->margin_top;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->margin_right;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->margin_bottom;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->margin_left;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
 
     pop @v if $v[1] eq $v[3];
     pop @v if $v[0] eq $v[2];
@@ -4183,13 +4183,13 @@ $Prop->{padding} = {
     local $Error::Depth = $Error::Depth + 1;
     my @v;
     push @v, $self->padding_top;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->padding_right;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->padding_bottom;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->padding_left;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
 
     pop @v if $v[1] eq $v[3];
     pop @v if $v[0] eq $v[2];
@@ -4307,9 +4307,9 @@ $Prop->{'border-spacing'} = {
     local $Error::Depth = $Error::Depth + 1;
     my @v;
     push @v, $self->_manakai_border_spacing_x;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->_manakai_border_spacing_y;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
 
     pop @v if $v[0] eq $v[1];
     return join ' ', @v;
@@ -4448,8 +4448,8 @@ $Prop->{'background-position'} = {
     local $Error::Depth = $Error::Depth + 1;
     my $x = $self->background_position_x;
     my $y = $self->background_position_y;
-    return $x . ' ' . $y if defined $x and defined $y;
-    return undef;
+    return $x . ' ' . $y if length $x and length $y;
+    return '';
   },
   serialize_multiple => $Prop->{'background-color'}->{serialize_multiple},
 };
@@ -4674,15 +4674,15 @@ $Prop->{background} = {
     
     local $Error::Depth = $Error::Depth + 1;
     my $color = $self->background_color;
-    return undef unless defined $color;
+    return '' unless length $color;
     my $image = $self->background_image;
-    return undef unless defined $image;
+    return '' unless length $image;
     my $repeat = $self->background_repeat;
-    return undef unless defined $repeat;
+    return '' unless length $repeat;
     my $attachment = $self->background_attachment;
-    return undef unless defined $attachment;
+    return '' unless length $attachment;
     my $position = $self->background_position;
-    return undef unless defined $position;
+    return '' unless length $position;
 
     my @v;
     push @v, $color unless $color eq 'transparent';
@@ -4820,22 +4820,22 @@ $Prop->{font} = {
     local $Error::Depth = $Error::Depth + 1;
     my $style = $self->font_style;
     my $i = $self->get_property_priority ('font-style');
-    return undef unless defined $style;
+    return '' unless length $style;
     my $variant = $self->font_variant;
-    return undef unless defined $variant;
-    return undef if $i ne $self->get_property_priority ('font-variant');
+    return '' unless length $variant;
+    return '' if $i ne $self->get_property_priority ('font-variant');
     my $weight = $self->font_weight;
-    return undef unless defined $weight;
-    return undef if $i ne $self->get_property_priority ('font-weight');
+    return '' unless length $weight;
+    return '' if $i ne $self->get_property_priority ('font-weight');
     my $size = $self->font_size;
-    return undef unless defined $size;
-    return undef if $i ne $self->get_property_priority ('font-size');
+    return '' unless length $size;
+    return '' if $i ne $self->get_property_priority ('font-size');
     my $height = $self->line_height;
-    return undef unless defined $height;
-    return undef if $i ne $self->get_property_priority ('line-height');
+    return '' unless length $height;
+    return '' if $i ne $self->get_property_priority ('line-height');
     my $family = $self->font_family;
-    return undef unless defined $family;
-    return undef if $i ne $self->get_property_priority ('font-family');
+    return '' unless length $family;
+    return '' if $i ne $self->get_property_priority ('font-family');
     
     my @v;
     push @v, $style unless $style eq 'normal';
@@ -4843,7 +4843,7 @@ $Prop->{font} = {
     push @v, $weight unless $weight eq 'normal';
     push @v, $size.($height eq 'normal' ? '' : '/'.$height);
     push @v, $family;
-    push @v, '!'.$i if length $i;
+    push @v, '! '.$i if length $i;
     return join ' ', @v;
   },
 };
@@ -5060,13 +5060,13 @@ $Prop->{'border-width'} = {
     local $Error::Depth = $Error::Depth + 1;
     my @v;
     push @v, $self->border_top_width;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_right_width;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_bottom_width;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
     push @v, $self->border_left_width;
-    return undef unless defined $v[-1];
+    return '' unless length $v[-1];
 
     pop @v if $v[1] eq $v[3];
     pop @v if $v[0] eq $v[2];
@@ -5287,4 +5287,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/14 05:57:35 $
+## $Date: 2008/01/14 10:02:46 $

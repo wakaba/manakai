@@ -1,5 +1,10 @@
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm (serialize, serialize_multiple): Return an empty 
+	string (not undef) if the property has no assigned value.
+
+2008-01-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm (parse_char_string): Namespace support is revised so
 	that more Gecko-like namespace serialization can be implemented.
 
