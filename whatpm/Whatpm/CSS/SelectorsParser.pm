@@ -1,6 +1,6 @@
 package Whatpm::CSS::SelectorsParser;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -10,7 +10,7 @@ use Whatpm::CSS::Tokenizer qw(:token);
 sub new ($) {
   my $self = bless {onerror => sub { }, lookup_namespace_uri => sub {
     return undef;
-  }, must_level => 'm'}, shift;
+  }, must_level => 'm', unsupported_level => 'u'}, shift;
   #$self->{href} = \(uri in which the selectors appears);
   return $self;
 } # new
@@ -160,7 +160,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         # Reprocess.
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before type selector',
+        $self->{onerror}->(type => 'no sss',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -175,7 +175,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
 
       if ($t->{type} == DOT_TOKEN) { ## class selector
         if ($has_pseudo_element) {
-          $self->{onerror}->(type => 'syntax error:after pseudo element',
+          $self->{onerror}->(type => 'ss after pseudo element',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
@@ -186,7 +186,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         redo S;
       } elsif ($t->{type} == HASH_TOKEN) { ## ID selector
         if ($has_pseudo_element) {
-          $self->{onerror}->(type => 'syntax error:after pseudo element',
+          $self->{onerror}->(type => 'ss after pseudo element',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
@@ -198,7 +198,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         redo S;
       } elsif ($t->{type} == COLON_TOKEN) { ## pseudo-class or pseudo-element
         if ($has_pseudo_element) {
-          $self->{onerror}->(type => 'syntax error:after pseudo element',
+          $self->{onerror}->(type => 'ss after pseudo element',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
@@ -209,7 +209,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         redo S;
       } elsif ($t->{type} == LBRACKET_TOKEN) { ## attribute selector
         if ($has_pseudo_element) {
-          $self->{onerror}->(type => 'syntax error:after pseudo element',
+          $self->{onerror}->(type => 'ss after pseudo element',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
@@ -271,7 +271,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else { ## "|" not followed by type or universal selector
-        $self->{onerror}->(type => 'syntax error:after namespace prefix',
+        $self->{onerror}->(type => 'no local name selector',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -285,7 +285,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before class name',
+        $self->{onerror}->(type => 'no class name',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -311,7 +311,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         ## Reprocess.
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before combinator',
+        $self->{onerror}->(type => 'no combinator',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -385,8 +385,10 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         } else {
           ## TODO: Should we raise a different kind of error
           ## if a pseudo class is known but not supported?
-          $self->{onerror}->(type => 'pseudo class:not allowed',
-                             level => $self->{must_level},
+          ## TODO: Maybe we should raise different type of error
+          ## for at least pseudo-classes which requires arguments.
+          $self->{onerror}->(type => 'pseudo-class not supported',
+                             level => $self->{unsupported_level},
                              uri => \$self->{href},
                              token => $t, value => $class);
           return ($t, undef);
@@ -430,8 +432,8 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           $t = $tt->get_next_token;
           redo S;
         } else {
-          $self->{onerror}->(type => 'pseudo class:not allowed',
-                             level => $self->{must_level},
+          $self->{onerror}->(type => 'pseudo-class not supported',
+                             level => $self->{unsupported_level},
                              uri => \$self->{href},
                              token => $t, value => $class);
           return ($t, undef);
@@ -442,7 +444,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:after colon',
+        $self->{onerror}->(type => 'no pseudo-class name',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -473,7 +475,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before attr name',
+        $self->{onerror}->(type => 'no attr name',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -498,7 +500,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         redo S;
       } else {
         unless (defined $name) { ## [*]
-          $self->{onerror}->(type => 'syntax error:after attr star',
+          $self->{onerror}->(type => 'no attr namespace separator',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
@@ -519,7 +521,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before attr local name',
+        $self->{onerror}->(type => 'no attr local name',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -550,7 +552,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before match',
+        $self->{onerror}->(type => 'no attr match',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -569,7 +571,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before attr value',
+        $self->{onerror}->(type => 'no attr value',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -581,7 +583,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:after attr value',
+        $self->{onerror}->(type => 'attr selector not closed',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -601,14 +603,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           $t = $tt->get_next_token;
           redo S;
         } else {
-          $self->{onerror}->(type => 'pseudo element:not allowed',
-                             level => $self->{must_level},
+          $self->{onerror}->(type => 'pseudo-element not supported',
+                             level => $self->{unsupported_level},
                              uri => \$self->{href},
                              token => $t, value => $pe);
           return ($t, undef);
         }
       } else {
-        $self->{onerror}->(type => 'syntax error:after double colon',
+        $self->{onerror}->(type => 'no pseudo-element name',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -626,7 +628,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before lang tag',
+        $self->{onerror}->(type => 'no lang tag',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -642,7 +644,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:after lang tag',
+        $self->{onerror}->(type => 'lang selector not closed',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -667,14 +669,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             $t = $tt->get_next_token;
             redo S;
           } else {
-            $self->{onerror}->(type => 'syntax error:an+b',
+            $self->{onerror}->(type => 'an+b syntax error',
                                level => $self->{must_level},
                                uri => \$self->{href},
                                token => $t);
             return ($t, undef);
           }
         } else {
-          $self->{onerror}->(type => 'syntax error:an+b',
+          $self->{onerror}->(type => 'an+b syntax error',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
@@ -688,7 +690,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           $t = $tt->get_next_token;
           redo S;
         } else { ## ISSUE: Is :nth-child(0.0) disallowed?
-          $self->{onerror}->(type => 'not integer',
+          $self->{onerror}->(type => 'an+b not integer',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t, value => $t->{number});
@@ -725,7 +727,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           $t = $tt->get_next_token;
           redo S;
         } else {
-          $self->{onerror}->(type => 'syntax error:an+b',
+          $self->{onerror}->(type => 'an+b syntax error',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
@@ -755,14 +757,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
               $t = $tt->get_next_token;
               redo S;
             } else {
-              $self->{onerror}->(type => 'syntax error:an+b',
+              $self->{onerror}->(type => 'an+b syntax error',
                                  level => $self->{must_level},
                                  uri => \$self->{href},
                                  token => $t);
               return ($t, undef);
             }
           } else {
-            $self->{onerror}->(type => 'syntax error:an+b',
+            $self->{onerror}->(type => 'an+b syntax error',
                                level => $self->{must_level},
                                uri => \$self->{href},
                                token => $t);
@@ -776,14 +778,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             $t = $tt->get_next_token;
             redo S;
           } else {
-            $self->{onerror}->(type => 'syntax error:an+b',
+            $self->{onerror}->(type => 'an+b syntax error',
                                level => $self->{must_level},
                                uri => \$self->{href},
                                token => $t);
             return ($t, undef);
           }
         } else {
-          $self->{onerror}->(type => 'syntax error:an+b',
+          $self->{onerror}->(type => 'an+b syntax error',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
@@ -794,7 +796,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:an+b',
+        $self->{onerror}->(type => 'an+b syntax error',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -826,7 +828,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:an+b',
+        $self->{onerror}->(type => 'an+b syntax error',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -843,14 +845,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           $t = $tt->get_next_token;
           redo S;
         } else {
-          $self->{onerror}->(type => 'syntax error:an+b',
+          $self->{onerror}->(type => 'an+b syntax error',
                              level => $self->{must_level},
                              uri => \$self->{href},
                              token => $t);
           return ($t, undef);
         }
       } else {
-        $self->{onerror}->(type => 'syntax error:an+b',
+        $self->{onerror}->(type => 'an+b syntax error',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -866,7 +868,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:after an+b',
+        $self->{onerror}->(type => 'an+b not closed',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -890,7 +892,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:after not simple selector',
+        $self->{onerror}->(type => 'not not closed',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -908,7 +910,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'syntax error:before contains string',
+        $self->{onerror}->(type => 'no contains string',
                            level => $self->{must_level},
                            uri => \$self->{href},
                            token => $t);
@@ -969,4 +971,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/01/20 06:15:20 $
+# $Date: 2008/01/20 09:59:25 $
