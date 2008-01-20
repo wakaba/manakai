@@ -1,6 +1,6 @@
 package Whatpm::CSS::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -127,14 +127,17 @@ sub get_next_token ($) {
     if ($self->{state} == BEFORE_TOKEN_STATE) {
       if ($self->{c} == 0x002D) { # -
         ## NOTE: |-| in |ident| in |IDENT|
-        $self->{t} = {type => IDENT_TOKEN, value => '-', hyphen => 1};
+        $self->{t} = {type => IDENT_TOKEN, value => '-', hyphen => 1,
+                      line => $self->{line}, column => $self->{column}};
         $self->{state} = BEFORE_NMSTART_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0055 or $self->{c} == 0x0075) { # U or u
-        $self->{t} = {type => IDENT_TOKEN, value => chr $self->{c}};
+        $self->{t} = {type => IDENT_TOKEN, value => chr $self->{c},
+                      line => $self->{line}, column => $self->{column}};
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x002B) { # +
+          my ($l, $c) = ($self->{line}, $self->{column});
           $self->{c} = $self->{get_char}->();
           if ((0x0030 <= $self->{c} and $self->{c} <= 0x0039) or # 0..9
               (0x0041 <= $self->{c} and $self->{c} <= 0x0046) or # A..F
@@ -176,7 +179,9 @@ sub get_next_token ($) {
                 #
               } else {
                 my $token = $self->{t};
-                $self->{t} = {type => IDENT_TOKEN, value => '-'};
+                $self->{t} = {type => IDENT_TOKEN, value => '-',
+                              line => $self->{line},
+                              column => $self->{column}};
                 $self->{state} = BEFORE_NMSTART_STATE;
                 # reprocess
                 return $token;
@@ -189,7 +194,8 @@ sub get_next_token ($) {
             return $self->{t};
             #redo A;
           } else {
-            unshift @{$self->{token}}, {type => PLUS_TOKEN};
+            unshift @{$self->{token}},
+                {type => PLUS_TOKEN, line => $l, column => $c};
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
             return $self->{t};
@@ -205,46 +211,54 @@ sub get_next_token ($) {
                $self->{c} == 0x005F or # _
                $self->{c} > 0x007F) { # nonascii
         ## NOTE: |nmstart| in |ident| in |IDENT|
-        $self->{t} = {type => IDENT_TOKEN, value => chr $self->{c}};
+        $self->{t} = {type => IDENT_TOKEN, value => chr $self->{c},
+                      line => $self->{line}, column => $self->{column}};
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x005C) { # \
         ## NOTE: |nmstart| in |ident| in |IDENT|
-        $self->{t} = {type => IDENT_TOKEN, value => ''};
+        $self->{t} = {type => IDENT_TOKEN, value => '',
+                      line => $self->{line}, column => $self->{column}};
         $self->{state} = ESCAPE_OPEN_STATE; $q = 0;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0040) { # @
         ## NOTE: |@| in |ATKEYWORD|
-        $self->{t} = {type => ATKEYWORD_TOKEN, value => ''};
+        $self->{t} = {type => ATKEYWORD_TOKEN, value => '',
+                      line => $self->{line}, column => $self->{column}};
         $self->{state} = AFTER_AT_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0022 or $self->{c} == 0x0027) { # " or '
-        $self->{t} = {type => STRING_TOKEN, value => ''};
+        $self->{t} = {type => STRING_TOKEN, value => '',
+                      line => $self->{line}, column => $self->{column}};
         $self->{state} = STRING_STATE; $q = $self->{c};
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0023) { # #
         ## NOTE: |#| in |HASH|.
-        $self->{t} = {type => HASH_TOKEN, value => ''};
+        $self->{t} = {type => HASH_TOKEN, value => '',
+                      line => $self->{line}, column => $self->{column}};
         $self->{state} = HASH_OPEN_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif (0x0030 <= $self->{c} and $self->{c} <= 0x0039) { # 0..9
         ## NOTE: |num|.
-        $self->{t} = {type => NUMBER_TOKEN, value => chr $self->{c}};
+        $self->{t} = {type => NUMBER_TOKEN, value => chr $self->{c},
+                      line => $self->{line}, column => $self->{column}};
         $self->{state} = NUMBER_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x002E) { # .
         ## NOTE: |num|.
-        $self->{t} = {type => NUMBER_TOKEN, value => '0'};
+        $self->{t} = {type => NUMBER_TOKEN, value => '0',
+                      line => $self->{line}, column => $self->{column}};
         $self->{state} = NUMBER_FRACTION_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x002F) { # /
+        my ($l, $c) = ($self->{line}, $self->{column});
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x002A) { # *
           C: {
@@ -276,10 +290,11 @@ sub get_next_token ($) {
         } else {
           # stay in the state.
           # reprocess
-          return {type => DELIM_TOKEN, value => '/'};
+          return {type => DELIM_TOKEN, value => '/', line => $l, column => $c};
           #redo A;
         }         
       } elsif ($self->{c} == 0x003C) { # <
+        my ($l, $c) = ($self->{line}, $self->{column});
         ## NOTE: |CDO|
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x0021) { # !
@@ -289,28 +304,34 @@ sub get_next_token ($) {
             if ($self->{c} == 0x002D) { # -
               $self->{state} = BEFORE_TOKEN_STATE;
               $self->{c} = $self->{get_char}->();
-              return {type => CDO_TOKEN};
+              return {type => CDO_TOKEN, line => $l, column => $c};
               #redo A;
             } else {
-              unshift @{$self->{token}}, {type => EXCLAMATION_TOKEN};
+              unshift @{$self->{token}},
+                  {type => EXCLAMATION_TOKEN, line => $l, column => $c + 1};
               ## NOTE: |-| in |ident| in |IDENT|
-              $self->{t} = {type => IDENT_TOKEN, value => '-'};
+              $self->{t} = {type => IDENT_TOKEN, value => '-',
+                            line => $l, column => $c + 2};
               $self->{state} = BEFORE_NMSTART_STATE;
               #reprocess
-              return {type => DELIM_TOKEN, value => '<'};
+              return {type => DELIM_TOKEN, value => '<',
+                      line => $l, column => $c};
               #redo A;
             }
           } else {
-            unshift @{$self->{token}}, {type => EXCLAMATION_TOKEN};
+            unshift @{$self->{token}}, {type => EXCLAMATION_TOKEN,
+                                        line => $l, column => $c + 1};
             $self->{state} = BEFORE_TOKEN_STATE;
             #reprocess
-            return {type => DELIM_TOKEN, value => '<'};
+            return {type => DELIM_TOKEN, value => '<',
+                    line => $l, column => $c};
             #redo A;
           }
         } else {
           $self->{state} = BEFORE_TOKEN_STATE;
           #reprocess
-          return {type => DELIM_TOKEN, value => '<'};
+          return {type => DELIM_TOKEN, value => '<',
+                  line => $l, column => $c};
           #redo A;
         }
       } elsif (my $t = {
@@ -339,6 +360,7 @@ sub get_next_token ($) {
                 0x000A => 1, # \n
                 0x000C => 1, # \f
                }->{$self->{c}}) {
+        my ($l, $c) = ($self->{line}, $self->{column});
         W: {
           $self->{c} = $self->{get_char}->();
           if ({
@@ -355,14 +377,15 @@ sub get_next_token ($) {
                             0x002C => COMMA_TOKEN, # ,
                             0x007E => TILDE_TOKEN, # ~
                            }->{$self->{c}}) {
+            my ($l, $c) = ($self->{line}, $self->{column});
             # stay in the state
             $self->{c} = $self->{get_char}->();
-            return {type => $v};
+            return {type => $v, line => $l, column => $c};
             #redo A;
           } else {
             # stay in the state
             # reprocess
-            return {type => S_TOKEN};
+            return {type => S_TOKEN, line => $l, column => $c};
             #redo A;
           }
         } # W
@@ -372,12 +395,13 @@ sub get_next_token ($) {
                         0x0024 => SUFFIXMATCH_TOKEN, # $
                         0x002A => SUBSTRINGMATCH_TOKEN, # *
                        }->{$self->{c}}) {
+        my ($line, $column) = ($self->{line}, $self->{column});
         my $c = $self->{c};
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x003D) { # =
           # stay in the state
           $self->{c} = $self->{get_char}->();
-          return {type => $v};
+          return {type => $v, line => $line, column => $column};
           #redo A;
         } elsif ($v = {
                        0x002A => STAR_TOKEN, # *
@@ -385,50 +409,57 @@ sub get_next_token ($) {
                       }->{$c}) {
           # stay in the state.
           # reprocess
-          return {type => $v};
+          return {type => $v, line => $line, column => $column};
           #redo A;
         } else {
           # stay in the state
           # reprocess
-          return {type => DELIM_TOKEN, value => chr $c};
+          return {type => DELIM_TOKEN, value => chr $c,
+                  line => $line, column => $column};
           #redo A;
         }
       } elsif ($self->{c} == 0x002B) { # +
+        my ($l, $c) = ($self->{line}, $self->{column});
         # stay in the state
         $self->{c} = $self->{get_char}->();
-        return {type => PLUS_TOKEN};
+        return {type => PLUS_TOKEN, line => $l, column => $c};
         #redo A;
       } elsif ($self->{c} == 0x003E) { # >
+        my ($l, $c) = ($self->{line}, $self->{column});
         # stay in the state
         $self->{c} = $self->{get_char}->();
-        return {type => GREATER_TOKEN};
+        return {type => GREATER_TOKEN, line => $l, column => $c};
         #redo A;
       } elsif ($self->{c} == 0x002C) { # ,
+        my ($l, $c) = ($self->{line}, $self->{column});
         # stay in the state
         $self->{c} = $self->{get_char}->();
-        return {type => COMMA_TOKEN};
+        return {type => COMMA_TOKEN, line => $l, column => $c};
         #redo A;
       } elsif ($self->{c} == 0x007E) { # ~
+        my ($l, $c) = ($self->{line}, $self->{column});
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x003D) { # =
           # stay in the state
           $self->{c} = $self->{get_char}->();
-          return {type => INCLUDES_TOKEN};
+          return {type => INCLUDES_TOKEN, line => $l, column => $c};
           #redo A;
         } else {
           # stay in the state
           # reprocess
-          return {type => TILDE_TOKEN};
+          return {type => TILDE_TOKEN, line => $l, column => $c};
           #redo A;
         }
       } elsif ($self->{c} == -1) {
         # stay in the state
         $self->{c} = $self->{get_char}->();
-        return {type => EOF_TOKEN};
+        return {type => EOF_TOKEN,
+                line => $self->{line}, column => $self->{column}};
         #redo A;
       } else {
         # stay in the state
-        $self->{t} = {type => DELIM_TOKEN, value => chr $self->{c}};
+        $self->{t} = {type => DELIM_TOKEN, value => chr $self->{c},
+                      line => $self->{line}, column => $self->{column}};
         $self->{c} = $self->{get_char}->();
         return $self->{t};
         #redo A;
@@ -456,17 +487,23 @@ sub get_next_token ($) {
           if ($self->{c} == 0x003E) { # >
             $self->{state} = BEFORE_TOKEN_STATE;
             $self->{c} = $self->{get_char}->();
-            return {type => CDC_TOKEN};
+            return {type => CDC_TOKEN,
+                    line => $self->{t}->{line},
+                    column => $self->{t}->{column}};
             #redo A;
           } else {
             ## NOTE: |-|, |-|, $self->{c}
             #$self->{t} = {type => IDENT_TOKEN, value => '-'};
+            $self->{t}->{column}++;
             # stay in the state
             # reconsume
-            return {type => MINUS_TOKEN};
+            return {type => MINUS_TOKEN,
+                    line => $self->{t}->{line},
+                    column => $self->{t}->{column} - 1};
             #redo A;
           }
         } elsif ($self->{t}->{type} == DIMENSION_TOKEN) {
+          my ($l, $c) = ($self->{line}, $self->{column}); # second '-'
           $self->{c} = $self->{get_char}->();
           if ($self->{c} == 0x003E) { # >
             unshift @{$self->{token}}, {type => CDC_TOKEN};
@@ -477,12 +514,14 @@ sub get_next_token ($) {
             return $self->{t};
             #redo A;
           } else {
-            ## NOTE: |-|, |-|, $self->{c}
+            ## NOTE: NUMBER, |-|, |-|, $self->{c}
             my $t = $self->{t};
             $t->{type} = NUMBER_TOKEN;
             $t->{value} = '';
-            $self->{t} = {type => IDENT_TOKEN, value => '-', hyphen => 1};
-            unshift @{$self->{token}}, {type => MINUS_TOKEN};
+            $self->{t} = {type => IDENT_TOKEN, value => '-', hyphen => 1,
+                          line => $l, column => $c};
+            unshift @{$self->{token}}, {type => MINUS_TOKEN,
+                                        line => $l, column => $c - 1};
             # stay in the state
             # reconsume
             return $t;
@@ -497,7 +536,10 @@ sub get_next_token ($) {
       
       if ($self->{t}->{type} == DIMENSION_TOKEN) {
         ## NOTE: |-| after |NUMBER|.
-        unshift @{$self->{token}}, {type => MINUS_TOKEN};
+        unshift @{$self->{token}}, {type => MINUS_TOKEN,
+                                    line => $self->{line},
+                                    column => $self->{column} - 1};
+        ## BUG: column might be wrong if on the line boundary.
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
         $self->{t}->{type} = NUMBER_TOKEN;
@@ -507,7 +549,9 @@ sub get_next_token ($) {
         ## NOTE: |-| not followed by |nmstart|.
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
-        return {type => MINUS_TOKEN};
+        return {type => MINUS_TOKEN,
+                line => $self->{line}, column => $self->{column} - 1};
+        ## BUG: column might be wrong if on the line boundary.
       }
     } elsif ($self->{state} == AFTER_AT_STATE) {
       if ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
@@ -530,7 +574,9 @@ sub get_next_token ($) {
       } else {
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
-        return {type => DELIM_TOKEN, value => '@'};
+        return {type => DELIM_TOKEN, value => '@',
+                line => $self->{t}->{line},
+                column => $self->{t}->{column}};
       }
     } elsif ($self->{state} == AFTER_AT_HYPHEN_STATE) {
       if ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
@@ -625,7 +671,9 @@ sub get_next_token ($) {
       } else {
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
-        return {type => DELIM_TOKEN, value => '#'};
+        return {type => DELIM_TOKEN, value => '#',
+                line => $self->{t}->{line},
+                column => $self->{t}->{column}};
         #redo A;
       }
     } elsif ($self->{state} == NAME_STATE) {
@@ -895,8 +943,14 @@ sub get_next_token ($) {
           if ($self->{t}->{hyphen} and $self->{t}->{value} eq '-') {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
-            unshift @{$self->{token}}, {type => MINUS_TOKEN};
+            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
+                                        line => $self->{line},
+                                        column => $self->{column} - 2};
+            unshift @{$self->{token}}, {type => MINUS_TOKEN,
+                                        line => $self->{line},
+                                        column => $self->{column} - 1};
+            ## BUG: line and column might be wrong if they are on the
+            ## line boundary.
             $self->{t}->{type} = NUMBER_TOKEN;
             $self->{t}->{value} = '';
             return $self->{t};
@@ -904,13 +958,21 @@ sub get_next_token ($) {
           } elsif (length $self->{t}->{value}) {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
+            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
+                                        line => $self->{line},
+                                        column => $self->{column} - 1};
+            ## BUG: line and column might be wrong if they are on the
+            ## line boundary.
             return $self->{t};
             #redo A;
           } else {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
+            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
+                                        line => $self->{line},
+                                        column => $self->{column} - 1};
+            ## BUG: line and column might be wrong if they are on the
+            ## line boundary.
             $self->{t}->{type} = NUMBER_TOKEN;
             $self->{t}->{value} = '';
             return $self->{t};
@@ -920,19 +982,33 @@ sub get_next_token ($) {
           if ($self->{t}->{hyphen} and $self->{t}->{value} eq '-') {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
-            return {type => MINUS_TOKEN};
+            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
+                                        line => $self->{line},
+                                        column => $self->{column} - 2};
+            return {type => MINUS_TOKEN,
+                    line => $self->{line},
+                    column => $self->{column} - 1};
+            ## BUG: line and column might be wrong if they are on the
+            ## line boundary.
             #redo A;
           } elsif (length $self->{t}->{value}) {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
+            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
+                                        line => $self->{line},
+                                        column => $self->{column} - 1};
+            ## BUG: line and column might be wrong if they are on the
+            ## line boundary.
             return $self->{t};
             #redo A;
           } else {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
-            return {type => DELIM_TOKEN, value => '\\'};
+            return {type => DELIM_TOKEN, value => '\\',
+                    line => $self->{line},
+                    column => $self->{column} - 1};
+            ## BUG: line and column might be wrong if they are on the
+            ## line boundary.
             #redo A;
           }
         }
@@ -941,7 +1017,11 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
+        unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
+                                    line => $self->{line},
+                                    column => $self->{column} - 1};
+        ## BUG: line and column might be wrong if they are on the
+        ## line boundary.
         $self->{t}->{type} = {
           STRING_TOKEN, INVALID_TOKEN,
           URI_TOKEN, URI_INVALID_TOKEN,
@@ -1110,7 +1190,10 @@ sub get_next_token ($) {
       } else {
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
-        return {type => DOT_TOKEN};
+        return {type => DOT_TOKEN,
+                line => $self->{line}, column => $self->{column} - 1};
+        ## BUG: line and column might be wrong if they are on the
+        ## line boundary.
         #redo A;
       }
     } elsif ($self->{state} == NUMBER_DOT_NUMBER_STATE) {
@@ -1240,4 +1323,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/01/20 04:02:25 $
+# $Date: 2008/01/20 06:15:20 $

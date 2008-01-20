@@ -51,14 +51,9 @@ sub parse_char_string ($$) {
   pos ($s) = 0;
   my $line = 1;
   my $column = 0;
-
-  my $_onerror = $self->{onerror};
-  my $onerror = sub {
-    $_onerror->(@_, line => $line, column => $column);
-  };
   
   my $tt = Whatpm::CSS::Tokenizer->new;
-  $tt->{onerror} = $onerror;
+  my $onerror = $tt->{onerror} = $self->{onerror};
   $tt->{get_char} = sub ($) {
     if (pos $s < length $s) {
       my $c = ord substr $s, pos ($s)++, 1;
@@ -86,7 +81,7 @@ sub parse_char_string ($$) {
   $tt->init;
 
   my $sp = Whatpm::CSS::SelectorsParser->new;
-  $sp->{onerror} = $onerror;
+  $sp->{onerror} = $self->{onerror};
   $sp->{must_level} = $self->{must_level};
   $sp->{pseudo_element} = $self->{pseudo_element};
   $sp->{pseudo_class} = $self->{pseudo_class};
@@ -104,6 +99,7 @@ sub parse_char_string ($$) {
   require Message::DOM::CSSStyleDeclaration;
 
   $self->{base_uri} = $self->{href} unless defined $self->{base_uri};
+  $sp->{href} = $self->{href};
 
   my $state = BEFORE_STATEMENT_STATE;
   my $t = $tt->get_next_token;
@@ -172,7 +168,7 @@ sub parse_char_string ($$) {
               } else {
                 $onerror->(type => 'at:namespace:not allowed',
                            level => $self->{must_level},
-                           uri => $self->{href},
+                           uri => \$self->{href},
                            token => $t);
               }
               
@@ -188,6 +184,7 @@ sub parse_char_string ($$) {
 
           $onerror->(type => 'syntax error:at:namespace',
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
           #
         } elsif (lc $t->{value} eq 'charset') { ## TODO: case folding
@@ -208,6 +205,7 @@ sub parse_char_string ($$) {
               } else {
                  $onerror->(type => 'at:charset:not allowed',
                             level => $self->{must_level},
+                            uri => \$self->{href},
                             token => $t);
               }
 
@@ -225,6 +223,7 @@ sub parse_char_string ($$) {
 
           $onerror->(type => 'syntax error:at:charset',
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
           #
         ## NOTE: When adding support for new at-rule, insert code
@@ -233,6 +232,7 @@ sub parse_char_string ($$) {
         } else {
           $onerror->(type => 'not supported:at:'.$t->{value},
                      level => $self->{unsupported_level},
+                     uri => \$self->{href},
                      token => $t);
         }
 
@@ -248,6 +248,7 @@ sub parse_char_string ($$) {
         if (@$open_rules > 1) {
           $onerror->(type => 'syntax error:block not closed',
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
         }
 
@@ -274,6 +275,7 @@ sub parse_char_string ($$) {
         } else {
           $onerror->(type => 'syntax error:after selectors',
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
 
           ## Stay in the state.
@@ -319,6 +321,7 @@ sub parse_char_string ($$) {
                 } else {
                   $onerror->(type => 'syntax error:important',
                              level => $self->{must_level},
+                             uri => \$self->{href},
                              token => $t);
                   
                   ## Reprocess.
@@ -338,7 +341,8 @@ sub parse_char_string ($$) {
           } else {
             $onerror->(type => 'not supported:property',
                        level => $self->{unsupported_level},
-                       token => $t, value => $prop_name);
+                       token => $t, value => $prop_name,
+                       uri => \$self->{href});
 
             #
             $state = IGNORED_DECLARATION_STATE;
@@ -347,6 +351,7 @@ sub parse_char_string ($$) {
         } else {
           $onerror->(type => 'syntax error:property colon',
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
 
           #
@@ -366,7 +371,7 @@ sub parse_char_string ($$) {
       } elsif ($t->{type} == EOF_TOKEN) {
         $onerror->(type => 'syntax error:ruleset not closed',
                    level => $self->{must_level},
-                   uri => $self->{href},
+                   uri => \$self->{href},
                    token => $t);
         ## Reprocess.
         $state = BEFORE_STATEMENT_STATE;
@@ -375,12 +380,12 @@ sub parse_char_string ($$) {
         if ($prop_value) {
           $onerror->(type => 'syntax error:property semicolon',
                      level => $self->{must_level},
-                     uri => $self->{href},
+                     uri => \$self->{href},
                      token => $t);
         } else {
           $onerror->(type => 'syntax error:property name',
                      level => $self->{must_level},
-                     uri => $self->{href},
+                     uri => \$self->{href},
                      token => $t);
         }
 
@@ -935,6 +940,7 @@ my $parse_color = sub {
   
   $onerror->(type => 'syntax error:'.$prop_name,
              level => $self->{must_level},
+             uri => \$self->{href},
              token => $t);
   
   return ($t, undef);
@@ -1221,8 +1227,9 @@ my $one_keyword_parser = sub {
     }
   }
   
-  $onerror->(type => 'syntax error:keyword:'.$prop_name,
+  $onerror->(type => 'syntax error:'.$prop_name,
              level => $self->{must_level},
+             uri => \$self->{href},
              token => $t);
   return ($t, undef);
 };
@@ -1735,6 +1742,7 @@ $Prop->{'z-index'} = {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
   },
@@ -1776,6 +1784,7 @@ $Prop->{orphans} = {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
   },
@@ -1829,6 +1838,7 @@ $Prop->{opacity} = {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
   },
@@ -1913,6 +1923,7 @@ $Prop->{'font-size'} = {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
   },
@@ -2077,6 +2088,7 @@ $Prop->{'letter-spacing'} = {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
   },
@@ -2224,6 +2236,7 @@ $Prop->{'margin-top'} = {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
   },
@@ -2595,6 +2608,7 @@ $Prop->{'line-height'} = {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
   },
@@ -2889,6 +2903,7 @@ $Prop->{'font-weight'} = {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
   },
@@ -2956,6 +2971,7 @@ my $uri_or_none_parser = sub {
     #  if ($t->{type} == EOF_TOKEN) {
     #    $onerror->(type => 'syntax error:eof:'.$prop_name,
     #               level => $self->{must_level},
+    #               uri => \$self->{href},
     #               token => $t);
     #    
     #    return ($t, {$prop_name => ['URI', $value, \($self->{base_uri})]});
@@ -2964,6 +2980,7 @@ my $uri_or_none_parser = sub {
     
     $onerror->(type => 'syntax error:'.$prop_name,
                level => $self->{must_level},
+               uri => \$self->{href},
                token => $t);
     return ($t, undef);
 }; # $uri_or_none_parser
@@ -3163,6 +3180,7 @@ $Prop->{'font-family'} = {
         } else {
           $onerror->(type => 'syntax error:'.$prop_name,
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
           return ($t, undef);
         }
@@ -3232,6 +3250,7 @@ $Prop->{cursor} = {
         } else {
           $onerror->(type => 'syntax error:'.$prop_name,
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
           return ($t, undef);
         }
@@ -3241,6 +3260,7 @@ $Prop->{cursor} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3334,8 +3354,9 @@ $Prop->{'border-style'} = {
         $prop_value{'border-left-style'} = $prop_value{'border-right-style'};
         return ($t, \%prop_value);
       } else {
-        $onerror->(type => 'syntax error:keyword:'.$prop_name,
+        $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3343,8 +3364,9 @@ $Prop->{'border-style'} = {
       $prop_value{'border-bottom-style'} = $prop_value{'border-top-style'};
       $prop_value{'border-left-style'} = $prop_value{'border-right-style'};
     } else {
-      $onerror->(type => 'syntax error:keyword:'.$prop_name,
+      $onerror->(type => 'syntax error:'.$prop_name,
                  level => $self->{must_level},
+                 uri => \$self->{href},
                  token => $t);
       return ($t, undef);
     }
@@ -3357,8 +3379,9 @@ $Prop->{'border-style'} = {
           $self->{prop_value}->{'border-right-style'}->{$prop_value}) {
         $prop_value{'border-right-style'} = ["KEYWORD", $prop_value];
       } else {
-        $onerror->(type => 'syntax error:keyword:'.$prop_name,
+        $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3372,8 +3395,9 @@ $Prop->{'border-style'} = {
             $self->{prop_value}->{'border-bottom-style'}->{$prop_value}) {
           $prop_value{'border-bottom-style'} = ["KEYWORD", $prop_value];
         } else {
-          $onerror->(type => 'syntax error:keyword:'.$prop_name,
+          $onerror->(type => 'syntax error:'.$prop_name,
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
           return ($t, undef);
         }
@@ -3386,8 +3410,9 @@ $Prop->{'border-style'} = {
               $self->{prop_value}->{'border-left-style'}->{$prop_value}) {
             $prop_value{'border-left-style'} = ["KEYWORD", $prop_value];
           } else {
-            $onerror->(type => 'syntax error:keyword:'.$prop_name,
+            $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             return ($t, undef);
           }
@@ -3451,6 +3476,7 @@ $Prop->{'border-color'} = {
       } elsif ($pv->{'border-color'}->[0] eq 'INHERIT') {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3469,6 +3495,7 @@ $Prop->{'border-color'} = {
         } elsif ($pv->{'border-color'}->[0] eq 'INHERIT') {
           $onerror->(type => 'syntax error:'.$prop_name,
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
           return ($t, undef);
         }
@@ -3486,6 +3513,7 @@ $Prop->{'border-color'} = {
           } elsif ($pv->{'border-color'}->[0] eq 'INHERIT') {
             $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             return ($t, undef);
           }
@@ -3552,6 +3580,7 @@ $Prop->{'border-top'} = {
         } else {
           $onerror->(type => 'syntax error:'.$prop_name,
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
           return ($t, undef);
         }
@@ -3588,6 +3617,7 @@ $Prop->{'border-top'} = {
         if ($pv->{$prop_name.'-color'}->[0] eq 'INHERIT') {
           $onerror->(type => 'syntax error:'.$prop_name,
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
         } else {
           $prop_value{$prop_name.'-color'} = $pv->{$prop_name.'-color'};
@@ -3608,6 +3638,7 @@ $Prop->{'border-top'} = {
           if ($pv->{$prop_name.'-width'}->[0] eq 'INHERIT') {
             $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
           } else {
             $prop_value{$prop_name.'-width'} = $pv->{$prop_name.'-width'};
@@ -3748,6 +3779,7 @@ $Prop->{margin} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3774,12 +3806,14 @@ $Prop->{margin} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
     } else {
       $onerror->(type => 'syntax error:'.$prop_name,
                  level => $self->{must_level},
+                 uri => \$self->{href},
                  token => $t);
       return ($t, undef);
     }
@@ -3803,6 +3837,7 @@ $Prop->{margin} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3823,6 +3858,7 @@ $Prop->{margin} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3830,6 +3866,7 @@ $Prop->{margin} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3853,6 +3890,7 @@ $Prop->{margin} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3873,6 +3911,7 @@ $Prop->{margin} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3880,6 +3919,7 @@ $Prop->{margin} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3902,6 +3942,7 @@ $Prop->{margin} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3922,6 +3963,7 @@ $Prop->{margin} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3929,6 +3971,7 @@ $Prop->{margin} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3982,6 +4025,7 @@ $Prop->{padding} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -3992,6 +4036,7 @@ $Prop->{padding} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4003,6 +4048,7 @@ $Prop->{padding} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4018,12 +4064,14 @@ $Prop->{padding} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
     } else {
       $onerror->(type => 'syntax error:'.$prop_name,
                  level => $self->{must_level},
+                 uri => \$self->{href},
                  token => $t);
       return ($t, undef);
     }
@@ -4047,6 +4095,7 @@ $Prop->{padding} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4057,6 +4106,7 @@ $Prop->{padding} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4068,6 +4118,7 @@ $Prop->{padding} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4075,6 +4126,7 @@ $Prop->{padding} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4098,6 +4150,7 @@ $Prop->{padding} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4108,6 +4161,7 @@ $Prop->{padding} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4119,6 +4173,7 @@ $Prop->{padding} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4126,6 +4181,7 @@ $Prop->{padding} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4148,6 +4204,7 @@ $Prop->{padding} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4158,6 +4215,7 @@ $Prop->{padding} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4169,6 +4227,7 @@ $Prop->{padding} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4176,6 +4235,7 @@ $Prop->{padding} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4229,6 +4289,7 @@ $Prop->{'border-spacing'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4240,6 +4301,7 @@ $Prop->{'border-spacing'} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4254,12 +4316,14 @@ $Prop->{'border-spacing'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
     } else {
       $onerror->(type => 'syntax error:'.$prop_name,
                  level => $self->{must_level},
+                 uri => \$self->{href},
                  token => $t);
       return ($t, undef);
     }
@@ -4282,6 +4346,7 @@ $Prop->{'border-spacing'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4293,6 +4358,7 @@ $Prop->{'border-spacing'} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4300,6 +4366,7 @@ $Prop->{'border-spacing'} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4352,6 +4419,7 @@ $Prop->{'background-position'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4393,12 +4461,14 @@ $Prop->{'background-position'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
     } else {
       $onerror->(type => 'syntax error:'.$prop_name,
                  level => $self->{must_level},
+                 uri => \$self->{href},
                  token => $t);
       return ($t, undef);
     }
@@ -4419,6 +4489,7 @@ $Prop->{'background-position'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4441,6 +4512,7 @@ $Prop->{'background-position'} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4524,6 +4596,7 @@ $Prop->{background} = {
             } else {
               $onerror->(type => 'syntax error:'.$prop_name,
                          level => $self->{must_level},
+                         uri => \$self->{href},
                          token => $t);
               last B;
             }
@@ -4539,6 +4612,7 @@ $Prop->{background} = {
           } elsif ($sign < 0) {
             $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             last B;
           }
@@ -4589,6 +4663,7 @@ $Prop->{background} = {
           } else {
             $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             last B;
           }
@@ -4624,6 +4699,7 @@ $Prop->{background} = {
           } else {
             $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             last B;
           }
@@ -4650,6 +4726,7 @@ $Prop->{background} = {
           } else {
             $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
           }
         }
@@ -4663,6 +4740,7 @@ $Prop->{background} = {
         } else {
           $onerror->(type => 'syntax error:'.$prop_name,
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
         }
       }
@@ -4762,6 +4840,7 @@ $Prop->{font} = {
           } else {
             $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             return ($t, undef);
           }
@@ -4789,6 +4868,7 @@ $Prop->{font} = {
     if ($pv->{font}->[0] eq 'INHERIT') {
       $onerror->(type => 'syntax error:'.$prop_name,
                  level => $self->{must_level},
+                 uri => \$self->{href},
                  token => $t);
       return ($t, undef);
     }
@@ -4804,6 +4884,7 @@ $Prop->{font} = {
       if ($pv->{font}->[0] eq 'INHERIT') {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4879,6 +4960,7 @@ $Prop->{'border-width'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4890,6 +4972,7 @@ $Prop->{'border-width'} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4907,12 +4990,14 @@ $Prop->{'border-width'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
     } else {
       $onerror->(type => 'syntax error:'.$prop_name,
                  level => $self->{must_level},
+                 uri => \$self->{href},
                  token => $t);
       return ($t, undef);
     }
@@ -4936,6 +5021,7 @@ $Prop->{'border-width'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4947,6 +5033,7 @@ $Prop->{'border-width'} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4960,6 +5047,7 @@ $Prop->{'border-width'} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4983,6 +5071,7 @@ $Prop->{'border-width'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -4994,6 +5083,7 @@ $Prop->{'border-width'} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -5007,6 +5097,7 @@ $Prop->{'border-width'} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -5029,6 +5120,7 @@ $Prop->{'border-width'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -5040,6 +5132,7 @@ $Prop->{'border-width'} = {
       unless ($value >= 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -5053,6 +5146,7 @@ $Prop->{'border-width'} = {
       if ($sign < 0) {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -5102,9 +5196,9 @@ $Prop->{'list-style'} = {
           $none++;
         } elsif ($Prop->{'list-style-type'}->{keyword}->{$prop_value}) {
           if (exists $prop_value{'list-style-type'}) {
-            $onerror->(type => q[syntax error:duplicate:'list-style-type':].
-                           $prop_name,
+            $onerror->(type => q[syntax error:duplicate:'list-style-type'],
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             return ($t, undef);
           } else {
@@ -5112,9 +5206,9 @@ $Prop->{'list-style'} = {
           }
         } elsif ($Prop->{'list-style-position'}->{keyword}->{$prop_value}) {
           if (exists $prop_value{'list-style-position'}) {
-            $onerror->(type => q[syntax error:duplicate:'list-style-position':].
-                           $prop_name,
+            $onerror->(type => q[syntax error:duplicate:'list-style-position'],
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             return ($t, undef);
           }
@@ -5129,6 +5223,7 @@ $Prop->{'list-style'} = {
           if ($f == 1) {
             $onerror->(type => 'syntax error:'.$prop_name,
                        level => $self->{must_level},
+                       uri => \$self->{href},
                        token => $t);
             return ($t, undef);
           } else {
@@ -5137,8 +5232,8 @@ $Prop->{'list-style'} = {
         }
       } elsif ($t->{type} == URI_TOKEN) {
         if (exists $prop_value{'list-style-image'}) {
-          $onerror->(type => q[syntax error:duplicate:'list-style-image':].
-                         $prop_name,
+          $onerror->(type => q[syntax error:duplicate:'list-style-image'],
+                     uri => \$self->{href},
                      level => $self->{must_level},
                      token => $t);
           return ($t, undef);
@@ -5149,8 +5244,9 @@ $Prop->{'list-style'} = {
         $t = $tt->get_next_token;
       } else {
         if ($f == 1) {
-          $onerror->(type => 'syntax error:keyword:'.$prop_name,
+          $onerror->(type => 'syntax error:'.$prop_name,
                      level => $self->{must_level},
+                     uri => \$self->{href},
                      token => $t);
           return ($t, undef);
         } else {
@@ -5165,8 +5261,8 @@ $Prop->{'list-style'} = {
     if ($none == 1) {
       if (exists $prop_value{'list-style-type'}) {
         if (exists $prop_value{'list-style-image'}) {
-          $onerror->(type => q[syntax error:duplicate:'list-style-image':].
-                         $prop_name,
+          $onerror->(type => q[syntax error:duplicate:'list-style-image'],
+                     uri => \$self->{href},
                      level => $self->{must_level},
                      token => $t);
           return ($t, undef);
@@ -5180,15 +5276,15 @@ $Prop->{'list-style'} = {
       }
     } elsif ($none == 2) {
       if (exists $prop_value{'list-style-type'}) {
-        $onerror->(type => q[syntax error:duplicate:'list-style-type':].
-                       $prop_name,
+        $onerror->(type => q[syntax error:duplicate:'list-style-type'],
+                   uri => \$self->{href},
                    level => $self->{must_level},
                    token => $t);
         return ($t, undef);
       }
       if (exists $prop_value{'list-style-image'}) {
-        $onerror->(type => q[syntax error:duplicate:'list-style-image':].
-                       $prop_name,
+        $onerror->(type => q[syntax error:duplicate:'list-style-image'],
+                   uri => \$self->{href},
                    level => $self->{must_level},
                    token => $t);
         return ($t, undef);
@@ -5197,8 +5293,8 @@ $Prop->{'list-style'} = {
       $prop_value{'list-style-type'} = ['KEYWORD', 'none'];
       $prop_value{'list-style-image'} = ['KEYWORD', 'none'];
     } elsif ($none == 3) {
-      $onerror->(type => q[syntax error:duplicate:'list-style-type':].
-                     $prop_name,
+      $onerror->(type => q[syntax error:duplicate:'list-style-type'],
+                 uri => \$self->{href},
                  level => $self->{must_level},
                  token => $t);
       return ($t, undef);
@@ -5253,6 +5349,7 @@ $Prop->{'text-decoration'} = {
       } else {
         $onerror->(type => 'syntax error:'.$prop_name,
                    level => $self->{must_level},
+                   uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
@@ -5294,4 +5391,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/20 04:02:25 $
+## $Date: 2008/01/20 06:15:20 $
