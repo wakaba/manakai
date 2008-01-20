@@ -32,7 +32,7 @@ if ($mode eq '/csstext') {
   my $p = Whatpm::CSS::Parser->new;
   $p->{onerror} = sub {
     my (%opt) = @_;
-    print STDOUT "$opt{line},$opt{column},$opt{level},$opt{type}\n";
+    print STDOUT "$opt{uri},$opt{token}->{line}:$opt{token}->{column},@{[Whatpm::CSS::Tokenizer->serialize_token ($opt{token})]},$opt{line},$opt{column},$opt{level},$opt{type}\n";
   };
 
   $p->{prop}->{$_} = 1 for qw/
@@ -309,4 +309,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/14 11:34:22 $
+## $Date: 2008/01/20 04:02:59 $
