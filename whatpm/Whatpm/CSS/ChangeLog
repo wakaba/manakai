@@ -1,3 +1,16 @@
+2008-01-20  Wakaba  <wakaba@suika.fam.cx>
+
+	* Parser.pm (parse_char_string): Revise |$tt->{get_char}| callback
+	so that it sets |$tt->{line}| and |$tt->{column}| options.  Some
+	error handler calling codes are modified for the experimental
+	support for more precious reporting of error location.
+
+	* Tokenizer.pm (new): The |onerror| option has been removed, since
+	it was never used.
+	(get_next_token): Limited and experimental support for token
+	emittion with the information on the position where it occurs.
+	(serialize_token): New function.
+	
 2008-01-14  Wakaba  <wakaba@suika.fam.cx>
 
 	* Parser.pm (-moz-opacity): DOM attribute name was wrong.

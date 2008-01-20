@@ -59,7 +59,7 @@ sub parse_char_string ($$) {
   
   my $tt = Whatpm::CSS::Tokenizer->new;
   $tt->{onerror} = $onerror;
-  $tt->{get_char} = sub {
+  $tt->{get_char} = sub ($) {
     if (pos $s < length $s) {
       my $c = ord substr $s, pos ($s)++, 1;
       if ($c == 0x000A) {
@@ -75,6 +75,9 @@ sub parse_char_string ($$) {
       } else {
         $column++;
       }
+      ## TODO: $tt -> $_[0]
+      $tt->{line} = $line;
+      $tt->{column} = $column;
       return $c;
     } else {
       return -1;
@@ -169,6 +172,7 @@ sub parse_char_string ($$) {
               } else {
                 $onerror->(type => 'at:namespace:not allowed',
                            level => $self->{must_level},
+                           uri => $self->{href},
                            token => $t);
               }
               
@@ -362,6 +366,7 @@ sub parse_char_string ($$) {
       } elsif ($t->{type} == EOF_TOKEN) {
         $onerror->(type => 'syntax error:ruleset not closed',
                    level => $self->{must_level},
+                   uri => $self->{href},
                    token => $t);
         ## Reprocess.
         $state = BEFORE_STATEMENT_STATE;
@@ -370,10 +375,12 @@ sub parse_char_string ($$) {
         if ($prop_value) {
           $onerror->(type => 'syntax error:property semicolon',
                      level => $self->{must_level},
+                     uri => $self->{href},
                      token => $t);
         } else {
           $onerror->(type => 'syntax error:property name',
                      level => $self->{must_level},
+                     uri => $self->{href},
                      token => $t);
         }
 
@@ -5287,4 +5294,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/14 13:53:50 $
+## $Date: 2008/01/20 04:02:25 $

@@ -1,6 +1,6 @@
 package Whatpm::CSS::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -96,8 +96,7 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = ('token' => [@EXPORT_OK]);
 
 sub new ($) {
-  my $self = bless {token => [], get_char => sub { -1 },
-                    onerror => sub { }}, shift;
+  my $self = bless {token => [], get_char => sub { -1 }}, shift;
   return $self;
 } # new
 
@@ -328,9 +327,10 @@ sub get_next_token ($) {
                         0x005B => LBRACKET_TOKEN, # [
                         0x005D => RBRACKET_TOKEN, # ]
                }->{$self->{c}}) {
+        my ($l, $c) = ($self->{line}, $self->{column});
         # stay in the state
-        $self->{c} = $self->{get_char}->();
-        return {type => $t};
+        $self->{c} = $self->{get_char}->($self);
+        return {type => $t, line => $l, column => $c};
         # redo A;
       } elsif ({
                 0x0020 => 1, # SP
@@ -1133,6 +1133,103 @@ sub get_next_token ($) {
   } # A
 } # get_next_token
 
+sub serialize_token ($$) {
+  shift;
+  my $t = shift;
+
+  ## NOTE: This function is not intended for roundtrip-able serialization.
+
+  if ($t->{type} == IDENT_TOKEN) {
+    return $t->{value};
+  } elsif ($t->{type} == ATKEYWORD_TOKEN) {
+    return '@' . $t->{value};
+  } elsif ($t->{type} == HASH_TOKEN) {
+    return '#' . $t->{value};
+  } elsif ($t->{type} == FUNCTION_TOKEN) {
+    return $t->{value} . '(';
+  } elsif ($t->{type} == URI_TOKEN) {
+    return 'url(' . $t->{value} . ')';
+  } elsif ($t->{type} == URI_INVALID_TOKEN) {
+    return 'url(' . $t->{value};
+  } elsif ($t->{type} == URI_PREFIX_TOKEN) {
+    return 'url-prefix(' . $t->{value} . ')';
+  } elsif ($t->{type} == URI_PREFIX_INVALID_TOKEN) {
+    return 'url-prefix(' . $t->{value};
+  } elsif ($t->{type} == STRING_TOKEN) {
+    return '"' . $t->{value} . '"';
+  } elsif ($t->{type} == INVALID_TOKEN) {
+    return '"' . $t->{value};
+  } elsif ($t->{type} == NUMBER_TOKEN) {
+    return $t->{number};
+  } elsif ($t->{type} == DIMENSION_TOKEN) {
+    return $t->{number} . $t->{value};
+  } elsif ($t->{type} == PERCENTAGE_TOKEN) {
+    return $t->{number} . '%';
+  } elsif ($t->{type} == UNICODE_RANGE_TOKEN) {
+    return 'U+' . $t->{value};
+  } elsif ($t->{type} == DELIM_TOKEN) {
+    return $t->{value};
+  } elsif ($t->{type} == PLUS_TOKEN) {
+    return '+';
+  } elsif ($t->{type} == GREATER_TOKEN) {
+    return '>';
+  } elsif ($t->{type} == COMMA_TOKEN) {
+    return ',';
+  } elsif ($t->{type} == TILDE_TOKEN) {
+    return '~';
+  } elsif ($t->{type} == DASHMATCH_TOKEN) {
+    return '|=';
+  } elsif ($t->{type} == PREFIXMATCH_TOKEN) {
+    return '^=';
+  } elsif ($t->{type} == SUFFIXMATCH_TOKEN) {
+    return '$=';
+  } elsif ($t->{type} == SUBSTRINGMATCH_TOKEN) {
+    return '*=';
+  } elsif ($t->{type} == INCLUDES_TOKEN) {
+    return '~=';
+  } elsif ($t->{type} == SEMICOLON_TOKEN) {
+    return ';';
+  } elsif ($t->{type} == LBRACE_TOKEN) {
+    return '{';
+  } elsif ($t->{type} == RBRACE_TOKEN) {
+    return '}';
+  } elsif ($t->{type} == LPAREN_TOKEN) {
+    return '(';
+  } elsif ($t->{type} == RPAREN_TOKEN) {
+    return ')';
+  } elsif ($t->{type} == LBRACKET_TOKEN) {
+    return '[';
+  } elsif ($t->{type} == RBRACKET_TOKEN) {
+    return ']';
+  } elsif ($t->{type} == S_TOKEN) {
+    return ' ';
+  } elsif ($t->{type} == CDO_TOKEN) {
+    return '<!--';
+  } elsif ($t->{type} == CDC_TOKEN) {
+    return '-->';
+  } elsif ($t->{type} == COMMENT_TOKEN) {
+    return '/**/';
+  } elsif ($t->{type} == COMMENT_INVALID_TOKEN) {
+    return '/*';
+  } elsif ($t->{type} == EOF_TOKEN) {
+    return '{EOF}';
+  } elsif ($t->{type} == MINUS_TOKEN) {
+    return '-';
+  } elsif ($t->{type} == STAR_TOKEN) {
+    return '*';
+  } elsif ($t->{type} == VBAR_TOKEN) {
+    return '|';
+  } elsif ($t->{type} == COLON_TOKEN) {
+    return ':';
+  } elsif ($t->{type} == MATCH_TOKEN) {
+    return '=';
+  } elsif ($t->{type} == EXCLAMATION_TOKEN) {
+    return '!';
+  } else {
+    return '{'.$t->{type}.'}';
+  }
+} # serialize_token
+
 =head1 LICENSE
 
 Copyright 2007 Wakaba <w@suika.fam.cx>
@@ -1143,4 +1240,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/10/17 10:46:26 $
+# $Date: 2008/01/20 04:02:25 $
