@@ -4,12 +4,26 @@ use Whatpm::CSS::Tokenizer qw(:token);
 require Whatpm::CSS::SelectorsParser;
 
 sub new ($) {
-  my $self = bless {onerror => sub { }, must_level => 'm',
+  my $self = bless {must_level => 'm',
                     message_level => 'w',
                     unsupported_level => 'unsupported'}, shift;
   # $self->{base_uri}
   # $self->{unitless_px} = 1/0
   # $self->{hashless_rgb} = 1/0
+
+  ## Default error handler
+  $self->{onerror} = sub {
+    my %opt = @_;
+    require Carp;
+    Carp::carp
+        (sprintf 'Document <%s>: Line %d column %d (token %s): %s%s',
+             defined $opt{uri} ? ${$opt{uri}} : 'thisdocument:/',
+             $opt{token}->{line},
+             $opt{token}->{column},
+             Whatpm::CSS::Tokenizer->serialize_token ($opt{token}),
+             $opt{type},
+             defined $opt{value} ? " (value $opt{value})" : '');
+  };
 
   ## Media-dependent RGB color range clipper
   $self->{clip_color} = sub {
@@ -75,6 +89,7 @@ sub parse_char_string ($$) {
       $tt->{column} = $column;
       return $c;
     } else {
+      $tt->{column} = $column + 1; ## Set the same number always.
       return -1;
     }
   }; # $tt->{get_char}
@@ -5392,4 +5407,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/20 09:59:25 $
+## $Date: 2008/01/22 12:47:26 $

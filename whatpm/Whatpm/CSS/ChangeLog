@@ -1,3 +1,11 @@
+2008-01-22  Wakaba  <wakaba@suika.fam.cx>
+
+	* Parser.pm (new {onerror}): The default error handler (outputting
+	to the standard error output) is defined.
+	(parse_char_string {get_char}): Set the next number to the
+	column number of the last character as the column of the
+	end of file pseudo-character.
+
 2008-01-20  Wakaba  <wakaba@suika.fam.cx>
 
 	* Parser.pm, SelectorsParser.pm: Error type strings are revised.

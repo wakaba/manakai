@@ -1,4 +1,153 @@
 #data
+#cssom
+#csstext
+
+#data
+p
+#errors
+;1;2;m;no declaration block
+#cssom
+#csstext
+
+#data
+p {
+#errors
+;1;4;m;block not closed
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {}
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {;}
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {!;}
+#errors
+;1;4;m;no property name
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {a;}
+#errors
+;1;5;m;no property colon
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {color:!}
+#errors
+;1;10;m;syntax error:color
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {color:blue}
+#cssom
+| <p>
+|   color: blue
+#csstext
+p {
+  color: blue;
+}
+
+#data
+p {color:blue!}
+#errors
+;1;15;m;priority syntax error
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {color:blue!i}
+#errors
+;1;15;m;priority syntax error
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {color:blue!important}
+#errors
+#cssom
+| <p>
+|   color: blue !important
+#csstext
+p {
+  color: blue ! important;
+}
+
+#data
+p {color:blue!importants}
+#errors
+;1;15;m;priority syntax error
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {color:blue!important!}
+#errors
+;1;24;m;no priority semicolon
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {color:blue!important;}
+#errors
+#cssom
+| <p>
+|   color: blue !important
+#csstext
+p {
+  color: blue ! important;
+}
+
+#data
+p {color:blue~}
+#errors
+;1;14;m;no property semicolon
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
 p {
   color: blue;
 }

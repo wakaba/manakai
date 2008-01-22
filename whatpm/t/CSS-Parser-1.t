@@ -46,6 +46,10 @@ for my $file_name (map {"t/$_"} qw(
       $test->{data} = '';
       $all_test->{document}->{$1} = $test;
       $mode = 'data';
+    } elsif (/^#errors$/) {
+      $test->{errors} = [];
+      $mode = 'errors';
+      $test->{data} =~ s/\x0D?\x0A\z//;
     } elsif (defined $test->{data} and /^$/) {
       undef $test;
     } else {
@@ -53,6 +57,9 @@ for my $file_name (map {"t/$_"} qw(
         $test->{$mode} .= $_;
       } elsif ($mode eq 'computed' or $mode eq 'computedtext') {
         $test->{$mode}->{$doc_id}->{$selectors} .= $_;
+      } elsif ($mode eq 'errors') {
+        tr/\x0D\x0A//d;
+        push @{$test->{errors}}, $_;
       } else {
         die "Line $.: $_";
       }
@@ -73,15 +80,21 @@ for my $file_name (map {"t/$_"} qw(
   for my $test (@{$all_test->{test}}) {
     my ($p, $css_options) = get_parser ();
 
-    ## TODO: check errors
+    my @actual_error;
     $p->{onerror} = sub {
       my (%opt) = @_;
-      print STDOUT "$opt{line},$opt{column},$opt{level},$opt{type},";
-      print STDOUT $opt{value} if defined $opt{value};
-      print STDOUT "\n";
+      my $uri = ${$opt{uri}};
+      $uri =~ s[^thismessage:/][];
+      push @actual_error, join ';',
+          $uri, $opt{token}->{line}, $opt{token}->{column},
+          $opt{level},
+          $opt{type} . (defined $opt{value} ? ','.$opt{value} : '');
     };
 
     my $ss = $p->parse_char_string ($test->{data});
+
+    ok ((join "\n", @actual_error), (join "\n", @{$test->{errors} or []}),
+        "#result ($test->{data})");
 
     if (defined $test->{cssom}) {
       my $actual = serialize_cssom ($ss);
