@@ -1,5 +1,13 @@
 2008-01-24  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm (parse_char_string): Treatement for non-important
+	duplicate declarations was incorrect.
+	(margin): Use 'margin' shorthand property for serializing 
+	margin-related properties if possible.  Support for the |+|
+	sign in <'margin'> is added.
+
+2008-01-24  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm: Support for the |+| sign in 'margin-top' and
 	similar properties.
 

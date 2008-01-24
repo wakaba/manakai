@@ -417,7 +417,7 @@ sub parse_char_string ($$) {
             = [$prop_value->{$set_prop_name}, $prop_flag]
             if $important or
                 not $$current_decls->{$set_prop_def->{key}} or
-                not defined $$current_decls->{$set_prop_def->{key}}->[1];
+                $$current_decls->{$set_prop_def->{key}}->[1] ne 'important';
       }
       redo S;
     } elsif ($state == IGNORED_STATEMENT_STATE or
@@ -2264,6 +2264,62 @@ $Prop->{'margin-top'} = {
   allow_negative => 1,
   keyword => {auto => 1},
   serialize => $default_serializer,
+  serialize_multiple => sub {
+    my $self = shift;
+
+    my $use_shorthand = 1;
+    my $t = $self->margin_top;
+    undef $use_shorthand unless length $t;
+    my $t_i = $self->get_property_priority ('margin-top');
+    my $r = $self->margin_right;
+    undef $use_shorthand
+        if not length $r or
+            ($r eq 'inherit' and $t ne 'inherit') or
+            ($t eq 'inherit' and $r ne 'inherit');
+    my $r_i = $self->get_property_priority ('margin-right');
+    undef $use_shorthand unless $r_i eq $t_i;
+    my $b = $self->margin_bottom;
+    undef $use_shorthand
+        if not length $b or
+            ($b eq 'inherit' and $t ne 'inherit') or
+            ($t eq 'inherit' and $b ne 'inherit');
+    my $b_i = $self->get_property_priority ('margin-bottom');
+    undef $use_shorthand unless $b_i eq $t_i;
+    my $l = $self->margin_left;
+    undef $use_shorthand
+        if not length $l or
+            ($l eq 'inherit' and $t ne 'inherit') or
+            ($t eq 'inherit' and $l ne 'inherit');
+    my $l_i = $self->get_property_priority ('margin-left');
+    undef $use_shorthand unless $l_i eq $t_i;
+
+    if ($use_shorthand) {
+      $b .= ' ' . $l if $r ne $l;
+      $r .= ' ' . $b if $t ne $b;
+      $t .= ' ' . $r if $t ne $r;
+      $t .= ' ! ' . $t_i if length $t_i;
+      return {margin => $t};
+    } else {
+      my $v = {};
+      if (length $t) {
+        $v->{'margin-top'} = $t;
+        $v->{'margin-top'} .= ' ! ' . $t_i if length $t_i;
+      }
+      if (length $r) {
+        $v->{'margin-right'} = $r;
+        $v->{'margin-right'} .= ' ! ' . $r_i if length $r_i;
+      }
+      if (length $b) {
+        $v->{'margin-bottom'} = $b;
+        $v->{'margin-bottom'} .= ' ! ' . $b_i if length $b_i;
+      }
+      if (length $l) {
+        $v->{'margin-left'} = $l;
+        $v->{'margin-left'} .= ' ! ' . $l_i if length $l_i;
+      }
+      return $v;
+    }
+  },
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
   compute => $compute_length,
@@ -2279,6 +2335,7 @@ $Prop->{'margin-bottom'} = {
   allow_negative => 1,
   keyword => {auto => 1},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'margin-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
   compute => $compute_length,
@@ -2294,6 +2351,7 @@ $Prop->{'margin-right'} = {
   allow_negative => 1,
   keyword => {auto => 1},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'margin-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
   compute => $compute_length,
@@ -2309,6 +2367,7 @@ $Prop->{'margin-left'} = {
   allow_negative => 1,
   keyword => {auto => 1},
   serialize => $default_serializer,
+  serialize_multiple => $Prop->{'margin-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
   compute => $compute_length,
@@ -3786,9 +3845,14 @@ $Prop->{margin} = {
     my %prop_value;
 
     my $sign = 1;
+    my $has_sign;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
@@ -3813,7 +3877,7 @@ $Prop->{margin} = {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
       $prop_value{'margin-top'} = ['DIMENSION', $value, 'px'];
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
       $t = $tt->get_next_token;
       if ($prop_value eq 'auto') {
@@ -3843,10 +3907,15 @@ $Prop->{margin} = {
     $prop_value{'margin-left'} = $prop_value{'margin-right'};
 
     $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    undef $has_sign;
     $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
@@ -3871,7 +3940,7 @@ $Prop->{margin} = {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
       $prop_value{'margin-right'} = ['DIMENSION', $value, 'px'];
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
       $t = $tt->get_next_token;
       if ($prop_value eq 'auto') {
@@ -3884,7 +3953,7 @@ $Prop->{margin} = {
         return ($t, undef);
       }
     } else {
-      if ($sign < 0) {
+      if ($has_sign) {
         $onerror->(type => "syntax error:'$prop_name'",
                    level => $self->{must_level},
                    uri => \$self->{href},
@@ -3896,10 +3965,15 @@ $Prop->{margin} = {
     $prop_value{'margin-left'} = $prop_value{'margin-right'};
 
     $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    undef $has_sign;
     $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
@@ -3924,7 +3998,7 @@ $Prop->{margin} = {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
       $prop_value{'margin-bottom'} = ['DIMENSION', $value, 'px'];
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
       $t = $tt->get_next_token;
       if ($prop_value eq 'auto') {
@@ -3937,7 +4011,7 @@ $Prop->{margin} = {
         return ($t, undef);
       }
     } else {
-      if ($sign < 0) {
+      if ($has_sign) {
         $onerror->(type => "syntax error:'$prop_name'",
                    level => $self->{must_level},
                    uri => \$self->{href},
@@ -3948,10 +4022,15 @@ $Prop->{margin} = {
     }
 
     $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    undef $has_sign;
     $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
@@ -3976,7 +4055,7 @@ $Prop->{margin} = {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
       $prop_value{'margin-left'} = ['DIMENSION', $value, 'px'];
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
       $t = $tt->get_next_token;
       if ($prop_value eq 'auto') {
@@ -3989,7 +4068,7 @@ $Prop->{margin} = {
         return ($t, undef);
       }
     } else {
-      if ($sign < 0) {
+      if ($has_sign) {
         $onerror->(type => "syntax error:'$prop_name'",
                    level => $self->{must_level},
                    uri => \$self->{href},
@@ -4020,6 +4099,7 @@ $Prop->{margin} = {
     pop @v if $v[0] eq $v[1];
     return join ' ', @v;
   },
+  serialize_multiple => $Prop->{'margin-top'}->{serialize_multiple},
 };
 $Attr->{margin} = $Prop->{margin};
 
@@ -5412,4 +5492,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/24 12:12:34 $
+## $Date: 2008/01/24 13:09:00 $

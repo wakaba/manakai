@@ -231,4 +231,96 @@ p {
 -  border: 0px none -manakai-default;
 +  border: 0px none rgb(0, 0, 255);
 
+#data
+p {
+  margin-top: 1px;
+  margin-top: 2px;
+}
+#cssom
+| <p>
+|   margin-top: 2px
+
+#data
+p {
+  margin-top: 1px;
+  margin-top: 2px;
+  margin-top: 3px;
+}
+#cssom
+| <p>
+|   margin-top: 3px
+
+#data
+p {
+  margin-top: 1px!important;
+  margin-top: 2px!important;
+}
+#cssom
+| <p>
+|   margin-top: 2px !important
+
+#data
+p {
+  margin-top: 1px ! important;
+  margin-top: 2px;
+}
+#cssom
+| <p>
+|   margin-top: 1px !important
+
+#data
+p {
+  margin-top: 1px;
+  margin-top: 2px !important;
+}
+#cssom
+| <p>
+|   margin-top: 2px !important
+
+#data
+p {
+  margin-top: invalid;
+  margin-top: 1px;
+}
+#errors
+;2;16;m;syntax error:'margin-top'
+#cssom
+| <p>
+|   margin-top: 1px
+
+#data
+p {
+  margin-top: 1px;
+  margin-top: invalid;
+}
+#errors
+;3;16;m;syntax error:'margin-top'
+#cssom
+| <p>
+|   margin-top: 1px
+
+#data
+p {
+  margin-top: invalid !important;
+  margin-top: 1px;
+}
+#errors
+;3;16;m;syntax error:'margin-top'
+#cssom
+| <p>
+|   margin-top: 1px
+
+#data
+p {
+  margin-top: 1px;
+  margin-top: invalid !important;
+}
+#errors
+;3;16;m;syntax error:'margin-top'
+#cssom
+| <p>
+|   margin-top: 1px
+
+
+
 

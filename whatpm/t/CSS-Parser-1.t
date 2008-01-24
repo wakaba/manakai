@@ -202,10 +202,7 @@ BEGIN {
   list-style-image: none;
   list-style-position: outside;
   list-style-type: disc;
-  margin-bottom: 0px;
-  margin-left: 0px;
-  margin-right: 0px;
-  margin-top: 0px;
+  margin: 0px;
   max-height: none;
   max-width: none;
   min-height: 0px;
@@ -273,7 +270,10 @@ BEGIN {
 | float: none
 | font: @@TODO
 | list-style: @@TODO
-| margin: @@TODO
+| margin-top: 0px
+| margin-right: 0px
+| margin-bottom: 0px
+| margin-left: 0px
 | outline-color: invert
 | outline-style: none
 | outline-width: 0px

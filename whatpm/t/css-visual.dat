@@ -87,10 +87,7 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin-bottom: 0px
-+| margin-left: 0px
-+| margin-right: 0px
-+| margin-bottom: 12px
++| margin: 12px 0px 0px
 
 #data
 p {
@@ -105,10 +102,9 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin-bottom: 0px
-+| margin-left: 0px
-+| margin-right: 0px
-+| margin-bottom: 1923.07692307692px
++| margin: 1923.07692307692px 0px 0px
+-| margin-top: 0px
++| margin-top: 1923.07692307692px
 
 #data
 p {
@@ -123,10 +119,9 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin-bottom: 0px
-+| margin-left: 0px
-+| margin-right: 0px
-+| margin-bottom: -12px
++| margin: -12px 0px 0px
+-| margin-top: 0px
++| margin-top: -12px
 
 #data
 p {
@@ -141,10 +136,7 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin-bottom: 0px
-+| margin-left: 0px
-+| margin-right: 0px
-+| margin-bottom: 12px
++| margin: 12px 0px 0px
 
 #data
 p {
@@ -159,10 +151,7 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin-bottom: 0px
-+| margin-left: 0px
-+| margin-right: 0px
-+| margin-bottom: 12px
++| margin: 12px 0px 0px
 
 #data
 p {
@@ -177,10 +166,9 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin-bottom: 0px
-+| margin-left: 0px
-+| margin-right: 0px
-+| margin-bottom: 12.01px
++| margin: 12.01px 0px 0px
+-| margin-top: 0px
++| margin-top: 12.01px
 
 #data
 p {
@@ -195,10 +183,9 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin-bottom: 0px
-+| margin-left: 0px
-+| margin-right: 0px
-+| margin-bottom: 0.1px
++| margin: 0.1px 0px 0px
+-| margin-top: 0px
++| margin-top: 0.1px
 
 #data
 p {
@@ -212,11 +199,6 @@ p {
   margin-top: 0px;
 }
 #computed 1 p
--| margin: 0px
-+| margin-bottom: 0px
-+| margin-left: 0px
-+| margin-right: 0px
-+| margin-bottom: 0px
 
 #data
 p {
@@ -307,15 +289,12 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin: 12% 0
++| margin: 12% 0px 0px
 -| margin-top: 0px
 +| margin-top: 12%
 #computedtext 1 p
 -  margin: 0px;
-+  margin-top: 12%;
-+  margin-bottom: 0px;
-+  margin-right: 0px;
-+  margin-left: 0px;
++  margin: 12% 0px 0px;
 
 #data
 p {
@@ -414,15 +393,12 @@ p {
 }
 #computed 1 p
 -| margin: 0px
-+| margin: auto 0
++| margin: auto 0px 0px
 -| margin-top: 0px
 +| margin-top: auto
 #computedtext 1 p
 -  margin: 0px;
-+  margin-top: auto;
-+  margin-bottom: 0px;
-+  margin-right: 0px;
-+  margin-left: 0px;
++  margin: auto 0px 0px;
 
 #data
 p {
@@ -466,6 +442,508 @@ p {
 }
 #errors
 ;2;17;m;syntax error:'margin-left'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin: 0;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin: 0px;
+}
+
+#data
+p {
+  margin: +0;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin: 0px;
+}
+
+#data
+p {
+  margin: +0 +0 +0 +0;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin: 0px;
+}
+
+#data
+p {
+  margin: +0 +;
+}
+#errors
+;2;15;m;syntax error:'margin'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin: +0 +auto;
+}
+#errors
+;2;15;m;syntax error:'margin'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin: +0 +0 +;
+}
+#errors
+;2;18;m;syntax error:'margin'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin: +0 +0 +auto;
+}
+#errors
+;2;18;m;syntax error:'margin'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin: +0 +0 +0 +;
+}
+#errors
+;2;21;m;syntax error:'margin'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin: +0 +0 +0 +auto;
+}
+#errors
+;2;21;m;syntax error:'margin'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin: +0 +0 +0 +0 +;
+}
+#errors
+;2;23;m;no property semicolon
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin: -0;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin: 0px;
+}
+
+#data
+p {
+  margin: 0.0;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin: 0px;
+}
+
+#data
+p {
+  margin: 0 1px;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 1px
+|   margin-right: 1px
+|   margin-top: 0px
+#csstext
+p {
+  margin: 0px 1px;
+}
+
+#data
+p {
+  margin: 0px 1px 2px;
+}
+#cssom
+| <p>
+|   margin-bottom: 2px
+|   margin-left: 1px
+|   margin-right: 1px
+|   margin-top: 0px
+#csstext
+p {
+  margin: 0px 1px 2px;
+}
+
+#data
+p {
+  margin: -1px -2px -3px -4px;
+}
+#cssom
+| <p>
+|   margin-bottom: -3px
+|   margin-left: -4px
+|   margin-right: -2px
+|   margin-top: -1px
+#csstext
+p {
+  margin: -1px -2px -3px -4px;
+}
+
+#data
+p {
+  margin: inherit;
+}
+#cssom
+| <p>
+|   margin-bottom: inherit
+|   margin-left: inherit
+|   margin-right: inherit
+|   margin-top: inherit
+#csstext
+p {
+  margin: inherit;
+}
+
+#data
+p {
+  margin: 0 2px 0 2px;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 2px
+|   margin-right: 2px
+|   margin-top: 0px
+#csstext
+p {
+  margin: 0px 2px;
+}
+
+#data
+p {
+  margin: 0 !important;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px !important
+|   margin-left: 0px !important
+|   margin-right: 0px !important
+|   margin-top: 0px !important
+#csstext
+p {
+  margin: 0px ! important;
+}
+
+#data
+p {
+  margin: 0;
+  margin-left: 1px !important;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 1px !important
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin-bottom: 0px;
+  margin-left: 1px ! important;
+  margin-right: 0px;
+  margin-top: 0px;
+}
+
+#data
+p {
+  margin: 0;
+  margin-top: 0px ! important;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: 0px !important
+#csstext
+p {
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px ! important;
+}
+
+#data
+p {
+  margin: 0;
+  margin-right: 0px !important;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: 0px !important
+|   margin-top: 0px
+#csstext
+p {
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px ! important;
+  margin-top: 0px;
+}
+
+#data
+p {
+  margin: 0;
+  margin-bottom: 0px !important;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px !important
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin-bottom: 0px ! important;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+}
+
+#data
+p {
+  margin: 0;
+  margin-left: 0px !important;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px !important
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin-bottom: 0px;
+  margin-left: 0px ! important;
+  margin-right: 0px;
+  margin-top: 0px;
+}
+
+#data
+p {
+  margin: 0 !important;
+  margin-top: 1px;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px !important
+|   margin-left: 0px !important
+|   margin-right: 0px !important
+|   margin-top: 0px !important
+#csstext
+p {
+  margin: 0px ! important;
+}
+
+#data
+p {
+  margin: 0 ! important;
+  margin-left: 0px ! important;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px !important
+|   margin-left: 0px !important
+|   margin-right: 0px !important
+|   margin-top: 0px !important
+#csstext
+p {
+  margin: 0px ! important;
+}
+
+#data
+p {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-top: 0px;
+}
+
+#data
+p {
+  margin: 0;
+  margin-top: inherit;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: inherit
+#csstext
+p {
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: inherit;
+}
+
+#data
+p {
+  margin: 0;
+  margin-right: inherit;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: 0px
+|   margin-right: inherit
+|   margin-top: 0px
+#csstext
+p {
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: inherit;
+  margin-top: 0px;
+}
+
+#data
+p {
+  margin: 0;
+  margin-bottom: inherit;
+}
+#cssom
+| <p>
+|   margin-bottom: inherit
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin-bottom: inherit;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+}
+
+#data
+p {
+  margin: 0;
+  margin-left: inherit;
+}
+#cssom
+| <p>
+|   margin-bottom: 0px
+|   margin-left: inherit
+|   margin-right: 0px
+|   margin-top: 0px
+#csstext
+p {
+  margin-bottom: 0px;
+  margin-left: inherit;
+  margin-right: 0px;
+  margin-top: 0px;
+}
+
+#data
+p {
+  margin: 0;
+  margin-top: inherit;
+  margin-bottom: inherit;
+}
+#cssom
+| <p>
+|   margin-bottom: inherit
+|   margin-left: 0px
+|   margin-right: 0px
+|   margin-top: inherit
+#csstext
+p {
+  margin-bottom: inherit;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: inherit;
+}
+
+#data
+p {
+  margin: inherit 0;
+}
+#errors
+;2;19;m;no property semicolon
 #cssom
 | <p>
 #csstext
