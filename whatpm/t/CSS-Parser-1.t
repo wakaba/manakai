@@ -436,7 +436,7 @@ sub get_computed_style ($$$$$$) {
   $window->___set_user_style_sheets ([$ss]);
   $window->set_document ($doc);
   
-  my $style = $element->current_style;
+  my $style = $element->manakai_computed_style;
   return ($window, $style);
 } # get_computed_style
 
