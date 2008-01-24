@@ -193,7 +193,7 @@ if ($mode eq '/csstext') {
   my $p = $doc->get_elements_by_tag_name ('p')->[0];
 
   print "#computed\n";
-  my $cd = $p->current_style;
+  my $cd = $p->manakai_computed_style;
   print $cd->css_text;
 } elsif ($mode eq '/tokens') {
   require Encode;
@@ -309,4 +309,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/20 06:13:12 $
+## $Date: 2008/01/24 11:25:04 $
