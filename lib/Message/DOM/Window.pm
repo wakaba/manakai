@@ -35,7 +35,10 @@ sub document ($) { ${$_[0]}->{document} }
 
 ## |ViewCSS| methods
 
-sub get_computed_style ($$;$) {
+## TODO: implement other methods
+
+## TODO: Documentation.
+sub manakai_get_computed_style ($$;$) {
   my $css = ${$_[0]}->{___css};
 
   ## TODO: pseudo element
@@ -44,7 +47,7 @@ sub get_computed_style ($$;$) {
 
   require Message::DOM::CSSStyleDeclaration;
   return Message::DOM::CSSComputedStyleDeclaration->____new ($css, $_[1]);
-} # get_computed_style
+} # manakai_get_computed_style
 
 sub ___set_css_options ($$) {
   ${$_[0]}->{___css_options} = $_[1];
@@ -104,4 +107,4 @@ package Message::IF::ViewCSS;
 package Message::IF::Window;
 
 1;
-## $Date: 2008/01/14 11:33:48 $
+## $Date: 2008/01/24 11:25:19 $

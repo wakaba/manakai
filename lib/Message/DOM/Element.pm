@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
     'Message::IF::ElementSelector', # MUST in Selectors API spec.
     'Message::IF::ElementCSSInlineStyle';
@@ -836,7 +836,8 @@ sub query_selector_all ($$;$);
 
 ## |ElementCSSInlineStyle| attributes
 
-sub current_style ($) {
+## TODO: documentation
+sub manakai_computed_style ($) {
   ## TODO: If not part of document tree
 
   ## ISSUE: Neither |getComputedStyle| nor |currentStyle| represent
@@ -849,10 +850,10 @@ sub current_style ($) {
   my $view = $self->owner_document->default_view;
   return undef unless defined $view;  ## ISSUE: Not defined in the spec yet.
   
-  return $view->get_computed_style ($self);
-} # current_style
+  return $view->manakai_get_computed_style ($self);
+} # manakai_computed_style
 
-## TODO: |style|, |runtimeStyle|
+## TODO: |current_style|, |style|, |runtime_style|
 
 package Message::IF::Element;
 package Message::IF::ElementSelector;
@@ -1292,4 +1293,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/01/14 13:56:35 $
+## $Date: 2008/01/24 11:25:19 $
