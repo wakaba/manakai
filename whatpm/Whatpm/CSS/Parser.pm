@@ -2213,9 +2213,14 @@ $Prop->{'margin-top'} = {
     ## and 'background-position-y'.
 
     my $sign = 1;
+    my $has_sign;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
     my $allow_negative = $Prop->{$prop_name}->{allow_negative};
 
@@ -2237,7 +2242,7 @@ $Prop->{'margin-top'} = {
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ['DIMENSION', $value, 'px']})
           if $allow_negative or $value >= 0;
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
       if ($Prop->{$prop_name}->{keyword}->{$value}) {
         $t = $tt->get_next_token;
@@ -5407,4 +5412,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/22 12:47:26 $
+## $Date: 2008/01/24 12:12:34 $

@@ -1,0 +1,478 @@
+#html 1
+<!DOCTYPE HTML><p>
+
+#data
+p {}
+#computed 1 p
+
+#data
+p {
+  margin-top: inherit;
+}
+#cssom
+| <p>
+|   margin-top: inherit
+#csstext
+p {
+  margin-top: inherit;
+}
+
+#data
+p {
+  margin-top: inherit !important;
+}
+#cssom
+| <p>
+|   margin-top: inherit !important
+#csstext
+p {
+  margin-top: inherit ! important;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  margin-top: inherit;
+  margin-right: inherit;
+  margin-bottom: inherit;
+  margin-left: inherit;
+}
+#cssom
+| <p>
+|   margin-bottom: inherit
+|   margin-left: inherit
+|   margin-right: inherit
+|   margin-top: inherit
+#csstext
+p {
+  margin: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  margin-top: inherit;
+  margin-right: inherit !important;
+  margin-bottom: inherit;
+  margin-left: inherit;
+}
+#cssom
+| <p>
+|   margin-bottom: inherit
+|   margin-left: inherit
+|   margin-right: inherit !important
+|   margin-top: inherit
+#csstext
+p {
+  margin-bottom: inherit;
+  margin-left: inherit;
+  margin-right: inherit ! important;
+  margin-top: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  margin-top: 12px;
+}
+#cssom
+| <p>
+|   margin-top: 12px
+#csstext
+p {
+  margin-top: 12px;
+}
+#computed 1 p
+-| margin: 0px
++| margin-bottom: 0px
++| margin-left: 0px
++| margin-right: 0px
++| margin-bottom: 12px
+
+#data
+p {
+  margin-top: 50cm;
+}
+#cssom
+| <p>
+|   margin-top: 50cm
+#csstext
+p {
+  margin-top: 50cm;
+}
+#computed 1 p
+-| margin: 0px
++| margin-bottom: 0px
++| margin-left: 0px
++| margin-right: 0px
++| margin-bottom: 1923.07692307692px
+
+#data
+p {
+  margin-top: -12px;
+}
+#cssom
+| <p>
+|   margin-top: -12px
+#csstext
+p {
+  margin-top: -12px;
+}
+#computed 1 p
+-| margin: 0px
++| margin-bottom: 0px
++| margin-left: 0px
++| margin-right: 0px
++| margin-bottom: -12px
+
+#data
+p {
+  margin-top: +12px;
+}
+#cssom
+| <p>
+|   margin-top: 12px
+#csstext
+p {
+  margin-top: 12px;
+}
+#computed 1 p
+-| margin: 0px
++| margin-bottom: 0px
++| margin-left: 0px
++| margin-right: 0px
++| margin-bottom: 12px
+
+#data
+p {
+  margin-top: 12.0px;
+}
+#cssom
+| <p>
+|   margin-top: 12px
+#csstext
+p {
+  margin-top: 12px;
+}
+#computed 1 p
+-| margin: 0px
++| margin-bottom: 0px
++| margin-left: 0px
++| margin-right: 0px
++| margin-bottom: 12px
+
+#data
+p {
+  margin-top: 12.01px;
+}
+#cssom
+| <p>
+|   margin-top: 12.01px
+#csstext
+p {
+  margin-top: 12.01px;
+}
+#computed 1 p
+-| margin: 0px
++| margin-bottom: 0px
++| margin-left: 0px
++| margin-right: 0px
++| margin-bottom: 12.01px
+
+#data
+p {
+  margin-top: .1px;
+}
+#cssom
+| <p>
+|   margin-top: 0.1px
+#csstext
+p {
+  margin-top: 0.1px;
+}
+#computed 1 p
+-| margin: 0px
++| margin-bottom: 0px
++| margin-left: 0px
++| margin-right: 0px
++| margin-bottom: 0.1px
+
+#data
+p {
+  margin-top: 0;
+}
+#cssom
+| <p>
+|   margin-top: 0px
+#csstext
+p {
+  margin-top: 0px;
+}
+#computed 1 p
+-| margin: 0px
++| margin-bottom: 0px
++| margin-left: 0px
++| margin-right: 0px
++| margin-bottom: 0px
+
+#data
+p {
+  margin-right: +0
+}
+#cssom
+| <p>
+|   margin-right: 0px
+#csstext
+p {
+  margin-right: 0px;
+}
+
+#data
+p {
+  margin-right: -0
+}
+#cssom
+| <p>
+|   margin-right: 0px
+#csstext
+p {
+  margin-right: 0px;
+}
+
+#data
+p {
+  margin-bottom: 50;
+}
+#errors
+;2;18;m;syntax error:'margin-bottom'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin-bottom: 50;
+}
+#option q
+#cssom
+| <p>
+|   margin-bottom: 50px
+#csstext
+p {
+  margin-bottom: 50px;
+}
+
+#data
+p {
+  margin-bottom: 50 !important;
+}
+#option q
+#cssom
+| <p>
+|   margin-bottom: 50px !important
+#csstext
+p {
+  margin-bottom: 50px ! important;
+}
+
+#data
+p {
+  margin-bottom: -50
+#option q
+#errors
+;2;21;m;block not closed
+#cssom
+| <p>
+|   margin-bottom: -50px
+#csstext
+p {
+  margin-bottom: -50px;
+}
+
+#data
+p {
+  margin-top: 12%;
+}
+#cssom
+| <p>
+|   margin-top: 12%
+#csstext
+p {
+  margin-top: 12%;
+}
+#computed 1 p
+-| margin: 0px
++| margin: 12% 0
+-| margin-top: 0px
++| margin-top: 12%
+#computedtext 1 p
+-  margin: 0px;
++  margin-top: 12%;
++  margin-bottom: 0px;
++  margin-right: 0px;
++  margin-left: 0px;
+
+#data
+p {
+  margin-top: -0%;
+}
+#cssom
+| <p>
+|   margin-top: 0%
+#csstext
+p {
+  margin-top: 0%;
+}
+
+#data
+p {
+  margin-top: +12%;
+}
+#cssom
+| <p>
+|   margin-top: 12%
+#csstext
+p {
+  margin-top: 12%;
+}
+
+#data
+p {
+  margin-top: 12.12%;
+}
+#cssom
+| <p>
+|   margin-top: 12.12%
+#csstext
+p {
+  margin-top: 12.12%;
+}
+
+#data
+p {
+  margin-top: -.12%;
+}
+#cssom
+| <p>
+|   margin-top: -0.12%
+#csstext
+p {
+  margin-top: -0.12%;
+}
+
+#data
+p {
+  margin-top: -/**/12%;
+}
+#cssom
+| <p>
+|   margin-top: -12%
+#csstext
+p {
+  margin-top: -12%;
+}
+
+#data
+p {
+  margin-top: +/**/12%;
+}
+#cssom
+| <p>
+|   margin-top: 12%
+#csstext
+p {
+  margin-top: 12%;
+}
+
+#data
+p {
+  margin-top: - 12%;
+}
+#errors
+;2;16;m;syntax error:'margin-top'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin-top: auto;
+}
+#cssom
+| <p>
+|   margin-top: auto
+#csstext
+p {
+  margin-top: auto;
+}
+#computed 1 p
+-| margin: 0px
++| margin: auto 0
+-| margin-top: 0px
++| margin-top: auto
+#computedtext 1 p
+-  margin: 0px;
++  margin-top: auto;
++  margin-bottom: 0px;
++  margin-right: 0px;
++  margin-left: 0px;
+
+#data
+p {
+  margin-left: auto!important;
+}
+#cssom
+| <p>
+|   margin-left: auto !important
+#csstext
+p {
+  margin-left: auto ! important;
+}
+
+#data
+p {
+  margin-left: -auto;
+}
+#errors
+;2;16;m;syntax error:'margin-left'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin-left: -/**/auto;
+}
+#errors
+;2;21;m;syntax error:'margin-left'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  margin-left: +auto;
+}
+#errors
+;2;17;m;syntax error:'margin-left'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+
+
+
+

@@ -18,6 +18,7 @@ my $DefaultComputedText;
 
 for my $file_name (map {"t/$_"} qw(
   css-1.dat
+  css-visual.dat
 )) {
   print "# $file_name\n";
   open my $file, '<', $file_name or die "$0: $file_name: $!";
@@ -50,6 +51,8 @@ for my $file_name (map {"t/$_"} qw(
       $test->{errors} = [];
       $mode = 'errors';
       $test->{data} =~ s/\x0D?\x0A\z//;
+    } elsif (/^#option q$/) {
+      $test->{option}->{parse_mode} = 'q';
     } elsif (defined $test->{data} and /^$/) {
       undef $test;
     } else {
@@ -78,7 +81,7 @@ for my $file_name (map {"t/$_"} qw(
   }
 
   for my $test (@{$all_test->{test}}) {
-    my ($p, $css_options) = get_parser ();
+    my ($p, $css_options) = get_parser ($test->{option}->{parse_mode});
 
     my @actual_error;
     $p->{onerror} = sub {
@@ -277,8 +280,15 @@ BEGIN {
 | padding: 1];
 }
 
-sub get_parser () {
+sub get_parser ($) {
+  my $parse_mode = shift;
+
   my $p = Whatpm::CSS::Parser->new;
+
+  if ($parse_mode eq 'q') {
+    $p->{unitless_px} = 1;
+    $p->{hashless_color} = 1;
+  }
 
   $p->{prop}->{$_} = 1 for (@longhand, @shorthand);
   $p->{prop_value}->{display}->{$_} = 1 for qw/
