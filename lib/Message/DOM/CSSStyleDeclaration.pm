@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration',
     'Message::IF::CSS2Properties';
 
@@ -18,18 +18,36 @@ sub AUTOLOAD {
 
   if ($prop_def) {
     no strict 'refs';
-    *{ $method_name } = sub {
-      ## TODO: setter
-
-      my $self = $_[0];
-      my $value = $$self->{$prop_def->{key}};
-      if ($value) {
-        return $prop_def->{serialize}->($self, $prop_def->{css}, $value->[0]);
-      } else {
-        return "";
-      }
-      ## ISSUE: If one of shorthand component properties is !important?
-    };
+    if ($prop_def->{serialize}) {
+      *{ $method_name } = sub {
+        ## TODO: setter
+  
+        my $self = $_[0];
+        my $value = $$self->{$prop_def->{key}};
+        if ($value) {
+          return $prop_def->{serialize}->($self, $prop_def->{css}, $value->[0]);
+        } else {
+          return '';
+        }
+      };
+    } elsif ($prop_def->{serialize_shorthand} or
+             $prop_def->{serialize_multiple}) {
+      *{ $method_name } = sub {
+        ## TODO: setter
+  
+        my $self = $_[0];
+        my $v = ($prop_def->{serialize_shorthand} or
+                 $prop_def->{serialize_multiple})->($self);
+        if (defined $v->{$prop_def->{css}}) {
+          return $v->{$prop_def->{css}}->[0];
+        } else {
+          return '';
+        }
+        ## ISSUE: If one of shorthand component properties is !important?
+      };
+    } else {
+      die qq<Implementation error: Can't load serializer for "$AUTOLOAD">;
+    }
     goto &{ $AUTOLOAD };
   } else {
     require Carp;
@@ -60,7 +78,7 @@ sub css_text ($;$) {
   my $self = $_[0];
   my $r = '';
   my %serialized;
-  for (grep {$$self->{$_}} keys %$$self) {
+  for (sort {$a cmp $b} grep {$$self->{$_}} keys %$$self) {
     my $prop_def = $Whatpm::CSS::Parser::Key->{$_};
     next unless $prop_def;
 
@@ -69,7 +87,8 @@ sub css_text ($;$) {
         $serialized{$prop_def->{serialize_multiple}} = 1;
         my $v = $prop_def->{serialize_multiple}->($self);
         for my $prop_name (sort {$a cmp $b} keys %$v) {
-          $r .= '  ' . $prop_name . ': ' . $v->{$prop_name} . ";\n"
+          $r .= '  ' . $prop_name . ': ' . $v->{$prop_name}->[0]
+              . $v->{$prop_name}->[1] . ";\n"
         }
       }
     } else {
@@ -153,11 +172,11 @@ sub AUTOLOAD {
 
   if ($prop_def) {
     no strict 'refs';
-    *{ $method_name } = sub {
-      ## TODO: setter
-
-      my $self = $_[0];
-      if ($prop_def->{compute} or $prop_def->{compute_multiple}) {
+    if ($prop_def->{compute} or $prop_def->{compute_multiple}) {
+      *{ $method_name } = sub {
+        ## TODO: setter
+  
+        my $self = $_[0];
         my $value = $$self->{cascade}->get_computed_value
             ($$self->{element}, $prop_def->{css});
         if ($value) {
@@ -165,23 +184,31 @@ sub AUTOLOAD {
         } else {
           return '';
         }
-      } elsif ($prop_def->{serialize_multiple}) {
-        my $v = $prop_def->{serialize_multiple}->($self);
+      };
+    } elsif ($prop_def->{serialize_shorthand} or
+             $prop_def->{serialize_multiple}) {
+      *{ $method_name } = sub {
+        ## TODO: setter
+        my $self = shift;
+
+        my $v = ($prop_def->{serialize_shorthand} or
+                 $prop_def->{serialize_multiple})->($self);
         if (defined $v->{$prop_def->{css}}) {
-          return $v->{$prop_def->{css}};
+          return $v->{$prop_def->{css}}->[0];
         } else {
           return '';
         }
-      } else {
-        ## TODO: This should be an error of the implementation.
-        ## However, currently some shorthand properties does not have
-        ## serializer.
-        ## TODO: Remove {serialize} from shorthand properties, since
-        ## they have no effect.
-        warn "$0: No computed value function for $method_name";
-        #die "$0: No computed value function for $method_name";
-      }
-    };
+      };
+    } else {
+      ## TODO: This should be an error of the implementation.
+      ## However, currently some shorthand properties does not have
+      ## serializer.
+      ## TODO: Remove {serialize} from shorthand properties, since
+      ## they have no effect.
+      warn "$0: No computed value function for $method_name";
+      #die "$0: No computed value function for $method_name";
+      *{ $method_name } = sub { };
+    }
     goto &{ $AUTOLOAD };
   } else {
     require Carp;
@@ -224,7 +251,8 @@ sub css_text ($;$) {
         $serialized{$prop_def->{serialize_multiple}} = 1;
         my $v = $prop_def->{serialize_multiple}->($self);
         for my $prop_name (sort {$a cmp $b} keys %$v) {
-          $r .= '  ' . $prop_name . ': ' . $v->{$prop_name} . ";\n"
+          $r .= '  ' . $prop_name . ': ' . $v->{$prop_name}->[0]
+              . $v->{$prop_name}->[1] . ";\n"
         }
       }
     } else {
@@ -284,4 +312,4 @@ package Message::IF::CSSStyleDeclaration;
 package Message::IF::CSS2Properties;
 
 1;
-## $Date: 2008/01/14 13:56:35 $
+## $Date: 2008/01/25 16:06:13 $
