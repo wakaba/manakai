@@ -1,3 +1,15 @@
+2008-01-26  Wakaba  <wakaba@suika.fam.cx>
+
+	* Parser.pm: Return value of |serialize_multiple| methods
+	are changed.
+	('margin' serialize_multiple, 'padding' serialize_multiple):
+	Implemented.
+	('border-style' serialize_shorthand, 'border-color'
+	serialize_shorthand, 'border-width' serialize_shorthand,
+	'border-left' serialize_shorthand, 'border-top' serialize_shorthand,
+	'border-bottom' serialize_shorthand, 'border-right' 
+	serialize_shorthand): New.
+
 2008-01-24  Wakaba  <wakaba@suika.fam.cx>
 
 	* Parser.pm (parse_char_string): Treatement for non-important

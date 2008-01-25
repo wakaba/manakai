@@ -454,6 +454,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px
 |   margin-bottom: 0px
 |   margin-left: 0px
 |   margin-right: 0px
@@ -469,6 +470,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px
 |   margin-bottom: 0px
 |   margin-left: 0px
 |   margin-right: 0px
@@ -484,6 +486,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px
 |   margin-bottom: 0px
 |   margin-left: 0px
 |   margin-right: 0px
@@ -583,6 +586,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px
 |   margin-bottom: 0px
 |   margin-left: 0px
 |   margin-right: 0px
@@ -598,6 +602,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px
 |   margin-bottom: 0px
 |   margin-left: 0px
 |   margin-right: 0px
@@ -613,6 +618,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px 1px
 |   margin-bottom: 0px
 |   margin-left: 1px
 |   margin-right: 1px
@@ -628,6 +634,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px 1px 2px
 |   margin-bottom: 2px
 |   margin-left: 1px
 |   margin-right: 1px
@@ -643,6 +650,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: -1px -2px -3px -4px
 |   margin-bottom: -3px
 |   margin-left: -4px
 |   margin-right: -2px
@@ -658,6 +666,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: inherit
 |   margin-bottom: inherit
 |   margin-left: inherit
 |   margin-right: inherit
@@ -673,6 +682,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px 2px
 |   margin-bottom: 0px
 |   margin-left: 2px
 |   margin-right: 2px
@@ -688,6 +698,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px !important
 |   margin-bottom: 0px !important
 |   margin-left: 0px !important
 |   margin-right: 0px !important
@@ -799,6 +810,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px !important
 |   margin-bottom: 0px !important
 |   margin-left: 0px !important
 |   margin-right: 0px !important
@@ -815,6 +827,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: 0px !important
 |   margin-bottom: 0px !important
 |   margin-left: 0px !important
 |   margin-right: 0px !important
@@ -949,6 +962,601 @@ p {
 #csstext
 p {
 }
+
+#data
+/*
+  TODO: border properties
+*/
+
+#data
+p {
+  border-color: blue;
+}
+#cssom
+| <p>
+|   border-bottom-color: blue
+|   border-color: blue
+|   border-left-color: blue
+|   border-right-color: blue
+|   border-top-color: blue
+#csstext
+p {
+  border-color: blue;
+}
+
+#data
+p {
+  border-color: blue;
+  border-top-color: red;
+}
+#cssom
+| <p>
+|   border-bottom-color: blue
+|   border-color: red blue blue
+|   border-left-color: blue
+|   border-right-color: blue
+|   border-top-color: red
+#csstext
+p {
+  border-color: red blue blue;
+}
+
+#data
+p {
+  border-color: blue;
+  border-right-color: blue ! important;
+}
+#cssom
+| <p>
+|   border-bottom-color: blue
+|   border-left-color: blue
+|   border-right-color: blue !important
+|   border-top-color: blue
+#csstext
+p {
+  border-bottom-color: blue;
+  border-left-color: blue;
+  border-right-color: blue ! important;
+  border-top-color: blue;
+}
+
+#data
+p {
+  border-color: inherit;
+  border-right-color: blue ! important;
+}
+#cssom
+| <p>
+|   border-bottom-color: inherit
+|   border-left-color: inherit
+|   border-right-color: blue !important
+|   border-top-color: inherit
+#csstext
+p {
+  border-bottom-color: inherit;
+  border-left-color: inherit;
+  border-right-color: blue ! important;
+  border-top-color: inherit;
+}
+
+#data
+p {
+  border-color: inherit;
+}
+#cssom
+| <p>
+|   border-bottom-color: inherit
+|   border-left-color: inherit
+|   border-right-color: inherit
+|   border-top-color: inherit
+#csstext
+p {
+  border-color: inherit;
+}
+
+#data
+p {
+  border-style: solid none;
+}
+#cssom
+| <p>
+|   border-bottom-style: solid
+|   border-left-style: none
+|   border-right-style: none
+|   border-style: solid none
+|   border-top-style: solid
+#csstext
+p {
+  border-style: solid none;
+}
+
+#data
+p {
+  border-style: solid none;
+  border-top-style: dotted;
+}
+#cssom
+| <p>
+|   border-bottom-style: solid
+|   border-left-style: none
+|   border-right-style: none
+|   border-style: dotted none solid
+|   border-top-style: dotted
+#csstext
+p {
+  border-style: dotted none solid;
+}
+
+#data
+p {
+  border-style: solid none;
+  border-right-style: none ! important;
+}
+#cssom
+| <p>
+|   border-bottom-style: solid
+|   border-left-style: none
+|   border-right-style: none !important
+|   border-top-style: solid
+#csstext
+p {
+  border-bottom-style: solid;
+  border-left-style: none;
+  border-right-style: none ! important;
+  border-top-style: solid;
+}
+
+#data
+p {
+  border-style: inherit;
+}
+#cssom
+| <p>
+|   border-bottom-style: inherit
+|   border-left-style: inherit
+|   border-right-style: inherit
+|   border-style: inherit
+|   border-top-style: inherit
+#csstext
+p {
+  border-style: inherit;
+}
+
+#data
+p {
+  border-style: inherit;
+  border-top-style: none;
+}
+#cssom
+| <p>
+|   border-bottom-style: inherit
+|   border-left-style: inherit
+|   border-right-style: inherit
+|   border-top-style: none
+#csstext
+p {
+  border-bottom-style: inherit;
+  border-left-style: inherit;
+  border-right-style: inherit;
+  border-top-style: none;
+}
+
+#data
+p {
+  border-width: 5px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 5px
+|   border-left-width: 5px
+|   border-right-width: 5px
+|   border-top-width: 5px
+|   border-width: 5px
+#csstext
+p {
+  border-width: 5px;
+}
+
+#data
+p {
+  border-width: 5px;
+  border-top-width: 4px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 5px
+|   border-left-width: 5px
+|   border-right-width: 5px
+|   border-top-width: 4px
+|   border-width: 4px 5px 5px
+#csstext
+p {
+  border-width: 4px 5px 5px;
+}
+
+#data
+p {
+  border-width: 5px;
+  border-right-width: inherit;
+}
+#cssom
+| <p>
+|   border-bottom-width: 5px
+|   border-left-width: 5px
+|   border-right-width: inherit
+|   border-top-width: 5px
+#csstext
+p {
+  border-bottom-width: 5px;
+  border-left-width: 5px;
+  border-right-width: inherit;
+  border-top-width: 5px;
+}
+
+#data
+p {
+  border-width: 5px;
+  border-left-width: 5px !important;
+}
+#cssom
+| <p>
+|   border-bottom-width: 5px
+|   border-left-width: 5px !important
+|   border-right-width: 5px
+|   border-top-width: 5px
+#csstext
+p {
+  border-bottom-width: 5px;
+  border-left-width: 5px ! important;
+  border-right-width: 5px;
+  border-top-width: 5px;
+}
+
+#data
+p {
+  border-top: 1px solid red;
+}
+#cssom
+| <p>
+|   border-top: 1px solid red
+|   border-top-color: red
+|   border-top-style: solid
+|   border-top-width: 1px
+#csstext
+p {
+  border-top: 1px solid red;
+}
+
+#data
+p {
+  border-bottom: 1px solid red;
+}
+#cssom
+| <p>
+|   border-bottom: 1px solid red
+|   border-bottom-color: red
+|   border-bottom-style: solid
+|   border-bottom-width: 1px
+#csstext
+p {
+  border-bottom: 1px solid red;
+}
+
+#data
+p {
+  border-top: inherit;
+}
+#cssom
+| <p>
+|   border-top: inherit
+|   border-top-color: inherit
+|   border-top-style: inherit
+|   border-top-width: inherit
+#csstext
+p {
+  border-top: inherit;
+}
+
+#data
+p {
+  border-top: inherit;
+  border-top-width: 3px;
+}
+#cssom
+| <p>
+|   border-top-color: inherit
+|   border-top-style: inherit
+|   border-top-width: 3px
+#csstext
+p {
+  border-top-color: inherit;
+  border-top-style: inherit;
+  border-top-width: 3px;
+}
+
+#data
+p {
+  border-top: inherit;
+  border-top-width: inherit ! important;
+}
+#cssom
+| <p>
+|   border-top-color: inherit
+|   border-top-style: inherit
+|   border-top-width: inherit !important
+#csstext
+p {
+  border-top-color: inherit;
+  border-top-style: inherit;
+  border-top-width: inherit ! important;
+}
+
+#data
+p {
+  border-bottom: inherit;
+  border-bottom-width: 3px;
+}
+#cssom
+| <p>
+|   border-bottom-color: inherit
+|   border-bottom-style: inherit
+|   border-bottom-width: 3px
+#csstext
+p {
+  border-bottom-color: inherit;
+  border-bottom-style: inherit;
+  border-bottom-width: 3px;
+}
+
+#data
+p {
+  border: 1px solid red;
+}
+#cssom
+| <p>
+|   border: 1px solid red
+|   border-bottom: 1px solid red
+|   border-bottom-color: red
+|   border-bottom-style: solid
+|   border-bottom-width: 1px
+|   border-color: red
+|   border-left: 1px solid red
+|   border-left-color: red
+|   border-left-style: solid
+|   border-left-width: 1px
+|   border-right: 1px solid red
+|   border-right-color: red
+|   border-right-style: solid
+|   border-right-width: 1px
+|   border-style: solid
+|   border-top: 1px solid red
+|   border-top-color: red
+|   border-top-style: solid
+|   border-top-width: 1px
+|   border-width: 1px
+#csstext
+p {
+  border: 1px solid red;
+}
+
+#data
+p {
+  border: 1px solid red;
+  border-width: 2px;
+}
+#cssom
+| <p>
+|   border: 2px solid red
+|   border-bottom: 2px solid red
+|   border-bottom-color: red
+|   border-bottom-style: solid
+|   border-bottom-width: 2px
+|   border-color: red
+|   border-left: 2px solid red
+|   border-left-color: red
+|   border-left-style: solid
+|   border-left-width: 2px
+|   border-right: 2px solid red
+|   border-right-color: red
+|   border-right-style: solid
+|   border-right-width: 2px
+|   border-style: solid
+|   border-top: 2px solid red
+|   border-top-color: red
+|   border-top-style: solid
+|   border-top-width: 2px
+|   border-width: 2px
+#csstext
+p {
+  border: 2px solid red;
+}
+
+#data
+/*
+  TODO: We need to add test data for border and padding related properties.
+*/
+
+#data
+p {
+  padding: 1px 2px 3px 4px;
+}
+#cssom
+| <p>
+|   padding: 1px 2px 3px 4px
+|   padding-bottom: 3px
+|   padding-left: 4px
+|   padding-right: 2px
+|   padding-top: 1px
+#csstext
+p {
+  padding: 1px 2px 3px 4px;
+}
+
+#data
+p {
+  padding: 1px 2px 3px 4px !important;
+}
+#cssom
+| <p>
+|   padding: 1px 2px 3px 4px !important
+|   padding-bottom: 3px !important
+|   padding-left: 4px !important
+|   padding-right: 2px !important
+|   padding-top: 1px !important
+#csstext
+p {
+  padding: 1px 2px 3px 4px ! important;
+}
+
+#data
+p {
+  padding: 1px 2px 3px;
+}
+#cssom
+| <p>
+|   padding: 1px 2px 3px
+|   padding-bottom: 3px
+|   padding-left: 2px
+|   padding-right: 2px
+|   padding-top: 1px
+#csstext
+p {
+  padding: 1px 2px 3px;
+}
+
+#data
+p {
+  padding: 1px 2px 1px 2px;
+}
+#cssom
+| <p>
+|   padding: 1px 2px
+|   padding-bottom: 1px
+|   padding-left: 2px
+|   padding-right: 2px
+|   padding-top: 1px
+#csstext
+p {
+  padding: 1px 2px;
+}
+
+#data
+p {
+  padding: 1px;
+}
+#cssom
+| <p>
+|   padding: 1px
+|   padding-bottom: 1px
+|   padding-left: 1px
+|   padding-right: 1px
+|   padding-top: 1px
+#csstext
+p {
+  padding: 1px;
+}
+
+#data
+p {
+  padding: 1px;
+  padding-top: 1px ! important;
+}
+#cssom
+| <p>
+|   padding-bottom: 1px
+|   padding-left: 1px
+|   padding-right: 1px
+|   padding-top: 1px !important
+#csstext
+p {
+  padding-bottom: 1px;
+  padding-left: 1px;
+  padding-right: 1px;
+  padding-top: 1px ! important;
+}
+
+#data
+p {
+  display: inline;
+}
+#cssom
+| <p>
+|   display: inline
+#csstext
+p {
+  display: inline;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  display: block;
+}
+#cssom
+| <p>
+|   display: block
+#csstext
+p {
+  display: block;
+}
+#computed 1 p
+-| display: inline
++| display: block
+#computedtext 1 p
+-  display: inline;
++  display: block;
+
+#data
+p {
+  display: inherit;
+}
+#cssom
+| <p>
+|   display: inherit
+#csstext
+p {
+  display: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+html {
+  display: inline;
+}
+#cssom
+| <html>
+|   display: inline
+#csstext
+html {
+  display: inline;
+}
+#computed 1 html
+-| display: inline
++| display: block
+#computedtext 1 html
+-  display: inline;
++  display: block;
+
+#data
+html {
+  display: inherit;
+}
+#cssom
+| <html>
+|   display: inherit
+#csstext
+html {
+  display: inherit;
+}
+#computed 1 html
+-| display: inline
++| display: block
+#computedtext 1 html
+-  display: inline;
++  display: block;
+
 
 
 

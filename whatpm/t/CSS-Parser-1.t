@@ -19,6 +19,7 @@ my $DefaultComputedText;
 for my $file_name (map {"t/$_"} qw(
   css-1.dat
   css-visual.dat
+  css-generated.dat
 )) {
   print "# $file_name\n";
   open my $file, '<', $file_name or die "$0: $file_name: $!";
@@ -211,10 +212,7 @@ BEGIN {
   orphans: 2;
   outline: 0px none invert;
   overflow: visible;
-  padding-bottom: 0px;
-  padding-left: 0px;
-  padding-right: 0px;
-  padding-top: 0px;
+  padding: 0px;
   page-break-after: auto;
   page-break-before: auto;
   page-break-inside: auto;
@@ -247,7 +245,6 @@ BEGIN {
 | background-position-x: 0%
 | background-position-y: 0%
 | background-repeat: repeat
-| border: 0px none -manakai-default
 | border-top: 0px none -manakai-default
 | border-right: 0px none -manakai-default
 | border-bottom: 0px none -manakai-default
@@ -269,7 +266,7 @@ BEGIN {
 | border-width: 0px
 | float: none
 | font: @@TODO
-| list-style: @@TODO
+| list-style: disc none outside
 | margin-top: 0px
 | margin-right: 0px
 | margin-bottom: 0px
@@ -277,7 +274,10 @@ BEGIN {
 | outline-color: invert
 | outline-style: none
 | outline-width: 0px
-| padding: 1];
+| padding-bottom: 0px
+| padding-left: 0px
+| padding-right: 0px
+| padding-top: 0px];
 }
 
 sub get_parser ($) {
@@ -436,7 +436,7 @@ sub get_computed_style ($$$$$$) {
     die "Test document $doc_id is not defined";
   }
 
-  my $element = $doc->document_element->query_selector ($selectors);
+  my $element = $doc->query_selector ($selectors);
   unless ($element) {
     die "Element $selectors not found in document $doc_id";
   }
