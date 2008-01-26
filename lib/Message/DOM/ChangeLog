@@ -1,5 +1,11 @@
 2008-01-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* CSSStyleDeclaration.pm (css_text): Prepend | ! | before
+	the priority token if any.
+	(get_property_priority): Shorthand case implemented.
+
+2008-01-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* CSSStyleDeclaration.pm: Use |serialize_shorthand|
 	and |serialize_multiple| to serialize shorthand properties
 	in reflecting attributes.  Return value of 

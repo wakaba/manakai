@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration',
     'Message::IF::CSS2Properties';
 
@@ -87,8 +87,9 @@ sub css_text ($;$) {
         $serialized{$prop_def->{serialize_multiple}} = 1;
         my $v = $prop_def->{serialize_multiple}->($self);
         for my $prop_name (sort {$a cmp $b} keys %$v) {
-          $r .= '  ' . $prop_name . ': ' . $v->{$prop_name}->[0]
-              . $v->{$prop_name}->[1] . ";\n"
+          $r .= '  ' . $prop_name . ': ' . $v->{$prop_name}->[0];
+          $r .= ' ! ' . $v->{$prop_name}->[1] if length $v->{$prop_name}->[1];
+          $r .= ";\n";
         }
       }
     } else {
@@ -127,8 +128,21 @@ sub get_property_priority ($$) {
   my $prop_def = $Whatpm::CSS::Parser::Prop->{$prop_name};
   return '' unless defined $prop_def;
 
-  my $v = ${$_[0]}->{$prop_def->{key}};
-  return $v ? $v->[1] : '';
+  if ($prop_def->{serialize}) {
+    my $v = ${$_[0]}->{$prop_def->{key}};
+    return $v ? $v->[1] : '';
+  } elsif ($prop_def->{serialize_shorthand} or
+           $prop_def->{serialize_multiple}) {
+    my $v = ($prop_def->{serialize_shorthand} or
+             $prop_def->{serialize_multiple})->($_[0]);
+    if (defined $v->{$prop_def->{css}}) {
+      return $v->{$prop_def->{css}}->[1];
+    } else {
+      return '';
+    }
+  } else {
+    die "Implementation error: No serializer for property '$prop_name'";
+  }
 } # get_property_priority
 
 sub item ($$) {
@@ -251,8 +265,9 @@ sub css_text ($;$) {
         $serialized{$prop_def->{serialize_multiple}} = 1;
         my $v = $prop_def->{serialize_multiple}->($self);
         for my $prop_name (sort {$a cmp $b} keys %$v) {
-          $r .= '  ' . $prop_name . ': ' . $v->{$prop_name}->[0]
-              . $v->{$prop_name}->[1] . ";\n"
+          $r .= '  ' . $prop_name . ': ' . $v->{$prop_name}->[0];
+          $r .= ' ! ' . $v->{$prop_name}->[1] if length $v->{$prop_name}->[1];
+          $r .= ";\n";
         }
       }
     } else {
@@ -312,4 +327,4 @@ package Message::IF::CSSStyleDeclaration;
 package Message::IF::CSS2Properties;
 
 1;
-## $Date: 2008/01/25 16:06:13 $
+## $Date: 2008/01/26 05:12:05 $
