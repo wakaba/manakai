@@ -1,0 +1,326 @@
+#html 1
+<!DOCTYPE HTML><p>
+
+#data
+p {
+  font-family: serif;
+}
+#cssom
+| <p>
+|   font-family: serif
+#csstext
+p {
+  font-family: serif;
+}
+
+#data
+p {
+  font-family: a,serif;
+}
+#cssom
+| <p>
+|   font-family: "a", serif
+#csstext
+p {
+  font-family: "a", serif;
+}
+
+#data
+p {
+  font-family: serif,a;
+}
+#cssom
+| <p>
+|   font-family: serif, "a"
+#csstext
+p {
+  font-family: serif, "a";
+}
+
+#data
+p {
+  font-family: serifA;
+}
+#cssom
+| <p>
+|   font-family: "serifA"
+#csstext
+p {
+  font-family: "serifA";
+}
+
+#data
+p {
+  font-family: inherit;
+}
+#cssom
+| <p>
+|   font-family: inherit
+#csstext
+p {
+  font-family: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  font-family: inherit, a;
+}
+#cssom
+| <p>
+|   font-family: "inherit", "a"
+#csstext
+p {
+  font-family: "inherit", "a";
+}
+
+#data
+p {
+  font-family: a,inherit;
+}
+#cssom
+| <p>
+|   font-family: "a", "inherit"
+#csstext
+p {
+  font-family: "a", "inherit";
+}
+
+#data
+p {
+  font-family: "inherit";
+}
+#cssom
+| <p>
+|   font-family: "inherit"
+#csstext
+p {
+  font-family: "inherit";
+}
+
+#data
+p {
+  font-family: inherit a;
+}
+#cssom
+| <p>
+|   font-family: "inherit a"
+#csstext
+p {
+  font-family: "inherit a";
+}
+
+#data
+p {
+  font: 1px serif;
+}
+#cssom
+| <p>
+|   font: 1px serif
+|   font-family: serif
+|   font-size: 1px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 1px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: normal;
+}
+
+#data
+p {
+  font: 1px inherit;
+}
+#cssom
+| <p>
+|   font: 1px "inherit"
+|   font-family: "inherit"
+|   font-size: 1px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+#csstext
+p {
+  font-family: "inherit";
+  font-size: 1px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: normal;
+}
+
+#data
+p {
+  font: normal 1px -manakai-default;
+}
+#cssom
+| <p>
+|   font: 1px -manakai-default
+|   font-family: -manakai-default
+|   font-size: 1px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+#csstext
+p {
+  font-family: -manakai-default;
+  font-size: 1px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: normal;
+}
+
+#data
+p {
+  font: bolder 1px Courier  New;
+}
+#cssom
+| <p>
+|   font: bolder 1px "Courier New"
+|   font-family: "Courier New"
+|   font-size: 1px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: bolder
+|   line-height: normal
+#csstext
+p {
+  font-family: "Courier New";
+  font-size: 1px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: bolder;
+  line-height: normal;
+}
+
+#data
+p {
+  font: inherit;
+}
+#cssom
+| <p>
+|   font: inherit
+|   font-family: inherit
+|   font-size: inherit
+|   font-style: inherit
+|   font-variant: inherit
+|   font-weight: inherit
+|   line-height: inherit
+#csstext
+p {
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-variant: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+#data
+p {
+  font: inherit;
+  font-family: "inherit";
+}
+#cssom
+| <p>
+|   font-family: "inherit"
+|   font-size: inherit
+|   font-style: inherit
+|   font-variant: inherit
+|   font-weight: inherit
+|   line-height: inherit
+#csstext
+p {
+  font-family: "inherit";
+  font-size: inherit;
+  font-style: inherit;
+  font-variant: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+#data
+p {
+  font: inherit;
+  font-size: 16px;
+}
+#cssom
+| <p>
+|   font-family: inherit
+|   font-size: 16px
+|   font-style: inherit
+|   font-variant: inherit
+|   font-weight: inherit
+|   line-height: inherit
+#csstext
+p {
+  font-family: inherit;
+  font-size: 16px;
+  font-style: inherit;
+  font-variant: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+#data
+p {
+  font: inherit;
+  font-variant: inherit ! important;
+}
+#cssom
+| <p>
+|   font-family: inherit
+|   font-size: inherit
+|   font-style: inherit
+|   font-variant: inherit !important
+|   font-weight: inherit
+|   line-height: inherit
+#csstext
+p {
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-variant: inherit ! important;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+#data
+p {
+  font: inherit;
+  font-weight: bolder;
+}
+#cssom
+| <p>
+|   font-family: inherit
+|   font-size: inherit
+|   font-style: inherit
+|   font-variant: inherit
+|   font-weight: bolder
+|   line-height: inherit
+#csstext
+p {
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-variant: inherit;
+  font-weight: bolder;
+  line-height: inherit;
+}
+
+
+
+
+
+
+

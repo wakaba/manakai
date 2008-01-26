@@ -3254,7 +3254,7 @@ $Attr->{outline_style} = $Prop->{'outline-style'};
 $Key->{outline_style} = $Prop->{'outline-style'};
 delete $Prop->{'outline-style'}->{keyword}->{hidden};
 
-my $generic_font_keywords => {
+my $generic_font_keywords = {
   serif => 1, 'sans-serif' => 1, cursive => 1,
   fantasy => 1, monospace => 1, '-manakai-default' => 1,
   '-manakai-caption' => 1, '-manakai-icon' => 1,
@@ -5121,28 +5121,38 @@ $Prop->{font} = {
 
     return ($t, \%prop_value);
   },
-  serialize => sub {
-    my ($self, $prop_name, $value) = @_;
+  serialize_shorthand => sub {
+    my $self = shift;
     
     local $Error::Depth = $Error::Depth + 1;
     my $style = $self->font_style;
     my $i = $self->get_property_priority ('font-style');
-    return '' unless length $style;
+    return {} unless length $style;
     my $variant = $self->font_variant;
-    return '' unless length $variant;
-    return '' if $i ne $self->get_property_priority ('font-variant');
+    return {} unless length $variant;
+    return {} if $i ne $self->get_property_priority ('font-variant');
     my $weight = $self->font_weight;
-    return '' unless length $weight;
-    return '' if $i ne $self->get_property_priority ('font-weight');
+    return {} unless length $weight;
+    return {} if $i ne $self->get_property_priority ('font-weight');
     my $size = $self->font_size;
-    return '' unless length $size;
-    return '' if $i ne $self->get_property_priority ('font-size');
+    return {} unless length $size;
+    return {} if $i ne $self->get_property_priority ('font-size');
     my $height = $self->line_height;
-    return '' unless length $height;
-    return '' if $i ne $self->get_property_priority ('line-height');
+    return {} unless length $height;
+    return {} if $i ne $self->get_property_priority ('line-height');
     my $family = $self->font_family;
-    return '' unless length $family;
-    return '' if $i ne $self->get_property_priority ('font-family');
+    return {} unless length $family;
+    return {} if $i ne $self->get_property_priority ('font-family');
+
+    my $v = 0;
+    for ($style, $variant, $weight, $size, $height, $family) {
+      $v++ if $_ eq 'inherit';
+    }
+    if ($v == 6) {
+      return {font => ['inherit', length $i ? ' ! ' . $i : '']};
+    } elsif ($v) {
+      return {};
+    }
     
     my @v;
     push @v, $style unless $style eq 'normal';
@@ -5150,8 +5160,7 @@ $Prop->{font} = {
     push @v, $weight unless $weight eq 'normal';
     push @v, $size.($height eq 'normal' ? '' : '/'.$height);
     push @v, $family;
-    push @v, '! '.$i if length $i;
-    return join ' ', @v;
+    return {font => [(join ' ', @v), length $i ? ' ! ' . $i : '']};
   },
 };
 $Attr->{font} = $Prop->{font};
@@ -5639,4 +5648,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/25 16:04:39 $
+## $Date: 2008/01/26 04:50:05 $

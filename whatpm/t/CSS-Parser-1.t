@@ -20,6 +20,7 @@ for my $file_name (map {"t/$_"} qw(
   css-1.dat
   css-visual.dat
   css-generated.dat
+  css-font.dat
 )) {
   print "# $file_name\n";
   open my $file, '<', $file_name or die "$0: $file_name: $!";
@@ -265,7 +266,7 @@ BEGIN {
 | border-style: none
 | border-width: 0px
 | float: none
-| font: @@TODO
+| font: 400 16px -manakai-default
 | list-style: disc none outside
 | margin-top: 0px
 | margin-right: 0px
