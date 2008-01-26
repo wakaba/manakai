@@ -1010,12 +1010,9 @@ $Prop->{'background-color'} = {
   serialize_multiple => sub {
     my $self = shift;
 
-    ## TODO: !important handling is incorrect.
-
     my $r = {};
     my $has_all;
     
-    local $Error::Depth = $Error::Depth + 1;
     my $x = $self->background_position_x;
     my $y = $self->background_position_y;
     my $xi = $self->get_property_priority ('background-position-x');
@@ -1023,8 +1020,21 @@ $Prop->{'background-color'} = {
     if (length $x) {
       if (length $y) {
         if ($xi eq $yi) {
-          $r->{'background-position'} = [$x . ' ' . $y, $xi];
-          $has_all = 1;
+          if ($x eq 'inherit') {
+            if ($y eq 'inherit') {
+              $r->{'background-position'} = ['inherit', $xi];
+              $has_all = 1;
+            } else {
+              $r->{'background-position-x'} = [$x, $xi];
+              $r->{'background-position-y'} = [$y, $yi];
+            }
+          } elsif ($y eq 'inherit') {
+            $r->{'background-position-x'} = [$x, $xi];
+            $r->{'background-position-y'} = [$y, $yi];
+          } else {
+            $r->{'background-position'} = [$x . ' ' . $y, $xi];
+            $has_all = 1;
+          }
         } else {
           $r->{'background-position-x'} = [$x, $xi];
           $r->{'background-position-y'} = [$y, $yi];
@@ -1045,6 +1055,7 @@ $Prop->{'background-color'} = {
       my $value = $self->$prop_name;
       if (length $value) {
         my $i = $self->get_property_priority ('background-'.$prop);
+        undef $has_all unless $xi eq $i;
         $r->{'background-'.$prop} = [$value, $i];
       } else {
         undef $has_all;
@@ -1064,9 +1075,19 @@ $Prop->{'background-color'} = {
       push @v, $r->{'background-position'}
           unless $r->{'background-position'}->[0] eq '0% 0%';
       if (@v) {
-        return {background => [(join ' ', map {$_->[0]} @v), '']};
+        my $inherit = 0;
+        for (@v) {
+          $inherit++ if $_->[0] eq 'inherit';
+        }
+        if ($inherit == 5) {
+          return {background => ['inherit', $xi]};
+        } elsif ($inherit) {
+          return $r;
+        } else {
+          return {background => [(join ' ', map {$_->[0]} @v), $xi]};
+        }
       } else {
-        return {background => ['transparent none repeat scroll 0% 0%', '']};
+        return {background => ['transparent none repeat scroll 0% 0%', $xi]};
       }
     } else {
       return $r;
@@ -4789,14 +4810,47 @@ $Prop->{'background-position'} = {
 
     return ($t, \%prop_value);
   },
-  serialize => sub {
-    my ($self, $prop_name, $value) = @_;
-    
-    local $Error::Depth = $Error::Depth + 1;
+  serialize_shorthand => sub {
+    my $self = shift;
+
+    my $r = {};
+
     my $x = $self->background_position_x;
     my $y = $self->background_position_y;
-    return $x . ' ' . $y if length $x and length $y;
-    return '';
+    my $xi = $self->get_property_priority ('background-position-x');
+    my $yi = $self->get_property_priority ('background-position-y');
+    if (length $x) {
+      if (length $y) {
+        if ($xi eq $yi) {
+          if ($x eq 'inherit') {
+            if ($y eq 'inherit') {
+              $r->{'background-position'} = ['inherit', $xi];
+            } else {
+              $r->{'background-position-x'} = [$x, $xi];
+              $r->{'background-position-y'} = [$y, $yi];
+            }
+          } elsif ($y eq 'inherit') {
+            $r->{'background-position-x'} = [$x, $xi];
+            $r->{'background-position-y'} = [$y, $yi];
+          } else {
+            $r->{'background-position'} = [$x . ' ' . $y, $xi];
+          }
+        } else {
+          $r->{'background-position-x'} = [$x, $xi];
+          $r->{'background-position-y'} = [$y, $yi];
+        }
+      } else {
+        $r->{'background-position-x'} = [$x, $xi];
+      }
+    } else {
+      if (length $y) {
+        $r->{'background-position-y'} = [$y, $yi];
+      } else {
+        #
+      }
+    }
+
+    return $r;
   },
   serialize_multiple => $Prop->{'background-color'}->{serialize_multiple},
 };
@@ -4809,13 +4863,18 @@ $Prop->{background} = {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
     my %prop_value;
     B: for (1..5) {
+      my $has_sign;
       my $sign = 1;
       if ($t->{type} == MINUS_TOKEN) {
         $sign = -1;
+        $has_sign = 1;
+        $t = $tt->get_next_token;
+      } elsif ($t->{type} == PLUS_TOKEN) {
+        $has_sign = 1;
         $t = $tt->get_next_token;
       }
 
-      if ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      if (not $has_sign and $t->{type} == IDENT_TOKEN) {
         my $value = lc $t->{value}; ## TODO: case
         if ($Prop->{'background-repeat'}->{keyword}->{$value} and
             $self->{prop_value}->{'background-repeat'}->{$value} and
@@ -4837,11 +4896,16 @@ $Prop->{background} = {
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
           my $sign = 1;
+          my $has_sign;
           if ($t->{type} == MINUS_TOKEN) {
             $sign = -1;
+            $has_sign = 1;
+            $t = $tt->get_next_token;
+          } elsif ($t->{type} == PLUS_TOKEN) {
+            $has_sign = 1;
             $t = $tt->get_next_token;
           }
-          if ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+          if (not $has_sign and $t->{type} == IDENT_TOKEN) {
             my $value = lc $t->{value}; ## TODO: case
             if ({top => 1, bottom => 1, center => 1}->{$value}) {
               $prop_value{'background-position-y'} = ['KEYWORD', $value];
@@ -4866,7 +4930,7 @@ $Prop->{background} = {
                          level => $self->{must_level},
                          uri => \$self->{href},
                          token => $t);
-              last B;
+              return ($t, undef);
             }
           } elsif ($t->{type} == PERCENTAGE_TOKEN) {
             my $value = $t->{number} * $sign;
@@ -4877,12 +4941,14 @@ $Prop->{background} = {
             my $value = $t->{number} * $sign;
             $t = $tt->get_next_token;
             $prop_value{'background-position-y'} = ['DIMENSION', $value, 'px'];
-          } elsif ($sign < 0) {
+          } elsif ($has_sign) {
             $onerror->(type => "syntax error:'$prop_name'",
                        level => $self->{must_level},
                        uri => \$self->{href},
                        token => $t);
-            last B;
+            return ($t, undef);
+          } else {
+            $prop_value{'background-position-y'} = ['KEYWORD', 'center'];
           }
         } elsif (($value eq 'top' or $value eq 'bottom') and
                  not defined $prop_value{'background-position-y'}) {
@@ -4890,7 +4956,9 @@ $Prop->{background} = {
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
           if ($t->{type} == IDENT_TOKEN and ## TODO: case
-              {left => 1, center => 1, right => 1}->{lc $t->{value}}) {
+              {
+                left => 1, center => 1, right => 1,
+              }->{my $value = lc $t->{value}}) {
             $prop_value{'background-position-x'} = ['KEYWORD', $value];
             $t = $tt->get_next_token;
           } else {
@@ -4919,7 +4987,7 @@ $Prop->{background} = {
       } elsif (($t->{type} == DIMENSION_TOKEN or
                 $t->{type} == PERCENTAGE_TOKEN or
                 ($t->{type} == NUMBER_TOKEN and
-                 $t->{unitless_px} or $t->{number} == 0)) and
+                 ($t->{unitless_px} or $t->{number} == 0))) and
                not defined $prop_value{'background-position-x'}) {
         if ($t->{type} == DIMENSION_TOKEN) {
           my $value = $t->{number} * $sign;
@@ -4933,7 +5001,7 @@ $Prop->{background} = {
                        level => $self->{must_level},
                        uri => \$self->{href},
                        token => $t);
-            last B;
+            return ($t, undef);
           }
         } elsif ($t->{type} == PERCENTAGE_TOKEN) {
           my $value = $t->{number} * $sign;
@@ -4952,8 +5020,13 @@ $Prop->{background} = {
         $t = $tt->get_next_token while $t->{type} == S_TOKEN;
         if ($t->{type} == MINUS_TOKEN) {
           $sign = -1;
+          $has_sign = 1;
+          $t = $tt->get_next_token;
+        } elsif ($t->{type} == PLUS_TOKEN) {
+          $has_sign = 1;
           $t = $tt->get_next_token;
         } else {
+          undef $has_sign;
           $sign = 1;
         }
 
@@ -4969,7 +5042,7 @@ $Prop->{background} = {
                        level => $self->{must_level},
                        uri => \$self->{href},
                        token => $t);
-            last B;
+            return ($t, undef);
           }
         } elsif ($t->{type} == PERCENTAGE_TOKEN) {
           my $value = $t->{number} * $sign;
@@ -4989,27 +5062,30 @@ $Prop->{background} = {
             $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
           }
         } else {
-          if ($sign > 0) {
-            $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
-          } else {
+          $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
+          if ($has_sign) {
             $onerror->(type => "syntax error:'$prop_name'",
                        level => $self->{must_level},
                        uri => \$self->{href},
                        token => $t);
+            return ($t, undef);
           }
         }
-      } elsif ($t->{type} == URI_TOKEN and
+      } elsif (not $has_sign and
+               $t->{type} == URI_TOKEN and
                not defined $prop_value{'background-image'}) {
-        $prop_value{'background-image'} = ['URI', $t->{value}];
+        $prop_value{'background-image'}
+            = ['URI', $t->{value}, \($self->{base_uri})];
         $t = $tt->get_next_token;
       } else {
-        if (keys %prop_value and $sign > 0) {
+        if (keys %prop_value and not $has_sign) {
           last B;
         } else {
           $onerror->(type => "syntax error:'$prop_name'",
                      level => $self->{must_level},
                      uri => \$self->{href},
                      token => $t);
+          return ($t, undef);
         }
       }
 
@@ -5021,33 +5097,6 @@ $Prop->{background} = {
                background-color background-position-x background-position-y/;
 
     return ($t, \%prop_value);
-  },
-  serialize => sub {
-    my ($self, $prop_name, $value) = @_;
-    
-    local $Error::Depth = $Error::Depth + 1;
-    my $color = $self->background_color;
-    return '' unless length $color;
-    my $image = $self->background_image;
-    return '' unless length $image;
-    my $repeat = $self->background_repeat;
-    return '' unless length $repeat;
-    my $attachment = $self->background_attachment;
-    return '' unless length $attachment;
-    my $position = $self->background_position;
-    return '' unless length $position;
-
-    my @v;
-    push @v, $color unless $color eq 'transparent';
-    push @v, $image unless $image eq 'none';
-    push @v, $repeat unless $repeat eq 'repeat';
-    push @v, $attachment unless $attachment eq 'scroll';
-    push @v, $position unless $position eq '0% 0%';
-    if (@v) {
-      return join ' ', @v;
-    } else {
-      return 'transparent none repeat scroll 0% 0%';
-    }
   },
   serialize_multiple => $Prop->{'background-color'}->{serialize_multiple},
 };
@@ -5696,4 +5745,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/26 09:30:47 $
+## $Date: 2008/01/26 11:18:40 $

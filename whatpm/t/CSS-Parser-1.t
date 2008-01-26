@@ -243,6 +243,7 @@ BEGIN {
 | background-attachment: scroll
 | background-color: transparent
 | background-image: none
+| background-position: 0% 0%
 | background-position-x: 0%
 | background-position-y: 0%
 | background-repeat: repeat

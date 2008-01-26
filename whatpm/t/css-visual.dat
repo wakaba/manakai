@@ -1734,8 +1734,1067 @@ html {
 -  display: inline;
 +  display: block;
 
+#data
+p {
+  background-position: inherit;
+}
+#cssom
+| <p>
+|   background-position: inherit
+|   background-position-x: inherit
+|   background-position-y: inherit
+#csstext
+p {
+  background-position: inherit;
+}
 
+#data
+p {
+  background-position-x: inherit;
+}
+#cssom
+| <p>
+|   background-position-x: inherit
+#csstext
+p {
+  background-position-x: inherit;
+}
 
+#data
+p {
+  background-position-x: inherit;
+  background-position-y: inherit;
+}
+#cssom
+| <p>
+|   background-position: inherit
+|   background-position-x: inherit
+|   background-position-y: inherit
+#csstext
+p {
+  background-position: inherit;
+}
 
+#data
+p {
+  background-position-x: inherit;
+  background-position-y: inherit !important;
+}
+#cssom
+| <p>
+|   background-position-x: inherit
+|   background-position-y: inherit !important
+#csstext
+p {
+  background-position-x: inherit;
+  background-position-y: inherit ! important;
+}
 
+#data
+p {
+  background-position-x: inherit;
+  background-position-y: 50%;
+}
+#cssom
+| <p>
+|   background-position-x: inherit
+|   background-position-y: 50%
+#csstext
+p {
+  background-position-x: inherit;
+  background-position-y: 50%;
+}
 
+#data
+p {
+  background-position-x: 12.4%;
+  background-position-y: inherit;
+}
+#cssom
+| <p>
+|   background-position-x: 12.4%
+|   background-position-y: inherit
+#csstext
+p {
+  background-position-x: 12.4%;
+  background-position-y: inherit;
+}
+
+#data
+p {
+  background-position: 12.3% 3px;
+}
+#cssom
+| <p>
+|   background-position: 12.3% 3px
+|   background-position-x: 12.3%
+|   background-position-y: 3px
+#csstext
+p {
+  background-position: 12.3% 3px;
+}
+
+#data
+p {
+  background-position-x: 12.3%;
+  background-position-y: 3px ! important;
+}
+#cssom
+| <p>
+|   background-position-x: 12.3%
+|   background-position-y: 3px !important
+#csstext
+p {
+  background-position-x: 12.3%;
+  background-position-y: 3px ! important;
+}
+
+#data
+p {
+  background-position-x: 12.3% ! important;
+  background-position-y: 3px;
+}
+#cssom
+| <p>
+|   background-position-x: 12.3% !important
+|   background-position-y: 3px
+#csstext
+p {
+  background-position-x: 12.3% ! important;
+  background-position-y: 3px;
+}
+
+#data
+p {
+  background-position-x: 12.3% !important;
+  background-position-y: 3px ! important;
+}
+#cssom
+| <p>
+|   background-position: 12.3% 3px !important
+|   background-position-x: 12.3% !important
+|   background-position-y: 3px !important
+#csstext
+p {
+  background-position: 12.3% 3px ! important;
+}
+
+#data
+p {
+  background:;
+}
+#errors
+;2;14;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background:
+#errors
+;2;14;m;syntax error:'background'
+;2;14;m;block not closed
+#cssom
+| <p>
+
+#data
+p {
+  background: -;
+}
+#errors
+;2;16;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: +;
+}
+#errors
+;2;16;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: +
+#errors
+;2;16;m;syntax error:'background'
+;2;16;m;block not closed
+#cssom
+| <p>
+
+#data
+p {
+  background: none;
+}
+#cssom
+| <p>
+|   background: transparent none repeat scroll 0% 0%
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: repeat
+#csstext
+p {
+  background: transparent none repeat scroll 0% 0%;
+}
+
+#data
+p {
+  background: url(bg);
+}
+#cssom
+| <p>
+|   background: url(bg)
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: url(bg)
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: repeat
+#csstext
+p {
+  background: url(bg);
+}
+#computed 1 p
+-| background: transparent none repeat scroll 0% 0%
++| background: url(thismessage:/bg)
+-| background-image: none
++| background-image: url(thismessage:/bg)
+
+#data
+p {
+  background: -url(bg);
+}
+#errors
+;2;15;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: -/**/url(bg);
+}
+#errors
+;2;20;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: +url(bg);
+}
+#errors
+;2;16;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: 12% url(a);
+}
+#cssom
+| <p>
+|   background: url(a) 12% 50%
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: url(a)
+|   background-position: 12% 50%
+|   background-position-x: 12%
+|   background-position-y: 50%
+|   background-repeat: repeat
+
+#data
+p {
+  background: url(a) url(b);
+}
+#errors
+;2;22;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  background: fixed center;
+}
+#cssom
+| <p>
+|   background: fixed center center
+|   background-attachment: fixed
+|   background-color: transparent
+|   background-image: none
+|   background-position: center center
+|   background-position-x: center
+|   background-position-y: center
+|   background-repeat: repeat
+#csstext
+p {
+  background: fixed center center;
+}
+
+#data
+p {
+  background: left;
+}
+#cssom
+| <p>
+|   background: left center
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left center
+|   background-position-x: left
+|   background-position-y: center
+|   background-repeat: repeat
+
+#data
+p {
+  background: left 1px;
+}
+#cssom
+| <p>
+|   background: left 1px
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left 1px
+|   background-position-x: left
+|   background-position-y: 1px
+|   background-repeat: repeat
+
+#data
+p {
+  background: left 1%;
+}
+#cssom
+| <p>
+|   background: left 1%
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left 1%
+|   background-position-x: left
+|   background-position-y: 1%
+|   background-repeat: repeat
+
+#data
+p {
+  background: left none;
+}
+#cssom
+| <p>
+|   background: left center
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left center
+|   background-position-x: left
+|   background-position-y: center
+|   background-repeat: repeat
+
+#data
+p {
+  background: left url(a);
+}
+#cssom
+| <p>
+|   background: url(a) left center
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: url(a)
+|   background-position: left center
+|   background-position-x: left
+|   background-position-y: center
+|   background-repeat: repeat
+
+#data
+p {
+  background: left -12px;
+}
+#cssom
+| <p>
+|   background: left -12px
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left -12px
+|   background-position-x: left
+|   background-position-y: -12px
+|   background-repeat: repeat
+
+#data
+p {
+  background: left +12px;
+}
+#cssom
+| <p>
+|   background: left 12px
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left 12px
+|   background-position-x: left
+|   background-position-y: 12px
+|   background-repeat: repeat
+
+#data
+p {
+  background: left +;
+}
+#errors
+;2;21;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: left -;
+}
+#errors
+;2;21;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: top left;
+}
+#cssom
+| <p>
+|   background: left top
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left top
+|   background-position-x: left
+|   background-position-y: top
+|   background-repeat: repeat
+
+#data
+p {
+  background: top center;
+}
+#cssom
+| <p>
+|   background: center top
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: center top
+|   background-position-x: center
+|   background-position-y: top
+|   background-repeat: repeat
+
+#data
+p {
+  background: top right;
+}
+#cssom
+| <p>
+|   background: right top
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: right top
+|   background-position-x: right
+|   background-position-y: top
+|   background-repeat: repeat
+
+#data
+p {
+  background: bottom left;
+}
+#cssom
+| <p>
+|   background: left bottom
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left bottom
+|   background-position-x: left
+|   background-position-y: bottom
+|   background-repeat: repeat
+
+#data
+p {
+  background: bottom center;
+}
+#cssom
+| <p>
+|   background: center bottom
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: center bottom
+|   background-position-x: center
+|   background-position-y: bottom
+|   background-repeat: repeat
+
+#data
+p {
+  background: bottom right;
+}
+#cssom
+| <p>
+|   background: right bottom
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: right bottom
+|   background-position-x: right
+|   background-position-y: bottom
+|   background-repeat: repeat
+
+#data
+p {
+  background: top -12px;
+}
+#errors
+;2;20;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: top +12px;
+}
+#errors
+;2;20;m;syntax error:'background'
+#cssom
+| <p>
+
+#data
+p {
+  background: -12px;
+}
+#cssom
+| <p>
+|   background: -12px 50%
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: -12px 50%
+|   background-position-x: -12px
+|   background-position-y: 50%
+|   background-repeat: repeat
+
+#data
+p {
+  background: +12px;
+}
+#cssom
+| <p>
+|   background: 12px 50%
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: 12px 50%
+|   background-position-x: 12px
+|   background-position-y: 50%
+|   background-repeat: repeat
+
+#data
+p {
+  background: 2% bottom;
+}
+#cssom
+| <p>
+|   background: 2% bottom
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: 2% bottom
+|   background-position-x: 2%
+|   background-position-y: bottom
+|   background-repeat: repeat
+
+#data
+p {
+  background: 2% left;
+}
+#errors
+;2;18;m;syntax error:color
+#cssom
+| <p>
+
+#data
+p {
+  background: none;
+  background-attachment: scroll ! important;
+}
+#cssom
+| <p>
+|   background-attachment: scroll !important
+|   background-color: transparent
+|   background-image: none
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll ! important;
+  background-color: transparent;
+  background-image: none;
+  background-position: 0% 0%;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: 0 -12px;
+}
+#cssom
+| <p>
+|   background: 0px -12px
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: 0px -12px
+|   background-position-x: 0px
+|   background-position-y: -12px
+|   background-repeat: repeat
+
+#data
+p {
+  background: 0 +12px;
+}
+#cssom
+| <p>
+|   background: 0px 12px
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: 0px 12px
+|   background-position-x: 0px
+|   background-position-y: 12px
+|   background-repeat: repeat
+
+#data
+p {
+  background: none;
+  background-color: red ! important;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: red !important
+|   background-image: none
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: red ! important;
+  background-image: none;
+  background-position: 0% 0%;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: none ! important;
+  background-color: transparent ! important;
+}
+#cssom
+| <p>
+|   background: transparent none repeat scroll 0% 0% !important
+|   background-attachment: scroll !important
+|   background-color: transparent !important
+|   background-image: none !important
+|   background-position: 0% 0% !important
+|   background-position-x: 0% !important
+|   background-position-y: 0% !important
+|   background-repeat: repeat !important
+#csstext
+p {
+  background: transparent none repeat scroll 0% 0% ! important;
+}
+
+#data
+p {
+  background: none !important;
+  background-color: blue;
+}
+#cssom
+| <p>
+|   background: transparent none repeat scroll 0% 0% !important
+|   background-attachment: scroll !important
+|   background-color: transparent !important
+|   background-image: none !important
+|   background-position: 0% 0% !important
+|   background-position-x: 0% !important
+|   background-position-y: 0% !important
+|   background-repeat: repeat !important
+#csstext
+p {
+  background: transparent none repeat scroll 0% 0% ! important;
+}
+
+#data
+p {
+  background: none;
+  background-image: none ! important;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none !important
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: none ! important;
+  background-position: 0% 0%;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: none;
+  background-position: left top !important;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left top !important
+|   background-position-x: left !important
+|   background-position-y: top !important
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: none;
+  background-position: left top ! important;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: none;
+  background-position-x: left !important;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position-x: left !important
+|   background-position-y: 0%
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: none;
+  background-position-x: left ! important;
+  background-position-y: 0%;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: none;
+  background-position-y: 12% !important;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position-x: 0%
+|   background-position-y: 12% !important
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: none;
+  background-position-x: 0%;
+  background-position-y: 12% ! important;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: none;
+  background-repeat: no-repeat ! important;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: no-repeat !important
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: none;
+  background-position: 0% 0%;
+  background-repeat: no-repeat ! important;
+}
+
+#data
+p {
+  background: none !important;
+}
+#cssom
+| <p>
+|   background: transparent none repeat scroll 0% 0% !important
+|   background-attachment: scroll !important
+|   background-color: transparent !important
+|   background-image: none !important
+|   background-position: 0% 0% !important
+|   background-position-x: 0% !important
+|   background-position-y: 0% !important
+|   background-repeat: repeat !important
+#csstext
+p {
+  background: transparent none repeat scroll 0% 0% ! important;
+}
+
+#data
+p {
+  background: none;
+  background-image: inherit;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: inherit
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: inherit;
+  background-position: 0% 0%;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: inherit;
+}
+#cssom
+| <p>
+|   background: inherit
+|   background-attachment: inherit
+|   background-color: inherit
+|   background-image: inherit
+|   background-position: inherit
+|   background-position-x: inherit
+|   background-position-y: inherit
+|   background-repeat: inherit
+#csstext
+p {
+  background: inherit;
+}
+
+#data
+p {
+  background: none;
+  background-color: inherit;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: inherit
+|   background-image: none
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: inherit;
+  background-image: none;
+  background-position: 0% 0%;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: none;
+  background-position: inherit;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: inherit
+|   background-position-x: inherit
+|   background-position-y: inherit
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: none;
+  background-position: inherit;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: inherit;
+  background-position-y: -13%;
+}
+#cssom
+| <p>
+|   background-attachment: inherit
+|   background-color: inherit
+|   background-image: inherit
+|   background-position-x: inherit
+|   background-position-y: -13%
+|   background-repeat: inherit
+#csstext
+p {
+  background-attachment: inherit;
+  background-color: inherit;
+  background-image: inherit;
+  background-position-x: inherit;
+  background-position-y: -13%;
+  background-repeat: inherit;
+}
+
+#data
+p {
+  background: blue;
+  background-position: inherit;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: blue
+|   background-image: none
+|   background-position: inherit
+|   background-position-x: inherit
+|   background-position-y: inherit
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: blue;
+  background-image: none;
+  background-position: inherit;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: inherit;
+  background-position-x: -13%;
+}
+#cssom
+| <p>
+|   background-attachment: inherit
+|   background-color: inherit
+|   background-image: inherit
+|   background-position-x: -13%
+|   background-position-y: inherit
+|   background-repeat: inherit
+#csstext
+p {
+  background-attachment: inherit;
+  background-color: inherit;
+  background-image: inherit;
+  background-position-x: -13%;
+  background-position-y: inherit;
+  background-repeat: inherit;
+}
+
+#data
+p {
+  background: blue;
+  background-position-y: inherit;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: blue
+|   background-image: none
+|   background-position-x: 0%
+|   background-position-y: inherit
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: blue;
+  background-image: none;
+  background-position-x: 0%;
+  background-position-y: inherit;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: blue;
+  background-position: inherit;
+  background-position-y: inherit ! important;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: blue
+|   background-image: none
+|   background-position-x: inherit
+|   background-position-y: inherit !important
+|   background-repeat: repeat
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: blue;
+  background-image: none;
+  background-position-x: inherit;
+  background-position-y: inherit ! important;
+  background-repeat: repeat;
+}
+
+#data
+p {
+  background: none;
+  background-repeat: inherit;
+}
+#cssom
+| <p>
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: 0% 0%
+|   background-position-x: 0%
+|   background-position-y: 0%
+|   background-repeat: inherit
+#csstext
+p {
+  background-attachment: scroll;
+  background-color: transparent;
+  background-image: none;
+  background-position: 0% 0%;
+  background-repeat: inherit;
+}

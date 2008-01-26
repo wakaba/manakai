@@ -1,5 +1,15 @@
 2008-01-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm ('background' serialize_multiple, 'background-position'
+	serialize_shorthand): Reimplemented taking 'inherit'
+	and 'important' into account.
+	('background' parse): Support for '+'.  Correct initial value
+	for 'background-position-y' was not set in some cases.
+	Wrong value was set to 'background-position-x' in some case.
+	Did not return by some syntax errors.
+
+2008-01-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm (get_char): Use argument to avoid self reference.
 
 	* Tokenizer.pm: Set the tokenizer itself as the first
