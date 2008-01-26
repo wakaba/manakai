@@ -1074,12 +1074,99 @@ p {
 #cssom
 | <p>
 |   border-bottom-color: inherit
+|   border-color: inherit
 |   border-left-color: inherit
 |   border-right-color: inherit
 |   border-top-color: inherit
 #csstext
 p {
   border-color: inherit;
+}
+
+#data
+p {
+  border-color: blue red;
+  border-bottom-color: green ! important;
+}
+#cssom
+| <p>
+|   border-bottom-color: green !important
+|   border-left-color: red
+|   border-right-color: red
+|   border-top-color: blue
+#csstext
+p {
+  border-bottom-color: green ! important;
+  border-left-color: red;
+  border-right-color: red;
+  border-top-color: blue;
+}
+
+#data
+p {
+  border-color: blue red;
+  border-bottom-color: INHERIT;
+}
+#cssom
+| <p>
+|   border-bottom-color: inherit
+|   border-left-color: red
+|   border-right-color: red
+|   border-top-color: blue
+#csstext
+p {
+  border-bottom-color: inherit;
+  border-left-color: red;
+  border-right-color: red;
+  border-top-color: blue;
+}
+
+#data
+p {
+  border-color: blue red;
+  border-bottom-color: green ! important;
+  border-bottom: 1px black dotted;
+}
+#cssom
+| <p>
+|   border-bottom-color: green !important
+|   border-bottom-style: dotted
+|   border-bottom-width: 1px
+|   border-left-color: red
+|   border-right-color: red
+|   border-top-color: blue
+#csstext
+p {
+  border-bottom-color: green ! important;
+  border-bottom-style: dotted;
+  border-bottom-width: 1px;
+  border-left-color: red;
+  border-right-color: red;
+  border-top-color: blue;
+}
+
+#data
+p {
+  border-color: blue red;
+  border-bottom-color: green;
+  border-bottom: 1px black dotted;
+}
+#cssom
+| <p>
+|   border-bottom: 1px dotted black
+|   border-bottom-color: black
+|   border-bottom-style: dotted
+|   border-bottom-width: 1px
+|   border-color: blue red black
+|   border-left-color: red
+|   border-right-color: red
+|   border-top-color: blue
+#csstext
+p {
+  border-bottom: 1px dotted black;
+  border-left-color: red;
+  border-right-color: red;
+  border-top-color: blue;
 }
 
 #data
@@ -1398,6 +1485,68 @@ p {
 p {
   border: 2px solid red;
 }
+
+#data
+p {
+  border: 1px solid red;
+  border-width: 2px;
+  border-top-color: green ! important;
+}
+#cssom
+| <p>
+|   border-bottom: 2px solid red
+|   border-bottom-color: red
+|   border-bottom-style: solid
+|   border-bottom-width: 2px
+|   border-left: 2px solid red
+|   border-left-color: red
+|   border-left-style: solid
+|   border-left-width: 2px
+|   border-right: 2px solid red
+|   border-right-color: red
+|   border-right-style: solid
+|   border-right-width: 2px
+|   border-style: solid
+|   border-top-color: green !important
+|   border-top-style: solid
+|   border-top-width: 2px
+|   border-width: 2px
+#csstext
+p {
+  border-bottom: 2px solid red;
+  border-left: 2px solid red;
+  border-right: 2px solid red;
+  border-top-color: green ! important;
+  border-top-style: solid;
+  border-top-width: 2px;
+}
+
+#data
+p {
+  border: inherit;
+}
+#cssom
+| <p>
+|   border: inherit
+|   border-bottom: inherit
+|   border-bottom-color: inherit
+|   border-bottom-style: inherit
+|   border-bottom-width: inherit
+|   border-color: inherit
+|   border-left: inherit
+|   border-left-color: inherit
+|   border-left-style: inherit
+|   border-left-width: inherit
+|   border-right: inherit
+|   border-right-color: inherit
+|   border-right-style: inherit
+|   border-right-width: inherit
+|   border-style: inherit
+|   border-top: inherit
+|   border-top-color: inherit
+|   border-top-style: inherit
+|   border-top-width: inherit
+|   border-width: inherit
 
 #data
 /*

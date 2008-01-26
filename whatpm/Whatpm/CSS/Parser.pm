@@ -1091,36 +1091,77 @@ $Prop->{'border-top-color'} = {
     ## NOTE: This algorithm returns the same result as that of Firefox 2
     ## in many case, but not always.
     my $r = {
-      'border-top-color' => [$self->border_top_color],
-      'border-top-style' => [$self->border_top_style],
-      'border-top-width' => [$self->border_top_width],
-      'border-right-color' => [$self->border_right_color],
-      'border-right-style' => [$self->border_right_style],
-      'border-right-width' => [$self->border_right_width],
-      'border-bottom-color' => [$self->border_bottom_color],
-      'border-bottom-style' => [$self->border_bottom_style],
-      'border-bottom-width' => [$self->border_bottom_width],
-      'border-left-color' => [$self->border_left_color],
-      'border-left-style' => [$self->border_left_style],
-      'border-left-width' => [$self->border_left_width],
+      'border-top-color' => [$self->border_top_color,
+                             $self->get_property_priority
+                                 ('border-top-color')],
+      'border-top-style' => [$self->border_top_style,
+                             $self->get_property_priority
+                                 ('border-top-style')],
+      'border-top-width' => [$self->border_top_width,
+                             $self->get_property_priority
+                                 ('border-top-width')],
+      'border-right-color' => [$self->border_right_color,
+                               $self->get_property_priority
+                                   ('border-right-color')],
+      'border-right-style' => [$self->border_right_style,
+                               $self->get_property_priority
+                                   ('border-right-style')],
+      'border-right-width' => [$self->border_right_width,
+                               $self->get_property_priority
+                                   ('border-right-width')],
+      'border-bottom-color' => [$self->border_bottom_color,
+                                $self->get_property_priority
+                                    ('border-bottom-color')],
+      'border-bottom-style' => [$self->border_bottom_style,
+                                $self->get_property_priority
+                                    ('border-bottom-style')],
+      'border-bottom-width' => [$self->border_bottom_width,
+                                $self->get_property_priority
+                                    ('border-bottom-width')],
+      'border-left-color' => [$self->border_left_color,
+                              $self->get_property_priority
+                                  ('border-leftcolor')],
+      'border-left-style' => [$self->border_left_style,
+                              $self->get_property_priority
+                                  ('border-left-style')],
+      'border-left-width' => [$self->border_left_width,
+                              $self->get_property_priority
+                                  ('border-left-width')],
     };
     my $i = 0;
     for my $prop (qw/border-top border-right border-bottom border-left/) {
       if (length $r->{$prop.'-color'}->[0] and
           length $r->{$prop.'-style'}->[0] and
-          length $r->{$prop.'-width'}->[0]) {
-        $r->{$prop} = [$r->{$prop.'-width'}->[0] . ' ' .
-              $r->{$prop.'-style'}->[0] . ' ' .
-              $r->{$prop.'-color'}->[0], ''];
+          length $r->{$prop.'-width'}->[0] and
+          $r->{$prop.'-color'}->[1] eq $r->{$prop.'-style'}->[1] and
+          $r->{$prop.'-color'}->[1] eq $r->{$prop.'-width'}->[1]) {
+        my $inherit = 0;
+        $inherit++ if $r->{$prop.'-color'}->[0] eq 'inherit';
+        $inherit++ if $r->{$prop.'-style'}->[0] eq 'inherit';
+        $inherit++ if $r->{$prop.'-width'}->[0] eq 'inherit';
+        if ($inherit == 3) {
+          $r->{$prop} = $r->{$prop.'-color'};
+        } elsif ($inherit) {
+          next;
+        } else {
+          $r->{$prop} = [$r->{$prop.'-width'}->[0] . ' ' .
+                             $r->{$prop.'-style'}->[0] . ' ' .
+                             $r->{$prop.'-color'}->[0],
+                         $r->{$prop.'-color'}->[1]];
+        }
         delete $r->{$prop.'-width'};
         delete $r->{$prop.'-style'};
         delete $r->{$prop.'-color'};
         $i++;
       }
     }
-    if ($i == 4 and $r->{'border-top'}->[0] eq $r->{'border-right'}->[0] and
+    if ($i == 4 and
+        $r->{'border-top'}->[0] eq $r->{'border-right'}->[0] and
         $r->{'border-right'}->[0] eq $r->{'border-bottom'}->[0] and
-        $r->{'border-bottom'}->[0] eq $r->{'border-left'}->[0]) {
+        $r->{'border-bottom'}->[0] eq $r->{'border-left'}->[0] and
+        $r->{'border-top'}->[1] eq $r->{'border-right'}->[1] and
+        $r->{'border-right'}->[1] eq $r->{'border-bottom'}->[1] and
+        $r->{'border-bottom'}->[1] eq $r->{'border-left'}->[1]) {
       return {border => $r->{'border-top'}};
     }
 
@@ -1129,15 +1170,43 @@ $Prop->{'border-top-color'} = {
         if (defined $r->{'border-top-'.$prop} and
             defined $r->{'border-bottom-'.$prop} and
             defined $r->{'border-right-'.$prop} and
-            defined $r->{'border-left-'.$prop}) {
+            defined $r->{'border-left-'.$prop} and
+            length $r->{'border-top-'.$prop}->[0] and
+            length $r->{'border-bottom-'.$prop}->[0] and
+            length $r->{'border-right-'.$prop}->[0] and
+            length $r->{'border-left-'.$prop}->[0] and
+            $r->{'border-top-'.$prop}->[1]
+                eq $r->{'border-bottom-'.$prop}->[1] and
+            $r->{'border-top-'.$prop}->[1]
+                eq $r->{'border-right-'.$prop}->[1] and
+            $r->{'border-top-'.$prop}->[1]
+                eq $r->{'border-left-'.$prop}->[1]) {
           my @v = ($r->{'border-top-'.$prop},
                    $r->{'border-right-'.$prop},
                    $r->{'border-bottom-'.$prop},
                    $r->{'border-left-'.$prop});
-          pop @v if $r->{'border-right-'.$prop}->[0] eq $r->{'border-left-'.$prop}->[0];
-          pop @v if $r->{'border-bottom-'.$prop}->[0] eq $r->{'border-top-'.$prop}->[0];
-          pop @v if $r->{'border-right-'.$prop}->[0] eq $r->{'border-top-'.$prop}->[0];
-          $r->{'border-'.$prop} = [(join ' ', map {$_->[0]} @v), ''];
+          my $inherit = 0;
+          for (@v) {
+            $inherit++ if $_->[0] eq 'inherit';
+          }
+          if ($inherit == 4) {
+            $r->{'border-'.$prop}
+                = ['inherit', $r->{'border-top-'.$prop}->[1]];
+          } elsif ($inherit) {
+            next;
+          } else {
+            pop @v
+                if $r->{'border-right-'.$prop}->[0]
+                    eq $r->{'border-left-'.$prop}->[0];
+            pop @v
+                if $r->{'border-bottom-'.$prop}->[0]
+                    eq $r->{'border-top-'.$prop}->[0];
+            pop @v
+                if $r->{'border-right-'.$prop}->[0]
+                    eq $r->{'border-top-'.$prop}->[0];
+            $r->{'border-'.$prop} = [(join ' ', map {$_->[0]} @v),
+                                     $r->{'border-top-'.$prop}->[1]];
+          }
           delete $r->{'border-top-'.$prop};
           delete $r->{'border-bottom-'.$prop};
           delete $r->{'border-right-'.$prop};
@@ -5628,4 +5697,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/26 05:11:01 $
+## $Date: 2008/01/26 09:05:07 $
