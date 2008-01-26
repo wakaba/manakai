@@ -1986,44 +1986,54 @@ $Prop->{'font-size'} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
+    my $has_sign;
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
       $sign = -1;
+      $has_sign = 1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($length_unit->{$unit} and $value >= 0) {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
       }
     } elsif ($t->{type} == PERCENTAGE_TOKEN) {
       my $value = $t->{number} * $sign;
-      $t = $tt->get_next_token;
-      return ($t, {$prop_name => ['PERCENTAGE', $value]}) if $value >= 0;
+      if ($value >= 0) {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['PERCENTAGE', $value]});
+      }
     } elsif ($t->{type} == NUMBER_TOKEN and
              ($self->{unitless_px} or $t->{number} == 0)) {
       my $value = $t->{number} * $sign;
-      $t = $tt->get_next_token;
-      return ($t, {$prop_name => ['DIMENSION', $value, 'px']}) if $value >= 0;
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      if ($value >= 0) {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
+      }
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ({
            'xx-small' => 1, 'x-small' => 1, small => 1, medium => 1,
            large => 1, 'x-large' => 1, 'xx-large' => 1, 
-           '-manakai-xxx-large' => 1, # -webkit-xxx-large
+           '-manakai-xxx-large' => 1, '-webkit-xxx-large' => 1,
            larger => 1, smaller => 1,
           }->{$value}) {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['KEYWORD', $value]});        
       } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['INHERIT']});
       }
     }
     
-    $onerror->(type => "syntax error:'$prop_name",
+    $onerror->(type => "syntax error:'$prop_name'",
                level => $self->{must_level},
                uri => \$self->{href},
                token => $t);
@@ -2098,6 +2108,7 @@ $Prop->{'font-size'} = {
             return ['DIMENSION', $self->{font_size}->[2], 'px'];
           }
         } else {
+          ## TODO: different computation in quirks mode?
           return ['DIMENSION', $self->{font_size}->[{
             'xx-small' => 0,
             'x-small' => 1,
@@ -2107,6 +2118,7 @@ $Prop->{'font-size'} = {
             'x-large' => 5,
             'xx-large' => 6,
             '-manakai-xxx-large' => 7,
+            '-webkit-xxx-large' => 7,
           }->{$specified_value->[1]}], 'px'];
         }
       }
@@ -5164,12 +5176,36 @@ $Prop->{font} = {
         }
       } elsif ($t->{type} == NUMBER_TOKEN) {
         if ({100 => 1, 200 => 1, 300 => 1, 400 => 1, 500 => 1,
-             600 => 1, 700 => 1, 800 => 1, 900 => 1}->{$t->{value}}) {
-          $prop_value{'font-weight'} = ['NUMBER', $t->{value}];
+             600 => 1, 700 => 1, 800 => 1, 900 => 1}->{$t->{number}}) {
+          $prop_value{'font-weight'} = ['WEIGHT', $t->{number}, 0];
           $t = $tt->get_next_token;
         } else {
           last A;
         }
+      } elsif ($t->{type} == PLUS_TOKEN) {
+        $t = $tt->get_next_token;
+        if ($t->{type} == NUMBER_TOKEN) {
+          if ({100 => 1, 200 => 1, 300 => 1, 400 => 1, 500 => 1,
+               600 => 1, 700 => 1, 800 => 1, 900 => 1}->{$t->{number}}) {
+            $prop_value{'font-weight'} = ['WEIGHT', $t->{number}, 0];
+            $t = $tt->get_next_token;
+          } else {
+            ## NOTE: <'font-size'> or invalid
+            last A;
+          }
+        } elsif ($t->{type} == DIMENSION_TOKEN or
+                 $t->{type} == PERCENTAGE_TOKEN) {
+          ## NOTE: <'font-size'> or invalid
+          last A;
+        } else {
+          $onerror->(type => "syntax error:'$prop_name'",
+                     level => $self->{must_level},
+                     uri => \$self->{href},
+                     token => $t);
+          return ($t, undef);
+        }
+      } else {
+        last A;
       }
 
       $t = $tt->get_next_token while $t->{type} == S_TOKEN;
@@ -5745,4 +5781,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/26 11:18:40 $
+## $Date: 2008/01/26 14:31:32 $

@@ -113,6 +113,323 @@ p {
 
 #data
 p {
+  font-size: 0;
+}
+#cssom
+| <p>
+|   font-size: 0px
+#csstext
+p {
+  font-size: 0px;
+}
+
+#data
+p {
+  font-size: -0;
+}
+#cssom
+| <p>
+|   font-size: 0px
+#csstext
+p {
+  font-size: 0px;
+}
+
+#data
+p {
+  font-size: +0;
+}
+#cssom
+| <p>
+|   font-size: 0px
+#csstext
+p {
+  font-size: 0px;
+}
+
+#data
+p {
+  font-size: 12;
+}
+#errors
+;2;14;m;syntax error:'font-size'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  font-size: 12;
+}
+#option q
+#cssom
+| <p>
+|   font-size: 12px
+#csstext
+p {
+  font-size: 12px;
+}
+
+#data
+p {
+  font-size: +12;
+}
+#errors
+;2;15;m;syntax error:'font-size'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  font-size: +12;
+}
+#option q
+#cssom
+| <p>
+|   font-size: 12px
+#csstext
+p {
+  font-size: 12px;
+}
+
+#data
+p {
+  font-size: .12px;
+}
+#cssom
+| <p>
+|   font-size: 0.12px
+#csstext
+p {
+  font-size: 0.12px;
+}
+
+#data
+p {
+  font-size: 12px;
+}
+#cssom
+| <p>
+|   font-size: 12px
+#csstext
+p {
+  font-size: 12px;
+}
+
+#data
+p {
+  font-size: 12px ! important ;
+}
+#cssom
+| <p>
+|   font-size: 12px !important
+#csstext
+p {
+  font-size: 12px ! important;
+}
+
+#data
+p {
+  font-size: 12%;
+}
+#cssom
+| <p>
+|   font-size: 12%
+#csstext
+p {
+  font-size: 12%;
+}
+
+#data
+p {
+  font-size: 12cm;
+}
+#cssom
+| <p>
+|   font-size: 12cm
+#csstext
+p {
+  font-size: 12cm;
+}
+
+#data
+p {
+  font-size: 12em;
+}
+#cssom
+| <p>
+|   font-size: 12em
+#csstext
+p {
+  font-size: 12em;
+}
+
+#data
+p {
+  font-size: inherit;
+}
+#cssom
+| <p>
+|   font-size: inherit
+#csstext
+p {
+  font-size: inherit;
+}
+
+#data
+p {
+  font-size: inherit!important;
+}
+#cssom
+| <p>
+|   font-size: inherit !important
+#csstext
+p {
+  font-size: inherit ! important;
+}
+
+#data
+p {
+  font-size: +inherit;
+}
+#errors
+;2;15;m;syntax error:'font-size'
+#cssom
+| <p>
+
+#data
+p {
+  font-size: -inherit;
+}
+#errors
+;2;14;m;syntax error:'font-size'
+#cssom
+| <p>
+
+#data
+p {
+  font-size: -/**/inherit;
+}
+#errors
+;2;19;m;syntax error:'font-size'
+#cssom
+| <p>
+
+#data
+p {
+  font-size: xx-small;
+}
+#cssom
+| <p>
+|   font-size: xx-small
+#csstext
+p {
+  font-size: xx-small;
+}
+
+#data
+p {
+  font-size: x-small;
+}
+#cssom
+| <p>
+|   font-size: x-small
+#csstext
+p {
+  font-size: x-small;
+}
+
+#data
+p {
+  font-size: small;
+}
+#cssom
+| <p>
+|   font-size: small
+#csstext
+p {
+  font-size: small;
+}
+
+#data
+p {
+  font-size: medium;
+}
+#cssom
+| <p>
+|   font-size: medium
+#csstext
+p {
+  font-size: medium;
+}
+
+#data
+p {
+  font-size: large;
+}
+#cssom
+| <p>
+|   font-size: large
+#csstext
+p {
+  font-size: large;
+}
+
+#data
+p {
+  font-size: x-large;
+}
+#cssom
+| <p>
+|   font-size: x-large
+#csstext
+p {
+  font-size: x-large;
+}
+
+#data
+p {
+  font-size: xx-large;
+}
+#cssom
+| <p>
+|   font-size: xx-large
+#csstext
+p {
+  font-size: xx-large;
+}
+
+#data
+p {
+  font-size: -manakai-xxx-large;
+}
+#cssom
+| <p>
+|   font-size: -manakai-xxx-large
+#csstext
+p {
+  font-size: -manakai-xxx-large;
+}
+
+#data
+p {
+  font-size: -webkit-xxx-large;
+}
+#cssom
+| <p>
+|   font-size: -webkit-xxx-large
+#csstext
+p {
+  font-size: -webkit-xxx-large;
+}
+
+#data
+p {
   font: 1px serif;
 }
 #cssom
@@ -364,9 +681,473 @@ p {
   line-height: inherit;
 }
 
+#data
+p {
+  font: 800 12 serif;
+}
+#errors
+;2;13;m;syntax error:'font'
+#cssom
+| <p>
+#csstext
+p {
+}
 
+#data
+p {
+  font: 800 12 serif;
+}
+#option q
+#cssom
+| <p>
+|   font: 800 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: 800
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 12px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 800;
+  line-height: normal;
+}
 
+#data
+p {
+  font: 800 12px serif;
+}
+#cssom
+| <p>
+|   font: 800 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: 800
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 12px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 800;
+  line-height: normal;
+}
 
+#data
+p {
+  font: 800/**/12px/**/serif;
+}
+#cssom
+| <p>
+|   font: 800 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: 800
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 12px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 800;
+  line-height: normal;
+}
 
+#data
+p {
+  font: 800 +12 serif;
+}
+#errors
+;2;14;m;syntax error:'font'
+#cssom
+| <p>
+#csstext
+p {
+}
 
+#data
+p {
+  font: 800 +12 serif;
+}
+#option q
+#cssom
+| <p>
+|   font: 800 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: 800
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 12px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 800;
+  line-height: normal;
+}
 
+#data
+p {
+  font: 800 + 12 serif;
+}
+#errors
+;2;14;m;syntax error:'font'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  font: 800 + 12 serif;
+}
+#option q
+#errors
+;2;14;m;syntax error:'font'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  font: +800 12px serif;
+}
+#cssom
+| <p>
+|   font: 800 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: 800
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 12px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+
+#data
+p {
+  font: -800 12px serif;
+}
+#errors
+;2;10;m;syntax error:'font'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  font: -800 12px serif;
+}
+#option q
+#errors
+;2;10;m;syntax error:'font'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  font: -800 serif;
+}
+#errors
+;2;10;m;syntax error:'font'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  font: +12 serif;
+}
+#option q
+#cssom
+| <p>
+|   font: 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 12px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: normal;
+}
+
+#data
+p {
+  font: +12px serif;
+}
+#cssom
+| <p>
+|   font: 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 12px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: normal;
+}
+
+#data
+p {
+  font: +12% serif;
+}
+#cssom
+| <p>
+|   font: 12% serif
+|   font-family: serif
+|   font-size: 12%
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+#csstext
+p {
+  font-family: serif;
+  font-size: 12%;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  line-height: normal;
+}
+
+#data
+p {
+  font: normal normal normal 12 serif;
+}
+#errors
+;2;30;m;syntax error:'font'
+#cssom
+| <p>
+
+#data
+p {
+  font: normal normal normal 12 serif;
+}
+#option q
+#cssom
+| <p>
+|   font: 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal 12px serif;
+}
+#cssom
+| <p>
+|   font: 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal 12% serif;
+}
+#cssom
+| <p>
+|   font: 12% serif
+|   font-family: serif
+|   font-size: 12%
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal +12 serif;
+}
+#errors
+;2;31;m;syntax error:'font'
+#cssom
+| <p>
+
+#data
+p {
+  font: normal normal normal +12 serif;
+}
+#option q
+#cssom
+| <p>
+|   font: 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal +12px serif;
+}
+#cssom
+| <p>
+|   font: 12px serif
+|   font-family: serif
+|   font-size: 12px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal +12% serif;
+}
+#cssom
+| <p>
+|   font: 12% serif
+|   font-family: serif
+|   font-size: 12%
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal ++12 serif;
+}
+#errors
+;2;31;m;syntax error:'font'
+#cssom
+| <p>
+
+#data
+p {
+  font: normal normal normal ++12 serif;
+}
+#option q
+#errors
+;2;31;m;syntax error:'font'
+#cssom
+| <p>
+
+#data
+p {
+  font: normal normal normal ++12px serif;
+}
+#errors
+;2;31;m;syntax error:'font'
+#cssom
+| <p>
+
+#data
+p {
+  font: normal normal normal ++12% serif;
+}
+#errors
+;2;31;m;syntax error:'font'
+#cssom
+| <p>
+
+#data
+p {
+  font: normal normal normal 0 serif;
+}
+#cssom
+| <p>
+|   font: 0px serif
+|   font-family: serif
+|   font-size: 0px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal 0 serif;
+}
+#option q
+#cssom
+| <p>
+|   font: 0px serif
+|   font-family: serif
+|   font-size: 0px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal +0 serif;
+}
+#cssom
+| <p>
+|   font: 0px serif
+|   font-family: serif
+|   font-size: 0px
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal
+
+#data
+p {
+  font: normal normal normal +0% serif;
+}
+#cssom
+| <p>
+|   font: 0% serif
+|   font-family: serif
+|   font-size: 0%
+|   font-style: normal
+|   font-variant: normal
+|   font-weight: normal
+|   line-height: normal

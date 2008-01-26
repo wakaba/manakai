@@ -1,5 +1,13 @@
 2008-01-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm ('font-size' parser): Support for '+'.  Fixed to
+	report more accurate error position.  Enabled the
+	support for '-webkit-xxx-large'.
+	('font' parse): Support for '+' in <'font-weight'>
+	and <'font-size'>.
+
+2008-01-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm ('background' serialize_multiple, 'background-position'
 	serialize_shorthand): Reimplemented taking 'inherit'
 	and 'important' into account.
