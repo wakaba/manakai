@@ -84,12 +84,11 @@ sub parse_char_string ($$) {
       } else {
         $column++;
       }
-      ## TODO: $tt -> $_[0]
-      $tt->{line} = $line;
-      $tt->{column} = $column;
+      $_[0]->{line} = $line;
+      $_[0]->{column} = $column;
       return $c;
     } else {
-      $tt->{column} = $column + 1; ## Set the same number always.
+      $_[0]->{column} = $column + 1; ## Set the same number always.
       return -1;
     }
   }; # $tt->{get_char}
@@ -5697,4 +5696,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/26 09:05:07 $
+## $Date: 2008/01/26 09:30:47 $

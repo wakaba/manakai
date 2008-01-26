@@ -1,5 +1,12 @@
 2008-01-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm (get_char): Use argument to avoid self reference.
+
+	* Tokenizer.pm: Set the tokenizer itself as the first
+	argument to the |get_char| function.
+
+2008-01-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm ('border' serialize_multiple): Reimplement
 	to take 'inherit' and 'important' into account.
 
