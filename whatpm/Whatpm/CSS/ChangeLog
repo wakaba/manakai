@@ -1,5 +1,13 @@
 2008-01-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm (serialize_shorthand, serialize_multiple): The
+	leading | ! |s in the priority part were removed (now they
+	are added by |css_text| attribute implementation).
+	(border-width, border-style, border-color serialize_shorthand): Typo
+	fixed.
+
+2008-01-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm (font serialize_shorthand): Implemented.
 	($generic_font_keywords): Typo fixed.
 

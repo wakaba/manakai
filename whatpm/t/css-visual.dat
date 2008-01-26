@@ -40,6 +40,7 @@ p {
 }
 #cssom
 | <p>
+|   margin: inherit
 |   margin-bottom: inherit
 |   margin-left: inherit
 |   margin-right: inherit
@@ -76,6 +77,27 @@ p {
 
 #data
 p {
+  margin-top: inherit!important;
+  margin-right: inherit !important;
+  margin-bottom: inherit !important;
+  margin-left: inherit ! important ;
+}
+#cssom
+| <p>
+|   margin: inherit !important
+|   margin-bottom: inherit !important
+|   margin-left: inherit !important
+|   margin-right: inherit !important
+|   margin-top: inherit !important
+#csstext
+p {
+  margin: inherit ! important;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
   margin-top: 12px;
 }
 #cssom
@@ -88,6 +110,8 @@ p {
 #computed 1 p
 -| margin: 0px
 +| margin: 12px 0px 0px
+-| margin-top: 0px
++| margin-top: 12px
 
 #data
 p {
@@ -137,6 +161,8 @@ p {
 #computed 1 p
 -| margin: 0px
 +| margin: 12px 0px 0px
+-| margin-top: 0px
++| margin-top: 12px
 
 #data
 p {
@@ -152,6 +178,8 @@ p {
 #computed 1 p
 -| margin: 0px
 +| margin: 12px 0px 0px
+-| margin-top: 0px
++| margin-top: 12px
 
 #data
 p {

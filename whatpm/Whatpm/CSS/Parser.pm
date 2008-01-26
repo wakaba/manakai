@@ -1021,8 +1021,6 @@ $Prop->{'background-color'} = {
     my $y = $self->background_position_y;
     my $xi = $self->get_property_priority ('background-position-x');
     my $yi = $self->get_property_priority ('background-position-y');
-    $xi = ' ! ' . $xi if length $xi;
-    $yi = ' ! ' . $yi if length $yi;
     if (length $x) {
       if (length $y) {
         if ($xi eq $yi) {
@@ -1047,9 +1045,8 @@ $Prop->{'background-color'} = {
       my $prop_name = 'background_'.$prop;
       my $value = $self->$prop_name;
       if (length $value) {
-        $r->{'background-'.$prop} = [$value, ''];
         my $i = $self->get_property_priority ('background-'.$prop);
-        $r->{'background-'.$prop}->[1] .= ' ! '.$i if length $i;
+        $r->{'background-'.$prop} = [$value, $i];
       } else {
         undef $has_all;
       }
@@ -2149,8 +2146,6 @@ $Prop->{'-manakai-border-spacing-x'} = {
     my $y = $self->_manakai_border_spacing_y;
     my $xi = $self->get_property_priority ('-manakai-border-spacing-x');
     my $yi = $self->get_property_priority ('-manakai-border-spacing-y');
-    $xi = ' ! ' . $xi if length $xi;
-    $yi = ' ! ' . $yi if length $yi;
     if (length $x) {
       if (length $y) {
         if ($xi eq $yi) {
@@ -2299,25 +2294,20 @@ $Prop->{'margin-top'} = {
       $b .= ' ' . $l if $r ne $l;
       $r .= ' ' . $b if $t ne $b;
       $t .= ' ' . $r if $t ne $r;
-      my $i = length $t_i ? ' ! ' . $t_i : '';
-      return {margin => [$t, $i]};
+      return {margin => [$t, $t_i]};
     } else {
       my $v = {};
       if (length $t) {
-        $v->{'margin-top'} = [$t, ''];
-        $v->{'margin-top'}->[1] .= ' ! ' . $t_i if length $t_i;
+        $v->{'margin-top'} = [$t, $t_i];
       }
       if (length $r) {
-        $v->{'margin-right'} = [$r, ''];
-        $v->{'margin-right'}->[1] .= ' ! ' . $r_i if length $r_i;
+        $v->{'margin-right'} = [$r, $r_i];
       }
       if (length $b) {
-        $v->{'margin-bottom'} = [$b, ''];
-        $v->{'margin-bottom'}->[1] .= ' ! ' . $b_i if length $b_i;
+        $v->{'margin-bottom'} = [$b, $b_i];
       }
       if (length $l) {
-        $v->{'margin-left'} = [$l, ''];
-        $v->{'margin-left'}->[1] .= ' ! ' . $l_i if length $l_i;
+        $v->{'margin-left'} = [$l, $l_i];
       }
       return $v;
     }
@@ -2831,25 +2821,20 @@ $Prop->{'padding-top'} = {
       $b .= ' ' . $l if $r ne $l;
       $r .= ' ' . $b if $t ne $b;
       $t .= ' ' . $r if $t ne $r;
-      my $i = length $t_i ? ' ! ' . $t_i : '';
-      return {padding => [$t, $i]};
+      return {padding => [$t, $t_i]};
     } else {
       my $v = {};
       if (length $t) {
-        $v->{'padding-top'} = [$t, ''];
-        $v->{'padding-top'}->[1] .= ' ! ' . $t_i if length $t_i;
+        $v->{'padding-top'} = [$t, $t_i];
       }
       if (length $r) {
-        $v->{'padding-right'} = [$r, ''];
-        $v->{'padding-right'}->[1] .= ' ! ' . $r_i if length $r_i;
+        $v->{'padding-right'} = [$r, $r_i];
       }
       if (length $b) {
-        $v->{'padding-bottom'} = [$b, ''];
-        $v->{'padding-bottom'}->[1] .= ' ! ' . $b_i if length $b_i;
+        $v->{'padding-bottom'} = [$b, $b_i];
       }
       if (length $l) {
-        $v->{'padding-left'} = [$l, ''];
-        $v->{'padding-left'}->[1] .= ' ! ' . $l_i if length $l_i;
+        $v->{'padding-left'} = [$l, $l_i];
       }
       return $v;
     }
@@ -3571,23 +3556,23 @@ $Prop->{'border-style'} = {
     my @v;
     push @v, $self->border_top_style;
     my $i = $self->get_property_priority ('border-top-style');
-    return '' unless length $v[-1];
+    return {} unless length $v[-1];
     push @v, $self->border_right_style;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-right-style');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-right-style');
     push @v, $self->border_bottom_style;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-bottom-style');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-bottom-style');
     push @v, $self->border_left_style;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-left-style');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-left-style');
 
     my $v = 0;
     for (0..3) {
       $v++ if $v[$_] eq 'inherit';
     }
     if ($v == 4) {
-      return {'border-style' => ['inherit', length $i ? ' ! ' . $i : '']};
+      return {'border-style' => ['inherit', $i]};
     } elsif ($v) {
       return {};
     }
@@ -3595,7 +3580,7 @@ $Prop->{'border-style'} = {
     pop @v if $v[1] eq $v[3];
     pop @v if $v[0] eq $v[2];
     pop @v if $v[0] eq $v[1];
-    return {'border-style' => [(join ' ', @v), length $i ? ' ! ' . $i : '']};
+    return {'border-style' => [(join ' ', @v), $i]};
   },
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
 };
@@ -3686,23 +3671,23 @@ $Prop->{'border-color'} = {
     my @v;
     push @v, $self->border_top_color;
     my $i = $self->get_property_priority ('border-top-color');
-    return '' unless length $v[-1];
+    return {} unless length $v[-1];
     push @v, $self->border_right_color;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-right-color');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-right-color');
     push @v, $self->border_bottom_color;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-bottom-color');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-bottom-color');
     push @v, $self->border_left_color;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-left-color');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-left-color');
 
     my $v = 0;
     for (0..3) {
       $v++ if $v[$_] eq 'inherit';
     }
     if ($v == 4) {
-      return {'border-color' => ['inherit', length $i ? ' ! ' . $i : '']};
+      return {'border-color' => ['inherit', $i]};
     } elsif ($v) {
       return {};
     }
@@ -3710,7 +3695,7 @@ $Prop->{'border-color'} = {
     pop @v if $v[1] eq $v[3];
     pop @v if $v[0] eq $v[2];
     pop @v if $v[0] eq $v[1];
-    return {'border-color' => [(join ' ', @v), length $i ? ' ! ' . $i : '']};
+    return {'border-color' => [(join ' ', @v), $i]};
   },
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
 };
@@ -3839,7 +3824,6 @@ $Prop->{'border-top'} = {
     my $c = $self->border_top_color;
     return {} unless length $c;
     return {} unless $i eq $self->get_property_priority ('border-top-color');
-    $i = ' ! ' . $i if length $i;
 
     my $v = 0;
     $v++ if $w eq 'inherit';
@@ -3873,7 +3857,6 @@ $Prop->{'border-right'} = {
     my $c = $self->border_right_color;
     return {} unless length $c;
     return {} unless $i eq $self->get_property_priority ('border-right-color');
-    $i = ' ! ' . $i if length $i;
 
     my $v = 0;
     $v++ if $w eq 'inherit';
@@ -3907,7 +3890,6 @@ $Prop->{'border-bottom'} = {
     my $c = $self->border_bottom_color;
     return {} unless length $c;
     return {} unless $i eq $self->get_property_priority ('border-bottom-color');
-    $i = ' ! ' . $i if length $i;
 
     my $v = 0;
     $v++ if $w eq 'inherit';
@@ -3941,7 +3923,6 @@ $Prop->{'border-left'} = {
     my $c = $self->border_left_color;
     return {} unless length $c;
     return {} unless $i eq $self->get_property_priority ('border-left-color');
-    $i = ' ! ' . $i if length $i;
 
     my $v = 0;
     $v++ if $w eq 'inherit';
@@ -5149,7 +5130,7 @@ $Prop->{font} = {
       $v++ if $_ eq 'inherit';
     }
     if ($v == 6) {
-      return {font => ['inherit', length $i ? ' ! ' . $i : '']};
+      return {font => ['inherit', $i]};
     } elsif ($v) {
       return {};
     }
@@ -5160,7 +5141,7 @@ $Prop->{font} = {
     push @v, $weight unless $weight eq 'normal';
     push @v, $size.($height eq 'normal' ? '' : '/'.$height);
     push @v, $family;
-    return {font => [(join ' ', @v), length $i ? ' ! ' . $i : '']};
+    return {font => [(join ' ', @v), $i]};
   },
 };
 $Attr->{font} = $Prop->{font};
@@ -5389,23 +5370,23 @@ $Prop->{'border-width'} = {
     my @v;
     push @v, $self->border_top_width;
     my $i = $self->get_property_priority ('border-top-width');
-    return '' unless length $v[-1];
+    return {} unless length $v[-1];
     push @v, $self->border_right_width;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-right-width');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-right-width');
     push @v, $self->border_bottom_width;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-bottom-width');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-bottom-width');
     push @v, $self->border_left_width;
-    return '' unless length $v[-1];
-    return '' unless $i eq $self->get_property_priority ('border-left-width');
+    return {} unless length $v[-1];
+    return {} unless $i eq $self->get_property_priority ('border-left-width');
 
     my $v = 0;
     for (0..3) {
       $v++ if $v[$_] eq 'inherit';
     }
     if ($v == 4) {
-      return {'border-width' => ['inherit', length $i ? ' ! ' . $i : '']};
+      return {'border-width' => ['inherit', $i]};
     } elsif ($v) {
       return {};
     }
@@ -5413,7 +5394,7 @@ $Prop->{'border-width'} = {
     pop @v if $v[1] eq $v[3];
     pop @v if $v[0] eq $v[2];
     pop @v if $v[0] eq $v[1];
-    return {'border-width' => [(join ' ', @v), length $i ? ' ! ' . $i : '']};
+    return {'border-width' => [(join ' ', @v), $i]};
   },
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
 };
@@ -5567,8 +5548,7 @@ $Prop->{'list-style'} = {
     my $position_i = $self->get_property_priority ('list-style-position');
     return {} unless $type_i eq $position_i;
 
-    return {'list-style' => [$type . ' ' . $image . ' ' . $position,
-                             (length $type_i ? ' ! ' . $type_i : '')]};
+    return {'list-style' => [$type . ' ' . $image . ' ' . $position, $type_i]};
   },
 };
 $Attr->{list_style} = $Prop->{'list-style'};
@@ -5648,4 +5628,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/26 04:50:05 $
+## $Date: 2008/01/26 05:11:01 $

@@ -136,6 +136,29 @@ p {
 
 #data
 p {
+  font: 1px serif !important;
+}
+#cssom
+| <p>
+|   font: 1px serif !important
+|   font-family: serif !important
+|   font-size: 1px !important
+|   font-style: normal !important
+|   font-variant: normal !important
+|   font-weight: normal !important
+|   line-height: normal !important
+#csstext
+p {
+  font-family: serif ! important;
+  font-size: 1px ! important;
+  font-style: normal ! important;
+  font-variant: normal ! important;
+  font-weight: normal ! important;
+  line-height: normal ! important;
+}
+
+#data
+p {
   font: 1px inherit;
 }
 #cssom
@@ -224,6 +247,29 @@ p {
   font-variant: inherit;
   font-weight: inherit;
   line-height: inherit;
+}
+
+#data
+p {
+  font: inherit !important;
+}
+#cssom
+| <p>
+|   font: inherit !important
+|   font-family: inherit !important
+|   font-size: inherit !important
+|   font-style: inherit !important
+|   font-variant: inherit !important
+|   font-weight: inherit !important
+|   line-height: inherit !important
+#csstext
+p {
+  font-family: inherit ! important;
+  font-size: inherit ! important;
+  font-style: inherit ! important;
+  font-variant: inherit ! important;
+  font-weight: inherit ! important;
+  line-height: inherit ! important;
 }
 
 #data
