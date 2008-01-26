@@ -1,5 +1,12 @@
 2008-01-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm ('font-weight' parser): Support for '+'.
+
+	* Tokenizer.pm: Normalize number stored in |NUMBER_TOKEN|,
+	|PERCENTAGE_TOKEN|, and |DIMENSION_TOKEN|.
+
+2008-01-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm ('font-size' parser): Support for '+'.  Fixed to
 	report more accurate error position.  Enabled the
 	support for '-webkit-xxx-large'.

@@ -1,6 +1,6 @@
 package Whatpm::CSS::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -247,6 +247,7 @@ sub get_next_token ($) {
         ## NOTE: |num|.
         $self->{t} = {type => NUMBER_TOKEN, value => chr $self->{c},
                       line => $self->{line}, column => $self->{column}};
+        ## NOTE: 'value' is renamed as 'number' later.
         $self->{state} = NUMBER_STATE;
         $self->{c} = $self->{get_char}->($self);
         redo A;
@@ -254,6 +255,7 @@ sub get_next_token ($) {
         ## NOTE: |num|.
         $self->{t} = {type => NUMBER_TOKEN, value => '0',
                       line => $self->{line}, column => $self->{column}};
+        ## NOTE: 'value' is renamed as 'number' later.
         $self->{state} = NUMBER_FRACTION_STATE;
         $self->{c} = $self->{get_char}->($self);
         redo A;
@@ -1158,7 +1160,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } else {
-        $self->{t}->{number} = $self->{t}->{value};
+        $self->{t}->{number} = 0+$self->{t}->{value};
         $self->{t}->{value} = '';
         $self->{state} = AFTER_NUMBER_STATE;
         # reprocess
@@ -1173,7 +1175,7 @@ sub get_next_token ($) {
         redo A;
       } else {
         unshift @{$self->{token}}, {type => DOT_TOKEN};
-        $self->{t}->{number} = $self->{t}->{value};
+        $self->{t}->{number} = 0+$self->{t}->{value};
         $self->{t}->{value} = '';
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
@@ -1204,7 +1206,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } else {
-        $self->{t}->{number} = $self->{t}->{value};
+        $self->{t}->{number} = 0+$self->{t}->{value};
         $self->{t}->{value} = '';
         $self->{state} = AFTER_NUMBER_STATE;
         # reprocess
@@ -1323,4 +1325,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/01/26 09:30:47 $
+# $Date: 2008/01/26 14:48:09 $

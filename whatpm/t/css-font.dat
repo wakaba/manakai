@@ -113,6 +113,150 @@ p {
 
 #data
 p {
+  font-weight: bold;
+}
+#cssom
+| <p>
+|   font-weight: bold
+#csstext
+p {
+  font-weight: bold;
+}
+
+#data
+p {
+  font-weight: normal;
+}
+#cssom
+| <p>
+|   font-weight: normal
+#csstext
+p {
+  font-weight: normal;
+}
+
+#data
+p {
+  font-weight: bolder;
+}
+#cssom
+| <p>
+|   font-weight: bolder
+#csstext
+p {
+  font-weight: bolder;
+}
+
+#data
+p {
+  font-weight: lighter;
+}
+#cssom
+| <p>
+|   font-weight: lighter
+#csstext
+p {
+  font-weight: lighter;
+}
+
+#data
+p {
+  font-weight: light;
+}
+#errors
+;2;16;m;syntax error:'font-weight'
+#cssom
+| <p>
+
+#data
+p {
+  font-weight: inherit;
+}
+#cssom
+| <p>
+|   font-weight: inherit
+#csstext
+p {
+  font-weight: inherit;
+}
+
+#data
+p {
+  font-weight: 100;
+}
+#cssom
+| <p>
+|   font-weight: 100
+#csstext
+p {
+  font-weight: 100;
+}
+
+#data
+p {
+  font-weight: +100;
+}
+#cssom
+| <p>
+|   font-weight: 100
+#csstext
+p {
+  font-weight: 100;
+}
+
+#data
+p {
+  font-weight: +100.0;
+}
+#cssom
+| <p>
+|   font-weight: 100
+#csstext
+p {
+  font-weight: 100;
+}
+
+#data
+p {
+  font-weight: -200;
+}
+#errors
+;2;16;m;syntax error:'font-weight'
+#cssom
+| <p>
+
+#data
+p {
+  font-weight: 000100;
+}
+#cssom
+| <p>
+|   font-weight: 100
+#csstext
+p {
+  font-weight: 100;
+}
+
+#data
+p {
+  font-weight: +bold
+}
+#errors
+;2;17;m;syntax error:'font-weight'
+#cssom
+| <p>
+
+#data
+p {
+  font-weight: +inherit;
+}
+#errors
+;2;17;m;syntax error:'font-weight'
+#cssom
+| <p>
+
+#data
+p {
   font-size: 0;
 }
 #cssom
@@ -426,6 +570,30 @@ p {
 #csstext
 p {
   font-size: -webkit-xxx-large;
+}
+
+#data
+p {
+  font-size: larger
+}
+#cssom
+| <p>
+|   font-size: larger
+#csstext
+p {
+  font-size: larger;
+}
+
+#data
+p {
+  font-size: smaller
+}
+#cssom
+| <p>
+|   font-size: smaller
+#csstext
+p {
+  font-size: smaller;
 }
 
 #data

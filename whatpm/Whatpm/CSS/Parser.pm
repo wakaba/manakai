@@ -3110,6 +3110,12 @@ $Prop->{'font-weight'} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
+    my $has_sign;
+    if ($t->{type} == PLUS_TOKEN) {
+      $has_sign = 1;
+      $t = $tt->get_next_token;
+    }
+
     if ($t->{type} == NUMBER_TOKEN) {
       ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/font-weight> for
       ## browser compatibility issue.
@@ -3118,14 +3124,15 @@ $Prop->{'font-weight'} = {
       if ($value % 100 == 0 and 100 <= $value and $value <= 900) {
         return ($t, {$prop_name => ['WEIGHT', $value, 0]});
       }
-    } elsif ($t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ({
            normal => 1, bold => 1, bolder => 1, lighter => 1,
           }->{$value}) {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['KEYWORD', $value]});
       } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['INHERIT']});
       }
     }
@@ -5781,4 +5788,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/26 14:31:32 $
+## $Date: 2008/01/26 14:48:09 $
