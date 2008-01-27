@@ -803,6 +803,8 @@ my $parse_color = sub {
       if ($t->{type} == MINUS_TOKEN) {
         $sign = -1;
         $t = $tt->get_next_token;
+      } elsif ($t->{type} == PLUS_TOKEN) {
+        $t = $tt->get_next_token;
       }
       if ($t->{type} == NUMBER_TOKEN) {
         my $r = $t->{number} * $sign;
@@ -815,7 +817,9 @@ my $parse_color = sub {
           if ($t->{type} == MINUS_TOKEN) {
             $sign = -1;
             $t = $tt->get_next_token;
-          } 
+          } elsif ($t->{type} == PLUS_TOKEN) {
+            $t = $tt->get_next_token;
+          }
           if ($t->{type} == NUMBER_TOKEN) {
             my $g = $t->{number} * $sign;
             $t = $tt->get_next_token;
@@ -827,7 +831,9 @@ my $parse_color = sub {
               if ($t->{type} == MINUS_TOKEN) {
                 $sign = -1;
                 $t = $tt->get_next_token;
-              } 
+              } elsif ($t->{type} == PLUS_TOKEN) {
+                $t = $tt->get_next_token;
+              }
               if ($t->{type} == NUMBER_TOKEN) {
                 my $b = $t->{number} * $sign;
                 $t = $tt->get_next_token;
@@ -854,7 +860,9 @@ my $parse_color = sub {
           if ($t->{type} == MINUS_TOKEN) {
             $sign = -1;
             $t = $tt->get_next_token;
-          }           
+          } elsif ($t->{type} == PLUS_TOKEN) {
+            $t = $tt->get_next_token;
+          }
           if ($t->{type} == PERCENTAGE_TOKEN) {
             my $g = $t->{number} * 255 / 100 * $sign;
             $t = $tt->get_next_token;
@@ -866,7 +874,9 @@ my $parse_color = sub {
               if ($t->{type} == MINUS_TOKEN) {
                 $sign = -1;
                 $t = $tt->get_next_token;
-              } 
+              } elsif ($t->{type} == PLUS_TOKEN) {
+                $t = $tt->get_next_token;
+              }
               if ($t->{type} == PERCENTAGE_TOKEN) {
                 my $b = $t->{number} * 255 / 100 * $sign;
                 $t = $tt->get_next_token;
@@ -890,6 +900,8 @@ my $parse_color = sub {
       if ($t->{type} == MINUS_TOKEN) {
         $sign = -1;
         $t = $tt->get_next_token;
+      } elsif ($t->{type} == PLUS_TOKEN) {
+        $t = $tt->get_next_token;
       }
       if ($t->{type} == NUMBER_TOKEN) {
         my $h = (((($t->{number} * $sign) % 360) + 360) % 360) / 360;
@@ -902,7 +914,9 @@ my $parse_color = sub {
           if ($t->{type} == MINUS_TOKEN) {
             $sign = -1;
             $t = $tt->get_next_token;
-          } 
+          } elsif ($t->{type} == PLUS_TOKEN) {
+            $t = $tt->get_next_token;
+          }
           if ($t->{type} == PERCENTAGE_TOKEN) {
             my $s = $t->{number} * $sign / 100;
             $s = 0 if $s < 0;
@@ -916,7 +930,9 @@ my $parse_color = sub {
               if ($t->{type} == MINUS_TOKEN) {
                 $sign = -1;
                 $t = $tt->get_next_token;
-              } 
+              } elsif ($t->{type} == PLUS_TOKEN) {
+                $t = $tt->get_next_token;
+              }
               if ($t->{type} == PERCENTAGE_TOKEN) {
                 my $l = $t->{number} * $sign / 100;
                 $l = 0 if $l < 0;
@@ -941,9 +957,9 @@ my $parse_color = sub {
                            $self->{clip_color}
                                ->($self,
                                   ['RGBA',
-                                   $hue2rgb->($m1, $m2, $h + 1/3),
-                                   $hue2rgb->($m1, $m2, $h),
-                                   $hue2rgb->($m1, $m2, $h - 1/3), 1])});
+                                   $hue2rgb->($m1, $m2, $h + 1/3) * 255,
+                                   $hue2rgb->($m1, $m2, $h) * 255,
+                                   $hue2rgb->($m1, $m2, $h - 1/3) * 255, 1])});
                 }
               }
             }
@@ -1869,10 +1885,15 @@ $Prop->{orphans} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
+    my $has_sign;
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == NUMBER_TOKEN) {
@@ -1882,10 +1903,10 @@ $Prop->{orphans} = {
       my $value = $t->{number};
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ["NUMBER", $sign * int ($value / 1)]});
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($value eq 'inherit') {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['INHERIT']});
       }
     }
@@ -4730,16 +4751,21 @@ $Prop->{'background-position'} = {
     my %prop_value;
 
     my $sign = 1;
+    my $has_sign;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($length_unit->{$unit}) {
+        $t = $tt->get_next_token;
         $prop_value{'background-position-x'} = ['DIMENSION', $value, $unit];
         $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
       } else {
@@ -4760,13 +4786,14 @@ $Prop->{'background-position'} = {
       $t = $tt->get_next_token;
       $prop_value{'background-position-x'} = ['DIMENSION', $value, 'px'];
       $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
-      $t = $tt->get_next_token;
       if ({left => 1, center => 1, right => 1}->{$prop_value}) {
+        $t = $tt->get_next_token;
         $prop_value{'background-position-x'} = ['KEYWORD', $prop_value];
         $prop_value{'background-position-y'} = ['KEYWORD', 'center'];
       } elsif ($prop_value eq 'top' or $prop_value eq 'bottom') {
+        $t = $tt->get_next_token;
         $prop_value{'background-position-y'} = ['KEYWORD', $prop_value];
 
         $t = $tt->get_next_token while $t->{type} == S_TOKEN;
@@ -4781,6 +4808,7 @@ $Prop->{'background-position'} = {
         $prop_value{'background-position-x'} = ['KEYWORD', 'center'];
         return ($t, \%prop_value);
       } elsif ($prop_value eq 'inherit') {
+        $t = $tt->get_next_token;
         $prop_value{'background-position-x'} = ['INHERIT'];
         $prop_value{'background-position-y'} = ['INHERIT'];
         return ($t, \%prop_value);
@@ -4800,17 +4828,22 @@ $Prop->{'background-position'} = {
     }
 
     $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    undef $has_sign;
     $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($length_unit->{$unit}) {
+        $t = $tt->get_next_token;
         $prop_value{'background-position-y'} = ['DIMENSION', $value, $unit];
       } else {
         $onerror->(type => "syntax error:'$prop_name'",
@@ -4828,14 +4861,14 @@ $Prop->{'background-position'} = {
       my $value = $t->{number} * $sign;
       $t = $tt->get_next_token;
       $prop_value{'background-position-y'} = ['DIMENSION', $value, 'px'];
-    } elsif ($t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
       if ({top => 1, center => 1, bottom => 1}->{$value}) {
         $prop_value{'background-position-y'} = ['KEYWORD', $value];
         $t = $tt->get_next_token;
       }
     } else {
-      if ($sign < 0) {
+      if ($has_sign) {
         $onerror->(type => "syntax error:'$prop_name'",
                    level => $self->{must_level},
                    uri => \$self->{href},
@@ -5837,4 +5870,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/27 06:42:05 $
+## $Date: 2008/01/27 07:19:05 $

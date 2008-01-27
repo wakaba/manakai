@@ -20,6 +20,8 @@ for my $file_name (map {"t/$_"} qw(
   css-1.dat
   css-visual.dat
   css-generated.dat
+  css-paged.dat
+  css-text.dat
   css-font.dat
 )) {
   print "# $file_name\n";

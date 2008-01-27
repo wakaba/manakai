@@ -1,0 +1,68 @@
+#data
+p {
+  color: rgb(1, 2, 3);
+}
+#cssom
+| <p>
+|   color: rgb(1, 2, 3)
+#csstext
+p {
+  color: rgb(1, 2, 3);
+}
+
+#data
+p {
+  color: rgb(1, 2, +3);
+}
+#cssom
+| <p>
+|   color: rgb(1, 2, 3)
+
+#data
+p {
+  color: rgb(1, +2, 3);
+}
+#cssom
+| <p>
+|   color: rgb(1, 2, 3)
+
+#data
+p {
+  color: rgb(+1, 2, 3);
+}
+#cssom
+| <p>
+|   color: rgb(1, 2, 3)
+
+#data
+p {
+  color: rgb(-1, -2, -3);
+}
+#cssom
+| <p>
+|   color: rgb(0, 0, 0)
+
+#data
+p {
+  color: hsl(1, 2%, 3%);
+}
+#cssom
+| <p>
+|   color: rgb(7.803, 7.5021, 7.497)
+
+#data
+p {
+  color: hsl(+1, +2%, +3%);
+}
+#cssom
+| <p>
+|   color: rgb(7.803, 7.5021, 7.497)
+
+#data
+p {
+  color: hsl(-1, -2%, -3%);
+}
+#cssom
+| <p>
+|   color: rgb(0, 0, 0)
+

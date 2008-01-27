@@ -3200,6 +3200,74 @@ p {
 
 #data
 p {
+  background-position: +12px +34px;
+}
+#cssom
+| <p>
+|   background-position: 12px 34px
+|   background-position-x: 12px
+|   background-position-y: 34px
+
+#data
+p {
+  background-position: -12px -34px;
+}
+#cssom
+| <p>
+|   background-position: -12px -34px
+|   background-position-x: -12px
+|   background-position-y: -34px
+
+#data
+p {
+  background-position: left +34px;
+}
+#cssom
+| <p>
+|   background-position: left 34px
+|   background-position-x: left
+|   background-position-y: 34px
+
+#data
+p {
+  background-position: +12px bottom
+}
+#cssom
+| <p>
+|   background-position: 12px bottom
+|   background-position-x: 12px
+|   background-position-y: bottom
+
+#data
+p {
+  background-position: +12px
+}
+#cssom
+| <p>
+|   background-position: 12px 50%
+|   background-position-x: 12px
+|   background-position-y: 50%
+
+#data
+p {
+  background-position: +12px left;
+}
+#errors
+;2;30;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  background-position: 12px +top;
+}
+#errors
+;2;30;m;syntax error:'background-position'
+#cssom
+| <p>
+
+#data
+p {
   background:;
 }
 #errors
