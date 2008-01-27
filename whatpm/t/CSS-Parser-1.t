@@ -169,7 +169,7 @@ BEGIN {
     list-style-image list-style-position list-style-type
     margin-bottom margin-left margin-right margin-top
     max-height max-width min-height min-width opacity -moz-opacity
-    orphans outline-color outline-style outline-width overflow
+    orphans outline-color outline-style outline-width overflow-x overflow-y
     padding-bottom padding-left padding-right padding-top
     page-break-after page-break-before page-break-inside
     position right table-layout
@@ -181,7 +181,7 @@ BEGIN {
     background background-position
     border border-color border-style border-width border-spacing
     border-top border-right border-bottom border-left
-    font list-style margin outline padding
+    font list-style margin outline overflow padding
   /;
   $DefaultComputedText = q[  border-spacing: 0px;
   background: transparent none repeat scroll 0% 0%;
@@ -280,6 +280,8 @@ BEGIN {
 | outline-color: invert
 | outline-style: none
 | outline-width: 0px
+| overflow-x: visible
+| overflow-y: visible
 | padding-bottom: 0px
 | padding-left: 0px
 | padding-right: 0px
@@ -316,9 +318,11 @@ sub get_parser ($) {
   $p->{prop_value}->{'unicode-bidi'}->{$_} = 1 for qw/
     normal bidi-override embed
   /;
-  $p->{prop_value}->{overflow}->{$_} = 1 for qw/
-    visible hidden scroll auto
-  /;
+  for my $prop_name (qw/overflow overflow-x overflow-y/) {
+    $p->{prop_value}->{$prop_name}->{$_} = 1 for qw/
+      visible hidden scroll auto -webkit-marquee -moz-hidden-unscrollable
+    /;
+  }
   $p->{prop_value}->{visibility}->{$_} = 1 for qw/
     visible hidden collapse
   /;

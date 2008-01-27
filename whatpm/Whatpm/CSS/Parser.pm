@@ -1336,11 +1336,12 @@ my $one_keyword_parser = sub {
 
   if ($t->{type} == IDENT_TOKEN) {
     my $prop_value = lc $t->{value}; ## TODO: case folding
-    $t = $tt->get_next_token;
     if ($Prop->{$prop_name}->{keyword}->{$prop_value} and
         $self->{prop_value}->{$prop_name}->{$prop_value}) {
+      $t = $tt->get_next_token;
       return ($t, {$prop_name => ["KEYWORD", $prop_value]});
     } elsif ($prop_value eq 'inherit') {
+      $t = $tt->get_next_token;
       return ($t, {$prop_name => ['INHERIT']});
     }
   }
@@ -1531,18 +1532,80 @@ $Prop->{'unicode-bidi'} = {
 $Attr->{unicode_bidi} = $Prop->{'unicode-bidi'};
 $Key->{unicode_bidi} = $Prop->{'unicode-bidi'};
 
-$Prop->{overflow} = {
-  css => 'overflow',
-  dom => 'overflow',
-  key => 'overflow',
+$Prop->{'overflow-x'} = {
+  css => 'overflow-x',
+  dom => 'overflow_x',
+  key => 'overflow_x',
   parse => $one_keyword_parser,
   serialize => $default_serializer,
+  serialize_multiple => sub {
+    my $self = shift;
+    
+    my $x = $self->overflow_x;
+    my $xi = $self->get_property_priority ('overflow-x');
+    my $y = $self->overflow_y;
+    my $yi = $self->get_property_priority ('overflow-y');
+
+    if (length $x) {
+      if (length $y) {
+        if ($x eq $y and $xi eq $yi) {
+          return {overflow => [$x, $xi]};
+        } else {
+          return {'overflow-x' => [$x, $xi], 'overflow-y' => [$y, $yi]};
+        }
+      } else {
+        return {'overflow-x' => [$x, $xi]};
+      }
+    } else {
+      if (length $y) {
+        return {'overflow-y' => [$y, $yi]};
+      } else {
+        return {};
+      }
+    }
+  },
   keyword => {
     visible => 1, hidden => 1, scroll => 1, auto => 1,
+    '-moz-hidden-unscrollable' => 1, '-webkit-marquee' => 1,
   },
   initial => ["KEYWORD", "visible"],
   #inherited => 0,
   compute => $compute_as_specified,
+};
+$Attr->{overflow_x} = $Prop->{'overflow-x'};
+$Key->{overflow_x} = $Prop->{'overflow-x'};
+
+$Prop->{'overflow-y'} = {
+  css => 'overflow-y',
+  dom => 'overflow_y',
+  key => 'overflow_y',
+  parse => $one_keyword_parser,
+  serialize => $default_serializer,
+  serialize_multiple => $Prop->{'overflow-x'}->{serialize_multiple},
+  keyword => $Prop->{'overflow-x'}->{keyword},
+  initial => ["KEYWORD", "visible"],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+$Attr->{overflow_y} = $Prop->{'overflow-y'};
+$Key->{overflow_y} = $Prop->{'overflow-y'};
+
+$Prop->{overflow} = {
+  css => 'overflow',
+  dom => 'overflow',
+  key => 'overflow',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+    my ($t, $pv) = $one_keyword_parser->($self, $prop_name, $tt, $t, $onerror);
+    if (defined $pv) {
+      return ($t, {'overflow-x' => $pv->{overflow},
+                   'overflow-y' => $pv->{overflow}});
+    } else {
+      return ($t, $pv);
+    }
+  },
+  keyword => $Prop->{'overflow-x'}->{keyword},
+  serialize_multiple => $Prop->{'overflow-x'}->{serialize_multiple},
 };
 $Attr->{overflow} = $Prop->{overflow};
 $Key->{overflow} = $Prop->{overflow};
@@ -5887,4 +5950,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/27 08:22:40 $
+## $Date: 2008/01/27 08:58:05 $
