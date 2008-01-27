@@ -1945,10 +1945,15 @@ $Prop->{opacity} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
+    my $has_sign;
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == NUMBER_TOKEN) {
@@ -1957,10 +1962,10 @@ $Prop->{opacity} = {
       my $value = $t->{number};
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ["NUMBER", $sign * $value]});
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($value eq 'inherit') {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['INHERIT']});
       }
     }
@@ -5882,4 +5887,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/27 08:09:12 $
+## $Date: 2008/01/27 08:22:40 $

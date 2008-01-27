@@ -4185,3 +4185,177 @@ p {
   background-position: 0% 0%;
   background-repeat: inherit;
 }
+
+#data
+p {
+  opacity: 0.4;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0.4
+|   opacity: 0.4
+#csstext
+p {
+  opacity: 0.4;
+}
+
+#data
+p {
+  opacity: +0.4;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0.4
+|   opacity: 0.4
+#csstext
+p {
+  opacity: 0.4;
+}
+
+#data
+p {
+  opacity: 0.40000;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0.4
+|   opacity: 0.4
+#csstext
+p {
+  opacity: 0.4;
+}
+
+#data
+p {
+  opacity: 0000000.4;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0.4
+|   opacity: 0.4
+#csstext
+p {
+  opacity: 0.4;
+}
+
+#data
+p {
+  opacity: 0.0000;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0
+|   opacity: 0
+#csstext
+p {
+  opacity: 0;
+}
+
+#data
+p {
+  opacity: 00000;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0
+|   opacity: 0
+#csstext
+p {
+  opacity: 0;
+}
+
+#data
+p {
+  opacity: +0;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0
+|   opacity: 0
+#csstext
+p {
+  opacity: 0;
+}
+
+#data
+p {
+  opacity: -0;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0
+|   opacity: 0
+#csstext
+p {
+  opacity: 0;
+}
+
+#data
+p {
+  opacity: inherit;
+}
+#cssom
+| <p>
+|   -moz-opacity: inherit
+|   opacity: inherit
+#csstext
+p {
+  opacity: inherit;
+}
+
+#data
+p {
+  opacity: +inherit;
+}
+#errors
+;2;13;m;syntax error:'opacity'
+#cssom
+| <p>
+
+#data
+p {
+  -moz-opacity: 0;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0
+|   opacity: 0
+#csstext
+p {
+  opacity: 0;
+}
+
+#data
+p {
+  -moz-opacity: 0.4;
+}
+#cssom
+| <p>
+|   -moz-opacity: 0.4
+|   opacity: 0.4
+#csstext
+p {
+  opacity: 0.4;
+}
+
+#data
+p {
+  -moz-opacity: inherit;
+}
+#cssom
+| <p>
+|   -moz-opacity: inherit
+|   opacity: inherit
+#csstext
+p {
+  opacity: inherit;
+}
+
+#data
+p {
+  -moz-opacity: +inherit;
+}
+#errors
+;2;18;m;syntax error:'-moz-opacity'
+#cssom
+| <p>
