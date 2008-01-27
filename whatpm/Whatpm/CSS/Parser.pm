@@ -563,6 +563,12 @@ my $default_serializer = sub {
     push @v, 'blink' if $value->[4];
     return 'none' unless @v;
     return join ' ', @v;
+  } elsif ($value->[0] eq 'QUOTES') {
+    return join ' ', map {'"'.$_.'"'} map {$_->[0], $_->[1]} @{$value->[1]};
+    ## NOTE: The result string might not be a <'quotes'> if it contains
+    ## e.g. '"'.  In addition, it might not be a <'quotes'> if 
+    ## @{$value->[1]} is empty (which is unlikely as long as the implementation
+    ## is not broken).
   } else {
     return '';
   }
@@ -5949,5 +5955,62 @@ $Prop->{'text-decoration'} = {
 $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
+$Attr->{quotes} =
+$Key->{quotes} =
+$Prop->{quotes} = {
+  css => 'quotes',
+  dom => 'quotes',
+  key => 'quotes',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my @v;
+    A: {
+      if ($t->{type} == STRING_TOKEN) {
+        my $open = $t->{value};
+        $t = $tt->get_next_token;
+
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == STRING_TOKEN) {
+          push @v, [$open, $t->{value}];
+          $t = $tt->get_next_token;
+        } else {
+          last A;
+        }
+      } elsif (not @v and $t->{type} == IDENT_TOKEN) {
+        my $value = lc $t->{value}; ## TODO: case
+        if ($value eq 'none' or $value eq '-manakai-default') {
+          $t = $tt->get_next_token;
+          return ($t, {$prop_name => ['KEYWORD', $value]});
+        } elsif ($value eq 'inherit') {
+          $t = $tt->get_next_token;
+          return ($t, {$prop_name => ['INHERIT']});
+        } else {
+          last A;
+        }
+      } else {
+        if (@v) {
+          return ($t, {$prop_name => ['QUOTES', \@v]});
+        } else {
+          last A;
+        }
+      }
+
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      redo A;
+    }
+    
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', '-manakai-default'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+
 1;
-## $Date: 2008/01/27 08:58:05 $
+## $Date: 2008/01/27 10:14:52 $

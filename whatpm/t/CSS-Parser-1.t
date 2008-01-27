@@ -172,7 +172,7 @@ BEGIN {
     orphans outline-color outline-style outline-width overflow-x overflow-y
     padding-bottom padding-left padding-right padding-top
     page-break-after page-break-before page-break-inside
-    position right table-layout
+    position quotes right table-layout
     text-align text-decoration text-indent text-transform
     top unicode-bidi vertical-align visibility white-space width widows
     word-spacing z-index
@@ -222,6 +222,7 @@ BEGIN {
   page-break-before: auto;
   page-break-inside: auto;
   position: static;
+  quotes: -manakai-default;
   right: auto;
   table-layout: auto;
   text-align: begin;

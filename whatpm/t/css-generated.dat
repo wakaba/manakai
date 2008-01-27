@@ -1,3 +1,235 @@
+#html 1
+<!DOCTYPE HTML><p>
+
+#data
+p {
+  quotes:;
+}
+#errors
+;2;10;m;syntax error:'quotes'
+#cssom
+| <p>
+
+#data
+p {
+  quotes: none;
+}
+#cssom
+| <p>
+|   quotes: none
+#csstext
+p {
+  quotes: none;
+}
+#computed 1 p
+-| quotes: -manakai-default
++| quotes: none
+#computedtext 1 p
+-  quotes: -manakai-default;
++  quotes: none;
+
+#data
+p {
+  quotes: none !important;
+}
+#cssom
+| <p>
+|   quotes: none !important
+#csstext
+p {
+  quotes: none ! important;
+}
+
+#data
+p {
+  quotes: noNe;
+}
+#cssom
+| <p>
+|   quotes: none
+#csstext
+p {
+  quotes: none;
+}
+
+#data
+p {
+  quotes: -manakai-default;
+}
+#cssom
+| <p>
+|   quotes: -manakai-default
+#csstext
+p {
+  quotes: -manakai-default;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  quotes: -MANAKAI-default;
+}
+#cssom
+| <p>
+|   quotes: -manakai-default
+#csstext
+p {
+  quotes: -manakai-default;
+}
+
+#data
+p {
+  quotes: -manakai-default ! important;
+}
+#cssom
+| <p>
+|   quotes: -manakai-default !important
+#csstext
+p {
+  quotes: -manakai-default ! important;
+}
+
+#data
+p {
+  quotes: inherit;
+}
+#cssom
+| <p>
+|   quotes: inherit
+#csstext
+p {
+  quotes: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  quotes: INHERIt;
+}
+#cssom
+| <p>
+|   quotes: inherit
+#csstext
+p {
+  quotes: inherit;
+}
+
+#data
+p {
+  quotes: inherit ! important;
+}
+#cssom
+| <p>
+|   quotes: inherit !important
+#csstext
+p {
+  quotes: inherit ! important;
+}
+
+#data
+p {
+  quotes: "1";
+}
+#errors
+;2;14;m;syntax error:'quotes'
+#cssom
+| <p>
+
+#data
+p {
+  quotes: "1" "2";
+}
+#cssom
+| <p>
+|   quotes: "1" "2"
+#csstext
+p {
+  quotes: "1" "2";
+}
+#computed 1 p
+-| quotes: -manakai-default
++| quotes: "1" "2"
+#computedtext 1 p
+-  quotes: -manakai-default;
++  quotes: "1" "2";
+
+#data
+p {
+  quotes: "1""2";
+}
+#cssom
+| <p>
+|   quotes: "1" "2"
+#csstext
+p {
+  quotes: "1" "2";
+}
+
+#data
+p {
+  quotes: "1"/**/"2";
+}
+#cssom
+| <p>
+|   quotes: "1" "2"
+#csstext
+p {
+  quotes: "1" "2";
+}
+
+#data
+p {
+  quotes: "1", "2";
+}
+#errors
+;2;14;m;syntax error:'quotes'
+#cssom
+| <p>
+
+#data
+p {
+  quotes: "1" "2" "3";
+}
+#errors
+;2;22;m;syntax error:'quotes'
+#cssom
+| <p>
+
+#data
+p {
+  quotes: "1" "2" "3" "4";
+}
+#cssom
+| <p>
+|   quotes: "1" "2" "3" "4"
+#csstext
+p {
+  quotes: "1" "2" "3" "4";
+}
+
+#data
+p {
+  quotes: "1" "2" "3" "4" "5" "6";
+}
+#cssom
+| <p>
+|   quotes: "1" "2" "3" "4" "5" "6"
+#csstext
+p {
+  quotes: "1" "2" "3" "4" "5" "6";
+}
+
+#data
+p {
+  quotes: 1 2;
+}
+#errors
+;2;11;m;syntax error:'quotes'
+#cssom
+| <p>
+
 #data
 p {
   list-style: none;
