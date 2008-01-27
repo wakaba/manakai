@@ -1274,6 +1274,145 @@ p {
 
 #data
 p {
+  border-top-width: 5px
+}
+#cssom
+| <p>
+|   border-top-width: 5px
+#csstext
+p {
+  border-top-width: 5px;
+}
+
+#data
+p {
+  border-top-width: +5px
+}
+#cssom
+| <p>
+|   border-top-width: 5px
+#csstext
+p {
+  border-top-width: 5px;
+}
+
+#data
+p {
+  border-top-width: -5px
+}
+#errors
+;2;22;m;syntax error:'border-top-width'
+#cssom
+| <p>
+#csstext
+p {
+}
+
+#data
+p {
+  border-top-width: 0;
+}
+#cssom
+| <p>
+|   border-top-width: 0px
+
+#data
+p {
+  border-top-width: +0;
+}
+#cssom
+| <p>
+|   border-top-width: 0px
+
+#data
+p {
+  border-top-width: -0;
+}
+#cssom
+| <p>
+|   border-top-width: 0px
+
+#data
+p {
+  border-top-width: 0.0000;
+}
+#cssom
+| <p>
+|   border-top-width: 0px
+
+#data
+p {
+  border-top-width: 00000012px;
+}
+#cssom
+| <p>
+|   border-top-width: 12px
+
+#data
+p {
+  border-top-width: 12.012000px;
+}
+#cssom
+| <p>
+|   border-top-width: 12.012px
+
+#data
+p {
+  border-top-width: 12;
+}
+#errors
+;2;21;m;syntax error:'border-top-width'
+#cssom
+| <p>
+
+#data
+p {
+  border-top-width: 12;
+}
+#option q
+#cssom
+| <p>
+|   border-top-width: 12px
+
+#data
+p {
+  border-top-width: +12;
+}
+#errors
+;2;22;m;syntax error:'border-top-width'
+#cssom
+| <p>
+
+#data
+p {
+  border-top-width: +12;
+}
+#option q
+#cssom
+| <p>
+|   border-top-width: 12px
+
+#data
+p {
+  border-top-width: -12;
+}
+#errors
+;2;22;m;syntax error:'border-top-width'
+#cssom
+| <p>
+
+#data
+p {
+  border-top-width: -12;
+}
+#option q
+#errors
+;2;22;m;syntax error:'border-top-width'
+#cssom
+| <p>
+
+#data
+p {
   border-width: 5px;
 }
 #cssom
@@ -1342,6 +1481,218 @@ p {
   border-right-width: 5px;
   border-top-width: 5px;
 }
+
+#data
+p {
+  border-width: 0;
+}
+#cssom
+| <p>
+|   border-bottom-width: 0px
+|   border-left-width: 0px
+|   border-right-width: 0px
+|   border-top-width: 0px
+|   border-width: 0px
+
+#data
+p {
+  border-width: +0;
+}
+#cssom
+| <p>
+|   border-bottom-width: 0px
+|   border-left-width: 0px
+|   border-right-width: 0px
+|   border-top-width: 0px
+|   border-width: 0px
+
+#data
+p {
+  border-width: -0;
+}
+#cssom
+| <p>
+|   border-bottom-width: 0px
+|   border-left-width: 0px
+|   border-right-width: 0px
+|   border-top-width: 0px
+|   border-width: 0px
+
+#data
+p {
+  border-width: 12;
+}
+#errors
+;2;17;m;syntax error:'border-width'
+#cssom
+| <p>
+
+#data
+p {
+  border-width: 12;
+}
+#option q
+#cssom
+| <p>
+|   border-bottom-width: 12px
+|   border-left-width: 12px
+|   border-right-width: 12px
+|   border-top-width: 12px
+|   border-width: 12px
+
+#data
+p {
+  border-width: +12;
+}
+#errors
+;2;18;m;syntax error:'border-width'
+#cssom
+| <p>
+
+#data
+p {
+  border-width: +12;
+}
+#option q
+#cssom
+| <p>
+|   border-bottom-width: 12px
+|   border-left-width: 12px
+|   border-right-width: 12px
+|   border-top-width: 12px
+|   border-width: 12px
+
+#data
+p {
+  border-width: 5px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 5px
+|   border-left-width: 5px
+|   border-right-width: 5px
+|   border-top-width: 5px
+|   border-width: 5px
+
+#data
+p {
+  border-width: +5px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 5px
+|   border-left-width: 5px
+|   border-right-width: 5px
+|   border-top-width: 5px
+|   border-width: 5px
+
+#data
+p {
+  border-width: -5px;
+}
+#errors
+;2;18;m;syntax error:'border-width'
+#cssom
+| <p>
+
+#data
+p {
+  border-width: 5px 6px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 5px
+|   border-left-width: 6px
+|   border-right-width: 6px
+|   border-top-width: 5px
+|   border-width: 5px 6px
+
+#data
+p {
+  border-width: 5px +6px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 5px
+|   border-left-width: 6px
+|   border-right-width: 6px
+|   border-top-width: 5px
+|   border-width: 5px 6px
+
+#data
+p {
+  border-width: 5px -6px;
+}
+#errors
+;2;22;m;syntax error:'border-width'
+#cssom
+| <p>
+
+#data
+p {
+  border-width: 5px 6px 7px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 7px
+|   border-left-width: 6px
+|   border-right-width: 6px
+|   border-top-width: 5px
+|   border-width: 5px 6px 7px
+
+#data
+p {
+  border-width: 5px 6px +7px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 7px
+|   border-left-width: 6px
+|   border-right-width: 6px
+|   border-top-width: 5px
+|   border-width: 5px 6px 7px
+
+#data
+p {
+  border-width: 5px 6px -7px;
+}
+#errors
+;2;26;m;syntax error:'border-width'
+#cssom
+| <p>
+
+#data
+p {
+  border-width: 5px 6px 7px 8px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 7px
+|   border-left-width: 8px
+|   border-right-width: 6px
+|   border-top-width: 5px
+|   border-width: 5px 6px 7px 8px
+
+#data
+p {
+  border-width: 5px 6px 7px +8px;
+}
+#cssom
+| <p>
+|   border-bottom-width: 7px
+|   border-left-width: 8px
+|   border-right-width: 6px
+|   border-top-width: 5px
+|   border-width: 5px 6px 7px 8px
+
+#data
+p {
+  border-width: 5px 6px 7px -8px;
+}
+#errors
+;2;30;m;syntax error:'border-width'
+#cssom
+| <p>
 
 #data
 p {
@@ -1565,9 +1916,73 @@ p {
 |   border-width: inherit
 
 #data
-/*
-  TODO: We need to add test data for border and padding related properties.
-*/
+p {
+  padding-top: 0;
+}
+#cssom
+| <p>
+|   padding-top: 0px
+
+#data
+p {
+  padding-top: +0;
+}
+#cssom
+| <p>
+|   padding-top: 0px
+
+#data
+p {
+  padding-top: -0;
+}
+#cssom
+| <p>
+|   padding-top: 0px
+
+#data
+p {
+  padding-top: 000.000;
+}
+#cssom
+| <p>
+|   padding-top: 0px
+
+#data
+p {
+  padding-top: 12px;
+}
+#cssom
+| <p>
+|   padding-top: 12px
+#csstext
+p {
+  padding-top: 12px;
+}
+
+#data
+p {
+  padding-top: +12px;
+}
+#cssom
+| <p>
+|   padding-top: 12px
+
+#data
+p {
+  padding-top: -12px;
+}
+#errors
+;2;17;m;syntax error:'padding-top'
+#cssom
+| <p>
+
+#data
+p {
+  padding-top: 0000120.00100px;
+}
+#cssom
+| <p>
+|   padding-top: 120.001px
 
 #data
 p {
@@ -1749,6 +2164,894 @@ html {
 #computedtext 1 html
 -  display: inline;
 +  display: block;
+
+#data
+p {
+  top: 12px;
+}
+#cssom
+| <p>
+|   top: 12px
+
+#data
+p {
+  top: +12px;
+}
+#cssom
+| <p>
+|   top: 12px
+
+#data
+p {
+  top: -12px;
+}
+#cssom
+| <p>
+|   top: -12px
+
+#data
+p {
+  top: auto;
+}
+#cssom
+| <p>
+|   top: auto
+
+#data
+p {
+  top: inherit;
+}
+#cssom
+| <p>
+|   top: inherit
+
+#data
+p {
+  bottom: 12px;
+}
+#cssom
+| <p>
+|   bottom: 12px
+
+#data
+p {
+  bottom: +12px;
+}
+#cssom
+| <p>
+|   bottom: 12px
+
+#data
+p {
+  bottom: -12px;
+}
+#cssom
+| <p>
+|   bottom: -12px
+
+#data
+p {
+  bottom: auto;
+}
+#cssom
+| <p>
+|   bottom: auto
+
+#data
+p {
+  bottom: inherit;
+}
+#cssom
+| <p>
+|   bottom: inherit
+
+#data
+p {
+  left: 12px;
+}
+#cssom
+| <p>
+|   left: 12px
+
+#data
+p {
+  left: +12px;
+}
+#cssom
+| <p>
+|   left: 12px
+
+#data
+p {
+  left: -12px;
+}
+#cssom
+| <p>
+|   left: -12px
+
+#data
+p {
+  left: auto;
+}
+#cssom
+| <p>
+|   left: auto
+
+#data
+p {
+  left: inherit;
+}
+#cssom
+| <p>
+|   left: inherit
+
+#data
+p {
+  right: 12px;
+}
+#cssom
+| <p>
+|   right: 12px
+
+#data
+p {
+  right: +12px;
+}
+#cssom
+| <p>
+|   right: 12px
+
+#data
+p {
+  right: -12px;
+}
+#cssom
+| <p>
+|   right: -12px
+
+#data
+p {
+  right: auto;
+}
+#cssom
+| <p>
+|   right: auto
+
+#data
+p {
+  right: inherit;
+}
+#cssom
+| <p>
+|   right: inherit
+
+#data
+/* From CSS 2.1 */
+      BODY { height: 8.5in } /* Required for percentage heights below */
+      #header {
+        position: fixed;
+        width: 100%;
+        height: 15%;
+        top: 0;
+        right: 0;
+        bottom: auto;
+        left: 0;
+      }
+      #sidebar {
+        position: fixed;
+        width: 10em;
+        height: auto;
+        top: 15%;
+        right: auto;
+        bottom: 100px;
+        left: 0;
+      }
+      #main {
+        position: fixed;
+        width: auto;
+        height: auto;
+        top: 15%;
+        right: 0;
+        bottom: 100px;
+        left: 10em;
+      }
+      #footer {
+        position: fixed;
+        width: 100%;
+        height: 100px;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+#cssom
+| <BODY>
+|   height: 8.5in
+| <#header>
+|   bottom: auto
+|   height: 15%
+|   left: 0px
+|   position: fixed
+|   right: 0px
+|   top: 0px
+|   width: 100%
+| <#sidebar>
+|   bottom: 100px
+|   height: auto
+|   left: 0px
+|   position: fixed
+|   right: auto
+|   top: 15%
+|   width: 10em
+| <#main>
+|   bottom: 100px
+|   height: auto
+|   left: 10em
+|   position: fixed
+|   right: 0px
+|   top: 15%
+|   width: auto
+| <#footer>
+|   bottom: 0px
+|   height: 100px
+|   left: 0px
+|   position: fixed
+|   right: 0px
+|   top: auto
+|   width: 100%
+
+#data
+p {
+  z-index: 10;
+}
+#cssom
+| <p>
+|   z-index: 10
+
+#data
+p {
+  z-index: +10;
+}
+#cssom
+| <p>
+|   z-index: 10
+
+#data
+p {
+  z-index: -10;
+}
+#cssom
+| <p>
+|   z-index: -10
+
+#data
+p {
+  z-index: auto;
+}
+#cssom
+| <p>
+|   z-index: auto
+
+#data
+p {
+  z-index: inherit;
+}
+#cssom
+| <p>
+|   z-index: inherit
+
+#data
+p {
+  z-index: +inherit;
+}
+#errors
+;2;13;m;syntax error:'z-index'
+#cssom
+| <p>
+
+#data
+p {
+  width: 62px;
+}
+#cssom
+| <p>
+|   width: 62px
+
+#data
+p {
+  width: +62px;
+}
+#cssom
+| <p>
+|   width: 62px
+
+#data
+p {
+  width: -62px;
+}
+#errors
+;2;11;m;syntax error:'width'
+#cssom
+| <p>
+
+#data
+p {
+  width: 62%;
+}
+#cssom
+| <p>
+|   width: 62%
+
+#data
+p {
+  width: auto;
+}
+#cssom
+| <p>
+|   width: auto
+
+#data
+p {
+  width: none;
+}
+#errors
+;2;10;m;syntax error:'width'
+#cssom
+| <p>
+
+#data
+p {
+  width: inherit
+}
+#cssom
+| <p>
+|   width: inherit
+
+#data
+p {
+  min-width: 62px;
+}
+#cssom
+| <p>
+|   min-width: 62px
+
+#data
+p {
+  min-width: +62px;
+}
+#cssom
+| <p>
+|   min-width: 62px
+
+#data
+p {
+  min-width: -62px;
+}
+#errors
+;2;15;m;syntax error:'min-width'
+#cssom
+| <p>
+
+#data
+p {
+  min-width: 62%;
+}
+#cssom
+| <p>
+|   min-width: 62%
+
+#data
+p {
+  min-width: auto;
+}
+#errors
+;2;14;m;syntax error:'min-width'
+#cssom
+| <p>
+
+#data
+p {
+  min-width: none;
+}
+#errors
+;2;14;m;syntax error:'min-width'
+#cssom
+| <p>
+
+#data
+p {
+  min-width: inherit
+}
+#cssom
+| <p>
+|   min-width: inherit
+
+#data
+p {
+  max-width: 62px;
+}
+#cssom
+| <p>
+|   max-width: 62px
+
+#data
+p {
+  max-width: +62px;
+}
+#cssom
+| <p>
+|   max-width: 62px
+
+#data
+p {
+  max-width: -62px;
+}
+#errors
+;2;15;m;syntax error:'max-width'
+#cssom
+| <p>
+
+#data
+p {
+  max-width: 62%;
+}
+#cssom
+| <p>
+|   max-width: 62%
+
+#data
+p {
+  max-width: auto;
+}
+#errors
+;2;14;m;syntax error:'max-width'
+#cssom
+| <p>
+
+#data
+p {
+  max-width: none
+}
+#cssom
+| <p>
+|   max-width: none
+
+#data
+p {
+  max-width: inherit
+}
+#cssom
+| <p>
+|   max-width: inherit
+
+#data
+p {
+  height: 62px;
+}
+#cssom
+| <p>
+|   height: 62px
+
+#data
+p {
+  height: +62px;
+}
+#cssom
+| <p>
+|   height: 62px
+
+#data
+p {
+  height: -62px;
+}
+#errors
+;2;12;m;syntax error:'height'
+#cssom
+| <p>
+
+#data
+p {
+  height: 62%;
+}
+#cssom
+| <p>
+|   height: 62%
+
+#data
+p {
+  height: auto;
+}
+#cssom
+| <p>
+|   height: auto
+
+#data
+p {
+  height: none;
+}
+#errors
+;2;11;m;syntax error:'height'
+#cssom
+| <p>
+
+#data
+p {
+  height: inherit
+}
+#cssom
+| <p>
+|   height: inherit
+
+#data
+p {
+  min-height: 62px;
+}
+#cssom
+| <p>
+|   min-height: 62px
+
+#data
+p {
+  min-height: +62px;
+}
+#cssom
+| <p>
+|   min-height: 62px
+
+#data
+p {
+  min-height: -62px;
+}
+#errors
+;2;16;m;syntax error:'min-height'
+#cssom
+| <p>
+
+#data
+p {
+  min-height: 62%;
+}
+#cssom
+| <p>
+|   min-height: 62%
+
+#data
+p {
+  min-height: auto;
+}
+#errors
+;2;15;m;syntax error:'min-height'
+#cssom
+| <p>
+
+#data
+p {
+  min-height: none;
+}
+#errors
+;2;15;m;syntax error:'min-height'
+#cssom
+| <p>
+
+#data
+p {
+  min-height: inherit
+}
+#cssom
+| <p>
+|   min-height: inherit
+
+#data
+p {
+  max-height: 62px;
+}
+#cssom
+| <p>
+|   max-height: 62px
+
+#data
+p {
+  max-height: +62px;
+}
+#cssom
+| <p>
+|   max-height: 62px
+
+#data
+p {
+  max-height: -62px;
+}
+#errors
+;2;16;m;syntax error:'max-height'
+#cssom
+| <p>
+
+#data
+p {
+  max-height: 62%;
+}
+#cssom
+| <p>
+|   max-height: 62%
+
+#data
+p {
+  max-height: auto;
+}
+#errors
+;2;15;m;syntax error:'max-height'
+#cssom
+| <p>
+
+#data
+p {
+  max-height: none
+}
+#cssom
+| <p>
+|   max-height: none
+
+#data
+p {
+  max-height: inherit
+}
+#cssom
+| <p>
+|   max-height: inherit
+
+#data
+p {
+  line-height: normal;
+}
+#cssom
+| <p>
+|   line-height: normal
+
+#data
+p {
+  line-height: 12px;
+}
+#cssom
+| <p>
+|   line-height: 12px
+
+#data
+p {
+  line-height: +12px
+}
+#cssom
+| <p>
+|   line-height: 12px
+
+#data
+p {
+  line-height: -12px
+}
+#errors
+;2;17;m;syntax error:'line-height'
+#cssom
+| <p>
+
+#data
+p {
+  line-height: 12%
+}
+#cssom
+| <p>
+|   line-height: 12%
+
+#data
+p {
+  line-height: +12%
+}
+#cssom
+| <p>
+|   line-height: 12%
+
+#data
+p {
+  line-height: -123%
+}
+#errors
+;2;17;m;syntax error:'line-height'
+#cssom
+| <p>
+
+#data
+p {
+  line-height: 12
+}
+#cssom
+| <p>
+|   line-height: 12
+
+#data
+p {
+  line-height: 12
+}
+#option q
+#cssom
+| <p>
+|   line-height: 12
+
+#data
+p {
+  line-height: +12
+}
+#cssom
+| <p>
+|   line-height: 12
+
+#data
+p {
+  line-height: -12
+}
+#errors
+;2;17;m;syntax error:'line-height'
+#cssom
+| <p>
+
+#data
+p {
+  line-height: 0
+}
+#cssom
+| <p>
+|   line-height: 0
+
+#data
+p {
+  line-height: +0
+}
+#cssom
+| <p>
+|   line-height: 0
+
+#data
+p {
+  line-height: -0
+}
+#cssom
+| <p>
+|   line-height: 0
+
+#data
+p {
+  vertical-align: baseline;
+}
+#cssom
+| <p>
+|   vertical-align: baseline
+
+#data
+p {
+  vertical-align: sub;
+}
+#cssom
+| <p>
+|   vertical-align: sub
+
+#data
+p {
+  vertical-align: super;
+}
+#cssom
+| <p>
+|   vertical-align: super
+
+#data
+p {
+  vertical-align: sup;
+}
+#errors
+;2;19;m;syntax error:'vertical-align'
+#cssom
+| <p>
+
+#data
+p {
+  vertical-align: top;
+}
+#cssom
+| <p>
+|   vertical-align: top
+
+#data
+p {
+  vertical-align: text-top;
+}
+#cssom
+| <p>
+|   vertical-align: text-top
+
+#data
+p {
+  vertical-align: middle;
+}
+#cssom
+| <p>
+|   vertical-align: middle
+
+#data
+p {
+  vertical-align: normal;
+}
+#errors
+;2;19;m;syntax error:'vertical-align'
+#cssom
+| <p>
+
+#data
+p {
+  vertical-align: bottom;
+}
+#cssom
+| <p>
+|   vertical-align: bottom
+
+#data
+p {
+  vertical-align: text-bottom;
+}
+#cssom
+| <p>
+|   vertical-align: text-bottom
+
+#data
+p {
+  vertical-align: 12%;
+}
+#cssom
+| <p>
+|   vertical-align: 12%
+
+#data
+p {
+  vertical-align: +12%;
+}
+#cssom
+| <p>
+|   vertical-align: 12%
+
+#data
+p {
+  vertical-align: -12%;
+}
+#cssom
+| <p>
+|   vertical-align: -12%
+
+#data
+p {
+  vertical-align: 10em;
+}
+#cssom
+| <p>
+|   vertical-align: 10em
+
+#data
+p {
+  vertical-align: +0000010em;
+}
+#cssom
+| <p>
+|   vertical-align: 10em
+
+#data
+p {
+  vertical-align: -00012.00000px;
+}
+#cssom
+| <p>
+|   vertical-align: -12px
+
+#data
+p {
+  vertical-align: inherit;
+}
+#cssom
+| <p>
+|   vertical-align: inherit
 
 #data
 p {
