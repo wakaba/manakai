@@ -23,6 +23,8 @@ for my $file_name (map {"t/$_"} qw(
   css-paged.dat
   css-text.dat
   css-font.dat
+  css-table.dat
+  css-interactive.dat
 )) {
   print "# $file_name\n";
   open my $file, '<', $file_name or die "$0: $file_name: $!";

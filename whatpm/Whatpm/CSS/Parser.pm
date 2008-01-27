@@ -2197,32 +2197,39 @@ $Prop->{'letter-spacing'} = {
     ## NOTE: Used also for 'word-spacing', '-manakai-border-spacing-x',
     ## and '-manakai-border-spacing-y'.
 
+    my $has_sign;
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
     my $allow_negative = $Prop->{$prop_name}->{allow_negative};
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($length_unit->{$unit} and ($allow_negative or $value >= 0)) {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
       }
     } elsif ($t->{type} == NUMBER_TOKEN and
              ($self->{unitless_px} or $t->{number} == 0)) {
       my $value = $t->{number} * $sign;
-      $t = $tt->get_next_token;
-      return ($t, {$prop_name => ['DIMENSION', $value, 'px']})
-          if $allow_negative or $value >= 0;
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+      if ($allow_negative or $value >= 0) {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
+      }
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($Prop->{$prop_name}->{keyword}->{$value}) {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['KEYWORD', $value]});        
       } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
         return ($t, {$prop_name => ['INHERIT']});
       }
     }
@@ -2269,7 +2276,6 @@ $Prop->{'-manakai-border-spacing-x'} = {
   serialize_multiple => sub {
     my $self = shift;
     
-    local $Error::Depth = $Error::Depth + 1;
     my $x = $self->_manakai_border_spacing_x;
     my $y = $self->_manakai_border_spacing_y;
     my $xi = $self->get_property_priority ('-manakai-border-spacing-x');
@@ -2280,7 +2286,12 @@ $Prop->{'-manakai-border-spacing-x'} = {
           if ($x eq $y) {
             return {'border-spacing' => [$x, $xi]};
           } else {
-            return {'border-spacing' => [$x . ' ' . $y, $xi]};
+            if ($x eq 'inherit' or $y eq 'inherit') {
+              return {'-manakai-border-spacing-x' => [$x, $xi],
+                      '-manakai-border-spacing-y' => [$y, $yi]};
+            } else {
+              return {'border-spacing' => [$x . ' ' . $y, $xi]};
+            }
           }
         } else {
           return {'-manakai-border-spacing-x' => [$x, $xi],
@@ -3410,6 +3421,9 @@ $Prop->{'font-family'} = {
 
     ## NOTE: See <http://suika.fam.cx/gate/2005/sw/font-family> for
     ## how chaotic browsers are!
+
+    ## NOTE: Opera 9 allows NUMBER and DIMENSION as part of 
+    ## <font-family>, while Firefox 2 does not.
 
     my @prop_value;
 
@@ -4620,18 +4634,22 @@ $Prop->{'border-spacing'} = {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
     my %prop_value;
-
+    my $has_sign;
     my $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($length_unit->{$unit} and $value >= 0) {
+        $t = $tt->get_next_token;
         $prop_value{'-manakai-border-spacing-x'} = ['DIMENSION', $value, $unit];
       } else {
         $onerror->(type => "syntax error:'$prop_name'",
@@ -4643,19 +4661,20 @@ $Prop->{'border-spacing'} = {
     } elsif ($t->{type} == NUMBER_TOKEN and
              ($self->{unitless_px} or $t->{number} == 0)) {
       my $value = $t->{number} * $sign;
-      $t = $tt->get_next_token;
       $prop_value{'-manakai-border-spacing-x'} = ['DIMENSION', $value, 'px'];
-      unless ($value >= 0) {
+      if ($value >= 0) {
+        $t = $tt->get_next_token;
+      } else {
         $onerror->(type => "syntax error:'$prop_name'",
                    level => $self->{must_level},
                    uri => \$self->{href},
                    token => $t);
         return ($t, undef);
       }
-    } elsif ($sign > 0 and $t->{type} == IDENT_TOKEN) {
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
-      $t = $tt->get_next_token;
       if ($prop_value eq 'inherit') {
+        $t = $tt->get_next_token;
         $prop_value{'-manakai-border-spacing-x'} = ['INHERIT'];
         $prop_value{'-manakai-border-spacing-y'}
             = $prop_value{'-manakai-border-spacing-x'};
@@ -4678,17 +4697,22 @@ $Prop->{'border-spacing'} = {
         = $prop_value{'-manakai-border-spacing-x'};
 
     $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+    undef $has_sign;
     $sign = 1;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
+      $has_sign = 1;
       $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
     }
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
-      $t = $tt->get_next_token;
       if ($length_unit->{$unit} and $value >= 0) {
+        $t = $tt->get_next_token;
         $prop_value{'-manakai-border-spacing-y'} = ['DIMENSION', $value, $unit];
       } else {
         $onerror->(type => "syntax error:'$prop_name'",
@@ -4700,9 +4724,10 @@ $Prop->{'border-spacing'} = {
     } elsif ($t->{type} == NUMBER_TOKEN and
              ($self->{unitless_px} or $t->{number} == 0)) {
       my $value = $t->{number} * $sign;
-      $t = $tt->get_next_token;
       $prop_value{'-manakai-border-spacing-y'} = ['DIMENSION', $value, 'px'];
-      unless ($value >= 0) {
+      if ($value >= 0) {
+        $t = $tt->get_next_token;
+      } else {
         $onerror->(type => "syntax error:'$prop_name'",
                    level => $self->{must_level},
                    uri => \$self->{href},
@@ -4710,7 +4735,7 @@ $Prop->{'border-spacing'} = {
         return ($t, undef);
       }
     } else {
-      if ($sign < 0) {
+      if ($has_sign) {
         $onerror->(type => "syntax error:'$prop_name'",
                    level => $self->{must_level},
                    uri => \$self->{href},
@@ -4721,19 +4746,6 @@ $Prop->{'border-spacing'} = {
     }
 
     return ($t, \%prop_value);
-  },
-  serialize => sub {
-    my ($self, $prop_name, $value) = @_;
-    
-    local $Error::Depth = $Error::Depth + 1;
-    my @v;
-    push @v, $self->_manakai_border_spacing_x;
-    return '' unless length $v[-1];
-    push @v, $self->_manakai_border_spacing_y;
-    return '' unless length $v[-1];
-
-    pop @v if $v[0] eq $v[1];
-    return join ' ', @v;
   },
   serialize_multiple => $Prop->{'-manakai-border-spacing-x'}
       ->{serialize_multiple},
@@ -5870,4 +5882,4 @@ $Attr->{text_decoration} = $Prop->{'text-decoration'};
 $Key->{text_decoration} = $Prop->{'text-decoration'};
 
 1;
-## $Date: 2008/01/27 07:19:05 $
+## $Date: 2008/01/27 08:09:12 $

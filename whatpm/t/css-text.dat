@@ -66,3 +66,251 @@ p {
 | <p>
 |   color: rgb(0, 0, 0)
 
+#data
+p {
+  text-indent: 12px
+}
+#cssom
+| <p>
+|   text-indent: 12px
+
+#data
+p {
+  text-indent: +12px
+}
+#cssom
+| <p>
+|   text-indent: 12px
+
+#data
+p {
+  text-indent: -12px
+}
+#cssom
+| <p>
+|   text-indent: -12px
+
+#data
+p {
+  letter-spacing: 12px
+}
+#cssom
+| <p>
+|   letter-spacing: 12px
+
+#data
+p {
+  letter-spacing: +12px
+}
+#cssom
+| <p>
+|   letter-spacing: 12px
+
+#data
+p {
+  letter-spacing: -12px
+}
+#cssom
+| <p>
+|   letter-spacing: -12px
+
+#data
+p {
+  letter-spacing: 12
+}
+#errors
+;2;19;m;syntax error:'letter-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  letter-spacing: 12
+}
+#option q
+#cssom
+| <p>
+|   letter-spacing: 12px
+
+#data
+p {
+  letter-spacing: +12
+}
+#errors
+;2;20;m;syntax error:'letter-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  letter-spacing: +12
+}
+#option q
+#cssom
+| <p>
+|   letter-spacing: 12px
+
+#data
+p {
+  letter-spacing: -12
+}
+#errors
+;2;20;m;syntax error:'letter-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  letter-spacing: -12
+}
+#option q
+#cssom
+| <p>
+|   letter-spacing: -12px
+
+#data
+p {
+  letter-spacing: normal
+}
+#cssom
+| <p>
+|   letter-spacing: normal
+
+#data
+p {
+  letter-spacing: +normal
+}
+#errors
+;2;20;m;syntax error:'letter-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  letter-spacing: inherit
+}
+#cssom
+| <p>
+|   letter-spacing: inherit
+
+#data
+p {
+  letter-spacing: +inherit
+}
+#errors
+;2;20;m;syntax error:'letter-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  word-spacing: 12px
+}
+#cssom
+| <p>
+|   word-spacing: 12px
+
+#data
+p {
+  word-spacing: +12px
+}
+#cssom
+| <p>
+|   word-spacing: 12px
+
+#data
+p {
+  word-spacing: -12px
+}
+#cssom
+| <p>
+|   word-spacing: -12px
+
+#data
+p {
+  word-spacing: 12
+}
+#errors
+;2;17;m;syntax error:'word-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  word-spacing: 12
+}
+#option q
+#cssom
+| <p>
+|   word-spacing: 12px
+
+#data
+p {
+  word-spacing: +12
+}
+#errors
+;2;18;m;syntax error:'word-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  word-spacing: +12
+}
+#option q
+#cssom
+| <p>
+|   word-spacing: 12px
+
+#data
+p {
+  word-spacing: -12
+}
+#errors
+;2;18;m;syntax error:'word-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  word-spacing: -12
+}
+#option q
+#cssom
+| <p>
+|   word-spacing: -12px
+
+#data
+p {
+  word-spacing: normal
+}
+#cssom
+| <p>
+|   word-spacing: normal
+
+#data
+p {
+  word-spacing: +normal
+}
+#errors
+;2;18;m;syntax error:'word-spacing'
+#cssom
+| <p>
+
+#data
+p {
+  word-spacing: inherit
+}
+#cssom
+| <p>
+|   word-spacing: inherit
+
+#data
+p {
+  word-spacing: +inherit
+}
+#errors
+;2;18;m;syntax error:'word-spacing'
+#cssom
+| <p>
+

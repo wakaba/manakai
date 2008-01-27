@@ -367,6 +367,23 @@ p {
 
 #data
 p {
+  font-size: +12px;
+}
+#cssom
+| <p>
+|   font-size: 12px
+
+#data
+p {
+  font-size: -12px
+}
+#errors
+;2;15;m;syntax error:'font-size'
+#cssom
+| <p>
+
+#data
+p {
   font-size: 12px ! important ;
 }
 #cssom

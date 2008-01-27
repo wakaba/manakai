@@ -1,0 +1,67 @@
+#data
+p {
+  outline-width: 12px;
+}
+#cssom
+| <p>
+|   outline-width: 12px
+#csstext
+p {
+  outline-width: 12px;
+}
+
+#data
+p {
+  outline-width: +12px;
+}
+#cssom
+| <p>
+|   outline-width: 12px
+#csstext
+p {
+  outline-width: 12px;
+}
+
+#data
+p {
+  outline-width: -12px;
+}
+#errors
+;2;19;m;syntax error:'outline-width'
+#cssom
+| <p>
+
+#data
+p {
+  outline: 12px;
+}
+#cssom
+| <p>
+|   outline: 12px none -manakai-invert-or-currentcolor
+|   outline-color: -manakai-invert-or-currentcolor
+|   outline-style: none
+|   outline-width: 12px
+#csstext
+p {
+  outline: 12px none -manakai-invert-or-currentcolor;
+}
+
+#data
+p {
+  outline: +12px;
+}
+#cssom
+| <p>
+|   outline: 12px none -manakai-invert-or-currentcolor
+|   outline-color: -manakai-invert-or-currentcolor
+|   outline-style: none
+|   outline-width: 12px
+
+#data
+p {
+  outline: -12px;
+}
+#errors
+;2;13;m;syntax error:'outline'
+#cssom
+| <p>
