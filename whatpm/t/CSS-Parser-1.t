@@ -27,7 +27,7 @@ for my $file_name (map {"t/$_"} qw(
   css-interactive.dat
 )) {
   print "# $file_name\n";
-  open my $file, '<', $file_name or die "$0: $file_name: $!";
+  open my $file, '<:utf8', $file_name or die "$0: $file_name: $!";
 
   my $all_test = {document => {}, test => []};
   my $test;
@@ -163,7 +163,7 @@ BEGIN {
     border-right-style border-right-width
     -manakai-border-spacing-x -manakai-border-spacing-y
     border-top-color border-top-style border-top-width bottom
-    caption-side clear color cursor direction display empty-cells float
+    caption-side clear color content cursor direction display empty-cells float
     font-family font-size font-style font-variant font-weight height left
     letter-spacing line-height
     list-style-image list-style-position list-style-type
@@ -191,6 +191,7 @@ BEGIN {
   caption-side: top;
   clear: none;
   color: -manakai-default;
+  content: normal;
   cursor: auto;
   direction: ltr;
   display: inline;

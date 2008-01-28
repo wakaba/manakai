@@ -569,6 +569,16 @@ my $default_serializer = sub {
     ## e.g. '"'.  In addition, it might not be a <'quotes'> if 
     ## @{$value->[1]} is empty (which is unlikely as long as the implementation
     ## is not broken).
+  } elsif ($value->[0] eq 'CONTENT') {
+    return join ' ', map {
+      $_->[0] eq 'KEYWORD' ? $_->[1] :
+      $_->[0] eq 'STRING' ? '"' . $_->[1] . '"' :
+      $_->[0] eq 'URI' ? 'url(' . $_->[1] . ')' :
+      $_->[0] eq 'ATTR' ? 'attr(' . $_->[2] . ')' : ## TODO: prefix
+      $_->[0] eq 'COUNTER' ? 'counter(' . $_->[1] . ', ' . $_->[3] . ')' :
+      $_->[0] eq 'COUNTERS' ? 'counters(' . $_->[1] . ', "' . $_->[2] . '", ' . $_->[3] . ')' :
+      ''
+    } @{$value}[1..$#$value];
   } else {
     return '';
   }
@@ -6012,5 +6022,187 @@ $Prop->{quotes} = {
   compute => $compute_as_specified,
 };
 
+$Attr->{content} =
+$Key->{content} =
+$Prop->{content} = {
+  css => 'content',
+  dom => 'content',
+  key => 'content',
+  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/content>.
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ($value eq 'normal' or $value eq 'none') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['KEYWORD', $value]});
+      } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    my @v;
+    A: {
+      if ($t->{type} == IDENT_TOKEN) {
+        my $value = lc $t->{value}; ## TODO: case
+        if ({qw/open-quote 1 close-quote 1
+                no-open-quote 1 no-close-quote 1/}->{$value} and
+            $self->{prop}->{quotes}) {
+          push @v, ['KEYWORD', $value];
+          $t = $tt->get_next_token;
+        } else {
+          last A;
+        }
+      } elsif ($t->{type} == STRING_TOKEN) {
+        push @v, ['STRING', $t->{value}];
+        $t = $tt->get_next_token;
+      } elsif ($t->{type} == URI_TOKEN) {
+        push @v, ['URI', $t->{value}, \($self->{base_uri})];
+        $t = $tt->get_next_token;
+      } elsif ($t->{type} == FUNCTION_TOKEN) {
+        my $name = lc $t->{value}; ## TODO: case
+        if ($name eq 'attr') {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          if ($t->{type} == IDENT_TOKEN) {
+            my $t_pfx;
+            my $t_ln = $t;
+            $t = $tt->get_next_token;
+            if ($t->{type} == VBAR_TOKEN) {
+              $t = $tt->get_next_token;
+              if ($t->{type} == IDENT_TOKEN) {
+                $t_pfx = $t_ln;
+                $t_ln = $t;
+                $t = $tt->get_next_token;
+              } else {
+                last A;
+              }
+            }
+            
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            if ($t->{type} == RPAREN_TOKEN) {
+              if (defined $t_pfx) {
+                my $uri = $self->{lookup_namespace_uri}->($name);
+                unless (defined $uri) {
+                  $self->{onerror}->(type => 'namespace prefix:not declared',
+                                     level => $self->{must_level},
+                                     uri => \$self->{href},
+                                     token => $t_pfx);
+                  return ($t, undef);
+                }
+                push @v, ['ATTR', $uri, $t_ln->{value}];
+              } else {
+                push @v, ['ATTR', undef, $t_ln->{value}];
+              }
+              $t = $tt->get_next_token;
+            } else {
+              last A;
+            }
+          } elsif ($t->{type} == VBAR_TOKEN) {
+            $t = $tt->get_next_token;
+            my $t_ln;
+            if ($t->{type} == IDENT_TOKEN) {
+              $t_ln = $t;
+              $t = $tt->get_next_token;
+            } else {
+              last A;
+            }
+            
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            if ($t->{type} == RPAREN_TOKEN) {
+              push @v, ['ATTR', undef, $t_ln->{value}];
+              $t = $tt->get_next_token;
+            } else {
+              last A;
+            }
+          } else {
+            last A;
+          }
+        } elsif (($name eq 'counter' or $name eq 'counters') # and
+                 #$self->{prop}->{'counter-reset'} ## TODO: enable this
+                ) {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          if ($t->{type} == IDENT_TOKEN) {
+            my $t_id = $t;
+            my $t_str;
+            my $type;
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            if ($t->{type} == COMMA_TOKEN) {
+              $t = $tt->get_next_token;
+              $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+              if ($name eq 'counters' and $t->{type} == STRING_TOKEN) {
+                $t_str = $t;
+                $t = $tt->get_next_token;
+                $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+                if ($t->{type} == COMMA_TOKEN) {
+                  $t = $tt->get_next_token;
+                  $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+                  if ($t->{type} == IDENT_TOKEN) {
+                    $type = lc $t->{value}; ## TODO: value
+                    if ($Prop->{'list-style-type'}->{keyword}->{$type}) {
+                      $t = $tt->get_next_token;
+                    } else {
+                      last A;
+                    }
+                  } else {
+                    last A;
+                  }
+                }
+              } elsif ($name eq 'counter' and $t->{type} == IDENT_TOKEN) {
+                $type = lc $t->{value}; ## TODO: value
+                if ($Prop->{'list-style-type'}->{keyword}->{$type}) {
+                  $t = $tt->get_next_token;
+                } else {
+                  last A;
+                }
+              } else {
+                last A;
+              }
+            } elsif ($name eq 'counters') {
+              last A;
+            }
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            if ($t->{type} == RPAREN_TOKEN) {
+              push @v, [uc $name, ## |COUNTER| or |COUNTERS|
+                        $t_id->{value},
+                        defined $t_str ? $t_str->{value} : undef,
+                        defined $type ? $type : 'decimal'];
+              $t = $tt->get_next_token;
+            } else {
+              last A;
+            }
+          } else {
+            last A;
+          }
+        } else {
+          last A;
+        }
+      } else {
+        unshift @v, 'CONTENT';
+        return ($t, {$prop_name => \@v});
+      }
+
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      redo A;
+    } # A
+
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'normal'],
+  #inherited => 0,
+  compute => $compute_as_specified,
+      ## NOTE: This is what Opera 9 does, except for 'normal' -> 'none'.
+      ## TODO: 'normal' -> 'none' for ::before and ::after [CSS 2.1]
+};
+
 1;
-## $Date: 2008/01/27 10:14:52 $
+## $Date: 2008/01/28 13:13:24 $
