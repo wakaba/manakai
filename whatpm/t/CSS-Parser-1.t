@@ -163,7 +163,8 @@ BEGIN {
     border-right-style border-right-width
     -manakai-border-spacing-x -manakai-border-spacing-y
     border-top-color border-top-style border-top-width bottom
-    caption-side clear color content cursor direction display empty-cells float
+    caption-side clear color content counter-increment counter-reset
+    cursor direction display empty-cells float
     font-family font-size font-style font-variant font-weight height left
     letter-spacing line-height
     list-style-image list-style-position list-style-type
@@ -192,6 +193,8 @@ BEGIN {
   clear: none;
   color: -manakai-default;
   content: normal;
+  counter-increment: none;
+  counter-reset: none;
   cursor: auto;
   direction: ltr;
   display: inline;

@@ -129,6 +129,18 @@ p {
 
 #data
 p {
+  content: counter(inherit);
+}
+#cssom
+| <p>
+|   content: counter(inherit, decimal)
+#csstext
+p {
+  content: counter(inherit, decimal);
+}
+
+#data
+p {
   content: counter(a, circlE);
 }
 #cssom
@@ -210,6 +222,18 @@ p {
 
 #data
 p {
+  content: counters(inherit, "x");
+}
+#cssom
+| <p>
+|   content: counters(inherit, "x", decimal)
+#csstext
+p {
+  content: counters(inherit, "x", decimal);
+}
+
+#data
+p {
   content: counters(a, "b", SQUARE);
 }
 #cssom
@@ -272,6 +296,18 @@ p {
 #csstext
 p {
   content: attr(aLign);
+}
+
+#data
+p {
+  content: attr(inherit);
+}
+#cssom
+| <p>
+|   content: attr(inherit)
+#csstext
+p {
+  content: attr(inherit);
 }
 
 #data
@@ -637,6 +673,496 @@ p {
 ;2;11;m;syntax error:'quotes'
 #cssom
 | <p>
+
+#data
+p {
+  counter-reset: ;
+}
+#errors
+;2;18;m;syntax error:'counter-reset'
+#cssom
+| <p>
+
+#data
+p {
+  counter-reset: none;
+}
+#cssom
+| <p>
+|   counter-reset: none
+#csstext
+p {
+  counter-reset: none;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  COUNTER-RESET: NONE;
+}
+#cssom
+| <p>
+|   counter-reset: none
+
+#data
+p {
+  counter-reset: none!important;
+}
+#cssom
+| <p>
+|   counter-reset: none !important
+
+#data
+p {
+  counter-reset: inherit;
+}
+#cssom
+| <p>
+|   counter-reset: inherit
+#csstext
+p {
+  counter-reset: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  COUNTER-reset: INHERIT;
+}
+#cssom
+| <p>
+|   counter-reset: inherit
+
+#data
+p {
+  counter-reset: inherit ! important;
+}
+#cssom
+| <p>
+|   counter-reset: inherit !important
+
+#data
+p {
+  counter-reset: 4
+}
+#errors
+;2;18;m;syntax error:'counter-reset'
+#cssom
+| <p>
+
+#data
+p {
+  counter-reset: a;
+}
+#cssom
+| <p>
+|   counter-reset: a 0
+#csstext
+p {
+  counter-reset: a 0;
+}
+#computed 1 p
+-| counter-reset: none
++| counter-reset: a 0
+
+#data
+p {
+  counter-reset: aBc;
+}
+#cssom
+| <p>
+|   counter-reset: aBc 0
+#csstext
+p {
+  counter-reset: aBc 0;
+}
+
+#data
+p {
+  counter-reset: a 12;
+}
+#cssom
+| <p>
+|   counter-reset: a 12
+#csstext
+p {
+  counter-reset: a 12;
+}
+
+#data
+p {
+  counter-reset: a 1 2
+}
+#errors
+;2;22;m;no property semicolon
+
+#data
+p {
+  counter-reset: a b;
+}
+#cssom
+| <p>
+|   counter-reset: a 0 b 0
+#csstext
+p {
+  counter-reset: a 0 b 0;
+}
+
+#data
+p {
+  counter-reset: a,b
+}
+#errors
+;2;19;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  counter-reset: a b !important;
+}
+#cssom
+| <p>
+|   counter-reset: a 0 b 0 !important
+#csstext
+p {
+  counter-reset: a 0 b 0 ! important;
+}
+
+#data
+p {
+  counter-reset: a 1 b 2 a 23;
+}
+#cssom
+| <p>
+|   counter-reset: a 1 b 2 a 23
+
+#data
+p {
+  counter-reset: a +23 b +55;
+}
+#cssom
+| <p>
+|   counter-reset: a 23 b 55
+
+#data
+p {
+  counter-reset: a -10 b -20
+}
+#cssom
+| <p>
+|   counter-reset: a -10 b -20
+
+#data
+p {
+  counter-reset: a 10.23 b 5665.4 c -53.4
+}
+#cssom
+| <p>
+|   counter-reset: a 10 b 5665 c -53
+
+#data
+p {
+  counter-reset: a 00000244 b 0000004
+}
+#cssom
+| <p>
+|   counter-reset: a 244 b 4
+
+#data
+p {
+  counter-reset: none 1;
+}
+#cssom
+| <p>
+|   counter-reset: none 1
+
+#data
+p {
+  counter-RESET: None 1;
+}
+#cssom
+| <p>
+|   counter-reset: None 1
+
+#data
+p {
+  counter-reset: none a;
+}
+#cssom
+| <p>
+|   counter-reset: none 0 a 0
+
+#data
+p {
+  counter-reset: inherit 2;
+}
+#cssom
+| <p>
+|   counter-reset: inherit 2
+
+#data
+p {
+  Counter-Reset: Inherit 2;
+}
+#cssom
+| <p>
+|   counter-reset: Inherit 2
+
+#data
+p {
+  counter-reset: inherit a;
+}
+#cssom
+| <p>
+|   counter-reset: inherit 0 a 0
+
+#data
+p {
+  counter-increment: ;
+}
+#errors
+;2;22;m;syntax error:'counter-increment'
+#cssom
+| <p>
+
+#data
+p {
+  counter-increment: none;
+}
+#cssom
+| <p>
+|   counter-increment: none
+#csstext
+p {
+  counter-increment: none;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  COUNTER-INCREMENT: NONE;
+}
+#cssom
+| <p>
+|   counter-increment: none
+
+#data
+p {
+  counter-increment: none!important;
+}
+#cssom
+| <p>
+|   counter-increment: none !important
+
+#data
+p {
+  counter-increment: inherit;
+}
+#cssom
+| <p>
+|   counter-increment: inherit
+#csstext
+p {
+  counter-increment: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  COUNTER-increment: INHERIT;
+}
+#cssom
+| <p>
+|   counter-increment: inherit
+
+#data
+p {
+  counter-increment: inherit ! important;
+}
+#cssom
+| <p>
+|   counter-increment: inherit !important
+
+#data
+p {
+  counter-increment: 4
+}
+#errors
+;2;22;m;syntax error:'counter-increment'
+#cssom
+| <p>
+
+#data
+p {
+  counter-increment: a;
+}
+#cssom
+| <p>
+|   counter-increment: a 1
+#csstext
+p {
+  counter-increment: a 1;
+}
+#computed 1 p
+-| counter-increment: none
++| counter-increment: a 1
+
+#data
+p {
+  counter-increment: aBc;
+}
+#cssom
+| <p>
+|   counter-increment: aBc 1
+#csstext
+p {
+  counter-increment: aBc 1;
+}
+
+#data
+p {
+  counter-increment: a 12;
+}
+#cssom
+| <p>
+|   counter-increment: a 12
+#csstext
+p {
+  counter-increment: a 12;
+}
+
+#data
+p {
+  counter-increment: a 1 2
+}
+#errors
+;2;26;m;no property semicolon
+
+#data
+p {
+  counter-increment: a b;
+}
+#cssom
+| <p>
+|   counter-increment: a 1 b 1
+#csstext
+p {
+  counter-increment: a 1 b 1;
+}
+
+#data
+p {
+  counter-increment: a,b
+}
+#errors
+;2;23;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  counter-increment: a b !important;
+}
+#cssom
+| <p>
+|   counter-increment: a 1 b 1 !important
+#csstext
+p {
+  counter-increment: a 1 b 1 ! important;
+}
+
+#data
+p {
+  counter-increment: a 1 b 2 a 23;
+}
+#cssom
+| <p>
+|   counter-increment: a 1 b 2 a 23
+
+#data
+p {
+  counter-increment: a +23 b +55;
+}
+#cssom
+| <p>
+|   counter-increment: a 23 b 55
+
+#data
+p {
+  counter-increment: a -10 b -20
+}
+#cssom
+| <p>
+|   counter-increment: a -10 b -20
+
+#data
+p {
+  counter-increment: a 10.23 b 5665.4 c -53.4
+}
+#cssom
+| <p>
+|   counter-increment: a 10 b 5665 c -53
+
+#data
+p {
+  counter-increment: a 00000244 b 0000004
+}
+#cssom
+| <p>
+|   counter-increment: a 244 b 4
+
+#data
+p {
+  counter-increment: none 1;
+}
+#cssom
+| <p>
+|   counter-increment: none 1
+
+#data
+p {
+  counter-INCREMENT: None 1;
+}
+#cssom
+| <p>
+|   counter-increment: None 1
+
+#data
+p {
+  counter-increment: none a;
+}
+#cssom
+| <p>
+|   counter-increment: none 1 a 1
+
+#data
+p {
+  counter-increment: inherit 2;
+}
+#cssom
+| <p>
+|   counter-increment: inherit 2
+
+#data
+p {
+  Counter-Increment: Inherit 2;
+}
+#cssom
+| <p>
+|   counter-increment: Inherit 2
+
+#data
+p {
+  counter-increment: inherit a;
+}
+#cssom
+| <p>
+|   counter-increment: inherit 1 a 1
 
 #data
 p {

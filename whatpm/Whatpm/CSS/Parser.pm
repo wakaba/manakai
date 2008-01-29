@@ -579,6 +579,8 @@ my $default_serializer = sub {
       $_->[0] eq 'COUNTERS' ? 'counters(' . $_->[1] . ', "' . $_->[2] . '", ' . $_->[3] . ')' :
       ''
     } @{$value}[1..$#$value];
+  } elsif ($value->[0] eq 'SETCOUNTER' or $value->[0] eq 'ADDCOUNTER') {
+    return join ' ', map {$_->[0], $_->[1]} @$value[1..$#$value];
   } else {
     return '';
   }
@@ -6120,9 +6122,8 @@ $Prop->{content} = {
           } else {
             last A;
           }
-        } elsif (($name eq 'counter' or $name eq 'counters') # and
-                 #$self->{prop}->{'counter-reset'} ## TODO: enable this
-                ) {
+        } elsif (($name eq 'counter' or $name eq 'counters') and
+                 $self->{prop}->{'counter-reset'}) {
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
           if ($t->{type} == IDENT_TOKEN) {
@@ -6204,5 +6205,135 @@ $Prop->{content} = {
       ## TODO: 'normal' -> 'none' for ::before and ::after [CSS 2.1]
 };
 
+$Attr->{counter_reset} =
+$Key->{counter_reset} =
+$Prop->{'counter-reset'} = {
+  css => 'counter-reset',
+  dom => 'counter_reset',
+  key => 'counter_reset',
+  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/counter-reset>.
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    ## NOTE: For 'counter-increment' and 'counter-reset'.
+
+    my @v = ($prop_name eq 'counter-increment' ? 'ADDCOUNTER' : 'SETCOUNTER');
+    B: {
+      if ($t->{type} == IDENT_TOKEN) {
+        my $value = $t->{value};
+        my $lcvalue = lc $value; ## TODO: case
+        last B if $lcvalue ne 'inherit' and $lcvalue ne 'none';
+        
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == IDENT_TOKEN) {
+          push @v, [$value, $prop_name eq 'counter-increment' ? 1 : 0];
+        } elsif ($t->{type} == NUMBER_TOKEN) {
+          push @v, [$value, int $t->{number}];
+          $t = $tt->get_next_token;
+        } elsif ($t->{type} == PLUS_TOKEN) {
+          $t = $tt->get_next_token;
+          if ($t->{type} == NUMBER_TOKEN) {
+            push @v, [$value, int $t->{number}];
+            $t = $tt->get_next_token;
+          } else {
+            $onerror->(type => "syntax error:'$prop_name'",
+                       level => $self->{must_level},
+                       uri => \$self->{href},
+                       token => $t);
+            return ($t, undef);
+          }
+        } elsif ($t->{type} == MINUS_TOKEN) {
+          $t = $tt->get_next_token;
+          if ($t->{type} == NUMBER_TOKEN) {
+            push @v, [$value, -int $t->{number}];
+            $t = $tt->get_next_token;
+          } else {
+            $onerror->(type => "syntax error:'$prop_name'",
+                       level => $self->{must_level},
+                       uri => \$self->{href},
+                       token => $t);
+            return ($t, undef);
+          }
+        } else {
+          if ($lcvalue eq 'none') {
+            return ($t, {$prop_name => ['KEYWORD', $lcvalue]});
+          } elsif ($lcvalue eq 'inherit') {
+            return ($t, {$prop_name => ['INHERIT']});
+          } else {
+            last B;
+          }
+        }
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      } else {
+        $onerror->(type => "syntax error:'$prop_name'",
+                   level => $self->{must_level},
+                   uri => \$self->{href},
+                   token => $t);
+        return ($t, undef);
+      }
+    } # B
+
+    A: {
+      if ($t->{type} == IDENT_TOKEN) {
+        my $value = $t->{value};
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == NUMBER_TOKEN) {
+          push @v, [$value, int $t->{number}];
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        } elsif ($t->{type} == MINUS_TOKEN) {
+          $t = $tt->get_next_token;
+          if ($t->{type} == NUMBER_TOKEN) {
+            push @v, [$value, -int $t->{number}];
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          } else {
+            last A;
+          }
+        } elsif ($t->{type} == PLUS_TOKEN) {
+          $t = $tt->get_next_token;
+          if ($t->{type} == NUMBER_TOKEN) {
+            push @v, [$value, int $t->{number}];
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          } else {
+            last A;
+          }
+        } else {
+          push @v, [$value, $prop_name eq 'counter-increment' ? 1 : 0];
+        }
+        redo A;
+      } else {
+        return ($t, {$prop_name => \@v});
+      }
+    } # A
+    
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'none'],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+
+$Attr->{counter_increment} =
+$Key->{counter_increment} =
+$Prop->{'counter-increment'} = {
+  css => 'counter-increment',
+  dom => 'counter_increment',
+  key => 'counter_increment',
+  parse => $Prop->{'counter-reset'}->{parse},
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'none'],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+
 1;
-## $Date: 2008/01/28 13:13:24 $
+## $Date: 2008/01/29 22:15:01 $

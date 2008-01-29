@@ -1,3 +1,11 @@
+2008-01-30  Wakaba  <wakaba@suika.fam.cx>
+
+	* Parser.pm ($default_serializer): New 'ADDCOUNTER'
+	and 'SETCOUNTER' types supported.
+	('content'): 'counter()' and 'counters()' are supported iff
+	the property 'counter-reset' is supported.
+	('counter-reset', 'counter-increment'): Implemented.
+
 2008-01-28  Wakaba  <wakaba@suika.fam.cx>
 
 	* Parser.pm ($default_serializer): New 'CONTENT' type supported.
