@@ -527,93 +527,6 @@ my $compute_as_specified = sub ($$$$) {
   return $_[3];
 }; # $compute_as_specified
 
-my $default_serializer = sub {
-  my ($self, $prop_name, $value) = @_;
-  if ($value->[0] eq 'NUMBER' or $value->[0] eq 'WEIGHT') {
-    ## TODO: What we currently do for 'font-weight' is different from
-    ## any browser for lighter/bolder cases.  We need to fix this, but
-    ## how?
-    return $value->[1]; ## TODO: big or small number cases?
-  } elsif ($value->[0] eq 'DIMENSION') {
-    return $value->[1] . $value->[2]; ## NOTE: This is what browsers do.
-  } elsif ($value->[0] eq 'PERCENTAGE') {
-    return $value->[1] . '%';
-  } elsif ($value->[0] eq 'KEYWORD') {
-    return $value->[1];
-  } elsif ($value->[0] eq 'URI') {
-    ## NOTE: This is what browsers do.
-    return 'url('.$value->[1].')';
-  } elsif ($value->[0] eq 'RGBA') {
-    if ($value->[4] == 1) {
-      return 'rgb('.$value->[1].', '.$value->[2].', '.$value->[3].')';
-    } elsif ($value->[4] == 0) {
-      ## TODO: check what browsers do...
-      return 'transparent';
-    } else {
-      return 'rgba('.$value->[1].', '.$value->[2].', '.$value->[3].', '
-          .$value->[4].')';
-    }
-  } elsif ($value->[0] eq 'INHERIT') {
-    return 'inherit';
-  } elsif ($value->[0] eq 'DECORATION') {
-    my @v = ();
-    push @v, 'underline' if $value->[1];
-    push @v, 'overline' if $value->[2];
-    push @v, 'line-through' if $value->[3];
-    push @v, 'blink' if $value->[4];
-    return 'none' unless @v;
-    return join ' ', @v;
-  } elsif ($value->[0] eq 'QUOTES') {
-    return join ' ', map {'"'.$_.'"'} map {$_->[0], $_->[1]} @{$value->[1]};
-    ## NOTE: The result string might not be a <'quotes'> if it contains
-    ## e.g. '"'.  In addition, it might not be a <'quotes'> if 
-    ## @{$value->[1]} is empty (which is unlikely as long as the implementation
-    ## is not broken).
-  } elsif ($value->[0] eq 'CONTENT') {
-    return join ' ', map {
-      $_->[0] eq 'KEYWORD' ? $_->[1] :
-      $_->[0] eq 'STRING' ? '"' . $_->[1] . '"' :
-      $_->[0] eq 'URI' ? 'url(' . $_->[1] . ')' :
-      $_->[0] eq 'ATTR' ? 'attr(' . $_->[2] . ')' : ## TODO: prefix
-      $_->[0] eq 'COUNTER' ? 'counter(' . $_->[1] . ', ' . $_->[3] . ')' :
-      $_->[0] eq 'COUNTERS' ? 'counters(' . $_->[1] . ', "' . $_->[2] . '", ' . $_->[3] . ')' :
-      ''
-    } @{$value}[1..$#$value];
-  } elsif ($value->[0] eq 'RECT') {
-    ## NOTE: Four components are DIMENSIONs.
-    return 'rect(' . $value->[1]->[1].$value->[1]->[2] . ', '
-          . $value->[2]->[1].$value->[2]->[2] . ', '
-          . $value->[3]->[1].$value->[3]->[2] . ', '
-          . $value->[4]->[1].$value->[4]->[2] . ')';
-  } elsif ($value->[0] eq 'SETCOUNTER' or $value->[0] eq 'ADDCOUNTER') {
-    return join ' ', map {$_->[0], $_->[1]} @$value[1..$#$value];
-  } elsif ($value->[0] eq 'FONT') {
-    return join ', ', map {
-      if ($_->[0] eq 'STRING') {
-        '"'.$_->[1].'"'; ## NOTE: This is what Firefox does.
-      } elsif ($_->[0] eq 'KEYWORD') {
-        $_->[1]; ## NOTE: This is what Firefox does.
-      } else {
-        ## NOTE: This should be an error.
-        '""';
-      }
-    } @$value[1..$#$value];
-  } elsif ($value->[0] eq 'CURSOR') {
-    return join ', ', map {
-      if ($_->[0] eq 'URI') {
-        'url('.$_->[1].')'; ## NOTE: This is what Firefox does.
-      } elsif ($_->[0] eq 'KEYWORD') {
-        $_->[1];
-      } else {
-        ## NOTE: This should be an error.
-        '""';
-      }
-    } @$value[1..$#$value];
-  } else {
-    return '';
-  }
-}; # $default_serializer
-
 my $x11_colors = {
                   'aliceblue' =>	[0xf0, 0xf8, 0xff],
                   'antiquewhite' =>	[0xfa, 0xeb, 0xd7],
@@ -1028,7 +941,6 @@ $Prop->{color} = {
   dom => 'color',
   key => 'color',
   parse => $parse_color,
-  serialize => $default_serializer,
   initial => ['KEYWORD', '-manakai-default'],
   inherited => 1,
   compute => sub ($$$$) {
@@ -1068,7 +980,6 @@ $Prop->{'background-color'} = {
   dom => 'background_color',
   key => 'background_color',
   parse => $parse_color,
-  serialize => $default_serializer,
   serialize_multiple => sub {
     my $self = shift;
 
@@ -1167,7 +1078,6 @@ $Prop->{'border-top-color'} = {
   dom => 'border_top_color',
   key => 'border_top_color',
   parse => $parse_color,
-  serialize => $default_serializer,
   serialize_multiple => sub {
     my $self = shift;
     ## NOTE: This algorithm returns the same result as that of Firefox 2
@@ -1312,7 +1222,6 @@ $Prop->{'border-right-color'} = {
   dom => 'border_right_color',
   key => 'border_right_color',
   parse => $parse_color,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'currentcolor'],
   #inherited => 0,
@@ -1326,7 +1235,6 @@ $Prop->{'border-bottom-color'} = {
   dom => 'border_bottom_color',
   key => 'border_bottom_color',
   parse => $parse_color,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'currentcolor'],
   #inherited => 0,
@@ -1340,7 +1248,6 @@ $Prop->{'border-left-color'} = {
   dom => 'border_left_color',
   key => 'border_left_color',
   parse => $parse_color,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'currentcolor'],
   #inherited => 0,
@@ -1354,7 +1261,6 @@ $Prop->{'outline-color'} = {
   dom => 'outline_color',
   key => 'outline_color',
   parse => $parse_color,
-  serialize => $default_serializer,
   serialize_multiple => sub {
     my $self = shift;
     my $oc = $self->outline_color;
@@ -1404,7 +1310,6 @@ $Prop->{display} = {
   dom => 'display',
   key => 'display',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     block => 1, inline => 1, 'inline-block' => 1, 'inline-table' => 1,
     'list-item' => 1, none => 1,
@@ -1475,7 +1380,6 @@ $Prop->{position} = {
   dom => 'position',
   key => 'position',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     static => 1, relative => 1, absolute => 1, fixed => 1,
   },
@@ -1491,7 +1395,6 @@ $Prop->{float} = {
   dom => 'css_float',
   key => 'float',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     left => 1, right => 1, none => 1,
   },
@@ -1535,7 +1438,6 @@ $Prop->{clear} = {
   dom => 'clear',
   key => 'clear',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     left => 1, right => 1, none => 1, both => 1,
   },
@@ -1551,7 +1453,6 @@ $Prop->{direction} = {
   dom => 'direction',
   key => 'direction',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     ltr => 1, rtl => 1,
   },
@@ -1567,7 +1468,6 @@ $Prop->{'unicode-bidi'} = {
   dom => 'unicode_bidi',
   key => 'unicode_bidi',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     normal => 1, embed => 1, 'bidi-override' => 1,
   },
@@ -1583,7 +1483,6 @@ $Prop->{'overflow-x'} = {
   dom => 'overflow_x',
   key => 'overflow_x',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => sub {
     my $self = shift;
     
@@ -1626,7 +1525,6 @@ $Prop->{'overflow-y'} = {
   dom => 'overflow_y',
   key => 'overflow_y',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'overflow-x'}->{serialize_multiple},
   keyword => $Prop->{'overflow-x'}->{keyword},
   initial => ["KEYWORD", "visible"],
@@ -1639,7 +1537,6 @@ $Key->{overflow_y} = $Prop->{'overflow-y'};
 $Prop->{overflow} = {
   css => 'overflow',
   dom => 'overflow',
-  key => 'overflow',
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
     my ($t, $pv) = $one_keyword_parser->($self, $prop_name, $tt, $t, $onerror);
@@ -1654,14 +1551,12 @@ $Prop->{overflow} = {
   serialize_multiple => $Prop->{'overflow-x'}->{serialize_multiple},
 };
 $Attr->{overflow} = $Prop->{overflow};
-$Key->{overflow} = $Prop->{overflow};
 
 $Prop->{visibility} = {
   css => 'visibility',
   dom => 'visibility',
   key => 'visibility',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     visible => 1, hidden => 1, collapse => 1,
   },
@@ -1677,7 +1572,6 @@ $Prop->{'list-style-type'} = {
   dom => 'list_style_type',
   key => 'list_style_type',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     qw/
       disc 1 circle 1 square 1 decimal 1 decimal-leading-zero 1 
@@ -1698,7 +1592,6 @@ $Prop->{'list-style-position'} = {
   dom => 'list_style_position',
   key => 'list_style_position',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     inside => 1, outside => 1,
   },
@@ -1714,7 +1607,6 @@ $Prop->{'page-break-before'} = {
   dom => 'page_break_before',
   key => 'page_break_before',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     auto => 1, always => 1, avoid => 1, left => 1, right => 1,
   },
@@ -1730,7 +1622,6 @@ $Prop->{'page-break-after'} = {
   dom => 'page_break_after',
   key => 'page_break_after',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     auto => 1, always => 1, avoid => 1, left => 1, right => 1,
   },
@@ -1746,7 +1637,6 @@ $Prop->{'page-break-inside'} = {
   dom => 'page_break_inside',
   key => 'page_break_inside',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     auto => 1, avoid => 1,
   },
@@ -1762,7 +1652,6 @@ $Prop->{'background-repeat'} = {
   dom => 'background_repeat',
   key => 'background_repeat',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'background-color'}->{serialize_multiple},
   keyword => {
     repeat => 1, 'repeat-x' => 1, 'repeat-y' => 1, 'no-repeat' => 1,
@@ -1779,7 +1668,6 @@ $Prop->{'background-attachment'} = {
   dom => 'background_attachment',
   key => 'background_attachment',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'background-color'}->{serialize_multiple},
   keyword => {
     scroll => 1, fixed => 1,
@@ -1796,7 +1684,6 @@ $Prop->{'font-style'} = {
   dom => 'font_style',
   key => 'font_style',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     normal => 1, italic => 1, oblique => 1,
   },
@@ -1812,7 +1699,6 @@ $Prop->{'font-variant'} = {
   dom => 'font_variant',
   key => 'font_variant',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     normal => 1, 'small-caps' => 1,
   },
@@ -1828,7 +1714,6 @@ $Prop->{'text-align'} = {
   dom => 'text_align',
   key => 'text_align',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     left => 1, right => 1, center => 1, justify => 1, ## CSS 2
     begin => 1, end => 1, ## CSS 3
@@ -1845,7 +1730,6 @@ $Prop->{'text-transform'} = {
   dom => 'text_transform',
   key => 'text_transform',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     capitalize => 1, uppercase => 1, lowercase => 1, none => 1,
   },
@@ -1861,7 +1745,6 @@ $Prop->{'white-space'} = {
   dom => 'white_space',
   key => 'white_space',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     normal => 1, pre => 1, nowrap => 1, 'pre-wrap' => 1, 'pre-line' => 1,
   },
@@ -1877,7 +1760,6 @@ $Prop->{'caption-side'} = {
   dom => 'caption_side',
   key => 'caption_side',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     top => 1, bottom => 1,
   },
@@ -1893,7 +1775,6 @@ $Prop->{'table-layout'} = {
   dom => 'table_layout',
   key => 'table_layout',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     auto => 1, fixed => 1,
   },
@@ -1909,7 +1790,6 @@ $Prop->{'border-collapse'} = {
   dom => 'border_collapse',
   key => 'border_collapse',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     collapse => 1, separate => 1,
   },
@@ -1925,7 +1805,6 @@ $Prop->{'empty-cells'} = {
   dom => 'empty_cells',
   key => 'empty_cells',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   keyword => {
     show => 1, hide => 1,
   },
@@ -1979,7 +1858,6 @@ $Prop->{'z-index'} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute => $compute_as_specified,
@@ -2026,7 +1904,6 @@ $Prop->{orphans} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['NUMBER', 2],
   inherited => 1,
   compute => $compute_as_specified,
@@ -2039,7 +1916,6 @@ $Prop->{widows} = {
   dom => 'widows',
   key => 'widows',
   parse => $Prop->{orphans}->{parse},
-  serialize => $default_serializer,
   initial => ['NUMBER', 2],
   inherited => 1,
   compute => $compute_as_specified,
@@ -2085,7 +1961,6 @@ $Prop->{opacity} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['NUMBER', 2],
   inherited => 1,
   compute => sub {
@@ -2180,7 +2055,6 @@ $Prop->{'font-size'} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'medium'],
   inherited => 1,
   compute => sub {
@@ -2356,7 +2230,6 @@ $Prop->{'letter-spacing'} = {
   },
   allow_negative => 1,
   keyword => {normal => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'normal'],
   inherited => 1,
   compute => $compute_length,
@@ -2371,7 +2244,6 @@ $Prop->{'word-spacing'} = {
   parse => $Prop->{'letter-spacing'}->{parse},
   allow_negative => 1,
   keyword => {normal => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'normal'],
   inherited => 1,
   compute => $compute_length,
@@ -2386,7 +2258,6 @@ $Prop->{'-manakai-border-spacing-x'} = {
   parse => $Prop->{'letter-spacing'}->{parse},
   #allow_negative => 0,
   #keyword => {},
-  serialize => $default_serializer,
   serialize_multiple => sub {
     my $self = shift;
     
@@ -2436,7 +2307,6 @@ $Prop->{'-manakai-border-spacing-y'} = {
   parse => $Prop->{'letter-spacing'}->{parse},
   #allow_negative => 0,
   #keyword => {},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'-manakai-border-spacing-x'}
       ->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
@@ -2513,7 +2383,6 @@ $Prop->{'margin-top'} = {
   },
   allow_negative => 1,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   serialize_multiple => sub {
     my $self = shift;
 
@@ -2581,7 +2450,6 @@ $Prop->{'margin-bottom'} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'margin-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -2597,7 +2465,6 @@ $Prop->{'margin-right'} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'margin-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -2613,7 +2480,6 @@ $Prop->{'margin-left'} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'margin-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -2629,7 +2495,6 @@ $Prop->{top} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute_multiple => sub {
@@ -2691,7 +2556,6 @@ $Prop->{bottom} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute_multiple => $Prop->{top}->{compute_multiple},
@@ -2706,7 +2570,6 @@ $Prop->{left} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute_multiple => sub {
@@ -2790,7 +2653,6 @@ $Prop->{right} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute_multiple => $Prop->{left}->{compute_multiple},
@@ -2805,7 +2667,6 @@ $Prop->{width} = {
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute => $compute_length,
@@ -2822,7 +2683,6 @@ $Prop->{'min-width'} = {
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
   #keyword => {},
-  serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
   compute => $compute_length,
@@ -2837,7 +2697,6 @@ $Prop->{'max-width'} = {
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
   keyword => {none => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'none'],
   #inherited => 0,
   compute => $compute_length,
@@ -2852,7 +2711,6 @@ $Prop->{height} = {
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
   keyword => {auto => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute => $compute_length,
@@ -2869,7 +2727,6 @@ $Prop->{'min-height'} = {
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
   #keyword => {},
-  serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
   compute => $compute_length,
@@ -2884,7 +2741,6 @@ $Prop->{'max-height'} = {
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
   keyword => {none => 1},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'none'],
   #inherited => 0,
   compute => $compute_length,
@@ -2949,7 +2805,6 @@ $Prop->{'line-height'} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'normal'],
   inherited => 1,
   compute => $compute_length,
@@ -2971,7 +2826,6 @@ $Prop->{'vertical-align'} = {
   ## supported by application (i.e. 
   ## $parser->{prop_value}->{'line-height'->{$keyword}).  Should we support
   ## it?
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'baseline'],
   #inherited => 0,
   compute => $compute_length,
@@ -2988,7 +2842,6 @@ $Prop->{'text-indent'} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {},
-  serialize => $default_serializer,
   initial => ['DIMENSION', 0, 'px'],
   inherited => 1,
   compute => $compute_length,
@@ -3003,7 +2856,6 @@ $Prop->{'background-position-x'} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {left => 1, center => 1, right => 1},
-  serialize => $default_serializer,
   initial => ['PERCENTAGE', 0],
   #inherited => 0,
   compute => sub {
@@ -3034,7 +2886,6 @@ $Prop->{'background-position-y'} = {
   parse => $Prop->{'margin-top'}->{parse},
   allow_negative => 1,
   keyword => {top => 1, center => 1, bottom => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'background-color'}->{serialize_multiple},
   initial => ['PERCENTAGE', 0],
   #inherited => 0,
@@ -3050,7 +2901,6 @@ $Prop->{'padding-top'} = {
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
   #keyword => {},
-  serialize => $default_serializer,
   serialize_multiple => sub {
     my $self = shift;
 
@@ -3118,7 +2968,6 @@ $Prop->{'padding-bottom'} = {
   parse => $Prop->{'padding-top'}->{parse},
   #allow_negative => 0,
   #keyword => {},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'padding-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -3134,7 +2983,6 @@ $Prop->{'padding-right'} = {
   parse => $Prop->{'padding-top'}->{parse},
   #allow_negative => 0,
   #keyword => {},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'padding-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -3150,7 +2998,6 @@ $Prop->{'padding-left'} = {
   parse => $Prop->{'padding-top'}->{parse},
   #allow_negative => 0,
   #keyword => {},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'padding-top'}->{serialize_multiple},
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
@@ -3166,7 +3013,6 @@ $Prop->{'border-top-width'} = {
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -3210,7 +3056,6 @@ $Prop->{'border-right-width'} = {
   parse => $Prop->{'border-top-width'}->{parse},
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -3226,7 +3071,6 @@ $Prop->{'border-bottom-width'} = {
   parse => $Prop->{'border-top-width'}->{parse},
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -3242,7 +3086,6 @@ $Prop->{'border-left-width'} = {
   parse => $Prop->{'border-top-width'}->{parse},
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -3258,7 +3101,6 @@ $Prop->{'outline-width'} = {
   parse => $Prop->{'border-top-width'}->{parse},
   #allow_negative => 0,
   keyword => {thin => 1, medium => 1, thick => 1},
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'outline-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'medium'],
   #inherited => 0,
@@ -3307,7 +3149,6 @@ $Prop->{'font-weight'} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'normal'],
   inherited => 1,
   compute => sub {
@@ -3408,7 +3249,6 @@ $Prop->{'list-style-image'} = {
   dom => 'list_style_image',
   key => 'list_style_image',
   parse => $uri_or_none_parser,
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'none'],
   inherited => 1,
   compute => $compute_uri_or_none,
@@ -3421,7 +3261,6 @@ $Prop->{'background-image'} = {
   dom => 'background_image',
   key => 'background_image',
   parse => $uri_or_none_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'background-color'}->{serialize_multiple},
   initial => ['KEYWORD', 'none'],
   #inherited => 0,
@@ -3440,7 +3279,6 @@ $Prop->{'border-top-style'} = {
   dom => 'border_top_style',
   key => 'border_top_style',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
@@ -3455,7 +3293,6 @@ $Prop->{'border-right-style'} = {
   dom => 'border_right_style',
   key => 'border_right_style',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
@@ -3470,7 +3307,6 @@ $Prop->{'border-bottom-style'} = {
   dom => 'border_bottom_style',
   key => 'border_bottom_style',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
@@ -3485,7 +3321,6 @@ $Prop->{'border-left-style'} = {
   dom => 'border_left_style',
   key => 'border_left_style',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
   keyword => $border_style_keyword,
   initial => ["KEYWORD", "none"],
@@ -3500,7 +3335,6 @@ $Prop->{'outline-style'} = {
   dom => 'outline_style',
   key => 'outline_style',
   parse => $one_keyword_parser,
-  serialize => $default_serializer,
   serialize_multiple => $Prop->{'outline-color'}->{serialize_multiple},
   keyword => {%$border_style_keyword},
   initial => ['KEYWORD', 'none'],
@@ -3602,7 +3436,6 @@ $Prop->{'font-family'} = {
       return ($t, {$prop_name => \@prop_value});
     }
   },
-  serialize => $default_serializer,
   initial => ['FONT', ['KEYWORD', '-manakai-default']],
   inherited => 1,
   compute => $compute_as_specified,
@@ -3659,7 +3492,6 @@ $Prop->{cursor} = {
 
     return ($t, {$prop_name => \@prop_value});
   },
-  serialize => $default_serializer,
   keyword => {
     auto => 1, crosshair => 1, default => 1, pointer => 1, move => 1,
     'e-resize' => 1, 'ne-resize' => 1, 'nw-resize' => 1, 'n-resize' => 1,
@@ -5949,7 +5781,6 @@ $Prop->{'text-decoration'} = {
 
     return ($t, {$prop_name => $value});
   },
-  serialize => $default_serializer,
   initial => ["KEYWORD", "none"],
   #inherited => 0,
   compute => $compute_as_specified,
@@ -6008,7 +5839,6 @@ $Prop->{quotes} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['KEYWORD', '-manakai-default'],
   inherited => 1,
   compute => $compute_as_specified,
@@ -6187,7 +6017,6 @@ $Prop->{content} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'normal'],
   #inherited => 0,
   compute => $compute_as_specified,
@@ -6306,7 +6135,6 @@ $Prop->{'counter-reset'} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'none'],
   #inherited => 0,
   compute => $compute_as_specified,
@@ -6319,7 +6147,6 @@ $Prop->{'counter-increment'} = {
   dom => 'counter_increment',
   key => 'counter_increment',
   parse => $Prop->{'counter-reset'}->{parse},
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'none'],
   #inherited => 0,
   compute => $compute_as_specified,
@@ -6423,7 +6250,6 @@ $Prop->{clip} = {
                token => $t);
     return ($t, undef);
   },
-  serialize => $default_serializer,
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute => sub {
@@ -6442,4 +6268,4 @@ $Prop->{clip} = {
 };
 
 1;
-## $Date: 2008/02/02 13:46:55 $
+## $Date: 2008/02/02 13:56:40 $
