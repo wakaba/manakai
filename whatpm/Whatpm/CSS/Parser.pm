@@ -587,6 +587,28 @@ my $default_serializer = sub {
           . $value->[4]->[1].$value->[4]->[2] . ')';
   } elsif ($value->[0] eq 'SETCOUNTER' or $value->[0] eq 'ADDCOUNTER') {
     return join ' ', map {$_->[0], $_->[1]} @$value[1..$#$value];
+  } elsif ($value->[0] eq 'FONT') {
+    return join ', ', map {
+      if ($_->[0] eq 'STRING') {
+        '"'.$_->[1].'"'; ## NOTE: This is what Firefox does.
+      } elsif ($_->[0] eq 'KEYWORD') {
+        $_->[1]; ## NOTE: This is what Firefox does.
+      } else {
+        ## NOTE: This should be an error.
+        '""';
+      }
+    } @$value[1..$#$value];
+  } elsif ($value->[0] eq 'CURSOR') {
+    return join ', ', map {
+      if ($_->[0] eq 'URI') {
+        'url('.$_->[1].')'; ## NOTE: This is what Firefox does.
+      } elsif ($_->[0] eq 'KEYWORD') {
+        $_->[1];
+      } else {
+        ## NOTE: This should be an error.
+        '""';
+      }
+    } @$value[1..$#$value];
   } else {
     return '';
   }
@@ -3580,26 +3602,7 @@ $Prop->{'font-family'} = {
       return ($t, {$prop_name => \@prop_value});
     }
   },
-  serialize => sub {
-    my ($self, $prop_name, $value) = @_;
-
-    if ($value->[0] eq 'FONT') {
-      return join ', ', map {
-        if ($_->[0] eq 'STRING') {
-          '"'.$_->[1].'"'; ## NOTE: This is what Firefox does.
-        } elsif ($_->[0] eq 'KEYWORD') {
-          $_->[1]; ## NOTE: This is what Firefox does.
-        } else {
-          ## NOTE: This should be an error.
-          '""';
-        }
-      } @$value[1..$#$value];
-    } elsif ($value->[0] eq 'INHERIT') {
-      return 'inherit';
-    } else {
-      return '';
-    }
-  },
+  serialize => $default_serializer,
   initial => ['FONT', ['KEYWORD', '-manakai-default']],
   inherited => 1,
   compute => $compute_as_specified,
@@ -3656,26 +3659,7 @@ $Prop->{cursor} = {
 
     return ($t, {$prop_name => \@prop_value});
   },
-  serialize => sub {
-    my ($self, $prop_name, $value) = @_;
-
-    if ($value->[0] eq 'CURSOR') {
-      return join ', ', map {
-        if ($_->[0] eq 'URI') {
-          'url('.$_->[1].')'; ## NOTE: This is what Firefox does.
-        } elsif ($_->[0] eq 'KEYWORD') {
-          $_->[1];
-        } else {
-          ## NOTE: This should be an error.
-          '""';
-        }
-      } @$value[1..$#$value];
-    } elsif ($value->[0] eq 'INHERIT') {
-      return 'inherit';
-    } else {
-      return '';
-    }
-  },
+  serialize => $default_serializer,
   keyword => {
     auto => 1, crosshair => 1, default => 1, pointer => 1, move => 1,
     'e-resize' => 1, 'ne-resize' => 1, 'nw-resize' => 1, 'n-resize' => 1,
@@ -6458,4 +6442,4 @@ $Prop->{clip} = {
 };
 
 1;
-## $Date: 2008/02/02 13:42:42 $
+## $Date: 2008/02/02 13:46:55 $
