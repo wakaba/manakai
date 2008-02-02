@@ -1,8 +1,95 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration',
     'Message::IF::CSS2Properties';
+
+my $serialize_value = sub ($$$) {
+  my ($self, $prop_name, $value) = @_;
+  if ($value->[0] eq 'NUMBER' or $value->[0] eq 'WEIGHT') {
+    ## TODO: What we currently do for 'font-weight' is different from
+    ## any browser for lighter/bolder cases.  We need to fix this, but
+    ## how?
+    return $value->[1]; ## TODO: big or small number cases?
+  } elsif ($value->[0] eq 'DIMENSION') {
+    return $value->[1] . $value->[2]; ## NOTE: This is what browsers do.
+  } elsif ($value->[0] eq 'PERCENTAGE') {
+    return $value->[1] . '%';
+  } elsif ($value->[0] eq 'KEYWORD') {
+    return $value->[1];
+  } elsif ($value->[0] eq 'URI') {
+    ## NOTE: This is what browsers do.
+    return 'url('.$value->[1].')';
+  } elsif ($value->[0] eq 'RGBA') {
+    if ($value->[4] == 1) {
+      return 'rgb('.$value->[1].', '.$value->[2].', '.$value->[3].')';
+    } elsif ($value->[4] == 0) {
+      ## TODO: check what browsers do...
+      return 'transparent';
+    } else {
+      return 'rgba('.$value->[1].', '.$value->[2].', '.$value->[3].', '
+          .$value->[4].')';
+    }
+  } elsif ($value->[0] eq 'INHERIT') {
+    return 'inherit';
+  } elsif ($value->[0] eq 'DECORATION') {
+    my @v = ();
+    push @v, 'underline' if $value->[1];
+    push @v, 'overline' if $value->[2];
+    push @v, 'line-through' if $value->[3];
+    push @v, 'blink' if $value->[4];
+    return 'none' unless @v;
+    return join ' ', @v;
+  } elsif ($value->[0] eq 'QUOTES') {
+    return join ' ', map {'"'.$_.'"'} map {$_->[0], $_->[1]} @{$value->[1]};
+    ## NOTE: The result string might not be a <'quotes'> if it contains
+    ## e.g. '"'.  In addition, it might not be a <'quotes'> if 
+    ## @{$value->[1]} is empty (which is unlikely as long as the implementation
+    ## is not broken).
+  } elsif ($value->[0] eq 'CONTENT') {
+    return join ' ', map {
+      $_->[0] eq 'KEYWORD' ? $_->[1] :
+      $_->[0] eq 'STRING' ? '"' . $_->[1] . '"' :
+      $_->[0] eq 'URI' ? 'url(' . $_->[1] . ')' :
+      $_->[0] eq 'ATTR' ? 'attr(' . $_->[2] . ')' : ## TODO: prefix
+      $_->[0] eq 'COUNTER' ? 'counter(' . $_->[1] . ', ' . $_->[3] . ')' :
+      $_->[0] eq 'COUNTERS' ? 'counters(' . $_->[1] . ', "' . $_->[2] . '", ' . $_->[3] . ')' :
+      ''
+    } @{$value}[1..$#$value];
+  } elsif ($value->[0] eq 'RECT') {
+    ## NOTE: Four components are DIMENSIONs.
+    return 'rect(' . $value->[1]->[1].$value->[1]->[2] . ', '
+          . $value->[2]->[1].$value->[2]->[2] . ', '
+          . $value->[3]->[1].$value->[3]->[2] . ', '
+          . $value->[4]->[1].$value->[4]->[2] . ')';
+  } elsif ($value->[0] eq 'SETCOUNTER' or $value->[0] eq 'ADDCOUNTER') {
+    return join ' ', map {$_->[0], $_->[1]} @$value[1..$#$value];
+  } elsif ($value->[0] eq 'FONT') {
+    return join ', ', map {
+      if ($_->[0] eq 'STRING') {
+        '"'.$_->[1].'"'; ## NOTE: This is what Firefox does.
+      } elsif ($_->[0] eq 'KEYWORD') {
+        $_->[1]; ## NOTE: This is what Firefox does.
+      } else {
+        ## NOTE: This should be an error.
+        '""';
+      }
+    } @$value[1..$#$value];
+  } elsif ($value->[0] eq 'CURSOR') {
+    return join ', ', map {
+      if ($_->[0] eq 'URI') {
+        'url('.$_->[1].')'; ## NOTE: This is what Firefox does.
+      } elsif ($_->[0] eq 'KEYWORD') {
+        $_->[1];
+      } else {
+        ## NOTE: This should be an error.
+        '""';
+      }
+    } @$value[1..$#$value];
+  } else {
+    return '';
+  }
+}; # $serialize_value
 
 sub ____new ($) {
   return bless \{}, $_[0];
@@ -18,14 +105,14 @@ sub AUTOLOAD {
 
   if ($prop_def) {
     no strict 'refs';
-    if ($prop_def->{serialize}) {
+    if (defined $prop_def->{key}) {
       *{ $method_name } = sub {
         ## TODO: setter
   
         my $self = $_[0];
         my $value = $$self->{$prop_def->{key}};
         if ($value) {
-          return $prop_def->{serialize}->($self, $prop_def->{css}, $value->[0]);
+          return $serialize_value->($self, $prop_def->{css}, $value->[0]);
         } else {
           return '';
         }
@@ -94,7 +181,7 @@ sub css_text ($;$) {
       }
     } else {
       my $value = $$self->{$_};
-      my $s = $prop_def->{serialize}->($self, $prop_def->{css}, $value->[0]);
+      my $s = $serialize_value->($self, $prop_def->{css}, $value->[0]);
       if (length $s) {
         $r .= '  ' . $prop_def->{css} . ': ' . $s;
         $r .= ' ! ' . $value->[1] if length $value->[1];
@@ -128,7 +215,7 @@ sub get_property_priority ($$) {
   my $prop_def = $Whatpm::CSS::Parser::Prop->{$prop_name};
   return '' unless defined $prop_def;
 
-  if ($prop_def->{serialize}) {
+  if (defined $prop_def->{key}) {
     my $v = ${$_[0]}->{$prop_def->{key}};
     return $v ? $v->[1] : '';
   } elsif ($prop_def->{serialize_shorthand} or
@@ -194,7 +281,7 @@ sub AUTOLOAD {
         my $value = $$self->{cascade}->get_computed_value
             ($$self->{element}, $prop_def->{css});
         if ($value) {
-          return $prop_def->{serialize}->($self, $prop_def->{css}, $value);
+          return $serialize_value->($self, $prop_def->{css}, $value);
         } else {
           return '';
         }
@@ -273,7 +360,7 @@ sub css_text ($;$) {
     } else {
       my $prop_value = $$self->{cascade}->get_computed_value
           ($$self->{element}, $prop_def->{css});
-      my $s = $prop_def->{serialize}->($self, $prop_def->{css}, $prop_value);
+      my $s = $serialize_value->($self, $prop_def->{css}, $prop_value);
       if (length $s) {
         $r .= '  ' . $prop_def->{css} . ': ' . $s;
         $r .= ";\n";
@@ -327,4 +414,4 @@ package Message::IF::CSSStyleDeclaration;
 package Message::IF::CSS2Properties;
 
 1;
-## $Date: 2008/01/26 05:12:05 $
+## $Date: 2008/02/02 13:58:02 $
