@@ -579,6 +579,12 @@ my $default_serializer = sub {
       $_->[0] eq 'COUNTERS' ? 'counters(' . $_->[1] . ', "' . $_->[2] . '", ' . $_->[3] . ')' :
       ''
     } @{$value}[1..$#$value];
+  } elsif ($value->[0] eq 'RECT') {
+    ## NOTE: Four components are DIMENSIONs.
+    return 'rect(' . $value->[1]->[1].$value->[1]->[2] . ', '
+          . $value->[2]->[1].$value->[2]->[2] . ', '
+          . $value->[3]->[1].$value->[3]->[2] . ', '
+          . $value->[4]->[1].$value->[4]->[2] . ')';
   } elsif ($value->[0] eq 'SETCOUNTER' or $value->[0] eq 'ADDCOUNTER') {
     return join ' ', map {$_->[0], $_->[1]} @$value[1..$#$value];
   } else {
@@ -6335,5 +6341,121 @@ $Prop->{'counter-increment'} = {
   compute => $compute_as_specified,
 };
 
+$Attr->{clip} =
+$Key->{clip} =
+$Prop->{clip} = {
+  css => 'clip',
+  dom => 'clip',
+  key => 'clip',
+  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/clip>.
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == FUNCTION_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ($value eq 'rect') {
+        $t = $tt->get_next_token;
+        my $prop_value = ['RECT'];
+
+        A: {
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          
+          my $has_sign;
+          my $sign = 1;
+          if ($t->{type} == MINUS_TOKEN) {
+            $sign = -1;
+            $has_sign = 1;
+            $t = $tt->get_next_token;
+          } elsif ($t->{type} == PLUS_TOKEN) {
+            $has_sign = 1;
+            $t = $tt->get_next_token;
+          }
+          if ($t->{type} == DIMENSION_TOKEN) {
+            my $value = $t->{number} * $sign;
+            my $unit = lc $t->{value}; ## TODO: case
+            if ($length_unit->{$unit}) {
+              $t = $tt->get_next_token;
+              push @$prop_value, ['DIMENSION', $value, $unit];
+            } else {
+              $onerror->(type => "syntax error:'$prop_name'",
+                         level => $self->{must_level},
+                         uri => \$self->{href},
+                         token => $t);
+              return ($t, undef);
+            }
+          } elsif ($t->{type} == NUMBER_TOKEN and
+                   ($self->{unitless_px} or $t->{number} == 0)) {
+            my $value = $t->{number} * $sign;
+            $t = $tt->get_next_token;
+            push @$prop_value, ['DIMENSION', $value, 'px'];
+          } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
+            my $value = lc $t->{value}; ## TODO: case
+            if ($value eq 'auto') {
+              push @$prop_value, ['KEYWORD', 'auto'];
+              $t = $tt->get_next_token;
+            } else {
+              last A;
+            }
+          } else {
+            if ($has_sign) {
+              $onerror->(type => "syntax error:'$prop_name'",
+                         level => $self->{must_level},
+                         uri => \$self->{href},
+                         token => $t);
+              return ($t, undef);
+            } else {
+              last A;
+            }
+          }
+        
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+          if ($#$prop_value == 4) {
+            if ($t->{type} == RPAREN_TOKEN) {
+              $t = $tt->get_next_token;
+              return ($t, {$prop_name => $prop_value});
+            } else {
+              last A;
+            }
+          } else {
+            $t = $tt->get_next_token if $t->{type} == COMMA_TOKEN;
+            redo A;
+          }
+        } # A
+      }
+    } elsif ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ($value eq 'auto') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['KEYWORD', 'auto']});
+      } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+  },
+  serialize => $default_serializer,
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    if (defined $specified_value and $specified_value->[0] eq 'RECT') {
+      my $v = ['RECT'];
+      for (@$specified_value[1..4]) {
+        push @$v, $compute_length->($self, $element, $prop_name, $_);
+      }
+      return $v;
+    }
+
+    return $specified_value;
+  },
+};
+
 1;
-## $Date: 2008/01/29 22:15:01 $
+## $Date: 2008/02/02 13:42:42 $

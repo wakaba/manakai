@@ -3252,6 +3252,242 @@ p {
 
 #data
 p {
+  clip: inherit;
+}
+#cssom
+| <p>
+|   clip: inherit
+#csstext
+p {
+  clip: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  clip: auto; 
+}
+#cssom
+| <p>
+|   clip: auto
+#csstext
+p {
+  clip: auto;
+}
+
+#data
+p {
+  clip: rect();
+}
+#errors
+;2;14;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(1px);
+}
+#errors
+;2;17;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(1px,2px);
+}
+#errors
+;2;21;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(1px, 2px,3px);
+}
+#errors
+;2;26;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(1px, 2px, 3px, 4px
+}
+#errors
+;3;1;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(0, 0, 0, 0)
+}
+#cssom
+| <p>
+|   clip: rect(0px, 0px, 0px, 0px)
+
+#data
+p {
+  clip: rect(1 1 1 1);
+}
+#errors
+;2;14;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(1 1 1 1)
+}
+#option q
+#cssom
+| <p>
+|   clip: rect(1px, 1px, 1px, 1px)
+
+#data
+p {
+  clip: rect(0 0 0 12)
+}
+#errors
+;2;20;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(0 0 0 12)
+}
+#option q
+#cssom
+| <p>
+|   clip: rect(0px, 0px, 0px, 12px)
+
+#data
+p {
+  clip: rect(1px 3px 2px 4px)
+}
+#cssom
+| <p>
+|   clip: rect(1px, 3px, 2px, 4px)
+
+#data
+p {
+  clip: rect(1px 3px 3px, 12px)
+}
+#cssom
+| <p>
+|   clip: rect(1px, 3px, 3px, 12px)
+
+#data
+p {
+  clip: rect(1px, 2px ,3px, 4px);
+}
+#cssom
+| <p>
+|   clip: rect(1px, 2px, 3px, 4px)
+#csstext
+p {
+  clip: rect(1px, 2px, 3px, 4px);
+}
+#computed 1 p
+-| clip: auto
++| clip: rect(1px, 2px, 3px, 4px)
+
+#data
+p {
+  clip: rect(+1px, +2px, +3px, +34px)
+}
+#cssom
+| <p>
+|   clip: rect(1px, 2px, 3px, 34px)
+
+#data
+p {
+  clip: rect(-1px, -0023.012px, -.4400em, -0.004400in);
+}
+#cssom
+| <p>
+|   clip: rect(-1px, -23.012px, -0.44em, -0.0044in)
+
+#data
+p {
+  clip: rect(1px, 2% 4em 6cm);
+} 
+#errors
+;2;19;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(1px auto 3px, auto);
+}
+#cssom
+| <p>
+|   clip: rect(1px, auto, 3px, auto)
+
+#data
+p {
+  clip: rect(auto, auto, auto, auto)
+}
+#cssom
+| <p>
+|   clip: rect(auto, auto, auto, auto)
+#csstext
+p {
+  clip: rect(auto, auto, auto, auto);
+}
+#computed 1 p
+-| clip: auto
++| clip: rect(auto, auto, auto, auto)
+
+#data
+p {
+  clip: rect(inherit, 1px, auto, 2px);
+}
+#errors
+;2;14;m;syntax error:'clip'
+
+#data
+p {
+  clip: rect(1px, 2px, 3px, 4px  );
+}
+#cssom
+| <p>
+|   clip: rect(1px, 2px, 3px, 4px)
+
+#data
+p {
+  clip: rect(1px, 2px, 3px, 4px 5px);
+}
+#errors
+;2;33;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(1px, 2px, 3px, 4px,);
+}
+#errors
+;2;32;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
+  clip: rect(1px, 2px, 3px, 4px, 5px);
+}
+#errors
+;2;32;m;syntax error:'clip'
+#cssom
+| <p>
+
+#data
+p {
   background-position: inherit;
 }
 #cssom

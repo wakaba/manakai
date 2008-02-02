@@ -163,7 +163,7 @@ BEGIN {
     border-right-style border-right-width
     -manakai-border-spacing-x -manakai-border-spacing-y
     border-top-color border-top-style border-top-width bottom
-    caption-side clear color content counter-increment counter-reset
+    caption-side clear clip color content counter-increment counter-reset
     cursor direction display empty-cells float
     font-family font-size font-style font-variant font-weight height left
     letter-spacing line-height
@@ -191,6 +191,7 @@ BEGIN {
   bottom: auto;
   caption-side: top;
   clear: none;
+  clip: auto;
   color: -manakai-default;
   content: normal;
   counter-increment: none;
@@ -305,7 +306,7 @@ sub get_parser ($) {
 
   $p->{prop}->{$_} = 1 for (@longhand, @shorthand);
   $p->{prop_value}->{display}->{$_} = 1 for qw/
-    block inline inline-block inline-table list-item none
+    block clip inline inline-block inline-table list-item none
     table table-caption table-cell table-column table-column-group
     table-header-group table-footer-group table-row table-row-group
   /;
