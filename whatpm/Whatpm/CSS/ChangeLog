@@ -1,3 +1,14 @@
+2008-02-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* Parser.pm ('display', 'list-style-type',
+	'caption-side'): CSS 2.0 values added.
+	('font-size-adjust', 'font-stretch', 'marker-offset'): Implemented. 
+	($length_percentage_keyword_parser): Now this is in a variable.
+	($length_keyword_parser): Now this is in a variable, too.
+	('font'): Reset 'font-size-adjust' and 'font-stretch' as
+	defined by CSS2.
+	('marks', 'size', 'page'): Implemented.
+
 2008-02-02  Wakaba  <wakaba@suika.fam.cx>
 
 	* Parser.pm ($default_serializer, serialize parameters): Removed (now

@@ -97,7 +97,7 @@ for my $file_name (map {"t/$_"} qw(
       push @actual_error, join ';',
           $uri, $opt{token}->{line}, $opt{token}->{column},
           $opt{level},
-          $opt{type} . (defined $opt{value} ? ','.$opt{value} : '');
+          $opt{type} . (defined $opt{value} ? ';'.$opt{value} : '');
     };
 
     my $ss = $p->parse_char_string ($test->{data});
@@ -165,15 +165,16 @@ BEGIN {
     border-top-color border-top-style border-top-width bottom
     caption-side clear clip color content counter-increment counter-reset
     cursor direction display empty-cells float
-    font-family font-size font-style font-variant font-weight height left
+    font-family font-size font-size-adjust font-stretch
+    font-style font-variant font-weight height left
     letter-spacing line-height
     list-style-image list-style-position list-style-type
-    margin-bottom margin-left margin-right margin-top
-    max-height max-width min-height min-width opacity -moz-opacity
+    margin-bottom margin-left margin-right margin-top marker-offset
+    marks max-height max-width min-height min-width opacity -moz-opacity
     orphans outline-color outline-style outline-width overflow-x overflow-y
     padding-bottom padding-left padding-right padding-top
-    page-break-after page-break-before page-break-inside
-    position quotes right table-layout
+    page page-break-after page-break-before page-break-inside
+    position quotes right size table-layout
     text-align text-decoration text-indent text-transform
     top unicode-bidi vertical-align visibility white-space width widows
     word-spacing z-index
@@ -203,6 +204,8 @@ BEGIN {
   float: none;
   font-family: -manakai-default;
   font-size: 16px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: 400;
@@ -214,6 +217,8 @@ BEGIN {
   list-style-position: outside;
   list-style-type: disc;
   margin: 0px;
+  marker-offset: auto;
+  marks: none;
   max-height: none;
   max-width: none;
   min-height: 0px;
@@ -223,12 +228,14 @@ BEGIN {
   outline: 0px none invert;
   overflow: visible;
   padding: 0px;
+  page: auto;
   page-break-after: auto;
   page-break-before: auto;
   page-break-inside: auto;
   position: static;
   quotes: -manakai-default;
   right: auto;
+  size: auto;
   table-layout: auto;
   text-align: begin;
   text-decoration: none;
@@ -309,6 +316,7 @@ sub get_parser ($) {
     block clip inline inline-block inline-table list-item none
     table table-caption table-cell table-column table-column-group
     table-header-group table-footer-group table-row table-row-group
+    compact marker
   /;
   $p->{prop_value}->{position}->{$_} = 1 for qw/
     absolute fixed relative static
@@ -321,6 +329,8 @@ sub get_parser ($) {
   /;
   $p->{prop_value}->{direction}->{ltr} = 1;
   $p->{prop_value}->{direction}->{rtl} = 1;
+  $p->{prop_value}->{marks}->{crop} = 1;
+  $p->{prop_value}->{marks}->{cross} = 1;
   $p->{prop_value}->{'unicode-bidi'}->{$_} = 1 for qw/
     normal bidi-override embed
   /;
@@ -336,6 +346,8 @@ sub get_parser ($) {
     disc circle square decimal decimal-leading-zero
     lower-roman upper-roman lower-greek lower-latin
     upper-latin armenian georgian lower-alpha upper-alpha none
+    hebrew cjk-ideographic hiragana katakana hiragana-iroha
+    katakana-iroha
   /;
   $p->{prop_value}->{'list-style-position'}->{outside} = 1;
   $p->{prop_value}->{'list-style-position'}->{inside} = 1;
@@ -352,11 +364,20 @@ sub get_parser ($) {
   /;
   $p->{prop_value}->{'background-attachment'}->{scroll} = 1;
   $p->{prop_value}->{'background-attachment'}->{fixed} = 1;
+  $p->{prop_value}->{'font-size'}->{$_} = 1 for qw/
+    xx-small x-small small medium large x-large xx-large
+    -manakai-xxx-large -webkit-xxx-large
+    larger smaller
+  /;
   $p->{prop_value}->{'font-style'}->{normal} = 1;
   $p->{prop_value}->{'font-style'}->{italic} = 1;
   $p->{prop_value}->{'font-style'}->{oblique} = 1;
   $p->{prop_value}->{'font-variant'}->{normal} = 1;
   $p->{prop_value}->{'font-variant'}->{'small-caps'} = 1;
+  $p->{prop_value}->{'font-stretch'}->{$_} = 1 for
+      qw/normal wider narrower ultra-condensed extra-condensed
+        condensed semi-condensed semi-expanded expanded
+        extra-expanded ultra-expanded/;
   $p->{prop_value}->{'text-align'}->{$_} = 1 for qw/
     left right center justify begin end
   /;
@@ -370,7 +391,7 @@ sub get_parser ($) {
     none blink underline overline line-through
   /;
   $p->{prop_value}->{'caption-side'}->{$_} = 1 for qw/
-    top bottom
+    top bottom left right
   /;
   $p->{prop_value}->{'table-layout'}->{auto} = 1;
   $p->{prop_value}->{'table-layout'}->{fixed} = 1;

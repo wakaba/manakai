@@ -1311,11 +1311,14 @@ $Prop->{display} = {
   key => 'display',
   parse => $one_keyword_parser,
   keyword => {
+    ## CSS 2.1
     block => 1, inline => 1, 'inline-block' => 1, 'inline-table' => 1,
     'list-item' => 1, none => 1,
     table => 1, 'table-caption' => 1, 'table-cell' => 1, 'table-column' => 1,
     'table-column-group' => 1, 'table-header-group' => 1,
     'table-footer-group' => 1, 'table-row' => 1, 'table-row-group' => 1,
+    ## CSS 2.0
+    compact => 1, marker => 1,
   },
   initial => ["KEYWORD", "inline"],
   #inherited => 0,
@@ -1345,6 +1348,9 @@ $Prop->{display} = {
           } elsif (not defined $element->manakai_parent_element) {
             ## Case 4 [CSS 2.1]
             #
+          } elsif ($specified_value->[1] eq 'marker') {
+            ## TODO: If ::after or ::before, then 'marker'.  Otherwise,
+            return ['KEYWORD', 'inline'];
           } else {
             ## Case 5 [CSS 2.1]
             return $specified_value;
@@ -1365,6 +1371,10 @@ $Prop->{display} = {
                  'table-cell' => 'block',
                  'table-caption' => 'block',
                  'inline-block' => 'block',
+
+                 ## NOTE: Not in CSS 2.1, but maybe...
+                 compact => 'block',
+                 marker => 'block',
                 }->{$specified_value->[1]} || $specified_value->[1]];
       }
     } else {
@@ -1573,12 +1583,16 @@ $Prop->{'list-style-type'} = {
   key => 'list_style_type',
   parse => $one_keyword_parser,
   keyword => {
+    ## CSS 2.1
     qw/
       disc 1 circle 1 square 1 decimal 1 decimal-leading-zero 1 
       lower-roman 1 upper-roman 1 lower-greek 1 lower-latin 1
       upper-latin 1 armenian 1 georgian 1 lower-alpha 1 upper-alpha 1
       none 1
     /,
+    ## CSS 2.0
+    hebrew => 1, 'cjk-ideographic' => 1, hiragana => 1, katakana => 1,
+    'hiragana-iroha' => 1, 'katakana-iroha' => 1,
   },
   initial => ["KEYWORD", 'disc'],
   inherited => 1,
@@ -1761,7 +1775,10 @@ $Prop->{'caption-side'} = {
   key => 'caption_side',
   parse => $one_keyword_parser,
   keyword => {
+    ## CSS 2.1
     top => 1, bottom => 1,
+    ## CSS 2
+    left => 1, right => 1,
   },
   initial => ['KEYWORD', 'top'],
   inherited => 1,
@@ -1864,6 +1881,52 @@ $Prop->{'z-index'} = {
 };
 $Attr->{z_index} = $Prop->{'z-index'};
 $Key->{z_index} = $Prop->{'z-index'};
+
+$Prop->{'font-size-adjust'} = {
+  css => 'font-size-adjust',
+  dom => 'font_size_adjust',
+  key => 'font_size_adjust',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my $has_sign;
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $sign = -1;
+      $has_sign = 1;
+      $t = $tt->get_next_token;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $has_sign = 1;
+      $t = $tt->get_next_token;
+    }
+
+    if ($t->{type} == NUMBER_TOKEN) {
+      my $value = $t->{number};
+      $t = $tt->get_next_token;
+      return ($t, {$prop_name => ["NUMBER", $sign * $value]});
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ($value eq 'none') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ["KEYWORD", $value]});
+      } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+    
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+  },
+  initial => ['KEYWORD', 'none'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+$Attr->{font_size_adjust} = $Prop->{'font-size-adjust'};
+$Key->{font_size_adjust} = $Prop->{'font-size-adjust'};
 
 $Prop->{orphans} = {
   css => 'orphans',
@@ -1995,52 +2058,95 @@ my $length_unit = {
   in => 1, cm => 1, mm => 1, pt => 1, pc => 1,
 };
 
-$Prop->{'font-size'} = {
-  css => 'font-size',
-  dom => 'font_size',
-  key => 'font_size',
-  parse => sub {
-    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+my $length_percentage_keyword_parser = sub ($$$$$) {
+  my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
-    my $has_sign;
+  ## NOTE: Allowed keyword must have true value for $self->{prop_value}->{$_}.
+
     my $sign = 1;
+    my $has_sign;
     if ($t->{type} == MINUS_TOKEN) {
       $t = $tt->get_next_token;
-      $sign = -1;
       $has_sign = 1;
+      $sign = -1;
     } elsif ($t->{type} == PLUS_TOKEN) {
       $t = $tt->get_next_token;
       $has_sign = 1;
     }
+    my $allow_negative = $Prop->{$prop_name}->{allow_negative};
 
     if ($t->{type} == DIMENSION_TOKEN) {
       my $value = $t->{number} * $sign;
       my $unit = lc $t->{value}; ## TODO: case
-      if ($length_unit->{$unit} and $value >= 0) {
+      if ($length_unit->{$unit} and ($allow_negative or $value >= 0)) {
         $t = $tt->get_next_token;
         return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
       }
     } elsif ($t->{type} == PERCENTAGE_TOKEN) {
       my $value = $t->{number} * $sign;
-      if ($value >= 0) {
+      if ($allow_negative or $value >= 0) {
         $t = $tt->get_next_token;
         return ($t, {$prop_name => ['PERCENTAGE', $value]});
       }
     } elsif ($t->{type} == NUMBER_TOKEN and
              ($self->{unitless_px} or $t->{number} == 0)) {
       my $value = $t->{number} * $sign;
-      if ($value >= 0) {
+      if ($allow_negative or $value >=0) {
         $t = $tt->get_next_token;
         return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
       }
     } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
-      if ({
-           'xx-small' => 1, 'x-small' => 1, small => 1, medium => 1,
-           large => 1, 'x-large' => 1, 'xx-large' => 1, 
-           '-manakai-xxx-large' => 1, '-webkit-xxx-large' => 1,
-           larger => 1, smaller => 1,
-          }->{$value}) {
+      if ($Prop->{$prop_name}->{keyword}->{$value}) {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['KEYWORD', $value]});        
+      } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+      ## NOTE: In the "else" case, don't procede the |$t| pointer
+      ## for the support of 'border-top' property (and similar ones).
+    }
+    
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+}; # $length_percentage_keyword_parser
+
+my $length_keyword_parser = sub {
+  my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    my $has_sign;
+    my $sign = 1;
+    if ($t->{type} == MINUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
+      $sign = -1;
+    } elsif ($t->{type} == PLUS_TOKEN) {
+      $t = $tt->get_next_token;
+      $has_sign = 1;
+    }
+    my $allow_negative = $Prop->{$prop_name}->{allow_negative};
+
+    if ($t->{type} == DIMENSION_TOKEN) {
+      my $value = $t->{number} * $sign;
+      my $unit = lc $t->{value}; ## TODO: case
+      if ($length_unit->{$unit} and ($allow_negative or $value >= 0)) {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
+      }
+    } elsif ($t->{type} == NUMBER_TOKEN and
+             ($self->{unitless_px} or $t->{number} == 0)) {
+      my $value = $t->{number} * $sign;
+      if ($allow_negative or $value >= 0) {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
+      }
+    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ($Prop->{$prop_name}->{keyword}->{$value}) {
         $t = $tt->get_next_token;
         return ($t, {$prop_name => ['KEYWORD', $value]});        
       } elsif ($value eq 'inherit') {
@@ -2054,6 +2160,19 @@ $Prop->{'font-size'} = {
                uri => \$self->{href},
                token => $t);
     return ($t, undef);
+}; # $length_keyword_parser
+
+$Prop->{'font-size'} = {
+  css => 'font-size',
+  dom => 'font_size',
+  key => 'font_size',
+  parse => $length_percentage_keyword_parser,
+  #allow_negative => 0,
+  keyword => {
+           'xx-small' => 1, 'x-small' => 1, small => 1, medium => 1,
+           large => 1, 'x-large' => 1, 'xx-large' => 1, 
+           '-manakai-xxx-large' => 1, '-webkit-xxx-large' => 1,
+           larger => 1, smaller => 1,
   },
   initial => ['KEYWORD', 'medium'],
   inherited => 1,
@@ -2179,55 +2298,7 @@ $Prop->{'letter-spacing'} = {
   css => 'letter-spacing',
   dom => 'letter_spacing',
   key => 'letter_spacing',
-  parse => sub {
-    my ($self, $prop_name, $tt, $t, $onerror) = @_;
-
-    ## NOTE: Used also for 'word-spacing', '-manakai-border-spacing-x',
-    ## and '-manakai-border-spacing-y'.
-
-    my $has_sign;
-    my $sign = 1;
-    if ($t->{type} == MINUS_TOKEN) {
-      $t = $tt->get_next_token;
-      $has_sign = 1;
-      $sign = -1;
-    } elsif ($t->{type} == PLUS_TOKEN) {
-      $t = $tt->get_next_token;
-      $has_sign = 1;
-    }
-    my $allow_negative = $Prop->{$prop_name}->{allow_negative};
-
-    if ($t->{type} == DIMENSION_TOKEN) {
-      my $value = $t->{number} * $sign;
-      my $unit = lc $t->{value}; ## TODO: case
-      if ($length_unit->{$unit} and ($allow_negative or $value >= 0)) {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
-      }
-    } elsif ($t->{type} == NUMBER_TOKEN and
-             ($self->{unitless_px} or $t->{number} == 0)) {
-      my $value = $t->{number} * $sign;
-      if ($allow_negative or $value >= 0) {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
-      }
-    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
-      my $value = lc $t->{value}; ## TODO: case
-      if ($Prop->{$prop_name}->{keyword}->{$value}) {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['KEYWORD', $value]});        
-      } elsif ($value eq 'inherit') {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['INHERIT']});
-      }
-    }
-    
-    $onerror->(type => "syntax error:'$prop_name'",
-               level => $self->{must_level},
-               uri => \$self->{href},
-               token => $t);
-    return ($t, undef);
-  },
+  parse => $length_keyword_parser,
   allow_negative => 1,
   keyword => {normal => 1},
   initial => ['KEYWORD', 'normal'],
@@ -2241,7 +2312,7 @@ $Prop->{'word-spacing'} = {
   css => 'word-spacing',
   dom => 'word_spacing',
   key => 'word_spacing',
-  parse => $Prop->{'letter-spacing'}->{parse},
+  parse => $length_keyword_parser,
   allow_negative => 1,
   keyword => {normal => 1},
   initial => ['KEYWORD', 'normal'],
@@ -2255,7 +2326,7 @@ $Prop->{'-manakai-border-spacing-x'} = {
   css => '-manakai-border-spacing-x',
   dom => '_manakai_border_spacing_x',
   key => 'border_spacing_x',
-  parse => $Prop->{'letter-spacing'}->{parse},
+  parse => $length_keyword_parser,
   #allow_negative => 0,
   #keyword => {},
   serialize_multiple => sub {
@@ -2304,7 +2375,7 @@ $Prop->{'-manakai-border-spacing-y'} = {
   css => '-manakai-border-spacing-y',
   dom => '_manakai_border_spacing_y',
   key => 'border_spacing_y',
-  parse => $Prop->{'letter-spacing'}->{parse},
+  parse => $length_keyword_parser,
   #allow_negative => 0,
   #keyword => {},
   serialize_multiple => $Prop->{'-manakai-border-spacing-x'}
@@ -2316,71 +2387,25 @@ $Prop->{'-manakai-border-spacing-y'} = {
 $Attr->{_manakai_border_spacing_y} = $Prop->{'-manakai-border-spacing-y'};
 $Key->{border_spacing_y} = $Prop->{'-manakai-border-spacing-y'};
 
+$Attr->{marker_offset} =
+$Key->{marker_offset} =
+$Prop->{'marker-offset'} = {
+  css => 'marker-offset',
+  dom => 'marker_offset',
+  key => 'marker_offset',
+  parse => $length_keyword_parser,
+  allow_negative => 1,
+  keyword => {auto => 1},
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute => $compute_length,
+};
+
 $Prop->{'margin-top'} = {
   css => 'margin-top',
   dom => 'margin_top',
   key => 'margin_top',
-  parse => sub {
-    my ($self, $prop_name, $tt, $t, $onerror) = @_;
-
-    ## NOTE: Used for 'margin-top', 'margin-right', 'margin-bottom',
-    ## 'margin-left', 'top', 'right', 'bottom', 'left', 'padding-top',
-    ## 'padding-right', 'padding-bottom', 'padding-left',
-    ## 'border-top-width', 'border-right-width', 'border-bottom-width',
-    ## 'border-left-width', 'text-indent', 'background-position-x',
-    ## and 'background-position-y'.
-
-    my $sign = 1;
-    my $has_sign;
-    if ($t->{type} == MINUS_TOKEN) {
-      $t = $tt->get_next_token;
-      $has_sign = 1;
-      $sign = -1;
-    } elsif ($t->{type} == PLUS_TOKEN) {
-      $t = $tt->get_next_token;
-      $has_sign = 1;
-    }
-    my $allow_negative = $Prop->{$prop_name}->{allow_negative};
-
-    if ($t->{type} == DIMENSION_TOKEN) {
-      my $value = $t->{number} * $sign;
-      my $unit = lc $t->{value}; ## TODO: case
-      if ($length_unit->{$unit} and ($allow_negative or $value >= 0)) {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['DIMENSION', $value, $unit]});
-      }
-    } elsif ($t->{type} == PERCENTAGE_TOKEN) {
-      my $value = $t->{number} * $sign;
-      if ($allow_negative or $value >= 0) {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['PERCENTAGE', $value]});
-      }
-    } elsif ($t->{type} == NUMBER_TOKEN and
-             ($self->{unitless_px} or $t->{number} == 0)) {
-      my $value = $t->{number} * $sign;
-      if ($allow_negative or $value >=0) {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['DIMENSION', $value, 'px']});
-      }
-    } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
-      my $value = lc $t->{value}; ## TODO: case
-      if ($Prop->{$prop_name}->{keyword}->{$value}) {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['KEYWORD', $value]});        
-      } elsif ($value eq 'inherit') {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['INHERIT']});
-      }
-      ## NOTE: In the "else" case, don't procede the |$t| pointer
-      ## for the support of 'border-top' property (and similar ones).
-    }
-    
-    $onerror->(type => "syntax error:'$prop_name'",
-               level => $self->{must_level},
-               uri => \$self->{href},
-               token => $t);
-    return ($t, undef);
-  },
+  parse => $length_percentage_keyword_parser,
   allow_negative => 1,
   keyword => {auto => 1},
   serialize_multiple => sub {
@@ -3268,6 +3293,75 @@ $Prop->{'background-image'} = {
 };
 $Attr->{background_image} = $Prop->{'background-image'};
 $Key->{background_image} = $Prop->{'background-image'};
+
+$Attr->{font_stretch} =
+$Key->{font_stretch} =
+$Prop->{'font-stretch'} = {
+  css => 'font-stretch',
+  dom => 'font_stretch',
+  key => 'font_stretch',
+  parse => $one_keyword_parser,
+  keyword => {
+    qw/normal 1 wider 1 narrower 1 ultra-condensed 1 extra-condensed 1
+       condensed 1 semi-condensed 1 semi-expanded 1 expanded 1 
+       extra-expanded 1 ultra-expanded 1/,
+  },
+  initial => ["KEYWORD", 'normal'],
+  inherited => 1,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    if (defined $specified_value and $specified_value->[0] eq 'KEYWORD') {
+      if ($specified_value->[1] eq 'wider') {
+        my $parent = $element->manakai_parent_element;
+        if ($parent) {
+          my $computed = $self->get_computed_value ($parent, $prop_name);
+          if (defined $computed and $computed->[0] eq 'KEYWORD') {
+            return ['KEYWORD', {
+                                'ultra-condensed' => 'extra-condensed',
+                                'extra-condensed' => 'condensed',
+                                'condensed' => 'semi-condensed',
+                                'semi-condensed' => 'normal',
+                                'normal' => 'semi-expanded',
+                                'semi-expanded' => 'expanded',
+                                'expanded' => 'extra-expanded',
+                                'extra-expanded' => 'ultra-expanded',
+                                'ultra-expanded' => 'ultra-expanded',
+                               }->{$computed->[1]} || $computed->[1]];
+          } else { ## This is an implementation error.
+            #
+          }
+        } else {
+          return ['KEYWORD', 'semi-expanded'];
+        }
+      } elsif ($specified_value->[1] eq 'narrower') {
+        my $parent = $element->manakai_parent_element;
+        if ($parent) {
+          my $computed = $self->get_computed_value ($parent, $prop_name);
+          if (defined $computed and $computed->[0] eq 'KEYWORD') {
+            return ['KEYWORD', {
+                                'ultra-condensed' => 'ultra-condensed',
+                                'extra-condensed' => 'ultra-condensed',
+                                'condensed' => 'extra-condensed',
+                                'semi-condensed' => 'condensed',
+                                'normal' => 'semi-condensed',
+                                'semi-expanded' => 'normal',
+                                'expanded' => 'semi-expanded',
+                                'extra-expanded' => 'expanded',
+                                'ultra-expanded' => 'extra-expanded',
+                               }->{$computed->[1]} || $computed->[1]];
+          } else { ## This is an implementation error.
+            #
+          }
+        } else {
+          return ['KEYWORD', 'semi-condensed'];
+        }
+      }
+    }
+
+    return $specified_value;
+  },
+};
 
 my $border_style_keyword = {
   none => 1, hidden => 1, dotted => 1, dashed => 1, solid => 1,
@@ -5126,6 +5220,8 @@ $Prop->{font} = {
                        'font-variant' => ['INHERIT'],
                        'font-weight' => ['INHERIT'],
                        'font-size' => ['INHERIT'],
+                       'font-size-adjust' => ['INHERIT'],
+                       'font-stretch' => ['INHERIT'],
                        'line-height' => ['INHERIT'],
                        'font-family' => ['INHERIT']});
         } elsif ({
@@ -5138,6 +5234,8 @@ $Prop->{font} = {
             'font-variant' => $Prop->{'font-variant'}->{initial},
             'font-weight' => $Prop->{'font-weight'}->{initial},
             'font-size' => $Prop->{'font-size'}->{initial},
+            'font-size-adjust' => $Prop->{'font-size-adjust'}->{initial},
+            'font-stretch' => $Prop->{'font-stretch'}->{initial},
             'line-height' => $Prop->{'line-height'}->{initial},
             'font-family' => ['FONT', ['KEYWORD', '-manakai-'.$value]],
           }));
@@ -5230,6 +5328,9 @@ $Prop->{font} = {
         ->($self, 'font', $tt, $t, $onerror);
     return ($t, undef) unless defined $pv;
     $prop_value{'font-family'} = $pv->{font};
+
+    $prop_value{'font-size-adjust'} = $Prop->{'font-size-adjust'}->{initial};
+    $prop_value{'font-stretch'} = $Prop->{'font-stretch'}->{initial};
 
     return ($t, \%prop_value);
   },
@@ -6267,5 +6368,186 @@ $Prop->{clip} = {
   },
 };
 
+$Attr->{marks} =
+$Key->{marks} =
+$Prop->{marks} = {
+  css => 'marks',
+  dom => 'marks',
+  key => 'marks',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ($value eq 'crop' and $self->{prop_value}->{$prop_name}->{$value}) {
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == IDENT_TOKEN) {
+          my $value = lc $t->{value}; ## TODO: case
+          if ($value eq 'cross' and
+              $self->{prop_value}->{$prop_name}->{$value}) {
+            $t = $tt->get_next_token;
+            return ($t, {$prop_name => ['MARKS', 1, 1]});
+          }
+        }
+        return ($t, {$prop_name => ['MARKS', 1, 0]});
+      } elsif ($value eq 'cross' and
+               $self->{prop_value}->{$prop_name}->{$value}) {
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == IDENT_TOKEN) {
+          my $value = lc $t->{value}; ## TODO: case
+          if ($value eq 'crop' and
+              $self->{prop_value}->{$prop_name}->{$value}) {
+            $t = $tt->get_next_token;
+            return ($t, {$prop_name => ['MARKS', 1, 1]});
+          }
+        }
+        return ($t, {$prop_name => ['MARKS', 0, 1]});
+      } elsif ($value eq 'none') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['MARKS']});
+      } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+  },
+  initial => ['MARKS', 0, 0],
+  #inherited => 0,
+  compute => $compute_as_specified,
+};
+
+$Attr->{size} =
+$Key->{size} =
+$Prop->{size} = {
+  css => 'size',
+  dom => 'size',
+  key => 'size',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ({
+           auto => 1, portrait => 1, landscape => 1,
+          }->{$value}) {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['KEYWORD', $value]});
+      } elsif ($value eq 'inherit') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['INHERIT']});
+      }
+    }
+
+    my $prop_value = ['SIZE'];
+    A: {
+      my $has_sign;
+      my $sign = 1;
+      if ($t->{type} == MINUS_TOKEN) {
+        $has_sign = 1;
+        $sign = -1;
+        $t = $tt->get_next_token;
+      } elsif ($t->{type} == PLUS_TOKEN) {
+        $has_sign = 1;
+        $t = $tt->get_next_token;
+      }
+      
+      if ($t->{type} == DIMENSION_TOKEN) {
+        my $value = $t->{number} * $sign;
+        my $unit = lc $t->{value}; ## TODO: case
+        if ($length_unit->{$unit}) {
+          $t = $tt->get_next_token;
+          push @$prop_value, ['DIMENSION', $value, $unit];
+        } else {
+          $onerror->(type => "syntax error:'$prop_name'",
+                     level => $self->{must_level},
+                     uri => \$self->{href},
+                     token => $t);
+          return ($t, undef);
+        }
+      } elsif ($t->{type} == NUMBER_TOKEN and
+               ($self->{unitless_px} or $t->{number} == 0)) {
+        my $value = $t->{number} * $sign;
+        $t = $tt->get_next_token;
+        push @$prop_value, ['DIMENSION', $value, 'px'];
+      } else {
+        if (@$prop_value == 2) {
+          $prop_value->[2] = $prop_value->[1];
+          return ($t, {$prop_name => $prop_value});
+        } else {
+          last A;
+        }
+      }
+
+      if (@$prop_value == 3) {
+        return ($t, {$prop_name => $prop_value});
+      } else {
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        redo A;
+      }
+    } # A
+
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+  },
+  initial => ['KEYWORD', 'auto'],
+  #inherited => 0,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    if (defined $specified_value and $specified_value->[0] eq 'SIZE') {
+      my $v = ['SIZE'];
+      for (@$specified_value[1..2]) {
+        push @$v, $compute_length->($self, $element, $prop_name, $_);
+      }
+      return $v;
+    }
+
+    return $specified_value;
+  },
+};
+
+$Attr->{page} =
+$Key->{page} =
+$Prop->{page} = {
+  css => 'page',
+  dom => 'page',
+  key => 'page',
+  parse => sub {
+    my ($self, $prop_name, $tt, $t, $onerror) = @_;
+
+    if ($t->{type} == IDENT_TOKEN) {
+      my $value = lc $t->{value}; ## TODO: case
+      if ($value eq 'auto') {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['KEYWORD', 'auto']});
+      } else {
+        $value = $t->{value};
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ['PAGE', $value]});
+      }
+    }
+
+    $onerror->(type => "syntax error:'$prop_name'",
+               level => $self->{must_level},
+               uri => \$self->{href},
+               token => $t);
+    return ($t, undef);
+  },
+  initial => ['KEYWORD', 'auto'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+
 1;
-## $Date: 2008/02/02 13:56:40 $
+## $Date: 2008/02/03 06:00:40 $

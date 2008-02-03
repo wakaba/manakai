@@ -2167,6 +2167,32 @@ html {
 
 #data
 p {
+  display: compact;
+}
+#cssom
+| <p>
+|   display: compact
+#csstext
+p {
+  display: compact;
+}
+
+#data
+p {
+  display: marker;
+}
+#cssom
+| <p>
+|   display: marker
+#csstext
+p {
+  display: marker;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
   top: 12px;
 }
 #cssom

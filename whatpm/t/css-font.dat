@@ -257,6 +257,114 @@ p {
 
 #data
 p {
+  font-stretch: normal;
+}
+#cssom
+| <p>
+|   font-stretch: normal
+#csstext
+p {
+  font-stretch: normal;
+}
+
+#data
+p {
+  font-stretch: wider;
+}
+#cssom
+| <p>
+|   font-stretch: wider
+#computed 1 p
+-| font-stretch: normal
++| font-stretch: semi-expanded
+
+#data
+p {
+  font-stretch: narrower;
+}
+#cssom
+| <p>
+|   font-stretch: narrower
+#computed 1 p
+-| font-stretch: normal
++| font-stretch: semi-condensed
+
+#data
+p {
+  font-stretch: ultra-condensed;
+}
+#cssom
+| <p>
+|   font-stretch: ultra-condensed
+
+#data
+p {
+  font-stretch: extra-condensed;
+}
+#cssom
+| <p>
+|   font-stretch: extra-condensed
+
+#data
+p {
+  font-stretch: condensed;
+}
+#cssom
+| <p>
+|   font-stretch: condensed
+
+#data
+p {
+  font-stretch: semi-condensed;
+}
+#cssom
+| <p>
+|   font-stretch: semi-condensed
+
+#data
+p {
+  font-stretch: semi-expanded;
+}
+#cssom
+| <p>
+|   font-stretch: semi-expanded
+
+#data
+p {
+  font-stretch: expanded
+}
+#cssom
+| <p>
+|   font-stretch: expanded
+
+#data
+p {
+  font-stretch: extra-expanded;
+}
+#cssom
+| <p>
+|   font-stretch: extra-expanded
+
+#data
+p {
+  font-stretch: ultra-expanded;
+}
+#cssom
+| <p>
+|   font-stretch: ultra-expanded
+
+#data
+p {
+  font-stretch: inherit;
+}
+#cssom
+| <p>
+|   font-stretch: inherit
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
   font-size: 0;
 }
 #cssom
@@ -615,6 +723,94 @@ p {
 
 #data
 p {
+  font-size-adjust: 1;
+}
+#cssom
+| <p>
+|   font-size-adjust: 1
+#csstext
+p {
+  font-size-adjust: 1;
+}
+#computed 1 p
+-| font-size-adjust: none
++| font-size-adjust: 1
+#computedtext 1 p
+-  font-size-adjust: none;
++  font-size-adjust: 1;
+
+#data
+p {
+  font-size-adjust : +2
+}
+#cssom
+| <p>
+|   font-size-adjust: 2
+
+#data
+p {
+  font-size-adjust: 0010.4400;
+}
+#cssom
+| <p>
+|   font-size-adjust: 10.44
+
+#data
+p {
+  font-size-adjust: -44.4
+}
+#cssom
+| <p>
+|   font-size-adjust: -44.4
+
+#data
+p {
+  font-size-adjust: none;
+}
+#cssom
+| <p>
+|   font-size-adjust: none
+#csstext
+p {
+  font-size-adjust: none;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  font-size-adjust: inherit;
+}
+#cssom
+| <p>
+|   font-size-adjust: inherit
+#csstext
+p {
+  font-size-adjust: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  font-size-ajust: none;
+}
+#errors
+;2;20;unsupported;property not supported;font-size-ajust
+#cssom
+| <p>
+
+#data
+p {
+  font-size-adjast: none;
+}
+#errors
+;2;21;unsupported;property not supported;font-size-adjast
+#cssom
+| <p>
+
+#data
+p {
   font: 1px serif;
 }
 #cssom
@@ -622,6 +818,8 @@ p {
 |   font: 1px serif
 |   font-family: serif
 |   font-size: 1px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -630,6 +828,8 @@ p {
 p {
   font-family: serif;
   font-size: 1px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: normal;
@@ -645,6 +845,8 @@ p {
 |   font: 1px serif !important
 |   font-family: serif !important
 |   font-size: 1px !important
+|   font-size-adjust: none !important
+|   font-stretch: normal !important
 |   font-style: normal !important
 |   font-variant: normal !important
 |   font-weight: normal !important
@@ -653,6 +855,8 @@ p {
 p {
   font-family: serif ! important;
   font-size: 1px ! important;
+  font-size-adjust: none ! important;
+  font-stretch: normal ! important;
   font-style: normal ! important;
   font-variant: normal ! important;
   font-weight: normal ! important;
@@ -668,6 +872,8 @@ p {
 |   font: 1px "inherit"
 |   font-family: "inherit"
 |   font-size: 1px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -676,6 +882,8 @@ p {
 p {
   font-family: "inherit";
   font-size: 1px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: normal;
@@ -691,6 +899,8 @@ p {
 |   font: 1px -manakai-default
 |   font-family: -manakai-default
 |   font-size: 1px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -699,6 +909,8 @@ p {
 p {
   font-family: -manakai-default;
   font-size: 1px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: normal;
@@ -714,6 +926,8 @@ p {
 |   font: bolder 1px "Courier New"
 |   font-family: "Courier New"
 |   font-size: 1px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: bolder
@@ -722,6 +936,8 @@ p {
 p {
   font-family: "Courier New";
   font-size: 1px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: bolder;
@@ -737,6 +953,8 @@ p {
 |   font: inherit
 |   font-family: inherit
 |   font-size: inherit
+|   font-size-adjust: inherit
+|   font-stretch: inherit
 |   font-style: inherit
 |   font-variant: inherit
 |   font-weight: inherit
@@ -745,6 +963,8 @@ p {
 p {
   font-family: inherit;
   font-size: inherit;
+  font-size-adjust: inherit;
+  font-stretch: inherit;
   font-style: inherit;
   font-variant: inherit;
   font-weight: inherit;
@@ -760,6 +980,8 @@ p {
 |   font: inherit !important
 |   font-family: inherit !important
 |   font-size: inherit !important
+|   font-size-adjust: inherit !important
+|   font-stretch: inherit !important
 |   font-style: inherit !important
 |   font-variant: inherit !important
 |   font-weight: inherit !important
@@ -768,6 +990,8 @@ p {
 p {
   font-family: inherit ! important;
   font-size: inherit ! important;
+  font-size-adjust: inherit ! important;
+  font-stretch: inherit ! important;
   font-style: inherit ! important;
   font-variant: inherit ! important;
   font-weight: inherit ! important;
@@ -783,6 +1007,8 @@ p {
 | <p>
 |   font-family: "inherit"
 |   font-size: inherit
+|   font-size-adjust: inherit
+|   font-stretch: inherit
 |   font-style: inherit
 |   font-variant: inherit
 |   font-weight: inherit
@@ -791,6 +1017,8 @@ p {
 p {
   font-family: "inherit";
   font-size: inherit;
+  font-size-adjust: inherit;
+  font-stretch: inherit;
   font-style: inherit;
   font-variant: inherit;
   font-weight: inherit;
@@ -806,6 +1034,8 @@ p {
 | <p>
 |   font-family: inherit
 |   font-size: 16px
+|   font-size-adjust: inherit
+|   font-stretch: inherit
 |   font-style: inherit
 |   font-variant: inherit
 |   font-weight: inherit
@@ -814,6 +1044,8 @@ p {
 p {
   font-family: inherit;
   font-size: 16px;
+  font-size-adjust: inherit;
+  font-stretch: inherit;
   font-style: inherit;
   font-variant: inherit;
   font-weight: inherit;
@@ -829,6 +1061,8 @@ p {
 | <p>
 |   font-family: inherit
 |   font-size: inherit
+|   font-size-adjust: inherit
+|   font-stretch: inherit
 |   font-style: inherit
 |   font-variant: inherit !important
 |   font-weight: inherit
@@ -837,6 +1071,8 @@ p {
 p {
   font-family: inherit;
   font-size: inherit;
+  font-size-adjust: inherit;
+  font-stretch: inherit;
   font-style: inherit;
   font-variant: inherit ! important;
   font-weight: inherit;
@@ -852,6 +1088,8 @@ p {
 | <p>
 |   font-family: inherit
 |   font-size: inherit
+|   font-size-adjust: inherit
+|   font-stretch: inherit
 |   font-style: inherit
 |   font-variant: inherit
 |   font-weight: bolder
@@ -860,6 +1098,8 @@ p {
 p {
   font-family: inherit;
   font-size: inherit;
+  font-size-adjust: inherit;
+  font-stretch: inherit;
   font-style: inherit;
   font-variant: inherit;
   font-weight: bolder;
@@ -888,6 +1128,8 @@ p {
 |   font: 800 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: 800
@@ -896,6 +1138,8 @@ p {
 p {
   font-family: serif;
   font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: 800;
@@ -911,6 +1155,8 @@ p {
 |   font: 800 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: 800
@@ -919,6 +1165,8 @@ p {
 p {
   font-family: serif;
   font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: 800;
@@ -934,6 +1182,8 @@ p {
 |   font: 800 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: 800
@@ -942,6 +1192,8 @@ p {
 p {
   font-family: serif;
   font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: 800;
@@ -970,6 +1222,8 @@ p {
 |   font: 800 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: 800
@@ -978,6 +1232,8 @@ p {
 p {
   font-family: serif;
   font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: 800;
@@ -1018,6 +1274,8 @@ p {
 |   font: 800 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: 800
@@ -1026,6 +1284,8 @@ p {
 p {
   font-family: serif;
   font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: 800;
@@ -1079,6 +1339,8 @@ p {
 |   font: 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1087,6 +1349,8 @@ p {
 p {
   font-family: serif;
   font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: normal;
@@ -1102,6 +1366,8 @@ p {
 |   font: 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1110,6 +1376,8 @@ p {
 p {
   font-family: serif;
   font-size: 12px;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: normal;
@@ -1125,6 +1393,8 @@ p {
 |   font: 12% serif
 |   font-family: serif
 |   font-size: 12%
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1133,6 +1403,8 @@ p {
 p {
   font-family: serif;
   font-size: 12%;
+  font-size-adjust: none;
+  font-stretch: normal;
   font-style: normal;
   font-variant: normal;
   font-weight: normal;
@@ -1158,6 +1430,8 @@ p {
 |   font: 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1172,6 +1446,8 @@ p {
 |   font: 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1186,6 +1462,8 @@ p {
 |   font: 12% serif
 |   font-family: serif
 |   font-size: 12%
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1210,6 +1488,8 @@ p {
 |   font: 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1224,6 +1504,8 @@ p {
 |   font: 12px serif
 |   font-family: serif
 |   font-size: 12px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1238,6 +1520,8 @@ p {
 |   font: 12% serif
 |   font-family: serif
 |   font-size: 12%
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1289,6 +1573,8 @@ p {
 |   font: 0px serif
 |   font-family: serif
 |   font-size: 0px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1304,6 +1590,8 @@ p {
 |   font: 0px serif
 |   font-family: serif
 |   font-size: 0px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1318,6 +1606,8 @@ p {
 |   font: 0px serif
 |   font-family: serif
 |   font-size: 0px
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal
@@ -1332,6 +1622,8 @@ p {
 |   font: 0% serif
 |   font-family: serif
 |   font-size: 0%
+|   font-size-adjust: none
+|   font-stretch: normal
 |   font-style: normal
 |   font-variant: normal
 |   font-weight: normal

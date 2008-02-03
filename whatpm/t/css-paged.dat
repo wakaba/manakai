@@ -1,3 +1,395 @@
+#html 1
+<!DOCTYPE HTML><p>
+
+#data
+p {
+  size:;
+}
+#errors
+;2;8;m;syntax error:'size'
+#cssom
+| <p>
+
+#data
+p {
+  size: auto;
+}
+#cssom
+| <p>
+|   size: auto
+#csstext
+p {
+  size: auto;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  size: portrait;
+}
+#cssom
+| <p>
+|   size: portrait
+#csstext
+p {
+  size: portrait;
+}
+
+#data
+p {
+  size: portreit
+}
+#errors
+;2;9;m;syntax error:'size'
+#cssom
+| <p>
+
+#data
+p {
+  size: portrate;
+}
+#errors
+;2;9;m;syntax error:'size'
+#cssom
+| <p>
+
+#data
+p {
+  size: landscape
+}
+#cssom
+| <p>
+|   size: landscape
+#csstext
+p {
+  size: landscape;
+}
+
+#data
+p {
+  size: inherit;
+}
+#cssom
+| <p>
+|   size: inherit
+
+#data
+p {
+  size: 1px;
+} 
+#cssom
+| <p>
+|   size: 1px
+#csstext
+p {
+  size: 1px;
+}
+
+#data
+p {
+  size: 1px 2cm;
+}
+#cssom
+| <p>
+|   size: 1px 2cm
+#csstext
+p {
+  size: 1px 2cm;
+}
+
+#data
+p {
+  size: 10cm 10cm
+}
+#cssom
+| <p>
+|   size: 10cm
+
+#data
+p {
+  size: 10cm auto;
+}
+#errors
+;2;14;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  size: auto 10px;
+}
+#errors
+;2;14;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  size: +10px +20em;
+}
+#cssom
+| <p>
+|   size: 10px 20em
+
+#data
+p {
+  size: -10in -20pt;
+}
+#cssom
+| <p>
+|   size: -10in -20pt
+
+#data
+p {
+  size: 1 4
+}
+#errors
+;2;9;m;syntax error:'size'
+#cssom
+| <p>
+
+#data
+p {
+  size: 1 4;
+}
+#option q
+#cssom
+| <p>
+|   size: 1px 4px
+
+#data
+p {
+  size: 10%;
+}
+#errors
+;2;9;m;syntax error:'size'
+#cssom
+| <p>
+
+#data
+p {
+  size: 1px 2px 3px;
+}
+#errors
+;2;17;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  marks: crop;
+}
+#cssom
+| <p>
+|   marks: crop
+#csstext
+p {
+  marks: crop;
+}
+
+#data
+p {
+  marks: cross;
+}
+#cssom
+| <p>
+|   marks: cross
+#csstext
+p {
+  marks: cross;
+}
+
+#data
+p {
+  marks: cross cross;
+}
+#errors
+;2;16;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  marks: crop/**/cross;
+}
+#cssom
+| <p>
+|   marks: crop cross
+
+#data
+p {
+  marks: crop cross;
+}
+#cssom
+| <p>
+|   marks: crop cross
+#csstext
+p {
+  marks: crop cross;
+}
+
+#data
+p {
+  marks: crop /**/ cross;
+}
+#cssom
+| <p>
+|   marks: crop cross
+
+#data
+p {
+  marks: cross/**/crop;
+}
+#cssom
+| <p>
+|   marks: crop cross
+
+#data
+p {
+  marks: cross crop;
+}
+#cssom
+| <p>
+|   marks: crop cross
+#csstext
+p {
+  marks: crop cross;
+}
+
+#data
+p {
+  marks: cross /**/ crop;
+}
+#cssom
+| <p>
+|   marks: crop cross
+
+#data
+p {
+  marks: crop crop;
+}
+#errors
+;2;15;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  marks: crop cross crop;
+}
+#errors
+;2;21;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  marks: crop inherit;
+}
+#errors
+;2;15;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  marks: none;
+}
+#cssom
+| <p>
+|   marks: none
+#csstext
+p {
+  marks: none;
+}
+
+#data
+p {
+  marks: none cross;
+}
+#errors
+;2;15;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  marks: inherit;
+}
+#cssom
+| <p>
+|   marks: inherit
+#csstext
+p {
+  marks: inherit;
+}
+
+#data
+p {
+  marks: inherit crop;
+}
+#errors
+;2;18;m;no property semicolon
+#cssom
+| <p>
+
+#data
+p {
+  page: auto
+}
+#cssom
+| <p>
+|   page: auto
+#csstext
+p {
+  page: auto;
+}
+
+#data
+p {
+  page: Auto;
+}
+#cssom
+| <p>
+|   page: auto
+
+#data
+p {
+  page: inherit;
+}
+#cssom
+| <p>
+|   page: inherit
+#csstext
+p {
+  page: inherit;
+}
+
+#data
+p {
+  page: InhErit;
+}
+#cssom
+| <p>
+|   page: InhErit
+#csstext
+p {
+  page: InhErit;
+}
+
+#data
+p {
+  page: pageName;
+}
+#cssom
+| <p>
+|   page: pageName
+#csstext
+p {
+  page: pageName;
+}
+
 #data
 p {
   orphans: 3;

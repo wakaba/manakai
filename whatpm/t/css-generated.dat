@@ -1166,6 +1166,187 @@ p {
 
 #data
 p {
+  marker-offset: auto
+}
+#cssom
+| <p>
+|   marker-offset: auto
+#csstext
+p {
+  marker-offset: auto;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  marker-offset: inherit;
+}
+#cssom
+| <p>
+|   marker-offset: inherit
+#csstext
+p {
+  marker-offset: inherit;
+}
+#computed 1 p
+#computedtext 1 p
+
+#data
+p {
+  marker-offset: 1px;
+}
+#cssom
+| <p>
+|   marker-offset: 1px
+#csstext
+p {
+  marker-offset: 1px;
+}
+#computed 1 p
+-| marker-offset: auto
++| marker-offset: 1px
+
+#data
+p {
+  marker-offset: +10em;
+}
+#cssom
+| <p>
+|   marker-offset: 10em
+#csstext
+p {
+  marker-offset: 10em;
+}
+
+#data
+p {
+  marker-offset: -0px;
+}
+#cssom
+| <p>
+|   marker-offset: 0px
+
+#data
+p {
+  marker-offset: -100cm;
+}
+#cssom
+| <p>
+|   marker-offset: -100cm
+
+#data
+p {
+  marker-offset: 0;
+}
+#cssom
+| <p>
+|   marker-offset: 0px
+
+#data
+p {
+  marker-offset: 10cml;
+}
+#errors
+;2;18;m;syntax error:'marker-offset'
+#cssom
+| <p>
+
+#data
+p {
+  marker-offset: 0010.345000px;
+}
+#cssom
+| <p>
+|   marker-offset: 10.345px
+
+#data
+p {
+  marker-offset: 3;
+}
+#errors
+;2;18;m;syntax error:'marker-offset'
+#cssom
+| <p>
+
+#data
+p {
+  marker-offset: 3;
+}
+#option q
+#cssom
+| <p>
+|   marker-offset: 3px
+
+#data
+p {
+  list-style-type: hebrew;
+}
+#cssom
+| <p>
+|   list-style-type: hebrew
+
+#data
+p {
+  list-style-type: CJK-ideographic
+}
+#cssom
+| <p>
+|   list-style-type: cjk-ideographic
+
+#data
+p {
+  list-style-type: kana
+}
+#errors
+;2;20;m;syntax error:'list-style-type'
+#cssom
+| <p>
+
+#data
+p {
+  list-style-type: hiragana;
+}
+#cssom
+| <p>
+|   list-style-type: hiragana
+
+#data
+p {
+  list-style-type: Hirakana;
+} 
+#errors
+;2;20;m;syntax error:'list-style-type'
+#cssom
+| <p>
+
+#data
+p {
+  list-style-type: iroha;
+}
+#errors
+;2;20;m;syntax error:'list-style-type'
+#cssom
+| <p>
+
+#data
+p {
+  list-style-type: hiragana-iroha;
+}
+#cssom
+| <p>
+|   list-style-type: hiragana-iroha
+
+#data
+p {
+  list-style-type: katakana-iroha
+}
+#cssom
+| <p>
+|   list-style-type: katakana-iroha
+
+#data
+p {
   list-style: none;
 }
 #cssom
