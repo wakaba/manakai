@@ -46,16 +46,19 @@ if ($mode eq '/csstext') {
     border-spacing -manakai-border-spacing-x -manakai-border-spacing-y
     border-style border-top border-top-color border-top-style border-top-width
     border-width bottom
-    caption-side clear color cursor direction display empty-cells float font
-    font-family font-size font-style font-variant font-weight height left
+    caption-side clear clip color content counter-increment counter-reset
+    cursor direction display empty-cells float font
+    font-family font-size font-size-adjust font-stretch
+    font-style font-variant font-weight height left
     letter-spacing line-height
     list-style list-style-image list-style-position list-style-type
-    margin margin-bottom margin-left margin-right margin-top
-    max-height max-width min-height min-width opacity -moz-opacity
+    margin margin-bottom margin-left margin-right margin-top marker-offset
+    marks max-height max-width min-height min-width opacity -moz-opacity
     orphans outline outline-color outline-style outline-width overflow
+    overflow-x overflow-y
     padding padding-bottom padding-left padding-right padding-top
-    page-break-after page-break-before page-break-inside
-    position right table-layout
+    page page-break-after page-break-before page-break-inside
+    position quotes right size table-layout
     text-align text-decoration text-indent text-transform
     top unicode-bidi vertical-align visibility white-space width widows
     word-spacing z-index
@@ -64,6 +67,7 @@ if ($mode eq '/csstext') {
     block inline inline-block inline-table list-item none
     table table-caption table-cell table-column table-column-group
     table-header-group table-footer-group table-row table-row-group
+    compact marker
   /;
   $p->{prop_value}->{position}->{$_} = 1 for qw/
     absolute fixed relative static
@@ -76,12 +80,16 @@ if ($mode eq '/csstext') {
   /;
   $p->{prop_value}->{direction}->{ltr} = 1;
   $p->{prop_value}->{direction}->{rtl} = 1;
+  $p->{prop_value}->{marks}->{crop} = 1;
+  $p->{prop_value}->{marks}->{cross} = 1;
   $p->{prop_value}->{'unicode-bidi'}->{$_} = 1 for qw/
     normal bidi-override embed
   /;
-  $p->{prop_value}->{overflow}->{$_} = 1 for qw/
-    visible hidden scroll auto
-  /;
+  for my $prop_name (qw/overflow overflow-x overflow-y/) {
+    $p->{prop_value}->{$prop_name}->{$_} = 1 for qw/
+      visible hidden scroll auto -webkit-marquee -moz-hidden-unscrollable
+    /;
+  }
   $p->{prop_value}->{visibility}->{$_} = 1 for qw/
     visible hidden collapse
   /;
@@ -89,6 +97,8 @@ if ($mode eq '/csstext') {
     disc circle square decimal decimal-leading-zero
     lower-roman upper-roman lower-greek lower-latin
     upper-latin armenian georgian lower-alpha upper-alpha none
+    hebrew cjk-ideographic hiragana katakana hiragana-iroha
+    katakana-iroha
   /;
   $p->{prop_value}->{'list-style-position'}->{outside} = 1;
   $p->{prop_value}->{'list-style-position'}->{inside} = 1;
@@ -105,11 +115,20 @@ if ($mode eq '/csstext') {
   /;
   $p->{prop_value}->{'background-attachment'}->{scroll} = 1;
   $p->{prop_value}->{'background-attachment'}->{fixed} = 1;
+  $p->{prop_value}->{'font-size'}->{$_} = 1 for qw/
+    xx-small x-small small medium large x-large xx-large
+    -manakai-xxx-large -webkit-xxx-large
+    larger smaller
+  /;
   $p->{prop_value}->{'font-style'}->{normal} = 1;
   $p->{prop_value}->{'font-style'}->{italic} = 1;
   $p->{prop_value}->{'font-style'}->{oblique} = 1;
   $p->{prop_value}->{'font-variant'}->{normal} = 1;
   $p->{prop_value}->{'font-variant'}->{'small-caps'} = 1;
+  $p->{prop_value}->{'font-stretch'}->{$_} = 1 for
+      qw/normal wider narrower ultra-condensed extra-condensed
+        condensed semi-condensed semi-expanded expanded
+        extra-expanded ultra-expanded/;
   $p->{prop_value}->{'text-align'}->{$_} = 1 for qw/
     left right center justify begin end
   /;
@@ -123,7 +142,7 @@ if ($mode eq '/csstext') {
     none blink underline overline line-through
   /;
   $p->{prop_value}->{'caption-side'}->{$_} = 1 for qw/
-    top bottom
+    top bottom left right
   /;
   $p->{prop_value}->{'table-layout'}->{auto} = 1;
   $p->{prop_value}->{'table-layout'}->{fixed} = 1;
@@ -309,4 +328,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/01/24 11:25:04 $
+## $Date: 2008/02/03 06:00:55 $
