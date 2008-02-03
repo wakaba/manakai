@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleDeclaration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleDeclaration',
     'Message::IF::CSS2Properties';
 
@@ -15,7 +15,7 @@ my $serialize_value = sub ($$$) {
     return $value->[1] . $value->[2]; ## NOTE: This is what browsers do.
   } elsif ($value->[0] eq 'PERCENTAGE') {
     return $value->[1] . '%';
-  } elsif ($value->[0] eq 'KEYWORD') {
+  } elsif ($value->[0] eq 'KEYWORD' or $value->[0] eq 'PAGE') {
     return $value->[1];
   } elsif ($value->[0] eq 'URI') {
     ## NOTE: This is what browsers do.
@@ -86,6 +86,26 @@ my $serialize_value = sub ($$$) {
         '""';
       }
     } @$value[1..$#$value];
+  } elsif ($value->[0] eq 'MARKS') {
+    if ($value->[1]) {
+      if ($value->[2]) {
+        return 'crop cross';
+      } else {
+        return 'crop';
+      }
+    } elsif ($value->[2]) {
+      return 'cross';
+    } else {
+      return 'none';
+    }
+  } elsif ($value->[0] eq 'SIZE') {
+    my $s1 = $value->[1]->[1] . $value->[1]->[2]; ## NOTE: They should be 
+    my $s2 = $value->[2]->[1] . $value->[2]->[2]; ## 'DIMENSION's.
+    if ($s1 eq $s2) {
+      return $s1;
+    } else {
+      return $s1 . ' ' . $s2;
+    }
   } else {
     return '';
   }
@@ -414,4 +434,4 @@ package Message::IF::CSSStyleDeclaration;
 package Message::IF::CSS2Properties;
 
 1;
-## $Date: 2008/02/02 13:58:02 $
+## $Date: 2008/02/03 06:01:20 $
