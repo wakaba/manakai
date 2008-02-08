@@ -1,6 +1,6 @@
 package Message::DOM::CSSRule;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSRule';
 require Scalar::Util;
 
@@ -117,7 +117,10 @@ package Message::DOM::CSSImportRule;
 push our @ISA, 'Message::DOM::CSSRule', 'Message::IF::CSSImportRule';
 
 sub ____new ($$$$) {
-  my $self = bless \{href => $_[1], media => $_[2], style_sheet => $_[3]}, $_[0];
+  my $self = bless \{href => $_[1], media => \$_[2],
+                     style_sheet => $_[3]}, $_[0];
+  require Message::DOM::MediaList;
+  bless $$self->{media}, 'Message::DOM::MediaList';
   ${$_[3]}->{owner_rule} = $self;
   Scalar::Util::weaken (${$_[3]}->{owner_rule});
   return $self;
@@ -147,7 +150,9 @@ package Message::DOM::CSSMediaRule;
 push our @ISA, 'Message::DOM::CSSRule', 'Message::IF::CSSMediaRule';
 
 sub ____new ($$$) {
-  my $self = bless \{media => $_[1], css_rules => $_[2]}, $_[0];
+  my $self = bless \{media => \$_[1], css_rules => $_[2]}, $_[0];
+  require Message::DOM::MediaList;
+  bless $$self->{media}, 'Message::DOM::MediaList';
   for (@{$_[2]}) {
     ${$_}->{parent_rule} = $self;
     Scalar::Util::weaken (${$_}->{parent_rule});
@@ -157,7 +162,16 @@ sub ____new ($$$) {
 
 ## |CSSRule| attributes
 
-## TODO: |css_text|
+sub css_text ($;$) {
+  ## TODO: setter
+  my $v = '@media ' . $_[0]->media . " {\n";
+  for (@{${$_[0]}->{css_rules}}) {
+    $v .= $_->css_text . "\n";
+    ## BUG: Browsers do indent.
+  }
+  $v .= "}";
+  return $v;
+} # css_text
 
 sub type ($) { Message::DOM::CSSRule::MEDIA_RULE }
 
@@ -263,4 +277,4 @@ package Message::IF::CSSFontFaceRule;
 package Message::IF::CSSPageRule;
 
 1;
-## $Date: 2008/01/14 05:53:44 $
+## $Date: 2008/02/08 15:08:04 $
