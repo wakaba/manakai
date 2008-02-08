@@ -2,6 +2,7 @@ package Whatpm::CSS::Parser;
 use strict;
 use Whatpm::CSS::Tokenizer qw(:token);
 require Whatpm::CSS::SelectorsParser;
+require Whatpm::CSS::MediaQueryParser;
 
 sub new ($) {
   my $self = bless {must_level => 'm',
@@ -100,6 +101,11 @@ sub parse_char_string ($$) {
   $sp->{pseudo_element} = $self->{pseudo_element};
   $sp->{pseudo_class} = $self->{pseudo_class};
 
+  my $mp = Whatpm::CSS::MediaQueryParser->new;
+  $mp->{onerror} = $self->{onerror};
+  $mp->{must_level} = $self->{must_level};
+  $mp->{unsupported_level} = $self->{unsupported_level};
+
   my $nsmap = {prefix_to_uri => {}, uri_to_prefixes => {}};
   # $nsmap->{prefix_to_uri}->{p/""} = uri/undef
   # $nsmap->{uri_to_prefixes}->{uri} = ["p|"/"",...]/undef
@@ -120,10 +126,12 @@ sub parse_char_string ($$) {
 
   my $open_rules = [[]];
   my $current_rules = $open_rules->[-1];
+  my $parent_rules = [];
   my $current_decls;
   my $closing_tokens = [];
   my $charset_allowed = 1;
   my $namespace_allowed = 1;
+  my $media_allowed = 1;
 
   S: {
     if ($state == BEFORE_STATEMENT_STATE) {
@@ -133,7 +141,8 @@ sub parse_char_string ($$) {
               $t->{type} == CDC_TOKEN;
 
       if ($t->{type} == ATKEYWORD_TOKEN) {
-        if (lc $t->{value} eq 'namespace') { ## TODO: case folding
+        my $at_rule_name = lc $t->{value}; ## TODO: case
+        if ($at_rule_name eq 'namespace') {
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
 
@@ -201,7 +210,46 @@ sub parse_char_string ($$) {
                      uri => \$self->{href},
                      token => $t);
           #
-        } elsif (lc $t->{value} eq 'charset') { ## TODO: case folding
+        } elsif ($at_rule_name eq 'media') {
+          if ($media_allowed) {
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            
+            my $q;
+            ($t, $q) = $mp->_parse_mq_with_tokenizer ($t, $tt);
+            if ($q) {
+              if ($t->{type} == LBRACE_TOKEN) {
+                undef $charset_allowed;
+                undef $namespace_allowed;
+                undef $media_allowed;
+                my $rule = Message::DOM::CSSMediaRule->____new
+                    ($q, my $v = []);
+                push @$current_rules, $rule;
+                push @$parent_rules, $rule;
+                push @$open_rules, $current_rules = $v;
+                $t = $tt->get_next_token;
+                ## Stay in the state.
+                redo S;
+              } else {
+                $onerror->(type => 'at-rule syntax error:media',
+                           level => $self->{must_level},
+                           uri => \$self->{href},
+                           token => $t);
+              }
+
+              #
+            }
+            
+            #
+          } else { ## Nested @media rule
+            $onerror->(type => 'at-rule not allowed:media',
+                       level => $self->{must_level},
+                       uri => \$self->{href},
+                       token => $t);
+            
+            #
+          }
+        } elsif ($at_rule_name eq 'charset') {
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
 
@@ -251,11 +299,14 @@ sub parse_char_string ($$) {
                      value => $t->{value});
         }
 
-        $t = $tt->get_next_token;
+        ## Reprocess.
+        #$t = $tt->get_next_token;
         $state = IGNORED_STATEMENT_STATE;
         redo S;
       } elsif (@$open_rules > 1 and $t->{type} == RBRACE_TOKEN) {
         pop @$open_rules;
+        $media_allowed = 1;
+        $current_rules = $open_rules->[-1];
         ## Stay in the state.
         $t = $tt->get_next_token;
         redo S;
@@ -510,6 +561,13 @@ sub parse_char_string ($$) {
       die "$0: parse_char_string: Unknown state: $state";
     }
   } # S
+  
+  for my $parent_rule (@$parent_rules) {
+    for (@{$$parent_rule->{css_rules}}) {
+      $$_->{parent_rule} = $parent_rule;
+      Scalar::Util::weaken ($$_->{parent_rule});
+    }
+  }
 
   my $ss = Message::DOM::CSSStyleSheet->____new
       (manakai_base_uri => $self->{base_uri},
@@ -6550,4 +6608,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/02/03 06:00:40 $
+## $Date: 2008/02/08 15:05:56 $

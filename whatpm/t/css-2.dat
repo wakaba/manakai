@@ -1,0 +1,181 @@
+#data
+@media all{}
+#cssom
+| @media all
+
+#data
+@media all {}
+p{}
+#cssom
+| @media all
+| <p>
+
+#data
+p{}
+@media all {}
+#cssom
+| <p>
+| @media all
+
+#data
+@media all {
+p{}
+q{}
+}
+#cssom
+| @media all
+|   <p>
+|   <q>
+#csstext
+@media all {
+p {
+}
+q {
+}
+}
+
+#data
+@media all {
+p{}
+}
+q{}
+#cssom
+| @media all
+|   <p>
+| <q>
+#csstext
+@media all {
+p {
+}
+}
+q {
+}
+
+#data
+@media screen, tv {
+  p{}
+}
+#cssom
+| @media screen, tv
+|   <p>
+#csstext
+@media screen, tv {
+p {
+}
+}
+
+#data
+@media
+#errors
+;1;7;m;mq syntax error
+#cssom
+
+#data
+@media   /**/  
+#errors
+;1;16;m;mq syntax error
+#cssom
+
+#data
+@media tty
+#errors
+;1;11;m;at-rule syntax error:media
+#cssom
+
+#data
+@media/**/screen{}
+#cssom
+| @media screen
+
+#data
+@media {}
+#errors
+;1;8;m;mq syntax error
+#cssom
+
+#data
+@media {}p{}
+#errors
+;1;8;m;mq syntax error
+#cssom
+| <p>
+
+#data
+@media{}}p{}
+#errors
+;1;7;m;mq syntax error
+;1;9;m;no sss
+#cssom
+
+#data
+@media tv {
+p{}
+#errors
+;2;4;m;block not closed
+
+#data
+@media screen{}
+@media screen{}
+#cssom
+| @media screen
+| @media screen
+
+#data
+@media a, b {
+p{}
+}
+#errors
+;1;8;unsupported;unknown media type
+;1;11;unsupported;unknown media type
+#cssom
+| @media unknown, unknown
+|   <p>
+
+#data
+@media all {
+}}
+#errors
+;2;2;m;no sss
+;2;3;m;no declaration block
+#cssom
+| @media all
+
+#data
+@media ! {
+p{}
+}
+q{}
+#errors
+;1;8;m;mq syntax error
+#cssom
+| <q>
+
+#data
+@media screen {
+p{}
+@media screen{
+q{}
+}
+r{}
+}
+s{}
+#errors
+;3;1;m;at-rule not allowed:media
+#cssom
+| @media screen
+|   <p>
+|   <r>
+| <s>
+
+#data
+@media screen, 3d {
+  p{color: green}
+}
+#errors
+;1;16;unsupported;unknown media type
+#cssom
+| @media screen, unknown
+|   <p>
+|     color: green
+
+

@@ -18,6 +18,7 @@ my $DefaultComputedText;
 
 for my $file_name (map {"t/$_"} qw(
   css-1.dat
+  css-2.dat
   css-visual.dat
   css-generated.dat
   css-paged.dat
@@ -449,12 +450,7 @@ sub serialize_cssom ($) {
       my $v = '';
       for my $rule (@{$ss->css_rules}) {
         my $indent = '';
-        if ($rule->type == $rule->STYLE_RULE) {
-          $v .= '| ' . $indent . '<' . $rule->selector_text . ">\n";
-          $v .= serialize_style ($rule->style, $indent . '  ');
-        } else {
-          die "Rule type @{[$rule->type]} is not supported";
-        }
+        $v .= serialize_rule ($rule, $indent);
       }
       return $v;
     } else {
@@ -464,6 +460,21 @@ sub serialize_cssom ($) {
     return '(undef)';
   }
 } # serialize_cssom
+
+sub serialize_rule ($$) {
+  my ($rule, $indent) = @_;
+  my $v = '';
+  if ($rule->type == $rule->STYLE_RULE) {
+    $v .= '| ' . $indent . '<' . $rule->selector_text . ">\n";
+    $v .= serialize_style ($rule->style, $indent . '  ');
+  } elsif ($rule->type == $rule->MEDIA_RULE) {
+    $v .= '| ' . $indent . '@media ' . $rule->media . "\n";
+    $v .= serialize_rule ($_, $indent . '  ') for @{$rule->css_rules};
+  } else {
+    die "Rule type @{[$rule->type]} is not supported";
+  }
+  return $v;
+} # serialize_rule
 
 sub get_computed_style ($$$$$$) {
   my ($all_test, $doc_id, $selectors, $dom, $css_options, $ss) = @_;
