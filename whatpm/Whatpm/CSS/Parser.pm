@@ -7,7 +7,7 @@ require Whatpm::CSS::MediaQueryParser;
 sub new ($) {
   my $self = bless {must_level => 'm',
                     message_level => 'w',
-                    unsupported_level => 'unsupported'}, shift;
+                    unsupported_level => 'u'}, shift;
   # $self->{base_uri}
   # $self->{unitless_px} = 1/0
   # $self->{hashless_rgb} = 1/0
@@ -6608,4 +6608,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/02/08 15:05:56 $
+## $Date: 2008/02/09 11:29:13 $
