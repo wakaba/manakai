@@ -1578,13 +1578,50 @@ $Element->{$HTML_NS}->{style} = {
     ## not different
   }),
   checker => sub {
-    ## NOTE: |html:style| has no conformance creteria on content model
+    ## NOTE: |html:style| itself has no conformance creteria on content model.
     my ($self, $todo) = @_;
     my $type = $todo->{node}->get_attribute_ns (undef, 'type');
-    $type = 'text/css' unless defined $type;
-    $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
-                       type => 'style:'.$type); ## TODO: $type normalization
-    return $AnyChecker->($self, $todo);
+    if (not defined $type or
+        $type =~ m[\A(?>(?>\x0D\x0A)?[\x09\x20])*[Tt][Ee][Xx][Tt](?>(?>\x0D\x0A)?[\x09\x20])*/(?>(?>\x0D\x0A)?[\x09\x20])*[Cc][Ss][Ss](?>(?>\x0D\x0A)?[\x09\x20])*\z]) {
+      my $el = $todo->{node};
+      my $new_todos = [];
+      my @nodes = (@{$el->child_nodes});
+      
+      my $ss_text = '';
+      while (@nodes) {
+        my $node = shift @nodes;
+        $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+        
+        my $nt = $node->node_type;
+        if ($nt == 1) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+          my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+          unshift @nodes, @$sib;
+          push @$new_todos, @$ch;
+        } elsif ($nt == 3 or $nt == 4) {
+          $ss_text .= $node->text_content;
+        } elsif ($nt == 5) {
+          unshift @nodes, @{$node->child_nodes};
+        }
+      }
+      
+      my $p = $self->_get_css_parser;
+      $p->{onerror} = sub {
+        $self->{onerror}->(@_, node => $el);
+      };
+      $p->{href} = $el->owner_document->document_uri;
+      
+      my $ss = $p->parse_char_string ($ss_text);
+
+      ## TODO: C.c. of $ss
+
+      $p->{onerror} = sub {};
+      return ($new_todos);
+    } else {
+      $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
+                         type => 'style:'.$type); ## TODO: $type normalization
+      return $AnyChecker->($self, $todo);
+    }
   },
 };
 ## ISSUE: Relationship to significant content check?
