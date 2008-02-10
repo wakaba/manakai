@@ -1,6 +1,6 @@
 package Message::DOM::CSSStyleSheet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSStyleSheet';
 require Message::DOM::DOMException;
 require Scalar::Util;
@@ -111,6 +111,18 @@ sub css_text ($;$) {
   return $r;
 } # css_text
 
+## TODO: documentation
+sub manakai_input_encoding ($;$) {
+  if (@_ > 1) {
+    if (defined $_[1]) {
+      ${$_[0]}->{input_encoding} = ''.$_[1];
+    } else {
+      delete ${$_[0]}->{input_encoding};
+    }
+  }
+  return ${$_[0]}->{input_encoding};
+} # manakai_input_encoding
+
 sub owner_rule ($);
 
 ## |CSSStyleSheet| methods
@@ -171,4 +183,4 @@ package Message::IF::StyleSheet;
 package Message::IF::CSSStyleSheet;
 
 1;
-## $Date: 2008/01/14 05:53:45 $
+## $Date: 2008/02/10 04:10:36 $
