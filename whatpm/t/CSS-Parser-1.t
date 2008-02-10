@@ -308,11 +308,6 @@ sub get_parser ($) {
 
   my $p = Whatpm::CSS::Parser->new;
 
-  if ($parse_mode eq 'q') {
-    $p->{unitless_px} = 1;
-    $p->{hashless_color} = 1;
-  }
-
   $p->{prop}->{$_} = 1 for (@longhand, @shorthand);
   $p->{prop_value}->{display}->{$_} = 1 for qw/
     block clip inline inline-block inline-table list-item none
@@ -438,6 +433,11 @@ sub get_parser ($) {
     pseudo_element => $p->{pseudo_element},
   };
 
+  $p->init;
+  if ($parse_mode eq 'q') {
+    $p->{unitless_px} = 1;
+    $p->{hashless_color} = 1;
+  }
   $p->{href} = 'thismessage:/';
 
   return ($p, $css_options);

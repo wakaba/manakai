@@ -60,6 +60,15 @@ our $Prop; ## By CSS property name
 our $Attr; ## By CSSOM attribute name
 our $Key; ## By internal key
 
+sub init ($) {
+  my $self = shift;
+  delete $self->{style_sheet};
+  delete $self->{unitless_px};
+  delete $self->{hashless_rgb};
+  delete $self->{href};
+  delete $self->{base_uri};
+} # init
+
 sub parse_char_string ($$) {
   my $self = $_[0];
 
@@ -134,6 +143,15 @@ sub parse_char_string ($$) {
   my $charset_allowed = 1;
   my $namespace_allowed = 1;
   my $media_allowed = 1;
+
+  my $ss = $self->{style_sheet} ||= Message::DOM::CSSStyleSheet->____new
+      (manakai_base_uri => $self->{base_uri},
+       css_rules => $open_rules->[0],
+       ## TODO: href
+       ## TODO: owner_node
+       ## TODO: media
+       type => 'text/css', ## TODO: OK?
+       _parser => $self, _nsmap => $nsmap);
 
   S: {
     if ($state == BEFORE_STATEMENT_STATE) {
@@ -564,7 +582,11 @@ sub parse_char_string ($$) {
       die "$0: parse_char_string: Unknown state: $state";
     }
   } # S
-  
+
+  for (@{$$ss->{css_rules}}) {
+    $$_->{parent_style_sheet} = $ss;
+    Scalar::Util::weaken ($$_->{parent_style_sheet});
+  }
   for my $parent_rule (@$parent_rules) {
     for (@{$$parent_rule->{css_rules}}) {
       $$_->{parent_rule} = $parent_rule;
@@ -572,14 +594,6 @@ sub parse_char_string ($$) {
     }
   }
 
-  my $ss = Message::DOM::CSSStyleSheet->____new
-      (manakai_base_uri => $self->{base_uri},
-       css_rules => $open_rules->[0],
-       ## TODO: href
-       ## TODO: owner_node
-       ## TODO: media
-       type => 'text/css', ## TODO: OK?
-       _parser => $self, _nsmap => $nsmap);
   return $ss;
 } # parse_char_string
 
@@ -6635,4 +6649,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/02/10 07:34:10 $
+## $Date: 2008/02/10 09:38:27 $

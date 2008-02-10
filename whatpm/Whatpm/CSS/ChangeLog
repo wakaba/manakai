@@ -1,5 +1,12 @@
 2008-02-10  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm (parse_char_string): Create a style sheet
+	before the actual parsing (or use the style sheet created before
+	the invocation to the method.
+	(init): New.
+
+2008-02-10  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm: |attr(prefix|localname)| did not work.  Support 
 	for uppercase namespace prefixes (namespace prefixes were
 	not normalized into lowercase when they were looked up.).  Report
