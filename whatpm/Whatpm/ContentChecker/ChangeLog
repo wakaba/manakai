@@ -1,3 +1,9 @@
+2008-02-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTML.pm (<style>): CSS validation code removed; instead,
+	it does invoke subdoc callback to ask to the callee to validate
+	the style sheet separately.
+
 2008-02-09  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTML.pm (<style>): Initial version of CSS validation support.

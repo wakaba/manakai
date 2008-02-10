@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.55 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.56 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -205,10 +205,13 @@ my $HTMLTransparentElements = {
 
 our $Element = {};
 
-sub check_document ($$$) {
-  my ($self, $doc, $onerror) = @_;
+sub check_document ($$$;$) {
+  my ($self, $doc, $onerror, $onsubdoc) = @_;
   $self = bless {}, $self unless ref $self;
   $self->{onerror} = $onerror;
+  $self->{onsubdoc} = $onsubdoc || sub {
+    warn "A subdocument is not conformance-checked";
+  };
 
   $self->{must_level} = 'm';
   $self->{fact_level} = 'f';
@@ -255,7 +258,7 @@ sub check_document ($$$) {
   ## TODO: Check for other items other than document element
   ## (second (errorous) element, text nodes, PI nodes, doctype nodes)
 
-  my $return = $self->check_element ($docel, $onerror);
+  my $return = $self->check_element ($docel, $onerror, $onsubdoc);
 
   ## TODO: Test for these checks are necessary.
   my $charset_name = $doc->input_encoding;
@@ -310,10 +313,13 @@ sub check_document ($$$) {
   return $return;
 } # check_document
 
-sub check_element ($$$) {
-  my ($self, $el, $onerror) = @_;
+sub check_element ($$$;$) {
+  my ($self, $el, $onerror, $onsubdoc) = @_;
   $self = bless {}, $self unless ref $self;
   $self->{onerror} = $onerror;
+  $self->{onsubdoc} = $onsubdoc || sub {
+    warn "A subdocument is not conformance-checked";
+  };
 
   $self->{must_level} = 'm';
   $self->{fact_level} = 'f';
@@ -543,170 +549,9 @@ sub _check_get_children ($$$) {
   return ($sib, $new_todos);
 } # _check_get_children
 
-sub _get_css_parser ($) {
-  my $self = shift;
-
-  return $self->{css_parser} if $self->{css_parser};
-
-  require Whatpm::CSS::Parser;
-  my $p = Whatpm::CSS::Parser->new;
-
-#  if ($parse_mode eq 'q') {
-#    $p->{unitless_px} = 1;
-#    $p->{hashless_color} = 1;
-#  }
-
-  $p->{prop}->{$_} = 1 for qw/
-    background background-attachment background-color background-image
-    background-position background-position-x background-position-y
-    background-repeat border border-bottom border-bottom-color
-    border-bottom-style border-bottom-width border-collapse border-color
-    border-left border-left-color
-    border-left-style border-left-width border-right border-right-color
-    border-right-style border-right-width
-    border-spacing -manakai-border-spacing-x -manakai-border-spacing-y
-    border-style border-top border-top-color border-top-style border-top-width
-    border-width bottom
-    caption-side clear clip color content counter-increment counter-reset
-    cursor direction display empty-cells float font
-    font-family font-size font-size-adjust font-stretch
-    font-style font-variant font-weight height left
-    letter-spacing line-height
-    list-style list-style-image list-style-position list-style-type
-    margin margin-bottom margin-left margin-right margin-top marker-offset
-    marks max-height max-width min-height min-width opacity -moz-opacity
-    orphans outline outline-color outline-style outline-width overflow
-    overflow-x overflow-y
-    padding padding-bottom padding-left padding-right padding-top
-    page page-break-after page-break-before page-break-inside
-    position quotes right size table-layout
-    text-align text-decoration text-indent text-transform
-    top unicode-bidi vertical-align visibility white-space width widows
-    word-spacing z-index
-  /;
-  $p->{prop_value}->{display}->{$_} = 1 for qw/
-    block clip inline inline-block inline-table list-item none
-    table table-caption table-cell table-column table-column-group
-    table-header-group table-footer-group table-row table-row-group
-    compact marker
-  /;
-  $p->{prop_value}->{position}->{$_} = 1 for qw/
-    absolute fixed relative static
-  /;
-  $p->{prop_value}->{float}->{$_} = 1 for qw/
-    left right none
-  /;
-  $p->{prop_value}->{clear}->{$_} = 1 for qw/
-    left right none both
-  /;
-  $p->{prop_value}->{direction}->{ltr} = 1;
-  $p->{prop_value}->{direction}->{rtl} = 1;
-  $p->{prop_value}->{marks}->{crop} = 1;
-  $p->{prop_value}->{marks}->{cross} = 1;
-  $p->{prop_value}->{'unicode-bidi'}->{$_} = 1 for qw/
-    normal bidi-override embed
-  /;
-  for my $prop_name (qw/overflow overflow-x overflow-y/) {
-    $p->{prop_value}->{$prop_name}->{$_} = 1 for qw/
-      visible hidden scroll auto -webkit-marquee -moz-hidden-unscrollable
-    /;
-  }
-  $p->{prop_value}->{visibility}->{$_} = 1 for qw/
-    visible hidden collapse
-  /;
-  $p->{prop_value}->{'list-style-type'}->{$_} = 1 for qw/
-    disc circle square decimal decimal-leading-zero
-    lower-roman upper-roman lower-greek lower-latin
-    upper-latin armenian georgian lower-alpha upper-alpha none
-    hebrew cjk-ideographic hiragana katakana hiragana-iroha
-    katakana-iroha
-  /;
-  $p->{prop_value}->{'list-style-position'}->{outside} = 1;
-  $p->{prop_value}->{'list-style-position'}->{inside} = 1;
-  $p->{prop_value}->{'page-break-before'}->{$_} = 1 for qw/
-    auto always avoid left right
-  /;
-  $p->{prop_value}->{'page-break-after'}->{$_} = 1 for qw/
-    auto always avoid left right
-  /;
-  $p->{prop_value}->{'page-break-inside'}->{auto} = 1;
-  $p->{prop_value}->{'page-break-inside'}->{avoid} = 1;
-  $p->{prop_value}->{'background-repeat'}->{$_} = 1 for qw/
-    repeat repeat-x repeat-y no-repeat
-  /;
-  $p->{prop_value}->{'background-attachment'}->{scroll} = 1;
-  $p->{prop_value}->{'background-attachment'}->{fixed} = 1;
-  $p->{prop_value}->{'font-size'}->{$_} = 1 for qw/
-    xx-small x-small small medium large x-large xx-large
-    -manakai-xxx-large -webkit-xxx-large
-    larger smaller
-  /;
-  $p->{prop_value}->{'font-style'}->{normal} = 1;
-  $p->{prop_value}->{'font-style'}->{italic} = 1;
-  $p->{prop_value}->{'font-style'}->{oblique} = 1;
-  $p->{prop_value}->{'font-variant'}->{normal} = 1;
-  $p->{prop_value}->{'font-variant'}->{'small-caps'} = 1;
-  $p->{prop_value}->{'font-stretch'}->{$_} = 1 for
-      qw/normal wider narrower ultra-condensed extra-condensed
-        condensed semi-condensed semi-expanded expanded
-        extra-expanded ultra-expanded/;
-  $p->{prop_value}->{'text-align'}->{$_} = 1 for qw/
-    left right center justify begin end
-  /;
-  $p->{prop_value}->{'text-transform'}->{$_} = 1 for qw/
-    capitalize uppercase lowercase none
-  /;
-  $p->{prop_value}->{'white-space'}->{$_} = 1 for qw/
-    normal pre nowrap pre-line pre-wrap
-  /;
-  $p->{prop_value}->{'text-decoration'}->{$_} = 1 for qw/
-    none blink underline overline line-through
-  /;
-  $p->{prop_value}->{'caption-side'}->{$_} = 1 for qw/
-    top bottom left right
-  /;
-  $p->{prop_value}->{'table-layout'}->{auto} = 1;
-  $p->{prop_value}->{'table-layout'}->{fixed} = 1;
-  $p->{prop_value}->{'border-collapse'}->{collapase} = 1;
-  $p->{prop_value}->{'border-collapse'}->{separate} = 1;
-  $p->{prop_value}->{'empty-cells'}->{show} = 1;
-  $p->{prop_value}->{'empty-cells'}->{hide} = 1;
-  $p->{prop_value}->{cursor}->{$_} = 1 for qw/
-    auto crosshair default pointer move e-resize ne-resize nw-resize n-resize
-    se-resize sw-resize s-resize w-resize text wait help progress
-  /;
-  for my $prop (qw/border-top-style border-left-style
-                   border-bottom-style border-right-style outline-style/) {
-    $p->{prop_value}->{$prop}->{$_} = 1 for qw/
-      none hidden dotted dashed solid double groove ridge inset outset
-    /;
-  }
-  for my $prop (qw/color background-color
-                   border-bottom-color border-left-color border-right-color
-                   border-top-color border-color/) {
-    $p->{prop_value}->{$prop}->{transparent} = 1;
-    $p->{prop_value}->{$prop}->{flavor} = 1;
-    $p->{prop_value}->{$prop}->{'-manakai-default'} = 1;
-  }
-  $p->{prop_value}->{'outline-color'}->{invert} = 1;
-  $p->{prop_value}->{'outline-color'}->{'-manakai-invert-or-currentcolor'} = 1;
-  $p->{pseudo_class}->{$_} = 1 for qw/
-    active checked disabled empty enabled first-child first-of-type
-    focus hover indeterminate last-child last-of-type link only-child
-    only-of-type root target visited
-    lang nth-child nth-last-child nth-of-type nth-last-of-type not
-    -manakai-contains -manakai-current
-  /;
-  $p->{pseudo_element}->{$_} = 1 for qw/
-    after before first-letter first-line
-  /;
-
-  return $self->{css_parser} = $p;
-} # _get_css_parser
-
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -714,4 +559,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/09 11:58:16 $
+# $Date: 2008/02/10 04:09:57 $

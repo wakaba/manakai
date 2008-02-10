@@ -1604,18 +1604,9 @@ $Element->{$HTML_NS}->{style} = {
           unshift @nodes, @{$node->child_nodes};
         }
       }
-      
-      my $p = $self->_get_css_parser;
-      $p->{onerror} = sub {
-        $self->{onerror}->(@_, node => $el);
-      };
-      $p->{href} = $el->owner_document->document_uri;
-      
-      my $ss = $p->parse_char_string ($ss_text);
 
-      ## TODO: C.c. of $ss
-
-      $p->{onerror} = sub {};
+      $self->{onsubdoc}->({s => $ss_text, container_node => $el,
+                           media_type => 'text/css', is_char_string => 1});
       return ($new_todos);
     } else {
       $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
