@@ -1,6 +1,6 @@
 package Whatpm::CSS::SelectorsParser;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -120,12 +120,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
   my $state = BEFORE_TYPE_SELECTOR_STATE;
   my $t = $_[3] || $tt->get_next_token;
   my $name;
+  my $name_t;
   S: {
     if ($state == BEFORE_TYPE_SELECTOR_STATE) {
       $in_negation = 2 if $in_negation;
 
       if ($t->{type} == IDENT_TOKEN) { ## element type or namespace prefix
         $name = $t->{value};
+        $name_t = $t;
         $state = AFTER_NAME_STATE;
         $t = $tt->get_next_token;
         redo S;
@@ -245,7 +247,8 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             $self->{onerror}->(type => 'namespace prefix:not declared',
                                level => $self->{must_level},
                                uri => \$self->{href},
-                               token => $t);
+                               token => $name_t || $t,
+                               value => $name);
             return ($t, undef);
           }
           push @$sss, [NAMESPACE_SELECTOR, $uri];
@@ -262,7 +265,8 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             $self->{onerror}->(type => 'namespace prefix:not declared',
                                level => $self->{must_level},
                                uri => \$self->{href},
-                               token => $t);
+                               token => $name_t || $t,
+                               value => $name);
             return ($t, undef);
           }
           push @$sss, [NAMESPACE_SELECTOR, $uri];
@@ -318,7 +322,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         return ($t, undef);
       }
     } elsif ($state == COMBINATOR_STATE) {
-      if ($state == S_TOKEN) {
+      if ($t->{type} == S_TOKEN) {
         ## Stay in the state.
         $t = $tt->get_next_token;
         redo S;
@@ -454,6 +458,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
       $simple_selector = [ATTRIBUTE_SELECTOR];
       if ($t->{type} == IDENT_TOKEN) {
         $name = $t->{value};
+        $name_t = $t;
 
         $state = AFTER_ATTR_NAME_STATE;
         $t = $tt->get_next_token;
@@ -466,6 +471,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         redo S;
       } elsif ($t->{type} == STAR_TOKEN) {
         $name = undef;
+        $name_t = undef;
 
         $state = AFTER_ATTR_NAME_STATE;
         $t = $tt->get_next_token;
@@ -489,7 +495,8 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             $self->{onerror}->(type => 'namespace prefix:not declared',
                                level => $self->{must_level},
                                uri => \$self->{href},
-                               token => $t);
+                               token => $name_t || $t,
+                               value => $name);
             return ($t, undef);
           }
           $simple_selector->[1] = $uri;
@@ -971,4 +978,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/01/20 09:59:25 $
+# $Date: 2008/02/10 07:34:10 $

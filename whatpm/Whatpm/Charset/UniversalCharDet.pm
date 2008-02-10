@@ -1,6 +1,6 @@
 package Whatpm::Charset::UniversalCharDet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 our $DEBUG;
 
@@ -21,7 +21,17 @@ def _detect(s):
 };
 
 sub detect_byte_string ($$) {
-  my $de = _detect ($_[1]);
+  my $de;
+  eval {
+    $de = _detect ($_[1]);
+    1;
+  } or do {
+    ## NOTE: As far as I can tell, Python implementation of UniversalCharDet
+    ## is broken for some input (at least for a broken ISO-2022-JP text it
+    ## croaks).
+    warn $@ unless $DEBUG;
+    die $@ if $DEBUG;
+  };
   if (defined $de and defined $de->{encoding}) {
     return lc $de->{encoding};
   } else {
@@ -39,4 +49,5 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/11/19 12:18:27 $
+## $Date: 2008/02/10 07:34:10 $
+#  LocalWords:  noClear JIS

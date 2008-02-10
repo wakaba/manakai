@@ -3727,6 +3727,66 @@ p {
 
 #data
 p {
+  background-position: top left;
+}
+#cssom
+| <p>
+|   background-position: left top
+|   background-position-x: left
+|   background-position-y: top
+
+#data
+p {
+  background-position: top right;
+}
+#cssom
+| <p>
+|   background-position: right top
+|   background-position-x: right
+|   background-position-y: top
+
+#data
+p {
+  background-position: bottom left;
+}
+#cssom
+| <p>
+|   background-position: left bottom
+|   background-position-x: left
+|   background-position-y: bottom
+
+#data
+p {
+  background-position: bottom right;
+}
+#cssom
+| <p>
+|   background-position: right bottom
+|   background-position-x: right
+|   background-position-y: bottom
+
+#data
+p {
+  background-position: center left;
+}
+#cssom
+| <p>
+|   background-position: left center
+|   background-position-x: left
+|   background-position-y: center
+
+#data
+p {
+  background-position: center right;
+}
+#cssom
+| <p>
+|   background-position: right center
+|   background-position-x: right
+|   background-position-y: center
+
+#data
+p {
   background:;
 }
 #errors
@@ -4094,6 +4154,51 @@ p {
 |   background-position: right bottom
 |   background-position-x: right
 |   background-position-y: bottom
+|   background-repeat: repeat
+
+#data
+p {
+  background: center right;
+}
+#cssom
+| <p>
+|   background: right center
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: right center
+|   background-position-x: right
+|   background-position-y: center
+|   background-repeat: repeat
+
+#data
+p {
+  background: center left;
+}
+#cssom
+| <p>
+|   background: left center
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: left center
+|   background-position-x: left
+|   background-position-y: center
+|   background-repeat: repeat
+
+#data
+p {
+  background: center center;
+}
+#cssom
+| <p>
+|   background: center center
+|   background-attachment: scroll
+|   background-color: transparent
+|   background-image: none
+|   background-position: center center
+|   background-position-x: center
+|   background-position-y: center
 |   background-repeat: repeat
 
 #data

@@ -16,6 +16,78 @@ p {
 
 #data
 p {
+  border-collapse  : collapse;
+}
+#cssom
+| <p>
+|   border-collapse: collapse
+#csstext
+p {
+  border-collapse: collapse;
+}
+
+#data
+p {
+  border-collapse: separate;
+}
+#cssom
+| <p>
+|   border-collapse: separate
+#csstext
+p {
+  border-collapse: separate;
+}
+
+#data
+p {
+  border-collapse: inherit;
+}
+#cssom
+| <p>
+|   border-collapse: inherit
+#csstext
+p {
+  border-collapse: inherit;
+}
+
+#data
+p {
+  border-collapse: collapase;
+}
+#errors
+;2;20;m;syntax error:'border-collapse'
+#cssom
+| <p>
+
+#data
+p {
+  border-collapse: separated;
+}
+#errors
+;2;20;m;syntax error:'border-collapse'
+#cssom
+| <p>
+
+#data
+p {
+  border-collapse: cllapase;
+}
+#errors
+;2;20;m;syntax error:'border-collapse'
+#cssom
+| <p>
+
+#data
+p {
+  border-collapase: collapse;
+}
+#errors
+;2;3;u;property not supported;border-collapase
+#cssom
+| <p>
+
+#data
+p {
   border-spacing: 12px;
 }
 #cssom

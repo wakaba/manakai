@@ -19,6 +19,7 @@ my $DefaultComputedText;
 for my $file_name (map {"t/$_"} qw(
   css-1.dat
   css-2.dat
+  css-3.dat
   css-visual.dat
   css-generated.dat
   css-paged.dat
@@ -386,7 +387,7 @@ sub get_parser ($) {
     capitalize uppercase lowercase none
   /;
   $p->{prop_value}->{'white-space'}->{$_} = 1 for qw/
-    normal pre nowrap pre-line pre-wrap
+    normal pre nowrap pre-line pre-wrap -moz-pre-wrap
   /;
   $p->{prop_value}->{'text-decoration'}->{$_} = 1 for qw/
     none blink underline overline line-through
@@ -396,7 +397,7 @@ sub get_parser ($) {
   /;
   $p->{prop_value}->{'table-layout'}->{auto} = 1;
   $p->{prop_value}->{'table-layout'}->{fixed} = 1;
-  $p->{prop_value}->{'border-collapse'}->{collapase} = 1;
+  $p->{prop_value}->{'border-collapse'}->{collapse} = 1;
   $p->{prop_value}->{'border-collapse'}->{separate} = 1;
   $p->{prop_value}->{'empty-cells'}->{show} = 1;
   $p->{prop_value}->{'empty-cells'}->{hide} = 1;
@@ -470,6 +471,11 @@ sub serialize_rule ($$) {
   } elsif ($rule->type == $rule->MEDIA_RULE) {
     $v .= '| ' . $indent . '@media ' . $rule->media . "\n";
     $v .= serialize_rule ($_, $indent . '  ') for @{$rule->css_rules};
+  } elsif ($rule->type == $rule->NAMESPACE_RULE) {
+    $v .= '| ' . $indent . '@namespace ';
+    my $prefix = $rule->prefix;
+    $v .= $prefix . ': ' if length $prefix;
+    $v .= '<' . $rule->namespace_uri . ">\n";
   } else {
     die "Rule type @{[$rule->type]} is not supported";
   }

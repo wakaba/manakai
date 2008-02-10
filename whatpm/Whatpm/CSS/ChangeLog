@@ -1,3 +1,17 @@
+2008-02-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* Parser.pm: |attr(prefix|localname)| did not work.  Support 
+	for uppercase namespace prefixes (namespace prefixes were
+	not normalized into lowercase when they were looked up.).  Report
+	the property name token when an unknown property error is raised.
+	The '-moz-pre-wrap' value is supported for 'white-space' property.
+	('background-position'): 'center left' and 'center right'
+	were not supported.
+
+	* SelectorsParser.pm: Report the namespace prefix token when
+	an undeclared prefix error is raised.  S_TOKEN in 
+	COMBINATOR_STATE was not handled correctly.
+
 2008-02-09  Wakaba  <wakaba@suika.fam.cx>
 
 	* Parser.pm (new): s/unsupported/u/;

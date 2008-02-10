@@ -28,6 +28,27 @@ p {
 }
 
 #data
+p /**/ {}
+#cssom
+| <p>
+
+#data
+p /**/ q {}
+#cssom
+| <p q>
+
+#data
+p /**/ ! {}
+#errors
+;1;8;m;no sss
+#cssom
+
+#data
+p /**/ + /**/ q {}
+#cssom
+| <p + q>
+
+#data
 p {;}
 #cssom
 | <p>

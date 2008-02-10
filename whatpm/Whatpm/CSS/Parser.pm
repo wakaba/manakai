@@ -7,7 +7,8 @@ require Whatpm::CSS::MediaQueryParser;
 sub new ($) {
   my $self = bless {must_level => 'm',
                     message_level => 'w',
-                    unsupported_level => 'u'}, shift;
+                    unsupported_level => 'u',
+                    lookup_namespace_uri => sub { undef }}, shift;
   # $self->{base_uri}
   # $self->{unitless_px} = 1/0
   # $self->{hashless_rgb} = 1/0
@@ -110,8 +111,9 @@ sub parse_char_string ($$) {
   # $nsmap->{prefix_to_uri}->{p/""} = uri/undef
   # $nsmap->{uri_to_prefixes}->{uri} = ["p|"/"",...]/undef
   # $nsmap->{has_namespace} = 1/0
-  $sp->{lookup_namespace_uri} = sub {
-    return $nsmap->{prefix_to_uri}->{$_[0]}; # $_[0] is '' (default) or prefix
+  $self->{lookup_namespace_uri} = 
+  $sp->{lookup_namespace_uri} = sub { ## TODO: case
+    return $nsmap->{prefix_to_uri}->{lc $_[0]}; # $_[0] is '' (default) or prefix
   }; # $sp->{lookup_namespace_uri}
 
   require Message::DOM::CSSStyleSheet;
@@ -359,6 +361,7 @@ sub parse_char_string ($$) {
       $t = $tt->get_next_token while $t->{type} == S_TOKEN;
       if ($t->{type} == IDENT_TOKEN) { # property
         my $prop_name = lc $t->{value}; ## TODO: case folding
+        my $prop_name_t = $t;
         $t = $tt->get_next_token;
         $t = $tt->get_next_token while $t->{type} == S_TOKEN;
         if ($t->{type} == COLON_TOKEN) {
@@ -407,7 +410,7 @@ sub parse_char_string ($$) {
           } else {
             $onerror->(type => 'property not supported',
                        level => $self->{unsupported_level},
-                       token => $t, value => $prop_name,
+                       token => $prop_name_t, value => $prop_name,
                        uri => \$self->{href});
 
             #
@@ -1819,6 +1822,7 @@ $Prop->{'white-space'} = {
   parse => $one_keyword_parser,
   keyword => {
     normal => 1, pre => 1, nowrap => 1, 'pre-wrap' => 1, 'pre-line' => 1,
+    '-moz-pre-wrap' => 1,
   },
   initial => ["KEYWORD", 'normal'],
   inherited => 1,
@@ -3928,6 +3932,8 @@ $Prop->{'border-top'} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
+    ## TODO: Need to be rewritten.
+
     my %prop_value;
     my $pv;
     ## NOTE: Since $onerror is disabled for three invocations below,
@@ -4160,6 +4166,8 @@ $Prop->{'border-left'} = {
   serialize_multiple => $Prop->{'border-top-color'}->{serialize_multiple},
 };
 $Attr->{border_left} = $Prop->{'border-left'};
+
+## TODO: -moz-outline -> outline
 
 $Prop->{outline} = {
   css => 'outline',
@@ -4860,10 +4868,27 @@ $Prop->{'background-position'} = {
       $prop_value{'background-position-y'} = ['PERCENTAGE', 50];
     } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $prop_value = lc $t->{value}; ## TODO: case folding
-      if ({left => 1, center => 1, right => 1}->{$prop_value}) {
+      if ($prop_value eq 'left' or $prop_value eq 'right') {
         $t = $tt->get_next_token;
         $prop_value{'background-position-x'} = ['KEYWORD', $prop_value];
         $prop_value{'background-position-y'} = ['KEYWORD', 'center'];
+      } elsif ($prop_value eq 'center') {
+        $t = $tt->get_next_token;
+        $prop_value{'background-position-x'} = ['KEYWORD', $prop_value];
+
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == IDENT_TOKEN) {
+          my $prop_value = lc $t->{value}; ## TODO: case folding
+          if ($prop_value eq 'left' or $prop_value eq 'right') {
+            $prop_value{'background-position-y'}
+                = $prop_value{'background-position-x'};
+            $prop_value{'background-position-x'} = ['KEYWORD', $prop_value];
+            $t = $tt->get_next_token;
+            return ($t, \%prop_value);
+          }
+        } else {
+          $prop_value{'background-position-y'} = ['KEYWORD', 'center'];
+        }
       } elsif ($prop_value eq 'top' or $prop_value eq 'bottom') {
         $t = $tt->get_next_token;
         $prop_value{'background-position-y'} = ['KEYWORD', $prop_value];
@@ -6065,12 +6090,14 @@ $Prop->{content} = {
             $t = $tt->get_next_token while $t->{type} == S_TOKEN;
             if ($t->{type} == RPAREN_TOKEN) {
               if (defined $t_pfx) {
-                my $uri = $self->{lookup_namespace_uri}->($name);
+                my $pfx = $t_pfx->{value};
+                my $uri = $self->{lookup_namespace_uri}->($pfx);
                 unless (defined $uri) {
                   $self->{onerror}->(type => 'namespace prefix:not declared',
                                      level => $self->{must_level},
                                      uri => \$self->{href},
-                                     token => $t_pfx);
+                                     token => $t_pfx,
+                                     value => $pfx);
                   return ($t, undef);
                 }
                 push @v, ['ATTR', $uri, $t_ln->{value}];
@@ -6608,4 +6635,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/02/09 11:29:13 $
+## $Date: 2008/02/10 07:34:10 $
