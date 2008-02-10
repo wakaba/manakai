@@ -1,4 +1,4 @@
-function tableToCanvas (table, parent) {
+function tableToCanvas (table, parent, idPrefix) {
   var canvas = document.createElement ('canvas');
   parent.appendChild (canvas);
   if (window.G_vmlCanvasManager) {
@@ -142,8 +142,8 @@ for (var i = 1; i < table.cell.length; i++) {
           area.shape = 'rect';
           area.coords = [x, y, x + width, y + height].join (',');
           area.alt = 'Cell (' + c[0].x + ', ' + c[0].y + ')';
-          area.href = '#node-' + c[0].id;
-          area.id = 'cell-' + c[0].id;
+          area.href = '#' + idPrefix + 'node-' + c[0].id;
+          area.id = idPrefix + 'cell-' + c[0].id;
           map.appendChild (area);
         }
       } else {
@@ -176,7 +176,7 @@ for (var i = 1; i < rowNumber; i++) {
 }
 
   if (map.hasChildNodes ()) {
-    var mapid = 'table-map-' + ++document.TableMapId;
+    var mapid = /* idPrefix + */ 'table-map-' + ++document.TableMapId;
     map.name = mapid;
     parent.appendChild (map);
     var img = document.createElement ('img');
@@ -191,10 +191,10 @@ if (!document.TableMapId) document.TableMapId = 0;
 
 /*
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 */
-/* $Date: 2007/06/30 08:26:08 $ */
+/* $Date: 2008/02/10 02:30:14 $ */

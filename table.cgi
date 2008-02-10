@@ -91,7 +91,7 @@ if ($mode eq '/table') {
   tableToCanvas (
 ';
     print STDOUT objToJson ($table);
-    print STDOUT ', document.body);
+    print STDOUT ', document.body, "");
 </script>';
   }
 
@@ -108,11 +108,11 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/16 10:55:11 $
+## $Date: 2008/02/10 02:30:14 $
