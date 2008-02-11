@@ -157,6 +157,7 @@ my @longhand;
 my @shorthand;
 BEGIN {
   @longhand = qw/
+    alignment-baseline
     background-attachment background-color background-image
     background-position-x background-position-y
     background-repeat border-bottom-color
@@ -167,7 +168,7 @@ BEGIN {
     -manakai-border-spacing-x -manakai-border-spacing-y
     border-top-color border-top-style border-top-width bottom
     caption-side clear clip color content counter-increment counter-reset
-    cursor direction display empty-cells float
+    cursor direction display dominant-baseline empty-cells float
     font-family font-size font-size-adjust font-stretch
     font-style font-variant font-weight height left
     letter-spacing line-height
@@ -178,9 +179,9 @@ BEGIN {
     padding-bottom padding-left padding-right padding-top
     page page-break-after page-break-before page-break-inside
     position quotes right size table-layout
-    text-align text-decoration text-indent text-transform
+    text-align text-anchor text-decoration text-indent text-transform
     top unicode-bidi vertical-align visibility white-space width widows
-    word-spacing z-index
+    word-spacing writing-mode z-index
   /;
   @shorthand = qw/
     background background-position
@@ -188,7 +189,8 @@ BEGIN {
     border-top border-right border-bottom border-left
     font list-style margin outline overflow padding
   /;
-  $DefaultComputedText = q[  border-spacing: 0px;
+  $DefaultComputedText = q[  alignment-baseline: auto;
+  border-spacing: 0px;
   background: transparent none repeat scroll 0% 0%;
   border: 0px none -manakai-default;
   border-collapse: separate;
@@ -203,6 +205,7 @@ BEGIN {
   cursor: auto;
   direction: ltr;
   display: inline;
+  dominant-baseline: auto;
   empty-cells: show;
   float: none;
   font-family: -manakai-default;
@@ -241,6 +244,7 @@ BEGIN {
   size: auto;
   table-layout: auto;
   text-align: begin;
+  text-anchor: start;
   text-decoration: none;
   text-indent: 0px;
   text-transform: none;
@@ -252,6 +256,7 @@ BEGIN {
   widows: 2;
   width: auto;
   word-spacing: normal;
+  writing-mode: lr-tb;
   z-index: auto;
 ];
   $DefaultComputed = $DefaultComputedText;
@@ -384,6 +389,21 @@ sub get_parser ($) {
   /;
   $p->{prop_value}->{'white-space'}->{$_} = 1 for qw/
     normal pre nowrap pre-line pre-wrap -moz-pre-wrap
+  /;
+  $p->{prop_value}->{'writing-mode'}->{$_} = 1 for qw/
+    lr rl tb lr-tb rl-tb tb-rl
+  /;
+  $p->{prop_value}->{'text-anchor'}->{$_} = 1 for qw/
+    start middle end
+  /;
+  $p->{prop_value}->{'dominant-baseline'}->{$_} = 1 for qw/
+    auto use-script no-change reset-size ideographic alphabetic
+    hanging mathematical central middle text-after-edge text-before-edge
+  /;
+  $p->{prop_value}->{'alignment-baseline'}->{$_} = 1 for qw/
+    auto baseline before-edge text-before-edge middle central
+    after-edge text-after-edge ideographic alphabetic hanging
+    mathematical
   /;
   $p->{prop_value}->{'text-decoration'}->{$_} = 1 for qw/
     none blink underline overline line-through

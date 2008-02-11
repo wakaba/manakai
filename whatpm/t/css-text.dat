@@ -1,3 +1,6 @@
+#html 1
+<!DOCTYPE HTML><p>
+
 #data
 p {
   color: rgb(1, 2, 3);
@@ -325,4 +328,144 @@ p {
 p {
   white-space: -moz-pre-wrap;
 }
+
+#data
+p {
+  writing-mode: lr-tb;
+}
+#cssom
+| <p>
+|   writing-mode: lr-tb
+#csstext
+p {
+  writing-mode: lr-tb;
+}
+#computed 1 p
+
+#data
+p {
+  writing-mode: rl-tb;
+}
+#cssom
+| <p>
+|   writing-mode: rl-tb
+#computed 1 p
+-| writing-mode: lr-tb
++| writing-mode: rl-tb
+
+#data
+p {
+  writing-mode: tb-rl;
+}
+#cssom
+| <p>
+|   writing-mode: tb-rl
+#computed 1 p
+-| writing-mode: lr-tb
++| writing-mode: tb-rl
+
+#data
+p {
+ writing-mode: lr;
+}
+#cssom
+| <p>
+|   writing-mode: lr
+#computed 1 p
+
+#data
+p {
+  writing-mode: rl;
+}
+#cssom
+| <p>
+|   writing-mode: rl
+#computed 1 p
+-| writing-mode: lr-tb
++| writing-mode: rl-tb
+
+#data
+p {
+  writing-mode: tb
+}
+#cssom
+| <p>
+|   writing-mode: tb
+#computed 1 p
+-| writing-mode: lr-tb
++| writing-mode: tb-rl
+
+#data
+p {
+  writing-mode: inherit
+}
+#cssom
+| <p>
+|   writing-mode: inherit
+#computed 1 p
+
+#data
+p {
+  text-anchor: start;
+}
+#cssom
+| <p>
+|   text-anchor: start
+#csstext
+p {
+  text-anchor: start;
+}
+#computed 1 p
+
+#data
+p {
+  text-anchor: middle;
+}
+#cssom
+| <p>
+|   text-anchor: middle
+#computed 1 p
+-| text-anchor: start
++| text-anchor: middle
+
+#data
+p {
+  text-anchor: end
+}
+#cssom
+| <p>
+|   text-anchor: end
+#computed 1 p
+-| text-anchor: start
++| text-anchor: end
+
+#data
+p {
+  text-anchor: inherit
+}
+#cssom
+| <p>
+|   text-anchor: inherit
+#computed 1 p
+
+#data
+p {
+  text-anchor: begin;
+}
+#errors
+;2;16;m;syntax error:'text-anchor'
+#cssom
+| <p>
+
+#data
+p {
+  text-amchor: start;
+}
+#errors
+;2;3;u;property not supported;text-amchor
+#cssom
+| <p>
+
+
+
 

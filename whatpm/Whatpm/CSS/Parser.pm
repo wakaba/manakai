@@ -3504,6 +3504,88 @@ $Prop->{'font-stretch'} = {
   },
 };
 
+$Attr->{writing_mode} =
+$Key->{writing_mode} =
+$Prop->{'writing-mode'} = {
+  css => 'writing-mode',
+  dom => 'writing_mode',
+  key => 'writing_mode',
+  parse => $one_keyword_parser,
+  keyword => {
+    'lr' => 1, 'lr-tb' => 1,
+    'rl' => 1, 'rl-tb' => 1,
+    'tb' => 1, 'tb-rl' => 1,
+  },
+  initial => ['KEYWORD', 'lr-tb'],
+  inherited => 1,
+  compute => sub {
+    my ($self, $element, $prop_name, $specified_value) = @_;
+
+    ## ISSUE: Not defined by any standard.
+
+    if (defined $specified_value and $specified_value->[0] eq 'KEYWORD') {
+      if ($specified_value->[1] eq 'lr') {
+        return ['KEYWORD', 'lr-tb'];
+      } elsif ($specified_value->[1] eq 'rl') {
+        return ['KEYWORD', 'rl-tb'];
+      } elsif ($specified_value->[1] eq 'tb') {
+        return ['KEYWORD', 'tb-rl'];
+      }
+    }
+
+    return $specified_value;
+  },
+};
+
+$Attr->{text_anchor} =
+$Key->{text_anchor} =
+$Prop->{'text-anchor'} = {
+  css => 'text-anchor',
+  dom => 'text_anchor', ## TODO: manakai extension.  Documentation.
+  key => 'text_anchor',
+  parse => $one_keyword_parser,
+  keyword => {
+    start => 1, middle => 1, end => 1,
+  },
+  initial => ['KEYWORD', 'start'],
+  inherited => 1,
+  compute => $compute_as_specified,
+};
+
+$Attr->{dominant_baseline} =
+$Key->{dominant_baseline} =
+$Prop->{'dominant-baseline'} = {
+  css => 'dominant-baseline',
+  dom => 'dominant_baseline', ## TODO: manakai extension.  Documentation.
+  key => 'dominant_baseline',
+  parse => $one_keyword_parser,
+  keyword => {
+    qw/auto 1 use-script 1 no-change 1 reset-size 1 ideographic 1 alphabetic 1
+       hanging 1 mathematical 1 central 1 middle 1 text-after-edge 1
+       text-before-edge 1/
+  },
+  initial => ['KEYWORD', 'auto'],
+  inherited => 0,
+  compute => $compute_as_specified,
+};
+
+$Attr->{alignment_baseline} =
+$Key->{alignment_baseline} =
+$Prop->{'alignment-baseline'} = {
+  css => 'alignment-baseline',
+  dom => 'alignment_baseline', ## TODO: manakai extension.  Documentation.
+  key => 'alignment_baseline',
+  parse => $one_keyword_parser,
+  keyword => {
+    qw/auto 1 baseline 1 before-edge 1 text-before-edge 1 middle 1 central 1
+       after-edge 1 text-after-edge 1 ideographic 1 alphabetic 1 hanging 1
+       mathematical 1/
+  },
+  initial => ['KEYWORD', 'auto'],
+  inherited => 0,
+  compute => $compute_as_specified,
+};
+
 my $border_style_keyword = {
   none => 1, hidden => 1, dotted => 1, dashed => 1, solid => 1,
   double => 1, groove => 1, ridge => 1, inset => 1, outset => 1,
@@ -5344,6 +5426,7 @@ $Prop->{background} = {
 
     return ($t, \%prop_value);
   },
+## TODO: background: #fff does not work.
   serialize_multiple => $Prop->{'background-color'}->{serialize_multiple},
 };
 $Attr->{background} = $Prop->{background};
@@ -6714,4 +6797,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/02/11 00:32:08 $
+## $Date: 2008/02/11 09:53:37 $
