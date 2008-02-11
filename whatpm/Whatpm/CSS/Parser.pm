@@ -142,16 +142,18 @@ sub parse_char_string ($$) {
   my $closing_tokens = [];
   my $charset_allowed = 1;
   my $namespace_allowed = 1;
+  my $import_allowed = 1;
   my $media_allowed = 1;
 
   my $ss = $self->{style_sheet} ||= Message::DOM::CSSStyleSheet->____new
-      (manakai_base_uri => $self->{base_uri},
-       css_rules => $open_rules->[0],
+      (css_rules => $open_rules->[0],
        ## TODO: href
        ## TODO: owner_node
        ## TODO: media
-       type => 'text/css', ## TODO: OK?
-       _parser => $self, _nsmap => $nsmap);
+       type => 'text/css'); ## TODO: OK?
+  $$ss->{manakai_base_uri} = $self->{base_uri};
+  $$ss->{_parser} = $self;
+  $$ss->{_nsmap} = $nsmap;
 
   S: {
     if ($state == BEFORE_STATEMENT_STATE) {
@@ -208,6 +210,7 @@ sub parse_char_string ($$) {
                 push @$current_rules,
                     Message::DOM::CSSNamespaceRule->____new ($prefix, $uri);
                 undef $charset_allowed;
+                undef $import_allowed;
               } else {
                 $onerror->(type => 'at-rule not allowed:namespace',
                            level => $self->{must_level},
@@ -230,6 +233,68 @@ sub parse_char_string ($$) {
                      uri => \$self->{href},
                      token => $t);
           #
+        } elsif ($at_rule_name eq 'import') {
+          if ($import_allowed) {
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            my $mq = [];
+            if ($t->{type} == STRING_TOKEN or $t->{type} == URI_TOKEN) {
+              my $uri = $t->{value};
+              $t = $tt->get_next_token;
+              $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+              if ($t->{type} == IDENT_TOKEN or 
+                  $t->{type} == DIMENSION_TOKEN or
+                  $t->{type} == NUMBER_TOKEN or
+                  $t->{type} == LPAREN_TOKEN) {
+                ($t, $mq) = $mp->_parse_mq_with_tokenizer ($t, $tt);
+                $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+              }
+              if ($mq and $t->{type} == SEMICOLON_TOKEN) {
+                ## TODO: error or warning
+                ## TODO: White space definition
+                $uri =~ s/^[\x09\x0A\x0D\x20]+//;
+                $uri =~ s/[\x09\x0A\x0D\x20]+\z//;
+
+                my $imported = Message::DOM::CSSStyleSheet->____new
+                    (css_rules => [],
+                     ## TODO: href
+                     parent_style_sheet => $ss,
+                     ## TODO: media
+                     type => 'text/css', ## TODO: OK?
+                     _parser => $self, _nsmap => {});
+
+                my $rule = Message::DOM::CSSImportRule->____new
+                    ($uri, \($self->{base_uri}), $mq, $ss);
+
+                $$imported->{owner_rule} = $rule;
+                Scalar::Util::weaken ($$imported->{owner_rule});
+                Scalar::Util::weaken ($$imported->{parent_style_sheet});
+
+                push @$current_rules, $rule;
+
+                undef $charset_allowed;
+
+                $t = $tt->get_next_token;
+                ## Stay in the state.
+                redo S;
+              }
+            }
+
+            $onerror->(type => 'at-rule syntax error:import',
+                       level => $self->{must_level},
+                       uri => \$self->{href},
+                       token => $t)
+                if defined $mq; ## NOTE: Otherwise, already raised in MQ parser
+            
+            #
+          } else {
+            $onerror->(type => 'at-rule not allowed:import',
+                       level => $self->{must_level},
+                       uri => \$self->{href},
+                       token => $t);
+            
+            #
+          }
         } elsif ($at_rule_name eq 'media') {
           if ($media_allowed) {
             $t = $tt->get_next_token;
@@ -241,6 +306,7 @@ sub parse_char_string ($$) {
               if ($t->{type} == LBRACE_TOKEN) {
                 undef $charset_allowed;
                 undef $namespace_allowed;
+                undef $import_allowed;
                 undef $media_allowed;
                 my $rule = Message::DOM::CSSMediaRule->____new
                     ($q, my $v = []);
@@ -270,47 +336,45 @@ sub parse_char_string ($$) {
             #
           }
         } elsif ($at_rule_name eq 'charset') {
-          $t = $tt->get_next_token;
-          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
-
-          if ($t->{type} == STRING_TOKEN) {
-            my $encoding = $t->{value};
-            
+          if ($charset_allowed) {
             $t = $tt->get_next_token;
             $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+            if ($t->{type} == STRING_TOKEN) {
+              my $encoding = $t->{value};
+              
+              $t = $tt->get_next_token;
+              $t = $tt->get_next_token while $t->{type} == S_TOKEN;
             
-            if ($t->{type} == SEMICOLON_TOKEN) {
-              if ($charset_allowed) {
+              if ($t->{type} == SEMICOLON_TOKEN) {
                 push @$current_rules,
                     Message::DOM::CSSCharsetRule->____new ($encoding);
                 undef $charset_allowed;
-              } else {
-                 $onerror->(type => 'at-rule not allowed:charset',
-                            level => $self->{must_level},
-                            uri => \$self->{href},
-                            token => $t);
-              }
 
-              ## TODO: Detect the conformance errors for @charset...
+                ## TODO: Detect the conformance errors for @charset...
               
-              $t = $tt->get_next_token;
-              ## Stay in the state.
-              redo S;
+                $t = $tt->get_next_token;
+                ## Stay in the state.
+                redo S;
+              } else {
+                #
+              }
             } else {
               #
             }
+            
+            $onerror->(type => 'at-rule syntax error:charset',
+                       level => $self->{must_level},
+                       uri => \$self->{href},
+                       token => $t);
+            #
           } else {
+            $onerror->(type => 'at-rule not allowed:charset',
+                       level => $self->{must_level},
+                       uri => \$self->{href},
+                       token => $t);
             #
           }
-
-          $onerror->(type => 'at-rule syntax error:charset',
-                     level => $self->{must_level},
-                     uri => \$self->{href},
-                     token => $t);
-          #
-        ## NOTE: When adding support for new at-rule, insert code
-        ## "undef $charset_allowed" and "undef $namespace_token" as
-        ## appropriate.
         } else {
           $onerror->(type => 'at-rule not supported',
                      level => $self->{unsupported_level},
@@ -342,6 +406,7 @@ sub parse_char_string ($$) {
       } else {
         undef $charset_allowed;
         undef $namespace_allowed;
+        undef $import_allowed;
 
         ($t, my $selectors) = $sp->_parse_selectors_with_tokenizer
             ($tt, LBRACE_TOKEN, $t);
@@ -6649,4 +6714,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/02/10 09:38:27 $
+## $Date: 2008/02/11 00:32:08 $

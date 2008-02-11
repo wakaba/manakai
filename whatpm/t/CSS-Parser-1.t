@@ -20,6 +20,7 @@ for my $file_name (map {"t/$_"} qw(
   css-1.dat
   css-2.dat
   css-3.dat
+  css-4.dat
   css-visual.dat
   css-generated.dat
   css-paged.dat
@@ -476,6 +477,11 @@ sub serialize_rule ($$) {
     my $prefix = $rule->prefix;
     $v .= $prefix . ': ' if length $prefix;
     $v .= '<' . $rule->namespace_uri . ">\n";
+  } elsif ($rule->type == $rule->IMPORT_RULE) {
+    $v .= '| ' . $indent . '@import <' . $rule->href . '> ' . $rule->media;
+    $v .= "\n";
+  } elsif ($rule->type == $rule->CHARSET_RULE) {
+    $v .= '| ' . $indent . '@charset ' . $rule->encoding . "\n";
   } else {
     die "Rule type @{[$rule->type]} is not supported";
   }

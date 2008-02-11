@@ -1,0 +1,258 @@
+#data
+@import;
+p {}
+#errors
+;1;8;m;at-rule syntax error:import
+#cssom
+| <p>
+
+#data
+@i '';
+#errors
+;1;1;u;at-rule not supported;i
+#cssom
+
+#data
+@import p{};
+q{}
+r{}
+#errors
+;1;9;m;at-rule syntax error:import
+;1;12;m;no sss
+#cssom
+| <r>
+
+#data
+@import q{}
+q{}
+r{}
+#errors
+;1;9;m;at-rule syntax error:import
+#cssom
+| <q>
+| <r>
+
+#data
+@import @media all {p{color:red;background-color:green}}
+q{}
+r{}
+#errors
+;1;9;m;at-rule syntax error:import
+#cssom
+| <q>
+| <r>
+
+#data
+@import a;
+p{}
+#errors
+;1;9;m;at-rule syntax error:import
+#cssom
+| <p>
+
+#data
+@import '';
+p{}
+#cssom
+| @import <> 
+| <p>
+#csstext
+@import url();
+p {
+}
+
+#data
+@import 'aBc';
+p{}
+#cssom
+| @import <aBc> 
+| <p>
+#csstext
+@import url(aBc);
+p {
+}
+
+#data
+@import "Abc";
+p{}
+#cssom
+| @import <Abc> 
+| <p>
+
+#data
+@import url(abC);
+p {}
+#cssom
+| @import <abC> 
+| <p>
+
+#data
+@import url("abC");
+p{}
+#cssom
+| @import <abC> 
+| <p>
+
+#data
+@import url('aBC');
+p{}
+#cssom
+| @import <aBC> 
+| <p>
+
+#data
+@import 'abc'screen;
+p{}
+#cssom
+| @import <abc> screen
+| <p>
+#csstext
+@import url(abc) screen;
+p {
+}
+
+#data
+@import 'abc' screen;
+p{}
+#cssom
+| @import <abc> screen
+| <p>
+
+#data
+@import 'AbC' screen, all;
+p{}
+#cssom
+| @import <AbC> screen, all
+| <p>
+
+#data
+@import 'abc' ScrEEn;
+#cssom
+| @import <abc> screen
+
+#data
+@import 'abc' ALL;
+#cssom
+| @import <abc> all
+#csstext
+@import url(abc) all;
+
+#data
+@import 'abc' a, b, c, screen, d, e, screen;
+p{}
+#errors
+;1;15;u;unknown media type
+;1;18;u;unknown media type
+;1;21;u;unknown media type
+;1;32;u;unknown media type
+;1;35;u;unknown media type
+#cssom
+| @import <abc> unknown, unknown, unknown, screen, unknown, unknown, screen
+| <p>
+
+#data
+@import 'abc' ;
+p{}
+#cssom
+| @import <abc> 
+| <p>
+
+#data
+@import 'abc' /**/ ;
+p{}
+#cssom
+| @import <abc> 
+| <p>
+
+#data
+@import 'abc'
+#errors
+;1;14;m;at-rule syntax error:import
+#cssom
+
+#data
+@import 'abc' all
+#errors
+;1;18;m;at-rule syntax error:import
+#cssom
+
+#data
+@import 'abc', all;
+#errors
+;1;14;m;at-rule syntax error:import
+#cssom
+
+#data
+@import 'abc' all,
+#errors
+;1;19;m;mq syntax error
+#cssom
+
+#data
+@charset 'us-ascii';
+@import 'abc';
+#cssom
+| @charset us-ascii
+| @import <abc> 
+
+#data
+@import 'abc';
+@charset 'iso-2022-jp';
+#errors
+;2;1;m;at-rule not allowed:charset
+#cssom
+| @import <abc> 
+
+#data
+@import 'abc';
+@import 'def';
+#cssom
+| @import <abc> 
+| @import <def> 
+
+#data
+@import 'abc';
+@namespace 'n';
+#cssom
+| @import <abc> 
+| @namespace <n>
+
+#data
+@namespace 'n';
+@import 'abc';
+#errors
+;2;1;m;at-rule not allowed:import
+#cssom
+| @namespace <n>
+
+#data
+@import 'abc';
+@media all {}
+#cssom
+| @import <abc> 
+| @media all
+
+#data
+@media all {}
+@import 'abc'
+#errors
+;2;1;m;at-rule not allowed:import
+#cssom
+| @media all
+
+#data
+@media all {
+  @import 'abc';
+}
+#errors
+;2;3;m;at-rule not allowed:import
+#cssom
+| @media all
+
+#data
+p{}
+@import 'abc';
+#errors
+;2;1;m;at-rule not allowed:import
+#cssom
+| <p>
