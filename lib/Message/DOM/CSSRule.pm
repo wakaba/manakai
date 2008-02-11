@@ -1,6 +1,6 @@
 package Message::DOM::CSSRule;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CSSRule';
 require Scalar::Util;
 
@@ -116,19 +116,32 @@ sub encoding ($) {
 package Message::DOM::CSSImportRule;
 push our @ISA, 'Message::DOM::CSSRule', 'Message::IF::CSSImportRule';
 
-sub ____new ($$$$) {
-  my $self = bless \{href => $_[1], media => \$_[2],
-                     style_sheet => $_[3]}, $_[0];
+sub ____new ($$$$$) {
+  my $self = bless \{href => $_[1],
+                     base_uri => $_[2], ## Ref to base URI
+                     media => \$_[3],
+                     style_sheet => $_[4]}, $_[0];
   require Message::DOM::MediaList;
   bless $$self->{media}, 'Message::DOM::MediaList';
-  ${$_[3]}->{owner_rule} = $self;
-  Scalar::Util::weaken (${$_[3]}->{owner_rule});
+  ${$_[4]}->{owner_rule} = $self;
+  Scalar::Util::weaken (${$_[4]}->{owner_rule});
   return $self;
 } # ____new
 
 ## |CSSRule| attributes
 
-## TODO: |css_text|
+sub css_text ($;$) {
+  ## TODO: setter
+
+  my $self = shift;
+  my $r = '@import url(' . $self->href . ')';
+  my $media = ''.$self->media;
+  if ($media) {
+    $r .= ' ' . $media;
+  }
+  $r .= ';';
+  return $r;
+} # css_text
 
 sub type ($) { Message::DOM::CSSRule::IMPORT_RULE }
 
@@ -277,4 +290,4 @@ package Message::IF::CSSFontFaceRule;
 package Message::IF::CSSPageRule;
 
 1;
-## $Date: 2008/02/08 15:08:04 $
+## $Date: 2008/02/11 00:32:53 $
