@@ -2886,3 +2886,33 @@ unmatched </h1>
 |     <form>
 |       <font>
 |         " "
+
+#data
+<table a><tr><table b>
+#errors
+1,10,no DOCTYPE
+1,22,not closed:tr
+1,22,not closed:table
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       a=""
+|       <tbody>
+|         <tr>
+|     <table>
+|       b=""
+
+#data
+<!DOCTYPE HTML>foo<html x>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   x=""
+|   <head>
+|   <body>
+|     "foo"
+
+

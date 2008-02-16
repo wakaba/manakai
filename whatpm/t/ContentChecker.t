@@ -84,6 +84,10 @@ sub test ($) {
        my %opt = @_;
        push @error, get_node_path ($opt{node}) . ';' . $opt{type} .
            (defined $opt{level} ? ';'.$opt{level} : '');
+     }, sub {
+       my $opt = shift;
+       push @error, get_node_path ($opt->{container_node}) .
+          ';style:text/css;unsupported';
      });
   
   ok join ("\n", sort {$a cmp $b} @error),
@@ -117,4 +121,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/11/25 08:04:21 $
+## $Date: 2008/02/16 00:18:13 $
