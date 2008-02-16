@@ -103,10 +103,9 @@ Check conformance of a cache manifest, given as I<$manifest>.
 
 =item I<$manifest>
 
-The cache manifest to check, in the L<MANIFEST DATA STRUCTURE>.
+The cache manifest to check, encoded in the L<MANIFEST DATA STRUCTURE>.
 
 =item I<$onerror>
-
 
 The callback function that will be invoked if the manifest cache
 has an error (or a warning).  It may be omitted.  If omitted, 
@@ -116,6 +115,8 @@ any error (or warning) is C<warn>ed with its C<type>.
 
 For the list of the error types, see Whatpm Error Types
 <http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
+
+C<index> is the index of the IRI with the error. @@ TBW
 
 =back
 
@@ -132,7 +133,7 @@ C<check_manifest> raises no error with level C<m> or C<s>.
 
 If I<$m> is in manifest data structure, I<$m> is a reference to
 the array with three items: I<$explicit_uris>, I<$fallback_uris>,
-and I<$online_whitelist>.
+I<$online_whitelist>, and I<$manifest_uri>.
 
 I<$explicit_uris> is a reference to the array, which
 contains zero or more strings.  The strings are IRI references
@@ -148,10 +149,13 @@ I<$online_whitelist> is a reference to the array, which
 contains zero or more strings.  The strings are IRI references
 in the online whitelist.
 
+I<$manfest_uri> is a string which is an IRI reference of the
+manifest itself.
+
 =head1 DEPENDENCY
 
 This module depends on L<Message::URI::URIReference>, which is
-part of manakai.
+part of the manakai-core package.
 
 =head1 SEE ALSO
 
@@ -169,18 +173,20 @@ L<Message::URI::URIReference>
 "Same scheme/host/port" comparison algorithm is not correctly implemented
 yet.
 
+Test suite.
+
 =head1 AUTHOR
 
 Wakaba <w@suika.fam.cx>
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/11/04 11:49:44 $
+# $Date: 2008/02/16 03:47:33 $
 

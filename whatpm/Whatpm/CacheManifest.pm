@@ -1,6 +1,6 @@
 package Whatpm::CacheManifest;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::URI::URIReference;
 
 sub parse_byte_string ($$$$$) {
@@ -44,7 +44,7 @@ sub _parse ($$$$$) {
 
     my $u1 = shift;
     
-    unless (lc $u1->uri_scheme eq lc $m_scheme) {
+    unless (lc $u1->uri_scheme eq lc $m_scheme) { ## TODO: case
       return 0;
     }
 
@@ -106,21 +106,23 @@ sub _parse ($$$$$) {
     my $line = $1;
 
     ## Step 15
-    next START_OF_LINE if $line =~ /^#/;
-
-    ## Step 16
     $line =~ s/[\x20\x09]+\z//;
 
+    ## Step 16-17
+    if ($line eq '' or $line =~ /^#/) {
+      next START_OF_LINE;
+    }
+
     if ($line eq 'CACHE:') {
-      ## Step 17
+      ## Step 18
       $mode = 'explicit';
       next START_OF_LINE;
     } elsif ($line eq 'FALLBACK:') {
-      ## Step 18
+      ## Step 19
       $mode = 'fallback';
       next START_OF_LINE;
     } elsif ($line eq 'NETWORK:') {
-      ## Step 19
+      ## Step 20
       $mode = 'online whitelist';
       next START_OF_LINE;
     }
@@ -138,7 +140,7 @@ sub _parse ($$$$$) {
     ## NOTE: "Relative URIs MUST be given relative to the manifest's own URI."
     ## requirement in writing section can't be tested.
 
-    ## Step 20
+    ## Step 21
     if ($mode eq 'explicit') {
       my $uri = Message::DOM::DOMImplementation->create_uri_reference ($line);
 
@@ -166,7 +168,6 @@ sub _parse ($$$$$) {
                    value => $uri->uri_reference);
         next START_OF_LINE;
       }
-      ## ISSUE: case-insensitive?
 
       push @$explicit_uris, $uri->uri_reference;
     } elsif ($mode eq 'fallback') {
@@ -270,12 +271,13 @@ sub _parse ($$$$$) {
       push @$online_whitelist_uris, $uri->uri_reference;      
     }
 
-    ## Step 21
+    ## Step 22
     #next START_OF_LINE;
   } # START_OF_LINE
 
-  ## Step 22
-  return [$explicit_uris, $fallback_uris, $online_whitelist_uris];
+  ## Step 23
+  return [$explicit_uris, $fallback_uris, $online_whitelist_uris,
+          $m_uri->uri_reference];
 } # _parse
 
 sub check_manifest ($$$) {
@@ -286,40 +288,68 @@ sub check_manifest ($$$) {
 
   require Whatpm::URIChecker;
 
+  my $i = 0;
   for my $uri (@{$manifest->[0]}) {
     $listed->{$uri} = 1;
 
     Whatpm::URIChecker->check_iri_reference ($uri, sub {
       my %opt = @_;
       $onerror->(level => $opt{level}, value => $uri,
+                 index => $i,
                  type => 'URI::'.$opt{type}.
                  (defined $opt{position} ? ':'.$opt{position} : ''));
     });
+
+    ## ISSUE: Literal equivalence, right?
+    if ($uri eq $manifest->[3]) {
+      $onerror->(level => $must_level, value => $uri,
+                 index => $i,
+                 type => 'manifest URI');
+    }
+
+    $i++;
   }
 
-  for my $uri (values %{$manifest->[1]}) {
-    $listed->{$uri} = 1;
-
-    Whatpm::URIChecker->check_iri_reference ($uri, sub {
+  for my $uri1 (sort {$a cmp $b} keys %{$manifest->[1]}) {
+    Whatpm::URIChecker->check_iri_reference ($uri1, sub {
       my %opt = @_;
-      $onerror->(level => $opt{level}, index => 1, value => $uri,
+      $onerror->(level => $opt{level}, index => 0, value => $uri1,
                  type => 'URI::'.$opt{type}.
                  (defined $opt{position} ? ':'.$opt{position} : ''));
     });
-  }
 
-  for my $uri (keys %{$manifest->[1]}) { 
-    Whatpm::URIChecker->check_iri_reference ($uri, sub {
+    if ($uri1 eq $manifest->[3]) {
+      $onerror->(level => $must_level, value => $uri1,
+                 index => $i,
+                 type => 'manifest URI');
+    }
+
+    $i++;
+
+    my $uri2 = $manifest->[1]->{$uri1};
+    $listed->{$uri2} = 1;
+
+    Whatpm::URIChecker->check_iri_reference ($uri2, sub {
       my %opt = @_;
-      $onerror->(level => $opt{level}, index => 0, value => $uri,
+      $onerror->(level => $opt{level}, index => 1, value => $uri2,
+                 index => $i,
                  type => 'URI::'.$opt{type}.
                  (defined $opt{position} ? ':'.$opt{position} : ''));
     });
+
+    if ($uri2 eq $manifest->[3]) {
+      $onerror->(level => $must_level, value => $uri2,
+                 index => $i,
+                 type => 'manifest URI');
+    }
+
+    $i++;
   }
 
   for my $uri (@{$manifest->[2]}) {
     if ($listed->{$uri}) {
       $onerror->(type => 'both in entries and whitelist',
+                 index => $i,
                  level => $must_level, value => $uri);
       ## NOTE: MUST in writing section.
     }
@@ -327,16 +357,25 @@ sub check_manifest ($$$) {
     Whatpm::URIChecker->check_iri_reference ($uri, sub {
       my %opt = @_;
       $onerror->(level => $opt{level}, value => $uri,
+                 index => $i,
                  type => 'URI::'.$opt{type}.
                  (defined $opt{position} ? ':'.$opt{position} : ''));
     });
+
+    if ($uri eq $manifest->[3]) {
+      $onerror->(level => $must_level, value => $uri,
+                 index => $i,
+                 type => 'manifest URI');
+    }
+
+    $i++;
   }
 } # check_manifest
 
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -344,4 +383,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/23 14:47:49 $
+# $Date: 2008/02/16 03:47:33 $

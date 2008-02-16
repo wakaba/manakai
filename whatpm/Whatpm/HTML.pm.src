@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.66 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.67 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -2193,7 +2193,7 @@ sub _tree_construction_root_element ($) {
         #
       } elsif ($token->{type} == START_TAG_TOKEN) {
         if ($token->{tag_name} eq 'html' and
-            $token->{attributes}->{manifest}) { ## ISSUE: Spec spells as "application"
+            $token->{attributes}->{manifest}) {
           $self->{application_cache_selection}
                ->($token->{attributes}->{manifest}->{value});
           ## ISSUE: No relative reference resolution?
@@ -5482,4 +5482,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2007/11/23 07:35:02 $
+# $Date: 2008/02/16 03:47:33 $
