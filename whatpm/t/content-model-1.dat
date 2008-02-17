@@ -965,6 +965,7 @@ para</del>
 </body>
 #errors
 /body/del/style;style:text/css;unsupported
+/body;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -973,7 +974,6 @@ para</del>
 para
 </body>
 #errors
-/body/ins;no significant content;s
 /body/style;element not allowed:prose style;m
 /body/style;style:text/css;unsupported
 
@@ -3572,6 +3572,102 @@ aaa
 /table/tfoot/tr/td;no significant content;s
 
 #data
+<th xmlns="http://www.w3.org/1999/xhtml"></th>
+#errors
+/th;no significant content;s
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml">xxx</th>
+#errors
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml">   </th>
+#errors
+/th;no significant content;s
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml">  <!---->xxx</th>
+#errors
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><a href="">aa</a></th>
+#errors
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><a href=""></a></th>
+#errors
+/th;no significant content;s
+/th/a;no significant content;s
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></th>
+#errors
+/th/p;element not allowed:phrasing;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><ul><li>xx</li></ul></th>
+#errors
+/th/ul;element not allowed:phrasing;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><h1>aaa</h1></th>
+#errors
+/th/h1;element not allowed:phrasing;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><table/></th>
+#errors
+/th/table;element not allowed:phrasing;m
+/th;no significant content;s
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><ins></ins></th>
+#errors
+/th;no significant content;s
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><ins>xxx</ins></th>
+#errors
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><ins><p>xx</p></ins></th>
+#errors
+/th/ins/p;element not allowed:phrasing;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><ins>xxx<p>xxx</p></ins></th>
+#errors
+/th/ins/p;element not allowed:phrasing;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><del></del></th>
+#errors
+/th;no significant content;s
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><del>xx</del></th>
+#errors
+/th;no significant content;s
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><del><p>xx</p></del></th>
+#errors
+/th;no significant content;s
+/th/del/p;element not allowed:phrasing;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><del><p>xxx</p>xxx</del></th>
+#errors
+/th;no significant content;s
+/th/del/p;element not allowed:phrasing;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"><del><ins>xxx<p>xxx</p></ins></del></th>
+#errors
+/th;no significant content;s
+/th/del/ins/p;element not allowed:phrasing;m
+
+#data
 <fieldset xmlns="http://www.w3.org/1999/xhtml">
 <legend>XXX</legend>
 </fieldset>
@@ -4893,7 +4989,6 @@ aaa
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/></del></rule>
 #errors
 /rule;no significant content;s
-/rule/del;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/>aa</del></rule>
@@ -4904,7 +4999,6 @@ aaa
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/><p/></del></rule>
 #errors
 /rule;no significant content;s
-/rule/del;no significant content;s
 /rule/del/p;no significant content;s
 
 #data

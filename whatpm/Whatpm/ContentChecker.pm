@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.57 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.58 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -509,6 +509,17 @@ sub _check_get_children ($$$) {
           push @$new_todos, {type => 'element-attributes', node => $node};
           last TP;
         }
+      } elsif ($node_ns eq $HTML_NS and $node_ln eq 'del') {
+        my $sig_flag = $parent_todo->{flag}->{has_descendant}->{significant};
+        unshift @$sib, @{$node->child_nodes};
+        push @$new_todos, {type => 'element-attributes', node => $node};
+        push @$new_todos,
+            {type => 'code',
+             code => sub {
+               $parent_todo->{flag}->{has_descendant}->{significant} = 0
+                   if not $sig_flag;
+             }};
+        last TP;
       } else {
         unshift @$sib, @{$node->child_nodes};
         push @$new_todos, {type => 'element-attributes', node => $node};
@@ -582,4 +593,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/17 06:36:28 $
+# $Date: 2008/02/17 11:04:08 $

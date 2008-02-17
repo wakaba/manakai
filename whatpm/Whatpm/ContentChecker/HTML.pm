@@ -193,21 +193,6 @@ my $HTMLSignificantContentErrors = {
   },
 }; # $HTMLSignificantContentErrors
 
-## TODO:
-
-=pod
-
-As a general rule, elements whose content model allows any
-+  <span>prose content</span> should have either at least one
-+  descendant text node that is not <span>inter-element
-+  whitespace</span>, or at least one descendant element node that is
-+  <span>embedded content</span>. For the purposes of this requirement,
-+  <code>del</code> elements and their descendants must not be
-+  counted as contributing to the ancestors of the <code>del</code>
-+  element.
-
-=cut
-
 our $AnyChecker;
 my $HTMLAnyChecker = sub {
   my ($self, $todo) = @_;
@@ -3360,7 +3345,7 @@ $Element->{$HTML_NS}->{th} = {
     scope => $GetHTMLEnumeratedAttrChecker
         ->({row => 1, col => 1, rowgroup => 1, colgroup => 1}),
   }),
-  checker => $HTMLProseContentChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 ## TODO: forms
@@ -3775,7 +3760,7 @@ $Element->{$HTML_NS}->{legend} = {
 
 $Element->{$HTML_NS}->{div} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLTransparentChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{font} = {
