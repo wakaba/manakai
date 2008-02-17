@@ -692,6 +692,26 @@
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<link rel="stylesheet" href=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<link rel="alternate" type="text/html" href=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
 <title/>
 <noscript>
 <meta charset="us-ascii"/>
@@ -763,7 +783,7 @@
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/meta;element not allowed
+/head/noscript/meta;element not allowed:head noscript;m
 /head/noscript/meta;attribute missing:name|http-equiv|charset
 /head/title;no significant content;s
 
@@ -776,7 +796,6 @@
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/meta;element not allowed
 /head/noscript/meta/@http-equiv;enumerated:invalid
 /head/title;no significant content;s
 
@@ -789,6 +808,7 @@
 </head>
 #errors
 /head/noscript;in XML:noscript
+/head/noscript/meta;element not allowed:head noscript;m
 /head/title;no significant content;s
 
 #data
@@ -812,10 +832,56 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript;m
+/head/noscript;in XML:noscript
 /head/noscript/meta;element not allowed:meta charset;m
 /head/noscript/meta;in XML:charset;m
 /head/noscript/meta/@content;mismatched charset name::us-ascii;unsupported
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<style/>
+</noscript>
+</head>
+#errors
+/head/noscript/style;style:text/css;unsupported
+/head/noscript;in XML:noscript
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<style scoped=""/>
+</noscript>
+</head>
+#errors
+/head/noscript/style;element not allowed:head noscript;m
+/head/noscript/style;style:text/css;unsupported
+/head/noscript;in XML:noscript
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<base href=""/>
+</noscript>
+</head>
+#errors
+/head/noscript/base;element not allowed:head noscript;m
+/head/noscript;in XML:noscript
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<unknown:unknown xmlns:unknown="about:"/>
+</noscript>
+</head>
+#errors
+/head/noscript/unknown;element;unsupported
+/head/noscript/unknown;element not allowed:head noscript;m
+/head/noscript;in XML:noscript
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>

@@ -3442,20 +3442,44 @@ $Element->{$HTML_NS}->{noscript} = {
           if ($self->{pluses}->{$node_ns}->{$node_ln}) {
             #
           } elsif ($node_ns eq $HTML_NS) {
-            if ({link => 1, style => 1}->{$node_ln}) {
+            if ($node_ln eq 'link') {
               #
-            } elsif ($node_ln eq 'meta') {
-              if ($node->has_attribute_ns (undef, 'name')) {
-                #
-              } else {
+            } elsif ($node_ln eq 'style') {
+              if ($node->has_attribute_ns (undef, 'scoped')) {
                 $self->{onerror}->(node => $node,
-                                   type => 'element not allowed');
+                                   type => 'element not allowed:head noscript',
+                                   level => $self->{must_level});
+              }
+            } elsif ($node_ln eq 'meta') {
+              if ($node->has_attribute_ns (undef, 'charset')) {
+                ## NOTE: Non-conforming.  An error is raised by
+                ## |meta|'s checker.
+              } else {
+                my $http_equiv_attr
+                    = $node->get_attribute_node_ns (undef, 'http-equiv');
+                if ($http_equiv_attr) {
+                  ## TODO: case
+                  if (lc $http_equiv_attr->value eq 'content-type') {
+                    ## NOTE: Non-conforming.  An error is raised by
+                    ## |meta|'s checker.
+                  } else {
+                    #
+                  }
+                } else {
+                  $self->{onerror}->(node => $node,
+                                     type => 'element not allowed:head noscript',
+                                     level => $self->{must_level});
+                }
               }
             } else {
-              $self->{onerror}->(node => $node, type => 'element not allowed');
+              $self->{onerror}->(node => $node,
+                                 type => 'element not allowed:head noscript',
+                                 level => $self->{must_level});
             }
           } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node,
+                               type => 'element not allowed:head noscript',
+                               level => $self->{must_level});
           }
 
           my ($sib, $ch) = $self->_check_get_children ($node, $todo);
