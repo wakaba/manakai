@@ -243,18 +243,24 @@ my $HTMLEmptyChecker = sub {
       my $node_ns = $node->namespace_uri;
       $node_ns = '' unless defined $node_ns;
       my $node_ln = $node->manakai_local_name;
-      if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node, type => 'element not allowed:minus',
+                           level => $self->{must_level});
+      } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
         #
       } else {
-        ## NOTE: |minuses| list is not checked since redundant
-        $self->{onerror}->(node => $node, type => 'element not allowed');
+        $self->{onerror}->(node => $node, type => 'element not allowed:empty',
+                           level => $self->{must_level});
       }
+
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $self->{onerror}->(node => $node, type => 'character not allowed');
+        $self->{onerror}->(node => $node,
+                           type => 'character not allowed:empty',
+                           level => $self->{must_level});
         $todo->{flag}->{has_descendant}->{significant} = 1;
       }
     } elsif ($nt == 5) {
@@ -389,10 +395,17 @@ my $HTMLProseContentChecker = sub {
       my $node_ns = $node->namespace_uri;
       $node_ns = '' unless defined $node_ns;
       my $node_ln = $node->manakai_local_name;
-      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      if ($node_ns eq $HTML_NS and $node_ln eq 'style') {
-        $not_allowed = 2 if $has_non_style or
-            not $node->has_attribute_ns (undef, 'scoped');
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node,
+                           type => 'element not allowed:minus',
+                           level => $self->{must_level});
+      } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
+        if ($has_non_style or
+            not $node->has_attribute_ns (undef, 'scoped')) {
+          $self->{onerror}->(node => $node,
+                             type => 'element not allowed:prose style',
+                             level => $self->{must_level});
+        }
       } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
         $has_non_style = 1;
         if ($HTMLEmbeddedContent->{$node_ns}->{$node_ln}) {
@@ -402,17 +415,11 @@ my $HTMLProseContentChecker = sub {
         #
       } else {
         $has_non_style = 1;
-        $not_allowed = 1;
+        $self->{onerror}->(node => $node,
+                           type => 'element not allowed:prose',
+                           level => $self->{must_level})
       }
-      if ($not_allowed) {
-        if ($not_allowed == 2) {
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:prose style')
-        } else {
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:prose')
-        }
-      }
+
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
@@ -665,12 +672,19 @@ my $HTMLPhrasingContentChecker = sub {
       my $node_ns = $node->namespace_uri;
       $node_ns = '' unless defined $node_ns;
       my $node_ln = $node->manakai_local_name;
-      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      $not_allowed = 1
-          unless $HTMLPhrasingContent->{$node_ns}->{$node_ln} or
-              $self->{pluses}->{$node_ns}->{$node_ln};
-      $self->{onerror}->(node => $node, type => 'element not allowed:phrasing')
-        if $not_allowed;
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node,
+                           type => 'element not allowed:minus',
+                           level => $self->{must_level});
+      } elsif ($HTMLPhrasingContent->{$node_ns}->{$node_ln} or
+               $self->{pluses}->{$node_ns}->{$node_ln}) {
+        #
+      } else {
+        $self->{onerror}->(node => $node,
+                           type => 'element not allowed:phrasing',
+                           level => $self->{must_level});
+      }
+
       my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
@@ -1478,14 +1492,25 @@ $Element->{$HTML_NS}->{head} = {
         my $node_ns = $node->namespace_uri;
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
-        my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+          $self->{onerror}->(node => $node,
+                             type => 'element not allowed:minus',
+                             level => $self->{must_level});
+        } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
           #
         } elsif ($node_ns eq $HTML_NS and $node_ln eq 'title') {
           unless ($has_title) {
             $has_title = 1;
           } else {
-            $not_allowed = 1;
+            $self->{onerror}->(node => $node,
+                               type => 'element not allowed:head title',
+                               level => $self->{must_level});
+          }
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
+          if ($todo->{node}->has_attribute_ns (undef, 'scoped')) {
+            $self->{onerror}->(node => $node,
+                               type => 'element not allowed:head style',
+                               level => $self->{must_level});
           }
         } elsif ($HTMLMetadataContent->{$node_ns}->{$node_ln}) {
           #
@@ -1495,10 +1520,10 @@ $Element->{$HTML_NS}->{head} = {
           ## or |http-equiv| attribute is not allowed.  It is non-conforming
           ## anyway.
         } else {
-          $not_allowed = 1;
+          $self->{onerror}->(node => $node,
+                             type => 'element not allowed:metadata',
+                             level => $self->{must_level});
         }
-        $self->{onerror}->(node => $node, type => 'element not allowed')
-          if $not_allowed;
         local $todo->{flag}->{in_head} = 1;
         my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;

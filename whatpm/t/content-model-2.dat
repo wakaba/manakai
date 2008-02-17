@@ -819,7 +819,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/a;element not allowed
+/head/a;element not allowed:metadata;m
 /head/base;basetarget after hyperlink
 /head/a;no significant content;s
 /head/title;no significant content;s
@@ -831,7 +831,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/area;element not allowed
+/head/area;element not allowed:metadata;m
 /head/base;basetarget after hyperlink
 /head/title;no significant content;s
 
@@ -842,7 +842,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/area;element not allowed
+/head/area;element not allowed:metadata;m
 /head/base;basehref after URI attribute
 /head/title;no significant content;s
 
@@ -853,7 +853,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/video;element not allowed
+/head/video;element not allowed:metadata;m
 /head/base;basehref after URI attribute
 /head/title;no significant content;s
 
@@ -1053,7 +1053,6 @@ id=""><span id="">x</span></p>
 <meta http-equiv="refresh" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;attribute missing:content
-/meta;element not allowed:meta charset
 
 #data
 <meta http-equiv="refresh" content="10; a.html"
@@ -1237,12 +1236,12 @@ id=""><span id="">x</span></p>
 #data
 <style type="Text/CSS" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style;style:Text/CSS;unsupported
+/style;style:text/css;unsupported
 
 #data
 <style type="TEXT/CSS" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style;style:TEXT/CSS;unsupported
+/style;style:text/css;unsupported
 
 #data
 <style type="text/css; charset=us-ascii" xmlns="http://www.w3.org/1999/xhtml">
@@ -1270,7 +1269,6 @@ id=""><span id="">x</span></p>
 <style scoped=""/>
 </head>
 #errors
-/head/style;element not allowed
 /head/style;style:text/css;unsupported
 
 #data
@@ -1278,7 +1276,7 @@ id=""><span id="">x</span></p>
 <style/>
 </article>
 #errors
-/article/style;element not allowed;prose style
+/article/style;element not allowed:prose style;m
 /article/style;style:text/css;unsupported
 /article;no significant content;s
 
@@ -1295,7 +1293,7 @@ id=""><span id="">x</span></p>
 <style/>
 </aside>
 #errors
-/aside/style;element not allowed:prose style
+/aside/style;element not allowed:prose style;m
 /aside/style;style:text/css;unsupported
 /aside;no significant content;s
 
@@ -1312,7 +1310,7 @@ id=""><span id="">x</span></p>
 <style/>
 </div>
 #errors
-/div/style;element not allowed:prose style
+/div/style;element not allowed:prose style;m
 /div/style;style:text/css;unsupported
 /div;no significant content;s
 
@@ -1329,7 +1327,7 @@ id=""><span id="">x</span></p>
 <style/>
 </section>
 #errors
-/section/style;element not allowed:prose style
+/section/style;element not allowed:prose style;m
 /section/style;style:text/css;unsupported
 /section;no significant content;s
 
