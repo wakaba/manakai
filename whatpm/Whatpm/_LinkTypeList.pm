@@ -1,4 +1,11 @@
 $Whatpm::ContentChecker::LinkType = {
+          'acquaintance' => {
+                              'effect' => [
+                                            'hyperlink',
+                                            'hyperlink'
+                                          ],
+                              'status' => 'proposal'
+                            },
           'alternate' => {
                            'effect' => [
                                          'hyperlink',
@@ -55,6 +62,34 @@ $Whatpm::ContentChecker::LinkType = {
                                      ],
                          'status' => 'proposal'
                        },
+          'child' => {
+                       'effect' => [
+                                     'hyperlink',
+                                     'hyperlink'
+                                   ],
+                       'status' => 'proposal'
+                     },
+          'co-resident' => {
+                             'effect' => [
+                                           'hyperlink',
+                                           'hyperlink'
+                                         ],
+                             'status' => 'proposal'
+                           },
+          'co-worker' => {
+                           'effect' => [
+                                         'hyperlink',
+                                         'hyperlink'
+                                       ],
+                           'status' => 'proposal'
+                         },
+          'colleague' => {
+                           'effect' => [
+                                         'hyperlink',
+                                         'hyperlink'
+                                       ],
+                           'status' => 'proposal'
+                         },
           'contact' => {
                          'effect' => [
                                        'hyperlink',
@@ -76,6 +111,20 @@ $Whatpm::ContentChecker::LinkType = {
                                        ],
                            'status' => 'synonym'
                          },
+          'crush' => {
+                       'effect' => [
+                                     'hyperlink',
+                                     'hyperlink'
+                                   ],
+                       'status' => 'proposal'
+                     },
+          'date' => {
+                      'effect' => [
+                                    'hyperlink',
+                                    'hyperlink'
+                                  ],
+                      'status' => 'proposal'
+                    },
           'edit' => {
                       'effect' => [
                                     'hyperlink',
@@ -111,6 +160,13 @@ $Whatpm::ContentChecker::LinkType = {
                                    ],
                        'status' => 'accepted'
                      },
+          'friend' => {
+                        'effect' => [
+                                      'hyperlink',
+                                      'hyperlink'
+                                    ],
+                        'status' => 'proposal'
+                      },
           'glossary' => {
                           'effect' => [
                                         'hyperlink',
@@ -139,6 +195,13 @@ $Whatpm::ContentChecker::LinkType = {
                                    ],
                        'status' => 'accepted'
                      },
+          'kin' => {
+                     'effect' => [
+                                   'hyperlink',
+                                   'hyperlink'
+                                 ],
+                     'status' => 'proposal'
+                   },
           'last' => {
                       'effect' => [
                                     'hyperlink',
@@ -153,6 +216,34 @@ $Whatpm::ContentChecker::LinkType = {
                                      ],
                          'status' => 'accepted'
                        },
+          'me' => {
+                    'effect' => [
+                                  'hyperlink',
+                                  'hyperlink'
+                                ],
+                    'status' => 'proposal'
+                  },
+          'met' => {
+                     'effect' => [
+                                   'hyperlink',
+                                   'hyperlink'
+                                 ],
+                     'status' => 'proposal'
+                   },
+          'muse' => {
+                      'effect' => [
+                                    'hyperlink',
+                                    'hyperlink'
+                                  ],
+                      'status' => 'proposal'
+                    },
+          'neighbor' => {
+                          'effect' => [
+                                        'hyperlink',
+                                        'hyperlink'
+                                      ],
+                          'status' => 'proposal'
+                        },
           'next' => {
                       'effect' => [
                                     'hyperlink',
@@ -188,6 +279,13 @@ $Whatpm::ContentChecker::LinkType = {
                                            ],
                                'status' => 'proposal'
                              },
+          'parent' => {
+                        'effect' => [
+                                      'hyperlink',
+                                      'hyperlink'
+                                    ],
+                        'status' => 'proposal'
+                      },
           'pingback' => {
                           'effect' => [
                                         'external resource',
@@ -217,6 +315,13 @@ $Whatpm::ContentChecker::LinkType = {
                                       ],
                           'status' => 'synonym'
                         },
+          'profile' => {
+                         'effect' => [
+                                       'hyperlink',
+                                       undef
+                                     ],
+                         'status' => 'proposal'
+                       },
           'script' => {
                         'effect' => [
                                       undef,
@@ -240,8 +345,15 @@ $Whatpm::ContentChecker::LinkType = {
                        },
           'service' => {
                          'effect' => [
-                                       'hyperlink',
+                                       'external resource',
                                        undef
+                                     ],
+                         'status' => 'proposal'
+                       },
+          'sibling' => {
+                         'effect' => [
+                                       'hyperlink',
+                                       'hyperlink'
                                      ],
                          'status' => 'proposal'
                        },
@@ -252,6 +364,13 @@ $Whatpm::ContentChecker::LinkType = {
                                      ],
                          'status' => 'accepted'
                        },
+          'spouse' => {
+                        'effect' => [
+                                      'hyperlink',
+                                      'hyperlink'
+                                    ],
+                        'status' => 'proposal'
+                      },
           'start' => {
                        'effect' => [
                                      'hyperlink',
@@ -272,6 +391,13 @@ $Whatpm::ContentChecker::LinkType = {
                                           'hyperlink'
                                         ],
                             'status' => 'synonym'
+                          },
+          'sweetheart' => {
+                            'effect' => [
+                                          'hyperlink',
+                                          'hyperlink'
+                                        ],
+                            'status' => 'proposal'
                           },
           'tag' => {
                      'effect' => [
