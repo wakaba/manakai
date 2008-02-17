@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.69 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.70 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -2173,6 +2173,22 @@ sub _get_next_token ($) {
       }
   
         redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
+
+        $self->{state} = DATA_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+
+        redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
@@ -2206,6 +2222,22 @@ sub _get_next_token ($) {
         $self->{set_next_input_character}->($self);
       }
   
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
+
+        $self->{state} = DATA_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
@@ -2385,6 +2417,22 @@ sub _get_next_token ($) {
       }
   
         redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
+
+        $self->{state} = DATA_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+
+        redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed SYSTEM literal');
 
@@ -2418,6 +2466,22 @@ sub _get_next_token ($) {
         $self->{set_next_input_character}->($self);
       }
   
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
+
+        $self->{state} = DATA_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed SYSTEM literal');
@@ -6908,4 +6972,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/02/17 12:18:06 $
+# $Date: 2008/02/17 12:39:32 $
