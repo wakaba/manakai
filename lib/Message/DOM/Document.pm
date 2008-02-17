@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -1113,6 +1113,35 @@ sub manakai_compat_mode ($;$) {
   }
 } # manakai_compat_mode
 
+## TODO: documentation
+sub manakai_head ($) {
+  local $Error::Depth = $Error::Depth + 1;
+  my $html = $_[0]->manakai_html;
+  return undef unless defined $html;
+  for my $el (@{$html->child_nodes}) {
+    next unless $el->node_type == 1; # ELEMENT_NODE
+    my $nsuri = $el->namespace_uri;
+    next unless defined $nsuri;
+    next unless $nsuri eq q<http://www.w3.org/1999/xhtml>;
+    next unless $el->manakai_local_name eq 'head';
+    return $el;
+  }
+  return undef;
+} # manakai_head
+
+## TODO: documentation
+sub manakai_html ($) {
+  local $Error::Depth = $Error::Depth + 1;
+  my $de = $_[0]->document_element;
+  my $nsuri = $de->namespace_uri;
+  if (defined $nsuri and $nsuri eq q<http://www.w3.org/1999/xhtml> and
+      $de->manakai_local_name eq 'html') {
+    return $de;
+  } else {
+    return undef;
+  }
+} # manakai_html
+
 sub inner_html ($;$) {
   my $self = $_[0];
   local $Error::Depth = $Error::Depth + 1;
@@ -1245,4 +1274,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/01/13 06:37:46 $
+## $Date: 2008/02/17 06:36:01 $
