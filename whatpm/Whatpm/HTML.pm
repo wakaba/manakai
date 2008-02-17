@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.68 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.69 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3003,7 +3003,7 @@ sub _tree_construction_root_element ($) {
         #
       } elsif ($token->{type} == START_TAG_TOKEN) {
         if ($token->{tag_name} eq 'html' and
-            $token->{attributes}->{manifest}) { ## ISSUE: Spec spells as "application"
+            $token->{attributes}->{manifest}) {
           $self->{application_cache_selection}
                ->($token->{attributes}->{manifest}->{value});
           ## ISSUE: No relative reference resolution?
@@ -3788,6 +3788,10 @@ sub _tree_construction_main ($) {
                           ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
                     $self->{change_encoding}
                         ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
+                    $meta_el->[0]->get_attribute_node_ns (undef, 'content')
+                        ->set_user_data (manakai_has_reference =>
+                                             $token->{attributes}->{content}
+                                                   ->{has_reference});
                   }
                 }
               } else {
@@ -3795,6 +3799,12 @@ sub _tree_construction_main ($) {
                   $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
                       ->set_user_data (manakai_has_reference =>
                                            $token->{attributes}->{charset}
+                                               ->{has_reference});
+                }
+                if ($token->{attributes}->{content}) {
+                  $meta_el->[0]->get_attribute_node_ns (undef, 'content')
+                      ->set_user_data (manakai_has_reference =>
+                                           $token->{attributes}->{content}
                                                ->{has_reference});
                 }
               }
@@ -5627,6 +5637,10 @@ sub _tree_construction_main ($) {
                     ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
               $self->{change_encoding}
                   ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
+              $meta_el->[0]->get_attribute_node_ns (undef, 'content')
+                  ->set_user_data (manakai_has_reference =>
+                                       $token->{attributes}->{content}
+                                             ->{has_reference});
             }
           }
         } else {
@@ -5634,6 +5648,12 @@ sub _tree_construction_main ($) {
             $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
                 ->set_user_data (manakai_has_reference =>
                                      $token->{attributes}->{charset}
+                                         ->{has_reference});
+          }
+          if ($token->{attributes}->{content}) {
+            $meta_el->[0]->get_attribute_node_ns (undef, 'content')
+                ->set_user_data (manakai_has_reference =>
+                                     $token->{attributes}->{content}
                                          ->{has_reference});
           }
         }
@@ -6888,4 +6908,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2007/11/23 07:35:02 $
+# $Date: 2008/02/17 12:18:06 $

@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Feb 17 19:58:40 2008
-# Current time GMT:   Sun Feb 17 10:58:40 2008
+# Current time local: Sun Feb 17 21:10:09 2008
+# Current time GMT:   Sun Feb 17 12:10:09 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -82,8 +82,8 @@ ok 75
 ok 76
 ok 77
 not ok 78
-# Test 78 got: "/svg/foreignObject/html/head/meta/@charset;in XML:charset\n/svg/foreignObject/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported\n/svg/foreignObject/html/head/meta;element not allowed:meta charset\n/svg/foreignObject;element;unsupported\n/svg;element;unsupported" (t/ContentChecker.t at line 94 fail #78)
-#    Expected: "/svg/foreignObject/html/head/meta/@charset;in XML:charset\n/svg/foreignObject/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported\n/svg/foreignObject/html/head/meta;element not allowed:meta charset" (<svg xmlns="http://www.w3.org/2000/svg">
+# Test 78 got: "/svg/foreignObject/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported\n/svg/foreignObject/html/head/meta;element not allowed:meta charset;m\n/svg/foreignObject/html/head/meta;in XML:charset;m\n/svg/foreignObject;element;unsupported\n/svg;element;unsupported" (t/ContentChecker.t at line 94 fail #78)
+#    Expected: "/svg/foreignObject/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported\n/svg/foreignObject/html/head/meta;element not allowed:meta charset;m\n/svg/foreignObject/html/head/meta;in XML:charset;m" (<svg xmlns="http://www.w3.org/2000/svg">
 #<foreignObject>
 #  <html xmlns="http://www.w3.org/1999/xhtml">
 #  <head>
@@ -96,14 +96,14 @@ not ok 78
 #</svg>)
 #  t/ContentChecker.t line 94 is:     join ("\n", sort {$a cmp $b} @{$test->{errors}}), $test->{data};
 not ok 79
-# Test 79 got: "/head/noscript/meta/@charset;in XML:charset\n/head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/head/noscript/meta;element not allowed\n/head/noscript/meta;element not allowed:meta charset\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (t/ContentChecker.t at line 94 fail #79)
-#    Expected: "/head/noscript/meta/@charset;in XML:charset\n/head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/head/noscript/meta;element not allowed:meta charset\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (<head xmlns="http://www.w3.org/1999/xhtml">
+# Test 79 got: "/head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/head/noscript/meta;element not allowed\n/head/noscript/meta;element not allowed:meta charset;m\n/head/noscript/meta;in XML:charset;m\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (t/ContentChecker.t at line 94 fail #79)
+#    Expected: "/head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/head/noscript/meta;element not allowed:meta charset;m\n/head/noscript/meta;in XML:charset;m\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (<head xmlns="http://www.w3.org/1999/xhtml">
 #<title/>
 #<noscript>
 #<meta charset="us-ascii"/>
 #</noscript>
 #</head>)
-#    Got 1 extra line at line 3:
+#    Got 1 extra line at line 2:
 #     + "/head/noscript/meta;element not allowed\n"
 ok 80
 ok 81
@@ -582,8 +582,8 @@ ok 458
 ok 459
 ok 460
 not ok 461
-# Test 461 got: "/head/noscript/noscript/meta/@charset;in XML:charset\n/head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/head/noscript/noscript/meta;element not allowed\n/head/noscript/noscript/meta;element not allowed:meta charset\n/head/noscript/noscript;element not allowed\n/head/noscript/noscript;in XML:noscript\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (t/ContentChecker.t at line 94 fail #461)
-#     Expected: "/head/noscript/noscript/meta/@charset;in XML:charset\n/head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/head/noscript/noscript/meta;element not allowed:meta charset\n/head/noscript/noscript;element not allowed\n/head/noscript/noscript;in XML:noscript\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (<head xmlns="http://www.w3.org/1999/xhtml">
+# Test 461 got: "/head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/head/noscript/noscript/meta;element not allowed\n/head/noscript/noscript/meta;element not allowed:meta charset;m\n/head/noscript/noscript/meta;in XML:charset;m\n/head/noscript/noscript;element not allowed\n/head/noscript/noscript;in XML:noscript\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (t/ContentChecker.t at line 94 fail #461)
+#     Expected: "/head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/head/noscript/noscript/meta;element not allowed:meta charset;m\n/head/noscript/noscript/meta;in XML:charset;m\n/head/noscript/noscript;element not allowed\n/head/noscript/noscript;in XML:noscript\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (<head xmlns="http://www.w3.org/1999/xhtml">
 #<title/>
 #<noscript>
 #<link rel="stylesheet" href=""/>
@@ -592,7 +592,7 @@ not ok 461
 #</noscript>
 #</noscript>
 #</head>)
-#     Got 1 extra line at line 3:
+#     Got 1 extra line at line 2:
 #      + "/head/noscript/noscript/meta;element not allowed\n"
 ok 462
 ok 463
@@ -604,11 +604,11 @@ not ok 466
 #<style scope=""/>
 #</noscript>)
 not ok 467
-# Test 467 got: "/noscript/meta/@charset;in XML:charset\n/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/noscript/meta;element not allowed:meta charset\n/noscript/meta;element not allowed:prose;m\n/noscript;in XML:noscript\n/noscript;no significant content;s" (t/ContentChecker.t at line 94 fail #467)
-#     Expected: "/noscript/meta/@charset;in XML:charset\n/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/noscript/meta;element not allowed:meta charset\n/noscript;in XML:noscript\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
+# Test 467 got: "/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/noscript/meta;element not allowed:meta charset;m\n/noscript/meta;element not allowed:prose;m\n/noscript/meta;in XML:charset;m\n/noscript;in XML:noscript\n/noscript;no significant content;s" (t/ContentChecker.t at line 94 fail #467)
+#     Expected: "/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/noscript/meta;element not allowed:meta charset;m\n/noscript/meta;in XML:charset;m\n/noscript;in XML:noscript\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
 #<meta charset="us-ascii"/>
 #</noscript>)
-#     Got 1 extra line at line 4:
+#     Got 1 extra line at line 3:
 #      + "/noscript/meta;element not allowed:prose;m\n"
 ok 468
 ok 469
@@ -986,10 +986,7 @@ ok 828
 ok 829
 ok 830
 ok 831
-not ok 832
-# Test 832 got: "/meta/@charset;attribute not allowed\n/meta/@charset;in XML:charset\n/meta/@charset;mismatched charset name::us-ascii;unsupported\n/meta;element not allowed:meta charset" (t/ContentChecker.t at line 94 fail #832)
-#     Expected: "/meta/@charset;attribute not allowed\n/meta/@charset;in XML:charset\n/meta/@charset;mismatched charset name::us-ascii;unsupported" (<meta http-equiv="refresh" content="10; a.html" charset="us-ascii"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 832
 ok 833
 ok 834
 ok 835
@@ -1009,7 +1006,11 @@ ok 848
 Parse error (bare ero) at line 2 column 24
 ok 849
 ok 850
-ok 851
+not ok 851
+# Test 851 got: "/meta;attribute missing:content\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (t/ContentChecker.t at line 94 fail #851)
+#     Expected: "/meta;attribute missing:content;m\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
+#    http-equiv="content-type"
+#    />)
 ok 852
 ok 853
 ok 854
@@ -1019,7 +1020,14 @@ ok 857
 ok 858
 ok 859
 ok 860
-ok 861
+not ok 861
+# Test 861 got: "/meta/@content;charset:not registered:\"us-ascii\";w\n/meta/@content;mismatched charset name::\"us-ascii\";unsupported\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (t/ContentChecker.t at line 94 fail #861)
+#     Expected: "/meta/@content;charset:not registered:\"us-ascii\";m\n/meta/@content;mismatched charset name::\"us-ascii\";unsupported\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
+#    http-equiv="content-type"
+#    content="text/html; charset=&quot;us-ascii&quot;"/>)
+#     Line 1 is changed:
+#      - "/meta/@content;charset:not registered:\"us-ascii\";m\n"
+#      + "/meta/@content;charset:not registered:\"us-ascii\";w\n"
 ok 862
 ok 863
 ok 864
@@ -1256,107 +1264,107 @@ ok 1094
 ok 1095
 ok 1096
 ok 1097
-not ok 1098
-# Test 1098 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1098)
+ok 1098
+ok 1099
+ok 1100
+ok 1101
+ok 1102
+ok 1103
+ok 1104
+ok 1105
+ok 1106
+ok 1107
+ok 1108
+ok 1109
+ok 1110
+ok 1111
+not ok 1112
+# Test 1112 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1112)
 #      Expected: "/object;attribute missing:data|type\n/object;no significant content;s" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1099
-# Test 1099 got: "/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1099)
+not ok 1113
+# Test 1113 got: "/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1113)
 #      Expected: "/object;no significant content;s" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1100
-# Test 1100 got: "/object/@data;URI::syntax error:iriref3987;m\n/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1100)
+not ok 1114
+# Test 1114 got: "/object/@data;URI::syntax error:iriref3987;m\n/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1114)
 #      Expected: "/object/@data;URI::syntax error:iriref3987;m\n/object;no significant content;s" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1101
-# Test 1101 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1101)
+not ok 1115
+# Test 1115 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1115)
 #      Expected: "/object/@type;IMT:syntax error\n/object;no significant content;s" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1102
-# Test 1102 got: "/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1102)
+not ok 1116
+# Test 1116 got: "/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1116)
 #      Expected: "/object;no significant content;s" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1103
-# Test 1103 got: "/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1103)
+not ok 1117
+# Test 1117 got: "/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1117)
 #      Expected: "/object;no significant content;s" (<object type="text/css" data="http://test/"
 #    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1104
-# Test 1104 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1104)
+not ok 1118
+# Test 1118 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1118)
 #      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="">x</object></p>
 #</div>)
-not ok 1105
-# Test 1105 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1105)
+not ok 1119
+# Test 1119 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1119)
 #      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="abc">x</object></p>
 #</div>)
-not ok 1106
-# Test 1106 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1106)
+not ok 1120
+# Test 1120 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1120)
 #      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="abc#">x</object></p>
 #</div>)
-not ok 1107
-# Test 1107 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1107)
+not ok 1121
+# Test 1121 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1121)
 #      Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="&#x0A;#abc">x</object></p>
 #</div>)
-not ok 1108
-# Test 1108 got: "/div/map;no significant content;s\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1108)
+not ok 1122
+# Test 1122 got: "/div/map;no significant content;s\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1122)
 #      Expected: "/div/map;no significant content;s" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="#aa">x</object></p>
 #<map id="aa"/>
 #</div>)
-not ok 1109
-# Test 1109 got: "/div/map;no significant content;s\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1109)
+not ok 1123
+# Test 1123 got: "/div/map;no significant content;s\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1123)
 #      Expected: "/div/map;no significant content;s" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#aa">x</object></p>
 #</div>)
-not ok 1110
-# Test 1110 got: "/div/map;no significant content;s\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1110)
+not ok 1124
+# Test 1124 got: "/div/map;no significant content;s\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1124)
 #      Expected: "/div/map;no significant content;s" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="&#x4E00;"/>
 #<p><object data="http://test/" usemap="#&#x4E00;">x</object></p>
 #</div>)
-not ok 1111
-# Test 1111 got: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1111)
+not ok 1125
+# Test 1125 got: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1125)
 #      Expected: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#bb">x</object></p>
 #</div>)
-not ok 1112
-# Test 1112 got: "/div/map;no significant content;s\n/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1112)
+not ok 1126
+# Test 1126 got: "/div/map;no significant content;s\n/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1126)
 #      Expected: "/div/map;no significant content;s" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#aa">x</object></p>
 #<p><object data="http://test/" usemap="#aa">x</object></p>
 #</div>)
-not ok 1113
-# Test 1113 got: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1113)
+not ok 1127
+# Test 1127 got: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1127)
 #      Expected: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#AA">x</object></p>
 #</div>)
-not ok 1114
-# Test 1114 got: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1114)
+not ok 1128
+# Test 1128 got: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1128)
 #      Expected: "/div/map;no significant content;s\n/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="AA"/>
 #<p><object data="http://test/" usemap="#aa">x</object></p>
 #</div>)
-not ok 1115
-# Test 1115 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1115)
+not ok 1129
+# Test 1129 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 94 fail #1129)
 #      Expected: "/div/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<object data="" usemap="#a">x</object><menu id="a">x</menu>
 #</div>)
-ok 1116
-ok 1117
-ok 1118
-ok 1119
-ok 1120
-ok 1121
-ok 1122
-ok 1123
-ok 1124
-ok 1125
-ok 1126
-ok 1127
-ok 1128
-ok 1129
 ok 1130
 ok 1131
 ok 1132
@@ -1656,7 +1664,6 @@ ok 1425
 ok 1426
 ok 1427
 ok 1428
-# t/content-model-3.dat
 ok 1429
 ok 1430
 ok 1431
@@ -1671,6 +1678,7 @@ ok 1439
 ok 1440
 ok 1441
 ok 1442
+# t/content-model-3.dat
 ok 1443
 ok 1444
 ok 1445
@@ -1678,7 +1686,6 @@ ok 1446
 ok 1447
 ok 1448
 ok 1449
-# t/content-model-4.dat
 ok 1450
 ok 1451
 ok 1452
@@ -1693,6 +1700,7 @@ ok 1460
 ok 1461
 ok 1462
 ok 1463
+# t/content-model-4.dat
 ok 1464
 ok 1465
 ok 1466
@@ -1726,7 +1734,6 @@ ok 1493
 ok 1494
 ok 1495
 ok 1496
-# t/content-model-5.dat
 ok 1497
 ok 1498
 ok 1499
@@ -1740,9 +1747,8 @@ ok 1506
 ok 1507
 ok 1508
 ok 1509
-not ok 1510
-# Test 1510 got: "/p;no significant content;s" (t/ContentChecker.t at line 94 fail #1510)
-#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml"><del>a</del>a</p>)
+ok 1510
+# t/content-model-5.dat
 ok 1511
 ok 1512
 ok 1513
@@ -1756,8 +1762,9 @@ ok 1520
 ok 1521
 ok 1522
 ok 1523
-# t/table-1.dat
-ok 1524
+not ok 1524
+# Test 1524 got: "/p;no significant content;s" (t/ContentChecker.t at line 94 fail #1524)
+#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml"><del>a</del>a</p>)
 ok 1525
 ok 1526
 ok 1527
@@ -1770,9 +1777,8 @@ ok 1533
 ok 1534
 ok 1535
 ok 1536
-# t/content-model-atom-1.dat
-# t/content-model-atom-2.dat
 ok 1537
+# t/table-1.dat
 ok 1538
 ok 1539
 ok 1540
@@ -1786,6 +1792,8 @@ ok 1547
 ok 1548
 ok 1549
 ok 1550
+# t/content-model-atom-1.dat
+# t/content-model-atom-2.dat
 ok 1551
 ok 1552
 ok 1553
@@ -1794,3 +1802,17 @@ ok 1555
 ok 1556
 ok 1557
 ok 1558
+ok 1559
+ok 1560
+ok 1561
+ok 1562
+ok 1563
+ok 1564
+ok 1565
+ok 1566
+ok 1567
+ok 1568
+ok 1569
+ok 1570
+ok 1571
+ok 1572

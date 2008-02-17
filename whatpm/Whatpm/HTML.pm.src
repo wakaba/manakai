@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.67 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.68 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -2890,6 +2890,10 @@ sub _tree_construction_main ($) {
                           ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
                     $self->{change_encoding}
                         ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
+                    $meta_el->[0]->get_attribute_node_ns (undef, 'content')
+                        ->set_user_data (manakai_has_reference =>
+                                             $token->{attributes}->{content}
+                                                   ->{has_reference});
                   }
                 }
               } else {
@@ -2897,6 +2901,12 @@ sub _tree_construction_main ($) {
                   $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
                       ->set_user_data (manakai_has_reference =>
                                            $token->{attributes}->{charset}
+                                               ->{has_reference});
+                }
+                if ($token->{attributes}->{content}) {
+                  $meta_el->[0]->get_attribute_node_ns (undef, 'content')
+                      ->set_user_data (manakai_has_reference =>
+                                           $token->{attributes}->{content}
                                                ->{has_reference});
                 }
               }
@@ -4490,6 +4500,10 @@ sub _tree_construction_main ($) {
                     ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
               $self->{change_encoding}
                   ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
+              $meta_el->[0]->get_attribute_node_ns (undef, 'content')
+                  ->set_user_data (manakai_has_reference =>
+                                       $token->{attributes}->{content}
+                                             ->{has_reference});
             }
           }
         } else {
@@ -4497,6 +4511,12 @@ sub _tree_construction_main ($) {
             $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
                 ->set_user_data (manakai_has_reference =>
                                      $token->{attributes}->{charset}
+                                         ->{has_reference});
+          }
+          if ($token->{attributes}->{content}) {
+            $meta_el->[0]->get_attribute_node_ns (undef, 'content')
+                ->set_user_data (manakai_has_reference =>
+                                     $token->{attributes}->{content}
                                          ->{has_reference});
           }
         }
@@ -5482,4 +5502,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/02/16 03:47:33 $
+# $Date: 2008/02/17 12:18:06 $

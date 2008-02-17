@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.58 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.59 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -219,6 +219,7 @@ sub check_document ($$$;$) {
   $self->{fact_level} = 'f';
   $self->{should_level} = 's';
   $self->{good_level} = 'w';
+  $self->{unsupported_lavel} = 'u';
 
   my $docel = $doc->document_element;
   unless (defined $docel) {
@@ -327,6 +328,7 @@ sub check_element ($$$;$) {
   $self->{fact_level} = 'f';
   $self->{should_level} = 's';
   $self->{good_level} = 'w';
+  $self->{unsupported_lavel} = 'u';
 
   $self->{pluses} = {};
   $self->{minuses} = {};
@@ -593,4 +595,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/17 11:04:08 $
+# $Date: 2008/02/17 12:18:06 $

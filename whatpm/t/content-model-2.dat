@@ -1044,9 +1044,9 @@ id=""><span id="">x</span></p>
 <meta charset="us-ascii" name="dns" content="example.net"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
+/meta;element not allowed:meta charset;m
 /meta/@charset;attribute not allowed
-/meta/@charset;in XML:charset
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -1070,8 +1070,9 @@ id=""><span id="">x</span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@charset;attribute not allowed
-/meta/@charset;in XML:charset
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta;element not allowed:meta charset;m
 
 #data
 <meta http-equiv="" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1088,9 +1089,9 @@ id=""><span id="">x</span></p>
 <meta charset="us-ascii" content="example.net"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
+/meta;element not allowed:meta charset;m
 /meta/@content;attribute not allowed
-/meta/@charset;in XML:charset
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -1107,8 +1108,8 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::;unsupported
 /meta/@charset;charset:syntax error:;m
 /meta/@charset;charset:not registered:;w
@@ -1116,30 +1117,30 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="US-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="csiso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::csiso2022jp;unsupported
 /meta/@charset;charset:not preferred:csiso2022jp;m
 
 #data
 <meta charset="iso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::iso2022jp;unsupported
 /meta/@charset;charset:not preferred:iso2022jp;m
 /meta/@charset;charset:not registered:iso2022jp;w
@@ -1147,8 +1148,8 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="x-utf-8" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::x-utf-8;unsupported
 /meta/@charset;charset:not preferred:x-utf-8;m
 /meta/@charset;charset:private:x-utf-8;w
@@ -1156,8 +1157,8 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="utf-8n" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::utf-8n;unsupported
 /meta/@charset;charset:not preferred:utf-8n;m
 /meta/@charset;charset:not registered:utf-8n;w
@@ -1165,8 +1166,8 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="x-sjis" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::x-sjis;unsupported
 /meta/@charset;charset:not preferred:x-sjis;m
 /meta/@charset;charset:private:x-sjis;w
@@ -1215,6 +1216,136 @@ id=""><span id="">x</span></p>
 /html/head/meta/@charset;mismatched charset name::us-&scii;unsupported
 /html/head/meta/@charset;charset:not registered:us-&scii;w
 /html/head/meta/@charset;character reference in charset;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    />
+#errors
+/meta;element not allowed:meta charset;m
+/meta;attribute missing:content;m
+/meta;in XML:charset;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content=""/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="html"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html;charset"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/HTML; charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html;  charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html ; charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html;&#x09;charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content=" text/html; charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html; charset=&quot;us-ascii&quot;"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;charset:not registered:"us-ascii";w
+/meta/@content;mismatched charset name::"us-ascii";unsupported
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html; charset=x-sjis"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;mismatched charset name::x-sjis;unsupported
+/meta/@content;charset:not preferred:x-sjis;m
+/meta/@content;charset:private:x-sjis;w
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=Content-Type content=text/html;charset=us-&#x61;scii>
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;character reference in charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=Content-Type content=text/html; charset=us-ascii>
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@charset;attribute not allowed
+/html/head/meta/@content;meta content-type syntax error;m
+/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>

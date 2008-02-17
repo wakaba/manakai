@@ -140,7 +140,7 @@ Check conformance of a cache manifest, given as <em>$manifest</em>.
 <dt><strong><a name="item__24manifest"><em>$manifest</em></a></strong><br />
 </dt>
 <dd>
-The cache manifest to check, in the <a href="#manifest_data_structure">MANIFEST DATA STRUCTURE</a>.
+The cache manifest to check, encoded in the <a href="#manifest_data_structure">MANIFEST DATA STRUCTURE</a>.
 </dd>
 <p></p>
 <dt><strong><em>$onerror</em></strong><br />
@@ -157,6 +157,9 @@ any error (or warning) is <code>warn</code>ed with its <code>type</code>.
 <p>For the list of the error types, see Whatpm Error Types
 &lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
 </dd>
+<dd>
+<p><code>index</code> is the index of the IRI with the error. @@ TBW</p>
+</dd>
 <p></p></dl>
 <p>A cache manifest is conforming if (a) it is correctly labeled
 as a cache manifest (e.g. as Internet media type <code>text/cache-manifest</code>)
@@ -171,7 +174,7 @@ with level <code>m</code> or <code>s</code>, and (c) checking the cache manifest
 <h1><a name="manifest_data_structure">MANIFEST DATA STRUCTURE</a></h1>
 <p>If <em>$m</em> is in manifest data structure, <em>$m</em> is a reference to
 the array with three items: <em>$explicit_uris</em>, <em>$fallback_uris</em>,
-and <em>$online_whitelist</em>.</p>
+<em>$online_whitelist</em>, and <em>$manifest_uri</em>.</p>
 <p><em>$explicit_uris</em> is a reference to the array, which
 contains zero or more strings.  The strings are IRI references
 of the explicit entries.</p>
@@ -183,12 +186,14 @@ to the oppotunistic caching namespaces.</p>
 <p><em>$online_whitelist</em> is a reference to the array, which
 contains zero or more strings.  The strings are IRI references
 in the online whitelist.</p>
+<p><em>$manfest_uri</em> is a string which is an IRI reference of the
+manifest itself.</p>
 <p>
 </p>
 <hr />
 <h1><a name="dependency">DEPENDENCY</a></h1>
 <p>This module depends on <a href="../Message/URI/URIReference.html">the Message::URI::URIReference manpage</a>, which is
-part of manakai.</p>
+part of the manakai-core package.</p>
 <p>
 </p>
 <hr />
@@ -205,6 +210,7 @@ part of manakai.</p>
 <h1><a name="todo">TODO</a></h1>
 <p>``Same scheme/host/port'' comparison algorithm is not correctly implemented
 yet.</p>
+<p>Test suite.</p>
 <p>
 </p>
 <hr />
@@ -214,7 +220,7 @@ yet.</p>
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>Copyright 2007-2008 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
 <p>This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.</p>
 

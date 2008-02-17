@@ -1699,27 +1699,7 @@ $Element->{$HTML_NS}->{meta} = {
       }
     }
 
-    ## TODO: metadata conformance
-
-    ## TODO: pragma conformance
-    if (defined $http_equiv_attr) { ## An enumerated attribute
-      my $keyword = lc $http_equiv_attr->value; ## TODO: ascii case?
-      if ({
-           'refresh' => 1,
-           'default-style' => 1,
-          }->{$keyword}) {
-        #
-      } elsif ($keyword eq 'content-type') {
-        $self->{onerror}
-            ->(node => $http_equiv_attr,
-               type => 'enumerated:invalid:http-equiv:content-type');
-      } else {
-        $self->{onerror}->(node => $http_equiv_attr,
-                           type => 'enumerated:invalid');
-      }
-    }
-
-    if (defined $charset_attr) {
+    my $check_charset_decl = sub () {
       my $parent = $todo->{node}->manakai_parent_element;
       if ($parent and $parent eq $parent->owner_document->manakai_head) {
         for my $el (@{$parent->child_nodes}) {
@@ -1727,22 +1707,27 @@ $Element->{$HTML_NS}->{meta} = {
           unless ($el eq $todo->{node}) {
             ## NOTE: Not the first child element.
             $self->{onerror}->(node => $todo->{node},
-                               type => 'element not allowed:meta charset');
+                               type => 'element not allowed:meta charset',
+                               level => $self->{must_level});
           }
           last;
           ## NOTE: Entity references are not supported.
         }
       } else {
         $self->{onerror}->(node => $todo->{node},
-                           type => 'element not allowed:meta charset');
+                           type => 'element not allowed:meta charset',
+                           level => $self->{must_level});
       }
 
       unless ($todo->{node}->owner_document->manakai_is_html) {
-        $self->{onerror}->(node => $charset_attr,
-                           type => 'in XML:charset');
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'in XML:charset',
+                           level => $self->{must_level});
       }
+    }; # $check_charset_decl
 
-      my $charset_value = $charset_attr->value;
+    my $check_charset = sub ($$) {
+      my ($attr, $charset_value) = @_;
       ## NOTE: Though the case-sensitivility of |charset| attribute value
       ## is not explicitly spelled in the HTML5 spec, the Character Set
       ## registry of IANA, which is referenced from HTML5 spec, says that
@@ -1756,17 +1741,17 @@ $Element->{$HTML_NS}->{meta} = {
         ## TODO: Test for this case
         my $ic_charset = $Message::Charset::Info::IANACharset->{$ic};
         if ($charset ne $ic_charset) {
-          $self->{onerror}->(node => $charset_attr,
+          $self->{onerror}->(node => $attr,
                              type => 'mismatched charset name:'.$ic.
-                                 ':'.$charset_value,
-                             level => 'm');
+                                 ':'.$charset_value, ## TODO: This should be a |value| value.
+                             level => $self->{must_level});
         }
       } else {
         ## NOTE: MUST, but not checkable, since the document is not originally
         ## in serialized form (or the parser does not preserve the input
         ## encoding information).
-        $self->{onerror}->(node => $charset_attr,
-                           type => 'mismatched charset name::'.$charset_value,
+        $self->{onerror}->(node => $attr,
+                           type => 'mismatched charset name::'.$charset_value, ## TODO: |value|
                            level => 'unsupported');
       }
       
@@ -1774,9 +1759,9 @@ $Element->{$HTML_NS}->{meta} = {
       ## Syntactically valid and registered?  What about x-charset names?
       unless (Message::Charset::Info::is_syntactically_valid_iana_charset_name
                   ($charset_value)) {
-        $self->{onerror}->(node => $charset_attr,
-                           type => 'charset:syntax error:'.$charset_value,
-                           level => 'm');
+        $self->{onerror}->(node => $attr,
+                           type => 'charset:syntax error:'.$charset_value, ## TODO
+                           level => $self->{must_level});
       }
 
       if ($charset) {
@@ -1786,40 +1771,73 @@ $Element->{$HTML_NS}->{meta} = {
         if (($charset_status &
              Message::Charset::Info::PREFERRED_CHARSET_NAME ())
                 != Message::Charset::Info::PREFERRED_CHARSET_NAME ()) {
-          $self->{onerror}->(node => $charset_attr,
+          $self->{onerror}->(node => $attr,
                              type => 'charset:not preferred:'.
-                                 $charset_value,
-                             level => 'm');
+                                 $charset_value, ## TODO
+                             level => $self->{must_level});
         }
         if (($charset_status &
              Message::Charset::Info::REGISTERED_CHARSET_NAME ())
                 != Message::Charset::Info::REGISTERED_CHARSET_NAME ()) {
           if ($charset_value =~ /^x-/) {
-            $self->{onerror}->(node => $charset_attr,
-                               type => 'charset:private:'.$charset_value,
+            $self->{onerror}->(node => $attr,
+                               type => 'charset:private:'.$charset_value, ## TODO
                                level => $self->{good_level});
           } else {
-            $self->{onerror}->(node => $charset_attr,
+            $self->{onerror}->(node => $attr,
                                type => 'charset:not registered:'.
-                                   $charset_value,
+                                   $charset_value, ## TODO
                                level => $self->{good_level});
           }
         }
       } elsif ($charset_value =~ /^x-/) {
-        $self->{onerror}->(node => $charset_attr,
-                             type => 'charset:private:'.$charset_value,
+        $self->{onerror}->(node => $attr,
+                             type => 'charset:private:'.$charset_value, ## TODO
                              level => $self->{good_level});
       } else {
-        $self->{onerror}->(node => $charset_attr,
-                             type => 'charset:not registered:'.$charset_value,
+        $self->{onerror}->(node => $attr,
+                             type => 'charset:not registered:'.$charset_value, ## TODO
                              level => $self->{good_level});
       }
 
-      if ($charset_attr->get_user_data ('manakai_has_reference')) {
-        $self->{onerror}->(node => $charset_attr,
+      if ($attr->get_user_data ('manakai_has_reference')) {
+        $self->{onerror}->(node => $attr,
                              type => 'character reference in charset',
                              level => $self->{must_level});
       }
+    }; # $check_charset
+
+    ## TODO: metadata conformance
+
+    ## TODO: pragma conformance
+    if (defined $http_equiv_attr) { ## An enumerated attribute
+      my $keyword = lc $http_equiv_attr->value; ## TODO: ascii case?
+      if ({
+           'refresh' => 1,
+           'default-style' => 1,
+          }->{$keyword}) {
+        #
+      } elsif ($keyword eq 'content-type') {
+        $check_charset_decl->();
+        if ($content_attr) {
+          my $content = $content_attr->value;
+          if ($content =~ m!^text/html;\x20?charset=(.+)\z!s) {
+            $check_charset->($content_attr, $1);
+          } else {
+            $self->{onerror}->(node => $content_attr,
+                               type => 'meta content-type syntax error',
+                               level => $self->{must_level});
+          }
+        }
+      } else {
+        $self->{onerror}->(node => $http_equiv_attr,
+                           type => 'enumerated:invalid');
+      }
+    }
+
+    if (defined $charset_attr) {
+      $check_charset_decl->();
+      $check_charset->($charset_attr, $charset_attr->value);
     }
   },
   checker => $HTMLEmptyChecker,

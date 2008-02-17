@@ -140,7 +140,7 @@
 </html>
 #errors
 /html/head;child element missing:title
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -256,7 +256,7 @@
 <body>t</body>
 </html>
 #errors
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -268,8 +268,8 @@
 <body>y</body>
 </html>
 #errors
-/html/head/meta;element not allowed:meta charset
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -350,7 +350,7 @@
 <body>ty</body>
 </html>
 #errors
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 /html/head/base;attribute missing:href|target
 
@@ -359,7 +359,7 @@
 <body>y</body></html>
 #errors
 /html/head/base;attribute missing:href|target
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -371,8 +371,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>x</title><base/><meta charset="us-ascii"/></head><body>x</body></html>
 #errors
 /html/head/base;attribute missing:href|target
-/html/head/meta;element not allowed:meta charset
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -385,7 +385,7 @@
 <body>y</body>
 </html>
 #errors
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -398,8 +398,8 @@
 <body>ty</body>
 </html>
 #errors
-/html/head/meta;element not allowed:meta charset
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -412,8 +412,8 @@
 <body>xx</body>
 </html>
 #errors
-/html/head/meta;element not allowed:meta charset
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -444,8 +444,8 @@
 <body>xx</body>
 </html>
 #errors
-/html/head/meta;element not allowed:meta charset
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -458,7 +458,7 @@
 <body>xx</body>
 </html>
 #errors
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -573,31 +573,31 @@
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"></meta>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"> </meta>
 #errors
-/meta;element not allowed:meta charset
-/meta/@charset;in XML:charset
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">a</meta>
 #errors
-/meta;element not allowed:meta charset
+/meta;element not allowed:meta charset;m
 /meta/"a";character not allowed:empty;m
-/meta/@charset;in XML:charset
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"><p/></meta>
 #errors
-/meta;element not allowed:meta charset
+/meta;element not allowed:meta charset;m
 /meta/p;element not allowed:empty;m
-/meta/@charset;in XML:charset
+/meta;in XML:charset;m
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 /meta/p;no significant content;s
 
@@ -610,7 +610,7 @@
 <body>x</body>
 </html>
 #errors
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -623,10 +623,10 @@
 <body>x</body>
 </html>
 #errors
-/html/head/meta/@charset;in XML:charset
-/html/head/meta;element not allowed:meta charset
+/html/head/meta;in XML:charset;m
+/html/head/meta;element not allowed:meta charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::iso-8859-1;unsupported
 
 #data
@@ -638,8 +638,8 @@
 <body>x</body>
 </html>
 #errors
-/html/head/meta/@charset;in XML:charset
-/html/head/meta;element not allowed:meta charset
+/html/head/meta;in XML:charset;m
+/html/head/meta;element not allowed:meta charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -655,8 +655,8 @@
 </html>
 #errors
 /html/head;element not allowed
-/html/head/meta/@charset;in XML:charset
-/html/head/meta;element not allowed:meta charset
+/html/head/meta;in XML:charset;m
+/html/head/meta;element not allowed:meta charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -670,7 +670,7 @@
 #errors
 /html/body;ps element missing:head
 /html/head;element not allowed
-/html/head/meta/@charset;in XML:charset
+/html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -686,8 +686,8 @@
 </foreignObject>
 </svg>
 #errors
-/svg/foreignObject/html/head/meta;element not allowed:meta charset
-/svg/foreignObject/html/head/meta/@charset;in XML:charset
+/svg/foreignObject/html/head/meta;element not allowed:meta charset;m
+/svg/foreignObject/html/head/meta;in XML:charset;m
 /svg/foreignObject/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -699,8 +699,8 @@
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/meta;element not allowed:meta charset
-/head/noscript/meta/@charset;in XML:charset
+/head/noscript/meta;element not allowed:meta charset;m
+/head/noscript/meta;in XML:charset;m
 /head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
 /head/title;no significant content;s
 
@@ -3904,8 +3904,8 @@ aaa
 /head/noscript;in XML:noscript
 /head/noscript/noscript;in XML:noscript
 /head/noscript/noscript;element not allowed
-/head/noscript/noscript/meta;element not allowed:meta charset
-/head/noscript/noscript/meta/@charset;in XML:charset
+/head/noscript/noscript/meta;element not allowed:meta charset;m
+/head/noscript/noscript/meta;in XML:charset;m
 /head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
 /head/title;no significant content;s
 
@@ -3963,8 +3963,8 @@ aaa
 #errors
 /noscript;no significant content;s
 /noscript;in XML:noscript
-/noscript/meta;element not allowed:meta charset
-/noscript/meta/@charset;in XML:charset
+/noscript/meta;element not allowed:meta charset;m
+/noscript/meta;in XML:charset;m
 /noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
@@ -4708,8 +4708,8 @@ aaa
 <head><meta charset="us-ascii"/><nest/><title/></head>
 </rule>
 #errors
-/rule/head/meta;element not allowed:meta charset
-/rule/head/meta/@charset;in XML:charset
+/rule/head/meta;element not allowed:meta charset;m
+/rule/head/meta;in XML:charset;m
 /rule/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 /rule;no significant content;s
 /rule/head/title;no significant content;s
@@ -4719,8 +4719,8 @@ aaa
 <head><nest/><meta charset="us-ascii"/><title/></head>
 </rule>
 #errors
-/rule/head/meta;element not allowed:meta charset
-/rule/head/meta/@charset;in XML:charset
+/rule/head/meta;element not allowed:meta charset;m
+/rule/head/meta;in XML:charset;m
 /rule/head/meta/@charset;mismatched charset name::us-ascii;unsupported
 /rule;no significant content;s
 /rule/head/title;no significant content;s
