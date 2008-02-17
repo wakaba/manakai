@@ -704,6 +704,56 @@
 /head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
 /head/title;no significant content;s
 
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta;element not allowed:meta charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta charset=us-ascii>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta;element not allowed:meta charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<meta charset=us-ascii>
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta;element not allowed:meta charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta;element not allowed:meta charset;m
+
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <title/>
@@ -753,6 +803,19 @@
 /head/noscript/meta/@http-equiv;attribute not allowed
 /head/noscript/meta/@http-equiv;enumerated:invalid
 /head/title;no significant content;s
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<meta http-equiv="content-type" content="text/html; charset=us-ascii"/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+/head/noscript/meta;element not allowed:meta charset;m
+/head/noscript/meta;in XML:charset;m
+/head/noscript/meta/@content;mismatched charset name::us-ascii;unsupported
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>

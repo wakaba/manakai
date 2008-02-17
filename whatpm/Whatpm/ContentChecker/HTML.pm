@@ -1817,7 +1817,13 @@ $Element->{$HTML_NS}->{meta} = {
            'default-style' => 1,
           }->{$keyword}) {
         #
+
+        ## TODO: More than one occurence is a MUST-level error (revision 1180).
       } elsif ($keyword eq 'content-type') {
+        ## ISSUE: Though it is renamed as "Encoding declaration" state in rev
+        ## 1221, there are still many occurence of "Content-Type" state in
+        ## the spec.
+
         $check_charset_decl->();
         if ($content_attr) {
           my $content = $content_attr->value;
