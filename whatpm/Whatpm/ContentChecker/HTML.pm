@@ -119,22 +119,14 @@ my $HTMLEmbeddedContent = {
 my $HTMLInteractiveContent = {
   $HTML_NS => {
     a => 1,
+    datagrid => 1, ## ISSUE: Categorized as "Inetractive element"
   },
 };
+
+## NOTE: $HTMLTransparentElements: See Whatpm::ContentChecker.
+## NOTE: Semi-transparent elements: See Whatpm::ContentChecker.
 
 ## Old HTML5 categories
-
-my $HTMLMetadataElements = {
-  $HTML_NS => {
-    qw/link 1 meta 1 style 1 script 1 event-source 1 command 1 base 1 title 1
-       noscript 1 datatemplate 1
-      /,
-  },
-};
-
-my $HTMLSectioningElements = {
-  $HTML_NS => {qw/body 1 section 1 nav 1 article 1 blockquote 1 aside 1/},
-};
 
 my $HTMLBlockLevelElements = {
   $HTML_NS => {
@@ -164,25 +156,6 @@ my $HTMLStrictlyInlineLevelElements = {
 my $HTMLStructuredInlineLevelElements = {
   $HTML_NS => {qw/blockquote 1 pre 1 ol 1 ul 1 dl 1 table 1 menu 1/},
 };
-
-my $HTMLInteractiveElements = {
-  $HTML_NS => {a => 1, details => 1, datagrid => 1},
-};
-## NOTE: |html:a| and |html:datagrid| are not allowed as a descendant
-## of interactive elements
-
-# my $HTMLTransparentElements : in |Whatpm/ContentChecker.pm|.
-
-#my $HTMLSemiTransparentElements = {
-#  $HTML_NS => {qw/video 1 audio 1/},
-#};
-
-my $HTMLEmbededElements = {
-  $HTML_NS => {qw/img 1 iframe 1 embed 1 object 1 video 1 audio 1 canvas 1/},
-};
-## NOTE: When an element is added to this list, make sure that
-## the element's checker set |has_descendant| flag for |significant| content
-## as true.
 
 my $HTMLSignificantContentErrors = {
   significant => sub {
@@ -302,64 +275,6 @@ my $HTMLTextChecker = sub {
   return ($new_todos);
 };
 
-## Zero or more |html:style| elements,
-## followed by zero or more block-level elements
-my $HTMLStylableBlockChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-  
-  my $has_non_style;
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      if ($node_ns eq $HTML_NS and $node_ln eq 'style') {
-        $not_allowed = 1 if $has_non_style or
-            not $node->has_attribute_ns (undef, 'scoped');
-      } elsif ($HTMLBlockLevelElements->{$node_ns}->{$node_ln}) {
-        $has_non_style = 1;
-      } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
-        #
-      } else {
-        $has_non_style = 1;
-        $not_allowed = 1;
-      }
-      $self->{onerror}->(node => $node, type => 'element not allowed')
-        if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $self->{onerror}->(node => $node, type => 'character not allowed');
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-}; # $HTMLStylableBlockChecker
-
 my $HTMLProseContentChecker = sub {
   my ($self, $todo) = @_;
   my $el = $todo->{node};
@@ -427,217 +342,6 @@ my $HTMLProseContentChecker = sub {
   return ($new_todos);
 }; # $HTMLProseContentChecker
 
-## Zero or more block-level elements
-my $HTMLBlockChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-  
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH'; 
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      $not_allowed = 1
-        unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln} or
-            $self->{pluses}->{$node_ns}->{$node_ln};
-      $self->{onerror}->(node => $node, type => 'element not allowed')
-        if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $self->{onerror}->(node => $node, type => 'character not allowed');
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-}; # $HTMLBlockChecker
-
-## Inline-level content
-my $HTMLInlineChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-  
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      $not_allowed = 1
-        unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-            $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
-            $self->{pluses}->{$node_ns}->{$node_ln};
-      $self->{onerror}->(node => $node, type => 'element not allowed')
-        if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  for (@$new_todos) {
-    $_->{inline} = 1;
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-}; # $HTMLInlineChecker
-
-## Strictly inline-level content
-my $HTMLStrictlyInlineChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-  
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      $not_allowed = 1
-        unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-            $self->{pluses}->{$node_ns}->{$node_ln};
-      $self->{onerror}->(node => $node, type => 'element not allowed')
-        if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  for (@$new_todos) {
-    $_->{inline} = 1;
-    $_->{strictly_inline} = 1;
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-}; # $HTMLStrictlyInlineChecker
-
-## Inline-level or strictly inline-level content
-my $HTMLInlineOrStrictlyInlineChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-  
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      if ($todo->{strictly_inline}) {
-        $not_allowed = 1
-          unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-              $self->{pluses}->{$node_ns}->{$node_ln};
-      } else {
-        $not_allowed = 1
-          unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
-              $self->{pluses}->{$node_ns}->{$node_ln};
-      }
-      $self->{onerror}->(node => $node, type => 'element not allowed')
-        if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  for (@$new_todos) {
-    $_->{inline} = 1;
-    $_->{strictly_inline} = 1;
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-}; # $HTMLInlineOrStrictlyInlineChecker
-
 my $HTMLPhrasingContentChecker = sub {
   my ($self, $todo) = @_;
   my $el = $todo->{node};
@@ -690,94 +394,6 @@ my $HTMLPhrasingContentChecker = sub {
 
   return ($new_todos);
 }; # $HTMLPhrasingContentChecker
-
-## Block-level content or inline-level content (i.e. bimorphic content model)
-my $HTMLBlockOrInlineChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-  
-  my $content = 'block-or-inline'; # or 'block' or 'inline'
-  my @block_not_inline;
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    ## ISSUE: It is unclear whether "<rule><div><p/><nest/></div></rule>"
-    ## is conforming or not.
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      if ($content eq 'block') {
-        $not_allowed = 1
-          unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln} or
-              $self->{pluses}->{$node_ns}->{$node_ln};
-      } elsif ($content eq 'inline') {
-        $not_allowed = 1
-          unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
-              $self->{pluses}->{$node_ns}->{$node_ln};
-      } else {
-        my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
-        my $is_inline
-          = $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} ||
-            $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
-        
-        push @block_not_inline, $node
-          if $is_block and not $is_inline and not $not_allowed;
-        if (not $is_block and not $self->{pluses}->{$node_ns}->{$node_ln}) {
-          $content = 'inline';
-          for (@block_not_inline) {
-            $self->{onerror}->(node => $_, type => 'element not allowed');
-          }
-          $not_allowed = 1 unless $is_inline;
-        }
-      }
-      $self->{onerror}->(node => $node, type => 'element not allowed')
-        if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        if ($content eq 'block') {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-        } else {
-          $content = 'inline';
-          for (@block_not_inline) {
-            $self->{onerror}->(node => $_, type => 'element not allowed');
-          }
-        }
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  if ($content eq 'inline') {
-    for (@$new_todos) {
-      $_->{inline} = 1;
-    }
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-};
 
 ## Zero or more XXX element, then either block-level or inline-level
 my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
@@ -881,6 +497,8 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
 my $HTMLTransparentChecker = $HTMLProseContentChecker;
 ## ISSUE: Significant content rule should be applied to transparent element
 ## with parent?  Currently, applied to |video| but not to others.
+
+## -- Common attribute syntacx checkers
 
 our $AttrChecker;
 
@@ -2331,7 +1949,7 @@ $Element->{$HTML_NS}->{a} = {
   checker => sub {
     my ($self, $todo) = @_;
 
-    my $end = $self->_add_minuses ($HTMLInteractiveElements);
+    my $end = $self->_add_minuses ($HTMLInteractiveContent);
     my ($new_todos, $ch) = $HTMLPhrasingContentChecker->($self, $todo);
     push @$new_todos, $end;
 
@@ -3304,7 +2922,7 @@ $Element->{$HTML_NS}->{table} = {
 
 $Element->{$HTML_NS}->{caption} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{colgroup} = {

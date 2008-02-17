@@ -1,5 +1,14 @@
 2008-02-17  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: Useless old stuff are removed.  |datagrid|
+	was missing from |$HTMLInteractiveContent|.
+	(a): Use new |$HTMLInteractiveContent| in place
+	of |$HTMLIntetractiveElements|.
+	(caption): Use new |$HTMLPhrasingContentChecker| in place 
+	of |$HTMLStrictlyInlineChecker|.
+
+2008-02-17  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm (figure): Implemented.
 	(video, audio): In no-parent-element case with |src| attribute,
 	the content model is now prose content.
