@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -279,6 +279,31 @@ sub manakai_compat_mode ($;$) {
     return 'no quirks';
   }
 } # manakai_compat_mode
+
+sub manakai_head ($) {
+  my $html = $_[0]->manakai_html;
+  return undef unless defined $html;
+  for my $el (@{$html->child_nodes}) {
+    next unless $el->node_type == 1; # ELEMENT_NODE
+    my $nsuri = $el->namespace_uri;
+    next unless defined $nsuri;
+    next unless $nsuri eq q<http://www.w3.org/1999/xhtml>;
+    next unless $el->manakai_local_name eq 'head';
+    return $el;
+  }
+  return undef;
+} # manakai_head
+
+sub manakai_html ($) {
+  my $de = $_[0]->document_element;
+  my $nsuri = $de->namespace_uri;
+  if (defined $nsuri and $nsuri eq q<http://www.w3.org/1999/xhtml> and
+      $de->manakai_local_name eq 'html') {
+    return $de;
+  } else {
+    return undef;
+  }
+} # manakai_html
 
 sub input_encoding ($;$) {
   $_[0]->{input_encoding} = $_[1] if @_ > 1;
@@ -560,4 +585,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/23 07:35:03 $
+# $Date: 2008/02/17 06:36:28 $

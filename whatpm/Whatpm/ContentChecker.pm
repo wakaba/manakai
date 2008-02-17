@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.56 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.57 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -198,10 +198,12 @@ our $ElementDefault = {
 };
 
 my $HTMLTransparentElements = {
-  $HTML_NS => {qw/ins 1 font 1 noscript 1/},
+  $HTML_NS => {qw/ins 1 del 1 font 1 noscript 1 canvas 1/},
   ## NOTE: |html:noscript| is transparent if scripting is disabled
   ## and not in |head|.
 };
+
+## Semi-transparent: html:video, html:audio, html:object
 
 our $Element = {};
 
@@ -338,6 +340,7 @@ sub check_element ($$$;$) {
   #$self->{has_uri_attr};
   #$self->{has_hyperlink_element};
   #$self->{has_charset};
+  #$self->{has_base};
   $self->{return} = {
     class => {},
     id => $self->{id}, table => [], term => $self->{term},
@@ -538,6 +541,26 @@ sub _check_get_children ($$$) {
         } # CN
         unshift @$sib, @cn;
       }
+    } elsif ($node_ns eq $HTML_NS and $node_ln eq 'object') {
+      my @cn = @{$node->child_nodes};
+      CN: while (@cn) {
+        my $cn = shift @cn;
+        my $cnt = $cn->node_type;
+        if ($cnt == 1) {
+          my $cn_nsuri = $cn->namespace_uri;
+          $cn_nsuri = '' unless defined $cn_nsuri;
+          if ($cn_nsuri eq $HTML_NS and $cn->manakai_local_name eq 'param') {
+            #
+          } else {
+            last CN;
+          }
+        } elsif ($cnt == 3 or $cnt == 4) {
+          if ($cn->data =~ /[^\x09-\x0D\x20]/) {
+            last CN;
+          }
+        }
+      } # CN
+      unshift @$sib, @cn;
     }
     push @$new_todos, {type => 'element', node => $node};
   } # TP
@@ -559,4 +582,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/10 04:09:57 $
+# $Date: 2008/02/17 06:36:28 $

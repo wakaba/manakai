@@ -647,7 +647,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/base;basehref after URI attribute
 /head/title;no significant content;s
 
@@ -667,7 +666,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/title;no significant content;s
 
 #data
@@ -687,7 +685,6 @@ id=""><span id="">x</span></p>
 </head>
 #errors
 /head/title;no significant content;s
-/head/base;element not allowed
 /head/base;basehref after URI attribute
 
 #data
@@ -706,7 +703,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/base;basehref after URI attribute
 /head/title;no significant content;s
 
@@ -726,7 +722,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/base;basetarget after hyperlink
 /head/title;no significant content;s
 
@@ -746,7 +741,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/base;basehref after URI attribute
 /head/base;basetarget after hyperlink
 /head/title;no significant content;s
@@ -767,7 +761,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/title;no significant content;s
 
 #data
@@ -777,7 +770,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/title;no significant content;s
 
 #data
@@ -787,7 +779,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/link/@rel;duplicate token:stylesheet
 /head/title;no significant content;s
 
@@ -798,7 +789,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/base;basetarget after hyperlink
 /head/title;no significant content;s
 
@@ -809,7 +799,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/base;basetarget after hyperlink
 /head/title;no significant content;s
 
@@ -820,7 +809,6 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;element not allowed
 /head/base;basetarget after hyperlink
 /head/title;no significant content;s
 
@@ -1056,6 +1044,7 @@ id=""><span id="">x</span></p>
 <meta charset="us-ascii" name="dns" content="example.net"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;attribute not allowed
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::us-ascii;unsupported
@@ -1064,6 +1053,7 @@ id=""><span id="">x</span></p>
 <meta http-equiv="refresh" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;attribute missing:content
+/meta;element not allowed:meta charset
 
 #data
 <meta http-equiv="refresh" content="10; a.html"
@@ -1099,6 +1089,7 @@ id=""><span id="">x</span></p>
 <meta charset="us-ascii" content="example.net"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@content;attribute not allowed
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::us-ascii;unsupported
@@ -1117,6 +1108,7 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::;unsupported
 /meta/@charset;charset:syntax error:;m
@@ -1125,18 +1117,21 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="US-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::us-ascii;unsupported
 
 #data
 <meta charset="csiso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::csiso2022jp;unsupported
 /meta/@charset;charset:not preferred:csiso2022jp;m
@@ -1144,6 +1139,7 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="iso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::iso2022jp;unsupported
 /meta/@charset;charset:not preferred:iso2022jp;m
@@ -1152,6 +1148,7 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="x-utf-8" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::x-utf-8;unsupported
 /meta/@charset;charset:not preferred:x-utf-8;m
@@ -1160,6 +1157,7 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="utf-8n" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::utf-8n;unsupported
 /meta/@charset;charset:not preferred:utf-8n;m
@@ -1168,6 +1166,7 @@ id=""><span id="">x</span></p>
 #data
 <meta charset="x-sjis" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta;element not allowed:meta charset
 /meta/@charset;in XML:charset
 /meta/@charset;mismatched charset name::x-sjis;unsupported
 /meta/@charset;charset:not preferred:x-sjis;m
@@ -1279,7 +1278,7 @@ id=""><span id="">x</span></p>
 <style/>
 </article>
 #errors
-/article/style;element not allowed
+/article/style;element not allowed;prose style
 /article/style;style:text/css;unsupported
 /article;no significant content;s
 
@@ -1296,7 +1295,7 @@ id=""><span id="">x</span></p>
 <style/>
 </aside>
 #errors
-/aside/style;element not allowed
+/aside/style;element not allowed:prose style
 /aside/style;style:text/css;unsupported
 /aside;no significant content;s
 
@@ -1313,7 +1312,7 @@ id=""><span id="">x</span></p>
 <style/>
 </div>
 #errors
-/div/style;element not allowed
+/div/style;element not allowed:prose style
 /div/style;style:text/css;unsupported
 /div;no significant content;s
 
@@ -1330,7 +1329,7 @@ id=""><span id="">x</span></p>
 <style/>
 </section>
 #errors
-/section/style;element not allowed
+/section/style;element not allowed:prose style
 /section/style;style:text/css;unsupported
 /section;no significant content;s
 
@@ -4521,13 +4520,13 @@ id=""><span id="">x</span></p>
 <rule xmlns="http://www.w3.org/1999/xhtml" condition=""/>
 #errors
 /rule;no significant content;s
-/rule/@condition;selectors:syntax error:before type selector;m
+/rule/@condition;selectors:no sss;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="  "/>
 #errors
 /rule;no significant content;s
-/rule/@condition;selectors:syntax error:before type selector;m
+/rule/@condition;selectors:no sss;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a"/>
@@ -4554,13 +4553,13 @@ id=""><span id="">x</span></p>
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a["/>
 #errors
 /rule;no significant content;s
-/rule/@condition;selectors:syntax error:before attr name;m
+/rule/@condition;selectors:no attr name;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="*/**/*"/>
 #errors
 /rule;no significant content;s
-/rule/@condition;selectors:syntax error:before combinator;m
+/rule/@condition;selectors:no combinator;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode=""/>
@@ -4598,12 +4597,12 @@ id=""><span id="">x</span></p>
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter=""/>
 #errors
-/nest/@filter;selectors:syntax error:before type selector;m
+/nest/@filter;selectors:no sss;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="  "/>
 #errors
-/nest/@filter;selectors:syntax error:before type selector;m
+/nest/@filter;selectors:no sss;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="a b"/>

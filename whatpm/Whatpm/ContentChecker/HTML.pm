@@ -4,6 +4,126 @@ require Whatpm::ContentChecker;
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 
+## December 2007 HTML5 Classification
+
+my $HTMLMetadataContent = {
+  $HTML_NS => {
+    title => 1, base => 1, link => 1, style => 1, script => 1, noscript => 1,
+    'event-source' => 1, command => 1, datatemplate => 1,
+    ## NOTE: A |meta| with no |name| element is not allowed as
+    ## a metadata content other than |head| element.
+    meta => 1,
+  },
+  ## NOTE: RDF is mentioned in the HTML5 spec.
+  ## TODO: Other RDF elements?
+  q<http://www.w3.org/1999/02/22-rdf-syntax-ns#> => {RDF => 1},
+};
+
+my $HTMLProseContent = {
+  $HTML_NS => {
+    section => 1, nav => 1, article => 1, blockquote => 1, aside => 1,
+    h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, header => 1,
+    footer => 1, address => 1, p => 1, hr => 1, dialog => 1, pre => 1,
+    ol => 1, ul => 1, dl => 1, figure => 1, map => 1, table => 1,
+    details => 1, ## ISSUE: "Prose element" in spec.
+    datagrid => 1, ## ISSUE: "Prose element" in spec.
+    datatemplate => 1,
+    div => 1, ## ISSUE: No category in spec.
+    ## NOTE: |style| is only allowed if |scoped| attribute is specified.
+    ## Additionally, it must be before any other element or
+    ## non-inter-element-whitespace text node.
+    style => 1,  
+
+    br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, m => 1,
+    dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
+    var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
+    b => 1, bdo => 1, script => 1, noscript => 1, 'event-source' => 1,
+    command => 1, font => 1,
+    a => 1,
+    datagrid => 1, ## ISSUE: "Interactive element" in the spec.
+    ## NOTE: |area| is allowed only as a descendant of |map|.
+    area => 1,
+    
+    ins => 1, del => 1,
+
+    ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, prose.
+    menu => 1,
+
+    img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
+    canvas => 1,
+  },
+
+  ## NOTE: Embedded
+  q<http://www.w3.org/1998/Math/MathML> => {math => 1},
+  q<http://www.w3.org/2000/svg> => {svg => 1},
+};
+
+my $HTMLSectioningContent = {
+  $HTML_NS => {
+    section => 1, nav => 1, article => 1, blockquote => 1, aside => 1,
+    ## NOTE: |body| is only allowed in |html| element.
+    body => 1,
+  },
+};
+
+my $HTMLHeadingContent = {
+  $HTML_NS => {
+    h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, header => 1,
+  },
+};
+
+my $HTMLPhrasingContent = {
+  ## NOTE: All phrasing content is also prose content.
+  $HTML_NS => {
+    br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, m => 1,
+    dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
+    var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
+    b => 1, bdo => 1, script => 1, noscript => 1, 'event-source' => 1,
+    command => 1, font => 1,
+    a => 1,
+    datagrid => 1, ## ISSUE: "Interactive element" in the spec.
+    ## NOTE: |area| is allowed only as a descendant of |map|.
+    area => 1,
+
+    ## NOTE: Transparent.    
+    ins => 1, del => 1,
+
+    ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, prose.
+    menu => 1,
+
+    img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
+    canvas => 1,
+  },
+
+  ## NOTE: Embedded
+  q<http://www.w3.org/1998/Math/MathML> => {math => 1},
+  q<http://www.w3.org/2000/svg> => {svg => 1},
+
+  ## NOTE: And non-inter-element-whitespace text nodes.
+};
+
+my $HTMLEmbeddedContent = {
+  ## NOTE: All embedded content is also phrasing content.
+  $HTML_NS => {
+    img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
+    canvas => 1,
+  },
+  ## NOTE: MathML is mentioned in the HTML5 spec.
+  q<http://www.w3.org/1998/Math/MathML> => {math => 1},
+  ## NOTE: SVG is mentioned in the HTML5 spec.
+  q<http://www.w3.org/2000/svg> => {svg => 1},
+  ## NOTE: Foreign elements with content (but no metadata) are 
+  ## embedded content.
+};  
+
+my $HTMLInteractiveContent = {
+  $HTML_NS => {
+    a => 1,
+  },
+};
+
+## Old HTML5 categories
+
 my $HTMLMetadataElements = {
   $HTML_NS => {
     qw/link 1 meta 1 style 1 script 1 event-source 1 command 1 base 1 title 1
@@ -72,6 +192,21 @@ my $HTMLSignificantContentErrors = {
                        type => 'no significant content');
   },
 }; # $HTMLSignificantContentErrors
+
+## TODO:
+
+=pod
+
+As a general rule, elements whose content model allows any
++  <span>prose content</span> should have either at least one
++  descendant text node that is not <span>inter-element
++  whitespace</span>, or at least one descendant element node that is
++  <span>embedded content</span>. For the purposes of this requirement,
++  <code>del</code> elements and their descendants must not be
++  counted as contributing to the ancestors of the <code>del</code>
++  element.
+
+=cut
 
 our $AnyChecker;
 my $HTMLAnyChecker = sub {
@@ -233,6 +368,72 @@ my $HTMLStylableBlockChecker = sub {
 
   return ($new_todos);
 }; # $HTMLStylableBlockChecker
+
+my $HTMLProseContentChecker = sub {
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
+  my @nodes = (@{$el->child_nodes});
+
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
+  
+  my $has_non_style;
+  while (@nodes) {
+    my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
+    my $nt = $node->node_type;
+    if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
+      if ($node_ns eq $HTML_NS and $node_ln eq 'style') {
+        $not_allowed = 2 if $has_non_style or
+            not $node->has_attribute_ns (undef, 'scoped');
+      } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
+        $has_non_style = 1;
+        if ($HTMLEmbeddedContent->{$node_ns}->{$node_ln}) {
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
+      } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
+        #
+      } else {
+        $has_non_style = 1;
+        $not_allowed = 1;
+      }
+      if ($not_allowed) {
+        if ($not_allowed == 2) {
+          $self->{onerror}->(node => $node,
+                             type => 'element not allowed:prose style')
+        } else {
+          $self->{onerror}->(node => $node,
+                             type => 'element not allowed:prose')
+        }
+      }
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+      unshift @nodes, @$sib;
+      push @$new_todos, @$ch;
+    } elsif ($nt == 3 or $nt == 4) {
+      if ($node->data =~ /[^\x09-\x0D\x20]/) {
+        $has_non_style = 1;
+        $todo->{flag}->{has_descendant}->{significant} = 1;
+      }
+    } elsif ($nt == 5) {
+      unshift @nodes, @{$node->child_nodes};
+    }
+  }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => $HTMLSignificantContentErrors,
+  };
+
+  return ($new_todos);
+}; # $HTMLProseContentChecker
 
 ## Zero or more block-level elements
 my $HTMLBlockChecker = sub {
@@ -445,6 +646,52 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
   return ($new_todos);
 }; # $HTMLInlineOrStrictlyInlineChecker
 
+my $HTMLPhrasingContentChecker = sub {
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
+  my @nodes = (@{$el->child_nodes});
+
+  my $old_values = {significant =>
+                        $todo->{flag}->{has_descendant}->{significant}};
+  $todo->{flag}->{has_descendant}->{significant} = 0;
+  
+  while (@nodes) {
+    my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
+    my $nt = $node->node_type;
+    if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
+      $not_allowed = 1
+          unless $HTMLPhrasingContent->{$node_ns}->{$node_ln} or
+              $self->{pluses}->{$node_ns}->{$node_ln};
+      $self->{onerror}->(node => $node, type => 'element not allowed:phrasing')
+        if $not_allowed;
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+      unshift @nodes, @$sib;
+      push @$new_todos, @$ch;
+    } elsif ($nt == 3 or $nt == 4) {
+      if ($node->data =~ /[^\x09-\x0D\x20]/) {
+        $todo->{flag}->{has_descendant}->{significant} = 1;
+      }
+    } elsif ($nt == 5) {
+      unshift @nodes, @{$node->child_nodes};
+    }
+  }
+
+  push @$new_todos, {
+    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+    old_values => $old_values,
+    errors => $HTMLSignificantContentErrors,
+  };
+
+  return ($new_todos);
+}; # $HTMLPhrasingContentChecker
+
 ## Block-level content or inline-level content (i.e. bimorphic content model)
 my $HTMLBlockOrInlineChecker = sub {
   my ($self, $todo) = @_;
@@ -632,7 +879,7 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
   };
 }; # $GetHTMLZeroOrMoreThenBlockOrInlineChecker
 
-my $HTMLTransparentChecker = $HTMLBlockOrInlineChecker;
+my $HTMLTransparentChecker = $HTMLProseContentChecker;
 ## ISSUE: Significant content rule should be applied to transparent element
 ## with parent?  Currently, applied to |video| but not to others.
 
@@ -970,7 +1217,7 @@ my $HTMLTargetAttrChecker = sub {
                          type => 'reserved browsing context name');
     }
   } else {
-    #$ ISSUE: An empty string is conforming?
+    ## NOTE: An empty string is a valid browsing context name (same as _self).
   }
 }; # $HTMLTargetAttrChecker
 
@@ -1222,7 +1469,6 @@ $Element->{$HTML_NS}->{head} = {
     my @nodes = (@{$el->child_nodes});
 
     my $has_title;
-    my $phase = 'initial'; # 'after charset', 'after base'
     while (@nodes) {
       my $node = shift @nodes;
       $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
@@ -1236,40 +1482,18 @@ $Element->{$HTML_NS}->{head} = {
         if ($self->{pluses}->{$node_ns}->{$node_ln}) {
           #
         } elsif ($node_ns eq $HTML_NS and $node_ln eq 'title') {
-          $phase = 'after base';
           unless ($has_title) {
             $has_title = 1;
           } else {
             $not_allowed = 1;
           }
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'meta') {
-          if ($node->has_attribute_ns (undef, 'charset')) {
-            if ($phase eq 'initial') {
-              $phase = 'after charset';
-            } else {
-              $not_allowed = 1;
-              ## NOTE: See also |base|'s "contexts" field in the spec
-            }
-          } elsif ($node->has_attribute_ns (undef, 'name') or
-                   $node->has_attribute_ns (undef, 'http-equiv')) {
-            $phase = 'after base';
-          } else {
-            $phase = 'after base';
-            $not_allowed = 1;
-          }
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'base') {
-          if ($phase eq 'initial' or $phase eq 'after charset') {
-            $phase = 'after base';
-          } else {
-            $not_allowed = 1;
-          }
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
-          $phase = 'after base';
-          if ($node->has_attribute_ns (undef, 'scoped')) {
-            $not_allowed = 1;
-          }
-        } elsif ($HTMLMetadataElements->{$node_ns}->{$node_ln}) {
-          $phase = 'after base';
+        } elsif ($HTMLMetadataContent->{$node_ns}->{$node_ln}) {
+          #
+
+          ## NOTE: |meta| is a metadata content.  However, strictly speaking,
+          ## a |meta| element with none of |charset|, |name|,
+          ## or |http-equiv| attribute is not allowed.  It is non-conforming
+          ## anyway.
         } else {
           $not_allowed = 1;
         }
@@ -1304,6 +1528,13 @@ $Element->{$HTML_NS}->{base} = {
   attrs_checker => sub {
     my ($self, $todo) = @_;
 
+    if ($self->{has_base}) {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'element not allowed:base');
+    } else {
+      $self->{has_base} = 1;
+    }
+
     my $has_href = $todo->{node}->has_attribute_ns (undef, 'href');
     my $has_target = $todo->{node}->has_attribute_ns (undef, 'target');
 
@@ -1314,8 +1545,6 @@ $Element->{$HTML_NS}->{base} = {
       ## <title xml:base="relative"/><base href/> (maybe it should be)
       ## <unknown xmlns="relative"/><base href/> (assuming that
       ## |{relative}:unknown| is allowed before XHTML |base| (unlikely, though))
-      ## <?xml-stylesheet href="relative"?>...<base href=""/>
-      ## NOTE: These are non-conformant anyway because of |head|'s content model:
       ## <style>@import 'relative';</style><base href>
       ## <script>location.href = 'relative';</script><base href>
       ## NOTE: <html manifest=".."><head><base href=""/> is conforming as
@@ -1481,6 +1710,23 @@ $Element->{$HTML_NS}->{meta} = {
     }
 
     if (defined $charset_attr) {
+      my $parent = $todo->{node}->manakai_parent_element;
+      if ($parent and $parent eq $parent->owner_document->manakai_head) {
+        for my $el (@{$parent->child_nodes}) {
+          next unless $el->node_type == 1; # ELEMENT_NODE
+          unless ($el eq $todo->{node}) {
+            ## NOTE: Not the first child element.
+            $self->{onerror}->(node => $todo->{node},
+                               type => 'element not allowed:meta charset');
+          }
+          last;
+          ## NOTE: Entity references are not supported.
+        }
+      } else {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'element not allowed:meta charset');
+      }
+
       unless ($todo->{node}->owner_document->manakai_is_html) {
         $self->{onerror}->(node => $charset_attr,
                            type => 'in XML:charset');
@@ -1594,7 +1840,14 @@ $Element->{$HTML_NS}->{style} = {
         
         my $nt = $node->node_type;
         if ($nt == 1) {
-          $self->{onerror}->(node => $node, type => 'element not allowed');
+          my $node_ns = $node->namespace_uri;
+          $node_ns = '' unless defined $node_ns;
+          my $node_ln = $node->manakai_local_name;
+          if ($self->{pluses}->{$node_ns}->{$node_ln}) {
+            #
+          } else {
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          }
           my ($sib, $ch) = $self->_check_get_children ($node, $todo);
           unshift @nodes, @$sib;
           push @$new_todos, @$ch;
@@ -1619,34 +1872,34 @@ $Element->{$HTML_NS}->{style} = {
 
 $Element->{$HTML_NS}->{body} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLBlockChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{section} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStylableBlockChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{nav} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLBlockOrInlineChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{article} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStylableBlockChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{blockquote} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
   }),
-  checker => $HTMLBlockChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{aside} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'style'),
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{h1} = {
@@ -1654,7 +1907,7 @@ $Element->{$HTML_NS}->{h1} = {
   checker => sub {
     my ($self, $todo) = @_;
     $todo->{flag}->{has_descendant}->{hn} = 1;
-    return $HTMLStrictlyInlineChecker->($self, $todo);
+    return $HTMLPhrasingContentChecker->($self, $todo);
   },
 };
 
@@ -1683,6 +1936,8 @@ $Element->{$HTML_NS}->{h6} = {
   checker => $Element->{$HTML_NS}->{h1}->{checker},
 };
 
+## TODO: Explicit sectioning is "encouraged".
+
 $Element->{$HTML_NS}->{header} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
@@ -1693,8 +1948,8 @@ $Element->{$HTML_NS}->{header} = {
 
     my $end = $self->_add_minuses
         ({$HTML_NS => {qw/header 1 footer 1/}},
-         $HTMLSectioningElements);
-    my ($new_todos, $ch) = $HTMLBlockChecker->($self, $todo);
+         $HTMLSectioningContent);
+    my ($new_todos, $ch) = $HTMLProseContentChecker->($self, $todo);
     push @$new_todos, $end,
         {type => 'descendant', node => $todo->{node},
          flag => $todo->{flag}, old_values => $old_flags,
@@ -1713,114 +1968,43 @@ $Element->{$HTML_NS}->{header} = {
 
 $Element->{$HTML_NS}->{footer} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub { ## block -hn -header -footer -sectioning or inline
+  checker => sub {
     my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
 
-    my $old_values = {significant =>
-                          $todo->{flag}->{has_descendant}->{significant}};
-    $todo->{flag}->{has_descendant}->{significant} = 0;
-  
-    my $content = 'block-or-inline'; # or 'block' or 'inline'
-    my @block_not_inline;
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;  
-        my $node_ln = $node->manakai_local_name;
-        my $not_allowed;
-        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-          $not_allowed = 1;
-        } elsif ($node_ns eq $HTML_NS and
-                 {
-                   qw/h1 1 h2 1 h3 1 h4 1 h5 1 h6 1 header 1 footer 1/
-                 }->{$node_ln}) {
-          $not_allowed = 1;
-        } elsif ($HTMLSectioningElements->{$node_ns}->{$node_ln}) {
-          $not_allowed = 1;
-        }
-        if ($content eq 'block') {
-          $not_allowed = 1
-            unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln} or
-                $self->{pluses}->{$node_ns}->{$node_ln};
-        } elsif ($content eq 'inline') {
-          $not_allowed = 1
-            unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-                $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
-                $self->{pluses}->{$node_ns}->{$node_ln};
-        } else {
-          my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
-          my $is_inline
-            = $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} ||
-              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
-          
-          push @block_not_inline, $node
-            if $is_block and not $is_inline and not $not_allowed;
-          if (not $is_block and not $self->{pluses}->{$node_ns}->{$node_ln}) {
-            $content = 'inline';
-            for (@block_not_inline) {
-              $self->{onerror}->(node => $_, type => 'element not allowed');
-            }
-            $not_allowed = 1 unless $is_inline;
-          }
-        }
-        $self->{onerror}->(node => $node, type => 'element not allowed')
-          if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          if ($content eq 'block') {
-            $self->{onerror}->(node => $node, type => 'character not allowed');
-          } else {
-            $content = 'inline';
-            for (@block_not_inline) {
-              $self->{onerror}->(node => $_, type => 'element not allowed');
-            }
-          }
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
-    }
+    my $old_flags = {hn => $todo->{flag}->{has_descendant}->{hn}};
+    $todo->{flag}->{has_descendant}->{hn} = 0;
 
     my $end = $self->_add_minuses
-      ({$HTML_NS => {qw/h1 1 h2 1 h3 1 h4 1 h5 1 h6 1/}},
-       $HTMLSectioningElements);
+        ({$HTML_NS => {footer => 1}},
+         $HTMLSectioningContent, $HTMLHeadingContent);
+    my ($new_todos, $ch) = $HTMLProseContentChecker->($self, $todo);
     push @$new_todos, $end;
 
-    if ($content eq 'inline') {
-      for (@$new_todos) {
-        $_->{inline} = 1;
-      }
-    }
-
-    push @$new_todos, {
-      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-      old_values => $old_values,
-      errors => $HTMLSignificantContentErrors,
-    };
-
-    return ($new_todos);
+    return ($new_todos, $ch);
   },
 };
 
 $Element->{$HTML_NS}->{address} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLInlineChecker,
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    my $old_flags = {hn => $todo->{flag}->{has_descendant}->{hn}};
+    $todo->{flag}->{has_descendant}->{hn} = 0;
+
+    my $end = $self->_add_minuses
+        ({$HTML_NS => {footer => 1, address => 1}},
+         $HTMLSectioningContent, $HTMLHeadingContent);
+    my ($new_todos, $ch) = $HTMLProseContentChecker->($self, $todo);
+    push @$new_todos, $end;
+
+    return ($new_todos, $ch);
+  },
 };
 
 $Element->{$HTML_NS}->{p} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{hr} = {
@@ -1831,6 +2015,8 @@ $Element->{$HTML_NS}->{hr} = {
 $Element->{$HTML_NS}->{br} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
+  ## NOTE: Blank line MUST NOT be used for presentation purpose.
+  ## (This requirement is semantic so that we cannot check.)
 };
 
 $Element->{$HTML_NS}->{dialog} = {
@@ -1896,7 +2082,7 @@ $Element->{$HTML_NS}->{dialog} = {
 
 $Element->{$HTML_NS}->{pre} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{ol} = {
@@ -1970,10 +2156,10 @@ $Element->{$HTML_NS}->{li} = {
   }),
   checker => sub {
     my ($self, $todo) = @_;
-    if ($todo->{inline}) {
-      return $HTMLInlineChecker->($self, $todo);
+    if ($todo->{flag}->{in_menu}) {
+      return $HTMLPhrasingContentChecker->($self, $todo);
     } else {
-      return $HTMLBlockOrInlineChecker->($self, $todo);
+      return $HTMLProseContentChecker->($self, $todo);
     }
   },
 };
@@ -2053,12 +2239,12 @@ $Element->{$HTML_NS}->{dl} = {
 
 $Element->{$HTML_NS}->{dt} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{dd} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{li}->{checker},
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{a} = {
@@ -2112,8 +2298,7 @@ $Element->{$HTML_NS}->{a} = {
     my ($self, $todo) = @_;
 
     my $end = $self->_add_minuses ($HTMLInteractiveElements);
-    my ($new_todos, $ch)
-      = $HTMLInlineOrStrictlyInlineChecker->($self, $todo);
+    my ($new_todos, $ch) = $HTMLPhrasingContentChecker->($self, $todo);
     push @$new_todos, $end;
 
     if ($todo->{node}->has_attribute_ns (undef, 'href')) {
@@ -2128,32 +2313,32 @@ $Element->{$HTML_NS}->{q} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
   }),
-  checker => $HTMLInlineOrStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{cite} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{em} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLInlineOrStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{strong} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLInlineOrStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{small} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLInlineOrStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{m} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLInlineOrStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{dfn} = {
@@ -2162,7 +2347,7 @@ $Element->{$HTML_NS}->{dfn} = {
     my ($self, $todo) = @_;
 
     my $end = $self->_add_minuses ({$HTML_NS => {dfn => 1}});
-    my ($sib, $ch) = $HTMLStrictlyInlineChecker->($self, $todo);
+    my ($sib, $ch) = $HTMLPhrasingContentChecker->($self, $todo);
     push @$sib, $end;
 
     my $node = $todo->{node};
@@ -2215,7 +2400,7 @@ $Element->{$HTML_NS}->{abbr} = {
     ## if there is a |dfn| whose defining term is the abbreviation,
     ## but it does not prohibit |abbr| w/o |title| in other cases.
   }),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{time} = {
@@ -2345,7 +2530,7 @@ $Element->{$HTML_NS}->{time} = {
                          type => 'dateortime:syntax error');
     }
 
-    return $HTMLStrictlyInlineChecker->($self, $todo);
+    return $HTMLPhrasingContentChecker->($self, $todo);
   },
 };
 
@@ -2358,7 +2543,7 @@ $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the va
     max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
     optimum => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
   }),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{progress} = { ## TODO: recommended to use content
@@ -2366,62 +2551,62 @@ $Element->{$HTML_NS}->{progress} = { ## TODO: recommended to use content
     value => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift >= 0 }),
     max => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift > 0 }),
   }),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{code} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   ## NOTE: Though |title| has special semantics,
   ## syntatically same as the |title| as global attribute.
-  checker => $HTMLInlineOrStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{var} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   ## NOTE: Though |title| has special semantics,
   ## syntatically same as the |title| as global attribute.
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{samp} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   ## NOTE: Though |title| has special semantics,
   ## syntatically same as the |title| as global attribute.
-  checker => $HTMLInlineOrStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{kbd} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{sub} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{sup} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{span} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   ## NOTE: Though |title| has special semantics,
   ## syntatically same as the |title| as global attribute.
-  checker => $HTMLInlineOrStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{i} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   ## NOTE: Though |title| has special semantics,
   ## syntatically same as the |title| as global attribute.
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{b} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{bdo} = {
@@ -2433,8 +2618,31 @@ $Element->{$HTML_NS}->{bdo} = {
     }
   },
   ## ISSUE: The spec does not directly say that |dir| is a enumerated attr.
-  checker => $HTMLStrictlyInlineChecker,
+  checker => $HTMLPhrasingContentChecker,
 };
+
+=pod
+
+## TODO: 
+
++
++  <p>Partly because of the confusion described above, authors are
++  strongly recommended to always mark up all paragraphs with the
++  <code>p</code> element, and to not have any <code>ins</code> or
++  <code>del</code> elements that cross across any <span
++  title="paragraph">implied paragraphs</span>.</p>
++
+(An informative note)
+
+<p><code>ins</code> elements should not cross <span
++  title="paragraph">implied paragraph</span> boundaries.</p>
+(normative)
+
++  <p><code>del</code> elements should not cross <span
++  title="paragraph">implied paragraph</span> boundaries.</p>
+(normative)
+
+=cut
 
 $Element->{$HTML_NS}->{ins} = {
   attrs_checker => $GetHTMLAttrsChecker->({
@@ -2451,24 +2659,12 @@ $Element->{$HTML_NS}->{del} = {
   }),
   checker => sub {
     my ($self, $todo) = @_;
-
-    my $parent = $todo->{node}->manakai_parent_element;
-    if (defined $parent) {
-      my $sig_flag = $todo->{flag}->{has_descendant}->{significant};
-      my $nsuri = $parent->namespace_uri;
-      $nsuri = '' unless defined $nsuri;
-      my $ln = $parent->manakai_local_name;
-      my $eldef = $Element->{$nsuri}->{$ln} ||
-        $Element->{$nsuri}->{''} ||
-        $ElementDefault;
-      my ($new_todos) =  $eldef->{checker}->($self, $todo);
-      push @$new_todos, {type => 'code', code => sub {
-        $todo->{flag}->{has_descendant}->{significant} = 0;
-      }} if not $sig_flag;
-      return $new_todos;
-    } else {
-      return $HTMLBlockOrInlineChecker->($self, $todo);
-    }
+    my $sig_flag = $todo->{flag}->{has_descendant}->{significant};
+    my ($new_todos) = $HTMLTransparentChecker->($self, $todo);
+    push @$new_todos, {type => 'code', code => sub {
+                         $todo->{flag}->{has_descendant}->{significant} = 0;
+                       }} if not $sig_flag;
+    return $new_todos;
   },
 };
 
@@ -2581,6 +2777,7 @@ $Element->{$HTML_NS}->{object} = {
       }
     }
   },
+  ## NOTE: param*, then transparent.
   checker => sub {
     my ($self, $todo) = @_;
     $todo->{flag}->{has_descendant}->{significant} = 1;
@@ -2623,6 +2820,7 @@ $Element->{$HTML_NS}->{video} = {
     my ($self, $todo) = @_;
     $todo->{flag}->{has_descendant}->{significant} = 1;
 
+## TODO:
     if ($todo->{node}->has_attribute_ns (undef, 'src')) {
       return $HTMLBlockOrInlineChecker->($self, $todo);
     } else {
@@ -2661,7 +2859,7 @@ $Element->{$HTML_NS}->{canvas} = {
   checker => sub {
     my ($self, $todo) = @_;
     $todo->{flag}->{has_descendant}->{significant} = 1;
-    return $HTMLInlineChecker->($self, $todo);
+    return $HTMLTransparentChecker->($self, $todo);
   },
 };
 
@@ -2695,7 +2893,7 @@ $Element->{$HTML_NS}->{map} = {
     $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:id')
         unless $has_id;
   },
-  checker => $HTMLBlockChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{area} = {
@@ -3127,7 +3325,7 @@ $Element->{$HTML_NS}->{td} = {
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
   }),
-  checker => $HTMLBlockOrInlineChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{th} = {
@@ -3137,7 +3335,7 @@ $Element->{$HTML_NS}->{th} = {
     scope => $GetHTMLEnumeratedAttrChecker
         ->({row => 1, col => 1, rowgroup => 1, colgroup => 1}),
   }),
-  checker => $HTMLBlockOrInlineChecker,
+  checker => $HTMLProseContentChecker,
 };
 
 ## TODO: forms
@@ -3241,7 +3439,7 @@ $Element->{$HTML_NS}->{noscript} = {
       return ($new_todos);
     } else {
       my $end = $self->_add_minuses ({$HTML_NS => {noscript => 1}});
-      my ($sib, $ch) = $HTMLBlockOrInlineChecker->($self, $todo);
+      my ($sib, $ch) = $HTMLTransparentChecker->($self, $todo);
       push @$sib, $end;
       return ($sib, $ch);
     }
@@ -3264,11 +3462,10 @@ $Element->{$HTML_NS}->{details} = {
   checker => sub {
     my ($self, $todo) = @_;
 
-    my $end = $self->_add_minuses ({$HTML_NS => {a => 1, datagrid => 1}});
+## TODO:
     my ($sib, $ch)
       = $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'legend')
         ->($self, $todo);
-    push @$sib, $end;
     return ($sib, $ch);
   },
 };
@@ -3290,7 +3487,7 @@ $Element->{$HTML_NS}->{datagrid} = {
 
     my $end = $self->_add_minuses ({$HTML_NS => {a => 1, datagrid => 1}});
     
-    ## Block-table Block* | table | select | datalist | Empty
+    ## Prose -(text* table Prose*) | table | select | datalist | Empty
     my $mode = 'any';
     while (@nodes) {
       my $node = shift @nodes;
@@ -3304,15 +3501,15 @@ $Element->{$HTML_NS}->{datagrid} = {
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
         if ($self->{pluses}->{$node_ns}->{$node_ln}) {
           #
-        } elsif ($mode eq 'block') {
+        } elsif ($mode eq 'prose') {
           $not_allowed = 1
-              unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+              unless $HTMLProseContent->{$node_ns}->{$node_ln};
         } elsif ($mode eq 'any') {
           if ($node_ns eq $HTML_NS and
               {table => 1, select => 1, datalist => 1}->{$node_ln}) {
             $mode = 'none';
-          } elsif ($HTMLBlockLevelElements->{$node_ns}->{$node_ln}) {
-            $mode = 'block';
+          } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
+            $mode = 'prose';
           } else {
             $not_allowed = 1;
           }
@@ -3326,7 +3523,13 @@ $Element->{$HTML_NS}->{datagrid} = {
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
+          if ($mode eq 'prose') {
+            #
+          } elsif ($mode eq 'any') {
+            $mode = 'prose';
+          } else {
+            $self->{onerror}->(node => $node, type => 'character not allowed');
+          }
           $todo->{flag}->{has_descendant}->{significant} = 1;
         }
       } elsif ($nt == 5) {
@@ -3343,6 +3546,10 @@ $Element->{$HTML_NS}->{datagrid} = {
     };
 
     return ($new_todos);
+
+    ## ISSUE: "xxx<table/>" is disallowed; "<select/>aaa" and "<datalist/>aa"
+    ## are not disallowed (assuming that form control contents are also
+    ## prose content).
   },
 };
 
@@ -3404,7 +3611,7 @@ $Element->{$HTML_NS}->{menu} = {
                           $todo->{flag}->{has_descendant}->{significant}};
     $todo->{flag}->{has_descendant}->{significant} = 0;
     
-    my $content = 'li or inline';
+    my $content = 'li or phrasing';
     while (@nodes) {
       my $node = shift @nodes;
       $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
@@ -3418,15 +3625,14 @@ $Element->{$HTML_NS}->{menu} = {
         if ($self->{pluses}->{$node_ns}->{$node_ln}) {
           #
         } elsif ($node_ns eq $HTML_NS and $node_ln eq 'li') {
-          if ($content eq 'inline') {
+          if ($content eq 'phrasing') {
             $not_allowed = 1;
-          } elsif ($content eq 'li or inline') {
+          } elsif ($content eq 'li or phrasing') {
             $content = 'li';
           }
         } else {
-          if ($HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln}) {
-            $content = 'inline';
+          if ($HTMLPhrasingContent->{$node_ns}->{$node_ln}) {
+            $content = 'phrasing';
           } else {
             $not_allowed = 1;
           }
@@ -3440,8 +3646,8 @@ $Element->{$HTML_NS}->{menu} = {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           if ($content eq 'li') {
             $self->{onerror}->(node => $node, type => 'character not allowed');
-          } elsif ($content eq 'li or inline') {
-            $content = 'inline';
+          } elsif ($content eq 'li or phrasing') {
+            $content = 'phrasing';
           }
           $todo->{flag}->{has_descendant}->{significant} = 1;
         }
@@ -3451,7 +3657,7 @@ $Element->{$HTML_NS}->{menu} = {
     }
 
     for (@$new_todos) {
-      $_->{inline} = 1;
+      $_->{flag}->{in_menu} = 1;
     }
 
     push @$new_todos, {
@@ -3539,31 +3745,12 @@ $Element->{$HTML_NS}->{nest} = {
 
 $Element->{$HTML_NS}->{legend} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-
-    my $parent = $todo->{node}->manakai_parent_element;
-    if (defined $parent) {
-      my $nsuri = $parent->namespace_uri;
-      $nsuri = '' unless defined $nsuri;
-      my $ln = $parent->manakai_local_name;
-      if ($nsuri eq $HTML_NS and $ln eq 'figure') {
-        return $HTMLInlineChecker->($self, $todo);
-      } else {
-        return $HTMLStrictlyInlineChecker->($self, $todo);
-      }
-    } else {
-      return $HTMLInlineChecker->($self, $todo);
-    }
-
-    ## ISSUE: Content model is defined only for fieldset/legend,
-    ## details/legend, and figure/legend.
-  },
+  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{div} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'style'),
+  checker => $HTMLTransparentChecker,
 };
 
 $Element->{$HTML_NS}->{font} = {
