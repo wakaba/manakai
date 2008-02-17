@@ -2702,7 +2702,113 @@ $Element->{$HTML_NS}->{del} = {
   },
 };
 
-## TODO: figure
+$Element->{$HTML_NS}->{figure} = {
+  attrs_checker => $GetHTMLAttrsChecker->({}),
+  checker => sub {
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
+    my @nodes = (@{$el->child_nodes});
+    
+    my $old_values = {significant =>
+                          $todo->{flag}->{has_descendant}->{significant}};
+    $todo->{flag}->{has_descendant}->{significant} = 0;
+
+    my $has_legend;
+    my $has_non_legend;
+    my $has_non_style;
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+      
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+          $has_non_legend = 1;
+          $self->{onerror}->(node => $node,
+                             type => 'element not allowed:minus',
+                             level => $self->{must_level});
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'legend') {
+          if ($has_legend) {
+            if (ref $has_legend) {
+              $self->{onerror}->(node => $has_legend,
+                                 type => 'element not allowed:figure legend',
+                                 level => $self->{must_level});
+              $has_legend = $node;
+            } else {
+              ## NOTE: The first child element was a |legend|.
+              $self->{onerror}->(node => $node,
+                                 type => 'element not allowed:figure legend',
+                                 level => $self->{must_level});
+            }
+          } elsif ($has_non_legend) {
+            undef $has_non_legend;
+            $has_legend = $node;
+          } else {
+            $has_legend = 1;
+          }
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
+          $has_non_legend = 1;
+          if ($has_non_style or
+              not $node->has_attribute_ns (undef, 'scoped')) {
+            $self->{onerror}->(node => $node,
+                               type => 'element not allowed:prose style',
+                               level => $self->{must_level});
+          }
+        } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
+          $has_non_style = 1;
+          $has_non_legend = 1;
+          if ($HTMLEmbeddedContent->{$node_ns}->{$node_ln}) {
+            $todo->{flag}->{has_descendant}->{significant} = 1;
+          }
+        } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
+          #
+        } else {
+          $has_non_style = 1;
+          $has_non_legend = 1;
+          $self->{onerror}->(node => $node,
+                             type => 'element not allowed:prose',
+                             level => $self->{must_level})
+        }
+        
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $has_non_style = 1;
+          $has_non_legend = 1;
+          $todo->{flag}->{has_descendant}->{significant} = 1;
+        }
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    if ($has_legend) {
+      if (ref $has_legend and $has_non_legend) {
+        $self->{onerror}->(node => $has_legend,
+                           type => 'element not allowed:figure legend',
+                           level => $self->{must_level});
+      }
+    } else {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'element missing:legend',
+                         level => $self->{must_level});
+    }
+    
+    push @$new_todos, {
+      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
+      old_values => $old_values,
+      errors => $HTMLSignificantContentErrors,
+    };
+    
+    return ($new_todos);
+  },
+};
 ## TODO: Test for <nest/> in <figure/>
 
 ## TODO: |alt|
@@ -2856,7 +2962,7 @@ $Element->{$HTML_NS}->{video} = {
 
 ## TODO:
     if ($todo->{node}->has_attribute_ns (undef, 'src')) {
-      return $HTMLBlockOrInlineChecker->($self, $todo);
+      return $HTMLProseContentChecker->($self, $todo);
     } else {
       return $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'source')
         ->($self, $todo);

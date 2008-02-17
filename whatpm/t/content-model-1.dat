@@ -3690,6 +3690,99 @@ aaa
 /p/dfn/em/dfn;no significant content;s
 
 #data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+</figure>
+#errors
+/figure;element missing:legend;m
+/figure;no significant content;s
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend/>
+</figure>
+#errors
+/figure;no significant content;s
+/figure/legend;no significant content;s
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+x
+</figure>
+#errors
+/figure;element missing:legend;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+x<legend>y</legend>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>y
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend><legend>y</legend>
+</figure>
+#errors
+/figure/legend;element not allowed:figure legend;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+y<legend>x</legend>z
+</figure>
+#errors
+/figure/legend;element not allowed:figure legend;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+x<legend>x</legend><legend>y</legend>
+</figure>
+#errors
+/figure/legend;element not allowed:figure legend;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend><legend>y</legend>z
+</figure>
+#errors
+/figure/legend;element not allowed:figure legend;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+x<legend>y</legend><legend>z</legend>w
+</figure>
+#errors
+/figure/legend;element not allowed:figure legend;m
+/figure/legend;element not allowed:figure legend;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+x<legend>y</legend><legend>z</legend><legend>w</legend>v
+</figure>
+#errors
+/figure/legend;element not allowed:figure legend;m
+/figure/legend;element not allowed:figure legend;m
+/figure/legend;element not allowed:figure legend;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<p>x</p><legend>y</legend><legend>z</legend>w
+</figure>
+#errors
+/figure/legend;element not allowed:figure legend;m
+/figure/legend;element not allowed:figure legend;m
+
+#data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <thead><tr><td/></tr></thead>
 <tbody><tr><td/></tr></tbody>
@@ -3871,7 +3964,7 @@ aaa
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/p;element not allowed
+/head/noscript/p;element not allowed:head noscript;m
 /head/title;no significant content;s
 /head/noscript/p;no significant content;s
 
@@ -3884,7 +3977,7 @@ aaa
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/noscript;element not allowed
+/head/noscript/noscript;element not allowed:head noscript;m
 /head/title;no significant content;s
 
 #data
@@ -3919,7 +4012,7 @@ aaa
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/script;element not allowed
+/head/noscript/script;element not allowed:head noscript;m
 /head/noscript/script;script:text/javascript;unsupported
 /head/title;no significant content;s
 
@@ -3943,7 +4036,7 @@ aaa
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/base;element not allowed
+/head/noscript/base;element not allowed:head noscript;m
 /head/title;no significant content;s
 
 #data
@@ -3955,7 +4048,7 @@ aaa
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/event-source;element not allowed
+/head/noscript/event-source;element not allowed:head noscript;m
 /head/title;no significant content;s
 
 #data
@@ -3967,7 +4060,7 @@ aaa
 </head>
 #errors
 /head/noscript;in XML:noscript
-/head/noscript/title;element not allowed
+/head/noscript/title;element not allowed:head noscript;m
 /head/title;no significant content;s
 /head/noscript/title;no significant content;s
 
@@ -3997,7 +4090,7 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/noscript;in XML:noscript
-/head/noscript/noscript;element not allowed
+/head/noscript/noscript;element not allowed:head noscript;m
 /head/noscript/noscript/style;style:text/css;unsupported
 /head/title;no significant content;s
 
@@ -4014,8 +4107,8 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/noscript;in XML:noscript
-/head/noscript/noscript;element not allowed
-/head/noscript/noscript/p;element not allowed
+/head/noscript/noscript;element not allowed:head noscript;m
+/head/noscript/noscript/p;element not allowed:head noscript;m
 /head/title;no significant content;s
 /head/noscript/noscript/p;no significant content;s
 
@@ -4032,7 +4125,7 @@ aaa
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/noscript;in XML:noscript
-/head/noscript/noscript;element not allowed
+/head/noscript/noscript;element not allowed:head noscript;m
 /head/noscript/noscript/meta;element not allowed:meta charset;m
 /head/noscript/noscript/meta;in XML:charset;m
 /head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
