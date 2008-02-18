@@ -34,7 +34,7 @@ my $HTMLProseContent = {
     ## non-inter-element-whitespace text node.
     style => 1,  
 
-    br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, m => 1,
+    br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, script => 1, noscript => 1, 'event-source' => 1,
@@ -75,7 +75,7 @@ my $HTMLHeadingContent = {
 my $HTMLPhrasingContent = {
   ## NOTE: All phrasing content is also prose content.
   $HTML_NS => {
-    br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, m => 1,
+    br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, script => 1, noscript => 1, 'event-source' => 1,
@@ -144,7 +144,7 @@ my $HTMLBlockLevelElements = {
 my $HTMLStrictlyInlineLevelElements = {
   $HTML_NS => {
     qw/
-      br 1 a 1 q 1 cite 1 em 1 strong 1 small 1 m 1 dfn 1 abbr 1
+      br 1 a 1 q 1 cite 1 em 1 strong 1 small 1 mark 1 dfn 1 abbr 1
       time 1 meter 1 progress 1 code 1 var 1 samp 1 kbd 1
       sub 1 sup 1 span 1 i 1 b 1 bdo 1 ins 1 del 1 img 1
       iframe 1 embed 1 object 1 video 1 audio 1 canvas 1 area 1
@@ -1988,7 +1988,7 @@ $Element->{$HTML_NS}->{small} = {
   checker => $HTMLPhrasingContentChecker,
 };
 
-$Element->{$HTML_NS}->{m} = {
+$Element->{$HTML_NS}->{mark} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLPhrasingContentChecker,
 };

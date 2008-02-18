@@ -3596,8 +3596,176 @@ aaa
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-@@ TODO: strong, small, m 
+@@ TODO: strong, small
 </p>
+#errors
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"></mark>
+#errors
+/mark;no significant content;s
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml">  </mark>
+#errors
+/mark;no significant content;s
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml">aaa</mark>
+#errors
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><em></em></mark>
+#errors
+/mark;no significant content;s
+/mark/em;no significant content;s
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><ins></ins></mark>
+#errors
+/mark;no significant content;s
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><ins>a</ins></mark>
+#errors
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><del></del></mark>
+#errors
+/mark;no significant content;s
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><del>as</del></mark>
+#errors
+/mark;no significant content;s
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><p>zxx</p></mark>
+#errors
+/mark/p;element not allowed:phrasing;m
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><a href="">xx</a>yy</mark>
+#errors
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><img src="" alt="x"/></mark>
+#errors
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><br/></mark>
+#errors
+/mark;no significant content;s
+
+#data
+<mark xmlns="http://www.w3.org/1999/xhtml"><object data=""/></mark>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><mark>x</mark></p>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><mark>x</mark></div>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"><mark>x</mark></ins>
+#errors
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"><mark>x</mark></li>
+#errors
+
+#data
+<a href="" xmlns="http://www.w3.org/1999/xhtml"><mark>x</mark></a>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<!-- From HTML5 Spec -->
+<p lang="en-US">Consider the following quote:</p>
+<blockquote lang="en-GB">
+ <p>Look around and you will find, no-one's really
+ <mark>colour</mark> blind.</p>
+</blockquote>
+<p lang="en-US">As we can tell from the <em>spelling</em> of the word,
+the person writing this quote is clearly not American.</p>
+</div>
+#errors
+/div/p/@lang;in XML:lang
+/div/blockquote/@lang;in XML:lang
+/div/p/@lang;in XML:lang
+
+#data
+<!-- From HTML5 Spec -->
+<p xmlns="http://www.w3.org/1999/xhtml">I also have some <mark>kitten</mark>s who are visiting me
+these days. They're really cute. I think they like my garden! Maybe I
+should adopt a <mark>kitten</mark>.</p>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<!-- From HTML5 Spec -->
+<p>The highlighted part below is where the error lies:</p>
+<pre><code>var i: Integer;
+begin
+   i := <mark>1.1</mark>;
+end.</code></pre>
+</div>
+#errors
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml">
+<!-- From HTML5 Spec -->
+ <style>
+  blockquote mark, q mark {
+    font: inherit; font-style: italic;
+    text-decoration: none;
+    background: transparent; color: inherit;
+  }
+  .bubble em {
+    font: inherit; font-size: larger;
+    text-decoration: underline;
+  }
+ </style>
+ <h1>She knew</h1>
+ <p>Did you notice the subtle joke in the joke on panel 4?</p>
+ <blockquote>
+  <p class="bubble">I didn't <em>want</em> to believe. <mark>Of course
+  on some level I realized it was a known-plaintext attack.</mark> But I
+  couldn't admit it until I saw for myself.</p>
+ </blockquote>
+ <p>(Emphasis mine.) I thought that was great. It's so pedantic, yet it
+ explains everything neatly.</p>
+</article>
+#errors
+/article/style;element not allowed:prose style;m
+/article/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<!-- From HTML5 Spec -->
+<h3>Wormhole Physics Introduction</h3>
+
+<p><mark>A wormhole in normal conditions can be held open for a
+maximum of just under 39 minutes.</mark> Conditions that can increase
+the time include a powerful energy source coupled to one or both of
+the gates connecting the wormhole, and a large gravity well (such as a
+black hole).</p>
+
+<p><mark>Momentum is preserved across the wormhole. Electromagnetic
+radiation can travel in both directions through a wormhole,
+but matter cannot.</mark></p>
+
+<p>When a wormhole is created, a vortex normally forms.
+<strong>Warning: The vortex caused by the wormhole opening will
+annihilate anything in its path.</strong> Vortexes can be avoided when
+using sufficently advanced dialing technology.</p>
+
+<p><mark>An obstruction in a gate will prevent it from accepting a
+wormhole connection.</mark></p>
+</div>
 #errors
 
 #data
