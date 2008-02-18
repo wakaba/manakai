@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Feb 17 23:24:11 2008
-# Current time GMT:   Sun Feb 17 14:24:11 2008
+# Current time local: Mon Feb 18 08:56:26 2008
+# Current time GMT:   Sun Feb 17 23:56:26 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -542,42 +542,12 @@ not ok 467
 #     Expected: "/fieldset/legend/blockquote;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend><blockquote><p>XXX</p></blockquote></legend>
 #</fieldset>)
-not ok 468
-# Test 468 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src" (t/ContentChecker.t at line 94 fail #468)
-#     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
-#<legend>XXX</legend>
-#<img/>
-#</figure>)
-not ok 469
-# Test 469 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure/legend/p;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #469)
-#     Expected: "/figure/legend/p;element not allowed:phrasing;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
-#<legend><p>XXX</p></legend>
-#<img/>
-#</figure>)
-not ok 470
-# Test 470 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure/legend/blockquote;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #470)
-#     Expected: "/figure/legend/blockquote;element not allowed:phrasing;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
-#<legend><blockquote><p>XXX</p></blockquote></legend>
-#<img/>
-#</figure>)
-not ok 471
-# Test 471 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src" (t/ContentChecker.t at line 94 fail #471)
-#     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
-#<legend>XXX</legend>
-#<img/>
-#</figure>)
-not ok 472
-# Test 472 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure/legend/p;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #472)
-#     Expected: "/figure/legend/p;element not allowed:phrasing;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
-#<legend><p>XXX</p></legend>
-#<img/>
-#</figure>)
-not ok 473
-# Test 473 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure/legend/blockquote;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #473)
-#     Expected: "/figure/legend/blockquote;element not allowed:phrasing;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
-#<legend><blockquote><p>XXX</p></blockquote></legend>
-#<img/>
-#</figure>)
+ok 468
+ok 469
+ok 470
+ok 471
+ok 472
+ok 473
 ok 474
 not ok 475
 # Test 475 got: "/head/noscript/noscript;element not allowed:head noscript;m\n/head/noscript/noscript;in XML:noscript\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (t/ContentChecker.t at line 94 fail #475)

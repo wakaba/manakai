@@ -2429,7 +2429,6 @@ $Element->{$HTML_NS}->{figure} = {
 };
 ## TODO: Test for <nest/> in <figure/>
 
-## TODO: |alt|
 $Element->{$HTML_NS}->{img} = {
   attrs_checker => sub {
     my ($self, $todo) = @_;
@@ -2449,7 +2448,9 @@ $Element->{$HTML_NS}->{img} = {
       ## TODO: width
     })->($self, $todo);
     unless ($todo->{node}->has_attribute_ns (undef, 'alt')) {
-      $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:alt');
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'attribute missing:alt',
+                         level => $self->{should_level});
     }
     unless ($todo->{node}->has_attribute_ns (undef, 'src')) {
       $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:src');
