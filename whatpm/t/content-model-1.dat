@@ -3660,6 +3660,7 @@ aaa
 #data
 <mark xmlns="http://www.w3.org/1999/xhtml"><object data=""/></mark>
 #errors
+/mark/object;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><mark>x</mark></p>
@@ -3949,6 +3950,263 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 #errors
 /figure/legend;element not allowed:figure legend;m
 /figure/legend;element not allowed:figure legend;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data=""></object>
+#errors
+/object;no significant content;s
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+</object>
+#errors
+/object;no significant content;s
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">xxxx</object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data=""><p>xx</p></object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data=""><p></p></object>
+#errors
+/object;no significant content;s
+/object/p;no significant content;s
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+</object>
+#errors
+/object;no significant content;s
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<param name="v" value="w"/>
+</object>
+#errors
+/object;no significant content;s
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<param name="v" value="w"/>
+<param name="a" value="b"/>
+</object>
+#errors
+/object;no significant content;s
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+zzz
+</object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<p>zzz</p>
+</object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/><p>
+zzz</p><img src="" alt="a"/>
+</object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<param name="z" value="w"/>
+zzz
+</object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+zzz
+<param name="a" value="y"/>
+</object>
+#errors
+/object/param;element not allowed:prose;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+aaa
+<param name="x" value="y"/>
+</object>
+#errors
+/object/param;element not allowed:prose;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<p>zxx</p>
+<param name="x" value="y"/>
+</object>
+#errors
+/object/param;element not allowed:prose;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<style scoped=""/>
+</object>
+#errors
+/object/style;style:text/css;unsupported
+/object;no significant content;s
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<style scoped=""/>
+aaa
+</object>
+#errors
+/object/style;style:text/css;unsupported
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<style scoped=""/>
+<p>xxx</p>
+</object>
+#errors
+/object/style;style:text/css;unsupported
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<style scoped=""/>
+<param name="xz" value=""/>
+</object>
+#errors
+/object/style;style:text/css;unsupported
+/object/param;element not allowed:prose;m
+/object;no significant content;s
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<style scoped=""/>
+<param name="x" value="y"/>
+</object>
+#errors
+/object/style;style:text/css;unsupported
+/object;no significant content;s
+/object/param;element not allowed:prose;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<p>xxx</p>
+<style scoped=""/>
+</object>
+#errors
+/object/style;style:text/css;unsupported
+/object/style;element not allowed:prose style;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+<param name="x" value="y"/>
+<style/>
+</object>
+#errors
+/object/style;style:text/css;unsupported
+/object;no significant content;s
+/object/style;element not allowed:prose style;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
+<param name="x" value="y"/>
+<style scoped=""/>
+</object>
+</p>
+#errors
+/p/object/style;style:text/css;unsupported
+/p/object;no significant content;s
+/p/object/style;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
+<param name="x" value="y"/>
+xxxx
+</object>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</object>
+</p>
+#errors
+/p/object/p;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</object>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
+<p>xxxx</p>
+<param name="x" value="y"/>
+</object>
+</div>
+#errors
+/div/object/param;element not allowed:prose;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
+<object data="">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</object>
+</object>
+</div>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
+<object data="">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</object>
+</object>
+</span>
+#errors
+/span/object/object/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
+<object data="">
+<p>xxxx</p>
+<param name="x" value="y"/>
+</object>
+</object>
+</span>
+#errors
+/span/object/object/p;element not allowed:phrasing;m
+/span/object/object/param;element not allowed:phrasing;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
