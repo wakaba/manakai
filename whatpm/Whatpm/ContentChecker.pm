@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.63 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.64 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -434,7 +434,10 @@ next unless $code;## TODO: temp.
 
             push @new_item, [$content_def->{check_child_element},
                              $self, $item, $child,
-                             $child_nsuri, $child_ln, 0, $content_state];
+                             $child_nsuri, $child_ln,
+                             $HTMLSemiTransparentElements
+                                 ->{$child_nsuri}->{$child_ln},
+                             $content_state];
             push @new_item, {type => 'element', node => $child,
                              parent_def => $eldef,
                              parent_state => $element_state};
@@ -700,4 +703,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/23 15:24:49 $
+# $Date: 2008/02/23 15:28:45 $

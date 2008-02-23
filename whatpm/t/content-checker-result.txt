@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Feb 24 00:16:37 2008
-# Current time GMT:   Sat Feb 23 15:16:37 2008
+# Current time local: Sun Feb 24 00:25:44 2008
+# Current time GMT:   Sat Feb 23 15:25:44 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -148,20 +148,8 @@ ok 120
 ok 121
 ok 122
 ok 123
-not ok 124
-# Test 124 got: "/body/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #124)
-#     Expected: "/body/style;element not allowed:prose style;m\n/body/style;style:text/css;unsupported" (<body xmlns="http://www.w3.org/1999/xhtml">
-#<ins/>
-#<style scoped="scoped"/>
-#para
-#</body>)
-not ok 125
-# Test 125 got: "/body/ins/style;style:text/css;unsupported\n/body/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #125)
-#     Expected: "/body/ins/style;style:text/css;unsupported\n/body/style;element not allowed:prose style;m\n/body/style;style:text/css;unsupported" (<body xmlns="http://www.w3.org/1999/xhtml">
-#<ins><style scoped="scoped"/></ins>
-#<style scoped="scoped"/>
-#para
-#</body>)
+ok 124
+ok 125
 ok 126
 ok 127
 ok 128
@@ -590,48 +578,22 @@ ok 518
 ok 519
 ok 520
 ok 521
-not ok 522
-# Test 522 got: "/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported\n/div/video;element missing:source;m" (t/ContentChecker.t at line 94 fail #522)
-#     Expected: "/div/video/style;style:text/css;unsupported\n/div/video;element missing:source;m" (<div xmlns="http://www.w3.org/1999/xhtml"><video><style scoped=""/>xx</video></div>)
-not ok 523
-# Test 523 got: "/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported\n/div/video;element missing:source;m" (t/ContentChecker.t at line 94 fail #523)
-#     Expected: "/div/video/style;style:text/css;unsupported\n/div/video;element missing:source;m" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<video><style scoped=""/><p>xx</p></video></div>)
+ok 522
+ok 523
 ok 524
 ok 525
 ok 526
-not ok 527
-# Test 527 got: "/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #527)
-#     Expected: "/div/video/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<video src=""><style scoped=""/>xx</video></div>)
-not ok 528
-# Test 528 got: "/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #528)
-#     Expected: "/div/video/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<video src=""><style scoped=""/><p>xx</p></video></div>)
+ok 527
+ok 528
 ok 529
 ok 530
-not ok 531
-# Test 531 got: "/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #531)
-#     Expected: "/div/video/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<video><source src=""/><style scoped=""/>xx</video></div>)
-not ok 532
-# Test 532 got: "/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #532)
-#     Expected: "/div/video/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<video><source src=""/><style scoped=""/><p>xx</p></video></div>)
+ok 531
+ok 532
 ok 533
 ok 534
-not ok 535
-# Test 535 got: "/div/video/source;element not allowed:prose;m\n/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #535)
-#     Expected: "/div/video/source;element not allowed:prose;m\n/div/video/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<video><style scoped=""/><source src=""/></video></div>)
-not ok 536
-# Test 536 got: "/div/video/source;element not allowed:prose;m\n/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #536)
-#     Expected: "/div/video/source;element not allowed:prose;m\n/div/video/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<video><source src=""/><style scoped=""/><source src=""/></video></div>)
-not ok 537
-# Test 537 got: "/div/video/source;element not allowed:prose;m\n/div/video/source;element not allowed:prose;m\n/div/video/style;element not allowed:prose style;m\n/div/video/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #537)
-#     Expected: "/div/video/source;element not allowed:prose;m\n/div/video/source;element not allowed:prose;m\n/div/video/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<video><source src=""/><style scoped=""/><source src=""/><source src=""/></video></div>)
+ok 535
+ok 536
+ok 537
 ok 538
 ok 539
 ok 540
@@ -673,48 +635,22 @@ ok 575
 ok 576
 ok 577
 ok 578
-not ok 579
-# Test 579 got: "/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported\n/div/audio;element missing:source;m" (t/ContentChecker.t at line 94 fail #579)
-#     Expected: "/div/audio/style;style:text/css;unsupported\n/div/audio;element missing:source;m" (<div xmlns="http://www.w3.org/1999/xhtml"><audio><style scoped=""/>xx</audio></div>)
-not ok 580
-# Test 580 got: "/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported\n/div/audio;element missing:source;m" (t/ContentChecker.t at line 94 fail #580)
-#     Expected: "/div/audio/style;style:text/css;unsupported\n/div/audio;element missing:source;m" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<audio><style scoped=""/><p>xx</p></audio></div>)
+ok 579
+ok 580
 ok 581
 ok 582
 ok 583
-not ok 584
-# Test 584 got: "/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #584)
-#     Expected: "/div/audio/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<audio src=""><style scoped=""/>xx</audio></div>)
-not ok 585
-# Test 585 got: "/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #585)
-#     Expected: "/div/audio/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<audio src=""><style scoped=""/><p>xx</p></audio></div>)
+ok 584
+ok 585
 ok 586
 ok 587
-not ok 588
-# Test 588 got: "/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #588)
-#     Expected: "/div/audio/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<audio><source src=""/><style scoped=""/>xx</audio></div>)
-not ok 589
-# Test 589 got: "/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #589)
-#     Expected: "/div/audio/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<audio><source src=""/><style scoped=""/><p>xx</p></audio></div>)
+ok 588
+ok 589
 ok 590
 ok 591
-not ok 592
-# Test 592 got: "/div/audio/source;element not allowed:prose;m\n/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #592)
-#     Expected: "/div/audio/source;element not allowed:prose;m\n/div/audio/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<audio><style scoped=""/><source src=""/></audio></div>)
-not ok 593
-# Test 593 got: "/div/audio/source;element not allowed:prose;m\n/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #593)
-#     Expected: "/div/audio/source;element not allowed:prose;m\n/div/audio/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<audio><source src=""/><style scoped=""/><source src=""/></audio></div>)
-not ok 594
-# Test 594 got: "/div/audio/source;element not allowed:prose;m\n/div/audio/source;element not allowed:prose;m\n/div/audio/style;element not allowed:prose style;m\n/div/audio/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #594)
-#     Expected: "/div/audio/source;element not allowed:prose;m\n/div/audio/source;element not allowed:prose;m\n/div/audio/style;style:text/css;unsupported" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<audio><source src=""/><style scoped=""/><source src=""/><source src=""/></audio></div>)
+ok 592
+ok 593
+ok 594
 ok 595
 ok 596
 ok 597
