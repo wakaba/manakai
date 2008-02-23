@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.59 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.60 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -140,53 +140,16 @@ $AttrChecker->{''}->{'xml:lang'} = $AttrChecker->{$XML_NS}->{lang};
 $AttrChecker->{''}->{'xml:base'} = $AttrChecker->{$XML_NS}->{base};
 $AttrChecker->{''}->{'xml:id'} = $AttrChecker->{$XML_NS}->{id};
 
-## ANY
-our $AnyChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-        $self->{onerror}->(node => $node, type => 'element not allowed');
-      }
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-  return ($new_todos);
-}; # $AnyChecker
-
-our $ElementDefault = {
-  checker => sub {
-    my ($self, $todo) = @_;
-    $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
-                       type => 'element');
-    return $AnyChecker->($self, $todo);
-  },
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
-    for my $attr (@{$todo->{node}->attributes}) {
+our %AnyChecker = (
+  check_start => sub { },
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
+    for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
       my $checker = $AttrChecker->{$attr_ns}->{$attr_ln}
-        || $AttrChecker->{$attr_ns}->{''};
+          || $AttrChecker->{$attr_ns}->{''};
       if ($checker) {
         $checker->($self, $attr);
       } else {
@@ -195,7 +158,50 @@ our $ElementDefault = {
       }
     }
   },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } else {
+      #
+    }
+  },
+  check_child_text => sub { },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{has_significant}) {
+      $item->{parent_state}->{has_significant} = 1;
+    }    
+  },
+);
+
+our $ElementDefault = {
+  %AnyChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->{onerror}->(node => $item->{node}, level => 'unsupported',
+                       type => 'element');
+  },
 };
+
+our $HTMLEmbeddedContent = {
+  ## NOTE: All embedded content is also phrasing content.
+  $HTML_NS => {
+    img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
+    canvas => 1,
+  },
+  ## NOTE: MathML is mentioned in the HTML5 spec.
+  q<http://www.w3.org/1998/Math/MathML> => {math => 1},
+  ## NOTE: SVG is mentioned in the HTML5 spec.
+  q<http://www.w3.org/2000/svg> => {svg => 1},
+  ## NOTE: Foreign elements with content (but no metadata) are 
+  ## embedded content.
+};  
 
 my $HTMLTransparentElements = {
   $HTML_NS => {qw/ins 1 del 1 font 1 noscript 1 canvas 1/},
@@ -339,6 +345,7 @@ sub check_element ($$$;$) {
   $self->{map} = {};
   $self->{menu} = {};
   $self->{has_link_type} = {};
+  $self->{flag} = {};
   #$self->{has_uri_attr};
   #$self->{has_hyperlink_element};
   #$self->{has_charset};
@@ -348,69 +355,86 @@ sub check_element ($$$;$) {
     id => $self->{id}, table => [], term => $self->{term},
   };
 
-  my @todo = ({type => 'element', node => $el});
-  while (@todo) {
-    my $todo = shift @todo;
-    if ($todo->{type} eq 'element') {
-      my $prefix = $todo->{node}->prefix;
-      if (defined $prefix and $prefix eq 'xmlns') {
-        $self->{onerror}
-          ->(node => $todo->{node}, level => 'NC',
-             type => 'Reserved Prefixes and Namespace Names:<xmlns:>');
-      }
-      my $nsuri = $todo->{node}->namespace_uri;
-      $nsuri = '' unless defined $nsuri;
-      unless ($Namespace->{$nsuri}->{loaded}) {
-        if ($Namespace->{$nsuri}->{module}) {
-          eval qq{ require $Namespace->{$nsuri}->{module} } or die $@;
+  my @item = ({type => 'element', node => $el, parent_state => {}});
+  while (@item) {
+    my $item = shift @item;
+    if (ref $item eq 'ARRAY') {
+      my $code = shift @$item;
+next unless $code;## TODO: temp.
+      $code->(@$item);
+    } elsif ($item->{type} eq 'element') {
+      my $el_nsuri = $item->{node}->namespace_uri;
+      $el_nsuri = '' unless defined $el_nsuri;
+      my $el_ln = $item->{node}->manakai_local_name;
+      
+      unless ($Namespace->{$el_nsuri}->{loaded}) {
+        if ($Namespace->{$el_nsuri}->{module}) {
+          eval qq{ require $Namespace->{$el_nsuri}->{module} } or die $@;
         } else {
-          $Namespace->{$nsuri}->{loaded} = 1;
+          $Namespace->{$el_nsuri}->{loaded} = 1;
         }
       }
-      my $ln = $todo->{node}->manakai_local_name;
-      my $eldef = $Element->{$nsuri}->{$ln} ||
-        $Element->{$nsuri}->{''} ||
+      my $eldef = $Element->{$el_nsuri}->{$el_ln} ||
+          $Element->{$el_nsuri}->{''} ||
           $ElementDefault;
-      $eldef->{attrs_checker}->($self, $todo);
-      my ($new_todos) = $eldef->{checker}->($self, $todo);
-      unshift @todo, @$new_todos;
-    } elsif ($todo->{type} eq 'element-attributes') {
-      my $prefix = $todo->{node}->prefix;
-      if (defined $prefix and $prefix eq 'xmlns') {
-        $self->{onerror}
-          ->(node => $todo->{node}, level => 'NC',
-             type => 'Reserved Prefixes and Namespace Names:<xmlns:>');
-      }
-      my $nsuri = $todo->{node}->namespace_uri;
-      $nsuri = '' unless defined $nsuri;
-      unless ($Namespace->{$nsuri}->{loaded}) {
-        if ($Namespace->{$nsuri}->{module}) {
-          eval qq{ require $Namespace->{$nsuri}->{module} } or die $@;
-        } else {
-          $Namespace->{$nsuri}->{loaded} = 1;
+      my $content_def = $item->{parent_def} || $eldef;
+
+      my $element_state = {};
+      my @new_item;
+      push @new_item, [$eldef->{check_start}, $self, $item, $element_state];
+      push @new_item, [$eldef->{check_attrs}, $self, $item, $element_state];
+        
+      my @child = @{$item->{node}->child_nodes};
+      while (@child) {
+        my $child = shift @child;
+        my $child_nt = $child->node_type;
+        if ($child_nt == 1) { # ELEMENT_NODE
+          my $child_nsuri = $child->namespace_uri;
+          $child_nsuri = '' unless defined $child_nsuri;
+          my $child_ln = $child->manakai_local_name;
+          if ($HTMLTransparentElements->{$child_nsuri}->{$child_ln} and
+              not (($self->{flag}->{in_head} or
+                    ($el_nsuri eq q<http://www.w3.org/1999/xhtml> and
+                     $el_ln eq 'head')) and
+                   $child_nsuri eq q<http://www.w3.org/1999/xhtml> and
+                   $child_ln eq 'noscript')) {
+            push @new_item, [$content_def->{check_child_element},
+                             $self, $item, $child,
+                             $child_nsuri, $child_ln, 1, $element_state];
+            push @new_item, {type => 'element', node => $child,
+                             parent_state => $element_state,
+                             parent_def => $item->{parent_def} || $eldef,
+                             transparent => 1};
+          } else {
+            push @new_item, [$content_def->{check_child_element},
+                             $self, $item, $child,
+                             $child_nsuri, $child_ln, 0, $element_state];
+            push @new_item, {type => 'element', node => $child,
+                             parent_state => $element_state};
+          }
+
+          if ($HTMLEmbeddedContent->{$child_nsuri}->{$child_ln}) {
+            $element_state->{has_significant} = 1;
+          }
+        } elsif ($child_nt == 3 or # TEXT_NODE
+                 $child_nt == 4) { # CDATA_SECTION_NODE
+          my $has_significant = ($child->data =~ /[^\x09-\x0D\x20]/);
+          push @new_item, [$content_def->{check_child_text},
+                           $self, $item, $child, $has_significant,
+                           $element_state];
+          $element_state->{has_significant} ||= $has_significant;
+        } elsif ($child_nt == 5) { # ENTITY_REFERENCE_NODE
+          push @child, @{$child->child_nodes};
         }
+        ## TODO: PI_NODE
+        ## TODO: Unknown node type
       }
-      my $ln = $todo->{node}->manakai_local_name;
-      my $eldef = $Element->{$nsuri}->{$ln} ||
-        $Element->{$nsuri}->{''} ||
-          $ElementDefault;
-      $eldef->{attrs_checker}->($self, $todo);
-    } elsif ($todo->{type} eq 'descendant') {
-      for my $key (keys %{$todo->{errors}}) {
-        unless ($todo->{flag}->{has_descendant}->{$key}) {
-          $todo->{errors}->{$key}->($self, $todo);
-        }
-        for my $key (keys %{$todo->{old_values}}) {
-          $todo->{flag}->{has_descendant}->{$key}
-              ||= $todo->{old_values}->{$key};
-        }
-      }
-    } elsif ($todo->{type} eq 'plus' or $todo->{type} eq 'minus') {
-      $self->_remove_minuses ($todo);
-    } elsif ($todo->{type} eq 'code') {
-      $todo->{code}->();
+      
+      push @new_item, [$eldef->{check_end}, $self, $item, $element_state];
+      
+      unshift @item, @new_item;
     } else {
-      die "$0: Internal error: Unsupported checking action type |$todo->{type}|";
+      die "$0: Internal error: Unsupported checking action type |$item->{type}|";
     }
   }
 
@@ -434,6 +458,56 @@ sub check_element ($$$;$) {
   delete $self->{map};
   return $self->{return};
 } # check_element
+
+sub _add_minus_elements ($$@) {
+  my $self = shift;
+  my $element_state = shift;
+  for my $elements (@_) {
+    for my $nsuri (keys %$elements) {
+      for my $ln (keys %{$elements->{$nsuri}}) {
+        unless ($self->{minus_elements}->{$nsuri}->{$ln}) {
+          $element_state->{minus_elements_original}->{$nsuri}->{$ln} = 0;
+          $self->{minus_elements}->{$nsuri}->{$ln} = 1;
+        }
+      }
+    }
+  }
+} # _add_minus_elements
+
+sub _remove_minus_elements ($$) {
+  my $self = shift;
+  my $element_state = shift;
+  for my $nsuri (keys %{$element_state->{minus_elements_original}}) {
+    for my $ln (keys %{$element_state->{minus_elements_original}->{$nsuri}}) {
+      delete $self->{minus_elements}->{$nsuri}->{$ln};
+    }
+  }
+} # _remove_minus_elements
+
+sub _add_plus_elements ($$@) {
+  my $self = shift;
+  my $element_state = shift;
+  for my $elements (@_) {
+    for my $nsuri (keys %$elements) {
+      for my $ln (keys %{$elements->{$nsuri}}) {
+        unless ($self->{plus_elements}->{$nsuri}->{$ln}) {
+          $element_state->{plus_elements_original}->{$nsuri}->{$ln} = 0;
+          $self->{plus_elements}->{$nsuri}->{$ln} = 1;
+        }
+      }
+    }
+  }
+} # _add_plus_elements
+
+sub _remove_plus_elements ($$) {
+  my $self = shift;
+  my $element_state = shift;
+  for my $nsuri (keys %{$element_state->{plus_elements_original}}) {
+    for my $ln (keys %{$element_state->{plus_elements_original}->{$nsuri}}) {
+      delete $self->{plus_elements}->{$nsuri}->{$ln};
+    }
+  }
+} # _remove_plus_elements
 
 sub _add_minuses ($@) {
   my $self = shift;
@@ -595,4 +669,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/17 12:18:06 $
+# $Date: 2008/02/23 10:35:00 $

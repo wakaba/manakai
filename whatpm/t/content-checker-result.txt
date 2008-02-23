@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Mon Feb 18 23:09:58 2008
-# Current time GMT:   Mon Feb 18 14:09:58 2008
+# Current time local: Sat Feb 23 19:26:25 2008
+# Current time GMT:   Sat Feb 23 10:26:25 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -146,26 +146,10 @@ ok 118
 ok 119
 ok 120
 ok 121
-not ok 122
-# Test 122 got: "/body/ins/style;element not allowed:prose style;m\n/body/ins/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #122)
-#     Expected: "/body/ins/style;style:text/css;unsupported" (<body xmlns="http://www.w3.org/1999/xhtml">
-#<ins><style scoped="scoped"/>
-#para</ins>
-#</body>)
-not ok 123
-# Test 123 got: "/body/del/style;element not allowed:prose style;m\n/body/del/style;style:text/css;unsupported\n/body;no significant content;s" (t/ContentChecker.t at line 94 fail #123)
-#     Expected: "/body/del/style;style:text/css;unsupported\n/body;no significant content;s" (<body xmlns="http://www.w3.org/1999/xhtml">
-#<del><style scoped="scoped"/>
-#para</del>
-#</body>)
+ok 122
+ok 123
 ok 124
-not ok 125
-# Test 125 got: "/body/ins/style;element not allowed:prose style;m\n/body/ins/style;style:text/css;unsupported\n/body/style;element not allowed:prose style;m\n/body/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #125)
-#     Expected: "/body/ins/style;style:text/css;unsupported\n/body/style;element not allowed:prose style;m\n/body/style;style:text/css;unsupported" (<body xmlns="http://www.w3.org/1999/xhtml">
-#<ins><style scoped="scoped"/></ins>
-#<style scoped="scoped"/>
-#para
-#</body>)
+ok 125
 ok 126
 ok 127
 ok 128
@@ -208,11 +192,7 @@ ok 164
 ok 165
 ok 166
 ok 167
-not ok 168
-# Test 168 got: "/header/footer;element not allowed:minus;m\n/header/footer;no significant content;s\n/header/h1;no significant content;s\n/header;element missing:hn\n/header;no significant content;s" (t/ContentChecker.t at line 94 fail #168)
-#     Expected: "/header/footer;element not allowed:minus;m\n/header/footer;no significant content;s\n/header/h1;no significant content;s\n/header;no significant content;s" (<header xmlns="http://www.w3.org/1999/xhtml"><h1/><footer/></header>)
-#     Got 1 extra line at line 4:
-#      + "/header;element missing:hn\n"
+ok 168
 ok 169
 ok 170
 ok 171
@@ -420,8 +400,19 @@ ok 372
 ok 373
 ok 374
 ok 375
-ok 376
-ok 377
+not ok 376
+# Test 376 got: "/details/legend;element not allowed:prose;m\n/details/legend;no significant content;s\n/details/p/a;no significant content;s\n/details/p;no significant content;s\n/details;no significant content;s" (t/ContentChecker.t at line 94 fail #376)
+#     Expected: "/details/legend;no significant content;s\n/details/p/a;no significant content;s\n/details/p;no significant content;s\n/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml">
+#<legend/>
+#<p><a/></p>
+#</details>)
+#     Got 1 extra line at line 1:
+#      + "/details/legend;element not allowed:prose;m\n"
+not ok 377
+# Test 377 got: "/details/legend/a;no significant content;s\n/details/legend;element not allowed:prose;m\n/details/legend;no significant content;s\n/details;no significant content;s" (t/ContentChecker.t at line 94 fail #377)
+#     Expected: "/details/legend/a;no significant content;s\n/details/legend;no significant content;s\n/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml">
+#<legend><a/></legend>
+#</details>)
 ok 378
 ok 379
 ok 380
@@ -429,7 +420,9 @@ ok 381
 ok 382
 ok 383
 ok 384
-ok 385
+not ok 385
+# Test 385 got: "/datagrid/p;no significant content;s\n/datagrid/table;element not allowed\n/datagrid;no significant content;s" (t/ContentChecker.t at line 94 fail #385)
+#     Expected: "/datagrid/p;no significant content;s\n/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><p/><table/></datagrid>)
 ok 386
 ok 387
 ok 388
@@ -439,11 +432,11 @@ not ok 390
 #     Expected: "/datagrid/table;element not allowed" (<datagrid xmlns="http://www.w3.org/1999/xhtml">xx<table/></datagrid>)
 ok 391
 not ok 392
-# Test 392 got: "/datagrid/select;element;unsupported\n/datagrid;no significant content;s" (t/ContentChecker.t at line 94 fail #392)
-#     Expected: "/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>)
+# Test 392 got: "/datagrid/select;element;unsupported" (t/ContentChecker.t at line 94 fail #392)
+#     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>)
 not ok 393
-# Test 393 got: "/datagrid/datalist;element;unsupported\n/datagrid;no significant content;s" (t/ContentChecker.t at line 94 fail #393)
-#     Expected: "/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>)
+# Test 393 got: "/datagrid/datalist;element;unsupported" (t/ContentChecker.t at line 94 fail #393)
+#     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>)
 ok 394
 not ok 395
 # Test 395 got: "/datagrid/\"aa\";character not allowed\n/datagrid/select;element;unsupported" (t/ContentChecker.t at line 94 fail #395)
@@ -451,14 +444,32 @@ not ok 395
 not ok 396
 # Test 396 got: "/datagrid/\"aa\";character not allowed\n/datagrid/datalist;element;unsupported" (t/ContentChecker.t at line 94 fail #396)
 #     Expected: "/datagrid/\"aa\";character not allowed" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/>aa</datagrid>)
-not ok 397
-# Test 397 got: "/datagrid/datagrid;element not allowed\n/datagrid/datagrid;no significant content;s\n/datagrid;no significant content;s" (t/ContentChecker.t at line 94 fail #397)
-#     Expected: "/datagrid/datagrid;element not allowed:minus;m\n/datagrid/datagrid;no significant content;s\n/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datagrid/></datagrid>)
+ok 397
 ok 398
 ok 399
-ok 400
-ok 401
-ok 402
+not ok 400
+# Test 400 got: "/datagrid/details/legend;element not allowed:prose;m\n/datagrid/details/legend;no significant content;s\n/datagrid/details;no significant content;s\n/datagrid;no significant content;s" (t/ContentChecker.t at line 94 fail #400)
+#     Expected: "/datagrid/details/legend;no significant content;s\n/datagrid/details;no significant content;s\n/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml">
+#<details><legend/></details>
+#</datagrid>)
+not ok 401
+# Test 401 got: "/a/details/legend;element not allowed:prose;m\n/a/details/legend;no significant content;s\n/a/details;element not allowed:phrasing;m\n/a/details;no significant content;s\n/a;no significant content;s" (t/ContentChecker.t at line 94 fail #401)
+#     Expected: "/a/details/legend;no significant content;s\n/a/details;element not allowed:phrasing;m\n/a/details;no significant content;s\n/a;no significant content;s" (<a xmlns="http://www.w3.org/1999/xhtml">
+#<details>
+#<legend/>
+#</details>
+#</a>)
+#     Got 1 extra line at line 1:
+#      + "/a/details/legend;element not allowed:prose;m\n"
+not ok 402
+# Test 402 got: "/a/span/details/legend;element not allowed:prose;m\n/a/span/details/legend;no significant content;s\n/a/span/details;element not allowed:phrasing;m\n/a/span/details;no significant content;s\n/a/span;no significant content;s\n/a;no significant content;s" (t/ContentChecker.t at line 94 fail #402)
+#     Expected: "/a/span/details/legend;no significant content;s\n/a/span/details;element not allowed:phrasing;m\n/a/span/details;no significant content;s\n/a/span;no significant content;s\n/a;no significant content;s" (<a xmlns="http://www.w3.org/1999/xhtml">
+#<span>
+#<details><legend/></details>
+#</span>
+#</a>)
+#     Got 1 extra line at line 1:
+#      + "/a/span/details/legend;element not allowed:prose;m\n"
 ok 403
 ok 404
 ok 405
@@ -511,70 +522,213 @@ ok 451
 ok 452
 ok 453
 ok 454
-ok 455
-ok 456
-ok 457
-ok 458
-ok 459
-ok 460
-ok 461
-ok 462
-ok 463
-ok 464
-ok 465
-ok 466
-ok 467
+not ok 455
+# Test 455 got: "/figure;no significant content;s" (t/ContentChecker.t at line 94 fail #455)
+#     Expected: "/figure;element missing:legend;m\n/figure;no significant content;s" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#</figure>)
+not ok 456
+# Test 456 got: "/figure/legend;element not allowed:prose;m\n/figure/legend;no significant content;s\n/figure;no significant content;s" (t/ContentChecker.t at line 94 fail #456)
+#     Expected: "/figure/legend;no significant content;s\n/figure;no significant content;s" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend/>
+#</figure>)
+not ok 457
+# Test 457 got: "/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #457)
+#     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend>x</legend>
+#</figure>)
+not ok 458
+# Test 458 got: "" (t/ContentChecker.t at line 94 fail #458)
+#     Expected: "/figure;element missing:legend;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#x
+#</figure>)
+not ok 459
+# Test 459 got: "/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #459)
+#     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#x<legend>y</legend>
+#</figure>)
+not ok 460
+# Test 460 got: "/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #460)
+#     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend>x</legend>y
+#</figure>)
+not ok 461
+# Test 461 got: "/figure/legend;element not allowed:prose;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #461)
+#     Expected: "/figure/legend;element not allowed:figure legend;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend>x</legend><legend>y</legend>
+#</figure>)
+not ok 462
+# Test 462 got: "/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #462)
+#     Expected: "/figure/legend;element not allowed:figure legend;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#y<legend>x</legend>z
+#</figure>)
+not ok 463
+# Test 463 got: "/figure/legend;element not allowed:prose;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #463)
+#     Expected: "/figure/legend;element not allowed:figure legend;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#x<legend>x</legend><legend>y</legend>
+#</figure>)
+not ok 464
+# Test 464 got: "/figure/legend;element not allowed:prose;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #464)
+#     Expected: "/figure/legend;element not allowed:figure legend;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend>x</legend><legend>y</legend>z
+#</figure>)
+not ok 465
+# Test 465 got: "/figure/legend;element not allowed:prose;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #465)
+#     Expected: "/figure/legend;element not allowed:figure legend;m\n/figure/legend;element not allowed:figure legend;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#x<legend>y</legend><legend>z</legend>w
+#</figure>)
+not ok 466
+# Test 466 got: "/figure/legend;element not allowed:prose;m\n/figure/legend;element not allowed:prose;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #466)
+#     Expected: "/figure/legend;element not allowed:figure legend;m\n/figure/legend;element not allowed:figure legend;m\n/figure/legend;element not allowed:figure legend;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#x<legend>y</legend><legend>z</legend><legend>w</legend>v
+#</figure>)
+not ok 467
+# Test 467 got: "/figure/legend;element not allowed:prose;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #467)
+#     Expected: "/figure/legend;element not allowed:figure legend;m\n/figure/legend;element not allowed:figure legend;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<p>x</p><legend>y</legend><legend>z</legend>w
+#</figure>)
 ok 468
 ok 469
 ok 470
 ok 471
 ok 472
-ok 473
-ok 474
-ok 475
-ok 476
-ok 477
-ok 478
-ok 479
-ok 480
+not ok 473
+# Test 473 got: "/object/param;element not allowed:prose;m\n/object;no significant content;s" (t/ContentChecker.t at line 94 fail #473)
+#     Expected: "/object;no significant content;s" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#</object>)
+not ok 474
+# Test 474 got: "/object/param;element not allowed:prose;m\n/object/param;element not allowed:prose;m\n/object;no significant content;s" (t/ContentChecker.t at line 94 fail #474)
+#     Expected: "/object;no significant content;s" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<param name="v" value="w"/>
+#</object>)
+not ok 475
+# Test 475 got: "/object/param;element not allowed:prose;m\n/object/param;element not allowed:prose;m\n/object/param;element not allowed:prose;m\n/object;no significant content;s" (t/ContentChecker.t at line 94 fail #475)
+#     Expected: "/object;no significant content;s" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<param name="v" value="w"/>
+#<param name="a" value="b"/>
+#</object>)
+not ok 476
+# Test 476 got: "/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #476)
+#     Expected: "" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#zzz
+#</object>)
+not ok 477
+# Test 477 got: "/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #477)
+#     Expected: "" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<p>zzz</p>
+#</object>)
+not ok 478
+# Test 478 got: "/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #478)
+#     Expected: "" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/><p>
+#zzz</p><img src="" alt="a"/>
+#</object>)
+not ok 479
+# Test 479 got: "/object/param;element not allowed:prose;m\n/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #479)
+#     Expected: "" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<param name="z" value="w"/>
+#zzz
+#</object>)
+not ok 480
+# Test 480 got: "/object/param;element not allowed:prose;m\n/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #480)
+#     Expected: "/object/param;element not allowed:prose;m" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#zzz
+#<param name="a" value="y"/>
+#</object>)
 ok 481
 ok 482
-ok 483
-ok 484
-ok 485
-ok 486
+not ok 483
+# Test 483 got: "/object/param;element not allowed:prose;m\n/object/style;element not allowed:prose style;m\n/object/style;style:text/css;unsupported\n/object;no significant content;s" (t/ContentChecker.t at line 94 fail #483)
+#     Expected: "/object/style;style:text/css;unsupported\n/object;no significant content;s" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<style scoped=""/>
+#</object>)
+not ok 484
+# Test 484 got: "/object/param;element not allowed:prose;m\n/object/style;element not allowed:prose style;m\n/object/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #484)
+#     Expected: "/object/style;style:text/css;unsupported" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<style scoped=""/>
+#aaa
+#</object>)
+not ok 485
+# Test 485 got: "/object/param;element not allowed:prose;m\n/object/style;element not allowed:prose style;m\n/object/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #485)
+#     Expected: "/object/style;style:text/css;unsupported" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<style scoped=""/>
+#<p>xxx</p>
+#</object>)
+not ok 486
+# Test 486 got: "/object/param;element not allowed:prose;m\n/object/param;element not allowed:prose;m\n/object/style;element not allowed:prose style;m\n/object/style;style:text/css;unsupported\n/object;no significant content;s" (t/ContentChecker.t at line 94 fail #486)
+#     Expected: "/object/param;element not allowed:prose;m\n/object/style;style:text/css;unsupported\n/object;no significant content;s" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<style scoped=""/>
+#<param name="xz" value=""/>
+#</object>)
 ok 487
-ok 488
-ok 489
+not ok 488
+# Test 488 got: "/object/param;element not allowed:prose;m\n/object/style;element not allowed:prose style;m\n/object/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #488)
+#     Expected: "/object/style;element not allowed:prose style;m\n/object/style;style:text/css;unsupported" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<p>xxx</p>
+#<style scoped=""/>
+#</object>)
+not ok 489
+# Test 489 got: "/object/param;element not allowed:prose;m\n/object/style;element not allowed:prose style;m\n/object/style;style:text/css;unsupported\n/object;no significant content;s" (t/ContentChecker.t at line 94 fail #489)
+#     Expected: "/object/style;element not allowed:prose style;m\n/object/style;style:text/css;unsupported\n/object;no significant content;s" (<object xmlns="http://www.w3.org/1999/xhtml" data="">
+#<param name="x" value="y"/>
+#<style/>
+#</object>)
 not ok 490
-# Test 490 got: "/p/object/style;style:text/css;unsupported\n/p/object;no significant content;s" (t/ContentChecker.t at line 94 fail #490)
+# Test 490 got: "/p/object/param;element not allowed:prose;m\n/p/object/style;element not allowed:prose style;m\n/p/object/style;style:text/css;unsupported\n/p/object;no significant content;s" (t/ContentChecker.t at line 94 fail #490)
 #     Expected: "/p/object/style;element not allowed:phrasing;m\n/p/object/style;style:text/css;unsupported\n/p/object;no significant content;s" (<p xmlns="http://www.w3.org/1999/xhtml">
 #<object data="">
 #<param name="x" value="y"/>
 #<style scoped=""/>
 #</object>
 #</p>)
-ok 491
+not ok 491
+# Test 491 got: "/p/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #491)
+#     Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml">
+#<object data="">
+#<param name="x" value="y"/>
+#xxxx
+#</object>
+#</p>)
 not ok 492
-# Test 492 got: "" (t/ContentChecker.t at line 94 fail #492)
+# Test 492 got: "/p/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #492)
 #     Expected: "/p/object/p;element not allowed:phrasing;m" (<p xmlns="http://www.w3.org/1999/xhtml">
 #<object data="">
 #<param name="x" value="y"/>
 #<p>xxxx</p>
 #</object>
 #</p>)
-ok 493
-not ok 494
-# Test 494 got: "/div/object/param;element not allowed:prose;m\n/div/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #494)
-#     Expected: "/div/object/param;element not allowed:prose;m" (<div xmlns="http://www.w3.org/1999/xhtml">
+not ok 493
+# Test 493 got: "/div/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #493)
+#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<object data="">
-#<p>xxxx</p>
 #<param name="x" value="y"/>
+#<p>xxxx</p>
 #</object>
 #</div>)
-ok 495
+ok 494
+not ok 495
+# Test 495 got: "/div/object/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #495)
+#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<object data="">
+#<object data="">
+#<param name="x" value="y"/>
+#<p>xxxx</p>
+#</object>
+#</object>
+#</div>)
 not ok 496
-# Test 496 got: "" (t/ContentChecker.t at line 94 fail #496)
+# Test 496 got: "/span/object/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #496)
 #     Expected: "/span/object/object/p;element not allowed:phrasing;m" (<span xmlns="http://www.w3.org/1999/xhtml">
 #<object data="">
 #<object data="">
@@ -584,7 +738,7 @@ not ok 496
 #</object>
 #</span>)
 not ok 497
-# Test 497 got: "/span/object/object/param;element not allowed:prose;m\n/span/object/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #497)
+# Test 497 got: "/span/object/object/param;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #497)
 #     Expected: "/span/object/object/p;element not allowed:phrasing;m\n/span/object/object/param;element not allowed:phrasing;m" (<span xmlns="http://www.w3.org/1999/xhtml">
 #<object data="">
 #<object data="">
@@ -610,15 +764,9 @@ ok 511
 ok 512
 ok 513
 ok 514
-not ok 515
-# Test 515 got: "/th/del/p;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #515)
-#     Expected: "/th/del/p;element not allowed:phrasing;m\n/th;no significant content;s" (<th xmlns="http://www.w3.org/1999/xhtml"><del><p>xx</p></del></th>)
-not ok 516
-# Test 516 got: "/th/del/p;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #516)
-#     Expected: "/th/del/p;element not allowed:phrasing;m\n/th;no significant content;s" (<th xmlns="http://www.w3.org/1999/xhtml"><del><p>xxx</p>xxx</del></th>)
-not ok 517
-# Test 517 got: "/th/del/ins/p;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #517)
-#     Expected: "/th/del/ins/p;element not allowed:phrasing;m\n/th;no significant content;s" (<th xmlns="http://www.w3.org/1999/xhtml"><del><ins>xxx<p>xxx</p></ins></del></th>)
+ok 515
+ok 516
+ok 517
 not ok 518
 # Test 518 got: "/fieldset;element;unsupported" (t/ContentChecker.t at line 94 fail #518)
 #     Expected: "" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
@@ -634,16 +782,46 @@ not ok 520
 #     Expected: "/fieldset/legend/blockquote;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend><blockquote><p>XXX</p></blockquote></legend>
 #</fieldset>)
-ok 521
-ok 522
-ok 523
-ok 524
-ok 525
-ok 526
+not ok 521
+# Test 521 got: "/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #521)
+#     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend>XXX</legend>
+#<img src="" alt="x"/>
+#</figure>)
+not ok 522
+# Test 522 got: "/figure/legend/p;element not allowed:phrasing;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #522)
+#     Expected: "/figure/legend/p;element not allowed:phrasing;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend><p>XXX</p></legend>
+#<img src="" alt="x"/>
+#</figure>)
+not ok 523
+# Test 523 got: "/figure/legend/blockquote;element not allowed:phrasing;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #523)
+#     Expected: "/figure/legend/blockquote;element not allowed:phrasing;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend><blockquote><p>XXX</p></blockquote></legend>
+#<img src="" alt="x"/>
+#</figure>)
+not ok 524
+# Test 524 got: "/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #524)
+#     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend>XXX</legend>
+#<img src="" alt="x"/>
+#</figure>)
+not ok 525
+# Test 525 got: "/figure/legend/p;element not allowed:phrasing;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #525)
+#     Expected: "/figure/legend/p;element not allowed:phrasing;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend><p>XXX</p></legend>
+#<img src="" alt="x"/>
+#</figure>)
+not ok 526
+# Test 526 got: "/figure/legend/blockquote;element not allowed:phrasing;m\n/figure/legend;element not allowed:prose;m" (t/ContentChecker.t at line 94 fail #526)
+#     Expected: "/figure/legend/blockquote;element not allowed:phrasing;m" (<figure xmlns="http://www.w3.org/1999/xhtml">
+#<legend><blockquote><p>XXX</p></blockquote></legend>
+#<img src="" alt="x"/>
+#</figure>)
 ok 527
 not ok 528
-# Test 528 got: "/head/noscript/noscript;element not allowed:head noscript;m\n/head/noscript/noscript;in XML:noscript\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (t/ContentChecker.t at line 94 fail #528)
-#     Expected: "/head/noscript/noscript;element not allowed:head noscript;m\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (<head xmlns="http://www.w3.org/1999/xhtml">
+# Test 528 got: "/head/noscript/noscript;element not allowed:head noscript;m\n/head/noscript/noscript;in XML:noscript\n/head/noscript;in XML:noscript" (t/ContentChecker.t at line 94 fail #528)
+#     Expected: "/head/noscript/noscript;element not allowed:head noscript;m\n/head/noscript;in XML:noscript" (<head xmlns="http://www.w3.org/1999/xhtml">
 #<title/>
 #<noscript>
 #<noscript/>
@@ -653,8 +831,8 @@ ok 529
 ok 530
 ok 531
 not ok 532
-# Test 532 got: "/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript\n/head/title;no significant content;s" (t/ContentChecker.t at line 94 fail #532)
-#     Expected: "/head/noscript;in XML:noscript\n/head/title;no significant content;s" (<head xmlns="http://www.w3.org/1999/xhtml">
+# Test 532 got: "/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript" (t/ContentChecker.t at line 94 fail #532)
+#     Expected: "/head/noscript;in XML:noscript" (<head xmlns="http://www.w3.org/1999/xhtml">
 #<title/>
 #<noscript>
 #<meta name="keywords" content=""/>
@@ -827,14 +1005,22 @@ ok 686
 ok 687
 ok 688
 ok 689
-not ok 690
-# Test 690 got: "/rule;no significant content;s" (t/ContentChecker.t at line 94 fail #690)
+ok 690
+not ok 691
+# Test 691 got: "/rule/video/source;element not allowed:prose;m\n/rule/video;no significant content;s" (t/ContentChecker.t at line 94 fail #691)
 #     Expected: "/rule/video;no significant content;s" (<rule xmlns="http://www.w3.org/1999/xhtml">
-#<video src="/"><nest/></video>
+#<video><nest/><source src="/"/></video>
 #</rule>)
-ok 691
-ok 692
-ok 693
+not ok 692
+# Test 692 got: "/rule/video/source;element not allowed:prose;m\n/rule/video/source;element not allowed:prose;m\n/rule/video;no significant content;s" (t/ContentChecker.t at line 94 fail #692)
+#     Expected: "/rule/video;no significant content;s" (<rule xmlns="http://www.w3.org/1999/xhtml">
+#<video><source src="/"/><nest/><source src="/"/></video>
+#</rule>)
+not ok 693
+# Test 693 got: "/rule/video/source;element not allowed:prose;m\n/rule/video;no significant content;s" (t/ContentChecker.t at line 94 fail #693)
+#     Expected: "/rule/video;no significant content;s" (<rule xmlns="http://www.w3.org/1999/xhtml">
+#<video><source src="/"/><nest/></video>
+#</rule>)
 ok 694
 ok 695
 ok 696
@@ -857,7 +1043,11 @@ ok 712
 ok 713
 ok 714
 ok 715
-ok 716
+not ok 716
+# Test 716 got: "/rule/datagrid/p;no significant content;s\n/rule/datagrid/table;element not allowed\n/rule/datagrid;no significant content;s" (t/ContentChecker.t at line 94 fail #716)
+#     Expected: "/rule/datagrid/p;no significant content;s\n/rule/datagrid;no significant content;s" (<rule xmlns="http://www.w3.org/1999/xhtml">
+#<datagrid><p/><nest/><table/></datagrid>
+#</rule>)
 ok 717
 ok 718
 ok 719
@@ -876,7 +1066,11 @@ ok 731
 ok 732
 ok 733
 ok 734
-ok 735
+not ok 735
+# Test 735 got: "" (t/ContentChecker.t at line 94 fail #735)
+#     Expected: "/rule/author/email;addr-spec;unsupported" (<rule xmlns="http://www.w3.org/1999/xhtml">
+#<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:email><nest/>a@example.com</a:email><a:name/></a:author>
+#</rule>)
 ok 736
 ok 737
 ok 738
@@ -1024,7 +1218,13 @@ ok 871
 ok 872
 ok 873
 ok 874
-ok 875
+not ok 875
+# Test 875 got: "/head/base;basehref after URI attribute\n/head/video;element not allowed:metadata;m\n/head/video;no significant content;s" (t/ContentChecker.t at line 94 fail #875)
+#     Expected: "/head/base;basehref after URI attribute\n/head/video;element not allowed:metadata;m" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<video src=""/>
+#<base href=""/>
+#<title/>
+#</head>)
 ok 876
 ok 877
 ok 878
@@ -1105,7 +1305,12 @@ ok 947
 ok 948
 ok 949
 ok 950
-ok 951
+not ok 951
+# Test 951 got: "/head/style;element not allowed:head style;m\n/head/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #951)
+#     Expected: "/head/style;style:text/css;unsupported" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<title>x</title>
+#<style scoped=""/>
+#</head>)
 ok 952
 ok 953
 ok 954
@@ -1333,9 +1538,15 @@ ok 1175
 ok 1176
 ok 1177
 ok 1178
-ok 1179
-ok 1180
-ok 1181
+not ok 1179
+# Test 1179 got: "" (t/ContentChecker.t at line 94 fail #1179)
+#      Expected: "/iframe;no significant content;s" (<iframe xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1180
+# Test 1180 got: "" (t/ContentChecker.t at line 94 fail #1180)
+#      Expected: "/iframe;no significant content;s" (<iframe src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1181
+# Test 1181 got: "/iframe/@src;URI::syntax error:iriref3987;m" (t/ContentChecker.t at line 94 fail #1181)
+#      Expected: "/iframe/@src;URI::syntax error:iriref3987;m\n/iframe;no significant content;s" (<iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1182
 ok 1183
 ok 1184
@@ -1686,7 +1897,9 @@ ok 1527
 ok 1528
 ok 1529
 ok 1530
-ok 1531
+not ok 1531
+# Test 1531 got: "/a;element;unsupported" (t/ContentChecker.t at line 94 fail #1531)
+#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
 ok 1532
 ok 1533
 ok 1534
@@ -1759,13 +1972,13 @@ ok 1598
 ok 1599
 ok 1600
 ok 1601
-not ok 1602
-# Test 1602 got: "/p;no significant content;s" (t/ContentChecker.t at line 94 fail #1602)
-#      Expected: "" (<p xmlns="http://www.w3.org/1999/xhtml"><del>a</del>a</p>)
+ok 1602
 ok 1603
 ok 1604
 ok 1605
-ok 1606
+not ok 1606
+# Test 1606 got: "" (t/ContentChecker.t at line 94 fail #1606)
+#      Expected: "/title;no significant content;s" (<title xmlns="http://www.w3.org/1999/xhtml"></title>)
 ok 1607
 ok 1608
 ok 1609
@@ -1792,23 +2005,53 @@ ok 1628
 # t/content-model-atom-1.dat
 # t/content-model-atom-2.dat
 ok 1629
-ok 1630
-ok 1631
+not ok 1630
+# Test 1630 got: "" (t/ContentChecker.t at line 94 fail #1630)
+#      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="!" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
+not ok 1631
+# Test 1631 got: "" (t/ContentChecker.t at line 94 fail #1631)
+#      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang=" en " href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
 ok 1632
-ok 1633
-ok 1634
-ok 1635
-ok 1636
-ok 1637
+not ok 1633
+# Test 1633 got: "" (t/ContentChecker.t at line 94 fail #1633)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>05-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1634
+# Test 1634 got: "" (t/ContentChecker.t at line 94 fail #1634)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>12005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1635
+# Test 1635 got: "" (t/ContentChecker.t at line 94 fail #1635)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31t12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1636
+# Test 1636 got: "" (t/ContentChecker.t at line 94 fail #1636)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1637
+# Test 1637 got: "" (t/ContentChecker.t at line 94 fail #1637)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 ok 1638
-ok 1639
-ok 1640
-ok 1641
-ok 1642
-ok 1643
-ok 1644
-ok 1645
-ok 1646
+not ok 1639
+# Test 1639 got: "" (t/ContentChecker.t at line 94 fail #1639)
+#      Expected: "/feed/updated;datetime:bad month;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-17-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1640
+# Test 1640 got: "" (t/ContentChecker.t at line 94 fail #1640)
+#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-32T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1641
+# Test 1641 got: "" (t/ContentChecker.t at line 94 fail #1641)
+#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-02-29T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1642
+# Test 1642 got: "" (t/ContentChecker.t at line 94 fail #1642)
+#      Expected: "/feed/updated;datetime:bad hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T24:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1643
+# Test 1643 got: "" (t/ContentChecker.t at line 94 fail #1643)
+#      Expected: "/feed/updated;datetime:bad minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:69:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1644
+# Test 1644 got: "" (t/ContentChecker.t at line 94 fail #1644)
+#      Expected: "/feed/updated;datetime:bad second;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:69Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1645
+# Test 1645 got: "" (t/ContentChecker.t at line 94 fail #1645)
+#      Expected: "/feed/updated;datetime:bad timezone hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+24:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1646
+# Test 1646 got: "" (t/ContentChecker.t at line 94 fail #1646)
+#      Expected: "/feed/updated;datetime:bad timezone minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+02:60</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 ok 1647
 ok 1648
 ok 1649

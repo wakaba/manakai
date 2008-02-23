@@ -102,19 +102,7 @@ my $HTMLPhrasingContent = {
   ## NOTE: And non-inter-element-whitespace text nodes.
 };
 
-my $HTMLEmbeddedContent = {
-  ## NOTE: All embedded content is also phrasing content.
-  $HTML_NS => {
-    img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
-    canvas => 1,
-  },
-  ## NOTE: MathML is mentioned in the HTML5 spec.
-  q<http://www.w3.org/1998/Math/MathML> => {math => 1},
-  ## NOTE: SVG is mentioned in the HTML5 spec.
-  q<http://www.w3.org/2000/svg> => {svg => 1},
-  ## NOTE: Foreign elements with content (but no metadata) are 
-  ## embedded content.
-};  
+## $HTMLEmbeddedContent: See Whatpm::ContentChecker.
 
 my $HTMLInteractiveContent = {
   $HTML_NS => {
@@ -125,378 +113,6 @@ my $HTMLInteractiveContent = {
 
 ## NOTE: $HTMLTransparentElements: See Whatpm::ContentChecker.
 ## NOTE: Semi-transparent elements: See Whatpm::ContentChecker.
-
-## Old HTML5 categories
-
-my $HTMLBlockLevelElements = {
-  $HTML_NS => {
-    qw/
-      section 1 nav 1 article 1 blockquote 1 aside 1 
-      h1 1 h2 1 h3 1 h4 1 h5 1 h6 1 header 1 footer 1
-      address 1 p 1 hr 1 dialog 1 pre 1 ol 1 ul 1 dl 1
-      ins 1 del 1 figure 1 map 1 table 1 script 1 noscript 1
-      event-source 1 details 1 datagrid 1 menu 1 div 1 font 1
-      datatemplate 1
-    /,
-  },
-};
-
-my $HTMLStrictlyInlineLevelElements = {
-  $HTML_NS => {
-    qw/
-      br 1 a 1 q 1 cite 1 em 1 strong 1 small 1 mark 1 dfn 1 abbr 1
-      time 1 meter 1 progress 1 code 1 var 1 samp 1 kbd 1
-      sub 1 sup 1 span 1 i 1 b 1 bdo 1 ins 1 del 1 img 1
-      iframe 1 embed 1 object 1 video 1 audio 1 canvas 1 area 1
-      script 1 noscript 1 event-source 1 command 1 font 1
-    /,
-  },
-};
-
-my $HTMLStructuredInlineLevelElements = {
-  $HTML_NS => {qw/blockquote 1 pre 1 ol 1 ul 1 dl 1 table 1 menu 1/},
-};
-
-my $HTMLSignificantContentErrors = {
-  significant => sub {
-    my ($self, $todo) = @_;
-    $self->{onerror}->(node => $todo->{node},
-                       level => $self->{should_level},
-                       type => 'no significant content');
-  },
-}; # $HTMLSignificantContentErrors
-
-our $AnyChecker;
-my $HTMLAnyChecker = sub {
-  my ($self, $todo) = @_;
-
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-  
-  my ($new_todos) = $AnyChecker->($self, $todo);
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-}; # $HTMLAnyChecker
-
-## Empty
-my $HTMLEmptyChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-        $self->{onerror}->(node => $node, type => 'element not allowed:minus',
-                           level => $self->{must_level});
-      } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
-        #
-      } else {
-        $self->{onerror}->(node => $node, type => 'element not allowed:empty',
-                           level => $self->{must_level});
-      }
-
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $self->{onerror}->(node => $node,
-                           type => 'character not allowed:empty',
-                           level => $self->{must_level});
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-  return ($new_todos);
-};
-
-## Text
-my $HTMLTextChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-        #
-      } else {
-        ## NOTE: |minuses| list is not checked since redundant
-        $self->{onerror}->(node => $node, type => 'element not allowed');
-      }
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-};
-
-my $HTMLProseContentChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-  
-  my $has_non_style;
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-        $self->{onerror}->(node => $node,
-                           type => 'element not allowed:minus',
-                           level => $self->{must_level});
-      } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
-        if ($has_non_style or
-            not $node->has_attribute_ns (undef, 'scoped')) {
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:prose style',
-                             level => $self->{must_level});
-        }
-      } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
-        $has_non_style = 1;
-        if ($HTMLEmbeddedContent->{$node_ns}->{$node_ln}) {
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
-        #
-      } else {
-        $has_non_style = 1;
-        $self->{onerror}->(node => $node,
-                           type => 'element not allowed:prose',
-                           level => $self->{must_level})
-      }
-
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $has_non_style = 1;
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-}; # $HTMLProseContentChecker
-
-my $HTMLPhrasingContentChecker = sub {
-  my ($self, $todo) = @_;
-  my $el = $todo->{node};
-  my $new_todos = [];
-  my @nodes = (@{$el->child_nodes});
-
-  my $old_values = {significant =>
-                        $todo->{flag}->{has_descendant}->{significant}};
-  $todo->{flag}->{has_descendant}->{significant} = 0;
-  
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      my $node_ns = $node->namespace_uri;
-      $node_ns = '' unless defined $node_ns;
-      my $node_ln = $node->manakai_local_name;
-      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-        $self->{onerror}->(node => $node,
-                           type => 'element not allowed:minus',
-                           level => $self->{must_level});
-      } elsif ($HTMLPhrasingContent->{$node_ns}->{$node_ln} or
-               $self->{pluses}->{$node_ns}->{$node_ln}) {
-        #
-      } else {
-        $self->{onerror}->(node => $node,
-                           type => 'element not allowed:phrasing',
-                           level => $self->{must_level});
-      }
-
-      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-      unshift @nodes, @$sib;
-      push @$new_todos, @$ch;
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $todo->{flag}->{has_descendant}->{significant} = 1;
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
-    }
-  }
-
-  push @$new_todos, {
-    type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-    old_values => $old_values,
-    errors => $HTMLSignificantContentErrors,
-  };
-
-  return ($new_todos);
-}; # $HTMLPhrasingContentChecker
-
-## Zero or more XXX element, then either block-level or inline-level
-my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
-  my ($elnsuri, $ellname) = @_;
-  return sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $old_values = {significant =>
-                          $todo->{flag}->{has_descendant}->{significant}};
-    $todo->{flag}->{has_descendant}->{significant} = 0;
-    
-    my $has_non_style;
-    my $content = 'block-or-inline'; # or 'block' or 'inline'
-    my @block_not_inline;
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($node_ns eq $elnsuri and $node_ln eq $ellname) {
-          $not_allowed = 1 if $has_non_style;
-          if ($ellname eq 'style' and
-              not $node->has_attribute_ns (undef, 'scoped')) {
-            $not_allowed = 1;
-          }
-        } elsif ($content eq 'block') {
-          $has_non_style = 1;
-          $not_allowed = 1
-            unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln} or
-                $self->{pluses}->{$node_ns}->{$node_ln};
-        } elsif ($content eq 'inline') {
-          $has_non_style = 1;
-          $not_allowed = 1
-            unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
-                $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln} or
-                $self->{pluses}->{$node_ns}->{$node_ln};
-        } else {
-          $has_non_style = 1 unless $self->{pluses}->{$node_ns}->{$node_ln};
-          my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
-          my $is_inline
-            = $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} ||
-              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
-            
-          push @block_not_inline, $node
-            if $is_block and not $is_inline and not $not_allowed;
-          if (not $is_block and not $self->{pluses}->{$node_ns}->{$node_ln}) {
-            $content = 'inline';
-            for (@block_not_inline) {
-              $self->{onerror}->(node => $_, type => 'element not allowed');
-            }
-            $not_allowed = 1 unless $is_inline;
-          }
-        }
-        $self->{onerror}->(node => $node, type => 'element not allowed')
-          if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $has_non_style = 1;
-          if ($content eq 'block') {
-            $self->{onerror}->(node => $node, type => 'character not allowed');
-          } else {
-            $content = 'inline';
-            for (@block_not_inline) {
-              $self->{onerror}->(node => $_, type => 'element not allowed');
-            }
-          }
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
-    }
-
-    if ($content eq 'inline') {
-      for (@$new_todos) {
-        $_->{inline} = 1;
-      }
-    }
-
-    push @$new_todos, {
-      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-      old_values => $old_values,
-      errors => $HTMLSignificantContentErrors,
-    };
-
-    return ($new_todos);
-  };
-}; # $GetHTMLZeroOrMoreThenBlockOrInlineChecker
-
-my $HTMLTransparentChecker = $HTMLProseContentChecker;
-## ISSUE: Significant content rule should be applied to transparent element
-## with parent?  Currently, applied to |video| but not to others.
 
 ## -- Common attribute syntacx checkers
 
@@ -952,20 +568,20 @@ for (qw/
 my $GetHTMLAttrsChecker = sub {
   my $element_specific_checker = shift;
   return sub {
-    my ($self, $todo) = @_;
-    for my $attr (@{$todo->{node}->attributes}) {
+    my ($self, $item, $element_state) = @_;
+    for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
       my $checker;
       if ($attr_ns eq '') {
         $checker = $element_specific_checker->{$attr_ln}
-          || $HTMLAttrChecker->{$attr_ln};
+            || $HTMLAttrChecker->{$attr_ln};
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
-        || $AttrChecker->{$attr_ns}->{''};
+          || $AttrChecker->{$attr_ns}->{''};
       if ($checker) {
-        $checker->($self, $attr, $todo);
+        $checker->($self, $attr, $item);
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
                            type => 'attribute');
@@ -975,17 +591,142 @@ my $GetHTMLAttrsChecker = sub {
   };
 }; # $GetHTMLAttrsChecker
 
+my %HTMLChecker = (
+  %Whatpm::ContentChecker::AnyChecker,
+  check_attrs => $GetHTMLAttrsChecker->({}),
+);
+
+my %HTMLEmptyChecker = (
+  %HTMLChecker,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:empty',
+                         level => $self->{must_level});
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node,
+                         type => 'character not allowed:empty',
+                         level => $self->{must_level});
+    }
+  },
+);
+
+my %HTMLTextChecker = (
+  %HTMLChecker,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed');
+    }
+  },
+);
+
+my %HTMLProseContentChecker = (
+  %HTMLChecker,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
+      if ($element_state->{has_non_style} or
+          not $child_el->has_attribute_ns (undef, 'scoped')) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:prose style',
+                           level => $self->{must_level});
+      }
+    } elsif ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
+      $element_state->{has_non_style} = 1;
+    } else {
+      $element_state->{has_non_style} = 1;
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:prose',
+                         level => $self->{must_level})
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $element_state->{has_non_style} = 1;
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{has_significant}) {
+      $item->{parent_state}->{has_significant} = 1;
+    } elsif ($item->{transparent}) {
+      #
+    } else {
+      $self->{onerror}->(node => $item->{node},
+                         level => $self->{should_level},
+                         type => 'no significant content');
+    }
+  },
+);
+
+my %HTMLPhrasingContentChecker = (
+  %HTMLChecker,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:phrasing',
+                         level => $self->{must_level});
+    }
+  },
+  check_end => $HTMLProseContentChecker{check_end},
+  ## NOTE: The definition for |li| assumes that the only differences
+  ## between prose and phrasing content checkers are |check_child_element|
+  ## and |check_child_text|.
+);
+
+my %HTMLTransparentChecker = %HTMLProseContentChecker;
+## ISSUE: Significant content rule should be applied to transparent element
+## with parent?  Currently, applied to |video| but not to others.
+
 our $Element;
 our $ElementDefault;
 
 $Element->{$HTML_NS}->{''} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $ElementDefault->{checker},
+  %HTMLChecker,
+  check_start => $ElementDefault->{check_start},
 };
 
 $Element->{$HTML_NS}->{html} = {
   is_root => 1,
-  attrs_checker => $GetHTMLAttrsChecker->({
+  check_attrs => $GetHTMLAttrsChecker->({
     manifest => $HTMLURIAttrChecker,
     xmlns => sub {
       my ($self, $attr) = @_;
@@ -999,172 +740,147 @@ $Element->{$HTML_NS}->{html} = {
       }
     },
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $old_values = {significant =>
-                          $todo->{flag}->{has_descendant}->{significant}};
-    $todo->{flag}->{has_descendant}->{significant} = 0;
-
-    my $phase = 'before head';
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($phase eq 'before head') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'head') {
-            $phase = 'after head';            
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'body') {
-            $self->{onerror}->(node => $node, type => 'ps element missing:head');
-            $phase = 'after body';
-          } else {
-            $not_allowed = 1;
-            # before head
-          }
-        } elsif ($phase eq 'after head') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'body') {
-            $phase = 'after body';
-          } else {
-            $not_allowed = 1;
-            # after head
-          }
-        } else { #elsif ($phase eq 'after body') {
-          $not_allowed = 1;
-          # after body
-        }
-        $self->{onerror}->(node => $node, type => 'element not allowed')
-          if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{phase} = 'before head';
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{phase} eq 'before head') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'head') {
+        $element_state->{phase} = 'after head';            
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'body') {
+        $self->{onerror}->(node => $child_el,
+                           type => 'ps element missing:head');
+        $element_state->{phase} = 'after body';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed');      
       }
+    } elsif ($element_state->{phase} eq 'after head') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'body') {
+        $element_state->{phase} = 'after body';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed');      
+      }
+    } elsif ($element_state->{phase} eq 'after body') {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed');      
+    } else {
+      die "check_child_element: Bad |html| phase: $element_state->{phase}";
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node,
+                         type => 'character not allowed');
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{phase} eq 'after body') {
+      #
+    } elsif ($element_state->{phase} eq 'before head') {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:head');
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:body');
+    } elsif ($element_state->{phase} eq 'after head') {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:body');
+    } else {
+      die "check_end: Bad |html| phase: $element_state->{phase}";
     }
 
-    if ($phase eq 'before head') {
-      $self->{onerror}->(node => $el, type => 'child element missing:head');
-      $self->{onerror}->(node => $el, type => 'child element missing:body');
-    } elsif ($phase eq 'after head') {
-      $self->{onerror}->(node => $el, type => 'child element missing:body');
-    }
-
-    ## NOTE: Significant content check - this is performed here since
-    ## |html| content model allows a block-level element - |body|.
-    push @$new_todos, {
-      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-      old_values => $old_values,
-      errors => $HTMLSignificantContentErrors,
-    };
-
-    return ($new_todos);
+    $HTMLChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{head} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $has_title;
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:minus',
-                             level => $self->{must_level});
-        } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'title') {
-          unless ($has_title) {
-            $has_title = 1;
-          } else {
-            $self->{onerror}->(node => $node,
-                               type => 'element not allowed:head title',
-                               level => $self->{must_level});
-          }
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
-          if ($todo->{node}->has_attribute_ns (undef, 'scoped')) {
-            $self->{onerror}->(node => $node,
-                               type => 'element not allowed:head style',
-                               level => $self->{must_level});
-          }
-        } elsif ($HTMLMetadataContent->{$node_ns}->{$node_ln}) {
-          #
-
-          ## NOTE: |meta| is a metadata content.  However, strictly speaking,
-          ## a |meta| element with none of |charset|, |name|,
-          ## or |http-equiv| attribute is not allowed.  It is non-conforming
-          ## anyway.
-        } else {
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:metadata',
-                             level => $self->{must_level});
-        }
-        local $todo->{flag}->{in_head} = 1;
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+  check_attrs => $GetHTMLAttrsChecker->({}),
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'title') {
+      unless ($element_state->{has_title}) {
+        $element_state->{has_title} = 1;
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:head title',
+                           level => $self->{must_level});
       }
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
+      if ($child_el->has_attribute_ns (undef, 'scoped')) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:head style',
+                           level => $self->{must_level});
+      }
+    } elsif ($HTMLMetadataContent->{$child_nsuri}->{$child_ln}) {
+      #
+      
+      ## NOTE: |meta| is a metadata content.  However, strictly speaking,
+      ## a |meta| element with none of |charset|, |name|,
+      ## or |http-equiv| attribute is not allowed.  It is non-conforming
+      ## anyway.
+    } else {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:metadata',
+                         level => $self->{must_level});
     }
-    unless ($has_title) {
-      $self->{onerror}->(node => $el, type => 'child element missing:title');
+    $element_state->{in_head_original} = $self->{flag}->{in_head};
+    $self->{flag}->{in_head} = 1;
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
     }
-    return ($new_todos);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    unless ($element_state->{has_title}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:title');
+    }
+    $self->{flag}->{in_head} = $element_state->{in_head_original};
+
+    $HTMLChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{title} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLTextChecker,
+  %HTMLTextChecker,
 };
 
 $Element->{$HTML_NS}->{base} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLEmptyChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
 
     if ($self->{has_base}) {
-      $self->{onerror}->(node => $todo->{node},
+      $self->{onerror}->(node => $item->{node},
                          type => 'element not allowed:base');
     } else {
       $self->{has_base} = 1;
     }
 
-    my $has_href = $todo->{node}->has_attribute_ns (undef, 'href');
-    my $has_target = $todo->{node}->has_attribute_ns (undef, 'target');
+    my $has_href = $item->{node}->has_attribute_ns (undef, 'href');
+    my $has_target = $item->{node}->has_attribute_ns (undef, 'target');
 
     if ($self->{has_uri_attr} and $has_href) {
       ## ISSUE: Are these examples conforming?
@@ -1177,7 +893,7 @@ $Element->{$HTML_NS}->{base} = {
       ## <script>location.href = 'relative';</script><base href>
       ## NOTE: <html manifest=".."><head><base href=""/> is conforming as
       ## an exception.
-      $self->{onerror}->(node => $todo->{node},
+      $self->{onerror}->(node => $item->{node},
                          type => 'basehref after URI attribute');
     }
     if ($self->{has_hyperlink_element} and $has_target) {
@@ -1188,57 +904,57 @@ $Element->{$HTML_NS}->{base} = {
       ## NOTE: These are non-conformant anyway because of |head|'s content model:
       ## <link href=""/><base target="name"/>
       ## <link rel=unknown href=""><base target=name>
-      $self->{onerror}->(node => $todo->{node},
+      $self->{onerror}->(node => $item->{node},
                          type => 'basetarget after hyperlink');
     }
 
     if (not $has_href and not $has_target) {
-      $self->{onerror}->(node => $todo->{node},
+      $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:href|target');
     }
 
     return $GetHTMLAttrsChecker->({
       href => $HTMLURIAttrChecker,
       target => $HTMLTargetAttrChecker,
-    })->($self, $todo);
+    })->($self, $item, $element_state);
   },
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{link} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLEmptyChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
       href => $HTMLURIAttrChecker,
-      rel => sub { $HTMLLinkTypesAttrChecker->(0, $todo, @_) },
+      rel => sub { $HTMLLinkTypesAttrChecker->(0, $item, @_) },
       media => $HTMLMQAttrChecker,
       hreflang => $HTMLLanguageTagAttrChecker,
       type => $HTMLIMTAttrChecker,
       ## NOTE: Though |title| has special semantics,
       ## syntactically same as the |title| as global attribute.
-    })->($self, $todo);
-    if ($todo->{node}->has_attribute_ns (undef, 'href')) {
-      $self->{has_hyperlink_element} = 1 if $todo->{has_hyperlink_link_type};
+    })->($self, $item, $element_state);
+    if ($item->{node}->has_attribute_ns (undef, 'href')) {
+      $self->{has_hyperlink_element} = 1 if $item->{has_hyperlink_link_type};
     } else {
-      $self->{onerror}->(node => $todo->{node},
+      $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:href');
     }
-    unless ($todo->{node}->has_attribute_ns (undef, 'rel')) {
-      $self->{onerror}->(node => $todo->{node},
+    unless ($item->{node}->has_attribute_ns (undef, 'rel')) {
+      $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:rel');
     }
   },
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{meta} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLEmptyChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     my $name_attr;
     my $http_equiv_attr;
     my $charset_attr;
     my $content_attr;
-    for my $attr (@{$todo->{node}->attributes}) {
+    for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
@@ -1287,7 +1003,7 @@ $Element->{$HTML_NS}->{meta} = {
       if (defined $content_attr) {
         $metadata_value = $content_attr->value;
       } else {
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:content');
         $metadata_value = '';
       }
@@ -1297,7 +1013,7 @@ $Element->{$HTML_NS}->{meta} = {
                            type => 'attribute not allowed');
       }
       unless (defined $content_attr) {
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:content');
       }
     } elsif (defined $charset_attr) {
@@ -1309,22 +1025,22 @@ $Element->{$HTML_NS}->{meta} = {
       if (defined $content_attr) {
         $self->{onerror}->(node => $content_attr,
                            type => 'attribute not allowed');
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:name|http-equiv');
       } else {
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:name|http-equiv|charset');
       }
     }
 
     my $check_charset_decl = sub () {
-      my $parent = $todo->{node}->manakai_parent_element;
+      my $parent = $item->{node}->manakai_parent_element;
       if ($parent and $parent eq $parent->owner_document->manakai_head) {
         for my $el (@{$parent->child_nodes}) {
           next unless $el->node_type == 1; # ELEMENT_NODE
-          unless ($el eq $todo->{node}) {
+          unless ($el eq $item->{node}) {
             ## NOTE: Not the first child element.
-            $self->{onerror}->(node => $todo->{node},
+            $self->{onerror}->(node => $item->{node},
                                type => 'element not allowed:meta charset',
                                level => $self->{must_level});
           }
@@ -1332,13 +1048,13 @@ $Element->{$HTML_NS}->{meta} = {
           ## NOTE: Entity references are not supported.
         }
       } else {
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'element not allowed:meta charset',
                            level => $self->{must_level});
       }
 
-      unless ($todo->{node}->owner_document->manakai_is_html) {
-        $self->{onerror}->(node => $todo->{node},
+      unless ($item->{node}->owner_document->manakai_is_html) {
+        $self->{onerror}->(node => $item->{node},
                            type => 'in XML:charset',
                            level => $self->{must_level});
       }
@@ -1354,7 +1070,7 @@ $Element->{$HTML_NS}->{meta} = {
 
       require Message::Charset::Info;
       my $charset = $Message::Charset::Info::IANACharset->{$charset_value};
-      my $ic = $todo->{node}->owner_document->input_encoding;
+      my $ic = $item->{node}->owner_document->input_encoding;
       if (defined $ic) {
         ## TODO: Test for this case
         my $ic_charset = $Message::Charset::Info::IANACharset->{$ic};
@@ -1464,333 +1180,278 @@ $Element->{$HTML_NS}->{meta} = {
       $check_charset->($charset_attr, $charset_attr->value);
     }
   },
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{style} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     type => $HTMLIMTAttrChecker, ## TODO: MUST be a styling language
     media => $HTMLMQAttrChecker,
     scoped => $GetHTMLBooleanAttrChecker->('scoped'),
     ## NOTE: |title| has special semantics for |style|s, but is syntactically
     ## not different
   }),
-  checker => sub {
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
     ## NOTE: |html:style| itself has no conformance creteria on content model.
-    my ($self, $todo) = @_;
-    my $type = $todo->{node}->get_attribute_ns (undef, 'type');
+    my $type = $item->{node}->get_attribute_ns (undef, 'type');
     if (not defined $type or
         $type =~ m[\A(?>(?>\x0D\x0A)?[\x09\x20])*[Tt][Ee][Xx][Tt](?>(?>\x0D\x0A)?[\x09\x20])*/(?>(?>\x0D\x0A)?[\x09\x20])*[Cc][Ss][Ss](?>(?>\x0D\x0A)?[\x09\x20])*\z]) {
-      my $el = $todo->{node};
-      my $new_todos = [];
-      my @nodes = (@{$el->child_nodes});
-      
-      my $ss_text = '';
-      while (@nodes) {
-        my $node = shift @nodes;
-        $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-        
-        my $nt = $node->node_type;
-        if ($nt == 1) {
-          my $node_ns = $node->namespace_uri;
-          $node_ns = '' unless defined $node_ns;
-          my $node_ln = $node->manakai_local_name;
-          if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-            #
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-          my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-          unshift @nodes, @$sib;
-          push @$new_todos, @$ch;
-        } elsif ($nt == 3 or $nt == 4) {
-          $ss_text .= $node->text_content;
-        } elsif ($nt == 5) {
-          unshift @nodes, @{$node->child_nodes};
-        }
-      }
-
-      $self->{onsubdoc}->({s => $ss_text, container_node => $el,
-                           media_type => 'text/css', is_char_string => 1});
-      return ($new_todos);
+      $element_state->{allow_element} = 0;
+      $element_state->{style_type} = 'text/css';
     } else {
-      $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
-                         type => 'style:'.$type); ## TODO: $type normalization
-      return $AnyChecker->($self, $todo);
+      $element_state->{allow_element} = 1; # unknown
+      $element_state->{style_type} = $type; ## TODO: $type normalization
     }
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{allow_element}) {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed');
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    $element_state->{text} .= $child_node->text_content;
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{style_type} eq 'text/css') {
+      $self->{onsubdoc}->({s => $element_state->{text},
+                           container_node => $item->{node},
+                           media_type => 'text/css', is_char_string => 1});
+    } else {
+      $self->{onerror}->(node => $item->{node}, level => 'unsupported',
+                         type => 'style:'.$element_state->{style_type});
+    }
+
+    $HTMLChecker{check_end}->(@_);
   },
 };
 ## ISSUE: Relationship to significant content check?
 
 $Element->{$HTML_NS}->{body} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLProseContentChecker,
+  %HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{section} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLProseContentChecker,
+  %HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{nav} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLProseContentChecker,
+  %HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{article} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLProseContentChecker,
+  %HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{blockquote} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLProseContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
   }),
-  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{aside} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLProseContentChecker,
+  %HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{h1} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-    $todo->{flag}->{has_descendant}->{hn} = 1;
-    return $HTMLPhrasingContentChecker->($self, $todo);
+  %HTMLPhrasingContentChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->{flag}->{has_hn} = 1;
   },
 };
 
-$Element->{$HTML_NS}->{h2} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{h1}->{checker},
-};
+$Element->{$HTML_NS}->{h2} = {%{$Element->{$HTML_NS}->{h1}}};
 
-$Element->{$HTML_NS}->{h3} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{h1}->{checker},
-};
+$Element->{$HTML_NS}->{h3} = {%{$Element->{$HTML_NS}->{h1}}};
 
-$Element->{$HTML_NS}->{h4} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{h1}->{checker},
-};
+$Element->{$HTML_NS}->{h4} = {%{$Element->{$HTML_NS}->{h1}}};
 
-$Element->{$HTML_NS}->{h5} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{h1}->{checker},
-};
+$Element->{$HTML_NS}->{h5} = {%{$Element->{$HTML_NS}->{h1}}};
 
-$Element->{$HTML_NS}->{h6} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{h1}->{checker},
-};
+$Element->{$HTML_NS}->{h6} = {%{$Element->{$HTML_NS}->{h1}}};
 
 ## TODO: Explicit sectioning is "encouraged".
 
 $Element->{$HTML_NS}->{header} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-
-    my $old_flags = {hn => $todo->{flag}->{has_descendant}->{hn}};
-    $todo->{flag}->{has_descendant}->{hn} = 0;
-
-    my $end = $self->_add_minuses
-        ({$HTML_NS => {qw/header 1 footer 1/}},
-         $HTMLSectioningContent);
-    my ($new_todos, $ch) = $HTMLProseContentChecker->($self, $todo);
-    push @$new_todos, $end,
-        {type => 'descendant', node => $todo->{node},
-         flag => $todo->{flag}, old_values => $old_flags,
-         errors => {
-           hn => sub {
-             my ($self, $todo) = @_;
-             $self->{onerror}->(node => $todo->{node},
-                                type => 'element missing:hn');
-           },
-         }};
-    return ($new_todos, $ch);
-
-    ## ISSUE: <header><del><h1>...</h1></del></header> is conforming?
+  %HTMLProseContentChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state,
+                                {$HTML_NS => {qw/header 1 footer 1/}},
+                                $HTMLSectioningContent);
+    $element_state->{has_hn_original} = $self->{flag}->{has_hn};
+    $self->{flag}->{has_hn} = 0;
   },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+    unless ($self->{flag}->{has_hn}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:hn');
+    }
+    $self->{flag}->{has_hn} ||= $element_state->{has_hn_original};
+
+    $HTMLProseContentChecker{check_end}->(@_);
+  },
+  ## ISSUE: <header><del><h1>...</h1></del></header> is conforming?
 };
 
 $Element->{$HTML_NS}->{footer} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLProseContentChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state,
+                                {$HTML_NS => {footer => 1}},
+                                $HTMLSectioningContent, $HTMLHeadingContent);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
 
-    my $old_flags = {hn => $todo->{flag}->{has_descendant}->{hn}};
-    $todo->{flag}->{has_descendant}->{hn} = 0;
-
-    my $end = $self->_add_minuses
-        ({$HTML_NS => {footer => 1}},
-         $HTMLSectioningContent, $HTMLHeadingContent);
-    my ($new_todos, $ch) = $HTMLProseContentChecker->($self, $todo);
-    push @$new_todos, $end;
-
-    return ($new_todos, $ch);
+    $HTMLProseContentChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{address} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLProseContentChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state,
+                                {$HTML_NS => {footer => 1, address => 1}},
+                                $HTMLSectioningContent, $HTMLHeadingContent);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
 
-    my $old_flags = {hn => $todo->{flag}->{has_descendant}->{hn}};
-    $todo->{flag}->{has_descendant}->{hn} = 0;
-
-    my $end = $self->_add_minuses
-        ({$HTML_NS => {footer => 1, address => 1}},
-         $HTMLSectioningContent, $HTMLHeadingContent);
-    my ($new_todos, $ch) = $HTMLProseContentChecker->($self, $todo);
-    push @$new_todos, $end;
-
-    return ($new_todos, $ch);
+    $HTMLProseContentChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{p} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{hr} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLEmptyChecker,
+  %HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{br} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLEmptyChecker,
+  %HTMLEmptyChecker,
   ## NOTE: Blank line MUST NOT be used for presentation purpose.
   ## (This requirement is semantic so that we cannot check.)
 };
 
 $Element->{$HTML_NS}->{dialog} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $phase = 'before dt';
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        ## NOTE: |minuses| list is not checked since redundant
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($phase eq 'before dt') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
-            $phase = 'before dd';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
-            $self->{onerror}
-              ->(node => $node, type => 'ps element missing:dt');
-            $phase = 'before dt';
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        } else { # before dd
-          if ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
-            $phase = 'before dt';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
-            $self->{onerror}
-              ->(node => $node, type => 'ps element missing:dd');
-            $phase = 'before dd';
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        }
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+  %HTMLChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{phase} = 'before dt';
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{phase} eq 'before dt') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+        $element_state->{phase} = 'before dd';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+        $self->{onerror}
+            ->(node => $child_el, type => 'ps element missing:dt');
+        $element_state->{phase} = 'before dt';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
       }
+    } elsif ($element_state->{phase} eq 'before dd') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+        $element_state->{phase} = 'before dt';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+        $self->{onerror}
+            ->(node => $child_el, type => 'ps element missing:dd');
+        $element_state->{phase} = 'before dd';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } else {
+      die "check_child_element: Bad |dialog| phase: $element_state->{phase}";
     }
-    if ($phase eq 'before dd') {
-      $self->{onerror}->(node => $el, type => 'child element missing:dd');
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
     }
-    return ($new_todos);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{phase} eq 'before dd') {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:dd');
+    }
+
+    $HTMLChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{pre} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{ol} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     start => $HTMLIntegerAttrChecker,
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        ## NOTE: |minuses| list is not checked since redundant
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif (not ($node_ns eq $HTML_NS and $node_ln eq 'li')) {
-          $self->{onerror}->(node => $node, type => 'element not allowed');
-        }
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'li') {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed');
     }
-
-    if ($todo->{inline}) {
-      for (@$new_todos) {
-        $_->{inline} = 1;
-      }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
     }
-    return ($new_todos);
   },
 };
 
 $Element->{$HTML_NS}->{ul} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{ol}->{checker},
+  %{$Element->{$HTML_NS}->{ol}},
 };
 
 $Element->{$HTML_NS}->{li} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLProseContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     start => sub {
       my ($self, $attr) = @_;
       my $parent = $attr->owner_element->manakai_parent_element;
@@ -1806,104 +1467,101 @@ $Element->{$HTML_NS}->{li} = {
       $HTMLIntegerAttrChecker->($self, $attr);
     },
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    if ($todo->{flag}->{in_menu}) {
-      return $HTMLPhrasingContentChecker->($self, $todo);
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{flag}->{in_menu}) {
+      $HTMLPhrasingContentChecker{check_child_element}->(@_);
     } else {
-      return $HTMLProseContentChecker->($self, $todo);
+      $HTMLProseContentChecker{check_child_element}->(@_);
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($self->{flag}->{in_menu}) {
+      $HTMLPhrasingContentChecker{check_child_text}->(@_);
+    } else {
+      $HTMLProseContentChecker{check_child_text}->(@_);
     }
   },
 };
 
 $Element->{$HTML_NS}->{dl} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $phase = 'before dt';
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        ## NOTE: |minuses| list is not checked since redundant
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($phase eq 'in dds') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
-            #$phase = 'in dds';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
-            $phase = 'in dts';
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        } elsif ($phase eq 'in dts') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
-            #$phase = 'in dts';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
-            $phase = 'in dds';
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        } else { # before dt
-          if ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
-            $phase = 'in dts';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
-            $self->{onerror}
-              ->(node => $node, type => 'ps element missing:dt');
-            $phase = 'in dds';
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        }
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+  %HTMLChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{phase} = 'before dt';
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{phase} eq 'in dds') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+        #$element_state->{phase} = 'in dds';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+        $element_state->{phase} = 'in dts';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
       }
+    } elsif ($element_state->{phase} eq 'in dts') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+        #$element_state->{phase} = 'in dts';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+        $element_state->{phase} = 'in dds';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } elsif ($element_state->{phase} eq 'before dt') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+        $element_state->{phase} = 'in dts';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+        $self->{onerror}
+             ->(node => $child_el, type => 'ps element missing:dt');
+        $element_state->{phase} = 'in dds';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } else {
+      die "check_child_element: Bad |dl| phase: $element_state->{phase}";
     }
-    if ($phase eq 'in dts') {
-      $self->{onerror}->(node => $el, type => 'child element missing:dd');
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{phase} eq 'in dts') {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:dd');
     }
 
-    if ($todo->{inline}) {
-      for (@$new_todos) {
-        $_->{inline} = 1;
-      }
-    }
-    return ($new_todos);
+    $HTMLChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{dt} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{dd} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLProseContentChecker,
+  %HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{a} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLPhrasingContentChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     my %attr;
-    for my $attr (@{$todo->{node}->attributes}) {
+    for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
@@ -1913,7 +1571,7 @@ $Element->{$HTML_NS}->{a} = {
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
-                     rel => sub { $HTMLLinkTypesAttrChecker->(1, $todo, @_) },
+                     rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
                      media => $HTMLMQAttrChecker,
                      hreflang => $HTMLLanguageTagAttrChecker,
                      type => $HTMLIMTAttrChecker,
@@ -1935,8 +1593,10 @@ $Element->{$HTML_NS}->{a} = {
       }
     }
 
+    $element_state->{in_a_href_original} = $self->{flag}->{in_a_href};
     if (defined $attr{href}) {
       $self->{has_hyperlink_element} = 1;
+      $self->{flag}->{in_a_href} = 1;
     } else {
       for (qw/target ping rel media hreflang type/) {
         if (defined $attr{$_}) {
@@ -1946,63 +1606,52 @@ $Element->{$HTML_NS}->{a} = {
       }
     }
   },
-  checker => sub {
-    my ($self, $todo) = @_;
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
 
-    my $end = $self->_add_minuses ($HTMLInteractiveContent);
-    my ($new_todos, $ch) = $HTMLPhrasingContentChecker->($self, $todo);
-    push @$new_todos, $end;
-
-    if ($todo->{node}->has_attribute_ns (undef, 'href')) {
-      $_->{flag}->{in_a_href} = 1 for @$new_todos;
-    }
-
-    return ($new_todos, $ch);
+    $HTMLPhrasingContentChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{q} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLPhrasingContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
   }),
-  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{cite} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{em} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{strong} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{small} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{mark} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{dfn} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLPhrasingContentChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {dfn => 1}});
 
-    my $end = $self->_add_minuses ({$HTML_NS => {dfn => 1}});
-    my ($sib, $ch) = $HTMLPhrasingContentChecker->($self, $todo);
-    push @$sib, $end;
-
-    my $node = $todo->{node};
+    my $node = $item->{node};
     my $term = $node->get_attribute_ns (undef, 'title');
     unless (defined $term) {
       for my $child (@{$node->child_nodes}) {
@@ -2040,30 +1689,29 @@ $Element->{$HTML_NS}->{dfn} = {
     }
 ## ISSUE: The HTML5 algorithm does not work with |ruby| unless |dfn|
 ## has |title|.
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
 
-    return ($sib, $ch);
+    $HTMLPhrasingContentChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{abbr} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
-    ## NOTE: |title| has special semantics for |abbr|s, but is syntactically
-    ## not different.  The spec says that the |title| MAY be omitted
-    ## if there is a |dfn| whose defining term is the abbreviation,
-    ## but it does not prohibit |abbr| w/o |title| in other cases.
-  }),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{time} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLPhrasingContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     datetime => sub { 1 }, # checked in |checker|
   }),
   ## TODO: Write tests
-  checker => sub {
-    my ($self, $todo) = @_;
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
 
-    my $attr = $todo->{node}->get_attribute_node_ns (undef, 'datetime');
+    my $attr = $item->{node}->get_attribute_node_ns (undef, 'datetime');
     my $input;
     my $reg_sp;
     my $input_node;
@@ -2072,9 +1720,9 @@ $Element->{$HTML_NS}->{time} = {
       $reg_sp = qr/[\x09-\x0D\x20]*/;
       $input_node = $attr;
     } else {
-      $input = $todo->{node}->text_content;
+      $input = $item->{node}->text_content;
       $reg_sp = qr/\p{Zs}*/;
-      $input_node = $todo->{node};
+      $input_node = $item->{node};
 
       ## ISSUE: What is the definition for "successfully extracts a date
       ## or time"?  If the algorithm says the string is invalid but
@@ -2182,12 +1830,13 @@ $Element->{$HTML_NS}->{time} = {
                          type => 'dateortime:syntax error');
     }
 
-    return $HTMLPhrasingContentChecker->($self, $todo);
+    $HTMLPhrasingContentChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the value is to include it as contents of the element"
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLPhrasingContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     value => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
     min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
     low => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
@@ -2195,82 +1844,63 @@ $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the va
     max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
     optimum => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
   }),
-  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{progress} = { ## TODO: recommended to use content
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLPhrasingContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     value => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift >= 0 }),
     max => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift > 0 }),
   }),
-  checker => $HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{code} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  ## NOTE: Though |title| has special semantics,
-  ## syntatically same as the |title| as global attribute.
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{var} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  ## NOTE: Though |title| has special semantics,
-  ## syntatically same as the |title| as global attribute.
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{samp} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  ## NOTE: Though |title| has special semantics,
-  ## syntatically same as the |title| as global attribute.
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{kbd} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{sub} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{sup} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{span} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  ## NOTE: Though |title| has special semantics,
-  ## syntatically same as the |title| as global attribute.
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{i} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  ## NOTE: Though |title| has special semantics,
-  ## syntatically same as the |title| as global attribute.
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{b} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{bdo} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
-    $GetHTMLAttrsChecker->({})->($self, $todo);
-    unless ($todo->{node}->has_attribute_ns (undef, 'dir')) {
-      $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:dir');
+  %HTMLPhrasingContentChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
+    $GetHTMLAttrsChecker->({})->($self, $item, $element_state);
+    unless ($item->{node}->has_attribute_ns (undef, 'dir')) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing:dir');
     }
   },
   ## ISSUE: The spec does not directly say that |dir| is a enumerated attr.
-  checker => $HTMLPhrasingContentChecker,
 };
 
 =pod
@@ -2297,31 +1927,37 @@ $Element->{$HTML_NS}->{bdo} = {
 =cut
 
 $Element->{$HTML_NS}->{ins} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLTransparentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
     datetime => $HTMLDatetimeAttrChecker,
   }),
-  checker => $HTMLTransparentChecker,
 };
 
 $Element->{$HTML_NS}->{del} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLTransparentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
     datetime => $HTMLDatetimeAttrChecker,
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $sig_flag = $todo->{flag}->{has_descendant}->{significant};
-    my ($new_todos) = $HTMLTransparentChecker->($self, $todo);
-    push @$new_todos, {type => 'code', code => sub {
-                         $todo->{flag}->{has_descendant}->{significant} = 0;
-                       }} if not $sig_flag;
-    return $new_todos;
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{has_significant}) {
+      ## NOTE: Significantness flag does not propagate.
+    } elsif ($item->{transparent}) {
+      #
+    } else {
+      $self->{onerror}->(node => $item->{node},
+                         level => $self->{should_level},
+                         type => 'no significant content');
+    }
   },
 };
 
 $Element->{$HTML_NS}->{figure} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  %HTMLProseContentChecker,
+
+## TODO: Reimplement
   checker => sub {
     ## NOTE: legend, Prose | Prose, legend
 
@@ -2381,9 +2017,6 @@ $Element->{$HTML_NS}->{figure} = {
         } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
           $has_non_style = 1;
           $has_non_legend = 1;
-          if ($HTMLEmbeddedContent->{$node_ns}->{$node_ln}) {
-            $todo->{flag}->{has_descendant}->{significant} = 1;
-          }
         } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
           #
         } else {
@@ -2423,7 +2056,7 @@ $Element->{$HTML_NS}->{figure} = {
     push @$new_todos, {
       type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
       old_values => $old_values,
-      errors => $HTMLSignificantContentErrors,
+#      errors => $HTMLSignificantContentErrors,
     };
     
     return ($new_todos);
@@ -2432,55 +2065,49 @@ $Element->{$HTML_NS}->{figure} = {
 ## TODO: Test for <nest/> in <figure/>
 
 $Element->{$HTML_NS}->{img} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLEmptyChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
       alt => sub { }, ## NOTE: No syntactical requirement
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
       ismap => sub {
-        my ($self, $attr, $parent_todo) = @_;
-        if (not $todo->{flag}->{in_a_href}) {
+        my ($self, $attr, $parent_item) = @_;
+        if (not $self->{flag}->{in_a_href}) {
           $self->{onerror}->(node => $attr,
                              type => 'attribute not allowed:ismap');
         }
-        $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_todo);
+        $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
       ## TODO: height
       ## TODO: width
-    })->($self, $todo);
-    unless ($todo->{node}->has_attribute_ns (undef, 'alt')) {
-      $self->{onerror}->(node => $todo->{node},
+    })->($self, $item);
+    unless ($item->{node}->has_attribute_ns (undef, 'alt')) {
+      $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:alt',
                          level => $self->{should_level});
     }
-    unless ($todo->{node}->has_attribute_ns (undef, 'src')) {
-      $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:src');
+    unless ($item->{node}->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing:src');
     }
-  },
-  checker => sub {
-    my ($self, $todo) = @_;
-    $todo->{flag}->{has_descendant}->{significant} = 1;
-    return $HTMLEmptyChecker->($self, $todo);
   },
 };
 
 $Element->{$HTML_NS}->{iframe} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLTextChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     src => $HTMLURIAttrChecker,
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    $todo->{flag}->{has_descendant}->{significant} = 1;
-    return $HTMLTextChecker->($self, $todo);
-  },
 };
 
 $Element->{$HTML_NS}->{embed} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLEmptyChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     my $has_src;
-    for my $attr (@{$todo->{node}->attributes}) {
+    for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
@@ -2510,34 +2137,32 @@ $Element->{$HTML_NS}->{embed} = {
     }
 
     unless ($has_src) {
-      $self->{onerror}->(node => $todo->{node},
+      $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:src');
     }
-  },
-  checker => sub {
-    my ($self, $todo) = @_;
-    $todo->{flag}->{has_descendant}->{significant} = 1;
-    return $HTMLEmptyChecker->($self, $todo);
   },
 };
 
 $Element->{$HTML_NS}->{object} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLTransparentChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
       data => $HTMLURIAttrChecker,
       type => $HTMLIMTAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
       ## TODO: width
       ## TODO: height
-    })->($self, $todo);
-    unless ($todo->{node}->has_attribute_ns (undef, 'data')) {
-      unless ($todo->{node}->has_attribute_ns (undef, 'type')) {
-        $self->{onerror}->(node => $todo->{node},
+    })->($self, $item);
+    unless ($item->{node}->has_attribute_ns (undef, 'data')) {
+      unless ($item->{node}->has_attribute_ns (undef, 'type')) {
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:data|type');
       }
     }
   },
+
+## TODO: reimplement
   checker => sub {
     ## NOTE: param*, transparent (Prose)
 
@@ -2581,9 +2206,6 @@ $Element->{$HTML_NS}->{object} = {
         } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
           $has_non_style = 1;
           $has_non_param = 1;
-          if ($HTMLEmbeddedContent->{$node_ns}->{$node_ln}) {
-            $todo->{flag}->{has_descendant}->{significant} = 1;
-          }
         } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
           #
         } else {
@@ -2611,7 +2233,7 @@ $Element->{$HTML_NS}->{object} = {
     push @$new_todos, {
       type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
       old_values => {significant => 1}, # |object| itself
-      errors => $HTMLSignificantContentErrors,
+#      errors => $HTMLSignificantContentErrors,
     };
     
     return ($new_todos);
@@ -2620,26 +2242,27 @@ $Element->{$HTML_NS}->{object} = {
 };
 
 $Element->{$HTML_NS}->{param} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLEmptyChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
       name => sub { },
       value => sub { },
-    })->($self, $todo);
-    unless ($todo->{node}->has_attribute_ns (undef, 'name')) {
-      $self->{onerror}->(node => $todo->{node},
+    })->($self, $item);
+    unless ($item->{node}->has_attribute_ns (undef, 'name')) {
+      $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:name');
     }
-    unless ($todo->{node}->has_attribute_ns (undef, 'value')) {
-      $self->{onerror}->(node => $todo->{node},
+    unless ($item->{node}->has_attribute_ns (undef, 'value')) {
+      $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:value');
     }
   },
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{video} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLTransparentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     src => $HTMLURIAttrChecker,
     ## TODO: start, loopstart, loopend, end
     ## ISSUE: they MUST be "value time offset"s.  Value?
@@ -2649,56 +2272,55 @@ $Element->{$HTML_NS}->{video} = {
     poster => $HTMLURIAttrChecker, ## TODO: not for audio!
     ## TODO: width, height (not for audio!)
   }),
+
+## TODO: reimplement
   checker => sub {
     my ($self, $todo) = @_;
     $todo->{flag}->{has_descendant}->{significant} = 1;
 
 ## TODO:
     if ($todo->{node}->has_attribute_ns (undef, 'src')) {
-      return $HTMLProseContentChecker->($self, $todo);
+#      return $HTMLProseContentChecker->($self, $todo);
     } else {
-      return $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'source')
-        ->($self, $todo);
+#      return $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'source')
+#        ->($self, $todo);
     }
   },
 };
 
 $Element->{$HTML_NS}->{audio} = {
-  attrs_checker => $Element->{$HTML_NS}->{video}->{attrs_checker},
-  checker => $Element->{$HTML_NS}->{video}->{checker},
+  %{$Element->{$HTML_NS}->{video}},
+## TODO: Is there audio-only attribute?
 };
 
 $Element->{$HTML_NS}->{source} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLEmptyChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
       src => $HTMLURIAttrChecker,
       type => $HTMLIMTAttrChecker,
       media => $HTMLMQAttrChecker,
-    })->($self, $todo);
-    unless ($todo->{node}->has_attribute_ns (undef, 'src')) {
-      $self->{onerror}->(node => $todo->{node},
+    })->($self, $item, $element_state);
+    unless ($item->{node}->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:src');
     }
   },
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{canvas} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLTransparentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    $todo->{flag}->{has_descendant}->{significant} = 1;
-    return $HTMLTransparentChecker->($self, $todo);
-  },
 };
 
 $Element->{$HTML_NS}->{map} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLProseContentChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     my $has_id;
     $GetHTMLAttrsChecker->({
       id => sub {
@@ -2722,19 +2344,19 @@ $Element->{$HTML_NS}->{map} = {
         $self->{map}->{$value} ||= $attr;
         $has_id = 1;
       },
-    })->($self, $todo);
-    $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:id')
+    })->($self, $item, $element_state);
+    $self->{onerror}->(node => $item->{node}, type => 'attribute missing:id')
         unless $has_id;
   },
-  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{area} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLEmptyChecker,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
     my %attr;
     my $coords;
-    for my $attr (@{$todo->{node}->attributes}) {
+    for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
@@ -2762,7 +2384,7 @@ $Element->{$HTML_NS}->{area} = {
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
-                     rel => sub { $HTMLLinkTypesAttrChecker->(1, $todo, @_) },
+                     rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
                      media => $HTMLMQAttrChecker,
                      hreflang => $HTMLLanguageTagAttrChecker,
                      type => $HTMLIMTAttrChecker,
@@ -2787,7 +2409,7 @@ $Element->{$HTML_NS}->{area} = {
     if (defined $attr{href}) {
       $self->{has_hyperlink_element} = 1;
       unless (defined $attr{alt}) {
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:alt');
       }
     } else {
@@ -2826,7 +2448,7 @@ $Element->{$HTML_NS}->{area} = {
           ## NOTE: A syntax error has been reported.
         }
       } else {
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:coords');
       }
     } elsif ($shape eq 'default') {
@@ -2850,7 +2472,7 @@ $Element->{$HTML_NS}->{area} = {
           ## NOTE: A syntax error has been reported.
         }
       } else {
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:coords');
       }
     } elsif ($shape eq 'rectangle') {
@@ -2873,323 +2495,277 @@ $Element->{$HTML_NS}->{area} = {
           ## NOTE: A syntax error has been reported.
         }
       } else {
-        $self->{onerror}->(node => $todo->{node},
+        $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:coords');
       }
     }
   },
-  checker => $HTMLEmptyChecker,
 };
 ## TODO: only in map
 
 $Element->{$HTML_NS}->{table} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $phase = 'before caption';
-    my $has_tfoot;
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        ## NOTE: |minuses| list is not checked since redundant
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($phase eq 'in tbodys') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
-            #$phase = 'in tbodys';
-          } elsif (not $has_tfoot and
-                   $node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
-            $phase = 'after tfoot';
-            $has_tfoot = 1;
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        } elsif ($phase eq 'in trs') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
-            #$phase = 'in trs';
-          } elsif (not $has_tfoot and
-                   $node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
-            $phase = 'after tfoot';
-            $has_tfoot = 1;
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        } elsif ($phase eq 'after thead') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
-            $phase = 'in tbodys';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
-            $phase = 'in trs';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
-            $phase = 'in tbodys';
-            $has_tfoot = 1;
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        } elsif ($phase eq 'in colgroup') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'colgroup') {
-            $phase = 'in colgroup';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'thead') {
-            $phase = 'after thead';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
-            $phase = 'in tbodys';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
-            $phase = 'in trs';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
-            $phase = 'in tbodys';
-            $has_tfoot = 1;
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        } elsif ($phase eq 'before caption') {
-          if ($node_ns eq $HTML_NS and $node_ln eq 'caption') {
-            $phase = 'in colgroup';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'colgroup') {
-            $phase = 'in colgroup';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'thead') {
-            $phase = 'after thead';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
-            $phase = 'in tbodys';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
-            $phase = 'in trs';
-          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
-            $phase = 'in tbodys';
-            $has_tfoot = 1;
-          } else {
-            $self->{onerror}->(node => $node, type => 'element not allowed');
-          }
-        } else { # after tfoot
-          $self->{onerror}->(node => $node, type => 'element not allowed');
-        }
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+  %HTMLChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{phase} = 'before caption';
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{phase} eq 'in tbodys') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'tbody') {
+        #$element_state->{phase} = 'in tbodys';
+      } elsif (not $element_state->{has_tfoot} and
+               $child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+        $element_state->{phase} = 'after tfoot';
+        $element_state->{has_tfoot} = 1;
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
       }
+    } elsif ($element_state->{phase} eq 'in trs') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+        #$element_state->{phase} = 'in trs';
+      } elsif (not $element_state->{has_tfoot} and
+               $child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+        $element_state->{phase} = 'after tfoot';
+        $element_state->{has_tfoot} = 1;
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } elsif ($element_state->{phase} eq 'after thead') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'tbody') {
+        $element_state->{phase} = 'in tbodys';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+        $element_state->{phase} = 'in trs';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+        $element_state->{phase} = 'in tbodys';
+        $element_state->{has_tfoot} = 1;
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } elsif ($element_state->{phase} eq 'in colgroup') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'colgroup') {
+        $element_state->{phase} = 'in colgroup';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'thead') {
+        $element_state->{phase} = 'after thead';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tbody') {
+        $element_state->{phase} = 'in tbodys';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+        $element_state->{phase} = 'in trs';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+        $element_state->{phase} = 'in tbodys';
+        $element_state->{has_tfoot} = 1;
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } elsif ($element_state->{phase} eq 'before caption') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'caption') {
+        $element_state->{phase} = 'in colgroup';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'colgroup') {
+        $element_state->{phase} = 'in colgroup';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'thead') {
+        $element_state->{phase} = 'after thead';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tbody') {
+        $element_state->{phase} = 'in tbodys';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+        $element_state->{phase} = 'in trs';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+        $element_state->{phase} = 'in tbodys';
+        $element_state->{has_tfoot} = 1;
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } elsif ($element_state->{phase} eq 'after tfoot') {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed');
+    } else {
+      die "check_child_element: Bad |table| phase: $element_state->{phase}";
     }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
 
     ## Table model errors
     require Whatpm::HTMLTable;
-    Whatpm::HTMLTable->form_table ($todo->{node}, sub {
+    Whatpm::HTMLTable->form_table ($item->{node}, sub {
       my %opt = @_;
       $self->{onerror}->(type => 'table:'.$opt{type}, node => $opt{node});
     });
-    push @{$self->{return}->{table}}, $todo->{node};
+    push @{$self->{return}->{table}}, $item->{node};
 
-    return ($new_todos);
+    $HTMLChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{caption} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{colgroup} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLEmptyChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
       ## NOTE: Defined only if "the |colgroup| element contains no |col| elements"
       ## TODO: "attribute not supported" if |col|.
       ## ISSUE: MUST NOT if any |col|?
       ## ISSUE: MUST NOT for |<colgroup span="1"><any><col/></any></colgroup>| (though non-conforming)?
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        ## NOTE: |minuses| list is not checked since redundant
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif (not ($node_ns eq $HTML_NS and $node_ln eq 'col')) {
-          $self->{onerror}->(node => $node, type => 'element not allowed');
-        }
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'col') {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed');
     }
-    return ($new_todos);
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
+    }
   },
 };
 
 $Element->{$HTML_NS}->{col} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLEmptyChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
   }),
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{tbody} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $has_tr;
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        ## NOTE: |minuses| list is not checked since redundant
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
-          $has_tr = 1;
-        } else {
-          $self->{onerror}->(node => $node, type => 'element not allowed');
-        }
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
+  %HTMLChecker,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+      $element_state->{has_tr} = 1;
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed');
     }
-    unless ($has_tr) {
-      $self->{onerror}->(node => $el, type => 'child element missing:tr');
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
     }
-    return ($new_todos);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    unless ($element_state->{has_tr}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:tr');
+    }
+
+    $HTMLChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{thead} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{tbody}->{checker},
+  %{$Element->{$HTML_NS}->{tbody}},
 };
 
 $Element->{$HTML_NS}->{tfoot} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{tbody}->{checker},
+  %{$Element->{$HTML_NS}->{tbody}},
 };
 
 $Element->{$HTML_NS}->{tr} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $has_td;
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        ## NOTE: |minuses| list is not checked since redundant
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($node_ns eq $HTML_NS and
-                 ($node_ln eq 'td' or $node_ln eq 'th')) {
-          $has_td = 1;
-        } else {
-          $self->{onerror}->(node => $node, type => 'element not allowed');
-        }
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
+  %HTMLChecker,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and
+             ($child_ln eq 'td' or $child_ln eq 'th')) {
+      $element_state->{has_cell} = 1;
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed');
     }
-    unless ($has_td) {
-      $self->{onerror}->(node => $el, type => 'child element missing:td|th');
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
     }
-    return ($new_todos);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    unless ($element_state->{has_cell}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:td|th');
+    }
+
+    $HTMLChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{td} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLProseContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
   }),
-  checker => $HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{th} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLPhrasingContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker
         ->({row => 1, col => 1, rowgroup => 1, colgroup => 1}),
   }),
-  checker => $HTMLPhrasingContentChecker,
 };
 
 ## TODO: forms
 ## TODO: Tests for <nest/> in form elements
 
 $Element->{$HTML_NS}->{script} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
       src => $HTMLURIAttrChecker,
       defer => $GetHTMLBooleanAttrChecker->('defer'),
       async => $GetHTMLBooleanAttrChecker->('async'),
       type => $HTMLIMTAttrChecker,
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
 
-    if ($todo->{node}->has_attribute_ns (undef, 'src')) {
-      return $HTMLEmptyChecker->($self, $todo);
+    if ($item->{node}->has_attribute_ns (undef, 'src')) {
+      $element_state->{must_be_empty} = 1;
     } else {
       ## NOTE: No content model conformance in HTML5 spec.
-      my $type = $todo->{node}->get_attribute_ns (undef, 'type');
-      my $language = $todo->{node}->get_attribute_ns (undef, 'language');
+      my $type = $item->{node}->get_attribute_ns (undef, 'type');
+      my $language = $item->{node}->get_attribute_ns (undef, 'language');
       if ((defined $type and $type eq '') or
           (defined $language and $language eq '')) {
         $type = 'text/javascript';
@@ -3200,9 +2776,41 @@ $Element->{$HTML_NS}->{script} = {
       } else {
         $type = 'text/javascript';
       }
-      $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
-                         type => 'script:'.$type); ## TODO: $type normalization
-      return $AnyChecker->($self, $todo);
+      $element_state->{script_type} = $type; ## TODO: $type normalization
+    }
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } else {
+      if ($element_state->{must_be_empty}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed');
+      }
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant and
+        $element_state->{must_be_empty}) {
+      $self->{onerror}->(node => $child_node,
+                         type => 'character not allowed');
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    unless ($element_state->{must_be_empty}) {
+      $self->{onerror}->(node => $item->{node}, level => 'unsupported',
+                         type => 'script:'.$element_state->{script_type});
+      ## TODO: text/javascript support
+      
+      $HTMLChecker{check_end}->(@_);
     }
   },
 };
@@ -3210,208 +2818,199 @@ $Element->{$HTML_NS}->{script} = {
 
 ## NOTE: When script is disabled.
 $Element->{$HTML_NS}->{noscript} = {
-  attrs_checker => sub {
-    my ($self, $todo) = @_;
+  %HTMLTransparentChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
 
-    ## NOTE: This check is inserted in |attrs_checker|, rather than |checker|,
-    ## since the later is not invoked when the |noscript| is used as a
-    ## transparent element.
-    unless ($todo->{node}->owner_document->manakai_is_html) {
-      $self->{onerror}->(node => $todo->{node}, type => 'in XML:noscript');
+    unless ($item->{node}->owner_document->manakai_is_html) {
+      $self->{onerror}->(node => $item->{node}, type => 'in XML:noscript');
     }
 
-    $GetHTMLAttrsChecker->({})->($self, $todo);
+    unless ($self->{flag}->{in_head}) {
+      $self->_add_minus_elements ($element_state,
+                                  {$HTML_NS => {noscript => 1}});
+    }
   },
-  checker => sub {
-    my ($self, $todo) = @_;
-
-    if ($todo->{flag}->{in_head}) {
-      my $new_todos = [];
-      my @nodes = (@{$todo->{node}->child_nodes});
-      
-      while (@nodes) {
-        my $node = shift @nodes;
-        $self->_remove_minuses ($node) and next if ref $node eq 'HASH'; 
-        
-        my $nt = $node->node_type;
-        if ($nt == 1) {
-          my $node_ns = $node->namespace_uri;
-          $node_ns = '' unless defined $node_ns;
-          my $node_ln = $node->manakai_local_name;
-          if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-            #
-          } elsif ($node_ns eq $HTML_NS) {
-            if ($node_ln eq 'link') {
-              #
-            } elsif ($node_ln eq 'style') {
-              if ($node->has_attribute_ns (undef, 'scoped')) {
-                $self->{onerror}->(node => $node,
-                                   type => 'element not allowed:head noscript',
-                                   level => $self->{must_level});
-              }
-            } elsif ($node_ln eq 'meta') {
-              if ($node->has_attribute_ns (undef, 'charset')) {
-                ## NOTE: Non-conforming.  An error is raised by
-                ## |meta|'s checker.
-              } else {
-                my $http_equiv_attr
-                    = $node->get_attribute_node_ns (undef, 'http-equiv');
-                if ($http_equiv_attr) {
-                  ## TODO: case
-                  if (lc $http_equiv_attr->value eq 'content-type') {
-                    ## NOTE: Non-conforming.  An error is raised by
-                    ## |meta|'s checker.
-                  } else {
-                    #
-                  }
-                } else {
-                  $self->{onerror}->(node => $node,
-                                     type => 'element not allowed:head noscript',
-                                     level => $self->{must_level});
-                }
-              }
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{flag}->{in_head}) {
+      if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:minus',
+                           level => $self->{must_level});
+      } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+        #
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'link') {
+        #
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
+        if ($child_el->has_attribute_ns (undef, 'scoped')) {
+          $self->{onerror}->(node => $child_el,
+                             type => 'element not allowed:head noscript',
+                             level => $self->{must_level});
+        }
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'meta') {
+        if ($child_el->has_attribute_ns (undef, 'charset')) {
+          ## NOTE: Non-conforming.  An error is raised by
+          ## |meta|'s checker.
+        } else {
+          my $http_equiv_attr
+              = $child_el->get_attribute_node_ns (undef, 'http-equiv');
+          if ($http_equiv_attr) {
+            ## TODO: case
+            if (lc $http_equiv_attr->value eq 'content-type') {
+              ## NOTE: Non-conforming.  An error is raised by
+              ## |meta|'s checker.
             } else {
-              $self->{onerror}->(node => $node,
-                                 type => 'element not allowed:head noscript',
-                                 level => $self->{must_level});
+              #
             }
           } else {
-            $self->{onerror}->(node => $node,
+            $self->{onerror}->(node => $child_el,
                                type => 'element not allowed:head noscript',
                                level => $self->{must_level});
           }
-
-          my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-          unshift @nodes, @$sib;
-          push @$new_todos, @$ch;
-        } elsif ($nt == 3 or $nt == 4) {
-          if ($node->data =~ /[^\x09-\x0D\x20]/) {
-            $self->{onerror}->(node => $node, type => 'character not allowed');
-            $todo->{flag}->{has_descendant}->{significant} = 1;
-          }
-        } elsif ($nt == 5) {
-          unshift @nodes, @{$node->child_nodes};
         }
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:head noscript',
+                           level => $self->{must_level});
       }
-      return ($new_todos);
     } else {
-      my $end = $self->_add_minuses ({$HTML_NS => {noscript => 1}});
-      my ($sib, $ch) = $HTMLTransparentChecker->($self, $todo);
-      push @$sib, $end;
-      return ($sib, $ch);
+      $HTMLTransparentChecker{check_child_element}->(@_);
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($self->{flag}->{in_head}) {
+      if ($has_significant) {
+        $self->{onerror}->(node => $child_node,
+                           type => 'character not allowed');
+      }
+    } else {
+      $HTMLTransparentChecker{check_child_text}->(@_);
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+    if ($self->{flag}->{in_head}) {
+      $HTMLChecker{check_end}->(@_);
+    } else {
+      $HTMLPhrasingContentChecker{check_end}->(@_);
     }
   },
 };
-
 ## ISSUE: Scripting is disabled: <head><noscript><html a></noscript></head>
 
 $Element->{$HTML_NS}->{'event-source'} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLEmptyChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     src => $HTMLURIAttrChecker,
   }),
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{details} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLProseContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     open => $GetHTMLBooleanAttrChecker->('open'),
   }),
   checker => sub {
     my ($self, $todo) = @_;
 
 ## TODO:
-    my ($sib, $ch)
-      = $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'legend')
-        ->($self, $todo);
-    return ($sib, $ch);
+#    my ($sib, $ch)
+#      = $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'legend')
+#        ->($self, $todo);
+#    return ($sib, $ch);
   },
 };
 
 $Element->{$HTML_NS}->{datagrid} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLProseContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
 
-    my $old_values = {significant =>
-                          $todo->{flag}->{has_descendant}->{significant}};
-    $todo->{flag}->{has_descendant}->{significant} = 0;
-
-    my $end = $self->_add_minuses ({$HTML_NS => {a => 1, datagrid => 1}});
-    
-    ## Prose -(text* table Prose*) | table | select | datalist | Empty
-    my $mode = 'any';
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH'; 
-      
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($mode eq 'prose') {
-          $not_allowed = 1
-              unless $HTMLProseContent->{$node_ns}->{$node_ln};
-        } elsif ($mode eq 'any') {
-          if ($node_ns eq $HTML_NS and
-              {table => 1, select => 1, datalist => 1}->{$node_ln}) {
-            $mode = 'none';
-          } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
-            $mode = 'prose';
-          } else {
-            $not_allowed = 1;
-          }
+    $self->_add_minus_elements ($element_state,
+                                {$HTML_NS => {a => 1, datagrid => 1}});
+    $element_state->{phase} = 'any';
+  },
+  ## Prose -(text* table Prose*) | table | select | datalist | Empty
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{phase} eq 'prose') {
+      if ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
+        if ($element_state->{has_element} and 
+            $child_nsuri eq $HTML_NS and
+            $child_ln eq 'table') {
+          $self->{onerror}->(node => $child_el,
+                             type => 'element not allowed');
         } else {
-          $not_allowed = 1;
+          #
         }
-        $self->{onerror}->(node => $node, type => 'element not allowed')
-            if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          if ($mode eq 'prose') {
-            #
-          } elsif ($mode eq 'any') {
-            $mode = 'prose';
-          } else {
-            $self->{onerror}->(node => $node, type => 'character not allowed');
-          }
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed');
+      }
+    } elsif ($element_state->{phase} eq 'any') {
+      if ($child_nsuri eq $HTML_NS and
+          {table => 1, select => 1, datalist => 1}->{$child_ln}) {
+        $element_state->{phase} = 'none';
+      } elsif ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
+        $element_state->{has_element} = 1;
+        $element_state->{phase} = 'prose';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed');        
+      }
+    } elsif ($element_state->{phase} eq 'none') {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed');
+    } else {
+      die "check_child_element: Bad |datagrid| phase: $element_state->{phase}";
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      if ($element_state->{phase} eq 'prose') {
+        #
+      } elsif ($element_state->{phase} eq 'any') {
+        $element_state->{phase} = 'prose';
+      } else {
+        $self->{onerror}->(node => $child_node,
+                           type => 'character not allowed');
       }
     }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
 
-    push @$new_todos, $end;
-
-    push @$new_todos, {
-      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-      old_values => $old_values,
-      errors => $HTMLSignificantContentErrors,
-    };
-
-    return ($new_todos);
-
+    if ($element_state->{phase} eq 'none') {
+      $HTMLChecker{check_end}->(@_);
+    } else {
+      $HTMLPhrasingContentChecker{check_end}->(@_);
+    }
+  },
     ## ISSUE: "xxx<table/>" is disallowed; "<select/>aaa" and "<datalist/>aa"
     ## are not disallowed (assuming that form control contents are also
     ## prose content).
-  },
 };
 
 $Element->{$HTML_NS}->{command} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLEmptyChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     checked => $GetHTMLBooleanAttrChecker->('checked'),
     default => $GetHTMLBooleanAttrChecker->('default'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -3428,11 +3027,11 @@ $Element->{$HTML_NS}->{command} = {
       }
     },
   }),
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{menu} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLPhrasingContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     autosubmit => $GetHTMLBooleanAttrChecker->('autosubmit'),
     id => sub {
       ## NOTE: same as global |id=""|, with |$self->{menu}| registeration
@@ -3458,128 +3057,109 @@ $Element->{$HTML_NS}->{menu} = {
     label => sub { }, ## NOTE: No conformance creteria
     type => $GetHTMLEnumeratedAttrChecker->({context => 1, toolbar => 1}),
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $old_values = {significant =>
-                          $todo->{flag}->{has_descendant}->{significant}};
-    $todo->{flag}->{has_descendant}->{significant} = 0;
-    
-    my $content = 'li or phrasing';
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'li') {
-          if ($content eq 'phrasing') {
-            $not_allowed = 1;
-          } elsif ($content eq 'li or phrasing') {
-            $content = 'li';
-          }
-        } else {
-          if ($HTMLPhrasingContent->{$node_ns}->{$node_ln}) {
-            $content = 'phrasing';
-          } else {
-            $not_allowed = 1;
-          }
-        }
-        $self->{onerror}->(node => $node, type => 'element not allowed')
-          if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          if ($content eq 'li') {
-            $self->{onerror}->(node => $node, type => 'character not allowed');
-          } elsif ($content eq 'li or phrasing') {
-            $content = 'phrasing';
-          }
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{phase} = 'li or phrasing';
+    $element_state->{in_menu_original} = $self->{flag}->{in_menu};
+    $self->{flag}->{in_menu} = 1;
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'li') {
+      if ($element_state->{phase} eq 'li') {
+        #
+      } elsif ($element_state->{phase} eq 'li or phrasing') {
+        $element_state->{phase} = 'li';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } elsif ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+      if ($element_state->{phase} eq 'phrasing') {
+        #
+      } elsif ($element_state->{phase} eq 'li or phrasing') {
+        $element_state->{phase} = 'phrasing';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      }
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed');
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      if ($element_state->{phase} eq 'phrasing') {
+        #
+      } elsif ($element_state->{phase} eq 'li or phrasing') {
+        $element_state->{phase} = 'phrasing';
+      } else {
+        $self->{onerror}->(node => $child_node,
+                           type => 'character not allowed');
       }
     }
-
-    for (@$new_todos) {
-      $_->{flag}->{in_menu} = 1;
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    delete $self->{flag}->{in_menu} unless $element_state->{in_menu_original};
+    
+    if ($element_state->{phase} eq 'li') {
+      $HTMLChecker{check_end}->(@_);
+    } else { # 'phrasing' or 'li or phrasing'
+      $HTMLPhrasingContentChecker{check_end}->(@_);
     }
-
-    push @$new_todos, {
-      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-      old_values => $old_values,
-      errors => $HTMLSignificantContentErrors,
-    };
-  
-    return ($new_todos);
   },
 };
 
 $Element->{$HTML_NS}->{datatemplate} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => sub {
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        ## NOTE: |minuses| list is not checked since redundant
-        if ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } elsif (not ($node_ns eq $HTML_NS and $node_ln eq 'rule')) {
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:datatemplate');
-        }
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $self->{onerror}->(node => $node, type => 'character not allowed');
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
+  %HTMLChecker,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'rule') {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:datatemplate');
     }
-    return ($new_todos);
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed');
+    }
   },
   is_xml_root => 1,
 };
 
 $Element->{$HTML_NS}->{rule} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     condition => $HTMLSelectorsAttrChecker,
     mode => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
-
-    my $end = $self->_add_pluses ({$HTML_NS => {nest => 1}});
-    my ($sib, $ch) = $HTMLAnyChecker->($self, $todo);
-    push @$sib, $end;
-    return ($sib, $ch);
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_plus_elements ($element_state, {$HTML_NS => {nest => 1}});
+  },
+  check_child_element => sub { },
+  check_child_text => sub { },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_plus_elements ($element_state);
+    $HTMLChecker{check_end}->(@_);
   },
   ## NOTE: "MAY be anything that, when the parent |datatemplate|
   ## is applied to some conforming data, results in a conforming DOM tree.":
@@ -3587,7 +3167,8 @@ $Element->{$HTML_NS}->{rule} = {
 };
 
 $Element->{$HTML_NS}->{nest} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
+  %HTMLEmptyChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
     filter => $HTMLSelectorsAttrChecker,
     mode => sub {
       my ($self, $attr) = @_;
@@ -3597,22 +3178,19 @@ $Element->{$HTML_NS}->{nest} = {
       }
     },
   }),
-  checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{legend} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLPhrasingContentChecker,
+  %HTMLPhrasingContentChecker,
 };
 
 $Element->{$HTML_NS}->{div} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLProseContentChecker,
+  %HTMLProseContentChecker,
 };
 
 $Element->{$HTML_NS}->{font} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
-  checker => $HTMLTransparentChecker,
+  %HTMLTransparentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({}), ## TODO
 };
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;

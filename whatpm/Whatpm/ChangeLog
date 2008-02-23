@@ -1,3 +1,14 @@
+2008-02-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* ContentChecker.pm (check_element): The way to traverse
+	the tree is entirely revised to make it easier to track
+	the state of ancestors/descendants.  As a result of this
+	revision (which rewrites almost all of Whatpm::ContentChecker::HTML),
+	support for content model checking for HTML elements |figure|,
+	|object|, |video|, and |audio| and checking for XML elements (and
+	some XMLNS checkings) are dropped for now.  They will be
+	reimplemented in due cource.
+
 2008-02-17  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTML.pm.src: |>| in public or system literal closes the DOCTYPE
