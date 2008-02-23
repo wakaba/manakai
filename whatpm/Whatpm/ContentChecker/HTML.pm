@@ -659,7 +659,7 @@ my %HTMLProseContentChecker = (
                            level => $self->{must_level});
       }
     } elsif ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
-      $element_state->{has_non_style} = 1;
+      $element_state->{has_non_style} = 1 unless $child_is_transparent;
     } else {
       $element_state->{has_non_style} = 1;
       $self->{onerror}->(node => $child_el,
@@ -1985,7 +1985,7 @@ $Element->{$HTML_NS}->{figure} = {
       delete $element_state->{has_non_legend};
     } else {
       $HTMLProseContentChecker{check_child_element}->(@_);
-      $element_state->{has_non_legend} = 1;
+      $element_state->{has_non_legend} = 1 unless $child_is_transparent;
     }
   },
   check_child_text => sub {
@@ -2873,14 +2873,49 @@ $Element->{$HTML_NS}->{details} = {
   check_attrs => $GetHTMLAttrsChecker->({
     open => $GetHTMLBooleanAttrChecker->('open'),
   }),
-  checker => sub {
-    my ($self, $todo) = @_;
+  ## NOTE: legend, Prose
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+      $element_state->{has_non_legend} = 1;
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'legend') {
+      if ($element_state->{has_non_legend}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:details legend',
+                           level => $self->{must_level});
+      }
+      $element_state->{has_legend} = 1;
+      $element_state->{has_non_legend} = 1;
+    } else {
+      $HTMLProseContentChecker{check_child_element}->(@_);
+      $element_state->{has_non_legend} = 1 unless $child_is_transparent;
+      ## ISSUE: |<details><object><legend>xx</legend></object>..</details>|
+      ## is conforming?
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $element_state->{has_non_legend} = 1;
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
 
-## TODO:
-#    my ($sib, $ch)
-#      = $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'legend')
-#        ->($self, $todo);
-#    return ($sib, $ch);
+    unless ($element_state->{has_legend}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:legend',
+                         level => $self->{must_level});
+    }
+
+    $HTMLProseContentChecker{check_end}->(@_);
+    ## ISSUE: |<details><legend>aa</legend></details>| error?
   },
 };
 
@@ -2921,6 +2956,7 @@ $Element->{$HTML_NS}->{datagrid} = {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed');
       }
+      $element_state->{has_element} = 1;
     } elsif ($element_state->{phase} eq 'any') {
       if ($child_nsuri eq $HTML_NS and
           {table => 1, select => 1, datalist => 1}->{$child_ln}) {
@@ -2928,6 +2964,7 @@ $Element->{$HTML_NS}->{datagrid} = {
       } elsif ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
         $element_state->{has_element} = 1;
         $element_state->{phase} = 'prose';
+        ## TODO: transparent?
       } else {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed');        

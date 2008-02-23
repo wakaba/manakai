@@ -1066,7 +1066,6 @@ para</del>
 para
 </body>
 #errors
-/body/style;element not allowed:prose style;m
 /body/style;style:text/css;unsupported
 
 #data
@@ -1076,7 +1075,6 @@ para
 para
 </body>
 #errors
-/body/style;element not allowed:prose style;m
 /body/ins/style;style:text/css;unsupported
 /body/style;style:text/css;unsupported
 
@@ -5212,6 +5210,85 @@ xxxx
 /noscript;in XML:noscript
 /noscript/noscript;element not allowed:minus;m
 /noscript/noscript;in XML:noscript
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml"></details>
+#errors
+/details;no significant content;s
+/details;element missing:legend;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">   </details>
+#errors
+/details;no significant content;s
+/details;element missing:legend;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">xxxx</details>
+#errors
+/details;element missing:legend;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml"><p></p></details>
+#errors
+/details;element missing:legend;m
+/details;no significant content;s
+/details/p;no significant content;s
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml"><p>xxx</p></details>
+#errors
+/details;element missing:legend;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend>xxx</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend><p>xxx</p></details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend><style scoped="scoped"></style><p>xxx</p></details>
+#errors
+/details/style;style:text/css;unsupported
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+<legend>xx</legend>
+<style scoped="scoped"></style><p>xxx</p></details>
+#errors
+/details/style;style:text/css;unsupported
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+xx<legend>xx</legend></details>
+#errors
+/details/legend;element not allowed:details legend;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+<p>xx</p><legend>xx</legend></details>
+#errors
+/details/legend;element not allowed:details legend;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+<legend>yy</legend><legend>xx</legend></details>
+#errors
+/details/legend;element not allowed:details legend;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+<ins><legend>xx</legend>aa</ins></details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+zzz<legend>yy</legend><legend>xx</legend>aaa</details>
+#errors
+/details/legend;element not allowed:details legend;m
+/details/legend;element not allowed:details legend;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"/>

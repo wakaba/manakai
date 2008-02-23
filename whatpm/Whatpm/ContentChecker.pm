@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.62 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.63 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -376,13 +376,16 @@ next unless $code;## TODO: temp.
           $Namespace->{$el_nsuri}->{loaded} = 1;
         }
       }
+
+      my $element_state = {};
       my $eldef = $Element->{$el_nsuri}->{$el_ln} ||
           $Element->{$el_nsuri}->{''} ||
           $ElementDefault;
       my $content_def = $item->{transparent}
           ? $item->{parent_def} || $eldef : $eldef;
+      my $content_state = $item->{transparent}
+          ? $item->{parent_state} || $element_state : $element_state;
 
-      my $element_state = {};
       my @new_item;
       push @new_item, [$eldef->{check_start}, $self, $item, $element_state];
       push @new_item, [$eldef->{check_attrs}, $self, $item, $element_state];
@@ -401,7 +404,7 @@ next unless $code;## TODO: temp.
                    $child_nsuri eq $HTML_NS and $child_ln eq 'noscript')) {
             push @new_item, [$content_def->{check_child_element},
                              $self, $item, $child,
-                             $child_nsuri, $child_ln, 1, $element_state];
+                             $child_nsuri, $child_ln, 1, $content_state];
             push @new_item, {type => 'element', node => $child,
                              parent_state => $element_state,
                              parent_def => $content_def,
@@ -415,6 +418,7 @@ next unless $code;## TODO: temp.
                   #
                 } else {
                   $content_def = $item->{parent_def} || $content_def;
+                  $content_state = $item->{parent_state} || $content_state;
                 }
               } elsif ($el_ln eq 'video' or $el_ln eq 'audio') {
                 if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
@@ -423,13 +427,14 @@ next unless $code;## TODO: temp.
                   $element_state->{has_source} = 1;
                 } else {
                   $content_def = $item->{parent_def} || $content_def;
+                  $content_state = $item->{parent_state} || $content_state;
                 }
               }
             }
 
             push @new_item, [$content_def->{check_child_element},
                              $self, $item, $child,
-                             $child_nsuri, $child_ln, 0, $element_state];
+                             $child_nsuri, $child_ln, 0, $content_state];
             push @new_item, {type => 'element', node => $child,
                              parent_def => $eldef,
                              parent_state => $element_state};
@@ -443,7 +448,7 @@ next unless $code;## TODO: temp.
           my $has_significant = ($child->data =~ /[^\x09-\x0D\x20]/);
           push @new_item, [$content_def->{check_child_text},
                            $self, $item, $child, $has_significant,
-                           $element_state];
+                           $content_state];
           $element_state->{has_significant} ||= $has_significant;
           if ($has_significant and
               $HTMLSemiTransparentElements->{$el_nsuri}->{$el_ln}) {
@@ -695,4 +700,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/23 14:37:09 $
+# $Date: 2008/02/23 15:24:49 $
