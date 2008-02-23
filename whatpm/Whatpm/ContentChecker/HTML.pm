@@ -2141,7 +2141,19 @@ $Element->{$HTML_NS}->{object} = {
     if ($has_significant) {
       $element_state->{has_non_param} = 1;
     }
-  },    
+  },   
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{has_significant}) {
+      $item->{parent_state}->{has_significant} = 1;
+    } elsif ($item->{node}->manakai_parent_element) {
+      ## NOTE: Transparent.
+    } else {
+      $self->{onerror}->(node => $item->{node},
+                         level => $self->{should_level},
+                         type => 'no significant content');
+    }
+  },
 ## TODO: Tests for <nest/> in <object/>
 };
 ## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
@@ -2177,27 +2189,67 @@ $Element->{$HTML_NS}->{video} = {
     autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
     controls => $GetHTMLBooleanAttrChecker->('controls'),
     poster => $HTMLURIAttrChecker, ## TODO: not for audio!
-    ## TODO: width, height (not for audio!)
+    ## TODO: width, height
   }),
-
-## TODO: reimplement
-  checker => sub {
-    my ($self, $todo) = @_;
-    $todo->{flag}->{has_descendant}->{significant} = 1;
-
-## TODO:
-    if ($todo->{node}->has_attribute_ns (undef, 'src')) {
-#      return $HTMLProseContentChecker->($self, $todo);
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{allow_source}
+        = not $item->{node}->has_attribute_ns (undef, 'src');
+    $element_state->{has_source} ||= $element_state->{allow_source} * -1;
+      ## NOTE: It might be set true by |check_element|.
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+      delete $element_state->{allow_source};
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'source') {
+      if ($element_state->{allow_source}) {
+        $element_state->{has_source} = 1;
+      } else {
+        $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:prose',
+                         level => $self->{must_level});
+      }
     } else {
-#      return $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'source')
-#        ->($self, $todo);
+      delete $element_state->{allow_source};
+      $HTMLProseContentChecker{check_child_element}->(@_);
     }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      delete $element_state->{allow_source};
+    }
+    $HTMLProseContentChecker{check_child_text}->(@_);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{has_source} == -1) { 
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:source',
+                         level => $self->{must_level});
+    }
+
+    $Element->{$HTML_NS}->{object}->{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{audio} = {
   %{$Element->{$HTML_NS}->{video}},
-## TODO: Is there audio-only attribute?
+  check_attrs => $GetHTMLAttrsChecker->({
+    src => $HTMLURIAttrChecker,
+    ## TODO: start, loopstart, loopend, end
+    ## ISSUE: they MUST be "value time offset"s.  Value?
+    ## ISSUE: playcount has no conformance creteria
+    autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
+    controls => $GetHTMLBooleanAttrChecker->('controls'),
+  }),
 };
 
 $Element->{$HTML_NS}->{source} = {

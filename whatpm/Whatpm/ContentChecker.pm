@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.61 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.62 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -407,16 +407,22 @@ next unless $code;## TODO: temp.
                              parent_def => $content_def,
                              transparent => 1};
           } else {
-            if ($content_def eq $eldef and
-                $item->{parent_def} and
-                $el_nsuri eq $HTML_NS) { ## $HTMLSemiTransparentElements
+            if ($el_nsuri eq $HTML_NS) { ## $HTMLSemiTransparentElements
               if ($el_ln eq 'object') {
                 if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
                   #
                 } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'param') {
                   #
                 } else {
-                  $content_def = $item->{parent_def};
+                  $content_def = $item->{parent_def} || $content_def;
+                }
+              } elsif ($el_ln eq 'video' or $el_ln eq 'audio') {
+                if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+                  #
+                } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'source') {
+                  $element_state->{has_source} = 1;
+                } else {
+                  $content_def = $item->{parent_def} || $content_def;
                 }
               }
             }
@@ -689,4 +695,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/23 13:18:42 $
+# $Date: 2008/02/23 14:37:09 $

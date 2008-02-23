@@ -3604,7 +3604,6 @@ aaa
 #data
 <mark xmlns="http://www.w3.org/1999/xhtml"><object data=""/></mark>
 #errors
-/mark/object;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><mark>x</mark></p>
@@ -4075,7 +4074,6 @@ aaa
 </p>
 #errors
 /p/object/style;style:text/css;unsupported
-/p/object;no significant content;s
 /p/object/style;element not allowed:phrasing;m
 
 #data
@@ -4162,6 +4160,654 @@ xxxx
 #errors
 /p/object/style;element not allowed:phrasing;m
 /p/object/style;style:text/css;unsupported
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"></video>
+#errors
+/video;no significant content;s
+/video;element missing:source;m
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml">  </video>
+#errors
+/video;element missing:source;m
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml">xx</video>
+#errors
+/video;element missing:source;m
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>xx</video>
+#errors
+/video;element missing:source;m
+/video/style;style:text/css;unsupported
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><p>xx</p></video>
+#errors
+/video;element missing:source;m
+/video/style;style:text/css;unsupported
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src=""></video>
+#errors
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src="">  </video>
+#errors
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src="">xx</video>
+#errors
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src=""><style scoped=""/>xx</video>
+#errors
+/video/style;style:text/css;unsupported
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src=""><style scoped=""/><p>xx</p></video>
+#errors
+/video/style;style:text/css;unsupported
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/></video>
+#errors
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/>xx</video>
+#errors
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/>xx</video>
+#errors
+/video/style;style:text/css;unsupported
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><p>xx</p></video>
+#errors
+/video/style;style:text/css;unsupported
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><source src=""/></video>
+#errors
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml">x<source src=""/></video>
+#errors
+/video/source;element not allowed:prose;m
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><source src=""/></video>
+#errors
+/video/source;element not allowed:prose;m
+/video/style;style:text/css;unsupported
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/></video>
+#errors
+/video/source;element not allowed:prose;m
+/video/style;style:text/css;unsupported
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/><source src=""/></video>
+#errors
+/video/source;element not allowed:prose;m
+/video/source;element not allowed:prose;m
+/video/style;style:text/css;unsupported
+/video;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video></video></div>
+#errors
+/div/video;element missing:source;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video>  </video></div>
+#errors
+/div/video;element missing:source;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video>xx</video></div>
+#errors
+/div/video;element missing:source;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video><style scoped=""/>xx</video></div>
+#errors
+/div/video;element missing:source;m
+/div/video/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><style scoped=""/><p>xx</p></video></div>
+#errors
+/div/video;element missing:source;m
+/div/video/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video src=""></video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video src="">  </video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video src="">xx</video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video src=""><style scoped=""/>xx</video></div>
+#errors
+/div/video/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video src=""><style scoped=""/><p>xx</p></video></div>
+#errors
+/div/video/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video><source src=""/></video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video><source src=""/>xx</video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/>xx</video></div>
+#errors
+/div/video/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><p>xx</p></video></div>
+#errors
+/div/video/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><source src=""/></video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video>x<source src=""/></video></div>
+#errors
+/div/video/source;element not allowed:prose;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><style scoped=""/><source src=""/></video></div>
+#errors
+/div/video/source;element not allowed:prose;m
+/div/video/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><source src=""/></video></div>
+#errors
+/div/video/source;element not allowed:prose;m
+/div/video/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><source src=""/><source src=""/></video></div>
+#errors
+/div/video/source;element not allowed:prose;m
+/div/video/source;element not allowed:prose;m
+/div/video/style;style:text/css;unsupported
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video></video></em>
+#errors
+/em/video;element missing:source;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video>  </video></em>
+#errors
+/em/video;element missing:source;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video>xx</video></em>
+#errors
+/em/video;element missing:source;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video><style scoped=""/>xx</video></em>
+#errors
+/em/video;element missing:source;m
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><style scoped=""/><p>xx</p></video></em>
+#errors
+/em/video;element missing:source;m
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+/em/video/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video src=""></video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video src="">  </video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video src="">xx</video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video src=""><style scoped=""/>xx</video></em>
+#errors
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video src=""><style scoped=""/><p>xx</p></video></em>
+#errors
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+/em/video/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video><source src=""/></video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video><source src=""/>xx</video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/>xx</video></em>
+#errors
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><p>xx</p></video></em>
+#errors
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+/em/video/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><source src=""/></video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video>x<source src=""/></video></em>
+#errors
+/em/video/source;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><style scoped=""/><source src=""/></video></em>
+#errors
+/em/video/source;element not allowed:phrasing;m
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><source src=""/></video></em>
+#errors
+/em/video/source;element not allowed:phrasing;m
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><source src=""/><source src=""/></video></em>
+#errors
+/em/video/source;element not allowed:phrasing;m
+/em/video/source;element not allowed:phrasing;m
+/em/video/style;style:text/css;unsupported
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"></audio>
+#errors
+/audio;no significant content;s
+/audio;element missing:source;m
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml">  </audio>
+#errors
+/audio;element missing:source;m
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml">xx</audio>
+#errors
+/audio;element missing:source;m
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>xx</audio>
+#errors
+/audio;element missing:source;m
+/audio/style;style:text/css;unsupported
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><p>xx</p></audio>
+#errors
+/audio;element missing:source;m
+/audio/style;style:text/css;unsupported
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src=""></audio>
+#errors
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src="">  </audio>
+#errors
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src="">xx</audio>
+#errors
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src=""><style scoped=""/>xx</audio>
+#errors
+/audio/style;style:text/css;unsupported
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src=""><style scoped=""/><p>xx</p></audio>
+#errors
+/audio/style;style:text/css;unsupported
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/></audio>
+#errors
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/>xx</audio>
+#errors
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/>xx</audio>
+#errors
+/audio/style;style:text/css;unsupported
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><p>xx</p></audio>
+#errors
+/audio/style;style:text/css;unsupported
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><source src=""/></audio>
+#errors
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml">x<source src=""/></audio>
+#errors
+/audio/source;element not allowed:prose;m
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><source src=""/></audio>
+#errors
+/audio/source;element not allowed:prose;m
+/audio/style;style:text/css;unsupported
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/></audio>
+#errors
+/audio/source;element not allowed:prose;m
+/audio/style;style:text/css;unsupported
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/><source src=""/></audio>
+#errors
+/audio/source;element not allowed:prose;m
+/audio/source;element not allowed:prose;m
+/audio/style;style:text/css;unsupported
+/audio;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio></audio></div>
+#errors
+/div/audio;element missing:source;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio>  </audio></div>
+#errors
+/div/audio;element missing:source;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio>xx</audio></div>
+#errors
+/div/audio;element missing:source;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio><style scoped=""/>xx</audio></div>
+#errors
+/div/audio;element missing:source;m
+/div/audio/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><style scoped=""/><p>xx</p></audio></div>
+#errors
+/div/audio;element missing:source;m
+/div/audio/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio src=""></audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio src="">  </audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio src="">xx</audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio src=""><style scoped=""/>xx</audio></div>
+#errors
+/div/audio/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio src=""><style scoped=""/><p>xx</p></audio></div>
+#errors
+/div/audio/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio><source src=""/></audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio><source src=""/>xx</audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/>xx</audio></div>
+#errors
+/div/audio/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><p>xx</p></audio></div>
+#errors
+/div/audio/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><source src=""/></audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio>x<source src=""/></audio></div>
+#errors
+/div/audio/source;element not allowed:prose;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><style scoped=""/><source src=""/></audio></div>
+#errors
+/div/audio/source;element not allowed:prose;m
+/div/audio/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><source src=""/></audio></div>
+#errors
+/div/audio/source;element not allowed:prose;m
+/div/audio/style;style:text/css;unsupported
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><source src=""/><source src=""/></audio></div>
+#errors
+/div/audio/source;element not allowed:prose;m
+/div/audio/source;element not allowed:prose;m
+/div/audio/style;style:text/css;unsupported
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio></audio></em>
+#errors
+/em/audio;element missing:source;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio>  </audio></em>
+#errors
+/em/audio;element missing:source;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio>xx</audio></em>
+#errors
+/em/audio;element missing:source;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio><style scoped=""/>xx</audio></em>
+#errors
+/em/audio;element missing:source;m
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><style scoped=""/><p>xx</p></audio></em>
+#errors
+/em/audio;element missing:source;m
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
+/em/audio/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio src=""></audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio src="">  </audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio src="">xx</audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio src=""><style scoped=""/>xx</audio></em>
+#errors
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio src=""><style scoped=""/><p>xx</p></audio></em>
+#errors
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
+/em/audio/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio><source src=""/></audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio><source src=""/>xx</audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/>xx</audio></em>
+#errors
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><p>xx</p></audio></em>
+#errors
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
+/em/audio/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><source src=""/></audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio>x<source src=""/></audio></em>
+#errors
+/em/audio/source;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><style scoped=""/><source src=""/></audio></em>
+#errors
+/em/audio/source;element not allowed:phrasing;m
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><source src=""/></audio></em>
+#errors
+/em/audio/source;element not allowed:phrasing;m
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><source src=""/><source src=""/></audio></em>
+#errors
+/em/audio/source;element not allowed:phrasing;m
+/em/audio/source;element not allowed:phrasing;m
+/em/audio/style;style:text/css;unsupported
+/em/audio/style;element not allowed:phrasing;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -5463,28 +6109,24 @@ xxxx
 <video src="/"><nest/></video>
 </rule>
 #errors
-/rule/video;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><nest/><source src="/"/></video>
 </rule>
 #errors
-/rule/video;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><source src="/"/><nest/><source src="/"/></video>
 </rule>
 #errors
-/rule/video;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><source src="/"/><nest/></video>
 </rule>
 #errors
-/rule/video;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
