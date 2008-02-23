@@ -2209,13 +2209,12 @@ $Element->{$HTML_NS}->{video} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'source') {
-      if ($element_state->{allow_source}) {
-        $element_state->{has_source} = 1;
-      } else {
+      unless ($element_state->{allow_source}) {
         $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:prose',
                          level => $self->{must_level});
       }
+      $element_state->{has_source} = 1;
     } else {
       delete $element_state->{allow_source};
       $HTMLProseContentChecker{check_child_element}->(@_);
