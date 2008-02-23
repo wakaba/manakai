@@ -1956,110 +1956,63 @@ $Element->{$HTML_NS}->{del} = {
 
 $Element->{$HTML_NS}->{figure} = {
   %HTMLProseContentChecker,
-
-## TODO: Reimplement
-  checker => sub {
-    ## NOTE: legend, Prose | Prose, legend
-
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-    
-    my $old_values = {significant =>
-                          $todo->{flag}->{has_descendant}->{significant}};
-    $todo->{flag}->{has_descendant}->{significant} = 0;
-
-    my $has_legend;
-    my $has_non_legend;
-    my $has_non_style;
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-      
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-          $has_non_legend = 1;
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:minus',
-                             level => $self->{must_level});
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'legend') {
-          if ($has_legend) {
-            if (ref $has_legend) {
-              $self->{onerror}->(node => $has_legend,
-                                 type => 'element not allowed:figure legend',
-                                 level => $self->{must_level});
-              $has_legend = $node;
-            } else {
-              ## NOTE: The first child element was a |legend|.
-              $self->{onerror}->(node => $node,
-                                 type => 'element not allowed:figure legend',
-                                 level => $self->{must_level});
-            }
-          } elsif ($has_non_legend) {
-            undef $has_non_legend;
-            $has_legend = $node;
-          } else {
-            $has_legend = 1;
-          }
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
-          $has_non_legend = 1;
-          if ($has_non_style or
-              not $node->has_attribute_ns (undef, 'scoped')) {
-            $self->{onerror}->(node => $node,
-                               type => 'element not allowed:prose style',
-                               level => $self->{must_level});
-          }
-        } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
-          $has_non_style = 1;
-          $has_non_legend = 1;
-        } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } else {
-          $has_non_style = 1;
-          $has_non_legend = 1;
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:prose',
-                             level => $self->{must_level})
-        }
-        
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $has_non_style = 1;
-          $has_non_legend = 1;
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+  ## NOTE: legend, Prose | Prose, legend
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+      $element_state->{has_non_legend} = 1;
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'legend') {
+      if ($element_state->{has_legend_at_first}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:figure legend',
+                           level => $self->{must_level});
+      } elsif ($element_state->{has_legend}) {
+        $self->{onerror}->(node => $element_state->{has_legend},
+                           type => 'element not allowed:figure legend',
+                           level => $self->{must_level});
+        $element_state->{has_legend} = $child_el;
+      } elsif ($element_state->{has_non_legend}) {
+        $element_state->{has_legend} = $child_el;
+      } else {
+        $element_state->{has_legend_at_first} = 1;
       }
+      delete $element_state->{has_non_legend};
+    } else {
+      $HTMLProseContentChecker{check_child_element}->(@_);
+      $element_state->{has_non_legend} = 1;
     }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $element_state->{has_non_legend} = 1;
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
 
-    if ($has_legend) {
-      if (ref $has_legend and $has_non_legend) {
-        $self->{onerror}->(node => $has_legend,
+    if ($element_state->{has_legend_at_first}) {
+      #
+    } elsif ($element_state->{has_legend}) {
+      if ($element_state->{has_non_legend}) {
+        $self->{onerror}->(node => $element_state->{has_legend},
                            type => 'element not allowed:figure legend',
                            level => $self->{must_level});
       }
     } else {
-      $self->{onerror}->(node => $todo->{node},
+      $self->{onerror}->(node => $item->{node},
                          type => 'element missing:legend',
                          level => $self->{must_level});
     }
-    
-    push @$new_todos, {
-      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-      old_values => $old_values,
-#      errors => $HTMLSignificantContentErrors,
-    };
-    
-    return ($new_todos);
+
+    $HTMLProseContentChecker{check_end}->(@_);
+## ISSUE: |<figure><legend>aa</legend></figure>| should be an error?
   },
 };
 ## TODO: Test for <nest/> in <figure/>
@@ -2161,85 +2114,39 @@ $Element->{$HTML_NS}->{object} = {
       }
     }
   },
-
-## TODO: reimplement
-  checker => sub {
-    ## NOTE: param*, transparent (Prose)
-
-    my ($self, $todo) = @_;
-    my $el = $todo->{node};
-    my $new_todos = [];
-    my @nodes = (@{$el->child_nodes});
-    
-    $todo->{flag}->{has_descendant}->{significant} = 0;
-
-    my $has_non_param;
-    my $has_non_style;
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-      
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-          $has_non_param = 1;
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:minus',
-                             level => $self->{must_level});
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'param') {
-          if ($has_non_param) {
-            $self->{onerror}->(node => $node,
-                               type => 'element not allowed:prose',
-                               level => $self->{must_level});
-          }
-        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
-          $has_non_param = 1;
-          if ($has_non_style or
-              not $node->has_attribute_ns (undef, 'scoped')) {
-            $self->{onerror}->(node => $node,
-                               type => 'element not allowed:prose style',
-                               level => $self->{must_level});
-          }
-        } elsif ($HTMLProseContent->{$node_ns}->{$node_ln}) {
-          $has_non_style = 1;
-          $has_non_param = 1;
-        } elsif ($self->{pluses}->{$node_ns}->{$node_ln}) {
-          #
-        } else {
-          $has_non_style = 1;
-          $has_non_param = 1;
-          $self->{onerror}->(node => $node,
-                             type => 'element not allowed:prose',
-                             level => $self->{must_level})
-        }
-        
-        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
-        unshift @nodes, @$sib;
-        push @$new_todos, @$ch;
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $has_non_style = 1;
-          $has_non_param = 1;
-          $todo->{flag}->{has_descendant}->{significant} = 1;
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
+  ## NOTE: param*, transparent (Prose)
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+      $element_state->{has_non_legend} = 1;
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'param') {
+      if ($element_state->{has_non_param}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:prose',
+                           level => $self->{must_level});
       }
+    } else {
+      $HTMLProseContentChecker{check_child_element}->(@_);
+      $element_state->{has_non_param} = 1;
     }
-    
-    push @$new_todos, {
-      type => 'descendant', node => $todo->{node}, flag => $todo->{flag},
-      old_values => {significant => 1}, # |object| itself
-#      errors => $HTMLSignificantContentErrors,
-    };
-    
-    return ($new_todos);
   },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $element_state->{has_non_param} = 1;
+    }
+  },    
 ## TODO: Tests for <nest/> in <object/>
 };
+## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
+## What about |<section><object data><style scoped></style>x</object></section>|?
+## |<section><ins></ins><object data><style scoped></style>x</object></section>|?
 
 $Element->{$HTML_NS}->{param} = {
   %HTMLEmptyChecker,
