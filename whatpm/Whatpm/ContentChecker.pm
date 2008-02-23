@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.60 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.61 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -209,7 +209,9 @@ my $HTMLTransparentElements = {
   ## and not in |head|.
 };
 
-## Semi-transparent: html:video, html:audio, html:object
+my $HTMLSemiTransparentElements = {
+  $HTML_NS => {object => 1, video => 1, audio => 1},
+};
 
 our $Element = {};
 
@@ -336,8 +338,8 @@ sub check_element ($$$;$) {
   $self->{good_level} = 'w';
   $self->{unsupported_lavel} = 'u';
 
-  $self->{pluses} = {};
-  $self->{minuses} = {};
+  $self->{plus_elements} = {};
+  $self->{minus_elements} = {};
   $self->{id} = {};
   $self->{term} = {};
   $self->{usemap} = [];
@@ -377,13 +379,14 @@ next unless $code;## TODO: temp.
       my $eldef = $Element->{$el_nsuri}->{$el_ln} ||
           $Element->{$el_nsuri}->{''} ||
           $ElementDefault;
-      my $content_def = $item->{parent_def} || $eldef;
+      my $content_def = $item->{transparent}
+          ? $item->{parent_def} || $eldef : $eldef;
 
       my $element_state = {};
       my @new_item;
       push @new_item, [$eldef->{check_start}, $self, $item, $element_state];
       push @new_item, [$eldef->{check_attrs}, $self, $item, $element_state];
-        
+      
       my @child = @{$item->{node}->child_nodes};
       while (@child) {
         my $child = shift @child;
@@ -394,22 +397,35 @@ next unless $code;## TODO: temp.
           my $child_ln = $child->manakai_local_name;
           if ($HTMLTransparentElements->{$child_nsuri}->{$child_ln} and
               not (($self->{flag}->{in_head} or
-                    ($el_nsuri eq q<http://www.w3.org/1999/xhtml> and
-                     $el_ln eq 'head')) and
-                   $child_nsuri eq q<http://www.w3.org/1999/xhtml> and
-                   $child_ln eq 'noscript')) {
+                    ($el_nsuri eq $HTML_NS and $el_ln eq 'head')) and
+                   $child_nsuri eq $HTML_NS and $child_ln eq 'noscript')) {
             push @new_item, [$content_def->{check_child_element},
                              $self, $item, $child,
                              $child_nsuri, $child_ln, 1, $element_state];
             push @new_item, {type => 'element', node => $child,
                              parent_state => $element_state,
-                             parent_def => $item->{parent_def} || $eldef,
+                             parent_def => $content_def,
                              transparent => 1};
           } else {
+            if ($content_def eq $eldef and
+                $item->{parent_def} and
+                $el_nsuri eq $HTML_NS) { ## $HTMLSemiTransparentElements
+              if ($el_ln eq 'object') {
+                if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+                  #
+                } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'param') {
+                  #
+                } else {
+                  $content_def = $item->{parent_def};
+                }
+              }
+            }
+
             push @new_item, [$content_def->{check_child_element},
                              $self, $item, $child,
                              $child_nsuri, $child_ln, 0, $element_state];
             push @new_item, {type => 'element', node => $child,
+                             parent_def => $eldef,
                              parent_state => $element_state};
           }
 
@@ -423,6 +439,10 @@ next unless $code;## TODO: temp.
                            $self, $item, $child, $has_significant,
                            $element_state];
           $element_state->{has_significant} ||= $has_significant;
+          if ($has_significant and
+              $HTMLSemiTransparentElements->{$el_nsuri}->{$el_ln}) {
+            $content_def = $item->{parent_def} || $content_def;
+          }
         } elsif ($child_nt == 5) { # ENTITY_REFERENCE_NODE
           push @child, @{$child->child_nodes};
         }
@@ -450,8 +470,8 @@ next unless $code;## TODO: temp.
     }
   }
 
-  delete $self->{pluses};
-  delete $self->{minuses};
+  delete $self->{plus_elements};
+  delete $self->{minus_elements};
   delete $self->{onerror};
   delete $self->{id};
   delete $self->{usemap};
@@ -669,4 +689,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/23 10:35:00 $
+# $Date: 2008/02/23 13:18:42 $

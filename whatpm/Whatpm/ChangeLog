@@ -1,5 +1,11 @@
 2008-02-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm ($HTMLSemiTransparentElements): New.
+	(check_element): s/minuses/minus_elements/, s/pluses/plus_elements/.
+	Support for |html:object| as a semi-transparent element.
+
+2008-02-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* ContentChecker.pm (check_element): The way to traverse
 	the tree is entirely revised to make it easier to track
 	the state of ancestors/descendants.  As a result of this

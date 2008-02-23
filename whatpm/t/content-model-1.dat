@@ -4153,6 +4153,17 @@ xxxx
 /span/object/object/param;element not allowed:phrasing;m
 
 #data
+<p xmlns="http://www.w3.org/1999/xhtml"><object data=""><p>xx</p></object></p>
+#errors
+/p/object/p;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><object data=""><style scoped=""></style>xx</object></p>
+#errors
+/p/object/style;element not allowed:phrasing;m
+/p/object/style;style:text/css;unsupported
+
+#data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <thead><tr><td/></tr></thead>
 <tbody><tr><td/></tr></tbody>
@@ -4346,6 +4357,7 @@ xxxx
 </head>
 #errors
 /head/noscript;in XML:noscript
+/head/noscript/noscript;in XML:noscript
 /head/noscript/noscript;element not allowed:head noscript;m
 
 #data
@@ -4390,6 +4402,7 @@ xxxx
 </head>
 #errors
 /head/noscript;in XML:noscript
+/head/noscript/meta;element not allowed:head noscript;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
