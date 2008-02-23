@@ -1377,6 +1377,7 @@ id=""><span id="">x</span></p>
 </head>
 #errors
 /head/style;style:text/css;unsupported
+/head/style;element not allowed:head style;m
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml">
@@ -1443,6 +1444,16 @@ id=""><span id="">x</span></p>
 <style scoped=""/>
 </section>
 #errors
+/section/style;style:text/css;unsupported
+/section;no significant content;s
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style scope=""/>
+</section>
+#errors
+/section/style/@scope;attribute;unsupported
+/section/style;element not allowed:prose style;m
 /section/style;style:text/css;unsupported
 /section;no significant content;s
 
@@ -2825,18 +2836,15 @@ id=""><span id="">x</span></p>
 #data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/iframe;no significant content;s
 
 #data
 <iframe src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/iframe;no significant content;s
 
 #data
 <iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /iframe/@src;URI::syntax error:iriref3987;m
-/iframe;no significant content;s
 
 #data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3041,6 +3049,7 @@ id=""><span id="">x</span></p>
 <video xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
+/video;element missing:source;m
 
 #data
 <video src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3057,42 +3066,50 @@ id=""><span id="">x</span></p>
 <video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
+/video;element missing:source;m
 
 #data
 <video autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
+/video;element missing:source;m
 
 #data
 <video autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
 /video/@autoplay;boolean:invalid
+/video;element missing:source;m
 
 #data
 <video controls="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
+/video;element missing:source;m
 
 #data
 <video controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
+/video;element missing:source;m
 
 #data
 <video controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video/@controls;boolean:invalid
 /video;no significant content;s
+/video;element missing:source;m
 
 #data
 <video poster="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
+/video;element missing:source;m
 
 #data
 <video poster="abc" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/video;element missing:source;m
 /video;no significant content;s
 
 #data
@@ -3100,11 +3117,13 @@ id=""><span id="">x</span></p>
 #errors
 /video/@poster;URI::syntax error:iriref3987;m
 /video;no significant content;s
+/video;element missing:source;m
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
+/audio;element missing:source;m
 
 #data
 <audio src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3121,33 +3140,39 @@ id=""><span id="">x</span></p>
 <audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
+/audio;element missing:source;m
 
 #data
 <audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
+/audio;element missing:source;m
 
 #data
 <audio autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio/@autoplay;boolean:invalid
 /audio;no significant content;s
+/audio;element missing:source;m
 
 #data
 <audio controls="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
+/audio;element missing:source;m
 
 #data
 <audio controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
+/audio;element missing:source;m
 
 #data
 <audio controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio/@controls;boolean:invalid
 /audio;no significant content;s
+/audio;element missing:source;m
 
 #data
 <source xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4148,28 +4173,33 @@ id=""><span id="">x</span></p>
 <details xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
+/details;element missing:legend;m
 
 #data
 <details open="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
+/details;element missing:legend;m
 
 #data
 <details open="open" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
+/details;element missing:legend;m
 
 #data
 <details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
 /details/@open;boolean:invalid
+/details;element missing:legend;m
 
 #data
 <details open="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details/@open;boolean:invalid
 /details;no significant content;s
+/details;element missing:legend;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>

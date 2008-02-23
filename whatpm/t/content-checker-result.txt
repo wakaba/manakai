@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Feb 24 00:25:44 2008
-# Current time GMT:   Sat Feb 23 15:25:44 2008
+# Current time local: Sun Feb 24 00:34:27 2008
+# Current time GMT:   Sat Feb 23 15:34:27 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -728,11 +728,7 @@ ok 656
 ok 657
 ok 658
 ok 659
-not ok 660
-# Test 660 got: "/noscript/style/@scope;attribute;unsupported\n/noscript/style;element not allowed:prose style;m\n/noscript/style;style:text/css;unsupported\n/noscript;in XML:noscript\n/noscript;no significant content;s" (t/ContentChecker.t at line 94 fail #660)
-#     Expected: "/noscript/style;style:text/css;unsupported\n/noscript;in XML:noscript\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
-#<style scope=""/>
-#</noscript>)
+ok 660
 not ok 661
 # Test 661 got: "/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/noscript/meta;element not allowed:meta charset;m\n/noscript/meta;element not allowed:prose;m\n/noscript/meta;in XML:charset;m\n/noscript;in XML:noscript\n/noscript;no significant content;s" (t/ContentChecker.t at line 94 fail #661)
 #     Expected: "/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported\n/noscript/meta;element not allowed:meta charset;m\n/noscript/meta;in XML:charset;m\n/noscript;in XML:noscript\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -1180,12 +1176,7 @@ ok 1077
 ok 1078
 ok 1079
 ok 1080
-not ok 1081
-# Test 1081 got: "/head/style;element not allowed:head style;m\n/head/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #1081)
-#      Expected: "/head/style;style:text/css;unsupported" (<head xmlns="http://www.w3.org/1999/xhtml">
-#<title>x</title>
-#<style scoped=""/>
-#</head>)
+ok 1081
 ok 1082
 ok 1083
 ok 1084
@@ -1413,15 +1404,9 @@ ok 1305
 ok 1306
 ok 1307
 ok 1308
-not ok 1309
-# Test 1309 got: "" (t/ContentChecker.t at line 94 fail #1309)
-#      Expected: "/iframe;no significant content;s" (<iframe xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1310
-# Test 1310 got: "" (t/ContentChecker.t at line 94 fail #1310)
-#      Expected: "/iframe;no significant content;s" (<iframe src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1311
-# Test 1311 got: "/iframe/@src;URI::syntax error:iriref3987;m" (t/ContentChecker.t at line 94 fail #1311)
-#      Expected: "/iframe/@src;URI::syntax error:iriref3987;m\n/iframe;no significant content;s" (<iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1309
+ok 1310
+ok 1311
 ok 1312
 ok 1313
 ok 1314
@@ -1454,61 +1439,27 @@ ok 1340
 ok 1341
 ok 1342
 ok 1343
-not ok 1344
-# Test 1344 got: "/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1344)
-#      Expected: "/video;no significant content;s" (<video xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1344
 ok 1345
 ok 1346
-not ok 1347
-# Test 1347 got: "/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1347)
-#      Expected: "/video;no significant content;s" (<video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1348
-# Test 1348 got: "/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1348)
-#      Expected: "/video;no significant content;s" (<video autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1349
-# Test 1349 got: "/video/@autoplay;boolean:invalid\n/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1349)
-#      Expected: "/video/@autoplay;boolean:invalid\n/video;no significant content;s" (<video autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1350
-# Test 1350 got: "/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1350)
-#      Expected: "/video;no significant content;s" (<video controls="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1351
-# Test 1351 got: "/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1351)
-#      Expected: "/video;no significant content;s" (<video controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1352
-# Test 1352 got: "/video/@controls;boolean:invalid\n/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1352)
-#      Expected: "/video/@controls;boolean:invalid\n/video;no significant content;s" (<video controls="true" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1353
-# Test 1353 got: "/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1353)
-#      Expected: "/video;no significant content;s" (<video poster="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1354
-# Test 1354 got: "/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1354)
-#      Expected: "/video;no significant content;s" (<video poster="abc" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1355
-# Test 1355 got: "/video/@poster;URI::syntax error:iriref3987;m\n/video;element missing:source;m\n/video;no significant content;s" (t/ContentChecker.t at line 94 fail #1355)
-#      Expected: "/video/@poster;URI::syntax error:iriref3987;m\n/video;no significant content;s" (<video poster="[]" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1356
-# Test 1356 got: "/audio;element missing:source;m\n/audio;no significant content;s" (t/ContentChecker.t at line 94 fail #1356)
-#      Expected: "/audio;no significant content;s" (<audio xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1347
+ok 1348
+ok 1349
+ok 1350
+ok 1351
+ok 1352
+ok 1353
+ok 1354
+ok 1355
+ok 1356
 ok 1357
 ok 1358
-not ok 1359
-# Test 1359 got: "/audio;element missing:source;m\n/audio;no significant content;s" (t/ContentChecker.t at line 94 fail #1359)
-#      Expected: "/audio;no significant content;s" (<audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1360
-# Test 1360 got: "/audio;element missing:source;m\n/audio;no significant content;s" (t/ContentChecker.t at line 94 fail #1360)
-#      Expected: "/audio;no significant content;s" (<audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1361
-# Test 1361 got: "/audio/@autoplay;boolean:invalid\n/audio;element missing:source;m\n/audio;no significant content;s" (t/ContentChecker.t at line 94 fail #1361)
-#      Expected: "/audio/@autoplay;boolean:invalid\n/audio;no significant content;s" (<audio autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1362
-# Test 1362 got: "/audio;element missing:source;m\n/audio;no significant content;s" (t/ContentChecker.t at line 94 fail #1362)
-#      Expected: "/audio;no significant content;s" (<audio controls="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1363
-# Test 1363 got: "/audio;element missing:source;m\n/audio;no significant content;s" (t/ContentChecker.t at line 94 fail #1363)
-#      Expected: "/audio;no significant content;s" (<audio controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1364
-# Test 1364 got: "/audio/@controls;boolean:invalid\n/audio;element missing:source;m\n/audio;no significant content;s" (t/ContentChecker.t at line 94 fail #1364)
-#      Expected: "/audio/@controls;boolean:invalid\n/audio;no significant content;s" (<audio controls="true" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1359
+ok 1360
+ok 1361
+ok 1362
+ok 1363
+ok 1364
 ok 1365
 ok 1366
 ok 1367
@@ -1684,21 +1635,11 @@ ok 1536
 ok 1537
 ok 1538
 ok 1539
-not ok 1540
-# Test 1540 got: "/details;element missing:legend;m\n/details;no significant content;s" (t/ContentChecker.t at line 94 fail #1540)
-#      Expected: "/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1541
-# Test 1541 got: "/details;element missing:legend;m\n/details;no significant content;s" (t/ContentChecker.t at line 94 fail #1541)
-#      Expected: "/details;no significant content;s" (<details open="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1542
-# Test 1542 got: "/details;element missing:legend;m\n/details;no significant content;s" (t/ContentChecker.t at line 94 fail #1542)
-#      Expected: "/details;no significant content;s" (<details open="open" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1543
-# Test 1543 got: "/details/@open;boolean:invalid\n/details;element missing:legend;m\n/details;no significant content;s" (t/ContentChecker.t at line 94 fail #1543)
-#      Expected: "/details/@open;boolean:invalid\n/details;no significant content;s" (<details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1544
-# Test 1544 got: "/details/@open;boolean:invalid\n/details;element missing:legend;m\n/details;no significant content;s" (t/ContentChecker.t at line 94 fail #1544)
-#      Expected: "/details/@open;boolean:invalid\n/details;no significant content;s" (<details open="true" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1540
+ok 1541
+ok 1542
+ok 1543
+ok 1544
 ok 1545
 ok 1546
 ok 1547
@@ -1805,8 +1746,8 @@ ok 1647
 ok 1648
 ok 1649
 ok 1650
-# t/content-model-3.dat
 ok 1651
+# t/content-model-3.dat
 ok 1652
 ok 1653
 ok 1654
@@ -1816,10 +1757,10 @@ ok 1657
 ok 1658
 ok 1659
 ok 1660
-not ok 1661
-# Test 1661 got: "/a;element;unsupported" (t/ContentChecker.t at line 94 fail #1661)
+ok 1661
+not ok 1662
+# Test 1662 got: "/a;element;unsupported" (t/ContentChecker.t at line 94 fail #1662)
 #      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
-ok 1662
 ok 1663
 ok 1664
 ok 1665
@@ -1829,8 +1770,8 @@ ok 1668
 ok 1669
 ok 1670
 ok 1671
-# t/content-model-4.dat
 ok 1672
+# t/content-model-4.dat
 ok 1673
 ok 1674
 ok 1675
@@ -1877,8 +1818,8 @@ ok 1715
 ok 1716
 ok 1717
 ok 1718
-# t/content-model-5.dat
 ok 1719
+# t/content-model-5.dat
 ok 1720
 ok 1721
 ok 1722
@@ -1895,9 +1836,7 @@ ok 1732
 ok 1733
 ok 1734
 ok 1735
-not ok 1736
-# Test 1736 got: "" (t/ContentChecker.t at line 94 fail #1736)
-#      Expected: "/title;no significant content;s" (<title xmlns="http://www.w3.org/1999/xhtml"></title>)
+ok 1736
 ok 1737
 ok 1738
 ok 1739
@@ -1907,8 +1846,8 @@ ok 1742
 ok 1743
 ok 1744
 ok 1745
-# t/table-1.dat
 ok 1746
+# t/table-1.dat
 ok 1747
 ok 1748
 ok 1749
@@ -1921,57 +1860,58 @@ ok 1755
 ok 1756
 ok 1757
 ok 1758
+ok 1759
 # t/content-model-atom-1.dat
 # t/content-model-atom-2.dat
-ok 1759
-not ok 1760
-# Test 1760 got: "" (t/ContentChecker.t at line 94 fail #1760)
-#      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="!" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
+ok 1760
 not ok 1761
 # Test 1761 got: "" (t/ContentChecker.t at line 94 fail #1761)
+#      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="!" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
+not ok 1762
+# Test 1762 got: "" (t/ContentChecker.t at line 94 fail #1762)
 #      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang=" en " href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
-ok 1762
-not ok 1763
-# Test 1763 got: "" (t/ContentChecker.t at line 94 fail #1763)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>05-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+ok 1763
 not ok 1764
 # Test 1764 got: "" (t/ContentChecker.t at line 94 fail #1764)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>12005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>05-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1765
 # Test 1765 got: "" (t/ContentChecker.t at line 94 fail #1765)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31t12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>12005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1766
 # Test 1766 got: "" (t/ContentChecker.t at line 94 fail #1766)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31t12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1767
 # Test 1767 got: "" (t/ContentChecker.t at line 94 fail #1767)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1768
+# Test 1768 got: "" (t/ContentChecker.t at line 94 fail #1768)
 #      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-ok 1768
-not ok 1769
-# Test 1769 got: "" (t/ContentChecker.t at line 94 fail #1769)
-#      Expected: "/feed/updated;datetime:bad month;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-17-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+ok 1769
 not ok 1770
 # Test 1770 got: "" (t/ContentChecker.t at line 94 fail #1770)
-#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-32T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:bad month;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-17-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1771
 # Test 1771 got: "" (t/ContentChecker.t at line 94 fail #1771)
-#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-02-29T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-32T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1772
 # Test 1772 got: "" (t/ContentChecker.t at line 94 fail #1772)
-#      Expected: "/feed/updated;datetime:bad hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T24:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-02-29T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1773
 # Test 1773 got: "" (t/ContentChecker.t at line 94 fail #1773)
-#      Expected: "/feed/updated;datetime:bad minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:69:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:bad hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T24:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1774
 # Test 1774 got: "" (t/ContentChecker.t at line 94 fail #1774)
-#      Expected: "/feed/updated;datetime:bad second;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:69Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:bad minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:69:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1775
 # Test 1775 got: "" (t/ContentChecker.t at line 94 fail #1775)
-#      Expected: "/feed/updated;datetime:bad timezone hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+24:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:bad second;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:69Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1776
 # Test 1776 got: "" (t/ContentChecker.t at line 94 fail #1776)
+#      Expected: "/feed/updated;datetime:bad timezone hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+24:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1777
+# Test 1777 got: "" (t/ContentChecker.t at line 94 fail #1777)
 #      Expected: "/feed/updated;datetime:bad timezone minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+02:60</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-ok 1777
 ok 1778
 ok 1779
 ok 1780
+ok 1781

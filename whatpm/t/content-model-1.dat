@@ -4126,6 +4126,28 @@ xxxx
 #data
 <span xmlns="http://www.w3.org/1999/xhtml">
 <object data="">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</object>
+</span>
+#errors
+/span/object/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<ins>
+<object data="">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</object>
+</ins>
+</span>
+#errors
+/span/ins/object/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<object data="">
 <object data="">
 <param name="x" value="y"/>
 <p>xxxx</p>
@@ -5183,7 +5205,7 @@ xxxx
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
-<style scope=""/>
+<style scoped=""/>
 </noscript>
 #errors
 /noscript;no significant content;s

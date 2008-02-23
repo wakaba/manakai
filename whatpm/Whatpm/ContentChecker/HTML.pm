@@ -2944,7 +2944,7 @@ $Element->{$HTML_NS}->{datagrid} = {
       #
     } elsif ($element_state->{phase} eq 'prose') {
       if ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
-        if ($element_state->{has_element} and 
+        if (not $element_state->{has_element} and 
             $child_nsuri eq $HTML_NS and
             $child_ln eq 'table') {
           $self->{onerror}->(node => $child_el,
