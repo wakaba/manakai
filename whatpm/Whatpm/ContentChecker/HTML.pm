@@ -1959,6 +1959,17 @@ $Element->{$HTML_NS}->{small} = {
   }),
 };
 
+$Element->{$HTML_NS}->{big} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+  }),
+  check_start => $Element->{$HTML_NS}->{''}->{check_start},
+};
+
 $Element->{$HTML_NS}->{mark} = {
   status => FEATURE_HTML5_DEFAULT,
   %HTMLPhrasingContentChecker,
@@ -2041,6 +2052,7 @@ $Element->{$HTML_NS}->{acronym} = {
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
+  check_start => $Element->{$HTML_NS}->{''}->{check_start},
 };
 
 $Element->{$HTML_NS}->{time} = {
@@ -2264,15 +2276,7 @@ $Element->{$HTML_NS}->{sub} = {
   }),
 };
 
-$Element->{$HTML_NS}->{sup} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
-    %HTMLAttrStatus,
-    %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-  }),
-};
+$Element->{$HTML_NS}->{sup} = $Element->{$HTML_NS}->{sub};
 
 $Element->{$HTML_NS}->{span} = {
   %HTMLPhrasingContentChecker,
@@ -2297,15 +2301,24 @@ $Element->{$HTML_NS}->{i} = {
   }),
 };
 
-$Element->{$HTML_NS}->{b} = {
+$Element->{$HTML_NS}->{b} = $Element->{$HTML_NS}->{i};
+
+$Element->{$HTML_NS}->{tt} = $Element->{$HTML_NS}->{big};
+
+$Element->{$HTML_NS}->{s} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  status => FEATURE_M12N10_REC_DEPRECATED,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
+  check_start => $Element->{$HTML_NS}->{''}->{check_start},
 };
+
+$Element->{$HTML_NS}->{strike} = $Element->{$HTML_NS}->{s};
+
+$Element->{$HTML_NS}->{u} = $Element->{$HTML_NS}->{s};
 
 $Element->{$HTML_NS}->{bdo} = {
   %HTMLPhrasingContentChecker,
@@ -2328,8 +2341,6 @@ $Element->{$HTML_NS}->{bdo} = {
   },
   ## ISSUE: The spec does not directly say that |dir| is a enumerated attr.
 };
-
-## TODO: big, tt: Common lang(xhtml10)
 
 =pod
 
@@ -4025,7 +4036,6 @@ $Element->{$HTML_NS}->{font} = {
 ## center Common lang(xhtml10)
 ## dir Common compat lang(xhtml10)
 ## isindex class dir id title prompt style(x10) lang(x10)
-## s,strike,u Common xhtml10.lang
 
 ## TODO: CR: ruby rb rt rp rbc rtc @rbspan
 

@@ -2034,6 +2034,110 @@ id=""><span id="">x</span></p>
 /q/@cite;URI::syntax error:iriref3987;m
 
 #data
+<big xmlns="http://www.w3.org/1999/xhtml"></big>
+#errors
+/big;element not defined;m
+/big;no significant content;s
+
+#data
+<big xmlns="http://www.w3.org/1999/xhtml">  </big>
+#errors
+/big;element not defined;m
+/big;no significant content;s
+
+#data
+<big xmlns="http://www.w3.org/1999/xhtml">x</big>
+#errors
+/big;element not defined;m
+
+#data
+<big xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></big>
+#errors
+/big;element not defined;m
+
+#data
+<big xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</big>
+#errors
+/big;element not defined;m
+/big/style;element not allowed:phrasing;m
+/big/style;style:text/css;unsupported
+
+#data
+<big xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></big>
+#errors
+/big;element not defined;m
+/big/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><big>xx</big></span>
+#errors
+/span/big;element not allowed:phrasing;m
+/span/big;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><big>xx</big></div>
+#errors
+/div/big;element not allowed:prose;m
+/div/big;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><big>xx</big></rule>
+#errors
+/rule/big;element not defined;m
+
+#data
+<acronym xmlns="http://www.w3.org/1999/xhtml"></acronym>
+#errors
+/acronym;element not defined;m
+/acronym;no significant content;s
+
+#data
+<acronym xmlns="http://www.w3.org/1999/xhtml">  </acronym>
+#errors
+/acronym;element not defined;m
+/acronym;no significant content;s
+
+#data
+<acronym xmlns="http://www.w3.org/1999/xhtml">x</acronym>
+#errors
+/acronym;element not defined;m
+
+#data
+<acronym xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></acronym>
+#errors
+/acronym;element not defined;m
+
+#data
+<acronym xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</acronym>
+#errors
+/acronym;element not defined;m
+/acronym/style;element not allowed:phrasing;m
+/acronym/style;style:text/css;unsupported
+
+#data
+<acronym xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></acronym>
+#errors
+/acronym;element not defined;m
+/acronym/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><acronym>xx</acronym></span>
+#errors
+/span/acronym;element not allowed:phrasing;m
+/span/acronym;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><acronym>xx</acronym></div>
+#errors
+/div/acronym;element not allowed:prose;m
+/div/acronym;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><acronym>xx</acronym></rule>
+#errors
+/rule/acronym;element not defined;m
+
+#data
 <meter value="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@value;float:syntax error
@@ -2324,6 +2428,214 @@ id=""><span id="">x</span></p>
 <bdo dir="xxx" xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
 /bdo/@dir;enumerated:invalid
+
+#data
+<tt xmlns="http://www.w3.org/1999/xhtml"></tt>
+#errors
+/tt;element not defined;m
+/tt;no significant content;s
+
+#data
+<tt xmlns="http://www.w3.org/1999/xhtml">  </tt>
+#errors
+/tt;element not defined;m
+/tt;no significant content;s
+
+#data
+<tt xmlns="http://www.w3.org/1999/xhtml">x</tt>
+#errors
+/tt;element not defined;m
+
+#data
+<tt xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></tt>
+#errors
+/tt;element not defined;m
+
+#data
+<tt xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</tt>
+#errors
+/tt;element not defined;m
+/tt/style;element not allowed:phrasing;m
+/tt/style;style:text/css;unsupported
+
+#data
+<tt xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></tt>
+#errors
+/tt;element not defined;m
+/tt/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><tt>xx</tt></span>
+#errors
+/span/tt;element not allowed:phrasing;m
+/span/tt;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><tt>xx</tt></div>
+#errors
+/div/tt;element not allowed:prose;m
+/div/tt;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><tt>xx</tt></rule>
+#errors
+/rule/tt;element not defined;m
+
+#data
+<s xmlns="http://www.w3.org/1999/xhtml"></s>
+#errors
+/s;element not defined;m
+/s;no significant content;s
+
+#data
+<s xmlns="http://www.w3.org/1999/xhtml">  </s>
+#errors
+/s;element not defined;m
+/s;no significant content;s
+
+#data
+<s xmlns="http://www.w3.org/1999/xhtml">x</s>
+#errors
+/s;element not defined;m
+
+#data
+<s xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></s>
+#errors
+/s;element not defined;m
+
+#data
+<s xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</s>
+#errors
+/s;element not defined;m
+/s/style;element not allowed:phrasing;m
+/s/style;style:text/css;unsupported
+
+#data
+<s xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></s>
+#errors
+/s;element not defined;m
+/s/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><s>xx</s></span>
+#errors
+/span/s;element not allowed:phrasing;m
+/span/s;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><s>xx</s></div>
+#errors
+/div/s;element not allowed:prose;m
+/div/s;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><s>xx</s></rule>
+#errors
+/rule/s;element not defined;m
+
+#data
+<strike xmlns="http://www.w3.org/1999/xhtml"></strike>
+#errors
+/strike;element not defined;m
+/strike;no significant content;s
+
+#data
+<strike xmlns="http://www.w3.org/1999/xhtml">  </strike>
+#errors
+/strike;element not defined;m
+/strike;no significant content;s
+
+#data
+<strike xmlns="http://www.w3.org/1999/xhtml">x</strike>
+#errors
+/strike;element not defined;m
+
+#data
+<strike xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></strike>
+#errors
+/strike;element not defined;m
+
+#data
+<strike xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</strike>
+#errors
+/strike;element not defined;m
+/strike/style;element not allowed:phrasing;m
+/strike/style;style:text/css;unsupported
+
+#data
+<strike xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></strike>
+#errors
+/strike;element not defined;m
+/strike/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><strike>xx</strike></span>
+#errors
+/span/strike;element not allowed:phrasing;m
+/span/strike;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><strike>xx</strike></div>
+#errors
+/div/strike;element not allowed:prose;m
+/div/strike;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><strike>xx</strike></rule>
+#errors
+/rule/strike;element not defined;m
+
+#data
+<u xmlns="http://www.w3.org/1999/xhtml"></u>
+#errors
+/u;element not defined;m
+/u;no significant content;s
+
+#data
+<u xmlns="http://www.w3.org/1999/xhtml">  </u>
+#errors
+/u;element not defined;m
+/u;no significant content;s
+
+#data
+<u xmlns="http://www.w3.org/1999/xhtml">x</u>
+#errors
+/u;element not defined;m
+
+#data
+<u xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></u>
+#errors
+/u;element not defined;m
+
+#data
+<u xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</u>
+#errors
+/u;element not defined;m
+/u/style;element not allowed:phrasing;m
+/u/style;style:text/css;unsupported
+
+#data
+<u xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></u>
+#errors
+/u;element not defined;m
+/u/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><u>xx</u></span>
+#errors
+/span/u;element not allowed:phrasing;m
+/span/u;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><u>xx</u></div>
+#errors
+/div/u;element not allowed:prose;m
+/div/u;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><u>xx</u></rule>
+#errors
+/rule/u;element not defined;m
 
 #data
 <ins cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</ins>
