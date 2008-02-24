@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Feb 24 19:13:30 2008
-# Current time GMT:   Sun Feb 24 10:13:30 2008
+# Current time local: Sun Feb 24 21:56:35 2008
+# Current time GMT:   Sun Feb 24 12:56:35 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -417,17 +417,17 @@ ok 389
 ok 390
 ok 391
 not ok 392
-# Test 392 got: "/datagrid/select;element not defined;m" (t/ContentChecker.t at line 98 fail #392)
+# Test 392 got: "/datagrid/select;no significant content;s" (t/ContentChecker.t at line 98 fail #392)
 #     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>)
 not ok 393
-# Test 393 got: "/datagrid/datalist;element not defined;m" (t/ContentChecker.t at line 98 fail #393)
+# Test 393 got: "/datagrid/datalist;no significant content;s" (t/ContentChecker.t at line 98 fail #393)
 #     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>)
 ok 394
 not ok 395
-# Test 395 got: "/datagrid/\"aa\";character not allowed\n/datagrid/select;element not defined;m" (t/ContentChecker.t at line 98 fail #395)
+# Test 395 got: "/datagrid/\"aa\";character not allowed\n/datagrid/select;no significant content;s" (t/ContentChecker.t at line 98 fail #395)
 #     Expected: "/datagrid/\"aa\";character not allowed" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/>aa</datagrid>)
 not ok 396
-# Test 396 got: "/datagrid/\"aa\";character not allowed\n/datagrid/datalist;element not defined;m" (t/ContentChecker.t at line 98 fail #396)
+# Test 396 got: "/datagrid/\"aa\";character not allowed\n/datagrid/datalist;no significant content;s" (t/ContentChecker.t at line 98 fail #396)
 #     Expected: "/datagrid/\"aa\";character not allowed" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/>aa</datagrid>)
 ok 397
 ok 398
@@ -669,17 +669,17 @@ ok 633
 ok 634
 ok 635
 not ok 636
-# Test 636 got: "/fieldset;element not defined;m" (t/ContentChecker.t at line 98 fail #636)
+# Test 636 got: "/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #636)
 #     Expected: "" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend>XXX</legend>
 #</fieldset>)
 not ok 637
-# Test 637 got: "/fieldset/legend/p;element not allowed:phrasing;m\n/fieldset;element not defined;m" (t/ContentChecker.t at line 98 fail #637)
+# Test 637 got: "/fieldset/legend/p;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #637)
 #     Expected: "/fieldset/legend/p;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend><p>XXX</p></legend>
 #</fieldset>)
 not ok 638
-# Test 638 got: "/fieldset/legend/blockquote;element not allowed:phrasing;m\n/fieldset;element not defined;m" (t/ContentChecker.t at line 98 fail #638)
+# Test 638 got: "/fieldset/legend/blockquote;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #638)
 #     Expected: "/fieldset/legend/blockquote;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend><blockquote><p>XXX</p></blockquote></legend>
 #</fieldset>)
@@ -761,7 +761,9 @@ ok 713
 ok 714
 ok 715
 ok 716
-ok 717
+not ok 717
+# Test 717 got: "" (t/ContentChecker.t at line 98 fail #717)
+#     Expected: "/rule/textarea;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><textarea><nest/></textarea></rule>)
 ok 718
 ok 719
 ok 720

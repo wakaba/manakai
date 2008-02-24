@@ -3434,27 +3434,310 @@ $Element->{$HTML_NS}->{th} = {
   }),
 };
 
-## TODO: forms
-## TODO: Tests for <nest/> in form elements
+my $AttrCheckerNotImplemented = sub {
+  my ($self, $attr) = @_;
+  $self->{onerror}->(node => $attr, level => 'unsupported',
+                     type => 'attribute');
+};
 
-=pod
+$Element->{$HTML_NS}->{form} = {
+  %HTMLProseContentChecker, ## NOTE: %Flow; in XHTML1 Transitional
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes
+    'accept-charset' => $AttrCheckerNotImplemented, ## TODO: Charsets
+    action => $HTMLURIAttrChecker, ## TODO: "User agent behavior for a value other than HTTP URI is undefined" [HTML4]
+    enctype => $HTMLIMTAttrChecker, ## TODO: "multipart/form-data" should be used when type=file is used [HTML4]
+    method => $GetHTMLEnumeratedAttrChecker->({get => 1, post => 1}),
+        ## NOTE: "get" SHOULD be used for idempotent submittion,
+        ## "post" SHOULD be used otherwise [HTML4].  This cannot be tested.
+    name => sub { }, # CDATA in HTML4 ## TODO: must be same as |id| (informative!) [XHTML10]
+    target => $HTMLTargetAttrChecker,
+    ## TODO: Warn for combination whose behavior is not defined.
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    accept => FEATURE_M12N10_REC,
+    'accept-charset' => FEATURE_M12N10_REC,
+    action => FEATURE_M12N10_REC,
+    enctype => FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    method => FEATURE_M12N10_REC,
+    name => FEATURE_M12N10_REC_DEPRECATED,
+    onreset => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onsubmit => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    target => FEATURE_M12N10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <form>
+};
 
-form Common, accept, accept-charset action method enctype target onreset onsubmit name(depreacte) xhtml10.lang
-input Common accept accesskey alt checked disabled maxlength name readonly size src tabindex type value usemap ismap onblur onchange onfocus onselect align(deprecated) lang(xhtml10) %reserved
-select Common disabled multiple name size tabindex onblur onchange onfocus  lang(xhtml10) %reserved
-option Common disabled label selected value lang(x10)
-textarea Common accesskey cols disabled name readonly rows tabindex onblur onchange onfocus onselect lang(x10) $resercvd
-button Common accesskey disabled name tabindex type value onblur onfocus lang(x10) %reserved
-fieldset Common lang(x10)
-label Common accesskey for onblur onfocus lang(xhtml10)
-optgroup Common disabled label lang(x10)
+$Element->{$HTML_NS}->{fieldset} = {
+  %HTMLProseContentChecker, ## NOTE: legend, %Flow; ## TODO: legend
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <fieldset>
+};
 
-%reserved (html4)
-datafld => FEATURE_HTML4_REC_RESERVED,
+$Element->{$HTML_NS}->{input} = {
+  %HTMLProseContentChecker,
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes
+    accesskey => $AttrCheckerNotImplemented, ## TODO: Character
+       ## TODO: "Note. Authors should consider the input method of the expected reader when specifying an accesskey." [HTML4]
+       ## "We recommend that authors include the access key in label text or wherever the access key is to apply." [HTML4]
+    align => $GetHTMLEnumeratedAttrChecker->({
+      top => 1, middle => 1, bottom => 1, left => 1, right => 1,
+    }),
+    alt => sub {}, ## NOTE: Text [M12N] ## TODO: |alt| should be provided for |type=image| [HTML4]
+        ## NOTE: HTML4 has a "should" for accessibility, which cannot be tested
+        ## here.
+    checked => $GetHTMLBooleanAttrChecker->('checked'),
+    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    ismap => $GetHTMLBooleanAttrChecker->('ismap'),
+    maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    name => sub {}, ## NOTE: CDATA [M12N]
+    readonly => $GetHTMLBooleanAttrChecker->('readonly'),
+    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    src => $HTMLURIAttrChecker,
+    type => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, password => 1, checkbox => 1, radio => 1, submit => 1,
+      reset => 1, file => 1, hidden => 1, image => 1, button => 1,
+    }),
+    usemap => $HTMLUsemapAttrChecker,
+    value => sub {}, ## NOTE: CDATA [M12N] ## TODO: "optional except when the type attribute has the value "radio" or "checkbox"" [HTML4]
+    ## TODO: "authors should ensure that in each set of radio buttons that one is initially "on"." [HTML4]
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    accept => FEATURE_M12N10_REC,
+    accesskey => FEATURE_M12N10_REC,
+    align => FEATURE_M12N10_REC_DEPRECATED,
+    alt => FEATURE_M12N10_REC,
+    checked => FEATURE_M12N10_REC,
+    datafld => FEATURE_HTML4_REC_RESERVED,
     dataformatas => FEATURE_HTML4_REC_RESERVED,
     datasrc => FEATURE_HTML4_REC_RESERVED,
+    disabled => FEATURE_M12N10_REC,
+    ismap => FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    maxlength => FEATURE_M12N10_REC,
+    name => FEATURE_M12N10_REC,
+    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    readonly => FEATURE_M12N10_REC,
+    size => FEATURE_M12N10_REC,
+    src => FEATURE_M12N10_REC,
+    tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    type => FEATURE_M12N10_REC,
+    usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
+    value => FEATURE_M12N10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <input>
+};
 
-=cut
+$Element->{$HTML_NS}->{button} = {
+  %HTMLProseContentChecker, ## NOTE: %Flow; - something [XHTML10]
+    ## TODO: -A|%formctrl;|form|fieldset [HTML4]
+    ## TODO: image map (img) in |button| is "illegal" [HTML4].
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    accesskey => $AttrCheckerNotImplemented, ## TODO: Character
+    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    name => sub {}, ## NOTE: CDATA [M12N]
+    type => $GetHTMLEnumeratedAttrChecker->({
+      button => 1, submit => 1, reset => 1,
+    }),
+    value => sub {}, ## NOTE: CDATA [M12N]
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    accesskey => FEATURE_M12N10_REC,
+    datafld => FEATURE_HTML4_REC_RESERVED,
+    dataformatas => FEATURE_HTML4_REC_RESERVED,
+    datasrc => FEATURE_HTML4_REC_RESERVED,
+    disabled => FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    name => FEATURE_M12N10_REC,
+    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    type => FEATURE_M12N10_REC,
+    value => FEATURE_M12N10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <button>
+};
+
+$Element->{$HTML_NS}->{label} = {
+  %HTMLPhrasingContentChecker, ## NOTE: %Inline - label [XHTML10] ## TODO: -label
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    accesskey => $AttrCheckerNotImplemented, ## TODO:  Charcter
+    for => $AttrCheckerNotImplemented, ## TODO: IDREF ## TODO: Must be |id| of control [HTML4] ## TODO: Or, "may only contain one control element"
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    accesskey => FEATURE_M12N10_REC,
+    for => FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <label>
+};
+
+$Element->{$HTML_NS}->{select} = {
+  %HTMLProseContentChecker, ## TODO: (optgroup|option)+ [HTML4]
+    ## TODO: author should SELECTED at least one OPTION in non-MULTIPLE case [HTML4].
+    ## TODO: more than one OPTION with SELECTED in non-MULTIPLE case is "error" [HTML4]
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    multiple => $GetHTMLBooleanAttrChecker->('multiple'),
+    name => sub {}, ## NOTE: CDATA [M12N]
+    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    datafld => FEATURE_HTML4_REC_RESERVED,
+    dataformatas => FEATURE_HTML4_REC_RESERVED,
+    datasrc => FEATURE_HTML4_REC_RESERVED,
+    disabled => FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    multiple => FEATURE_M12N10_REC,
+    name => FEATURE_M12N10_REC,
+    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    size => FEATURE_M12N10_REC,
+    tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <select>
+};
+
+$Element->{$HTML_NS}->{datalist} = {
+  %HTMLProseContentChecker,
+  status => FEATURE_WF2,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <datalist>
+};
+
+$Element->{$HTML_NS}->{optgroup} = {
+  %HTMLProseContentChecker, ## TODO: option+ [HTML4]
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    label => sub {}, ## NOTE: Text [M12N] ## TODO: required
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    disabled => FEATURE_M12N10_REC,
+    label => FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <optgroup>
+};
+
+$Element->{$HTML_NS}->{option} = {
+  %HTMLTextChecker,
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    label => sub {}, ## NOTE: Text [M12N]
+    selected => $GetHTMLBooleanAttrChecker->('selected'),
+    value => sub {}, ## NOTE: CDATA [M12N]
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    disabled => FEATURE_M12N10_REC,
+    label => FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    selected => FEATURE_M12N10_REC,
+    value => FEATURE_M12N10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <option>
+};
+
+$Element->{$HTML_NS}->{textarea} = {
+  %HTMLTextChecker,
+  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    accesskey => $AttrCheckerNotImplemented, ## TODO: Character
+    cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## TODO: required [M12n}
+    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    name => sub {}, ## NOTE: CDATA [M12N]
+    readonly => $GetHTMLBooleanAttrChecker->('readonly'),
+    rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## TODO: required [M12n}
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    accesskey => FEATURE_M12N10_REC,
+    cols => FEATURE_M12N10_REC,
+    datafld => FEATURE_HTML4_REC_RESERVED,
+    dataformatas => FEATURE_HTML4_REC_RESERVED,
+    datasrc => FEATURE_HTML4_REC_RESERVED,
+    disabled => FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    name => FEATURE_M12N10_REC,
+    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    readonly => FEATURE_M12N10_REC,
+    rows => FEATURE_M12N10_REC,
+    tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <textarea>
+};
+
+$Element->{$HTML_NS}->{output} = {
+  %HTMLProseContentChecker,
+  status => FEATURE_WF2,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <output>
+};
+
+## TODO: repetition template
+
+$Element->{$HTML_NS}->{isindex} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_M12N10_REC_DEPRECATED,
+  check_attrs => $GetHTMLAttrsChecker->({
+    prompt => sub {}, ## NOTE: Text [M12N]
+  }, {
+    %HTMLAttrStatus,
+    class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    prompt => FEATURE_M12N10_REC_DEPRECATED,
+    style => FEATURE_XHTML10_REC,
+    title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  }),
+  ## TODO: Tests
+  ## TODO: Tests for <nest/> in <isindex>
+};
 
 $Element->{$HTML_NS}->{script} = {
   %HTMLChecker,
@@ -3985,7 +4268,12 @@ $Element->{$HTML_NS}->{nest} = {
 $Element->{$HTML_NS}->{legend} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+#    accesskey => $AttrCheckerNotImplemented, ## TODO: Character ## TODO: This attribute is not part of HTML5
+#    align => $GetHTMLEnumeratedAttrChecker->({
+#      top => 1, bottom => 1, left => 1, right => 1,
+#    }),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     accesskey => FEATURE_M12N10_REC,
@@ -4035,7 +4323,6 @@ $Element->{$HTML_NS}->{font} = {
 ## basefont color face id size
 ## center Common lang(xhtml10)
 ## dir Common compat lang(xhtml10)
-## isindex class dir id title prompt style(x10) lang(x10)
 
 ## TODO: CR: ruby rb rt rp rbc rtc @rbspan
 
