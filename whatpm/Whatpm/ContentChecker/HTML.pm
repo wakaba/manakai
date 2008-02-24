@@ -2808,25 +2808,21 @@ $Element->{$HTML_NS}->{noscript} = {
                              level => $self->{must_level});
         }
       } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'meta') {
-        if ($child_el->has_attribute_ns (undef, 'charset')) {
-          ## NOTE: Non-conforming.  An error is raised by
-          ## |meta|'s checker.
-        } else {
-          my $http_equiv_attr
-              = $child_el->get_attribute_node_ns (undef, 'http-equiv');
-          if ($http_equiv_attr) {
-            ## TODO: case
-            if (lc $http_equiv_attr->value eq 'content-type') {
-              ## NOTE: Non-conforming.  An error is raised by
-              ## |meta|'s checker.
-            } else {
-              #
-            }
-          } else {
+        my $http_equiv_attr
+            = $child_el->get_attribute_node_ns (undef, 'http-equiv');
+        if ($http_equiv_attr) {
+          ## TODO: case
+          if (lc $http_equiv_attr->value eq 'content-type') {
             $self->{onerror}->(node => $child_el,
                                type => 'element not allowed:head noscript',
                                level => $self->{must_level});
+          } else {
+            #
           }
+        } else {
+          $self->{onerror}->(node => $child_el,
+                             type => 'element not allowed:head noscript',
+                             level => $self->{must_level});
         }
       } else {
         $self->{onerror}->(node => $child_el,

@@ -687,6 +687,7 @@
 </head>
 #errors
 /head/noscript;in XML:noscript
+/head/noscript/meta;element not allowed:head noscript;m
 /head/noscript/meta;element not allowed:meta charset;m
 /head/noscript/meta;in XML:charset;m
 /head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
@@ -796,6 +797,7 @@
 </head>
 #errors
 /head/noscript;in XML:noscript
+/head/noscript/meta;element not allowed:head noscript;m
 /head/noscript/meta;element not allowed:meta charset;m
 /head/noscript/meta;in XML:charset;m
 /head/noscript/meta/@content;mismatched charset name::us-ascii;unsupported
@@ -5162,6 +5164,7 @@ xxxx
 /head/noscript;in XML:noscript
 /head/noscript/noscript;in XML:noscript
 /head/noscript/noscript;element not allowed:head noscript;m
+/head/noscript/noscript/meta;element not allowed:head noscript;m
 /head/noscript/noscript/meta;element not allowed:meta charset;m
 /head/noscript/noscript/meta;in XML:charset;m
 /head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
@@ -5219,9 +5222,22 @@ xxxx
 #errors
 /noscript;no significant content;s
 /noscript;in XML:noscript
+/noscript/meta;element not allowed:prose;m
 /noscript/meta;element not allowed:meta charset;m
 /noscript/meta;in XML:charset;m
 /noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
+
+#data
+<noscript xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii"/>
+</noscript>
+#errors
+/noscript;no significant content;s
+/noscript;in XML:noscript
+/noscript/meta;element not allowed:prose;m
+/noscript/meta;element not allowed:meta charset;m
+/noscript/meta;in XML:charset;m
+/noscript/meta/@content;mismatched charset name::us-ascii;unsupported
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
