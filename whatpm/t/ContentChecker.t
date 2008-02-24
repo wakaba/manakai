@@ -82,8 +82,12 @@ sub test ($) {
   Whatpm::ContentChecker->check_element
     ($doc->document_element, sub {
        my %opt = @_;
-       push @error, get_node_path ($opt{node}) . ';' . $opt{type} .
-           (defined $opt{level} ? ';'.$opt{level} : '');
+       if ($opt{type} =~ /^status:/ and $opt{level} eq 'i') {
+         #
+       } else {
+         push @error, get_node_path ($opt{node}) . ';' . $opt{type} .
+             (defined $opt{level} ? ';'.$opt{level} : '');
+       }
      }, sub {
        my $opt = shift;
        push @error, get_node_path ($opt->{container_node}) .
@@ -121,4 +125,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2008/02/16 00:18:13 $
+## $Date: 2008/02/24 01:38:36 $

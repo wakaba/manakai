@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.66 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.67 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -8,6 +8,11 @@ require Whatpm::URIChecker;
 ## be applied to an in-memory representation (i.e. DOM)?
 
 ## TODO: Conformance of an HTML document with non-html root element.
+
+sub FEATURE_STATUS_REC () { 0b1 } ## Interoperable standard
+sub FEATURE_STATUS_CR () { 0b10 } ## Call for implementation
+sub FEATURE_STATUS_LC () { 0b100 } ## Last call for comments
+sub FEATURE_STATUS_WD () { 0b1000 } ## Working or editor's draft
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
@@ -227,6 +232,7 @@ sub check_document ($$$;$) {
   $self->{fact_level} = 'f';
   $self->{should_level} = 's';
   $self->{good_level} = 'w';
+  $self->{info_level} = 'i';
   $self->{unsupported_lavel} = 'u';
 
   my $docel = $doc->document_element;
@@ -336,6 +342,7 @@ sub check_element ($$$;$) {
   $self->{fact_level} = 'f';
   $self->{should_level} = 's';
   $self->{good_level} = 'w';
+  $self->{info_level} = 'i';
   $self->{unsupported_lavel} = 'u';
 
   $self->{plus_elements} = {};
@@ -388,6 +395,15 @@ next unless $code;## TODO: temp.
           ? $item->{parent_def}
               ? $item->{parent_state} || $element_state : $element_state
           : $element_state;
+
+      unless ($eldef->{status} & FEATURE_STATUS_REC) {
+        my $status = $eldef->{status} & FEATURE_STATUS_CR ? 'cr' :
+            $eldef->{status} & FEATURE_STATUS_LC ? 'lc' :
+            $eldef->{status} & FEATURE_STATUS_WD ? 'wd' : 'non-standard';
+        $self->{onerror}->(node => $item->{node},
+                           type => 'status:'.$status.':element',
+                           level => $self->{info_level});
+      }
 
       my @new_item;
       push @new_item, [$eldef->{check_start}, $self, $item, $element_state];
@@ -710,4 +726,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/24 00:51:09 $
+# $Date: 2008/02/24 01:38:36 $
