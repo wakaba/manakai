@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Feb 24 01:04:11 2008
-# Current time GMT:   Sat Feb 23 16:04:11 2008
+# Current time local: Sun Feb 24 09:49:00 2008
+# Current time GMT:   Sun Feb 24 00:49:00 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -145,19 +145,9 @@ ok 117
 ok 118
 ok 119
 ok 120
-not ok 121
-# Test 121 got: "/body/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #121)
-#     Expected: "/body/style;style:text/css;unsupported\n/body;no significant content;s" (<body xmlns="http://www.w3.org/1999/xhtml">
-#<style scoped="scoped"/>
-#<del>para</del>
-#</body>)
+ok 121
 ok 122
-not ok 123
-# Test 123 got: "/body/del/style;style:text/css;unsupported" (t/ContentChecker.t at line 94 fail #123)
-#     Expected: "/body/del/style;style:text/css;unsupported\n/body;no significant content;s" (<body xmlns="http://www.w3.org/1999/xhtml">
-#<del><style scoped="scoped"/>
-#para</del>
-#</body>)
+ok 123
 ok 124
 ok 125
 ok 126
@@ -471,9 +461,7 @@ ok 425
 ok 426
 ok 427
 ok 428
-not ok 429
-# Test 429 got: "" (t/ContentChecker.t at line 94 fail #429)
-#     Expected: "/mark;no significant content;s" (<mark xmlns="http://www.w3.org/1999/xhtml"><del>as</del></mark>)
+ok 429
 ok 430
 ok 431
 ok 432
@@ -676,18 +664,10 @@ ok 628
 ok 629
 ok 630
 ok 631
-not ok 632
-# Test 632 got: "" (t/ContentChecker.t at line 94 fail #632)
-#     Expected: "/th;no significant content;s" (<th xmlns="http://www.w3.org/1999/xhtml"><del>xx</del></th>)
-not ok 633
-# Test 633 got: "/th/del/p;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #633)
-#     Expected: "/th/del/p;element not allowed:phrasing;m\n/th;no significant content;s" (<th xmlns="http://www.w3.org/1999/xhtml"><del><p>xx</p></del></th>)
-not ok 634
-# Test 634 got: "/th/del/p;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #634)
-#     Expected: "/th/del/p;element not allowed:phrasing;m\n/th;no significant content;s" (<th xmlns="http://www.w3.org/1999/xhtml"><del><p>xxx</p>xxx</del></th>)
-not ok 635
-# Test 635 got: "/th/del/ins/p;element not allowed:phrasing;m" (t/ContentChecker.t at line 94 fail #635)
-#     Expected: "/th/del/ins/p;element not allowed:phrasing;m\n/th;no significant content;s" (<th xmlns="http://www.w3.org/1999/xhtml"><del><ins>xxx<p>xxx</p></ins></del></th>)
+ok 632
+ok 633
+ok 634
+ok 635
 not ok 636
 # Test 636 got: "/fieldset;element;unsupported" (t/ContentChecker.t at line 94 fail #636)
 #     Expected: "" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
@@ -1825,9 +1805,7 @@ ok 1729
 ok 1730
 ok 1731
 ok 1732
-not ok 1733
-# Test 1733 got: "" (t/ContentChecker.t at line 94 fail #1733)
-#      Expected: "/p;no significant content;s" (<p xmlns="http://www.w3.org/1999/xhtml"><del>a</del></p>)
+ok 1733
 ok 1734
 ok 1735
 ok 1736

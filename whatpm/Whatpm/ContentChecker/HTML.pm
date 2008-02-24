@@ -676,7 +676,7 @@ my %HTMLProseContentChecker = (
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     if ($element_state->{has_significant}) {
-      $item->{parent_state}->{has_significant} = 1;
+      $item->{real_parent_state}->{has_significant} = 1;
     } elsif ($item->{transparent}) {
       #
     } else {
@@ -714,7 +714,7 @@ my %HTMLPhrasingContentChecker = (
 
 my %HTMLTransparentChecker = %HTMLProseContentChecker;
 ## ISSUE: Significant content rule should be applied to transparent element
-## with parent?  Currently, applied to |video| but not to others.
+## with parent?
 
 our $Element;
 our $ElementDefault;
@@ -2145,7 +2145,7 @@ $Element->{$HTML_NS}->{object} = {
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     if ($element_state->{has_significant}) {
-      $item->{parent_state}->{has_significant} = 1;
+      $item->{real_parent_state}->{has_significant} = 1;
     } elsif ($item->{node}->manakai_parent_element) {
       ## NOTE: Transparent.
     } else {

@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.65 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.66 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -175,7 +175,7 @@ our %AnyChecker = (
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     if ($element_state->{has_significant}) {
-      $item->{parent_state}->{has_significant} = 1;
+      $item->{real_parent_state}->{has_significant} = 1;
     }    
   },
 );
@@ -358,6 +358,7 @@ sub check_element ($$$;$) {
   };
 
   my @item = ({type => 'element', node => $el, parent_state => {}});
+  $item[-1]->{real_parent_state} = $item[-1]->{parent_state};
   while (@item) {
     my $item = shift @item;
     if (ref $item eq 'ARRAY') {
@@ -406,10 +407,12 @@ next unless $code;## TODO: temp.
                    $child_nsuri eq $HTML_NS and $child_ln eq 'noscript')) {
             push @new_item, [$content_def->{check_child_element},
                              $self, $item, $child,
-                             $child_nsuri, $child_ln, 1, $content_state];
+                             $child_nsuri, $child_ln, 1,
+                             $content_state, $element_state];
             push @new_item, {type => 'element', node => $child,
                              parent_state => $content_state,
                              parent_def => $content_def,
+                             real_parent_state => $element_state,
                              transparent => 1};
           } else {
             if ($item->{parent_def} and # has parent
@@ -440,9 +443,10 @@ next unless $code;## TODO: temp.
                              $child_nsuri, $child_ln,
                              $HTMLSemiTransparentElements
                                  ->{$child_nsuri}->{$child_ln},
-                             $content_state];
+                             $content_state, $element_state];
             push @new_item, {type => 'element', node => $child,
                              parent_def => $content_def,
+                             real_parent_state => $element_state,
                              parent_state => $content_state};
           }
 
@@ -454,8 +458,8 @@ next unless $code;## TODO: temp.
           my $has_significant = ($child->data =~ /[^\x09-\x0D\x20]/);
           push @new_item, [$content_def->{check_child_text},
                            $self, $item, $child, $has_significant,
-                           $content_state];
-          $content_state->{has_significant} ||= $has_significant;
+                           $content_state, $element_state];
+          $element_state->{has_significant} ||= $has_significant;
           if ($has_significant and
               $HTMLSemiTransparentElements->{$el_nsuri}->{$el_ln}) {
             $content_def = $item->{parent_def} || $content_def;
@@ -706,4 +710,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/23 16:09:20 $
+# $Date: 2008/02/24 00:51:09 $
