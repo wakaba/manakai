@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.67 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.68 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -566,6 +566,25 @@ sub _remove_plus_elements ($$) {
   }
 } # _remove_plus_elements
 
+sub _attr_status_info ($$$) {
+  my ($self, $attr, $status_code) = @_;
+  my $status;
+  if ($status_code & FEATURE_STATUS_REC) {
+    return;
+  } elsif ($status_code & FEATURE_STATUS_CR) {
+    $status = 'cr';
+  } elsif ($status_code & FEATURE_STATUS_LC) {
+    $status = 'lc';
+  } elsif ($status_code & FEATURE_STATUS_WD) {
+    $status = 'wd';
+  } else {
+    $status = 'non-standard';
+  }
+  $self->{onerror}->(node => $attr,
+                     type => 'status:'.$status.':attr',
+                     level => $self->{info_level});
+} # _attr_status_info
+
 sub _add_minuses ($@) {
   my $self = shift;
   my $r = {};
@@ -726,4 +745,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/24 01:38:36 $
+# $Date: 2008/02/24 07:51:19 $

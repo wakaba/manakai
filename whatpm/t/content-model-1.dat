@@ -6,13 +6,13 @@
 #data
 <unknown xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
-/unknown;element;unsupported
+/unknown;element not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><unknown/></p>
 #errors
 /p/unknown;element not allowed:phrasing;m
-/p/unknown;element;unsupported
+/p/unknown;element not defined;m
 /p;no significant content;s
 
 #data
@@ -1002,7 +1002,7 @@ para
 </body>
 #errors
 /body/unknown;element not allowed:prose;m
-/body/unknown;element;unsupported
+/body/unknown;element not defined;m
 /body/style;style:text/css;unsupported
 /body;no significant content;s
 
@@ -1012,7 +1012,7 @@ para
 <unknown>xx</unknown>
 </body>
 #errors
-/body/unknown;element;unsupported
+/body/unknown;element not defined;m
 /body/unknown;element not allowed:prose;m
 /body/style;style:text/css;unsupported
 
@@ -5413,7 +5413,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><unknownelement/></rule>
 #errors
-/rule/unknownelement;element;unsupported
+/rule/unknownelement;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><unknown xmlns=""/></rule>
@@ -5520,12 +5520,12 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <plaintext><nest/></plaintext>
 </rule>
 #errors
-/rule/plaintext;element;unsupported
+/rule/plaintext;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><textarea><nest/></textarea></rule>
 #errors
-/rule/textarea;element;unsupported
+/rule/textarea;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><section><nest/></section></rule>

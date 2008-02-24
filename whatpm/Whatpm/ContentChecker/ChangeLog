@@ -1,5 +1,16 @@
 2008-02-24  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: Standardized status for attributes are added (HTML5
+	info are not added yet).  Make element or attribute not defined
+	by HTML5 spec as a conformance error (though it is not clearly
+	defined by HTML5 spec as non-conforming).  Note that more work
+	is needed for non-standard attribute thing, since the current
+	implementation prevents non-standard attribute from being 
+	syntactically checked (otherwise it is treated as if a
+	standard attribute).
+
+2008-02-24  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm: Standardized status attributes are added.
 
 2008-02-24  Wakaba  <wakaba@suika.fam.cx>

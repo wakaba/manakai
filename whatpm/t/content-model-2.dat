@@ -36,21 +36,41 @@
 <unknown u1="" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
 /unknown;element;unsupported
-/unknown/@u1;attribute;unsupported
+/unknown/@u1;attribute not defined;m
 
 #data
 <unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
 /unknown;element;unsupported
 /unknown/@lang;syntax error
-/unknown/@u1;attribute;unsupported
+/unknown/@u1;attribute not defined;m
 
 #data
-<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
+<unknown class="" u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
 /unknown;element;unsupported
 /unknown/@lang;syntax error
-/unknown/@u1;attribute;unsupported
+/unknown/@u1;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" unknown="">x</p>
+#errors
+/p/@unknown;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" unknown="">x</a>
+#errors
+/a/@unknown;attribute not defined;m
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" unknown="" alt="x" href="" shape="default"></area>
+#errors
+/area/@unknown;attribute not defined;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml" name="keywords" content="a" unknown=""/>
+#errors
+/meta/@unknown;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
