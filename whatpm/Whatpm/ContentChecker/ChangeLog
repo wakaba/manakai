@@ -1,5 +1,10 @@
 2008-02-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: Since even XHTML Basic 1.1 is a CR, diffs
+	from XHTML M12N 1.0 are reflected in |status| field.
+
+2008-02-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm: HTML5 status constants are OR-ed with "allowed" status.
 	Don't raise "not defined" errors; they are now raised according
 	to status flags.  Status flags of li/@value, ol/@start, and menu

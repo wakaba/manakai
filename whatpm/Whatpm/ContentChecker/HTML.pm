@@ -33,6 +33,15 @@ sub FEATURE_WF2 () {
   Whatpm::ContentChecker::FEATURE_ALLOWED
 }
 
+sub FEATURE_XHTMLBASIC11_CR () {
+  ## NOTE: Only additions to M12N10_REC are marked.
+  Whatpm::ContentChecker::FEATURE_STATUS_CR
+}
+sub FEATURE_XHTMLBASIC11_CR_DEPRECATED () {
+  Whatpm::ContentChecker::FEATURE_STATUS_CR |
+  Whatpm::ContentChecker::FEATURE_DEPRECATED_INFO
+}
+
 ## NOTE: M12N10 status is based on its abstract module definition.
 ## It contains a number of problems.  (However, again, it's a REC!)
 sub FEATURE_M12N10_REC () {
@@ -640,7 +649,8 @@ my %HTMLM12NCommonAttrStatus = (
   onkeypress => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeydown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  style => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  style => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR_DEPRECATED |
+      FEATURE_M12N10_REC,
   title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
 );
 
@@ -1730,8 +1740,10 @@ $Element->{$HTML_NS}->{li} = {
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     type => FEATURE_M12N10_REC_DEPRECATED,
-    #value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
-    value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    #value => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR | 
+    #    FEATURE_M12N10_REC_DEPRECATED,
+    value => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR |
+        FEATURE_M12N10_REC,
   }),
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -3541,6 +3553,7 @@ $Element->{$HTML_NS}->{input} = {
     dataformatas => FEATURE_HTML4_REC_RESERVED,
     datasrc => FEATURE_HTML4_REC_RESERVED,
     disabled => FEATURE_M12N10_REC,
+    inputmode => FEATURE_XHTMLBASIC11_CR,
     ismap => FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     maxlength => FEATURE_M12N10_REC,
@@ -3710,6 +3723,7 @@ $Element->{$HTML_NS}->{textarea} = {
     dataformatas => FEATURE_HTML4_REC_RESERVED,
     datasrc => FEATURE_HTML4_REC_RESERVED,
     disabled => FEATURE_M12N10_REC,
+    inputmode => FEATURE_XHTMLBASIC11_CR,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     name => FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
