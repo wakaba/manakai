@@ -1639,11 +1639,13 @@ $Element->{$HTML_NS}->{ol} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     start => $HTMLIntegerAttrChecker,
+    reversed => $GetHTMLBooleanAttrChecker->('reversed'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     compact => FEATURE_M12N10_REC_DEPRECATED,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    reversed => FEATURE_HTML5_DEFAULT,
     start => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
     type => FEATURE_M12N10_REC_DEPRECATED,
   }),
@@ -2410,7 +2412,7 @@ $Element->{$HTML_NS}->{del} = {
 $Element->{$HTML_NS}->{figure} = {
   %HTMLProseContentChecker,
   status => FEATURE_HTML5_FD,
-  ## NOTE: legend, Prose | Prose, legend
+  ## NOTE: legend, Prose | Prose, legend?
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -2459,10 +2461,6 @@ $Element->{$HTML_NS}->{figure} = {
                            type => 'element not allowed:figure legend',
                            level => $self->{must_level});
       }
-    } else {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:legend',
-                         level => $self->{must_level});
     }
 
     $HTMLProseContentChecker{check_end}->(@_);
@@ -3722,6 +3720,7 @@ $Element->{$HTML_NS}->{output} = {
 
 $Element->{$HTML_NS}->{isindex} = {
   %HTMLEmptyChecker,
+## TODO: SHOULD use form [HTML4]
   status => FEATURE_M12N10_REC_DEPRECATED,
   check_attrs => $GetHTMLAttrsChecker->({
     prompt => sub {}, ## NOTE: Text [M12N]

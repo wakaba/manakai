@@ -1667,6 +1667,49 @@ id=""><span id="">x</span></p>
 /ol/@start;integer:syntax error
 
 #data
+<ol reversed="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol reversed="reversed" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol reversed="REVERSED" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@reversed;boolean:invalid
+
+#data
+<ol reversed="  reversed  " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@reversed;boolean:invalid
+
+#data
+<ol reversed="yes" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@reversed;boolean:invalid
+
+#data
+<ol reversed="on" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@reversed;boolean:invalid
+
+#data
+<ol reversed="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@reversed;boolean:invalid
+
+#data
+<ol reverse="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@reverse;attribute not defined;m
+
+#data
+<ol reversed="reverse" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@reversed;boolean:invalid
+
+#data
 <ol xmlns="http://www.w3.org/1999/xhtml">
 <li value=""/>
 </ol>
