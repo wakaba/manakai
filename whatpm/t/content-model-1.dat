@@ -1436,9 +1436,17 @@ para
 /header/p;no significant content;s
 
 #data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/><section/></header>
+#errors
+/header/section;element not allowed:minus;m
+/header;no significant content;s
+/header/h1;no significant content;s
+/header/p;no significant content;s
+/header/section;no significant content;s
+
+#data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/><blockquote/></header>
 #errors
-/header/blockquote;element not allowed:minus;m
 /header;no significant content;s
 /header/h1;no significant content;s
 /header/p;no significant content;s
@@ -1495,6 +1503,15 @@ para
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml">xx<h1>xx</h1><p>x</p></header>
+#errors
+
+#data
+<footer xmlns="http://www.w3.org/1999/xhtml"><section>a</section></footer>
+#errors
+/footer/section;element not allowed:minus;m
+
+#data
+<footer xmlns="http://www.w3.org/1999/xhtml"><blockquote>a</blockquote></footer>
 #errors
 
 #data

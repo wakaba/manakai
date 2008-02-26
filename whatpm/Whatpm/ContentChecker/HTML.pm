@@ -129,6 +129,14 @@ my $HTMLProseContent = {
   q<http://www.w3.org/2000/svg> => {svg => 1},
 };
 
+my $HTMLSectioningContentNoBlockquote = {
+  $HTML_NS => {
+    section => 1, nav => 1, article => 1, aside => 1,
+    ## NOTE: |body| is only allowed in |html| element.
+    body => 1,
+  },
+};
+
 my $HTMLSectioningContent = {
   $HTML_NS => {
     section => 1, nav => 1, article => 1, blockquote => 1, aside => 1,
@@ -1514,7 +1522,7 @@ $Element->{$HTML_NS}->{header} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
                                 {$HTML_NS => {qw/header 1 footer 1/}},
-                                $HTMLSectioningContent);
+                                $HTMLSectioningContentNoBlockquote);
     $element_state->{has_hn_original} = $self->{flag}->{has_hn};
     $self->{flag}->{has_hn} = 0;
   },
@@ -1539,7 +1547,8 @@ $Element->{$HTML_NS}->{footer} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
                                 {$HTML_NS => {footer => 1}},
-                                $HTMLSectioningContent, $HTMLHeadingContent);
+                                $HTMLSectioningContentNoBlockquote,
+                                $HTMLHeadingContent);
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
