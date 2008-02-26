@@ -1,5 +1,14 @@
 2008-02-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: HTML5 status constants are OR-ed with "allowed" status.
+	Don't raise "not defined" errors; they are now raised according
+	to status flags.  Status flags of li/@value, ol/@start, and menu
+	are now non-deprecated, to avoid deprecated error message.
+	area/@hreftype typo fixed.  |isindex| SHOULD NOT be used
+	according to HTML4.
+
+2008-02-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm: Make |figure| caption optional (HTML5 revision 1240).
 	Add |reversed| to |ol| (HTML5 revision 1248).
 

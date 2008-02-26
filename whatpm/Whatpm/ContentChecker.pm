@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.69 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.70 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -9,10 +9,18 @@ require Whatpm::URIChecker;
 
 ## TODO: Conformance of an HTML document with non-html root element.
 
+## Stability
 sub FEATURE_STATUS_REC () { 0b1 } ## Interoperable standard
 sub FEATURE_STATUS_CR () { 0b10 } ## Call for implementation
 sub FEATURE_STATUS_LC () { 0b100 } ## Last call for comments
 sub FEATURE_STATUS_WD () { 0b1000 } ## Working or editor's draft
+
+## Deprecated
+sub FEATURE_DEPRECATED_SHOULD () { 0b100000 } ## SHOULD-level
+sub FEATURE_DEPRECATED_INFO () { 0b1000000 } ## Does not affect conformance
+
+## Conformance
+sub FEATURE_ALLOWED () { 0b10000 }
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
@@ -187,6 +195,8 @@ our %AnyChecker = (
 
 our $ElementDefault = {
   %AnyChecker,
+  status => FEATURE_ALLOWED,
+      ## NOTE: No "element not defined" error - it is not supported anyway.
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->{onerror}->(node => $item->{node}, level => 'unsupported',
@@ -404,6 +414,19 @@ next unless $code;## TODO: temp.
                            type => 'status:'.$status.':element',
                            level => $self->{info_level});
       }
+      if (not ($eldef->{status} & FEATURE_ALLOWED)) {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'element not defined',
+                           level => $self->{must_level});
+      } elsif ($eldef->{status} & FEATURE_DEPRECATED_SHOULD) {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'deprecated:element',
+                           level => $self->{should_level});
+      } elsif ($eldef->{status} & FEATURE_DEPRECATED_INFO) {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'deprecated:element',
+                           level => $self->{info_level});
+      }
 
       my @new_item;
       push @new_item, [$eldef->{check_start}, $self, $item, $element_state];
@@ -568,6 +591,21 @@ sub _remove_plus_elements ($$) {
 
 sub _attr_status_info ($$$) {
   my ($self, $attr, $status_code) = @_;
+
+  if (not ($status_code & FEATURE_ALLOWED)) {
+    $self->{onerror}->(node => $attr,
+                       type => 'attribute not defined',
+                       level => $self->{must_level});
+  } elsif ($status_code & FEATURE_DEPRECATED_SHOULD) {
+    $self->{onerror}->(node => $attr,
+                       type => 'deprecated:attr',
+                       level => $self->{should_level});
+  } elsif ($status_code & FEATURE_DEPRECATED_INFO) {
+    $self->{onerror}->(node => $attr,
+                       type => 'deprecated:attr',
+                       level => $self->{info_level});
+  }
+
   my $status;
   if ($status_code & FEATURE_STATUS_REC) {
     return;
@@ -745,4 +783,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/26 07:46:22 $
+# $Date: 2008/02/26 08:28:00 $

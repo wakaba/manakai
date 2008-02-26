@@ -4,32 +4,61 @@ require Whatpm::ContentChecker;
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 
-sub FEATURE_HTML5_LC () { Whatpm::ContentChecker::FEATURE_STATUS_LC }
-sub FEATURE_HTML5_AT_RISK () { Whatpm::ContentChecker::FEATURE_STATUS_WD }
-sub FEATURE_HTML5_WD () { Whatpm::ContentChecker::FEATURE_STATUS_WD }
-sub FEATURE_HTML5_FD () { Whatpm::ContentChecker::FEATURE_STATUS_WD }
-sub FEATURE_HTML5_DEFAULT () { Whatpm::ContentChecker::FEATURE_STATUS_WD }
-sub FEATURE_HTML5_DROPPED () { Whatpm::ContentChecker::FEATURE_STATUS_WD }
-    ## NOTE: Was part of HTML5, but was dropped.
-sub FEATURE_WF2 () { Whatpm::ContentChecker::FEATURE_STATUS_LC }
-sub FEATURE_M12N10_REC () { Whatpm::ContentChecker::FEATURE_STATUS_REC }
-    ## NOTE: Oh, XHTML m12n 1.0 passed the CR phase!  W3C Process suck!
-sub FEATURE_M12N10_REC_DEPRECATED () {
-  Whatpm::ContentChecker::FEATURE_STATUS_REC
+sub FEATURE_HTML5_LC () {
+  Whatpm::ContentChecker::FEATURE_STATUS_LC |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
 }
-sub FEATURE_XHTML10_REC () { Whatpm::ContentChecker::FEATURE_STATUS_CR }
-sub FEATURE_HTML4_REC_RESERVED () {
+sub FEATURE_HTML5_AT_RISK () {
+  Whatpm::ContentChecker::FEATURE_STATUS_WD |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
+}
+sub FEATURE_HTML5_WD () {
+  Whatpm::ContentChecker::FEATURE_STATUS_WD |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
+}
+sub FEATURE_HTML5_FD () {
+  Whatpm::ContentChecker::FEATURE_STATUS_WD |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
+}
+sub FEATURE_HTML5_DEFAULT () {
+  Whatpm::ContentChecker::FEATURE_STATUS_WD |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
+}
+sub FEATURE_HTML5_DROPPED () {
+  ## NOTE: Was part of HTML5, but was dropped.
   Whatpm::ContentChecker::FEATURE_STATUS_WD
+}
+sub FEATURE_WF2 () {
+  Whatpm::ContentChecker::FEATURE_STATUS_LC |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
 }
 
 ## NOTE: M12N10 status is based on its abstract module definition.
 ## It contains a number of problems.  (However, again, it's a REC!)
+sub FEATURE_M12N10_REC () {
+  ## NOTE: Oh, XHTML m12n 1.0 passed the CR phase!  W3C Process suck!
+  Whatpm::ContentChecker::FEATURE_STATUS_REC
+}
+sub FEATURE_M12N10_REC_DEPRECATED () {
+  Whatpm::ContentChecker::FEATURE_STATUS_REC |
+  Whatpm::ContentChecker::FEATURE_DEPRECATED_INFO
+}
 
 ## NOTE: XHTML10 status is based on its transitional and frameset DTDs
 ## (second edition).  Only missing attributes from M12N10 abstract
 ## definition are added.
+sub FEATURE_XHTML10_REC () {
+  Whatpm::ContentChecker::FEATURE_STATUS_CR
+}
+
 ## NOTE: HTML4 status is based on its transitional and frameset DTDs (HTML
 ## 4.01).  Only missing attributes from XHTML10 are added.
+sub FEATURE_HTML4_REC_RESERVED () {
+  Whatpm::ContentChecker::FEATURE_STATUS_WD
+}
+
+## TODO: According to HTML4 definition, authors SHOULD use style sheets
+## rather than presentational attributes (deprecated or not deprecated).
 
 ## December 2007 HTML5 Classification
 
@@ -646,8 +675,7 @@ my $GetHTMLAttrsChecker = sub {
       if ($checker) {
         $checker->($self, $attr, $item);
       } elsif ($attr_ns eq '') {
-        $self->{onerror}->(node => $attr, level => $self->{must_level},
-                           type => 'attribute not defined');
+        #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
                            type => 'attribute');
@@ -791,11 +819,6 @@ our $ElementDefault;
 
 $Element->{$HTML_NS}->{''} = {
   %HTMLChecker,
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->{onerror}->(node => $item->{node}, level => $self->{must_level},
-                       type => 'element not defined');
-  },
 };
 
 $Element->{$HTML_NS}->{html} = {
@@ -1101,8 +1124,7 @@ $Element->{$HTML_NS}->{meta} = {
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
       } elsif ($attr_ns eq '') {
-        $self->{onerror}->(node => $attr, level => $self->{must_level},
-                           type => 'attribute not defined');
+        #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
                            type => 'attribute');
@@ -1646,7 +1668,8 @@ $Element->{$HTML_NS}->{ol} = {
     compact => FEATURE_M12N10_REC_DEPRECATED,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     reversed => FEATURE_HTML5_DEFAULT,
-    start => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
+    #start => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
+    start => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     type => FEATURE_M12N10_REC_DEPRECATED,
   }),
   check_child_element => sub {
@@ -1707,7 +1730,8 @@ $Element->{$HTML_NS}->{li} = {
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     type => FEATURE_M12N10_REC_DEPRECATED,
-    value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
+    #value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
+    value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -1850,8 +1874,7 @@ $Element->{$HTML_NS}->{a} = {
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
       } elsif ($attr_ns eq '') {
-        $self->{onerror}->(node => $attr, level => $self->{must_level},
-                           type => 'attribute not defined');
+        #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
                            type => 'attribute');
@@ -1969,7 +1992,6 @@ $Element->{$HTML_NS}->{big} = {
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
-  check_start => $Element->{$HTML_NS}->{''}->{check_start},
 };
 
 $Element->{$HTML_NS}->{mark} = {
@@ -2054,7 +2076,6 @@ $Element->{$HTML_NS}->{acronym} = {
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
-  check_start => $Element->{$HTML_NS}->{''}->{check_start},
 };
 
 $Element->{$HTML_NS}->{time} = {
@@ -2315,7 +2336,6 @@ $Element->{$HTML_NS}->{s} = {
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
-  check_start => $Element->{$HTML_NS}->{''}->{check_start},
 };
 
 $Element->{$HTML_NS}->{strike} = $Element->{$HTML_NS}->{s};
@@ -2571,8 +2591,7 @@ $Element->{$HTML_NS}->{embed} = {
       if ($checker) {
         $checker->($self, $attr);
       } elsif ($attr_ns eq '') {
-        $self->{onerror}->(node => $attr, level => $self->{must_level},
-                           type => 'attribute not defined');
+        #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
                            type => 'attribute');
@@ -2953,8 +2972,7 @@ $Element->{$HTML_NS}->{area} = {
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
       } elsif ($attr_ns eq '') {
-        $self->{onerror}->(node => $attr, level => $self->{must_level},
-                           type => 'attribute not defined');
+        #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
                            type => 'attribute');
@@ -2969,7 +2987,7 @@ $Element->{$HTML_NS}->{area} = {
           alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           coords => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          hreftype => FEATURE_HTML5_DEFAULT,
+          hreflang => FEATURE_HTML5_DEFAULT,
           lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
           media => FEATURE_HTML5_DEFAULT,
           nohref => FEATURE_M12N10_REC,
@@ -3720,8 +3738,8 @@ $Element->{$HTML_NS}->{output} = {
 
 $Element->{$HTML_NS}->{isindex} = {
   %HTMLEmptyChecker,
-## TODO: SHOULD use form [HTML4]
-  status => FEATURE_M12N10_REC_DEPRECATED,
+  status => FEATURE_M12N10_REC_DEPRECATED |
+      Whatpm::ContentChecker::FEATURE_DEPRECATED_SHOULD, ## [HTML4]
   check_attrs => $GetHTMLAttrsChecker->({
     prompt => sub {}, ## NOTE: Text [M12N]
   }, {
@@ -4095,7 +4113,9 @@ $Element->{$HTML_NS}->{command} = {
 
 $Element->{$HTML_NS}->{menu} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_M12N10_REC_DEPRECATED | FEATURE_HTML5_WD,
+  #status => FEATURE_M12N10_REC_DEPRECATED | FEATURE_HTML5_WD,
+  status => FEATURE_M12N10_REC | FEATURE_HTML5_WD,
+      ## NOTE: We don't want any |menu| element warned as deprecated.
   check_attrs => $GetHTMLAttrsChecker->({
     autosubmit => $GetHTMLBooleanAttrChecker->('autosubmit'),
     id => sub {
