@@ -1515,6 +1515,58 @@ para
 #errors
 
 #data
+<address xmlns="http://www.w3.org/1999/xhtml"></address>
+#errors
+/address;no significant content;s
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml">  </address>
+#errors
+/address;no significant content;s
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml">aa</address>
+#errors
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><a>aa</a></address>
+#errors
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><p>aa</p></address>
+#errors
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><blockquote>aa</blockquote></address>
+#errors
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><header><h1>aa</h1></header></address>
+#errors
+/address/header;element not allowed:minus;m
+/address/header/h1;element not allowed:minus;m
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><footer>aa</footer></address>
+#errors
+/address/footer;element not allowed:minus;m
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><address>aa</address></address>
+#errors
+/address/address;element not allowed:minus;m
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><section>aa</section></address>
+#errors
+/address/section;element not allowed:minus;m
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><h1>aa</h1></address>
+#errors
+/address/h1;element not allowed:minus;m
+
+#data
 <li xmlns="http://www.w3.org/1999/xhtml"></li>
 #errors
 /li;no significant content;s
