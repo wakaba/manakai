@@ -27,9 +27,12 @@ algorithm as defined in the HTML5 specification.
 
 =cut
 
+## TODO: HTML5 revision 1282 (feed BOM)
+## TODO: HTML5 revision 1288 (no Content-Encoding safebar, so on)
+
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -421,4 +424,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/11/18 05:29:22 $
+# $Date: 2008/03/01 00:42:52 $

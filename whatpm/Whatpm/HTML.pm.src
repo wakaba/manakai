@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.69 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.70 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -13,6 +13,10 @@ use Error qw(:try);
 ## is not yet clear.
 ## "{U+FEFF}..." in UTF-16BE/UTF-16LE is three or four characters?
 ## "{U+FEFF}..." in GB18030?
+
+## TODO: Control charcters and noncharacters are not allowed (HTML5 revision 1263)
+## TODO: 1252 parse error (revision 1264)
+## TODO: 8859-11 = 874 (revision 1271)
 
 my $permitted_slash_tag_name = {
   base => 1,
@@ -2925,7 +2929,8 @@ sub _tree_construction_main ($) {
                 } elsif ($token->{attributes}->{content}) {
                   ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
                   if ($token->{attributes}->{content}->{value}
-                      =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
+                      =~ /\A[^;]*;[\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
+                          [\x09-\x0D\x20]*=
                           [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                           ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
                     $self->{change_encoding}
@@ -4535,7 +4540,8 @@ sub _tree_construction_main ($) {
           } elsif ($token->{attributes}->{content}) {
             ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
             if ($token->{attributes}->{content}->{value}
-                =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
+                =~ /\A[^;]*;[\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
+                    [\x09-\x0D\x20]*=
                     [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                     ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
               $self->{change_encoding}
@@ -5542,4 +5548,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/02/17 12:39:32 $
+# $Date: 2008/03/01 00:42:52 $

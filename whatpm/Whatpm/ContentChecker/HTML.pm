@@ -4,6 +4,11 @@ require Whatpm::ContentChecker;
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 
+sub FEATURE_HTML5_ROLE () {
+  Whatpm::ContentChecker::FEATURE_STATUS_WD
+      ## TODO: svg:*/@role
+}
+
 sub FEATURE_HTML5_LC () {
   Whatpm::ContentChecker::FEATURE_STATUS_LC |
   Whatpm::ContentChecker::FEATURE_ALLOWED
@@ -37,6 +42,13 @@ sub FEATURE_WF2_DEPRECATED () {
   ## NOTE: MUST NOT be used.
 }
 
+## TODO: RDFa LC
+
+## NOTE: XHTML Role LCWD has almost no information on how the |role|
+## attribute can be used- the only requirements for that matter is:
+## "the attribute MUST be referenced using its namespace-qualified form" (and
+## this is a host language conformance!).
+
 sub FEATURE_XHTMLBASIC11_CR () {
   ## NOTE: Only additions to M12N10_REC are marked.
   Whatpm::ContentChecker::FEATURE_STATUS_CR
@@ -56,6 +68,8 @@ sub FEATURE_M12N10_REC_DEPRECATED () {
   Whatpm::ContentChecker::FEATURE_STATUS_REC |
   Whatpm::ContentChecker::FEATURE_DEPRECATED_INFO
 }
+## NOTE: XHTML M12N 1.1 is a LC at the time of writing and no
+## addition from 1.0.
 
 ## NOTE: XHTML10 status is based on its transitional and frameset DTDs
 ## (second edition).  Only missing attributes from M12N10 abstract
@@ -63,6 +77,8 @@ sub FEATURE_M12N10_REC_DEPRECATED () {
 sub FEATURE_XHTML10_REC () {
   Whatpm::ContentChecker::FEATURE_STATUS_CR
 }
+
+## TODO: ISO-HTML
 
 ## NOTE: HTML4 status is based on its transitional and frameset DTDs (HTML
 ## 4.01).  Only missing attributes from XHTML10 are added.
@@ -72,6 +88,11 @@ sub FEATURE_HTML4_REC_RESERVED () {
 
 ## TODO: According to HTML4 definition, authors SHOULD use style sheets
 ## rather than presentational attributes (deprecated or not deprecated).
+
+## TODO: HTML 3.2 REC
+## TODO: HTML 2.x RFC
+## TODO: HTML 2.0 RFC
+## TODO: Other HTML RFCs
 
 ## December 2007 HTML5 Classification
 
@@ -129,7 +150,7 @@ my $HTMLProseContent = {
   q<http://www.w3.org/2000/svg> => {svg => 1},
 };
 
-my $HTMLSectioningContentNoBlockquote = {
+my $HTMLSectioningContent = {
   $HTML_NS => {
     section => 1, nav => 1, article => 1, aside => 1,
     ## NOTE: |body| is only allowed in |html| element.
@@ -137,11 +158,9 @@ my $HTMLSectioningContentNoBlockquote = {
   },
 };
 
-my $HTMLSectioningContent = {
+my $HTMLSectioningRoot = {
   $HTML_NS => {
-    section => 1, nav => 1, article => 1, blockquote => 1, aside => 1,
-    ## NOTE: |body| is only allowed in |html| element.
-    body => 1,
+    blockquote => 1, datagrid => 1, figure => 1, td => 1,
   },
 };
 
@@ -568,6 +587,7 @@ my $HTMLSelectorsAttrChecker = sub {
 }; # $HTMLSelectorsAttrChecker
 
 my $HTMLAttrChecker = {
+  ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
     ## NOTE: |map| has its own variant of |id=""| checker
     my ($self, $attr) = @_;
@@ -634,6 +654,7 @@ my $HTMLAttrChecker = {
   },
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'), ## TODO: status: Working Draft
   ## TODO: repeat, repeat-start, repeat-min, repeat-max, repeat-template ## TODO: global
+  ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
   tabindex => $HTMLIntegerAttrChecker
 ## TODO: ref, template, registrationmark
 };
@@ -649,6 +670,7 @@ my %HTMLAttrStatus = (
   lang => FEATURE_HTML5_DEFAULT,
   ref => FEATURE_HTML5_AT_RISK,
   registrationmark => FEATURE_HTML5_AT_RISK,
+  role => FEATURE_HTML5_ROLE,
   tabindex => FEATURE_HTML5_DEFAULT,
   template => FEATURE_HTML5_AT_RISK,
   title => FEATURE_HTML5_DEFAULT,  
@@ -767,6 +789,7 @@ my %HTMLTextChecker = (
   },
 );
 
+## TODO: Rename as "FlowContent" (HTML5 revision 1261)
 my %HTMLProseContentChecker = (
   %HTMLChecker,
   check_child_element => sub {
@@ -1341,14 +1364,14 @@ $Element->{$HTML_NS}->{meta} = {
 
         ## TODO: More than one occurence is a MUST-level error (revision 1180).
       } elsif ($keyword eq 'content-type') {
-        ## ISSUE: Though it is renamed as "Encoding declaration" state in rev
-        ## 1221, there are still many occurence of "Content-Type" state in
-        ## the spec.
+        ## TODO: refs in "text/html; charset=" are not disallowed since rev.1275.
 
         $check_charset_decl->();
         if ($content_attr) {
           my $content = $content_attr->value;
-          if ($content =~ m!^text/html;\x20?charset=(.+)\z!s) {
+          if ($content =~ m!^[Tt][Ee][Xx][Tt]/[Hh][Tt][Mm][Ll];
+                            [\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
+                            =(.+)\z!sx) {
             $check_charset->($content_attr, $1);
           } else {
             $self->{onerror}->(node => $content_attr,
@@ -1522,7 +1545,7 @@ $Element->{$HTML_NS}->{header} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
                                 {$HTML_NS => {qw/header 1 footer 1/}},
-                                $HTMLSectioningContentNoBlockquote);
+                                $HTMLSectioningContent);
     $element_state->{has_hn_original} = $self->{flag}->{has_hn};
     $self->{flag}->{has_hn} = 0;
   },
@@ -1547,7 +1570,7 @@ $Element->{$HTML_NS}->{footer} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
                                 {$HTML_NS => {footer => 1}},
-                                $HTMLSectioningContentNoBlockquote,
+                                $HTMLSectioningContent,
                                 $HTMLHeadingContent);
   },
   check_end => sub {

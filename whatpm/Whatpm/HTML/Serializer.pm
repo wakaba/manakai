@@ -1,6 +1,6 @@
 package Whatpm::HTML::Serializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub get_inner_html ($$$) {
   my (undef, $node, $on_error) = @_;
@@ -52,6 +52,7 @@ sub get_inner_html ($$$) {
         $attr_value =~ s/</&lt;/g;
         $attr_value =~ s/>/&gt;/g;
         $attr_value =~ s/"/&quot;/g;
+        $attr_value =~ s/\xA0/&nbsp;/g;
         $s .= $attr_value . '"';
       }
       $s .= '>';
@@ -84,6 +85,7 @@ sub get_inner_html ($$$) {
         $value =~ s/</&lt;/g;
         $value =~ s/>/&gt;/g;
         $value =~ s/"/&quot;/g;
+        $value =~ s/\xA0/&nbsp;/g;
         $s .= $value;
       }
     } elsif ($nt == 8) {
@@ -92,10 +94,11 @@ sub get_inner_html ($$$) {
       $s .= '<!DOCTYPE ' . $child->name . '>';
     } elsif ($nt == 5) { # entrefs
       push @node, @{$child->child_nodes};
+    } elsif ($nt == 7) { # PIs
+      $s .= '<?' . $child->target . ' ' . $target->data . '>';
     } else {
       $on_error->($child) if defined $on_error;
     }
-    ## ISSUE: This code does not support PIs.
   } # C
   
   ## Step 3
@@ -104,7 +107,7 @@ sub get_inner_html ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -112,4 +115,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/11/11 04:59:36 $
+## $Date: 2008/03/01 00:42:53 $
