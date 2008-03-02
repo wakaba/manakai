@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.72 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.73 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -2186,6 +2186,8 @@ sub _get_next_token ($) {
       }
 
       $self->{parse_error}-> (type => 'string after DOCTYPE name');
+      delete $self->{current_token}->{correct};
+
       $self->{state} = BOGUS_DOCTYPE_STATE;
       # next-input-character is already done
       redo A;
@@ -2253,6 +2255,8 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after PUBLIC');
+        delete $self->{current_token}->{correct};
+
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
@@ -2424,6 +2428,8 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after PUBLIC literal');
+        delete $self->{current_token}->{correct};
+
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
@@ -2497,6 +2503,8 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after SYSTEM');
+        delete $self->{current_token}->{correct};
+
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
@@ -2646,6 +2654,8 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after SYSTEM literal');
+        delete $self->{current_token}->{correct};
+
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
@@ -2667,7 +2677,6 @@ sub _get_next_token ($) {
       }
   
 
-        delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2676,7 +2685,6 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -7079,4 +7087,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/02 14:32:26 $
+# $Date: 2008/03/02 23:38:37 $
