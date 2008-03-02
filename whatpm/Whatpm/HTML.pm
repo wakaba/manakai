@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.73 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.74 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -2654,7 +2654,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after SYSTEM literal');
-        delete $self->{current_token}->{correct};
+        #delete $self->{current_token}->{correct};
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
@@ -7087,4 +7087,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/02 23:38:37 $
+# $Date: 2008/03/02 23:51:00 $

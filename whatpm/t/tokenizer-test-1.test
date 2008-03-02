@@ -114,11 +114,11 @@
 
 {"description":"PUBLIC \u0022\u0022 \u0022\u0022bogus",
 "input":"<!DOCTYPE html PUBLIC \u0022\u0022 \u0022\u0022bogus>",
-"output":["ParseError",["DOCTYPE", "html", "", "", false]]},
+"output":["ParseError",["DOCTYPE", "html", "", "", true]]},
 
 {"description":"PUBLIC \u0022\u0022 \u0022\u0022 bogus",
 "input":"<!DOCTYPE html PUBLIC \u0022\u0022 \u0022\u0022 bogus>",
-"output":["ParseError",["DOCTYPE", "html", "", "", false]]},
+"output":["ParseError",["DOCTYPE", "html", "", "", true]]},
 
 {"description":"PUBLIC \u0022\u0022\u0022\u0022>",
 "input":"<!DOCTYPE html PUBLIC \u0022\u0022\u0022\u0022>",
@@ -131,6 +131,22 @@
 {"description":"SYSTEM a",
 "input":"<!DOCTYPE html SYSTEM a>",
 "output":["ParseError", ["DOCTYPE", "html", null, null, false]]},
+
+{"description": "garbage after SYSTEM literal",
+"input": "<!DOCTYPE html SYSTEM 'a' b>",
+"output": ["ParseError", ["DOCTYPE", "html", null, "a", true]]},
+
+{"description": "garbage after PUBLIC and SYSTEM literal",
+"input": "<!DOCTYPE html PUBLIC 'c' 'a' b>",
+"output": ["ParseError", ["DOCTYPE", "html", "c", "a", true]]},
+
+{"description": "garbage immediately after SYSTEM literal",
+"input": "<!DOCTYPE html SYSTEM 'a'b>",
+"output": ["ParseError", ["DOCTYPE", "html", null, "a", true]]},
+
+{"description": "garbage immediately after PUBLIC and SYSTEM literal",
+"input": "<!DOCTYPE html PUBLIC 'c' 'a'b>",
+"output": ["ParseError", ["DOCTYPE", "html", "c", "a", true]]},
 
 {"description":"<!---x-->",
 "input":"<!---x-->",
