@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Mar  1 19:43:51 2008
-# Current time GMT:   Sat Mar  1 10:43:51 2008
+# Current time local: Sun Mar  2 12:31:14 2008
+# Current time GMT:   Sun Mar  2 03:31:14 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -429,20 +429,20 @@ ok 401
 ok 402
 ok 403
 ok 404
-not ok 405
-# Test 405 got: "/datagrid/select;no significant content;s" (t/ContentChecker.t at line 98 fail #405)
-#     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>)
+ok 405
 not ok 406
-# Test 406 got: "/datagrid/datalist;no significant content;s" (t/ContentChecker.t at line 98 fail #406)
+# Test 406 got: "/datagrid/select;no significant content;s" (t/ContentChecker.t at line 98 fail #406)
+#     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>)
+not ok 407
+# Test 407 got: "/datagrid/datalist;no significant content;s" (t/ContentChecker.t at line 98 fail #407)
 #     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>)
-ok 407
-not ok 408
-# Test 408 got: "/datagrid/\"aa\";character not allowed\n/datagrid/select;no significant content;s" (t/ContentChecker.t at line 98 fail #408)
-#     Expected: "/datagrid/\"aa\";character not allowed" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/>aa</datagrid>)
+ok 408
 not ok 409
-# Test 409 got: "/datagrid/\"aa\";character not allowed\n/datagrid/datalist;no significant content;s" (t/ContentChecker.t at line 98 fail #409)
+# Test 409 got: "/datagrid/\"aa\";character not allowed\n/datagrid/select;no significant content;s" (t/ContentChecker.t at line 98 fail #409)
+#     Expected: "/datagrid/\"aa\";character not allowed" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/>aa</datagrid>)
+not ok 410
+# Test 410 got: "/datagrid/\"aa\";character not allowed\n/datagrid/datalist;no significant content;s" (t/ContentChecker.t at line 98 fail #410)
 #     Expected: "/datagrid/\"aa\";character not allowed" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/>aa</datagrid>)
-ok 410
 ok 411
 ok 412
 ok 413
@@ -681,30 +681,30 @@ ok 645
 ok 646
 ok 647
 ok 648
-not ok 649
-# Test 649 got: "/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #649)
-#     Expected: "" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
-#<legend>XXX</legend>
-#</fieldset>)
-not ok 650
-# Test 650 got: "/fieldset/legend/p;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #650)
-#     Expected: "/fieldset/legend/p;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
-#<legend><p>XXX</p></legend>
-#</fieldset>)
-not ok 651
-# Test 651 got: "/fieldset/legend/blockquote;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #651)
-#     Expected: "/fieldset/legend/blockquote;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
-#<legend><blockquote><p>XXX</p></blockquote></legend>
-#</fieldset>)
+ok 649
+ok 650
+ok 651
 ok 652
 ok 653
 ok 654
 ok 655
 ok 656
 ok 657
-ok 658
-ok 659
-ok 660
+not ok 658
+# Test 658 got: "/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #658)
+#     Expected: "" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
+#<legend>XXX</legend>
+#</fieldset>)
+not ok 659
+# Test 659 got: "/fieldset/legend/p;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #659)
+#     Expected: "/fieldset/legend/p;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
+#<legend><p>XXX</p></legend>
+#</fieldset>)
+not ok 660
+# Test 660 got: "/fieldset/legend/blockquote;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #660)
+#     Expected: "/fieldset/legend/blockquote;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
+#<legend><blockquote><p>XXX</p></blockquote></legend>
+#</fieldset>)
 ok 661
 ok 662
 ok 663
@@ -774,9 +774,7 @@ ok 726
 ok 727
 ok 728
 ok 729
-not ok 730
-# Test 730 got: "" (t/ContentChecker.t at line 98 fail #730)
-#     Expected: "/rule/textarea;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><textarea><nest/></textarea></rule>)
+ok 730
 ok 731
 ok 732
 ok 733
@@ -785,7 +783,9 @@ ok 735
 ok 736
 ok 737
 ok 738
-ok 739
+not ok 739
+# Test 739 got: "" (t/ContentChecker.t at line 98 fail #739)
+#     Expected: "/rule/textarea;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><textarea><nest/></textarea></rule>)
 ok 740
 ok 741
 ok 742
@@ -923,91 +923,91 @@ ok 873
 ok 874
 ok 875
 ok 876
-not ok 877
-# Test 877 got: "/rule/author/name;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #877)
+ok 877
+ok 878
+ok 879
+ok 880
+ok 881
+ok 882
+ok 883
+ok 884
+ok 885
+not ok 886
+# Test 886 got: "/rule/author/name;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #886)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name><nest/></a:name></a:author>
 #</rule>)
-not ok 878
-# Test 878 got: "/rule/author/name;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #878)
+not ok 887
+# Test 887 got: "/rule/author/name;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #887)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name><nest/>aa</a:name></a:author>
 #</rule>)
-not ok 879
-# Test 879 got: "/rule/author/name;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #879)
+not ok 888
+# Test 888 got: "/rule/author/name;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #888)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name>aa<nest/></a:name></a:author>
 #</rule>)
-not ok 880
-# Test 880 got: "/rule/author/name;element not defined;m\n/rule/author/uri;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #880)
+not ok 889
+# Test 889 got: "/rule/author/name;element not defined;m\n/rule/author/uri;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #889)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:uri><nest/>http://www.example.org/</a:uri><a:name/></a:author>
 #</rule>)
-not ok 881
-# Test 881 got: "/rule/author/email;element not defined;m\n/rule/author/name;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #881)
+not ok 890
+# Test 890 got: "/rule/author/email;element not defined;m\n/rule/author/name;element not defined;m\n/rule/author;element not defined;m" (t/ContentChecker.t at line 98 fail #890)
 #     Expected: "/rule/author/email;addr-spec;unsupported" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:email><nest/>a@example.com</a:email><a:name/></a:author>
 #</rule>)
-not ok 882
-# Test 882 got: "/rule/published;element not defined;m" (t/ContentChecker.t at line 98 fail #882)
+not ok 891
+# Test 891 got: "/rule/published;element not defined;m" (t/ContentChecker.t at line 98 fail #891)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:published xmlns:a="http://www.w3.org/2005/Atom">2006-12-31T00:00:00Z<nest/></a:published>
 #</rule>)
-not ok 883
-# Test 883 got: "/rule/entry/author/name;element not defined;m\n/rule/entry/author;element not defined;m\n/rule/entry/content;element not defined;m\n/rule/entry/id;element not defined;m\n/rule/entry/title;element not defined;m\n/rule/entry/updated;element not defined;m\n/rule/entry;element not defined;m" (t/ContentChecker.t at line 98 fail #883)
+not ok 892
+# Test 892 got: "/rule/entry/author/name;element not defined;m\n/rule/entry/author;element not defined;m\n/rule/entry/content;element not defined;m\n/rule/entry/id;element not defined;m\n/rule/entry/title;element not defined;m\n/rule/entry/updated;element not defined;m\n/rule/entry;element not defined;m" (t/ContentChecker.t at line 98 fail #892)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:entry xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:content/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/></a:entry>
 #</rule>)
-not ok 884
-# Test 884 got: "/rule/entry/author/name;element not defined;m\n/rule/entry/author;element not defined;m\n/rule/entry/content;element not defined;m\n/rule/entry/id;element not defined;m\n/rule/entry/title;element not defined;m\n/rule/entry/updated;element not defined;m\n/rule/entry;element not defined;m" (t/ContentChecker.t at line 98 fail #884)
+not ok 893
+# Test 893 got: "/rule/entry/author/name;element not defined;m\n/rule/entry/author;element not defined;m\n/rule/entry/content;element not defined;m\n/rule/entry/id;element not defined;m\n/rule/entry/title;element not defined;m\n/rule/entry/updated;element not defined;m\n/rule/entry;element not defined;m" (t/ContentChecker.t at line 98 fail #893)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:entry xmlns:a="http://www.w3.org/2005/Atom"><nest/><a:id>http://www.example.org/</a:id><a:title/><a:content/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated></a:entry>
 #</rule>)
-not ok 885
-# Test 885 got: "/rule/feed/author/name;element not defined;m\n/rule/feed/author;element not defined;m\n/rule/feed/id;element not defined;m\n/rule/feed/link;element not defined;m\n/rule/feed/title;element not defined;m\n/rule/feed/updated;element not defined;m\n/rule/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #885)
+not ok 894
+# Test 894 got: "/rule/feed/author/name;element not defined;m\n/rule/feed/author;element not defined;m\n/rule/feed/id;element not defined;m\n/rule/feed/link;element not defined;m\n/rule/feed/title;element not defined;m\n/rule/feed/updated;element not defined;m\n/rule/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #894)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:feed xmlns:a="http://www.w3.org/2005/Atom"><nest/><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated></a:feed>
 #</rule>)
-not ok 886
-# Test 886 got: "/rule/feed/author/name;element not defined;m\n/rule/feed/author;element not defined;m\n/rule/feed/id;element not defined;m\n/rule/feed/link;element not defined;m\n/rule/feed/title;element not defined;m\n/rule/feed/updated;element not defined;m\n/rule/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #886)
+not ok 895
+# Test 895 got: "/rule/feed/author/name;element not defined;m\n/rule/feed/author;element not defined;m\n/rule/feed/id;element not defined;m\n/rule/feed/link;element not defined;m\n/rule/feed/title;element not defined;m\n/rule/feed/updated;element not defined;m\n/rule/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #895)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/></a:feed>
 #</rule>)
-not ok 887
-# Test 887 got: "/rule/feed/author/name;element not defined;m\n/rule/feed/author;element not defined;m\n/rule/feed/entry/content;element not defined;m\n/rule/feed/entry/id;element not defined;m\n/rule/feed/entry/title;element not defined;m\n/rule/feed/entry/updated;element not defined;m\n/rule/feed/entry;element not defined;m\n/rule/feed/id;element not defined;m\n/rule/feed/link;element not defined;m\n/rule/feed/title;element not defined;m\n/rule/feed/updated;element not defined;m\n/rule/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #887)
+not ok 896
+# Test 896 got: "/rule/feed/author/name;element not defined;m\n/rule/feed/author;element not defined;m\n/rule/feed/entry/content;element not defined;m\n/rule/feed/entry/id;element not defined;m\n/rule/feed/entry/title;element not defined;m\n/rule/feed/entry/updated;element not defined;m\n/rule/feed/entry;element not defined;m\n/rule/feed/id;element not defined;m\n/rule/feed/link;element not defined;m\n/rule/feed/title;element not defined;m\n/rule/feed/updated;element not defined;m\n/rule/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #896)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/><a:entry><a:id>http://www.example.org/1/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry></a:feed>
 #</rule>)
-not ok 888
-# Test 888 got: "/rule/feed/author/name;element not defined;m\n/rule/feed/author;element not defined;m\n/rule/feed/entry/content;element not defined;m\n/rule/feed/entry/content;element not defined;m\n/rule/feed/entry/id;element not defined;m\n/rule/feed/entry/id;element not defined;m\n/rule/feed/entry/title;element not defined;m\n/rule/feed/entry/title;element not defined;m\n/rule/feed/entry/updated;element not defined;m\n/rule/feed/entry/updated;element not defined;m\n/rule/feed/entry;element not defined;m\n/rule/feed/entry;element not defined;m\n/rule/feed/id;element not defined;m\n/rule/feed/link;element not defined;m\n/rule/feed/title;element not defined;m\n/rule/feed/updated;element not defined;m\n/rule/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #888)
+not ok 897
+# Test 897 got: "/rule/feed/author/name;element not defined;m\n/rule/feed/author;element not defined;m\n/rule/feed/entry/content;element not defined;m\n/rule/feed/entry/content;element not defined;m\n/rule/feed/entry/id;element not defined;m\n/rule/feed/entry/id;element not defined;m\n/rule/feed/entry/title;element not defined;m\n/rule/feed/entry/title;element not defined;m\n/rule/feed/entry/updated;element not defined;m\n/rule/feed/entry/updated;element not defined;m\n/rule/feed/entry;element not defined;m\n/rule/feed/entry;element not defined;m\n/rule/feed/id;element not defined;m\n/rule/feed/link;element not defined;m\n/rule/feed/title;element not defined;m\n/rule/feed/updated;element not defined;m\n/rule/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #897)
 #     Expected: "" (<rule xmlns="http://www.w3.org/1999/xhtml">
 #<a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><a:entry><a:id>http://www.example.org/1/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry><nest/><a:entry><a:id>http://www.example.org/2/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry></a:feed>
 #</rule>)
-ok 889
-# t/content-model-2.dat
-ok 890
-ok 891
-ok 892
-ok 893
-ok 894
-not ok 895
-# Test 895 got: "/unknown/@u1;attribute not defined;m\n/unknown;element not defined;m" (t/ContentChecker.t at line 98 fail #895)
-#     Expected: "/unknown/@u1;attribute not defined;m\n/unknown;element;unsupported" (<unknown u1="" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
-not ok 896
-# Test 896 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute not defined;m\n/unknown;element not defined;m" (t/ContentChecker.t at line 98 fail #896)
-#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute not defined;m\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
-not ok 897
-# Test 897 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute not defined;m\n/unknown;element not defined;m" (t/ContentChecker.t at line 98 fail #897)
-#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute not defined;m\n/unknown;element;unsupported" (<unknown class="" u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
 ok 898
+# t/content-model-2.dat
 ok 899
 ok 900
 ok 901
 ok 902
 ok 903
-ok 904
-ok 905
-ok 906
+not ok 904
+# Test 904 got: "/unknown/@u1;attribute not defined;m\n/unknown;element not defined;m" (t/ContentChecker.t at line 98 fail #904)
+#     Expected: "/unknown/@u1;attribute not defined;m\n/unknown;element;unsupported" (<unknown u1="" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
+not ok 905
+# Test 905 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute not defined;m\n/unknown;element not defined;m" (t/ContentChecker.t at line 98 fail #905)
+#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute not defined;m\n/unknown;element;unsupported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
+not ok 906
+# Test 906 got: "/unknown/@lang;LangTag:nosemantics:language;m\n/unknown/@lang;LangTag:syntax:illegal;m\n/unknown/@u1;attribute not defined;m\n/unknown;element not defined;m" (t/ContentChecker.t at line 98 fail #906)
+#     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute not defined;m\n/unknown;element;unsupported" (<unknown class="" u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
 ok 907
 ok 908
 ok 909
@@ -1029,26 +1029,26 @@ ok 924
 ok 925
 ok 926
 ok 927
-not ok 928
-# Test 928 got: "/html/body/p/@xml:lang;attribute not defined;m\n/html/body/p/@xml:lang;in HTML:xml:lang" (t/ContentChecker.t at line 98 fail #928)
-#     Expected: "/html/body/p/@xml:lang;in HTML:xml:lang" (<!DOCTYPE HTML><title>x</title><p xml:lang="">x</p>)
+ok 928
 ok 929
 ok 930
 ok 931
 ok 932
-not ok 933
-# Test 933 got: "/p/@dir;enumerated:invalid" (t/ContentChecker.t at line 98 fail #933)
-#     Expected: "" (<!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
-#<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml">x</p>)
+ok 933
 ok 934
 ok 935
 ok 936
-ok 937
+not ok 937
+# Test 937 got: "/html/body/p/@xml:lang;attribute not defined;m\n/html/body/p/@xml:lang;in HTML:xml:lang" (t/ContentChecker.t at line 98 fail #937)
+#     Expected: "/html/body/p/@xml:lang;in HTML:xml:lang" (<!DOCTYPE HTML><title>x</title><p xml:lang="">x</p>)
 ok 938
 ok 939
 ok 940
 ok 941
-ok 942
+not ok 942
+# Test 942 got: "/p/@dir;enumerated:invalid" (t/ContentChecker.t at line 98 fail #942)
+#     Expected: "" (<!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
+#<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml">x</p>)
 ok 943
 ok 944
 ok 945
@@ -1083,41 +1083,31 @@ ok 973
 ok 974
 ok 975
 ok 976
-not ok 977
-# Test 977 got: "/p/@onxxxx;attribute not defined;m" (t/ContentChecker.t at line 98 fail #977)
-#     Expected: "/p/@onxxxx;attribute;unsupported" (<p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+ok 977
 ok 978
 ok 979
 ok 980
 ok 981
-not ok 982
-# Test 982 got: "/html/@application;attribute not defined;m" (t/ContentChecker.t at line 98 fail #982)
+ok 982
+ok 983
+ok 984
+ok 985
+not ok 986
+# Test 986 got: "/p/@onxxxx;attribute not defined;m" (t/ContentChecker.t at line 98 fail #986)
+#     Expected: "/p/@onxxxx;attribute;unsupported" (<p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+ok 987
+ok 988
+ok 989
+ok 990
+not ok 991
+# Test 991 got: "/html/@application;attribute not defined;m" (t/ContentChecker.t at line 98 fail #991)
 #     Expected: "/html/@application;attribute;unsupported" (<html xmlns="http://www.w3.org/1999/xhtml"
 #    application="http://www.example.com/">
 #<head><title>a</title></head>
 #<body><p>a</p></body>
 #</html>)
-ok 983
-ok 984
-ok 985
-ok 986
-ok 987
-ok 988
-ok 989
-ok 990
-ok 991
-not ok 992
-# Test 992 got: "/html/body;no significant content;s\n/html/head/@xmlns;attribute not defined;m" (t/ContentChecker.t at line 98 fail #992)
-#     Expected: "/html/body;no significant content;s\n/html/head/@xmlns;attribute;unsupported" (<!DOCTYPE html>
-#<html>
-#<head xmlns="http://www.w3.org/1999/xhtml"><title>x</title></head>
-#<body></body>
-#</html>)
-not ok 993
-# Test 993 got: "/head/@profile;attribute not defined;m" (t/ContentChecker.t at line 98 fail #993)
-#     Expected: "/head/@profile;attribute;unsupported" (<head profile="http://www.test/" xmlns="http://www.w3.org/1999/xhtml">
-#  <title/>
-#</head>)
+ok 992
+ok 993
 ok 994
 ok 995
 ok 996
@@ -1125,8 +1115,18 @@ ok 997
 ok 998
 ok 999
 ok 1000
-ok 1001
-ok 1002
+not ok 1001
+# Test 1001 got: "/html/body;no significant content;s\n/html/head/@xmlns;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1001)
+#      Expected: "/html/body;no significant content;s\n/html/head/@xmlns;attribute;unsupported" (<!DOCTYPE html>
+#<html>
+#<head xmlns="http://www.w3.org/1999/xhtml"><title>x</title></head>
+#<body></body>
+#</html>)
+not ok 1002
+# Test 1002 got: "/head/@profile;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1002)
+#      Expected: "/head/@profile;attribute;unsupported" (<head profile="http://www.test/" xmlns="http://www.w3.org/1999/xhtml">
+#  <title/>
+#</head>)
 ok 1003
 ok 1004
 ok 1005
@@ -1156,8 +1156,20 @@ ok 1028
 ok 1029
 ok 1030
 ok 1031
-ok 1032
-ok 1033
+not ok 1032
+# Test 1032 got: "/head/area;element not allowed:area;m\n/head/area;element not allowed:metadata;m\n/head/base;basetarget after hyperlink" (t/ContentChecker.t at line 98 fail #1032)
+#      Expected: "/head/area;element not allowed:metadata;m\n/head/base;basetarget after hyperlink" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<area shape="default" href="" alt=""/>
+#<base target="_self"/>
+#<title/>
+#</head>)
+not ok 1033
+# Test 1033 got: "/head/area;element not allowed:area;m\n/head/area;element not allowed:metadata;m\n/head/base;basehref after URI attribute" (t/ContentChecker.t at line 98 fail #1033)
+#      Expected: "/head/area;element not allowed:metadata;m\n/head/base;basehref after URI attribute" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<area shape="default" href="" alt=""/>
+#<base href=""/>
+#<title/>
+#</head>)
 ok 1034
 ok 1035
 ok 1036
@@ -1174,10 +1186,7 @@ ok 1046
 ok 1047
 ok 1048
 ok 1049
-not ok 1050
-# Test 1050 got: "/link/@target;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1050)
-#      Expected: "/link/@target;attribute;unsupported" (<link href="http://test/" rel="author" target="_self"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1050
 ok 1051
 ok 1052
 ok 1053
@@ -1186,7 +1195,10 @@ ok 1055
 ok 1056
 ok 1057
 ok 1058
-ok 1059
+not ok 1059
+# Test 1059 got: "/link/@target;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1059)
+#      Expected: "/link/@target;attribute;unsupported" (<link href="http://test/" rel="author" target="_self"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1060
 ok 1061
 ok 1062
@@ -1204,23 +1216,23 @@ ok 1073
 ok 1074
 ok 1075
 ok 1076
-Parse error (bare ero) at line 2 column 24
 ok 1077
 ok 1078
-not ok 1079
-# Test 1079 got: "/meta;attribute missing:content\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (t/ContentChecker.t at line 98 fail #1079)
-#      Expected: "/meta;attribute missing:content;m\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
-#    http-equiv="content-type"
-#    />)
+ok 1079
 ok 1080
 ok 1081
 ok 1082
 ok 1083
 ok 1084
 ok 1085
+Parse error (bare ero) at line 2 column 24
 ok 1086
 ok 1087
-ok 1088
+not ok 1088
+# Test 1088 got: "/meta;attribute missing:content\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (t/ContentChecker.t at line 98 fail #1088)
+#      Expected: "/meta;attribute missing:content;m\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
+#    http-equiv="content-type"
+#    />)
 ok 1089
 ok 1090
 ok 1091
@@ -1242,49 +1254,49 @@ ok 1106
 ok 1107
 ok 1108
 ok 1109
-not ok 1110
-# Test 1110 got: "/section/style/@scope;attribute not defined;m\n/section/style;element not allowed:prose style;m\n/section/style;style:text/css;unsupported\n/section;no significant content;s" (t/ContentChecker.t at line 98 fail #1110)
+ok 1110
+ok 1111
+ok 1112
+ok 1113
+ok 1114
+ok 1115
+ok 1116
+ok 1117
+ok 1118
+not ok 1119
+# Test 1119 got: "/section/style/@scope;attribute not defined;m\n/section/style;element not allowed:prose style;m\n/section/style;style:text/css;unsupported\n/section;no significant content;s" (t/ContentChecker.t at line 98 fail #1119)
 #      Expected: "/section/style/@scope;attribute;unsupported\n/section/style;element not allowed:prose style;m\n/section/style;style:text/css;unsupported\n/section;no significant content;s" (<section xmlns="http://www.w3.org/1999/xhtml">
 #<style scope=""/>
 #</section>)
 #      Line 1 is changed:
 #       - "/section/style/@scope;attribute;unsupported\n"
 #       + "/section/style/@scope;attribute not defined;m\n"
-not ok 1111
-# Test 1111 got: "/body/@text;attribute not defined;m\n/body;no significant content;s" (t/ContentChecker.t at line 98 fail #1111)
-#      Expected: "/body/@text;attribute;unsupported\n/body;no significant content;s" (<body text="red" xmlns="http://www.w3.org/1999/xhtml"/>)
-ok 1112
-ok 1113
-not ok 1114
-# Test 1114 got: "/h1/@align;attribute not defined;m\n/h1;no significant content;s" (t/ContentChecker.t at line 98 fail #1114)
-#      Expected: "/h1/@align;attribute;unsupported\n/h1;no significant content;s" (<h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1115
-# Test 1115 got: "/address/@align;attribute not defined;m\n/address;no significant content;s" (t/ContentChecker.t at line 98 fail #1115)
-#      Expected: "/address/@align;attribute;unsupported\n/address;no significant content;s" (<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1116
-# Test 1116 got: "/p/@align;attribute not defined;m\n/p;no significant content;s" (t/ContentChecker.t at line 98 fail #1116)
-#      Expected: "/p/@align;attribute;unsupported\n/p;no significant content;s" (<p align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1117
-# Test 1117 got: "/hr/@align;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1117)
-#      Expected: "/hr/@align;attribute;unsupported" (<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1118
-# Test 1118 got: "/br/@clear;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1118)
-#      Expected: "/br/@clear;attribute;unsupported" (<br clear="left" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1119
-# Test 1119 got: "/dialog/@compact;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1119)
-#      Expected: "/dialog/@compact;attribute;unsupported" (<dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1120
-# Test 1120 got: "/pre/@width;attribute not defined;m\n/pre;no significant content;s" (t/ContentChecker.t at line 98 fail #1120)
-#      Expected: "/pre/@width;attribute;unsupported\n/pre;no significant content;s" (<pre width="4" xmlns="http://www.w3.org/1999/xhtml"/>)
+# Test 1120 got: "/body/@text;attribute not defined;m\n/body;no significant content;s" (t/ContentChecker.t at line 98 fail #1120)
+#      Expected: "/body/@text;attribute;unsupported\n/body;no significant content;s" (<body text="red" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1121
 ok 1122
-ok 1123
-ok 1124
-ok 1125
-ok 1126
-ok 1127
-ok 1128
-ok 1129
+not ok 1123
+# Test 1123 got: "/h1/@align;attribute not defined;m\n/h1;no significant content;s" (t/ContentChecker.t at line 98 fail #1123)
+#      Expected: "/h1/@align;attribute;unsupported\n/h1;no significant content;s" (<h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1124
+# Test 1124 got: "/address/@align;attribute not defined;m\n/address;no significant content;s" (t/ContentChecker.t at line 98 fail #1124)
+#      Expected: "/address/@align;attribute;unsupported\n/address;no significant content;s" (<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1125
+# Test 1125 got: "/p/@align;attribute not defined;m\n/p;no significant content;s" (t/ContentChecker.t at line 98 fail #1125)
+#      Expected: "/p/@align;attribute;unsupported\n/p;no significant content;s" (<p align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1126
+# Test 1126 got: "/hr/@align;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1126)
+#      Expected: "/hr/@align;attribute;unsupported" (<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1127
+# Test 1127 got: "/br/@clear;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1127)
+#      Expected: "/br/@clear;attribute;unsupported" (<br clear="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1128
+# Test 1128 got: "/dialog/@compact;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1128)
+#      Expected: "/dialog/@compact;attribute;unsupported" (<dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1129
+# Test 1129 got: "/pre/@width;attribute not defined;m\n/pre;no significant content;s" (t/ContentChecker.t at line 98 fail #1129)
+#      Expected: "/pre/@width;attribute;unsupported\n/pre;no significant content;s" (<pre width="4" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1130
 ok 1131
 ok 1132
@@ -1543,7 +1555,12 @@ ok 1384
 ok 1385
 ok 1386
 ok 1387
-ok 1388
+not ok 1388
+# Test 1388 got: "/div/img/@ismap;attribute not allowed:ismap;m" (t/ContentChecker.t at line 98 fail #1388)
+#      Expected: "/div/img/@ismap;attribute not allowed" (<div  xmlns="http://www.w3.org/1999/xhtml">
+#<a href="http://link.test/">a</a>
+#<img alt="" src="http://test/" ismap="ismap"/>
+#</div>)
 ok 1389
 ok 1390
 ok 1391
@@ -1582,9 +1599,7 @@ ok 1423
 ok 1424
 ok 1425
 ok 1426
-not ok 1427
-# Test 1427 got: "/param/@valuetype;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1427)
-#      Expected: "/param/@valuetype;attribute;unsupported" (<param name="a" value="b" valuetype="text" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1427
 ok 1428
 ok 1429
 ok 1430
@@ -1595,7 +1610,9 @@ ok 1434
 ok 1435
 ok 1436
 ok 1437
-ok 1438
+not ok 1438
+# Test 1438 got: "/param/@valuetype;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1438)
+#      Expected: "/param/@valuetype;attribute;unsupported" (<param name="a" value="b" valuetype="text" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1439
 ok 1440
 ok 1441
@@ -1634,9 +1651,7 @@ ok 1473
 ok 1474
 ok 1475
 ok 1476
-not ok 1477
-# Test 1477 got: "/map/@name;attribute not defined;m\n/map;attribute missing:id\n/map;no significant content;s" (t/ContentChecker.t at line 98 fail #1477)
-#      Expected: "/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1477
 ok 1478
 ok 1479
 ok 1480
@@ -1647,7 +1662,9 @@ ok 1484
 ok 1485
 ok 1486
 ok 1487
-ok 1488
+not ok 1488
+# Test 1488 got: "/map/@name;attribute not defined;m\n/map;attribute missing:id\n/map;no significant content;s" (t/ContentChecker.t at line 98 fail #1488)
+#      Expected: "/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1489
 ok 1490
 ok 1491
@@ -1718,18 +1735,10 @@ ok 1555
 ok 1556
 ok 1557
 ok 1558
-not ok 1559
-# Test 1559 got: "/table/@border;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1559)
-#      Expected: "/table/@border;attribute;unsupported" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1560
-# Test 1560 got: "/table/@frame;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1560)
-#      Expected: "/table/@frame;attribute;unsupported" (<table frame="border" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1561
-# Test 1561 got: "/table/@border;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1561)
-#      Expected: "/table/@border;attribute;unsupported" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1562
-# Test 1562 got: "/caption/@align;attribute not defined;m\n/caption;no significant content;s" (t/ContentChecker.t at line 98 fail #1562)
-#      Expected: "/caption/@align;attribute;unsupported\n/caption;no significant content;s" (<caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1559
+ok 1560
+ok 1561
+ok 1562
 ok 1563
 ok 1564
 ok 1565
@@ -1737,10 +1746,18 @@ ok 1566
 ok 1567
 ok 1568
 ok 1569
-ok 1570
-ok 1571
-ok 1572
-ok 1573
+not ok 1570
+# Test 1570 got: "/table/@border;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1570)
+#      Expected: "/table/@border;attribute;unsupported" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1571
+# Test 1571 got: "/table/@frame;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1571)
+#      Expected: "/table/@frame;attribute;unsupported" (<table frame="border" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1572
+# Test 1572 got: "/table/@border;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1572)
+#      Expected: "/table/@border;attribute;unsupported" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1573
+# Test 1573 got: "/caption/@align;attribute not defined;m\n/caption;no significant content;s" (t/ContentChecker.t at line 98 fail #1573)
+#      Expected: "/caption/@align;attribute;unsupported\n/caption;no significant content;s" (<caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1574
 ok 1575
 ok 1576
@@ -1760,9 +1777,7 @@ ok 1589
 ok 1590
 ok 1591
 ok 1592
-not ok 1593
-# Test 1593 got: "/td/@scope;attribute not defined;m\n/td;no significant content;s" (t/ContentChecker.t at line 98 fail #1593)
-#      Expected: "/td/@scope;attribute;unsupported\n/td;no significant content;s" (<td scope="row" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1593
 ok 1594
 ok 1595
 ok 1596
@@ -1773,7 +1788,9 @@ ok 1600
 ok 1601
 ok 1602
 ok 1603
-ok 1604
+not ok 1604
+# Test 1604 got: "/td/@scope;attribute not defined;m\n/td;no significant content;s" (t/ContentChecker.t at line 98 fail #1604)
+#      Expected: "/td/@scope;attribute;unsupported\n/td;no significant content;s" (<td scope="row" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1605
 ok 1606
 ok 1607
@@ -1903,10 +1920,7 @@ ok 1730
 ok 1731
 ok 1732
 ok 1733
-not ok 1734
-# Test 1734 got: "/div/@align;attribute not defined;m\n/div;no significant content;s" (t/ContentChecker.t at line 98 fail #1734)
-#      Expected: "/div/@align;attribute;unsupported\n/div;no significant content;s" (<div align="center" xmlns="http://www.w3.org/1999/xhtml"/>)
-# t/content-model-3.dat
+ok 1734
 ok 1735
 ok 1736
 ok 1737
@@ -1918,8 +1932,9 @@ ok 1742
 ok 1743
 ok 1744
 not ok 1745
-# Test 1745 got: "/a;element;unsupported" (t/ContentChecker.t at line 98 fail #1745)
-#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
+# Test 1745 got: "/div/@align;attribute not defined;m\n/div;no significant content;s" (t/ContentChecker.t at line 98 fail #1745)
+#      Expected: "/div/@align;attribute;unsupported\n/div;no significant content;s" (<div align="center" xmlns="http://www.w3.org/1999/xhtml"/>)
+# t/content-model-3.dat
 ok 1746
 ok 1747
 ok 1748
@@ -1930,8 +1945,9 @@ ok 1752
 ok 1753
 ok 1754
 ok 1755
-# t/content-model-4.dat
-ok 1756
+not ok 1756
+# Test 1756 got: "/a;element;unsupported" (t/ContentChecker.t at line 98 fail #1756)
+#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
 ok 1757
 ok 1758
 ok 1759
@@ -1942,6 +1958,7 @@ ok 1763
 ok 1764
 ok 1765
 ok 1766
+# t/content-model-4.dat
 ok 1767
 ok 1768
 ok 1769
@@ -1978,7 +1995,6 @@ ok 1799
 ok 1800
 ok 1801
 ok 1802
-# t/content-model-5.dat
 ok 1803
 ok 1804
 ok 1805
@@ -1990,6 +2006,7 @@ ok 1810
 ok 1811
 ok 1812
 ok 1813
+# t/content-model-5.dat
 ok 1814
 ok 1815
 ok 1816
@@ -2006,7 +2023,6 @@ ok 1826
 ok 1827
 ok 1828
 ok 1829
-# t/table-1.dat
 ok 1830
 ok 1831
 ok 1832
@@ -2018,73 +2034,85 @@ ok 1837
 ok 1838
 ok 1839
 ok 1840
+# t/table-1.dat
 ok 1841
 ok 1842
+ok 1843
+ok 1844
+ok 1845
+ok 1846
+ok 1847
+ok 1848
+ok 1849
+ok 1850
+ok 1851
+ok 1852
+ok 1853
 # t/content-model-atom-1.dat
 # t/content-model-atom-2.dat
-not ok 1843
-# Test 1843 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1843)
-#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="en" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
-not ok 1844
-# Test 1844 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1844)
-#      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="!" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
-not ok 1845
-# Test 1845 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1845)
-#      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang=" en " href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
-not ok 1846
-# Test 1846 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1846)
-#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-not ok 1847
-# Test 1847 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1847)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>05-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-not ok 1848
-# Test 1848 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1848)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>12005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-not ok 1849
-# Test 1849 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1849)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31t12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-not ok 1850
-# Test 1850 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1850)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-not ok 1851
-# Test 1851 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1851)
-#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-not ok 1852
-# Test 1852 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1852)
-#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29.0120Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
-not ok 1853
-# Test 1853 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1853)
-#      Expected: "/feed/updated;datetime:bad month;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-17-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1854
 # Test 1854 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1854)
-#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-32T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="en" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
 not ok 1855
 # Test 1855 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1855)
-#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-02-29T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="!" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
 not ok 1856
 # Test 1856 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1856)
-#      Expected: "/feed/updated;datetime:bad hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T24:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/link/@hreflang;LangTag:nosemantics:language;m\n/feed/link/@hreflang;LangTag:syntax:illegal;m" (<feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang=" en " href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>)
 not ok 1857
 # Test 1857 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1857)
-#      Expected: "/feed/updated;datetime:bad minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:69:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1858
 # Test 1858 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1858)
-#      Expected: "/feed/updated;datetime:bad second;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:69Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>05-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1859
 # Test 1859 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1859)
-#      Expected: "/feed/updated;datetime:bad timezone hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+24:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>12005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1860
 # Test 1860 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1860)
-#      Expected: "/feed/updated;datetime:bad timezone minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+02:60</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31t12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1861
 # Test 1861 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1861)
-#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>1972-12-31T23:59:60+00:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1862
 # Test 1862 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1862)
-#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>1973-01-01T00:59:60+00:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "/feed/updated;datetime:syntax error;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1863
 # Test 1863 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1863)
-#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><link title="" rel="self" href="http://example.org/1"/><updated>1973-01-01T00:59:60+00:00</updated><id>tag:example.org,1</id><title/></feed>)
+#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29.0120Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
 not ok 1864
 # Test 1864 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1864)
+#      Expected: "/feed/updated;datetime:bad month;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-17-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1865
+# Test 1865 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1865)
+#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-32T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1866
+# Test 1866 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1866)
+#      Expected: "/feed/updated;datetime:bad day;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-02-29T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1867
+# Test 1867 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1867)
+#      Expected: "/feed/updated;datetime:bad hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T24:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1868
+# Test 1868 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1868)
+#      Expected: "/feed/updated;datetime:bad minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:69:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1869
+# Test 1869 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1869)
+#      Expected: "/feed/updated;datetime:bad second;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:69Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1870
+# Test 1870 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1870)
+#      Expected: "/feed/updated;datetime:bad timezone hour;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+24:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1871
+# Test 1871 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1871)
+#      Expected: "/feed/updated;datetime:bad timezone minute;m" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29+02:60</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1872
+# Test 1872 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1872)
+#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>1972-12-31T23:59:60+00:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1873
+# Test 1873 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1873)
+#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><updated>1973-01-01T00:59:60+00:00</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>)
+not ok 1874
+# Test 1874 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1874)
+#      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><link title="" rel="self" href="http://example.org/1"/><updated>1973-01-01T00:59:60+00:00</updated><id>tag:example.org,1</id><title/></feed>)
+not ok 1875
+# Test 1875 got: "/feed/id;element not defined;m\n/feed/link;element not defined;m\n/feed/title;element not defined;m\n/feed/updated;element not defined;m\n/feed;element not defined;m" (t/ContentChecker.t at line 98 fail #1875)
 #      Expected: "" (<feed xmlns="http://www.w3.org/2005/Atom"><link title="a b c" rel="self" href="http://example.org/1"/><updated>1973-01-01T00:59:60+00:00</updated><id>tag:example.org,1</id><title/></feed>)

@@ -1983,6 +1983,8 @@ $Element->{$HTML_NS}->{a} = {
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
+    delete $self->{flag}->{in_a_href}
+        unless $element_state->{in_a_href_original};
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
   },
@@ -2559,7 +2561,8 @@ $Element->{$HTML_NS}->{img} = {
         my ($self, $attr, $parent_item) = @_;
         if (not $self->{flag}->{in_a_href}) {
           $self->{onerror}->(node => $attr,
-                             type => 'attribute not allowed:ismap');
+                             type => 'attribute not allowed:ismap',
+                             level => $self->{must_level});
         }
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
@@ -2804,7 +2807,7 @@ $Element->{$HTML_NS}->{video} = {
     ## ISSUE: playcount has no conformance creteria
     autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
     controls => $GetHTMLBooleanAttrChecker->('controls'),
-    poster => $HTMLURIAttrChecker, ## TODO: not for audio!
+    poster => $HTMLURIAttrChecker,
     ## TODO: width, height
   }, {
     %HTMLAttrStatus,
@@ -2975,6 +2978,16 @@ $Element->{$HTML_NS}->{map} = {
     })->($self, $item, $element_state);
     $self->{onerror}->(node => $item->{node}, type => 'attribute missing:id')
         unless $has_id;
+  },
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{in_map_original} = $self->{flag}->{in_map};
+    $self->{flag}->{in_map} = 1;
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    delete $self->{flag}->{in_map} unless $element_state->{in_map_original};
+    $HTMLProseContentChecker{check_end}->(@_);
   },
 };
 
@@ -3154,8 +3167,16 @@ $Element->{$HTML_NS}->{area} = {
       }
     }
   },
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    unless ($self->{flag}->{in_map} or
+            not $item->{node}->manakai_parent_element) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element not allowed:area',
+                         level => $self->{must_level});
+    }
+  },
 };
-## TODO: only in map
 
 $Element->{$HTML_NS}->{table} = {
   %HTMLChecker,
@@ -4116,7 +4137,7 @@ $Element->{$HTML_NS}->{details} = {
     open => $GetHTMLBooleanAttrChecker->('open'),
   }, {
     %HTMLAttrStatus,
-    open =>  FEATURE_HTML5_WD,
+    open => FEATURE_HTML5_WD,
   }),
   ## NOTE: legend, Prose
   check_child_element => sub {

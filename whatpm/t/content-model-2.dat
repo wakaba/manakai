@@ -3042,14 +3042,14 @@ id=""><span id="">x</span></p>
 #data
 <img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img/@ismap;attribute not allowed:ismap
+/img/@ismap;attribute not allowed:ismap;m
 
 #data
 <span xmlns="http://www.w3.org/1999/xhtml">
 <img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
 </span>
 #errors
-/span/img/@ismap;attribute not allowed:ismap
+/span/img/@ismap;attribute not allowed:ismap;m
 
 #data
 <span xmlns="http://www.w3.org/1999/xhtml">
@@ -3057,21 +3057,21 @@ id=""><span id="">x</span></p>
 <img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
 </span>
 #errors
-/span/img/@ismap;attribute not allowed:ismap
+/span/img/@ismap;attribute not allowed:ismap;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
 <img alt="" src="http://test/" ismap="ismap"/>
 </a>
 #errors
-/a/img/@ismap;attribute not allowed:ismap
+/a/img/@ismap;attribute not allowed:ismap;m
 
 #data
 <a title="" xmlns="http://www.w3.org/1999/xhtml">
 <img alt="" src="http://test/" ismap="ismap"/>
 </a>
 #errors
-/a/img/@ismap;attribute not allowed:ismap
+/a/img/@ismap;attribute not allowed:ismap;m
 
 #data
 <a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
@@ -3091,6 +3091,22 @@ id=""><span id="">x</span></p>
 </a>
 #errors
 /a/img/@ismap;boolean:invalid
+
+#data
+<div  xmlns="http://www.w3.org/1999/xhtml">
+<a href="http://link.test/">a</a>
+<img alt="" src="http://test/" ismap="ismap"/>
+</div>
+#errors
+/div/img/@ismap;attribute not allowed
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<span>
+<img alt="" src="http://test/" ismap="ismap"/>
+</span>
+</a>
+#errors
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">

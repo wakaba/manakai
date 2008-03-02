@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.70 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.71 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -8,11 +8,9 @@ use Error qw(:try);
 ## doc.write ('');
 ## alert (doc.compatMode);
 
-## ISSUE: HTML5 revision 967 says that the encoding layer MUST NOT
-## strip BOM and the HTML layer MUST ignore it.  Whether we can do it
-## is not yet clear.
-## "{U+FEFF}..." in UTF-16BE/UTF-16LE is three or four characters?
-## "{U+FEFF}..." in GB18030?
+## TODO: Control charcters and noncharacters are not allowed (HTML5 revision 1263)
+## TODO: 1252 parse error (revision 1264)
+## TODO: 8859-11 = 874 (revision 1271)
 
 my $permitted_slash_tag_name = {
   base => 1,
@@ -20,7 +18,7 @@ my $permitted_slash_tag_name = {
   meta => 1,
   hr => 1,
   br => 1,
-  img=> 1,
+  img => 1,
   embed => 1,
   param => 1,
   area => 1,
@@ -154,6 +152,15 @@ sub parse_byte_string ($$$$;$) {
   };
   return $return;
 } # parse_byte_string
+
+## NOTE: HTML5 spec says that the encoding layer MUST NOT strip BOM
+## and the HTML layer MUST ignore it.  However, we does strip BOM in
+## the encoding layer and the HTML layer does not ignore any U+FEFF,
+## because the core part of our HTML parser expects a string of character,
+## not a string of bytes or code units or anything which might contain a BOM.
+## Therefore, any parser interface that accepts a string of bytes,
+## such as |parse_byte_string| in this module, must ensure that it does
+## strip the BOM and never strip any ZWNBSP.
 
 *parse_char_string = \&parse_string;
 
@@ -3847,7 +3854,8 @@ sub _tree_construction_main ($) {
                 } elsif ($token->{attributes}->{content}) {
                   ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
                   if ($token->{attributes}->{content}->{value}
-                      =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
+                      =~ /\A[^;]*;[\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
+                          [\x09-\x0D\x20]*=
                           [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                           ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
                     $self->{change_encoding}
@@ -5696,7 +5704,8 @@ sub _tree_construction_main ($) {
           } elsif ($token->{attributes}->{content}) {
             ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
             if ($token->{attributes}->{content}->{value}
-                =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
+                =~ /\A[^;]*;[\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
+                    [\x09-\x0D\x20]*=
                     [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                     ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
               $self->{change_encoding}
@@ -6888,7 +6897,7 @@ sub set_inner_html ($$$) {
     $p->_initialize_tree_constructor;
 
     ## Step 2
-    my $node_ln = $node->local_name;
+    my $node_ln = $node->manakai_local_name;
     $p->{content_model} = {
       title => RCDATA_CONTENT_MODEL,
       textarea => RCDATA_CONTENT_MODEL,
@@ -6928,7 +6937,7 @@ sub set_inner_html ($$$) {
       if ($anode->node_type == 1) {
         my $nsuri = $anode->namespace_uri;
         if (defined $nsuri and $nsuri eq 'http://www.w3.org/1999/xhtml') {
-          if ($anode->local_name eq 'form') { ## TODO: case?
+          if ($anode->manakai_local_name eq 'form') {
             $p->{form_element} = $anode;
             last AN;
           }
@@ -6972,4 +6981,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/02/17 12:39:32 $
+# $Date: 2008/03/02 03:39:40 $

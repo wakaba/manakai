@@ -1,6 +1,6 @@
 package Whatpm::HTML::Serializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub get_inner_html ($$$) {
   my (undef, $node, $on_error) = @_;
@@ -95,7 +95,7 @@ sub get_inner_html ($$$) {
     } elsif ($nt == 5) { # entrefs
       push @node, @{$child->child_nodes};
     } elsif ($nt == 7) { # PIs
-      $s .= '<?' . $child->target . ' ' . $target->data . '>';
+      $s .= '<?' . $child->target . ' ' . $child->data . '>';
     } else {
       $on_error->($child) if defined $on_error;
     }
@@ -115,4 +115,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/03/01 00:42:53 $
+## $Date: 2008/03/02 03:39:41 $
