@@ -523,27 +523,29 @@
 
 {"description":"/''b=\"\"",
 "input": "<a /''b=\"\">",
-"output": ["ParseError", ["StartTag", "a", {"''b": ""}]]},
+"output": ["ParseError", "ParseError", "ParseError",
+    ["StartTag", "a", {"''b": ""}]]},
 
 {"description":"/\"\"b=\"\"",
 "input": "<a /\"\"b=\"\">",
-"output": ["ParseError", ["StartTag", "a", {"\"\"b": ""}]]},
+"output": ["ParseError", "ParseError", "ParseError",
+    ["StartTag", "a", {"\"\"b": ""}]]},
 
 {"description":"\"b=\"\"",
 "input": "<a \"b=\"\">",
-"output": [["StartTag", "a", {"\"b": ""}]]},
+"output": ["ParseError", ["StartTag", "a", {"\"b": ""}]]},
 
 {"description":"\"\"b=\"\"",
 "input": "<a \"\"b=\"\">",
-"output": [["StartTag", "a", {"\"\"b": ""}]]},
+"output": ["ParseError", "ParseError", ["StartTag", "a", {"\"\"b": ""}]]},
 
 {"description":"'b=\"\"",
 "input": "<a 'b=\"\">",
-"output": [["StartTag", "a", {"'b": ""}]]},
+"output": ["ParseError", ["StartTag", "a", {"'b": ""}]]},
 
 {"description":"''b=\"\"",
 "input": "<a ''b=\"\">",
-"output": [["StartTag", "a", {"''b": ""}]]},
+"output": ["ParseError", "ParseError", ["StartTag", "a", {"''b": ""}]]},
 
 {"description":"/b=\"\"",
 "input": "<a /b=\"\">",
@@ -551,7 +553,8 @@
 
 {"description":"b/=\"\"",
 "input": "<a b/=\"\">",
-"output": ["ParseError", ["StartTag", "a", {"b": "", "=\"\"": ""}]]},
+"output": ["ParseError", "ParseError", "ParseError", "ParseError",
+    ["StartTag", "a", {"b": "", "=\"\"": ""}]]},
 
 {"description":"b/c=\"\"",
 "input": "<a b/c=\"\">",
@@ -567,6 +570,140 @@
 
 {"description":"[NULL]bc=\"\"",
 "input": "<a \u0000bc=\"\">",
-"output": ["ParseError", ["StartTag", "a", {"\uFFFDbc": ""}]]}
+"output": ["ParseError", ["StartTag", "a", {"\uFFFDbc": ""}]]},
+
+{"description": "<span ===>",
+"input": "<span ===>",
+"output": ["ParseError", "ParseError", ["StartTag", "span", {"=": "="}]]},
+
+{"description": "<span a==>",
+"input": "<span a==>",
+"output": ["ParseError", ["StartTag", "span", {"a": "="}]]},
+
+{"description": "<span ==a>",
+"input": "<span ==a>",
+"output": ["ParseError", ["StartTag", "span", {"=": "a"}]]},
+
+{"description": "<span a=b=>",
+"input": "<span a=b=>",
+"output": ["ParseError", ["StartTag", "span", {"a": "b="}]]},
+
+{"description": "<span =x\"=\"x>",
+"input": "<span =x\"=\"x>",
+"output": ["ParseError", "ParseError", "ParseError",
+    ["StartTag", "span", {"=x\"": "x>"}]]},
+
+{"description": "<span =x\"=\"x\">",
+"input": "<span =x\"=\"x\">",
+"output": ["ParseError", "ParseError", ["StartTag", "span", {"=x\"": "x"}]]},
+
+{"description":"&\"",
+"input": "&\"",
+"output": ["ParseError", ["Character", "&\""]]},
+
+{"description":"&'",
+"input": "&'",
+"output": ["ParseError", ["Character", "&'"]]},
+
+{"description":"<a href=\"&\">",
+"input": "<a href=\"&\">",
+"output": [["StartTag", "a", {"href": "&"}]]},
+
+{"description":"<a href=\"&'\">",
+"input": "<a href=\"&'\">",
+"output": ["ParseError", ["StartTag", "a", {"href": "&'"}]]},
+
+{"description":"<a href='&'>",
+"input": "<a href='&'>",
+"output": [["StartTag", "a", {"href": "&"}]]},
+
+{"description":"<a href='&\"'>",
+"input": "<a href='&\"'>",
+"output": ["ParseError", ["StartTag", "a", {"href": "&\""}]]},
+
+{"description":"<a href=&\">",
+"input": "<a href=&\">",
+"output": ["ParseError", "ParseError", ["StartTag", "a", {"href": "&\""}]]},
+
+{"description":"<a href=&'>",
+"input": "<a href=&'>",
+"output": ["ParseError", "ParseError", ["StartTag", "a", {"href": "&'"}]]},
+
+{"description": "<!->-->",
+"input": "<!->-->",
+"output": ["ParseError", ["Comment", "-"], ["Character", "-->"]]},
+
+{"description": "<!!--->-->",
+"input": "<!!--->-->",
+"output": ["ParseError", ["Comment", "!---"], ["Character", "-->"]]},
+
+{"description": "<a href=''rel=''>",
+"input": "<a href=''rel=''>",
+"output": ["ParseError", ["StartTag", "a", {"href": "", "rel": ""}]]},
+
+{"description": "<a href=\"\"rel=''>",
+"input": "<a href=\"\"rel=''>",
+"output": ["ParseError", ["StartTag", "a", {"href": "", "rel": ""}]]},
+
+{"description": "<a href=''/rel=''>",
+"input": "<a href=''/rel=''>",
+"output": ["ParseError", ["StartTag", "a", {"href": "", "rel": ""}]]},
+
+{"description": "<a href=''rel=''/>",
+"input": "<a href=''rel=''/>",
+"output": ["ParseError", "ParseError",
+    ["StartTag", "a", {"href": "", "rel": ""}]]},
+
+{"description": "<link href=''rel=''/>",
+"input": "<link href=''rel=''/>",
+"output": ["ParseError", ["StartTag", "link", {"href": "", "rel": ""}]]},
+
+{"description": "<a \">",
+"input": "<a \">",
+"output": ["ParseError", ["StartTag", "a", {"\"": ""}]]},
+
+{"description": "<a \"\">",
+"input": "<a \"\">",
+"output": ["ParseError", "ParseError", ["StartTag", "a", {"\"\"": ""}]]},
+
+{"description": "<a '>",
+"input": "<a '>",
+"output": ["ParseError", ["StartTag", "a", {"'": ""}]]},
+
+{"description": "<a ''>",
+"input": "<a ''>",
+"output": ["ParseError", "ParseError", ["StartTag", "a", {"''": ""}]]},
+
+{"description": "<a a\">",
+"input": "<a a\">",
+"output": ["ParseError", ["StartTag", "a", {"a\"": ""}]]},
+
+{"description": "<a a'>",
+"input": "<a a'>",
+"output": ["ParseError", ["StartTag", "a", {"a'": ""}]]},
+
+{"description": "<a a\"'>",
+"input": "<a a\"'>",
+"output": ["ParseError", "ParseError", ["StartTag", "a", {"a\"'": ""}]]},
+
+{"description": "<a a=\">",
+"input": "<a a=\">",
+"output": ["ParseError", ["StartTag", "a", {"a": ">"}]]},
+
+{"description": "<a a='>",
+"input": "<a a='>",
+"output": ["ParseError", ["StartTag", "a", {"a": ">"}]]},
+
+{"description": "<a a=a\">",
+"input": "<a a=a\">",
+"output": ["ParseError", ["StartTag", "a", {"a": "a\""}]]},
+
+{"description": "<a a=a'>",
+"input": "<a a=a'>",
+"output": ["ParseError", ["StartTag", "a", {"a": "a'"}]]},
+
+{"description": "<a a=>",
+"input": "<a a=>",
+"output": [["StartTag", "a", {"a": ""}]]}
 
 ]}

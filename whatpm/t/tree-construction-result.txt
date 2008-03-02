@@ -1,7 +1,7 @@
 1..980
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Mar  2 21:56:15 2008
-# Current time GMT:   Sun Mar  2 12:56:15 2008
+# Current time local: Sun Mar  2 23:30:42 2008
+# Current time GMT:   Sun Mar  2 14:30:42 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -700,11 +700,8 @@ not ok 465
 # Test 465 got: "2" (t/HTML-tree.t at line 141 fail #233)
 #     Expected: "1" (Parse error: qq'<title><!--&amp;--></title>'; 1:8:no DOCTYPE, 1:27:not closed:head;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE.)
 not ok 466
-# Test 466 got: "| <html>\n|   <head>\n|     <title>\n|       \"<!--&-->\"\n" (t/HTML-tree.t at line 143 fail #233)
+# Test 466 got: "| <html>\n|   <head>\n|     <title>\n|       \"<!--&amp;-->\"\n" (t/HTML-tree.t at line 143 fail #233)
 #     Expected: "| <html>\n|   <head>\n|     <title>\n|       \"<!--&amp;-->\"\n|   <body>\n" (Document tree: qq'<title><!--&amp;--></title>')
-#     Line 4 is changed:
-#      - "|       \"<!--&amp;-->\"\n"
-#      + "|       \"<!--&-->\"\n"
 #     Line 5 is missing:
 #      - "|   <body>\n"
 not ok 467
@@ -747,11 +744,8 @@ not ok 481
 # Test 481 got: "1" (t/HTML-tree.t at line 141 fail #241)
 #     Expected: "0" (Parse error: qq'<!doctype HTml><title><!--&amp;--></title>'; 1:42:not closed:head;)
 not ok 482
-# Test 482 got: "| <!DOCTYPE HTml>\n| <html>\n|   <head>\n|     <title>\n|       \"<!--&-->\"\n" (t/HTML-tree.t at line 143 fail #241)
+# Test 482 got: "| <!DOCTYPE HTml>\n| <html>\n|   <head>\n|     <title>\n|       \"<!--&amp;-->\"\n" (t/HTML-tree.t at line 143 fail #241)
 #     Expected: "| <!DOCTYPE HTml>\n| <html>\n|   <head>\n|     <title>\n|       \"<!--&amp;-->\"\n|   <body>\n" (Document tree: qq'<!doctype HTml><title><!--&amp;--></title>')
-#     Line 5 is changed:
-#      - "|       \"<!--&amp;-->\"\n"
-#      + "|       \"<!--&-->\"\n"
 #     Line 6 is missing:
 #      - "|   <body>\n"
 ok 483

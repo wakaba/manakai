@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.71 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.72 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -286,6 +286,7 @@ sub DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE () { 29 }
 sub DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE () { 30 }
 sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
 sub BOGUS_DOCTYPE_STATE () { 32 }
+sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -390,7 +391,8 @@ sub _get_next_token ($) {
   A: {
     if ($self->{state} == DATA_STATE) {
       if ($self->{next_input_character} == 0x0026) { # &
-	if ($self->{content_model} & CM_ENTITY) { # PCDATA | RCDATA
+	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
+            not $self->{escape}) {
           $self->{state} = ENTITY_DATA_STATE;
           
       if (@{$self->{char}}) {
@@ -463,7 +465,7 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == ENTITY_DATA_STATE) {
       ## (cannot happen in CDATA state)
       
-      my $token = $self->_tokenize_attempt_to_consume_an_entity (0);
+      my $token = $self->_tokenize_attempt_to_consume_an_entity (0, -1);
 
       $self->{state} = DATA_STATE;
       # next-input-character is already done
@@ -880,6 +882,13 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        if ({
+             0x0022 => 1, # "
+             0x0027 => 1, # '
+             0x003D => 1, # =
+            }->{$self->{next_input_character}}) {
+          $self->{parse_error}-> (type => 'bad attribute name');
+        }
         $self->{current_attribute} = {name => chr ($self->{next_input_character}),
                               value => ''};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -1010,6 +1019,10 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        if ($self->{next_input_character} == 0x0022 or # "
+            $self->{next_input_character} == 0x0027) { # '
+          $self->{parse_error}-> (type => 'bad attribute name');
+        }
         $self->{current_attribute}->{name} .= chr ($self->{next_input_character});
         ## Stay in the state
         
@@ -1222,6 +1235,9 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        if ($self->{next_input_character} == 0x003D) { # =
+          $self->{parse_error}-> (type => 'bad attribute value');
+        }
         $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         
@@ -1235,7 +1251,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
       if ($self->{next_input_character} == 0x0022) { # "
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
+        $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1289,7 +1305,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
       if ($self->{next_input_character} == 0x0027) { # '
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
+        $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1413,6 +1429,13 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        if ({
+             0x0022 => 1, # "
+             0x0027 => 1, # '
+             0x003D => 1, # =
+            }->{$self->{next_input_character}}) {
+          $self->{parse_error}-> (type => 'bad attribute value');
+        }
         $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
         ## Stay in the state
         
@@ -1425,7 +1448,13 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ENTITY_IN_ATTRIBUTE_VALUE_STATE) {
-      my $token = $self->_tokenize_attempt_to_consume_an_entity (1);
+      my $token = $self->_tokenize_attempt_to_consume_an_entity
+          (1,
+           $self->{last_attribute_value_state}
+             == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE ? 0x0022 : # "
+           $self->{last_attribute_value_state}
+             == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE ? 0x0027 : # '
+           -1);
 
       unless (defined $token) {
         $self->{current_attribute}->{value} .= '&';
@@ -1438,6 +1467,71 @@ sub _get_next_token ($) {
       $self->{state} = $self->{last_attribute_value_state};
       # next-input-character is already done
       redo A;
+    } elsif ($self->{state} == AFTER_ATTRIBUTE_VALUE_QUOTED_STATE) {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
+          if ($self->{current_token}->{attributes}) {
+            $self->{parse_error}-> (type => 'end tag attribute');
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = DATA_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        return  ($self->{current_token}); # start tag or end tag
+
+        redo A;
+      } elsif ($self->{next_input_character} == 0x002F) { # /
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        if ($self->{next_input_character} == 0x003E and # >
+            $self->{current_token}->{type} == START_TAG_TOKEN and
+            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
+          # permitted slash
+          #
+        } else {
+          $self->{parse_error}-> (type => 'nestc');
+        }
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
+        # next-input-character is already done
+        redo A;
+      } else {
+        $self->{parse_error}-> (type => 'no space between attributes');
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
+        ## reconsume
+        redo A;
+      }
     } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
       ## (only happen if PCDATA state)
       
@@ -2605,12 +2699,13 @@ sub _get_next_token ($) {
   die "$0: _get_next_token: unexpected case";
 } # _get_next_token
 
-sub _tokenize_attempt_to_consume_an_entity ($$) {
-  my ($self, $in_attr) = @_;
+sub _tokenize_attempt_to_consume_an_entity ($$$) {
+  my ($self, $in_attr, $additional) = @_;
 
   if ({
        0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, # HT, LF, VT, FF,
        0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, & # 0x000D # CR
+       $additional => 1,
       }->{$self->{next_input_character}}) {
     ## Don't consume
     ## No error
@@ -2957,6 +3052,9 @@ sub _tree_construction_initial ($) {
           "-//NETSCAPE COMM. CORP.//DTD STRICT HTML//EN" => 1,
           "-//O'REILLY AND ASSOCIATES//DTD HTML 2.0//EN" => 1,
           "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED 1.0//EN" => 1,
+          "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED RELAXED 1.0//EN" => 1,
+          "-//SOFTQUAD SOFTWARE//DTD HOTMETAL PRO 6.0::19990601::EXTENSIONS TO HTML 4.0//EN" => 1,
+          "-//SOFTQUAD//DTD HOTMETAL PRO 4.0::19971010::EXTENSIONS TO HTML 4.0//EN" => 1,
           "-//SPYGLASS//DTD HTML 2.0 EXTENDED//EN" => 1,
           "-//SQ//DTD HTML 2.0 HOTMETAL + EXTENSIONS//EN" => 1,
           "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA HTML//EN" => 1,
@@ -6981,4 +7079,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/02 03:39:40 $
+# $Date: 2008/03/02 14:32:26 $

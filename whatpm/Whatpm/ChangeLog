@@ -1,5 +1,16 @@
 2008-03-02  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: Raise a parse error for |<span ===>| (HTML5 revision
+	1292).  Entities are not parsed in comment-like part in RCDATA
+	elements (HTML5 revision 1294).  Allow bare & at the end
+	of attribute value literals (HTML5 revision 1296).  More
+	quirks mode doctypes (HTML5 revision 1302).  Requires spaces
+	between attributes and ban attribute names or unquoted
+	attribute values containing single or double quotes (HTML5
+	revision 1303).
+
+2008-03-02  Wakaba  <wakaba@suika.fam.cx>
+
 	* ContentChecker.pm: Typo fixed.  Don't raise "character encoding"
 	and related errors unless it is an HTML document (though the spec
 	is unclear on whether it is applied to XHTML document).
