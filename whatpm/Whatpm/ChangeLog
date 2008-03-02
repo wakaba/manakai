@@ -1,5 +1,14 @@
 2008-03-02  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Typo fixed.  Don't raise "character encoding"
+	and related errors unless it is an HTML document (though the spec
+	is unclear on whether it is applied to XHTML document).
+
+	* HTML.pm (%HTMLAttrStatus): WF2 repetition model attributes
+	are added.
+
+2008-03-02  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: s/local_name/manakai_local_name/g.
 
 2008-03-01  Wakaba  <wakaba@suika.fam.cx>

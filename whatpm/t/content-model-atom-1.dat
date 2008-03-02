@@ -1,0 +1,237 @@
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title>xxx</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title>x<p xmlns="">x</p>x</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/p;element not allowed:atom|TextConstruct;m
+/feed/title/p;element;unsupported
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="text">xxx</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="text">x<p xmlns="">x</p>x</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/p;element not allowed:atom|TextConstruct;m
+/feed/title/p;element;unsupported
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="html">xxx</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="html">x<p xmlns="">x</p>x</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/p;element not allowed:atom|TextConstruct;m
+/feed/title/p;element;unsupported
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="html"><div xmlns="http://www.w3.org/1999/xhtml">x</div></title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/div;element not allowed:atom|TextConstruct;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="xhtml">xxx</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/"xxx";character not allowed:atom|TextConstruct;m
+/feed/title;element missing:div;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="xhtml">x<p xmlns="">x</p>x</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/"x";character not allowed:atom|TextConstruct;m
+/feed/title/p;element not allowed:atom|TextConstruct;m
+/feed/title/p;element;unsupported
+/feed/title/"x";character not allowed:atom|TextConstruct;m
+/feed/title;element missing:div;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="xhtml"><p xmlns="http://www.w3.org/1999/xhtml">x</p></title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/p;element not allowed:atom|TextConstruct;m
+/feed/title;element missing:div;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">x</div></title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="xhtml"><div>x</div></title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/div;element not allowed:atom|TextConstruct;m
+/feed/title;element missing:div;m
+/feed/title/div;element not defined;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">x</div><div xmlns="http://www.w3.org/1999/xhtml">x</div></title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/title/div;element not allowed:atom|TextConstruct;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author></author>
+<title>x</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/author;element missing:atom|name;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>xx</name></author>
+<title>x</title>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>xx</name><uri>about:</uri></author>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+</feed>
+#errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>xx</name><uri>about:</uri><uri>data:,</uri></author>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+</feed>
+#errors
+/feed/author/uri;element not allowed:atom|PersonConstruct;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<title>x</title>
+<author><name>x</name><email>a@example.net</email></author>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/author/email;addr-spec not supported;u
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom"><id>about:</id><author><name>x</name><email>a@example.net</email><email>b@example.test</email></author>
+<link rel="self" href=""/>
+<title>x</title>
+<updated>2000-01-02T03:04:05Z</updated>
+</feed>
+#errors
+/feed/author/email;element not allowed:atom|PersonConstruct;m
+/feed/author/email;addr-spec not supported;u
+/feed/author/email;addr-spec not supported;u
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><email>a@example.net</email></author>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+</feed>
+#errors
+/feed/author;element missing:atom|name;m
+/feed/author/email;addr-spec not supported;u
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><title>a@example.net</title></author>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+</feed>
+#errors
+/feed/author;element missing:atom|name;m
+/feed/author/title;element not allowed:atom|PersonConstruct;m
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><p>a@example.net</p></author>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+</feed>
+#errors
+/feed/author;element missing:atom|name;m
+/feed/author/p;element not allowed:atom|PersonConstruct;m
+/feed/author/p;element not defined;m

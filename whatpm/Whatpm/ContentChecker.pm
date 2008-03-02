@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.70 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.71 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -243,7 +243,7 @@ sub check_document ($$$;$) {
   $self->{should_level} = 's';
   $self->{good_level} = 'w';
   $self->{info_level} = 'i';
-  $self->{unsupported_lavel} = 'u';
+  $self->{unsupported_level} = 'u';
 
   my $docel = $doc->document_element;
   unless (defined $docel) {
@@ -293,41 +293,42 @@ sub check_document ($$$;$) {
     require Message::Charset::Info;
     my $charset = $Message::Charset::Info::IANACharset->{$charset_name};
 
-    if ($doc->manakai_is_html and
-        not $doc->manakai_has_bom and
-        not defined $doc->manakai_charset) {
-      unless ($charset->{is_html_ascii_superset}) {
-        $onerror->(node => $doc, level => $self->{must_level},
-                   type => 'non ascii superset:'.$charset_name);
+    if ($doc->manakai_is_html) {
+      if (not $doc->manakai_has_bom and
+          not defined $doc->manakai_charset) {
+        unless ($charset->{is_html_ascii_superset}) {
+          $onerror->(node => $doc, level => $self->{must_level},
+                     type => 'non ascii superset:'.$charset_name);
+        }
+        
+        if (not $self->{has_charset} and ## TODO: This does not work now.
+            not $charset->{iana_names}->{'us-ascii'}) {
+          $onerror->(node => $doc, level => $self->{must_level},
+                     type => 'no character encoding declaration:'.$charset_name);
+        }
       }
-      
-      if (not $self->{has_charset} and ## TODO: This does not work now.
-          not $charset->{iana_names}->{'us-ascii'}) {
-        $onerror->(node => $doc, level => $self->{must_level},
-                   type => 'no character encoding declaration:'.$charset_name);
-      }
-    }
 
-    if ($charset->{iana_names}->{'utf-8'}) {
-      #
-    } elsif ($charset->{iana_names}->{'jis_x0212-1990'} or
-             $charset->{iana_names}->{'x-jis0208'} or
-             $charset->{iana_names}->{'utf-32'} or ## ISSUE: UTF-32BE? UTF-32LE?
-             $charset->{is_ebcdic_based}) {
-      $onerror->(node => $doc,
-                 type => 'character encoding:'.$charset_name,
-                 level => $self->{should_level});
-    } elsif ($charset->{iana_names}->{'cesu-8'} or
-             $charset->{iana_names}->{'utf-8'} or ## ISSUE: UNICODE-1-1-UTF-7?
-             $charset->{iana_names}->{'bocu-1'} or
-             $charset->{iana_names}->{'scsu'}) {
-      $onerror->(node => $doc,
-                 type => 'character encoding:'.$charset_name,
-                 level => $self->{must_level});
-    } else {
-      $onerror->(node => $doc,
-                 type => 'character encoding:'.$charset_name,
-                 level => $self->{good_level});
+      if ($charset->{iana_names}->{'utf-8'}) {
+        #
+      } elsif ($charset->{iana_names}->{'jis_x0212-1990'} or
+               $charset->{iana_names}->{'x-jis0208'} or
+               $charset->{iana_names}->{'utf-32'} or ## ISSUE: UTF-32BE? UTF-32LE?
+               $charset->{is_ebcdic_based}) {
+        $onerror->(node => $doc,
+                   type => 'character encoding:'.$charset_name,
+                   level => $self->{should_level});
+      } elsif ($charset->{iana_names}->{'cesu-8'} or
+               $charset->{iana_names}->{'utf-8'} or ## ISSUE: UNICODE-1-1-UTF-7?
+               $charset->{iana_names}->{'bocu-1'} or
+               $charset->{iana_names}->{'scsu'}) {
+        $onerror->(node => $doc,
+                   type => 'character encoding:'.$charset_name,
+                   level => $self->{must_level});
+      } else {
+        $onerror->(node => $doc,
+                   type => 'character encoding:'.$charset_name,
+                   level => $self->{good_level});
+      }
     }
   } elsif ($doc->manakai_is_html) {
     ## NOTE: MUST and SHOULD requirements above cannot be tested,
@@ -353,7 +354,7 @@ sub check_element ($$$;$) {
   $self->{should_level} = 's';
   $self->{good_level} = 'w';
   $self->{info_level} = 'i';
-  $self->{unsupported_lavel} = 'u';
+  $self->{unsupported_level} = 'u';
 
   $self->{plus_elements} = {};
   $self->{minus_elements} = {};
@@ -783,4 +784,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/26 08:28:00 $
+# $Date: 2008/03/02 11:16:34 $

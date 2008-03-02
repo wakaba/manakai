@@ -652,7 +652,7 @@ my $HTMLAttrChecker = {
     ## of the Document tree is in the DOM?  A menu Element node that
     ## belong to another Document tree is in the DOM?
   },
-  irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'), ## TODO: status: Working Draft
+  irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   ## TODO: repeat, repeat-start, repeat-min, repeat-max, repeat-template ## TODO: global
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
   tabindex => $HTMLIntegerAttrChecker
@@ -670,6 +670,11 @@ my %HTMLAttrStatus = (
   lang => FEATURE_HTML5_DEFAULT,
   ref => FEATURE_HTML5_AT_RISK,
   registrationmark => FEATURE_HTML5_AT_RISK,
+  repeat => FEATURE_WF2,
+  'repeat-max' => FEATURE_WF2,
+  'repeat-min' => FEATURE_WF2,
+  'repeat-start' => FEATURE_WF2,
+  'repeat-template' => FEATURE_WF2,
   role => FEATURE_HTML5_ROLE,
   tabindex => FEATURE_HTML5_DEFAULT,
   template => FEATURE_HTML5_AT_RISK,
