@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.77 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.78 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -656,12 +656,13 @@ sub _get_next_token ($) {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
-            !!!cp (36);
-            !!!parse-error (type => 'end tag attribute');
-          } else {
+          #if ($self->{current_token}->{attributes}) {
+          #  ## NOTE: This should never be reached.
+          #  !!! cp (36);
+          #  !!! parse-error (type => 'end tag attribute');
+          #} else {
             !!!cp (37);
-          }
+          #}
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
@@ -688,12 +689,13 @@ sub _get_next_token ($) {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
-            !!!cp (40);
-            !!!parse-error (type => 'end tag attribute');
-          } else {
+          #if ($self->{current_token}->{attributes}) {
+          #  ## NOTE: This state should never be reached.
+          #  !!! cp (40);
+          #  !!! parse-error (type => 'end tag attribute');
+          #} else {
             !!!cp (41);
-          }
+          #}
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
@@ -912,6 +914,7 @@ sub _get_next_token ($) {
             !!!cp (67);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (68);
           }
         } else {
@@ -963,6 +966,7 @@ sub _get_next_token ($) {
             !!!cp (74);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (75);
           }
         } else {
@@ -1011,6 +1015,7 @@ sub _get_next_token ($) {
             !!!cp (80);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (81);
           }
         } else {
@@ -1067,6 +1072,7 @@ sub _get_next_token ($) {
             !!!cp (88);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (89);
           }
         } else {
@@ -1091,6 +1097,7 @@ sub _get_next_token ($) {
             !!!cp (91);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (92);
           }
         } else {
@@ -1139,6 +1146,7 @@ sub _get_next_token ($) {
             !!!cp (98);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (99);
           }
         } else {
@@ -1182,6 +1190,7 @@ sub _get_next_token ($) {
             !!!cp (104);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (105);
           }
         } else {
@@ -1228,6 +1237,7 @@ sub _get_next_token ($) {
             !!!cp (110);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (111);
           }
         } else {
@@ -1252,6 +1262,7 @@ sub _get_next_token ($) {
             !!!cp (113);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (114);
           }
         } else {
@@ -1323,6 +1334,7 @@ sub _get_next_token ($) {
             !!!cp (120);
             !!!parse-error (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             !!!cp (121);
           }
         } else {
@@ -2190,6 +2202,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
        0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, & # 0x000D # CR
        $additional => 1,
       }->{$self->{next_char}}) {
+    !!!cp (1001);
     ## Don't consume
     ## No error
     return undef;
@@ -2203,43 +2216,53 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
         !!!next-input-character;
         if (0x0030 <= $self->{next_char} and 
             $self->{next_char} <= 0x0039) { # 0..9
+          !!!cp (1002);
           $code ||= 0;
           $code *= 0x10;
           $code += $self->{next_char} - 0x0030;
           redo X;
         } elsif (0x0061 <= $self->{next_char} and
                  $self->{next_char} <= 0x0066) { # a..f
+          !!!cp (1003);
           $code ||= 0;
           $code *= 0x10;
           $code += $self->{next_char} - 0x0060 + 9;
           redo X;
         } elsif (0x0041 <= $self->{next_char} and
                  $self->{next_char} <= 0x0046) { # A..F
+          !!!cp (1004);
           $code ||= 0;
           $code *= 0x10;
           $code += $self->{next_char} - 0x0040 + 9;
           redo X;
         } elsif (not defined $code) { # no hexadecimal digit
+          !!!cp (1005);
           !!!parse-error (type => 'bare hcro');
           !!!back-next-input-character ($x_char, $self->{next_char});
           $self->{next_char} = 0x0023; # #
           return undef;
         } elsif ($self->{next_char} == 0x003B) { # ;
+          !!!cp (1006);
           !!!next-input-character;
         } else {
+          !!!cp (1007);
           !!!parse-error (type => 'no refc');
         }
 
         if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+          !!!cp (1008);
           !!!parse-error (type => sprintf 'invalid character reference:U+%04X', $code);
           $code = 0xFFFD;
         } elsif ($code > 0x10FFFF) {
+          !!!cp (1009);
           !!!parse-error (type => sprintf 'invalid character reference:U-%08X', $code);
           $code = 0xFFFD;
         } elsif ($code == 0x000D) {
+          !!!cp (1010);
           !!!parse-error (type => 'CR character reference');
           $code = 0x000A;
         } elsif (0x80 <= $code and $code <= 0x9F) {
+          !!!cp (1011);
           !!!parse-error (type => sprintf 'C1 character reference:U+%04X', $code);
           $code = $c1_entity_char->{$code};
         }
@@ -2254,6 +2277,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
       
       while (0x0030 <= $self->{next_char} and 
                 $self->{next_char} <= 0x0039) { # 0..9
+        !!!cp (1012);
         $code *= 10;
         $code += $self->{next_char} - 0x0030;
         
@@ -2261,27 +2285,34 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
       }
 
       if ($self->{next_char} == 0x003B) { # ;
+        !!!cp (1013);
         !!!next-input-character;
       } else {
+        !!!cp (1014);
         !!!parse-error (type => 'no refc');
       }
 
       if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+        !!!cp (1015);
         !!!parse-error (type => sprintf 'invalid character reference:U+%04X', $code);
         $code = 0xFFFD;
       } elsif ($code > 0x10FFFF) {
+        !!!cp (1016);
         !!!parse-error (type => sprintf 'invalid character reference:U-%08X', $code);
         $code = 0xFFFD;
       } elsif ($code == 0x000D) {
+        !!!cp (1017);
         !!!parse-error (type => 'CR character reference');
         $code = 0x000A;
       } elsif (0x80 <= $code and $code <= 0x9F) {
+        !!!cp (1018);
         !!!parse-error (type => sprintf 'C1 character reference:U+%04X', $code);
         $code = $c1_entity_char->{$code};
       }
       
       return {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1};
     } else {
+      !!!cp (1019);
       !!!parse-error (type => 'bare nero');
       !!!back-next-input-character ($self->{next_char});
       $self->{next_char} = 0x0023; # #
@@ -2311,16 +2342,19 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
       $entity_name .= chr $self->{next_char};
       if (defined $EntityChar->{$entity_name}) {
         if ($self->{next_char} == 0x003B) { # ;
+          !!!cp (1020);
           $value = $EntityChar->{$entity_name};
           $match = 1;
           !!!next-input-character;
           last;
         } else {
+          !!!cp (1021);
           $value = $EntityChar->{$entity_name};
           $match = -1;
           !!!next-input-character;
         }
       } else {
+        !!!cp (1022);
         $value .= chr $self->{next_char};
         $match *= 2;
         !!!next-input-character;
@@ -2328,20 +2362,25 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
     }
     
     if ($match > 0) {
+      !!!cp (1023);
       return {type => CHARACTER_TOKEN, data => $value, has_reference => 1};
     } elsif ($match < 0) {
       !!!parse-error (type => 'no refc');
       if ($in_attr and $match < -1) {
+        !!!cp (1024);
         return {type => CHARACTER_TOKEN, data => '&'.$entity_name};
       } else {
+        !!!cp (1025);
         return {type => CHARACTER_TOKEN, data => $value, has_reference => 1};
       }
     } else {
+      !!!cp (1026);
       !!!parse-error (type => 'bare ero');
       ## NOTE: "No characters are consumed" in the spec.
       return {type => CHARACTER_TOKEN, data => '&'.$value};
     }
   } else {
+    !!!cp (1027);
     ## no characters are consumed
     !!!parse-error (type => 'bare ero');
     return undef;
@@ -5906,4 +5945,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/03 10:20:19 $
+# $Date: 2008/03/03 11:56:18 $

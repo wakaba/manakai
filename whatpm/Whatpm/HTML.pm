@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.77 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.78 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -921,22 +921,18 @@ sub _get_next_token ($) {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
-            
-      $Whatpm::HTML::Debug::cp_pass->(36) if $Whatpm::HTML::Debug::cp_pass;
-      BEGIN {
-        $Whatpm::HTML::Debug::cp->{36} = 1;
-      }
-    
-            $self->{parse_error}-> (type => 'end tag attribute');
-          } else {
+          #if ($self->{current_token}->{attributes}) {
+          #  ## NOTE: This should never be reached.
+          #  !!! cp (36);
+          #  !!! parse-error (type => 'end tag attribute');
+          #} else {
             
       $Whatpm::HTML::Debug::cp_pass->(37) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{37} = 1;
       }
     
-          }
+          #}
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
@@ -985,22 +981,18 @@ sub _get_next_token ($) {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
-            
-      $Whatpm::HTML::Debug::cp_pass->(40) if $Whatpm::HTML::Debug::cp_pass;
-      BEGIN {
-        $Whatpm::HTML::Debug::cp->{40} = 1;
-      }
-    
-            $self->{parse_error}-> (type => 'end tag attribute');
-          } else {
+          #if ($self->{current_token}->{attributes}) {
+          #  ## NOTE: This state should never be reached.
+          #  !!! cp (40);
+          #  !!! parse-error (type => 'end tag attribute');
+          #} else {
             
       $Whatpm::HTML::Debug::cp_pass->(41) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{41} = 1;
       }
     
-          }
+          #}
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
@@ -1421,6 +1413,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(68) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -1525,6 +1518,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(75) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -1621,6 +1615,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(81) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -1741,6 +1736,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(89) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -1786,6 +1782,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(92) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -1887,6 +1884,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(99) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -1978,6 +1976,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(105) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -2072,6 +2071,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(111) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -2117,6 +2117,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(114) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -2240,6 +2241,7 @@ sub _get_next_token ($) {
     
             $self->{parse_error}-> (type => 'end tag attribute');
           } else {
+            ## NOTE: This state should never be reached.
             
       $Whatpm::HTML::Debug::cp_pass->(121) if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -4097,6 +4099,12 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
        0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, & # 0x000D # CR
        $additional => 1,
       }->{$self->{next_char}}) {
+    
+      $Whatpm::HTML::Debug::cp_pass->(1001) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1001} = 1;
+      }
+    
     ## Don't consume
     ## No error
     return undef;
@@ -4122,28 +4130,58 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
   
         if (0x0030 <= $self->{next_char} and 
             $self->{next_char} <= 0x0039) { # 0..9
+          
+      $Whatpm::HTML::Debug::cp_pass->(1002) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1002} = 1;
+      }
+    
           $code ||= 0;
           $code *= 0x10;
           $code += $self->{next_char} - 0x0030;
           redo X;
         } elsif (0x0061 <= $self->{next_char} and
                  $self->{next_char} <= 0x0066) { # a..f
+          
+      $Whatpm::HTML::Debug::cp_pass->(1003) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1003} = 1;
+      }
+    
           $code ||= 0;
           $code *= 0x10;
           $code += $self->{next_char} - 0x0060 + 9;
           redo X;
         } elsif (0x0041 <= $self->{next_char} and
                  $self->{next_char} <= 0x0046) { # A..F
+          
+      $Whatpm::HTML::Debug::cp_pass->(1004) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1004} = 1;
+      }
+    
           $code ||= 0;
           $code *= 0x10;
           $code += $self->{next_char} - 0x0040 + 9;
           redo X;
         } elsif (not defined $code) { # no hexadecimal digit
+          
+      $Whatpm::HTML::Debug::cp_pass->(1005) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1005} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'bare hcro');
           unshift @{$self->{char}},  ($x_char, $self->{next_char});
           $self->{next_char} = 0x0023; # #
           return undef;
         } elsif ($self->{next_char} == 0x003B) { # ;
+          
+      $Whatpm::HTML::Debug::cp_pass->(1006) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1006} = 1;
+      }
+    
           
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -4152,19 +4190,49 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
       }
   
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(1007) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1007} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'no refc');
         }
 
         if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(1008) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1008} = 1;
+      }
+    
           $self->{parse_error}-> (type => sprintf 'invalid character reference:U+%04X', $code);
           $code = 0xFFFD;
         } elsif ($code > 0x10FFFF) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(1009) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1009} = 1;
+      }
+    
           $self->{parse_error}-> (type => sprintf 'invalid character reference:U-%08X', $code);
           $code = 0xFFFD;
         } elsif ($code == 0x000D) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(1010) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1010} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'CR character reference');
           $code = 0x000A;
         } elsif (0x80 <= $code and $code <= 0x9F) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(1011) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1011} = 1;
+      }
+    
           $self->{parse_error}-> (type => sprintf 'C1 character reference:U+%04X', $code);
           $code = $c1_entity_char->{$code};
         }
@@ -4185,6 +4253,12 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
       
       while (0x0030 <= $self->{next_char} and 
                 $self->{next_char} <= 0x0039) { # 0..9
+        
+      $Whatpm::HTML::Debug::cp_pass->(1012) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1012} = 1;
+      }
+    
         $code *= 10;
         $code += $self->{next_char} - 0x0030;
         
@@ -4199,6 +4273,12 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
 
       if ($self->{next_char} == 0x003B) { # ;
         
+      $Whatpm::HTML::Debug::cp_pass->(1013) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1013} = 1;
+      }
+    
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
@@ -4206,25 +4286,61 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
       }
   
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(1014) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1014} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'no refc');
       }
 
       if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(1015) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1015} = 1;
+      }
+    
         $self->{parse_error}-> (type => sprintf 'invalid character reference:U+%04X', $code);
         $code = 0xFFFD;
       } elsif ($code > 0x10FFFF) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(1016) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1016} = 1;
+      }
+    
         $self->{parse_error}-> (type => sprintf 'invalid character reference:U-%08X', $code);
         $code = 0xFFFD;
       } elsif ($code == 0x000D) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(1017) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1017} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'CR character reference');
         $code = 0x000A;
       } elsif (0x80 <= $code and $code <= 0x9F) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(1018) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1018} = 1;
+      }
+    
         $self->{parse_error}-> (type => sprintf 'C1 character reference:U+%04X', $code);
         $code = $c1_entity_char->{$code};
       }
       
       return {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1};
     } else {
+      
+      $Whatpm::HTML::Debug::cp_pass->(1019) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1019} = 1;
+      }
+    
       $self->{parse_error}-> (type => 'bare nero');
       unshift @{$self->{char}},  ($self->{next_char});
       $self->{next_char} = 0x0023; # #
@@ -4260,6 +4376,12 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
       $entity_name .= chr $self->{next_char};
       if (defined $EntityChar->{$entity_name}) {
         if ($self->{next_char} == 0x003B) { # ;
+          
+      $Whatpm::HTML::Debug::cp_pass->(1020) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1020} = 1;
+      }
+    
           $value = $EntityChar->{$entity_name};
           $match = 1;
           
@@ -4271,6 +4393,12 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
   
           last;
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(1021) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1021} = 1;
+      }
+    
           $value = $EntityChar->{$entity_name};
           $match = -1;
           
@@ -4282,6 +4410,12 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
   
         }
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(1022) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1022} = 1;
+      }
+    
         $value .= chr $self->{next_char};
         $match *= 2;
         
@@ -4295,20 +4429,50 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
     }
     
     if ($match > 0) {
+      
+      $Whatpm::HTML::Debug::cp_pass->(1023) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1023} = 1;
+      }
+    
       return {type => CHARACTER_TOKEN, data => $value, has_reference => 1};
     } elsif ($match < 0) {
       $self->{parse_error}-> (type => 'no refc');
       if ($in_attr and $match < -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(1024) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1024} = 1;
+      }
+    
         return {type => CHARACTER_TOKEN, data => '&'.$entity_name};
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(1025) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1025} = 1;
+      }
+    
         return {type => CHARACTER_TOKEN, data => $value, has_reference => 1};
       }
     } else {
+      
+      $Whatpm::HTML::Debug::cp_pass->(1026) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1026} = 1;
+      }
+    
       $self->{parse_error}-> (type => 'bare ero');
       ## NOTE: "No characters are consumed" in the spec.
       return {type => CHARACTER_TOKEN, data => '&'.$value};
     }
   } else {
+    
+      $Whatpm::HTML::Debug::cp_pass->(1027) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1027} = 1;
+      }
+    
     ## no characters are consumed
     $self->{parse_error}-> (type => 'bare ero');
     return undef;
@@ -8469,4 +8633,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/03 10:20:19 $
+# $Date: 2008/03/03 11:56:17 $

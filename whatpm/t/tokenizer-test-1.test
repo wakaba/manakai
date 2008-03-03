@@ -148,6 +148,94 @@
 "input": "<!DOCTYPE html PUBLIC 'c' 'a'b>",
 "output": ["ParseError", ["DOCTYPE", "html", "c", "a", true]]},
 
+{"description": "<!D>",
+"input": "<!D>",
+"output": ["ParseError", ["Comment", "D"]]},
+
+{"description": "<!DO>",
+"input": "<!DO>",
+"output": ["ParseError", ["Comment", "DO"]]},
+
+{"description": "<!DOc>",
+"input": "<!DOc>",
+"output": ["ParseError", ["Comment", "DOc"]]},
+
+{"description": "<!dOcT>",
+"input": "<!dOcT>",
+"output": ["ParseError", ["Comment", "dOcT"]]},
+
+{"description": "<!DoctY",
+"input": "<!DoctY",
+"output": ["ParseError", ["Comment", "DoctY"]]},
+
+{"description": "<!doctyp!>",
+"input": "<!doctyp!>",
+"output": ["ParseError", ["Comment", "doctyp!"]]},
+
+{"description": "<!Doc?>",
+"input": "<!Doc?>",
+"output": ["ParseError", ["Comment", "Doc?"]]},
+
+{"description": "<!Doc<type>>",
+"input": "<!Doc<type>>",
+"output": ["ParseError", ["Comment", "Doc<type"], ["Character", ">"]]},
+
+{"description": "<!DOCTYPE HTML P>",
+"input": "<!DOCTYPE HTML P>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML Pa>",
+"input": "<!DOCTYPE HTML Pa>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML Pua>",
+"input": "<!DOCTYPE HTML Pua>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML PUB>",
+"input": "<!DOCTYPE HTML PUB>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML pubL>",
+"input": "<!DOCTYPE HTML pubL>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML publication>",
+"input": "<!DOCTYPE HTML publication>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML publi>",
+"input": "<!DOCTYPE HTML publi>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML PULICID>",
+"input": "<!DOCTYPE HTML PUBLICID>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML S ''>",
+"input": "<!DOCTYPE HTML S ''>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML sy>",
+"input": "<!DOCTYPE HTML sy>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML sys ''>",
+"input": "<!DOCTYPE HTML sys ''>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML syst>",
+"input": "<!DOCTYPE HTML syst>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML SySter>",
+"input": "<!DOCTYPE HTML SySter>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
+{"description": "<!DOCTYPE HTML systemid>",
+"input": "<!DOCTYPE HTML systemid>",
+"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+
 {"description":"<!---x-->",
 "input":"<!---x-->",
 "output":[["Comment", "-x"]]},
@@ -674,6 +762,50 @@
 "input": "<link href=''rel=''/>",
 "output": ["ParseError", ["StartTag", "link", {"href": "", "rel": ""}]]},
 
+{"description": "permitted slash after a space",
+"input": "<br />",
+"output": [["StartTag", "br", {}]]},
+
+{"description": "slash in tag after a space",
+"input": "<br / >",
+"output": ["ParseError", ["StartTag", "br", {}]]},
+
+{"description": "non-permitted slash after a space",
+"input": "<b />",
+"output": ["ParseError", ["StartTag", "b", {}]]},
+
+{"description": "end tag (non-)permitted slash after a space",
+"input": "</br />",
+"output": ["ParseError", ["EndTag", "br"]]},
+
+{"description": "permitted slash after attribute name",
+"input": "<br class/>",
+"output": [["StartTag", "br", {"class": ""}]]},
+
+{"description": "slash in tag after attribute name",
+"input": "<br class/ >",
+"output": ["ParseError", ["StartTag", "br", {"class": ""}]]},
+
+{"description": "non permitted slash after attribute name",
+"input": "<b class/>",
+"output": ["ParseError", ["StartTag", "b", {"class": ""}]]},
+
+{"description": "end tag (non-)permitted slash after attribute name",
+"input": "</br class/>",
+"output": ["ParseError", "ParseError", ["EndTag", "br"]]},
+
+{"description": "permitted slash in after attribute name state",
+"input": "<br class />",
+"output": [["StartTag", "br", {"class": ""}]]},
+
+{"description": "non permitted slash in after attribute name state",
+"input": "<b class />",
+"output": ["ParseError", ["StartTag", "b", {"class": ""}]]},
+
+{"description": "end tag (non-)permitted slash in after attribute name state",
+"input": "</br class />",
+"output": ["ParseError", "ParseError", ["EndTag", "br"]]},
+
 {"description": "<a \">",
 "input": "<a \">",
 "output": ["ParseError", ["StartTag", "a", {"\"": ""}]]},
@@ -720,6 +852,78 @@
 
 {"description": "<a a=>",
 "input": "<a a=>",
-"output": [["StartTag", "a", {"a": ""}]]}
+"output": [["StartTag", "a", {"a": ""}]]},
+
+{"description": "end tag attribute (before attribute, >)",
+"input": "</p class=\"\"  >",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag attribute (before attribute, EOF)",
+"input": "</p class=\"\"  ",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (before attribute)",
+"input": "</p >",
+"output": [["EndTag", "p"]]},
+
+{"description": "end tag not closed (attribute name)",
+"input": "</p class",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag attribute (after attribute name)",
+"input": "</p class >",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag attributes uc (after attribute name)",
+"input": "</p class Title>",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag attributes lc (after attribute name)",
+"input": "</p class title>",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (after attribute name)",
+"input": "</p class ",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag attribute (before attribute value)",
+"input": "</p class=>",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (before attribute value)",
+"input": "</p class=",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (attribute value double quote)",
+"input": "</p class=\"",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (attribute value single quote)",
+"input": "</p class='",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag attribute (attribute value unquoted)",
+"input": "</p class=a>",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (attribute value unquoted)",
+"input": "</p class=a",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag attribute (after attribute value double quoted)",
+"input": "</p class=\"a\" >",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag attribute (after attribute value single quoted)",
+"input": "</p class='a' >",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (after attribute value double quoted)",
+"input": "</p class=\"a\" ",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (after attribute value single quoted)",
+"input": "</p class='a' ",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]}
 
 ]}

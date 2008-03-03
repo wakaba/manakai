@@ -26,7 +26,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 420 }
+BEGIN { plan tests => 471 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -46,7 +46,7 @@ if ($DEBUG) {
 
   END {
     for my $id (sort {$a <=> $b || $a cmp $b} keys %$not_found) {
-      print "# checkpoint $id is not passed\n";
+      print "# checkpoint $id is not reached\n";
     }
   }
 }
@@ -179,4 +179,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/03/03 10:20:19 $
+## $Date: 2008/03/03 11:56:18 $

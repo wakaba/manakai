@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 use strict;
 
+my $DEBUG = $ENV{DEBUG};
+
 my $dir_name;
 my $test_dir_name;
 BEGIN {
@@ -29,6 +31,21 @@ sub Data::Dumper::qquote {
   $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
   return q<qq'> . $s . q<'>;
 } # Data::Dumper::qquote
+
+
+if ($DEBUG) {
+  my $not_found = {%$Whatpm::HTML::Debug::cp};
+  $Whatpm::HTML::Debug::cp_pass = sub {
+    my $id = shift;
+    delete $not_found->{$id};
+  };
+
+  END {
+    for my $id (sort {$a <=> $b || $a cmp $b} keys %$not_found) {
+      print "# checkpoint $id is not reached\n";
+    }
+  }
+}
 
 for my $file_name (grep {$_} split /\s+/, qq[
                       ${test_dir_name}tokenizer-test-2.dat
@@ -178,4 +195,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/08/25 02:44:39 $
+## $Date: 2008/03/03 11:56:18 $
