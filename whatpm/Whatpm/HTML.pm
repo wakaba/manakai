@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.74 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.75 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -352,7 +352,7 @@ sub _initialize_tokenizer ($) {
 ##   ->{tag_name} (START_TAG_TOKEN, END_TAG_TOKEN)
 ##   ->{public_identifier} (DOCTYPE_TOKEN)
 ##   ->{system_identifier} (DOCTYPE_TOKEN)
-##   ->{correct} == 1 or 0 (DOCTYPE_TOKEN)
+##   ->{quirks} == 1 or 0 (DOCTYPE_TOKEN): "force-quirks" flag
 ##   ->{attributes} isa HASH (START_TAG_TOKEN, END_TAG_TOKEN)
 ##        ->{name}
 ##        ->{value}
@@ -1933,7 +1933,7 @@ sub _get_next_token ($) {
       }
   
 
-        return  ({type => DOCTYPE_TOKEN}); # incorrect
+        return  ({type => DOCTYPE_TOKEN, quirks => 1});
 
         redo A;
       } elsif ($self->{next_input_character} == -1) { 
@@ -1941,14 +1941,15 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ({type => DOCTYPE_TOKEN}); # incorrect
+        return  ({type => DOCTYPE_TOKEN, quirks => 1});
 
         redo A;
       } else {
         $self->{current_token}
             = {type => DOCTYPE_TOKEN,
                name => chr ($self->{next_input_character}),
-               correct => 1};
+               #quirks => 0,
+              };
 ## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = DOCTYPE_NAME_STATE;
         
@@ -1994,7 +1995,7 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2044,7 +2045,7 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2186,7 +2187,7 @@ sub _get_next_token ($) {
       }
 
       $self->{parse_error}-> (type => 'string after DOCTYPE name');
-      delete $self->{current_token}->{correct};
+      $self->{current_token}->{quirks} = 1;
 
       $self->{state} = BOGUS_DOCTYPE_STATE;
       # next-input-character is already done
@@ -2239,7 +2240,7 @@ sub _get_next_token ($) {
       }
   
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2249,13 +2250,13 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after PUBLIC');
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
@@ -2290,7 +2291,7 @@ sub _get_next_token ($) {
       }
   
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2300,7 +2301,7 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2340,7 +2341,7 @@ sub _get_next_token ($) {
       }
   
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2350,7 +2351,7 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2422,13 +2423,13 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after PUBLIC literal');
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
@@ -2487,7 +2488,7 @@ sub _get_next_token ($) {
       }
   
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2497,13 +2498,13 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after SYSTEM');
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
@@ -2538,7 +2539,7 @@ sub _get_next_token ($) {
       }
   
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2548,7 +2549,7 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2588,7 +2589,7 @@ sub _get_next_token ($) {
       }
   
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2598,7 +2599,7 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
@@ -2648,13 +2649,13 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        delete $self->{current_token}->{correct};
+        $self->{current_token}->{quirks} = 1;
         return  ($self->{current_token}); # DOCTYPE
 
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after SYSTEM literal');
-        #delete $self->{current_token}->{correct};
+        #$self->{current_token}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
@@ -3006,7 +3007,7 @@ sub _tree_construction_initial ($) {
       ## ISSUE: internalSubset = null??
       $self->{document}->append_child ($doctype);
       
-      if (not $token->{correct} or $doctype_name ne 'HTML') {
+      if ($token->{quirks} or $doctype_name ne 'HTML') {
         $self->{document}->manakai_compat_mode ('quirks');
       } elsif (defined $token->{public_identifier}) {
         my $pubid = $token->{public_identifier};
@@ -7087,4 +7088,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/02 23:51:00 $
+# $Date: 2008/03/03 00:13:22 $

@@ -142,7 +142,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
           $test_token->[1] = $token->{name};
           $test_token->[2] = $token->{public_identifier};
           $test_token->[3] = $token->{system_identifier};
-          $test_token->[4] = $token->{correct} ? 1 : 0;
+          $test_token->[4] = $token->{quirks} ? 0 : 1;
         }
 
         if (@token and ref $token[-1] and $token[-1]->[0] eq 'Character' and
@@ -162,4 +162,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/03/02 23:51:00 $
+## $Date: 2008/03/03 00:13:22 $
