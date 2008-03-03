@@ -45,7 +45,8 @@ if ($DEBUG) {
   };
 
   END {
-    for my $id (sort {$a <=> $b || $a cmp $b} keys %$not_found) {
+    for my $id (sort {$a <=> $b || $a cmp $b} grep {!/^[ti]/}
+                keys %$not_found) {
       print "# checkpoint $id is not reached\n";
     }
   }
@@ -179,4 +180,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/03/03 11:56:18 $
+## $Date: 2008/03/03 13:15:54 $
