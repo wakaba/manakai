@@ -5,9 +5,9 @@ while (<>) {
   s/!!!emit\b/return /;
   s{!!!next-input-character;}{q{
       if (@{$self->{char}}) {
-        $self->{next_input_character} = shift @{$self->{char}};
+        $self->{next_char} = shift @{$self->{char}};
       } else {
-        $self->{set_next_input_character}->($self);
+        $self->{set_next_char}->($self);
       }
   }}ge;
   s{!!!back-next-input-character\b}{q{unshift @{$self->{char}}, }}ge;

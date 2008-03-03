@@ -85,28 +85,28 @@ for my $file_name (grep {$_} split /\s+/, qq[
       my $p = Whatpm::HTML->new;
       my $i = 0;
       my @token;
-      $p->{set_next_input_character} = sub {
+      $p->{set_next_char} = sub {
         my $self = shift;
 
-        pop @{$self->{prev_input_character}};
-        unshift @{$self->{prev_input_character}}, $self->{next_input_character};
+        pop @{$self->{prev_char}};
+        unshift @{$self->{prev_char}}, $self->{next_char};
 
-        $self->{next_input_character} = -1 and return if $i >= length $s;
-        $self->{next_input_character} = ord substr $s, $i++, 1;
+        $self->{next_char} = -1 and return if $i >= length $s;
+        $self->{next_char} = ord substr $s, $i++, 1;
 
-        if ($self->{next_input_character} == 0x000D) { # CR
+        if ($self->{next_char} == 0x000D) { # CR
           $i++ if substr ($s, $i, 1) eq "\x0A";
-          $self->{next_input_character} = 0x000A; # LF # MUST
-        } elsif ($self->{next_input_character} > 0x10FFFF) {
-          $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+          $self->{next_char} = 0x000A; # LF # MUST
+        } elsif ($self->{next_char} > 0x10FFFF) {
+          $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
           push @token, 'ParseError';
-        } elsif ($self->{next_input_character} == 0x0000) { # NULL
-          $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+        } elsif ($self->{next_char} == 0x0000) { # NULL
+          $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
           push @token, 'ParseError';
         }
       };
-      $p->{prev_input_character} = [-1, -1, -1];
-      $p->{next_input_character} = -1;
+      $p->{prev_char} = [-1, -1, -1];
+      $p->{next_char} = -1;
       
       $p->{parse_error} = sub {
         push @token, 'ParseError';
@@ -162,4 +162,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/03/03 00:13:22 $
+## $Date: 2008/03/03 09:17:10 $
