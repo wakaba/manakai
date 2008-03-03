@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.76 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.77 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -393,6 +393,12 @@ sub _get_next_token ($) {
       if ($self->{next_char} == 0x0026) { # &
 	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
             not $self->{escape}) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(1) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{1} = 1;
+      }
+    
           $self->{state} = ENTITY_DATA_STATE;
           
       if (@{$self->{char}}) {
@@ -403,6 +409,12 @@ sub _get_next_token ($) {
   
           redo A;
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(2) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{2} = 1;
+      }
+    
           #
         }
       } elsif ($self->{next_char} == 0x002D) { # -
@@ -411,8 +423,28 @@ sub _get_next_token ($) {
             if ($self->{prev_char}->[0] == 0x002D and # -
                 $self->{prev_char}->[1] == 0x0021 and # !
                 $self->{prev_char}->[2] == 0x003C) { # <
+              
+      $Whatpm::HTML::Debug::cp_pass->(3) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{3} = 1;
+      }
+    
               $self->{escape} = 1;
+            } else {
+              
+      $Whatpm::HTML::Debug::cp_pass->(4) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{4} = 1;
+      }
+    
             }
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(5) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{5} = 1;
+      }
+    
           }
         }
         
@@ -421,6 +453,12 @@ sub _get_next_token ($) {
         if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
             (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
              not $self->{escape})) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(6) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{6} = 1;
+      }
+    
           $self->{state} = TAG_OPEN_STATE;
           
       if (@{$self->{char}}) {
@@ -431,6 +469,12 @@ sub _get_next_token ($) {
   
           redo A;
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(7) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{7} = 1;
+      }
+    
           #
         }
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -438,14 +482,47 @@ sub _get_next_token ($) {
             ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
           if ($self->{prev_char}->[0] == 0x002D and # -
               $self->{prev_char}->[1] == 0x002D) { # -
+            
+      $Whatpm::HTML::Debug::cp_pass->(8) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{8} = 1;
+      }
+    
             delete $self->{escape};
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(9) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{9} = 1;
+      }
+    
           }
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(10) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{10} = 1;
+      }
+    
         }
         
         #
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(11) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{11} = 1;
+      }
+    
         return  ({type => END_OF_FILE_TOKEN});
         last A; ## TODO: ok?
+      } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(12) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{12} = 1;
+      }
+    
       }
       # Anything else
       my $token = {type => CHARACTER_TOKEN,
@@ -471,8 +548,20 @@ sub _get_next_token ($) {
       # next-input-character is already done
 
       unless (defined $token) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(13) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{13} = 1;
+      }
+    
         return  ({type => CHARACTER_TOKEN, data => '&'});
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(14) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{14} = 1;
+      }
+    
         return  ($token);
       }
 
@@ -480,6 +569,12 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == TAG_OPEN_STATE) {
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if ($self->{next_char} == 0x002F) { # /
+          
+      $Whatpm::HTML::Debug::cp_pass->(15) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{15} = 1;
+      }
+    
           
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -490,6 +585,12 @@ sub _get_next_token ($) {
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           redo A;
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(16) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{16} = 1;
+      }
+    
           ## reconsume
           $self->{state} = DATA_STATE;
 
@@ -499,6 +600,12 @@ sub _get_next_token ($) {
         }
       } elsif ($self->{content_model} & CM_FULL_MARKUP) { # PCDATA
         if ($self->{next_char} == 0x0021) { # !
+          
+      $Whatpm::HTML::Debug::cp_pass->(17) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{17} = 1;
+      }
+    
           $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
           
       if (@{$self->{char}}) {
@@ -509,6 +616,12 @@ sub _get_next_token ($) {
   
           redo A;
         } elsif ($self->{next_char} == 0x002F) { # /
+          
+      $Whatpm::HTML::Debug::cp_pass->(18) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{18} = 1;
+      }
+    
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           
       if (@{$self->{char}}) {
@@ -520,6 +633,12 @@ sub _get_next_token ($) {
           redo A;
         } elsif (0x0041 <= $self->{next_char} and
                  $self->{next_char} <= 0x005A) { # A..Z
+          
+      $Whatpm::HTML::Debug::cp_pass->(19) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{19} = 1;
+      }
+    
           $self->{current_token}
             = {type => START_TAG_TOKEN,
                tag_name => chr ($self->{next_char} + 0x0020)};
@@ -534,6 +653,12 @@ sub _get_next_token ($) {
           redo A;
         } elsif (0x0061 <= $self->{next_char} and
                  $self->{next_char} <= 0x007A) { # a..z
+          
+      $Whatpm::HTML::Debug::cp_pass->(20) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{20} = 1;
+      }
+    
           $self->{current_token} = {type => START_TAG_TOKEN,
                             tag_name => chr ($self->{next_char})};
           $self->{state} = TAG_NAME_STATE;
@@ -546,6 +671,12 @@ sub _get_next_token ($) {
   
           redo A;
         } elsif ($self->{next_char} == 0x003E) { # >
+          
+      $Whatpm::HTML::Debug::cp_pass->(21) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{21} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'empty start tag');
           $self->{state} = DATA_STATE;
           
@@ -560,11 +691,23 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{next_char} == 0x003F) { # ?
+          
+      $Whatpm::HTML::Debug::cp_pass->(22) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{22} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'pio');
           $self->{state} = BOGUS_COMMENT_STATE;
           ## $self->{next_char} is intentionally left as is
           redo A;
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(23) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{23} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'bare stago');
           $self->{state} = DATA_STATE;
           ## reconsume
@@ -587,6 +730,12 @@ sub _get_next_token ($) {
             my $C = 0x0061 <= $c && $c <= 0x007A ? $c - 0x0020 : $c;
             if ($self->{next_char} == $c or $self->{next_char} == $C) {
               
+      $Whatpm::HTML::Debug::cp_pass->(24) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{24} = 1;
+      }
+    
+              
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
@@ -595,6 +744,12 @@ sub _get_next_token ($) {
   
               next TAGNAME;
             } else {
+              
+      $Whatpm::HTML::Debug::cp_pass->(25) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{25} = 1;
+      }
+    
               $self->{next_char} = shift @next_char; # reconsume
               unshift @{$self->{char}},  (@next_char);
               $self->{state} = DATA_STATE;
@@ -614,18 +769,36 @@ sub _get_next_token ($) {
                   $self->{next_char} == 0x003E or # >
                   $self->{next_char} == 0x002F or # /
                   $self->{next_char} == -1) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(26) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{26} = 1;
+      }
+    
             $self->{next_char} = shift @next_char; # reconsume
             unshift @{$self->{char}},  (@next_char);
             $self->{state} = DATA_STATE;
             return  ({type => CHARACTER_TOKEN, data => '</'});
             redo A;
           } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(27) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{27} = 1;
+      }
+    
             $self->{next_char} = shift @next_char;
             unshift @{$self->{char}},  (@next_char);
             # and consume...
           }
         } else {
           ## No start tag token has ever been emitted
+          
+      $Whatpm::HTML::Debug::cp_pass->(28) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{28} = 1;
+      }
+    
           # next-input-character is already done
           $self->{state} = DATA_STATE;
           return  ({type => CHARACTER_TOKEN, data => '</'});
@@ -635,6 +808,12 @@ sub _get_next_token ($) {
       
       if (0x0041 <= $self->{next_char} and
           $self->{next_char} <= 0x005A) { # A..Z
+        
+      $Whatpm::HTML::Debug::cp_pass->(29) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{29} = 1;
+      }
+    
         $self->{current_token} = {type => END_TAG_TOKEN,
                           tag_name => chr ($self->{next_char} + 0x0020)};
         $self->{state} = TAG_NAME_STATE;
@@ -648,6 +827,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0061 <= $self->{next_char} and
                $self->{next_char} <= 0x007A) { # a..z
+        
+      $Whatpm::HTML::Debug::cp_pass->(30) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{30} = 1;
+      }
+    
         $self->{current_token} = {type => END_TAG_TOKEN,
                           tag_name => chr ($self->{next_char})};
         $self->{state} = TAG_NAME_STATE;
@@ -660,6 +845,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(31) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{31} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'empty end tag');
         $self->{state} = DATA_STATE;
         
@@ -671,6 +862,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(32) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{32} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'bare etago');
         $self->{state} = DATA_STATE;
         # reconsume
@@ -679,6 +876,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(33) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{33} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'bogus end tag');
         $self->{state} = BOGUS_COMMENT_STATE;
         ## $self->{next_char} is intentionally left as is
@@ -690,6 +893,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(34) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{34} = 1;
+      }
+    
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -701,13 +910,32 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(35) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{35} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(36) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{36} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(37) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{37} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -726,6 +954,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
+        
+      $Whatpm::HTML::Debug::cp_pass->(38) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{38} = 1;
+      }
+    
         $self->{current_token}->{tag_name} .= chr ($self->{next_char} + 0x0020);
           # start tag or end tag
         ## Stay in this state
@@ -740,13 +974,32 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(39) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{39} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(40) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{40} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(41) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{41} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -769,14 +1022,32 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          
+      $Whatpm::HTML::Debug::cp_pass->(42) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{42} = 1;
+      }
+    
           #
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(43) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{43} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'nestc');
         }
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         # next-input-character is already done
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(44) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{44} = 1;
+      }
+    
         $self->{current_token}->{tag_name} .= chr $self->{next_char};
           # start tag or end tag
         ## Stay in the state
@@ -795,6 +1066,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(45) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{45} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -806,13 +1083,32 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(46) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{46} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(47) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{47} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(48) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{48} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -831,6 +1127,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
+        
+      $Whatpm::HTML::Debug::cp_pass->(49) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{49} = 1;
+      }
+    
         $self->{current_attribute} = {name => chr ($self->{next_char} + 0x0020),
                               value => ''};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -854,8 +1156,20 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          
+      $Whatpm::HTML::Debug::cp_pass->(50) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{50} = 1;
+      }
+    
           #
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(51) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{51} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'nestc');
         }
         ## Stay in the state
@@ -864,13 +1178,32 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(52) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{52} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(53) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{53} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(54) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{54} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -887,7 +1220,20 @@ sub _get_next_token ($) {
              0x0027 => 1, # '
              0x003D => 1, # =
             }->{$self->{next_char}}) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(55) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{55} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'bad attribute name');
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(56) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{56} = 1;
+      }
+    
         }
         $self->{current_attribute} = {name => chr ($self->{next_char}),
                               value => ''};
@@ -905,9 +1251,21 @@ sub _get_next_token ($) {
       my $before_leave = sub {
         if (exists $self->{current_token}->{attributes} # start tag or end tag
             ->{$self->{current_attribute}->{name}}) { # MUST
+          
+      $Whatpm::HTML::Debug::cp_pass->(57) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{57} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'duplicate attribute:'.$self->{current_attribute}->{name});
           ## Discard $self->{current_attribute} # MUST
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(58) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{58} = 1;
+      }
+    
           $self->{current_token}->{attributes}->{$self->{current_attribute}->{name}}
             = $self->{current_attribute};
         }
@@ -918,6 +1276,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(59) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{59} = 1;
+      }
+    
         $before_leave->();
         $self->{state} = AFTER_ATTRIBUTE_NAME_STATE;
         
@@ -929,6 +1293,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003D) { # =
+        
+      $Whatpm::HTML::Debug::cp_pass->(60) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{60} = 1;
+      }
+    
         $before_leave->();
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
@@ -942,10 +1312,22 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x003E) { # >
         $before_leave->();
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(61) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{61} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(62) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{62} = 1;
+      }
+    
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
@@ -967,6 +1349,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
+        
+      $Whatpm::HTML::Debug::cp_pass->(63) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{63} = 1;
+      }
+    
         $self->{current_attribute}->{name} .= chr ($self->{next_char} + 0x0020);
         ## Stay in the state
         
@@ -990,8 +1378,20 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          
+      $Whatpm::HTML::Debug::cp_pass->(64) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{64} = 1;
+      }
+    
           #
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(65) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{65} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'nestc');
         }
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
@@ -1001,13 +1401,32 @@ sub _get_next_token ($) {
         $self->{parse_error}-> (type => 'unclosed tag');
         $before_leave->();
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(66) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{66} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(67) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{67} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(68) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{68} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1021,7 +1440,20 @@ sub _get_next_token ($) {
       } else {
         if ($self->{next_char} == 0x0022 or # "
             $self->{next_char} == 0x0027) { # '
+          
+      $Whatpm::HTML::Debug::cp_pass->(69) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{69} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'bad attribute name');
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(70) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{70} = 1;
+      }
+    
         }
         $self->{current_attribute}->{name} .= chr ($self->{next_char});
         ## Stay in the state
@@ -1040,6 +1472,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(71) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{71} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -1050,6 +1488,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003D) { # =
+        
+      $Whatpm::HTML::Debug::cp_pass->(72) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{72} = 1;
+      }
+    
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
       if (@{$self->{char}}) {
@@ -1061,13 +1505,32 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(73) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{73} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(74) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{74} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(75) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{75} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1086,6 +1549,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
+        
+      $Whatpm::HTML::Debug::cp_pass->(76) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{76} = 1;
+      }
+    
         $self->{current_attribute} = {name => chr ($self->{next_char} + 0x0020),
                               value => ''};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -1109,8 +1578,20 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          
+      $Whatpm::HTML::Debug::cp_pass->(77) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{77} = 1;
+      }
+    
           #
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(78) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{78} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'nestc');
           ## TODO: Different error type for <aa / bb> than <aa/>
         }
@@ -1120,13 +1601,32 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(79) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{79} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(80) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{80} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(81) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{81} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1138,6 +1638,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(82) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{82} = 1;
+      }
+    
         $self->{current_attribute} = {name => chr ($self->{next_char}),
                               value => ''};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -1156,6 +1662,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP      
+        
+      $Whatpm::HTML::Debug::cp_pass->(83) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{83} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -1166,6 +1678,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
+        
+      $Whatpm::HTML::Debug::cp_pass->(84) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{84} = 1;
+      }
+    
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
@@ -1176,10 +1694,22 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
+        
+      $Whatpm::HTML::Debug::cp_pass->(85) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{85} = 1;
+      }
+    
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         ## reconsume
         redo A;
       } elsif ($self->{next_char} == 0x0027) { # '
+        
+      $Whatpm::HTML::Debug::cp_pass->(86) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{86} = 1;
+      }
+    
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
@@ -1191,13 +1721,32 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(87) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{87} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(88) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{88} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(89) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{89} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1217,13 +1766,32 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(90) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{90} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(91) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{91} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(92) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{92} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1236,7 +1804,20 @@ sub _get_next_token ($) {
         redo A;
       } else {
         if ($self->{next_char} == 0x003D) { # =
+          
+      $Whatpm::HTML::Debug::cp_pass->(93) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{93} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'bad attribute value');
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(94) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{94} = 1;
+      }
+    
         }
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
@@ -1251,6 +1832,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0022) { # "
+        
+      $Whatpm::HTML::Debug::cp_pass->(95) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{95} = 1;
+      }
+    
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
@@ -1261,6 +1848,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
+        
+      $Whatpm::HTML::Debug::cp_pass->(96) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{96} = 1;
+      }
+    
         $self->{last_attribute_value_state} = $self->{state};
         $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         
@@ -1274,13 +1867,32 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}-> (type => 'unclosed attribute value');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(97) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{97} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(98) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{98} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(99) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{99} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1292,6 +1904,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(100) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{100} = 1;
+      }
+    
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
         
@@ -1305,6 +1923,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0027) { # '
+        
+      $Whatpm::HTML::Debug::cp_pass->(101) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{101} = 1;
+      }
+    
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
@@ -1315,6 +1939,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
+        
+      $Whatpm::HTML::Debug::cp_pass->(102) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{102} = 1;
+      }
+    
         $self->{last_attribute_value_state} = $self->{state};
         $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         
@@ -1328,13 +1958,32 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}-> (type => 'unclosed attribute value');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(103) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{103} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(104) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{104} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(105) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{105} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1346,6 +1995,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(106) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{106} = 1;
+      }
+    
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
         
@@ -1363,6 +2018,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # HT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(107) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{107} = 1;
+      }
+    
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -1373,6 +2034,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
+        
+      $Whatpm::HTML::Debug::cp_pass->(108) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{108} = 1;
+      }
+    
         $self->{last_attribute_value_state} = $self->{state};
         $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         
@@ -1385,13 +2052,32 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(109) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{109} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(110) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{110} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(111) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{111} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1411,13 +2097,32 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(112) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{112} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(113) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{113} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(114) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{114} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1434,7 +2139,20 @@ sub _get_next_token ($) {
              0x0027 => 1, # '
              0x003D => 1, # =
             }->{$self->{next_char}}) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(115) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{115} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'bad attribute value');
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(116) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{116} = 1;
+      }
+    
         }
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
@@ -1457,8 +2175,20 @@ sub _get_next_token ($) {
            -1);
 
       unless (defined $token) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(117) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{117} = 1;
+      }
+    
         $self->{current_attribute}->{value} .= '&';
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(118) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{118} = 1;
+      }
+    
         $self->{current_attribute}->{value} .= $token->{data};
 	$self->{current_attribute}->{has_reference} = $token->{has_reference};
         ## ISSUE: spec says "append the returned character token to the current attribute's value"
@@ -1473,6 +2203,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(118) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{118} = 1;
+      }
+    
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -1484,13 +2220,32 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          
+      $Whatpm::HTML::Debug::cp_pass->(119) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{119} = 1;
+      }
+    
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            
+      $Whatpm::HTML::Debug::cp_pass->(120) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{120} = 1;
+      }
+    
             $self->{parse_error}-> (type => 'end tag attribute');
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(121) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{121} = 1;
+      }
+    
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1519,14 +2274,32 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          
+      $Whatpm::HTML::Debug::cp_pass->(122) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{122} = 1;
+      }
+    
           #
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(123) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{123} = 1;
+      }
+    
           $self->{parse_error}-> (type => 'nestc');
         }
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         # next-input-character is already done
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(124) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{124} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'no space between attributes');
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         ## reconsume
@@ -1539,6 +2312,12 @@ sub _get_next_token ($) {
 
       BC: {
         if ($self->{next_char} == 0x003E) { # >
+          
+      $Whatpm::HTML::Debug::cp_pass->(124) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{124} = 1;
+      }
+    
           $self->{state} = DATA_STATE;
           
       if (@{$self->{char}}) {
@@ -1552,6 +2331,12 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{next_char} == -1) { 
+          
+      $Whatpm::HTML::Debug::cp_pass->(125) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{125} = 1;
+      }
+    
           $self->{state} = DATA_STATE;
           ## reconsume
 
@@ -1559,6 +2344,12 @@ sub _get_next_token ($) {
 
           redo A;
         } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(126) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{126} = 1;
+      }
+    
           $token->{data} .= chr ($self->{next_char});
           
       if (@{$self->{char}}) {
@@ -1570,6 +2361,8 @@ sub _get_next_token ($) {
           redo BC;
         }
       } # BC
+
+      die "$0: _get_next_token: unexpected case [BC]";
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## (only happen if PCDATA state)
 
@@ -1586,6 +2379,12 @@ sub _get_next_token ($) {
   
         push @next_char, $self->{next_char};
         if ($self->{next_char} == 0x002D) { # -
+          
+      $Whatpm::HTML::Debug::cp_pass->(127) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{127} = 1;
+      }
+    
           $self->{current_token} = {type => COMMENT_TOKEN, data => ''};
           $self->{state} = COMMENT_START_STATE;
           
@@ -1596,6 +2395,13 @@ sub _get_next_token ($) {
       }
   
           redo A;
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(128) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{128} = 1;
+      }
+    
         }
       } elsif ($self->{next_char} == 0x0044 or # D
                $self->{next_char} == 0x0064) { # d
@@ -1659,7 +2465,13 @@ sub _get_next_token ($) {
                   push @next_char, $self->{next_char};
                   if ($self->{next_char} == 0x0045 or # E
                       $self->{next_char} == 0x0065) { # e
-                    ## ISSUE: What a stupid code this is!
+                    
+      $Whatpm::HTML::Debug::cp_pass->(129) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{129} = 1;
+      }
+    
+                    ## TODO: What a stupid code this is!
                     $self->{state} = DOCTYPE_STATE;
                     
       if (@{$self->{char}}) {
@@ -1669,12 +2481,61 @@ sub _get_next_token ($) {
       }
   
                     redo A;
+                  } else {
+                    
+      $Whatpm::HTML::Debug::cp_pass->(130) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{130} = 1;
+      }
+    
                   }
+                } else {
+                  
+      $Whatpm::HTML::Debug::cp_pass->(131) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{131} = 1;
+      }
+    
                 }
+              } else {
+                
+      $Whatpm::HTML::Debug::cp_pass->(132) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{132} = 1;
+      }
+    
               }
+            } else {
+              
+      $Whatpm::HTML::Debug::cp_pass->(133) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{133} = 1;
+      }
+    
             }
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(134) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{134} = 1;
+      }
+    
           }
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(135) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{135} = 1;
+      }
+    
         }
+      } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(136) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{136} = 1;
+      }
+    
       }
 
       $self->{parse_error}-> (type => 'bogus comment');
@@ -1687,6 +2548,12 @@ sub _get_next_token ($) {
       ## ISSUE: spec is somewhat unclear on "is the first character that will be in the comment"; what is "that will be in the comment" is what the algorithm defines, isn't it?
     } elsif ($self->{state} == COMMENT_START_STATE) {
       if ($self->{next_char} == 0x002D) { # -
+        
+      $Whatpm::HTML::Debug::cp_pass->(137) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{137} = 1;
+      }
+    
         $self->{state} = COMMENT_START_DASH_STATE;
         
       if (@{$self->{char}}) {
@@ -1697,6 +2564,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(138) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{138} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'bogus comment');
         $self->{state} = DATA_STATE;
         
@@ -1711,6 +2584,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(139) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{139} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1719,6 +2598,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(140) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{140} = 1;
+      }
+    
         $self->{current_token}->{data} # comment
             .= chr ($self->{next_char});
         $self->{state} = COMMENT_STATE;
@@ -1733,6 +2618,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_START_DASH_STATE) {
       if ($self->{next_char} == 0x002D) { # -
+        
+      $Whatpm::HTML::Debug::cp_pass->(141) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{141} = 1;
+      }
+    
         $self->{state} = COMMENT_END_STATE;
         
       if (@{$self->{char}}) {
@@ -1743,6 +2634,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(142) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{142} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'bogus comment');
         $self->{state} = DATA_STATE;
         
@@ -1757,6 +2654,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(143) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{143} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1765,6 +2668,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(144) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{144} = 1;
+      }
+    
         $self->{current_token}->{data} # comment
             .= '-' . chr ($self->{next_char});
         $self->{state} = COMMENT_STATE;
@@ -1779,6 +2688,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_STATE) {
       if ($self->{next_char} == 0x002D) { # -
+        
+      $Whatpm::HTML::Debug::cp_pass->(145) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{145} = 1;
+      }
+    
         $self->{state} = COMMENT_END_DASH_STATE;
         
       if (@{$self->{char}}) {
@@ -1789,6 +2704,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(146) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{146} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1797,6 +2718,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(147) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{147} = 1;
+      }
+    
         $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
         ## Stay in the state
         
@@ -1810,6 +2737,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_END_DASH_STATE) {
       if ($self->{next_char} == 0x002D) { # -
+        
+      $Whatpm::HTML::Debug::cp_pass->(148) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{148} = 1;
+      }
+    
         $self->{state} = COMMENT_END_STATE;
         
       if (@{$self->{char}}) {
@@ -1820,6 +2753,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(149) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{149} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1828,6 +2767,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(150) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{150} = 1;
+      }
+    
         $self->{current_token}->{data} .= '-' . chr ($self->{next_char}); # comment
         $self->{state} = COMMENT_STATE;
         
@@ -1841,6 +2786,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_END_STATE) {
       if ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(151) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{151} = 1;
+      }
+    
         $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
@@ -1854,6 +2805,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == 0x002D) { # -
+        
+      $Whatpm::HTML::Debug::cp_pass->(152) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{152} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'dash in comment');
         $self->{current_token}->{data} .= '-'; # comment
         ## Stay in the state
@@ -1866,6 +2823,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(153) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{153} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1874,6 +2837,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(154) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{154} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'dash in comment');
         $self->{current_token}->{data} .= '--' . chr ($self->{next_char}); # comment
         $self->{state} = COMMENT_STATE;
@@ -1892,6 +2861,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(155) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{155} = 1;
+      }
+    
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -1902,6 +2877,12 @@ sub _get_next_token ($) {
   
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(156) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{156} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'no space before DOCTYPE name');
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         ## reconsume
@@ -1913,6 +2894,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(157) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{157} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -1923,6 +2910,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(158) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{158} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         
@@ -1936,7 +2929,13 @@ sub _get_next_token ($) {
         return  ({type => DOCTYPE_TOKEN, quirks => 1});
 
         redo A;
-      } elsif ($self->{next_char} == -1) { 
+      } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(159) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{159} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1945,6 +2944,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(160) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{160} = 1;
+      }
+    
         $self->{current_token}
             = {type => DOCTYPE_TOKEN,
                name => chr ($self->{next_char}),
@@ -1968,6 +2973,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(161) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{161} = 1;
+      }
+    
         $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -1978,6 +2989,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(162) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{162} = 1;
+      }
+    
         $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
@@ -1991,6 +3008,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(163) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{163} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -2000,6 +3023,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(164) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{164} = 1;
+      }
+    
         $self->{current_token}->{name}
           .= chr ($self->{next_char}); # DOCTYPE
         ## Stay in the state
@@ -2018,6 +3047,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        
+      $Whatpm::HTML::Debug::cp_pass->(165) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{165} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -2028,6 +3063,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(166) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{166} = 1;
+      }
+    
         $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
@@ -2041,6 +3082,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(167) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{167} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -2096,6 +3143,12 @@ sub _get_next_token ($) {
   
                 if ($self->{next_char} == 0x0043 or # C
                     $self->{next_char} == 0x0063) { # c
+                  
+      $Whatpm::HTML::Debug::cp_pass->(168) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{168} = 1;
+      }
+    
                   $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
                   
       if (@{$self->{char}}) {
@@ -2105,10 +3158,45 @@ sub _get_next_token ($) {
       }
   
                   redo A;
+                } else {
+                  
+      $Whatpm::HTML::Debug::cp_pass->(169) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{169} = 1;
+      }
+    
                 }
+              } else {
+                
+      $Whatpm::HTML::Debug::cp_pass->(170) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{170} = 1;
+      }
+    
               }
+            } else {
+              
+      $Whatpm::HTML::Debug::cp_pass->(171) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{171} = 1;
+      }
+    
             }
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(172) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{172} = 1;
+      }
+    
           }
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(173) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{173} = 1;
+      }
+    
         }
 
         #
@@ -2159,6 +3247,12 @@ sub _get_next_token ($) {
   
                 if ($self->{next_char} == 0x004D or # M
                     $self->{next_char} == 0x006D) { # m
+                  
+      $Whatpm::HTML::Debug::cp_pass->(174) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{174} = 1;
+      }
+    
                   $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
                   
       if (@{$self->{char}}) {
@@ -2168,14 +3262,55 @@ sub _get_next_token ($) {
       }
   
                   redo A;
+                } else {
+                  
+      $Whatpm::HTML::Debug::cp_pass->(175) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{175} = 1;
+      }
+    
                 }
+              } else {
+                
+      $Whatpm::HTML::Debug::cp_pass->(176) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{176} = 1;
+      }
+    
               }
+            } else {
+              
+      $Whatpm::HTML::Debug::cp_pass->(177) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{177} = 1;
+      }
+    
             }
+          } else {
+            
+      $Whatpm::HTML::Debug::cp_pass->(178) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{178} = 1;
+      }
+    
           }
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->(179) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{179} = 1;
+      }
+    
         }
 
         #
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(180) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{180} = 1;
+      }
+    
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -2197,6 +3332,12 @@ sub _get_next_token ($) {
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
           }->{$self->{next_char}}) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(181) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{181} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -2207,6 +3348,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} eq 0x0022) { # "
+        
+      $Whatpm::HTML::Debug::cp_pass->(182) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{182} = 1;
+      }
+    
         $self->{current_token}->{public_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
@@ -2218,6 +3365,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} eq 0x0027) { # '
+        
+      $Whatpm::HTML::Debug::cp_pass->(183) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{183} = 1;
+      }
+    
         $self->{current_token}->{public_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
         
@@ -2229,6 +3382,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} eq 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(184) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{184} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'no PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -2245,6 +3404,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(185) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{185} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
@@ -2255,6 +3420,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(186) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{186} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'string after PUBLIC');
         $self->{current_token}->{quirks} = 1;
 
@@ -2270,6 +3441,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0022) { # "
+        
+      $Whatpm::HTML::Debug::cp_pass->(187) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{187} = 1;
+      }
+    
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
       if (@{$self->{char}}) {
@@ -2280,6 +3457,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(188) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{188} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -2296,6 +3479,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(189) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{189} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -2306,6 +3495,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(190) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{190} = 1;
+      }
+    
         $self->{current_token}->{public_identifier} # DOCTYPE
             .= chr $self->{next_char};
         ## Stay in the state
@@ -2320,6 +3515,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0027) { # '
+        
+      $Whatpm::HTML::Debug::cp_pass->(191) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{191} = 1;
+      }
+    
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
       if (@{$self->{char}}) {
@@ -2330,6 +3531,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(192) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{192} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -2346,6 +3553,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(193) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{193} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -2356,6 +3569,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(194) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{194} = 1;
+      }
+    
         $self->{current_token}->{public_identifier} # DOCTYPE
             .= chr $self->{next_char};
         ## Stay in the state
@@ -2373,6 +3592,12 @@ sub _get_next_token ($) {
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
           }->{$self->{next_char}}) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(195) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{195} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -2383,6 +3608,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
+        
+      $Whatpm::HTML::Debug::cp_pass->(196) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{196} = 1;
+      }
+    
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
@@ -2394,6 +3625,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0027) { # '
+        
+      $Whatpm::HTML::Debug::cp_pass->(197) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{197} = 1;
+      }
+    
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
@@ -2405,6 +3642,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(198) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{198} = 1;
+      }
+    
         $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
@@ -2418,6 +3661,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(199) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{199} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
@@ -2428,6 +3677,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(200) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{200} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'string after PUBLIC literal');
         $self->{current_token}->{quirks} = 1;
 
@@ -2446,6 +3701,12 @@ sub _get_next_token ($) {
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
           }->{$self->{next_char}}) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(201) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{201} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -2456,6 +3717,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
+        
+      $Whatpm::HTML::Debug::cp_pass->(202) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{202} = 1;
+      }
+    
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
@@ -2467,6 +3734,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x0027) { # '
+        
+      $Whatpm::HTML::Debug::cp_pass->(203) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{203} = 1;
+      }
+    
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
@@ -2478,6 +3751,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(204) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{204} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'no SYSTEM literal');
         $self->{state} = DATA_STATE;
         
@@ -2493,6 +3772,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(205) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{205} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
@@ -2503,6 +3788,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(206) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{206} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'string after SYSTEM');
         $self->{current_token}->{quirks} = 1;
 
@@ -2518,6 +3809,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0022) { # "
+        
+      $Whatpm::HTML::Debug::cp_pass->(207) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{207} = 1;
+      }
+    
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
       if (@{$self->{char}}) {
@@ -2528,6 +3825,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(208) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{208} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -2544,6 +3847,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(209) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{209} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
@@ -2554,6 +3863,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(210) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{210} = 1;
+      }
+    
         $self->{current_token}->{system_identifier} # DOCTYPE
             .= chr $self->{next_char};
         ## Stay in the state
@@ -2568,6 +3883,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0027) { # '
+        
+      $Whatpm::HTML::Debug::cp_pass->(211) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{211} = 1;
+      }
+    
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
       if (@{$self->{char}}) {
@@ -2578,6 +3899,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(212) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{212} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -2594,6 +3921,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(213) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{213} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
@@ -2604,6 +3937,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(214) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{214} = 1;
+      }
+    
         $self->{current_token}->{system_identifier} # DOCTYPE
             .= chr $self->{next_char};
         ## Stay in the state
@@ -2621,6 +3960,12 @@ sub _get_next_token ($) {
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
           }->{$self->{next_char}}) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(215) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{215} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -2631,6 +3976,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(216) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{216} = 1;
+      }
+    
         $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
@@ -2644,6 +3995,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(217) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{217} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
@@ -2654,6 +4011,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(218) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{218} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'string after SYSTEM literal');
         #$self->{current_token}->{quirks} = 1;
 
@@ -2669,6 +4032,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == BOGUS_DOCTYPE_STATE) {
       if ($self->{next_char} == 0x003E) { # >
+        
+      $Whatpm::HTML::Debug::cp_pass->(219) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{219} = 1;
+      }
+    
         $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
@@ -2682,6 +4051,12 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        
+      $Whatpm::HTML::Debug::cp_pass->(220) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{220} = 1;
+      }
+    
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -2690,6 +4065,12 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        
+      $Whatpm::HTML::Debug::cp_pass->(221) if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{221} = 1;
+      }
+    
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -7088,4 +8469,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/03 09:17:09 $
+# $Date: 2008/03/03 10:20:19 $

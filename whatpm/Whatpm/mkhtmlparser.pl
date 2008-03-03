@@ -1,6 +1,8 @@
 #!/usr/bin/perl 
 use strict;
 
+my $DEBUG = $ENV{DEBUG};
+
 while (<>) {
   s/!!!emit\b/return /;
   s{!!!next-input-character;}{q{
@@ -63,5 +65,13 @@ while (<>) {
   s{!!!next-token;}{q{$token = $self->_get_next_token;}}ge;
   s{!!!back-token;}{q{unshift @{$self->{token}}, $token;}}ge;
   s{!!!back-token\s*\(}{q{unshift @{$self->{token}}, (}}ge;
+  s{!!!cp\s*\(\s*(\S+)\s*\)\s*;}{
+    $DEBUG ? qq{
+      \$Whatpm::HTML::Debug::cp_pass->($1) if \$Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        \$Whatpm::HTML::Debug::cp->{$1} = 1;
+      }
+    } : ''
+  }ge;
   print;
 }

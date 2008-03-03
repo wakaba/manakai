@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.76 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.77 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -387,10 +387,12 @@ sub _get_next_token ($) {
       if ($self->{next_char} == 0x0026) { # &
 	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
             not $self->{escape}) {
+          !!!cp (1);
           $self->{state} = ENTITY_DATA_STATE;
           !!!next-input-character;
           redo A;
         } else {
+          !!!cp (2);
           #
         }
       } elsif ($self->{next_char} == 0x002D) { # -
@@ -399,8 +401,13 @@ sub _get_next_token ($) {
             if ($self->{prev_char}->[0] == 0x002D and # -
                 $self->{prev_char}->[1] == 0x0021 and # !
                 $self->{prev_char}->[2] == 0x003C) { # <
+              !!!cp (3);
               $self->{escape} = 1;
+            } else {
+              !!!cp (4);
             }
+          } else {
+            !!!cp (5);
           }
         }
         
@@ -409,10 +416,12 @@ sub _get_next_token ($) {
         if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
             (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
              not $self->{escape})) {
+          !!!cp (6);
           $self->{state} = TAG_OPEN_STATE;
           !!!next-input-character;
           redo A;
         } else {
+          !!!cp (7);
           #
         }
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -420,14 +429,22 @@ sub _get_next_token ($) {
             ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
           if ($self->{prev_char}->[0] == 0x002D and # -
               $self->{prev_char}->[1] == 0x002D) { # -
+            !!!cp (8);
             delete $self->{escape};
+          } else {
+            !!!cp (9);
           }
+        } else {
+          !!!cp (10);
         }
         
         #
       } elsif ($self->{next_char} == -1) {
+        !!!cp (11);
         !!!emit ({type => END_OF_FILE_TOKEN});
         last A; ## TODO: ok?
+      } else {
+        !!!cp (12);
       }
       # Anything else
       my $token = {type => CHARACTER_TOKEN,
@@ -447,8 +464,10 @@ sub _get_next_token ($) {
       # next-input-character is already done
 
       unless (defined $token) {
+        !!!cp (13);
         !!!emit ({type => CHARACTER_TOKEN, data => '&'});
       } else {
+        !!!cp (14);
         !!!emit ($token);
       }
 
@@ -456,10 +475,12 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == TAG_OPEN_STATE) {
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if ($self->{next_char} == 0x002F) { # /
+          !!!cp (15);
           !!!next-input-character;
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           redo A;
         } else {
+          !!!cp (16);
           ## reconsume
           $self->{state} = DATA_STATE;
 
@@ -469,15 +490,18 @@ sub _get_next_token ($) {
         }
       } elsif ($self->{content_model} & CM_FULL_MARKUP) { # PCDATA
         if ($self->{next_char} == 0x0021) { # !
+          !!!cp (17);
           $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
           !!!next-input-character;
           redo A;
         } elsif ($self->{next_char} == 0x002F) { # /
+          !!!cp (18);
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           !!!next-input-character;
           redo A;
         } elsif (0x0041 <= $self->{next_char} and
                  $self->{next_char} <= 0x005A) { # A..Z
+          !!!cp (19);
           $self->{current_token}
             = {type => START_TAG_TOKEN,
                tag_name => chr ($self->{next_char} + 0x0020)};
@@ -486,12 +510,14 @@ sub _get_next_token ($) {
           redo A;
         } elsif (0x0061 <= $self->{next_char} and
                  $self->{next_char} <= 0x007A) { # a..z
+          !!!cp (20);
           $self->{current_token} = {type => START_TAG_TOKEN,
                             tag_name => chr ($self->{next_char})};
           $self->{state} = TAG_NAME_STATE;
           !!!next-input-character;
           redo A;
         } elsif ($self->{next_char} == 0x003E) { # >
+          !!!cp (21);
           !!!parse-error (type => 'empty start tag');
           $self->{state} = DATA_STATE;
           !!!next-input-character;
@@ -500,11 +526,13 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{next_char} == 0x003F) { # ?
+          !!!cp (22);
           !!!parse-error (type => 'pio');
           $self->{state} = BOGUS_COMMENT_STATE;
           ## $self->{next_char} is intentionally left as is
           redo A;
         } else {
+          !!!cp (23);
           !!!parse-error (type => 'bare stago');
           $self->{state} = DATA_STATE;
           ## reconsume
@@ -526,9 +554,11 @@ sub _get_next_token ($) {
             my $c = ord substr ($self->{last_emitted_start_tag_name}, $i, 1);
             my $C = 0x0061 <= $c && $c <= 0x007A ? $c - 0x0020 : $c;
             if ($self->{next_char} == $c or $self->{next_char} == $C) {
+              !!!cp (24);
               !!!next-input-character;
               next TAGNAME;
             } else {
+              !!!cp (25);
               $self->{next_char} = shift @next_char; # reconsume
               !!!back-next-input-character (@next_char);
               $self->{state} = DATA_STATE;
@@ -548,18 +578,21 @@ sub _get_next_token ($) {
                   $self->{next_char} == 0x003E or # >
                   $self->{next_char} == 0x002F or # /
                   $self->{next_char} == -1) {
+            !!!cp (26);
             $self->{next_char} = shift @next_char; # reconsume
             !!!back-next-input-character (@next_char);
             $self->{state} = DATA_STATE;
             !!!emit ({type => CHARACTER_TOKEN, data => '</'});
             redo A;
           } else {
+            !!!cp (27);
             $self->{next_char} = shift @next_char;
             !!!back-next-input-character (@next_char);
             # and consume...
           }
         } else {
           ## No start tag token has ever been emitted
+          !!!cp (28);
           # next-input-character is already done
           $self->{state} = DATA_STATE;
           !!!emit ({type => CHARACTER_TOKEN, data => '</'});
@@ -569,6 +602,7 @@ sub _get_next_token ($) {
       
       if (0x0041 <= $self->{next_char} and
           $self->{next_char} <= 0x005A) { # A..Z
+        !!!cp (29);
         $self->{current_token} = {type => END_TAG_TOKEN,
                           tag_name => chr ($self->{next_char} + 0x0020)};
         $self->{state} = TAG_NAME_STATE;
@@ -576,17 +610,20 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0061 <= $self->{next_char} and
                $self->{next_char} <= 0x007A) { # a..z
+        !!!cp (30);
         $self->{current_token} = {type => END_TAG_TOKEN,
                           tag_name => chr ($self->{next_char})};
         $self->{state} = TAG_NAME_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (31);
         !!!parse-error (type => 'empty end tag');
         $self->{state} = DATA_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (32);
         !!!parse-error (type => 'bare etago');
         $self->{state} = DATA_STATE;
         # reconsume
@@ -595,6 +632,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (33);
         !!!parse-error (type => 'bogus end tag');
         $self->{state} = BOGUS_COMMENT_STATE;
         ## $self->{next_char} is intentionally left as is
@@ -606,18 +644,23 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (34);
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (35);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (36);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (37);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -630,6 +673,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
+        !!!cp (38);
         $self->{current_token}->{tag_name} .= chr ($self->{next_char} + 0x0020);
           # start tag or end tag
         ## Stay in this state
@@ -638,13 +682,17 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         !!!parse-error (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (39);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (40);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (41);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -661,14 +709,17 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          !!!cp (42);
           #
         } else {
+          !!!cp (43);
           !!!parse-error (type => 'nestc');
         }
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         # next-input-character is already done
         redo A;
       } else {
+        !!!cp (44);
         $self->{current_token}->{tag_name} .= chr $self->{next_char};
           # start tag or end tag
         ## Stay in the state
@@ -681,18 +732,23 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (45);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (46);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (47);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (48);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -705,6 +761,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
+        !!!cp (49);
         $self->{current_attribute} = {name => chr ($self->{next_char} + 0x0020),
                               value => ''};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -716,8 +773,10 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          !!!cp (50);
           #
         } else {
+          !!!cp (51);
           !!!parse-error (type => 'nestc');
         }
         ## Stay in the state
@@ -726,13 +785,17 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         !!!parse-error (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (52);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (53);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (54);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -749,7 +812,10 @@ sub _get_next_token ($) {
              0x0027 => 1, # '
              0x003D => 1, # =
             }->{$self->{next_char}}) {
+          !!!cp (55);
           !!!parse-error (type => 'bad attribute name');
+        } else {
+          !!!cp (56);
         }
         $self->{current_attribute} = {name => chr ($self->{next_char}),
                               value => ''};
@@ -761,9 +827,11 @@ sub _get_next_token ($) {
       my $before_leave = sub {
         if (exists $self->{current_token}->{attributes} # start tag or end tag
             ->{$self->{current_attribute}->{name}}) { # MUST
+          !!!cp (57);
           !!!parse-error (type => 'duplicate attribute:'.$self->{current_attribute}->{name});
           ## Discard $self->{current_attribute} # MUST
         } else {
+          !!!cp (58);
           $self->{current_token}->{attributes}->{$self->{current_attribute}->{name}}
             = $self->{current_attribute};
         }
@@ -774,11 +842,13 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (59);
         $before_leave->();
         $self->{state} = AFTER_ATTRIBUTE_NAME_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003D) { # =
+        !!!cp (60);
         $before_leave->();
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         !!!next-input-character;
@@ -786,10 +856,12 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x003E) { # >
         $before_leave->();
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (61);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          !!!cp (62);
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             !!!parse-error (type => 'end tag attribute');
@@ -805,6 +877,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
+        !!!cp (63);
         $self->{current_attribute}->{name} .= chr ($self->{next_char} + 0x0020);
         ## Stay in the state
         !!!next-input-character;
@@ -816,8 +889,10 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          !!!cp (64);
           #
         } else {
+          !!!cp (65);
           !!!parse-error (type => 'nestc');
         }
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
@@ -827,13 +902,17 @@ sub _get_next_token ($) {
         !!!parse-error (type => 'unclosed tag');
         $before_leave->();
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (66);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (67);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (68);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -847,7 +926,10 @@ sub _get_next_token ($) {
       } else {
         if ($self->{next_char} == 0x0022 or # "
             $self->{next_char} == 0x0027) { # '
+          !!!cp (69);
           !!!parse-error (type => 'bad attribute name');
+        } else {
+          !!!cp (70);
         }
         $self->{current_attribute}->{name} .= chr ($self->{next_char});
         ## Stay in the state
@@ -860,22 +942,28 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (71);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003D) { # =
+        !!!cp (72);
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (73);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (74);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (75);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -888,6 +976,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
+        !!!cp (76);
         $self->{current_attribute} = {name => chr ($self->{next_char} + 0x0020),
                               value => ''};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -899,8 +988,10 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          !!!cp (77);
           #
         } else {
+          !!!cp (78);
           !!!parse-error (type => 'nestc');
           ## TODO: Different error type for <aa / bb> than <aa/>
         }
@@ -910,13 +1001,17 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         !!!parse-error (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (79);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (80);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (81);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -928,6 +1023,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (82);
         $self->{current_attribute} = {name => chr ($self->{next_char}),
                               value => ''};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -940,30 +1036,38 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP      
+        !!!cp (83);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
+        !!!cp (84);
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
+        !!!cp (85);
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         ## reconsume
         redo A;
       } elsif ($self->{next_char} == 0x0027) { # '
+        !!!cp (86);
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (87);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (88);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (89);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -977,13 +1081,17 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         !!!parse-error (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (90);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (91);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (92);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -996,7 +1104,10 @@ sub _get_next_token ($) {
         redo A;
       } else {
         if ($self->{next_char} == 0x003D) { # =
+          !!!cp (93);
           !!!parse-error (type => 'bad attribute value');
+        } else {
+          !!!cp (94);
         }
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
@@ -1005,10 +1116,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0022) { # "
+        !!!cp (95);
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
+        !!!cp (96);
         $self->{last_attribute_value_state} = $self->{state};
         $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         !!!next-input-character;
@@ -1016,13 +1129,17 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         !!!parse-error (type => 'unclosed attribute value');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (97);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (98);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (99);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1034,6 +1151,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (100);
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
         !!!next-input-character;
@@ -1041,10 +1159,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0027) { # '
+        !!!cp (101);
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
+        !!!cp (102);
         $self->{last_attribute_value_state} = $self->{state};
         $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         !!!next-input-character;
@@ -1052,13 +1172,17 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         !!!parse-error (type => 'unclosed attribute value');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (103);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (104);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (105);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1070,6 +1194,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (106);
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
         !!!next-input-character;
@@ -1081,23 +1206,29 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # HT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (107);
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
+        !!!cp (108);
         $self->{last_attribute_value_state} = $self->{state};
         $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (109);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (110);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (111);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1111,13 +1242,17 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == -1) {
         !!!parse-error (type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (112);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (113);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (114);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1134,7 +1269,10 @@ sub _get_next_token ($) {
              0x0027 => 1, # '
              0x003D => 1, # =
             }->{$self->{next_char}}) {
+          !!!cp (115);
           !!!parse-error (type => 'bad attribute value');
+        } else {
+          !!!cp (116);
         }
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
@@ -1151,8 +1289,10 @@ sub _get_next_token ($) {
            -1);
 
       unless (defined $token) {
+        !!!cp (117);
         $self->{current_attribute}->{value} .= '&';
       } else {
+        !!!cp (118);
         $self->{current_attribute}->{value} .= $token->{data};
 	$self->{current_attribute}->{has_reference} = $token->{has_reference};
         ## ISSUE: spec says "append the returned character token to the current attribute's value"
@@ -1167,18 +1307,23 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (118);
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (119);
           $self->{current_token}->{first_start_tag}
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
+            !!!cp (120);
             !!!parse-error (type => 'end tag attribute');
+          } else {
+            !!!cp (121);
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1195,14 +1340,17 @@ sub _get_next_token ($) {
             $self->{current_token}->{type} == START_TAG_TOKEN and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
+          !!!cp (122);
           #
         } else {
+          !!!cp (123);
           !!!parse-error (type => 'nestc');
         }
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         # next-input-character is already done
         redo A;
       } else {
+        !!!cp (124);
         !!!parse-error (type => 'no space between attributes');
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         ## reconsume
@@ -1215,6 +1363,7 @@ sub _get_next_token ($) {
 
       BC: {
         if ($self->{next_char} == 0x003E) { # >
+          !!!cp (124);
           $self->{state} = DATA_STATE;
           !!!next-input-character;
 
@@ -1222,6 +1371,7 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{next_char} == -1) { 
+          !!!cp (125);
           $self->{state} = DATA_STATE;
           ## reconsume
 
@@ -1229,11 +1379,14 @@ sub _get_next_token ($) {
 
           redo A;
         } else {
+          !!!cp (126);
           $token->{data} .= chr ($self->{next_char});
           !!!next-input-character;
           redo BC;
         }
       } # BC
+
+      die "$0: _get_next_token: unexpected case [BC]";
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## (only happen if PCDATA state)
 
@@ -1244,10 +1397,13 @@ sub _get_next_token ($) {
         !!!next-input-character;
         push @next_char, $self->{next_char};
         if ($self->{next_char} == 0x002D) { # -
+          !!!cp (127);
           $self->{current_token} = {type => COMMENT_TOKEN, data => ''};
           $self->{state} = COMMENT_START_STATE;
           !!!next-input-character;
           redo A;
+        } else {
+          !!!cp (128);
         }
       } elsif ($self->{next_char} == 0x0044 or # D
                $self->{next_char} == 0x0064) { # d
@@ -1275,16 +1431,31 @@ sub _get_next_token ($) {
                   push @next_char, $self->{next_char};
                   if ($self->{next_char} == 0x0045 or # E
                       $self->{next_char} == 0x0065) { # e
-                    ## ISSUE: What a stupid code this is!
+                    !!!cp (129);
+                    ## TODO: What a stupid code this is!
                     $self->{state} = DOCTYPE_STATE;
                     !!!next-input-character;
                     redo A;
+                  } else {
+                    !!!cp (130);
                   }
+                } else {
+                  !!!cp (131);
                 }
+              } else {
+                !!!cp (132);
               }
+            } else {
+              !!!cp (133);
             }
+          } else {
+            !!!cp (134);
           }
+        } else {
+          !!!cp (135);
         }
+      } else {
+        !!!cp (136);
       }
 
       !!!parse-error (type => 'bogus comment');
@@ -1297,10 +1468,12 @@ sub _get_next_token ($) {
       ## ISSUE: spec is somewhat unclear on "is the first character that will be in the comment"; what is "that will be in the comment" is what the algorithm defines, isn't it?
     } elsif ($self->{state} == COMMENT_START_STATE) {
       if ($self->{next_char} == 0x002D) { # -
+        !!!cp (137);
         $self->{state} = COMMENT_START_DASH_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (138);
         !!!parse-error (type => 'bogus comment');
         $self->{state} = DATA_STATE;
         !!!next-input-character;
@@ -1309,6 +1482,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (139);
         !!!parse-error (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1317,6 +1491,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (140);
         $self->{current_token}->{data} # comment
             .= chr ($self->{next_char});
         $self->{state} = COMMENT_STATE;
@@ -1325,10 +1500,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_START_DASH_STATE) {
       if ($self->{next_char} == 0x002D) { # -
+        !!!cp (141);
         $self->{state} = COMMENT_END_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (142);
         !!!parse-error (type => 'bogus comment');
         $self->{state} = DATA_STATE;
         !!!next-input-character;
@@ -1337,6 +1514,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (143);
         !!!parse-error (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1345,6 +1523,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (144);
         $self->{current_token}->{data} # comment
             .= '-' . chr ($self->{next_char});
         $self->{state} = COMMENT_STATE;
@@ -1353,10 +1532,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_STATE) {
       if ($self->{next_char} == 0x002D) { # -
+        !!!cp (145);
         $self->{state} = COMMENT_END_DASH_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (146);
         !!!parse-error (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1365,6 +1546,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (147);
         $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
         ## Stay in the state
         !!!next-input-character;
@@ -1372,10 +1554,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_END_DASH_STATE) {
       if ($self->{next_char} == 0x002D) { # -
+        !!!cp (148);
         $self->{state} = COMMENT_END_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (149);
         !!!parse-error (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1384,6 +1568,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (150);
         $self->{current_token}->{data} .= '-' . chr ($self->{next_char}); # comment
         $self->{state} = COMMENT_STATE;
         !!!next-input-character;
@@ -1391,6 +1576,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_END_STATE) {
       if ($self->{next_char} == 0x003E) { # >
+        !!!cp (151);
         $self->{state} = DATA_STATE;
         !!!next-input-character;
 
@@ -1398,12 +1584,14 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == 0x002D) { # -
+        !!!cp (152);
         !!!parse-error (type => 'dash in comment');
         $self->{current_token}->{data} .= '-'; # comment
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (153);
         !!!parse-error (type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1412,6 +1600,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (154);
         !!!parse-error (type => 'dash in comment');
         $self->{current_token}->{data} .= '--' . chr ($self->{next_char}); # comment
         $self->{state} = COMMENT_STATE;
@@ -1424,10 +1613,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (155);
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         !!!next-input-character;
         redo A;
       } else {
+        !!!cp (156);
         !!!parse-error (type => 'no space before DOCTYPE name');
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         ## reconsume
@@ -1439,10 +1630,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (157);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (158);
         !!!parse-error (type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         !!!next-input-character;
@@ -1450,7 +1643,8 @@ sub _get_next_token ($) {
         !!!emit ({type => DOCTYPE_TOKEN, quirks => 1});
 
         redo A;
-      } elsif ($self->{next_char} == -1) { 
+      } elsif ($self->{next_char} == -1) {
+        !!!cp (159);
         !!!parse-error (type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1459,6 +1653,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (160);
         $self->{current_token}
             = {type => DOCTYPE_TOKEN,
                name => chr ($self->{next_char}),
@@ -1476,10 +1671,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (161);
         $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (162);
         $self->{state} = DATA_STATE;
         !!!next-input-character;
 
@@ -1487,6 +1684,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (163);
         !!!parse-error (type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1496,6 +1694,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (164);
         $self->{current_token}->{name}
           .= chr ($self->{next_char}); # DOCTYPE
         ## Stay in the state
@@ -1508,10 +1707,12 @@ sub _get_next_token ($) {
           $self->{next_char} == 0x000B or # VT
           $self->{next_char} == 0x000C or # FF
           $self->{next_char} == 0x0020) { # SP
+        !!!cp (165);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (166);
         $self->{state} = DATA_STATE;
         !!!next-input-character;
 
@@ -1519,6 +1720,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (167);
         !!!parse-error (type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1544,13 +1746,24 @@ sub _get_next_token ($) {
                 !!!next-input-character;
                 if ($self->{next_char} == 0x0043 or # C
                     $self->{next_char} == 0x0063) { # c
+                  !!!cp (168);
                   $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
                   !!!next-input-character;
                   redo A;
+                } else {
+                  !!!cp (169);
                 }
+              } else {
+                !!!cp (170);
               }
+            } else {
+              !!!cp (171);
             }
+          } else {
+            !!!cp (172);
           }
+        } else {
+          !!!cp (173);
         }
 
         #
@@ -1571,17 +1784,29 @@ sub _get_next_token ($) {
                 !!!next-input-character;
                 if ($self->{next_char} == 0x004D or # M
                     $self->{next_char} == 0x006D) { # m
+                  !!!cp (174);
                   $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
                   !!!next-input-character;
                   redo A;
+                } else {
+                  !!!cp (175);
                 }
+              } else {
+                !!!cp (176);
               }
+            } else {
+              !!!cp (177);
             }
+          } else {
+            !!!cp (178);
           }
+        } else {
+          !!!cp (179);
         }
 
         #
       } else {
+        !!!cp (180);
         !!!next-input-character;
         #
       }
@@ -1597,20 +1822,24 @@ sub _get_next_token ($) {
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
           }->{$self->{next_char}}) {
+        !!!cp (181);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} eq 0x0022) { # "
+        !!!cp (182);
         $self->{current_token}->{public_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} eq 0x0027) { # '
+        !!!cp (183);
         $self->{current_token}->{public_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} eq 0x003E) { # >
+        !!!cp (184);
         !!!parse-error (type => 'no PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -1621,6 +1850,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (185);
         !!!parse-error (type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
@@ -1631,6 +1861,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (186);
         !!!parse-error (type => 'string after PUBLIC');
         $self->{current_token}->{quirks} = 1;
 
@@ -1640,10 +1871,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0022) { # "
+        !!!cp (187);
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (188);
         !!!parse-error (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -1654,6 +1887,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (189);
         !!!parse-error (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -1664,6 +1898,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (190);
         $self->{current_token}->{public_identifier} # DOCTYPE
             .= chr $self->{next_char};
         ## Stay in the state
@@ -1672,10 +1907,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0027) { # '
+        !!!cp (191);
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (192);
         !!!parse-error (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -1686,6 +1923,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (193);
         !!!parse-error (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -1696,6 +1934,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (194);
         $self->{current_token}->{public_identifier} # DOCTYPE
             .= chr $self->{next_char};
         ## Stay in the state
@@ -1707,20 +1946,24 @@ sub _get_next_token ($) {
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
           }->{$self->{next_char}}) {
+        !!!cp (195);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
+        !!!cp (196);
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0027) { # '
+        !!!cp (197);
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (198);
         $self->{state} = DATA_STATE;
         !!!next-input-character;
 
@@ -1728,6 +1971,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (199);
         !!!parse-error (type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
@@ -1738,6 +1982,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (200);
         !!!parse-error (type => 'string after PUBLIC literal');
         $self->{current_token}->{quirks} = 1;
 
@@ -1750,20 +1995,24 @@ sub _get_next_token ($) {
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
           }->{$self->{next_char}}) {
+        !!!cp (201);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
+        !!!cp (202);
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x0027) { # '
+        !!!cp (203);
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (204);
         !!!parse-error (type => 'no SYSTEM literal');
         $self->{state} = DATA_STATE;
         !!!next-input-character;
@@ -1773,6 +2022,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (205);
         !!!parse-error (type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
@@ -1783,6 +2033,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (206);
         !!!parse-error (type => 'string after SYSTEM');
         $self->{current_token}->{quirks} = 1;
 
@@ -1792,10 +2043,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0022) { # "
+        !!!cp (207);
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (208);
         !!!parse-error (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -1806,6 +2059,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (209);
         !!!parse-error (type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
@@ -1816,6 +2070,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (210);
         $self->{current_token}->{system_identifier} # DOCTYPE
             .= chr $self->{next_char};
         ## Stay in the state
@@ -1824,10 +2079,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0027) { # '
+        !!!cp (211);
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (212);
         !!!parse-error (type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
@@ -1838,6 +2095,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (213);
         !!!parse-error (type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
@@ -1848,6 +2106,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (214);
         $self->{current_token}->{system_identifier} # DOCTYPE
             .= chr $self->{next_char};
         ## Stay in the state
@@ -1859,10 +2118,12 @@ sub _get_next_token ($) {
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
           }->{$self->{next_char}}) {
+        !!!cp (215);
         ## Stay in the state
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!cp (216);
         $self->{state} = DATA_STATE;
         !!!next-input-character;
 
@@ -1870,6 +2131,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (217);
         !!!parse-error (type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
@@ -1880,6 +2142,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (218);
         !!!parse-error (type => 'string after SYSTEM literal');
         #$self->{current_token}->{quirks} = 1;
 
@@ -1889,6 +2152,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == BOGUS_DOCTYPE_STATE) {
       if ($self->{next_char} == 0x003E) { # >
+        !!!cp (219);
         $self->{state} = DATA_STATE;
         !!!next-input-character;
 
@@ -1896,6 +2160,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_char} == -1) {
+        !!!cp (220);
         !!!parse-error (type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -1904,6 +2169,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        !!!cp (221);
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -5640,4 +5906,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/03 09:17:10 $
+# $Date: 2008/03/03 10:20:19 $
