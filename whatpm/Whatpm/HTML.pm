@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.79 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.80 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4682,8 +4682,8 @@ sub _tree_construction_initial ($) {
     
             $self->{document}->manakai_compat_mode ('limited quirks');
           }
-        } elsif ($pubid eq "-//W3C//DTD XHTML 1.0 Frameset//EN" or
-                 $pubid eq "-//W3C//DTD XHTML 1.0 Transitional//EN") {
+        } elsif ($pubid eq "-//W3C//DTD XHTML 1.0 FRAMESET//EN" or
+                 $pubid eq "-//W3C//DTD XHTML 1.0 TRANSITIONAL//EN") {
           
       $Whatpm::HTML::Debug::cp_pass->('t8') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -4711,6 +4711,7 @@ sub _tree_construction_initial ($) {
         my $sysid = $token->{system_identifier};
         $sysid =~ tr/A-Z/a-z/;
         if ($sysid eq "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd") {
+          ## TODO: Check the spec: PUBLIC "(limited quirks)" "(quirks)"
           $self->{document}->manakai_compat_mode ('quirks');
           
       $Whatpm::HTML::Debug::cp_pass->('t11') if $Whatpm::HTML::Debug::cp_pass;
@@ -11342,4 +11343,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/03 13:15:54 $
+# $Date: 2008/03/04 00:03:13 $
