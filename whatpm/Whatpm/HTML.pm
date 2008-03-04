@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.80 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.81 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5000,6 +5000,7 @@ sub _reset_insertion_mode ($) {
     
           $self->{insertion_mode} = BEFORE_HEAD_IM;
         } else {
+          ## ISSUE: Can this state be reached?
           
       $Whatpm::HTML::Debug::cp_pass->('t30') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -5072,9 +5073,9 @@ sub _tree_construction_main ($) {
       ## Step 6
       if ($entry->[0] eq '#marker') {
         
-      $Whatpm::HTML::Debug::cp_pass->('t33') if $Whatpm::HTML::Debug::cp_pass;
+      $Whatpm::HTML::Debug::cp_pass->('t33_1') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
-        $Whatpm::HTML::Debug::cp->{'t33'} = 1;
+        $Whatpm::HTML::Debug::cp->{'t33_1'} = 1;
       }
     
         #
@@ -5101,6 +5102,7 @@ sub _tree_construction_main ($) {
     
           #
         } else {
+          ## NOTE: <!DOCTYPE HTML><p><b><i><u></p> <p>X
           
       $Whatpm::HTML::Debug::cp_pass->('t35') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -5750,6 +5752,7 @@ sub _tree_construction_main ($) {
         } elsif (defined $self->{inner_html_node} and
                  @{$self->{open_elements}} > 1 and
                  $self->{open_elements}->[1]->[1] ne 'body') {
+## ISSUE: This case is never reached.
           
       $Whatpm::HTML::Debug::cp_pass->('t77') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -11343,4 +11346,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/04 00:03:13 $
+# $Date: 2008/03/04 14:51:54 $

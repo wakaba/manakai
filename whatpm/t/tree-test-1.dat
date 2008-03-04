@@ -169,12 +169,56 @@ not HTML5 (quirks doctype)
 |   <body>
 
 #data
+<!DOCTYPE HTML><!DOCTYPE HTML><title></title><body>
+#errors
+duplicate DOCTYPE
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><title></title><body>
+#errors
+duplicate DOCTYPE
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><!DOCTYPE HTML><title></title><body>
+#errors
+duplicate DOCTYPE
+#document
+| <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
 <!DOCTYPE HTML><html title="t"><head><title></title></head><body></body></html>
 #errors
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   title="t"
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML><html manifest=manifest.dat><title></title><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   manifest="manifest.dat"
 |   <head>
 |     <title>
 |   <body>
@@ -472,6 +516,92 @@ no </noscript>
 |   <head>
 |     <noscript>
 |       "  "
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript><base><title></title><body>
+#errors
+<base> in <noscript>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|     <base>
+|     <title>
+|   <body>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript><title></title><body>
+#errors
+<title> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|     <title>
+|   <body>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head></head><noscript></noscript>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noscript>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript><script></script>
+#errors
+<script> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     <script>
+
+#data
+<!DOCTYPE HTML><head><title></title></head><base><body>
+#errors
+<base> after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <base>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head><title></title></head><meta><body>
+#errors
+<meta> after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <meta>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></head><title></title><body>
+#errors
+<title> after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
 
 #data
 <!DOCTYPE HTML><iframe>

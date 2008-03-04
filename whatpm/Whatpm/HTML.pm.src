@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.80 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.81 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -2760,6 +2760,7 @@ sub _reset_insertion_mode ($) {
           !!!cp ('t29');
           $self->{insertion_mode} = BEFORE_HEAD_IM;
         } else {
+          ## ISSUE: Can this state be reached?
           !!!cp ('t30');
           $self->{insertion_mode} = AFTER_HEAD_IM;
         }
@@ -2816,7 +2817,7 @@ sub _tree_construction_main ($) {
 
       ## Step 6
       if ($entry->[0] eq '#marker') {
-        !!!cp ('t33');
+        !!!cp ('t33_1');
         #
       } else {
         my $in_open_elements;
@@ -2831,6 +2832,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t34');
           #
         } else {
+          ## NOTE: <!DOCTYPE HTML><p><b><i><u></p> <p>X
           !!!cp ('t35');
           redo S4;
         }
@@ -3254,6 +3256,7 @@ sub _tree_construction_main ($) {
         } elsif (defined $self->{inner_html_node} and
                  @{$self->{open_elements}} > 1 and
                  $self->{open_elements}->[1]->[1] ne 'body') {
+## ISSUE: This case is never reached.
           !!!cp ('t77');
           !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
         } else {
@@ -6460,4 +6463,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/04 00:03:13 $
+# $Date: 2008/03/04 14:51:54 $
