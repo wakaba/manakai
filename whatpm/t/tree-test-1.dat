@@ -1,4 +1,13 @@
 #data
+<!Doctype html><body>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+
+#data
 <!DOCTYPE XHTML><title></title><body>
 #errors
 not HTML5
@@ -25,7 +34,7 @@ not HTML5
 #errors
 not HTML5
 #document
-| <!DOCTYPE HTML4>
+| <!DOCTYPE html4>
 | <html>
 |   <head>
 |     <title>
@@ -193,6 +202,7 @@ duplicate DOCTYPE
 #data
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><!DOCTYPE HTML><title></title><body>
 #errors
+not HTML5
 duplicate DOCTYPE
 #document
 | <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -560,12 +570,12 @@ no </noscript>
 <!DOCTYPE HTML><head><noscript><script></script>
 #errors
 <script> in <noscript> in <head>
+unexpected end of file
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <noscript>
-|   <body>
 |     <script>
 
 ## When scripting is disabled
@@ -623,6 +633,7 @@ no </noscript>
 <!DOCTYPE HTML><head><noscript></p>
 #errors
 </p> in <noscript> in <head>
+unmatched </p>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -636,6 +647,7 @@ no </noscript>
 <!DOCTYPE HTML><head><noscript></br>
 #errors
 </br> in <noscript> in <head>
+</br>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -648,27 +660,25 @@ no </noscript>
 #data
 <!DOCTYPE HTML><head><noscript></div>
 #errors
-<br> in <noscript> in <head>
-no <div>
+</div> in <noscript> in <head>
+unexpected end of file (no </noscript>)
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <noscript>
-|   <body>
 
 ## When scripting is disabled
 #data
 <!DOCTYPE HTML><head><noscript></img>
 #errors
-<br> in <noscript> in <head>
-</img>
+</img> in <noscript> in <head>
+unexpected end of file (no </noscript>)
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <noscript>
-|   <body>
 
 ## When scripting is disabled
 #data
@@ -681,20 +691,20 @@ no <div>
 | <html>
 |   <head>
 |     <noscript>
-|   <link>
+|     <link>
 |   <body>
 
 #data
 <!DOCTYPE HTML><head></head></head><link><body>
 #errors
 </head> after </head>
-<link> after </head>
+<link> in <body>
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <link>
 |   <body>
+|     <link>
 
 #data
 <!DOCTYPE HTML></noscript><head><body>
@@ -710,25 +720,25 @@ no <div>
 <!DOCTYPE HTML><head></noscript><link><body>
 #errors
 </noscript> in <head>
-<link> after </head>
+<link> in <body>
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <link>
 |   <body>
+|     <link>
 
 #data
 <!DOCTYPE HTML><head></head></noscript><link><body>
 #errors
 </noscript> after </head>
-<link> after </head>
+<link> in <body>
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <link>
 |   <body>
+|     <link>
 
 ## When scripting is disabled
 #data
@@ -772,7 +782,6 @@ no <div>
 #data
 <!DOCTYPE HTML></br>
 #errors
-</br> before <head>
 </br>
 #document
 | <!DOCTYPE HTML>
@@ -784,7 +793,6 @@ no <div>
 #data
 <!DOCTYPE HTML><head></head></img>
 #errors
-</img> after </head>
 </img>
 #document
 | <!DOCTYPE HTML>
@@ -795,8 +803,7 @@ no <div>
 #data
 <!DOCTYPE HTML><head></head></div>
 #errors
-</div> after </head>
-</div>
+unmatched </div>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -830,7 +837,7 @@ no <div>
 | <html>
 |   <head>
 |     <title>
-|   <base>
+|     <base>
 |   <body>
 
 #data
@@ -842,7 +849,7 @@ no <div>
 | <html>
 |   <head>
 |     <title>
-|   <meta>
+|     <meta>
 |   <body>
 
 #data
@@ -1249,6 +1256,50 @@ div not closed before EOF
 |         "ab"
 
 #data
+<!DOCTYPE HTML><form><p></form>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <p>
+
+#data
+<!DOCTYPE HTML><form><li></form>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <li>
+
+#data
+<!DOCTYPE HTML><form><dt></form>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <dt>
+
+#data
+<!DOCTYPE HTML><form><dd></form>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <dd>
+
+#data
 <!DOCTYPE HTML><ul></body>
 #errors
 ul not closed
@@ -1317,8 +1368,20 @@ dl not closed
 |     <p>
 
 #data
+<!DOCTYPE HTML><table>  </table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       "  "
+
+#data
 <!DOCTYPE HTML><table><tr><td></body>
 #errors
+unmatched </body>
 table not closed
 #document
 | <!DOCTYPE HTML>
@@ -1333,6 +1396,7 @@ table not closed
 #data
 <!DOCTYPE HTML><table><tr><th></body>
 #errors
+unmatched </body>
 table not closed
 #document
 | <!DOCTYPE HTML>
@@ -1347,6 +1411,7 @@ table not closed
 #data
 <!DOCTYPE HTML><table><thead><tr><td></body>
 #errors
+unmatched </body>
 table not closed
 #document
 | <!DOCTYPE HTML>
@@ -1464,9 +1529,7 @@ isindex
 #data
 <!DOCTYPE HTML><h1><a><h2>
 #errors
-h1 not closed
-a not closed
-h2 not closed
+unexpected end of file (no </h1></a></h2>)
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -1475,6 +1538,60 @@ h2 not closed
 |     <h1>
 |       <a>
 |         <h2>
+
+#data
+<!DOCTYPE HTML><h1><p></h1>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <h1>
+|       <p>
+
+#data
+<!DOCTYPE HTML><h1><li></h1>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <h1>
+|       <li>
+
+#data
+<!DOCTYPE HTML><h1><dt></h1>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <h1>
+|       <dt>
+
+#data
+<!DOCTYPE HTML><h1><dd></h1>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <h1>
+|       <dd>
+
+#data
+<!DOCTYPE HTML><h1></h1>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <h1>
 
 #data
   <p>
@@ -2372,6 +2489,29 @@ unexpected end of file
 |         "b"
 
 #data
+<!DOCTYPE HTML><table><colgroup>  </table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <colgroup>
+|         "  "
+
+#data
+<!DOCTYPE HTML><table><colgroup></colgroup></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <colgroup>
+
+#data
 <!DOCTYPE HTML><table><caption>a<col>b
 #errors
 no </caption>
@@ -2523,6 +2663,82 @@ unexpected end of file
 |   <head>
 |   <body>
 |     "ab"
+
+#data
+<!DOCTYPE HTML><table><caption><span><tbody>
+#errors
+<caption> not closed
+<span> not closed
+<table> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <span>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML><table><caption><li><tbody>
+#errors
+<caption> not closed
+<table> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <li>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML><table><caption><p><tbody>
+#errors
+<caption> not closed
+<table> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <p>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML><table><caption><dt><tbody>
+#errors
+<caption> not closed
+<table> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <dt>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML><table><caption><dd><tbody>
+#errors
+<caption> not closed
+<table> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <dd>
+|       <tbody>
 
 #data
 <!DOCTYPE HTML>a<col>b
@@ -3015,6 +3231,120 @@ unexpected end of file
 |         "a"
 
 #data
+<!DOCTYPE HTML><table><caption><li></caption></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <li>
+
+#data
+<!DOCTYPE HTML><table><caption><p></caption></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <p>
+
+#data
+<!DOCTYPE HTML><table><caption><dt></caption></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <dt>
+
+#data
+<!DOCTYPE HTML><table><caption><dd></caption></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <dd>
+
+#data
+<!DOCTYPE HTML><table><caption><p></table>
+#errors
+<caption> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <p>
+
+#data
+<!DOCTYPE HTML><table><caption><li></table>
+#errors
+<caption> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <li>
+
+#data
+<!DOCTYPE HTML><table><caption><dd></table>
+#errors
+<caption> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <dd>
+
+#data
+<!DOCTYPE HTML><table><caption><dt></table>
+#errors
+<caption> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <dt>
+
+#data
+<!DOCTYPE HTML><table><caption><span></table>
+#errors
+<caption> not closed
+<span> not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <span>
+
+#data
 <!DOCTYPE HTML><table><tbody><thead><tr></table>
 #errors
 #document
@@ -3414,6 +3744,104 @@ ubmatched </form>
 |           <td>
 
 #data
+<!DOCTYPE HTML><table><tr><td></th></table>
+#errors
+unmatched </th>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+
+#data
+<!DOCTYPE HTML><table><tr><th></td></table>
+#errors
+unmatched </td>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+
+#data
+<!DOCTYPE HTML><table><tr><td><dd></td></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <dd>
+
+#data
+<!DOCTYPE HTML><table><tr><td><dt></td></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <dt>
+
+#data
+<!DOCTYPE HTML><table><tr><td><li></td></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <li>
+
+#data
+<!DOCTYPE HTML><table><tr><td><p></td></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <p>
+
+#data
+<!DOCTYPE HTML><table><tr><th><p></th></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+|             <p>
+
+#data
 <!DOCTYPE HTML><body></h1>
 #errors
 unmatched </h1>
@@ -3468,4 +3896,446 @@ unmatched </h1>
 |   <body>
 |     "foo"
 
+#data
+<!DOCTYPE HTML><select><option><option>
+#errors
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|       <option>
 
+#data
+<!DOCTYPE HTML><select></p>
+#errors
+</p> in <select>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+
+#data
+<!DOCTYPE HTML><select></br>
+#errors
+</br> in <select>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+
+#data
+<!DOCTYPE HTML><select></base>
+#errors
+</base> in <select>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+
+#data
+<!DOCTYPE HTML><select></div>
+#errors
+</div> in <select>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+
+#data
+<!DOCTYPE HTML><select></option>
+#errors
+unmatched </option>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+
+#data
+<!DOCTYPE HTML><select><option></option></select>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+
+#data
+<!DOCTYPE HTML><select><optgroup></option></select>
+#errors
+</option> in <optgroup>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <optgroup>
+
+#data
+<!DOCTYPE HTML><select></table>aa
+#errors
+unmatched </table>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "aa"
+
+#data
+<!DOCTYPE HTML><select></tbody>aa
+#errors
+unmatched </tbody>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "aa"
+
+#data
+<!DOCTYPE HTML><select></thead>aa
+#errors
+unmatched </thead>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "aa"
+
+#data
+<!DOCTYPE HTML><select></tfoot>aa
+#errors
+unmatched </tfoot>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "aa"
+
+#data
+<!DOCTYPE HTML><select></tr>aa
+#errors
+unmatched </tr>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "aa"
+
+#data
+<!DOCTYPE HTML><select></td>aa
+#errors
+unmatched </td>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "aa"
+
+#data
+<!DOCTYPE HTML><select></th>aa
+#errors
+unmatched </th>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "aa"
+
+#data
+<!DOCTYPE HTML><select></caption>aa
+#errors
+unmatched </caption>
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "aa"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select></tbody>a
+#errors
+no </select>
+char in <table>
+no </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+
+#data
+<!DOCTYPE HTML><table><tr><td><select></table>a
+#errors
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|     "a"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select></thead>a
+#errors
+unmatched </thead>
+unexpected end of file (no </select>, no </table>)
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|               "a"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select></tfoot>a
+#errors
+unmatched </tfoot>
+unexpected end of file (no </select>, no </table>)
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|               "a"
+
+#data
+<!DOCTYPE HTML><table><tfoot><tr><td><select></thead>a
+#errors
+unmatched </thead>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tfoot>
+|         <tr>
+|           <td>
+|             <select>
+|               "a"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select></tr>a
+#errors
+no </select>
+char in <tbody>
+no </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+
+#data
+<!DOCTYPE HTML><table><tr><td><select></td>a
+#errors
+no </select>
+char in <tr>
+no </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+
+#data
+<!DOCTYPE HTML><table><tr><td><select></th>a
+#errors
+unmatched </th>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|               "a"
+
+#data
+<!DOCTYPE HTML><p><plaintext>
+#errors
+unexpected end of file (no </plaintext>)
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|     <plaintext>
+
+#data
+<!DOCTYPE HTML><p><h1>
+#errors
+unexpected end of file (no </h1>)
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|     <h1>
+
+#data
+<!DOCTYPE HTML><p><table></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|     <table>
+
+#data
+<!DOCTYPE HTML><textarea></textarea>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <textarea>
+
+#data
+<!DOCTYPE HTML><textarea>
+#errors
+no </textarea>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <textarea>
+
+#data
+<!DOCTYPE HTML><span></html>
+#errors
+no </span>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <span>
+
+#data
+<!DOCTYPE HTML><unknown><p></unknown>
+#errors
+unmatched </unknown>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <unknown>
+|       <p>
+
+#data
+<!DOCTYPE HTML><unknown><p></unknown>xx
+#errors
+unmatched </unknown>
+unexpected end of file (no </unknown>)
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <unknown>
+|       <p>
+|         "xx"
+
+#data
+<!DOCTYPE HTML><p></unknown>xx
+#errors
+unmatched </unknown>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "xx"

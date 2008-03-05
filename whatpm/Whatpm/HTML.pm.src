@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.82 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.83 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -2739,6 +2739,8 @@ sub _reset_insertion_mode ($) {
       ## Step 4..13
       my $new_mode = {
                       select => IN_SELECT_IM,
+                      ## NOTE: |option| and |optgroup| do not set
+                      ## insertion mode to "in select" by themselves.
                       td => IN_CELL_IM,
                       th => IN_CELL_IM,
                       tr => IN_ROW_IM,
@@ -3858,6 +3860,7 @@ sub _tree_construction_main ($) {
                 } # INSCOPE
                   unless (defined $i) {
                     !!!cp ('t157');
+## TODO: this type is wrong.
                     !!!parse-error (type => 'unmatched end tag:caption');
                     ## Ignore the token
                     !!!next-token;
@@ -3867,8 +3870,10 @@ sub _tree_construction_main ($) {
                 ## generate implied end tags
                 if ({
                      dd => 1, dt => 1, li => 1, p => 1,
+
+                     ## NOTE: Maybe the following elements never appear here.
                      td => 1, th => 1, tr => 1,
-                     tbody => 1, tfoot=> 1, thead => 1,
+                     tbody => 1, tfoot => 1, thead => 1,
                     }->{$self->{open_elements}->[-1]->[1]}) {
                   !!!cp ('t158');
                   !!!back-token; # <?>
@@ -3933,8 +3938,10 @@ sub _tree_construction_main ($) {
                      dd => 1, dt => 1, li => 1, p => 1,
                      td => ($token->{tag_name} eq 'th'),
                      th => ($token->{tag_name} eq 'td'),
+
+                     ## NOTE: Maybe the following elements never appear here.
                      tr => 1,
-                     tbody => 1, tfoot=> 1, thead => 1,
+                     tbody => 1, tfoot => 1, thead => 1,
                     }->{$self->{open_elements}->[-1]->[1]}) {
                   !!!cp ('t166');
                   !!!back-token;
@@ -3996,8 +4003,10 @@ sub _tree_construction_main ($) {
                 ## generate implied end tags
                 if ({
                      dd => 1, dt => 1, li => 1, p => 1,
+
+                     ## NOTE: The following elements never appear here, maybe.
                      td => 1, th => 1, tr => 1,
-                     tbody => 1, tfoot=> 1, thead => 1,
+                     tbody => 1, tfoot => 1, thead => 1,
                     }->{$self->{open_elements}->[-1]->[1]}) {
                   !!!cp ('t174');
                   !!!back-token;
@@ -4102,8 +4111,10 @@ sub _tree_construction_main ($) {
               ## generate implied end tags
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
+
+                   ## NOTE: The following elements never appear, maybe.
                    td => 1, th => 1, tr => 1,
-                   tbody => 1, tfoot=> 1, thead => 1,
+                   tbody => 1, tfoot => 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 !!!cp ('t187');
                 !!!back-token; # </table>
@@ -4258,6 +4269,7 @@ sub _tree_construction_main ($) {
                   tbody => 1, tfoot => 1, thead => 1, html => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   !!!cp ('t203');
+                  ## ISSUE: Can this case be reached?
                   !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
@@ -4309,7 +4321,10 @@ sub _tree_construction_main ($) {
                     $i = $_;
                     last INSCOPE;
                   } elsif ({
-                            table => 1, html => 1,
+                            html => 1,
+
+                            ## NOTE: This element does not appear here, maybe.
+                            table => 1,
                            }->{$node->[1]}) {
                     !!!cp ('t209');
                     last INSCOPE;
@@ -4317,6 +4332,7 @@ sub _tree_construction_main ($) {
                 } # INSCOPE
                 unless (defined $i) { 
                  !!!cp ('t210');
+## TODO: This type is wrong.
                  !!!parse-error (type => 'unmacthed end tag:'.$token->{tag_name});
                   ## Ignore the token
                   !!!next-token;
@@ -4328,6 +4344,7 @@ sub _tree_construction_main ($) {
                   tr => 1, html => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   !!!cp ('t211');
+                  ## ISSUE: Can this case be reached?
                   !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
@@ -4376,6 +4393,7 @@ sub _tree_construction_main ($) {
                   tbody => 1, tfoot => 1, thead => 1, html => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   !!!cp ('t217');
+                  ## ISSUE: Can this state be reached?
                   !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
@@ -4399,6 +4417,7 @@ sub _tree_construction_main ($) {
                 while ($self->{open_elements}->[-1]->[1] ne 'table' and
                        $self->{open_elements}->[-1]->[1] ne 'html') {
                   !!!cp ('t219');
+                  ## ISSUE: Can this state be reached?
                   !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
@@ -4416,6 +4435,7 @@ sub _tree_construction_main ($) {
                 while ($self->{open_elements}->[-1]->[1] ne 'table' and
                        $self->{open_elements}->[-1]->[1] ne 'html') {
                   !!!cp ('t220');
+                  ## ISSUE: Can this state be reached?
                   !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
@@ -4449,7 +4469,8 @@ sub _tree_construction_main ($) {
                   $i = $_;
                   last INSCOPE;
                 } elsif ({
-                          table => 1, html => 1,
+                          #table => 1,
+                          html => 1,
                          }->{$node->[1]}) {
                   !!!cp ('t222');
                   last INSCOPE;
@@ -4457,6 +4478,7 @@ sub _tree_construction_main ($) {
               } # INSCOPE
               unless (defined $i) {
                 !!!cp ('t223');
+## TODO: The following is wrong, maybe.
                 !!!parse-error (type => 'unmatched end tag:table');
                 ## Ignore tokens </table><table>
                 !!!next-token;
@@ -4480,6 +4502,7 @@ sub _tree_construction_main ($) {
 
               if ($self->{open_elements}->[-1]->[1] ne 'table') {
                 !!!cp ('t225');
+## ISSUE: Can this case be reached?
                 !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               } else {
                 !!!cp ('t226');
@@ -4531,6 +4554,7 @@ sub _tree_construction_main ($) {
                 tr => 1, html => 1,
               }->{$self->{open_elements}->[-1]->[1]}) {
                 !!!cp ('t231');
+## ISSUE: Can this state be reached?
                 !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                 pop @{$self->{open_elements}};
               }
@@ -4559,6 +4583,7 @@ sub _tree_construction_main ($) {
                 } # INSCOPE
                 unless (defined $i) {
                   !!!cp ('t235');
+## TODO: The following is wrong.
                   !!!parse-error (type => 'unmatched end tag:'.$token->{type});
                   ## Ignore the token
                   !!!next-token;
@@ -4570,6 +4595,7 @@ sub _tree_construction_main ($) {
                   tr => 1, html => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   !!!cp ('t236');
+## ISSUE: Can this state be reached?
                   !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
@@ -4656,6 +4682,7 @@ sub _tree_construction_main ($) {
                    tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 !!!cp ('t244');
+## ISSUE: Can this case be reached?
                 !!!back-token;
                 $token = {type => END_TAG_TOKEN,
                           tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
@@ -4732,6 +4759,7 @@ sub _tree_construction_main ($) {
                   tr => 1, html => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   !!!cp ('t253');
+## ISSUE: Can this case be reached?
                   !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
@@ -4769,6 +4797,7 @@ sub _tree_construction_main ($) {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
               }->{$self->{open_elements}->[-1]->[1]}) {
                 !!!cp ('t257');
+## ISSUE: Can this case be reached?
                 !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                 pop @{$self->{open_elements}};
               }
@@ -4848,8 +4877,7 @@ sub _tree_construction_main ($) {
               # 
             }
           } else {
-            !!!cp ('t268');
-            #
+            die "$0: $token->{type}: Unknown token type";
           }
 
           ## As if </colgroup>
@@ -4906,6 +4934,7 @@ sub _tree_construction_main ($) {
               !!!next-token;
               redo B;
             } elsif ($token->{tag_name} eq 'select') {
+## TODO: The type below is not good - <select> is replaced by </select>
               !!!parse-error (type => 'not closed:select');
               ## As if </select> instead
               ## have an element in table scope
@@ -5008,6 +5037,7 @@ sub _tree_construction_main ($) {
                       caption => 1, table => 1, tbody => 1,
                       tfoot => 1, thead => 1, tr => 1, td => 1, th => 1,
                      }->{$token->{tag_name}}) {
+## TODO: The following is wrong?
               !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
               
               ## have an element in table scope
@@ -5044,12 +5074,14 @@ sub _tree_construction_main ($) {
                 } elsif ({
                           table => 1, html => 1,
                          }->{$node->[1]}) {
+## ISSUE: Can this state be reached?
                   !!!cp ('t296');
                   last INSCOPE;
                 }
               } # INSCOPE
               unless (defined $i) {
                 !!!cp ('t297');
+## TODO: The following error type is correct?
                 !!!parse-error (type => 'unmatched end tag:select');
                 ## Ignore the </select> token
                 !!!next-token; ## TODO: ok?
@@ -6102,8 +6134,10 @@ sub _tree_construction_main ($) {
             ## generate implied end tags
             if ({
                  dd => 1, dt => 1, li => 1, p => 1,
+
+                 ## NOTE: The following elements never appear here, maybe.
                  td => 1, th => 1, tr => 1,
-                 tbody => 1, tfoot=> 1, thead => 1,
+                 tbody => 1, tfoot => 1, thead => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
               !!!cp ('t417');
               !!!back-token;
@@ -6238,6 +6272,7 @@ sub _tree_construction_main ($) {
                  tbody => 1, tfoot => 1, thead => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
               !!!cp ('t430');
+              ## ISSUE: Can this case be reached?
               !!!back-token;
               $token = {type => END_TAG_TOKEN,
                         tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
@@ -6466,4 +6501,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/05 02:55:08 $
+# $Date: 2008/03/05 13:07:02 $

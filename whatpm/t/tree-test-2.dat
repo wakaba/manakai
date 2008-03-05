@@ -135,6 +135,317 @@ outer <table> not closed
 |   "a"
 
 #data
+</table>
+#errors
+</table> in <caption>
+</caption> implied by </table> is ignored
+#document-fragment caption
+
+#data
+<tbody>
+#errors
+<tbody> in <caption>
+</caption> implied by <tbody> is ignored
+#document-fragment caption
+
+#data
+<tbody>a
+#errors
+<tbody> in <caption>
+</caption> implied by <tbody> is ignored
+#document-fragment caption
+| "a"
+
+#data
+<caption>x
+#errors
+<caption> in <caption>
+</caption> implied by <caption> is ignored
+#document-fragment caption
+| "x"
+
+#data
+<tr>
+#errors
+<tr> in <caption>
+</caption> implied by <tr> is ignored
+#document-fragment caption
+
+#data
+<tr>x
+#errors
+<tr> in <caption>
+</caption> implied by <tr> is ignored
+#document-fragment caption
+| "x"
+
+#data
+<td>
+#errors
+<td> in <caption>
+</caption> implied by <td> is ignored
+#document-fragment caption
+
+#data
+<td>x
+#errors
+<td> in <caption>
+</caption> implied by <td> is ignored
+#document-fragment caption
+| "x"
+
+#data
+<th>
+#errors
+<th> in <caption>
+</caption> implied by <th> is ignored
+#document-fragment caption
+
+#data
+<th>x
+#errors
+<th> in <caption>
+</caption> implied by <th> is ignored
+#document-fragment caption
+| "x"
+
+#data
+<col>
+#errors
+<col> in <caption>
+</caption> implied by <col> is ignored
+#document-fragment caption
+
+#data
+<col>x
+#errors
+<col> in <caption>
+</caption> implied by <col> is ignored
+#document-fragment caption
+| "x"
+
+#data
+<caption><tbody>
+#errors
+<caption> in <tbody>
+<tbody> in <tbody>
+#document-fragment tbody
+
+#data
+<caption>
+#errors
+<caption> in <tr>
+#document-fragment tr
+
+#data
+<caption>x
+#errors
+<caption> in <tr>
+char in <tr>
+#document-fragment tr
+| "x"
+
+#data
+</table>
+#errors
+</table> in <tr>.innerHTML
+#document-fragment tr
+
+#data
+</table><td>
+#errors
+</table> in <tr>.innerHTML
+#document-fragment tr
+| <td>
+
+#data
+</tbody>
+#errors
+</tbody> in <tr>.innerHTML
+#document-fragment tr
+
+#data
+<table>
+#errors
+<table> in <table>
+#document-fragment table
+
+#data
+<table><tr>
+#errors
+<table> in <table>
+#document-fragment table
+| <tbody>
+|   <tr>
+
+#data
+</colgroup>
+#errors
+</colgroup> in <colgroup>.innerHTML
+#document-fragment colgroup
+
+#data
+</colgroup><col>
+#errors
+</colgroup> in <colgroup>.innerHTML
+#document-fragment colgroup
+| <col>
+
+#data
+</select>
+#errors
+</select> in <select>.innerHTML
+#document-fragment select
+
+#data
+</select><option>
+#errors
+</select> in <select>.innerHTML
+#document-fragment select
+| <option>
+
+#data
+<select>
+#errors
+<select> in <select> - treated as if </select>
+</select> in <select>.innerHTML
+#document-fragment select
+
+#data
+<select><option>
+#errors
+<select> in <select> - treated as if </select>
+</select> in <select>.innerHTML
+#document-fragment select
+| <option>
+
+#data
+</optgroup>
+#errors
+unmatched </optgroup>
+#document-fragment optgroup
+
+#data
+</optgroup><option>
+#errors
+unmatched </optgroup>
+<option> in body
+#document-fragment optgroup
+
+#data
+</optgroup>
+#errors
+unmatched </optgroup>
+#document-fragment option
+
+#data
+</optgroup><option>
+#errors
+unmatched </optgroup>
+<option> in body
+#document-fragment option
+
+#data
+</optgroup>a
+#errors
+unmatched </optgroup>
+#document-fragment option
+| "a"
+
+#data
+</optgroup>
+#errors
+unmatched </optgroup>
+#document-fragment select
+
+#data
+</option>
+#errors
+unmatched </option>
+#document-fragment select
+
+#data
+</option>
+#errors
+unmatched </option>
+#document-fragment option
+
+#data
+</table>
+#errors
+</table> in <select>
+#document-fragment select
+
+#data
+</tbody>
+#errors
+</tbody> in <select>
+#document-fragment select
+
+#data
+</thead>
+#errors
+</thead> in <select>
+#document-fragment select
+
+#data
+</tfoot>
+#errors
+</tfoot> in <select>
+#document-fragment select
+
+#data
+</tr>
+#errors
+</tr> in <select>
+#document-fragment select
+
+#data
+<option>
+#errors
+#document-fragment select
+| <option>
+
+#data
+<optgroup>
+#errors
+#document-fragment select
+| <optgroup>
+
+#data
+</tr><option>a
+#errors
+</tr> in <select>
+#document-fragment select
+| <option>
+|   "a"
+
+#data
+</caption>
+#errors
+</caption> in <select>
+#document-fragment select
+
+#data
+</td>
+#errors
+</td> in <select>
+#document-fragment select
+
+#data
+</th>
+#errors
+</th> in <select>
+#document-fragment select
+
+#data
+</th>aaa
+#errors
+unmatched </th>
+#document-fragment option
+| "aaa"
+
+#data
 </frameset>
 #errors
 unmatched </frameset>
@@ -255,3 +566,113 @@ unexpected end of file
 #document-fragment html
 | <head>
 |   <style>
+
+#data
+#errors
+#document-fragment html
+
+#data
+<head>
+#errors
+unexpected end of file (no <body>)
+#document-fragment html
+| <head>
+
+#data
+<link>
+#errors
+unexpected end of file (no <body>)
+#document-fragment html
+| <head>
+|   <link>
+
+#data
+</html>
+#errors
+unmarched </html>
+#document-fragment html
+| <head>
+| <body>
+
+#data
+</html>a
+#errors
+unmatched </html>
+char after </body> implied by </html>
+#document-fragment html
+| <head>
+| <body>
+|   "a"
+
+#data
+<span></html>
+#errors
+<span> not closed at </body> implied by </html>
+unmatched </html>
+unexpected end of file (no </span>)
+#document-fragment html
+| <head>
+| <body>
+|   <span>
+
+#data
+<span></html>a
+#errors
+<span> not closed at </body> implied by </html>
+char after </body> implied by </html>
+unmatched </html>
+unexpected end of file (no </span>)
+#document-fragment html
+| <head>
+| <body>
+|   <span>
+|     "a"
+
+#data
+</html>
+#errors
+unmarched </html>
+#document-fragment p
+
+#data
+</html>a
+#errors
+unmatched </html>
+#document-fragment p
+| "a"
+
+#data
+<span></html>
+#errors
+unmatched </html>
+<span> not closed
+#document-fragment p
+| <span>
+
+#data
+<span></html>a
+#errors
+unmatched </html>
+<span> not closed
+#document-fragment p
+| <span>
+|   "a"
+
+#data escaped
+aa\u0000b
+#errors
+NULL
+#document-fragment p escaped
+| "aa\ufffdb"
+
+#data escaped
+a\U12345678b
+#errors
+#document-fragment p escaped
+| "a\ufffdb"
+
+#data
+<input>
+#errors
+#document-fragment form
+| <input>

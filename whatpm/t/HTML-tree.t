@@ -82,6 +82,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $mode = 'errors';
       $test->{data} =~ s/\x0D?\x0A\z//;       
       $test->{data} =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
+      $test->{data} =~ s/\\U([0-9A-Fa-f]{8})/chr hex $1/ge if $escaped;
       undef $escaped;
     } elsif (/^#document$/) {
       $test->{document} = '';
@@ -107,6 +108,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $escaped = 1;
     } elsif (defined $test->{document} and /^$/) {
       $test->{document} =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
+      $test->{document} =~ s/\\U([0-9A-Fa-f]{8})/chr hex $1/ge if $escaped;
       test ($test);
       undef $test;
     } else {
@@ -185,7 +187,13 @@ sub serialize ($) {
     } elsif ($nt == $child->[0]->COMMENT_NODE) {
       $r .= '| ' . $child->[1] . '<!-- ' . $child->[0]->data . " -->\x0A";
     } elsif ($nt == $child->[0]->DOCUMENT_TYPE_NODE) {
-      $r .= '| ' . $child->[1] . '<!DOCTYPE ' . $child->[0]->name . ">\x0A";
+      $r .= '| ' . $child->[1] . '<!DOCTYPE ' . $child->[0]->name;
+      my $pubid = $child->[0]->public_id;
+      $r .= ' PUBLIC "' . $pubid . '"' if length $pubid;
+      my $sysid = $child->[0]->system_id;
+      $r .= ' SYSTEM' if not length $pubid and length $sysid;
+      $r .= ' "' . $sysid . '"' if length $sysid;
+      $r .= ">\x0A";
     } else {
       $r .= '| ' . $child->[1] . $child->[0]->node_type . "\x0A"; # error
     }
@@ -195,4 +203,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/03/03 11:56:18 $
+## $Date: 2008/03/05 13:07:02 $
