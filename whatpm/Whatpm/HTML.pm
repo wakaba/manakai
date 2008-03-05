@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.81 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.82 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6554,7 +6554,7 @@ sub _tree_construction_main ($) {
     
                 ## As if </noscript>
                 pop @{$self->{open_elements}};
-                $self->{parse_error}-> (type => 'in noscript:script');
+                $self->{parse_error}-> (type => 'in noscript:/head');
                 
                 ## Reprocess in the "in head" insertion mode...
                 pop @{$self->{open_elements}};
@@ -6735,6 +6735,7 @@ sub _tree_construction_main ($) {
 
               ## Reprocess in the "after head" insertion mode...
             } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
+## ISSUE: This case cannot be reached?
               
       $Whatpm::HTML::Debug::cp_pass->('t148') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -6828,6 +6829,7 @@ sub _tree_construction_main ($) {
         $Whatpm::HTML::Debug::cp->{'t153'} = 1;
       }
     
+## TODO: This error type is wrong.
                     $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                     ## Ignore the token
                     $token = $self->_get_next_token;
@@ -7731,7 +7733,7 @@ sub _tree_construction_main ($) {
         $Whatpm::HTML::Debug::cp->{'t216'} = 1;
       }
     
-                  $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                  $self->{parse_error}-> (type => 'Yunmatched end tag:'.$token->{tag_name});
                   ## Ignore the token
                   $token = $self->_get_next_token;
                   redo B;
@@ -11346,4 +11348,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/04 14:51:54 $
+# $Date: 2008/03/05 02:55:07 $

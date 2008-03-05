@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.81 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.82 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3666,7 +3666,7 @@ sub _tree_construction_main ($) {
                 !!!cp ('t133');
                 ## As if </noscript>
                 pop @{$self->{open_elements}};
-                !!!parse-error (type => 'in noscript:script');
+                !!!parse-error (type => 'in noscript:/head');
                 
                 ## Reprocess in the "in head" insertion mode...
                 pop @{$self->{open_elements}};
@@ -3771,6 +3771,7 @@ sub _tree_construction_main ($) {
 
               ## Reprocess in the "after head" insertion mode...
             } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
+## ISSUE: This case cannot be reached?
               !!!cp ('t148');
               !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token ## ISSUE: An issue in the spec.
@@ -3824,6 +3825,7 @@ sub _tree_construction_main ($) {
                 } # INSCOPE
                   unless (defined $tn) {
                     !!!cp ('t153');
+## TODO: This error type is wrong.
                     !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
                     ## Ignore the token
                     !!!next-token;
@@ -4362,6 +4364,7 @@ sub _tree_construction_main ($) {
                 } # INSCOPE
                 unless (defined $i) {
                   !!!cp ('t216');
+## TODO: This erorr type ios wrong.
                   !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
                   ## Ignore the token
                   !!!next-token;
@@ -6463,4 +6466,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/04 14:51:54 $
+# $Date: 2008/03/05 02:55:08 $

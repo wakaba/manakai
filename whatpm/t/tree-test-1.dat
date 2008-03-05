@@ -568,6 +568,259 @@ no </noscript>
 |   <body>
 |     <script>
 
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript><body>
+#errors
+<body> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript><frameset></frameset>
+#errors
+<frameset> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <frameset>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript><br>
+#errors
+<br> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     <br>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript><p>
+#errors
+<p> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     <p>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript></p>
+#errors
+</p> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     <p>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript></br>
+#errors
+</br> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     <br>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript></div>
+#errors
+<br> in <noscript> in <head>
+no <div>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript></img>
+#errors
+<br> in <noscript> in <head>
+</img>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript></head><link><body>
+#errors
+</head> in <noscript> in <head>
+<link> after <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <link>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></head></head><link><body>
+#errors
+</head> after </head>
+<link> after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <link>
+|   <body>
+
+#data
+<!DOCTYPE HTML></noscript><head><body>
+#errors
+</noscript> before <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></noscript><link><body>
+#errors
+</noscript> in <head>
+<link> after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <link>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></head></noscript><link><body>
+#errors
+</noscript> after </head>
+<link> after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <link>
+|   <body>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript></body><meta></noscript><link><body>
+#errors
+</body> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|       <meta>
+|     <link>
+|   <body>
+
+## When scripting is disabled
+#data
+<!DOCTYPE HTML><head><noscript></html><meta></noscript><link><body>
+#errors
+</html> in <noscript> in <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|       <meta>
+|     <link>
+|   <body>
+
+#data
+<!DOCTYPE HTML></p>
+#errors
+</p> before <head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+
+#data
+<!DOCTYPE HTML></br>
+#errors
+</br> before <head>
+</br>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <br>
+
+#data
+<!DOCTYPE HTML><head></head></img>
+#errors
+</img> after </head>
+</img>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></head></div>
+#errors
+</div> after </head>
+</div>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></head></body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></head></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
 #data
 <!DOCTYPE HTML><head><title></title></head><base><body>
 #errors
