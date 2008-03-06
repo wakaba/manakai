@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.84 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.85 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -304,7 +304,7 @@ sub ROW_IMS ()        { 0b10000000 }
 sub BODY_AFTER_IMS () { 0b100000000 }
 sub FRAME_IMS ()      { 0b1000000000 }
 
-## NOTE: "initial" and "root element" insertion modes have no constants.
+## NOTE: "initial" and "before html" insertion modes have no constants.
 
 ## NOTE: "after after body" insertion mode.
 sub AFTER_HTML_BODY_IM () { AFTER_HTML_IMS | BODY_AFTER_IMS }
@@ -4526,7 +4526,7 @@ sub _construct_tree ($) {
   ## NOTE: The "initial" insertion mode.
   $self->_tree_construction_initial; # MUST
 
-  ## NOTE: The "root element" insertion mode.
+  ## NOTE: The "before html" insertion mode.
   $self->_tree_construction_root_element;
   $self->{insertion_mode} = BEFORE_HEAD_IM;
 
@@ -4750,7 +4750,7 @@ sub _tree_construction_initial ($) {
     
       }
       
-      ## Go to the "root element" insertion mode.
+      ## Go to the "before html" insertion mode.
       $token = $self->_get_next_token;
       return;
     } elsif ({
@@ -4766,7 +4766,7 @@ sub _tree_construction_initial ($) {
     
       $self->{parse_error}-> (type => 'no DOCTYPE');
       $self->{document}->manakai_compat_mode ('quirks');
-      ## Go to the "root element" insertion mode.
+      ## Go to the "before html" insertion mode.
       ## reprocess
       return;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
@@ -4802,7 +4802,7 @@ sub _tree_construction_initial ($) {
 
       $self->{parse_error}-> (type => 'no DOCTYPE');
       $self->{document}->manakai_compat_mode ('quirks');
-      ## Go to the "root element" insertion mode.
+      ## Go to the "before html" insertion mode.
       ## reprocess
       return;
     } elsif ($token->{type} == COMMENT_TOKEN) {
@@ -4829,7 +4829,7 @@ sub _tree_construction_initial ($) {
 sub _tree_construction_root_element ($) {
   my $self = shift;
 
-  ## NOTE: "root element" insertion mode.
+  ## NOTE: "before html" insertion mode.
   
   B: {
       if ($token->{type} == DOCTYPE_TOKEN) {
@@ -9010,7 +9010,7 @@ sub _tree_construction_main ($) {
     
           $self->{parse_error}-> (type => 'after html:#character');
 
-          ## Reprocess in the "main" phase, "after body" insertion mode...
+          ## Reprocess in the "after body" insertion mode.
         } else {
           
       $Whatpm::HTML::Debug::cp_pass->('t302') if $Whatpm::HTML::Debug::cp_pass;
@@ -9036,7 +9036,7 @@ sub _tree_construction_main ($) {
     
           $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
           
-          ## Reprocess in the "main" phase, "after body" insertion mode...
+          ## Reprocess in the "after body" insertion mode.
         } else {
           
       $Whatpm::HTML::Debug::cp_pass->('t304') if $Whatpm::HTML::Debug::cp_pass;
@@ -9063,7 +9063,7 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'after html:/'.$token->{tag_name});
           
           $self->{insertion_mode} = AFTER_BODY_IM;
-          ## Reprocess in the "main" phase, "after body" insertion mode...
+          ## Reprocess in the "after body" insertion mode.
         } else {
           
       $Whatpm::HTML::Debug::cp_pass->('t306') if $Whatpm::HTML::Debug::cp_pass;
@@ -9157,7 +9157,7 @@ sub _tree_construction_main ($) {
             $self->{parse_error}-> (type => 'after html:#character');
 
             $self->{insertion_mode} = AFTER_FRAMESET_IM;
-            ## Reprocess in the "main" phase, "after frameset"...
+            ## Reprocess in the "after frameset" insertion mode.
             $self->{parse_error}-> (type => 'after frameset:#character');
           }
           
@@ -9194,7 +9194,7 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
 
           $self->{insertion_mode} = AFTER_FRAMESET_IM;
-          ## Process in the "main" phase, "after frameset" insertion mode...
+          ## Process in the "after frameset" insertion mode.
         } else {
           
       $Whatpm::HTML::Debug::cp_pass->('t317') if $Whatpm::HTML::Debug::cp_pass;
@@ -9300,7 +9300,7 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'after html:/'.$token->{tag_name});
 
           $self->{insertion_mode} = AFTER_FRAMESET_IM;
-          ## Process in the "main" phase, "after frameset" insertion mode...
+          ## Process in the "after frameset" insertion mode.
         } else {
           
       $Whatpm::HTML::Debug::cp_pass->('t324') if $Whatpm::HTML::Debug::cp_pass;
@@ -9591,8 +9591,9 @@ sub _tree_construction_main ($) {
         redo B;
       } elsif ({
                 address => 1, blockquote => 1, center => 1, dir => 1, 
-                div => 1, dl => 1, fieldset => 1, listing => 1,
-                menu => 1, ol => 1, p => 1, ul => 1,
+                div => 1, dl => 1, fieldset => 1,
+                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
+                listing => 1, menu => 1, ol => 1, p => 1, ul => 1,
                 pre => 1,
                }->{$token->{tag_name}}) {
         ## has a p element in scope
@@ -9991,78 +9992,6 @@ sub _tree_construction_main ($) {
   
           
         $self->{content_model} = PLAINTEXT_CONTENT_MODEL;
-          
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ({
-                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
-               }->{$token->{tag_name}}) {
-        ## has a p element in scope
-        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-          my $node = $self->{open_elements}->[$_];
-          if ($node->[1] eq 'p') {
-            
-      $Whatpm::HTML::Debug::cp_pass->('t369') if $Whatpm::HTML::Debug::cp_pass;
-      BEGIN {
-        $Whatpm::HTML::Debug::cp->{'t369'} = 1;
-      }
-    
-            unshift @{$self->{token}}, $token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-            redo B;
-          } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$node->[1]}) {
-            
-      $Whatpm::HTML::Debug::cp_pass->('t370') if $Whatpm::HTML::Debug::cp_pass;
-      BEGIN {
-        $Whatpm::HTML::Debug::cp->{'t370'} = 1;
-      }
-    
-            last INSCOPE;
-          }
-        } # INSCOPE
-          
-        ## NOTE: See <http://html5.org/tools/web-apps-tracker?from=925&to=926>
-        ## has an element in scope
-        #my $i;
-        #INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-        #  my $node = $self->{open_elements}->[$_];
-        #  if ({
-        #       h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
-        #      }->{$node->[1]}) {
-        #    $i = $_;
-        #    last INSCOPE;
-        #  } elsif ({
-        #            table => 1, caption => 1, td => 1, th => 1,
-        #            button => 1, marquee => 1, object => 1, html => 1,
-        #           }->{$node->[1]}) {
-        #    last INSCOPE;
-        #  }
-        #} # INSCOPE
-        #  
-        #if (defined $i) {
-        #  !!! parse-error (type => 'in hn:hn');
-        #  splice @{$self->{open_elements}}, $i;
-        #}
-          
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
           
         $token = $self->_get_next_token;
         redo B;
@@ -11201,11 +11130,6 @@ sub _tree_construction_main ($) {
     redo B;
   } # B
 
-  ## NOTE: The "trailing end" phase in HTML5 is split into
-  ## two insertion modes: "after html body" and "after html frameset".
-  ## NOTE: States in the main stage is preserved while
-  ## the parser stays in the trailing end phase. # MUST
-
   ## Stop parsing # MUST
   
   ## TODO: script stuffs
@@ -11404,4 +11328,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/06 15:23:14 $
+# $Date: 2008/03/06 15:29:39 $

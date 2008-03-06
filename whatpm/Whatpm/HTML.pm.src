@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.84 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.85 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5454,8 +5454,9 @@ sub _tree_construction_main ($) {
         redo B;
       } elsif ({
                 address => 1, blockquote => 1, center => 1, dir => 1, 
-                div => 1, dl => 1, fieldset => 1, listing => 1,
-                menu => 1, ol => 1, p => 1, ul => 1,
+                div => 1, dl => 1, fieldset => 1,
+                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
+                listing => 1, menu => 1, ol => 1, p => 1, ul => 1,
                 pre => 1,
                }->{$token->{tag_name}}) {
         ## has a p element in scope
@@ -5657,53 +5658,6 @@ sub _tree_construction_main ($) {
           
         !!!next-token;
         redo B;
-      } elsif ({
-                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
-               }->{$token->{tag_name}}) {
-        ## has a p element in scope
-        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-          my $node = $self->{open_elements}->[$_];
-          if ($node->[1] eq 'p') {
-            !!!cp ('t369');
-            !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-            redo B;
-          } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$node->[1]}) {
-            !!!cp ('t370');
-            last INSCOPE;
-          }
-        } # INSCOPE
-          
-        ## NOTE: See <http://html5.org/tools/web-apps-tracker?from=925&to=926>
-        ## has an element in scope
-        #my $i;
-        #INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-        #  my $node = $self->{open_elements}->[$_];
-        #  if ({
-        #       h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
-        #      }->{$node->[1]}) {
-        #    $i = $_;
-        #    last INSCOPE;
-        #  } elsif ({
-        #            table => 1, caption => 1, td => 1, th => 1,
-        #            button => 1, marquee => 1, object => 1, html => 1,
-        #           }->{$node->[1]}) {
-        #    last INSCOPE;
-        #  }
-        #} # INSCOPE
-        #  
-        #if (defined $i) {
-        #  !!! parse-error (type => 'in hn:hn');
-        #  splice @{$self->{open_elements}}, $i;
-        #}
-          
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-          
-        !!!next-token;
-        redo B;
       } elsif ($token->{tag_name} eq 'a') {
         AFE: for my $i (reverse 0..$#$active_formatting_elements) {
           my $node = $active_formatting_elements->[$i];
@@ -5804,6 +5758,9 @@ sub _tree_construction_main ($) {
         $reconstruct_active_formatting_elements->($insert_to_current);
           
         !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+
+        ## TODO: associate with $self->{form_element} if defined
+
         push @$active_formatting_elements, ['#marker', ''];
 
         !!!next-token;
@@ -6003,6 +5960,8 @@ sub _tree_construction_main ($) {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
         !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+
+        ## TODO: associate with $self->{form_element} if defined
         
         $self->{insertion_mode} = IN_SELECT_IM;
         !!!next-token;
@@ -6513,4 +6472,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/06 15:23:17 $
+# $Date: 2008/03/06 15:29:39 $
