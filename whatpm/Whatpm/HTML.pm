@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.83 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.84 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -304,8 +304,14 @@ sub ROW_IMS ()        { 0b10000000 }
 sub BODY_AFTER_IMS () { 0b100000000 }
 sub FRAME_IMS ()      { 0b1000000000 }
 
+## NOTE: "initial" and "root element" insertion modes have no constants.
+
+## NOTE: "after after body" insertion mode.
 sub AFTER_HTML_BODY_IM () { AFTER_HTML_IMS | BODY_AFTER_IMS }
+
+## NOTE: "after after frameset" insertion mode.
 sub AFTER_HTML_FRAMESET_IM () { AFTER_HTML_IMS | FRAME_IMS }
+
 sub IN_HEAD_IM () { HEAD_IMS | 0b00 }
 sub IN_HEAD_NOSCRIPT_IM () { HEAD_IMS | 0b01 }
 sub AFTER_HEAD_IM () { HEAD_IMS | 0b10 }
@@ -4512,19 +4518,27 @@ sub _construct_tree ($) {
   
   $token = $self->_get_next_token;
 
-  $self->{insertion_mode} = BEFORE_HEAD_IM;
   undef $self->{form_element};
   undef $self->{head_element};
   $self->{open_elements} = [];
   undef $self->{inner_html_node};
 
+  ## NOTE: The "initial" insertion mode.
   $self->_tree_construction_initial; # MUST
+
+  ## NOTE: The "root element" insertion mode.
   $self->_tree_construction_root_element;
+  $self->{insertion_mode} = BEFORE_HEAD_IM;
+
+  ## NOTE: The "before head" insertion mode and so on.
   $self->_tree_construction_main;
 } # _construct_tree
 
 sub _tree_construction_initial ($) {
   my $self = shift;
+
+  ## NOTE: "initial" insertion mode
+
   INITIAL: {
     if ($token->{type} == DOCTYPE_TOKEN) {
       ## NOTE: Conformance checkers MAY, instead of reporting "not HTML5"
@@ -4736,7 +4750,7 @@ sub _tree_construction_initial ($) {
     
       }
       
-      ## Go to the root element phase.
+      ## Go to the "root element" insertion mode.
       $token = $self->_get_next_token;
       return;
     } elsif ({
@@ -4752,7 +4766,7 @@ sub _tree_construction_initial ($) {
     
       $self->{parse_error}-> (type => 'no DOCTYPE');
       $self->{document}->manakai_compat_mode ('quirks');
-      ## Go to the root element phase
+      ## Go to the "root element" insertion mode.
       ## reprocess
       return;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
@@ -4766,7 +4780,7 @@ sub _tree_construction_initial ($) {
         $Whatpm::HTML::Debug::cp->{'t15'} = 1;
       }
     
-          ## Stay in the phase
+          ## Stay in the insertion mode.
           $token = $self->_get_next_token;
           redo INITIAL;
         } else {
@@ -4788,7 +4802,7 @@ sub _tree_construction_initial ($) {
 
       $self->{parse_error}-> (type => 'no DOCTYPE');
       $self->{document}->manakai_compat_mode ('quirks');
-      ## Go to the root element phase
+      ## Go to the "root element" insertion mode.
       ## reprocess
       return;
     } elsif ($token->{type} == COMMENT_TOKEN) {
@@ -4801,7 +4815,7 @@ sub _tree_construction_initial ($) {
       my $comment = $self->{document}->create_comment ($token->{data});
       $self->{document}->append_child ($comment);
       
-      ## Stay in the phase.
+      ## Stay in the insertion mode.
       $token = $self->_get_next_token;
       redo INITIAL;
     } else {
@@ -4814,6 +4828,8 @@ sub _tree_construction_initial ($) {
 
 sub _tree_construction_root_element ($) {
   my $self = shift;
+
+  ## NOTE: "root element" insertion mode.
   
   B: {
       if ($token->{type} == DOCTYPE_TOKEN) {
@@ -4825,7 +4841,7 @@ sub _tree_construction_root_element ($) {
     
         $self->{parse_error}-> (type => 'in html:#DOCTYPE');
         ## Ignore the token
-        ## Stay in the phase
+        ## Stay in the insertion mode.
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} == COMMENT_TOKEN) {
@@ -4837,7 +4853,7 @@ sub _tree_construction_root_element ($) {
     
         my $comment = $self->{document}->create_comment ($token->{data});
         $self->{document}->append_child ($comment);
-        ## Stay in the phase
+        ## Stay in the insertion mode.
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} == CHARACTER_TOKEN) {
@@ -4851,7 +4867,7 @@ sub _tree_construction_root_element ($) {
         $Whatpm::HTML::Debug::cp->{'t21'} = 1;
       }
     
-            ## Stay in the phase
+            ## Stay in the insertion mode.
             $token = $self->_get_next_token;
             redo B;
           } else {
@@ -4875,29 +4891,51 @@ sub _tree_construction_root_element ($) {
 
         #
       } elsif ($token->{type} == START_TAG_TOKEN) {
-        if ($token->{tag_name} eq 'html' and
-            $token->{attributes}->{manifest}) {
+        if ($token->{tag_name} eq 'html') {
+          my $root_element;
           
+      $root_element = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $root_element->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+          $self->{document}->append_child ($root_element);
+          push @{$self->{open_elements}}, [$root_element, 'html'];
+
+          if ($token->{attributes}->{manifest}) {
+            
       $Whatpm::HTML::Debug::cp_pass->('t24') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t24'} = 1;
       }
     
-          $self->{application_cache_selection}
-               ->($token->{attributes}->{manifest}->{value});
-          ## ISSUE: No relative reference resolution?
-        } else {
-          
+            $self->{application_cache_selection}
+                ->($token->{attributes}->{manifest}->{value});
+            ## ISSUE: No relative reference resolution?
+          } else {
+            
       $Whatpm::HTML::Debug::cp_pass->('t25') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t25'} = 1;
       }
     
-          $self->{application_cache_selection}->(undef);
-        }
+            $self->{application_cache_selection}->(undef);
+          }
 
-        ## ISSUE: There is an issue in the spec
-        #
+          $token = $self->_get_next_token;
+          return; ## Go to the "before head" insertion mode.
+        } else {
+          
+      $Whatpm::HTML::Debug::cp_pass->('t25.1') if $Whatpm::HTML::Debug::cp_pass;
+      BEGIN {
+        $Whatpm::HTML::Debug::cp->{'t25.1'} = 1;
+      }
+    
+          #
+        }
       } elsif ({
                 END_TAG_TOKEN, 1,
                 END_OF_FILE_TOKEN, 1,
@@ -4908,23 +4946,24 @@ sub _tree_construction_root_element ($) {
         $Whatpm::HTML::Debug::cp->{'t26'} = 1;
       }
     
-        $self->{application_cache_selection}->(undef);
- 
-        ## ISSUE: There is an issue in the spec
         #
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
 
-      my $root_element; 
+    my $root_element; 
       $root_element = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'html']);
     
-      $self->{document}->append_child ($root_element);
-      push @{$self->{open_elements}}, [$root_element, 'html'];
-      ## reprocess
-      #redo B;
-      return; ## Go to the main phase.
+    $self->{document}->append_child ($root_element);
+    push @{$self->{open_elements}}, [$root_element, 'html'];
+
+    $self->{application_cache_selection}->(undef);
+
+    ## NOTE: Reprocess the token.
+    return; ## Go to the "before head" insertion mode.
+
+    ## ISSUE: There is an issue in the spec
   } # B
 
   die "$0: _tree_construction_root_element: This should never be reached";
@@ -5785,7 +5824,6 @@ sub _tree_construction_main ($) {
         $Whatpm::HTML::Debug::cp->{'t79'} = 1;
       }
     
-        ## Turn into the main phase
         $self->{parse_error}-> (type => 'after html:html');
         $self->{insertion_mode} = AFTER_BODY_IM;
       } elsif ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
@@ -5795,7 +5833,6 @@ sub _tree_construction_main ($) {
         $Whatpm::HTML::Debug::cp->{'t80'} = 1;
       }
     
-        ## Turn into the main phase
         $self->{parse_error}-> (type => 'after html:html');
         $self->{insertion_mode} = AFTER_FRAMESET_IM;
       } else {
@@ -5807,24 +5844,13 @@ sub _tree_construction_main ($) {
     
       }
 
-## ISSUE: "aa<html>" is not a parse error.
-## ISSUE: "<html>" in fragment is not a parse error.
-      unless ($token->{first_start_tag}) {
-        
+      
       $Whatpm::HTML::Debug::cp_pass->('t82') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t82'} = 1;
       }
     
-        $self->{parse_error}-> (type => 'not first start tag');
-      } else {
-        
-      $Whatpm::HTML::Debug::cp_pass->('t83') if $Whatpm::HTML::Debug::cp_pass;
-      BEGIN {
-        $Whatpm::HTML::Debug::cp->{'t83'} = 1;
-      }
-    
-      }
+      $self->{parse_error}-> (type => 'not first start tag');
       my $top_el = $self->{open_elements}->[0]->[0];
       for my $attr_name (keys %{$token->{attributes}}) {
         unless ($top_el->has_attribute_ns (undef, $attr_name)) {
@@ -11221,7 +11247,7 @@ sub set_inner_html ($$$) {
     my $p = $class->new;
     $p->{document} = $doc;
 
-    ## Step 9 # MUST
+    ## Step 8 # MUST
     my $i = 0;
     my $line = 1;
     my $column = 0;
@@ -11308,22 +11334,22 @@ sub set_inner_html ($$$) {
 
     $p->{inner_html_node} = [$node, $node_ln];
 
-    ## Step 4
+    ## Step 3
     my $root = $doc->create_element_ns
       ('http://www.w3.org/1999/xhtml', [undef, 'html']);
 
-    ## Step 5 # MUST
+    ## Step 4 # MUST
     $doc->append_child ($root);
 
-    ## Step 6 # MUST
+    ## Step 5 # MUST
     push @{$p->{open_elements}}, [$root, 'html'];
 
     undef $p->{head_element};
 
-    ## Step 7 # MUST
+    ## Step 6 # MUST
     $p->_reset_insertion_mode;
 
-    ## Step 8 # MUST
+    ## Step 7 # MUST
     my $anode = $node;
     AN: while (defined $anode) {
       if ($anode->node_type == 1) {
@@ -11344,22 +11370,21 @@ sub set_inner_html ($$$) {
       $anode = $anode->parent_node;
     } # AN
     
-    ## Step 3 # MUST
-    ## Step 10 # MUST
+    ## Step 9 # MUST
     {
       my $self = $p;
       $token = $self->_get_next_token;
     }
     $p->_tree_construction_main;
 
-    ## Step 11 # MUST
+    ## Step 10 # MUST
     my @cn = @{$node->child_nodes};
     for (@cn) {
       $node->remove_child ($_);
     }
     ## ISSUE: mutation events? read-only?
 
-    ## Step 12 # MUST
+    ## Step 11 # MUST
     @cn = @{$root->child_nodes};
     for (@cn) {
       $this_doc->adopt_node ($_);
@@ -11379,4 +11404,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/05 13:07:01 $
+# $Date: 2008/03/06 15:23:14 $

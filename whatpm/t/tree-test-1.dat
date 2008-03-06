@@ -212,6 +212,42 @@ duplicate DOCTYPE
 |   <body>
 
 #data
+a<html>
+#errors
+no doctype
+<html> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     "a"
+
+#data
+a<html a>
+#errors
+no doctype
+<html> in body
+#document
+| <html>
+|   a=""
+|   <head>
+|   <body>
+|     "a"
+
+#data
+<p>x<html a>y
+#errors
+no doctype
+<html> in body
+#document
+| <html>
+|   a=""
+|   <head>
+|   <body>
+|     <p>
+|       "xy"
+
+#data
 <!DOCTYPE HTML><html title="t"><head><title></title></head><body></body></html>
 #errors
 #document
@@ -2218,6 +2254,7 @@ unexpected end of file
 #errors
 no <!DOCTYPE>
 <html> after </html>
+<html> in body
 #document
 | <html>
 |   a=""
@@ -3888,6 +3925,7 @@ unmatched </h1>
 #data
 <!DOCTYPE HTML>foo<html x>
 #errors
+<html> in body
 #document
 | <!DOCTYPE HTML>
 | <html>
