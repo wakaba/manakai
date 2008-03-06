@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.85 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.86 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5766,19 +5766,16 @@ sub _tree_construction_main ($) {
         #
       } else {
         ## Generate implied end tags
-        if ({
-             dd => 1, dt => 1, li => 1, p => 1, td => 1, th => 1, tr => 1,
-             tbody => 1, tfoot=> 1, thead => 1,
-            }->{$self->{open_elements}->[-1]->[1]}) {
+        while ({
+                dd => 1, dt => 1, li => 1, p => 1,
+               }->{$self->{open_elements}->[-1]->[1]}) {
           
       $Whatpm::HTML::Debug::cp_pass->('t75') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t75'} = 1;
       }
     
-          unshift @{$self->{token}}, $token;
-          $token = {type => END_TAG_TOKEN, tag_name => $self->{open_elements}->[-1]->[1]};
-          redo B;
+          pop @{$self->{open_elements}};
         }
         
         if (@{$self->{open_elements}} > 2 or
@@ -6918,25 +6915,16 @@ sub _tree_construction_main ($) {
                   }
                 
                 ## generate implied end tags
-                if ({
-                     dd => 1, dt => 1, li => 1, p => 1,
-
-                     ## NOTE: Maybe the following elements never appear here.
-                     td => 1, th => 1, tr => 1,
-                     tbody => 1, tfoot => 1, thead => 1,
-                    }->{$self->{open_elements}->[-1]->[1]}) {
+                while ({
+                        dd => 1, dt => 1, li => 1, p => 1,
+                       }->{$self->{open_elements}->[-1]->[1]}) {
                   
       $Whatpm::HTML::Debug::cp_pass->('t158') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t158'} = 1;
       }
     
-                  unshift @{$self->{token}}, $token; # <?>
-                  $token = {type => END_TAG_TOKEN, tag_name => 'caption'};
-                  unshift @{$self->{token}}, $token;
-                  $token = {type => END_TAG_TOKEN,
-                            tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-                  redo B;
+                  pop @{$self->{open_elements}};
                 }
 
                 if ($self->{open_elements}->[-1]->[1] ne 'caption') {
@@ -7024,27 +7012,18 @@ sub _tree_construction_main ($) {
                   }
                 
                 ## generate implied end tags
-                if ({
-                     dd => 1, dt => 1, li => 1, p => 1,
-                     td => ($token->{tag_name} eq 'th'),
-                     th => ($token->{tag_name} eq 'td'),
-
-                     ## NOTE: Maybe the following elements never appear here.
-                     tr => 1,
-                     tbody => 1, tfoot => 1, thead => 1,
-                    }->{$self->{open_elements}->[-1]->[1]}) {
+                while ({
+                        dd => 1, dt => 1, li => 1, p => 1,
+                       }->{$self->{open_elements}->[-1]->[1]}) {
                   
       $Whatpm::HTML::Debug::cp_pass->('t166') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t166'} = 1;
       }
     
-                  unshift @{$self->{token}}, $token;
-                  $token = {type => END_TAG_TOKEN,
-                            tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-                  redo B;
+                  pop @{$self->{open_elements}};
                 }
-                
+
                 if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
                   
       $Whatpm::HTML::Debug::cp_pass->('t167') if $Whatpm::HTML::Debug::cp_pass;
@@ -7131,23 +7110,16 @@ sub _tree_construction_main ($) {
                   }
                 
                 ## generate implied end tags
-                if ({
-                     dd => 1, dt => 1, li => 1, p => 1,
-
-                     ## NOTE: The following elements never appear here, maybe.
-                     td => 1, th => 1, tr => 1,
-                     tbody => 1, tfoot => 1, thead => 1,
-                    }->{$self->{open_elements}->[-1]->[1]}) {
+                while ({
+                        dd => 1, dt => 1, li => 1, p => 1,
+                       }->{$self->{open_elements}->[-1]->[1]}) {
                   
       $Whatpm::HTML::Debug::cp_pass->('t174') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t174'} = 1;
       }
     
-                  unshift @{$self->{token}}, $token;
-                  $token = {type => END_TAG_TOKEN,
-                            tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-                  redo B;
+                  pop @{$self->{open_elements}};
                 }
                 
                 if ($self->{open_elements}->[-1]->[1] ne 'caption') {
@@ -7304,25 +7276,16 @@ sub _tree_construction_main ($) {
               }
               
               ## generate implied end tags
-              if ({
-                   dd => 1, dt => 1, li => 1, p => 1,
-
-                   ## NOTE: The following elements never appear, maybe.
-                   td => 1, th => 1, tr => 1,
-                   tbody => 1, tfoot => 1, thead => 1,
-                  }->{$self->{open_elements}->[-1]->[1]}) {
+              while ({
+                      dd => 1, dt => 1, li => 1, p => 1,
+                     }->{$self->{open_elements}->[-1]->[1]}) {
                 
       $Whatpm::HTML::Debug::cp_pass->('t187') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t187'} = 1;
       }
     
-                unshift @{$self->{token}}, $token; # </table>
-                $token = {type => END_TAG_TOKEN, tag_name => 'caption'};
-                unshift @{$self->{token}}, $token;
-                $token = {type => END_TAG_TOKEN,
-                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-                redo B;
+                pop @{$self->{open_elements}};
               }
 
               if ($self->{open_elements}->[-1]->[1] ne 'caption') {
@@ -7941,23 +7904,16 @@ sub _tree_construction_main ($) {
               }
               
               ## generate implied end tags
-              if ({
-                   dd => 1, dt => 1, li => 1, p => 1,
-                   td => 1, th => 1, tr => 1,
-                   tbody => 1, tfoot=> 1, thead => 1,
-                  }->{$self->{open_elements}->[-1]->[1]}) {
+              while ({
+                      dd => 1, dt => 1, li => 1, p => 1,
+                     }->{$self->{open_elements}->[-1]->[1]}) {
                 
       $Whatpm::HTML::Debug::cp_pass->('t224') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t224'} = 1;
       }
     
-                unshift @{$self->{token}}, $token; # <table>
-                $token = {type => END_TAG_TOKEN, tag_name => 'table'};
-                unshift @{$self->{token}}, $token;
-                $token = {type => END_TAG_TOKEN,
-                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-                redo B;
+                pop @{$self->{open_elements}};
               }
 
               if ($self->{open_elements}->[-1]->[1] ne 'table') {
@@ -8231,11 +8187,9 @@ sub _tree_construction_main ($) {
               }
 
               ## generate implied end tags
-              if ({
-                   dd => 1, dt => 1, li => 1, p => 1,
-                   td => 1, th => 1, tr => 1,
-                   tbody => 1, tfoot=> 1, thead => 1,
-                  }->{$self->{open_elements}->[-1]->[1]}) {
+              while ({
+                      dd => 1, dt => 1, li => 1, p => 1,
+                     }->{$self->{open_elements}->[-1]->[1]}) {
                 
       $Whatpm::HTML::Debug::cp_pass->('t244') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -8243,10 +8197,7 @@ sub _tree_construction_main ($) {
       }
     
 ## ISSUE: Can this case be reached?
-                unshift @{$self->{token}}, $token;
-                $token = {type => END_TAG_TOKEN,
-                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-                redo B;
+                pop @{$self->{open_elements}};
               }
               
               if ($self->{open_elements}->[-1]->[1] ne 'table') {
@@ -10200,6 +10151,9 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
+
+        ## TODO: associate with $self->{form_element} if defined
+
         push @$active_formatting_elements, ['#marker', ''];
 
         $token = $self->_get_next_token;
@@ -10602,6 +10556,8 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
+
+        ## TODO: associate with $self->{form_element} if defined
         
         $self->{insertion_mode} = IN_SELECT_IM;
         $token = $self->_get_next_token;
@@ -10743,24 +10699,19 @@ sub _tree_construction_main ($) {
           my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq $token->{tag_name}) {
             ## generate implied end tags
-            if ({
-                 dd => ($token->{tag_name} ne 'dd'),
-                 dt => ($token->{tag_name} ne 'dt'),
-                 li => ($token->{tag_name} ne 'li'),
-                 p => ($token->{tag_name} ne 'p'),
-                 td => 1, th => 1, tr => 1,
-                 tbody => 1, tfoot=> 1, thead => 1,
-                }->{$self->{open_elements}->[-1]->[1]}) {
+            while ({
+                    dd => ($token->{tag_name} ne 'dd'),
+                    dt => ($token->{tag_name} ne 'dt'),
+                    li => ($token->{tag_name} ne 'li'),
+                    p => ($token->{tag_name} ne 'p'),
+                   }->{$self->{open_elements}->[-1]->[1]}) {
               
       $Whatpm::HTML::Debug::cp_pass->('t409') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t409'} = 1;
       }
     
-              unshift @{$self->{token}}, $token;
-              $token = {type => END_TAG_TOKEN,
-                        tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-              redo B;
+              pop @{$self->{open_elements}};
             }
             
             
@@ -10847,25 +10798,18 @@ sub _tree_construction_main ($) {
           my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq $token->{tag_name}) {
             ## generate implied end tags
-            if ({
-                 dd => 1, dt => 1, li => 1, p => 1,
-
-                 ## NOTE: The following elements never appear here, maybe.
-                 td => 1, th => 1, tr => 1,
-                 tbody => 1, tfoot => 1, thead => 1,
-                }->{$self->{open_elements}->[-1]->[1]}) {
+            while ({
+                    dd => 1, dt => 1, li => 1, p => 1,
+                   }->{$self->{open_elements}->[-1]->[1]}) {
               
       $Whatpm::HTML::Debug::cp_pass->('t417') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t417'} = 1;
       }
     
-              unshift @{$self->{token}}, $token;
-              $token = {type => END_TAG_TOKEN,
-                        tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-              redo B;
+              pop @{$self->{open_elements}};
             }
-            
+
             
       $Whatpm::HTML::Debug::cp_pass->('t418') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -10919,21 +10863,16 @@ sub _tree_construction_main ($) {
                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
               }->{$node->[1]}) {
             ## generate implied end tags
-            if ({
-                 dd => 1, dt => 1, li => 1, p => 1,
-                 td => 1, th => 1, tr => 1,
-                 tbody => 1, tfoot=> 1, thead => 1,
-                }->{$self->{open_elements}->[-1]->[1]}) {
+            while ({
+                    dd => 1, dt => 1, li => 1, p => 1,
+                   }->{$self->{open_elements}->[-1]->[1]}) {
               
       $Whatpm::HTML::Debug::cp_pass->('t422') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         $Whatpm::HTML::Debug::cp->{'t422'} = 1;
       }
     
-              unshift @{$self->{token}}, $token;
-              $token = {type => END_TAG_TOKEN,
-                        tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-              redo B;
+              pop @{$self->{open_elements}};
             }
 
             
@@ -11049,11 +10988,9 @@ sub _tree_construction_main ($) {
           if ($node->[1] eq $token->{tag_name}) {
             ## Step 1
             ## generate implied end tags
-            if ({
-                 dd => 1, dt => 1, li => 1, p => 1,
-                 td => 1, th => 1, tr => 1,
-                 tbody => 1, tfoot => 1, thead => 1,
-                }->{$self->{open_elements}->[-1]->[1]}) {
+            while ({
+                    dd => 1, dt => 1, li => 1, p => 1,
+                   }->{$self->{open_elements}->[-1]->[1]}) {
               
       $Whatpm::HTML::Debug::cp_pass->('t430') if $Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -11061,10 +10998,7 @@ sub _tree_construction_main ($) {
       }
     
               ## ISSUE: Can this case be reached?
-              unshift @{$self->{token}}, $token;
-              $token = {type => END_TAG_TOKEN,
-                        tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-              redo B;
+              pop @{$self->{open_elements}};
             }
         
             ## Step 2
@@ -11328,4 +11262,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/06 15:29:39 $
+# $Date: 2008/03/06 15:56:52 $
