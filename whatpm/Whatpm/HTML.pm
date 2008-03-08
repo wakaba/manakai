@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.92 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.93 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -7534,14 +7534,6 @@ sub _tree_construction_main ($) {
           if ({
                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
               }->{$node->[1]}) {
-            ## generate implied end tags
-            while ({
-                    dd => 1, dt => 1, li => 1, p => 1,
-                   }->{$self->{open_elements}->[-1]->[1]}) {
-              
-              pop @{$self->{open_elements}};
-            }
-
             
             $i = $_;
             last INSCOPE;
@@ -7553,15 +7545,31 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
-        
-        if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
+
+        unless (defined $i) { # has an element in scope
           
           $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
         } else {
+          ## Step 1. generate implied end tags
+          while ({
+                  dd => 1, dt => 1, li => 1, p => 1,
+                 }->{$self->{open_elements}->[-1]->[1]}) {
+            
+            pop @{$self->{open_elements}};
+          }
           
+          ## Step 2.
+          if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
+            
+            $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+          } else {
+            
+          }
+
+          ## Step 3.
+          splice @{$self->{open_elements}}, $i;
         }
         
-        splice @{$self->{open_elements}}, $i if defined $i;
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'p') {
@@ -7888,4 +7896,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 03:29:30 $
+# $Date: 2008/03/08 03:43:48 $
