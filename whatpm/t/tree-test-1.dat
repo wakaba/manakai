@@ -1479,6 +1479,225 @@ dl not closed
 |       "  "
 
 #data
+<!DOCTYPE HTML><table>  a</table>
+#errors
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+|       "  "
+
+#data
+<!DOCTYPE HTML><table>  a b</table>
+#errors
+char in <table>
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a b"
+|     <table>
+|       "  "
+
+#data
+<!DOCTYPE HTML><table>a b </table>
+#errors
+char in <table>
+x
+x
+4
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a b "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><br> </table>
+#errors
+<br> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <br>
+|     " "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><tbody>a </table>
+#errors
+char in <tbody>
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a "
+|     <table>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML><table><tr>a </table>
+#errors
+char in <tr>
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a "
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table>a<tr> </table>
+#errors
+char in <table>
+char in <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a "
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody><br> </table>
+#errors
+<br> in <tbody>
+char in <tbody>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <br>
+|     " "
+|     <table>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML><table><tr><br> </table>
+#errors
+<br> in <tr>
+char in <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <br>
+|     " "
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table a><table b>  </table></table>
+#errors
+<table> in <table>
+unmatched </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       a=""
+|     <table>
+|       b=""
+|       "  "
+
+#data
+<!DOCTYPE HTML><table a><table b>  </table> </table>
+#errors
+<table> in <table>
+unmatched </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       a=""
+|     <table>
+|       b=""
+|       "  "
+|     " "
+
+#data
+<!DOCTYPE HTML><table><tr><td><table>  </table></td>x</table>
+#errors
+char in <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "x"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <table>
+|               "  "
+
+#data
+<!DOCTYPE HTML><table><tr><td></td>x<table>  </table></table>
+#errors
+char in <tr>
+<table> in <tr>
+unmatched </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "x"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|     <table>
+|       "  "
+
+#data
+<!DOCTYPE HTML><table><tr><td><table>x</table><table> </table></table>
+#errors
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             "x"
+|             <table>
+|             <table>
+|               " "
+
+#data
 <!DOCTYPE HTML><table><tr><td></body>
 #errors
 unmatched </body>
