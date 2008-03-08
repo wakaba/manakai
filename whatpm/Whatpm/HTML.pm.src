@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.90 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.91 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6135,27 +6135,28 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
-        
-        if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
-          if (defined $i) {
+
+        if (defined $i) {
+          if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
             !!!cp ('t412.1');
             !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
           } else {
-            !!!cp ('t413.1');
-            !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
+            !!!cp ('t414.1');
           }
-        }
-        
-        if (defined $i) {
-          !!!cp ('t414.1');
+
           splice @{$self->{open_elements}}, $i;
         } else {
+          !!!cp ('t413.1');
+          !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
+
           !!!cp ('t415.1');
           ## As if <p>, then reprocess the current token
           my $el;
           !!!create-element ($el, 'p');
           $insert->($el);
+          ## NOTE: Not inserted into |$self->{open_elements}|.
         }
+
         !!!next-token;
         redo B;
       } elsif ({
@@ -6435,4 +6436,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 02:54:45 $
+# $Date: 2008/03/08 03:04:09 $

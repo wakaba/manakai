@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.90 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.91 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -7570,21 +7570,20 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
-        
-        if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
-          if (defined $i) {
+
+        if (defined $i) {
+          if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
             
             $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
           } else {
             
-            $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
           }
-        }
-        
-        if (defined $i) {
-          
+
           splice @{$self->{open_elements}}, $i;
         } else {
+          
+          $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+
           
           ## As if <p>, then reprocess the current token
           my $el;
@@ -7593,7 +7592,9 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  'p']);
     
           $insert->($el);
+          ## NOTE: Not inserted into |$self->{open_elements}|.
         }
+
         $token = $self->_get_next_token;
         redo B;
       } elsif ({
@@ -7876,4 +7877,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 02:54:45 $
+# $Date: 2008/03/08 03:04:08 $
