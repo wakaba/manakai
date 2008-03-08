@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.88 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.89 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5997,17 +5997,6 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq $token->{tag_name}) {
-            ## generate implied end tags
-            while ({
-                    dd => ($token->{tag_name} ne 'dd'),
-                    dt => ($token->{tag_name} ne 'dt'),
-                    li => ($token->{tag_name} ne 'li'),
-                    p => 1,
-                   }->{$self->{open_elements}->[-1]->[1]}) {
-              !!!cp ('t409');
-              pop @{$self->{open_elements}};
-            }
-            
             !!!cp ('t410');
             $i = $_;
             last INSCOPE;
@@ -6019,27 +6008,39 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
-        
-        if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
-          if (defined $i) {
+
+        unless (defined $i) { # has an element in scope
+          !!!cp ('t413');
+          !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
+        } else {
+          ## Step 1. generate implied end tags
+          while ({
+                  dd => ($token->{tag_name} ne 'dd'),
+                  dt => ($token->{tag_name} ne 'dt'),
+                  li => ($token->{tag_name} ne 'li'),
+                  p => 1,
+                 }->{$self->{open_elements}->[-1]->[1]}) {
+            !!!cp ('t409');
+            pop @{$self->{open_elements}};
+          }
+
+          ## Step 2.
+          if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
             !!!cp ('t412');
             !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
           } else {
-            !!!cp ('t413');
-            !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
+            !!!cp ('t414');
           }
-        }
-        
-        if (defined $i) {
-          !!!cp ('t414');
+
+          ## Step 3.
           splice @{$self->{open_elements}}, $i;
-        } else {
-          !!!cp ('t416');
+
+          ## Step 4.
+          $clear_up_to_marker->()
+              if {
+                button => 1, marquee => 1, object => 1,
+              }->{$token->{tag_name}};
         }
-        $clear_up_to_marker->()
-          if {
-            button => 1, marquee => 1, object => 1,
-          }->{$token->{tag_name}};
         !!!next-token;
         redo B;
       } elsif ($token->{tag_name} eq 'form') {
@@ -6442,4 +6443,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 02:35:05 $
+# $Date: 2008/03/08 02:48:20 $
