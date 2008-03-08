@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.87 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.88 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6133,7 +6133,7 @@ sub _tree_construction_main ($) {
             
             !!!cp ('t410.1');
             $i = $_;
-            last INSCOPE unless $token->{tag_name} eq 'p';
+            last INSCOPE;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -6442,4 +6442,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 02:29:22 $
+# $Date: 2008/03/08 02:35:05 $
