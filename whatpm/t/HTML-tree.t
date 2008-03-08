@@ -34,7 +34,7 @@ sub Data::Dumper::qquote {
 
 
 if ($DEBUG) {
-  my $not_found = {%$Whatpm::HTML::Debug::cp};
+  my $not_found = {%{$Whatpm::HTML::Debug::cp or {}}};
   $Whatpm::HTML::Debug::cp_pass = sub {
     my $id = shift;
     delete $not_found->{$id};
@@ -203,4 +203,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/03/05 13:07:02 $
+## $Date: 2008/03/08 04:13:10 $

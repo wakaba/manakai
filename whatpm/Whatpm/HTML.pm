@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.93 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.94 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5237,7 +5237,6 @@ sub _tree_construction_main ($) {
                 while ($self->{open_elements}->[-1]->[1] ne 'table' and
                        $self->{open_elements}->[-1]->[1] ne 'html') {
                   
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5268,7 +5267,6 @@ sub _tree_construction_main ($) {
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   
                   ## ISSUE: Can this case be reached?
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5317,7 +5315,6 @@ sub _tree_construction_main ($) {
                 tr => 1, html => 1,
               }->{$self->{open_elements}->[-1]->[1]}) {
                 
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                 pop @{$self->{open_elements}};
               }
               
@@ -5383,7 +5380,6 @@ sub _tree_construction_main ($) {
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   
                   ## ISSUE: Can this case be reached?
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5432,7 +5428,6 @@ sub _tree_construction_main ($) {
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   
                   ## ISSUE: Can this state be reached?
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5456,7 +5451,6 @@ sub _tree_construction_main ($) {
                        $self->{open_elements}->[-1]->[1] ne 'html') {
                   
                   ## ISSUE: Can this state be reached?
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5484,7 +5478,6 @@ sub _tree_construction_main ($) {
                        $self->{open_elements}->[-1]->[1] ne 'html') {
                   
                   ## ISSUE: Can this state be reached?
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5611,7 +5604,6 @@ sub _tree_construction_main ($) {
               }->{$self->{open_elements}->[-1]->[1]}) {
                 
 ## ISSUE: Can this state be reached?
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                 pop @{$self->{open_elements}};
               }
 
@@ -5652,7 +5644,6 @@ sub _tree_construction_main ($) {
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   
 ## ISSUE: Can this state be reached?
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5692,7 +5683,6 @@ sub _tree_construction_main ($) {
                   tbody => 1, tfoot => 1, thead => 1, html => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5707,6 +5697,11 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = IN_TABLE_IM;
                 ## reprocess in the "in table" insertion mode...
               }
+
+              ## NOTE: </table> in the "in table" insertion mode.
+              ## When you edit the code fragment below, please ensure that
+              ## the code for <table> in the "in table" insertion mode
+              ## is synced with it.
 
               ## have a table element in table scope
               my $i;
@@ -5729,22 +5724,6 @@ sub _tree_construction_main ($) {
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
-              }
-
-              ## generate implied end tags
-              while ({
-                      dd => 1, dt => 1, li => 1, p => 1,
-                     }->{$self->{open_elements}->[-1]->[1]}) {
-                
-## ISSUE: Can this case be reached?
-                pop @{$self->{open_elements}};
-              }
-              
-              if ($self->{open_elements}->[-1]->[1] ne 'table') {
-                
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-              } else {
-                
               }
                 
               splice @{$self->{open_elements}}, $i;
@@ -5811,7 +5790,6 @@ sub _tree_construction_main ($) {
                 }->{$self->{open_elements}->[-1]->[1]}) {
                   
 ## ISSUE: Can this case be reached?
-                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                   pop @{$self->{open_elements}};
                 }
                 
@@ -5849,7 +5827,6 @@ sub _tree_construction_main ($) {
               }->{$self->{open_elements}->[-1]->[1]}) {
                 
 ## ISSUE: Can this case be reached?
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
                 pop @{$self->{open_elements}};
               }
 
@@ -7896,4 +7873,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 03:43:48 $
+# $Date: 2008/03/08 04:13:10 $

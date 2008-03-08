@@ -37,7 +37,7 @@ sub Data::Dumper::qquote {
 } # Data::Dumper::qquote
 
 if ($DEBUG) {
-  my $not_found = {%$Whatpm::HTML::Debug::cp};
+  my $not_found = {%{$Whatpm::HTML::Debug::cp or {}}};
 
   $Whatpm::HTML::Debug::cp_pass = sub {
     my $id = shift;
@@ -180,4 +180,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/03/07 00:31:23 $
+## $Date: 2008/03/08 04:13:10 $
