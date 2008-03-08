@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.89 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.90 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6124,14 +6124,6 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq $token->{tag_name}) {
-            ## generate implied end tags
-            while ({
-                    dd => 1, dt => 1, li => 1, p => 0,
-                   }->{$self->{open_elements}->[-1]->[1]}) {
-              !!!cp ('t409.1');
-              pop @{$self->{open_elements}};
-            }
-            
             !!!cp ('t410.1');
             $i = $_;
             last INSCOPE;
@@ -6443,4 +6435,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 02:48:20 $
+# $Date: 2008/03/08 02:54:45 $
