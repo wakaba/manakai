@@ -1698,6 +1698,19 @@ char in <table>
 |               " "
 
 #data
+<!DOCTYPE HTML><table><title>a</title></table>
+#errors
+<title> in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <title>
+|       "a"
+|     <table>
+
+#data
 <!DOCTYPE HTML><table><tr><td></body>
 #errors
 unmatched </body>

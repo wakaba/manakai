@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.95 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.96 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3766,8 +3766,10 @@ sub _tree_construction_main ($) {
     
   }; # $clear_up_to_marker
 
-  my $parse_rcdata = sub ($$) {
-    my ($content_model_flag, $insert) = @_;
+  my $insert;
+
+  my $parse_rcdata = sub ($) {
+    my ($content_model_flag) = @_;
 
     ## Step 1
     my $start_tag_name = $token->{tag_name};
@@ -3783,7 +3785,7 @@ sub _tree_construction_main ($) {
       
 
     ## Step 2
-    $insert->($el); # /context node/->append_child ($el)
+    $insert->($el);
 
     ## Step 3
     $self->{content_model} = $content_model_flag; # CDATA or RCDATA
@@ -3813,20 +3815,22 @@ sub _tree_construction_main ($) {
         $token->{tag_name} eq $start_tag_name) {
       
       ## Ignore the token
-    } elsif ($content_model_flag == CDATA_CONTENT_MODEL) {
-      
-      $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
-    } elsif ($content_model_flag == RCDATA_CONTENT_MODEL) {
-      
-      $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
     } else {
-      die "$0: $content_model_flag in parse_rcdata";
+      ## NOTE: An end-of-file token.
+      if ($content_model_flag == CDATA_CONTENT_MODEL) {
+        
+        $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
+      } elsif ($content_model_flag == RCDATA_CONTENT_MODEL) {
+        
+        $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
+      } else {
+        die "$0: $content_model_flag in parse_rcdata";
+      }
     }
     $token = $self->_get_next_token;
   }; # $parse_rcdata
 
-  my $script_start_tag = sub ($) {
-    my $insert = $_[0];
+  my $script_start_tag = sub () {
     my $script_el;
     
       $script_el = $self->{document}->create_element_ns
@@ -4091,7 +4095,7 @@ sub _tree_construction_main ($) {
   ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag.
   my $open_tables = [[$self->{open_elements}->[0]->[0]]];
 
-  my $insert_to_current = sub {
+  $insert = my $insert_to_current = sub {
     $self->{open_elements}->[-1]->[0]->append_child ($_[0]);
   }; # $insert_to_current
 
@@ -4128,8 +4132,6 @@ sub _tree_construction_main ($) {
       $self->{open_elements}->[-1]->[0]->append_child ($child);
     }
   }; # $insert_to_foster
-
-  my $insert;
 
   B: {
     if ($token->{type} == DOCTYPE_TOKEN) {
@@ -4485,8 +4487,7 @@ sub _tree_construction_main ($) {
               ## NOTE: There is a "as if in head" code clone.
               my $parent = defined $self->{head_element} ? $self->{head_element}
                   : $self->{open_elements}->[-1]->[0];
-              $parse_rcdata->(RCDATA_CONTENT_MODEL,
-                              sub { $parent->append_child ($_[0]) });
+              $parse_rcdata->(RCDATA_CONTENT_MODEL);
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               redo B;
@@ -4501,7 +4502,7 @@ sub _tree_construction_main ($) {
               } else {
                 
               }
-              $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
+              $parse_rcdata->(CDATA_CONTENT_MODEL);
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               redo B;
@@ -6361,7 +6362,7 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'noframes') {
           
           ## NOTE: As if in body.
-          $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
+          $parse_rcdata->(CDATA_CONTENT_MODEL);
           redo B;
         } else {
           if ($self->{insertion_mode} == IN_FRAMESET_IM) {
@@ -6445,7 +6446,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'style') {
         
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
+        $parse_rcdata->(CDATA_CONTENT_MODEL);
         redo B;
       } elsif ({
                 base => 1, link => 1,
@@ -6538,17 +6539,8 @@ sub _tree_construction_main ($) {
         redo B;
       } elsif ($token->{tag_name} eq 'title') {
         
-        $self->{parse_error}-> (type => 'in body:title');
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->(RCDATA_CONTENT_MODEL, sub {
-          if (defined $self->{head_element}) {
-            
-            $self->{head_element}->append_child ($_[0]);
-          } else {
-            
-            $insert->($_[0]);
-          }
-        });
+        $parse_rcdata->(RCDATA_CONTENT_MODEL);
         redo B;
       } elsif ($token->{tag_name} eq 'body') {
         $self->{parse_error}-> (type => 'in body:body');
@@ -7046,7 +7038,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'xmp') {
         
         $reconstruct_active_formatting_elements->($insert_to_current);
-        $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
+        $parse_rcdata->(CDATA_CONTENT_MODEL);
         redo B;
       } elsif ($token->{tag_name} eq 'table') {
         ## has a p element in scope
@@ -7290,7 +7282,7 @@ sub _tree_construction_main ($) {
                }->{$token->{tag_name}}) {
         
         ## NOTE: There is an "as if in body" code clone.
-        $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
+        $parse_rcdata->(CDATA_CONTENT_MODEL);
         redo B;
       } elsif ($token->{tag_name} eq 'select') {
         
@@ -7877,4 +7869,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 05:09:25 $
+# $Date: 2008/03/08 13:26:45 $
