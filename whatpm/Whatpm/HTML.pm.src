@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.86 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.87 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5989,7 +5989,6 @@ sub _tree_construction_main ($) {
                 address => 1, blockquote => 1, center => 1, dir => 1,
                 div => 1, dl => 1, fieldset => 1, listing => 1,
                 menu => 1, ol => 1, pre => 1, ul => 1,
-                p => 1,
                 dd => 1, dt => 1, li => 1,
                 button => 1, marquee => 1, object => 1,
                }->{$token->{tag_name}}) {
@@ -6003,7 +6002,7 @@ sub _tree_construction_main ($) {
                     dd => ($token->{tag_name} ne 'dd'),
                     dt => ($token->{tag_name} ne 'dt'),
                     li => ($token->{tag_name} ne 'li'),
-                    p => ($token->{tag_name} ne 'p'),
+                    p => 1,
                    }->{$self->{open_elements}->[-1]->[1]}) {
               !!!cp ('t409');
               pop @{$self->{open_elements}};
@@ -6011,7 +6010,7 @@ sub _tree_construction_main ($) {
             
             !!!cp ('t410');
             $i = $_;
-            last INSCOPE unless $token->{tag_name} eq 'p';
+            last INSCOPE;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -6034,12 +6033,6 @@ sub _tree_construction_main ($) {
         if (defined $i) {
           !!!cp ('t414');
           splice @{$self->{open_elements}}, $i;
-        } elsif ($token->{tag_name} eq 'p') {
-          !!!cp ('t415');
-          ## As if <p>, then reprocess the current token
-          my $el;
-          !!!create-element ($el, 'p');
-          $insert->($el);
         } else {
           !!!cp ('t416');
         }
@@ -6122,6 +6115,54 @@ sub _tree_construction_main ($) {
         }
         
         splice @{$self->{open_elements}}, $i if defined $i;
+        !!!next-token;
+        redo B;
+      } elsif ($token->{tag_name} eq 'p') {
+        ## has an element in scope
+        my $i;
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
+          if ($node->[1] eq $token->{tag_name}) {
+            ## generate implied end tags
+            while ({
+                    dd => 1, dt => 1, li => 1, p => 0,
+                   }->{$self->{open_elements}->[-1]->[1]}) {
+              !!!cp ('t409.1');
+              pop @{$self->{open_elements}};
+            }
+            
+            !!!cp ('t410.1');
+            $i = $_;
+            last INSCOPE unless $token->{tag_name} eq 'p';
+          } elsif ({
+                    table => 1, caption => 1, td => 1, th => 1,
+                    button => 1, marquee => 1, object => 1, html => 1,
+                   }->{$node->[1]}) {
+            !!!cp ('t411.1');
+            last INSCOPE;
+          }
+        } # INSCOPE
+        
+        if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
+          if (defined $i) {
+            !!!cp ('t412.1');
+            !!!parse-error (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+          } else {
+            !!!cp ('t413.1');
+            !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
+          }
+        }
+        
+        if (defined $i) {
+          !!!cp ('t414.1');
+          splice @{$self->{open_elements}}, $i;
+        } else {
+          !!!cp ('t415.1');
+          ## As if <p>, then reprocess the current token
+          my $el;
+          !!!create-element ($el, 'p');
+          $insert->($el);
+        }
         !!!next-token;
         redo B;
       } elsif ({
@@ -6401,4 +6442,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/06 15:56:52 $
+# $Date: 2008/03/08 02:29:22 $
