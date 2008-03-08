@@ -1990,6 +1990,69 @@ unclosed <span>
 |       <span>
 
 #data
+<!DOCTYPE HTML><listing>
+</listing>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <listing>
+
+#data
+<!DOCTYPE HTML><listing>
+a</listing>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <listing>
+|       "a"
+
+#data
+<!DOCTYPE HTML><listing>a
+</listing>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <listing>
+|       "a
+"
+
+#data
+<!DOCTYPE HTML><listing>
+
+</listing>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <listing>
+|       "
+"
+
+#data
+<!DOCTYPE HTML><listing> 
+</listing>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <listing>
+|       " 
+"
+
+#data
 <!DOCTYPE HTML><pre><!---->
 a</pre>
 #errors
@@ -1999,6 +2062,20 @@ a</pre>
 |   <head>
 |   <body>
 |     <pre>
+|       <!--  -->
+|       "
+a"
+
+#data
+<!DOCTYPE HTML><listing><!---->
+a</listing>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <listing>
 |       <!--  -->
 |       "
 a"

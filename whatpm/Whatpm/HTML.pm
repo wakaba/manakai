@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.96 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.97 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6566,8 +6566,8 @@ sub _tree_construction_main ($) {
                 address => 1, blockquote => 1, center => 1, dir => 1, 
                 div => 1, dl => 1, fieldset => 1,
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
-                listing => 1, menu => 1, ol => 1, p => 1, ul => 1,
-                pre => 1,
+                menu => 1, ol => 1, p => 1, ul => 1,
+                pre => 1, listing => 1,
                }->{$token->{tag_name}}) {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
@@ -6601,7 +6601,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-        if ($token->{tag_name} eq 'pre') {
+        if ($token->{tag_name} eq 'pre' or $token->{tag_name} eq 'listing') {
           $token = $self->_get_next_token;
           if ($token->{type} == CHARACTER_TOKEN) {
             $token->{data} =~ s/^\x0A//;
@@ -7869,4 +7869,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 13:26:45 $
+# $Date: 2008/03/08 13:45:43 $

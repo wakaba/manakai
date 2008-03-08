@@ -685,3 +685,57 @@ a\U12345678b
 #errors
 <html> in <html>
 #document-fragment html
+
+#data
+#errors
+#document-fragment pre
+
+#data
+#errors
+#document-fragment listing
+
+#data
+#errors
+#document-fragment textarea
+
+#data escaped
+\u000A
+#errors
+#document-fragment pre
+| "
+"
+
+#data escaped
+\u000A
+#errors
+#document-fragment listing
+| "
+"
+
+#data escaped
+\u000A
+#errors
+#document-fragment textarea
+| "
+"
+
+#data escaped
+\u000Aa
+#errors
+#document-fragment pre
+| "
+a"
+
+#data escaped
+\u000Aa
+#errors
+#document-fragment listing
+| "
+a"
+
+#data escaped
+\u000Aa
+#errors
+#document-fragment textarea
+| "
+a"
