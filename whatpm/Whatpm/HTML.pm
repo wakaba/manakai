@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.91 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.92 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -7479,19 +7479,15 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'form') {
+        undef $self->{form_element};
+
         ## has an element in scope
+        my $i;
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq $token->{tag_name}) {
-            ## generate implied end tags
-            while ({
-                    dd => 1, dt => 1, li => 1, p => 1,
-                   }->{$self->{open_elements}->[-1]->[1]}) {
-              
-              pop @{$self->{open_elements}};
-            }
-
             
+            $i = $_;
             last INSCOPE;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
@@ -7501,16 +7497,31 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
-        
-        if ($self->{open_elements}->[-1]->[1] eq $token->{tag_name}) {
-          
-          pop @{$self->{open_elements}};
-        } else {
+
+        unless (defined $i) { # has an element in scope
           
           $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+        } else {
+          ## Step 1. generate implied end tags
+          while ({
+                  dd => 1, dt => 1, li => 1, p => 1,
+                 }->{$self->{open_elements}->[-1]->[1]}) {
+            
+            pop @{$self->{open_elements}};
+          }
+          
+          ## Step 2. 
+          if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
+            
+            $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+          } else {
+            
+          }  
+          
+          ## Step 3.
+          splice @{$self->{open_elements}}, $i;
         }
 
-        undef $self->{form_element};
         $token = $self->_get_next_token;
         redo B;
       } elsif ({
@@ -7877,4 +7888,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 03:04:08 $
+# $Date: 2008/03/08 03:29:30 $

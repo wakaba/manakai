@@ -1280,8 +1280,7 @@ div closed by dd
 #data
 <!DOCTYPE HTML><body><form><div>a</form>b
 #errors
-div not closed before </form>
-div not closed before EOF
+no </div> before </form>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -1289,7 +1288,24 @@ div not closed before EOF
 |   <body>
 |     <form>
 |       <div>
-|         "ab"
+|         "a"
+|     "b"
+
+#data
+<!DOCTYPE HTML><body><form><div><div><div>a</form>b
+#errors
+no </div> before </form>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <div>
+|         <div>
+|           <div>
+|             "a"
+|     "b"
 
 #data
 <!DOCTYPE HTML><form><p></form>
@@ -1303,6 +1319,18 @@ div not closed before EOF
 |       <p>
 
 #data
+<!DOCTYPE HTML><form><p></form>x
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <p>
+|     "x"
+
+#data
 <!DOCTYPE HTML><form><li></form>
 #errors
 #document
@@ -1312,6 +1340,18 @@ div not closed before EOF
 |   <body>
 |     <form>
 |       <li>
+
+#data
+<!DOCTYPE HTML><form><li></form>y
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <li>
+|     "y"
 
 #data
 <!DOCTYPE HTML><form><dt></form>
@@ -1325,6 +1365,18 @@ div not closed before EOF
 |       <dt>
 
 #data
+<!DOCTYPE HTML><form><dt></form>x
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <dt>
+|     "x"
+
+#data
 <!DOCTYPE HTML><form><dd></form>
 #errors
 #document
@@ -1334,6 +1386,18 @@ div not closed before EOF
 |   <body>
 |     <form>
 |       <dd>
+
+#data
+<!DOCTYPE HTML><form><dd></form>x
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <dd>
+|     "x"
 
 #data
 <!DOCTYPE HTML><ul></body>
