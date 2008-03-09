@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.97 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.98 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5566,13 +5566,58 @@ sub _tree_construction_main ($) {
 
               ## reprocess
               redo B;
+        } elsif ($token->{tag_name} eq 'input') {
+          if (not $open_tables->[-1]->[1]) { # tainted
+            if ($token->{attributes}->{type}) { ## TODO: case
+              my $type = lc $token->{attributes}->{type}->{value};
+              if ($type eq 'hidden') {
+                
+                $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
+
+                
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+
+                ## TODO: form element pointer
+
+                pop @{$self->{open_elements}};
+
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                
+                #
+              }
+            } else {
+              
+              #
+            }
+          } else {
+            
+            #
+          }
         } else {
           
-          $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
-
-          $insert = $insert_to_foster;
           #
         }
+
+        $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
+
+        $insert = $insert_to_foster;
+        #
       } elsif ($token->{type} == END_TAG_TOKEN) {
             if ($token->{tag_name} eq 'tr' and
                 $self->{insertion_mode} == IN_ROW_IM) {
@@ -7869,4 +7914,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/08 13:45:43 $
+# $Date: 2008/03/09 03:23:42 $

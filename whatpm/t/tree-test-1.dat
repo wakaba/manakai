@@ -1711,6 +1711,173 @@ char in <table>
 |     <table>
 
 #data
+<!DOCTYPE HTML><table><li><table></table>
+#errors
+<li> in <table>
+<table> in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <li>
+|     <table>
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><input> </table>
+#errors
+<input> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <input>
+|     " "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><input type="text"> </table>
+#errors
+<input> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <input>
+|       type="text"
+|     " "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><input type=hidden> </table>
+#errors
+<input type=hidden> in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <input>
+|         type="hidden"
+|       " "
+
+#data
+<!DOCTYPE HTML><table> <input> </table>
+#errors
+<input> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <input>
+|     " "
+|     <table>
+|       " "
+
+#data
+<!DOCTYPE HTML><table>a<input> </table>
+#errors
+char in <table>
+<input> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <input>
+|     " "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table> <input type="text"> </table>
+#errors
+<input> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <input>
+|       type="text"
+|     " "
+|     <table>
+|       " "
+
+#data
+<!DOCTYPE HTML><table>a<input type=text> </table>
+#errors
+char in <table>
+<input> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <input>
+|       type="text"
+|     " "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table> <input type=hidden> </table>
+#errors
+<input type=hidden> in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       " "
+|       <input>
+|         type="hidden"
+|       " "
+
+#data
+<!DOCTYPE HTML><table>a<input type=hidden> </table>
+#errors
+char in <table>
+<input> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <input>
+|       type="hidden"
+|     " "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><input type="HiddeN"> </table>
+#errors
+<input type=hidden> in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <input>
+|         type="HiddeN"
+|       " "
+
+#data
 <!DOCTYPE HTML><table><tr><td></body>
 #errors
 unmatched </body>
