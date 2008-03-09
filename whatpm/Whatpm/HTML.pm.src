@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.106 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.107 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6118,31 +6118,45 @@ sub _tree_construction_main ($) {
       }
     } elsif ($token->{type} == END_TAG_TOKEN) {
       if ($token->{tag_name} eq 'body') {
-        if (@{$self->{open_elements}} > 1 and
-            $self->{open_elements}->[1]->[1] eq 'body') {
-          for (@{$self->{open_elements}}) {
-            unless ({
-                       dd => 1, dt => 1, li => 1, p => 1, td => 1,
-                       th => 1, tr => 1, body => 1, html => 1,
-                     tbody => 1, tfoot => 1, thead => 1,
-                    }->{$_->[1]}) {
-              !!!cp ('t403');
-              !!!parse-error (type => 'not closed:'.$_->[1]);
-            } else {
-              !!!cp ('t404');
-            }
+        ## has a |body| element in scope
+        my $i;
+        INSCOPE: for (reverse @{$self->{open_elements}}) {
+          if ($_->[1] eq 'body') {
+            !!!cp ('t405');
+            $i = $_;
+            last INSCOPE;
+          } elsif ({
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
+                    button => 1, marquee => 1, object => 1, html => 1,
+                   }->{$_->[1]}) {
+            !!!cp ('t405.1');
+            last INSCOPE;
           }
-
-          $self->{insertion_mode} = AFTER_BODY_IM;
-          !!!next-token;
-          redo B;
-        } else {
-          !!!cp ('t405');
+        } # INSCOPE
+        unless (defined $i) {
           !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
-          ## Ignore the token
+          ## NOTE: Ignore the token.
           !!!next-token;
           redo B;
         }
+
+        for (@{$self->{open_elements}}) {
+          unless ({
+                   dd => 1, dt => 1, li => 1, p => 1, td => 1,
+                   th => 1, tr => 1, body => 1, html => 1,
+                   tbody => 1, tfoot => 1, thead => 1,
+                  }->{$_->[1]}) {
+            !!!cp ('t403');
+            !!!parse-error (type => 'not closed:'.$_->[1]);
+            last;
+          } else {
+            !!!cp ('t404');
+          }
+        }
+
+        $self->{insertion_mode} = AFTER_BODY_IM;
+        !!!next-token;
+        redo B;
       } elsif ($token->{tag_name} eq 'html') {
         if (@{$self->{open_elements}} > 1 and $self->{open_elements}->[1]->[1] eq 'body') {
           ## ISSUE: There is an issue in the spec.
@@ -6632,4 +6646,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 10:31:19 $
+# $Date: 2008/03/09 10:49:13 $
