@@ -670,6 +670,9 @@ my $HTMLAttrChecker = {
       }
     }
   },
+  contenteditable => $GetHTMLEnumeratedAttrChecker->({
+    true => 1, false => 1, '' => 1,
+  }),
   contextmenu => sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;

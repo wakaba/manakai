@@ -333,6 +333,61 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<p contenteditable="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p contenteditable="true" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p contenteditable="TruE" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p contenteditable="false" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p contenteditable="False" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p contenteditable="none" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@contenteditable;enumerated:invalid
+
+#data
+<p contenteditable="true " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@contenteditable;enumerated:invalid
+
+#data
+<p contenteditable="yes" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@contenteditable;enumerated:invalid
+
+#data
+<p contenteditable="contenteditable" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@contenteditable;enumerated:invalid
+
+#data
+<p contenteditable="inherit" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@contenteditable;enumerated:invalid
+
+#data
+<p contenteditable="yes" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@contenteditable;enumerated:invalid
+
+#data
+<p contentEditable="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@contentEditable;attribute not defined;m
+
+#data
 <p irrelevant="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
