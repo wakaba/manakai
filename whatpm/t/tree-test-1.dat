@@ -1937,6 +1937,274 @@ char in <table>
 |       " "
 
 #data
+<!DOCTYPE HTML><table><thead><input type=hidden></table>
+#errors
+<input type=hidden> in <thead>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <thead>
+|         <input>
+|           type="hidden"
+
+#data
+<!DOCTYPE HTML><table><thead>a<input type=hidden></table>
+#errors
+char in <thead>
+<input type=hidden> in <thead>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <input>
+|       type="hidden"
+|     <table>
+|       <thead>
+
+#data
+<!DOCTYPE HTML><table><tr><input type=hidden></table>
+#errors
+<input type=hidden> in <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <input>
+|             type="hidden"
+
+#data
+<!DOCTYPE HTML><table><tr>a<input type=hidden></table>
+#errors
+char in <tr>
+<input type=hidden> in <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <input>
+|       type="hidden"
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><script></script></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <script>
+
+#data
+<!DOCTYPE HTML><table> <script></script> </table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       " "
+|       <script>
+|       " "
+
+#data
+<!DOCTYPE HTML><table>a<script></script> </table>
+#errors
+char in <table>
+<script> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <script>
+|     " "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><tfoot><script></script> </table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tfoot>
+|         <script>
+|         " "
+
+#data
+<!DOCTYPE HTML><table><tfoot>a<script></script> </table>
+#errors
+char in <tfoot>
+<script> in <tfoot>
+char in <tfoot>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <script>
+|     " "
+|     <table>
+|       <tfoot>
+
+#data
+<!DOCTYPE HTML><table><tr> <script></script> </table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           " "
+|           <script>
+|           " "
+
+#data
+<!DOCTYPE HTML><table><tr>a<script></script> </table>
+#errors
+char in <tr>
+<script> in <tr>
+char in <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <script>
+|     " "
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><style></style></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <style>
+
+#data
+<!DOCTYPE HTML><table> <style></style> </table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       " "
+|       <style>
+|       " "
+
+#data
+<!DOCTYPE HTML><table>a<style></style> </table>
+#errors
+char in <table>
+<style> in <table>
+char in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <style>
+|     " "
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><tfoot><style></style> </table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tfoot>
+|         <style>
+|         " "
+
+#data
+<!DOCTYPE HTML><table><tfoot>a<style></style> </table>
+#errors
+char in <tfoot>
+<style> in <tfoot>
+char in <tfoot>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <style>
+|     " "
+|     <table>
+|       <tfoot>
+
+#data
+<!DOCTYPE HTML><table><tr> <style></style> </table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           " "
+|           <style>
+|           " "
+
+#data
+<!DOCTYPE HTML><table><tr>a<style></style> </table>
+#errors
+char in <tr>
+<style> in <tr>
+char in <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <style>
+|     " "
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
 <!DOCTYPE HTML><table><tr><td></body>
 #errors
 unmatched </body>

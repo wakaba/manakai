@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.99 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.100 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3447,7 +3447,7 @@ sub _tree_construction_main ($) {
               }
               !!!insert-element ($token->{tag_name}, $token->{attributes});
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
-              pop @{$self->{open_elements}}
+              pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               !!!next-token;
               redo B;
@@ -3462,7 +3462,7 @@ sub _tree_construction_main ($) {
               }
               !!!insert-element ($token->{tag_name}, $token->{attributes});
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
-              pop @{$self->{open_elements}}
+              pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               !!!next-token;
               redo B;
@@ -3523,7 +3523,7 @@ sub _tree_construction_main ($) {
                 }
               }
 
-              pop @{$self->{open_elements}}
+              pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               !!!next-token;
               redo B;
@@ -3548,7 +3548,7 @@ sub _tree_construction_main ($) {
               my $parent = defined $self->{head_element} ? $self->{head_element}
                   : $self->{open_elements}->[-1]->[0];
               $parse_rcdata->(RCDATA_CONTENT_MODEL);
-              pop @{$self->{open_elements}}
+              pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               redo B;
             } elsif ($token->{tag_name} eq 'style') {
@@ -3563,7 +3563,7 @@ sub _tree_construction_main ($) {
                 !!!cp ('t115');
               }
               $parse_rcdata->(CDATA_CONTENT_MODEL);
-              pop @{$self->{open_elements}}
+              pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               redo B;
             } elsif ($token->{tag_name} eq 'noscript') {
@@ -3602,8 +3602,8 @@ sub _tree_construction_main ($) {
               }
 
               ## NOTE: There is a "as if in head" code clone.
-              $script_start_tag->($insert_to_current);
-              pop @{$self->{open_elements}}
+              $script_start_tag->();
+              pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               redo B;
             } elsif ($token->{tag_name} eq 'body' or
@@ -4492,6 +4492,26 @@ sub _tree_construction_main ($) {
 
               ## reprocess
               redo B;
+        } elsif ($token->{tag_name} eq 'style') {
+          if (not $open_tables->[-1]->[1]) { # tainted
+            !!!cp ('t227.8');
+            ## NOTE: This is a "as if in head" code clone.
+            $parse_rcdata->(CDATA_CONTENT_MODEL);
+            redo B;
+          } else {
+            !!!cp ('t227.7');
+            #
+          }
+        } elsif ($token->{tag_name} eq 'script') {
+          if (not $open_tables->[-1]->[1]) { # tainted
+            !!!cp ('t227.6');
+            ## NOTE: This is a "as if in head" code clone.
+            $script_start_tag->();
+            redo B;
+          } else {
+            !!!cp ('t227.5');
+            #
+          }
         } elsif ($token->{tag_name} eq 'input') {
           if (not $open_tables->[-1]->[1]) { # tainted
             if ($token->{attributes}->{type}) { ## TODO: case
@@ -5322,7 +5342,7 @@ sub _tree_construction_main ($) {
       if ($token->{tag_name} eq 'script') {
         !!!cp ('t332');
         ## NOTE: This is an "as if in head" code clone
-        $script_start_tag->($insert);
+        $script_start_tag->();
         redo B;
       } elsif ($token->{tag_name} eq 'style') {
         !!!cp ('t333');
@@ -6466,4 +6486,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 03:46:43 $
+# $Date: 2008/03/09 04:08:41 $
