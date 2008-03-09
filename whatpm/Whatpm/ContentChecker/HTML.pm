@@ -1830,6 +1830,21 @@ $Element->{$HTML_NS}->{ul} = {
   }),
 };
 
+$Element->{$HTML_NS}->{dir} = {
+## TODO: %block; is not allowed [HTML4] ## TODO: Empty list allowed?
+  %{$Element->{$HTML_NS}->{ul}},
+  status => FEATURE_M12N10_REC_DEPRECATED,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    align => FEATURE_HTML2X_RFC,
+    compact => FEATURE_M12N10_REC_DEPRECATED,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    sdaform => FEATURE_HTML20_RFC,
+    sdapref => FEATURE_HTML20_RFC,
+  }),
+};
+
 $Element->{$HTML_NS}->{li} = {
   %HTMLProseContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -4638,6 +4653,16 @@ $Element->{$HTML_NS}->{div} = {
   }),
 };
 
+$Element->{$HTML_NS}->{center} = {
+  %HTMLProseContentChecker,
+  status => FEATURE_M12N10_REC_DEPRECATED,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+  }),
+};
+
 $Element->{$HTML_NS}->{font} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_AT_RISK | FEATURE_M12N10_REC_DEPRECATED,
@@ -4656,15 +4681,25 @@ $Element->{$HTML_NS}->{font} = {
   }),
 };
 
+$Element->{$HTML_NS}->{basefont} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_M12N10_REC_DEPRECATED,
+  check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: color, face, size
+  }, {
+    %HTMLAttrStatus,
+    color => FEATURE_M12N10_REC_DEPRECATED,
+    face => FEATURE_M12N10_REC_DEPRECATED,
+    #id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
+    id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    size => FEATURE_M12N10_REC_DEPRECATED,
+  }),
+};
+
 ## TODO: frameset FEATURE_M12N10_REC
 ## class title id cols rows onload onunload style(x10)
 ## frame frameborder longdesc marginheight marginwidth noresize scrolling src name(deprecated) class,id,title,style(x10)
 ## noframes Common, lang(xhtml10)
-
-## TODO: deprecated:
-## basefont color face id size
-## center Common lang(xhtml10)
-## dir Common compat lang(xhtml10) align(HTML2.x) sdaform sdapref (HTML2.0)
 
 ## TODO: CR: ruby rb rt rp rbc rtc @rbspan
 

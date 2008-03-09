@@ -6723,3 +6723,107 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /div/datatemplate/nest;element not allowed:datatemplate
 /div;no significant content;s
+
+#data
+<center  xmlns="http://www.w3.org/1999/xhtml"></center>
+#errors
+/center;element not defined;m
+/center;no significant content;s
+
+#data
+<center  xmlns="http://www.w3.org/1999/xhtml">   </center>
+#errors
+/center;element not defined;m
+/center;no significant content;s
+
+#data
+<center  xmlns="http://www.w3.org/1999/xhtml">x</center>
+#errors
+/center;element not defined;m
+
+#data
+<center  xmlns="http://www.w3.org/1999/xhtml">x<p>y</p></center>
+#errors
+/center;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><center>x</center></div>
+#errors
+/div/center;element not defined;m
+/div/center;element not allowed:prose;m
+
+#data
+<b xmlns="http://www.w3.org/1999/xhtml"><center>x</center></b>
+#errors
+/b/center;element not defined;m
+/b/center;element not allowed:phrasing;m
+
+#data
+<centre xmlns="http://www.w3.org/1999/xhtml"></centre>
+#errors
+/centre;element not defined;m
+
+#data
+<basefont xmlns="http://www.w3.org/1999/xhtml"></basefont>
+#errors
+/basefont;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><basefont/></div>
+#errors
+/div/basefont;element not defined;m
+/div/basefont;element not allowed:prose;m
+/div;no significant content;s
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><basefont/></span>
+#errors
+/span/basefont;element not defined;m
+/span/basefont;element not allowed:phrasing;m
+/span;no significant content;s
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"></dir>
+#errors
+/dir;element not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"><li/></dir>
+#errors
+/dir;element not defined;m
+/dir/li;no significant content;s
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"><li/>a</dir>
+#errors
+/dir;element not defined;m
+/dir/li;no significant content;s
+/dir/"a";character not allowed
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml">a</dir>
+#errors
+/dir;element not defined;m
+/dir/"a";character not allowed
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"><p/></dir>
+/dir;element not defined;m
+/dir/p;element not allowed;m
+/dir/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><dir><li/></dir></div>
+#errors
+/div;no significant content;s
+/div/dir;element not defined;m
+/div/dir;element not allowed:prose;m
+/div/dir/li;no significant content;s
+
+#data
+<i xmlns="http://www.w3.org/1999/xhtml"><dir><li/></dir></i>
+#errors
+/i;no significant content;s
+/i/dir;element not defined;m
+/i/dir;element not allowed:phrasing;m
+/i/dir/li;no significant content;s
