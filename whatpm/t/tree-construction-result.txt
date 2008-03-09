@@ -1,7 +1,7 @@
 1..980
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Mar  9 14:07:38 2008
-# Current time GMT:   Sun Mar  9 05:07:38 2008
+# Current time local: Sun Mar  9 15:25:21 2008
+# Current time GMT:   Sun Mar  9 06:25:21 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -1563,23 +1563,23 @@ ok 1229
 ok 1230
 ok 1231
 ok 1232
-not ok 1233
-# Test 1233 got: "3" (t/HTML-tree.t at line 160 fail #617)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><thead><table b>'; 1:40:not closed:thead, 1:40:not closed:thead, 1:40:not closed:table;<table> in table row group, unexpected end of file)
+ok 1233
 ok 1234
 not ok 1235
 # Test 1235 got: "3" (t/HTML-tree.t at line 160 fail #618)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tbody><table b>'; 1:40:not closed:tbody, 1:40:not closed:tbody, 1:40:not closed:table;<table> in table row group, unexpected end of file)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><thead><table b>'; 1:40:not closed:thead, 1:40:not closed:thead, 1:40:not closed:table;<table> in table row group, unexpected end of file)
 ok 1236
 not ok 1237
 # Test 1237 got: "3" (t/HTML-tree.t at line 160 fail #619)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tfoot><table b>'; 1:40:not closed:tfoot, 1:40:not closed:tfoot, 1:40:not closed:table;<table> in table row group, unexpected end of file)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tbody><table b>'; 1:40:not closed:tbody, 1:40:not closed:tbody, 1:40:not closed:table;<table> in table row group, unexpected end of file)
 ok 1238
 not ok 1239
 # Test 1239 got: "3" (t/HTML-tree.t at line 160 fail #620)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tr><table b>'; 1:37:not closed:tr, 1:37:not closed:tr, 1:37:not closed:table;<table> in table row, unexpected end of file)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tfoot><table b>'; 1:40:not closed:tfoot, 1:40:not closed:tfoot, 1:40:not closed:table;<table> in table row group, unexpected end of file)
 ok 1240
-ok 1241
+not ok 1241
+# Test 1241 got: "3" (t/HTML-tree.t at line 160 fail #621)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tr><table b>'; 1:37:not closed:tr, 1:37:not closed:tr, 1:37:not closed:table;<table> in table row, unexpected end of file)
 ok 1242
 ok 1243
 ok 1244
@@ -1613,11 +1613,11 @@ ok 1271
 ok 1272
 ok 1273
 ok 1274
-not ok 1275
-# Test 1275 got: "3" (t/HTML-tree.t at line 160 fail #638)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table><tr><form><td></td></form></table>'; 1:33:in table:form, 1:49:in table:/form, 1:49:unmatched end tag:form;<form> in table, form not closed, </form> in table, ubmatched </form>)
+ok 1275
 ok 1276
-ok 1277
+not ok 1277
+# Test 1277 got: "3" (t/HTML-tree.t at line 160 fail #639)
+#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table><tr><form><td></td></form></table>'; 1:33:in table:form, 1:49:in table:/form, 1:49:unmatched end tag:form;<form> in table, form not closed, </form> in table, ubmatched </form>)
 ok 1278
 ok 1279
 ok 1280
@@ -1633,15 +1633,15 @@ ok 1289
 ok 1290
 ok 1291
 ok 1292
-not ok 1293
-# Test 1293 got: "3" (t/HTML-tree.t at line 160 fail #647)
-#      Expected: "4" (Parse error: qq'<p><font><form> </form>'; 1:4:no DOCTYPE, 1:16:not closed:font, 1:23:not closed:font;1,4,no DOCTYPE, 1,16,not closed:font, 1,23,unmatched end tag:form, 1,23,not closed:font)
+ok 1293
 ok 1294
 not ok 1295
-# Test 1295 got: "4" (t/HTML-tree.t at line 160 fail #648)
-#      Expected: "3" (Parse error: qq'<table a><tr><table b>'; 1:10:no DOCTYPE, 1:22:not closed:tr, 1:22:not closed:tr, 1:22:not closed:table;1,10,no DOCTYPE, 1,22,not closed:tr, 1,22,not closed:table)
+# Test 1295 got: "3" (t/HTML-tree.t at line 160 fail #648)
+#      Expected: "4" (Parse error: qq'<p><font><form> </form>'; 1:4:no DOCTYPE, 1:16:not closed:font, 1:23:not closed:font;1,4,no DOCTYPE, 1,16,not closed:font, 1,23,unmatched end tag:form, 1,23,not closed:font)
 ok 1296
-ok 1297
+not ok 1297
+# Test 1297 got: "4" (t/HTML-tree.t at line 160 fail #649)
+#      Expected: "3" (Parse error: qq'<table a><tr><table b>'; 1:10:no DOCTYPE, 1:22:not closed:tr, 1:22:not closed:tr, 1:22:not closed:table;1,10,no DOCTYPE, 1,22,not closed:tr, 1,22,not closed:table)
 ok 1298
 ok 1299
 ok 1300
@@ -1753,9 +1753,9 @@ ok 1405
 ok 1406
 ok 1407
 ok 1408
-# t/tree-test-2.dat
 ok 1409
 ok 1410
+# t/tree-test-2.dat
 ok 1411
 ok 1412
 ok 1413
@@ -1820,37 +1820,37 @@ ok 1471
 ok 1472
 ok 1473
 ok 1474
-not ok 1475
-# Test 1475 got: "2" (t/HTML-tree.t at line 160 fail #738)
-#      Expected: "1" (Parse error: qq'</table><td>'; 1:9:unmatched end tag:4, 1:12:not closed:td;</table> in <tr>.innerHTML)
+ok 1475
 ok 1476
-ok 1477
+not ok 1477
+# Test 1477 got: "2" (t/HTML-tree.t at line 160 fail #739)
+#      Expected: "1" (Parse error: qq'</table><td>'; 1:9:unmatched end tag:4, 1:12:not closed:td;</table> in <tr>.innerHTML)
 ok 1478
-not ok 1479
-# Test 1479 got: "2" (t/HTML-tree.t at line 160 fail #740)
-#      Expected: "1" (Parse error: qq'<table>'; 1:7:not closed:html, 1:7:unmatched end tag:table;<table> in <table>)
+ok 1479
 ok 1480
 not ok 1481
-# Test 1481 got: "3" (t/HTML-tree.t at line 160 fail #741)
-#      Expected: "1" (Parse error: qq'<table><tr>'; 1:8:not closed:html, 1:8:unmatched end tag:table, 1:11:not closed:tr;<table> in <table>)
+# Test 1481 got: "2" (t/HTML-tree.t at line 160 fail #741)
+#      Expected: "1" (Parse error: qq'<table>'; 1:7:not closed:html, 1:7:unmatched end tag:table;<table> in <table>)
 ok 1482
-ok 1483
+not ok 1483
+# Test 1483 got: "3" (t/HTML-tree.t at line 160 fail #742)
+#      Expected: "1" (Parse error: qq'<table><tr>'; 1:8:not closed:html, 1:8:unmatched end tag:table, 1:11:not closed:tr;<table> in <table>)
 ok 1484
 ok 1485
 ok 1486
 ok 1487
 ok 1488
-not ok 1489
-# Test 1489 got: "2" (t/HTML-tree.t at line 160 fail #745)
-#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag:select, 1:17:not closed:option;</select> in <select>.innerHTML)
+ok 1489
 ok 1490
-ok 1491
+not ok 1491
+# Test 1491 got: "2" (t/HTML-tree.t at line 160 fail #746)
+#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag:select, 1:17:not closed:option;</select> in <select>.innerHTML)
 ok 1492
-not ok 1493
-# Test 1493 got: "3" (t/HTML-tree.t at line 160 fail #747)
-#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed:select, 1:9:unmatched end tag:select, 1:16:not closed:option;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
+ok 1493
 ok 1494
-ok 1495
+not ok 1495
+# Test 1495 got: "3" (t/HTML-tree.t at line 160 fail #748)
+#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed:select, 1:9:unmatched end tag:select, 1:16:not closed:option;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
 ok 1496
 ok 1497
 ok 1498
@@ -1876,19 +1876,19 @@ ok 1517
 ok 1518
 ok 1519
 ok 1520
-not ok 1521
-# Test 1521 got: "1" (t/HTML-tree.t at line 160 fail #761)
-#      Expected: "0" (Parse error: qq'<option>'; 1:8:not closed:option;)
+ok 1521
 ok 1522
 not ok 1523
 # Test 1523 got: "1" (t/HTML-tree.t at line 160 fail #762)
-#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:not closed:optgroup;)
+#      Expected: "0" (Parse error: qq'<option>'; 1:8:not closed:option;)
 ok 1524
 not ok 1525
-# Test 1525 got: "2" (t/HTML-tree.t at line 160 fail #763)
-#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/tr, 1:14:not closed:option;</tr> in <select>)
+# Test 1525 got: "1" (t/HTML-tree.t at line 160 fail #763)
+#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:not closed:optgroup;)
 ok 1526
-ok 1527
+not ok 1527
+# Test 1527 got: "2" (t/HTML-tree.t at line 160 fail #764)
+#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/tr, 1:14:not closed:option;</tr> in <select>)
 ok 1528
 ok 1529
 ok 1530
@@ -1988,3 +1988,5 @@ ok 1623
 ok 1624
 ok 1625
 ok 1626
+ok 1627
+ok 1628

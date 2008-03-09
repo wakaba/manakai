@@ -2205,6 +2205,40 @@ char in <tr>
 |         <tr>
 
 #data
+<!DOCTYPE HTML><table><b>x<i>y<div>z</b>a</i>b
+#errors
+1,26,in table:b
+1,27,in table:#character
+1,30,in table:i
+1,31,in table:#character
+1,36,in table:div
+1,37,in table:#character
+1,41,in table:/b
+1,41,not closed:div
+1,42,in table:#character
+1,46,in table:/i
+1,46,not closed:div
+1,46,in table:#character
+no </div></table> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       "x"
+|       <i>
+|         "y"
+|     <table>
+|       <i>
+|       <div>
+|         <i>
+|           <b>
+|             "z"
+|           "a"
+|         "b"
+
+#data
 <!DOCTYPE HTML><table><tr><td></body>
 #errors
 unmatched </body>

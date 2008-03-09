@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.101 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.102 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3012,8 +3012,14 @@ sub _tree_construction_main ($) {
     !!!next-token;
   }; # $script_start_tag
 
+  ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
+  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag.
+  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
+
   my $formatting_end_tag = sub {
     my $tag_name = shift;
+
+    ## NOTE: The adoptioon agency algorithm (AAA).
 
     FET: {
       ## Step 1
@@ -3168,7 +3174,34 @@ sub _tree_construction_main ($) {
       } # S7  
       
       ## Step 8
-      $common_ancestor_node->[0]->append_child ($last_node->[0]);
+      if ({
+           table => 1, tbody => 1, tfoot => 1, thead => 1, tr => 1,
+          }->{$common_ancestor_node->[1]}) {
+        my $foster_parent_element;
+        my $next_sibling;
+                         OE: for (reverse 0..$#{$self->{open_elements}}) {
+                           if ($self->{open_elements}->[$_]->[1] eq 'table') {
+                             my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
+                             if (defined $parent and $parent->node_type == 1) {
+                               !!!cp ('t65.1');
+                               $foster_parent_element = $parent;
+                               $next_sibling = $self->{open_elements}->[$_]->[0];
+                             } else {
+                               !!!cp ('t65.2');
+                               $foster_parent_element
+                                 = $self->{open_elements}->[$_ - 1]->[0];
+                             }
+                             last OE;
+                           }
+                         } # OE
+                         $foster_parent_element = $self->{open_elements}->[0]->[0]
+                           unless defined $foster_parent_element;
+        $foster_parent_element->insert_before ($last_node->[0], $next_sibling);
+        $open_tables->[-1]->[1] = 1; # tainted
+      } else {
+        !!!cp ('t65.3');
+        $common_ancestor_node->[0]->append_child ($last_node->[0]);
+      }
       
       ## Step 9
       my $clone = [$formatting_element->[0]->clone_node (0),
@@ -3213,10 +3246,6 @@ sub _tree_construction_main ($) {
       redo FET;
     } # FET
   }; # $formatting_end_tag
-
-  ## NOTE: $open_tables->[-1]->[0] is the "current table".
-  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag.
-  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
 
   $insert = my $insert_to_current = sub {
     $self->{open_elements}->[-1]->[0]->append_child ($_[0]);
@@ -6512,4 +6541,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 05:12:05 $
+# $Date: 2008/03/09 06:29:25 $
