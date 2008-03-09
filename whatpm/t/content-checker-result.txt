@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Mar  9 19:42:39 2008
-# Current time GMT:   Sun Mar  9 10:42:39 2008
+# Current time local: Sun Mar  9 20:02:40 2008
+# Current time GMT:   Sun Mar  9 11:02:40 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1075,7 +1075,7 @@ not ok 1001
 #<body></body>
 #</html>)
 not ok 1002
-# Test 1002 got: "/head/@profile;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1002)
+# Test 1002 got: "/head/@profile;attribute not defined;m\n/head/@profile;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1002)
 #      Expected: "/head/@profile;attribute;unsupported" (<head profile="http://www.test/" xmlns="http://www.w3.org/1999/xhtml">
 #  <title/>
 #</head>)
@@ -1148,7 +1148,7 @@ ok 1056
 ok 1057
 ok 1058
 not ok 1059
-# Test 1059 got: "/link/@target;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1059)
+# Test 1059 got: "/link/@target;attribute not defined;m\n/link/@target;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1059)
 #      Expected: "/link/@target;attribute;unsupported" (<link href="http://test/" rel="author" target="_self"
 #    xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1060
@@ -1225,30 +1225,30 @@ not ok 1119
 #       - "/section/style/@scope;attribute;unsupported\n"
 #       + "/section/style/@scope;attribute not defined;m\n"
 not ok 1120
-# Test 1120 got: "/body/@text;attribute not defined;m\n/body;no significant content;s" (t/ContentChecker.t at line 98 fail #1120)
+# Test 1120 got: "/body/@text;attribute not defined;m\n/body/@text;attribute;unsupported\n/body;no significant content;s" (t/ContentChecker.t at line 98 fail #1120)
 #      Expected: "/body/@text;attribute;unsupported\n/body;no significant content;s" (<body text="red" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1121
 ok 1122
 not ok 1123
-# Test 1123 got: "/h1/@align;attribute not defined;m\n/h1;no significant content;s" (t/ContentChecker.t at line 98 fail #1123)
+# Test 1123 got: "/h1/@align;attribute not defined;m\n/h1/@align;attribute;unsupported\n/h1;no significant content;s" (t/ContentChecker.t at line 98 fail #1123)
 #      Expected: "/h1/@align;attribute;unsupported\n/h1;no significant content;s" (<h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1124
-# Test 1124 got: "/address/@align;attribute not defined;m\n/address;no significant content;s" (t/ContentChecker.t at line 98 fail #1124)
+# Test 1124 got: "/address/@align;attribute not defined;m\n/address/@align;attribute;unsupported\n/address;no significant content;s" (t/ContentChecker.t at line 98 fail #1124)
 #      Expected: "/address/@align;attribute;unsupported\n/address;no significant content;s" (<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1125
-# Test 1125 got: "/p/@align;attribute not defined;m\n/p;no significant content;s" (t/ContentChecker.t at line 98 fail #1125)
+# Test 1125 got: "/p/@align;attribute not defined;m\n/p/@align;attribute;unsupported\n/p;no significant content;s" (t/ContentChecker.t at line 98 fail #1125)
 #      Expected: "/p/@align;attribute;unsupported\n/p;no significant content;s" (<p align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1126
-# Test 1126 got: "/hr/@align;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1126)
+# Test 1126 got: "/hr/@align;attribute not defined;m\n/hr/@align;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1126)
 #      Expected: "/hr/@align;attribute;unsupported" (<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1127
-# Test 1127 got: "/br/@clear;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1127)
+# Test 1127 got: "/br/@clear;attribute not defined;m\n/br/@clear;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1127)
 #      Expected: "/br/@clear;attribute;unsupported" (<br clear="left" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1128
 # Test 1128 got: "/dialog/@compact;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1128)
 #      Expected: "/dialog/@compact;attribute;unsupported" (<dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1129
-# Test 1129 got: "/pre/@width;attribute not defined;m\n/pre;no significant content;s" (t/ContentChecker.t at line 98 fail #1129)
+# Test 1129 got: "/pre/@width;attribute not defined;m\n/pre/@width;attribute;unsupported\n/pre;no significant content;s" (t/ContentChecker.t at line 98 fail #1129)
 #      Expected: "/pre/@width;attribute;unsupported\n/pre;no significant content;s" (<pre width="4" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1130
 ok 1131
@@ -1564,7 +1564,7 @@ ok 1435
 ok 1436
 ok 1437
 not ok 1438
-# Test 1438 got: "/param/@valuetype;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1438)
+# Test 1438 got: "/param/@valuetype;attribute not defined;m\n/param/@valuetype;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1438)
 #      Expected: "/param/@valuetype;attribute;unsupported" (<param name="a" value="b" valuetype="text" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1439
 ok 1440
@@ -1616,7 +1616,7 @@ ok 1485
 ok 1486
 ok 1487
 not ok 1488
-# Test 1488 got: "/map/@name;attribute not defined;m\n/map;attribute missing:id\n/map;no significant content;s" (t/ContentChecker.t at line 98 fail #1488)
+# Test 1488 got: "/map/@name;attribute not defined;m\n/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (t/ContentChecker.t at line 98 fail #1488)
 #      Expected: "/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1489
 ok 1490
@@ -1700,16 +1700,16 @@ ok 1567
 ok 1568
 ok 1569
 not ok 1570
-# Test 1570 got: "/table/@border;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1570)
+# Test 1570 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1570)
 #      Expected: "/table/@border;attribute;unsupported" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1571
-# Test 1571 got: "/table/@frame;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1571)
+# Test 1571 got: "/table/@frame;attribute not defined;m\n/table/@frame;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1571)
 #      Expected: "/table/@frame;attribute;unsupported" (<table frame="border" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1572
-# Test 1572 got: "/table/@border;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1572)
+# Test 1572 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1572)
 #      Expected: "/table/@border;attribute;unsupported" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1573
-# Test 1573 got: "/caption/@align;attribute not defined;m\n/caption;no significant content;s" (t/ContentChecker.t at line 98 fail #1573)
+# Test 1573 got: "/caption/@align;attribute not defined;m\n/caption/@align;attribute;unsupported\n/caption;no significant content;s" (t/ContentChecker.t at line 98 fail #1573)
 #      Expected: "/caption/@align;attribute;unsupported\n/caption;no significant content;s" (<caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1574
 ok 1575
@@ -1742,7 +1742,7 @@ ok 1601
 ok 1602
 ok 1603
 not ok 1604
-# Test 1604 got: "/td/@scope;attribute not defined;m\n/td;no significant content;s" (t/ContentChecker.t at line 98 fail #1604)
+# Test 1604 got: "/td/@scope;attribute not defined;m\n/td/@scope;attribute;unsupported\n/td;no significant content;s" (t/ContentChecker.t at line 98 fail #1604)
 #      Expected: "/td/@scope;attribute;unsupported\n/td;no significant content;s" (<td scope="row" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1605
 ok 1606
@@ -1885,7 +1885,7 @@ ok 1742
 ok 1743
 ok 1744
 not ok 1745
-# Test 1745 got: "/div/@align;attribute not defined;m\n/div;no significant content;s" (t/ContentChecker.t at line 98 fail #1745)
+# Test 1745 got: "/div/@align;attribute not defined;m\n/div/@align;attribute;unsupported\n/div;no significant content;s" (t/ContentChecker.t at line 98 fail #1745)
 #      Expected: "/div/@align;attribute;unsupported\n/div;no significant content;s" (<div align="center" xmlns="http://www.w3.org/1999/xhtml"/>)
 # t/content-model-3.dat
 ok 1746

@@ -765,7 +765,7 @@ my $GetHTMLAttrsChecker = sub {
           || $AttrChecker->{$attr_ns}->{''};
       if ($checker) {
         $checker->($self, $attr, $item);
-      } elsif ($attr_ns eq '') {
+      } elsif ($attr_ns eq '' and not $element_specific_status->{$attr_ln}) {
         #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
@@ -1223,9 +1223,22 @@ $Element->{$HTML_NS}->{meta} = {
         $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
           || $AttrChecker->{$attr_ns}->{''};
       }
+
+      my $status = {
+        %HTMLAttrStatus,
+        charset => FEATURE_HTML5_DEFAULT,
+        content => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        'http-equiv' => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+        lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+        name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        scheme => FEATURE_M12N10_REC,
+      }->{$attr_ln};
+
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
-      } elsif ($attr_ns eq '') {
+      } elsif ($attr_ns eq '' and not $status) {
         #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
@@ -1234,17 +1247,7 @@ $Element->{$HTML_NS}->{meta} = {
       }
 
       if ($attr_ns eq '') {
-        $self->_attr_status_info ($attr, {
-          %HTMLAttrStatus,
-          charset => FEATURE_HTML5_DEFAULT,
-          content => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          'http-equiv' => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-          lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-          name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          scheme => FEATURE_M12N10_REC,
-        }->{$attr_ln});
+        $self->_attr_status_info ($attr, $status);
       }
     }
     
@@ -1996,9 +1999,38 @@ $Element->{$HTML_NS}->{a} = {
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
         || $AttrChecker->{$attr_ns}->{''};
+
+      my $status = {
+        %HTMLAttrStatus,
+        %HTMLM12NCommonAttrStatus,
+        accesskey => FEATURE_M12N10_REC,
+        charset => FEATURE_M12N10_REC,
+        coords => FEATURE_M12N10_REC,
+        cryptopts => FEATURE_RFC2659,
+        dn => FEATURE_RFC2659,
+        href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        hreflang => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+        media => FEATURE_HTML5_DEFAULT,
+        methods => FEATURE_HTML20_RFC,
+        name => FEATURE_M12N10_REC_DEPRECATED,
+        nonce => FEATURE_RFC2659,
+        onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        ping => FEATURE_HTML5_DEFAULT,
+        rel => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        rev => FEATURE_M12N10_REC,
+        sdapref => FEATURE_HTML20_RFC,
+        shape => FEATURE_M12N10_REC,
+        tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        urn => FEATURE_HTML20_RFC,
+      }->{$attr_ln};
+
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
-      } elsif ($attr_ns eq '') {
+      } elsif ($attr_ns eq '' and not $status) {
         #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
@@ -2007,33 +2039,7 @@ $Element->{$HTML_NS}->{a} = {
       }
 
       if ($attr_ns eq '') {
-        $self->_attr_status_info ($attr, {
-          %HTMLAttrStatus,
-          %HTMLM12NCommonAttrStatus,
-          accesskey => FEATURE_M12N10_REC,
-          charset => FEATURE_M12N10_REC,
-          coords => FEATURE_M12N10_REC,
-          cryptopts => FEATURE_RFC2659,
-          dn => FEATURE_RFC2659,
-          href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          hreflang => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-          media => FEATURE_HTML5_DEFAULT,
-          methods => FEATURE_HTML20_RFC,
-          name => FEATURE_M12N10_REC_DEPRECATED,
-          nonce => FEATURE_RFC2659,
-          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          ping => FEATURE_HTML5_DEFAULT,
-          rel => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          rev => FEATURE_M12N10_REC,
-          sdapref => FEATURE_HTML20_RFC,
-          shape => FEATURE_M12N10_REC,
-          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          urn => FEATURE_HTML20_RFC,
-        }->{$attr_ln});
+        $self->_attr_status_info ($attr, $status);
       }
     }
 
@@ -2746,9 +2752,18 @@ $Element->{$HTML_NS}->{embed} = {
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
         || $AttrChecker->{$attr_ns}->{''};
+
+      my $status = {
+        %HTMLAttrStatus,
+        height => FEATURE_HTML5_DEFAULT,
+        src => FEATURE_HTML5_DEFAULT,
+        type => FEATURE_HTML5_DEFAULT,
+        width => FEATURE_HTML5_DEFAULT,
+      }->{$attr_ln};
+
       if ($checker) {
         $checker->($self, $attr);
-      } elsif ($attr_ns eq '') {
+      } elsif ($attr_ns eq '' and not $status) {
         #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
@@ -2757,13 +2772,6 @@ $Element->{$HTML_NS}->{embed} = {
       }
 
       if ($attr_ns eq '') {
-        my $status = {
-          %HTMLAttrStatus,
-          height => FEATURE_HTML5_DEFAULT,
-          src => FEATURE_HTML5_DEFAULT,
-          type => FEATURE_HTML5_DEFAULT,
-          width => FEATURE_HTML5_DEFAULT,
-        }->{$attr_ln};
         $self->_attr_status_info ($attr, $status) if $status;
       }
     }
@@ -3137,9 +3145,31 @@ $Element->{$HTML_NS}->{area} = {
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
         || $AttrChecker->{$attr_ns}->{''};
+
+      my $status = {
+        %HTMLAttrStatus,
+        %HTMLM12NCommonAttrStatus,
+        accesskey => FEATURE_M12N10_REC,
+        alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        coords => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        hreflang => FEATURE_HTML5_DEFAULT,
+        lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+        media => FEATURE_HTML5_DEFAULT,
+        nohref => FEATURE_M12N10_REC,
+        onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        ping => FEATURE_HTML5_DEFAULT,
+        rel => FEATURE_HTML5_DEFAULT,
+        shape => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        type => FEATURE_HTML5_DEFAULT,
+      }->{$attr_ln};
+
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
-      } elsif ($attr_ns eq '') {
+      } elsif ($attr_ns eq '' and not $status) {
         #
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
@@ -3148,26 +3178,7 @@ $Element->{$HTML_NS}->{area} = {
       }
 
       if ($attr_ns eq '') {
-        $self->_attr_status_info ($attr, {
-          %HTMLAttrStatus,
-          %HTMLM12NCommonAttrStatus,
-          accesskey => FEATURE_M12N10_REC,
-          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          coords => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          hreflang => FEATURE_HTML5_DEFAULT,
-          lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-          media => FEATURE_HTML5_DEFAULT,
-          nohref => FEATURE_M12N10_REC,
-          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          ping => FEATURE_HTML5_DEFAULT,
-          rel => FEATURE_HTML5_DEFAULT,
-          shape => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          type => FEATURE_HTML5_DEFAULT,
-        }->{$attr_ln});
+        $self->_attr_status_info ($attr, $status);
       }
     }
 
