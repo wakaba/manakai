@@ -67,6 +67,7 @@ while (<>) {
   s{!!!back-token\s*\(}{q{unshift @{$self->{token}}, (}}ge;
   s{!!!cp\s*\(\s*(\S+)\s*\)\s*;}{
     $DEBUG ? qq{
+      #print STDERR "$1, ";
       \$Whatpm::HTML::Debug::cp_pass->($1) if \$Whatpm::HTML::Debug::cp_pass;
       BEGIN {
         \$Whatpm::HTML::Debug::cp->{$1} = 1;

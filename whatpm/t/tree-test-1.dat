@@ -2229,14 +2229,14 @@ no </div></table> at the end-of-file
 |       "x"
 |       <i>
 |         "y"
-|     <table>
+|     <i>
+|     <div>
 |       <i>
-|       <div>
-|         <i>
-|           <b>
-|             "z"
-|           "a"
-|         "b"
+|         <b>
+|           "z"
+|         "a"
+|       "b"
+|     <table>
 
 #data
 <!DOCTYPE HTML><table><tr><td></body>
@@ -5626,3 +5626,403 @@ unmatched </unknown>
 |   <body>
 |     <p>
 |       "xx"
+
+#data
+<!DOCTYPE HTML><b>a<i>b<applet>c</b>d</i>e
+#errors
+1,37,unmatched end tag:b
+1,42,unmatched end tag:i
+no </applet> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       "a"
+|       <i>
+|         "b"
+|         <applet>
+|           "cde"
+
+#data
+<!DOCTYPE HTML><li>a<applet>b</li>c
+#errors
+1,35,unmatched end tag:li
+no </applet> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <li>
+|       "a"
+|       <applet>
+|         "bc"
+
+#data
+<!DOCTYPE HTML><dt>a<applet>b</dt>c
+#errors
+1,35,unmatched end tag:dt
+no </applet> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dt>
+|       "a"
+|       <applet>
+|         "bc"
+
+#data
+<!DOCTYPE HTML><dd>a<applet>b</dd>c
+#errors
+1,35,unmatched end tag:dd
+no </applet> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dd>
+|       "a"
+|       <applet>
+|         "bc"
+
+#data
+<!DOCTYPE HTML><x>a<applet>b</x>c
+#errors
+1,33,unmatched end tag:x
+no </applet> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <x>
+|       "a"
+|       <applet>
+|         "bc"
+
+#data
+<!DOCTYPE HTML><p><applet><address>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <address>
+
+#data
+<!DOCTYPE HTML><p><applet><h1>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <h1>
+
+#data
+<!DOCTYPE HTML><p><applet><pre>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <pre>
+
+#data
+<!DOCTYPE HTML><p><applet><listing>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <listing>
+
+#data
+<!DOCTYPE HTML><p><applet><div>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <div>
+
+#data
+<!DOCTYPE HTML><p><applet><form>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <form>
+
+#data
+<!DOCTYPE HTML><p><applet><li>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <li>
+
+#data
+<!DOCTYPE HTML><p><applet><dt>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <dt>
+
+#data
+<!DOCTYPE HTML><p><applet><dd>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <dd>
+
+#data
+<!DOCTYPE HTML><p><applet><plaintext>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <plaintext>
+
+#data
+<!DOCTYPE HTML><p><applet><table>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <table>
+
+#data
+<!DOCTYPE HTML><p><applet><hr>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <hr>
+
+#data
+<!DOCTYPE HTML><nobr><applet><nobr>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <nobr>
+|       <applet>
+|         <nobr>
+
+#data
+<!DOCTYPE HTML><button><applet><button>
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <button>
+|       <applet>
+|         <button>
+
+#data
+<!DOCTYPE HTML><address><applet></address>x
+#errors
+unmatched end tag
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <address>
+|       <applet>
+|         "x"
+
+#data
+<!DOCTYPE HTML><h1><applet></h1>x
+#errors
+unmatched end tag
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <h1>
+|       <applet>
+|         "x"
+
+#data
+<!DOCTYPE HTML><button><applet></button>x
+#errors
+unmatched end tag
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <button>
+|       <applet>
+|         "x"
+
+#data
+<!DOCTYPE HTML><object><applet></object>x
+#errors
+unmatched end tag
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <object>
+|       <applet>
+|         "x"
+
+#data
+<!DOCTYPE HTML><p><applet></p>x
+#errors
+unmatched end tag </p>
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <applet>
+|         <p>
+|         "x"
+
+#data
+<!DOCTYPE HTML><dt><applet></dt>x
+#errors
+unmatched end tag
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dt>
+|       <applet>
+|         "x"
+
+#data
+<!DOCTYPE HTML><dd><applet></dd>x
+#errors
+unmatched end tag
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dd>
+|       <applet>
+|         "x"
+
+#data
+<!DOCTYPE HTML><pre><applet></pre>x
+#errors
+unmatched end tag
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <pre>
+|       <applet>
+|         "x"
+
+#data
+<!DOCTYPE HTML><form><applet></form>x
+#errors
+unmatched end tag
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <applet>
+|         "x"
+
+#data
+<!DOCTYPE HTML><applet><applet></applet>x
+#errors
+unexpected end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <applet>
+|       <applet>
+|       "x"

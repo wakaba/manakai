@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.102 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.103 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -74,7 +74,7 @@ my $special_category = {
   textarea => 1, tfoot => 1, thead => 1, title => 1, tr => 1, ul => 1, wbr => 1,
 };
 my $scoping_category = {
-  button => 1, caption => 1, html => 1, marquee => 1, object => 1,
+  applet => 1, button => 1, caption => 1, html => 1, marquee => 1, object => 1,
   table => 1, td => 1, th => 1,
 };
 my $formatting_category = {
@@ -3019,7 +3019,7 @@ sub _tree_construction_main ($) {
   my $formatting_end_tag = sub {
     my $tag_name = shift;
 
-    ## NOTE: The adoptioon agency algorithm (AAA).
+    ## NOTE: The adoption agency algorithm (AAA).
 
     FET: {
       ## Step 1
@@ -3061,7 +3061,7 @@ sub _tree_construction_main ($) {
             return;
           }
         } elsif ({
-                  table => 1, caption => 1, td => 1, th => 1,
+                  applet => 1, table => 1, caption => 1, td => 1, th => 1,
                   button => 1, marquee => 1, object => 1, html => 1,
                  }->{$node->[1]}) {
           !!!cp ('t56');
@@ -3088,7 +3088,7 @@ sub _tree_construction_main ($) {
         if (not $formatting_category->{$node->[1]} and
             #not $phrasing_category->{$node->[1]} and
             ($special_category->{$node->[1]} or
-             $scoping_category->{$node->[1]})) {
+             $scoping_category->{$node->[1]})) { ## Scoping is redundant, maybe
           !!!cp ('t59');
           $furthest_block = $node;
           $furthest_block_i_in_open = $_;
@@ -5495,7 +5495,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p'};
             redo B;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$_->[1]}) {
             !!!cp ('t345');
@@ -5538,7 +5538,7 @@ sub _tree_construction_main ($) {
               $token = {type => END_TAG_TOKEN, tag_name => 'p'};
               redo B;
             } elsif ({
-                      table => 1, caption => 1, td => 1, th => 1,
+                      applet => 1, table => 1, caption => 1, td => 1, th => 1,
                       button => 1, marquee => 1, object => 1, html => 1,
                      }->{$_->[1]}) {
               !!!cp ('t352');
@@ -5560,7 +5560,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p'};
             redo B;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$_->[1]}) {
             !!!cp ('t354');
@@ -5616,7 +5616,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p'};
             redo B;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$_->[1]}) {
             !!!cp ('t361');
@@ -5672,7 +5672,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p'};
             redo B;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$_->[1]}) {
             !!!cp ('t368');
@@ -5751,7 +5751,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'nobr'};
             redo B;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$node->[1]}) {
             !!!cp ('t377');
@@ -5775,7 +5775,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'button'};
             redo B;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$node->[1]}) {
             !!!cp ('t379');
@@ -5793,8 +5793,9 @@ sub _tree_construction_main ($) {
 
         !!!next-token;
         redo B;
-      } elsif ($token->{tag_name} eq 'marquee' or 
-               $token->{tag_name} eq 'object') {
+      } elsif ({
+                applet => 1, marquee => 1, object => 1,
+               }->{$token->{tag_name}}) {
         !!!cp ('t380');
         $reconstruct_active_formatting_elements->($insert_to_current);
         
@@ -5817,7 +5818,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p'};
             redo B;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$_->[1]}) {
             !!!cp ('t383');
@@ -5862,7 +5863,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p'};
             redo B;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$_->[1]}) {
             !!!cp ('t387');
@@ -6076,7 +6077,7 @@ sub _tree_construction_main ($) {
                 div => 1, dl => 1, fieldset => 1, listing => 1,
                 menu => 1, ol => 1, pre => 1, ul => 1,
                 dd => 1, dt => 1, li => 1,
-                button => 1, marquee => 1, object => 1,
+                applet => 1, button => 1, marquee => 1, object => 1,
                }->{$token->{tag_name}}) {
         ## has an element in scope
         my $i;
@@ -6087,7 +6088,7 @@ sub _tree_construction_main ($) {
             $i = $_;
             last INSCOPE;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$node->[1]}) {
             !!!cp ('t411');
@@ -6124,7 +6125,7 @@ sub _tree_construction_main ($) {
           ## Step 4.
           $clear_up_to_marker->()
               if {
-                button => 1, marquee => 1, object => 1,
+                applet => 1, button => 1, marquee => 1, object => 1,
               }->{$token->{tag_name}};
         }
         !!!next-token;
@@ -6141,7 +6142,7 @@ sub _tree_construction_main ($) {
             $i = $_;
             last INSCOPE;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$node->[1]}) {
             !!!cp ('t419');
@@ -6189,7 +6190,7 @@ sub _tree_construction_main ($) {
             $i = $_;
             last INSCOPE;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$node->[1]}) {
             !!!cp ('t424');
@@ -6233,7 +6234,7 @@ sub _tree_construction_main ($) {
             $i = $_;
             last INSCOPE;
           } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
+                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
                    }->{$node->[1]}) {
             !!!cp ('t411.1');
@@ -6541,4 +6542,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 06:29:25 $
+# $Date: 2008/03/09 07:57:29 $
