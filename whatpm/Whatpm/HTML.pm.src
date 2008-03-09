@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.100 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.101 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -303,6 +303,7 @@ sub TABLE_IMS ()      { 0b1000000 }
 sub ROW_IMS ()        { 0b10000000 }
 sub BODY_AFTER_IMS () { 0b100000000 }
 sub FRAME_IMS ()      { 0b1000000000 }
+sub SELECT_IMS ()     { 0b10000000000 }
 
 ## NOTE: "initial" and "before html" insertion modes have no constants.
 
@@ -325,7 +326,8 @@ sub IN_TABLE_IM () { TABLE_IMS }
 sub AFTER_BODY_IM () { BODY_AFTER_IMS }
 sub IN_FRAMESET_IM () { FRAME_IMS | 0b01 }
 sub AFTER_FRAMESET_IM () { FRAME_IMS | 0b10 }
-sub IN_SELECT_IM () { 0b01 }
+sub IN_SELECT_IM () { SELECT_IMS | 0b01 }
+sub IN_SELECT_IN_TABLE_IM () { SELECT_IMS | 0b10 }
 sub IN_COLUMN_GROUP_IM () { 0b10 }
 
 ## Implementations MUST act as if state machine in the spec
@@ -4902,7 +4904,7 @@ sub _tree_construction_main ($) {
             ## reprocess
             redo B;
           }
-    } elsif ($self->{insertion_mode} == IN_SELECT_IM) {
+    } elsif ($self->{insertion_mode} & SELECT_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         !!!cp ('t271');
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
@@ -4941,15 +4943,23 @@ sub _tree_construction_main ($) {
               !!!insert-element ($token->{tag_name}, $token->{attributes});
               !!!next-token;
               redo B;
-            } elsif ($token->{tag_name} eq 'select') {
-## TODO: The type below is not good - <select> is replaced by </select>
-              !!!parse-error (type => 'not closed:select');
-              ## As if </select> instead
+        } elsif ($token->{tag_name} eq 'select' or
+                 $token->{tag_name} eq 'input' or
+                 ($self->{insertion_mode} == IN_SELECT_IN_TABLE_IM and
+                  {
+                   caption => 1, table => 1,
+                   tbody => 1, tfoot => 1, thead => 1,
+                   tr => 1, td => 1, th => 1,
+                  }->{$token->{tag_name}})) {
+          ## TODO: The type below is not good - <select> is replaced by </select>
+          !!!parse-error (type => 'not closed:select');
+          ## NOTE: As if the token were </select> (<select> case) or
+          ## as if there were </select> (otherwise).
               ## have an element in table scope
               my $i;
               INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                 my $node = $self->{open_elements}->[$_];
-                if ($node->[1] eq $token->{tag_name}) {
+                if ($node->[1] eq 'select') {
                   !!!cp ('t278');
                   $i = $_;
                   last INSCOPE;
@@ -4973,8 +4983,15 @@ sub _tree_construction_main ($) {
 
               $self->_reset_insertion_mode;
 
-              !!!next-token;
-              redo B;
+          if ($token->{tag_name} eq 'select') {
+            !!!cp ('t281.2');
+            !!!next-token;
+            redo B;
+          } else {
+            !!!cp ('t281.1');
+            ## Reprocess the token.
+            redo B;
+          }
         } else {
           !!!cp ('t282');
           !!!parse-error (type => 'in select:'.$token->{tag_name});
@@ -5041,10 +5058,11 @@ sub _tree_construction_main ($) {
 
               !!!next-token;
               redo B;
-            } elsif ({
-                      caption => 1, table => 1, tbody => 1,
-                      tfoot => 1, thead => 1, tr => 1, td => 1, th => 1,
-                     }->{$token->{tag_name}}) {
+        } elsif ($self->{insertion_mode} == IN_SELECT_IN_TABLE_IM and
+                 {
+                  caption => 1, table => 1, tbody => 1,
+                  tfoot => 1, thead => 1, tr => 1, td => 1, th => 1,
+                 }->{$token->{tag_name}}) {
 ## TODO: The following is wrong?
               !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
               
@@ -5945,7 +5963,15 @@ sub _tree_construction_main ($) {
 
         ## TODO: associate with $self->{form_element} if defined
         
-        $self->{insertion_mode} = IN_SELECT_IM;
+        if ($self->{insertion_mode} & TABLE_IMS or
+            $self->{insertion_mode} & BODY_TABLE_IMS or
+            $self->{insertion_mode} == IN_COLUMN_GROUP_IM) {
+          !!!cp ('t400.1');
+          $self->{insertion_mode} = IN_SELECT_IN_TABLE_IM;
+        } else {
+          !!!cp ('t400.2');
+          $self->{insertion_mode} = IN_SELECT_IM;
+        }
         !!!next-token;
         redo B;
       } elsif ({
@@ -6486,4 +6512,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 04:08:41 $
+# $Date: 2008/03/09 05:12:05 $

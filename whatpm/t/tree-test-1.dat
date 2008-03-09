@@ -5140,6 +5140,354 @@ unexpected end of file
 |               "a"
 
 #data
+<!DOCTYPE HTML><table><select></table>a
+#errors
+<select> in <table>
+no </select> before </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <table>
+|     "a"
+
+#data
+<!DOCTYPE HTML><table><select><option>b</table>a
+#errors
+<select> in <table>
+no </select> before </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|         "b"
+|     <table>
+|     "a"
+
+#data
+<!DOCTYPE HTML><table><tfoot><select></table>a
+#errors
+<select> in <tfoot>
+no </select> before </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <table>
+|       <tfoot>
+|     "a"
+
+#data
+<!DOCTYPE HTML><table><select><option>b</tfoot>a
+#errors
+<select> in <table>
+unmatched </tfoot>
+no </table> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|         "ba"
+|     <table>
+
+#data
+<!DOCTYPE HTML><table><tr><select></table>a
+#errors
+<select> in <tr>
+no </select> before </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <table>
+|       <tbody>
+|         <tr>
+|     "a"
+
+#data
+<!DOCTYPE HTML><table><tr><select></tr>a</table>
+#errors
+<select> in <tr>
+no </select> before </tr>
+char in <tbody>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     "a"
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tr><td><select><option>b</table>a
+#errors
+no </select> before </table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|               <option>
+|                 "b"
+|     "a"
+
+#data
+<!DOCTYPE HTML><select><input>x
+#errors
+no </select> before </input>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <input>
+|     "x"
+
+#data
+<!DOCTYPE HTML><select><option>a<input>b
+#errors
+no </select> before <input>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|         "a"
+|     <input>
+|     "b"
+
+#data
+<!DOCTYPE HTML><table><select><input></table>a
+#errors
+<select> in <table>
+no </select> before <input>
+<input> in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <input>
+|     <table>
+|     "a"
+
+#data
+<!DOCTYPE HTML><table><select><option>b<input></table>a
+#errors
+<select> in <table>
+no </select> before <input>
+<input> in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|         "b"
+|     <input>
+|     <table>
+|     "a"
+
+#data
+<!DOCTYPE HTML><select><table></table>
+#errors
+<table> in <select>
+</table> in <select>
+no </select> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+
+#data
+<!DOCTYPE HTML><select><option><table></table>x
+#errors
+<table> in <select>
+</table> in <select>
+no </select> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|         "x"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select><table></table>x
+#errors
+no </select> before <table>
+no </table> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|             <table>
+|             "x"
+
+#data
+<!DOCTYPE HTML><select><option><caption>x
+#errors
+<caption> in <select>
+no </select> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|         "x"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select><caption>x
+#errors
+no </select> before <caption>
+no </caption></table> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|       <caption>
+|         "x"
+
+#data
+<!DOCTYPE HTML><select><tbody>x
+#errors
+<tbody> in <select>
+no </select> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "x"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select><tbody><tr><td>x
+#errors
+no </select> before <tbody>
+no </table> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|       <tbody>
+|         <tr>
+|           <td>
+|             "x"
+
+#data
+<!DOCTYPE HTML><select><tr>x
+#errors
+<tr> in <select>
+no </select> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "x"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select><tr><td>x
+#errors
+no </select> before <tr>
+no </table> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|         <tr>
+|           <td>
+|             "x"
+
+#data
+<!DOCTYPE HTML><select><td>x
+#errors
+<td> in <select>
+no </select> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "x"
+
+#data
+<!DOCTYPE HTML><table><tr><td><select><td>x
+#errors
+no </select> before <table>
+no </table> at the end-of-file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|           <td>
+|             "x"
+
+#data
 <!DOCTYPE HTML><p><plaintext>
 #errors
 unexpected end of file (no </plaintext>)

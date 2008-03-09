@@ -1,7 +1,7 @@
 1..980
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Mar  9 13:04:11 2008
-# Current time GMT:   Sun Mar  9 04:04:11 2008
+# Current time local: Sun Mar  9 14:07:38 2008
+# Current time GMT:   Sun Mar  9 05:07:38 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -1709,7 +1709,6 @@ ok 1361
 ok 1362
 ok 1363
 ok 1364
-# t/tree-test-2.dat
 ok 1365
 ok 1366
 ok 1367
@@ -1754,6 +1753,7 @@ ok 1405
 ok 1406
 ok 1407
 ok 1408
+# t/tree-test-2.dat
 ok 1409
 ok 1410
 ok 1411
@@ -1776,19 +1776,13 @@ ok 1427
 ok 1428
 ok 1429
 ok 1430
-not ok 1431
-# Test 1431 got: "2" (t/HTML-tree.t at line 160 fail #716)
-#      Expected: "1" (Parse error: qq'</table><td>'; 1:9:unmatched end tag:4, 1:12:not closed:td;</table> in <tr>.innerHTML)
+ok 1431
 ok 1432
 ok 1433
 ok 1434
-not ok 1435
-# Test 1435 got: "2" (t/HTML-tree.t at line 160 fail #718)
-#      Expected: "1" (Parse error: qq'<table>'; 1:7:not closed:html, 1:7:unmatched end tag:table;<table> in <table>)
+ok 1435
 ok 1436
-not ok 1437
-# Test 1437 got: "3" (t/HTML-tree.t at line 160 fail #719)
-#      Expected: "1" (Parse error: qq'<table><tr>'; 1:8:not closed:html, 1:8:unmatched end tag:table, 1:11:not closed:tr;<table> in <table>)
+ok 1437
 ok 1438
 ok 1439
 ok 1440
@@ -1796,15 +1790,11 @@ ok 1441
 ok 1442
 ok 1443
 ok 1444
-not ok 1445
-# Test 1445 got: "2" (t/HTML-tree.t at line 160 fail #723)
-#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag:select, 1:17:not closed:option;</select> in <select>.innerHTML)
+ok 1445
 ok 1446
 ok 1447
 ok 1448
-not ok 1449
-# Test 1449 got: "3" (t/HTML-tree.t at line 160 fail #725)
-#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed:select, 1:9:unmatched end tag:select, 1:16:not closed:option;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
+ok 1449
 ok 1450
 ok 1451
 ok 1452
@@ -1830,19 +1820,19 @@ ok 1471
 ok 1472
 ok 1473
 ok 1474
-ok 1475
+not ok 1475
+# Test 1475 got: "2" (t/HTML-tree.t at line 160 fail #738)
+#      Expected: "1" (Parse error: qq'</table><td>'; 1:9:unmatched end tag:4, 1:12:not closed:td;</table> in <tr>.innerHTML)
 ok 1476
-not ok 1477
-# Test 1477 got: "1" (t/HTML-tree.t at line 160 fail #739)
-#      Expected: "0" (Parse error: qq'<option>'; 1:8:not closed:option;)
+ok 1477
 ok 1478
 not ok 1479
-# Test 1479 got: "1" (t/HTML-tree.t at line 160 fail #740)
-#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:not closed:optgroup;)
+# Test 1479 got: "2" (t/HTML-tree.t at line 160 fail #740)
+#      Expected: "1" (Parse error: qq'<table>'; 1:7:not closed:html, 1:7:unmatched end tag:table;<table> in <table>)
 ok 1480
 not ok 1481
-# Test 1481 got: "2" (t/HTML-tree.t at line 160 fail #741)
-#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:unmatched end tag:tr, 1:14:not closed:option;</tr> in <select>)
+# Test 1481 got: "3" (t/HTML-tree.t at line 160 fail #741)
+#      Expected: "1" (Parse error: qq'<table><tr>'; 1:8:not closed:html, 1:8:unmatched end tag:table, 1:11:not closed:tr;<table> in <table>)
 ok 1482
 ok 1483
 ok 1484
@@ -1850,11 +1840,15 @@ ok 1485
 ok 1486
 ok 1487
 ok 1488
-ok 1489
+not ok 1489
+# Test 1489 got: "2" (t/HTML-tree.t at line 160 fail #745)
+#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag:select, 1:17:not closed:option;</select> in <select>.innerHTML)
 ok 1490
 ok 1491
 ok 1492
-ok 1493
+not ok 1493
+# Test 1493 got: "3" (t/HTML-tree.t at line 160 fail #747)
+#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed:select, 1:9:unmatched end tag:select, 1:16:not closed:option;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
 ok 1494
 ok 1495
 ok 1496
@@ -1882,11 +1876,17 @@ ok 1517
 ok 1518
 ok 1519
 ok 1520
-ok 1521
+not ok 1521
+# Test 1521 got: "1" (t/HTML-tree.t at line 160 fail #761)
+#      Expected: "0" (Parse error: qq'<option>'; 1:8:not closed:option;)
 ok 1522
-ok 1523
+not ok 1523
+# Test 1523 got: "1" (t/HTML-tree.t at line 160 fail #762)
+#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:not closed:optgroup;)
 ok 1524
-ok 1525
+not ok 1525
+# Test 1525 got: "2" (t/HTML-tree.t at line 160 fail #763)
+#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/tr, 1:14:not closed:option;</tr> in <select>)
 ok 1526
 ok 1527
 ok 1528
@@ -1944,3 +1944,47 @@ ok 1579
 ok 1580
 ok 1581
 ok 1582
+ok 1583
+ok 1584
+ok 1585
+ok 1586
+ok 1587
+ok 1588
+ok 1589
+ok 1590
+ok 1591
+ok 1592
+ok 1593
+ok 1594
+ok 1595
+ok 1596
+ok 1597
+ok 1598
+ok 1599
+ok 1600
+ok 1601
+ok 1602
+ok 1603
+ok 1604
+ok 1605
+ok 1606
+ok 1607
+ok 1608
+ok 1609
+ok 1610
+ok 1611
+ok 1612
+ok 1613
+ok 1614
+ok 1615
+ok 1616
+ok 1617
+ok 1618
+ok 1619
+ok 1620
+ok 1621
+ok 1622
+ok 1623
+ok 1624
+ok 1625
+ok 1626
