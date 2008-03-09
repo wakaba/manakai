@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.102 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.103 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4172,38 +4172,6 @@ sub _tree_construction_main ($) {
       ## Stay in the phase
       $token = $self->_get_next_token;
       redo B;
-    } elsif ($token->{type} == END_OF_FILE_TOKEN) {
-      if ($self->{insertion_mode} & AFTER_HTML_IMS) {
-        
-        #
-      } else {
-        ## Generate implied end tags
-        while ({
-                dd => 1, dt => 1, li => 1, p => 1,
-               }->{$self->{open_elements}->[-1]->[1]}) {
-          
-          pop @{$self->{open_elements}};
-        }
-        
-        if (@{$self->{open_elements}} > 2 or
-            (@{$self->{open_elements}} == 2 and $self->{open_elements}->[1]->[1] ne 'body')) {
-          
-          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-        } elsif (defined $self->{inner_html_node} and
-                 @{$self->{open_elements}} > 1 and
-                 $self->{open_elements}->[1]->[1] ne 'body') {
-## ISSUE: This case is never reached.
-          
-          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-        } else {
-          
-        }
-
-        ## ISSUE: There is an issue in the spec.
-      }
-
-      ## Stop parsing
-      last B;
     } elsif ($token->{type} == START_TAG_TOKEN and
              $token->{tag_name} eq 'html') {
       if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
@@ -4850,9 +4818,75 @@ sub _tree_construction_main ($) {
             $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
             redo B;
-          } else {
-            die "$0: $token->{type}: Unknown token type";
-          }
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
+          
+
+          ## NOTE: As if <head>
+          
+      $self->{head_element} = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+    
+          $self->{open_elements}->[-1]->[0]->append_child
+              ($self->{head_element});
+          #push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
+          #$self->{insertion_mode} = IN_HEAD_IM;
+          ## NOTE: Reprocess.
+
+          ## NOTE: As if </head>
+          #pop @{$self->{open_elements}};
+          #$self->{insertion_mode} = IN_AFTER_HEAD_IM;
+          ## NOTE: Reprocess.
+          
+          #
+        } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
+          
+
+          ## NOTE: As if </head>
+          pop @{$self->{open_elements}};
+          #$self->{insertion_mode} = IN_AFTER_HEAD_IM;
+          ## NOTE: Reprocess.
+
+          #
+        } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
+          
+
+          $self->{parse_error}-> (type => 'in noscript:#eof');
+
+          ## As if </noscript>
+          pop @{$self->{open_elements}};
+          #$self->{insertion_mode} = IN_HEAD_IM;
+          ## NOTE: Reprocess.
+
+          ## NOTE: As if </head>
+          pop @{$self->{open_elements}};
+          #$self->{insertion_mode} = IN_AFTER_HEAD_IM;
+          ## NOTE: Reprocess.
+
+          #
+        } else {
+          
+          #
+        }
+
+        ## NOTE: As if <body>
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+    
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, 'body'];
+    }
+  
+        $self->{insertion_mode} = IN_BODY_IM;
+        ## NOTE: Reprocess.
+        redo B;
+      } else {
+        die "$0: $token->{type}: Unknown token type";
+      }
 
           ## ISSUE: An issue in the spec.
     } elsif ($self->{insertion_mode} & BODY_IMS) {
@@ -5194,6 +5228,20 @@ sub _tree_construction_main ($) {
               
               #
             }
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        for my $entry (@{$self->{open_elements}}) {
+          if (not {
+            dd => 1, dt => 1, li => 1, p => 1, tbody => 1, td => 1, tfoot => 1,
+            th => 1, thead => 1, tr => 1, body => 1, html => 1,
+          }->{$entry->[1]}) {
+            
+            $self->{parse_error}-> (type => 'in body:#eof');
+            last;
+          }
+        }
+
+        ## Stop parsing.
+        last B;
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
@@ -5960,6 +6008,17 @@ sub _tree_construction_main ($) {
           $insert = $insert_to_foster;
           #
         }
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        unless ($self->{open_elements}->[-1]->[1] eq 'html' and
+                @{$self->{open_elements}} == 1) { # redundant, maybe
+          
+          $self->{parse_error}-> (type => 'in body:#eof');
+        } else {
+          
+        }
+
+        ## Stop parsing
+        last B;
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
@@ -6027,13 +6086,28 @@ sub _tree_construction_main ($) {
               
               # 
             }
-          } else {
-            die "$0: $token->{type}: Unknown token type";
-          }
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        if ($self->{open_elements}->[-1]->[1] eq 'html' or
+            @{$self->{open_elements}} == 1) { # redundant, maybe
+          
+          ## Stop parsing.
+          last B;
+        } else {
+          ## NOTE: As if </colgroup>.
+          
+          pop @{$self->{open_elements}}; # colgroup
+          $self->{insertion_mode} = IN_TABLE_IM;
+          ## Reprocess.
+          redo B;
+        }
+      } else {
+        die "$0: $token->{type}: Unknown token type";
+      }
 
           ## As if </colgroup>
           if ($self->{open_elements}->[-1]->[1] eq 'html') {
             
+## TODO: Wrong error type?
             $self->{parse_error}-> (type => 'unmatched end tag:colgroup');
             ## Ignore the token
             $token = $self->_get_next_token;
@@ -6299,6 +6373,17 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           redo B;
         }
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        unless ($self->{open_elements}->[-1]->[1] eq 'html' and
+                @{$self->{open_elements}} == 1) { # redundant, maybe
+          
+          $self->{parse_error}-> (type => 'in body:#eof');
+        } else {
+          
+        }
+
+        ## Stop parsing.
+        last B;
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
@@ -6382,6 +6467,10 @@ sub _tree_construction_main ($) {
           ## reprocess
           redo B;
         }
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        
+        ## Stop parsing
+        last B;
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
@@ -6547,6 +6636,17 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           redo B;
         }
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        unless ($self->{open_elements}->[-1]->[1] eq 'html' and
+                @{$self->{open_elements}} == 1) { # redundant, maybe
+          
+          $self->{parse_error}-> (type => 'in body:#eof');
+        } else {
+          
+        }
+        
+        ## Stop parsing
+        last B;
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
@@ -7998,4 +8098,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 07:57:26 $
+# $Date: 2008/03/09 08:47:33 $
