@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.104 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.105 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4901,10 +4901,12 @@ sub _tree_construction_main ($) {
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         unless ($self->{open_elements}->[-1]->[1] eq 'html' and
                 @{$self->{open_elements}} == 1) { # redundant, maybe
-          !!!cp ('t259.1');
           !!!parse-error (type => 'in body:#eof');
+          !!!cp ('t259.1');
+          #
         } else {
           !!!cp ('t259.2');
+          #
         }
 
         ## Stop parsing
@@ -6629,4 +6631,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 08:47:33 $
+# $Date: 2008/03/09 10:05:21 $
