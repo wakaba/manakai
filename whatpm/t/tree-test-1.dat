@@ -248,6 +248,67 @@ no doctype
 |       "xy"
 
 #data
+<!DOCTYPE HTML><html> <head><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><html> 
+<head><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><html>   <!---->   <head><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <!--  -->
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><html>  <!DOCTYPE HTML>  <head><body>
+#errors
+<!DOCTYPE> in <html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><html a>  <html b>  <head><body>
+#errors
+second <html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   a=""
+|   b=""
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><html>   </end>  <head><body>
+#errors
+unmatched </end>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
 <!DOCTYPE HTML><html title="t"><head><title></title></head><body></body></html>
 #errors
 #document
@@ -294,27 +355,25 @@ no doctype
 #data
 <!DOCTYPE HTML><html><head></head><body><title class="a"></title></body></html>
 #errors
-title in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
+|   <body>
 |     <title>
 |       class="a"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head></head><body></body><title class="a"></title></html>
 #errors
 data after body
-title in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
+|   <body>
 |     <title>
 |       class="a"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body title="t"></body></html>

@@ -687,6 +687,42 @@ a\U12345678b
 #document-fragment html
 
 #data
+                       
+#errors
+#document-fragment html
+
+#data
+             <head><body>
+#errors
+#document-fragment html
+| <head>
+| <body>
+
+#data
+                    a
+#errors
+#document-fragment html
+| <head>
+| <body>
+|   "a"
+
+#data
+           a        b
+#errors
+#document-fragment html
+| <head>
+| <body>
+|   "a        b"
+
+#data
+    <!---->    <body>
+#errors
+#document-fragment html
+| <!--  -->
+| <head>
+| <body>
+
+#data
 #errors
 #document-fragment pre
 

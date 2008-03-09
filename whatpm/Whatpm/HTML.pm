@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.98 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.99 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4217,7 +4217,15 @@ sub _tree_construction_main ($) {
     } elsif ($self->{insertion_mode} & HEAD_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-          $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
+          unless ($self->{insertion_mode} == BEFORE_HEAD_IM) {
+            
+            $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
+          } else {
+            
+            ## Ignore the token.
+            $token = $self->_get_next_token;
+            redo B;
+          }
           unless (length $token->{data}) {
             
             $token = $self->_get_next_token;
@@ -7914,4 +7922,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 03:23:42 $
+# $Date: 2008/03/09 03:46:43 $
