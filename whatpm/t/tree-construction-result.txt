@@ -1,7 +1,7 @@
 1..980
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Mar  9 19:01:22 2008
-# Current time GMT:   Sun Mar  9 10:01:22 2008
+# Current time local: Sun Mar  9 19:26:53 2008
+# Current time GMT:   Sun Mar  9 10:26:53 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -749,37 +749,19 @@ ok 668
 ok 669
 ok 670
 ok 671
-not ok 672
-# Test 672 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|   <body>\n" (t/HTML-tree.t at line 162 fail #336)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n" (Document tree: qq'<!DOCTYPE HTML><head><noscript><noscript>')
-#     Got 1 extra line at line 5:
-#      + "|   <body>\n"
+ok 672
 ok 673
-not ok 674
-# Test 674 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|       \" \"\n|   <body>\n" (t/HTML-tree.t at line 162 fail #337)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|       \" \"\n" (Document tree: qq'<!DOCTYPE HTML><head><noscript><noscript> ')
-#     Got 1 extra line at line 6:
-#      + "|   <body>\n"
+ok 674
 ok 675
-not ok 676
-# Test 676 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|       \"  \"\n|   <body>\n" (t/HTML-tree.t at line 162 fail #338)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|       \"  \"\n" (Document tree: qq'<!DOCTYPE HTML><head><noscript> <noscript> ')
-#     Got 1 extra line at line 6:
-#      + "|   <body>\n"
+ok 676
 ok 677
 ok 678
 ok 679
 ok 680
 ok 681
 ok 682
-not ok 683
-# Test 683 got: "1" (t/HTML-tree.t at line 160 fail #342)
-#     Expected: "2" (Parse error: qq'<!DOCTYPE HTML><head><noscript><script></script>'; 1:40:in noscript:script;<script> in <noscript> in <head>, unexpected end of file)
-not ok 684
-# Test 684 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|     <script>\n|   <body>\n" (t/HTML-tree.t at line 162 fail #342)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|     <script>\n" (Document tree: qq'<!DOCTYPE HTML><head><noscript><script></script>')
-#     Got 1 extra line at line 6:
-#      + "|   <body>\n"
+ok 683
+ok 684
 ok 685
 ok 686
 ok 687
@@ -793,17 +775,9 @@ ok 694
 ok 695
 ok 696
 ok 697
-not ok 698
-# Test 698 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|   <body>\n" (t/HTML-tree.t at line 162 fail #349)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n" (Document tree: qq'<!DOCTYPE HTML><head><noscript></div>')
-#     Got 1 extra line at line 5:
-#      + "|   <body>\n"
+ok 698
 ok 699
-not ok 700
-# Test 700 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n|   <body>\n" (t/HTML-tree.t at line 162 fail #350)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <noscript>\n" (Document tree: qq'<!DOCTYPE HTML><head><noscript></img>')
-#     Got 1 extra line at line 5:
-#      + "|   <body>\n"
+ok 700
 ok 701
 ok 702
 ok 703
@@ -954,7 +928,7 @@ ok 847
 ok 848
 not ok 849
 # Test 849 got: "4" (t/HTML-tree.t at line 160 fail #425)
-#     Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table><tr><td></td>x<table>  </table></table>'; 1:37:in table:#character, 1:44:not closed:tr, 1:44:not closed:tr, 1:61:unmatched end tag:table;char in <tr>, <table> in <tr>, unmatched </table>)
+#     Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table><tr><td></td>x<table>  </table></table>'; 1:37:in table:#character, 1:44:not closed:tr, 1:44:not closed:tr, 1:61:unmatched end tag:table;char in <tr>, no </table> before <table>, unmatched </table>)
 ok 850
 ok 851
 ok 852
@@ -1410,15 +1384,13 @@ ok 1291
 ok 1292
 ok 1293
 ok 1294
-not ok 1295
-# Test 1295 got: "3" (t/HTML-tree.t at line 160 fail #648)
-#      Expected: "4" (Parse error: qq'<p><font><form> </form>'; 1:4:no DOCTYPE, 1:16:not closed:font, 1:23:not closed:font;1,4,no DOCTYPE, 1,16,not closed:font, 1,23,unmatched end tag:form, 1,23,not closed:font)
+ok 1295
 ok 1296
-not ok 1297
-# Test 1297 got: "4" (t/HTML-tree.t at line 160 fail #649)
-#      Expected: "3" (Parse error: qq'<table a><tr><table b>'; 1:10:no DOCTYPE, 1:22:not closed:tr, 1:22:not closed:tr, 1:22:in body:#eof;1,10,no DOCTYPE, 1,22,not closed:tr, 1,22,not closed:table)
+ok 1297
 ok 1298
-ok 1299
+not ok 1299
+# Test 1299 got: "4" (t/HTML-tree.t at line 160 fail #650)
+#      Expected: "3" (Parse error: qq'<table a><tr><table b>'; 1:10:no DOCTYPE, 1:22:not closed:tr, 1:22:not closed:tr, 1:22:in body:#eof;1,10,no DOCTYPE, 1,22,not closed:tr, 1,22,not closed:table)
 ok 1300
 ok 1301
 ok 1302
@@ -1652,9 +1624,9 @@ ok 1529
 ok 1530
 ok 1531
 ok 1532
-# t/tree-test-2.dat
 ok 1533
 ok 1534
+# t/tree-test-2.dat
 ok 1535
 ok 1536
 ok 1537
@@ -1723,31 +1695,29 @@ ok 1599
 ok 1600
 ok 1601
 ok 1602
-not ok 1603
-# Test 1603 got: "2" (t/HTML-tree.t at line 160 fail #802)
-#      Expected: "1" (Parse error: qq'<table>'; 1:7:not closed:html, 1:7:unmatched end tag:table;<table> in <table>)
+ok 1603
 ok 1604
-not ok 1605
-# Test 1605 got: "3" (t/HTML-tree.t at line 160 fail #803)
-#      Expected: "1" (Parse error: qq'<table><tr>'; 1:8:not closed:html, 1:8:unmatched end tag:table, 1:11:in body:#eof;<table> in <table>)
+ok 1605
 ok 1606
-ok 1607
+not ok 1607
+# Test 1607 got: "3" (t/HTML-tree.t at line 160 fail #804)
+#      Expected: "2" (Parse error: qq'<table><tr>'; 1:8:not closed:html, 1:8:unmatched end tag:table, 1:11:in body:#eof;no </table> before <table>, </table> but no opening <table>)
 ok 1608
 ok 1609
 ok 1610
 ok 1611
 ok 1612
-not ok 1613
-# Test 1613 got: "2" (t/HTML-tree.t at line 160 fail #807)
-#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag:select, 1:17:in body:#eof;</select> in <select>.innerHTML)
+ok 1613
 ok 1614
-ok 1615
+not ok 1615
+# Test 1615 got: "2" (t/HTML-tree.t at line 160 fail #808)
+#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag:select, 1:17:in body:#eof;</select> in <select>.innerHTML)
 ok 1616
-not ok 1617
-# Test 1617 got: "3" (t/HTML-tree.t at line 160 fail #809)
-#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed:select, 1:9:unmatched end tag:select, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
+ok 1617
 ok 1618
-ok 1619
+not ok 1619
+# Test 1619 got: "3" (t/HTML-tree.t at line 160 fail #810)
+#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed:select, 1:9:unmatched end tag:select, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
 ok 1620
 ok 1621
 ok 1622
@@ -1773,19 +1743,19 @@ ok 1641
 ok 1642
 ok 1643
 ok 1644
-not ok 1645
-# Test 1645 got: "1" (t/HTML-tree.t at line 160 fail #823)
-#      Expected: "0" (Parse error: qq'<option>'; 1:8:in body:#eof;)
+ok 1645
 ok 1646
 not ok 1647
 # Test 1647 got: "1" (t/HTML-tree.t at line 160 fail #824)
-#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<option>'; 1:8:in body:#eof;)
 ok 1648
 not ok 1649
-# Test 1649 got: "2" (t/HTML-tree.t at line 160 fail #825)
-#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/tr, 1:14:in body:#eof;</tr> in <select>)
+# Test 1649 got: "1" (t/HTML-tree.t at line 160 fail #825)
+#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:in body:#eof;)
 ok 1650
-ok 1651
+not ok 1651
+# Test 1651 got: "2" (t/HTML-tree.t at line 160 fail #826)
+#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/tr, 1:14:in body:#eof;</tr> in <select>)
 ok 1652
 ok 1653
 ok 1654
@@ -1819,53 +1789,27 @@ ok 1681
 ok 1682
 ok 1683
 ok 1684
-not ok 1685
-# Test 1685 got: "1" (t/HTML-tree.t at line 160 fail #843)
-#      Expected: "2" (Parse error: qq'<title>aa'; 1:9:in RCDATA:#5;EOF in <title>, unexpected end of file)
-not ok 1686
-# Test 1686 got: "| <head>\n|   <title>\n|     \"aa\"\n| <body>\n" (t/HTML-tree.t at line 162 fail #843)
-#      Expected: "| <head>\n|   <title>\n|     \"aa\"\n" (Document tree: qq'<title>aa')
-#      Got 1 extra line at line 4:
-#       + "| <body>\n"
-not ok 1687
-# Test 1687 got: "0" (t/HTML-tree.t at line 160 fail #844)
-#      Expected: "1" (Parse error: qq'<title>aa</title>'; ;unexpected end of file)
-not ok 1688
-# Test 1688 got: "| <head>\n|   <title>\n|     \"aa\"\n| <body>\n" (t/HTML-tree.t at line 162 fail #844)
-#      Expected: "| <head>\n|   <title>\n|     \"aa\"\n" (Document tree: qq'<title>aa</title>')
-#      Got 1 extra line at line 4:
-#       + "| <body>\n"
-not ok 1689
-# Test 1689 got: "0" (t/HTML-tree.t at line 160 fail #845)
-#      Expected: "1" (Parse error: qq'<style></style>'; ;unexpected end of file)
-not ok 1690
-# Test 1690 got: "| <head>\n|   <style>\n| <body>\n" (t/HTML-tree.t at line 162 fail #845)
-#      Expected: "| <head>\n|   <style>\n" (Document tree: qq'<style></style>')
+ok 1685
+ok 1686
+ok 1687
+ok 1688
+ok 1689
+ok 1690
 ok 1691
-not ok 1692
-# Test 1692 got: "| <head>\n| <body>\n" (t/HTML-tree.t at line 162 fail #846)
-#      Expected: "" (Document tree: qq'')
-not ok 1693
-# Test 1693 got: "0" (t/HTML-tree.t at line 160 fail #847)
-#      Expected: "1" (Parse error: qq'<head>'; ;unexpected end of file (no <body>))
-not ok 1694
-# Test 1694 got: "| <head>\n| <body>\n" (t/HTML-tree.t at line 162 fail #847)
-#      Expected: "| <head>\n" (Document tree: qq'<head>')
-not ok 1695
-# Test 1695 got: "0" (t/HTML-tree.t at line 160 fail #848)
-#      Expected: "1" (Parse error: qq'<link>'; ;unexpected end of file (no <body>))
-not ok 1696
-# Test 1696 got: "| <head>\n|   <link>\n| <body>\n" (t/HTML-tree.t at line 162 fail #848)
-#      Expected: "| <head>\n|   <link>\n" (Document tree: qq'<link>')
+ok 1692
+ok 1693
+ok 1694
+ok 1695
+ok 1696
 ok 1697
 ok 1698
 ok 1699
 ok 1700
-not ok 1701
-# Test 1701 got: "2" (t/HTML-tree.t at line 160 fail #851)
-#      Expected: "3" (Parse error: qq'<span></html>'; 1:13:not closed:body, 1:13:unmatched end tag:html;<span> not closed at </body> implied by </html>, unmatched </html>, unexpected end of file (no </span>))
+ok 1701
 ok 1702
-ok 1703
+not ok 1703
+# Test 1703 got: "2" (t/HTML-tree.t at line 160 fail #852)
+#      Expected: "3" (Parse error: qq'<span></html>'; 1:13:not closed:body, 1:13:unmatched end tag:html;<span> not closed at </body> implied by </html>, unmatched </html>, unexpected end of file (no </span>))
 ok 1704
 ok 1705
 ok 1706
@@ -1884,13 +1828,9 @@ ok 1718
 ok 1719
 ok 1720
 ok 1721
-not ok 1722
-# Test 1722 got: "| <head>\n| <body>\n" (t/HTML-tree.t at line 162 fail #861)
-#      Expected: "" (Document tree: qq'<html>')
+ok 1722
 ok 1723
-not ok 1724
-# Test 1724 got: "| <head>\n| <body>\n" (t/HTML-tree.t at line 162 fail #862)
-#      Expected: "" (Document tree: qq'                       ')
+ok 1724
 ok 1725
 ok 1726
 ok 1727
@@ -1927,27 +1867,27 @@ ok 1757
 ok 1758
 ok 1759
 ok 1760
-not ok 1761
-# Test 1761 got: "1" (t/HTML-tree.t at line 160 fail #881)
-#      Expected: "0" (Parse error: qq'<thead>'; 1:7:in body:#eof;)
+ok 1761
 ok 1762
 not ok 1763
 # Test 1763 got: "1" (t/HTML-tree.t at line 160 fail #882)
-#      Expected: "0" (Parse error: qq'<tbody>'; 1:7:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<thead>'; 1:7:in body:#eof;)
 ok 1764
 not ok 1765
 # Test 1765 got: "1" (t/HTML-tree.t at line 160 fail #883)
-#      Expected: "0" (Parse error: qq'<tfoot>'; 1:7:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<tbody>'; 1:7:in body:#eof;)
 ok 1766
 not ok 1767
 # Test 1767 got: "1" (t/HTML-tree.t at line 160 fail #884)
-#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<tfoot>'; 1:7:in body:#eof;)
 ok 1768
 not ok 1769
 # Test 1769 got: "1" (t/HTML-tree.t at line 160 fail #885)
 #      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
 ok 1770
-ok 1771
+not ok 1771
+# Test 1771 got: "1" (t/HTML-tree.t at line 160 fail #886)
+#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
 ok 1772
 ok 1773
 ok 1774
@@ -1967,3 +1907,5 @@ ok 1787
 ok 1788
 ok 1789
 ok 1790
+ok 1791
+ok 1792

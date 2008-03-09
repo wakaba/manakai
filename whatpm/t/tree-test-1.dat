@@ -595,6 +595,7 @@ no </noscript>
 | <html>
 |   <head>
 |     <noscript>
+|   <body>
 
 ## when script is disabled
 #data
@@ -608,6 +609,7 @@ no </noscript>
 |   <head>
 |     <noscript>
 |       " "
+|   <body>
 
 ## when script is disabled
 #data
@@ -621,6 +623,7 @@ no </noscript>
 |   <head>
 |     <noscript>
 |       "  "
+|   <body>
 
 ## When scripting is disabled
 #data
@@ -665,13 +668,13 @@ no </noscript>
 <!DOCTYPE HTML><head><noscript><script></script>
 #errors
 <script> in <noscript> in <head>
-unexpected end of file
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <noscript>
 |     <script>
+|   <body>
 
 ## When scripting is disabled
 #data
@@ -762,6 +765,7 @@ unexpected end of file (no </noscript>)
 | <html>
 |   <head>
 |     <noscript>
+|   <body>
 
 ## When scripting is disabled
 #data
@@ -774,6 +778,7 @@ unexpected end of file (no </noscript>)
 | <html>
 |   <head>
 |     <noscript>
+|   <body>
 
 ## When scripting is disabled
 #data
@@ -1723,7 +1728,7 @@ char in <tr>
 <!DOCTYPE HTML><table><tr><td></td>x<table>  </table></table>
 #errors
 char in <tr>
-<table> in <tr>
+no </table> before <table>
 unmatched </table>
 #document
 | <!DOCTYPE HTML>
@@ -4794,8 +4799,7 @@ unmatched </h1>
 #errors
 1,4,no DOCTYPE
 1,16,not closed:font
-1,23,unmatched end tag:form
-1,23,not closed:font
+unexpected end-of-file
 #document
 | <html>
 |   <head>
@@ -4805,6 +4809,25 @@ unmatched </h1>
 |     <form>
 |       <font>
 |         " "
+
+#data
+<p><font><form> </form>a
+#errors
+no DOCTYPE
+<font> not closed before <form>
+<font> not closed before </form>
+unexpected end-of-file (<font> not closed before end-of-file)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <font>
+|     <form>
+|       <font>
+|         " "
+|     <font>
+|       "a"
 
 #data
 <table a><tr><table b>

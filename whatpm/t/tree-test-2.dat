@@ -264,13 +264,15 @@ char in <tr>
 #data
 <table>
 #errors
-<table> in <table>
+no </table> before <table> (</table> implied before <table>)
+</table> but no opening <table> (</table> ignored, which causes <table> ignored)
 #document-fragment table
 
 #data
 <table><tr>
 #errors
-<table> in <table>
+no </table> before <table>
+</table> but no opening <table>
 #document-fragment table
 | <tbody>
 |   <tr>
@@ -541,47 +543,49 @@ a
 <title>aa
 #errors
 EOF in <title>
-unexpected end of file
 #document-fragment html
 | <head>
 |   <title>
 |     "aa"
+| <body>
 
 #data
 <title>aa</title>
 #errors
-unexpected end of file
 #document-fragment html
 | <head>
 |   <title>
 |     "aa"
+| <body>
 
 #data
 <style></style>
 #errors
-unexpected end of file
 #document-fragment html
 | <head>
 |   <style>
+| <body>
 
 #data
 #errors
 #document-fragment html
+| <head>
+| <body>
 
 #data
 <head>
 #errors
-unexpected end of file (no <body>)
 #document-fragment html
 | <head>
+| <body>
 
 #data
 <link>
 #errors
-unexpected end of file (no <body>)
 #document-fragment html
 | <head>
 |   <link>
+| <body>
 
 #data
 </html>
@@ -685,11 +689,15 @@ a\U12345678b
 #errors
 <html> in <html>
 #document-fragment html
+| <head>
+| <body>
 
 #data
                        
 #errors
 #document-fragment html
+| <head>
+| <body>
 
 #data
              <head><body>

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.105 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.106 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4535,6 +4535,7 @@ sub _tree_construction_main ($) {
                 redo B;
               }
               
+## TODO: Followings are removed from the latest spec.
               ## generate implied end tags
               while ({
                       dd => 1, dt => 1, li => 1, p => 1,
@@ -6631,4 +6632,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 10:05:21 $
+# $Date: 2008/03/09 10:31:19 $
