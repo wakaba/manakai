@@ -14,7 +14,9 @@ while (<>) {
   }}ge;
   s{!!!back-next-input-character\b}{q{unshift @{$self->{char}}, }}ge;
   s{!!!parse-error;}{q{$self->{parse_error}->();}}ge;
-  s{!!!parse-error\b}{q{$self->{parse_error}->}}ge;
+  s{!!!parse-error\s*\(}{
+    q{$self->{parse_error}->(level => $self->{must_level}, }
+  }ge;
   s{!!!insert-element-t\s*\(([^(),]+),([^(),]+)\)\s*;}{qq{
     {
       my \$el;

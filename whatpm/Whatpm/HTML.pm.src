@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.107 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.108 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3886,61 +3886,58 @@ sub _tree_construction_main ($) {
                 }->{$token->{tag_name}}) {
               if ($self->{insertion_mode} == IN_CELL_IM) {
                 ## have an element in table scope
-                my $tn;
-                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                for (reverse 0..$#{$self->{open_elements}}) {
                   my $node = $self->{open_elements}->[$_];
                   if ($node->[1] eq 'td' or $node->[1] eq 'th') {
                     !!!cp ('t151');
-                    $tn = $node->[1];
-                    last INSCOPE;
+
+                    ## Close the cell
+                    !!!back-token; # <?>
+                    $token = {type => END_TAG_TOKEN, tag_name => $node->[1]};
+                    redo B;
                   } elsif ({
                             table => 1, html => 1,
                            }->{$node->[1]}) {
                     !!!cp ('t152');
-                    last INSCOPE;
+                    ## ISSUE: This case can never be reached, maybe.
+                    last;
                   }
-                } # INSCOPE
-                  unless (defined $tn) {
-                    !!!cp ('t153');
-## TODO: This error type is wrong.
-                    !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
-                    ## Ignore the token
-                    !!!next-token;
-                    redo B;
-                  }
-                
-                !!!cp ('t154');
-                ## Close the cell
-                !!!back-token; # <?>
-                $token = {type => END_TAG_TOKEN, tag_name => $tn};
+                }
+
+                !!!cp ('t153');
+                !!!parse-error (type => 'start tag not allowed',
+                    value => $token->{tag_name});
+                ## Ignore the token
+                !!!next-token;
                 redo B;
               } elsif ($self->{insertion_mode} == IN_CAPTION_IM) {
                 !!!parse-error (type => 'not closed:caption');
                 
-                ## As if </caption>
+                ## NOTE: As if </caption>.
                 ## have a table element in table scope
                 my $i;
-                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                  my $node = $self->{open_elements}->[$_];
-                  if ($node->[1] eq 'caption') {
-                    !!!cp ('t155');
-                    $i = $_;
-                    last INSCOPE;
-                  } elsif ({
-                            table => 1, html => 1,
-                           }->{$node->[1]}) {
-                    !!!cp ('t156');
-                    last INSCOPE;
+                INSCOPE: {
+                  for (reverse 0..$#{$self->{open_elements}}) {
+                    my $node = $self->{open_elements}->[$_];
+                    if ($node->[1] eq 'caption') {
+                      !!!cp ('t155');
+                      $i = $_;
+                      last INSCOPE;
+                    } elsif ({
+                              table => 1, html => 1,
+                             }->{$node->[1]}) {
+                      !!!cp ('t156');
+                      last;
+                    }
                   }
+
+                  !!!cp ('t157');
+                  !!!parse-error (type => 'start tag not allowed',
+                                  value => $token->{tag_name});
+                  ## Ignore the token
+                  !!!next-token;
+                  redo B;
                 } # INSCOPE
-                  unless (defined $i) {
-                    !!!cp ('t157');
-## TODO: this type is wrong.
-                    !!!parse-error (type => 'unmatched end tag:caption');
-                    ## Ignore the token
-                    !!!next-token;
-                    redo B;
-                  }
                 
                 ## generate implied end tags
                 while ({
@@ -4036,26 +4033,28 @@ sub _tree_construction_main ($) {
               if ($self->{insertion_mode} == IN_CAPTION_IM) {
                 ## have a table element in table scope
                 my $i;
-                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                  my $node = $self->{open_elements}->[$_];
-                  if ($node->[1] eq $token->{tag_name}) {
-                    !!!cp ('t171');
-                    $i = $_;
-                    last INSCOPE;
-                  } elsif ({
-                            table => 1, html => 1,
-                           }->{$node->[1]}) {
-                    !!!cp ('t172');
-                    last INSCOPE;
+                INSCOPE: {
+                  for (reverse 0..$#{$self->{open_elements}}) {
+                    my $node = $self->{open_elements}->[$_];
+                    if ($node->[1] eq $token->{tag_name}) {
+                      !!!cp ('t171');
+                      $i = $_;
+                      last INSCOPE;
+                    } elsif ({
+                              table => 1, html => 1,
+                             }->{$node->[1]}) {
+                      !!!cp ('t172');
+                      last;
+                    }
                   }
+
+                  !!!cp ('t173');
+                  !!!parse-error (type => 'unmatched end tag',
+                                  value => $token->{tag_name});
+                  ## Ignore the token
+                  !!!next-token;
+                  redo B;
                 } # INSCOPE
-                  unless (defined $i) {
-                    !!!cp ('t173');
-                    !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
-                    ## Ignore the token
-                    !!!next-token;
-                    redo B;
-                  }
                 
                 ## generate implied end tags
                 while ({
@@ -4098,38 +4097,38 @@ sub _tree_construction_main ($) {
               ## have an element in table scope
               my $i;
               my $tn;
-              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                my $node = $self->{open_elements}->[$_];
-                if ($node->[1] eq $token->{tag_name}) {
-                  !!!cp ('t179');
-                  $i = $_;
-                  last INSCOPE;
-                } elsif ($node->[1] eq 'td' or $node->[1] eq 'th') {
-                  !!!cp ('t180');
-                  $tn = $node->[1];
-                  ## NOTE: There is exactly one |td| or |th| element
-                  ## in scope in the stack of open elements by definition.
-                } elsif ({
-                          table => 1, html => 1,
-                         }->{$node->[1]}) {
-                  !!!cp ('t181');
-                  last INSCOPE;
+              INSCOPE: {
+                for (reverse 0..$#{$self->{open_elements}}) {
+                  my $node = $self->{open_elements}->[$_];
+                  if ($node->[1] eq $token->{tag_name}) {
+                    !!!cp ('t179');
+                    $i = $_;
+
+                    ## Close the cell
+                    !!!back-token; # </?>
+                    $token = {type => END_TAG_TOKEN, tag_name => $tn};
+                    redo B;
+                  } elsif ($node->[1] eq 'td' or $node->[1] eq 'th') {
+                    !!!cp ('t180');
+                    $tn = $node->[1];
+                    ## NOTE: There is exactly one |td| or |th| element
+                    ## in scope in the stack of open elements by definition.
+                  } elsif ({
+                            table => 1, html => 1,
+                           }->{$node->[1]}) {
+                    ## ISSUE: Can this be reached?
+                    !!!cp ('t181');
+                    last;
+                  }
                 }
-              } # INSCOPE
-              unless (defined $i) {
+
                 !!!cp ('t182');
-                !!!parse-error (type => 'unmatched end tag:'.$token->{tag_name});
+                !!!parse-error (type => 'unmatched end tag',
+                    value => $token->{tag_name});
                 ## Ignore the token
                 !!!next-token;
                 redo B;
-              } else {
-                !!!cp ('t183');
-              }
-
-              ## Close the cell
-              !!!back-token; # </?>
-              $token = {type => END_TAG_TOKEN, tag_name => $tn};
-              redo B;
+              } # INSCOPE
             } elsif ($token->{tag_name} eq 'table' and
                      $self->{insertion_mode} == IN_CAPTION_IM) {
               !!!parse-error (type => 'not closed:caption');
@@ -6646,4 +6645,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/09 10:49:13 $
+# $Date: 2008/03/10 10:55:57 $
