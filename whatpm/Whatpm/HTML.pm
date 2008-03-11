@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.106 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.107 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6790,7 +6790,18 @@ sub _tree_construction_main ($) {
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
                 menu => 1, ol => 1, p => 1, ul => 1,
                 pre => 1, listing => 1,
+                form => 1,
+                table => 1,
+                hr => 1,
                }->{$token->{tag_name}}) {
+        if ($token->{tag_name} eq 'form' and defined $self->{form_element}) {
+          
+          $self->{parse_error}->(level => $self->{must_level}, type => 'in form:form');
+          ## Ignore the token
+          $token = $self->_get_next_token;
+          redo B;
+        }
+
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
@@ -6836,127 +6847,29 @@ sub _tree_construction_main ($) {
           } else {
             
           }
-        } else {
+        } elsif ($token->{tag_name} eq 'form') {
           
-          $token = $self->_get_next_token;
-        }
-        redo B;
-      } elsif ($token->{tag_name} eq 'form') {
-        if (defined $self->{form_element}) {
-          
-          $self->{parse_error}->(level => $self->{must_level}, type => 'in form:form');
-          ## Ignore the token
-          $token = $self->_get_next_token;
-          redo B;
-        } else {
-          ## has a p element in scope
-          INSCOPE: for (reverse @{$self->{open_elements}}) {
-            if ($_->[1] eq 'p') {
-              
-              unshift @{$self->{token}}, $token;
-              $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-              redo B;
-            } elsif ({
-                      applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                      button => 1, marquee => 1, object => 1, html => 1,
-                     }->{$_->[1]}) {
-              
-              last INSCOPE;
-            }
-          } # INSCOPE
-            
-          
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
           $self->{form_element} = $self->{open_elements}->[-1]->[0];
+
           $token = $self->_get_next_token;
-          redo B;
-        }
-      } elsif ($token->{tag_name} eq 'li') {
-        ## has a p element in scope
-        INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] eq 'p') {
-            
-            unshift @{$self->{token}}, $token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-            redo B;
-          } elsif ({
-                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$_->[1]}) {
-            
-            last INSCOPE;
-          }
-        } # INSCOPE
+        } elsif ($token->{tag_name} eq 'table') {
           
-        ## Step 1
-        my $i = -1;
-        my $node = $self->{open_elements}->[$i];
-        LI: {
-          ## Step 2
-          if ($node->[1] eq 'li') {
-            if ($i != -1) {
-              
-              $self->{parse_error}->(level => $self->{must_level}, type => 'end tag missing:'.
-                              $self->{open_elements}->[-1]->[1]);
-            } else {
-              
-            }
-            splice @{$self->{open_elements}}, $i;
-            last LI;
-          } else {
-            
-          }
+          push @{$open_tables}, [$self->{open_elements}->[-1]->[0]];
           
-          ## Step 3
-          if (not $formatting_category->{$node->[1]} and
-              #not $phrasing_category->{$node->[1]} and
-              ($special_category->{$node->[1]} or
-               $scoping_category->{$node->[1]}) and
-              $node->[1] ne 'address' and $node->[1] ne 'div') {
-            
-            last LI;
-          }
+          $self->{insertion_mode} = IN_TABLE_IM;
+
+          $token = $self->_get_next_token;
+        } elsif ($token->{tag_name} eq 'hr') {
           
-          
-          ## Step 4
-          $i--;
-          $node = $self->{open_elements}->[$i];
-          redo LI;
-        } # LI
-          
+          pop @{$self->{open_elements}};
         
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          $token = $self->_get_next_token;
+        } else {
+          
+          $token = $self->_get_next_token;
         }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-        $token = $self->_get_next_token;
         redo B;
-      } elsif ($token->{tag_name} eq 'dd' or $token->{tag_name} eq 'dt') {
+      } elsif ({li => 1, dt => 1, dd => 1}->{$token->{tag_name}}) {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
@@ -6976,9 +6889,12 @@ sub _tree_construction_main ($) {
         ## Step 1
         my $i = -1;
         my $node = $self->{open_elements}->[$i];
+        my $li_or_dtdd = {li => {li => 1},
+                          dt => {dt => 1, dd => 1},
+                          dd => {dt => 1, dd => 1}}->{$token->{tag_name}};
         LI: {
           ## Step 2
-          if ($node->[1] eq 'dt' or $node->[1] eq 'dd') {
+          if ($li_or_dtdd->{$node->[1]}) {
             if ($i != -1) {
               
               $self->{parse_error}->(level => $self->{must_level}, type => 'end tag missing:'.
@@ -7119,34 +7035,6 @@ sub _tree_construction_main ($) {
 
         $token = $self->_get_next_token;
         redo B;
-      } elsif ({
-                b => 1, big => 1, em => 1, font => 1, i => 1,
-                s => 1, small => 1, strile => 1, 
-                strong => 1, tt => 1, u => 1,
-               }->{$token->{tag_name}}) {
-        
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-        push @$active_formatting_elements, $self->{open_elements}->[-1];
-        
-        $token = $self->_get_next_token;
-        redo B;
       } elsif ($token->{tag_name} eq 'nobr') {
         $reconstruct_active_formatting_elements->($insert_to_current);
 
@@ -7233,79 +7121,30 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         redo B;
       } elsif ({
-                applet => 1, marquee => 1, object => 1,
+                xmp => 1,
+                iframe => 1,
+                noembed => 1,
+                noframes => 1,
+                noscript => 0, ## TODO: 1 if scripting is enabled
                }->{$token->{tag_name}}) {
-        
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+        if ($token->{tag_name} eq 'xmp') {
+          
+          $reconstruct_active_formatting_elements->($insert_to_current);
+        } else {
+          
         }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-        push @$active_formatting_elements, ['#marker', ''];
-        
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{tag_name} eq 'xmp') {
-        
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        ## NOTE: There is an "as if in body" code clone.
         $parse_rcdata->(CDATA_CONTENT_MODEL);
         redo B;
-      } elsif ($token->{tag_name} eq 'table') {
-        ## has a p element in scope
-        INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] eq 'p') {
-            
-            unshift @{$self->{token}}, $token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-            redo B;
-          } elsif ({
-                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$_->[1]}) {
-            
-            last INSCOPE;
-          }
-        } # INSCOPE
-          
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-        push @{$open_tables}, [$self->{open_elements}->[-1]->[0]];
-
-        $self->{insertion_mode} = IN_TABLE_IM;
-          
-        $token = $self->_get_next_token;
-        redo B;
       } elsif ({
+                b => 1, big => 1, em => 1, font => 1, i => 1,
+                s => 1, small => 1, strile => 1, 
+                strong => 1, tt => 1, u => 1,
+                applet => 1, marquee => 1, object => 1,
                 area => 1, basefont => 1, bgsound => 1, br => 1,
                 embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
                 image => 1,
+                input => 1,
                }->{$token->{tag_name}}) {
         if ($token->{tag_name} eq 'image') {
           
@@ -7334,70 +7173,27 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-        pop @{$self->{open_elements}};
-        
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{tag_name} eq 'hr') {
-        ## has a p element in scope
-        INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] eq 'p') {
-            
-            unshift @{$self->{token}}, $token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-            redo B;
-          } elsif ({
-                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$_->[1]}) {
-            
-            last INSCOPE;
-          }
-        } # INSCOPE
+        if ({
+             applet => 1, marquee => 1, object => 1,
+            }->{$token->{tag_name}}) {
           
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-        pop @{$self->{open_elements}};
+          push @$active_formatting_elements, ['#marker', ''];
+        } elsif ({
+                  b => 1, big => 1, em => 1, font => 1, i => 1,
+                  s => 1, small => 1, strile => 1,
+                  strong => 1, tt => 1, u => 1,
+                 }->{$token->{tag_name}}) {
           
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{tag_name} eq 'input') {
-        
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          push @$active_formatting_elements, $self->{open_elements}->[-1];
+        } elsif ($token->{tag_name} eq 'input') {
+          
+          ## TODO: associate with $self->{form_element} if defined
+          pop @{$self->{open_elements}};
+        } else {
+          
+          pop @{$self->{open_elements}};
         }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-        ## TODO: associate with $self->{form_element} if defined
-        pop @{$self->{open_elements}};
-        
+
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'isindex') {
@@ -7498,50 +7294,6 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         redo B;
       } elsif ({
-                iframe => 1,
-                noembed => 1,
-                noframes => 1,
-                noscript => 0, ## TODO: 1 if scripting is enabled
-               }->{$token->{tag_name}}) {
-        
-        ## NOTE: There is an "as if in body" code clone.
-        $parse_rcdata->(CDATA_CONTENT_MODEL);
-        redo B;
-      } elsif ($token->{tag_name} eq 'select') {
-        
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-
-        ## TODO: associate with $self->{form_element} if defined
-        
-        if ($self->{insertion_mode} & TABLE_IMS or
-            $self->{insertion_mode} & BODY_TABLE_IMS or
-            $self->{insertion_mode} == IN_COLUMN_GROUP_IM) {
-          
-          $self->{insertion_mode} = IN_SELECT_IN_TABLE_IM;
-        } else {
-          
-          $self->{insertion_mode} = IN_SELECT_IM;
-        }
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
                 frameset => 1, head => 1, option => 1, optgroup => 1,
                 tbody => 1, td => 1, tfoot => 1, th => 1,
@@ -7574,6 +7326,20 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
+
+        if ($token->{tag_name} eq 'select') {
+          ## TODO: associate with $self->{form_element} if defined
+        
+          if ($self->{insertion_mode} & TABLE_IMS or
+              $self->{insertion_mode} & BODY_TABLE_IMS or
+              $self->{insertion_mode} == IN_COLUMN_GROUP_IM) {
+            
+            $self->{insertion_mode} = IN_SELECT_IN_TABLE_IM;
+          } else {
+            
+            $self->{insertion_mode} = IN_SELECT_IM;
+          }
+        }
         
         $token = $self->_get_next_token;
         redo B;
@@ -8114,4 +7880,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/10 10:55:56 $
+# $Date: 2008/03/11 01:15:38 $

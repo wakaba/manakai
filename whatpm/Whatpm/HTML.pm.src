@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.108 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.109 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5575,7 +5575,18 @@ sub _tree_construction_main ($) {
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
                 menu => 1, ol => 1, p => 1, ul => 1,
                 pre => 1, listing => 1,
+                form => 1,
+                table => 1,
+                hr => 1,
                }->{$token->{tag_name}}) {
+        if ($token->{tag_name} eq 'form' and defined $self->{form_element}) {
+          !!!cp ('t350');
+          !!!parse-error (type => 'in form:form');
+          ## Ignore the token
+          !!!next-token;
+          redo B;
+        }
+
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
@@ -5606,41 +5617,29 @@ sub _tree_construction_main ($) {
           } else {
             !!!cp ('t348');
           }
+        } elsif ($token->{tag_name} eq 'form') {
+          !!!cp ('t347.1');
+          $self->{form_element} = $self->{open_elements}->[-1]->[0];
+
+          !!!next-token;
+        } elsif ($token->{tag_name} eq 'table') {
+          !!!cp ('t382');
+          push @{$open_tables}, [$self->{open_elements}->[-1]->[0]];
+          
+          $self->{insertion_mode} = IN_TABLE_IM;
+
+          !!!next-token;
+        } elsif ($token->{tag_name} eq 'hr') {
+          !!!cp ('t386');
+          pop @{$self->{open_elements}};
+        
+          !!!next-token;
         } else {
           !!!cp ('t347');
           !!!next-token;
         }
         redo B;
-      } elsif ($token->{tag_name} eq 'form') {
-        if (defined $self->{form_element}) {
-          !!!cp ('t350');
-          !!!parse-error (type => 'in form:form');
-          ## Ignore the token
-          !!!next-token;
-          redo B;
-        } else {
-          ## has a p element in scope
-          INSCOPE: for (reverse @{$self->{open_elements}}) {
-            if ($_->[1] eq 'p') {
-              !!!cp ('t351');
-              !!!back-token;
-              $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-              redo B;
-            } elsif ({
-                      applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                      button => 1, marquee => 1, object => 1, html => 1,
-                     }->{$_->[1]}) {
-              !!!cp ('t352');
-              last INSCOPE;
-            }
-          } # INSCOPE
-            
-          !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-          $self->{form_element} = $self->{open_elements}->[-1]->[0];
-          !!!next-token;
-          redo B;
-        }
-      } elsif ($token->{tag_name} eq 'li') {
+      } elsif ({li => 1, dt => 1, dd => 1}->{$token->{tag_name}}) {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
@@ -5660,9 +5659,12 @@ sub _tree_construction_main ($) {
         ## Step 1
         my $i = -1;
         my $node = $self->{open_elements}->[$i];
+        my $li_or_dtdd = {li => {li => 1},
+                          dt => {dt => 1, dd => 1},
+                          dd => {dt => 1, dd => 1}}->{$token->{tag_name}};
         LI: {
           ## Step 2
-          if ($node->[1] eq 'li') {
+          if ($li_or_dtdd->{$node->[1]}) {
             if ($i != -1) {
               !!!cp ('t355');
               !!!parse-error (type => 'end tag missing:'.
@@ -5687,62 +5689,6 @@ sub _tree_construction_main ($) {
           }
           
           !!!cp ('t359');
-          ## Step 4
-          $i--;
-          $node = $self->{open_elements}->[$i];
-          redo LI;
-        } # LI
-          
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        !!!next-token;
-        redo B;
-      } elsif ($token->{tag_name} eq 'dd' or $token->{tag_name} eq 'dt') {
-        ## has a p element in scope
-        INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] eq 'p') {
-            !!!cp ('t360');
-            !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-            redo B;
-          } elsif ({
-                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$_->[1]}) {
-            !!!cp ('t361');
-            last INSCOPE;
-          }
-        } # INSCOPE
-          
-        ## Step 1
-        my $i = -1;
-        my $node = $self->{open_elements}->[$i];
-        LI: {
-          ## Step 2
-          if ($node->[1] eq 'dt' or $node->[1] eq 'dd') {
-            if ($i != -1) {
-              !!!cp ('t362');
-              !!!parse-error (type => 'end tag missing:'.
-                              $self->{open_elements}->[-1]->[1]);
-            } else {
-              !!!cp ('t363');
-            }
-            splice @{$self->{open_elements}}, $i;
-            last LI;
-          } else {
-            !!!cp ('t364');
-          }
-          
-          ## Step 3
-          if (not $formatting_category->{$node->[1]} and
-              #not $phrasing_category->{$node->[1]} and
-              ($special_category->{$node->[1]} or
-               $scoping_category->{$node->[1]}) and
-              $node->[1] ne 'address' and $node->[1] ne 'div') {
-            !!!cp ('t365');
-            last LI;
-          }
-          
-          !!!cp ('t366');
           ## Step 4
           $i--;
           $node = $self->{open_elements}->[$i];
@@ -5814,19 +5760,6 @@ sub _tree_construction_main ($) {
 
         !!!next-token;
         redo B;
-      } elsif ({
-                b => 1, big => 1, em => 1, font => 1, i => 1,
-                s => 1, small => 1, strile => 1, 
-                strong => 1, tt => 1, u => 1,
-               }->{$token->{tag_name}}) {
-        !!!cp ('t375');
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        push @$active_formatting_elements, $self->{open_elements}->[-1];
-        
-        !!!next-token;
-        redo B;
       } elsif ($token->{tag_name} eq 'nobr') {
         $reconstruct_active_formatting_elements->($insert_to_current);
 
@@ -5883,49 +5816,30 @@ sub _tree_construction_main ($) {
         !!!next-token;
         redo B;
       } elsif ({
-                applet => 1, marquee => 1, object => 1,
+                xmp => 1,
+                iframe => 1,
+                noembed => 1,
+                noframes => 1,
+                noscript => 0, ## TODO: 1 if scripting is enabled
                }->{$token->{tag_name}}) {
-        !!!cp ('t380');
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        push @$active_formatting_elements, ['#marker', ''];
-        
-        !!!next-token;
-        redo B;
-      } elsif ($token->{tag_name} eq 'xmp') {
-        !!!cp ('t381');
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        if ($token->{tag_name} eq 'xmp') {
+          !!!cp ('t381');
+          $reconstruct_active_formatting_elements->($insert_to_current);
+        } else {
+          !!!cp ('t399');
+        }
+        ## NOTE: There is an "as if in body" code clone.
         $parse_rcdata->(CDATA_CONTENT_MODEL);
         redo B;
-      } elsif ($token->{tag_name} eq 'table') {
-        ## has a p element in scope
-        INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] eq 'p') {
-            !!!cp ('t382');
-            !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-            redo B;
-          } elsif ({
-                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$_->[1]}) {
-            !!!cp ('t383');
-            last INSCOPE;
-          }
-        } # INSCOPE
-          
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        push @{$open_tables}, [$self->{open_elements}->[-1]->[0]];
-
-        $self->{insertion_mode} = IN_TABLE_IM;
-          
-        !!!next-token;
-        redo B;
       } elsif ({
+                b => 1, big => 1, em => 1, font => 1, i => 1,
+                s => 1, small => 1, strile => 1, 
+                strong => 1, tt => 1, u => 1,
+                applet => 1, marquee => 1, object => 1,
                 area => 1, basefont => 1, bgsound => 1, br => 1,
                 embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
                 image => 1,
+                input => 1,
                }->{$token->{tag_name}}) {
         if ($token->{tag_name} eq 'image') {
           !!!cp ('t384');
@@ -5939,40 +5853,27 @@ sub _tree_construction_main ($) {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
         !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        pop @{$self->{open_elements}};
-        
-        !!!next-token;
-        redo B;
-      } elsif ($token->{tag_name} eq 'hr') {
-        ## has a p element in scope
-        INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] eq 'p') {
-            !!!cp ('t386');
-            !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
-            redo B;
-          } elsif ({
-                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$_->[1]}) {
-            !!!cp ('t387');
-            last INSCOPE;
-          }
-        } # INSCOPE
-          
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        pop @{$self->{open_elements}};
-          
-        !!!next-token;
-        redo B;
-      } elsif ($token->{tag_name} eq 'input') {
-        !!!cp ('t388');
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        ## TODO: associate with $self->{form_element} if defined
-        pop @{$self->{open_elements}};
-        
+        if ({
+             applet => 1, marquee => 1, object => 1,
+            }->{$token->{tag_name}}) {
+          !!!cp ('t380');
+          push @$active_formatting_elements, ['#marker', ''];
+        } elsif ({
+                  b => 1, big => 1, em => 1, font => 1, i => 1,
+                  s => 1, small => 1, strile => 1,
+                  strong => 1, tt => 1, u => 1,
+                 }->{$token->{tag_name}}) {
+          !!!cp ('t375');
+          push @$active_formatting_elements, $self->{open_elements}->[-1];
+        } elsif ($token->{tag_name} eq 'input') {
+          !!!cp ('t388');
+          ## TODO: associate with $self->{form_element} if defined
+          pop @{$self->{open_elements}};
+        } else {
+          !!!cp ('t388.1');
+          pop @{$self->{open_elements}};
+        }
+
         !!!next-token;
         redo B;
       } elsif ($token->{tag_name} eq 'isindex') {
@@ -6065,35 +5966,6 @@ sub _tree_construction_main ($) {
         !!!next-token;
         redo B;
       } elsif ({
-                iframe => 1,
-                noembed => 1,
-                noframes => 1,
-                noscript => 0, ## TODO: 1 if scripting is enabled
-               }->{$token->{tag_name}}) {
-        !!!cp ('t399');
-        ## NOTE: There is an "as if in body" code clone.
-        $parse_rcdata->(CDATA_CONTENT_MODEL);
-        redo B;
-      } elsif ($token->{tag_name} eq 'select') {
-        !!!cp ('t400');
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-
-        ## TODO: associate with $self->{form_element} if defined
-        
-        if ($self->{insertion_mode} & TABLE_IMS or
-            $self->{insertion_mode} & BODY_TABLE_IMS or
-            $self->{insertion_mode} == IN_COLUMN_GROUP_IM) {
-          !!!cp ('t400.1');
-          $self->{insertion_mode} = IN_SELECT_IN_TABLE_IM;
-        } else {
-          !!!cp ('t400.2');
-          $self->{insertion_mode} = IN_SELECT_IM;
-        }
-        !!!next-token;
-        redo B;
-      } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
                 frameset => 1, head => 1, option => 1, optgroup => 1,
                 tbody => 1, td => 1, tfoot => 1, th => 1,
@@ -6111,6 +5983,20 @@ sub _tree_construction_main ($) {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
         !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+
+        if ($token->{tag_name} eq 'select') {
+          ## TODO: associate with $self->{form_element} if defined
+        
+          if ($self->{insertion_mode} & TABLE_IMS or
+              $self->{insertion_mode} & BODY_TABLE_IMS or
+              $self->{insertion_mode} == IN_COLUMN_GROUP_IM) {
+            !!!cp ('t400.1');
+            $self->{insertion_mode} = IN_SELECT_IN_TABLE_IM;
+          } else {
+            !!!cp ('t400.2');
+            $self->{insertion_mode} = IN_SELECT_IM;
+          }
+        }
         
         !!!next-token;
         redo B;
@@ -6645,4 +6531,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/10 10:55:57 $
+# $Date: 2008/03/11 01:15:38 $
