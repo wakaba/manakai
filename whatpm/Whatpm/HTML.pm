@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.108 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.109 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -7321,25 +7321,27 @@ sub _tree_construction_main ($) {
       if ($token->{tag_name} eq 'body') {
         ## has a |body| element in scope
         my $i;
-        INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] eq 'body') {
-            
-            $i = $_;
-            last INSCOPE;
-          } elsif ({
-                    applet => 1, table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$_->[1]}) {
-            
-            last INSCOPE;
+        INSCOPE: {
+          for (reverse @{$self->{open_elements}}) {
+            if ($_->[1] eq 'body') {
+              
+              $i = $_;
+              last INSCOPE;
+            } elsif ({
+                      applet => 1, table => 1, caption => 1, td => 1, th => 1,
+                      button => 1, marquee => 1, object => 1, html => 1,
+                     }->{$_->[1]}) {
+              
+              last;
+            }
           }
-        } # INSCOPE
-        unless (defined $i) {
-          $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name});
+
+          $self->{parse_error}->(level => $self->{must_level}, type => 'start tag not allowed',
+                          value => $token->{tag_name});
           ## NOTE: Ignore the token.
           $token = $self->_get_next_token;
           redo B;
-        }
+        } # INSCOPE
 
         for (@{$self->{open_elements}}) {
           unless ({
@@ -7853,4 +7855,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/11 01:23:50 $
+# $Date: 2008/03/11 14:02:08 $
