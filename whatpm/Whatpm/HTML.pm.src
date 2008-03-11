@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.109 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.110 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5831,51 +5831,6 @@ sub _tree_construction_main ($) {
         ## NOTE: There is an "as if in body" code clone.
         $parse_rcdata->(CDATA_CONTENT_MODEL);
         redo B;
-      } elsif ({
-                b => 1, big => 1, em => 1, font => 1, i => 1,
-                s => 1, small => 1, strile => 1, 
-                strong => 1, tt => 1, u => 1,
-                applet => 1, marquee => 1, object => 1,
-                area => 1, basefont => 1, bgsound => 1, br => 1,
-                embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
-                image => 1,
-                input => 1,
-               }->{$token->{tag_name}}) {
-        if ($token->{tag_name} eq 'image') {
-          !!!cp ('t384');
-          !!!parse-error (type => 'image');
-          $token->{tag_name} = 'img';
-        } else {
-          !!!cp ('t385');
-        }
-
-        ## NOTE: There is an "as if <br>" code clone.
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        if ({
-             applet => 1, marquee => 1, object => 1,
-            }->{$token->{tag_name}}) {
-          !!!cp ('t380');
-          push @$active_formatting_elements, ['#marker', ''];
-        } elsif ({
-                  b => 1, big => 1, em => 1, font => 1, i => 1,
-                  s => 1, small => 1, strile => 1,
-                  strong => 1, tt => 1, u => 1,
-                 }->{$token->{tag_name}}) {
-          !!!cp ('t375');
-          push @$active_formatting_elements, $self->{open_elements}->[-1];
-        } elsif ($token->{tag_name} eq 'input') {
-          !!!cp ('t388');
-          ## TODO: associate with $self->{form_element} if defined
-          pop @{$self->{open_elements}};
-        } else {
-          !!!cp ('t388.1');
-          pop @{$self->{open_elements}};
-        }
-
-        !!!next-token;
-        redo B;
       } elsif ($token->{tag_name} eq 'isindex') {
         !!!parse-error (type => 'isindex');
         
@@ -5979,12 +5934,43 @@ sub _tree_construction_main ($) {
         
         ## ISSUE: An issue on HTML5 new elements in the spec.
       } else {
-        !!!cp ('t402');
+        if ($token->{tag_name} eq 'image') {
+          !!!cp ('t384');
+          !!!parse-error (type => 'image');
+          $token->{tag_name} = 'img';
+        } else {
+          !!!cp ('t385');
+        }
+
+        ## NOTE: There is an "as if <br>" code clone.
         $reconstruct_active_formatting_elements->($insert_to_current);
         
         !!!insert-element-t ($token->{tag_name}, $token->{attributes});
 
-        if ($token->{tag_name} eq 'select') {
+        if ({
+             applet => 1, marquee => 1, object => 1,
+            }->{$token->{tag_name}}) {
+          !!!cp ('t380');
+          push @$active_formatting_elements, ['#marker', ''];
+        } elsif ({
+                  b => 1, big => 1, em => 1, font => 1, i => 1,
+                  s => 1, small => 1, strile => 1,
+                  strong => 1, tt => 1, u => 1,
+                 }->{$token->{tag_name}}) {
+          !!!cp ('t375');
+          push @$active_formatting_elements, $self->{open_elements}->[-1];
+        } elsif ($token->{tag_name} eq 'input') {
+          !!!cp ('t388');
+          ## TODO: associate with $self->{form_element} if defined
+          pop @{$self->{open_elements}};
+        } elsif ({
+                  area => 1, basefont => 1, bgsound => 1, br => 1,
+                  embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
+                  #image => 1,
+                 }->{$token->{tag_name}}) {
+          !!!cp ('t388.1');
+          pop @{$self->{open_elements}};
+        } elsif ($token->{tag_name} eq 'select') {
           ## TODO: associate with $self->{form_element} if defined
         
           if ($self->{insertion_mode} & TABLE_IMS or
@@ -5996,6 +5982,8 @@ sub _tree_construction_main ($) {
             !!!cp ('t400.2');
             $self->{insertion_mode} = IN_SELECT_IM;
           }
+        } else {
+          !!!cp ('t402');
         }
         
         !!!next-token;
@@ -6531,4 +6519,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/11 01:15:38 $
+# $Date: 2008/03/11 01:23:50 $

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.107 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.108 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -7136,66 +7136,6 @@ sub _tree_construction_main ($) {
         ## NOTE: There is an "as if in body" code clone.
         $parse_rcdata->(CDATA_CONTENT_MODEL);
         redo B;
-      } elsif ({
-                b => 1, big => 1, em => 1, font => 1, i => 1,
-                s => 1, small => 1, strile => 1, 
-                strong => 1, tt => 1, u => 1,
-                applet => 1, marquee => 1, object => 1,
-                area => 1, basefont => 1, bgsound => 1, br => 1,
-                embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
-                image => 1,
-                input => 1,
-               }->{$token->{tag_name}}) {
-        if ($token->{tag_name} eq 'image') {
-          
-          $self->{parse_error}->(level => $self->{must_level}, type => 'image');
-          $token->{tag_name} = 'img';
-        } else {
-          
-        }
-
-        ## NOTE: There is an "as if <br>" code clone.
-        $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-        if ({
-             applet => 1, marquee => 1, object => 1,
-            }->{$token->{tag_name}}) {
-          
-          push @$active_formatting_elements, ['#marker', ''];
-        } elsif ({
-                  b => 1, big => 1, em => 1, font => 1, i => 1,
-                  s => 1, small => 1, strile => 1,
-                  strong => 1, tt => 1, u => 1,
-                 }->{$token->{tag_name}}) {
-          
-          push @$active_formatting_elements, $self->{open_elements}->[-1];
-        } elsif ($token->{tag_name} eq 'input') {
-          
-          ## TODO: associate with $self->{form_element} if defined
-          pop @{$self->{open_elements}};
-        } else {
-          
-          pop @{$self->{open_elements}};
-        }
-
-        $token = $self->_get_next_token;
-        redo B;
       } elsif ($token->{tag_name} eq 'isindex') {
         $self->{parse_error}->(level => $self->{must_level}, type => 'isindex');
         
@@ -7307,7 +7247,15 @@ sub _tree_construction_main ($) {
         
         ## ISSUE: An issue on HTML5 new elements in the spec.
       } else {
-        
+        if ($token->{tag_name} eq 'image') {
+          
+          $self->{parse_error}->(level => $self->{must_level}, type => 'image');
+          $token->{tag_name} = 'img';
+        } else {
+          
+        }
+
+        ## NOTE: There is an "as if <br>" code clone.
         $reconstruct_active_formatting_elements->($insert_to_current);
         
         
@@ -7327,7 +7275,30 @@ sub _tree_construction_main ($) {
     }
   
 
-        if ($token->{tag_name} eq 'select') {
+        if ({
+             applet => 1, marquee => 1, object => 1,
+            }->{$token->{tag_name}}) {
+          
+          push @$active_formatting_elements, ['#marker', ''];
+        } elsif ({
+                  b => 1, big => 1, em => 1, font => 1, i => 1,
+                  s => 1, small => 1, strile => 1,
+                  strong => 1, tt => 1, u => 1,
+                 }->{$token->{tag_name}}) {
+          
+          push @$active_formatting_elements, $self->{open_elements}->[-1];
+        } elsif ($token->{tag_name} eq 'input') {
+          
+          ## TODO: associate with $self->{form_element} if defined
+          pop @{$self->{open_elements}};
+        } elsif ({
+                  area => 1, basefont => 1, bgsound => 1, br => 1,
+                  embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
+                  #image => 1,
+                 }->{$token->{tag_name}}) {
+          
+          pop @{$self->{open_elements}};
+        } elsif ($token->{tag_name} eq 'select') {
           ## TODO: associate with $self->{form_element} if defined
         
           if ($self->{insertion_mode} & TABLE_IMS or
@@ -7339,6 +7310,8 @@ sub _tree_construction_main ($) {
             
             $self->{insertion_mode} = IN_SELECT_IM;
           }
+        } else {
+          
         }
         
         $token = $self->_get_next_token;
@@ -7880,4 +7853,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/11 01:15:38 $
+# $Date: 2008/03/11 01:23:50 $
