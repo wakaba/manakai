@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.111 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.112 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -177,8 +177,8 @@ sub parse_string ($$$;$) {
       if defined $self->{input_encoding};
 
   my $i = 0;
-  my $line = 1;
-  my $column = 0;
+  $self->{line_prev} = $self->{line} = 1;
+  $self->{column_prev} = $self->{column} = 0;
   $self->{set_next_char} = sub {
     my $self = shift;
 
@@ -187,16 +187,19 @@ sub parse_string ($$$;$) {
 
     $self->{next_char} = -1 and return if $i >= length $$s;
     $self->{next_char} = ord substr $$s, $i++, 1;
-    $column++;
+
+    ($self->{line_prev}, $self->{column_prev})
+        = ($self->{line}, $self->{column});
+    $self->{column}++;
     
     if ($self->{next_char} == 0x000A) { # LF
-      $line++;
-      $column = 0;
+      $self->{line}++;
+      $self->{column} = 0;
     } elsif ($self->{next_char} == 0x000D) { # CR
       $i++ if substr ($$s, $i, 1) eq "\x0A";
       $self->{next_char} = 0x000A; # LF # MUST
-      $line++;
-      $column = 0;
+      $self->{line}++;
+      $self->{column} = 0;
     } elsif ($self->{next_char} > 0x10FFFF) {
       $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     } elsif ($self->{next_char} == 0x0000) { # NULL
@@ -209,16 +212,20 @@ sub parse_string ($$$;$) {
 
   my $onerror = $_[2] || sub {
     my (%opt) = @_;
-    warn "Parse error ($opt{type}) at line $opt{line} column $opt{column}\n";
+    my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
+    my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
+    warn "Parse error ($opt{type}) at line $line column $column\n";
   };
   $self->{parse_error} = sub {
-    $onerror->(@_, line => $line, column => $column);
+    $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
 
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
   $self->_construct_tree;
   $self->_terminate_tree_constructor;
+
+  delete $self->{parse_error}; # remove loop
 
   return $self->{document};
 } # parse_string
@@ -449,14 +456,16 @@ sub _get_next_token ($) {
         #
       } elsif ($self->{next_char} == -1) {
         !!!cp (11);
-        !!!emit ({type => END_OF_FILE_TOKEN});
+        !!!emit ({type => END_OF_FILE_TOKEN,
+                  line => $self->{line}, column => $self->{column}});
         last A; ## TODO: ok?
       } else {
         !!!cp (12);
       }
       # Anything else
       my $token = {type => CHARACTER_TOKEN,
-                   data => chr $self->{next_char}};
+                   data => chr $self->{next_char},
+                   line => $self->{line}, column => $self->{column}};
       ## Stay in the data state
       !!!next-input-character;
 
@@ -465,6 +474,8 @@ sub _get_next_token ($) {
       redo A;
     } elsif ($self->{state} == ENTITY_DATA_STATE) {
       ## (cannot happen in CDATA state)
+
+      my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
       
       my $token = $self->_tokenize_attempt_to_consume_an_entity (0, -1);
 
@@ -473,7 +484,8 @@ sub _get_next_token ($) {
 
       unless (defined $token) {
         !!!cp (13);
-        !!!emit ({type => CHARACTER_TOKEN, data => '&'});
+        !!!emit ({type => CHARACTER_TOKEN, data => '&',
+                  line => $l, column => $c});
       } else {
         !!!cp (14);
         !!!emit ($token);
@@ -492,7 +504,9 @@ sub _get_next_token ($) {
           ## reconsume
           $self->{state} = DATA_STATE;
 
-          !!!emit ({type => CHARACTER_TOKEN, data => '<'});
+          !!!emit ({type => CHARACTER_TOKEN, data => '<',
+                    line => $self->{line_prev},
+                    column => $self->{column_prev}});
 
           redo A;
         }
@@ -512,7 +526,9 @@ sub _get_next_token ($) {
           !!!cp (19);
           $self->{current_token}
             = {type => START_TAG_TOKEN,
-               tag_name => chr ($self->{next_char} + 0x0020)};
+               tag_name => chr ($self->{next_char} + 0x0020),
+               line => $self->{line_prev},
+               column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
           !!!next-input-character;
           redo A;
@@ -520,7 +536,9 @@ sub _get_next_token ($) {
                  $self->{next_char} <= 0x007A) { # a..z
           !!!cp (20);
           $self->{current_token} = {type => START_TAG_TOKEN,
-                            tag_name => chr ($self->{next_char})};
+                                    tag_name => chr ($self->{next_char}),
+                                    line => $self->{line_prev},
+                                    column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
           !!!next-input-character;
           redo A;
@@ -530,13 +548,18 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           !!!next-input-character;
 
-          !!!emit ({type => CHARACTER_TOKEN, data => '<>'});
+          !!!emit ({type => CHARACTER_TOKEN, data => '<>',
+                    line => $self->{line_prev},
+                    column => $self->{column_prev}});
 
           redo A;
         } elsif ($self->{next_char} == 0x003F) { # ?
           !!!cp (22);
           !!!parse-error (type => 'pio');
           $self->{state} = BOGUS_COMMENT_STATE;
+          $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+                                    line => $self->{line_prev},
+                                    column => $self->{column_prev}};
           ## $self->{next_char} is intentionally left as is
           redo A;
         } else {
@@ -545,7 +568,9 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           ## reconsume
 
-          !!!emit ({type => CHARACTER_TOKEN, data => '<'});
+          !!!emit ({type => CHARACTER_TOKEN, data => '<',
+                    line => $self->{line_prev},
+                    column => $self->{column_prev}});
 
           redo A;
         }
@@ -553,8 +578,10 @@ sub _get_next_token ($) {
         die "$0: $self->{content_model} in tag open";
       }
     } elsif ($self->{state} == CLOSE_TAG_OPEN_STATE) {
+      my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if (defined $self->{last_emitted_start_tag_name}) {
+
           ## NOTE: <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>
           my @next_char;
           TAGNAME: for (my $i = 0; $i < length $self->{last_emitted_start_tag_name}; $i++) {
@@ -571,7 +598,8 @@ sub _get_next_token ($) {
               !!!back-next-input-character (@next_char);
               $self->{state} = DATA_STATE;
 
-              !!!emit ({type => CHARACTER_TOKEN, data => '</'});
+              !!!emit ({type => CHARACTER_TOKEN, data => '</',
+                        line => $l, column => $c});
   
               redo A;
             }
@@ -590,7 +618,8 @@ sub _get_next_token ($) {
             $self->{next_char} = shift @next_char; # reconsume
             !!!back-next-input-character (@next_char);
             $self->{state} = DATA_STATE;
-            !!!emit ({type => CHARACTER_TOKEN, data => '</'});
+            !!!emit ({type => CHARACTER_TOKEN, data => '</',
+                      line => $l, column => $c});
             redo A;
           } else {
             !!!cp (27);
@@ -603,7 +632,8 @@ sub _get_next_token ($) {
           !!!cp (28);
           # next-input-character is already done
           $self->{state} = DATA_STATE;
-          !!!emit ({type => CHARACTER_TOKEN, data => '</'});
+          !!!emit ({type => CHARACTER_TOKEN, data => '</',
+                    line => $l, column => $c});
           redo A;
         }
       }
@@ -611,8 +641,10 @@ sub _get_next_token ($) {
       if (0x0041 <= $self->{next_char} and
           $self->{next_char} <= 0x005A) { # A..Z
         !!!cp (29);
-        $self->{current_token} = {type => END_TAG_TOKEN,
-                          tag_name => chr ($self->{next_char} + 0x0020)};
+        $self->{current_token}
+            = {type => END_TAG_TOKEN,
+               tag_name => chr ($self->{next_char} + 0x0020),
+               line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         !!!next-input-character;
         redo A;
@@ -620,7 +652,8 @@ sub _get_next_token ($) {
                $self->{next_char} <= 0x007A) { # a..z
         !!!cp (30);
         $self->{current_token} = {type => END_TAG_TOKEN,
-                          tag_name => chr ($self->{next_char})};
+                                  tag_name => chr ($self->{next_char}),
+                                  line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         !!!next-input-character;
         redo A;
@@ -636,13 +669,17 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         # reconsume
 
-        !!!emit ({type => CHARACTER_TOKEN, data => '</'});
+        !!!emit ({type => CHARACTER_TOKEN, data => '</',
+                  line => $l, column => $c});
 
         redo A;
       } else {
         !!!cp (33);
         !!!parse-error (type => 'bogus end tag');
         $self->{state} = BOGUS_COMMENT_STATE;
+        $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+                                  line => $self->{line_prev}, # "<" of "</"
+                                  column => $self->{column_prev} - 1};
         ## $self->{next_char} is intentionally left as is
         redo A;
       }
@@ -1379,7 +1416,8 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
       ## (only happen if PCDATA state)
       
-      my $token = {type => COMMENT_TOKEN, data => ''};
+      ## NOTE: Set by the previous state
+      #my $token = {type => COMMENT_TOKEN, data => ''};
 
       BC: {
         if ($self->{next_char} == 0x003E) { # >
@@ -1387,7 +1425,7 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           !!!next-input-character;
 
-          !!!emit ($token);
+          !!!emit ($self->{current_token}); # comment
 
           redo A;
         } elsif ($self->{next_char} == -1) { 
@@ -1395,12 +1433,12 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           ## reconsume
 
-          !!!emit ($token);
+          !!!emit ($self->{current_token}); # comment
 
           redo A;
         } else {
           !!!cp (126);
-          $token->{data} .= chr ($self->{next_char});
+          $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
           !!!next-input-character;
           redo BC;
         }
@@ -1410,6 +1448,8 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## (only happen if PCDATA state)
 
+      my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1);
+
       my @next_char;
       push @next_char, $self->{next_char};
       
@@ -1418,7 +1458,8 @@ sub _get_next_token ($) {
         push @next_char, $self->{next_char};
         if ($self->{next_char} == 0x002D) { # -
           !!!cp (127);
-          $self->{current_token} = {type => COMMENT_TOKEN, data => ''};
+          $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+                                    line => $l, column => $c};
           $self->{state} = COMMENT_START_STATE;
           !!!next-input-character;
           redo A;
@@ -1454,6 +1495,9 @@ sub _get_next_token ($) {
                     !!!cp (129);
                     ## TODO: What a stupid code this is!
                     $self->{state} = DOCTYPE_STATE;
+                    $self->{current_token} = {type => DOCTYPE_TOKEN,
+                                              quirks => 1,
+                                              line => $l, column => $c};
                     !!!next-input-character;
                     redo A;
                   } else {
@@ -1482,6 +1526,8 @@ sub _get_next_token ($) {
       $self->{next_char} = shift @next_char;
       !!!back-next-input-character (@next_char);
       $self->{state} = BOGUS_COMMENT_STATE;
+      $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+                                line => $l, column => $c};
       redo A;
       
       ## ISSUE: typos in spec: chacacters, is is a parse error
@@ -1660,7 +1706,7 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         !!!next-input-character;
 
-        !!!emit ({type => DOCTYPE_TOKEN, quirks => 1});
+        !!!emit ($self->{current_token}); # DOCTYPE (quirks)
 
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -1669,16 +1715,13 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        !!!emit ({type => DOCTYPE_TOKEN, quirks => 1});
+        !!!emit ($self->{current_token}); # DOCTYPE (quirks)
 
         redo A;
       } else {
         !!!cp (160);
-        $self->{current_token}
-            = {type => DOCTYPE_TOKEN,
-               name => chr ($self->{next_char}),
-               #quirks => 0,
-              };
+        $self->{current_token}->{name} = chr $self->{next_char};
+        delete $self->{current_token}->{quirks};
 ## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = DOCTYPE_NAME_STATE;
         !!!next-input-character;
@@ -2205,6 +2248,8 @@ sub _get_next_token ($) {
 sub _tokenize_attempt_to_consume_an_entity ($$$) {
   my ($self, $in_attr, $additional) = @_;
 
+  my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
+
   if ({
        0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, # HT, LF, VT, FF,
        0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, & # 0x000D # CR
@@ -2245,7 +2290,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
           redo X;
         } elsif (not defined $code) { # no hexadecimal digit
           !!!cp (1005);
-          !!!parse-error (type => 'bare hcro');
+          !!!parse-error (type => 'bare hcro', line => $l, column => $c);
           !!!back-next-input-character ($x_char, $self->{next_char});
           $self->{next_char} = 0x0023; # #
           return undef;
@@ -2254,29 +2299,29 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
           !!!next-input-character;
         } else {
           !!!cp (1007);
-          !!!parse-error (type => 'no refc');
+          !!!parse-error (type => 'no refc', line => $l, column => $c);
         }
 
         if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
           !!!cp (1008);
-          !!!parse-error (type => sprintf 'invalid character reference:U+%04X', $code);
+          !!!parse-error (type => (sprintf 'invalid character reference:U+%04X', $code), line => $l, column => $c);
           $code = 0xFFFD;
         } elsif ($code > 0x10FFFF) {
           !!!cp (1009);
-          !!!parse-error (type => sprintf 'invalid character reference:U-%08X', $code);
+          !!!parse-error (type => (sprintf 'invalid character reference:U-%08X', $code), line => $l, column => $c);
           $code = 0xFFFD;
         } elsif ($code == 0x000D) {
           !!!cp (1010);
-          !!!parse-error (type => 'CR character reference');
+          !!!parse-error (type => 'CR character reference', line => $l, column => $c);
           $code = 0x000A;
         } elsif (0x80 <= $code and $code <= 0x9F) {
           !!!cp (1011);
-          !!!parse-error (type => sprintf 'C1 character reference:U+%04X', $code);
+          !!!parse-error (type => (sprintf 'C1 character reference:U+%04X', $code), line => $l, column => $c);
           $code = $c1_entity_char->{$code};
         }
 
         return {type => CHARACTER_TOKEN, data => chr $code,
-                has_reference => 1};
+                has_reference => 1, line => $l, column => $c};
       } # X
     } elsif (0x0030 <= $self->{next_char} and
              $self->{next_char} <= 0x0039) { # 0..9
@@ -2297,31 +2342,32 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
         !!!next-input-character;
       } else {
         !!!cp (1014);
-        !!!parse-error (type => 'no refc');
+        !!!parse-error (type => 'no refc', line => $l, column => $c);
       }
 
       if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
         !!!cp (1015);
-        !!!parse-error (type => sprintf 'invalid character reference:U+%04X', $code);
+        !!!parse-error (type => (sprintf 'invalid character reference:U+%04X', $code), line => $l, column => $c);
         $code = 0xFFFD;
       } elsif ($code > 0x10FFFF) {
         !!!cp (1016);
-        !!!parse-error (type => sprintf 'invalid character reference:U-%08X', $code);
+        !!!parse-error (type => (sprintf 'invalid character reference:U-%08X', $code), line => $l, column => $c);
         $code = 0xFFFD;
       } elsif ($code == 0x000D) {
         !!!cp (1017);
-        !!!parse-error (type => 'CR character reference');
+        !!!parse-error (type => 'CR character reference', line => $l, column => $c);
         $code = 0x000A;
       } elsif (0x80 <= $code and $code <= 0x9F) {
         !!!cp (1018);
-        !!!parse-error (type => sprintf 'C1 character reference:U+%04X', $code);
+        !!!parse-error (type => (sprintf 'C1 character reference:U+%04X', $code), line => $l, column => $c);
         $code = $c1_entity_char->{$code};
       }
       
-      return {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1};
+      return {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1,
+              line => $l, column => $c};
     } else {
       !!!cp (1019);
-      !!!parse-error (type => 'bare nero');
+      !!!parse-error (type => 'bare nero', line => $l, column => $c);
       !!!back-next-input-character ($self->{next_char});
       $self->{next_char} = 0x0023; # #
       return undef;
@@ -2371,26 +2417,30 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
     
     if ($match > 0) {
       !!!cp (1023);
-      return {type => CHARACTER_TOKEN, data => $value, has_reference => 1};
+      return {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
+              line => $l, column => $c};
     } elsif ($match < 0) {
-      !!!parse-error (type => 'no refc');
+      !!!parse-error (type => 'no refc', line => $l, column => $c);
       if ($in_attr and $match < -1) {
         !!!cp (1024);
-        return {type => CHARACTER_TOKEN, data => '&'.$entity_name};
+        return {type => CHARACTER_TOKEN, data => '&'.$entity_name,
+                line => $l, column => $c};
       } else {
         !!!cp (1025);
-        return {type => CHARACTER_TOKEN, data => $value, has_reference => 1};
+        return {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
+                line => $l, column => $c};
       }
     } else {
       !!!cp (1026);
-      !!!parse-error (type => 'bare ero');
+      !!!parse-error (type => 'bare ero', line => $l, column => $c);
       ## NOTE: "No characters are consumed" in the spec.
-      return {type => CHARACTER_TOKEN, data => '&'.$value};
+      return {type => CHARACTER_TOKEN, data => '&'.$value,
+              line => $l, column => $c};
     }
   } else {
     !!!cp (1027);
     ## no characters are consumed
-    !!!parse-error (type => 'bare ero');
+    !!!parse-error (type => 'bare ero', line => $l, column => $c);
     return undef;
   }
 } # _tokenize_attempt_to_consume_an_entity
@@ -6521,4 +6571,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/11 14:02:08 $
+# $Date: 2008/03/16 06:39:57 $
