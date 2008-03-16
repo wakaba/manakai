@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.112 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.113 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -599,7 +599,9 @@ sub _get_next_token ($) {
           redo A;
         } elsif ($self->{next_char} == 0x003E) { # >
           
-          $self->{parse_error}->(level => $self->{must_level}, type => 'empty start tag');
+          $self->{parse_error}->(level => $self->{must_level}, type => 'empty start tag',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev});
           $self->{state} = DATA_STATE;
           
       if (@{$self->{char}}) {
@@ -616,7 +618,9 @@ sub _get_next_token ($) {
           redo A;
         } elsif ($self->{next_char} == 0x003F) { # ?
           
-          $self->{parse_error}->(level => $self->{must_level}, type => 'pio');
+          $self->{parse_error}->(level => $self->{must_level}, type => 'pio',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev});
           $self->{state} = BOGUS_COMMENT_STATE;
           $self->{current_token} = {type => COMMENT_TOKEN, data => '',
                                     line => $self->{line_prev},
@@ -738,7 +742,9 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         
-        $self->{parse_error}->(level => $self->{must_level}, type => 'empty end tag');
+        $self->{parse_error}->(level => $self->{must_level}, type => 'empty end tag',
+                        line => $self->{line_prev}, ## "<" in "</>"
+                        column => $self->{column_prev} - 1);
         $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
@@ -7937,4 +7943,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/16 11:40:19 $
+# $Date: 2008/03/16 23:53:48 $
