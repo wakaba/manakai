@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.113 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.114 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -108,6 +108,7 @@ sub parse_byte_string ($$$$;$) {
   $self->{change_encoding} = sub {
     my $self = shift;
     my $charset = lc shift;
+    my $token = shift;
     ## TODO: if $charset is supported
     ## TODO: normalize charset name
 
@@ -126,7 +127,7 @@ sub parse_byte_string ($$$$;$) {
     }
 
     !!!parse-error (type => 'charset label detected:'.$self->{input_encoding}.
-        ':'.$charset, level => 'w');
+        ':'.$charset, level => 'w', token => $token);
 
     ## Step 3
     # if (can) {
@@ -1651,7 +1652,9 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x002D) { # -
         !!!cp (152);
-        !!!parse-error (type => 'dash in comment');
+        !!!parse-error (type => 'dash in comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev});
         $self->{current_token}->{data} .= '-'; # comment
         ## Stay in the state
         !!!next-input-character;
@@ -1667,7 +1670,9 @@ sub _get_next_token ($) {
         redo A;
       } else {
         !!!cp (154);
-        !!!parse-error (type => 'dash in comment');
+        !!!parse-error (type => 'dash in comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev});
         $self->{current_token}->{data} .= '--' . chr ($self->{next_char}); # comment
         $self->{state} = COMMENT_STATE;
         !!!next-input-character;
@@ -3535,7 +3540,8 @@ sub _tree_construction_main ($) {
                 if ($token->{attributes}->{charset}) { ## TODO: And if supported
                   !!!cp ('t106');
                   $self->{change_encoding}
-                      ->($self, $token->{attributes}->{charset}->{value});
+                      ->($self, $token->{attributes}->{charset}->{value},
+                         $token);
                   
                   $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
                       ->set_user_data (manakai_has_reference =>
@@ -3550,7 +3556,8 @@ sub _tree_construction_main ($) {
                           ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
                     !!!cp ('t107');
                     $self->{change_encoding}
-                        ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
+                        ->($self, defined $1 ? $1 : defined $2 ? $2 : $3,
+                           $token);
                     $meta_el->[0]->get_attribute_node_ns (undef, 'content')
                         ->set_user_data (manakai_has_reference =>
                                              $token->{attributes}->{content}
@@ -3947,7 +3954,9 @@ sub _tree_construction_main ($) {
 
                     ## Close the cell
                     !!!back-token; # <?>
-                    $token = {type => END_TAG_TOKEN, tag_name => $node->[1]};
+                    $token = {type => END_TAG_TOKEN, tag_name => $node->[1],
+                              line => $token->{line},
+                              column => $token->{column}};
                     redo B;
                   } elsif ({
                             table => 1, html => 1,
@@ -4160,7 +4169,9 @@ sub _tree_construction_main ($) {
 
                     ## Close the cell
                     !!!back-token; # </?>
-                    $token = {type => END_TAG_TOKEN, tag_name => $tn};
+                    $token = {type => END_TAG_TOKEN, tag_name => $tn,
+                              line => $token->{line},
+                              column => $token->{column}};
                     redo B;
                   } elsif ($node->[1] eq 'td' or $node->[1] eq 'th') {
                     !!!cp ('t180');
@@ -5557,7 +5568,7 @@ sub _tree_construction_main ($) {
           if ($token->{attributes}->{charset}) { ## TODO: And if supported
             !!!cp ('t335');
             $self->{change_encoding}
-                ->($self, $token->{attributes}->{charset}->{value});
+                ->($self, $token->{attributes}->{charset}->{value}, $token);
             
             $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
                 ->set_user_data (manakai_has_reference =>
@@ -5572,7 +5583,7 @@ sub _tree_construction_main ($) {
                     ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
               !!!cp ('t336');
               $self->{change_encoding}
-                  ->($self, defined $1 ? $1 : defined $2 ? $2 : $3);
+                  ->($self, defined $1 ? $1 : defined $2 ? $2 : $3, $token);
               $meta_el->[0]->get_attribute_node_ns (undef, 'content')
                   ->set_user_data (manakai_has_reference =>
                                        $token->{attributes}->{content}
@@ -5646,7 +5657,8 @@ sub _tree_construction_main ($) {
           if ($_->[1] eq 'p') {
             !!!cp ('t344');
             !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
+            $token = {type => END_TAG_TOKEN, tag_name => 'p',
+                      line => $token->{line}, column => $token->{column}};
             redo B;
           } elsif ({
                     applet => 1, table => 1, caption => 1, td => 1, th => 1,
@@ -5699,7 +5711,8 @@ sub _tree_construction_main ($) {
           if ($_->[1] eq 'p') {
             !!!cp ('t353');
             !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
+            $token = {type => END_TAG_TOKEN, tag_name => 'p',
+                      line => $token->{line}, column => $token->{column}};
             redo B;
           } elsif ({
                     applet => 1, table => 1, caption => 1, td => 1, th => 1,
@@ -5758,7 +5771,8 @@ sub _tree_construction_main ($) {
           if ($_->[1] eq 'p') {
             !!!cp ('t367');
             !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'p'};
+            $token = {type => END_TAG_TOKEN, tag_name => 'p',
+                      line => $token->{line}, column => $token->{column}};
             redo B;
           } elsif ({
                     applet => 1, table => 1, caption => 1, td => 1, th => 1,
@@ -5783,7 +5797,8 @@ sub _tree_construction_main ($) {
             !!!parse-error (type => 'in a:a', token => $token);
             
             !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'a'};
+            $token = {type => END_TAG_TOKEN, tag_name => 'a',
+                      line => $token->{line}, column => $token->{column}};
             $formatting_end_tag->($token);
             
             AFE2: for (reverse 0..$#$active_formatting_elements) {
@@ -5824,7 +5839,8 @@ sub _tree_construction_main ($) {
             !!!cp ('t376');
             !!!parse-error (type => 'in nobr:nobr', token => $token);
             !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'nobr'};
+            $token = {type => END_TAG_TOKEN, tag_name => 'nobr',
+                      line => $token->{line}, column => $token->{column}};
             redo B;
           } elsif ({
                     applet => 1, table => 1, caption => 1, td => 1, th => 1,
@@ -5848,7 +5864,8 @@ sub _tree_construction_main ($) {
             !!!cp ('t378');
             !!!parse-error (type => 'in button:button', token => $token);
             !!!back-token;
-            $token = {type => END_TAG_TOKEN, tag_name => 'button'};
+            $token = {type => END_TAG_TOKEN, tag_name => 'button',
+                      line => $token->{line}, column => $token->{column}};
             redo B;
           } elsif ({
                     applet => 1, table => 1, caption => 1, td => 1, th => 1,
@@ -5903,27 +5920,38 @@ sub _tree_construction_main ($) {
           delete $at->{prompt};
           my @tokens = (
                         {type => START_TAG_TOKEN, tag_name => 'form',
-                         attributes => $form_attrs},
-                        {type => START_TAG_TOKEN, tag_name => 'hr'},
-                        {type => START_TAG_TOKEN, tag_name => 'p'},
-                        {type => START_TAG_TOKEN, tag_name => 'label'},
+                         attributes => $form_attrs,
+                         line => $token->{line}, column => $token->{column}},
+                        {type => START_TAG_TOKEN, tag_name => 'hr',
+                         line => $token->{line}, column => $token->{column}},
+                        {type => START_TAG_TOKEN, tag_name => 'p',
+                         line => $token->{line}, column => $token->{column}},
+                        {type => START_TAG_TOKEN, tag_name => 'label',
+                         line => $token->{line}, column => $token->{column}},
                        );
           if ($prompt_attr) {
             !!!cp ('t390');
-            push @tokens, {type => CHARACTER_TOKEN, data => $prompt_attr->{value}};
+            push @tokens, {type => CHARACTER_TOKEN, data => $prompt_attr->{value},
+                           line => $token->{line}, column => $token->{column}};
           } else {
             !!!cp ('t391');
             push @tokens, {type => CHARACTER_TOKEN,
-                           data => 'This is a searchable index. Insert your search keywords here: '}; # SHOULD
+                           data => 'This is a searchable index. Insert your search keywords here: ',
+                           line => $token->{line}, column => $token->{column}}; # SHOULD
             ## TODO: make this configurable
           }
           push @tokens,
-                        {type => START_TAG_TOKEN, tag_name => 'input', attributes => $at},
+                        {type => START_TAG_TOKEN, tag_name => 'input', attributes => $at,
+                         line => $token->{line}, column => $token->{column}},
                         #{type => CHARACTER_TOKEN, data => ''}, # SHOULD
-                        {type => END_TAG_TOKEN, tag_name => 'label'},
-                        {type => END_TAG_TOKEN, tag_name => 'p'},
-                        {type => START_TAG_TOKEN, tag_name => 'hr'},
-                        {type => END_TAG_TOKEN, tag_name => 'form'};
+                        {type => END_TAG_TOKEN, tag_name => 'label',
+                         line => $token->{line}, column => $token->{column}},
+                        {type => END_TAG_TOKEN, tag_name => 'p',
+                         line => $token->{line}, column => $token->{column}},
+                        {type => START_TAG_TOKEN, tag_name => 'hr',
+                         line => $token->{line}, column => $token->{column}},
+                        {type => END_TAG_TOKEN, tag_name => 'form',
+                         line => $token->{line}, column => $token->{column}};
           $token = shift @tokens;
           !!!back-token (@tokens);
           redo B;
@@ -6575,4 +6603,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/16 07:07:59 $
+# $Date: 2008/03/16 11:40:19 $
