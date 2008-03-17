@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.115 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.116 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -2749,7 +2749,7 @@ sub _tree_construction_root_element ($) {
       } elsif ($token->{type} == START_TAG_TOKEN) {
         if ($token->{tag_name} eq 'html') {
           my $root_element;
-          !!!create-element ($root_element, $token->{tag_name}, $token->{attributes});
+          !!!create-element ($root_element, $token->{tag_name}, $token->{attributes}, $token);
           $self->{document}->append_child ($root_element);
           push @{$self->{open_elements}}, [$root_element, 'html'];
 
@@ -2779,7 +2779,7 @@ sub _tree_construction_root_element ($) {
         die "$0: $token->{type}: Unknown token type";
       }
 
-    my $root_element; !!!create-element ($root_element, 'html');
+    my $root_element; !!!create-element ($root_element, 'html',, $token);
     $self->{document}->append_child ($root_element);
     push @{$self->{open_elements}}, [$root_element, 'html'];
 
@@ -2974,7 +2974,7 @@ sub _tree_construction_main ($) {
     ## Step 1
     my $start_tag_name = $token->{tag_name};
     my $el;
-    !!!create-element ($el, $start_tag_name, $token->{attributes});
+    !!!create-element ($el, $start_tag_name, $token->{attributes}, $token);
 
     ## Step 2
     $insert->($el);
@@ -3024,7 +3024,7 @@ sub _tree_construction_main ($) {
 
   my $script_start_tag = sub () {
     my $script_el;
-    !!!create-element ($script_el, 'script', $token->{attributes});
+    !!!create-element ($script_el, 'script', $token->{attributes}, $token);
     ## TODO: mark as "parser-inserted"
 
     $self->{content_model} = CDATA_CONTENT_MODEL;
@@ -3421,7 +3421,7 @@ sub _tree_construction_main ($) {
         if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
           !!!cp ('t89');
           ## As if <head>
-          !!!create-element ($self->{head_element}, 'head');
+          !!!create-element ($self->{head_element}, 'head',, $token);
           $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
           push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -3451,7 +3451,7 @@ sub _tree_construction_main ($) {
 
             ## "after head" insertion mode
             ## As if <body>
-            !!!insert-element ('body');
+            !!!insert-element ('body',, $token);
             $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
             redo B;
@@ -3459,7 +3459,7 @@ sub _tree_construction_main ($) {
             if ($token->{tag_name} eq 'head') {
               if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 !!!cp ('t93');
-                !!!create-element ($self->{head_element}, $token->{tag_name}, $token->{attributes});
+                !!!create-element ($self->{head_element}, $token->{tag_name}, $token->{attributes}, $token);
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, $token->{tag_name}];
                 $self->{insertion_mode} = IN_HEAD_IM;
@@ -3478,7 +3478,7 @@ sub _tree_construction_main ($) {
             } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
               !!!cp ('t96');
               ## As if <head>
-              !!!create-element ($self->{head_element}, 'head');
+              !!!create-element ($self->{head_element}, 'head',, $token);
               $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
               push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -3509,7 +3509,7 @@ sub _tree_construction_main ($) {
               } else {
                 !!!cp ('t101');
               }
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
@@ -3524,7 +3524,7 @@ sub _tree_construction_main ($) {
               } else {
                 !!!cp ('t103');
               }
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
@@ -3539,7 +3539,7 @@ sub _tree_construction_main ($) {
               } else {
                 !!!cp ('t105');
               }
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
               my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
 
               unless ($self->{confident}) {
@@ -3636,7 +3636,7 @@ sub _tree_construction_main ($) {
               if ($self->{insertion_mode} == IN_HEAD_IM) {
                 !!!cp ('t116');
                 ## NOTE: and scripting is disalbed
-                !!!insert-element ($token->{tag_name}, $token->{attributes});
+                !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
                 $self->{insertion_mode} = IN_HEAD_NOSCRIPT_IM;
                 !!!next-token;
                 redo B;
@@ -3695,7 +3695,7 @@ sub _tree_construction_main ($) {
               }
 
               ## "after head" insertion mode
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
               if ($token->{tag_name} eq 'body') {
                 !!!cp ('t126');
                 $self->{insertion_mode} = IN_BODY_IM;
@@ -3735,7 +3735,7 @@ sub _tree_construction_main ($) {
 
             ## "after head" insertion mode
             ## As if <body>
-            !!!insert-element ('body');
+            !!!insert-element ('body',, $token);
             $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
             redo B;
@@ -3744,7 +3744,7 @@ sub _tree_construction_main ($) {
               if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 !!!cp ('t132');
                 ## As if <head>
-                !!!create-element ($self->{head_element}, 'head');
+                !!!create-element ($self->{head_element}, 'head',, $token);
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -3797,7 +3797,7 @@ sub _tree_construction_main ($) {
               if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 !!!cp ('t139');
                 ## As if <head>
-                !!!create-element ($self->{head_element}, 'head');
+                !!!create-element ($self->{head_element}, 'head',, $token);
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -3820,7 +3820,7 @@ sub _tree_construction_main ($) {
               if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 !!!cp ('t142');
                 ## As if <head>
-                !!!create-element ($self->{head_element}, 'head');
+                !!!create-element ($self->{head_element}, 'head',, $token);
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -3874,7 +3874,7 @@ sub _tree_construction_main ($) {
 
             ## "after head" insertion mode
             ## As if <body>
-            !!!insert-element ('body');
+            !!!insert-element ('body',, $token);
             $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
             redo B;
@@ -3883,7 +3883,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t149.1');
 
           ## NOTE: As if <head>
-          !!!create-element ($self->{head_element}, 'head');
+          !!!create-element ($self->{head_element}, 'head',, $token);
           $self->{open_elements}->[-1]->[0]->append_child
               ($self->{head_element});
           #push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
@@ -3927,7 +3927,7 @@ sub _tree_construction_main ($) {
         }
 
         ## NOTE: As if <body>
-        !!!insert-element ('body');
+        !!!insert-element ('body',, $token);
         $self->{insertion_mode} = IN_BODY_IM;
         ## NOTE: Reprocess.
         redo B;
@@ -4379,7 +4379,7 @@ sub _tree_construction_main ($) {
                   pop @{$self->{open_elements}};
                 }
                 
-                !!!insert-element ('tbody');
+                !!!insert-element ('tbody',, $token);
                 $self->{insertion_mode} = IN_TABLE_BODY_IM;
                 ## reprocess in the "in table body" insertion mode...
               }
@@ -4402,12 +4402,12 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = IN_ROW_IM;
                 if ($token->{tag_name} eq 'tr') {
                   !!!cp ('t204');
-                  !!!insert-element ($token->{tag_name}, $token->{attributes});
+                  !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
                   !!!next-token;
                   redo B;
                 } else {
                   !!!cp ('t205');
-                  !!!insert-element ('tr');
+                  !!!insert-element ('tr',, $token);
                   ## reprocess in the "in row" insertion mode
                 }
               } else {
@@ -4422,7 +4422,7 @@ sub _tree_construction_main ($) {
                 pop @{$self->{open_elements}};
               }
               
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
               $self->{insertion_mode} = IN_CELL_IM;
 
               push @$active_formatting_elements, ['#marker', ''];
@@ -4543,7 +4543,7 @@ sub _tree_construction_main ($) {
                   pop @{$self->{open_elements}};
                 }
                 
-                !!!insert-element ('colgroup');
+                !!!insert-element ('colgroup',, $token);
                 $self->{insertion_mode} = IN_COLUMN_GROUP_IM;
                 ## reprocess
                 redo B;
@@ -4563,7 +4563,7 @@ sub _tree_construction_main ($) {
                 push @$active_formatting_elements, ['#marker', '']
                     if $token->{tag_name} eq 'caption';
                 
-                !!!insert-element ($token->{tag_name}, $token->{attributes});
+                !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
                 $self->{insertion_mode} = {
                                            caption => IN_CAPTION_IM,
                                            colgroup => IN_COLUMN_GROUP_IM,
@@ -4657,7 +4657,7 @@ sub _tree_construction_main ($) {
                 !!!cp ('t227.3');
                 !!!parse-error (type => 'in table:'.$token->{tag_name}, token => $token);
 
-                !!!insert-element ($token->{tag_name}, $token->{attributes});
+                !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
 
                 ## TODO: form element pointer
 
@@ -5001,7 +5001,7 @@ sub _tree_construction_main ($) {
           } elsif ($token->{type} == START_TAG_TOKEN) {
             if ($token->{tag_name} eq 'col') {
               !!!cp ('t262');
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
               pop @{$self->{open_elements}};
               !!!next-token;
               redo B;
@@ -5083,7 +5083,7 @@ sub _tree_construction_main ($) {
                 !!!cp ('t273');
               }
 
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
               !!!next-token;
               redo B;
             } elsif ($token->{tag_name} eq 'optgroup') {
@@ -5103,7 +5103,7 @@ sub _tree_construction_main ($) {
                 !!!cp ('t277');
               }
 
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
               !!!next-token;
               redo B;
         } elsif ($token->{tag_name} eq 'select' or
@@ -5446,13 +5446,13 @@ sub _tree_construction_main ($) {
         if ($token->{tag_name} eq 'frameset' and
             $self->{insertion_mode} == IN_FRAMESET_IM) {
           !!!cp ('t318');
-          !!!insert-element ($token->{tag_name}, $token->{attributes});
+          !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
           !!!next-token;
           redo B;
         } elsif ($token->{tag_name} eq 'frame' and
                  $self->{insertion_mode} == IN_FRAMESET_IM) {
           !!!cp ('t319');
-          !!!insert-element ($token->{tag_name}, $token->{attributes});
+          !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
           pop @{$self->{open_elements}};
           !!!next-token;
           redo B;
@@ -5561,13 +5561,13 @@ sub _tree_construction_main ($) {
                }->{$token->{tag_name}}) {
         !!!cp ('t334');
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
         pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
         !!!next-token;
         redo B;
       } elsif ($token->{tag_name} eq 'meta') {
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
         my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
 
         unless ($self->{confident}) {
@@ -5675,7 +5675,7 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
         if ($token->{tag_name} eq 'pre' or $token->{tag_name} eq 'listing') {
           !!!next-token;
           if ($token->{type} == CHARACTER_TOKEN) {
@@ -5768,7 +5768,7 @@ sub _tree_construction_main ($) {
           redo LI;
         } # LI
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
         !!!next-token;
         redo B;
       } elsif ($token->{tag_name} eq 'plaintext') {
@@ -5789,7 +5789,7 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
           
         $self->{content_model} = PLAINTEXT_CONTENT_MODEL;
           
@@ -5830,7 +5830,7 @@ sub _tree_construction_main ($) {
           
         $reconstruct_active_formatting_elements->($insert_to_current);
 
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
         push @$active_formatting_elements, $self->{open_elements}->[-1];
 
         !!!next-token;
@@ -5857,7 +5857,7 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
         push @$active_formatting_elements, $self->{open_elements}->[-1];
         
         !!!next-token;
@@ -5884,7 +5884,7 @@ sub _tree_construction_main ($) {
           
         $reconstruct_active_formatting_elements->($insert_to_current);
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
 
         ## TODO: associate with $self->{form_element} if defined
 
@@ -5965,7 +5965,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'textarea') {
         my $tag_name = $token->{tag_name};
         my $el;
-        !!!create-element ($el, $token->{tag_name}, $token->{attributes});
+        !!!create-element ($el, $token->{tag_name}, $token->{attributes}, $token);
         
         ## TODO: $self->{form_element} if defined
         $self->{content_model} = RCDATA_CONTENT_MODEL;
@@ -6033,7 +6033,7 @@ sub _tree_construction_main ($) {
         ## NOTE: There is an "as if <br>" code clone.
         $reconstruct_active_formatting_elements->($insert_to_current);
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
 
         if ({
              applet => 1, marquee => 1, object => 1,
@@ -6325,7 +6325,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t415.1');
           ## As if <p>, then reprocess the current token
           my $el;
-          !!!create-element ($el, 'p');
+          !!!create-element ($el, 'p',, $token);
           $insert->($el);
           ## NOTE: Not inserted into |$self->{open_elements}|.
         }
@@ -6349,7 +6349,7 @@ sub _tree_construction_main ($) {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
         my $el;
-        !!!create-element ($el, 'br');
+        !!!create-element ($el, 'br',, $token);
         $insert->($el);
         
         ## Ignore the token.
@@ -6609,4 +6609,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/16 23:53:48 $
+# $Date: 2008/03/17 13:23:39 $

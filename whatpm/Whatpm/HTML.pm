@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.113 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.114 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3610,6 +3610,11 @@ sub _tree_construction_root_element ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $root_element->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $root_element->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
           $self->{document}->append_child ($root_element);
           push @{$self->{open_elements}}, [$root_element, 'html'];
 
@@ -3643,6 +3648,11 @@ sub _tree_construction_root_element ($) {
       $root_element = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'html']);
     
+        $root_element->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $root_element->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
     $self->{document}->append_child ($root_element);
     push @{$self->{open_elements}}, [$root_element, 'html'];
 
@@ -3846,6 +3856,11 @@ sub _tree_construction_main ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
 
     ## Step 2
     $insert->($el);
@@ -3903,6 +3918,11 @@ sub _tree_construction_main ($) {
           $script_el->set_attribute_ns (undef, [undef, $attr_name],
                                  $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $script_el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $script_el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
     ## TODO: mark as "parser-inserted"
 
@@ -4304,6 +4324,11 @@ sub _tree_construction_main ($) {
       $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
+        $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
           $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
           push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -4340,6 +4365,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, 'body'];
     }
@@ -4359,6 +4389,11 @@ sub _tree_construction_main ($) {
           $self->{head_element}->set_attribute_ns (undef, [undef, $attr_name],
                                  $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, $token->{tag_name}];
@@ -4382,6 +4417,11 @@ sub _tree_construction_main ($) {
       $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
+        $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
               $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
               push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -4424,6 +4464,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -4454,6 +4499,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -4483,6 +4533,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -4596,6 +4651,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -4670,6 +4730,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -4720,6 +4785,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, 'body'];
     }
@@ -4736,6 +4806,11 @@ sub _tree_construction_main ($) {
       $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
+        $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -4792,6 +4867,11 @@ sub _tree_construction_main ($) {
       $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
+        $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -4818,6 +4898,11 @@ sub _tree_construction_main ($) {
       $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
+        $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
@@ -4878,6 +4963,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, 'body'];
     }
@@ -4894,6 +4984,11 @@ sub _tree_construction_main ($) {
       $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
+        $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
           $self->{open_elements}->[-1]->[0]->append_child
               ($self->{head_element});
           #push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
@@ -4944,6 +5039,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, 'body'];
     }
@@ -5406,6 +5506,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'tbody']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, 'tbody'];
     }
@@ -5444,6 +5549,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -5459,6 +5569,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'tr']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, 'tr'];
     }
@@ -5488,6 +5603,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -5620,6 +5740,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'colgroup']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, 'colgroup'];
     }
@@ -5654,6 +5779,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -5763,6 +5893,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -6123,6 +6258,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -6220,6 +6360,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -6254,6 +6399,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -6613,6 +6763,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -6633,6 +6788,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $self->{open_elements}->[-1]->[0]->append_child ($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -6758,6 +6918,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -6778,6 +6943,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -6902,6 +7072,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -7010,6 +7185,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -7045,6 +7225,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -7102,6 +7287,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -7144,6 +7334,11 @@ sub _tree_construction_main ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
@@ -7185,6 +7380,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -7279,6 +7479,11 @@ sub _tree_construction_main ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
         
         ## TODO: $self->{form_element} if defined
         $self->{content_model} = RCDATA_CONTENT_MODEL;
@@ -7357,6 +7562,11 @@ sub _tree_construction_main ($) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
                                   $token->{attributes} ->{$attr_name}->{value});
         }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
       
       $insert->($el);
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -7657,6 +7867,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'p']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
           $insert->($el);
           ## NOTE: Not inserted into |$self->{open_elements}|.
         }
@@ -7684,6 +7899,11 @@ sub _tree_construction_main ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'br']);
     
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
         $insert->($el);
         
         ## Ignore the token.
@@ -7943,4 +8163,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/16 23:53:48 $
+# $Date: 2008/03/17 13:23:39 $
