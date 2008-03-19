@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.114 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.115 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -793,8 +793,6 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -838,8 +836,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -913,8 +909,6 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -978,8 +972,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1067,8 +1059,6 @@ sub _get_next_token ($) {
         $before_leave->();
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           
@@ -1131,8 +1121,6 @@ sub _get_next_token ($) {
         $before_leave->();
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1201,8 +1189,6 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1268,8 +1254,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1349,8 +1333,6 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1380,8 +1362,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1447,8 +1427,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed attribute value');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1509,8 +1487,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed attribute value');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1574,8 +1550,6 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1605,8 +1579,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed tag');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1689,8 +1661,6 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x003E) { # >
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           
-          $self->{current_token}->{first_start_tag}
-              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -8163,4 +8133,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/17 13:23:39 $
+# $Date: 2008/03/19 23:43:47 $
