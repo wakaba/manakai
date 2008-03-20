@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.116 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.117 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -947,8 +947,10 @@ sub _get_next_token ($) {
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
         
-        $self->{current_attribute} = {name => chr ($self->{next_char} + 0x0020),
-                              value => ''};
+        $self->{current_attribute}
+            = {name => chr ($self->{next_char} + 0x0020),
+               value => '',
+               line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -1012,8 +1014,10 @@ sub _get_next_token ($) {
         } else {
           
         }
-        $self->{current_attribute} = {name => chr ($self->{next_char}),
-                              value => ''};
+        $self->{current_attribute}
+            = {name => chr ($self->{next_char}),
+               value => '',
+               line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -1228,8 +1232,10 @@ sub _get_next_token ($) {
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
         
-        $self->{current_attribute} = {name => chr ($self->{next_char} + 0x0020),
-                              value => ''};
+        $self->{current_attribute}
+            = {name => chr ($self->{next_char} + 0x0020),
+               value => '',
+               line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -1286,8 +1292,10 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
-        $self->{current_attribute} = {name => chr ($self->{next_char}),
-                              value => ''};
+        $self->{current_attribute}
+            = {name => chr ($self->{next_char}),
+               value => '',
+               line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
@@ -3597,8 +3605,13 @@ sub _tree_construction_root_element ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
-          $root_element->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =  $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $root_element->set_attribute_node_ns ($attr);
         }
       
         $root_element->set_user_data (manakai_source_line => $token->{line})
@@ -3846,8 +3859,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $start_tag_name]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =  $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -3909,8 +3927,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  'script']);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
-          $script_el->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =  $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $script_el->set_attribute_node_ns ($attr);
         }
       
         $script_el->set_user_data (manakai_source_line => $token->{line})
@@ -4380,8 +4403,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
-          $self->{head_element}->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =  $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $self->{head_element}->set_attribute_node_ns ($attr);
         }
       
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
@@ -4454,8 +4482,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -4489,8 +4522,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -4524,8 +4562,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -4641,8 +4684,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -4720,8 +4768,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -5539,8 +5592,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -5594,8 +5652,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -5770,8 +5833,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -5884,8 +5952,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -6248,8 +6321,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -6350,8 +6428,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -6390,8 +6473,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -6753,8 +6841,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -6779,8 +6872,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -6908,8 +7006,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -6934,8 +7037,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -7062,8 +7170,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -7175,8 +7288,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -7216,8 +7334,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -7277,8 +7400,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -7324,8 +7452,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -7371,8 +7504,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -7471,8 +7609,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =  $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -7555,8 +7698,13 @@ sub _tree_construction_main ($) {
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
         }
       
         $el->set_user_data (manakai_source_line => $token->{line})
@@ -8159,4 +8307,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/20 01:33:59 $
+# $Date: 2008/03/20 03:37:18 $

@@ -90,8 +90,13 @@ while (<>) {
     if (defined $3 and length $3) {
       $r .= qq{
         for my \$attr_name (keys %{$3}) {
-          $l_var->set_attribute_ns (undef, [undef, \$attr_name],
-                                $3 ->{\$attr_name}->{value});
+          my \$attr_t = $3\->{\$attr_name};
+          my \$attr = \$self->{document}->create_attribute_ns
+              (undef, [undef, \$attr_name]);
+          \$attr->value (\$attr_t->{value});
+          \$attr->set_user_data (manakai_source_line => \$attr_t->{line});
+          \$attr->set_user_data (manakai_source_column => \$attr_t->{column});
+          $l_var->set_attribute_node_ns (\$attr);
         }
       };
     }

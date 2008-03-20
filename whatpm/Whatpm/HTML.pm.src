@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.118 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.119 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -821,8 +821,10 @@ sub _get_next_token ($) {
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
         !!!cp (49);
-        $self->{current_attribute} = {name => chr ($self->{next_char} + 0x0020),
-                              value => ''};
+        $self->{current_attribute}
+            = {name => chr ($self->{next_char} + 0x0020),
+               value => '',
+               line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         !!!next-input-character;
         redo A;
@@ -874,8 +876,10 @@ sub _get_next_token ($) {
         } else {
           !!!cp (56);
         }
-        $self->{current_attribute} = {name => chr ($self->{next_char}),
-                              value => ''};
+        $self->{current_attribute}
+            = {name => chr ($self->{next_char}),
+               value => '',
+               line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         !!!next-input-character;
         redo A;
@@ -1030,8 +1034,10 @@ sub _get_next_token ($) {
       } elsif (0x0041 <= $self->{next_char} and
                $self->{next_char} <= 0x005A) { # A..Z
         !!!cp (76);
-        $self->{current_attribute} = {name => chr ($self->{next_char} + 0x0020),
-                              value => ''};
+        $self->{current_attribute}
+            = {name => chr ($self->{next_char} + 0x0020),
+               value => '',
+               line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         !!!next-input-character;
         redo A;
@@ -1076,8 +1082,10 @@ sub _get_next_token ($) {
         redo A;
       } else {
         !!!cp (82);
-        $self->{current_attribute} = {name => chr ($self->{next_char}),
-                              value => ''};
+        $self->{current_attribute}
+            = {name => chr ($self->{next_char}),
+               value => '',
+               line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         !!!next-input-character;
         redo A;        
@@ -6605,4 +6613,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/20 01:34:00 $
+# $Date: 2008/03/20 03:37:18 $

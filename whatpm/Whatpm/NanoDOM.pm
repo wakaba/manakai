@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -207,6 +207,17 @@ sub create_comment ($$) {
   shift;
   return Whatpm::NanoDOM::Comment->new (shift);
 } # create_comment
+
+## The second parameter only supports manakai extended way
+## to specify qualified name - "[$prefix, $local_name]"
+sub create_attribute_ns ($$$) {
+  my ($self, $nsuri, $qn) = @_;
+  return Whatpm::NanoDOM::Attr->new (undef, $nsuri, $qn->[0], $qn->[1], '');
+
+  ## NOTE: Created attribute node should be set to an element node
+  ## as far as possible.  |onwer_document| of the attribute node, for
+  ## example, depends on the definedness of the |owner_element| attribute.
+} # create_attribute_ns
 
 ## The second parameter only supports manakai extended way
 ## to specify qualified name - "[$prefix, $local_name]"
@@ -467,6 +478,15 @@ sub set_attribute_ns ($$$$) {
     = Whatpm::NanoDOM::Attr->new ($self, $nsuri, $qn->[0], $qn->[1], $value);
 } # set_attribute_ns
 
+sub set_attribute_node_ns ($$) {
+  my $self = shift;
+  my $attr = shift;
+  $self->{attributes}->{$attr->namespace_uri}->{$attr->manakai_local_name}
+      = $attr;
+  $attr->{owner_element} = $self;
+  Scalar::Util::weaken ($attr->{owner_element});
+} # set_attribute_node_ns
+
 package Whatpm::NanoDOM::Attr;
 push our @ISA, 'Whatpm::NanoDOM::Node';
 
@@ -505,7 +525,10 @@ sub name ($) {
   }
 } # name
 
-sub value ($) {
+sub value ($;$) {
+  if (@_ > 1) {
+    $_[0]->{value} = $_[1];
+  }
   return shift->{value};
 } # value
 
@@ -585,4 +608,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/17 06:36:28 $
+# $Date: 2008/03/20 03:37:19 $
