@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.118 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.119 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -8177,8 +8177,8 @@ sub set_inner_html ($$$) {
 
     ## Step 8 # MUST
     my $i = 0;
-    my $line = 1;
-    my $column = 0;
+    $p->{line_prev} = $p->{line} = 1;
+    $p->{column_prev} = $p->{column} = 0;
     $p->{set_next_char} = sub {
       my $self = shift;
 
@@ -8187,17 +8187,19 @@ sub set_inner_html ($$$) {
 
       $self->{next_char} = -1 and return if $i >= length $$s;
       $self->{next_char} = ord substr $$s, $i++, 1;
-      $column++;
+
+      ($p->{line_prev}, $p->{column_prev}) = ($p->{line}, $p->{column});
+      $p->{column}++;
 
       if ($self->{next_char} == 0x000A) { # LF
-        $line++;
-        $column = 0;
+        $p->{line}++;
+        $p->{column} = 0;
         
       } elsif ($self->{next_char} == 0x000D) { # CR
         $i++ if substr ($$s, $i, 1) eq "\x0A";
         $self->{next_char} = 0x000A; # LF # MUST
-        $line++;
-        $column = 0;
+        $p->{line}++;
+        $p->{column} = 0;
         
       } elsif ($self->{next_char} > 0x10FFFF) {
         $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
@@ -8213,10 +8215,16 @@ sub set_inner_html ($$$) {
     
     my $ponerror = $onerror || sub {
       my (%opt) = @_;
-      warn "Parse error ($opt{type}) at line $opt{line} column $opt{column}\n";
+      my $line = $opt{line};
+      my $column = $opt{column};
+      if (defined $opt{token} and defined $opt{token}->{line}) {
+        $line = $opt{token}->{line};
+        $column = $opt{token}->{column};
+      }
+      warn "Parse error ($opt{type}) at line $line column $column\n";
     };
     $p->{parse_error} = sub {
-      $ponerror->(@_, line => $line, column => $column);
+      $ponerror->(line => $p->{line}, column => $p->{column}, @_);
     };
     
     $p->_initialize_tokenizer;
@@ -8296,6 +8304,8 @@ sub set_inner_html ($$$) {
     ## ISSUE: mutation events?
 
     $p->_terminate_tree_constructor;
+
+    delete $p->{parse_error}; # delete loop
   } else {
     die "$0: |set_inner_html| is not defined for node of type $nt";
   }
@@ -8307,4 +8317,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/20 03:57:00 $
+# $Date: 2008/03/20 08:04:58 $

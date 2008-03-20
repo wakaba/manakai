@@ -587,6 +587,8 @@ $Element->{$ATOM_NS}->{feed} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'element missing:atom|author',
                          level => $self->{must_level});
+      ## ISSUE: If there is no |atom:entry| element,
+      ## there should be an |atom:author| element?
     }
 
     ## TODO: If entry's with same id, then updated SHOULD be different
@@ -617,6 +619,7 @@ $Element->{$ATOM_NS}->{content} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{type} = 'text';
+    $element_state->{text} = '';
   },
   check_attrs => $GetAtomAttrsChecker->({
     src => sub {
@@ -746,10 +749,7 @@ $Element->{$ATOM_NS}->{content} = {
       }
     }
 
-    ## type=html
-      ## TODO: SHOULD be suitable for handling as HTML [HTML4]
-      # markup MUST be escaped
-      ## TODO: HTML SHOULD be valid as if within <div>
+    $element_state->{text} .= $child_node->data;
 
     ## NOTE: type=text/* has no further restriction (i.e. the content don't
     ## have to conform to the definition of the type).
@@ -778,6 +778,14 @@ $Element->{$ATOM_NS}->{content} = {
                            type => 'element missing:div',
                            level => $self->{must_level});
       }
+    } elsif ($element_state->{type} eq 'html') {
+      ## TODO: SHOULD be suitable for handling as HTML [HTML4]
+      # markup MUST be escaped
+      $self->{onsubdoc}->({s => $element_state->{text},
+                           container_node => $item->{node},
+                           media_type => 'text/html',
+                           inner_html_element => 'div',
+                           is_char_string => 1});
     } elsif ($element_state->{type} eq 'xml') {
       ## NOTE: SHOULD be suitable for handling as $value.
       ## If no @src, this would normally mean it contains a 
@@ -788,7 +796,6 @@ $Element->{$ATOM_NS}->{content} = {
                          value => $item->{node}->get_attribute_ns
                              (undef, 'type'));
     } elsif ($element_state->{type} eq 'text' or
-             $element_state->{type} eq 'html' or
              $element_state->{type} eq 'mime-text') {
       #
     } else {
