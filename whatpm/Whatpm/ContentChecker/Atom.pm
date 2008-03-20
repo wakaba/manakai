@@ -150,16 +150,22 @@ my %AtomTextConstruct = (
       die "atom:TextConstruct type error: $element_state->{type}";
     }
   },
-  ## type=html
-      ## TODO: SHOULD be suitable for handling as HTML [HTML4]
-      ## TODO: HTML SHOULD be valid as if within <div>
   check_end => sub {
     my ($self, $item, $element_state) = @_;
-    if ($element_state->{type} eq 'xhtml' and
-        not $element_state->{has_div}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:div',
-                         level => $self->{must_level});
+    if ($element_state->{type} eq 'xhtml') {
+      unless ($element_state->{has_div}) {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'element missing:div',
+                           level => $self->{must_level});
+      }
+    } elsif ($element_state->{type} eq 'html') {
+      ## TODO: SHOULD be suitable for handling as HTML [HTML4]
+      # markup MUST be escaped
+      $self->{onsubdoc}->({s => $element_state->{value},
+                           container_node => $item->{node},
+                           media_type => 'text/html',
+                           inner_html_element => 'div',
+                           is_char_string => 1});
     }
 
     $AtomChecker{check_end}->(@_);
@@ -626,7 +632,7 @@ $Element->{$ATOM_NS}->{content} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{type} = 'text';
-    $element_state->{text} = '';
+    $element_state->{value} = '';
   },
   check_attrs => $GetAtomAttrsChecker->({
     src => sub {
@@ -756,7 +762,7 @@ $Element->{$ATOM_NS}->{content} = {
       }
     }
 
-    $element_state->{text} .= $child_node->data;
+    $element_state->{value} .= $child_node->data;
 
     ## NOTE: type=text/* has no further restriction (i.e. the content don't
     ## have to conform to the definition of the type).
@@ -788,7 +794,7 @@ $Element->{$ATOM_NS}->{content} = {
     } elsif ($element_state->{type} eq 'html') {
       ## TODO: SHOULD be suitable for handling as HTML [HTML4]
       # markup MUST be escaped
-      $self->{onsubdoc}->({s => $element_state->{text},
+      $self->{onsubdoc}->({s => $element_state->{value},
                            container_node => $item->{node},
                            media_type => 'text/html',
                            inner_html_element => 'div',
