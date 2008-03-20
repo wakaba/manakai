@@ -90,8 +90,7 @@ sub test ($) {
        }
      }, sub {
        my $opt = shift;
-       push @error, get_node_path ($opt->{container_node}) .
-          ';style:text/css;unsupported';
+       push @error, get_node_path ($opt->{container_node}) . ';SUBDOC';
      });
   
   ok join ("\n", sort {$a cmp $b} @error),
@@ -125,4 +124,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2008/02/24 01:38:36 $
+## $Date: 2008/03/20 08:54:00 $

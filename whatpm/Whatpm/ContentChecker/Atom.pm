@@ -398,7 +398,6 @@ $Element->{$ATOM_NS}->{entry} = {
            rights => 1,
            source => 1,
            summary => 1,
-           ## TODO: MUST if child::content/@src | child::content/@type = IMT, !text/ !/xml !+xml
            title => 1,
            updated => 1,
           }->{$child_ln}) {
@@ -508,6 +507,13 @@ $Element->{$ATOM_NS}->{entry} = {
         not $element_state->{has_element}->{'link.alternate'}) {
       $self->{onerror}->(node => $item->{node},
                          type => 'element missing:atom|link|alternate');
+    }
+
+    if ($element_state->{require_summary} and
+        not $element_state->{has_element}->{summary}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:atom|summary',
+                         level => $self->{must_level});
     }
   },
 };
@@ -639,6 +645,7 @@ $Element->{$ATOM_NS}->{content} = {
       my ($self, $attr, $item, $element_state) = @_;
 
       $element_state->{has_src} = 1;
+      $item->{parent_state}->{require_summary} = 1;
 
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
@@ -695,6 +702,9 @@ $Element->{$ATOM_NS}->{content} = {
       } elsif ($value =~ m!^(?>message|multipart)/!i) {
         $self->{onerror}->(node => $attr, type => 'IMT:composite',
                            level => $self->{must_level});
+        $item->{parent_state}->{require_summary} = 1;
+      } else {
+        $item->{parent_state}->{require_summary} = 1;
       }
 
       $element_state->{type} = $value;
@@ -775,10 +785,9 @@ $Element->{$ATOM_NS}->{content} = {
         $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:type',
                            level => $self->{should_level});
-      }
-      if ($element_state->{type} eq 'text' or
-          $element_state->{type} eq 'html' or
-          $element_state->{type} eq 'xhtml') {
+      } elsif ($element_state->{type} eq 'text' or
+               $element_state->{type} eq 'html' or
+               $element_state->{type} eq 'xhtml') {
         $self->{onerror}
             ->(node => $item->{node}->get_attribute_node_ns (undef, 'type'),
                type => 'not IMT', level => $self->{must_level});

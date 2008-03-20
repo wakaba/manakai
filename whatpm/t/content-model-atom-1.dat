@@ -46,6 +46,7 @@
 <updated>2000-01-02T03:04:05Z</updated>
 </feed>
 #errors
+/feed/title;SUBDOC
 
 #data
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -57,6 +58,7 @@
 #errors
 /feed/title/p;element not allowed:atom|TextConstruct;m
 /feed/title/p;element;unsupported
+/feed/title;SUBDOC
 
 #data
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -67,6 +69,7 @@
 </feed>
 #errors
 /feed/title/div;element not allowed:atom|TextConstruct;m
+/feed/title;SUBDOC
 
 #data
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -670,3 +673,54 @@
 /feed/entry;element missing:atom|title
 /feed/entry;element missing:atom|updated
 /feed/entry;element missing:atom|link|alternate
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<content src="x"/>
+</entry>
+#errors
+/entry;element missing:atom|summary;m
+/entry/content;attribute missing:type;s
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<content src=""/>
+<summary/>
+</entry>
+#errors
+/entry/content;attribute missing:type;s
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<content type="image/png"/>
+</entry>
+#errors
+/entry;element missing:atom|summary;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<content type="message/rfc822"/>
+</entry>
+#errors
+/entry/content/@type;IMT:composite;m
+/entry;element missing:atom|summary;m
