@@ -1,5 +1,15 @@
 2008-03-20  Wakaba  <wakaba@suika.fam.cx>
 
+	* Atom.pm: Don't raise an error even if there is
+	no |atom:summary| element child in the |atom:entry|
+	element when the |type| attribute of the |atom:content|
+	element is set to |html|, |xhtml|, or |text|.
+	The |atom:rights| elements were implemented
+	as Date construct (!?).
+	Typo in code for |rel=alternate| are fixed.
+
+2008-03-20  Wakaba  <wakaba@suika.fam.cx>
+
 	* Atom.pm: Support for |thr:total| element.
 	Add notes on additional Atom namespaces.
 

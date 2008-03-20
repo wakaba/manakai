@@ -706,7 +706,9 @@ $Element->{$ATOM_NS}->{content} = {
         }
       }
 
-      if ($value =~ m![+/][Xx][Mm][Ll]\z!) {
+      if ({text => 1, html => 1, xhtml => 1}->{$value}) {
+        #
+      } elsif ($value =~ m![+/][Xx][Mm][Ll]\z!) {
         ## ISSUE: There is no definition for "XML media type" in RFC 3023.
         ## Is |application/xml-dtd| an XML media type?
         $value = 'xml';
@@ -1109,7 +1111,7 @@ $Element->{$ATOM_NS}->{logo} = {
 
 $Element->{$ATOM_NS}->{published} = \%AtomDateConstruct;
 
-$Element->{$ATOM_NS}->{rights} = \%AtomDateConstruct;
+$Element->{$ATOM_NS}->{rights} = \%AtomTextConstruct;
 ## NOTE: SHOULD NOT be used to convey machine-readable information.
 
 $Element->{$ATOM_NS}->{source} = {
@@ -1145,10 +1147,10 @@ $Element->{$ATOM_NS}->{source} = {
           $not_allowed = 1;
         }
       } elsif ($child_ln eq 'link') {
-        if ($child_ln->rel eq $LINK_REL . 'alternate') {
-          my $type = $child_ln->get_attribute_ns (undef, 'type');
+        if ($child_el->rel eq $LINK_REL . 'alternate') {
+          my $type = $child_el->get_attribute_ns (undef, 'type');
           $type = '' unless defined $type;
-          my $hreflang = $child_ln->get_attribute_ns (undef, 'hreflang');
+          my $hreflang = $child_el->get_attribute_ns (undef, 'hreflang');
           $hreflang = '' unless defined $hreflang;
           my $key = 'link:'.(defined $type ? ':'.$type : '').':'.
               (defined $hreflang ? ':'.$hreflang : '');

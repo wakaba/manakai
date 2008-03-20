@@ -724,3 +724,39 @@
 #errors
 /entry/content/@type;IMT:composite;m
 /entry;element missing:atom|summary;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<content type="text"/>
+</entry>
+#errors
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<content type="html"/>
+</entry>
+#errors
+/entry/content;SUBDOC
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<content type="xhtml"/>
+</entry>
+#errors
+/entry/content;element missing:div;m
+

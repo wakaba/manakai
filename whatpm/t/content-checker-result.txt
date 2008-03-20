@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Thu Mar 20 18:57:56 2008
-# Current time GMT:   Thu Mar 20 09:57:56 2008
+# Current time local: Thu Mar 20 19:50:31 2008
+# Current time GMT:   Thu Mar 20 10:50:31 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2086,11 +2086,20 @@ not ok 1928
 #<title>x</title>
 #<content type="image/png"/>
 #</entry>)
-# t/content-model-atom-2.dat
-ok 1929
+not ok 1929
+# Test 1929 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #1929)
+#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="message/rfc822"/>
+#</entry>)
 ok 1930
 ok 1931
 ok 1932
+# t/content-model-atom-2.dat
 ok 1933
 ok 1934
 ok 1935
@@ -2109,9 +2118,15 @@ ok 1947
 ok 1948
 ok 1949
 ok 1950
+ok 1951
+ok 1952
+ok 1953
+ok 1954
+ok 1955
+ok 1956
 # t/content-model-atom-threading-1.dat
-not ok 1951
-# Test 1951 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #1951)
+not ok 1957
+# Test 1957 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #1957)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2141,8 +2156,8 @@ not ok 1951
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 1952
-# Test 1952 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #1952)
+not ok 1958
+# Test 1958 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #1958)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2168,12 +2183,6 @@ not ok 1952
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 1953
-ok 1954
-ok 1955
-ok 1956
-ok 1957
-ok 1958
 ok 1959
 ok 1960
 ok 1961
@@ -2182,3 +2191,9 @@ ok 1963
 ok 1964
 ok 1965
 ok 1966
+ok 1967
+ok 1968
+ok 1969
+ok 1970
+ok 1971
+ok 1972
