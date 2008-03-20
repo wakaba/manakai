@@ -371,8 +371,6 @@ my %AtomDateConstruct = (
 $Element->{$ATOM_NS}->{entry} = {
   %AtomChecker,
   is_root => 1,
-  ## TODO: MUST author+ unless (child::source/child::author)
-  ## or (parent::feed/child::author)
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -423,11 +421,13 @@ $Element->{$ATOM_NS}->{entry} = {
         ## NOTE: MAY
         $not_allowed ||= $element_state->{has_element}->{entry};
       } elsif ({ # MAY
-                author => 1,
                 category => 1,
                 contributor => 1,
                }->{$child_ln}) {
         $not_allowed = $element_state->{has_element}->{entry};
+      } elsif ($child_ln eq 'author') { # MAY
+        $not_allowed = $element_state->{has_element}->{entry};
+        $element_state->{has_author} = 1;
       } else {
         $not_allowed = 1;
       }
@@ -448,6 +448,36 @@ $Element->{$ATOM_NS}->{entry} = {
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+
+    if ($element_state->{has_author}) {
+      ## NOTE: There is either a child atom:author element
+      ## or a child atom:source element which contains an atom:author
+      ## child element.
+      #
+    } else {
+      A: {
+        my $root = $item->{node}->owner_document->document_element;
+        if ($root and $root->manakai_local_name eq 'feed') {
+          my $nsuri = $root->namespace_uri;
+          if (defined $nsuri and $nsuri eq $ATOM_NS) {
+            ## NOTE: An Atom Feed Document.
+            for my $root_child (@{$root->child_nodes}) {
+              ## NOTE: Entity references are not supported.
+              next unless $root_child->node_type == 1; # ELEMENT_NODE
+              next unless $root_child->manakai_local_name eq 'author';
+              my $root_child_nsuri = $root_child->namespace_uri;
+              next unless defined $root_child_nsuri;
+              next unless $root_child_nsuri eq $ATOM_NS;
+              last A;
+            }
+          }
+        }
+        
+        $self->{onerror}->(node => $item->{node},
+                           type => 'element missing:atom|author',
+                           level => $self->{must_level});
+      } # A
+    }
 
     ## TODO: If entry's with same id, then updated SHOULD be different
 
@@ -1069,11 +1099,13 @@ $Element->{$ATOM_NS}->{source} = {
         }
         $not_allowed ||= $element_state->{has_element}->{entry};
       } elsif ({
-                author => 1,
                 category => 1,
                 contributor => 1,
                }->{$child_ln}) {
         $not_allowed = $element_state->{has_element}->{entry};
+      } elsif ($child_ln eq 'author') {
+        $not_allowed = $element_state->{has_element}->{entry};
+        $item->{parent_state}->{has_author} = 1; # parent::atom:entry's flag
       } else {
         $not_allowed = 1;
       }

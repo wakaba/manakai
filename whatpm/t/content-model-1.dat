@@ -6699,12 +6699,15 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/><a:entry><a:id>http://www.example.org/1/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry></a:feed>
 </rule>
 #errors
+/rule/feed/entry;element missing:atom|author;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><a:entry><a:id>http://www.example.org/1/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry><nest/><a:entry><a:id>http://www.example.org/2/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry></a:feed>
 </rule>
 #errors
+/rule/feed/entry;element missing:atom|author;m
+/rule/feed/entry;element missing:atom|author;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
