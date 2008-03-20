@@ -476,6 +476,7 @@ $Element->{$ATOM_NS}->{entry} = {
         $self->{onerror}->(node => $item->{node},
                            type => 'element missing:atom|author',
                            level => $self->{must_level});
+        $item->{parent_state}->{has_no_author_entry} = 1;#for atom:feed's check
       } # A
     }
 
@@ -517,7 +518,6 @@ $Element->{$ATOM_NS}->{feed} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq $ATOM_NS) {
-      ## TODO: MUST author+ unless all entry child has author+.
       my $not_allowed;
       if ($child_ln eq 'entry') {
         $element_state->{has_element}->{entry} = 1;
@@ -582,6 +582,12 @@ $Element->{$ATOM_NS}->{feed} = {
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+
+    if ($element_state->{has_no_author_entry}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:atom|author',
+                         level => $self->{must_level});
+    }
 
     ## TODO: If entry's with same id, then updated SHOULD be different
 

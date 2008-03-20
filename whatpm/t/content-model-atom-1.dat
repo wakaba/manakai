@@ -287,6 +287,7 @@
 </entry>
 </feed>
 #errors
+/feed;element missing:atom|author;m
 /feed/entry;element missing:atom|author;m
 /feed/entry;element missing:atom|id
 /feed/entry;element missing:atom|title
@@ -305,6 +306,7 @@
 <entry/>
 </feed>
 #errors
+/feed;element missing:atom|author;m
 /feed/entry;element missing:atom|author;m
 /feed/entry;element missing:atom|author;m
 /feed/entry;element missing:atom|id
@@ -325,6 +327,7 @@
 <title>x</title>
 </feed>
 #errors
+/feed;element missing:atom|author;m
 /feed/entry;element missing:atom|author;m
 /feed/link;element not allowed
 /feed/title;element not allowed
@@ -364,6 +367,7 @@
 </entry>
 </feed>
 #errors
+/feed;element missing:atom|author;m
 /feed/entry;element missing:atom|author;m
 /feed/entry/entry;element not allowed
 /feed/entry/entry;element missing:atom|author;m
@@ -404,6 +408,7 @@
 <entry/>
 </feed>
 #errors
+/feed;element missing:atom|author;m
 /feed/entry;element missing:atom|author;m
 /feed/entry;element missing:atom|id
 /feed/entry;element missing:atom|title
@@ -427,6 +432,7 @@
 </entry>
 </feed>
 #errors
+/feed;element missing:atom|author;m
 /feed/entry;element missing:atom|id
 /feed/entry;element missing:atom|title
 /feed/entry;element missing:atom|updated
@@ -446,6 +452,7 @@
 </entry>
 </feed>
 #errors
+/feed;element missing:atom|author;m
 /feed/entry;element missing:atom|author;m
 /feed/source;element not allowed
 /feed/entry;element missing:atom|id
@@ -503,3 +510,163 @@
 <title>x</title>
 </entry>
 #errors
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<entry>
+
+</entry>
+</feed>
+#errors
+/feed;element missing:atom|author;m
+/feed/entry;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<entry>
+  <author><name>x</name></author>
+</entry>
+</feed>
+#errors
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<entry>
+  <author><name>x</name></author>
+</entry>
+<entry>
+  <author><name>x</name></author>
+</entry>
+</feed>
+#errors
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<entry>
+</entry>
+<entry>
+  <author><name>x</name></author>
+</entry>
+</feed>
+#errors
+/feed;element missing:atom|author;m
+/feed/entry;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<entry>
+  <author><name>x</name></author>
+</entry>
+<entry>
+</entry>
+</feed>
+#errors
+/feed;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+/feed/entry;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<entry>
+</entry>
+<entry>
+  <author><name>x</name></author>
+</entry>
+</feed>
+#errors
+/feed;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+/feed/entry;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+
+#data
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>about:</id>
+<link rel="self" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<entry>
+  <author><name>x</name></author>
+</entry>
+<entry>
+</entry>
+<entry>
+</entry>
+</feed>
+#errors
+/feed;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+/feed/entry;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate
+/feed/entry;element missing:atom|author;m
+/feed/entry;element missing:atom|id
+/feed/entry;element missing:atom|title
+/feed/entry;element missing:atom|updated
+/feed/entry;element missing:atom|link|alternate

@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Thu Mar 20 14:55:41 2008
-# Current time GMT:   Thu Mar 20 05:55:41 2008
+# Current time local: Thu Mar 20 16:31:23 2008
+# Current time GMT:   Thu Mar 20 07:31:23 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2061,12 +2061,43 @@ ok 1909
 ok 1910
 ok 1911
 ok 1912
-ok 1913
+not ok 1913
+# Test 1913 got: "/feed/entry;element missing:atom|id\n/feed/entry;element missing:atom|link|alternate\n/feed/entry;element missing:atom|title\n/feed/entry;element missing:atom|updated" (t/ContentChecker.t at line 98 fail #1913)
+#      Expected: "/feed/entry;element missing:atom|id\n/feed/entry;element missing:atom|link|alternate\n/feed/entry;element missing:atom|title\n/feed/entry;element missing:atom|updated\n/feed;element missing:atom|author;m" (<feed xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<link rel="self" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<entry>
+#  <source>
+#    <author><name>x</name></author>
+#  </source>
+#</entry>
+#</feed>)
+#      Line 4 is changed:
+#       - "/feed/entry;element missing:atom|updated\n"
+#       + "/feed/entry;element missing:atom|updated"
+#      Line 5 is missing:
+#       - "/feed;element missing:atom|author;m"
 ok 1914
-ok 1915
+not ok 1915
+# Test 1915 got: "/x/feed/entry;element missing:atom|author;m\n/x/feed/entry;element missing:atom|id\n/x/feed/entry;element missing:atom|link|alternate\n/x/feed/entry;element missing:atom|title\n/x/feed/entry;element missing:atom|updated\n/x/feed;element missing:atom|author;m\n/x;element;unsupported" (t/ContentChecker.t at line 98 fail #1915)
+#      Expected: "/x/feed/entry;element missing:atom|author;m\n/x/feed/entry;element missing:atom|id\n/x/feed/entry;element missing:atom|link|alternate\n/x/feed/entry;element missing:atom|title\n/x/feed/entry;element missing:atom|updated\n/x;element;unsupported" (<x xmlns="">
+#<feed xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="self" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<entry>
+#
+#</entry>
+#</feed>
+#</x>)
+#      Got 1 extra line at line 6:
+#       + "/x/feed;element missing:atom|author;m\n"
 ok 1916
 ok 1917
-# t/content-model-atom-2.dat
 ok 1918
 ok 1919
 ok 1920
@@ -2074,6 +2105,7 @@ ok 1921
 ok 1922
 ok 1923
 ok 1924
+# t/content-model-atom-2.dat
 ok 1925
 ok 1926
 ok 1927
@@ -2089,3 +2121,10 @@ ok 1936
 ok 1937
 ok 1938
 ok 1939
+ok 1940
+ok 1941
+ok 1942
+ok 1943
+ok 1944
+ok 1945
+ok 1946
