@@ -1,5 +1,13 @@
 2008-03-20  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: Better line/column reporting for "duplicate attribute"
+	errors.  Line/column markings for DOCTYPE, comment, and
+	character tokens are reintroduced; otherwise,
+	error location for "not HTML5" error and errors
+	for implied elements are not attached.
+
+2008-03-20  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: Set line/column numbers to attributes.
 
 	* NanoDOM.pm (create_attribute_ns, set_attribute_node_ns): Added.
