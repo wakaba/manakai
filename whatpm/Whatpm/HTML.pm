@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.115 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.116 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -484,7 +484,8 @@ sub _get_next_token ($) {
       # Anything else
       my $token = {type => CHARACTER_TOKEN,
                    data => chr $self->{next_char},
-                   line => $self->{line}, column => $self->{column}};
+                   #line => $self->{line}, column => $self->{column},
+                  };
       ## Stay in the data state
       
       if (@{$self->{char}}) {
@@ -500,7 +501,7 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == ENTITY_DATA_STATE) {
       ## (cannot happen in CDATA state)
 
-      my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
+      #my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
       
       my $token = $self->_tokenize_attempt_to_consume_an_entity (0, -1);
 
@@ -510,7 +511,8 @@ sub _get_next_token ($) {
       unless (defined $token) {
         
         return  ({type => CHARACTER_TOKEN, data => '&',
-                  line => $l, column => $c});
+                  #line => $l, column => $c,
+                 });
       } else {
         
         return  ($token);
@@ -536,8 +538,9 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
 
           return  ({type => CHARACTER_TOKEN, data => '<',
-                    line => $self->{line_prev},
-                    column => $self->{column_prev}});
+                    #line => $self->{line_prev},
+                    #column => $self->{column_prev},
+                   });
 
           redo A;
         }
@@ -612,8 +615,9 @@ sub _get_next_token ($) {
   
 
           return  ({type => CHARACTER_TOKEN, data => '<>',
-                    line => $self->{line_prev},
-                    column => $self->{column_prev}});
+                    #line => $self->{line_prev},
+                    #column => $self->{column_prev},
+                   });
 
           redo A;
         } elsif ($self->{next_char} == 0x003F) { # ?
@@ -623,8 +627,9 @@ sub _get_next_token ($) {
                           column => $self->{column_prev});
           $self->{state} = BOGUS_COMMENT_STATE;
           $self->{current_token} = {type => COMMENT_TOKEN, data => '',
-                                    line => $self->{line_prev},
-                                    column => $self->{column_prev}};
+                                    #line => $self->{line_prev},
+                                    #column => $self->{column_prev},
+                                   };
           ## $self->{next_char} is intentionally left as is
           redo A;
         } else {
@@ -634,8 +639,9 @@ sub _get_next_token ($) {
           ## reconsume
 
           return  ({type => CHARACTER_TOKEN, data => '<',
-                    line => $self->{line_prev},
-                    column => $self->{column_prev}});
+                    #line => $self->{line_prev},
+                    #column => $self->{column_prev},
+                   });
 
           redo A;
         }
@@ -670,7 +676,8 @@ sub _get_next_token ($) {
               $self->{state} = DATA_STATE;
 
               return  ({type => CHARACTER_TOKEN, data => '</',
-                        line => $l, column => $c});
+                        #line => $l, column => $c,
+                       });
   
               redo A;
             }
@@ -690,7 +697,8 @@ sub _get_next_token ($) {
             unshift @{$self->{char}},  (@next_char);
             $self->{state} = DATA_STATE;
             return  ({type => CHARACTER_TOKEN, data => '</',
-                      line => $l, column => $c});
+                      #line => $l, column => $c,
+                     });
             redo A;
           } else {
             
@@ -704,7 +712,8 @@ sub _get_next_token ($) {
           # next-input-character is already done
           $self->{state} = DATA_STATE;
           return  ({type => CHARACTER_TOKEN, data => '</',
-                    line => $l, column => $c});
+                    #line => $l, column => $c,
+                   });
           redo A;
         }
       }
@@ -761,7 +770,8 @@ sub _get_next_token ($) {
         # reconsume
 
         return  ({type => CHARACTER_TOKEN, data => '</',
-                  line => $l, column => $c});
+                  #line => $l, column => $c,
+                 });
 
         redo A;
       } else {
@@ -769,8 +779,9 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'bogus end tag');
         $self->{state} = BOGUS_COMMENT_STATE;
         $self->{current_token} = {type => COMMENT_TOKEN, data => '',
-                                  line => $self->{line_prev}, # "<" of "</"
-                                  column => $self->{column_prev} - 1};
+                                  #line => $self->{line_prev}, # "<" of "</"
+                                  #column => $self->{column_prev} - 1,
+                                 };
         ## $self->{next_char} is intentionally left as is
         redo A;
       }
@@ -1761,7 +1772,7 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## (only happen if PCDATA state)
 
-      my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1);
+      #my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1);
 
       my @next_char;
       push @next_char, $self->{next_char};
@@ -1778,7 +1789,8 @@ sub _get_next_token ($) {
         if ($self->{next_char} == 0x002D) { # -
           
           $self->{current_token} = {type => COMMENT_TOKEN, data => '',
-                                    line => $l, column => $c};
+                                    #line => $l, column => $c,
+                                   };
           $self->{state} = COMMENT_START_STATE;
           
       if (@{$self->{char}}) {
@@ -1858,7 +1870,8 @@ sub _get_next_token ($) {
                     $self->{state} = DOCTYPE_STATE;
                     $self->{current_token} = {type => DOCTYPE_TOKEN,
                                               quirks => 1,
-                                              line => $l, column => $c};
+                                              #line => $l, column => $c,
+                                             };
                     
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -1894,7 +1907,8 @@ sub _get_next_token ($) {
       unshift @{$self->{char}},  (@next_char);
       $self->{state} = BOGUS_COMMENT_STATE;
       $self->{current_token} = {type => COMMENT_TOKEN, data => '',
-                                line => $l, column => $c};
+                                #line => $l, column => $c,
+                               };
       redo A;
       
       ## ISSUE: typos in spec: chacacters, is is a parse error
@@ -3112,7 +3126,9 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
         }
 
         return {type => CHARACTER_TOKEN, data => chr $code,
-                has_reference => 1, line => $l, column => $c};
+                has_reference => 1,
+                #line => $l, column => $c,
+               };
       } # X
     } elsif (0x0030 <= $self->{next_char} and
              $self->{next_char} <= 0x0039) { # 0..9
@@ -3173,7 +3189,8 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
       }
       
       return {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1,
-              line => $l, column => $c};
+              #line => $l, column => $c,
+             };
     } else {
       
       $self->{parse_error}->(level => $self->{must_level}, type => 'bare nero', line => $l, column => $c);
@@ -3251,24 +3268,28 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
     if ($match > 0) {
       
       return {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
-              line => $l, column => $c};
+              #line => $l, column => $c,
+             };
     } elsif ($match < 0) {
       $self->{parse_error}->(level => $self->{must_level}, type => 'no refc', line => $l, column => $c);
       if ($in_attr and $match < -1) {
         
         return {type => CHARACTER_TOKEN, data => '&'.$entity_name,
-                line => $l, column => $c};
+                #line => $l, column => $c,
+               };
       } else {
         
         return {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
-                line => $l, column => $c};
+                #line => $l, column => $c,
+               };
       }
     } else {
       
       $self->{parse_error}->(level => $self->{must_level}, type => 'bare ero', line => $l, column => $c);
       ## NOTE: "No characters are consumed" in the spec.
       return {type => CHARACTER_TOKEN, data => '&'.$value,
-              line => $l, column => $c};
+              #line => $l, column => $c,
+             };
     }
   } else {
     
@@ -3592,7 +3613,10 @@ sub _tree_construction_root_element ($) {
             
             $self->{application_cache_selection}
                 ->($token->{attributes}->{manifest}->{value});
-            ## ISSUE: No relative reference resolution?
+            ## ISSUE: Spec is unclear on relative references.
+            ## According to Hixie (#whatwg 2008-03-19), it should be
+            ## resolved against the base URI of the document in HTML
+            ## or xml:base of the element in XHTML.
           } else {
             
             $self->{application_cache_selection}->(undef);
@@ -7413,12 +7437,14 @@ sub _tree_construction_main ($) {
           if ($prompt_attr) {
             
             push @tokens, {type => CHARACTER_TOKEN, data => $prompt_attr->{value},
-                           line => $token->{line}, column => $token->{column}};
+                           #line => $token->{line}, column => $token->{column},
+                          };
           } else {
             
             push @tokens, {type => CHARACTER_TOKEN,
                            data => 'This is a searchable index. Insert your search keywords here: ',
-                           line => $token->{line}, column => $token->{column}}; # SHOULD
+                           #line => $token->{line}, column => $token->{column},
+                          }; # SHOULD
             ## TODO: make this configurable
           }
           push @tokens,
@@ -8133,4 +8159,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/19 23:43:47 $
+# $Date: 2008/03/20 01:33:59 $
