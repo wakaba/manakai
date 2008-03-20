@@ -5,9 +5,15 @@ require Whatpm::ContentChecker;
 require Whatpm::URIChecker;
 
 my $ATOM_NS = q<http://www.w3.org/2005/Atom>;
+my $THR_NS = q<http://purl.org/syndication/thread/1.0>;
 my $LINK_REL = q<http://www.iana.org/assignments/relation/>;
 
 sub FEATURE_RFC4287 () {
+  Whatpm::ContentChecker::FEATURE_STATUS_CR |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
+}
+
+sub FEATURE_RFC4685 () {
   Whatpm::ContentChecker::FEATURE_STATUS_CR |
   Whatpm::ContentChecker::FEATURE_ALLOWED
 }
@@ -440,6 +446,10 @@ $Element->{$ATOM_NS}->{entry} = {
       if ($not_allowed) {
         $self->{onerror}->(node => $child_el, type => 'element not allowed');
       }
+    } elsif ($child_nsuri eq $THR_NS and $child_ln eq 'in-reply-to') {
+      ## ISSUE: Where |thr:in-reply-to| is allowed is not explicit;y
+      ## defined in RFC 4685.
+      #
     } else {
       ## TODO: extension element
       $self->{onerror}->(node => $child_el, type => 'element not allowed');
@@ -965,41 +975,7 @@ $Element->{$ATOM_NS}->{id} = {
   },
 };
 
-$Element->{$ATOM_NS}->{link} = {
-  %AtomChecker,
-  check_attrs => $GetAtomAttrsChecker->({
-    href => sub {
-      my ($self, $attr) = @_;
-      ## NOTE: There MUST NOT be any white space.
-      Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
-        my %opt = @_;
-        $self->{onerror}->(node => $attr, level => $opt{level},
-                           type => 'URI::'.$opt{type}.
-                           (defined $opt{position} ? ':'.$opt{position} : ''));
-      });
-    },
-    hreflang => $AtomLanguageTagAttrChecker,
-    length => sub { }, # No MUST; in octets.
-    rel => sub { # MUST
-      my ($self, $attr) = @_;
-      my $value = $attr->value;
-      if ($value =~ /\A(?>[0-9A-Za-z._~!\$&'()*+,;=\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}-]|%[0-9A-Fa-f][0-9A-Fa-f]|\@)+\z/) {
-        $value = $LINK_REL . $value;
-      }
-
-      ## NOTE: There MUST NOT be any white space.
-      Whatpm::URIChecker->check_iri ($value, sub {
-        my %opt = @_;
-        $self->{onerror}->(node => $attr, level => $opt{level},
-                           type => 'URI::'.$opt{type}.
-                           (defined $opt{position} ? ':'.$opt{position} : ''));
-      });
-
-      ## TODO: Warn if unregistered
-    },
-    title => sub { }, # No MUST
-    type => sub {
-      ## NOTE: MUST be a MIME media type.  What is "MIME media type"?
+my $AtomIMTAttrChecker = sub {
       my ($self, $attr) = @_;
       my $value = $attr->value;
       my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
@@ -1027,7 +1003,45 @@ $Element->{$ATOM_NS}->{link} = {
       } else {
         $self->{onerror}->(node => $attr, type => 'IMT:syntax error');
       }
+}; # $AtomIMTAttrChecker
+
+my $AtomIRIReferenceAttrChecker = sub {
+  my ($self, $attr) = @_;
+  ## NOTE: There MUST NOT be any white space.
+  Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
+    my %opt = @_;
+    $self->{onerror}->(node => $attr, level => $opt{level},
+                       type => 'URI::'.$opt{type}.
+                       (defined $opt{position} ? ':'.$opt{position} : ''));
+  });
+}; # $AtomIRIReferenceAttrChecker
+
+$Element->{$ATOM_NS}->{link} = {
+  %AtomChecker,
+  check_attrs => $GetAtomAttrsChecker->({
+    href => $AtomIRIReferenceAttrChecker,
+    hreflang => $AtomLanguageTagAttrChecker,
+    length => sub { }, # No MUST; in octets.
+    rel => sub { # MUST
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      if ($value =~ /\A(?>[0-9A-Za-z._~!\$&'()*+,;=\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}-]|%[0-9A-Fa-f][0-9A-Fa-f]|\@)+\z/) {
+        $value = $LINK_REL . $value;
+      }
+
+      ## NOTE: There MUST NOT be any white space.
+      Whatpm::URIChecker->check_iri ($value, sub {
+        my %opt = @_;
+        $self->{onerror}->(node => $attr, level => $opt{level},
+                           type => 'URI::'.$opt{type}.
+                           (defined $opt{position} ? ':'.$opt{position} : ''));
+      });
+
+      ## TODO: Warn if unregistered
     },
+    title => sub { }, # No MUST
+    type => $AtomIMTAttrChecker,
+    ## NOTE: MUST be a MIME media type.  What is "MIME media type"?
   }, {
     href => FEATURE_RFC4287,
     hreflang => FEATURE_RFC4287,
@@ -1173,6 +1187,64 @@ $Element->{$ATOM_NS}->{updated} = \%AtomDateConstruct;
 
 ## TODO: simple extension element and structured extension element
 
+## -- Atom Threading 1.0 [RFC 4685]
+
+$Element->{$THR_NS}->{''} = {
+  %AtomChecker,
+  status => 0,
+};
+
+## ISSUE: Strictly speaking, thr:* element/attribute,
+## where * is an undefined local name, is not disallowed.
+
+$Element->{$THR_NS}->{'in-reply-to'} = {
+  %AtomChecker,
+  status => FEATURE_RFC4685,
+  check_attrs => $GetAtomAttrsChecker->({
+    href => $AtomIRIReferenceAttrChecker,
+        ## TODO: fact-level.
+        ## TODO: MUST be dereferencable.
+    ref => sub {
+      my ($self, $attr, $item, $element_state) = @_;
+      $element_state->{has_ref} = 1;
+
+      ## NOTE: Same as |atom:id|.
+      ## NOTE: There MUST NOT be any white space.
+      Whatpm::URIChecker->check_iri ($attr->value, sub {
+        my %opt = @_;
+        $self->{onerror}->(node => $attr, level => $opt{level},
+                           type => 'URI::'.$opt{type}.
+                           (defined $opt{position} ? ':'.$opt{position} : ''));
+      });
+
+      ## TODO: Check against ID guideline...
+    },
+    source => $AtomIRIReferenceAttrChecker,
+        ## TODO: fact-level.
+        ## TODO: MUST be dereferencable.
+    type => $AtomIMTAttrChecker,
+        ## TODO: fact-level.
+  }, {
+    href => FEATURE_RFC4685,
+    source => FEATURE_RFC4685,
+    ref => FEATURE_RFC4685,
+    type => FEATURE_RFC4685,
+  }),
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+  
+    unless ($element_state->{has_ref}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing:ref',
+                         level => $self->{must_level});
+    }
+
+    $AtomChecker{check_end}->(@_);
+  },
+  ## NOTE: Content model has no constraint.
+};
+
 $Whatpm::ContentChecker::Namespace->{$ATOM_NS}->{loaded} = 1;
+$Whatpm::ContentChecker::Namespace->{$THR_NS}->{loaded} = 1;
 
 1;

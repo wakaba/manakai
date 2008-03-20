@@ -13,6 +13,7 @@ my @FILES = qw[
   t/table-1.dat
   t/content-model-atom-1.dat
   t/content-model-atom-2.dat
+  t/content-model-atom-threading-1.dat
 ];
 
 require Whatpm::ContentChecker;
@@ -124,4 +125,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2008/03/20 08:54:00 $
+## $Date: 2008/03/20 09:38:47 $
