@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.71 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.72 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -28,6 +28,10 @@ my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
 
 my $Namespace = {
   q<http://www.w3.org/2005/Atom> => {module => 'Whatpm::ContentChecker::Atom'},
+  q<http://purl.org/syndication/history/1.0>
+      => {module => 'Whatpm::ContentChecker::Atom'},
+  q<http://purl.org/syndication/threading/1.0>
+      => {module => 'Whatpm::ContentChecker::Atom'},
   $HTML_NS => {module => 'Whatpm::ContentChecker::HTML'},
   $XML_NS => {loaded => 1},
   $XMLNS_NS => {loaded => 1},
@@ -784,4 +788,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/03/02 11:16:34 $
+# $Date: 2008/03/20 10:30:20 $

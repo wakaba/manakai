@@ -6,6 +6,7 @@ require Whatpm::URIChecker;
 
 my $ATOM_NS = q<http://www.w3.org/2005/Atom>;
 my $THR_NS = q<http://purl.org/syndication/thread/1.0>;
+my $FH_NS = q<http://purl.org/syndication/history/1.0>;
 my $LINK_REL = q<http://www.iana.org/assignments/relation/>;
 
 sub FEATURE_RFC4287 () {
@@ -449,6 +450,8 @@ $Element->{$ATOM_NS}->{entry} = {
     } elsif ($child_nsuri eq $THR_NS and $child_ln eq 'in-reply-to') {
       ## ISSUE: Where |thr:in-reply-to| is allowed is not explicit;y
       ## defined in RFC 4685.
+      #
+    } elsif ($child_nsuri eq $THR_NS and $child_ln eq 'total') {
       #
     } else {
       ## TODO: extension element
@@ -1038,6 +1041,12 @@ $Element->{$ATOM_NS}->{link} = {
       });
 
       ## TODO: Warn if unregistered
+
+      ## TODO: rel=license [RFC 4946]
+      ## MUST NOT multiple rel=license with same href="",type="" pairs
+      ## href="" SHOULD be dereferencable
+      ## title="" SHOULD be there if multiple rel=license
+      ## MUST NOT "unspecified" and other rel=license
     },
     title => sub { }, # No MUST
     type => $AtomIMTAttrChecker,
@@ -1049,6 +1058,9 @@ $Element->{$ATOM_NS}->{link} = {
     rel => FEATURE_RFC4287,
     title => FEATURE_RFC4287,
     type => FEATURE_RFC4287,
+
+    ## TODO: thr:count
+    ## TODO: thr:updated
   }),
   check_start =>  sub {
     my ($self, $item, $element_state) = @_;
@@ -1243,6 +1255,54 @@ $Element->{$THR_NS}->{'in-reply-to'} = {
   },
   ## NOTE: Content model has no constraint.
 };
+
+$Element->{$THR_NS}->{total} = {
+  %AtomChecker,
+  check_start =>  sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{value} = '';
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed',
+                         level => $self->{must_level});
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    $element_state->{value} .= $child_node->data;
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    ## NOTE: xsd:nonNegativeInteger
+    unless ($element_state->{value} =~ /\A(?>[0-9]+|-0+)\z/) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'syntax error', ## TODO: 
+                         level => $self->{must_level});
+    }
+
+    $AtomChecker{check_end}->(@_);
+  },
+};
+
+## TODO: fh:complete
+
+## TODO: fh:archive
+
+## TODO: Check as archive document, page feed document, ...
+
+## TODO: APP [RFC 5023]
 
 $Whatpm::ContentChecker::Namespace->{$ATOM_NS}->{loaded} = 1;
 $Whatpm::ContentChecker::Namespace->{$THR_NS}->{loaded} = 1;

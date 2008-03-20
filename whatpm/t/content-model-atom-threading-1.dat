@@ -60,3 +60,182 @@
 #errors
 /feed;element missing:atom|link|self;s
 
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total></thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>0</thr:total>
+</entry>
+#errors
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>00000</thr:total>
+</entry>
+#errors
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>+0</thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>-0</thr:total>
+</entry>
+#errors
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>0.00</thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>12211</thr:total>
+</entry>
+#errors
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>33,44</thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>444 </thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>+233</thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>.444</thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total> 44</thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>40,444</thr:total>
+</entry>
+#errors
+/entry/total;syntax error;m
+
+#data
+<entry xmlns="http://www.w3.org/2005/Atom"
+    xmlns:thr="http://purl.org/syndication/thread/1.0">
+<id>about:</id>
+<author><name>x</name></author>
+<link rel="alternate" href=""/>
+<updated>2000-01-02T03:04:05Z</updated>
+<title>x</title>
+<thr:total>0004444</thr:total>
+</entry>
+#errors
+
+
