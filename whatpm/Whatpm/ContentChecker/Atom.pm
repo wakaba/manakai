@@ -427,7 +427,8 @@ $Element->{$ATOM_NS}->{entry} = {
         $not_allowed = $element_state->{has_element}->{entry};
       } elsif ($child_ln eq 'author') { # MAY
         $not_allowed = $element_state->{has_element}->{entry};
-        $element_state->{has_author} = 1;
+        $element_state->{has_author} = 1; # ./author | ./source/author
+        $element_state->{has_element}->{$child_ln} = 1; # ./author
       } else {
         $not_allowed = 1;
       }
@@ -476,8 +477,11 @@ $Element->{$ATOM_NS}->{entry} = {
         $self->{onerror}->(node => $item->{node},
                            type => 'element missing:atom|author',
                            level => $self->{must_level});
-        $item->{parent_state}->{has_no_author_entry} = 1;#for atom:feed's check
       } # A
+    }
+
+    unless ($element_state->{has_element}->{author}) {
+      $item->{parent_state}->{has_no_author_entry} = 1; # for atom:feed's check
     }
 
     ## TODO: If entry's with same id, then updated SHOULD be different
@@ -558,11 +562,13 @@ $Element->{$ATOM_NS}->{feed} = {
         ## NOTE: MAY
         $not_allowed = $element_state->{has_element}->{entry};
       } elsif ({ # MAY
-                author => 1,
                 category => 1,
                 contributor => 1,
                }->{$child_ln}) {
         $not_allowed = $element_state->{has_element}->{entry};
+      } elsif ($child_ln eq 'author') { # MAY
+        $not_allowed = $element_state->{has_element}->{entry};
+        $element_state->{has_element}->{author} = 1;
       } else {
         $not_allowed = 1;
       }
@@ -583,7 +589,8 @@ $Element->{$ATOM_NS}->{feed} = {
   check_end => sub {
     my ($self, $item, $element_state) = @_;
 
-    if ($element_state->{has_no_author_entry}) {
+    if ($element_state->{has_no_author_entry} and
+        not $element_state->{has_element}->{author}) {
       $self->{onerror}->(node => $item->{node},
                          type => 'element missing:atom|author',
                          level => $self->{must_level});
