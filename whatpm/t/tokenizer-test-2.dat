@@ -163,3 +163,14 @@ NULL
 | <style>
 |   "<!-- </style> -->"
 
+#data
+<script><!----x></script>foo
+#errors
+no DOCTYPE
+no --></script> before EOF
+#document
+| <html>
+|   <head>
+|     <script>
+|       "<!----x></script>foo"
+|   <body>
