@@ -7,6 +7,7 @@ our $DefaultPort = {
   http => 80,
 };
 
+our $FactLevel = 'm';
 our $MustLevel = 'm'; ## Non-RFC 2119 "must" (or fact)
 our $ShouldLevel = 'w'; ## Non-RFC 2119 "should"
 
@@ -246,5 +247,31 @@ sub check_iri_reference ($$$) {
   ## TODO: If it is a relative reference, then resolve and then check against scheme dependent requirements
 } # check_iri_reference
 
+sub check_rdf_uri_reference ($$$) {
+  require Message::URI::URIReference;
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $uri_o = $dom->create_uri_reference ($_[1]);
+  my $uri_s = $uri_o->uri_reference;
+
+  local $Error::Depth = $Error::Depth + 1;
+
+  if ($uri_s =~ /[\x00-\x1F\x7F-\x9F]/) {
+    $_[2]->(type => 'syntax error:rdfuriref', level => $FactLevel,
+            position => $-[0]);
+    ## TODO: Add error type to the list.
+  }
+
+  my $ascii_uri_o = $uri_o->get_uri_reference_3986; # same as RDF spec's one
+
+  unless ($ascii_uri_o->is_uri) { ## TODO: is_uri_2396
+    $_[2]->(type => 'syntax error:uri2396', level => $FactLevel,
+            value => $ascii_uri_o->uri_reference);
+    ## TODO: Add error type to the list.
+  }
+
+  ## TODO: Check against RFC 2396.
+  #Whatpm::URIChecker->check_iri_reference ($_[1], $_[2]);
+} # check_rdf_uri_reference
+
 1;
-## $Date: 2007/11/23 12:01:20 $
+## $Date: 2008/03/21 10:58:30 $

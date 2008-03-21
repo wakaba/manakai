@@ -12,11 +12,20 @@ use strict;
 
 ## ISSUE: PIs in RDF subtree should be validated?
 
+## TODO: Should we validate expanded URI created from QName?
+
+## TODO: attributes in null namespace
+
+## TODO: elements in null namespace (not mentioned in the spec.)
+
 my $RDF_URI = q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>;
 
+use Char::Class::XML qw(InXML_NCNameStartChar10 InXMLNameChar10);
+require Whatpm::URIChecker;
+
 sub new ($) {
-  my $self = bless {fact_level => 'm', grammer_level => 'm'}, shift;
-  $self->{next_id} = 0;
+  my $self = bless {fact_level => 'm', grammer_level => 'm',
+                    info_level => 'i', next_id => 0}, shift;
   $self->{onerror} = sub {
     my %opt = @_;
     warn $opt{type}, "\n";
@@ -166,6 +175,8 @@ my $resolve = sub {
       ->get_absolute_reference ($_[1]->base_uri)
       ->uri_reference;
 
+  ## TODO: Ummm... RDF/XML spec refers dated version of xml:base and RFC 2396...
+
   ## TODO: Check latest xml:base and IRI spec...
   ## (non IRI/URI chars should be percent-encoded before resolve?)
 }; # $resolve
@@ -177,6 +188,23 @@ my $generate_bnodeid = sub {
 my $get_bnodeid = sub {
   return 'b'.$_[0];
 }; # $get_bnodeid
+
+my $uri_attr = sub {
+  my ($self, $attr) = @_;
+
+  my $abs_uri = $resolve->($attr->value, $attr);
+
+  Whatpm::URIChecker->check_iri_reference ($abs_uri, sub {
+    my %opt = @_;
+    $self->{onerror}->(node => $attr, level => $opt{level},
+                       type => 'URI::'.$opt{type}.
+                       (defined $opt{position} ? ':'.$opt{position} : ''));
+  });
+
+  return $abs_uri;
+};
+
+## TODO: rdf:ID, base-uri pair must (lowercase) be unique in the document.
 
 sub convert_node_element ($$) {
   my ($self, $node) = @_;
@@ -217,20 +245,46 @@ sub convert_node_element ($$) {
     my $attr_xuri = $attr->manakai_expanded_uri;
     if ($attr_xuri eq $RDF_URI . 'ID') {
       unless (defined $subject) {
-        $subject = {uri => $resolve->('#' . $attr->value, $attr)};
+        my $id = $attr->value;
+        unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+          $self->{onerror}->(type => 'syntax error', ## TODO: type
+                             level => $self->{grammer_level},
+                             node => $self);
+        }
+        
+        $subject = {uri => $resolve->('#' . $id, $attr)};
       } else {
+        $self->{onerror}->(type => 'attribute not allowed',
+                           level => $self->{grammer_level},
+                           node => $attr);
+
         ## TODO: Ignore triple as W3C RDF Validator does
       }
     } elsif ($attr_xuri eq $RDF_URI . 'nodeID') {
       unless (defined $subject) {
-        $subject = {bnodeid => $get_bnodeid->($attr->value)};
+        my $id = $attr->value;
+        unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+          $self->{onerror}->(type => 'syntax error', ## TODO: type
+                             level => $self->{grammer_level},
+                             node => $self);
+        }
+
+        $subject = {bnodeid => $get_bnodeid->($id)};
       } else {
+        $self->{onerror}->(type => 'attribute not allowed',
+                           level => $self->{grammer_level},
+                           node => $attr);
+
         ## TODO: Ignore triple as W3C RDF Validator does
       }
     } elsif ($attr_xuri eq $RDF_URI . 'about') {
       unless (defined $subject) {
-        $subject = {uri => $resolve->($attr->value, $attr)};
+        $subject = {uri => $uri_attr->($self, $attr)};
       } else {
+        $self->{onerror}->(type => 'attribute not allowed',
+                           level => $self->{grammer_level},
+                           node => $attr);
+
         ## TODO: Ignore triple as W3C RDF Validator does
       }
     } elsif ($attr_xuri eq $RDF_URI . 'type') {
@@ -300,7 +354,16 @@ sub convert_node_element ($$) {
 } # convert_node_element
 
 my $get_id_resource = sub {
-  return $_[0] ? {uri => $resolve->('#' . $_[0]->value, $_[0])} : undef;
+  my $self = shift;
+  my $node = shift;
+  return undef unless $node;
+  my $id = $node->value;
+  unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+    $self->{onerror}->(type => 'syntax error', ## TODO: type
+                       level => $self->{grammer_level},
+                       node => $self);
+  }
+  return {uri => $resolve->('#' . $id, $node)};
 }; # $get_id_resource
 
 sub convert_property_element ($$%) {
@@ -385,7 +448,7 @@ sub convert_property_element ($$%) {
                         predicate => {uri => $xuri},
                         object => $object,
                         node => $node,
-                        id => $get_id_resource->($id_attr));
+                        id => $get_id_resource->($self, $id_attr));
     
     ## As if nodeElement
 
@@ -444,7 +507,7 @@ sub convert_property_element ($$%) {
                           predicate => {uri => $xuri},
                           object => {uri => $RDF_URI . 'nil'},
                           node => $node,
-                          id => $get_id_resource->($id_attr));
+                          id => $get_id_resource->($self, $id_attr));
     }
     
     while (@resource) {
@@ -467,7 +530,14 @@ sub convert_property_element ($$%) {
     }
   } elsif ($parse_attr) {
     # |parseTypeLiteralPropertyElt|
-    # |parseTypeOtherPropertyElt| ## TODO: What RDF Validator does?
+
+    if ($parse ne 'Literal') {
+      # |parseTypeOtherPropertyElt| ## TODO: What RDF Validator does?
+
+      $self->{onerror}->(type => 'parse type other',
+                         level => $self->{info_level},
+                         node => $parse_attr);
+    }
 
     for my $attr ($resource_attr, $nodeid_attr, $dt_attr) {
       next unless $attr;
@@ -486,7 +556,7 @@ sub convert_property_element ($$%) {
                         object => {nodes => $value,
                                    datatype => $RDF_URI . 'XMLLiteral'},
                         node => $node,
-                        id => $get_id_resource->($id_attr));
+                        id => $get_id_resource->($self, $id_attr));
   } else {
     my $mode = 'unknown';
 
@@ -561,7 +631,7 @@ sub convert_property_element ($$%) {
                           predicate => {uri => $xuri},
                           object => $object,
                           node => $node,
-                          id => $get_id_resource->($id_attr));
+                          id => $get_id_resource->($self, $id_attr));
     } elsif ($mode eq 'literal' or $mode eq 'literal-or-resource') {
       # |literalPropertyElt|
       
@@ -576,12 +646,15 @@ sub convert_property_element ($$%) {
       ## TODO: $text SHOULD be in NFC
       
       if ($dt_attr) {
-        $self->{ontriple}->(subject => $opt{subject},
-                            predicate => {uri => $xuri},
-                            object => {value => $text,
-                                       datatype => $dt_attr->value},
-                            node => $node,
-                            id => $get_id_resource->($id_attr));
+        $self->{ontriple}
+            ->(subject => $opt{subject},
+               predicate => {uri => $xuri},
+               object => {value => $text,
+                          datatype => $uri_attr->$self, ($dt_attr->value)},
+               ## ISSUE: No resolve() in the spec (but spec says that
+               ## xml:base is applied also to rdf:datatype).
+               node => $node,
+               id => $get_id_resource->($self, $id_attr));
       } else {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
@@ -589,7 +662,7 @@ sub convert_property_element ($$%) {
                                        ## TODO: language
                                       },
                             node => $node,
-                            id => $get_id_resource->($id_attr));
+                            id => $get_id_resource->($self, $id_attr));
       }
     } else {
       ## |emptyPropertyElt|
@@ -609,13 +682,25 @@ sub convert_property_element ($$%) {
                                        ## TODO: language
                                       },
                             node => $node,
-                            id => $get_id_resource->($id_attr));
+                            id => $get_id_resource->($self, $id_attr));
       } else {
         my $object;
         if ($resource_attr) {
-          $object = {uri => $resolve->($resource_attr->value, $resource_attr)};
+          $object = {uri => $uri_attr->($self, $resource_attr)};
+          if (defined $nodeid_attr) {
+            $self->{onerror}->(type => 'attribute not allowed',
+                               level => $self->{grammer_level},
+                               node => $nodeid_attr);
+             ## TODO: RDF Validator?
+          }
         } elsif ($nodeid_attr) {
-          $object = {bnodeid => $get_bnodeid->($nodeid_attr->value)};
+          my $id = $nodeid_attr->value;
+          unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+            $self->{onerror}->(type => 'syntax error', ## TODO: type
+                               level => $self->{grammer_level},
+                               node => $self);
+          }
+          $object = {bnodeid => $get_bnodeid->($id)};
         } else {
           $object = {bnodeid => $generate_bnodeid->($self)};
         }
@@ -642,7 +727,7 @@ sub convert_property_element ($$%) {
                             predicate => {uri => $xuri},
                             object => $object,
                             node => $node,
-                            id => $get_id_resource->($id_attr));
+                            id => $get_id_resource->($self, $id_attr));
       }
     }
   }
