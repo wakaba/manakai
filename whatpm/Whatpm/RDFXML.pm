@@ -16,6 +16,7 @@ my $RDF_URI = q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>;
 
 sub new ($) {
   my $self = bless {fact_level => 'm', grammer_level => 'm'}, shift;
+  $self->{next_id} = 0;
   $self->{onerror} = sub {
     my %opt = @_;
     warn $opt{type}, "\n";
@@ -159,6 +160,24 @@ my %oldTerms = (
   $RDF_URI . 'bagID' => 1,
 );
 
+require Message::DOM::DOMImplementation;
+my $resolve = sub {
+  return Message::DOM::DOMImplementation->create_uri_reference ($_[0])
+      ->get_absolute_reference ($_[1]->base_uri)
+      ->uri_reference;
+
+  ## TODO: Check latest xml:base and IRI spec...
+  ## (non IRI/URI chars should be percent-encoded before resolve?)
+}; # $resolve
+
+my $generate_bnodeid = sub {
+  return 'g'.$_[0]->{next_id}++;
+}; # $generate_bnodeid
+
+my $get_bnodeid = sub {
+  return 'b'.$_[0];
+}; # $get_bnodeid
+
 sub convert_node_element ($$) {
   my ($self, $node) = @_;
 
@@ -182,7 +201,7 @@ sub convert_node_element ($$) {
   }
 
   my $subject;
-  my $rdf_type_attr;
+  my $type_attr;
   my @prop_attr;
 
   for my $attr (@{$node->attributes}) {
@@ -198,24 +217,24 @@ sub convert_node_element ($$) {
     my $attr_xuri = $attr->manakai_expanded_uri;
     if ($attr_xuri eq $RDF_URI . 'ID') {
       unless (defined $subject) {
-        $subject = {uri => '#' . $attr->value}; ## TODO: resolve()
+        $subject = {uri => $resolve->('#' . $attr->value, $attr)};
       } else {
         ## TODO: Ignore triple as W3C RDF Validator does
       }
     } elsif ($attr_xuri eq $RDF_URI . 'nodeID') {
       unless (defined $subject) {
-        $subject = {bnodeid => '## TODO: bnode: ' . $attr->value};
+        $subject = {bnodeid => $get_bnodeid->($attr->value)};
       } else {
         ## TODO: Ignore triple as W3C RDF Validator does
       }
     } elsif ($attr_xuri eq $RDF_URI . 'about') {
       unless (defined $subject) {
-        $subject = {uri => $attr->value}; ## TODO: resolve
+        $subject = {uri => $resolve->($attr->value, $attr)};
       } else {
         ## TODO: Ignore triple as W3C RDF Validator does
       }
     } elsif ($attr_xuri eq $RDF_URI . 'type') {
-      $rdf_type_attr = $attr;
+      $type_attr = $attr;
     } elsif ({
       %coreSyntaxTerms,
       $RDF_URI . 'li' => 1,
@@ -233,7 +252,7 @@ sub convert_node_element ($$) {
   }
   
   unless (defined $subject) {
-    $subject = {bnodeid => '## TODO: new bnodeid'};
+    $subject = {bnodeid => $generate_bnodeid->($self)};
   }
 
   if ($xuri ne $RDF_URI . 'Description') {
@@ -243,11 +262,12 @@ sub convert_node_element ($$) {
                         node => $node);
   }
 
-  if ($rdf_type_attr) {
+  if ($type_attr) {
     $self->{ontriple}->(subject => $subject,
                         predicate => {uri => $RDF_URI . 'type'},
-                        object => {uri => $rdf_type_attr->value}, ## TODO: resolve
-                        node => $rdf_type_attr);
+                        object => {uri => $resolve->($type_attr->value,
+                                                     $type_attr)},
+                        node => $type_attr);
   }
 
   for my $attr (@prop_attr) {
@@ -278,6 +298,10 @@ sub convert_node_element ($$) {
 
   return $subject;
 } # convert_node_element
+
+my $get_id_resource = sub {
+  return $_[0] ? {uri => $resolve->('#' . $_[0]->value, $_[0])} : undef;
+}; # $get_id_resource
 
 sub convert_property_element ($$%) {
   my ($self, $node, %opt) = @_;
@@ -356,12 +380,12 @@ sub convert_property_element ($$%) {
       ## TODO: RDF Validator?
     }
     
-    my $object = {bnodeid => '## TODO: generate bnodeid'};
+    my $object = {bnodeid => $generate_bnodeid->($self)};
     $self->{ontriple}->(subject => $opt{subject},
                         predicate => {uri => $xuri},
                         object => $object,
                         node => $node,
-                        id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
+                        id => $get_id_resource->($id_attr));
     
     ## As if nodeElement
 
@@ -398,7 +422,7 @@ sub convert_property_element ($$%) {
     for my $cn (@{$node->child_nodes}) {
       if ($cn->node_type == $cn->ELEMENT_NODE) {
         push @resource, [$self->convert_node_element ($cn),
-                         {bnodeid => '## TODO: bnodeid generated'},
+                         {bnodeid => $generate_bnodeid->($self)},
                          $cn];
       } elsif ($cn->node_type == $cn->TEXT_NODE or
                $cn->node_type == $cn->CDATA_SECTION_NODE) {
@@ -420,7 +444,7 @@ sub convert_property_element ($$%) {
                           predicate => {uri => $xuri},
                           object => {uri => $RDF_URI . 'nil'},
                           node => $node,
-                          id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
+                          id => $get_id_resource->($id_attr));
     }
     
     while (@resource) {
@@ -462,7 +486,7 @@ sub convert_property_element ($$%) {
                         object => {nodes => $value,
                                    datatype => $RDF_URI . 'XMLLiteral'},
                         node => $node,
-                        id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
+                        id => $get_id_resource->($id_attr));
   } else {
     my $mode = 'unknown';
 
@@ -537,7 +561,7 @@ sub convert_property_element ($$%) {
                           predicate => {uri => $xuri},
                           object => $object,
                           node => $node,
-                          id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
+                          id => $get_id_resource->($id_attr));
     } elsif ($mode eq 'literal' or $mode eq 'literal-or-resource') {
       # |literalPropertyElt|
       
@@ -557,7 +581,7 @@ sub convert_property_element ($$%) {
                             object => {value => $text,
                                        datatype => $dt_attr->value},
                             node => $node,
-                            id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
+                            id => $get_id_resource->($id_attr));
       } else {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
@@ -565,7 +589,7 @@ sub convert_property_element ($$%) {
                                        ## TODO: language
                                       },
                             node => $node,
-                            id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
+                            id => $get_id_resource->($id_attr));
       }
     } else {
       ## |emptyPropertyElt|
@@ -585,15 +609,15 @@ sub convert_property_element ($$%) {
                                        ## TODO: language
                                       },
                             node => $node,
-                            id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
+                            id => $get_id_resource->($id_attr));
       } else {
         my $object;
         if ($resource_attr) {
-          $object = {uri => $resource_attr->value}; ## TODO: resolve
+          $object = {uri => $resolve->($resource_attr->value, $resource_attr)};
         } elsif ($nodeid_attr) {
-          $object = {bnodeid => $nodeid_attr->value};
+          $object = {bnodeid => $get_bnodeid->($nodeid_attr->value)};
         } else {
-          $object = {bnodeid => '## TODO: generated bnodeid'};
+          $object = {bnodeid => $generate_bnodeid->($self)};
         }
         
         for my $attr (@prop_attr) {
@@ -601,7 +625,7 @@ sub convert_property_element ($$%) {
           if ($attr_xuri eq $RDF_URI . 'type') {
             $self->{ontriple}->(subject => $object,
                                 predicate => {uri => $attr_xuri},
-                                object => $attr->value, ## TODO: resolve
+                                object => $resolve->($attr->value, $attr),
                                 node => $attr);
           } else {
             ## TODO: SHOULD be in NFC
@@ -618,7 +642,7 @@ sub convert_property_element ($$%) {
                             predicate => {uri => $xuri},
                             object => $object,
                             node => $node,
-                            id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
+                            id => $get_id_resource->($id_attr));
       }
     }
   }
