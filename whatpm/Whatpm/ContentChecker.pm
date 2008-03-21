@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.73 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.74 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -250,6 +250,28 @@ $Element->{q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>}->{RDF} = {
       my %opt = @_;
       push @$triple,
           [$opt{node}, $opt{subject}, $opt{predicate}, $opt{object}];
+      if (defined $opt{id}) {
+        push @$triple,
+            [$opt{node},
+             $opt{id},
+             {uri => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#subject>},
+             $opt{subject}];
+        push @$triple,
+            [$opt{node},
+             $opt{id},
+             {uri => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate>},
+             $opt{predicate}];
+        push @$triple,
+            [$opt{node},
+             $opt{id},
+             {uri => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#object>},
+             $opt{object}];
+        push @$triple,
+            [$opt{node},
+             $opt{id},
+             {uri => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>},
+             {uri => q<http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement>}];
+      }
     };
     $rdf->convert_rdf_element ($item->{node});
   },
@@ -812,4 +834,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/03/21 08:58:35 $
+# $Date: 2008/03/21 09:18:40 $

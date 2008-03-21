@@ -24,9 +24,9 @@ sub new ($) {
     my %opt = @_;
     my $dump_resource = sub {
       my $resource = shift;
-      if ($resource->{uri}) {
+      if (defined $resource->{uri}) {
         return '<' . $resource->{uri} . '>';
-      } elsif ($resource->{bnodeid}) {
+      } elsif (defined $resource->{bnodeid}) {
         return '_:' . $resource->{bnodeid};
       } elsif ($resource->{nodes}) {
         return '"' . join ('', map {$_->inner_html} @{$resource->{nodes}}) .
@@ -43,6 +43,20 @@ sub new ($) {
     print STDERR $dump_resource->($opt{subject}) . ' ';
     print STDERR $dump_resource->($opt{predicate}) . ' ';
     print STDERR $dump_resource->($opt{object}) . "\n";
+    if ($dump_resource->{id}) {
+      print STDERR $dump_resource->($dump_resource->{id}) . ' ';
+      print STDERR $dump_resource->({uri => $RDF_URI . 'subject'}) . ' ';
+      print STDERR $dump_resource->($opt{subject}) . "\n";
+      print STDERR $dump_resource->($dump_resource->{id}) . ' ';
+      print STDERR $dump_resource->({uri => $RDF_URI . 'predicate'}) . ' ';
+      print STDERR $dump_resource->($opt{predicate}) . "\n";
+      print STDERR $dump_resource->($dump_resource->{id}) . ' ';
+      print STDERR $dump_resource->({uri => $RDF_URI . 'object'}) . ' ';
+      print STDERR $dump_resource->($opt{object}) . "\n";
+      print STDERR $dump_resource->($dump_resource->{id}) . ' ';
+      print STDERR $dump_resource->({uri => $RDF_URI . 'type'}) . ' ';
+      print STDERR $dump_resource->({uri => $RDF_URI . 'Statement'}) . "\n";
+    }
   };
   return $self;
 } # new
@@ -346,8 +360,8 @@ sub convert_property_element ($$%) {
     $self->{ontriple}->(subject => $opt{subject},
                         predicate => {uri => $xuri},
                         object => $object,
-                        node => $node);
-    ## TODO: reification
+                        node => $node,
+                        id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
     
     ## As if nodeElement
 
@@ -405,10 +419,10 @@ sub convert_property_element ($$%) {
       $self->{ontriple}->(subject => $opt{subject},
                           predicate => {uri => $xuri},
                           object => {uri => $RDF_URI . 'nil'},
-                          node => $node);
+                          node => $node,
+                          id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
     }
-    ## TODO: reification
-
+    
     while (@resource) {
       my $resource = shift @resource;
       $self->{ontriple}->(subject => $resource->[1],
@@ -447,8 +461,8 @@ sub convert_property_element ($$%) {
                         predicate => {uri => $xuri},
                         object => {nodes => $value,
                                    datatype => $RDF_URI . 'XMLLiteral'},
-                        node => $node);
-    ## TODO: reification
+                        node => $node,
+                        id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
   } else {
     my $mode = 'unknown';
 
@@ -522,9 +536,8 @@ sub convert_property_element ($$%) {
       $self->{ontriple}->(subject => $opt{subject},
                           predicate => {uri => $xuri},
                           object => $object,
-                          node => $node);
-
-      ## TODO: reification
+                          node => $node,
+                          id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
     } elsif ($mode eq 'literal' or $mode eq 'literal-or-resource') {
       # |literalPropertyElt|
       
@@ -543,17 +556,17 @@ sub convert_property_element ($$%) {
                             predicate => {uri => $xuri},
                             object => {value => $text,
                                        datatype => $dt_attr->value},
-                            node => $node);
+                            node => $node,
+                            id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
       } else {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
                             object => {value => $text,
                                        ## TODO: language
                                       },
-                            node => $node);
+                            node => $node,
+                            id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
       }
-
-      ## TODO: reification
     } else {
       ## |emptyPropertyElt|
 
@@ -571,9 +584,8 @@ sub convert_property_element ($$%) {
                             object => {value => '',
                                        ## TODO: language
                                       },
-                            node => $node);
-        
-        ## TODO: reification
+                            node => $node,
+                            id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
       } else {
         my $object;
         if ($resource_attr) {
@@ -605,9 +617,8 @@ sub convert_property_element ($$%) {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
                             object => $object,
-                            node => $node);
-        
-        ## TODO: reification
+                            node => $node,
+                            id => $id_attr ? {uri => '#' . $id_attr->value} : undef); ## TODO: resolve
       }
     }
   }
