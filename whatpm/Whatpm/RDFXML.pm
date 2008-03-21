@@ -14,8 +14,6 @@ use strict;
 
 ## TODO: Should we validate expanded URI created from QName?
 
-## TODO: attributes in null namespace
-
 ## TODO: elements in null namespace (not mentioned in the spec.)
 
 my $RDF_URI = q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>;
@@ -85,9 +83,9 @@ sub convert_document ($$) {
     if ($cn->node_type == $cn->ELEMENT_NODE) {
       unless ($has_element) {
         if ($cn->manakai_expanded_uri eq $RDF_URI . q<RDF>) {
-          $self->convert_rdf_element ($cn);
+          $self->convert_rdf_element ($cn, language => '');
         } else {
-          $self->convert_rdf_node_element ($cn);
+          $self->convert_rdf_node_element ($cn, language => '');
         }
         $has_element = 1;
       } else {
@@ -117,14 +115,24 @@ my $check_rdf_namespace = sub {
   }
 }; # $check_rdf_namespace
 
-sub convert_rdf_element ($$) {
-  my ($self, $node) = @_;
+sub convert_rdf_element ($$%) {
+  my ($self, $node, %opt) = @_;
+  $opt{language} = '' unless defined $opt{language};
+      ## ISSUE: Not explicitly defined in the spec.
 
   $check_rdf_namespace->($self, $node);
 
   # |RDF|
 
   for my $attr (@{$node->attributes}) {
+    my $nsuri = $attr->namespace_uri;
+    if (defined $nsuri and
+        $nsuri eq q<http://www.w3.org/XML/1998/namespace> and
+        $attr->manakai_local_name eq 'lang') {
+      $opt{language} = $attr->value;
+      next;
+    }
+
     my $prefix = $attr->prefix;
     if (defined $prefix) {
       next if $prefix =~ /^[Xx][Mm][Ll]/;
@@ -141,7 +149,7 @@ sub convert_rdf_element ($$) {
   # |nodeElementList|
   for my $cn (@{$node->child_nodes}) {
     if ($cn->node_type == $cn->ELEMENT_NODE) {
-      $self->convert_node_element ($cn);
+      $self->convert_node_element ($cn, language => $opt{language});
     } elsif ($cn->node_type == $cn->TEXT_NODE or
              $cn->node_type == $cn->CDATA_SECTION_NODE) {
       if ($cn->data =~ /[^\x09\x0A\x0D\x20]/) {
@@ -213,14 +221,51 @@ my $id_attr = sub {
                        level => $self->{grammer_level},
                        node => $attr);
   }
+
+  my $base_uri = $attr->base_uri;
+  if ($self->{id}->{$base_uri}->{$id}) {
+    $self->{onerror}->(type => 'duplicate rdf id', ## TODO: type
+                       level => $self->{small_must_level},
+                       node => $attr);
+    ## TODO: RDF Validator?
+  } else {
+    $self->{id}->{$base_uri}->{$id} = 1;
+  }
   
   return $resolve->('#' . $id, $attr);
-
-## TODO: rdf:ID, base-uri pair must (lowercase) be unique in the document.
 }; # $id_attr
 
-sub convert_node_element ($$) {
-  my ($self, $node) = @_;
+my $check_local_attr = sub {
+  my ($self, $node, $attr, $attr_xuri) = @_;
+  
+  if ({
+       ID => 1, about => 1, resource => 1, parseType => 1, type => 1,
+      }->{$attr_xuri}) {
+    $self->{onerror}->(type => 'unqualified rdf attr', ## TODO: type
+                       level => $self->{should_level},
+                       node => $attr);
+    if ($node->has_attribute_ns ($RDF_URI, $attr_xuri)) {
+      $self->{onerror}->(type => 'duplicate unqualified attr',## TODO: type
+                         level => $self->{fact_level},
+                         node => $attr);
+      ## NOTE: <? rdfa:bout="" about=""> and such are not catched
+      ## by this check; but who cares?  rdfa:bout="" is itself illegal.
+    }
+    $attr_xuri = $RDF_URI . $attr_xuri;
+  } else {
+    $self->{onerror}->(type => 'unqualified attr', ## TODO: type
+                       level => $self->{fact_level},
+                       node => $attr);
+    ## TODO: RDF Validator?
+  }
+  
+  return $attr_xuri;
+}; # $check_local_attr
+
+sub convert_node_element ($$;%) {
+  my ($self, $node, %opt) = @_;
+  $opt{language} = '' unless defined $opt{language};
+      ## ISSUE: Not explicitly defined in the spec.
 
   $check_rdf_namespace->($self, $node);
 
@@ -246,6 +291,13 @@ sub convert_node_element ($$) {
   my @prop_attr;
 
   for my $attr (@{$node->attributes}) {
+    my $nsuri = $attr->namespace_uri;
+    if (defined $nsuri and
+        $nsuri eq q<http://www.w3.org/XML/1998/namespace> and
+        $attr->manakai_local_name eq 'lang') {
+      $opt{language} = $attr->value;
+    }
+
     my $prefix = $attr->prefix;
     if (defined $prefix) {
       next if $prefix =~ /^[Xx][Mm][Ll]/;
@@ -256,6 +308,11 @@ sub convert_node_element ($$) {
     $check_rdf_namespace->($self, $attr);
 
     my $attr_xuri = $attr->manakai_expanded_uri;
+
+    unless (defined $nsuri) {
+      $attr_xuri = $check_local_attr->($self, $node, $attr, $attr_xuri);
+    }
+
     if ($attr_xuri eq $RDF_URI . 'ID') {
       unless (defined $subject) {
         $subject = {uri => $id_attr->($self, $attr)};
@@ -333,7 +390,8 @@ sub convert_node_element ($$) {
   for my $attr (@prop_attr) {
     $self->{ontriple}->(subject => $subject,
                         predicate => {uri => $attr->manakai_expanded_uri},
-                        object => {value => $attr->value}, ## TODO: language
+                        object => {value => $attr->value,
+                                   language => $opt{language}},
                         node => $attr);
     ## TODO: SHOULD in NFC
   }
@@ -345,7 +403,8 @@ sub convert_node_element ($$) {
     my $cn_type = $cn->node_type;
     if ($cn_type == $cn->ELEMENT_NODE) {
       $self->convert_property_element ($cn, li_counter => \$li_counter,
-                                       subject => $subject);
+                                       subject => $subject,
+                                       language => $opt{language});
     } elsif ($cn_type == $cn->TEXT_NODE or
              $cn_type == $cn->CDATA_SECTION_NODE) {
       if ($cn->data =~ /[^\x09\x0A\x0D\x20]/) {
@@ -398,6 +457,13 @@ sub convert_property_element ($$%) {
   my $resource_attr;
   my @prop_attr;
   for my $attr (@{$node->attributes}) {
+    my $nsuri = $attr->namespace_uri;
+    if (defined $nsuri and
+        $nsuri eq q<http://www.w3.org/XML/1998/namespace> and
+        $attr->manakai_local_name eq 'lang') {
+      $opt{language} = $attr->value;
+    }
+
     my $prefix = $attr->prefix;
     if (defined $prefix) {
       next if $prefix =~ /^[Xx][Mm][Ll]/;
@@ -408,6 +474,11 @@ sub convert_property_element ($$%) {
     $check_rdf_namespace->($self, $attr);
 
     my $attr_xuri = $attr->manakai_expanded_uri;
+
+    unless (defined $nsuri) {
+      $attr_xuri = $check_local_attr->($self, $node, $attr, $attr_xuri);
+    }
+
     if ($attr_xuri eq $RDF_URI . 'ID') {
       $rdf_id_attr = $attr;
     } elsif ($attr_xuri eq $RDF_URI . 'datatype') {
@@ -461,7 +532,8 @@ sub convert_property_element ($$%) {
       my $cn_type = $cn->node_type;
       if ($cn_type == $cn->ELEMENT_NODE) {
         $self->convert_property_element ($cn, li_counter => \$li_counter,
-                                         subject => $object);
+                                         subject => $object,
+                                         language => $opt{language});
       } elsif ($cn_type == $cn->TEXT_NODE or
                $cn_type == $cn->CDATA_SECTION_NODE) {
         if ($cn->data =~ /[^\x09\x0A\x0D\x20]/) {
@@ -627,7 +699,8 @@ sub convert_property_element ($$%) {
         ## TODO: RDF Validator?
       }
       
-      my $object = $self->convert_node_element ($node_element);
+      my $object = $self->convert_node_element ($node_element,
+                                                language => $opt{language});
       
       $self->{ontriple}->(subject => $opt{subject},
                           predicate => {uri => $xuri},
@@ -661,8 +734,7 @@ sub convert_property_element ($$%) {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
                             object => {value => $text,
-                                       ## TODO: language
-                                      },
+                                       language => $opt{language}},
                             node => $node,
                             id => $get_id_resource->($self, $rdf_id_attr));
       }
@@ -681,8 +753,7 @@ sub convert_property_element ($$%) {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
                             object => {value => '',
-                                       ## TODO: language
-                                      },
+                                       language => $opt{language}},
                             node => $node,
                             id => $get_id_resource->($self, $rdf_id_attr));
       } else {
@@ -719,8 +790,7 @@ sub convert_property_element ($$%) {
             $self->{ontriple}->(subject => $object,
                                 predicate => {uri => $attr_xuri},
                                 object => {value => $attr->value,
-                                           ## TODO: lang
-                                          },
+                                           language => $opt{language}},
                                 node => $attr);
           }
         }
