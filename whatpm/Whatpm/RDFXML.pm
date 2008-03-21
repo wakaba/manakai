@@ -202,9 +202,22 @@ my $uri_attr = sub {
   });
 
   return $abs_uri;
-};
+}; # $uri_attr
+
+my $id_attr = sub {
+  my ($self, $attr) = @_;
+  
+  my $id = $attr->value;
+  unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+    $self->{onerror}->(type => 'syntax error', ## TODO: type
+                       level => $self->{grammer_level},
+                       node => $attr);
+  }
+  
+  return $resolve->('#' . $id, $attr);
 
 ## TODO: rdf:ID, base-uri pair must (lowercase) be unique in the document.
+}; # $id_attr
 
 sub convert_node_element ($$) {
   my ($self, $node) = @_;
@@ -245,14 +258,7 @@ sub convert_node_element ($$) {
     my $attr_xuri = $attr->manakai_expanded_uri;
     if ($attr_xuri eq $RDF_URI . 'ID') {
       unless (defined $subject) {
-        my $id = $attr->value;
-        unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
-          $self->{onerror}->(type => 'syntax error', ## TODO: type
-                             level => $self->{grammer_level},
-                             node => $self);
-        }
-        
-        $subject = {uri => $resolve->('#' . $id, $attr)};
+        $subject = {uri => $id_attr->($self, $attr)};
       } else {
         $self->{onerror}->(type => 'attribute not allowed',
                            level => $self->{grammer_level},
@@ -356,14 +362,10 @@ sub convert_node_element ($$) {
 my $get_id_resource = sub {
   my $self = shift;
   my $node = shift;
+
   return undef unless $node;
-  my $id = $node->value;
-  unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
-    $self->{onerror}->(type => 'syntax error', ## TODO: type
-                       level => $self->{grammer_level},
-                       node => $self);
-  }
-  return {uri => $resolve->('#' . $id, $node)};
+
+  return {uri => $id_attr->($self, $node)};
 }; # $get_id_resource
 
 sub convert_property_element ($$%) {
@@ -389,7 +391,7 @@ sub convert_property_element ($$%) {
     ## TODO: RDF Validator?
   }
 
-  my $id_attr;
+  my $rdf_id_attr;
   my $dt_attr;
   my $parse_attr;
   my $nodeid_attr;
@@ -407,7 +409,7 @@ sub convert_property_element ($$%) {
 
     my $attr_xuri = $attr->manakai_expanded_uri;
     if ($attr_xuri eq $RDF_URI . 'ID') {
-      $id_attr = $attr;
+      $rdf_id_attr = $attr;
     } elsif ($attr_xuri eq $RDF_URI . 'datatype') {
       $dt_attr = $attr;
     } elsif ($attr_xuri eq $RDF_URI . 'parseType') {
@@ -448,7 +450,7 @@ sub convert_property_element ($$%) {
                         predicate => {uri => $xuri},
                         object => $object,
                         node => $node,
-                        id => $get_id_resource->($self, $id_attr));
+                        id => $get_id_resource->($self, $rdf_id_attr));
     
     ## As if nodeElement
 
@@ -507,7 +509,7 @@ sub convert_property_element ($$%) {
                           predicate => {uri => $xuri},
                           object => {uri => $RDF_URI . 'nil'},
                           node => $node,
-                          id => $get_id_resource->($self, $id_attr));
+                          id => $get_id_resource->($self, $rdf_id_attr));
     }
     
     while (@resource) {
@@ -556,7 +558,7 @@ sub convert_property_element ($$%) {
                         object => {nodes => $value,
                                    datatype => $RDF_URI . 'XMLLiteral'},
                         node => $node,
-                        id => $get_id_resource->($self, $id_attr));
+                        id => $get_id_resource->($self, $rdf_id_attr));
   } else {
     my $mode = 'unknown';
 
@@ -631,7 +633,7 @@ sub convert_property_element ($$%) {
                           predicate => {uri => $xuri},
                           object => $object,
                           node => $node,
-                          id => $get_id_resource->($self, $id_attr));
+                          id => $get_id_resource->($self, $rdf_id_attr));
     } elsif ($mode eq 'literal' or $mode eq 'literal-or-resource') {
       # |literalPropertyElt|
       
@@ -654,7 +656,7 @@ sub convert_property_element ($$%) {
                ## ISSUE: No resolve() in the spec (but spec says that
                ## xml:base is applied also to rdf:datatype).
                node => $node,
-               id => $get_id_resource->($self, $id_attr));
+               id => $get_id_resource->($self, $rdf_id_attr));
       } else {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
@@ -662,7 +664,7 @@ sub convert_property_element ($$%) {
                                        ## TODO: language
                                       },
                             node => $node,
-                            id => $get_id_resource->($self, $id_attr));
+                            id => $get_id_resource->($self, $rdf_id_attr));
       }
     } else {
       ## |emptyPropertyElt|
@@ -682,7 +684,7 @@ sub convert_property_element ($$%) {
                                        ## TODO: language
                                       },
                             node => $node,
-                            id => $get_id_resource->($self, $id_attr));
+                            id => $get_id_resource->($self, $rdf_id_attr));
       } else {
         my $object;
         if ($resource_attr) {
@@ -727,7 +729,7 @@ sub convert_property_element ($$%) {
                             predicate => {uri => $xuri},
                             object => $object,
                             node => $node,
-                            id => $get_id_resource->($self, $id_attr));
+                            id => $get_id_resource->($self, $rdf_id_attr));
       }
     }
   }
