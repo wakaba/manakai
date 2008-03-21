@@ -5,6 +5,13 @@ use strict;
 ## unexpected entity reference are simply ignored.  (In fact
 ## all EntityRefernce nodes are ignored.)
 
+## TODO: Add a callback function invoked for every element
+## when XMLCC is implemented in WDCC.
+
+## ISSUE: <html:nest/> in RDF subtree?
+
+## ISSUE: PIs in RDF subtree should be validated?
+
 my $RDF_URI = q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>;
 
 sub new ($) {
@@ -175,7 +182,7 @@ sub convert_node_element ($$) {
     $check_rdf_namespace->($self, $attr);
 
     my $attr_xuri = $attr->manakai_expanded_uri;
-    if ($attr_xuri eq $RDF_URI . 'id') {
+    if ($attr_xuri eq $RDF_URI . 'ID') {
       unless (defined $subject) {
         $subject = {uri => '#' . $attr->value}; ## TODO: resolve()
       } else {
@@ -218,19 +225,22 @@ sub convert_node_element ($$) {
   if ($xuri ne $RDF_URI . 'Description') {
     $self->{ontriple}->(subject => $subject,
                         predicate => {uri => $RDF_URI . 'type'},
-                        object => {uri => $xuri});
+                        object => {uri => $xuri},
+                        node => $node);
   }
 
   if ($rdf_type_attr) {
     $self->{ontriple}->(subject => $subject,
                         predicate => {uri => $RDF_URI . 'type'},
-                        object => {uri => $rdf_type_attr->value}); ## TODO: resolve
+                        object => {uri => $rdf_type_attr->value}, ## TODO: resolve
+                        node => $rdf_type_attr);
   }
 
   for my $attr (@prop_attr) {
     $self->{ontriple}->(subject => $subject,
                         predicate => {uri => $attr->manakai_expanded_uri},
-                        object => {value => $attr->value}); ## TODO: language
+                        object => {value => $attr->value}, ## TODO: language
+                        node => $attr);
     ## TODO: SHOULD in NFC
   }
 
@@ -325,6 +335,7 @@ sub convert_property_element ($$%) {
     # |parseTypeResourcePropertyElt|
 
     for my $attr ($resource_attr, $nodeid_attr, $dt_attr) {
+      next unless $attr;
       $self->{onerror}->(type => 'attribute not allowed',
                          level => $self->{grammer_level},
                          node => $attr);
@@ -334,7 +345,8 @@ sub convert_property_element ($$%) {
     my $object = {bnodeid => '## TODO: generate bnodeid'};
     $self->{ontriple}->(subject => $opt{subject},
                         predicate => {uri => $xuri},
-                        object => $object);
+                        object => $object,
+                        node => $node);
     ## TODO: reification
     
     ## As if nodeElement
@@ -360,6 +372,7 @@ sub convert_property_element ($$%) {
     # |parseTypeCollectionPropertyElt|
 
     for my $attr ($resource_attr, $nodeid_attr, $dt_attr) {
+      next unless $attr;
       $self->{onerror}->(type => 'attribute not allowed',
                          level => $self->{grammer_level},
                          node => $attr);
@@ -371,7 +384,8 @@ sub convert_property_element ($$%) {
     for my $cn (@{$node->child_nodes}) {
       if ($cn->node_type == $cn->ELEMENT_NODE) {
         push @resource, [$self->convert_node_element ($cn),
-                         {bnodeid => '## TODO: bnodeid generated'}];
+                         {bnodeid => '## TODO: bnodeid generated'},
+                         $cn];
       } elsif ($cn->node_type == $cn->TEXT_NODE or
                $cn->node_type == $cn->CDATA_SECTION_NODE) {
         if ($cn->data =~ /[^\x09\x0A\x0D\x20]/) {
@@ -385,11 +399,13 @@ sub convert_property_element ($$%) {
     if (@resource) {
       $self->{ontriple}->(subject => $opt{subject},
                           predicate => {uri => $xuri},
-                          object => $resource[0]->[1]);
+                          object => $resource[0]->[1],
+                          node => $node);
     } else {
       $self->{ontriple}->(subject => $opt{subject},
                           predicate => {uri => $xuri},
-                          object => {uri => $RDF_URI . 'nil'});
+                          object => {uri => $RDF_URI . 'nil'},
+                          node => $node);
     }
     ## TODO: reification
 
@@ -397,15 +413,18 @@ sub convert_property_element ($$%) {
       my $resource = shift @resource;
       $self->{ontriple}->(subject => $resource->[1],
                           predicate => {uri => $RDF_URI . 'first'},
-                          object => $resource->[0]);
+                          object => $resource->[0],
+                          node => $resource->[2]);
       if (@resource) {
         $self->{ontriple}->(subject => $resource->[1],
                             predicate => {uri => $RDF_URI . 'rest'},
-                            object => $resource[0]->[1]);
+                            object => $resource[0]->[1],
+                            node => $resource->[2]);
       } else {
         $self->{ontriple}->(subject => $resource->[1],
                             predicate => {uri => $RDF_URI . 'rest'},
-                            object => {uri => $RDF_URI . 'nil'});
+                            object => {uri => $RDF_URI . 'nil'},
+                            node => $resource->[2]);
       }
     }
   } elsif ($parse_attr) {
@@ -413,6 +432,7 @@ sub convert_property_element ($$%) {
     # |parseTypeOtherPropertyElt| ## TODO: What RDF Validator does?
 
     for my $attr ($resource_attr, $nodeid_attr, $dt_attr) {
+      next unless $attr;
       $self->{onerror}->(type => 'attribute not allowed',
                          level => $self->{grammer_level},
                          node => $attr);
@@ -426,7 +446,8 @@ sub convert_property_element ($$%) {
     $self->{ontriple}->(subject => $opt{subject},
                         predicate => {uri => $xuri},
                         object => {nodes => $value,
-                                   datatype => $RDF_URI . 'XMLLiteral'});
+                                   datatype => $RDF_URI . 'XMLLiteral'},
+                        node => $node);
     ## TODO: reification
   } else {
     my $mode = 'unknown';
@@ -489,6 +510,7 @@ sub convert_property_element ($$%) {
       # |resourcePropertyElt|
       
       for my $attr (@prop_attr, $resource_attr, $nodeid_attr, $dt_attr) {
+        next unless $attr;
         $self->{onerror}->(type => 'attribute not allowed',
                            level => $self->{grammer_level},
                            node => $attr);
@@ -499,13 +521,15 @@ sub convert_property_element ($$%) {
       
       $self->{ontriple}->(subject => $opt{subject},
                           predicate => {uri => $xuri},
-                          object => $object);
+                          object => $object,
+                          node => $node);
 
       ## TODO: reification
     } elsif ($mode eq 'literal' or $mode eq 'literal-or-resource') {
       # |literalPropertyElt|
       
       for my $attr (@prop_attr, $resource_attr, $nodeid_attr) {
+        next unless $attr;
         $self->{onerror}->(type => 'attribute not allowed',
                            level => $self->{grammer_level},
                            node => $attr);
@@ -518,13 +542,15 @@ sub convert_property_element ($$%) {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
                             object => {value => $text,
-                                       datatype => $dt_attr->value});
+                                       datatype => $dt_attr->value},
+                            node => $node);
       } else {
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
                             object => {value => $text,
                                        ## TODO: language
-                                      });
+                                      },
+                            node => $node);
       }
 
       ## TODO: reification
@@ -532,6 +558,7 @@ sub convert_property_element ($$%) {
       ## |emptyPropertyElt|
 
       for my $attr ($dt_attr) {
+        next unless $attr;
         $self->{onerror}->(type => 'attribute not allowed',
                            level => $self->{grammer_level},
                            node => $attr);
@@ -543,7 +570,8 @@ sub convert_property_element ($$%) {
                             predicate => {uri => $xuri},
                             object => {value => '',
                                        ## TODO: language
-                                      });
+                                      },
+                            node => $node);
         
         ## TODO: reification
       } else {
@@ -561,20 +589,23 @@ sub convert_property_element ($$%) {
           if ($attr_xuri eq $RDF_URI . 'type') {
             $self->{ontriple}->(subject => $object,
                                 predicate => {uri => $attr_xuri},
-                                object => $attr->value); ## TODO: resolve
+                                object => $attr->value, ## TODO: resolve
+                                node => $attr);
           } else {
             ## TODO: SHOULD be in NFC
             $self->{ontriple}->(subject => $object,
                                 predicate => {uri => $attr_xuri},
                                 object => {value => $attr->value,
                                            ## TODO: lang
-                                          });
+                                          },
+                                node => $attr);
           }
         }
 
         $self->{ontriple}->(subject => $opt{subject},
                             predicate => {uri => $xuri},
-                            object => $object);
+                            object => $object,
+                            node => $node);
         
         ## TODO: reification
       }

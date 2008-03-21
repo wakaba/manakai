@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.72 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.73 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -35,6 +35,7 @@ my $Namespace = {
   $HTML_NS => {module => 'Whatpm::ContentChecker::HTML'},
   $XML_NS => {loaded => 1},
   $XMLNS_NS => {loaded => 1},
+  q<http://www.w3.org/1999/02/22-rdf-syntax-ns#> => {loaded => 1},
 };
 
 our $AttrChecker = {
@@ -234,6 +235,26 @@ my $HTMLSemiTransparentElements = {
 
 our $Element = {};
 
+$Element->{q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>}->{RDF} = {
+  %AnyChecker,
+  status => FEATURE_STATUS_REC | FEATURE_ALLOWED,
+  is_root => 1, ## ISSUE: Not explicitly allowed for non application/rdf+xml
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    my $triple = [];
+    push @{$self->{return}->{rdf}}, [$item->{node}, $triple];
+    require Whatpm::RDFXML;
+    my $rdf = Whatpm::RDFXML->new;
+    $rdf->{onerror} = $self->{onerror};
+    $rdf->{ontriple} = sub {
+      my %opt = @_;
+      push @$triple,
+          [$opt{node}, $opt{subject}, $opt{predicate}, $opt{object}];
+    };
+    $rdf->convert_rdf_element ($item->{node});
+  },
+};
+
 sub check_document ($$$;$) {
   my ($self, $doc, $onerror, $onsubdoc) = @_;
   $self = bless {}, $self unless ref $self;
@@ -248,6 +269,8 @@ sub check_document ($$$;$) {
   $self->{good_level} = 'w';
   $self->{info_level} = 'i';
   $self->{unsupported_level} = 'u';
+
+  ## TODO: If application/rdf+xml, RDF/XML mode should be invoked.
 
   my $docel = $doc->document_element;
   unless (defined $docel) {
@@ -377,6 +400,7 @@ sub check_element ($$$;$) {
   $self->{return} = {
     class => {},
     id => $self->{id}, table => [], term => $self->{term},
+    rdf => [],
   };
 
   my @item = ({type => 'element', node => $el, parent_state => {}});
@@ -788,4 +812,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/03/20 10:30:20 $
+# $Date: 2008/03/21 08:58:35 $
