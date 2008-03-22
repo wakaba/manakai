@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Mar 22 15:47:35 2008
-# Current time GMT:   Sat Mar 22 06:47:35 2008
+# Current time local: Sat Mar 22 17:20:06 2008
+# Current time GMT:   Sat Mar 22 08:20:06 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1748,18 +1748,14 @@ ok 1629
 ok 1630
 ok 1631
 ok 1632
-not ok 1633
-# Test 1633 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1633)
-#      Expected: "/table/@border;attribute;unsupported" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1634
-# Test 1634 got: "/table/@frame;attribute not defined;m\n/table/@frame;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1634)
-#      Expected: "/table/@frame;attribute;unsupported" (<table frame="border" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1633
+ok 1634
 not ok 1635
 # Test 1635 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1635)
-#      Expected: "/table/@border;attribute;unsupported" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
+#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1636
-# Test 1636 got: "/caption/@align;attribute not defined;m\n/caption/@align;attribute;unsupported\n/caption;no significant content;s" (t/ContentChecker.t at line 98 fail #1636)
-#      Expected: "/caption/@align;attribute;unsupported\n/caption;no significant content;s" (<caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>)
+# Test 1636 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1636)
+#      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1637
 ok 1638
 ok 1639
@@ -1790,9 +1786,7 @@ ok 1663
 ok 1664
 ok 1665
 ok 1666
-not ok 1667
-# Test 1667 got: "/td/@scope;attribute not defined;m\n/td/@scope;attribute;unsupported\n/td;no significant content;s" (t/ContentChecker.t at line 98 fail #1667)
-#      Expected: "/td/@scope;attribute;unsupported\n/td;no significant content;s" (<td scope="row" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1667
 ok 1668
 ok 1669
 ok 1670
@@ -1954,17 +1948,12 @@ ok 1825
 ok 1826
 ok 1827
 ok 1828
-not ok 1829
-# Test 1829 got: "/select/@accesskey;char:syntax error;m\n/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1829)
-#      Expected: "/select/@accesskey;char:syntax error;m" (<select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1830
-# Test 1830 got: "/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1830)
-#      Expected: "" (<select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1829
+ok 1830
 ok 1831
 ok 1832
 ok 1833
 ok 1834
-# t/content-model-3.dat
 ok 1835
 ok 1836
 ok 1837
@@ -1975,9 +1964,7 @@ ok 1841
 ok 1842
 ok 1843
 ok 1844
-not ok 1845
-# Test 1845 got: "/a;element;unsupported" (t/ContentChecker.t at line 98 fail #1845)
-#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
+ok 1845
 ok 1846
 ok 1847
 ok 1848
@@ -1988,7 +1975,6 @@ ok 1852
 ok 1853
 ok 1854
 ok 1855
-# t/content-model-4.dat
 ok 1856
 ok 1857
 ok 1858
@@ -1997,12 +1983,17 @@ ok 1860
 ok 1861
 ok 1862
 ok 1863
-ok 1864
-ok 1865
+not ok 1864
+# Test 1864 got: "/select/@accesskey;char:syntax error;m\n/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1864)
+#      Expected: "/select/@accesskey;char:syntax error;m" (<select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1865
+# Test 1865 got: "/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1865)
+#      Expected: "" (<select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1866
 ok 1867
 ok 1868
 ok 1869
+# t/content-model-3.dat
 ok 1870
 ok 1871
 ok 1872
@@ -2013,7 +2004,9 @@ ok 1876
 ok 1877
 ok 1878
 ok 1879
-ok 1880
+not ok 1880
+# Test 1880 got: "/a;element;unsupported" (t/ContentChecker.t at line 98 fail #1880)
+#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
 ok 1881
 ok 1882
 ok 1883
@@ -2024,6 +2017,7 @@ ok 1887
 ok 1888
 ok 1889
 ok 1890
+# t/content-model-4.dat
 ok 1891
 ok 1892
 ok 1893
@@ -2036,7 +2030,6 @@ ok 1899
 ok 1900
 ok 1901
 ok 1902
-# t/content-model-5.dat
 ok 1903
 ok 1904
 ok 1905
@@ -2064,7 +2057,6 @@ ok 1926
 ok 1927
 ok 1928
 ok 1929
-# t/table-1.dat
 ok 1930
 ok 1931
 ok 1932
@@ -2073,12 +2065,12 @@ ok 1934
 ok 1935
 ok 1936
 ok 1937
+# t/content-model-5.dat
 ok 1938
 ok 1939
 ok 1940
 ok 1941
 ok 1942
-# t/content-model-atom-1.dat
 ok 1943
 ok 1944
 ok 1945
@@ -2101,6 +2093,7 @@ ok 1961
 ok 1962
 ok 1963
 ok 1964
+# t/table-1.dat
 ok 1965
 ok 1966
 ok 1967
@@ -2114,6 +2107,7 @@ ok 1974
 ok 1975
 ok 1976
 ok 1977
+# t/content-model-atom-1.dat
 ok 1978
 ok 1979
 ok 1980
@@ -2125,30 +2119,11 @@ ok 1985
 ok 1986
 ok 1987
 ok 1988
-not ok 1989
-# Test 1989 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #1989)
-#      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
-#<id>about:</id>
-#<author><name>x</name></author>
-#<link rel="alternate" href=""/>
-#<updated>2000-01-02T03:04:05Z</updated>
-#<title>x</title>
-#<content type="image/png"/>
-#</entry>)
-not ok 1990
-# Test 1990 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #1990)
-#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
-#<id>about:</id>
-#<author><name>x</name></author>
-#<link rel="alternate" href=""/>
-#<updated>2000-01-02T03:04:05Z</updated>
-#<title>x</title>
-#<content type="message/rfc822"/>
-#</entry>)
+ok 1989
+ok 1990
 ok 1991
 ok 1992
 ok 1993
-# t/content-model-atom-2.dat
 ok 1994
 ok 1995
 ok 1996
@@ -2173,9 +2148,63 @@ ok 2014
 ok 2015
 ok 2016
 ok 2017
+ok 2018
+ok 2019
+ok 2020
+ok 2021
+ok 2022
+ok 2023
+not ok 2024
+# Test 2024 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #2024)
+#      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="image/png"/>
+#</entry>)
+not ok 2025
+# Test 2025 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #2025)
+#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="message/rfc822"/>
+#</entry>)
+ok 2026
+ok 2027
+ok 2028
+# t/content-model-atom-2.dat
+ok 2029
+ok 2030
+ok 2031
+ok 2032
+ok 2033
+ok 2034
+ok 2035
+ok 2036
+ok 2037
+ok 2038
+ok 2039
+ok 2040
+ok 2041
+ok 2042
+ok 2043
+ok 2044
+ok 2045
+ok 2046
+ok 2047
+ok 2048
+ok 2049
+ok 2050
+ok 2051
+ok 2052
 # t/content-model-atom-threading-1.dat
-not ok 2018
-# Test 2018 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #2018)
+not ok 2053
+# Test 2053 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #2053)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2205,8 +2234,8 @@ not ok 2018
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 2019
-# Test 2019 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #2019)
+not ok 2054
+# Test 2054 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #2054)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2232,17 +2261,17 @@ not ok 2019
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 2020
-ok 2021
-ok 2022
-ok 2023
-ok 2024
-ok 2025
-ok 2026
-ok 2027
-ok 2028
-ok 2029
-ok 2030
-ok 2031
-ok 2032
-ok 2033
+ok 2055
+ok 2056
+ok 2057
+ok 2058
+ok 2059
+ok 2060
+ok 2061
+ok 2062
+ok 2063
+ok 2064
+ok 2065
+ok 2066
+ok 2067
+ok 2068

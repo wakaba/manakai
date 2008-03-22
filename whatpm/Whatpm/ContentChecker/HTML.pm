@@ -1903,8 +1903,9 @@ $Element->{$HTML_NS}->{ol} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     compact => $GetHTMLBooleanAttrChecker->('compact'),
-    start => $HTMLIntegerAttrChecker,
     reversed => $GetHTMLBooleanAttrChecker->('reversed'),
+    start => $HTMLIntegerAttrChecker,
+    ## TODO: HTML4 |type|
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -1945,6 +1946,8 @@ $Element->{$HTML_NS}->{ul} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     compact => $GetHTMLBooleanAttrChecker->('compact'),
+    ## TODO: HTML4 |type|
+    ## TODO: sdaform, align
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -1977,6 +1980,7 @@ $Element->{$HTML_NS}->{li} = {
   %HTMLProseContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: HTML4 |type|
     value => sub {
       my ($self, $attr) = @_;
       my $parent = $attr->owner_element->manakai_parent_element;
@@ -3484,7 +3488,17 @@ $Element->{$HTML_NS}->{area} = {
 $Element->{$HTML_NS}->{table} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    frame => $GetHTMLEnumeratedAttrChecker->({
+      void => 1, above => 1, below => 1, hsides => 1, vsides => 1,
+      lhs => 1, rhs => 1, box => 1, border => 1,
+    }),
+    rules => $GetHTMLEnumeratedAttrChecker->({
+      none => 1, groups => 1, rows => 1, cols => 1, all => 1,
+    }),
+    summary => sub {}, ## NOTE: %Text; in HTML4.
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## %Pixels;
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_M12N10_REC_DEPRECATED,
@@ -3611,7 +3625,11 @@ $Element->{$HTML_NS}->{table} = {
 $Element->{$HTML_NS}->{caption} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      top => 1, bottom => 1, left => 1, right => 1,
+    }),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_M12N10_REC_DEPRECATED,
@@ -3619,10 +3637,17 @@ $Element->{$HTML_NS}->{caption} = {
   }),
 };
 
+my %cellalign = (
+  ## HTML4 %cellhalign;
+
+  ## HTML4 %cellvalign;
+);
+
 $Element->{$HTML_NS}->{colgroup} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    %cellalign,
     span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
       ## NOTE: Defined only if "the |colgroup| element contains no |col| elements"
       ## TODO: "attribute not supported" if |col|.
@@ -3666,6 +3691,7 @@ $Element->{$HTML_NS}->{col} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    %cellalign,
     span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
   }, {
     %HTMLAttrStatus,
@@ -3683,7 +3709,9 @@ $Element->{$HTML_NS}->{col} = {
 $Element->{$HTML_NS}->{tbody} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    %cellalign,
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_M12N10_REC,
@@ -3735,7 +3763,10 @@ $Element->{$HTML_NS}->{tfoot} = {
 $Element->{$HTML_NS}->{tr} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    %cellalign,
+    bgcolor => $HTMLColorAttrChecker,
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_M12N10_REC,
@@ -3782,8 +3813,15 @@ $Element->{$HTML_NS}->{td} = {
   %HTMLProseContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    %cellalign,
+    abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
+    axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
+    bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    scope => $GetHTMLEnumeratedAttrChecker
+        ->({row => 1, col => 1, rowgroup => 1, colgroup => 1}),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -3809,7 +3847,12 @@ $Element->{$HTML_NS}->{th} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    %cellalign,
+    abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
+    axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
+    bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker
         ->({row => 1, col => 1, rowgroup => 1, colgroup => 1}),

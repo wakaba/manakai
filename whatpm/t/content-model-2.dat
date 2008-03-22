@@ -4560,25 +4560,112 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
-<table border="" xmlns="http://www.w3.org/1999/xhtml"/>
+<table xmlns="http://www.w3.org/1999/xhtml" summary=""/>
 #errors
-/table/@border;attribute;unsupported
+/table/@summary;attribute not defined;m
 
 #data
-<table frame="border" xmlns="http://www.w3.org/1999/xhtml"/>
+<table xmlns="http://www.w3.org/1999/xhtml" summary="xxxx"/>
 #errors
-/table/@frame;attribute;unsupported
+/table/@summary;attribute not defined;m
+
+#data
+<table border="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not defined;m
+/table/@border;nninteger:syntax error
 
 #data
 <table border="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute;unsupported
+/table/@border;attribute not defined;m
+
+#data
+<table frame="border" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@frame;attribute not defined;m
+
+#data
+<table frame="below" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@frame;attribute not defined;m
+
+#data
+<table frame="box" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@frame;attribute not defined;m
+
+#data
+<table frame="vside" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@frame;attribute not defined;m
+/table/@frame;enumerated:invalid
+
+#data
+<table rules="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@rules;attribute not defined;m
+
+#data
+<table rules="groups" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@rules;attribute not defined;m
+
+#data
+<table rules="all" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@rules;attribute not defined;m
+
+#data
+<table rules="group" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@rules;attribute not defined;m
+/table/@rules;enumerated:invalid
 
 #data
 <caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/caption/@align;attribute;unsupported
+/caption/@align;attribute not defined;m
 /caption;no significant content;s
+
+#data
+<caption align="bottom" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+
+#data
+<caption align="left" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+
+#data
+<caption align="right" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+
+#data
+<caption align="middle" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+/caption/@align;enumerated:invalid
+
+#data
+<caption align="center" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+/caption/@align;enumerated:invalid
+
+#data
+<caption align="justify" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+/caption/@align;enumerated:invalid
+
+#data
+<caption align="" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+/caption/@align;enumerated:invalid
 
 #data
 <colgroup xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4652,6 +4739,11 @@ id=""><span id="">x</span></p>
 <col span="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /col/@span;nninteger:syntax error
+
+#data
+<tr bgcolor="blue" xmlns="http://www.w3.org/1999/xhtml"><td>x</td></tr>
+#errors
+/tr/@bgcolor;attribute not defined;m
 
 #data
 <td colspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4731,8 +4823,105 @@ id=""><span id="">x</span></p>
 #data
 <td scope="row" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/td/@scope;attribute;unsupported
+/td/@scope;attribute not defined;m
 /td;no significant content;s
+
+#data
+<td scope="rowgroup" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/td/@scope;attribute not defined;m
+/td;no significant content;s
+
+#data
+<td scope="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/td/@scope;attribute not defined;m
+/td/@scope;enumerated:invalid
+/td;no significant content;s
+
+#data
+<td nowrap="" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@nowrap;attribute not defined;m
+
+#data
+<td nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@nowrap;attribute not defined;m
+
+#data
+<td nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@nowrap;attribute not defined;m
+
+#data
+<td nowrap="yes" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@nowrap;attribute not defined;m
+/td/@nowrap;boolean:invalid
+
+#data
+<th nowrap="" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@nowrap;attribute not defined;m
+
+#data
+<th nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@nowrap;attribute not defined;m
+
+#data
+<th nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@nowrap;attribute not defined;m
+
+#data
+<th nowrap="yes" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@nowrap;attribute not defined;m
+/th/@nowrap;boolean:invalid
+
+#data
+<td abbr="" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@abbr;attribute not defined;m
+
+#data
+<th abbr="" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@abbr;attribute not defined;m
+
+#data
+<td axis="" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@axis;attribute not defined;m
+
+#data
+<th axis="" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@axis;attribute not defined;m
+
+#data
+<td bgcolor="" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@bgcolor;attribute not defined;m
+/td/@bgcolor;color:syntax error;m
+
+#data
+<th bgcolor="" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@bgcolor;attribute not defined;m
+/th/@bgcolor;color:syntax error;m
+
+#data
+<td bgcolor="blue" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@bgcolor;attribute not defined;m
+
+#data
+<th bgcolor="blue" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@bgcolor;attribute not defined;m
 
 #data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
