@@ -664,11 +664,49 @@ id=""><span id="">x</span></p>
 /html/body;no significant content;s
 
 #data
+<html xmlns="http://www.w3.org/1999/xhtml" version="">
+<head><title>x</title></head>
+<body>y</body>
+</html>
+#errors
+/html/@version;attribute not defined;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml" version="-//W3C//DTD HTML 4.01//EN">
+<head><title>x</title></head>
+<body>y</body>
+</html>
+#errors
+/html/@version;attribute not defined;m
+
+#data
+<head profile="" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+
+#data
 <head profile="http://www.test/" xmlns="http://www.w3.org/1999/xhtml">
   <title/>
 </head>
 #errors
-/head/@profile;attribute;unsupported
+/head/@profile;attribute not defined;m
+
+#data
+<head profile="http://www.test/ http://www.test/2" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+
+#data
+<head profile="[]" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+/head/@profile;URIs::syntax error:iriref3987:0;m
 
 #data
 <base xmlns="http://www.w3.org/1999/xhtml"/>

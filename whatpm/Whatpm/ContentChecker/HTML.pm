@@ -427,11 +427,11 @@ my $HTMLSpaceURIsAttrChecker = sub {
 
     ## TODO: absolute
     push @{$self->{return}->{uri}->{$value} ||= []},
-        {node => $attr, type => $type};
+        {node => $attr, type => {$type => 1}};
 
     $i++;
   }
-  ## ISSUE: Relative references?
+  ## ISSUE: Relative references? (especially, in profile="")
   ## ISSUE: Leading or trailing white spaces are conformant?
   ## ISSUE: A sequence of white space characters are conformant?
   ## ISSUE: A zero-length string is conformant? (It does contain a relative reference, i.e. same as base URI.)
@@ -985,6 +985,13 @@ $Element->{$HTML_NS}->{html} = {
       push @{$self->{return}->{uri}->{$value} ||= []},
           {node => $attr, type => {namespace => 1}};
     },
+    version => sub {
+      ## NOTE: According to HTML4 prose, this is a "cdata" attribute.
+      ## Though DTDs of various versions of HTML define the attribute
+      ## as |#FIXED|, this conformance checker does no check for
+      ## the attribute value, since what kind of check should be done
+      ## is unknown.
+    },
   }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_DEFAULT | FEATURE_HTML2X_RFC,
@@ -1064,7 +1071,9 @@ $Element->{$HTML_NS}->{html} = {
 
 $Element->{$HTML_NS}->{head} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    profile => $HTMLSpaceURIsAttrChecker, ## NOTE: MUST be profile URIs.
+  }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_DEFAULT | FEATURE_HTML2X_RFC,
     dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -1125,9 +1134,6 @@ $Element->{$HTML_NS}->{head} = {
                          type => 'child element missing:title');
     }
     $self->{flag}->{in_head} = $element_state->{in_head_original};
-
-    ## TODO:
-    #$element_state->{uri_info}->{profile}->{type}->{namespace} = 1;
 
     $HTMLChecker{check_end}->(@_);
   },
@@ -1276,9 +1282,21 @@ $Element->{$HTML_NS}->{meta} = {
         } elsif ($attr_ln eq 'charset') {
           $charset_attr = $attr;
           $checker = 1;
+        } elsif ($attr_ln eq 'scheme') {
+          $checker = sub {};
+          ## NOTE: According to HTML4, values for the |scheme| attribute
+          ## depend on |name| attribute and |profile| of |head|.  Otherwise
+          ## it is "cdata".  The only profile with any scheme value defined
+          ## is <http://dublincore.org/documents/dcq-html/> (and those
+          ## references that profile; see
+          ## <http://suika.fam.cx/gate/2005/sw/scheme#anchor-55> for more
+          ## information).
+          ## TODO: Should we implement the checking against the profile above?
+          ## (But we don't want to implement its namespace bits.  It is
+          ## suck and obsolete in favor of HTML5's new ecosystem.)
         } else {
           $checker = $HTMLAttrChecker->{$attr_ln}
-            || $AttrChecker->{$attr_ns}->{$attr_ln}
+              || $AttrChecker->{$attr_ns}->{$attr_ln}
               || $AttrChecker->{$attr_ns}->{''};
         }
       } else {

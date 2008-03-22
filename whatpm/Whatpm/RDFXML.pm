@@ -18,7 +18,7 @@ use strict;
 
 my $RDF_URI = q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>;
 
-use Char::Class::XML qw(InXML_NCNameStartChar10 InXMLNameChar10);
+use Char::Class::XML qw(InXML_NCNameStartChar10 InXMLNCNameChar10);
 require Whatpm::URIChecker;
 
 sub new ($) {
