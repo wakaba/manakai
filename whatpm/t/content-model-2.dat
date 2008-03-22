@@ -1571,10 +1571,83 @@ id=""><span id="">x</span></p>
 /section;no significant content;s
 
 #data
+<body background="" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@background;attribute not defined;m
+
+#data
+<body background="a.png" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@background;attribute not defined;m
+
+#data
+<body background="[]" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@background;attribute not defined;m
+/body/@background;URI::syntax error:iriref3987;m
+
+#data
 <body text="red" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/body/@text;attribute;unsupported
+/body/@text;attribute not defined;m
 /body;no significant content;s
+
+#data
+<body text="" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@text;attribute not defined;m
+/body/@text;color:syntax error;m
+
+#data
+<body link="" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@link;attribute not defined;m
+/body/@link;color:syntax error;m
+
+#data
+<body link="#c0c0c0" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@link;attribute not defined;m
+
+#data
+<body alink="" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@alink;attribute not defined;m
+/body/@alink;color:syntax error;m
+
+#data
+<body alink="Red" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@alink;attribute not defined;m
+
+#data
+<body vlink="" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@vlink;attribute not defined;m
+/body/@vlink;color:syntax error;m
+
+#data
+<body vlink="orange" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@vlink;attribute not defined;m
+/body/@vlink;color:syntax error;m
+
+#data
+<body alink="000000" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@alink;attribute not defined;m
+/body/@alink;color:syntax error;m
+
+#data
+<body bgcolor="" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@bgcolor;attribute not defined;m
+/body/@bgcolor;color:syntax error;m
+
+#data
+<body bgcolor="#ffffff" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@bgcolor;attribute not defined;m
 
 #data
 <blockquote cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1590,8 +1663,19 @@ id=""><span id="">x</span></p>
 #data
 <h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/h1/@align;attribute;unsupported
+/h1/@align;attribute not defined;m
 /h1;no significant content;s
+
+#data
+<h1 align="nonleft" xmlns="http://www.w3.org/1999/xhtml">x</h1>
+#errors
+/h1/@align;attribute not defined;m
+/h1/@align;enumerated:invalid
+
+#data
+<h2 align="justify" xmlns="http://www.w3.org/1999/xhtml">x</h2>
+#errors
+/h2/@align;attribute not defined;m
 
 #data
 <address align="left" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1600,9 +1684,22 @@ id=""><span id="">x</span></p>
 /address;no significant content;s
 
 #data
+<p align="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@align;attribute not defined;m
+/p/@align;enumerated:invalid
+/p;no significant content;s
+
+#data
 <p align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/p/@align;attribute;unsupported
+/p/@align;attribute not defined;m
+/p;no significant content;s
+
+#data
+<p align="justifY" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@align;attribute not defined;m
 /p;no significant content;s
 
 #data
@@ -1611,9 +1708,36 @@ id=""><span id="">x</span></p>
 /hr/@align;attribute;unsupported
 
 #data
+<br clear="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/br/@clear;attribute not defined;m
+/br/@clear;enumerated:invalid
+
+#data
 <br clear="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/br/@clear;attribute;unsupported
+/br/@clear;attribute not defined;m
+
+#data
+<br clear="right" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/br/@clear;attribute not defined;m
+
+#data
+<br clear="all" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/br/@clear;attribute not defined;m
+
+#data
+<br clear="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/br/@clear;attribute not defined;m
+
+#data
+<br clear="both" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/br/@clear;attribute not defined;m
+/br/@clear;enumerated:invalid
 
 #data
 <dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1621,9 +1745,62 @@ id=""><span id="">x</span></p>
 /dialog/@compact;attribute;unsupported
 
 #data
+<pre width="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not defined;m
+/pre/@width;nninteger:syntax error
+/pre;no significant content;s
+
+#data
+<pre width="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not defined;m
+/pre;no significant content;s
+
+#data
 <pre width="4" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/pre/@width;attribute;unsupported
+/pre/@width;attribute not defined;m
+/pre;no significant content;s
+
+#data
+<pre width="1224" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not defined;m
+/pre;no significant content;s
+
+#data
+<pre width="0000122" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not defined;m
+/pre;no significant content;s
+
+#data
+<pre width="-122" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not defined;m
+/pre/@width;nninteger:syntax error
+/pre;no significant content;s
+
+#data
+<pre width="12.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not defined;m
+/pre/@width;nninteger:syntax error
+/pre;no significant content;s
+
+#data
+<pre width="  12" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not defined;m
+/pre/@width;nninteger:syntax error
+/pre;no significant content;s
+
+#data
+<pre width="aaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not defined;m
+/pre/@width;nninteger:syntax error
 /pre;no significant content;s
 
 #data
@@ -1935,9 +2112,90 @@ id=""><span id="">x</span></p>
 /li;no significant content;s
 
 #data
+<ol compact="" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/ol/@compact;attribute not defined;m
+
+#data
+<ol compact="compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/ol/@compact;attribute not defined;m
+
+#data
+<ol compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/ol/@compact;attribute not defined;m
+/ol/@compact;boolean:invalid
+
+#data
+<ul compact="" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/ul/@compact;attribute not defined;m
+
+#data
+<ul compact="compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/ul/@compact;attribute not defined;m
+
+#data
+<ul compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/ul/@compact;attribute not defined;m
+/ul/@compact;boolean:invalid
+
+#data
+<dir compact="" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/dir/@compact;attribute not defined;m
+/dir;element not defined;m
+
+#data
+<dir compact="compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/dir/@compact;attribute not defined;m
+/dir;element not defined;m
+
+#data
+<dir compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/dir/@compact;attribute not defined;m
+/dir/@compact;boolean:invalid
+/dir;element not defined;m
+
+#data
+<menu compact="" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/menu/@compact;attribute not defined;m
+/menu;no significant content;s
+
+#data
+<menu compact="compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/menu/@compact;attribute not defined;m
+/menu;no significant content;s
+
+#data
+<menu compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/menu/@compact;attribute not defined;m
+/menu/@compact;boolean:invalid
+/menu;no significant content;s
+
+#data
 <dl compact="" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
-/dl/@compact;attribute;unsupported
+/dl/@compact;attribute not defined;m
+
+#data
+<dl compact="compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/dl/@compact;attribute not defined;m
+
+#data
+<dl compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/dl/@compact;attribute not defined;m
+/dl/@compact;boolean:invalid
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5225,10 +5483,43 @@ id=""><span id="">x</span></p>
 /nest/@filter;selectors:namespace prefix:not declared;m
 
 #data
+<div align="" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+/div/@align;enumerated:invalid
+
+#data
+<div align="Left" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+
+#data
 <div align="center" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/div/@align;attribute;unsupported
+/div/@align;attribute not defined;m
 /div;no significant content;s
+
+#data
+<div align="right" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+
+#data
+<div align="justify" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+
+#data
+<div align="xxx" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+/div/@align;enumerated:invalid
+
+#data
+<div align=" left" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+/div/@align;enumerated:invalid
 
 #data
 <a accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</a>

@@ -662,6 +662,21 @@ my $HTMLAccesskeyAttrChecker = sub {
   ## or wherever the access key is to apply." [HTML4] (informative)
 }; # $HTMLAccesskeyAttrChecker
 
+my $HTMLColorAttrChecker = sub {
+  my ($self, $attr) = @_;
+  
+  ## NOTE: HTML4 "color" or |%Color;|
+
+  my $value = $attr->value;
+
+  if ($value !~ /\A(?>#[0-9A-F]+|black|silver|gray|white|maroon|red|purple|fuchsia|green|lime|olive|yellow|navy|blue|teal|aqua)\z/i) {
+    $self->{onerror}->(node => $attr, type => 'color:syntax error', ## TODO: type
+                       level => $self->{fact_level});
+  }
+
+  ## TODO: HTML4 has some guideline on usage of color.
+}; # $HTMLColorAttrChecker
+
 my $HTMLAttrChecker = {
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
@@ -1594,7 +1609,14 @@ $Element->{$HTML_NS}->{style} = {
 $Element->{$HTML_NS}->{body} = {
   %HTMLProseContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    alink => $HTMLColorAttrChecker,
+    background => $HTMLURIAttrChecker,
+    bgcolor => $HTMLColorAttrChecker,
+    link => $HTMLColorAttrChecker,
+    text => $HTMLColorAttrChecker,
+    vlink => $HTMLColorAttrChecker,
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     alink => FEATURE_M12N10_REC_DEPRECATED,
@@ -1607,6 +1629,11 @@ $Element->{$HTML_NS}->{body} = {
     text => FEATURE_M12N10_REC_DEPRECATED,
     vlink => FEATURE_M12N10_REC_DEPRECATED,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{section} = {
@@ -1652,7 +1679,11 @@ $Element->{$HTML_NS}->{aside} = {
 $Element->{$HTML_NS}->{h1} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_M12N10_REC_DEPRECATED,
@@ -1748,7 +1779,11 @@ $Element->{$HTML_NS}->{address} = {
 $Element->{$HTML_NS}->{p} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_M12N10_REC_DEPRECATED,
@@ -1775,7 +1810,11 @@ $Element->{$HTML_NS}->{hr} = {
 $Element->{$HTML_NS}->{br} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1,
+    }),
+  }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     clear => FEATURE_M12N10_REC_DEPRECATED,
@@ -1848,7 +1887,9 @@ $Element->{$HTML_NS}->{dialog} = {
 $Element->{$HTML_NS}->{pre} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
@@ -1861,6 +1902,7 @@ $Element->{$HTML_NS}->{ol} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    compact => $GetHTMLBooleanAttrChecker->('compact'),
     start => $HTMLIntegerAttrChecker,
     reversed => $GetHTMLBooleanAttrChecker->('reversed'),
   }, {
@@ -1901,7 +1943,9 @@ $Element->{$HTML_NS}->{ol} = {
 $Element->{$HTML_NS}->{ul} = {
   %{$Element->{$HTML_NS}->{ol}},
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    compact => $GetHTMLBooleanAttrChecker->('compact'),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_HTML2X_RFC,
@@ -1916,7 +1960,9 @@ $Element->{$HTML_NS}->{dir} = {
 ## TODO: %block; is not allowed [HTML4] ## TODO: Empty list allowed?
   %{$Element->{$HTML_NS}->{ul}},
   status => FEATURE_M12N10_REC_DEPRECATED,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    compact => $GetHTMLBooleanAttrChecker->('compact'),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_HTML2X_RFC,
@@ -1979,7 +2025,9 @@ $Element->{$HTML_NS}->{li} = {
 $Element->{$HTML_NS}->{dl} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    compact => $GetHTMLBooleanAttrChecker->('compact'),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     compact => FEATURE_M12N10_REC_DEPRECATED,
@@ -4636,6 +4684,7 @@ $Element->{$HTML_NS}->{menu} = {
       ## NOTE: We don't want any |menu| element warned as deprecated.
   check_attrs => $GetHTMLAttrsChecker->({
     autosubmit => $GetHTMLBooleanAttrChecker->('autosubmit'),
+    compact => $GetHTMLBooleanAttrChecker->('compact'),
     id => sub {
       ## NOTE: same as global |id=""|, with |$self->{menu}| registeration
       my ($self, $attr) = @_;
@@ -4825,7 +4874,11 @@ $Element->{$HTML_NS}->{legend} = {
 $Element->{$HTML_NS}->{div} = {
   %HTMLProseContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_M12N10_REC_DEPRECATED,
