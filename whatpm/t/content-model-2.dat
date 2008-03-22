@@ -5192,3 +5192,110 @@ id=""><span id="">x</span></p>
 /div/@align;attribute;unsupported
 /div;no significant content;s
 
+#data
+<a accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@accesskey;char:syntax error;m
+/a/@accesskey;attribute not defined;m
+
+#data
+<a accesskey="a" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@accesskey;attribute not defined;m
+
+#data
+<a accesskey=" " xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@accesskey;attribute not defined;m
+
+#data
+<a accesskey="xx" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@accesskey;char:syntax error;m
+/a/@accesskey;attribute not defined;m
+
+#data
+<area href="" shape="default" alt="" accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@accesskey;char:syntax error;m
+/area/@accesskey;attribute not defined;m
+
+#data
+<area href="" shape="default" alt="" accesskey="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@accesskey;attribute not defined;m
+
+#data
+<area href="" shape="default" alt="" accesskey=" " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@accesskey;attribute not defined;m
+
+#data
+<area href="" shape="default" alt="" accesskey="xx" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@accesskey;char:syntax error;m
+/area/@accesskey;attribute not defined;m
+
+#data
+<input accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@accesskey;char:syntax error;m
+/input/@accesskey;attribute not defined;m
+
+#data
+<input accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@accesskey;attribute not defined;m
+
+#data
+<button accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</button>
+#errors
+/button/@accesskey;char:syntax error;m
+/button/@accesskey;attribute not defined;m
+
+#data
+<button accesskey="x" xmlns="http://www.w3.org/1999/xhtml">x</button>
+#errors
+/button/@accesskey;attribute not defined;m
+
+#data
+<label accesskey="" xmlns="http://www.w3.org/1999/xhtml"><input/>x</label>
+#errors
+/label/@accesskey;char:syntax error;m
+
+#data
+<label accesskey="x" xmlns="http://www.w3.org/1999/xhtml"><input/>x</label>
+#errors
+
+#data
+<select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/select/@accesskey;char:syntax error;m
+
+#data
+<select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<textarea accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/textarea/@accesskey;char:syntax error;m
+/textarea/@accesskey;attribute not defined;m
+
+#data
+<textarea accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/textarea/@accesskey;attribute not defined;m
+
+
+#data
+<legend accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</legend>
+#errors
+/legend/@accesskey;char:syntax error;m
+/legend/@accesskey;attribute not defined;m
+
+#data
+<legend accesskey="x" xmlns="http://www.w3.org/1999/xhtml">x</legend>
+#errors
+/legend/@accesskey;attribute not defined;m
+

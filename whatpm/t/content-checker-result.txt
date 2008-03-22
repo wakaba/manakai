@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Fri Mar 21 11:37:34 2008
-# Current time GMT:   Fri Mar 21 02:37:34 2008
+# Current time local: Sat Mar 22 11:59:53 2008
+# Current time GMT:   Sat Mar 22 02:59:53 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1915,7 +1915,6 @@ ok 1772
 not ok 1773
 # Test 1773 got: "/div/@align;attribute not defined;m\n/div/@align;attribute;unsupported\n/div;no significant content;s" (t/ContentChecker.t at line 98 fail #1773)
 #      Expected: "/div/@align;attribute;unsupported\n/div;no significant content;s" (<div align="center" xmlns="http://www.w3.org/1999/xhtml"/>)
-# t/content-model-3.dat
 ok 1774
 ok 1775
 ok 1776
@@ -1926,20 +1925,22 @@ ok 1780
 ok 1781
 ok 1782
 ok 1783
-not ok 1784
-# Test 1784 got: "/a;element;unsupported" (t/ContentChecker.t at line 98 fail #1784)
-#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
+ok 1784
 ok 1785
 ok 1786
 ok 1787
-ok 1788
-ok 1789
+not ok 1788
+# Test 1788 got: "/select/@accesskey;char:syntax error;m\n/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1788)
+#      Expected: "/select/@accesskey;char:syntax error;m" (<select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1789
+# Test 1789 got: "/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1789)
+#      Expected: "" (<select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1790
 ok 1791
 ok 1792
 ok 1793
+# t/content-model-3.dat
 ok 1794
-# t/content-model-4.dat
 ok 1795
 ok 1796
 ok 1797
@@ -1949,7 +1950,9 @@ ok 1800
 ok 1801
 ok 1802
 ok 1803
-ok 1804
+not ok 1804
+# Test 1804 got: "/a;element;unsupported" (t/ContentChecker.t at line 98 fail #1804)
+#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
 ok 1805
 ok 1806
 ok 1807
@@ -1960,6 +1963,7 @@ ok 1811
 ok 1812
 ok 1813
 ok 1814
+# t/content-model-4.dat
 ok 1815
 ok 1816
 ok 1817
@@ -1987,7 +1991,6 @@ ok 1838
 ok 1839
 ok 1840
 ok 1841
-# t/content-model-5.dat
 ok 1842
 ok 1843
 ok 1844
@@ -2008,6 +2011,7 @@ ok 1858
 ok 1859
 ok 1860
 ok 1861
+# t/content-model-5.dat
 ok 1862
 ok 1863
 ok 1864
@@ -2015,7 +2019,6 @@ ok 1865
 ok 1866
 ok 1867
 ok 1868
-# t/table-1.dat
 ok 1869
 ok 1870
 ok 1871
@@ -2029,7 +2032,6 @@ ok 1878
 ok 1879
 ok 1880
 ok 1881
-# t/content-model-atom-1.dat
 ok 1882
 ok 1883
 ok 1884
@@ -2037,6 +2039,7 @@ ok 1885
 ok 1886
 ok 1887
 ok 1888
+# t/table-1.dat
 ok 1889
 ok 1890
 ok 1891
@@ -2050,6 +2053,7 @@ ok 1898
 ok 1899
 ok 1900
 ok 1901
+# t/content-model-atom-1.dat
 ok 1902
 ok 1903
 ok 1904
@@ -2076,30 +2080,11 @@ ok 1924
 ok 1925
 ok 1926
 ok 1927
-not ok 1928
-# Test 1928 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #1928)
-#      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
-#<id>about:</id>
-#<author><name>x</name></author>
-#<link rel="alternate" href=""/>
-#<updated>2000-01-02T03:04:05Z</updated>
-#<title>x</title>
-#<content type="image/png"/>
-#</entry>)
-not ok 1929
-# Test 1929 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #1929)
-#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
-#<id>about:</id>
-#<author><name>x</name></author>
-#<link rel="alternate" href=""/>
-#<updated>2000-01-02T03:04:05Z</updated>
-#<title>x</title>
-#<content type="message/rfc822"/>
-#</entry>)
+ok 1928
+ok 1929
 ok 1930
 ok 1931
 ok 1932
-# t/content-model-atom-2.dat
 ok 1933
 ok 1934
 ok 1935
@@ -2115,18 +2100,57 @@ ok 1944
 ok 1945
 ok 1946
 ok 1947
-ok 1948
-ok 1949
+not ok 1948
+# Test 1948 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #1948)
+#      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="image/png"/>
+#</entry>)
+not ok 1949
+# Test 1949 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #1949)
+#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="message/rfc822"/>
+#</entry>)
 ok 1950
 ok 1951
 ok 1952
+# t/content-model-atom-2.dat
 ok 1953
 ok 1954
 ok 1955
 ok 1956
+ok 1957
+ok 1958
+ok 1959
+ok 1960
+ok 1961
+ok 1962
+ok 1963
+ok 1964
+ok 1965
+ok 1966
+ok 1967
+ok 1968
+ok 1969
+ok 1970
+ok 1971
+ok 1972
+ok 1973
+ok 1974
+ok 1975
+ok 1976
 # t/content-model-atom-threading-1.dat
-not ok 1957
-# Test 1957 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #1957)
+not ok 1977
+# Test 1977 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #1977)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2156,8 +2180,8 @@ not ok 1957
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 1958
-# Test 1958 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #1958)
+not ok 1978
+# Test 1978 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #1978)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2183,17 +2207,17 @@ not ok 1958
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 1959
-ok 1960
-ok 1961
-ok 1962
-ok 1963
-ok 1964
-ok 1965
-ok 1966
-ok 1967
-ok 1968
-ok 1969
-ok 1970
-ok 1971
-ok 1972
+ok 1979
+ok 1980
+ok 1981
+ok 1982
+ok 1983
+ok 1984
+ok 1985
+ok 1986
+ok 1987
+ok 1988
+ok 1989
+ok 1990
+ok 1991
+ok 1992

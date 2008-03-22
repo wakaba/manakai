@@ -289,7 +289,7 @@ my $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
 ## |rel| attribute (unordered set of space separated tokens,
 ## whose allowed values are defined by the section on link types)
 my $HTMLLinkTypesAttrChecker = sub {
-  my ($a_or_area, $todo, $self, $attr) = @_;
+  my ($a_or_area, $todo, $self, $attr, $item, $element_state) = @_;
   my %word;
   for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
     unless ($word{$word}) {
@@ -307,6 +307,9 @@ my $HTMLLinkTypesAttrChecker = sub {
   ## NOTE: Though there is no explicit "MUST NOT" for undefined values,
   ## "MAY"s and "only ... MAY" restrict non-standard non-registered
   ## values to be used conformingly.
+
+  my $is_hyperlink;
+  my $is_resource;
   require Whatpm::_LinkTypeList;
   our $LinkType;
   for my $word (keys %word) {
@@ -336,7 +339,7 @@ my $HTMLLinkTypesAttrChecker = sub {
         if ($word eq 'alternate') {
           #
         } elsif ($def->{effect}->[$a_or_area] eq 'hyperlink') {
-          $todo->{has_hyperlink_link_type} = 1;
+          $is_hyperlink = 1;
         }
       }
       if ($def->{unique}) {
@@ -347,13 +350,17 @@ my $HTMLLinkTypesAttrChecker = sub {
                              type => 'link type:duplicate:'.$word);
         }
       }
+
+      if (defined $def->{effect}->[$a_or_area] and $word ne 'alternate') {
+        $is_hyperlink = 1 if $def->{effect}->[$a_or_area] eq 'hyperlink';
+        $is_resource = 1 if $def->{effect}->[$a_or_area] eq 'external resource';
+      }
     } else {
       $self->{onerror}->(node => $attr, level => 'unsupported',
                          type => 'link type:'.$word);
     }
   }
-  $todo->{has_hyperlink_link_type} = 1
-      if $word{alternate} and not $word{stylesheet};
+  $is_hyperlink = 1 if $word{alternate} and not $word{stylesheet};
   ## TODO: The Pingback 1.0 specification, which is referenced by HTML5,
   ## says that using both X-Pingback: header field and HTML
   ## <link rel=pingback> is deprecated and if both appears they
@@ -368,13 +375,21 @@ my $HTMLLinkTypesAttrChecker = sub {
   ## NOTE: <link rel="up index"><link rel="up up index"> is not an error.
   ## NOTE: We can't check "If the page is part of multiple hierarchies,
   ## then they SHOULD be described in different paragraphs.".
+
+  $todo->{has_hyperlink_link_type} = 1 if $is_hyperlink;
+  if ($is_hyperlink or $a_or_area) {
+    $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
+  }
+  if ($is_resource and not $a_or_area) {
+    $element_state->{uri_info}->{href}->{type}->{resource} = 1;
+  }
 }; # $HTMLLinkTypesAttrChecker
 
 ## TODO: "When an author uses a new type not defined by either this specification or the Wiki page, conformance checkers should offer to add the value to the Wiki, with the details described above, with the "proposal" status."
 
 ## URI (or IRI)
 my $HTMLURIAttrChecker = sub {
-  my ($self, $attr) = @_;
+  my ($self, $attr, $item, $element_state) = @_;
   ## ISSUE: Relative references are allowed? (RFC 3987 "IRI" is an absolute reference with optional fragment identifier.)
   my $value = $attr->value;
   Whatpm::URIChecker->check_iri_reference ($value, sub {
@@ -384,11 +399,22 @@ my $HTMLURIAttrChecker = sub {
                        (defined $opt{position} ? ':'.$opt{position} : ''));
   });
   $self->{has_uri_attr} = 1; ## TODO: <html manifest>
+
+  my $attr_name = $attr->name;
+  $element_state->{uri_info}->{$attr_name}->{node} = $attr;
+  ## TODO: absolute
+  push @{$self->{return}->{uri}->{$value} ||= []},
+      $element_state->{uri_info}->{$attr_name};
 }; # $HTMLURIAttrChecker
 
 ## A space separated list of one or more URIs (or IRIs)
 my $HTMLSpaceURIsAttrChecker = sub {
   my ($self, $attr) = @_;
+
+  my $type = {ping => 'action',
+              profile => 'namespace',
+              archive => 'resource'}->{$attr->name};
+
   my $i = 0;
   for my $value (split /[\x09-\x0D\x20]+/, $attr->value) {
     Whatpm::URIChecker->check_iri_reference ($value, sub {
@@ -398,6 +424,11 @@ my $HTMLSpaceURIsAttrChecker = sub {
                          $opt{type}.':'.$i.
                          (defined $opt{position} ? ':'.$opt{position} : ''));
     });
+
+    ## TODO: absolute
+    push @{$self->{return}->{uri}->{$value} ||= []},
+        {node => $attr, type => $type};
+
     $i++;
   }
   ## ISSUE: Relative references?
@@ -613,6 +644,24 @@ my $HTMLSelectorsAttrChecker = sub {
   $p->parse_string ($value);
 }; # $HTMLSelectorsAttrChecker
 
+my $HTMLAccesskeyAttrChecker = sub {
+  my ($self, $attr) = @_;
+
+  ## NOTE: "character" or |%Character;| in HTML4.
+
+  my $value = $attr->value;
+  if (length $value != 1) {
+    $self->{onerror}->(node => $attr, type => 'char:syntax error',
+                       level => $self->{fact_level}); ## TODO: type
+  }
+
+  ## NOTE: "Note. Authors should consider the input method of the expected
+  ## reader when specifying an accesskey." [HTML4]  This is hard to implement,
+  ## since it depends on keyboard and so on.
+  ## NOTE: "We recommend that authors include the access key in label text
+  ## or wherever the access key is to apply." [HTML4] (informative)
+}; # $HTMLAccesskeyAttrChecker
+
 my $HTMLAttrChecker = {
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
@@ -767,7 +816,7 @@ my $GetHTMLAttrsChecker = sub {
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
           || $AttrChecker->{$attr_ns}->{''};
       if ($checker) {
-        $checker->($self, $attr, $item);
+        $checker->($self, $attr, $item, $element_state);
       } elsif ($attr_ns eq '' and not $element_specific_status->{$attr_ln}) {
         #
       } else {
@@ -931,6 +980,10 @@ $Element->{$HTML_NS}->{html} = {
         $self->{onerror}->(node => $attr, type => 'in XML:xmlns');
   ## TODO: Test
       }
+
+      ## TODO: Should be resolved?
+      push @{$self->{return}->{uri}->{$value} ||= []},
+          {node => $attr, type => {namespace => 1}};
     },
   }, {
     %HTMLAttrStatus,
@@ -946,6 +999,7 @@ $Element->{$HTML_NS}->{html} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before head';
+    $element_state->{uri_info}->{manifest}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -1072,6 +1126,9 @@ $Element->{$HTML_NS}->{head} = {
     }
     $self->{flag}->{in_head} = $element_state->{in_head_original};
 
+    ## TODO:
+    #$element_state->{uri_info}->{profile}->{type}->{namespace} = 1;
+
     $HTMLChecker{check_end}->(@_);
   },
 };
@@ -1135,6 +1192,8 @@ $Element->{$HTML_NS}->{base} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:href|target');
     }
+
+    $element_state->{uri_info}->{href}->{type}->{base} = 1;
 
     return $GetHTMLAttrsChecker->({
       href => $HTMLURIAttrChecker,
@@ -1240,7 +1299,7 @@ $Element->{$HTML_NS}->{meta} = {
       }->{$attr_ln};
 
       if ($checker) {
-        $checker->($self, $attr) if ref $checker;
+        $checker->($self, $attr, $item, $element_state) if ref $checker;
       } elsif ($attr_ns eq '' and not $status) {
         #
       } else {
@@ -1560,6 +1619,11 @@ $Element->{$HTML_NS}->{blockquote} = {
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     sdaform => FEATURE_HTML20_RFC,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+  
+    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{aside} = {
@@ -2001,6 +2065,7 @@ $Element->{$HTML_NS}->{a} = {
       my $checker;
       if ($attr_ns eq '') {
         $checker = {
+          accesskey => $HTMLAccesskeyAttrChecker,
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
@@ -2047,7 +2112,7 @@ $Element->{$HTML_NS}->{a} = {
       }->{$attr_ln};
 
       if ($checker) {
-        $checker->($self, $attr) if ref $checker;
+        $checker->($self, $attr, $item, $element_state) if ref $checker;
       } elsif ($attr_ns eq '' and not $status) {
         #
       } else {
@@ -2073,6 +2138,8 @@ $Element->{$HTML_NS}->{a} = {
         }
       }
     }
+
+    $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -2101,6 +2168,11 @@ $Element->{$HTML_NS}->{q} = {
     sdapref => FEATURE_HTML2X_RFC,
     sdasuff => FEATURE_HTML2X_RFC,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{cite} = {
@@ -2580,6 +2652,11 @@ $Element->{$HTML_NS}->{ins} = {
     datetime => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{del} = {
@@ -2606,6 +2683,11 @@ $Element->{$HTML_NS}->{del} = {
                          level => $self->{should_level},
                          type => 'no significant content');
     }
+  },
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
   },
 };
 
@@ -2706,7 +2788,7 @@ $Element->{$HTML_NS}->{img} = {
       usemap => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       vspace => FEATURE_M12N10_REC_DEPRECATED,
       width => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    })->($self, $item);
+    })->($self, $item, $element_state);
     unless ($item->{node}->has_attribute_ns (undef, 'alt')) {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:alt',
@@ -2716,6 +2798,11 @@ $Element->{$HTML_NS}->{img} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:src');
     }
+
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{lowsrc}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{dynsrc}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{longdesc}->{type}->{cite} = 1;
   },
 };
 
@@ -2742,6 +2829,11 @@ $Element->{$HTML_NS}->{iframe} = {
     title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     width => FEATURE_M12N10_REC,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{embed} = {
@@ -2780,7 +2872,7 @@ $Element->{$HTML_NS}->{embed} = {
       }->{$attr_ln};
 
       if ($checker) {
-        $checker->($self, $attr);
+        $checker->($self, $attr, $item, $element_state);
       } elsif ($attr_ns eq '' and not $status) {
         #
       } else {
@@ -2798,6 +2890,8 @@ $Element->{$HTML_NS}->{embed} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:src');
     }
+
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
   },
 };
 
@@ -2840,13 +2934,19 @@ $Element->{$HTML_NS}->{object} = {
       usemap => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       vspace => FEATURE_XHTML10_REC,
       width => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    })->($self, $item);
+    })->($self, $item, $element_state);
     unless ($item->{node}->has_attribute_ns (undef, 'data')) {
       unless ($item->{node}->has_attribute_ns (undef, 'type')) {
         $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing:data|type');
       }
     }
+
+    $element_state->{uri_info}->{data}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{classid}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
+    ## TODO: archive
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   ## NOTE: param*, transparent (Prose)
   check_child_element => sub {
@@ -2909,7 +3009,7 @@ $Element->{$HTML_NS}->{param} = {
       type => FEATURE_M12N10_REC,
       value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       valuetype => FEATURE_M12N10_REC,
-    })->($self, $item);
+    })->(@_);
     unless ($item->{node}->has_attribute_ns (undef, 'name')) {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:name');
@@ -2918,6 +3018,8 @@ $Element->{$HTML_NS}->{param} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:value');
     }
+
+    $element_state->{uri_info}->{value}->{type}->{resource} = 1;
   },
 };
 
@@ -2953,6 +3055,9 @@ $Element->{$HTML_NS}->{video} = {
         = not $item->{node}->has_attribute_ns (undef, 'src');
     $element_state->{has_source} ||= $element_state->{allow_source} * -1;
       ## NOTE: It might be set true by |check_element|.
+
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{poster}->{type}->{embedded} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -3032,11 +3137,13 @@ $Element->{$HTML_NS}->{source} = {
       media => FEATURE_HTML5_DEFAULT,
       src => FEATURE_HTML5_DEFAULT,
       type => FEATURE_HTML5_DEFAULT,
-    })->($self, $item, $element_state);
+    })->(@_);
     unless ($item->{node}->has_attribute_ns (undef, 'src')) {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:src');
     }
+
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
   },
 };
 
@@ -3099,7 +3206,7 @@ $Element->{$HTML_NS}->{map} = {
       onkeydown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    })->($self, $item, $element_state);
+    })->(@_);
     $self->{onerror}->(node => $item->{node}, type => 'attribute missing:id')
         unless $has_id;
   },
@@ -3129,6 +3236,7 @@ $Element->{$HTML_NS}->{area} = {
       my $checker;
       if ($attr_ns eq '') {
         $checker = {
+          accesskey => $HTMLAccesskeyAttrChecker,
                      alt => sub { },
                          ## NOTE: |alt| value has no conformance creteria.
                      shape => $GetHTMLEnumeratedAttrChecker->({
@@ -3186,7 +3294,7 @@ $Element->{$HTML_NS}->{area} = {
       }->{$attr_ln};
 
       if ($checker) {
-        $checker->($self, $attr) if ref $checker;
+        $checker->($self, $attr, $item, $element_state) if ref $checker;
       } elsif ($attr_ns eq '' and not $status) {
         #
       } else {
@@ -3293,6 +3401,8 @@ $Element->{$HTML_NS}->{area} = {
                            type => 'attribute missing:coords');
       }
     }
+
+    $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -3330,6 +3440,8 @@ $Element->{$HTML_NS}->{table} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before caption';
+
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -3703,6 +3815,12 @@ $Element->{$HTML_NS}->{form} = {
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <form>
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{action}->{type}->{action} = 1;
+    $element_state->{uri_info}->{data}->{type}->{resource} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{fieldset} = {
@@ -3727,9 +3845,7 @@ $Element->{$HTML_NS}->{input} = {
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
-    accesskey => $AttrCheckerNotImplemented, ## TODO: Character
-       ## TODO: "Note. Authors should consider the input method of the expected reader when specifying an accesskey." [HTML4]
-       ## "We recommend that authors include the access key in label text or wherever the access key is to apply." [HTML4]
+    accesskey => $HTMLAccesskeyAttrChecker,
     action => $HTMLURIAttrChecker,
     align => $GetHTMLEnumeratedAttrChecker->({
       top => 1, middle => 1, bottom => 1, left => 1, right => 1,
@@ -3819,6 +3935,13 @@ $Element->{$HTML_NS}->{input} = {
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <input>
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{action}->{type}->{action} = 1;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+  },
 };
 
 ## TODO: Form |name| attributes: MUST NOT conflict with RFC 3106 [WF2]
@@ -3829,7 +3952,7 @@ $Element->{$HTML_NS}->{button} = {
     ## TODO: image map (img) in |button| is "illegal" [HTML4].
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    accesskey => $AttrCheckerNotImplemented, ## TODO: Character
+    accesskey => $HTMLAccesskeyAttrChecker,
     action => $HTMLURIAttrChecker,
     autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -3873,6 +3996,12 @@ $Element->{$HTML_NS}->{button} = {
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <button>
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{action}->{type}->{action} = 1;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{label} = {
@@ -3880,7 +4009,7 @@ $Element->{$HTML_NS}->{label} = {
     ## TODO: At most one form control [WF2]
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    accesskey => $AttrCheckerNotImplemented, ## TODO:  Charcter
+    accesskey => $HTMLAccesskeyAttrChecker,
     for => $AttrCheckerNotImplemented, ## TODO: IDREF ## TODO: Must be |id| of control [HTML4] ## TODO: Or, "may only contain one control element"
   }, {
     %HTMLAttrStatus,
@@ -3902,7 +4031,7 @@ $Element->{$HTML_NS}->{select} = {
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
   is_root => 1, ## TODO: SHOULD NOT in application/xhtml+xml [WF2]
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: accesskey [WF2]
+    accesskey => $HTMLAccesskeyAttrChecker,
     autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
@@ -3938,6 +4067,12 @@ $Element->{$HTML_NS}->{select} = {
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <select>
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{data}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{datalist} = {
@@ -3952,6 +4087,11 @@ $Element->{$HTML_NS}->{datalist} = {
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <datalist>
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{data}->{type}->{resource} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{optgroup} = {
@@ -3999,7 +4139,7 @@ $Element->{$HTML_NS}->{textarea} = {
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $HTMLIMTAttrChecker, ## TODO: MUST be a text-based type
-    accesskey => $AttrCheckerNotImplemented, ## TODO: Character
+    accesskey => $HTMLAccesskeyAttrChecker,
     autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## TODO: SHOULD if wrap=hard [WF2]
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -4046,6 +4186,11 @@ $Element->{$HTML_NS}->{textarea} = {
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <textarea>
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{data}->{type}->{resource} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{output} = {
@@ -4092,6 +4237,11 @@ $Element->{$HTML_NS}->{isindex} = {
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <isindex>
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{action}->{type}->{action} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{script} = {
@@ -4136,6 +4286,8 @@ $Element->{$HTML_NS}->{script} = {
       }
       $element_state->{script_type} = $type; ## TODO: $type normalization
     }
+
+    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -4271,6 +4423,11 @@ $Element->{$HTML_NS}->{'event-source'} = {
     %HTMLAttrStatus,
     src => FEATURE_HTML5_LC,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{details} = {
@@ -4447,6 +4604,11 @@ $Element->{$HTML_NS}->{command} = {
     radiogroup => FEATURE_HTML5_WD,
     type => FEATURE_HTML5_WD,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{icon}->{type}->{embedded} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{menu} = {
@@ -4629,7 +4791,7 @@ $Element->{$HTML_NS}->{legend} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-#    accesskey => $AttrCheckerNotImplemented, ## TODO: Character ## TODO: This attribute is not part of HTML5
+    accesskey => $HTMLAccesskeyAttrChecker,
 #    align => $GetHTMLEnumeratedAttrChecker->({
 #      top => 1, bottom => 1, left => 1, right => 1,
 #    }),
@@ -4654,6 +4816,11 @@ $Element->{$HTML_NS}->{div} = {
     datasrc => FEATURE_HTML4_REC_RESERVED,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  },
 };
 
 $Element->{$HTML_NS}->{center} = {

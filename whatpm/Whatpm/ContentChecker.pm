@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.75 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.76 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -287,7 +287,7 @@ sub check_document ($$$;$) {
   };
 
   $self->{must_level} = 'm';
-  $self->{fact_level} = 'f';
+  $self->{fact_level} = 'm';
   $self->{should_level} = 's';
   $self->{good_level} = 'w';
   $self->{info_level} = 'i';
@@ -400,7 +400,7 @@ sub check_element ($$$;$) {
   };
 
   $self->{must_level} = 'm';
-  $self->{fact_level} = 'f';
+  $self->{fact_level} = 'm';
   $self->{should_level} = 's';
   $self->{good_level} = 'w';
   $self->{info_level} = 'i';
@@ -423,6 +423,8 @@ sub check_element ($$$;$) {
   $self->{return} = {
     class => {},
     id => $self->{id}, table => [], term => $self->{term},
+    uri => {}, # URIs other than those in RDF triples
+                     ## TODO: xmlns="", SYSTEM "", atom:* src="", xml:base=""
     rdf => [],
   };
 
@@ -835,4 +837,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/03/21 09:44:57 $
+# $Date: 2008/03/22 03:07:06 $
