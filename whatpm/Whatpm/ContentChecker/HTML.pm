@@ -1234,10 +1234,13 @@ $Element->{$HTML_NS}->{link} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
+      ## TODO: HTML4 |charset|
       href => $HTMLURIAttrChecker,
       rel => sub { $HTMLLinkTypesAttrChecker->(0, $item, @_) },
+      ## TODO: HTML4 |rev|
       media => $HTMLMQAttrChecker,
       hreflang => $HTMLLanguageTagAttrChecker,
+      target => $HTMLTargetAttrChecker,
       type => $HTMLIMTAttrChecker,
       ## NOTE: Though |title| has special semantics,
       ## syntactically same as the |title| as global attribute.
@@ -1795,7 +1798,9 @@ $Element->{$HTML_NS}->{p} = {
 $Element->{$HTML_NS}->{hr} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: HTML4 |align|, |noshade|, |size|, |width|
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_M12N10_REC_DEPRECATED,
@@ -2136,11 +2141,16 @@ $Element->{$HTML_NS}->{a} = {
       if ($attr_ns eq '') {
         $checker = {
           accesskey => $HTMLAccesskeyAttrChecker,
+          ## TODO: HTML4 |charset|
+          ## TODO: HTML4 |coords|
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
                      rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
+          ## TODO: HTML4 |rev|
+          ## TODO: HTML4 |shape|
                      media => $HTMLMQAttrChecker,
+          ## TODO: HTML4/XHTML1 |name|
                      hreflang => $HTMLLanguageTagAttrChecker,
                      type => $HTMLIMTAttrChecker,
                    }->{$attr_ln};
@@ -2827,9 +2837,14 @@ $Element->{$HTML_NS}->{img} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
+      align => $GetHTMLEnumeratedAttrChecker->({
+        bottom => 1, middle => 1, top => 1, left => 1, right => 1,
+      }),
       alt => sub { }, ## NOTE: No syntactical requirement
+      border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
+      hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       ismap => sub {
         my ($self, $attr, $parent_item) = @_;
         if (not $self->{flag}->{in_a_href}) {
@@ -2839,7 +2854,10 @@ $Element->{$HTML_NS}->{img} = {
         }
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
+      longdesc => $HTMLURIAttrChecker,
+      ## TODO: HTML4 |name|
       ## TODO: height
+      vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       ## TODO: width
     }, {
       %HTMLAttrStatus,
@@ -2975,9 +2993,26 @@ $Element->{$HTML_NS}->{object} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
+      align => $GetHTMLEnumeratedAttrChecker->({
+        bottom => 1, middle => 1, top => 1, left => 1, right => 1,
+      }),
+      archive => $HTMLSpaceURIsAttrChecker,
+          ## TODO: Relative to @codebase
+      border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+      classid => $HTMLURIAttrChecker,
+      codebase => $HTMLURIAttrChecker,
+      codetype => $HTMLIMTAttrChecker,
+          ## TODO: "RECOMMENDED when |classid| is specified" [HTML4]
       data => $HTMLURIAttrChecker,
+      declare => $GetHTMLBooleanAttrChecker->('declare'),
+          ## NOTE: "The object MUST be instantiated by a subsequent OBJECT ..."
+          ## [HTML4] but we don't know how to test this.
+      hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+      ## TODO: HTML4 |name|
+      standby => sub {}, ## NOTE: %Text; in HTML4
       type => $HTMLIMTAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
+      vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       ## TODO: width
       ## TODO: height
     }, {
@@ -3071,7 +3106,11 @@ $Element->{$HTML_NS}->{param} = {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
       name => sub { },
+      type => $HTMLIMTAttrChecker,
       value => sub { },
+      valuetype => $GetHTMLEnumeratedAttrChecker->({
+        data => 1, ref => 1, object => 1,
+      }),
     }, {
       %HTMLAttrStatus,
       id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -3088,8 +3127,6 @@ $Element->{$HTML_NS}->{param} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:value');
     }
-
-    $element_state->{uri_info}->{value}->{type}->{resource} = 1;
   },
 };
 
@@ -3258,6 +3295,7 @@ $Element->{$HTML_NS}->{map} = {
         $self->{map}->{$value} ||= $attr;
         $has_id = 1;
       },
+      ## TODO: HTML4 |name|
     }, {
       %HTMLAttrStatus,
       class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -3325,7 +3363,8 @@ $Element->{$HTML_NS}->{area} = {
                                             type => 'coords:syntax error');
                        }
                      },
-                     target => $HTMLTargetAttrChecker,
+          nohref => $GetHTMLBooleanAttrChecker->('nohref'),
+          target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
                      rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
@@ -3489,6 +3528,7 @@ $Element->{$HTML_NS}->{table} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: HTML4 |cellspacing|, |cellpadding|
     frame => $GetHTMLEnumeratedAttrChecker->({
       void => 1, above => 1, below => 1, hsides => 1, vsides => 1,
       lhs => 1, rhs => 1, box => 1, border => 1,
@@ -3639,8 +3679,25 @@ $Element->{$HTML_NS}->{caption} = {
 
 my %cellalign = (
   ## HTML4 %cellhalign;
+  align => $GetHTMLEnumeratedAttrChecker->({
+    left => 1, center => 1, right => 1, justify => 1, char => 1,
+  }),
+  char => sub {
+    my ($self, $attr) = @_;
 
+    ## NOTE: "character" or |%Character;| in HTML4.
+    
+    my $value = $attr->value;
+    if (length $value != 1) {
+      $self->{onerror}->(node => $attr, type => 'char:syntax error',
+                         level => $self->{fact_level}); ## TODO: type
+    }
+  },
+  ## TODO: HTML4 |charoff|  
   ## HTML4 %cellvalign;
+  valign => $GetHTMLEnumeratedAttrChecker->({
+    top => 1, middle => 1, bottom => 1, baseline => 1,
+  }),
 );
 
 $Element->{$HTML_NS}->{colgroup} = {
@@ -3818,6 +3875,7 @@ $Element->{$HTML_NS}->{td} = {
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    ## TODO: HTML5 |headers|
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker
@@ -3852,6 +3910,7 @@ $Element->{$HTML_NS}->{th} = {
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    ## TODO: HTML5 |headers|
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker
@@ -4357,6 +4416,8 @@ $Element->{$HTML_NS}->{script} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: HTML4 |charset|
+    ## TODO: HTML4 |language|
       src => $HTMLURIAttrChecker,
       defer => $GetHTMLBooleanAttrChecker->('defer'),
       async => $GetHTMLBooleanAttrChecker->('async'),
@@ -4950,7 +5011,9 @@ $Element->{$HTML_NS}->{center} = {
 $Element->{$HTML_NS}->{font} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_AT_RISK | FEATURE_M12N10_REC_DEPRECATED,
-  check_attrs => $GetHTMLAttrsChecker->({ ## TODO
+  check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: HTML4 |size|, |color|, |face|
+    ## TODO: HTML5 |style|
   }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,

@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Mar 22 17:20:06 2008
-# Current time GMT:   Sat Mar 22 08:20:06 2008
+# Current time local: Sat Mar 22 20:28:53 2008
+# Current time GMT:   Sat Mar 22 11:28:53 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1176,10 +1176,7 @@ ok 1088
 ok 1089
 ok 1090
 ok 1091
-not ok 1092
-# Test 1092 got: "/link/@target;attribute not defined;m\n/link/@target;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1092)
-#      Expected: "/link/@target;attribute;unsupported" (<link href="http://test/" rel="author" target="_self"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1092
 ok 1093
 ok 1094
 ok 1095
@@ -1206,17 +1203,17 @@ ok 1115
 ok 1116
 ok 1117
 ok 1118
-Parse error (bare ero) at line 2 column 19
 ok 1119
 ok 1120
-not ok 1121
-# Test 1121 got: "/meta;attribute missing:content\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (t/ContentChecker.t at line 98 fail #1121)
+ok 1121
+Parse error (bare ero) at line 2 column 19
+ok 1122
+ok 1123
+not ok 1124
+# Test 1124 got: "/meta;attribute missing:content\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (t/ContentChecker.t at line 98 fail #1124)
 #      Expected: "/meta;attribute missing:content;m\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
 #    http-equiv="content-type"
 #    />)
-ok 1122
-ok 1123
-ok 1124
 ok 1125
 ok 1126
 ok 1127
@@ -1225,10 +1222,10 @@ ok 1129
 ok 1130
 ok 1131
 ok 1132
-Parse error (bad attribute value) at line 2 column 56
 ok 1133
 ok 1134
 ok 1135
+Parse error (bad attribute value) at line 2 column 56
 ok 1136
 ok 1137
 ok 1138
@@ -1245,17 +1242,17 @@ ok 1148
 ok 1149
 ok 1150
 ok 1151
-not ok 1152
-# Test 1152 got: "/section/style/@scope;attribute not defined;m\n/section/style;SUBDOC\n/section/style;element not allowed:prose style;m\n/section;no significant content;s" (t/ContentChecker.t at line 98 fail #1152)
+ok 1152
+ok 1153
+ok 1154
+not ok 1155
+# Test 1155 got: "/section/style/@scope;attribute not defined;m\n/section/style;SUBDOC\n/section/style;element not allowed:prose style;m\n/section;no significant content;s" (t/ContentChecker.t at line 98 fail #1155)
 #      Expected: "/section/style/@scope;attribute;unsupported\n/section/style;SUBDOC\n/section/style;element not allowed:prose style;m\n/section;no significant content;s" (<section xmlns="http://www.w3.org/1999/xhtml">
 #<style scope=""/>
 #</section>)
 #      Line 1 is changed:
 #       - "/section/style/@scope;attribute;unsupported\n"
 #       + "/section/style/@scope;attribute not defined;m\n"
-ok 1153
-ok 1154
-ok 1155
 ok 1156
 ok 1157
 ok 1158
@@ -1272,27 +1269,27 @@ ok 1168
 ok 1169
 ok 1170
 ok 1171
-not ok 1172
-# Test 1172 got: "/address/@align;attribute not defined;m\n/address/@align;attribute;unsupported\n/address;no significant content;s" (t/ContentChecker.t at line 98 fail #1172)
-#      Expected: "/address/@align;attribute;unsupported\n/address;no significant content;s" (<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1172
 ok 1173
 ok 1174
-ok 1175
-not ok 1176
-# Test 1176 got: "/hr/@align;attribute not defined;m\n/hr/@align;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1176)
-#      Expected: "/hr/@align;attribute;unsupported" (<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1175
+# Test 1175 got: "/address/@align;attribute not defined;m\n/address/@align;attribute;unsupported\n/address;no significant content;s" (t/ContentChecker.t at line 98 fail #1175)
+#      Expected: "/address/@align;attribute;unsupported\n/address;no significant content;s" (<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1176
 ok 1177
 ok 1178
-ok 1179
+not ok 1179
+# Test 1179 got: "/hr/@align;attribute not defined;m\n/hr/@align;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1179)
+#      Expected: "/hr/@align;attribute;unsupported" (<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1180
 ok 1181
 ok 1182
-not ok 1183
-# Test 1183 got: "/dialog/@compact;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1183)
-#      Expected: "/dialog/@compact;attribute;unsupported" (<dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1183
 ok 1184
 ok 1185
-ok 1186
+not ok 1186
+# Test 1186 got: "/dialog/@compact;attribute not defined;m" (t/ContentChecker.t at line 98 fail #1186)
+#      Expected: "/dialog/@compact;attribute;unsupported" (<dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1187
 ok 1188
 ok 1189
@@ -1557,12 +1554,7 @@ ok 1447
 ok 1448
 ok 1449
 ok 1450
-not ok 1451
-# Test 1451 got: "/div/img/@ismap;attribute not allowed:ismap;m" (t/ContentChecker.t at line 98 fail #1451)
-#      Expected: "/div/img/@ismap;attribute not allowed" (<div  xmlns="http://www.w3.org/1999/xhtml">
-#<a href="http://link.test/">a</a>
-#<img alt="" src="http://test/" ismap="ismap"/>
-#</div>)
+ok 1451
 ok 1452
 ok 1453
 ok 1454
@@ -1589,7 +1581,12 @@ ok 1474
 ok 1475
 ok 1476
 ok 1477
-ok 1478
+not ok 1478
+# Test 1478 got: "/div/img/@ismap;attribute not allowed:ismap;m" (t/ContentChecker.t at line 98 fail #1478)
+#      Expected: "/div/img/@ismap;attribute not allowed" (<div  xmlns="http://www.w3.org/1999/xhtml">
+#<a href="http://link.test/">a</a>
+#<img alt="" src="http://test/" ismap="ismap"/>
+#</div>)
 ok 1479
 ok 1480
 ok 1481
@@ -1612,9 +1609,7 @@ ok 1497
 ok 1498
 ok 1499
 ok 1500
-not ok 1501
-# Test 1501 got: "/param/@valuetype;attribute not defined;m\n/param/@valuetype;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1501)
-#      Expected: "/param/@valuetype;attribute;unsupported" (<param name="a" value="b" valuetype="text" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1501
 ok 1502
 ok 1503
 ok 1504
@@ -1645,39 +1640,99 @@ ok 1528
 ok 1529
 ok 1530
 ok 1531
-ok 1532
-ok 1533
-ok 1534
-ok 1535
-ok 1536
-ok 1537
-ok 1538
-ok 1539
-ok 1540
-ok 1541
-ok 1542
-ok 1543
-ok 1544
-ok 1545
-ok 1546
-ok 1547
-ok 1548
-ok 1549
-ok 1550
+not ok 1532
+# Test 1532 got: "/object/@declare;attribute not defined;m\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1532)
+#      Expected: "/object/@declare;attribute not defined;m" (<object data="" declare="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1533
+# Test 1533 got: "/object/@declare;attribute not defined;m\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1533)
+#      Expected: "/object/@declare;attribute not defined;m" (<object data="" declare="declare" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1534
+# Test 1534 got: "/object/@declare;attribute not defined;m\n/object/@declare;boolean:invalid\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1534)
+#      Expected: "/object/@declare;attribute not defined;m\n/object/@declare;boolean:invalid" (<object data="" declare="yes" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1535
+# Test 1535 got: "/object/@declare;attribute not defined;m\n/object/@declare;boolean:invalid\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1535)
+#      Expected: "/object/@declare;attribute not defined;m\n/object/@declare;boolean:invalid" (<object data="" declare="no" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1536
+# Test 1536 got: "/object/@classid;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1536)
+#      Expected: "/object/@classid;attribute not defined;m" (<object classid="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1537
+# Test 1537 got: "/object/@classid;URI::syntax error:iriref3987;m\n/object/@classid;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1537)
+#      Expected: "/object/@classid;URI::syntax error:iriref3987;m\n/object/@classid;attribute not defined;m" (<object classid="[]" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1538
+# Test 1538 got: "/object/@codebase;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1538)
+#      Expected: "/object/@codebase;attribute not defined;m" (<object codebase="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1539
+# Test 1539 got: "/object/@codebase;URI::syntax error:iriref3987;m\n/object/@codebase;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1539)
+#      Expected: "/object/@codebase;URI::syntax error:iriref3987;m\n/object/@codebase;attribute not defined;m" (<object codebase="[]" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1540
+# Test 1540 got: "/object/@archive;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1540)
+#      Expected: "/object/@archive;attribute not defined;m" (<object archive="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1541
+# Test 1541 got: "/object/@archive;URIs::syntax error:iriref3987:0;m\n/object/@archive;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1541)
+#      Expected: "/object/@archive;URIs::syntax error:iriref3987:0;m\n/object/@archive;attribute not defined;m" (<object archive="[]" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1542
+# Test 1542 got: "/object/@archive;URIs::syntax error:iriref3987:0;m\n/object/@archive;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1542)
+#      Expected: "/object/@archive;URIs::syntax error:iriref3987:0;m\n/object/@archive;attribute not defined;m" (<object archive="a,[]" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1543
+# Test 1543 got: "/object/@archives;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1543)
+#      Expected: "/object/@archives;attribute not defined;m" (<object archives="[]" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1544
+# Test 1544 got: "/object/@codetype;IMT:syntax error\n/object/@codetype;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1544)
+#      Expected: "/object/@codetype;IMT:syntax error\n/object/@codetype;attribute not defined;m" (<object codetype="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1545
+# Test 1545 got: "/object/@codetype;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1545)
+#      Expected: "/object/@codetype;attribute not defined;m" (<object codetype="text/html" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1546
+# Test 1546 got: "/object/@standby;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1546)
+#      Expected: "/object/@standby;attribute not defined;m" (<object standby="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1547
+# Test 1547 got: "/object/@standby;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1547)
+#      Expected: "/object/@standby;attribute not defined;m" (<object standby="[]" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1548
+# Test 1548 got: "/object/@border;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1548)
+#      Expected: "/object/@border;attribute not defined;m" (<object border="0" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1549
+# Test 1549 got: "/object/@border;attribute not defined;m\n/object/@border;nninteger:syntax error\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1549)
+#      Expected: "/object/@border;attribute not defined;m\n/object/@border;nninteger:syntax error" (<object border="none" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1550
+# Test 1550 got: "/object/@hspace;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1550)
+#      Expected: "/object/@hspace;attribute not defined;m" (<object hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 1551
-# Test 1551 got: "/map/@name;attribute not defined;m\n/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (t/ContentChecker.t at line 98 fail #1551)
-#      Expected: "/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>)
-ok 1552
-ok 1553
-ok 1554
-ok 1555
-ok 1556
-ok 1557
-ok 1558
-ok 1559
-ok 1560
-ok 1561
-ok 1562
+# Test 1551 got: "/object/@hspace;attribute not defined;m\n/object/@hspace;nninteger:syntax error\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1551)
+#      Expected: "/object/@hspace;attribute not defined;m\n/object/@hspace;nninteger:syntax error" (<object hspace="none" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1552
+# Test 1552 got: "/object/@vspace;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1552)
+#      Expected: "/object/@vspace;attribute not defined;m" (<object vspace="0" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1553
+# Test 1553 got: "/object/@vspace;attribute not defined;m\n/object/@vspace;nninteger:syntax error\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1553)
+#      Expected: "/object/@vspace;attribute not defined;m\n/object/@vspace;nninteger:syntax error" (<object vspace="none" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1554
+# Test 1554 got: "/object/@align;attribute not defined;m\n/object/@align;enumerated:invalid\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1554)
+#      Expected: "/object/@align;attribute not defined;m\n/object/@align;enumerated:invalid" (<object align="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1555
+# Test 1555 got: "/object/@align;attribute not defined;m\n/object/@align;enumerated:invalid\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1555)
+#      Expected: "/object/@align;attribute not defined;m\n/object/@align;enumerated:invalid" (<object align="char" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1556
+# Test 1556 got: "/object/@align;attribute not defined;m\n/object/@align;enumerated:invalid\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1556)
+#      Expected: "/object/@align;attribute not defined;m\n/object/@align;enumerated:invalid" (<object align="justify" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1557
+# Test 1557 got: "/object/@align;attribute not defined;m\n/object/@align;enumerated:invalid\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1557)
+#      Expected: "/object/@align;attribute not defined;m\n/object/@align;enumerated:invalid" (<object align="center" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1558
+# Test 1558 got: "/object/@align;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1558)
+#      Expected: "/object/@align;attribute not defined;m" (<object align="bottom" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1559
+# Test 1559 got: "/object/@align;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1559)
+#      Expected: "/object/@align;attribute not defined;m" (<object align="middle" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1560
+# Test 1560 got: "/object/@align;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1560)
+#      Expected: "/object/@align;attribute not defined;m" (<object align="top" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1561
+# Test 1561 got: "/object/@align;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1561)
+#      Expected: "/object/@align;attribute not defined;m" (<object align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1562
+# Test 1562 got: "/object/@align;attribute not defined;m\n/object;attribute missing:data|type\n/object;no significant content;s" (t/ContentChecker.t at line 98 fail #1562)
+#      Expected: "/object/@align;attribute not defined;m" (<object align="right" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1563
 ok 1564
 ok 1565
@@ -1687,8 +1742,12 @@ ok 1568
 ok 1569
 ok 1570
 ok 1571
-ok 1572
-ok 1573
+not ok 1572
+# Test 1572 got: "/param/@type;attribute not defined;m\n/param/@type;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1572)
+#      Expected: "/param/@type;IMT:syntax error\n/param/@type;attribute not defined;m" (<param name="a" value="b" type="text" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1573
+# Test 1573 got: "/param/@type;attribute not defined;m\n/param/@type;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1573)
+#      Expected: "/param/@valuetype;attribute not defined;m" (<param name="a" value="b" type="text/html" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1574
 ok 1575
 ok 1576
@@ -1738,7 +1797,9 @@ ok 1619
 ok 1620
 ok 1621
 ok 1622
-ok 1623
+not ok 1623
+# Test 1623 got: "/map/@name;attribute not defined;m\n/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (t/ContentChecker.t at line 98 fail #1623)
+#      Expected: "/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1624
 ok 1625
 ok 1626
@@ -1750,12 +1811,8 @@ ok 1631
 ok 1632
 ok 1633
 ok 1634
-not ok 1635
-# Test 1635 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1635)
-#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1636
-# Test 1636 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1636)
-#      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1635
+ok 1636
 ok 1637
 ok 1638
 ok 1639
@@ -1829,8 +1886,12 @@ ok 1706
 ok 1707
 ok 1708
 ok 1709
-ok 1710
-ok 1711
+not ok 1710
+# Test 1710 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1710)
+#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1711
+# Test 1711 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 98 fail #1711)
+#      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1712
 ok 1713
 ok 1714
@@ -1983,17 +2044,12 @@ ok 1860
 ok 1861
 ok 1862
 ok 1863
-not ok 1864
-# Test 1864 got: "/select/@accesskey;char:syntax error;m\n/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1864)
-#      Expected: "/select/@accesskey;char:syntax error;m" (<select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1865
-# Test 1865 got: "/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1865)
-#      Expected: "" (<select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1864
+ok 1865
 ok 1866
 ok 1867
 ok 1868
 ok 1869
-# t/content-model-3.dat
 ok 1870
 ok 1871
 ok 1872
@@ -2004,9 +2060,7 @@ ok 1876
 ok 1877
 ok 1878
 ok 1879
-not ok 1880
-# Test 1880 got: "/a;element;unsupported" (t/ContentChecker.t at line 98 fail #1880)
-#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
+ok 1880
 ok 1881
 ok 1882
 ok 1883
@@ -2017,7 +2071,6 @@ ok 1887
 ok 1888
 ok 1889
 ok 1890
-# t/content-model-4.dat
 ok 1891
 ok 1892
 ok 1893
@@ -2065,7 +2118,6 @@ ok 1934
 ok 1935
 ok 1936
 ok 1937
-# t/content-model-5.dat
 ok 1938
 ok 1939
 ok 1940
@@ -2092,13 +2144,17 @@ ok 1960
 ok 1961
 ok 1962
 ok 1963
-ok 1964
-# t/table-1.dat
-ok 1965
+not ok 1964
+# Test 1964 got: "/select/@accesskey;char:syntax error;m\n/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1964)
+#      Expected: "/select/@accesskey;char:syntax error;m" (<select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1965
+# Test 1965 got: "/select;no significant content;s" (t/ContentChecker.t at line 98 fail #1965)
+#      Expected: "" (<select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1966
 ok 1967
 ok 1968
 ok 1969
+# t/content-model-3.dat
 ok 1970
 ok 1971
 ok 1972
@@ -2107,10 +2163,11 @@ ok 1974
 ok 1975
 ok 1976
 ok 1977
-# t/content-model-atom-1.dat
 ok 1978
 ok 1979
-ok 1980
+not ok 1980
+# Test 1980 got: "/a;element;unsupported" (t/ContentChecker.t at line 98 fail #1980)
+#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
 ok 1981
 ok 1982
 ok 1983
@@ -2121,6 +2178,7 @@ ok 1987
 ok 1988
 ok 1989
 ok 1990
+# t/content-model-4.dat
 ok 1991
 ok 1992
 ok 1993
@@ -2154,30 +2212,11 @@ ok 2020
 ok 2021
 ok 2022
 ok 2023
-not ok 2024
-# Test 2024 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #2024)
-#      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
-#<id>about:</id>
-#<author><name>x</name></author>
-#<link rel="alternate" href=""/>
-#<updated>2000-01-02T03:04:05Z</updated>
-#<title>x</title>
-#<content type="image/png"/>
-#</entry>)
-not ok 2025
-# Test 2025 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #2025)
-#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
-#<id>about:</id>
-#<author><name>x</name></author>
-#<link rel="alternate" href=""/>
-#<updated>2000-01-02T03:04:05Z</updated>
-#<title>x</title>
-#<content type="message/rfc822"/>
-#</entry>)
+ok 2024
+ok 2025
 ok 2026
 ok 2027
 ok 2028
-# t/content-model-atom-2.dat
 ok 2029
 ok 2030
 ok 2031
@@ -2187,6 +2226,7 @@ ok 2034
 ok 2035
 ok 2036
 ok 2037
+# t/content-model-5.dat
 ok 2038
 ok 2039
 ok 2040
@@ -2202,9 +2242,130 @@ ok 2049
 ok 2050
 ok 2051
 ok 2052
+ok 2053
+ok 2054
+ok 2055
+ok 2056
+ok 2057
+ok 2058
+ok 2059
+ok 2060
+ok 2061
+ok 2062
+ok 2063
+ok 2064
+# t/table-1.dat
+ok 2065
+ok 2066
+ok 2067
+ok 2068
+ok 2069
+ok 2070
+ok 2071
+ok 2072
+ok 2073
+ok 2074
+ok 2075
+ok 2076
+ok 2077
+# t/content-model-atom-1.dat
+ok 2078
+ok 2079
+ok 2080
+ok 2081
+ok 2082
+ok 2083
+ok 2084
+ok 2085
+ok 2086
+ok 2087
+ok 2088
+ok 2089
+ok 2090
+ok 2091
+ok 2092
+ok 2093
+ok 2094
+ok 2095
+ok 2096
+ok 2097
+ok 2098
+ok 2099
+ok 2100
+ok 2101
+ok 2102
+ok 2103
+ok 2104
+ok 2105
+ok 2106
+ok 2107
+ok 2108
+ok 2109
+ok 2110
+ok 2111
+ok 2112
+ok 2113
+ok 2114
+ok 2115
+ok 2116
+ok 2117
+ok 2118
+ok 2119
+ok 2120
+ok 2121
+ok 2122
+ok 2123
+not ok 2124
+# Test 2124 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #2124)
+#      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="image/png"/>
+#</entry>)
+not ok 2125
+# Test 2125 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 98 fail #2125)
+#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="message/rfc822"/>
+#</entry>)
+ok 2126
+ok 2127
+ok 2128
+# t/content-model-atom-2.dat
+ok 2129
+ok 2130
+ok 2131
+ok 2132
+ok 2133
+ok 2134
+ok 2135
+ok 2136
+ok 2137
+ok 2138
+ok 2139
+ok 2140
+ok 2141
+ok 2142
+ok 2143
+ok 2144
+ok 2145
+ok 2146
+ok 2147
+ok 2148
+ok 2149
+ok 2150
+ok 2151
+ok 2152
 # t/content-model-atom-threading-1.dat
-not ok 2053
-# Test 2053 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #2053)
+not ok 2153
+# Test 2153 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #2153)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2234,8 +2395,8 @@ not ok 2053
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 2054
-# Test 2054 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #2054)
+not ok 2154
+# Test 2154 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 98 fail #2154)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2261,17 +2422,17 @@ not ok 2054
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 2055
-ok 2056
-ok 2057
-ok 2058
-ok 2059
-ok 2060
-ok 2061
-ok 2062
-ok 2063
-ok 2064
-ok 2065
-ok 2066
-ok 2067
-ok 2068
+ok 2155
+ok 2156
+ok 2157
+ok 2158
+ok 2159
+ok 2160
+ok 2161
+ok 2162
+ok 2163
+ok 2164
+ok 2165
+ok 2166
+ok 2167
+ok 2168

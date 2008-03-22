@@ -1093,7 +1093,7 @@ id=""><span id="">x</span></p>
 <link href="http://test/" rel="author" target="_self"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@target;attribute;unsupported
+/link/@target;attribute not defined;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1112,6 +1112,22 @@ id=""><span id="">x</span></p>
 </head>
 #errors
 /head/link/@rel;link type:duplicate:pingback
+
+#data
+<link rel="alternate" href="" target="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+
+#data
+<link rel="alternate" href="" target="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+
+#data
+<link rel="alternate" href="" target="_blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+/link/@target;reserved browsing context name
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml">
@@ -3391,6 +3407,142 @@ id=""><span id="">x</span></p>
 /img/@src;URI::syntax error:iriref3987;m
 
 #data
+<img alt="" src="" longdesc="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@longdesc;attribute not defined;m
+
+#data
+<img alt="" src="" longdesc="http://www.example.com/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@longdesc;attribute not defined;m
+
+#data
+<img alt="" src="" longdesc="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@longdesc;attribute not defined;m
+/img/@longdesc;URI::syntax error:iriref3987;m
+
+#data
+<img alt="" src="" hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+
+#data
+<img alt="" src="" vspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+
+#data
+<img alt="" src="" hspace="120" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+
+#data
+<img alt="" src="" vspace="120" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+
+#data
+<img alt="" src="" hspace="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;nninteger:syntax error
+
+#data
+<img alt="" src="" vspace="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;nninteger:syntax error
+
+#data
+<img alt="" src="" hspace="10px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;nninteger:syntax error
+
+#data
+<img alt="" src="" vspace="10px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;nninteger:syntax error
+
+#data
+<img alt="" src="" hspace="0 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;nninteger:syntax error
+
+#data
+<img alt="" src="" vspace=" 0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;nninteger:syntax error
+/img/@vspace;attribute not defined;m
+
+#data
+<img alt="" src="" hspace="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;nninteger:syntax error
+
+#data
+<img alt="" src="" vspace="20%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;nninteger:syntax error
+
+#data
+<img alt="" src="" hspace="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;nninteger:syntax error
+
+#data
+<img alt="" src="" vspace="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;nninteger:syntax error
+
+#data
+<img alt="" src="" border="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;attribute not defined;m
+
+#data
+<img alt="" src="" border="4563" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;attribute not defined;m
+
+#data
+<img alt="" src="" border="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;attribute not defined;m
+/img/@border;nninteger:syntax error
+
+#data
+<img alt="" src="" border="10-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;attribute not defined;m
+/img/@border;nninteger:syntax error
+
+#data
+<img alt="" src="" border="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;attribute not defined;m
+/img/@border;nninteger:syntax error
+
+#data
+<img alt="" src="" border="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;attribute not defined;m
+/img/@border;nninteger:syntax error
+
+#data
+<img alt="" src="" noborder="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@noborder;attribute not defined;m
+
+#data
 <img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@ismap;attribute not allowed:ismap;m
@@ -3449,7 +3601,7 @@ id=""><span id="">x</span></p>
 <img alt="" src="http://test/" ismap="ismap"/>
 </div>
 #errors
-/div/img/@ismap;attribute not allowed
+/div/img/@ismap;attribute not allowed:ismap;m
 
 #data
 <a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
@@ -3574,6 +3726,55 @@ id=""><span id="">x</span></p>
 #errors
 /div/p/img/@usemap;no referenced map
 /div/p;no significant content;s
+
+#data
+<img alt="" src="" align="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid
+
+#data
+<img alt="" src="" align="char" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid
+
+#data
+<img alt="" src="" align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid
+
+#data
+<img alt="" src="" align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid
+
+#data
+<img alt="" src="" align="bottom" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data
+<img alt="" src="" align="middle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data
+<img alt="" src="" align="top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data
+<img alt="" src="" align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data
+<img alt="" src="" align="right" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
 
 #data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3759,6 +3960,206 @@ id=""><span id="">x</span></p>
 /div/object/@usemap;no referenced map
 
 #data
+<object data="" declare="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@declare;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object data="" declare="declare" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@declare;attribute not defined;m
+
+/object;no significant content;s
+#data
+<object data="" declare="yes" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@declare;attribute not defined;m
+/object/@declare;boolean:invalid
+/object;no significant content;s
+
+#data
+<object data="" declare="no" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@declare;attribute not defined;m
+/object/@declare;boolean:invalid
+/object;no significant content;s
+
+#data
+<object classid="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@classid;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object classid="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@classid;attribute not defined;m
+/object/@classid;URI::syntax error:iriref3987;m
+/object;no significant content;s
+
+#data
+<object codebase="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@codebase;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object codebase="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@codebase;attribute not defined;m
+/object/@codebase;URI::syntax error:iriref3987;m
+/object;no significant content;s
+
+#data
+<object archive="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@archive;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object archive="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@archive;attribute not defined;m
+/object/@archive;URIs::syntax error:iriref3987:0;m
+/object;no significant content;s
+
+#data
+<object archive="a,[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@archive;attribute not defined;m
+/object/@archive;URIs::syntax error:iriref3987:0;m
+/object;no significant content;s
+
+#data
+<object archives="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@archives;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object codetype="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@codetype;attribute not defined;m
+/object/@codetype;IMT:syntax error
+/object;no significant content;s
+
+#data
+<object codetype="text/html" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@codetype;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object standby="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@standby;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object standby="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@standby;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object border="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@border;attribute not defined;m
+
+#data
+<object border="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@border;attribute not defined;m
+/object/@border;nninteger:syntax error
+/object;no significant content;s
+
+#data
+<object hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@hspace;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object hspace="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@hspace;attribute not defined;m
+/object;no significant content;s
+/object/@hspace;nninteger:syntax error
+
+#data
+<object vspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@vspace;attribute not defined;m
+
+#data
+<object vspace="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@vspace;attribute not defined;m
+/object/@vspace;nninteger:syntax error
+
+#data
+<object align="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:invalid
+
+#data
+<object align="char" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:invalid
+
+#data
+<object align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:invalid
+
+#data
+<object align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:invalid
+
+#data
+<object align="bottom" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+
+#data
+<object align="middle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+
+#data
+<object align="top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+
+#data
+<object align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+
+#data
+<object align="right" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+
+#data
 <param xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /param;attribute missing:name
@@ -3783,9 +4184,36 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<param name="a" value="b" valuetype="data" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param/@valuetype;attribute not defined;m
+
+#data
+<param name="a" value="b" valuetype="ref" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param/@valuetype;attribute not defined;m
+
+#data
+<param name="a" value="b" valuetype="object" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param/@valuetype;attribute not defined;m
+
+#data
 <param name="a" value="b" valuetype="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/param/@valuetype;attribute;unsupported
+/param/@valuetype;attribute not defined;m
+/param/@valuetype;enumerated:invalid
+
+#data
+<param name="a" value="b" type="text" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param/@type;attribute not defined;m
+/param/@type;IMT:syntax error
+
+#data
+<param name="a" value="b" type="text/html" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param/@valuetype;attribute not defined;m
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4556,6 +4984,22 @@ id=""><span id="">x</span></p>
 /area/@ping;URIs::syntax error:iriref3987:2;m
 
 #data
+<area shape="default" nohref="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@nohref;attribute not defined;m
+
+#data
+<area shape="default" nohref="nohref" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@nohref;attribute not defined;m
+
+#data
+<area shape="default" nohref="http://example/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@nohref;attribute not defined;m
+/area/@nohref;boolean:invalid
+
+#data
 <table xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -4922,6 +5366,143 @@ id=""><span id="">x</span></p>
 <th bgcolor="blue" xmlns="http://www.w3.org/1999/xhtml">x</th>
 #errors
 /th/@bgcolor;attribute not defined;m
+
+#data
+<tbody align="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
+#errors
+/tbody/@align;attribute not defined;m
+/tbody/@align;enumerated:invalid
+
+#data
+<tbody align="left" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
+#errors
+/tbody/@align;attribute not defined;m
+
+#data
+<thead align="right" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
+#errors
+/thead/@align;attribute not defined;m
+
+#data
+<tfoot align="center" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
+#errors
+/tfoot/@align;attribute not defined;m
+
+#data
+<col align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@align;attribute not defined;m
+
+#data
+<colgroup align="char" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@align;attribute not defined;m
+
+#data
+<tr align="centre" xmlns="http://www.w3.org/1999/xhtml"><th>x</th></tr>
+#errors
+/tr/@align;attribute not defined;m
+/tr/@align;enumerated:invalid
+
+#data
+<th align="top" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@align;attribute not defined;m
+/th/@align;enumerated:invalid
+
+#data
+<td align="bottom" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@align;attribute not defined;m
+/td/@align;enumerated:invalid
+
+#data
+<tbody valign="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
+#errors
+/tbody/@valign;attribute not defined;m
+/tbody/@valign;enumerated:invalid
+
+#data
+<thead valign="top" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
+#errors
+/thead/@valign;attribute not defined;m
+
+#data
+<tfoot valign="middle" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
+#errors
+/tfoot/@valign;attribute not defined;m
+
+#data
+<tr valign="bottom" xmlns="http://www.w3.org/1999/xhtml"><td>x</td></tr>
+#errors
+/tr/@valign;attribute not defined;m
+
+#data
+<th valign="baseline" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@valign;attribute not defined;m
+
+#data
+<td valign="center" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@valign;attribute not defined;m
+/td/@valign;enumerated:invalid
+
+#data
+<col valign="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@valign;attribute not defined;m
+/col/@valign;enumerated:invalid
+
+#data
+<colgroup valign="text-bottom" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@valign;attribute not defined;m
+/colgroup/@valign;enumerated:invalid
+
+#data
+<tbody char="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
+#errors
+/tbody/@char;attribute not defined;m
+/tbody/@char;char:syntax error;m
+
+#data
+<thead char=" " xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
+#errors
+/thead/@char;attribute not defined;m
+
+#data
+<tfoot char="x" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
+#errors
+/tfoot/@char;attribute not defined;m
+
+#data
+<colgroup char="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@char;attribute not defined;m
+/colgroup/@char;char:syntax error;m
+
+#data
+<col char="&#x4e00;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@char;attribute not defined;m
+
+#data
+<tr char=" x" xmlns="http://www.w3.org/1999/xhtml"><td>x</td></tr>
+#errors
+/tr/@char;attribute not defined;m
+/tr/@char;char:syntax error;m
+
+#data
+<th char="." xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@char;attribute not defined;m
+
+#data
+<td char="char" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@char;attribute not defined;m
+/td/@char;char:syntax error;m
 
 #data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
