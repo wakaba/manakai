@@ -1237,7 +1237,7 @@ $Element->{$HTML_NS}->{link} = {
       ## TODO: HTML4 |charset|
       href => $HTMLURIAttrChecker,
       rel => sub { $HTMLLinkTypesAttrChecker->(0, $item, @_) },
-      ## TODO: HTML4 |rev|
+      rev => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
       media => $HTMLMQAttrChecker,
       hreflang => $HTMLLanguageTagAttrChecker,
       target => $HTMLTargetAttrChecker,
@@ -1301,17 +1301,8 @@ $Element->{$HTML_NS}->{meta} = {
           $charset_attr = $attr;
           $checker = 1;
         } elsif ($attr_ln eq 'scheme') {
+          ## NOTE: <http://suika.fam.cx/2007/html/standards#html-meta-scheme>
           $checker = sub {};
-          ## NOTE: According to HTML4, values for the |scheme| attribute
-          ## depend on |name| attribute and |profile| of |head|.  Otherwise
-          ## it is "cdata".  The only profile with any scheme value defined
-          ## is <http://dublincore.org/documents/dcq-html/> (and those
-          ## references that profile; see
-          ## <http://suika.fam.cx/gate/2005/sw/scheme#anchor-55> for more
-          ## information).
-          ## TODO: Should we implement the checking against the profile above?
-          ## (But we don't want to implement its namespace bits.  It is
-          ## suck and obsolete in favor of HTML5's new ecosystem.)
         } else {
           $checker = $HTMLAttrChecker->{$attr_ln}
               || $AttrChecker->{$attr_ns}->{$attr_ln}
@@ -2147,7 +2138,7 @@ $Element->{$HTML_NS}->{a} = {
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
                      rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
-          ## TODO: HTML4 |rev|
+          rev => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
           ## TODO: HTML4 |shape|
                      media => $HTMLMQAttrChecker,
           ## TODO: HTML4/XHTML1 |name|

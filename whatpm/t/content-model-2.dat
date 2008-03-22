@@ -1130,6 +1130,25 @@ id=""><span id="">x</span></p>
 /link/@target;reserved browsing context name
 
 #data
+<link href="" rev=" " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rev;attribute not defined;m
+/link;attribute missing:rel
+
+#data
+<link href="" rev="made" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rev;attribute not defined;m
+/link;attribute missing:rel
+
+#data
+<link href="" rev="made made" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rev;attribute not defined;m
+/link/@rev;duplicate token:made
+/link;attribute missing:rel
+
+#data
 <meta xmlns="http://www.w3.org/1999/xhtml">
   <!-- TODO: <meta> tests are not complete -->
 </meta>
@@ -2399,6 +2418,27 @@ id=""><span id="">x</span></p>
 #errors
 /a/@rel;attribute not allowed
 /a;no significant content;s
+
+#data
+<a rev="" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+
+#data
+<a rev="made" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+
+#data
+<a rev="  made" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+
+#data
+<a rev="made made" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+/a/@rev;duplicate token:made
 
 #data
 <a ping="a" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4982,6 +5022,11 @@ id=""><span id="">x</span></p>
 #errors
 /area/@ping;URIs::syntax error:iriref3987:1;m
 /area/@ping;URIs::syntax error:iriref3987:2;m
+
+#data
+<area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rev;attribute not defined;m
 
 #data
 <area shape="default" nohref="" xmlns="http://www.w3.org/1999/xhtml"/>
