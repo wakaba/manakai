@@ -138,14 +138,14 @@ my $HTMLMetadataContent = {
   q<http://www.w3.org/1999/02/22-rdf-syntax-ns#> => {RDF => 1},
 };
 
-my $HTMLProseContent = {
+my $HTMLFlowContent = {
   $HTML_NS => {
     section => 1, nav => 1, article => 1, blockquote => 1, aside => 1,
     h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, header => 1,
     footer => 1, address => 1, p => 1, hr => 1, dialog => 1, pre => 1,
     ol => 1, ul => 1, dl => 1, figure => 1, map => 1, table => 1,
-    details => 1, ## ISSUE: "Prose element" in spec.
-    datagrid => 1, ## ISSUE: "Prose element" in spec.
+    details => 1, ## ISSUE: "Flow element" in spec.
+    datagrid => 1, ## ISSUE: "Flow element" in spec.
     datatemplate => 1,
     div => 1, ## ISSUE: No category in spec.
     ## NOTE: |style| is only allowed if |scoped| attribute is specified.
@@ -165,7 +165,7 @@ my $HTMLProseContent = {
     
     ins => 1, del => 1,
 
-    ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, prose.
+    ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
     menu => 1,
 
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
@@ -198,7 +198,7 @@ my $HTMLHeadingContent = {
 };
 
 my $HTMLPhrasingContent = {
-  ## NOTE: All phrasing content is also prose content.
+  ## NOTE: All phrasing content is also flow content.
   $HTML_NS => {
     br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
@@ -213,7 +213,7 @@ my $HTMLPhrasingContent = {
     ## NOTE: Transparent.    
     ins => 1, del => 1,
 
-    ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, prose.
+    ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
     menu => 1,
 
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
@@ -896,8 +896,7 @@ my %HTMLTextChecker = (
   },
 );
 
-## TODO: Rename as "FlowContent" (HTML5 revision 1261)
-my %HTMLProseContentChecker = (
+my %HTMLFlowContentChecker = (
   %HTMLChecker,
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -911,16 +910,16 @@ my %HTMLProseContentChecker = (
     } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
       if ($element_state->{has_non_style} or
           not $child_el->has_attribute_ns (undef, 'scoped')) {
-        $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:prose style',
+        $self->{onerror}->(node => $child_el, ## TODO: type
+                           type => 'element not allowed:flow style',
                            level => $self->{must_level});
       }
-    } elsif ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
+    } elsif ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
       $element_state->{has_non_style} = 1 unless $child_is_transparent;
     } else {
       $element_state->{has_non_style} = 1;
-      $self->{onerror}->(node => $child_el,
-                         type => 'element not allowed:prose',
+      $self->{onerror}->(node => $child_el, ## TODO: type
+                         type => 'element not allowed:flow',
                          level => $self->{must_level})
     }
   },
@@ -963,13 +962,13 @@ my %HTMLPhrasingContentChecker = (
                          level => $self->{must_level});
     }
   },
-  check_end => $HTMLProseContentChecker{check_end},
+  check_end => $HTMLFlowContentChecker{check_end},
   ## NOTE: The definition for |li| assumes that the only differences
-  ## between prose and phrasing content checkers are |check_child_element|
+  ## between flow and phrasing content checkers are |check_child_element|
   ## and |check_child_text|.
 );
 
-my %HTMLTransparentChecker = %HTMLProseContentChecker;
+my %HTMLTransparentChecker = %HTMLFlowContentChecker;
 ## ISSUE: Significant content rule should be applied to transparent element
 ## with parent?
 
@@ -1601,7 +1600,7 @@ $Element->{$HTML_NS}->{style} = {
 ## ISSUE: Relationship to significant content check?
 
 $Element->{$HTML_NS}->{body} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     alink => $HTMLColorAttrChecker,
@@ -1632,22 +1631,22 @@ $Element->{$HTML_NS}->{body} = {
 
 $Element->{$HTML_NS}->{section} = {
   status => FEATURE_HTML5_DEFAULT,
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
 };
 
 $Element->{$HTML_NS}->{nav} = {
   status => FEATURE_HTML5_DEFAULT,
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
 };
 
 $Element->{$HTML_NS}->{article} = {
   status => FEATURE_HTML5_DEFAULT,
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
 };
 
 $Element->{$HTML_NS}->{blockquote} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
   }, {
@@ -1667,7 +1666,7 @@ $Element->{$HTML_NS}->{blockquote} = {
 
 $Element->{$HTML_NS}->{aside} = {
   status => FEATURE_HTML5_DEFAULT,
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
 };
 
 $Element->{$HTML_NS}->{h1} = {
@@ -1704,7 +1703,7 @@ $Element->{$HTML_NS}->{h6} = {%{$Element->{$HTML_NS}->{h1}}};
 
 $Element->{$HTML_NS}->{header} = {
   status => FEATURE_HTML5_DEFAULT,
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
@@ -1722,14 +1721,14 @@ $Element->{$HTML_NS}->{header} = {
     }
     $self->{flag}->{has_hn} ||= $element_state->{has_hn_original};
 
-    $HTMLProseContentChecker{check_end}->(@_);
+    $HTMLFlowContentChecker{check_end}->(@_);
   },
   ## ISSUE: <header><del><h1>...</h1></del></header> is conforming?
 };
 
 $Element->{$HTML_NS}->{footer} = {
   status => FEATURE_HTML5_DEFAULT,
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
@@ -1741,12 +1740,12 @@ $Element->{$HTML_NS}->{footer} = {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
 
-    $HTMLProseContentChecker{check_end}->(@_);
+    $HTMLFlowContentChecker{check_end}->(@_);
   },
 };
 
 $Element->{$HTML_NS}->{address} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
@@ -1766,7 +1765,7 @@ $Element->{$HTML_NS}->{address} = {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
 
-    $HTMLProseContentChecker{check_end}->(@_);
+    $HTMLFlowContentChecker{check_end}->(@_);
   },
 };
 
@@ -1973,7 +1972,7 @@ $Element->{$HTML_NS}->{dir} = {
 };
 
 $Element->{$HTML_NS}->{li} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     ## TODO: HTML4 |type|
@@ -2009,7 +2008,7 @@ $Element->{$HTML_NS}->{li} = {
     if ($self->{flag}->{in_menu}) {
       $HTMLPhrasingContentChecker{check_child_element}->(@_);
     } else {
-      $HTMLProseContentChecker{check_child_element}->(@_);
+      $HTMLFlowContentChecker{check_child_element}->(@_);
     }
   },
   check_child_text => sub {
@@ -2017,7 +2016,7 @@ $Element->{$HTML_NS}->{li} = {
     if ($self->{flag}->{in_menu}) {
       $HTMLPhrasingContentChecker{check_child_text}->(@_);
     } else {
-      $HTMLProseContentChecker{check_child_text}->(@_);
+      $HTMLFlowContentChecker{check_child_text}->(@_);
     }
   },
 };
@@ -2108,7 +2107,7 @@ $Element->{$HTML_NS}->{dt} = {
 };
 
 $Element->{$HTML_NS}->{dd} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
@@ -2391,7 +2390,7 @@ $Element->{$HTML_NS}->{time} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    datetime => FEATURE_HTML5_DEFAULT,
+    datetime => FEATURE_HTML5_FD,
   }),
   ## TODO: Write tests
   check_end => sub {
@@ -2720,7 +2719,7 @@ $Element->{$HTML_NS}->{ins} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     cite => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    datetime => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    datetime => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
   check_start => sub {
@@ -2740,7 +2739,7 @@ $Element->{$HTML_NS}->{del} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     cite => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    datetime => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    datetime => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
   check_end => sub {
@@ -2763,9 +2762,9 @@ $Element->{$HTML_NS}->{del} = {
 };
 
 $Element->{$HTML_NS}->{figure} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_FD,
-  ## NOTE: legend, Prose | Prose, legend?
+  ## NOTE: legend, Flow | Flow, legend?
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -2793,7 +2792,7 @@ $Element->{$HTML_NS}->{figure} = {
       }
       delete $element_state->{has_non_legend};
     } else {
-      $HTMLProseContentChecker{check_child_element}->(@_);
+      $HTMLFlowContentChecker{check_child_element}->(@_);
       $element_state->{has_non_legend} = 1 unless $child_is_transparent;
     }
   },
@@ -2816,7 +2815,7 @@ $Element->{$HTML_NS}->{figure} = {
       }
     }
 
-    $HTMLProseContentChecker{check_end}->(@_);
+    $HTMLFlowContentChecker{check_end}->(@_);
 ## ISSUE: |<figure><legend>aa</legend></figure>| should be an error?
   },
 };
@@ -3044,7 +3043,7 @@ $Element->{$HTML_NS}->{object} = {
     ## TODO: archive
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
-  ## NOTE: param*, transparent (Prose)
+  ## NOTE: param*, transparent (Flow)
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -3057,12 +3056,12 @@ $Element->{$HTML_NS}->{object} = {
       #
     } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'param') {
       if ($element_state->{has_non_param}) {
-        $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:prose',
+        $self->{onerror}->(node => $child_el, ## TODO: type
+                           type => 'element not allowed:flow',
                            level => $self->{must_level});
       }
     } else {
-      $HTMLProseContentChecker{check_child_element}->(@_);
+      $HTMLFlowContentChecker{check_child_element}->(@_);
       $element_state->{has_non_param} = 1;
     }
   },
@@ -3169,14 +3168,14 @@ $Element->{$HTML_NS}->{video} = {
       #
     } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'source') {
       unless ($element_state->{allow_source}) {
-        $self->{onerror}->(node => $child_el,
-                         type => 'element not allowed:prose',
+        $self->{onerror}->(node => $child_el, ## TODO: type
+                         type => 'element not allowed:flow',
                          level => $self->{must_level});
       }
       $element_state->{has_source} = 1;
     } else {
       delete $element_state->{allow_source};
-      $HTMLProseContentChecker{check_child_element}->(@_);
+      $HTMLFlowContentChecker{check_child_element}->(@_);
     }
   },
   check_child_text => sub {
@@ -3184,7 +3183,7 @@ $Element->{$HTML_NS}->{video} = {
     if ($has_significant) {
       delete $element_state->{allow_source};
     }
-    $HTMLProseContentChecker{check_child_text}->(@_);
+    $HTMLFlowContentChecker{check_child_text}->(@_);
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3259,7 +3258,7 @@ $Element->{$HTML_NS}->{canvas} = {
 };
 
 $Element->{$HTML_NS}->{map} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
@@ -3317,7 +3316,7 @@ $Element->{$HTML_NS}->{map} = {
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     delete $self->{flag}->{in_map} unless $element_state->{in_map_original};
-    $HTMLProseContentChecker{check_end}->(@_);
+    $HTMLFlowContentChecker{check_end}->(@_);
   },
 };
 
@@ -3858,7 +3857,7 @@ $Element->{$HTML_NS}->{tr} = {
 };
 
 $Element->{$HTML_NS}->{td} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
@@ -3934,7 +3933,7 @@ my $AttrCheckerNotImplemented = sub {
 };
 
 $Element->{$HTML_NS}->{form} = {
-  %HTMLProseContentChecker, ## NOTE: Flow* [WF2]
+  %HTMLFlowContentChecker, ## NOTE: Flow* [WF2]
     ## TODO: form in form is allowed in XML [WF2]
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3983,7 +3982,7 @@ $Element->{$HTML_NS}->{form} = {
 };
 
 $Element->{$HTML_NS}->{fieldset} = {
-  %HTMLProseContentChecker, ## NOTE: legend, %Flow; ## TODO: legend
+  %HTMLFlowContentChecker, ## NOTE: legend, %Flow; ## TODO: legend
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -4106,7 +4105,7 @@ $Element->{$HTML_NS}->{input} = {
 ## TODO: Form |name| attributes: MUST NOT conflict with RFC 3106 [WF2]
 
 $Element->{$HTML_NS}->{button} = {
-  %HTMLProseContentChecker, ## NOTE: %Flow; - something [XHTML10]
+  %HTMLFlowContentChecker, ## NOTE: %Flow; - something [XHTML10]
     ## TODO: -A|%formctrl;|form|fieldset [HTML4]
     ## TODO: image map (img) in |button| is "illegal" [HTML4].
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
@@ -4184,7 +4183,7 @@ $Element->{$HTML_NS}->{label} = {
 };
 
 $Element->{$HTML_NS}->{select} = {
-  %HTMLProseContentChecker, ## TODO: (optgroup|option)* [HTML4] + [WF2] ## TODO: SHOULD avoid empty and visible [WF2]
+  %HTMLFlowContentChecker, ## TODO: (optgroup|option)* [HTML4] + [WF2] ## TODO: SHOULD avoid empty and visible [WF2]
     ## TODO: author should SELECTED at least one OPTION in non-MULTIPLE case [HTML4].
     ## TODO: more than one OPTION with SELECTED in non-MULTIPLE case is "error" [HTML4]
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
@@ -4235,7 +4234,7 @@ $Element->{$HTML_NS}->{select} = {
 };
 
 $Element->{$HTML_NS}->{datalist} = {
-  %HTMLProseContentChecker, ## TODO: (transparent | option)*
+  %HTMLFlowContentChecker, ## TODO: (transparent | option)*
     ## TODO: |option| child MUST be empty [WF2]
   status => FEATURE_WF2,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4254,7 +4253,7 @@ $Element->{$HTML_NS}->{datalist} = {
 };
 
 $Element->{$HTML_NS}->{optgroup} = {
-  %HTMLProseContentChecker, ## TODO: (option|optgroup)* [HTML4] + [WF2] SHOULD avoid empty and visible [WF2]
+  %HTMLFlowContentChecker, ## TODO: (option|optgroup)* [HTML4] + [WF2] SHOULD avoid empty and visible [WF2]
   status => FEATURE_WF2 | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -4592,7 +4591,7 @@ $Element->{$HTML_NS}->{'event-source'} = {
 };
 
 $Element->{$HTML_NS}->{details} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD,
   check_attrs => $GetHTMLAttrsChecker->({
     open => $GetHTMLBooleanAttrChecker->('open'),
@@ -4600,7 +4599,7 @@ $Element->{$HTML_NS}->{details} = {
     %HTMLAttrStatus,
     open => FEATURE_HTML5_WD,
   }),
-  ## NOTE: legend, Prose
+  ## NOTE: legend, Flow
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -4620,7 +4619,7 @@ $Element->{$HTML_NS}->{details} = {
       $element_state->{has_legend} = 1;
       $element_state->{has_non_legend} = 1;
     } else {
-      $HTMLProseContentChecker{check_child_element}->(@_);
+      $HTMLFlowContentChecker{check_child_element}->(@_);
       $element_state->{has_non_legend} = 1 unless $child_is_transparent;
       ## ISSUE: |<details><object><legend>xx</legend></object>..</details>|
       ## is conforming?
@@ -4641,13 +4640,13 @@ $Element->{$HTML_NS}->{details} = {
                          level => $self->{must_level});
     }
 
-    $HTMLProseContentChecker{check_end}->(@_);
+    $HTMLFlowContentChecker{check_end}->(@_);
     ## ISSUE: |<details><legend>aa</legend></details>| error?
   },
 };
 
 $Element->{$HTML_NS}->{datagrid} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -4664,7 +4663,7 @@ $Element->{$HTML_NS}->{datagrid} = {
                                 {$HTML_NS => {a => 1, datagrid => 1}});
     $element_state->{phase} = 'any';
   },
-  ## Prose -(text* table Prose*) | table | select | datalist | Empty
+  ## Flow -(text* table Flow*) | table | select | datalist | Empty
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -4674,8 +4673,8 @@ $Element->{$HTML_NS}->{datagrid} = {
                          level => $self->{must_level});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($element_state->{phase} eq 'prose') {
-      if ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
+    } elsif ($element_state->{phase} eq 'flow') {
+      if ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
         if (not $element_state->{has_element} and 
             $child_nsuri eq $HTML_NS and
             $child_ln eq 'table') {
@@ -4693,9 +4692,9 @@ $Element->{$HTML_NS}->{datagrid} = {
       if ($child_nsuri eq $HTML_NS and
           {table => 1, select => 1, datalist => 1}->{$child_ln}) {
         $element_state->{phase} = 'none';
-      } elsif ($HTMLProseContent->{$child_nsuri}->{$child_ln}) {
+      } elsif ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
         $element_state->{has_element} = 1;
-        $element_state->{phase} = 'prose';
+        $element_state->{phase} = 'flow';
         ## TODO: transparent?
       } else {
         $self->{onerror}->(node => $child_el,
@@ -4711,10 +4710,10 @@ $Element->{$HTML_NS}->{datagrid} = {
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
-      if ($element_state->{phase} eq 'prose') {
+      if ($element_state->{phase} eq 'flow') {
         #
       } elsif ($element_state->{phase} eq 'any') {
-        $element_state->{phase} = 'prose';
+        $element_state->{phase} = 'flow';
       } else {
         $self->{onerror}->(node => $child_node,
                            type => 'character not allowed');
@@ -4733,7 +4732,7 @@ $Element->{$HTML_NS}->{datagrid} = {
   },
     ## ISSUE: "xxx<table/>" is disallowed; "<select/>aaa" and "<datalist/>aa"
     ## are not disallowed (assuming that form control contents are also
-    ## prose content).
+    ## flow content).
 };
 
 $Element->{$HTML_NS}->{command} = {
@@ -4967,7 +4966,7 @@ $Element->{$HTML_NS}->{legend} = {
 };
 
 $Element->{$HTML_NS}->{div} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $GetHTMLEnumeratedAttrChecker->({
@@ -4990,7 +4989,7 @@ $Element->{$HTML_NS}->{div} = {
 };
 
 $Element->{$HTML_NS}->{center} = {
-  %HTMLProseContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_M12N10_REC_DEPRECATED,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,

@@ -1,7 +1,7 @@
 1..1502
 # Running under perl version 5.008007 for linux
-# Current time local: Fri Mar 28 23:15:13 2008
-# Current time GMT:   Fri Mar 28 14:15:13 2008
+# Current time local: Sat Mar 29 00:13:08 2008
+# Current time GMT:   Fri Mar 28 15:13:08 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -691,17 +691,17 @@ ok 655
 ok 656
 ok 657
 not ok 658
-# Test 658 got: "/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #658)
+# Test 658 got: "/fieldset/legend;element not allowed:flow;m" (t/ContentChecker.t at line 98 fail #658)
 #     Expected: "" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend>XXX</legend>
 #</fieldset>)
 not ok 659
-# Test 659 got: "/fieldset/legend/p;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #659)
+# Test 659 got: "/fieldset/legend/p;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:flow;m" (t/ContentChecker.t at line 98 fail #659)
 #     Expected: "/fieldset/legend/p;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend><p>XXX</p></legend>
 #</fieldset>)
 not ok 660
-# Test 660 got: "/fieldset/legend/blockquote;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:prose;m" (t/ContentChecker.t at line 98 fail #660)
+# Test 660 got: "/fieldset/legend/blockquote;element not allowed:phrasing;m\n/fieldset/legend;element not allowed:flow;m" (t/ContentChecker.t at line 98 fail #660)
 #     Expected: "/fieldset/legend/blockquote;element not allowed:phrasing;m" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend><blockquote><p>XXX</p></blockquote></legend>
 #</fieldset>)
@@ -1249,8 +1249,8 @@ ok 1155
 ok 1156
 ok 1157
 not ok 1158
-# Test 1158 got: "/section/style/@scope;attribute not defined;m\n/section/style;SUBDOC\n/section/style;element not allowed:prose style;m\n/section;no significant content;s" (t/ContentChecker.t at line 98 fail #1158)
-#      Expected: "/section/style/@scope;attribute;unsupported\n/section/style;SUBDOC\n/section/style;element not allowed:prose style;m\n/section;no significant content;s" (<section xmlns="http://www.w3.org/1999/xhtml">
+# Test 1158 got: "/section/style/@scope;attribute not defined;m\n/section/style;SUBDOC\n/section/style;element not allowed:flow style;m\n/section;no significant content;s" (t/ContentChecker.t at line 98 fail #1158)
+#      Expected: "/section/style/@scope;attribute;unsupported\n/section/style;SUBDOC\n/section/style;element not allowed:flow style;m\n/section;no significant content;s" (<section xmlns="http://www.w3.org/1999/xhtml">
 #<style scope=""/>
 #</section>)
 #      Line 1 is changed:

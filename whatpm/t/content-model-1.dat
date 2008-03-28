@@ -938,7 +938,7 @@ para
 para
 </body>
 #errors
-/body/style;element not allowed:prose style;m
+/body/style;element not allowed:flow style;m
 /body/style;SUBDOC
 
 #data
@@ -948,7 +948,7 @@ para1
 para2
 </body>
 #errors
-/body/style;element not allowed:prose style;m
+/body/style;element not allowed:flow style;m
 /body/style;SUBDOC
 
 #data
@@ -975,7 +975,7 @@ para
 para
 </body>
 #errors
-/body/style;element not allowed:prose style;m
+/body/style;element not allowed:flow style;m
 /body/style;SUBDOC
 
 #data
@@ -991,7 +991,7 @@ para
 <title>x</title>
 </body>
 #errors
-/body/title;element not allowed:prose;m
+/body/title;element not allowed:flow;m
 /body/style;SUBDOC
 
 #data
@@ -1000,7 +1000,7 @@ para
 <unknown/>
 </body>
 #errors
-/body/unknown;element not allowed:prose;m
+/body/unknown;element not allowed:flow;m
 /body/unknown;element not defined;m
 /body/style;SUBDOC
 /body;no significant content;s
@@ -1012,7 +1012,7 @@ para
 </body>
 #errors
 /body/unknown;element not defined;m
-/body/unknown;element not allowed:prose;m
+/body/unknown;element not allowed:flow;m
 /body/style;SUBDOC
 
 #data
@@ -1021,7 +1021,7 @@ para
 <x:unknown xmlns:x="about:"/>
 </body>
 #errors
-/body/unknown;element not allowed:prose;m
+/body/unknown;element not allowed:flow;m
 /body/unknown;element;unsupported
 /body/style;SUBDOC
 /body;no significant content;s
@@ -1150,7 +1150,7 @@ para
 <style type="text/css" scoped=""/>
 </section>
 #errors
-/section/style;element not allowed:prose style;m
+/section/style;element not allowed:flow style;m
 /section/style;SUBDOC
 /section;no significant content;s
 /section/p;no significant content;s
@@ -1171,7 +1171,7 @@ para
 <style type="text/css" scoped=""/>
 </section>
 #errors
-/section/style;element not allowed:prose style;m
+/section/style;element not allowed:flow style;m
 /section/style;SUBDOC
 /section;no significant content;s
 /section/b;no significant content;s
@@ -1187,7 +1187,7 @@ para
 </section>
 #errors
 /section/style;SUBDOC
-/section/style;element not allowed:prose style;m
+/section/style;element not allowed:flow style;m
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -3752,7 +3752,7 @@ end.</code></pre>
  explains everything neatly.</p>
 </article>
 #errors
-/article/style;element not allowed:prose style;m
+/article/style;element not allowed:flow style;m
 /article/style;SUBDOC
 
 #data
@@ -4045,7 +4045,7 @@ zzz
 <param name="a" value="y"/>
 </object>
 #errors
-/object/param;element not allowed:prose;m
+/object/param;element not allowed:flow;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml" data="">
@@ -4053,7 +4053,7 @@ aaa
 <param name="x" value="y"/>
 </object>
 #errors
-/object/param;element not allowed:prose;m
+/object/param;element not allowed:flow;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml" data="">
@@ -4061,7 +4061,7 @@ aaa
 <param name="x" value="y"/>
 </object>
 #errors
-/object/param;element not allowed:prose;m
+/object/param;element not allowed:flow;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml" data="">
@@ -4098,7 +4098,7 @@ aaa
 </object>
 #errors
 /object/style;SUBDOC
-/object/param;element not allowed:prose;m
+/object/param;element not allowed:flow;m
 /object;no significant content;s
 
 #data
@@ -4109,7 +4109,7 @@ aaa
 #errors
 /object/style;SUBDOC
 /object;no significant content;s
-/object/param;element not allowed:prose;m
+/object/param;element not allowed:flow;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml" data="">
@@ -4119,7 +4119,7 @@ aaa
 </object>
 #errors
 /object/style;SUBDOC
-/object/style;element not allowed:prose style;m
+/object/style;element not allowed:flow style;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml" data="">
@@ -4129,7 +4129,7 @@ aaa
 #errors
 /object/style;SUBDOC
 /object;no significant content;s
-/object/style;element not allowed:prose style;m
+/object/style;element not allowed:flow style;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -4178,7 +4178,7 @@ xxxx
 </object>
 </div>
 #errors
-/div/object/param;element not allowed:prose;m
+/div/object/param;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4329,27 +4329,27 @@ xxxx
 #data
 <video xmlns="http://www.w3.org/1999/xhtml">x<source src=""/></video>
 #errors
-/video/source;element not allowed:prose;m
+/video/source;element not allowed:flow;m
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><source src=""/></video>
 #errors
-/video/source;element not allowed:prose;m
+/video/source;element not allowed:flow;m
 /video/style;SUBDOC
 /video;no significant content;s
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/></video>
 #errors
-/video/source;element not allowed:prose;m
+/video/source;element not allowed:flow;m
 /video/style;SUBDOC
 /video;no significant content;s
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/><source src=""/></video>
 #errors
-/video/source;element not allowed:prose;m
-/video/source;element not allowed:prose;m
+/video/source;element not allowed:flow;m
+/video/source;element not allowed:flow;m
 /video/style;SUBDOC
 /video;no significant content;s
 
@@ -4433,28 +4433,28 @@ xxxx
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><video>x<source src=""/></video></div>
 #errors
-/div/video/source;element not allowed:prose;m
+/div/video/source;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <video><style scoped=""/><source src=""/></video></div>
 #errors
-/div/video/source;element not allowed:prose;m
+/div/video/source;element not allowed:flow;m
 /div/video/style;SUBDOC
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <video><source src=""/><style scoped=""/><source src=""/></video></div>
 #errors
-/div/video/source;element not allowed:prose;m
+/div/video/source;element not allowed:flow;m
 /div/video/style;SUBDOC
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <video><source src=""/><style scoped=""/><source src=""/><source src=""/></video></div>
 #errors
-/div/video/source;element not allowed:prose;m
-/div/video/source;element not allowed:prose;m
+/div/video/source;element not allowed:flow;m
+/div/video/source;element not allowed:flow;m
 /div/video/style;SUBDOC
 
 #data
@@ -4653,27 +4653,27 @@ xxxx
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml">x<source src=""/></audio>
 #errors
-/audio/source;element not allowed:prose;m
+/audio/source;element not allowed:flow;m
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><source src=""/></audio>
 #errors
-/audio/source;element not allowed:prose;m
+/audio/source;element not allowed:flow;m
 /audio/style;SUBDOC
 /audio;no significant content;s
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/></audio>
 #errors
-/audio/source;element not allowed:prose;m
+/audio/source;element not allowed:flow;m
 /audio/style;SUBDOC
 /audio;no significant content;s
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/><source src=""/></audio>
 #errors
-/audio/source;element not allowed:prose;m
-/audio/source;element not allowed:prose;m
+/audio/source;element not allowed:flow;m
+/audio/source;element not allowed:flow;m
 /audio/style;SUBDOC
 /audio;no significant content;s
 
@@ -4757,28 +4757,28 @@ xxxx
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><audio>x<source src=""/></audio></div>
 #errors
-/div/audio/source;element not allowed:prose;m
+/div/audio/source;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <audio><style scoped=""/><source src=""/></audio></div>
 #errors
-/div/audio/source;element not allowed:prose;m
+/div/audio/source;element not allowed:flow;m
 /div/audio/style;SUBDOC
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <audio><source src=""/><style scoped=""/><source src=""/></audio></div>
 #errors
-/div/audio/source;element not allowed:prose;m
+/div/audio/source;element not allowed:flow;m
 /div/audio/style;SUBDOC
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <audio><source src=""/><style scoped=""/><source src=""/><source src=""/></audio></div>
 #errors
-/div/audio/source;element not allowed:prose;m
-/div/audio/source;element not allowed:prose;m
+/div/audio/source;element not allowed:flow;m
+/div/audio/source;element not allowed:flow;m
 /div/audio/style;SUBDOC
 
 #data
@@ -5309,7 +5309,7 @@ xxxx
 #errors
 /noscript;in XML:noscript
 /noscript;no significant content;s
-/noscript/meta;element not allowed:prose;m
+/noscript/meta;element not allowed:flow;m
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -5318,7 +5318,7 @@ xxxx
 #errors
 /noscript;no significant content;s
 /noscript;in XML:noscript
-/noscript/title;element not allowed:prose;m
+/noscript/title;element not allowed:flow;m
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -5327,7 +5327,7 @@ xxxx
 #errors
 /noscript;no significant content;s
 /noscript;in XML:noscript
-/noscript/link;element not allowed:prose;m
+/noscript/link;element not allowed:flow;m
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -5336,7 +5336,7 @@ xxxx
 #errors
 /noscript;no significant content;s
 /noscript;in XML:noscript
-/noscript/style;element not allowed:prose style;m
+/noscript/style;element not allowed:flow style;m
 /noscript/style;SUBDOC
 
 #data
@@ -5355,7 +5355,7 @@ xxxx
 #errors
 /noscript;no significant content;s
 /noscript;in XML:noscript
-/noscript/meta;element not allowed:prose;m
+/noscript/meta;element not allowed:flow;m
 /noscript/meta;element not allowed:meta charset;m
 /noscript/meta;in XML:charset;m
 /noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
@@ -5367,7 +5367,7 @@ xxxx
 #errors
 /noscript;no significant content;s
 /noscript;in XML:noscript
-/noscript/meta;element not allowed:prose;m
+/noscript/meta;element not allowed:flow;m
 /noscript/meta;element not allowed:meta charset;m
 /noscript/meta;in XML:charset;m
 /noscript/meta/@content;mismatched charset name::us-ascii;unsupported
@@ -5569,7 +5569,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><rule/></body>
 #errors
-/body/rule;element not allowed:prose;m
+/body/rule;element not allowed:flow;m
 /body;no significant content;s
 
 #data
@@ -5619,7 +5619,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><nest/></div>
 #errors
-/div/nest;element not allowed:prose;m
+/div/nest;element not allowed:flow;m
 /div;no significant content;s
 
 #data
@@ -5695,7 +5695,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <section><p/><style scoped=""/><nest/></section>
 </rule>
 #errors
-/rule/section/style;element not allowed:prose style;m
+/rule/section/style;element not allowed:flow style;m
 /rule/section/style;SUBDOC
 /rule/section;no significant content;s
 /rule/section/p;no significant content;s
@@ -5904,7 +5904,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <aside><nest/>aa<style scoped=""/></aside>
 </rule>
 #errors
-/rule/aside/style;element not allowed:prose style;m
+/rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
 
 #data
@@ -5912,7 +5912,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <aside><nest/><i/><style scoped=""/></aside>
 </rule>
 #errors
-/rule/aside/style;element not allowed:prose style;m
+/rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/i;no significant content;s
@@ -5922,7 +5922,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <aside><nest/><p/><style scoped=""/></aside>
 </rule>
 #errors
-/rule/aside/style;element not allowed:prose style;m
+/rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
@@ -5962,7 +5962,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <aside>aa<nest/><style scoped=""/></aside>
 </rule>
 #errors
-/rule/aside/style;element not allowed:prose style;m
+/rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
 
 #data
@@ -5970,7 +5970,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <aside><i/><nest/><style scoped=""/></aside>
 </rule>
 #errors
-/rule/aside/style;element not allowed:prose style;m
+/rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/i;no significant content;s
@@ -5980,7 +5980,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <aside><blockquote/><nest/><style scoped=""/></aside>
 </rule>
 #errors
-/rule/aside/style;element not allowed:prose style;m
+/rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
 /rule/aside/blockquote;no significant content;s
 /rule/aside;no significant content;s
@@ -5990,7 +5990,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <aside><p/><nest/><style scoped=""/></aside>
 </rule>
 #errors
-/rule/aside/style;element not allowed:prose style;m
+/rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
@@ -6715,7 +6715,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </div>
 #errors
 /div/datatemplate/nest;element not allowed:datatemplate
-/div/nest;element not allowed:prose;m
+/div/nest;element not allowed:flow;m
 /div;no significant content;s
 
 #data
@@ -6752,7 +6752,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <div xmlns="http://www.w3.org/1999/xhtml"><center>x</center></div>
 #errors
 /div/center;element not defined;m
-/div/center;element not allowed:prose;m
+/div/center;element not allowed:flow;m
 
 #data
 <b xmlns="http://www.w3.org/1999/xhtml"><center>x</center></b>
@@ -6774,7 +6774,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <div xmlns="http://www.w3.org/1999/xhtml"><basefont/></div>
 #errors
 /div/basefont;element not defined;m
-/div/basefont;element not allowed:prose;m
+/div/basefont;element not allowed:flow;m
 /div;no significant content;s
 
 #data
@@ -6819,7 +6819,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /div;no significant content;s
 /div/dir;element not defined;m
-/div/dir;element not allowed:prose;m
+/div/dir;element not allowed:flow;m
 /div/dir/li;no significant content;s
 
 #data
