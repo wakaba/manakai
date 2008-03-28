@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Mar 22 21:22:44 2008
-# Current time GMT:   Sat Mar 22 12:22:44 2008
+# Current time local: Fri Mar 28 23:14:27 2008
+# Current time GMT:   Fri Mar 28 14:14:27 2008
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -252,9 +252,21 @@ not ok 222
 #     Line 8 is missing:
 #      - "          qq'ParseError',\n"
 ok 223
-ok 224
-ok 225
-ok 226
+not ok 224
+# Test 224 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc\\x{80}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 176 fail #224)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc\\x{80}'\n          ]\n        ];\n" (U+0080 in lookahead region: qq'<!doc\x{80}')
+#     Line 3 is missing:
+#      - "          qq'ParseError',\n"
+not ok 225
+# Test 225 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc\\x{FDD1}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 176 fail #225)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc\\x{FDD1}'\n          ]\n        ];\n" (U+FDD1 in lookahead region: qq'<!doc\x{FDD1}')
+#     Line 3 is missing:
+#      - "          qq'ParseError',\n"
+not ok 226
+# Test 226 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc\\x{1FFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 176 fail #226)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc\\x{1FFFF}'\n          ]\n        ];\n" (U+1FFFF in lookahead region: qq'<!doc\x{1FFFF}')
+#     Line 3 is missing:
+#      - "          qq'ParseError',\n"
 ok 227
 ok 228
 ok 229
@@ -265,10 +277,10 @@ ok 233
 ok 234
 ok 235
 ok 236
-# t/tokenizer/contentModelFlags.test
 ok 237
 ok 238
 ok 239
+# t/tokenizer/contentModelFlags.test
 ok 240
 ok 241
 ok 242
@@ -279,20 +291,20 @@ ok 246
 ok 247
 ok 248
 ok 249
-# t/tokenizer/escapeFlag.test
 ok 250
 ok 251
 ok 252
+# t/tokenizer/escapeFlag.test
 ok 253
 ok 254
 ok 255
 ok 256
-# t/tokenizer-test-1.test
 ok 257
 ok 258
 ok 259
 ok 260
 ok 261
+# t/tokenizer-test-1.test
 ok 262
 ok 263
 ok 264
@@ -504,3 +516,8 @@ ok 469
 ok 470
 ok 471
 ok 472
+ok 473
+ok 474
+ok 475
+ok 476
+ok 477
