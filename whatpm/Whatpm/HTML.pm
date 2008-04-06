@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.119 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.120 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3384,6 +3384,8 @@ sub _tree_construction_initial ($) {
       
       my $doctype = $self->{document}->create_document_type_definition
         ($token->{name}); ## ISSUE: If name is missing (e.g. <!DOCTYPE>)?
+      ## NOTE: Default value for both |public_id| and |system_id| attributes
+      ## are empty strings, so that we don't set any value in missing cases.
       $doctype->public_id ($token->{public_identifier})
           if defined $token->{public_identifier};
       $doctype->system_id ($token->{system_identifier})
@@ -4057,7 +4059,9 @@ sub _tree_construction_main ($) {
       }
       if (not $self->{open_elements}->[-1]->[0] eq $formatting_element->[0]) {
         
-        $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1],
+        $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                        value => $self->{open_elements}->[-1]->[0]
+                            ->manakai_local_name,
                         token => $end_tag_token);
       }
       
@@ -5127,7 +5131,8 @@ sub _tree_construction_main ($) {
 
                     ## Close the cell
                     unshift @{$self->{token}}, $token; # <?>
-                    $token = {type => END_TAG_TOKEN, tag_name => $node->[1],
+                    $token = {type => END_TAG_TOKEN,
+                              tag_name => $node->[0]->manakai_local_name,
                               line => $token->{line},
                               column => $token->{column}};
                     redo B;
@@ -5185,7 +5190,10 @@ sub _tree_construction_main ($) {
 
                 if ($self->{open_elements}->[-1]->[1] ne 'caption') {
                   
-                  $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+                  $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                                  value => $self->{open_elements}->[-1]->[0]
+                                      ->manakai_local_name,
+                                  token => $token);
                 } else {
                   
                 }
@@ -5242,7 +5250,10 @@ sub _tree_construction_main ($) {
 
                 if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
                   
-                  $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+                  $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                                  value => $self->{open_elements}->[-1]->[0]
+                                      ->manakai_local_name,
+                                  token => $token);
                 } else {
                   
                 }
@@ -5302,7 +5313,10 @@ sub _tree_construction_main ($) {
                 
                 if ($self->{open_elements}->[-1]->[1] ne 'caption') {
                   
-                  $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+                  $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                                  value => $self->{open_elements}->[-1]->[0]
+                                      ->manakai_local_name,
+                                  token => $token);
                 } else {
                   
                 }
@@ -5405,7 +5419,10 @@ sub _tree_construction_main ($) {
 
               if ($self->{open_elements}->[-1]->[1] ne 'caption') {
                 
-                $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+                $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                                value => $self->{open_elements}->[-1]->[0]
+                                    ->manakai_local_name,
+                                token => $token);
               } else {
                 
               }
@@ -5864,7 +5881,10 @@ sub _tree_construction_main ($) {
                 die "$0: in table: <>: $token->{tag_name}";
               }
             } elsif ($token->{tag_name} eq 'table') {
-              $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+              $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                              value => $self->{open_elements}->[-1]->[0]
+                                  ->manakai_local_name,
+                              token => $token);
 
               ## As if </table>
               ## have a table element in table scope
@@ -5903,8 +5923,11 @@ sub _tree_construction_main ($) {
 
               if ($self->{open_elements}->[-1]->[1] ne 'table') {
                 
-## ISSUE: Can this case be reached?
-                $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+                ## NOTE: |<table><tr><table>|
+                $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                                value => $self->{open_elements}->[-1]->[0]
+                                    ->manakai_local_name,
+                                token => $token);
               } else {
                 
               }
@@ -7252,8 +7275,10 @@ sub _tree_construction_main ($) {
           if ($li_or_dtdd->{$node->[1]}) {
             if ($i != -1) {
               
-              $self->{parse_error}->(level => $self->{must_level}, type => 'end tag missing:'.
-                              $self->{open_elements}->[-1]->[1], token => $token);
+              $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                              value => $self->{open_elements}->[-1]->[0]
+                                  ->manakai_local_name,
+                              token => $token);
             } else {
               
             }
@@ -7792,7 +7817,9 @@ sub _tree_construction_main ($) {
                    tbody => 1, tfoot => 1, thead => 1,
                   }->{$_->[1]}) {
             
-            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$_->[1], token => $token);
+            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                            value => $_->[0]->manakai_local_name,
+                            token => $token);
             last;
           } else {
             
@@ -7803,11 +7830,16 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'html') {
+        ## TODO: Update this code.  It seems that the code below is not
+        ## up-to-date, though it has same effect as speced.
         if (@{$self->{open_elements}} > 1 and $self->{open_elements}->[1]->[1] eq 'body') {
           ## ISSUE: There is an issue in the spec.
           if ($self->{open_elements}->[-1]->[1] ne 'body') {
             
-            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[1]->[1], token => $token);
+            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                            value => $self->{open_elements}->[1]->[0]
+                                ->manakai_local_name,
+                            token => $token);
           } else {
             
           }
@@ -7863,7 +7895,10 @@ sub _tree_construction_main ($) {
           ## Step 2.
           if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
             
-            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                            value => $self->{open_elements}->[-1]->[0]
+                                ->manakai_local_name,
+                            token => $token);
           } else {
             
           }
@@ -7914,7 +7949,10 @@ sub _tree_construction_main ($) {
           ## Step 2. 
           if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
             
-            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                            value => $self->{open_elements}->[-1]->[0]
+                                ->manakai_local_name,
+                            token => $token);
           } else {
             
           }  
@@ -7994,7 +8032,10 @@ sub _tree_construction_main ($) {
         if (defined $i) {
           if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
             
-            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+            $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                            value => $self->{open_elements}->[-1]->[0]
+                                ->manakai_local_name,
+                            token => $token);
           } else {
             
           }
@@ -8095,7 +8136,10 @@ sub _tree_construction_main ($) {
             if ($token->{tag_name} ne $self->{open_elements}->[-1]->[1]) {
               
               ## NOTE: <x><y></x>
-              $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:'.$self->{open_elements}->[-1]->[1], token => $token);
+              $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                              value => $self->{open_elements}->[-1]->[0]
+                                  ->manakai_local_name,
+                              token => $token);
             } else {
               
             }
@@ -8317,4 +8361,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/03/20 08:04:58 $
+# $Date: 2008/04/06 06:34:10 $
