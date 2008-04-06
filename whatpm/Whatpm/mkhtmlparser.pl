@@ -22,7 +22,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1, $2, $3);
       \$insert->(\$el);
-      push \@{\$self->{open_elements}}, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
   s{!!!insert-element-t\s*\(([^(),]+),\s*,([^(),]+)\)\s*;}{qq{
@@ -30,7 +30,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1,, $2);
       \$insert->(\$el);
-      push \@{\$self->{open_elements}}, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
   s{!!!insert-element-t\s*\(([^(),]+),([^(),]+)\)\s*;}{qq{
@@ -38,7 +38,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1, $2);
       \$insert->(\$el);
-      push \@{\$self->{open_elements}}, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
   s{!!!insert-element-t\s*\(([^(),]+)\)\s*;}{qq{
@@ -46,7 +46,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1);
       \$insert->(\$el);
-      push \@{\$self->{open_elements}}, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
   s{!!!insert-element\s*\(([^(),]+),\s*,([^(),]+)\)\s*;}{qq{
@@ -54,7 +54,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1,, $2);
       \$self->{open_elements}->[-1]->[0]->append_child (\$el);
-      push \@{\$self->{open_elements}}, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
   s{!!!insert-element\s*\(([^(),]+),([^(),]+),([^(),]+)\)\s*;}{qq{
@@ -62,7 +62,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1, $2, $3);
       \$self->{open_elements}->[-1]->[0]->append_child (\$el);
-      push \@{\$self->{open_elements}}, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
   s{!!!insert-element\s*\(([^(),]+),([^(),]+)\)\s*;}{qq{
@@ -70,7 +70,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1, $2);
       \$self->{open_elements}->[-1]->[0]->append_child (\$el);
-      push \@{\$self->{open_elements}}, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
   s{!!!insert-element\s*\(([^(),]+)\)\s*;}{qq{
@@ -78,7 +78,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1);
       \$self->{open_elements}->[-1]->[0]->append_child (\$el);
-      push \@{\$self->{open_elements}}, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
   s{!!!create-element\s*\(([^(),]+),([^(),]+)(?:,([^(),]*)(?>,([^(),]+))?)?\)\s*;}{
