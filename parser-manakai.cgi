@@ -31,8 +31,9 @@ shift @mode if @mode and $mode[0] == '';
   my $doc;
   my $el;
 
+
 if (@mode == 3 and $mode[0] eq 'html' and
-    ($mode[2] eq 'html' or $mode[2] eq 'test')) {
+    ($mode[2] eq 'html' or $mode[2] eq 'test' or $mode[2] eq 'xml')) {
   print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
 
   require Encode;
@@ -72,6 +73,13 @@ if (@mode == 3 and $mode[0] eq 'html' and
     $out = \( ($el or $doc)->inner_html );
     $time2 = time;
     $time{serialize_html} = $time2 - $time1;
+  } elsif ($mode[2] eq 'xml') {
+    $doc->manakai_is_html (0);
+    $time1 = time;
+    $out = \( ($el or $doc)->inner_html );
+    $time2 = time;
+    $time{serialize_xml} = $time2 - $time1;
+    $doc->manakai_is_html (1);
   } else { # test
     $time1 = time;
     $out = test_serialize ($el || $doc);
@@ -81,7 +89,7 @@ if (@mode == 3 and $mode[0] eq 'html' and
   print STDOUT Encode::encode ('utf-8', $$out);
   print STDOUT "\n";
 } elsif (@mode == 3 and $mode[0] eq 'xhtml' and
-         ($mode[2] eq 'html' or $mode[2] eq 'test')) {
+         ($mode[2] eq 'html' or $mode[2] eq 'test' or $mode[2] eq 'xml')) {
   print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
 
   require Message::DOM::XMLParserTemp;
@@ -106,6 +114,13 @@ if (@mode == 3 and $mode[0] eq 'html' and
 
   my $out;
   if ($mode[2] eq 'html') {
+    $doc->manakai_is_html (0);
+    $time1 = time;
+    $out = \( $doc->inner_html ); ## TODO: $el case
+    $time2 = time;
+    $time{serialize_html} = $time2 - $time1;
+    $doc->manakai_is_html (1);
+  } elsif ($mode[2] eq 'xml') {
     $time1 = time;
     $out = \( $doc->inner_html ); ## TODO: $el case
     $time2 = time;
@@ -119,7 +134,7 @@ if (@mode == 3 and $mode[0] eq 'html' and
   print STDOUT Encode::encode ('utf-8', $$out);
   print STDOUT "\n";
 } elsif (@mode == 3 and $mode[0] eq 'h2h' and $mode[1] eq '' and
-         ($mode[2] eq 'html' or $mode[2] eq 'test')) {
+         ($mode[2] eq 'html' or $mode[2] eq 'test' or $mode[2] eq 'xml')) {
   print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
 
   require Encode;
@@ -136,6 +151,13 @@ if (@mode == 3 and $mode[0] eq 'html' and
 
   my $out;
   if ($mode[2] eq 'html') {
+    $doc->manakai_is_html (0);
+    $time1 = time;
+    $out = \( $doc->inner_html );
+    $time2 = time;
+    $time{serialize_html} = $time2 - $time1;
+    $doc->manakai_is_html (1);
+  } elsif ($mode[2] eq 'xml') {
     $time1 = time;
     $out = \( $doc->inner_html );
     $time2 = time;
@@ -267,4 +289,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/08/11 13:54:55 $
+## $Date: 2008/04/12 15:57:56 $

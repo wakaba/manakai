@@ -80,6 +80,8 @@
       }
       if (document.getElementById ('format-test').checked) {
         this.action = uri + 'test';
+      } else if (document.getElementById ('format-xml').checked) {
+        this.action = uri + 'xml';
       } else {
         this.action = uri + 'html';
       }
@@ -104,8 +106,10 @@
 </fieldset>
 <fieldset>
 <legend>Output format</legend>
-<p><label title="Show the value of |document.innerHTML| if checked"><input type="radio" name="format" value="html" checked id="format-html"> 
-  <code>innerHTML</code></label></p>
+<p><label title="Show the value of |document.innerHTML| (in HTML) if checked"><input type="radio" name="format" value="html" checked id="format-html"> 
+  <code>innerHTML</code> (HTML)</label></p>
+<p><label title="Show the value of |document.innerHTML| (in XML) if checked"><input type="radio" name="format" value="xml" id="format-xml"> 
+  <code>innerHTML</code> (XML)</label></p>
 <p><label title="Show the parsed DOM in the format used in html5lib tests"><input type="radio" name="format" value="test" id="format-test">
   parser test</label></p>
 </fieldset>
