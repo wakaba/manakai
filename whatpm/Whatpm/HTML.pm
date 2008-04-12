@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.125 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.126 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4682,7 +4682,8 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
-        if ($self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL or
+        if ((not {mglyph => 1, malignmark => 1}->{$token->{tag_name}} and
+             $self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL) or
             not ($self->{open_elements}->[-1]->[1] & FOREIGN_EL) or
             ($token->{tag_name} eq 'svg' and
              $self->{open_elements}->[-1]->[1] & MML_AXML_EL)) {
@@ -8880,4 +8881,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/12 15:31:55 $
+# $Date: 2008/04/12 15:37:32 $
