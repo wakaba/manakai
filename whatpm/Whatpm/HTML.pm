@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.124 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.125 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3569,7 +3569,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
     require Whatpm::_NamedEntityList;
     our $EntityChar;
 
-    while (length $entity_name < 10 and
+    while (length $entity_name < 30 and
            ## NOTE: Some number greater than the maximum length of entity name
            ((0x0041 <= $self->{next_char} and # a
              $self->{next_char} <= 0x005A) or # x
@@ -8880,4 +8880,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/12 15:25:52 $
+# $Date: 2008/04/12 15:31:55 $
