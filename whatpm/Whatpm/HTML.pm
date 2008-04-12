@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.121 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.122 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -185,20 +185,6 @@ my $el_category = {
   wbr => MISC_SPECIAL_EL,
 };
 
-my $permitted_slash_tag_name = {
-  base => 1,
-  link => 1,
-  meta => 1,
-  hr => 1,
-  br => 1,
-  img => 1,
-  embed => 1,
-  param => 1,
-  area => 1,
-  col => 1,
-  input => 1,
-};
-
 my $c1_entity_char = {
   0x80 => 0x20AC,
   0x81 => 0xFFFD,
@@ -233,28 +219,6 @@ my $c1_entity_char = {
   0x9E => 0x017E,
   0x9F => 0x0178,
 }; # $c1_entity_char
-
-my $special_category = {
-  address => 1, area => 1, base => 1, basefont => 1, bgsound => 1,
-  blockquote => 1, body => 1, br => 1, center => 1, col => 1, colgroup => 1,
-  dd => 1, dir => 1, div => 1, dl => 1, dt => 1, embed => 1, fieldset => 1,
-  form => 1, frame => 1, frameset => 1, h1 => 1, h2 => 1, h3 => 1, 
-  h4 => 1, h5 => 1, h6 => 1, head => 1, hr => 1, iframe => 1, image => 1,
-  img => 1, input => 1, isindex => 1, li => 1, link => 1, listing => 1,
-  menu => 1, meta => 1, noembed => 1, noframes => 1, noscript => 1,
-  ol => 1, optgroup => 1, option => 1, p => 1, param => 1, plaintext => 1,
-  pre => 1, script => 1, select => 1, spacer => 1, style => 1, tbody => 1,
-  textarea => 1, tfoot => 1, thead => 1, title => 1, tr => 1, ul => 1, wbr => 1,
-};
-my $scoping_category = {
-  applet => 1, button => 1, caption => 1, html => 1, marquee => 1, object => 1,
-  table => 1, td => 1, th => 1,
-};
-my $formatting_category = {
-  a => 1, b => 1, big => 1, em => 1, font => 1, i => 1, nobr => 1,
-  s => 1, small => 1, strile => 1, strong => 1, tt => 1, u => 1,
-};
-# $phrasing_category: all other elements
 
 sub parse_byte_string ($$$$;$) {
   my $self = ref $_[0] ? shift : shift->new;
@@ -468,6 +432,7 @@ sub DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE () { 30 }
 sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
 sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
+sub SELF_CLOSING_START_TAG_STATE () { 34 }
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -521,6 +486,7 @@ sub _initialize_tokenizer ($) {
   undef $self->{current_attribute};
   undef $self->{last_emitted_start_tag_name};
   undef $self->{last_attribute_value_state};
+  delete $self->{self_closing};
   $self->{char} = [];
   # $self->{next_char}
   
@@ -547,6 +513,13 @@ sub _initialize_tokenizer ($) {
 ##        ->{value}
 ##        ->{has_reference} == 1 or 0
 ##   ->{data} (COMMENT_TOKEN, CHARACTER_TOKEN)
+## NOTE: The "self-closing flag" is hold as |$self->{self_closing}|.
+##     |->{self_closing}| is used to save the value of |$self->{self_closing}|
+##     while the token is pushed back to the stack.
+
+## ISSUE: "When a DOCTYPE token is created, its
+## <i>self-closing flag</i> must be unset (its other state is that it
+## be set), and its attributes list must be empty.": Wrong subject?
 
 ## Emitted token MUST immediately be handled by the tree construction state.
 
@@ -573,7 +546,17 @@ sub _initialize_tokenizer ($) {
 
 sub _get_next_token ($) {
   my $self = shift;
+
+  if ($self->{self_closing}) {
+    $self->{parse_error}->(level => $self->{must_level}, type => 'nestc', token => $self->{current_token});
+    ## NOTE: The |self_closing| flag is only set by start tag token.
+    ## In addition, when a start tag token is emitted, it is always set to
+    ## |current_token|.
+    delete $self->{self_closing};
+  }
+
   if (@{$self->{token}}) {
+    $self->{self_closing} = $self->{token}->[0]->{self_closing};
     return shift @{$self->{token}};
   }
 
@@ -1041,24 +1024,14 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x002F) { # /
         
+        $self->{state} = SELF_CLOSING_START_TAG_STATE;
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
         $self->{set_next_char}->($self);
       }
   
-        if ($self->{next_char} == 0x003E and # >
-            $self->{current_token}->{type} == START_TAG_TOKEN and
-            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
-          # permitted slash
-          
-          #
-        } else {
-          
-          $self->{parse_error}->(level => $self->{must_level}, type => 'nestc');
-        }
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
-        # next-input-character is already done
         redo A;
       } else {
         
@@ -1135,24 +1108,14 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x002F) { # /
         
+        $self->{state} = SELF_CLOSING_START_TAG_STATE;
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
         $self->{set_next_char}->($self);
       }
   
-        if ($self->{next_char} == 0x003E and # >
-            $self->{current_token}->{type} == START_TAG_TOKEN and
-            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
-          # permitted slash
-          
-          #
-        } else {
-          
-          $self->{parse_error}->(level => $self->{must_level}, type => 'nestc');
-        }
-        ## Stay in the state
-        # next-input-character is already done
         redo A;
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed tag');
@@ -1283,7 +1246,9 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_char} == 0x002F) { # /
+        
         $before_leave->();
+        $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -1291,18 +1256,6 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
-        if ($self->{next_char} == 0x003E and # >
-            $self->{current_token}->{type} == START_TAG_TOKEN and
-            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
-          # permitted slash
-          
-          #
-        } else {
-          
-          $self->{parse_error}->(level => $self->{must_level}, type => 'nestc');
-        }
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
-        # next-input-character is already done
         redo A;
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed tag');
@@ -1420,25 +1373,14 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x002F) { # /
         
+        $self->{state} = SELF_CLOSING_START_TAG_STATE;
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
         $self->{set_next_char}->($self);
       }
   
-        if ($self->{next_char} == 0x003E and # >
-            $self->{current_token}->{type} == START_TAG_TOKEN and
-            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
-          # permitted slash
-          
-          #
-        } else {
-          
-          $self->{parse_error}->(level => $self->{must_level}, type => 'nestc');
-          ## TODO: Different error type for <aa / bb> than <aa/>
-        }
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
-        # next-input-character is already done
         redo A;
       } elsif ($self->{next_char} == -1) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed tag');
@@ -1880,30 +1822,59 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x002F) { # /
         
+        $self->{state} = SELF_CLOSING_START_TAG_STATE;
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
         $self->{set_next_char}->($self);
       }
   
-        if ($self->{next_char} == 0x003E and # >
-            $self->{current_token}->{type} == START_TAG_TOKEN and
-            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
-          # permitted slash
-          
-          #
-        } else {
-          
-          $self->{parse_error}->(level => $self->{must_level}, type => 'nestc');
-        }
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
-        # next-input-character is already done
         redo A;
       } else {
         
         $self->{parse_error}->(level => $self->{must_level}, type => 'no space between attributes');
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         ## reconsume
+        redo A;
+      }
+    } elsif ($self->{state} == SELF_CLOSING_START_TAG_STATE) {
+      if ($self->{next_char} == 0x003E) { # >
+        if ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{must_level}, type => 'nestc', token => $self->{current_token});
+          ## TODO: Different type than slash in start tag
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
+          if ($self->{current_token}->{attributes}) {
+            
+            $self->{parse_error}->(level => $self->{must_level}, type => 'end tag attribute');
+          } else {
+            
+          }
+          ## TODO: Test |<title></title/>|
+        } else {
+          
+          $self->{self_closing} = 1;
+        }
+
+        $self->{state} = DATA_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+
+        return  ($self->{current_token}); # start tag or end tag
+
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{must_level}, type => 'nestc');
+        ## TODO: This error type is wrong.
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
@@ -3695,6 +3666,7 @@ sub _tree_construction_initial ($) {
       $self->{document}->manakai_compat_mode ('quirks');
       ## Go to the "before html" insertion mode.
       ## reprocess
+      
       return;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
       if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) { # \x0D
@@ -3811,6 +3783,8 @@ sub _tree_construction_root_element ($) {
             $self->{application_cache_selection}->(undef);
           }
 
+          
+
           $token = $self->_get_next_token;
           return; ## Go to the "before head" insertion mode.
         } else {
@@ -3842,6 +3816,7 @@ sub _tree_construction_root_element ($) {
     $self->{application_cache_selection}->(undef);
 
     ## NOTE: Reprocess the token.
+    
     return; ## Go to the "before head" insertion mode.
 
     ## ISSUE: There is an issue in the spec
@@ -4059,6 +4034,7 @@ sub _tree_construction_main ($) {
 
     ## Step 4
     my $text = '';
+    
     $token = $self->_get_next_token;
     while ($token->{type} == CHARACTER_TOKEN) { # or until stop tokenizing
       
@@ -4123,6 +4099,7 @@ sub _tree_construction_main ($) {
     delete $self->{escape}; # MUST
     
     my $text = '';
+    
     $token = $self->_get_next_token;
     while ($token->{type} == CHARACTER_TOKEN) {
       
@@ -4471,6 +4448,7 @@ sub _tree_construction_main ($) {
              $token->{attributes}->{$attr_name}->{value});
         }
       }
+      
       $token = $self->_get_next_token;
       redo B;
     } elsif ($token->{type} == COMMENT_TOKEN) {
@@ -4595,19 +4573,21 @@ sub _tree_construction_main ($) {
             push @{$self->{open_elements}},
                 [$self->{head_element}, $el_category->{head}];
             $self->{insertion_mode} = IN_HEAD_IM;
+            
             $token = $self->_get_next_token;
             redo B;
-              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
-                
-                #
-              } else {
-                
-                $self->{parse_error}->(level => $self->{must_level}, type => 'in head:head', token => $token); # or in head noscript
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                redo B;
-              }
-            } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
+          } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
+            
+            #
+          } else {
+            
+            $self->{parse_error}->(level => $self->{must_level}, type => 'in head:head', token => $token); # or in head noscript
+            ## Ignore the token
+            
+            $token = $self->_get_next_token;
+            redo B;
+          }
+        } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
               
               ## As if <head>
               
@@ -4680,6 +4660,7 @@ sub _tree_construction_main ($) {
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
+              
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'link') {
@@ -4721,6 +4702,7 @@ sub _tree_construction_main ($) {
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
+              delete $self->{self_closing};
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'meta') {
@@ -4810,6 +4792,7 @@ sub _tree_construction_main ($) {
 
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
+              delete $self->{self_closing};
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'title') {
@@ -4884,12 +4867,14 @@ sub _tree_construction_main ($) {
     }
   
                 $self->{insertion_mode} = IN_HEAD_NOSCRIPT_IM;
+                
                 $token = $self->_get_next_token;
                 redo B;
               } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'in noscript:noscript', token => $token);
                 ## Ignore the token
+                
                 $token = $self->_get_next_token;
                 redo B;
               } else {
@@ -4977,6 +4962,7 @@ sub _tree_construction_main ($) {
               } else {
                 die "$0: tag name: $self->{tag_name}";
               }
+              
               $token = $self->_get_next_token;
               redo B;
             } else {
@@ -5025,6 +5011,7 @@ sub _tree_construction_main ($) {
   
             $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
+            
             redo B;
           } elsif ($token->{type} == END_TAG_TOKEN) {
             if ($token->{tag_name} eq 'head') {
@@ -5312,7 +5299,11 @@ sub _tree_construction_main ($) {
                     
 
                     ## Close the cell
-                    unshift @{$self->{token}}, $token; # <?>
+                    
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <x>
                     $token = {type => END_TAG_TOKEN,
                               tag_name => $node->[0]->manakai_local_name,
                               line => $token->{line},
@@ -5329,6 +5320,7 @@ sub _tree_construction_main ($) {
                 $self->{parse_error}->(level => $self->{must_level}, type => 'start tag not allowed',
                     value => $token->{tag_name}, token => $token);
                 ## Ignore the token
+                
                 $token = $self->_get_next_token;
                 redo B;
               } elsif ($self->{insertion_mode} == IN_CAPTION_IM) {
@@ -5354,6 +5346,7 @@ sub _tree_construction_main ($) {
                   $self->{parse_error}->(level => $self->{must_level}, type => 'start tag not allowed',
                                   value => $token->{tag_name}, token => $token);
                   ## Ignore the token
+                  
                   $token = $self->_get_next_token;
                   redo B;
                 } # INSCOPE
@@ -5382,6 +5375,7 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = IN_TABLE_IM;
                 
                 ## reprocess
+                
                 redo B;
               } else {
                 
@@ -5527,7 +5521,11 @@ sub _tree_construction_main ($) {
                     $i = $_;
 
                     ## Close the cell
-                    unshift @{$self->{token}}, $token; # </?>
+                    
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # </x>
                     $token = {type => END_TAG_TOKEN, tag_name => $tn,
                               line => $token->{line},
                               column => $token->{column}};
@@ -5786,6 +5784,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
+                  
                   $token = $self->_get_next_token;
                   redo B;
                 } else {
@@ -5849,6 +5848,7 @@ sub _tree_construction_main ($) {
 
               push @$active_formatting_elements, ['#marker', ''];
               
+              
               $token = $self->_get_next_token;
               redo B;
             } elsif ({
@@ -5872,10 +5872,11 @@ sub _tree_construction_main ($) {
                   }
                 } # INSCOPE
                 unless (defined $i) { 
-                 
+                  
 ## TODO: This type is wrong.
-                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmacthed end tag:'.$token->{tag_name}, token => $token);
+                  $self->{parse_error}->(level => $self->{must_level}, type => 'unmacthed end tag:'.$token->{tag_name}, token => $token);
                   ## Ignore the token
+                  
                   $token = $self->_get_next_token;
                   redo B;
                 }
@@ -5893,6 +5894,7 @@ sub _tree_construction_main ($) {
                 if ($token->{tag_name} eq 'tr') {
                   
                   ## reprocess
+                  
                   redo B;
                 } else {
                   
@@ -5919,6 +5921,7 @@ sub _tree_construction_main ($) {
 ## TODO: This erorr type ios wrong.
                   $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                   ## Ignore the token
+                  
                   $token = $self->_get_next_token;
                   redo B;
                 }
@@ -5972,6 +5975,7 @@ sub _tree_construction_main ($) {
   
                 $self->{insertion_mode} = IN_COLUMN_GROUP_IM;
                 ## reprocess
+                
                 redo B;
               } elsif ({
                         caption => 1,
@@ -6023,6 +6027,7 @@ sub _tree_construction_main ($) {
                                            thead => IN_TABLE_BODY_IM,
                                           }->{$token->{tag_name}};
                 $token = $self->_get_next_token;
+                
                 redo B;
               } else {
                 die "$0: in table: <>: $token->{tag_name}";
@@ -6052,6 +6057,7 @@ sub _tree_construction_main ($) {
 ## TODO: The following is wrong, maybe.
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:table', token => $token);
                 ## Ignore tokens </table><table>
+                
                 $token = $self->_get_next_token;
                 redo B;
               }
@@ -6079,8 +6085,9 @@ sub _tree_construction_main ($) {
 
               $self->_reset_insertion_mode; 
 
-              ## reprocess
-              redo B;
+          ## reprocess
+          
+          redo B;
         } elsif ($token->{tag_name} eq 'style') {
           if (not $open_tables->[-1]->[1]) { # tainted
             
@@ -6141,6 +6148,7 @@ sub _tree_construction_main ($) {
                 pop @{$self->{open_elements}};
 
                 $token = $self->_get_next_token;
+                delete $self->{self_closing};
                 redo B;
               } else {
                 
@@ -6183,6 +6191,7 @@ sub _tree_construction_main ($) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
+                
                 $token = $self->_get_next_token;
                 redo B;
               } else {
@@ -6200,6 +6209,7 @@ sub _tree_construction_main ($) {
               pop @{$self->{open_elements}}; # tr
               $self->{insertion_mode} = IN_TABLE_BODY_IM;
               $token = $self->_get_next_token;
+              
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               if ($self->{insertion_mode} == IN_ROW_IM) {
@@ -6222,6 +6232,7 @@ sub _tree_construction_main ($) {
 ## TODO: The following is wrong.
                   $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{type}, token => $token);
                   ## Ignore the token
+                  
                   $token = $self->_get_next_token;
                   redo B;
                 }
@@ -6257,6 +6268,7 @@ sub _tree_construction_main ($) {
                   
                   $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                   ## Ignore the token
+                  
                   $token = $self->_get_next_token;
                   redo B;
                 }
@@ -6302,6 +6314,7 @@ sub _tree_construction_main ($) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
+                
                 $token = $self->_get_next_token;
                 redo B;
               }
@@ -6335,6 +6348,7 @@ sub _tree_construction_main ($) {
                     
                     $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                     ## Ignore the token
+                    
                     $token = $self->_get_next_token;
                     redo B;
                   }
@@ -6357,6 +6371,7 @@ sub _tree_construction_main ($) {
                     
                     $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:tr', token => $token);
                     ## Ignore the token
+                    
                     $token = $self->_get_next_token;
                     redo B;
                   }
@@ -6391,6 +6406,7 @@ sub _tree_construction_main ($) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
+                
                 $token = $self->_get_next_token;
                 redo B;
               }
@@ -6405,6 +6421,7 @@ sub _tree_construction_main ($) {
 
               pop @{$self->{open_elements}};
               $self->{insertion_mode} = IN_TABLE_IM;
+              
               $token = $self->_get_next_token;
               redo B;
             } elsif ({
@@ -6413,11 +6430,12 @@ sub _tree_construction_main ($) {
                       tr => 1, # $self->{insertion_mode} == IN_ROW_IM
                       tbody => 1, tfoot => 1, thead => 1, # $self->{insertion_mode} == IN_TABLE_IM
                      }->{$token->{tag_name}}) {
-              
-              $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
-              ## Ignore the token
-              $token = $self->_get_next_token;
-              redo B;
+          
+          $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
+          ## Ignore the token
+          
+           $token = $self->_get_next_token;
+          redo B;
         } else {
           
           $self->{parse_error}->(level => $self->{must_level}, type => 'in table:/'.$token->{tag_name}, token => $token);
@@ -6484,6 +6502,7 @@ sub _tree_construction_main ($) {
     }
   
               pop @{$self->{open_elements}};
+              delete $self->{self_closing};
               $token = $self->_get_next_token;
               redo B;
             } else { 
@@ -6539,12 +6558,14 @@ sub _tree_construction_main ($) {
 ## TODO: Wrong error type?
             $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:colgroup', token => $token);
             ## Ignore the token
+            
             $token = $self->_get_next_token;
             redo B;
           } else {
             
             pop @{$self->{open_elements}}; # colgroup
             $self->{insertion_mode} = IN_TABLE_IM;
+            
             ## reprocess
             redo B;
           }
@@ -6590,6 +6611,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
+          
           $token = $self->_get_next_token;
           redo B;
         } elsif ($token->{tag_name} eq 'optgroup') {
@@ -6635,6 +6657,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
+          
           $token = $self->_get_next_token;
           redo B;
         } elsif ($token->{tag_name} eq 'select' or
@@ -6666,6 +6689,7 @@ sub _tree_construction_main ($) {
             
             $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:select', token => $token);
             ## Ignore the token
+            
             $token = $self->_get_next_token;
             redo B;
           }
@@ -6681,6 +6705,7 @@ sub _tree_construction_main ($) {
             redo B;
           } else {
             
+            
             ## Reprocess the token.
             redo B;
           }
@@ -6688,6 +6713,7 @@ sub _tree_construction_main ($) {
           
           $self->{parse_error}->(level => $self->{must_level}, type => 'in select:'.$token->{tag_name}, token => $token);
           ## Ignore the token
+          
           $token = $self->_get_next_token;
           redo B;
         }
@@ -6706,6 +6732,7 @@ sub _tree_construction_main ($) {
             $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
             ## Ignore the token
           }
+          
           $token = $self->_get_next_token;
           redo B;
         } elsif ($token->{tag_name} eq 'option') {
@@ -6717,6 +6744,7 @@ sub _tree_construction_main ($) {
             $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
             ## Ignore the token
           }
+          
           $token = $self->_get_next_token;
           redo B;
         } elsif ($token->{tag_name} eq 'select') {
@@ -6737,6 +6765,7 @@ sub _tree_construction_main ($) {
             
             $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
             ## Ignore the token
+            
             $token = $self->_get_next_token;
             redo B;
           }
@@ -6746,6 +6775,7 @@ sub _tree_construction_main ($) {
 
           $self->_reset_insertion_mode;
 
+          
           $token = $self->_get_next_token;
           redo B;
         } elsif ($self->{insertion_mode} == IN_SELECT_IN_TABLE_IM and
@@ -6772,6 +6802,7 @@ sub _tree_construction_main ($) {
           unless (defined $i) {
             
             ## Ignore the token
+            
             $token = $self->_get_next_token;
             redo B;
           }
@@ -6796,6 +6827,7 @@ sub _tree_construction_main ($) {
 ## TODO: The following error type is correct?
             $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:select', token => $token);
             ## Ignore the </select> token
+            
             $token = $self->_get_next_token; ## TODO: ok?
             redo B;
           }
@@ -6805,12 +6837,14 @@ sub _tree_construction_main ($) {
 
           $self->_reset_insertion_mode;
 
+          
           ## reprocess
           redo B;
         } else {
           
           $self->{parse_error}->(level => $self->{must_level}, type => 'in select:/'.$token->{tag_name}, token => $token);
           ## Ignore the token
+          
           $token = $self->_get_next_token;
           redo B;
         }
@@ -6873,6 +6907,7 @@ sub _tree_construction_main ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'after body:'.$token->{tag_name}, token => $token);
 
         $self->{insertion_mode} = IN_BODY_IM;
+        
         ## reprocess
         redo B;
       } elsif ($token->{type} == END_TAG_TOKEN) {
@@ -6995,6 +7030,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
+          
           $token = $self->_get_next_token;
           redo B;
         } elsif ($token->{tag_name} eq 'frame' and
@@ -7027,6 +7063,7 @@ sub _tree_construction_main ($) {
     }
   
           pop @{$self->{open_elements}};
+          delete $self->{self_closing};
           $token = $self->_get_next_token;
           redo B;
         } elsif ($token->{tag_name} eq 'noframes') {
@@ -7043,6 +7080,7 @@ sub _tree_construction_main ($) {
             $self->{parse_error}->(level => $self->{must_level}, type => 'after frameset:'.$token->{tag_name}, token => $token);
           }
           ## Ignore the token
+          
           $token = $self->_get_next_token;
           redo B;
         }
@@ -7161,6 +7199,7 @@ sub _tree_construction_main ($) {
     }
   
         pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+        delete $self->{self_closing};
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'meta') {
@@ -7236,6 +7275,7 @@ sub _tree_construction_main ($) {
           }
         }
 
+        delete $self->{self_closing};
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'title') {
@@ -7261,6 +7301,7 @@ sub _tree_construction_main ($) {
             }
           }
         }
+        
         $token = $self->_get_next_token;
         redo B;
       } elsif ({
@@ -7277,6 +7318,7 @@ sub _tree_construction_main ($) {
           
           $self->{parse_error}->(level => $self->{must_level}, type => 'in form:form', token => $token);
           ## Ignore the token
+          
           $token = $self->_get_next_token;
           redo B;
         }
@@ -7285,7 +7327,11 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
             
-            unshift @{$self->{token}}, $token;
+            
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <form>
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
             redo B;
@@ -7322,6 +7368,7 @@ sub _tree_construction_main ($) {
     }
   
         if ($token->{tag_name} eq 'pre' or $token->{tag_name} eq 'listing') {
+          
           $token = $self->_get_next_token;
           if ($token->{type} == CHARACTER_TOKEN) {
             $token->{data} =~ s/^\x0A//;
@@ -7338,6 +7385,7 @@ sub _tree_construction_main ($) {
           
           $self->{form_element} = $self->{open_elements}->[-1]->[0];
 
+          
           $token = $self->_get_next_token;
         } elsif ($token->{tag_name} eq 'table') {
           
@@ -7345,11 +7393,13 @@ sub _tree_construction_main ($) {
           
           $self->{insertion_mode} = IN_TABLE_IM;
 
+          
           $token = $self->_get_next_token;
         } elsif ($token->{tag_name} eq 'hr') {
           
           pop @{$self->{open_elements}};
         
+          
           $token = $self->_get_next_token;
         } else {
           
@@ -7361,7 +7411,11 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
             
-            unshift @{$self->{token}}, $token;
+            
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <x>
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
             redo B;
@@ -7439,6 +7493,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
+        
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'plaintext') {
@@ -7446,7 +7501,11 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
             
-            unshift @{$self->{token}}, $token;
+            
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <plaintext>
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
             redo B;
@@ -7485,6 +7544,7 @@ sub _tree_construction_main ($) {
           
         $self->{content_model} = PLAINTEXT_CONTENT_MODEL;
           
+        
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'a') {
@@ -7494,7 +7554,11 @@ sub _tree_construction_main ($) {
             
             $self->{parse_error}->(level => $self->{must_level}, type => 'in a:a', token => $token);
             
-            unshift @{$self->{token}}, $token;
+            
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <a>
             $token = {type => END_TAG_TOKEN, tag_name => 'a',
                       line => $token->{line}, column => $token->{column}};
             $formatting_end_tag->($token);
@@ -7550,6 +7614,7 @@ sub _tree_construction_main ($) {
   
         push @$active_formatting_elements, $self->{open_elements}->[-1];
 
+        
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'nobr') {
@@ -7561,7 +7626,11 @@ sub _tree_construction_main ($) {
           if ($node->[1] & NOBR_EL) {
             
             $self->{parse_error}->(level => $self->{must_level}, type => 'in nobr:nobr', token => $token);
-            unshift @{$self->{token}}, $token;
+            
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <nobr>
             $token = {type => END_TAG_TOKEN, tag_name => 'nobr',
                       line => $token->{line}, column => $token->{column}};
             redo B;
@@ -7599,6 +7668,7 @@ sub _tree_construction_main ($) {
   
         push @$active_formatting_elements, $self->{open_elements}->[-1];
         
+        
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{tag_name} eq 'button') {
@@ -7608,7 +7678,11 @@ sub _tree_construction_main ($) {
           if ($node->[1] & BUTTON_EL) {
             
             $self->{parse_error}->(level => $self->{must_level}, type => 'in button:button', token => $token);
-            unshift @{$self->{token}}, $token;
+            
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <button>
             $token = {type => END_TAG_TOKEN, tag_name => 'button',
                       line => $token->{line}, column => $token->{column}};
             redo B;
@@ -7651,6 +7725,7 @@ sub _tree_construction_main ($) {
 
         push @$active_formatting_elements, ['#marker', ''];
 
+        
         $token = $self->_get_next_token;
         redo B;
       } elsif ({
@@ -7675,6 +7750,7 @@ sub _tree_construction_main ($) {
         if (defined $self->{form_element}) {
           
           ## Ignore the token
+           ## NOTE: Not acknowledged.
           $token = $self->_get_next_token;
           redo B;
         } else {
@@ -7721,8 +7797,9 @@ sub _tree_construction_main ($) {
                          line => $token->{line}, column => $token->{column}},
                         {type => END_TAG_TOKEN, tag_name => 'form',
                          line => $token->{line}, column => $token->{column}};
-          $token = shift @tokens;
+           ## NOTE: Not acknowledged.
           unshift @{$self->{token}}, (@tokens);
+          $token = $self->_get_next_token;
           redo B;
         }
       } elsif ($token->{tag_name} eq 'textarea') {
@@ -7755,6 +7832,7 @@ sub _tree_construction_main ($) {
         $insert->($el);
         
         my $text = '';
+        
         $token = $self->_get_next_token;
         if ($token->{type} == CHARACTER_TOKEN) {
           $token->{data} =~ s/^\x0A//;
@@ -7798,6 +7876,7 @@ sub _tree_construction_main ($) {
         
         $self->{parse_error}->(level => $self->{must_level}, type => 'in body:'.$token->{tag_name}, token => $token);
         ## Ignore the token
+         ## NOTE: |<col/>| or |<frame/>| here is an error.
         $token = $self->_get_next_token;
         redo B;
         
@@ -7846,6 +7925,7 @@ sub _tree_construction_main ($) {
             }->{$token->{tag_name}}) {
           
           push @$active_formatting_elements, ['#marker', ''];
+          
         } elsif ({
                   b => 1, big => 1, em => 1, font => 1, i => 1,
                   s => 1, small => 1, strile => 1,
@@ -7853,10 +7933,12 @@ sub _tree_construction_main ($) {
                  }->{$token->{tag_name}}) {
           
           push @$active_formatting_elements, $self->{open_elements}->[-1];
+          
         } elsif ($token->{tag_name} eq 'input') {
           
           ## TODO: associate with $self->{form_element} if defined
           pop @{$self->{open_elements}};
+          delete $self->{self_closing};
         } elsif ({
                   area => 1, basefont => 1, bgsound => 1, br => 1,
                   embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
@@ -7864,6 +7946,7 @@ sub _tree_construction_main ($) {
                  }->{$token->{tag_name}}) {
           
           pop @{$self->{open_elements}};
+          delete $self->{self_closing};
         } elsif ($token->{tag_name} eq 'select') {
           ## TODO: associate with $self->{form_element} if defined
         
@@ -7876,6 +7959,7 @@ sub _tree_construction_main ($) {
             
             $self->{insertion_mode} = IN_SELECT_IM;
           }
+          
         } else {
           
         }
@@ -8440,4 +8524,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/06 10:31:51 $
+# $Date: 2008/04/12 10:41:30 $

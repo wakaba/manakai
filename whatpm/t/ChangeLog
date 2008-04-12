@@ -1,5 +1,13 @@
 2008-04-12  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML-tokenizer.t: Remove "self-closing flag" if the start
+	tag token is that of a slash permitted element (This is necessary
+	to maintain compatibility with current test data, since in the
+	new algorithm whether slash is permitted or not is decided in
+	tree construction stage).
+
+2008-04-12  Wakaba  <wakaba@suika.fam.cx>
+
 	* content-model-6.dat: New test data file.  Test data for
 	HTML custom data attributes (HTML5 revision 1399) are added.
 

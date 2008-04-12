@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.76 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.77 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -215,9 +215,7 @@ our $HTMLEmbeddedContent = {
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
     canvas => 1,
   },
-  ## NOTE: MathML is mentioned in the HTML5 spec.
   q<http://www.w3.org/1998/Math/MathML> => {math => 1},
-  ## NOTE: SVG is mentioned in the HTML5 spec.
   q<http://www.w3.org/2000/svg> => {svg => 1},
   ## NOTE: Foreign elements with content (but no metadata) are 
   ## embedded content.
@@ -837,4 +835,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/03/22 03:07:06 $
+# $Date: 2008/04/12 10:41:30 $

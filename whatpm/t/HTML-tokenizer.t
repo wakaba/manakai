@@ -156,6 +156,12 @@ for my $file_name (grep {$_} split /\s+/, qq[
         $test_token->[1] = $token->{data} if defined $token->{data};
         if ($token->{type} == Whatpm::HTML::START_TAG_TOKEN ()) {
           $test_token->[2] = {map {$_->{name} => $_->{value}} values %{$token->{attributes}}};
+          if ({
+               ## NOTE: Permitted slash
+               br => 1, link => 1,
+              }->{$token->{tag_name}}) {
+            delete $p->{self_closing};
+          }
         } elsif ($token->{type} == Whatpm::HTML::DOCTYPE_TOKEN ()) {
           $test_token->[1] = $token->{name};
           $test_token->[2] = $token->{public_identifier};
@@ -180,4 +186,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/03/28 14:23:09 $
+## $Date: 2008/04/12 10:41:31 $

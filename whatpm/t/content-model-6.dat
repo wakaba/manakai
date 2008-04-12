@@ -1,0 +1,57 @@
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    data-1="" data-2="custom data">x</p>
+#errors
+
+#data
+<p xmlns="http://ww.w3.org/1999/xhtml" data="">x</p>
+#errors
+/p/@data;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    data-="custom data">x</p>
+#errors
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    data-1="" data-2="custom data">x</unknown>
+#errors
+/unknown;element not defined;m
+
+#data
+<p xmlns="http://www.example.com/non-html"
+    data-1="" data-2="custom data">x</p>
+#errors
+/p;element;unsupported
+/p/@data-1;attribute;unsupported
+/p/@data-2;attribute;unsupported
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    data-1="" data-2="custom data"
+    name="keywords" content="a, b"/>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    data-1="" data-2="custom data">x</a>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml"
+    href="" alt="x" shape="default"
+    data-1="" data-2="custom data"/>
+#errors
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml"
+    src=""
+    data-1="" data-2="custom data"/>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    data=""
+    data-1="" data-2="custom data">x</object>
+#errors

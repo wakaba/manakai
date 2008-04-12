@@ -13,6 +13,17 @@ while (<>) {
       }
   }}ge;
   s{!!!back-next-input-character\b}{q{unshift @{$self->{char}}, }}ge;
+  s{!!!nack\s*\(\s*'([^']+)'\s*\)\s*;}{
+    ($DEBUG ? qq{
+      if (\$self->{self_closing}) {
+        !!!cp ('$1.2');
+      } else {
+        !!!cp ('$1.3');
+      }
+    } : '')
+  }ge;
+  s{!!!ack\s*(?>\([^)]*\)\s*)?;}{q{delete $self->{self_closing};}}ge;
+  s{!!!ack-later\s*(?>\([^)]*\)\s*)?;}{}ge;
   s{!!!parse-error;}{q{$self->{parse_error}->();}}ge;
   s{!!!parse-error\s*\(}{
     q{$self->{parse_error}->(level => $self->{must_level}, }
@@ -117,7 +128,13 @@ while (<>) {
     $r;
   }ge; # MUST
   s{!!!next-token;}{q{$token = $self->_get_next_token;}}ge;
-  s{!!!back-token;}{q{unshift @{$self->{token}}, $token;}}ge;
+  s{!!!back-token;}{
+    q{
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+    }
+  }ge;
   s{!!!back-token\s*\(}{q{unshift @{$self->{token}}, (}}ge;
   s{!!!cp\s*\(\s*(\S+)\s*\)\s*;}{
     $DEBUG ? qq{
