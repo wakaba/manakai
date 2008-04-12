@@ -28,34 +28,18 @@ while (<>) {
   s{!!!parse-error\s*\(}{
     q{$self->{parse_error}->(level => $self->{must_level}, }
   }ge;
+  s{!!!insert-element-f\s*\(([^(),]+),([^(),]+)\)\s*;}{qq{
+    {
+      my \$el;
+      !!!create-element (\$el, $1, $2\->{tag_name}, $2\->{attributes}, $2);
+      \$insert->(\$el);
+      push \@{\$self->{open_elements}}, [\$el, (\$el_category_f->{$1}->{$2\->{tag_name}} || 0) | FOREIGN_EL];
+    }
+  }}ge;
   s{!!!insert-element-t\s*\(([^(),]+),([^(),]+),([^(),]+)\)\s*;}{qq{
     {
       my \$el;
-      !!!create-element (\$el, $1, $2, $3);
-      \$insert->(\$el);
-      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
-    }
-  }}ge;
-  s{!!!insert-element-t\s*\(([^(),]+),\s*,([^(),]+)\)\s*;}{qq{
-    {
-      my \$el;
-      !!!create-element (\$el, $1,, $2);
-      \$insert->(\$el);
-      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
-    }
-  }}ge;
-  s{!!!insert-element-t\s*\(([^(),]+),([^(),]+)\)\s*;}{qq{
-    {
-      my \$el;
-      !!!create-element (\$el, $1, $2);
-      \$insert->(\$el);
-      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
-    }
-  }}ge;
-  s{!!!insert-element-t\s*\(([^(),]+)\)\s*;}{qq{
-    {
-      my \$el;
-      !!!create-element (\$el, $1);
+      !!!create-element (\$el, \$HTML_NS, $1, $2, $3);
       \$insert->(\$el);
       push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
@@ -63,7 +47,7 @@ while (<>) {
   s{!!!insert-element\s*\(([^(),]+),\s*,([^(),]+)\)\s*;}{qq{
     {
       my \$el;
-      !!!create-element (\$el, $1,, $2);
+      !!!create-element (\$el, \$HTML_NS, $1,, $2);
       \$self->{open_elements}->[-1]->[0]->append_child (\$el);
       push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
@@ -71,37 +55,21 @@ while (<>) {
   s{!!!insert-element\s*\(([^(),]+),([^(),]+),([^(),]+)\)\s*;}{qq{
     {
       my \$el;
-      !!!create-element (\$el, $1, $2, $3);
+      !!!create-element (\$el, \$HTML_NS, $1, $2, $3);
       \$self->{open_elements}->[-1]->[0]->append_child (\$el);
       push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
-  s{!!!insert-element\s*\(([^(),]+),([^(),]+)\)\s*;}{qq{
-    {
-      my \$el;
-      !!!create-element (\$el, $1, $2);
-      \$self->{open_elements}->[-1]->[0]->append_child (\$el);
-      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
-    }
-  }}ge;
-  s{!!!insert-element\s*\(([^(),]+)\)\s*;}{qq{
-    {
-      my \$el;
-      !!!create-element (\$el, $1);
-      \$self->{open_elements}->[-1]->[0]->append_child (\$el);
-      push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
-    }
-  }}ge;
-  s{!!!create-element\s*\(([^(),]+),([^(),]+)(?:,([^(),]*)(?>,([^(),]+))?)?\)\s*;}{
+  s{!!!create-element\s*\(([^(),]+),([^(),]+),([^(),]+)(?:,([^(),]*)(?>,([^(),]+))?)?\)\s*;}{
     my $l_var = $1;
     my $r = qq{
       $l_var = \$self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef, $2]);
+        ($2, [undef, $3]);
     };
-    if (defined $3 and length $3) {
+    if (defined $4 and length $4) {
       $r .= qq{
-        for my \$attr_name (keys %{$3}) {
-          my \$attr_t = $3\->{\$attr_name};
+        for my \$attr_name (keys %{$4}) {
+          my \$attr_t = $4\->{\$attr_name};
           my \$attr = \$self->{document}->create_attribute_ns
               (undef, [undef, \$attr_name]);
           \$attr->value (\$attr_t->{value});
@@ -111,8 +79,8 @@ while (<>) {
         }
       };
     }
-    if (defined $4) {
-      my $token_var = $4;
+    if (defined $5) {
+      my $token_var = $5;
       $token_var =~ s/^\s+//;
       $token_var =~ s/\s+$//;
       $r .= qq{

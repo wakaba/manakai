@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.122 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.123 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -11,6 +11,13 @@ use Error qw(:try);
 ## TODO: Control charcters and noncharacters are not allowed (HTML5 revision 1263)
 ## TODO: 1252 parse error (revision 1264)
 ## TODO: 8859-11 = 874 (revision 1271)
+
+my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
+my $MML_NS = q<http://www.w3.org/1998/Math/MathML>;
+my $SVG_NS = q<http://www.w3.org/2000/svg>;
+my $XLINK_NS = q<http://www.w3.org/1999/xlink>;
+my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
+my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
 
 sub A_EL () { 0b1 }
 sub ADDRESS_EL () { 0b10 }
@@ -37,6 +44,9 @@ sub TABLE_ROW_EL () { 0b1000000000000000000000 }
 sub TABLE_ROW_GROUP_EL () { 0b10000000000000000000000 }
 sub MISC_SCOPING_EL () { 0b100000000000000000000000 }
 sub MISC_SPECIAL_EL () { 0b1000000000000000000000000 }
+sub FOREIGN_EL () { 0b10000000000000000000000000 }
+sub FOREIGN_FLOW_CONTENT_EL () { 0b100000000000000000000000000 }
+sub MML_AXML_EL () { 0b1000000000000000000000000000 }
 
 sub TABLE_ROWS_EL () {
   TABLE_EL |
@@ -183,6 +193,23 @@ my $el_category = {
   u => FORMATTING_EL,
   ul => MISC_SPECIAL_EL,
   wbr => MISC_SPECIAL_EL,
+};
+
+my $el_category_f = {
+  $MML_NS => {
+    'annotation-xml' => MML_AXML_EL,
+    mi => FOREIGN_FLOW_CONTENT_EL,
+    mo => FOREIGN_FLOW_CONTENT_EL,
+    mn => FOREIGN_FLOW_CONTENT_EL,
+    ms => FOREIGN_FLOW_CONTENT_EL,
+    mtext => FOREIGN_FLOW_CONTENT_EL,
+  },
+  $SVG_NS => {
+    foreignobject => FOREIGN_FLOW_CONTENT_EL, ## TODO: case
+    desc => FOREIGN_FLOW_CONTENT_EL,
+    title => FOREIGN_FLOW_CONTENT_EL,
+  },
+  ## NOTE: In addition, FOREIGN_EL is set to non-HTML elements.
 };
 
 my $c1_entity_char = {
@@ -450,6 +477,10 @@ sub ROW_IMS ()        { 0b10000000 }
 sub BODY_AFTER_IMS () { 0b100000000 }
 sub FRAME_IMS ()      { 0b1000000000 }
 sub SELECT_IMS ()     { 0b10000000000 }
+sub IN_FOREIGN_CONTENT_IM () { 0b100000000000 }
+    ## NOTE: "in foreign content" insertion mode is special; it is combined
+    ## with the secondary insertion mode.  In this parser, they are stored
+    ## together in the bit-or'ed form.
 
 ## NOTE: "initial" and "before html" insertion modes have no constants.
 
@@ -3749,7 +3780,7 @@ sub _tree_construction_root_element ($) {
           my $root_element;
           
       $root_element = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
@@ -3801,9 +3832,10 @@ sub _tree_construction_root_element ($) {
         die "$0: $token->{type}: Unknown token type";
       }
 
-    my $root_element; 
+    my $root_element;
+    
       $root_element = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'html']);
+        ( $HTML_NS, [undef,  'html']);
     
         $root_element->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -3850,8 +3882,16 @@ sub _reset_insertion_mode ($) {
         }
       }
     
-      ## Step 4..13
-      my $new_mode = {
+    ## Step 4..14
+    my $new_mode;
+    if ($node->[1] & FOREIGN_EL) {
+      ## NOTE: Strictly spaking, the line below only applies to MathML and
+      ## SVG elements.  Currently the HTML syntax supports only MathML and
+      ## SVG elements as foreigners.
+      $new_mode = $self->{insertion_mode} | IN_FOREIGN_CONTENT_IM;
+      ## ISSUE: What is set as the secondary insertion mode?
+    } else {
+      $new_mode = {
                       select => IN_SELECT_IM,
                       ## NOTE: |option| and |optgroup| do not set
                       ## insertion mode to "in select" by themselves.
@@ -3868,10 +3908,10 @@ sub _reset_insertion_mode ($) {
                       body => IN_BODY_IM,
                       frameset => IN_FRAMESET_IM,
                      }->{$node->[0]->manakai_local_name};
-                     ## TODO: Foreign namespace case OK?
-      $self->{insertion_mode} = $new_mode and return if defined $new_mode;
+    }
+    $self->{insertion_mode} = $new_mode and return if defined $new_mode;
       
-      ## Step 14
+      ## Step 15
       if ($node->[1] & HTML_EL) {
         unless (defined $self->{head_element}) {
           
@@ -3886,14 +3926,14 @@ sub _reset_insertion_mode ($) {
         
       }
       
-      ## Step 15
+      ## Step 16
       $self->{insertion_mode} = IN_BODY_IM and return if $last;
       
-      ## Step 16
+      ## Step 17
       $i--;
       $node = $self->{open_elements}->[$i];
       
-      ## Step 17
+      ## Step 18
       redo S3;
     } # S3
 
@@ -4007,7 +4047,7 @@ sub _tree_construction_main ($) {
     my $el;
     
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $start_tag_name]);
+        ( $HTML_NS, [undef,  $start_tag_name]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
@@ -4076,7 +4116,7 @@ sub _tree_construction_main ($) {
     my $script_el;
     
       $script_el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'script']);
+        ( $HTML_NS, [undef,  'script']);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
@@ -4415,14 +4455,14 @@ sub _tree_construction_main ($) {
     }
   }; # $insert_to_foster
 
-  B: {
+  B: while (1) {
     if ($token->{type} == DOCTYPE_TOKEN) {
       
       $self->{parse_error}->(level => $self->{must_level}, type => 'DOCTYPE in the middle', token => $token);
       ## Ignore the token
       ## Stay in the phase
       $token = $self->_get_next_token;
-      redo B;
+      next B;
     } elsif ($token->{type} == START_TAG_TOKEN and
              $token->{tag_name} eq 'html') {
       if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
@@ -4450,7 +4490,7 @@ sub _tree_construction_main ($) {
       }
       
       $token = $self->_get_next_token;
-      redo B;
+      next B;
     } elsif ($token->{type} == COMMENT_TOKEN) {
       my $comment = $self->{document}->create_comment ($token->{data});
       if ($self->{insertion_mode} & AFTER_HTML_IMS) {
@@ -4464,8 +4504,91 @@ sub _tree_construction_main ($) {
         $self->{open_elements}->[-1]->[0]->append_child ($comment);
       }
       $token = $self->_get_next_token;
-      redo B;
-    } elsif ($self->{insertion_mode} & HEAD_IMS) {
+      next B;
+    } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
+      if ($token->{type} == CHARACTER_TOKEN) {
+        
+        $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+        $token = $self->_get_next_token;
+        next B;
+      } elsif ($token->{type} == START_TAG_TOKEN) {
+        if ($self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL or
+            not ($self->{open_elements}->[-1]->[1] & FOREIGN_EL) or
+            ($token->{tag_name} eq 'svg' and
+             $self->{open_elements}->[-1]->[1] & MML_AXML_EL)) {
+          ## NOTE: "using the rules for secondary insertion mode"then"continue"
+          
+          #
+        } elsif ({
+  ## TODO:
+                 }->{$token->{tag_name}}) {
+          
+          $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                          value => $self->{open_elements}->[-1]->[0]
+                              ->manakai_local_name,
+                          token => $token);
+
+          pop @{$self->{open_elements}}
+              while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
+
+          $self->{insertion_mode} &= ~ $self->{insertion_mode};
+          ## Reprocess.
+          next B;
+        } else {
+          ## TODO: case fixup
+
+          
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ( $self->{open_elements}->[-1]->[0]->namespace_uri, [undef,   $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$self->{open_elements}->[-1]->[0]->namespace_uri}->{ $token->{tag_name}} || 0) | FOREIGN_EL];
+    }
+  
+
+          if ($self->{self_closing}) {
+            pop @{$self->{open_elements}};
+            delete $self->{self_closing};
+          } else {
+            
+          }
+
+          $token = $self->_get_next_token;
+          next B;
+        }
+      } elsif ($token->{type} == END_TAG_TOKEN) {
+        ## NOTE: "using the rules for secondary insertion mode" then "continue"
+        
+        #
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        ## NOTE: "using the rules for secondary insertion mode" then "continue"
+        
+        #
+        ## TODO: ...
+      } else {
+        die "$0: $token->{type}: Unknown token type";        
+      }
+    }
+
+    if ($self->{insertion_mode} & HEAD_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
           unless ($self->{insertion_mode} == BEFORE_HEAD_IM) {
@@ -4475,12 +4598,12 @@ sub _tree_construction_main ($) {
             
             ## Ignore the token.
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
           unless (length $token->{data}) {
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
         }
 
@@ -4489,7 +4612,7 @@ sub _tree_construction_main ($) {
           ## As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+        ( $HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -4531,7 +4654,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+        ( $HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -4544,14 +4667,14 @@ sub _tree_construction_main ($) {
   
         $self->{insertion_mode} = IN_BODY_IM;
         ## reprocess
-        redo B;
+        next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
         if ($token->{tag_name} eq 'head') {
           if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
             
             
       $self->{head_element} = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
@@ -4575,7 +4698,7 @@ sub _tree_construction_main ($) {
             $self->{insertion_mode} = IN_HEAD_IM;
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
             
             #
@@ -4585,29 +4708,29 @@ sub _tree_construction_main ($) {
             ## Ignore the token
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
         } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
-              
-              ## As if <head>
-              
+          
+          ## As if <head>
+          
       $self->{head_element} = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+        ( $HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
         $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-              $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
-              push @{$self->{open_elements}},
-                  [$self->{head_element}, $el_category->{head}];
+          $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
+          push @{$self->{open_elements}},
+              [$self->{head_element}, $el_category->{head}];
 
-              $self->{insertion_mode} = IN_HEAD_IM;
-              ## Reprocess in the "in head" insertion mode...
-            } else {
-              
-            }
+          $self->{insertion_mode} = IN_HEAD_IM;
+          ## Reprocess in the "in head" insertion mode...
+        } else {
+          
+        }
 
             if ($token->{tag_name} eq 'base') {
               if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
@@ -4636,7 +4759,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4662,7 +4785,7 @@ sub _tree_construction_main ($) {
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } elsif ($token->{tag_name} eq 'link') {
               ## NOTE: There is a "as if in head" code clone.
               if ($self->{insertion_mode} == AFTER_HEAD_IM) {
@@ -4678,7 +4801,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4704,7 +4827,7 @@ sub _tree_construction_main ($) {
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               delete $self->{self_closing};
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } elsif ($token->{tag_name} eq 'meta') {
               ## NOTE: There is a "as if in head" code clone.
               if ($self->{insertion_mode} == AFTER_HEAD_IM) {
@@ -4720,7 +4843,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4794,7 +4917,7 @@ sub _tree_construction_main ($) {
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               delete $self->{self_closing};
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } elsif ($token->{tag_name} eq 'title') {
               if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 
@@ -4819,7 +4942,7 @@ sub _tree_construction_main ($) {
               $parse_rcdata->(RCDATA_CONTENT_MODEL);
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
-              redo B;
+              next B;
             } elsif ($token->{tag_name} eq 'style') {
               ## NOTE: Or (scripting is enabled and tag_name eq 'noscript' and
               ## insertion mode IN_HEAD_IM)
@@ -4835,7 +4958,7 @@ sub _tree_construction_main ($) {
               $parse_rcdata->(CDATA_CONTENT_MODEL);
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
-              redo B;
+              next B;
             } elsif ($token->{tag_name} eq 'noscript') {
               if ($self->{insertion_mode} == IN_HEAD_IM) {
                 
@@ -4845,7 +4968,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4869,14 +4992,14 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = IN_HEAD_NOSCRIPT_IM;
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'in noscript:noscript', token => $token);
                 ## Ignore the token
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
                 #
@@ -4903,7 +5026,7 @@ sub _tree_construction_main ($) {
               $script_start_tag->();
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
-              redo B;
+              next B;
             } elsif ($token->{tag_name} eq 'body' or
                      $token->{tag_name} eq 'frameset') {
               if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
@@ -4932,7 +5055,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4964,7 +5087,7 @@ sub _tree_construction_main ($) {
               }
               
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } else {
               
               #
@@ -4998,7 +5121,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+        ( $HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5012,7 +5135,7 @@ sub _tree_construction_main ($) {
             $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
             
-            redo B;
+            next B;
           } elsif ($token->{type} == END_TAG_TOKEN) {
             if ($token->{tag_name} eq 'head') {
               if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
@@ -5020,7 +5143,7 @@ sub _tree_construction_main ($) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+        ( $HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5035,7 +5158,7 @@ sub _tree_construction_main ($) {
                 pop @{$self->{open_elements}};
                 $self->{insertion_mode} = AFTER_HEAD_IM;
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 
                 ## As if </noscript>
@@ -5046,13 +5169,13 @@ sub _tree_construction_main ($) {
                 pop @{$self->{open_elements}};
                 $self->{insertion_mode} = AFTER_HEAD_IM;
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
                 
                 pop @{$self->{open_elements}};
                 $self->{insertion_mode} = AFTER_HEAD_IM;
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
                 #
@@ -5063,13 +5186,13 @@ sub _tree_construction_main ($) {
                 pop @{$self->{open_elements}};
                 $self->{insertion_mode} = IN_HEAD_IM;
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:noscript', token => $token);
                 ## Ignore the token ## ISSUE: An issue in the spec.
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
                 #
@@ -5082,7 +5205,7 @@ sub _tree_construction_main ($) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+        ( $HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5100,7 +5223,7 @@ sub _tree_construction_main ($) {
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
               }
@@ -5114,7 +5237,7 @@ sub _tree_construction_main ($) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+        ( $HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5141,7 +5264,7 @@ sub _tree_construction_main ($) {
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               }
             }
 
@@ -5168,7 +5291,7 @@ sub _tree_construction_main ($) {
               $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
               ## Ignore the token ## ISSUE: An issue in the spec.
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } else {
               
             }
@@ -5180,7 +5303,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+        ( $HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5193,7 +5316,7 @@ sub _tree_construction_main ($) {
   
             $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
-            redo B;
+            next B;
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
           
@@ -5201,7 +5324,7 @@ sub _tree_construction_main ($) {
           ## NOTE: As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+        ( $HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5257,7 +5380,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+        ( $HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5270,7 +5393,7 @@ sub _tree_construction_main ($) {
   
         $self->{insertion_mode} = IN_BODY_IM;
         ## NOTE: Reprocess.
-        redo B;
+        next B;
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
@@ -5285,7 +5408,7 @@ sub _tree_construction_main ($) {
             $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           } elsif ($token->{type} == START_TAG_TOKEN) {
             if ({
                  caption => 1, col => 1, colgroup => 1, tbody => 1,
@@ -5308,7 +5431,7 @@ sub _tree_construction_main ($) {
                               tag_name => $node->[0]->manakai_local_name,
                               line => $token->{line},
                               column => $token->{column}};
-                    redo B;
+                    next B;
                   } elsif ($node->[1] & TABLE_SCOPING_EL) {
                     
                     ## ISSUE: This case can never be reached, maybe.
@@ -5322,7 +5445,7 @@ sub _tree_construction_main ($) {
                 ## Ignore the token
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } elsif ($self->{insertion_mode} == IN_CAPTION_IM) {
                 $self->{parse_error}->(level => $self->{must_level}, type => 'not closed:caption', token => $token);
                 
@@ -5348,7 +5471,7 @@ sub _tree_construction_main ($) {
                   ## Ignore the token
                   
                   $token = $self->_get_next_token;
-                  redo B;
+                  next B;
                 } # INSCOPE
                 
                 ## generate implied end tags
@@ -5376,7 +5499,7 @@ sub _tree_construction_main ($) {
                 
                 ## reprocess
                 
-                redo B;
+                next B;
               } else {
                 
                 #
@@ -5406,7 +5529,7 @@ sub _tree_construction_main ($) {
                     $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                     ## Ignore the token
                     $token = $self->_get_next_token;
-                    redo B;
+                    next B;
                   }
                 
                 ## generate implied end tags
@@ -5434,13 +5557,13 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = IN_ROW_IM;
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } elsif ($self->{insertion_mode} == IN_CAPTION_IM) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
                 #
@@ -5467,7 +5590,7 @@ sub _tree_construction_main ($) {
                                   value => $token->{tag_name}, token => $token);
                   ## Ignore the token
                   $token = $self->_get_next_token;
-                  redo B;
+                  next B;
                 } # INSCOPE
                 
                 ## generate implied end tags
@@ -5494,13 +5617,13 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = IN_TABLE_IM;
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } elsif ($self->{insertion_mode} == IN_CELL_IM) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
                 #
@@ -5529,7 +5652,7 @@ sub _tree_construction_main ($) {
                     $token = {type => END_TAG_TOKEN, tag_name => $tn,
                               line => $token->{line},
                               column => $token->{column}};
-                    redo B;
+                    next B;
                   } elsif ($node->[1] & TABLE_CELL_EL) {
                     
                     $tn = $node->[0]->manakai_local_name;
@@ -5547,7 +5670,7 @@ sub _tree_construction_main ($) {
                     value => $token->{tag_name}, token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } # INSCOPE
             } elsif ($token->{tag_name} eq 'table' and
                      $self->{insertion_mode} == IN_CAPTION_IM) {
@@ -5572,7 +5695,7 @@ sub _tree_construction_main ($) {
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:caption', token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               }
               
               ## generate implied end tags
@@ -5598,7 +5721,7 @@ sub _tree_construction_main ($) {
               $self->{insertion_mode} = IN_TABLE_IM;
 
               ## reprocess
-              redo B;
+              next B;
             } elsif ({
                       body => 1, col => 1, colgroup => 1, html => 1,
                      }->{$token->{tag_name}}) {
@@ -5607,7 +5730,7 @@ sub _tree_construction_main ($) {
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
                 #
@@ -5621,7 +5744,7 @@ sub _tree_construction_main ($) {
               $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
               ## Ignore the token
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } else {
               
               #
@@ -5652,7 +5775,7 @@ sub _tree_construction_main ($) {
           unless (length $token->{data}) {
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           } else {
             
           }
@@ -5707,7 +5830,7 @@ sub _tree_construction_main ($) {
         }
             
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
             if ({
                  tr => ($self->{insertion_mode} != IN_ROW_IM),
@@ -5726,7 +5849,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'tbody']);
+        ( $HTML_NS, [undef,  'tbody']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5763,7 +5886,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5786,7 +5909,7 @@ sub _tree_construction_main ($) {
   
                   
                   $token = $self->_get_next_token;
-                  redo B;
+                  next B;
                 } else {
                   
                   
@@ -5794,7 +5917,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'tr']);
+        ( $HTML_NS, [undef,  'tr']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5823,7 +5946,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5850,7 +5973,7 @@ sub _tree_construction_main ($) {
               
               
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } elsif ({
                       caption => 1, col => 1, colgroup => 1,
                       tbody => 1, tfoot => 1, thead => 1,
@@ -5878,7 +6001,7 @@ sub _tree_construction_main ($) {
                   ## Ignore the token
                   
                   $token = $self->_get_next_token;
-                  redo B;
+                  next B;
                 }
                 
                 ## Clear back to table row context
@@ -5895,7 +6018,7 @@ sub _tree_construction_main ($) {
                   
                   ## reprocess
                   
-                  redo B;
+                  next B;
                 } else {
                   
                   ## reprocess in the "in table body" insertion mode...
@@ -5923,7 +6046,7 @@ sub _tree_construction_main ($) {
                   ## Ignore the token
                   
                   $token = $self->_get_next_token;
-                  redo B;
+                  next B;
                 }
 
                 ## Clear back to table body context
@@ -5962,7 +6085,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'colgroup']);
+        ( $HTML_NS, [undef,  'colgroup']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5976,7 +6099,7 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = IN_COLUMN_GROUP_IM;
                 ## reprocess
                 
-                redo B;
+                next B;
               } elsif ({
                         caption => 1,
                         colgroup => 1,
@@ -5998,7 +6121,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6028,7 +6151,7 @@ sub _tree_construction_main ($) {
                                           }->{$token->{tag_name}};
                 $token = $self->_get_next_token;
                 
-                redo B;
+                next B;
               } else {
                 die "$0: in table: <>: $token->{tag_name}";
               }
@@ -6059,7 +6182,7 @@ sub _tree_construction_main ($) {
                 ## Ignore tokens </table><table>
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               }
               
 ## TODO: Followings are removed from the latest spec.
@@ -6087,13 +6210,13 @@ sub _tree_construction_main ($) {
 
           ## reprocess
           
-          redo B;
+          next B;
         } elsif ($token->{tag_name} eq 'style') {
           if (not $open_tables->[-1]->[1]) { # tainted
             
             ## NOTE: This is a "as if in head" code clone.
             $parse_rcdata->(CDATA_CONTENT_MODEL);
-            redo B;
+            next B;
           } else {
             
             #
@@ -6103,7 +6226,7 @@ sub _tree_construction_main ($) {
             
             ## NOTE: This is a "as if in head" code clone.
             $script_start_tag->();
-            redo B;
+            next B;
           } else {
             
             #
@@ -6121,7 +6244,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6149,7 +6272,7 @@ sub _tree_construction_main ($) {
 
                 $token = $self->_get_next_token;
                 delete $self->{self_closing};
-                redo B;
+                next B;
               } else {
                 
                 #
@@ -6193,7 +6316,7 @@ sub _tree_construction_main ($) {
                 ## Ignore the token
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
               }
@@ -6210,7 +6333,7 @@ sub _tree_construction_main ($) {
               $self->{insertion_mode} = IN_TABLE_BODY_IM;
               $token = $self->_get_next_token;
               
-              redo B;
+              next B;
             } elsif ($token->{tag_name} eq 'table') {
               if ($self->{insertion_mode} == IN_ROW_IM) {
                 ## As if </tr>
@@ -6234,7 +6357,7 @@ sub _tree_construction_main ($) {
                   ## Ignore the token
                   
                   $token = $self->_get_next_token;
-                  redo B;
+                  next B;
                 }
                 
                 ## Clear back to table row context
@@ -6270,7 +6393,7 @@ sub _tree_construction_main ($) {
                   ## Ignore the token
                   
                   $token = $self->_get_next_token;
-                  redo B;
+                  next B;
                 }
                 
                 ## Clear back to table body context
@@ -6316,7 +6439,7 @@ sub _tree_construction_main ($) {
                 ## Ignore the token
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               }
                 
               splice @{$self->{open_elements}}, $i;
@@ -6325,7 +6448,7 @@ sub _tree_construction_main ($) {
               $self->_reset_insertion_mode;
               
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } elsif ({
                       tbody => 1, tfoot => 1, thead => 1,
                      }->{$token->{tag_name}} and
@@ -6350,7 +6473,7 @@ sub _tree_construction_main ($) {
                     ## Ignore the token
                     
                     $token = $self->_get_next_token;
-                    redo B;
+                    next B;
                   }
                 
                 ## As if </tr>
@@ -6373,7 +6496,7 @@ sub _tree_construction_main ($) {
                     ## Ignore the token
                     
                     $token = $self->_get_next_token;
-                    redo B;
+                    next B;
                   }
                 
                 ## Clear back to table row context
@@ -6408,7 +6531,7 @@ sub _tree_construction_main ($) {
                 ## Ignore the token
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               }
 
               ## Clear back to table body context
@@ -6423,7 +6546,7 @@ sub _tree_construction_main ($) {
               $self->{insertion_mode} = IN_TABLE_IM;
               
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } elsif ({
                       body => 1, caption => 1, col => 1, colgroup => 1,
                       html => 1, td => 1, th => 1,
@@ -6435,7 +6558,7 @@ sub _tree_construction_main ($) {
           ## Ignore the token
           
            $token = $self->_get_next_token;
-          redo B;
+          next B;
         } else {
           
           $self->{parse_error}->(level => $self->{must_level}, type => 'in table:/'.$token->{tag_name}, token => $token);
@@ -6466,7 +6589,7 @@ sub _tree_construction_main ($) {
               unless (length $token->{data}) {
                 
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               }
             }
             
@@ -6480,7 +6603,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6504,7 +6627,7 @@ sub _tree_construction_main ($) {
               pop @{$self->{open_elements}};
               delete $self->{self_closing};
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } else { 
               
               #
@@ -6516,20 +6639,20 @@ sub _tree_construction_main ($) {
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:colgroup', token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
-                redo B;
+                next B;
               } else {
                 
                 pop @{$self->{open_elements}}; # colgroup
                 $self->{insertion_mode} = IN_TABLE_IM;
                 $token = $self->_get_next_token;
-                redo B;             
+                next B;             
               }
             } elsif ($token->{tag_name} eq 'col') {
               
               $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:col', token => $token);
               ## Ignore the token
               $token = $self->_get_next_token;
-              redo B;
+              next B;
             } else {
               
               # 
@@ -6546,7 +6669,7 @@ sub _tree_construction_main ($) {
           pop @{$self->{open_elements}}; # colgroup
           $self->{insertion_mode} = IN_TABLE_IM;
           ## Reprocess.
-          redo B;
+          next B;
         }
       } else {
         die "$0: $token->{type}: Unknown token type";
@@ -6560,21 +6683,21 @@ sub _tree_construction_main ($) {
             ## Ignore the token
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           } else {
             
             pop @{$self->{open_elements}}; # colgroup
             $self->{insertion_mode} = IN_TABLE_IM;
             
             ## reprocess
-            redo B;
+            next B;
           }
     } elsif ($self->{insertion_mode} & SELECT_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
         if ($token->{tag_name} eq 'option') {
           if ($self->{open_elements}->[-1]->[1] & OPTION_EL) {
@@ -6590,7 +6713,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6613,7 +6736,7 @@ sub _tree_construction_main ($) {
   
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } elsif ($token->{tag_name} eq 'optgroup') {
           if ($self->{open_elements}->[-1]->[1] & OPTION_EL) {
             
@@ -6636,7 +6759,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6659,7 +6782,7 @@ sub _tree_construction_main ($) {
   
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } elsif ($token->{tag_name} eq 'select' or
                  $token->{tag_name} eq 'input' or
                  ($self->{insertion_mode} == IN_SELECT_IN_TABLE_IM and
@@ -6691,7 +6814,7 @@ sub _tree_construction_main ($) {
             ## Ignore the token
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
               
           
@@ -6702,12 +6825,12 @@ sub _tree_construction_main ($) {
           if ($token->{tag_name} eq 'select') {
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           } else {
             
             
             ## Reprocess the token.
-            redo B;
+            next B;
           }
         } else {
           
@@ -6715,7 +6838,7 @@ sub _tree_construction_main ($) {
           ## Ignore the token
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         }
       } elsif ($token->{type} == END_TAG_TOKEN) {
         if ($token->{tag_name} eq 'optgroup') {
@@ -6734,7 +6857,7 @@ sub _tree_construction_main ($) {
           }
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } elsif ($token->{tag_name} eq 'option') {
           if ($self->{open_elements}->[-1]->[1] & OPTION_EL) {
             
@@ -6746,7 +6869,7 @@ sub _tree_construction_main ($) {
           }
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } elsif ($token->{tag_name} eq 'select') {
           ## have an element in table scope
           my $i;
@@ -6767,7 +6890,7 @@ sub _tree_construction_main ($) {
             ## Ignore the token
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
               
           
@@ -6777,7 +6900,7 @@ sub _tree_construction_main ($) {
 
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } elsif ($self->{insertion_mode} == IN_SELECT_IN_TABLE_IM and
                  {
                   caption => 1, table => 1, tbody => 1,
@@ -6804,7 +6927,7 @@ sub _tree_construction_main ($) {
             ## Ignore the token
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
               
           ## As if </select>
@@ -6829,7 +6952,7 @@ sub _tree_construction_main ($) {
             ## Ignore the </select> token
             
             $token = $self->_get_next_token; ## TODO: ok?
-            redo B;
+            next B;
           }
               
           
@@ -6839,14 +6962,14 @@ sub _tree_construction_main ($) {
 
           
           ## reprocess
-          redo B;
+          next B;
         } else {
           
           $self->{parse_error}->(level => $self->{must_level}, type => 'in select:/'.$token->{tag_name}, token => $token);
           ## Ignore the token
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         unless ($self->{open_elements}->[-1]->[1] & HTML_EL and
@@ -6874,7 +6997,7 @@ sub _tree_construction_main ($) {
           unless (length $token->{data}) {
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
         }
         
@@ -6892,7 +7015,7 @@ sub _tree_construction_main ($) {
 
         $self->{insertion_mode} = IN_BODY_IM;
         ## reprocess
-        redo B;
+        next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
         if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
           
@@ -6909,7 +7032,7 @@ sub _tree_construction_main ($) {
         $self->{insertion_mode} = IN_BODY_IM;
         
         ## reprocess
-        redo B;
+        next B;
       } elsif ($token->{type} == END_TAG_TOKEN) {
         if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
           
@@ -6928,12 +7051,12 @@ sub _tree_construction_main ($) {
             $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:html', token => $token);
             ## Ignore the token
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           } else {
             
             $self->{insertion_mode} = AFTER_HTML_BODY_IM;
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
         } else {
           
@@ -6941,7 +7064,7 @@ sub _tree_construction_main ($) {
 
           $self->{insertion_mode} = IN_BODY_IM;
           ## reprocess
-          redo B;
+          next B;
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         
@@ -6958,7 +7081,7 @@ sub _tree_construction_main ($) {
           unless (length $token->{data}) {
             
             $token = $self->_get_next_token;
-            redo B;
+            next B;
           }
         }
         
@@ -6986,7 +7109,7 @@ sub _tree_construction_main ($) {
             
             $token = $self->_get_next_token;
           }
-          redo B;
+          next B;
         }
         
         die qq[$0: Character "$token->{data}"];
@@ -7009,7 +7132,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7032,7 +7155,7 @@ sub _tree_construction_main ($) {
   
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } elsif ($token->{tag_name} eq 'frame' and
                  $self->{insertion_mode} == IN_FRAMESET_IM) {
           
@@ -7041,7 +7164,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7065,12 +7188,12 @@ sub _tree_construction_main ($) {
           pop @{$self->{open_elements}};
           delete $self->{self_closing};
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } elsif ($token->{tag_name} eq 'noframes') {
           
           ## NOTE: As if in body.
           $parse_rcdata->(CDATA_CONTENT_MODEL);
-          redo B;
+          next B;
         } else {
           if ($self->{insertion_mode} == IN_FRAMESET_IM) {
             
@@ -7082,7 +7205,7 @@ sub _tree_construction_main ($) {
           ## Ignore the token
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         }
       } elsif ($token->{type} == END_TAG_TOKEN) {
         if ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
@@ -7116,13 +7239,13 @@ sub _tree_construction_main ($) {
           } else {
             
           }
-          redo B;
+          next B;
         } elsif ($token->{tag_name} eq 'html' and
                  $self->{insertion_mode} == AFTER_FRAMESET_IM) {
           
           $self->{insertion_mode} = AFTER_HTML_FRAMESET_IM;
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } else {
           if ($self->{insertion_mode} == IN_FRAMESET_IM) {
             
@@ -7133,7 +7256,7 @@ sub _tree_construction_main ($) {
           }
           ## Ignore the token
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         unless ($self->{open_elements}->[-1]->[1] & HTML_EL and
@@ -7161,12 +7284,12 @@ sub _tree_construction_main ($) {
         
         ## NOTE: This is an "as if in head" code clone
         $script_start_tag->();
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'style') {
         
         ## NOTE: This is an "as if in head" code clone
         $parse_rcdata->(CDATA_CONTENT_MODEL);
-        redo B;
+        next B;
       } elsif ({
                 base => 1, link => 1,
                }->{$token->{tag_name}}) {
@@ -7177,7 +7300,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7201,7 +7324,7 @@ sub _tree_construction_main ($) {
         pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
         delete $self->{self_closing};
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'meta') {
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
         
@@ -7209,7 +7332,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7277,12 +7400,12 @@ sub _tree_construction_main ($) {
 
         delete $self->{self_closing};
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'title') {
         
         ## NOTE: This is an "as if in head" code clone
         $parse_rcdata->(RCDATA_CONTENT_MODEL);
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'body') {
         $self->{parse_error}->(level => $self->{must_level}, type => 'in body:body', token => $token);
               
@@ -7303,7 +7426,7 @@ sub _tree_construction_main ($) {
         }
         
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ({
                 address => 1, blockquote => 1, center => 1, dir => 1, 
                 div => 1, dl => 1, fieldset => 1,
@@ -7320,7 +7443,7 @@ sub _tree_construction_main ($) {
           ## Ignore the token
           
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         }
 
         ## has a p element in scope
@@ -7334,7 +7457,7 @@ sub _tree_construction_main ($) {
      # <form>
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
-            redo B;
+            next B;
           } elsif ($_->[1] & SCOPING_EL) {
             
             last INSCOPE;
@@ -7346,7 +7469,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7405,7 +7528,7 @@ sub _tree_construction_main ($) {
           
           $token = $self->_get_next_token;
         }
-        redo B;
+        next B;
       } elsif ({li => 1, dt => 1, dd => 1}->{$token->{tag_name}}) {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
@@ -7418,7 +7541,7 @@ sub _tree_construction_main ($) {
      # <x>
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
-            redo B;
+            next B;
           } elsif ($_->[1] & SCOPING_EL) {
             
             last INSCOPE;
@@ -7472,7 +7595,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7495,7 +7618,7 @@ sub _tree_construction_main ($) {
   
         
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'plaintext') {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
@@ -7508,7 +7631,7 @@ sub _tree_construction_main ($) {
      # <plaintext>
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
-            redo B;
+            next B;
           } elsif ($_->[1] & SCOPING_EL) {
             
             last INSCOPE;
@@ -7520,7 +7643,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7546,7 +7669,7 @@ sub _tree_construction_main ($) {
           
         
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'a') {
         AFE: for my $i (reverse 0..$#$active_formatting_elements) {
           my $node = $active_formatting_elements->[$i];
@@ -7591,7 +7714,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7616,7 +7739,7 @@ sub _tree_construction_main ($) {
 
         
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'nobr') {
         $reconstruct_active_formatting_elements->($insert_to_current);
 
@@ -7633,7 +7756,7 @@ sub _tree_construction_main ($) {
      # <nobr>
             $token = {type => END_TAG_TOKEN, tag_name => 'nobr',
                       line => $token->{line}, column => $token->{column}};
-            redo B;
+            next B;
           } elsif ($node->[1] & SCOPING_EL) {
             
             last INSCOPE;
@@ -7645,7 +7768,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7670,7 +7793,7 @@ sub _tree_construction_main ($) {
         
         
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'button') {
         ## has a button element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -7685,7 +7808,7 @@ sub _tree_construction_main ($) {
      # <button>
             $token = {type => END_TAG_TOKEN, tag_name => 'button',
                       line => $token->{line}, column => $token->{column}};
-            redo B;
+            next B;
           } elsif ($node->[1] & SCOPING_EL) {
             
             last INSCOPE;
@@ -7699,7 +7822,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7727,7 +7850,7 @@ sub _tree_construction_main ($) {
 
         
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ({
                 xmp => 1,
                 iframe => 1,
@@ -7743,7 +7866,7 @@ sub _tree_construction_main ($) {
         }
         ## NOTE: There is an "as if in body" code clone.
         $parse_rcdata->(CDATA_CONTENT_MODEL);
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'isindex') {
         $self->{parse_error}->(level => $self->{must_level}, type => 'isindex', token => $token);
         
@@ -7752,7 +7875,7 @@ sub _tree_construction_main ($) {
           ## Ignore the token
            ## NOTE: Not acknowledged.
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } else {
           my $at = $token->{attributes};
           my $form_attrs;
@@ -7800,14 +7923,14 @@ sub _tree_construction_main ($) {
            ## NOTE: Not acknowledged.
           unshift @{$self->{token}}, (@tokens);
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         }
       } elsif ($token->{tag_name} eq 'textarea') {
         my $tag_name = $token->{tag_name};
         my $el;
         
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
@@ -7866,7 +7989,51 @@ sub _tree_construction_main ($) {
           $self->{parse_error}->(level => $self->{must_level}, type => 'in RCDATA:#'.$token->{type}, token => $token);
         }
         $token = $self->_get_next_token;
-        redo B;
+        next B;
+      } elsif ($token->{tag_name} eq 'math' or
+               $token->{tag_name} eq 'svg') {
+        $reconstruct_active_formatting_elements->($insert_to_current);
+        
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ( $token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS, [undef,   $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns
+              (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL];
+    }
+  
+        
+        if ($self->{self_closing}) {
+          pop @{$self->{open_elements}};
+          delete $self->{self_closing};
+        } else {
+          
+          $self->{insertion_mode} |= IN_FOREIGN_CONTENT_IM;
+          ## NOTE: |<body><math><mi><svg>| -> "in foreign content" insertion
+          ## mode, "in body" (not "in foreign content") secondary insertion
+          ## mode, maybe.
+        }
+
+        $token = $self->_get_next_token;
+        next B;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
                 frameset => 1, head => 1, option => 1, optgroup => 1,
@@ -7878,7 +8045,7 @@ sub _tree_construction_main ($) {
         ## Ignore the token
          ## NOTE: |<col/>| or |<frame/>| here is an error.
         $token = $self->_get_next_token;
-        redo B;
+        next B;
         
         ## ISSUE: An issue on HTML5 new elements in the spec.
       } else {
@@ -7898,7 +8065,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+        ( $HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -7965,7 +8132,7 @@ sub _tree_construction_main ($) {
         }
         
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       }
     } elsif ($token->{type} == END_TAG_TOKEN) {
       if ($token->{tag_name} eq 'body') {
@@ -7987,7 +8154,7 @@ sub _tree_construction_main ($) {
                           value => $token->{tag_name}, token => $token);
           ## NOTE: Ignore the token.
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         } # INSCOPE
 
         for (@{$self->{open_elements}}) {
@@ -8004,7 +8171,7 @@ sub _tree_construction_main ($) {
 
         $self->{insertion_mode} = AFTER_BODY_IM;
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'html') {
         ## TODO: Update this code.  It seems that the code below is not
         ## up-to-date, though it has same effect as speced.
@@ -8022,13 +8189,13 @@ sub _tree_construction_main ($) {
           }
           $self->{insertion_mode} = AFTER_BODY_IM;
           ## reprocess
-          redo B;
+          next B;
         } else {
           
           $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
           ## Ignore the token
           $token = $self->_get_next_token;
-          redo B;
+          next B;
         }
       } elsif ({
                 address => 1, blockquote => 1, center => 1, dir => 1,
@@ -8088,7 +8255,7 @@ sub _tree_construction_main ($) {
               }->{$token->{tag_name}};
         }
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'form') {
         undef $self->{form_element};
 
@@ -8133,7 +8300,7 @@ sub _tree_construction_main ($) {
         }
 
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ({
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
                }->{$token->{tag_name}}) {
@@ -8175,7 +8342,7 @@ sub _tree_construction_main ($) {
         }
         
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'p') {
         ## has an element in scope
         my $i;
@@ -8213,7 +8380,7 @@ sub _tree_construction_main ($) {
           my $el;
           
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'p']);
+        ( $HTML_NS, [undef,  'p']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -8225,7 +8392,7 @@ sub _tree_construction_main ($) {
         }
 
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ({
                 a => 1,
                 b => 1, big => 1, em => 1, font => 1, i => 1,
@@ -8234,7 +8401,7 @@ sub _tree_construction_main ($) {
                }->{$token->{tag_name}}) {
         
         $formatting_end_tag->($token);
-        redo B;
+        next B;
       } elsif ($token->{tag_name} eq 'br') {
         
         $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:br', token => $token);
@@ -8245,7 +8412,7 @@ sub _tree_construction_main ($) {
         my $el;
         
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'br']);
+        ( $HTML_NS, [undef,  'br']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -8256,7 +8423,7 @@ sub _tree_construction_main ($) {
         
         ## Ignore the token.
         $token = $self->_get_next_token;
-        redo B;
+        next B;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
                 frameset => 1, head => 1, option => 1, optgroup => 1,
@@ -8273,7 +8440,7 @@ sub _tree_construction_main ($) {
         $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
         ## Ignore the token
         $token = $self->_get_next_token;
-        redo B;
+        next B;
         
         ## ISSUE: Issue on HTML5 new elements in spec
         
@@ -8334,10 +8501,29 @@ sub _tree_construction_main ($) {
           ## Step 5;
           redo S2;
         } # S2
-	redo B;
+	next B;
       }
     }
-    redo B;
+    next B;
+  } continue { # B
+    if ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
+      ## NOTE: The code below is executed in cases where it does not have
+      ## to be, but it it is harmless even in those cases.
+      ## has an element in scope
+      INSCOPE: {
+        for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
+          if ($node->[1] & FOREIGN_EL) {
+            last INSCOPE;
+          } elsif ($node->[1] & SCOPING_EL) {
+            last;
+          }
+        }
+        
+        ## NOTE: No foreign element in scope.
+        $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
+      } # INSCOPE
+    }
   } # B
 
   ## Stop parsing # MUST
@@ -8524,4 +8710,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/12 10:41:30 $
+# $Date: 2008/04/12 14:54:33 $
