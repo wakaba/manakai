@@ -814,6 +814,14 @@ for (qw/
   $HTMLAttrStatus{$_} = FEATURE_HTML5_DEFAULT;
 }
 
+my $HTMLDatasetAttrChecker = sub {
+  ## NOTE: "Authors should ... when the attributes are ignored and
+  ## any associated CSS dropped, the page is still usable." (semantic
+  ## constraint.)
+}; # $HTMLDatasetAttrChecker
+
+my $HTMLDatasetAttrStatus = FEATURE_HTML5_DEFAULT;
+
 my $GetHTMLAttrsChecker = sub {
   my $element_specific_checker = shift;
   my $element_specific_status = shift;
@@ -824,9 +832,16 @@ my $GetHTMLAttrsChecker = sub {
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
       my $checker;
+      my $status;
       if ($attr_ns eq '') {
-        $checker = $element_specific_checker->{$attr_ln}
-            || $HTMLAttrChecker->{$attr_ln};
+        if ($attr_ln =~ /^data-/) {
+          $checker = $HTMLDatasetAttrChecker;
+          $status = $HTMLDatasetAttrStatus;
+        } else {
+          $checker = $element_specific_checker->{$attr_ln}
+              || $HTMLAttrChecker->{$attr_ln};
+          $status = $element_specific_status->{$attr_ln};
+        }
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
           || $AttrChecker->{$attr_ns}->{''};
@@ -840,7 +855,7 @@ my $GetHTMLAttrsChecker = sub {
         ## ISSUE: No conformance createria for unknown attributes in the spec
       }
       if ($attr_ns eq '') {
-        $self->_attr_status_info ($attr, $element_specific_status->{$attr_ln});
+        $self->_attr_status_info ($attr, $status);
       }
       ## TODO: global attribute
     }
@@ -1286,7 +1301,20 @@ $Element->{$HTML_NS}->{meta} = {
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
       my $checker;
+      my $status;
       if ($attr_ns eq '') {
+        $status = {
+          %HTMLAttrStatus,
+          charset => FEATURE_HTML5_DEFAULT,
+          content => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          'http-equiv' => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+          lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+          name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          scheme => FEATURE_M12N10_REC,
+        }->{$attr_ln};
+
         if ($attr_ln eq 'content') {
           $content_attr = $attr;
           $checker = 1;
@@ -1302,6 +1330,9 @@ $Element->{$HTML_NS}->{meta} = {
         } elsif ($attr_ln eq 'scheme') {
           ## NOTE: <http://suika.fam.cx/2007/html/standards#html-meta-scheme>
           $checker = sub {};
+        } elsif ($attr_ln =~ /^data-/) {
+          $checker = $HTMLDatasetAttrChecker;
+          $status = $HTMLDatasetAttrStatus;
         } else {
           $checker = $HTMLAttrChecker->{$attr_ln}
               || $AttrChecker->{$attr_ns}->{$attr_ln}
@@ -1311,18 +1342,6 @@ $Element->{$HTML_NS}->{meta} = {
         $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
           || $AttrChecker->{$attr_ns}->{''};
       }
-
-      my $status = {
-        %HTMLAttrStatus,
-        charset => FEATURE_HTML5_DEFAULT,
-        content => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        'http-equiv' => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-        lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-        name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        scheme => FEATURE_M12N10_REC,
-      }->{$attr_ln};
 
       if ($checker) {
         $checker->($self, $attr, $item, $element_state) if ref $checker;
@@ -2128,7 +2147,36 @@ $Element->{$HTML_NS}->{a} = {
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
       my $checker;
+      my $status;
       if ($attr_ns eq '') {
+        $status = {
+          %HTMLAttrStatus,
+          %HTMLM12NCommonAttrStatus,
+          accesskey => FEATURE_M12N10_REC,
+          charset => FEATURE_M12N10_REC,
+          coords => FEATURE_M12N10_REC,
+          cryptopts => FEATURE_RFC2659,
+          dn => FEATURE_RFC2659,
+          href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          hreflang => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+          media => FEATURE_HTML5_DEFAULT,
+          methods => FEATURE_HTML20_RFC,
+          name => FEATURE_M12N10_REC_DEPRECATED,
+          nonce => FEATURE_RFC2659,
+          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          ping => FEATURE_HTML5_DEFAULT,
+          rel => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          rev => FEATURE_M12N10_REC,
+          sdapref => FEATURE_HTML20_RFC,
+          shape => FEATURE_M12N10_REC,
+          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          urn => FEATURE_HTML20_RFC,
+        }->{$attr_ln};
+
         $checker = {
           accesskey => $HTMLAccesskeyAttrChecker,
           ## TODO: HTML4 |charset|
@@ -2146,40 +2194,15 @@ $Element->{$HTML_NS}->{a} = {
                    }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
+        } elsif ($attr_ln =~ /^data-/) {
+          $checker = $HTMLDatasetAttrChecker;
+          $status = $HTMLDatasetAttrStatus;
         } else {
           $checker = $HTMLAttrChecker->{$attr_ln};
         }
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
         || $AttrChecker->{$attr_ns}->{''};
-
-      my $status = {
-        %HTMLAttrStatus,
-        %HTMLM12NCommonAttrStatus,
-        accesskey => FEATURE_M12N10_REC,
-        charset => FEATURE_M12N10_REC,
-        coords => FEATURE_M12N10_REC,
-        cryptopts => FEATURE_RFC2659,
-        dn => FEATURE_RFC2659,
-        href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        hreflang => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-        media => FEATURE_HTML5_DEFAULT,
-        methods => FEATURE_HTML20_RFC,
-        name => FEATURE_M12N10_REC_DEPRECATED,
-        nonce => FEATURE_RFC2659,
-        onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        ping => FEATURE_HTML5_DEFAULT,
-        rel => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        rev => FEATURE_M12N10_REC,
-        sdapref => FEATURE_HTML20_RFC,
-        shape => FEATURE_M12N10_REC,
-        tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        urn => FEATURE_HTML20_RFC,
-      }->{$attr_ln};
 
       if ($checker) {
         $checker->($self, $attr, $item, $element_state) if ref $checker;
@@ -2925,12 +2948,24 @@ $Element->{$HTML_NS}->{embed} = {
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
       my $checker;
+
+      my $status = {
+        %HTMLAttrStatus,
+        height => FEATURE_HTML5_DEFAULT,
+        src => FEATURE_HTML5_DEFAULT,
+        type => FEATURE_HTML5_DEFAULT,
+        width => FEATURE_HTML5_DEFAULT,
+      }->{$attr_ln};
+
       if ($attr_ns eq '') {
         if ($attr_ln eq 'src') {
           $checker = $HTMLURIAttrChecker;
           $has_src = 1;
         } elsif ($attr_ln eq 'type') {
           $checker = $HTMLIMTAttrChecker;
+        } elsif ($attr_ln =~ /^data-/) {
+          $checker = $HTMLDatasetAttrChecker;
+          $status = $HTMLDatasetAttrStatus;
         } else {
           ## TODO: height
           ## TODO: width
@@ -2940,14 +2975,6 @@ $Element->{$HTML_NS}->{embed} = {
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
         || $AttrChecker->{$attr_ns}->{''};
-
-      my $status = {
-        %HTMLAttrStatus,
-        height => FEATURE_HTML5_DEFAULT,
-        src => FEATURE_HTML5_DEFAULT,
-        type => FEATURE_HTML5_DEFAULT,
-        width => FEATURE_HTML5_DEFAULT,
-      }->{$attr_ln};
 
       if ($checker) {
         $checker->($self, $attr, $item, $element_state);
@@ -3332,7 +3359,29 @@ $Element->{$HTML_NS}->{area} = {
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
       my $checker;
+      my $status;
       if ($attr_ns eq '') {
+        $status = {
+          %HTMLAttrStatus,
+          %HTMLM12NCommonAttrStatus,
+          accesskey => FEATURE_M12N10_REC,
+          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          coords => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          hreflang => FEATURE_HTML5_DEFAULT,
+          lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+          media => FEATURE_HTML5_DEFAULT,
+          nohref => FEATURE_M12N10_REC,
+          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          ping => FEATURE_HTML5_DEFAULT,
+          rel => FEATURE_HTML5_DEFAULT,
+          shape => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          type => FEATURE_HTML5_DEFAULT,
+        }->{$attr_ln};
+
         $checker = {
           accesskey => $HTMLAccesskeyAttrChecker,
                      alt => sub { },
@@ -3364,33 +3413,15 @@ $Element->{$HTML_NS}->{area} = {
                    }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
+        } elsif ($attr_ln =~ /^data-/) {
+          $checker = $HTMLDatasetAttrChecker;
+          $status = $HTMLDatasetAttrStatus;
         } else {
           $checker = $HTMLAttrChecker->{$attr_ln};
         }
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
         || $AttrChecker->{$attr_ns}->{''};
-
-      my $status = {
-        %HTMLAttrStatus,
-        %HTMLM12NCommonAttrStatus,
-        accesskey => FEATURE_M12N10_REC,
-        alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        coords => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        hreflang => FEATURE_HTML5_DEFAULT,
-        lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-        media => FEATURE_HTML5_DEFAULT,
-        nohref => FEATURE_M12N10_REC,
-        onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        ping => FEATURE_HTML5_DEFAULT,
-        rel => FEATURE_HTML5_DEFAULT,
-        shape => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-        type => FEATURE_HTML5_DEFAULT,
-      }->{$attr_ln};
 
       if ($checker) {
         $checker->($self, $attr, $item, $element_state) if ref $checker;
