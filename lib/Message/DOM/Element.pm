@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
     'Message::IF::ElementSelector', # MUST in Selectors API spec.
     'Message::IF::ElementCSSInlineStyle';
@@ -863,15 +863,16 @@ package Message::DOM::Document;
 
 sub create_element ($$) {
   my $self = $_[0];
+  my $eln = ''.$_[1]; ## TODO: Need testing against DOM Perl binding.
   if ($$self->{strict_error_checking}) {
     my $xv = $self->xml_version;
     ## TODO: HTML Document ??
     if (defined $xv) {
       if ($xv eq '1.0' and
-          $_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+          $eln =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
         #
       } elsif ($xv eq '1.1' and
-               $_[1] =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+               $eln =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
         # 
       } else {
         report Message::DOM::DOMException
@@ -883,7 +884,7 @@ sub create_element ($$) {
   }
   ## TODO: HTML5
 
-  my $r = Message::DOM::Element->____new ($self, undef, undef, $_[1]);
+  my $r = Message::DOM::Element->____new ($self, undef, undef, $eln);
 
   ## -- Default attributes
   {
@@ -896,7 +897,7 @@ sub create_element ($$) {
     my $doctype = $self->doctype;
     return $r unless defined $doctype;
 
-    my $et = $doctype->get_element_type_definition_node ($_[1]);
+    my $et = $doctype->get_element_type_definition_node ($eln);
     return $r unless defined $et;
 
     my $orig_strict = $self->strict_error_checking;
@@ -996,7 +997,8 @@ sub create_element_ns ($$$) {
     ($prefix, $lname) = split /:/, $_[2], 2;
     ($prefix, $lname) = (undef, $prefix) unless defined $lname;
   }
-  my $nsuri = defined $_[1] ? $_[1] eq '' ? undef : $_[1] : undef;
+  my $nsuri = defined $_[1] ? $_[1] eq '' ? undef : ''.$_[1] : undef;
+  ## TODO: Need tests against DOM Perl binding.
 
   if ($$self->{strict_error_checking}) {
     my $xv = $self->xml_version;
@@ -1285,7 +1287,7 @@ sub create_element_ns ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -1293,4 +1295,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/01/24 11:25:19 $
+## $Date: 2008/04/12 15:58:41 $

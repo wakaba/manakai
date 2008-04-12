@@ -1,8 +1,6 @@
-## NOTE: This module will be renamed as Document.pm.
-
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -1205,8 +1203,8 @@ sub inner_html ($;$) {
     ## TODO: This serializer is currently not conformant to HTML5 spec.
     require Whatpm::XMLSerializer;
     my $r = '';
-    for (@{$self->child_nodes}) {
-      $r .= ${ Whatpm::XMLSerializer->get_outer_xml ($_, sub {
+    for my $node (@{$self->child_nodes}) {
+      $r .= ${ Whatpm::XMLSerializer->get_outer_xml ($node, sub {
         ## TODO: INVALID_STATE_ERR
       }) };
     }
@@ -1274,4 +1272,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/02/17 06:36:01 $
+## $Date: 2008/04/12 15:58:41 $
