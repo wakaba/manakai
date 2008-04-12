@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.129 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.130 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3699,7 +3699,14 @@ sub _tree_construction_main ($) {
           !!!cp ('t87.2');
           #
         } elsif ({
-  ## TODO:
+                  b => 1, big => 1, blockquote => 1, body => 1, br => 1,
+                  center => 1, code => 1, dd => 1, div => 1, dl => 1, em => 1,
+                  embed => 1, font => 1, h1 => 1, h2 => 1, h3 => 1, ## No h4!
+                  h5 => 1, h6 => 1, head => 1, hr => 1, i => 1, img => 1,
+                  li => 1, menu => 1, meta => 1, nobr => 1, p => 1, pre => 1,
+                  ruby => 1, s => 1, small => 1, span => 1, strong => 1,
+                  sub => 1, sup => 1, table => 1, tt => 1, u => 1, ul => 1,
+                  var => 1,
                  }->{$token->{tag_name}}) {
           !!!cp ('t87.2');
           !!!parse-error (type => 'not closed',
@@ -3710,7 +3717,7 @@ sub _tree_construction_main ($) {
           pop @{$self->{open_elements}}
               while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
 
-          $self->{insertion_mode} &= ~ $self->{insertion_mode};
+          $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
           ## Reprocess.
           next B;
         } else {
@@ -7027,4 +7034,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/12 15:37:33 $
+# $Date: 2008/04/12 15:47:13 $
