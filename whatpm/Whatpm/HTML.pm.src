@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.126 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.127 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -460,6 +460,7 @@ sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
 sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
 sub SELF_CLOSING_START_TAG_STATE () { 34 }
+sub CDATA_BLOCK_STATE () { 35 }
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -1685,6 +1686,49 @@ sub _get_next_token ($) {
         } else {
           !!!cp (135);
         }
+      } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
+               $self->{open_elements}->[-1]->[1] & FOREIGN_EL and
+               $self->{next_char} == 0x005B) { # [
+        !!!next-input-character;
+        push @next_char, $self->{next_char};
+        if ($self->{next_char} == 0x0043) { # C
+          !!!next-input-character;
+          push @next_char, $self->{next_char};
+          if ($self->{next_char} == 0x0044) { # D
+            !!!next-input-character;
+            push @next_char, $self->{next_char};
+            if ($self->{next_char} == 0x0041) { # A
+              !!!next-input-character;
+              push @next_char, $self->{next_char};
+              if ($self->{next_char} == 0x0054) { # T
+                !!!next-input-character;
+                push @next_char, $self->{next_char};
+                if ($self->{next_char} == 0x0041) { # A
+                  !!!next-input-character;
+                  push @next_char, $self->{next_char};
+                  if ($self->{next_char} == 0x005B) { # [
+                    !!!cp (135.1);
+                    $self->{state} = CDATA_BLOCK_STATE;
+                    !!!next-input-character;
+                    redo A;
+                  } else {
+                    !!!cp (135.2);
+                  }
+                } else {
+                  !!!cp (135.3);
+                }
+              } else {
+                !!!cp (135.4);                
+              }
+            } else {
+              !!!cp (135.5);
+            }
+          } else {
+            !!!cp (135.6);
+          }
+        } else {
+          !!!cp (135.7);
+        }
       } else {
         !!!cp (136);
       }
@@ -2409,6 +2453,60 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       }
+    } elsif ($self->{state} == CDATA_BLOCK_STATE) {
+      my $s = '';
+      
+      my ($l, $c) = ($self->{line}, $self->{column});
+
+      CS: while ($self->{next_char} != -1) {
+        if ($self->{next_char} == 0x005D) { # ]
+          !!!next-input-character;
+          if ($self->{next_char} == 0x005D) { # ]
+            !!!next-input-character;
+            MDC: {
+              if ($self->{next_char} == 0x003E) { # >
+                !!!cp (221.1);
+                !!!next-input-character;
+                last CS;
+              } elsif ($self->{next_char} == 0x005D) { # ]
+                !!!cp (221.2);
+                $s .= ']';
+                !!!next-input-character;
+                redo MDC;
+              } else {
+                !!!cp (221.3);
+                $s .= ']]';
+                #
+              }
+            } # MDC
+          } else {
+            !!!cp (221.4);
+            $s .= ']';
+            #
+          }
+        } else {
+          !!!cp (221.5);
+          #
+        }
+        $s .= chr $self->{next_char};
+        !!!next-input-character;
+      } # CS
+
+      $self->{state} = DATA_STATE;
+      ## next-input-character done or EOF, which is reconsumed.
+
+      if (length $s) {
+        !!!cp (221.6);
+        !!!emit ({type => CHARACTER_TOKEN, data => $s,
+                  line => $l, column => $c});
+      } else {
+        !!!cp (221.7);
+      }
+
+      redo A;
+
+      ## ISSUE: "text tokens" in spec.
+      ## TODO: Streaming support
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -6928,4 +7026,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/12 14:54:33 $
+# $Date: 2008/04/12 15:25:52 $

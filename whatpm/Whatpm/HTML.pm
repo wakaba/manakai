@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.123 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.124 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -460,6 +460,7 @@ sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
 sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
 sub SELF_CLOSING_START_TAG_STATE () { 34 }
+sub CDATA_BLOCK_STATE () { 35 }
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -2081,6 +2082,91 @@ sub _get_next_token ($) {
         } else {
           
         }
+      } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
+               $self->{open_elements}->[-1]->[1] & FOREIGN_EL and
+               $self->{next_char} == 0x005B) { # [
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        push @next_char, $self->{next_char};
+        if ($self->{next_char} == 0x0043) { # C
+          
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+          push @next_char, $self->{next_char};
+          if ($self->{next_char} == 0x0044) { # D
+            
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+            push @next_char, $self->{next_char};
+            if ($self->{next_char} == 0x0041) { # A
+              
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+              push @next_char, $self->{next_char};
+              if ($self->{next_char} == 0x0054) { # T
+                
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+                push @next_char, $self->{next_char};
+                if ($self->{next_char} == 0x0041) { # A
+                  
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+                  push @next_char, $self->{next_char};
+                  if ($self->{next_char} == 0x005B) { # [
+                    
+                    $self->{state} = CDATA_BLOCK_STATE;
+                    
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+                    redo A;
+                  } else {
+                    
+                  }
+                } else {
+                  
+                }
+              } else {
+                                
+              }
+            } else {
+              
+            }
+          } else {
+            
+          }
+        } else {
+          
+        }
       } else {
         
       }
@@ -3207,6 +3293,90 @@ sub _get_next_token ($) {
   
         redo A;
       }
+    } elsif ($self->{state} == CDATA_BLOCK_STATE) {
+      my $s = '';
+      
+      my ($l, $c) = ($self->{line}, $self->{column});
+
+      CS: while ($self->{next_char} != -1) {
+        if ($self->{next_char} == 0x005D) { # ]
+          
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+          if ($self->{next_char} == 0x005D) { # ]
+            
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+            MDC: {
+              if ($self->{next_char} == 0x003E) { # >
+                
+                
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+                last CS;
+              } elsif ($self->{next_char} == 0x005D) { # ]
+                
+                $s .= ']';
+                
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+                redo MDC;
+              } else {
+                
+                $s .= ']]';
+                #
+              }
+            } # MDC
+          } else {
+            
+            $s .= ']';
+            #
+          }
+        } else {
+          
+          #
+        }
+        $s .= chr $self->{next_char};
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+      } # CS
+
+      $self->{state} = DATA_STATE;
+      ## next-input-character done or EOF, which is reconsumed.
+
+      if (length $s) {
+        
+        return  ({type => CHARACTER_TOKEN, data => $s,
+                  line => $l, column => $c});
+      } else {
+        
+      }
+
+      redo A;
+
+      ## ISSUE: "text tokens" in spec.
+      ## TODO: Streaming support
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -8710,4 +8880,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/12 14:54:33 $
+# $Date: 2008/04/12 15:25:52 $
