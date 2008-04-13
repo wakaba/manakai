@@ -61,6 +61,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
                       ${dir_name}test4.test
                       ${dir_name}contentModelFlags.test
                       ${dir_name}escapeFlag.test
+                      ${dir_name}entities.test
+                      ${dir_name}xmlViolation.test
                       ${test_dir_name}tokenizer-test-1.test
                      ]) {
   open my $file, '<', $file_name
@@ -80,7 +82,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
     $c += ((((hex $1) & 0b1111111111) << 10) | ((hex $2) & 0b1111111111));
     chr $c;
   }gex;
-  my $tests = jsonToObj ($js)->{tests};
+  my $json = jsonToObj ($js);
+  my $tests = $json->{tests} || $json->{xmlViolationTests};
   TEST: for my $test (@$tests) {
     my $s = $test->{input};
     
@@ -186,4 +189,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/04/12 10:41:31 $
+## $Date: 2008/04/13 06:44:27 $

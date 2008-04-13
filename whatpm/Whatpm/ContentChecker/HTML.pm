@@ -2285,6 +2285,11 @@ $Element->{$HTML_NS}->{q} = {
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
   },
 };
+## TODO: "Quotation punctuation (such as quotation marks), if any, must be
+## placed inside the <code>q</code> element."  Though we cannot test the
+## element against this requirement since it incluides a semantic bit,
+## it might be possible to inform of the existence of quotation marks OUTSIDE
+## the |q| element.
 
 $Element->{$HTML_NS}->{cite} = {
   %HTMLPhrasingContentChecker,

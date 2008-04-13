@@ -48,7 +48,6 @@ while (@node) {
   }
 }
 shift @row; # heading rows
-shift @row;
 
 my $n = sub { my $s = shift; $s =~ s/\s+/ /g; $s =~ s/^ //; $s =~ s/ $//; $s };
 for my $tr (@row) {

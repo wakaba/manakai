@@ -1,5 +1,6 @@
 $Whatpm::HTML::EntityChar = {
           "AElig" => "\306",
+          "AElig;" => "\306",
           "AMP" => "&",
           "AMP;" => "&",
           "Aacute" => "\301",

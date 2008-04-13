@@ -25,6 +25,8 @@ tokenizer-remote-files: tokenizer \
   tokenizer/escapeFlag.test \
   tokenizer/test3.test \
   tokenizer/test4.test \
+  tokenizer/xmlViolation.test \
+  tokenizer/entities.test \
   tokenizer/LICENSE
 
 tokenizer:
@@ -49,6 +51,7 @@ tree-construction-remote-files: tree-construction \
   tree-construction/tests4.dat \
   tree-construction/tests5.dat \
   tree-construction/tests6.dat \
+  tree-construction/tests7.dat \
   tree-construction/LICENSE
 
 tree-construction:
@@ -75,4 +78,4 @@ clean-remote-files:
 always:
 
 ## License: Public Domain.
-## $Date: 2007/09/30 11:38:18 $
+## $Date: 2008/04/13 06:44:27 $
