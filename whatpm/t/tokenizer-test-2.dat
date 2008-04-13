@@ -174,3 +174,289 @@ no --></script> before EOF
 |     <script>
 |       "<!----x></script>foo"
 |   <body>
+
+#data escaped
+\u0001
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u0001"
+
+#data escaped
+\u0001
+#errors
+control character
+#document-fragment p escaped
+| "\u0001"
+
+#data escaped
+\u0002
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u0002"
+
+#data escaped
+\u0002
+#errors
+control character
+#document-fragment p escaped
+| "\u0002"
+
+#data escaped
+\u000b
+#errors
+no DOCTYPE
+#document escaped
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+\u000b
+#errors
+#document-fragment p escaped
+| "\u000b"
+
+#data escaped
+\u000e
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u000e"
+
+#data escaped
+\u000e
+#errors
+control character
+#document-fragment p escaped
+| "\u000e"
+
+#data escaped
+\u001f
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u001f"
+
+#data escaped
+\u001f
+#errors
+control character
+#document-fragment p escaped
+| "\u001f"
+
+#data escaped
+\u007f
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u007f"
+
+#data escaped
+\u007f
+#errors
+control character
+#document-fragment p escaped
+| "\u007f"
+
+#data escaped
+\u0080
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u0080"
+
+#data escaped
+\u0080
+#errors
+control character
+#document-fragment p escaped
+| "\u0080"
+
+#data escaped
+\u0085
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u0085"
+
+#data escaped
+\u0085
+#errors
+control character
+#document-fragment p escaped
+| "\u0085"
+
+#data escaped
+\u009f
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u009f"
+
+#data escaped
+\u009f
+#errors
+control character
+#document-fragment p escaped
+| "\u009f"
+
+#data escaped
+\ud800
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\ud800"
+
+#data escaped
+\ud800
+#errors
+control character
+#document-fragment p escaped
+| "\ud800"
+
+#data escaped
+\udfff
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\udfff"
+
+#data escaped
+\udfff
+#errors
+control character
+#document-fragment p escaped
+| "\udfff"
+
+#data escaped
+\ufdd0
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\ufdd0"
+
+#data escaped
+\ufdd0
+#errors
+control character
+#document-fragment p escaped
+| "\ufdd0"
+
+#data escaped
+\ufddf
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\ufddf"
+
+#data escaped
+\ufddf
+#errors
+control character
+#document-fragment p escaped
+| "\ufddf"
+
+#data escaped
+\ufffe
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\ufffe"
+
+#data escaped
+\ufffe
+#errors
+control character
+#document-fragment p escaped
+| "\ufffe"
+
+#data escaped
+\uffff
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\uffff"
+
+#data escaped
+\uffff
+#errors
+control character
+#document-fragment p escaped
+| "\uffff"
+
+#data escaped
+\U0010ffff
+#errors
+no DOCTYPE
+control character
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\U0010ffff"
+
+#data escaped
+\U0010ffff
+#errors
+control character
+#document-fragment p escaped
+| "\U0010ffff"
+

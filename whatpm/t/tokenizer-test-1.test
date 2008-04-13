@@ -396,12 +396,13 @@
 
 {"description":"surrogate character reference",
 "input":"\uD800&#xDFFF;",
-"output":[["Character", "\uD800"],
+"output":["ParseError", ["Character", "\uD800"],
           "ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"surrogate character reference",
 "input":"&#xD800;\uDFFF",
-"output":["ParseError", ["Character", "\uFFFD\uDFFF"]]},
+"output":["ParseError", ["Character", "\uFFFD"],
+          "ParseError", ["Character", "\uDFFF"]]},
 
 {"description":"surrogate character reference",
 "input":"&#55296;",

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.128 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.129 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -8,7 +8,6 @@ use Error qw(:try);
 ## doc.write ('');
 ## alert (doc.compatMode);
 
-## TODO: Control charcters and noncharacters are not allowed (HTML5 revision 1263)
 ## TODO: 1252 parse error (revision 1264)
 ## TODO: 8859-11 = 874 (revision 1271)
 
@@ -295,6 +294,8 @@ my $foreign_attr_xname = {
   'xmlns:xlink' => [$XMLNS_NS, ['xmlns', 'xlink']],
 };
 
+## ISSUE: xmlns:xlink="non-xlink-ns" is not an error.
+
 my $c1_entity_char = {
   0x80 => 0x20AC,
   0x81 => 0xFFFD,
@@ -441,18 +442,41 @@ sub parse_string ($$$;$) {
     $self->{column}++;
     
     if ($self->{next_char} == 0x000A) { # LF
+      
       $self->{line}++;
       $self->{column} = 0;
     } elsif ($self->{next_char} == 0x000D) { # CR
+      
       $i++ if substr ($$s, $i, 1) eq "\x0A";
       $self->{next_char} = 0x000A; # LF # MUST
       $self->{line}++;
       $self->{column} = 0;
     } elsif ($self->{next_char} > 0x10FFFF) {
+      
       $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     } elsif ($self->{next_char} == 0x0000) { # NULL
+      
       $self->{parse_error}->(level => $self->{must_level}, type => 'NULL');
       $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+    } elsif ($self->{next_char} <= 0x0008 or
+             (0x000E <= $self->{next_char} and $self->{next_char} <= 0x001F) or
+             (0x007F <= $self->{next_char} and $self->{next_char} <= 0x009F) or
+             (0xD800 <= $self->{next_char} and $self->{next_char} <= 0xDFFF) or
+             (0xFDD0 <= $self->{next_char} and $self->{next_char} <= 0xFDDF) or
+             {
+              0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
+              0x2FFFE => 1, 0x2FFFF => 1, 0x3FFFE => 1, 0x3FFFF => 1,
+              0x4FFFE => 1, 0x4FFFF => 1, 0x5FFFE => 1, 0x5FFFF => 1,
+              0x6FFFE => 1, 0x6FFFF => 1, 0x7FFFE => 1, 0x7FFFF => 1,
+              0x8FFFE => 1, 0x8FFFF => 1, 0x9FFFE => 1, 0x9FFFF => 1,
+              0xAFFFE => 1, 0xAFFFF => 1, 0xBFFFE => 1, 0xBFFFF => 1,
+              0xCFFFE => 1, 0xCFFFF => 1, 0xDFFFE => 1, 0xDFFFF => 1,
+              0xEFFFE => 1, 0xEFFFF => 1, 0xFFFFE => 1, 0xFFFFF => 1,
+              0x10FFFE => 1, 0x10FFFF => 1,
+             }->{$self->{next_char}}) {
+      
+      $self->{parse_error}->(level => $self->{must_level}, type => 'control char', level => $self->{must_level});
+## TODO: error type documentation
     }
   };
   $self->{prev_char} = [-1, -1, -1];
@@ -8907,6 +8931,29 @@ sub set_inner_html ($$$) {
         
         $self->{parse_error}->(level => $self->{must_level}, type => 'NULL');
         $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+      } elsif ($self->{next_char} <= 0x0008 or
+               (0x000E <= $self->{next_char} and 
+                $self->{next_char} <= 0x001F) or
+               (0x007F <= $self->{next_char} and
+                $self->{next_char} <= 0x009F) or
+               (0xD800 <= $self->{next_char} and
+                $self->{next_char} <= 0xDFFF) or
+               (0xFDD0 <= $self->{next_char} and
+                $self->{next_char} <= 0xFDDF) or
+               {
+                0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
+                0x2FFFE => 1, 0x2FFFF => 1, 0x3FFFE => 1, 0x3FFFF => 1,
+                0x4FFFE => 1, 0x4FFFF => 1, 0x5FFFE => 1, 0x5FFFF => 1,
+                0x6FFFE => 1, 0x6FFFF => 1, 0x7FFFE => 1, 0x7FFFF => 1,
+                0x8FFFE => 1, 0x8FFFF => 1, 0x9FFFE => 1, 0x9FFFF => 1,
+                0xAFFFE => 1, 0xAFFFF => 1, 0xBFFFE => 1, 0xBFFFF => 1,
+                0xCFFFE => 1, 0xCFFFF => 1, 0xDFFFE => 1, 0xDFFFF => 1,
+                0xEFFFE => 1, 0xEFFFF => 1, 0xFFFFE => 1, 0xFFFFF => 1,
+                0x10FFFE => 1, 0x10FFFF => 1,
+               }->{$self->{next_char}}) {
+        
+        $self->{parse_error}->(level => $self->{must_level}, type => 'control char', level => $self->{must_level});
+## TODO: error type documentation
       }
     };
     $p->{prev_char} = [-1, -1, -1];
@@ -9017,4 +9064,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/13 05:54:28 $
+# $Date: 2008/04/13 10:36:40 $

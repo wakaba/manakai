@@ -2,7 +2,7 @@
 use strict;
 
 use Test;
-BEGIN { plan tests => 1502 }
+BEGIN { plan tests => 2192 }
 
 my @FILES = qw[
   t/content-model-1.dat
@@ -126,4 +126,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2008/04/12 07:38:37 $
+## $Date: 2008/04/13 10:36:41 $

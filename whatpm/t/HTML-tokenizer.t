@@ -26,7 +26,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 477 }
+BEGIN { plan tests => 1068 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -124,6 +124,27 @@ for my $file_name (grep {$_} split /\s+/, qq[
         } elsif ($self->{next_char} == 0x0000) { # NULL
           $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
           push @token, 'ParseError';
+        } elsif ($self->{next_char} <= 0x0008 or
+                 (0x000E <= $self->{next_char} and
+                  $self->{next_char} <= 0x001F) or
+                 (0x007F <= $self->{next_char} and
+                  $self->{next_char} <= 0x009F) or
+                 (0xD800 <= $self->{next_char} and
+                  $self->{next_char} <= 0xDFFF) or
+                 (0xFDD0 <= $self->{next_char} and
+                  $self->{next_char} <= 0xFDDF) or
+                 {
+                   0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
+                   0x2FFFE => 1, 0x2FFFF => 1, 0x3FFFE => 1, 0x3FFFF => 1,
+                   0x4FFFE => 1, 0x4FFFF => 1, 0x5FFFE => 1, 0x5FFFF => 1,
+                   0x6FFFE => 1, 0x6FFFF => 1, 0x7FFFE => 1, 0x7FFFF => 1,
+                   0x8FFFE => 1, 0x8FFFF => 1, 0x9FFFE => 1, 0x9FFFF => 1,
+                   0xAFFFE => 1, 0xAFFFF => 1, 0xBFFFE => 1, 0xBFFFF => 1,
+                   0xCFFFE => 1, 0xCFFFF => 1, 0xDFFFE => 1, 0xDFFFF => 1,
+                   0xEFFFE => 1, 0xEFFFF => 1, 0xFFFFE => 1, 0xFFFFF => 1,
+                   0x10FFFE => 1, 0x10FFFF => 1,
+                  }->{$self->{next_char}}) {
+          push @token, 'ParseError';
         }
       };
       $p->{prev_char} = [-1, -1, -1];
@@ -189,4 +210,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/04/13 06:44:27 $
+## $Date: 2008/04/13 10:36:41 $

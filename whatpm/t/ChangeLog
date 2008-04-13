@@ -1,5 +1,16 @@
 2008-04-13  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML-tokenizer.t: Raise a parse error if there are disallowed
+	character (for compatibility with existing html5lib test data).
+
+	* tokenizer-test-1.test: Some test results are updated with
+	regard to parse errors on disallowed characters.
+
+	* tokenizer-test-2.dat: Test data for disallowed characters
+	are added (HTML5 revision 1263).
+
+2008-04-13  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML-tokenizer.t, HTML-tree.t, Makefile: Support for html5lib
 	new test files.
 
