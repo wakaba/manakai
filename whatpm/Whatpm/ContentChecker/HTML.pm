@@ -749,8 +749,41 @@ my $HTMLAttrChecker = {
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   ## TODO: repeat, repeat-start, repeat-min, repeat-max, repeat-template ## TODO: global
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
-  tabindex => $HTMLIntegerAttrChecker
+  tabindex => $HTMLIntegerAttrChecker,
 ## TODO: ref, template, registrationmark
+  xmlns => sub {
+    my ($self, $attr) = @_;
+    my $value = $attr->value;
+    unless ($value eq $HTML_NS) {
+      $self->{onerror}->(node => $attr, type => 'invalid attribute value');
+      ## TODO: Should be new "bad namespace" error?
+    }
+    unless ($attr->owner_document->manakai_is_html) {
+      $self->{onerror}->(node => $attr, type => 'in XML:xmlns');
+      ## TODO: Test
+    }
+
+    my $owner_el = $attr->owner_element;
+    ## NOTE: There should always be the owner element in the HTML namespace.
+    if ($owner_el->manakai_local_name eq 'html') {
+      #
+    } else {
+      my $parent = $owner_el->manakai_parent_element;
+      if ($parent) {
+        my $parent_ns = $parent->namespace_uri;
+        if (defined $parent_ns and $parent_ns eq $HTML_NS) {
+          $self->{onerror}->(node => $attr, type => 'attribute not allowed',
+                             level => $self->{must_level});
+          ## NOTE: No explicit "MUST" ("MAY ... if, and only if" be used).
+        }
+      }
+      ## NOTE: If the element has no parent, we ignore the conformance issue.
+    }
+    
+    ## TODO: Should be resolved?
+    push @{$self->{return}->{uri}->{$value} ||= []},
+        {node => $attr, type => {namespace => 1}};
+  },
 };
 
 my %HTMLAttrStatus = (
@@ -773,6 +806,7 @@ my %HTMLAttrStatus = (
   tabindex => FEATURE_HTML5_DEFAULT,
   template => FEATURE_HTML5_AT_RISK,
   title => FEATURE_HTML5_DEFAULT,  
+  xmlns => FEATURE_HTML5_DEFAULT,
 );
 
 my %HTMLM12NCommonAttrStatus = (
@@ -999,21 +1033,6 @@ $Element->{$HTML_NS}->{html} = {
   is_root => 1,
   check_attrs => $GetHTMLAttrsChecker->({
     manifest => $HTMLURIAttrChecker,
-    xmlns => sub {
-      my ($self, $attr) = @_;
-      my $value = $attr->value;
-      unless ($value eq $HTML_NS) {
-        $self->{onerror}->(node => $attr, type => 'invalid attribute value');
-      }
-      unless ($attr->owner_document->manakai_is_html) {
-        $self->{onerror}->(node => $attr, type => 'in XML:xmlns');
-  ## TODO: Test
-      }
-
-      ## TODO: Should be resolved?
-      push @{$self->{return}->{uri}->{$value} ||= []},
-          {node => $attr, type => {namespace => 1}};
-    },
     version => sub {
       ## NOTE: According to HTML4 prose, this is a "cdata" attribute.
       ## Though DTDs of various versions of HTML define the attribute
@@ -1030,7 +1049,6 @@ $Element->{$HTML_NS}->{html} = {
     manifest => FEATURE_HTML5_DEFAULT,
     sdaform => FEATURE_HTML20_RFC,
     version => FEATURE_M12N10_REC,
-    xmlns => FEATURE_HTML5_DEFAULT,
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;

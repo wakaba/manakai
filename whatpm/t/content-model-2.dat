@@ -660,8 +660,81 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html/head/@xmlns;attribute;unsupported
+/html/head/@xmlns;attribute not allowed;m
 /html/body;no significant content;s
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<p xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/html/body/p/@xmlns;attribute not allowed;m
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<p xmlns="">x</p>
+#errors
+/html/body/p/@xmlns;invalid attribute value
+/html/body/p/@xmlns;attribute not allowed;m
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<unknown xmlns="http://www.w3.org/1999/xhtml">x</unknown>
+#errors
+/html/body/unknown/@xmlns;attribute not allowed;m
+/html/body/unknown;element not defined;m
+/html/body/unknown;element not allowed:flow;m
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<unknown xmlns="http://www.w3.org/1999/html">x</unknown>
+#errors
+/html/body/unknown/@xmlns;invalid attribute value
+/html/body/unknown/@xmlns;attribute not allowed;m
+/html/body/unknown;element not defined;m
+/html/body/unknown;element not allowed:flow;m
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<svg>
+<title>
+<p xmlns="http://www.w3.org/1999/xhtml">x</p>
+</title>
+</svg>
+#errors
+/html/body/svg;element;unsupported
+/html/body/svg/title;element;unsupported
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<svg>
+<title>
+<p xmlns="">x</p>
+</title>
+</svg>
+#errors
+/html/body/svg;element;unsupported
+/html/body/svg/title;element;unsupported
+/html/body/svg/title/p/@xmlns;invalid attribute value
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<svg>
+<title>
+<div><p xmlns="">x</p></div>
+</title>
+</svg>
+#errors
+/html/body/svg;element;unsupported
+/html/body/svg/title;element;unsupported
+/html/body/svg/title/div/p/@xmlns;invalid attribute value
+/html/body/svg/title/div/p/@xmlns;attribute not allowed;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml" version="">
