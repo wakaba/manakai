@@ -24,16 +24,17 @@ while (<>) {
   }ge;
   s{!!!ack\s*(?>\([^)]*\)\s*)?;}{q{delete $self->{self_closing};}}ge;
   s{!!!ack-later\s*(?>\([^)]*\)\s*)?;}{}ge;
-  s{!!!parse-error;}{q{$self->{parse_error}->();}}ge;
-  s{!!!parse-error\s*\(}{
-    q{$self->{parse_error}->(level => $self->{must_level}, }
-  }ge;
-  s{!!!insert-element-f\s*\(([^(),]+),([^(),]+)\)\s*;}{qq{
+  s{!!!insert-element-f\s*\(([^(),]+),([^(),]+),([^(),]+),([^(),]+)\)\s*;}{qq{
     {
       my \$el;
-      !!!create-element (\$el, $1, $2\->{tag_name}, $2\->{attributes}, $2);
+      !!!create-element (\$el, $1, $2, $3, $4);
       \$insert->(\$el);
-      push \@{\$self->{open_elements}}, [\$el, (\$el_category_f->{$1}->{$2\->{tag_name}} || 0) | FOREIGN_EL];
+      push \@{\$self->{open_elements}}, [\$el, (\$el_category_f->{$1}->{$2} || 0) | FOREIGN_EL];
+
+      if ($3\->{xmlns} and $3\->{xmlns}->{value} ne ($1)) {
+        !!!parse-error (type => 'bad namespace', token => $4);
+## TODO: Error type documentation
+      }
     }
   }}ge;
   s{!!!insert-element-t\s*\(([^(),]+),([^(),]+),([^(),]+)\)\s*;}{qq{
@@ -60,18 +61,35 @@ while (<>) {
       push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
-  s{!!!create-element\s*\(([^(),]+),([^(),]+),([^(),]+)(?:,([^(),]*)(?>,([^(),]+))?)?\)\s*;}{
-    my $l_var = $1;
+  s{!!!create-element\s*\(([^(),]+),\s*([^(),]+),([^(),]+)(?:,([^(),]*)(?>,([^(),]+))?)?\)\s*;}{
+    my ($l_var, $nsuri, $lname, $attrs, $token_var) = ($1, $2, $3, $4, $5);
+    $nsuri =~ s/^\s+//;
+    $nsuri =~ s/\s+\z//;
     my $r = qq{
       $l_var = \$self->{document}->create_element_ns
-        ($2, [undef, $3]);
+        ($nsuri, [undef, $lname]);
     };
-    if (defined $4 and length $4) {
+    if (defined $attrs and length $attrs) {
+      my $attr_xname;
+      if ($nsuri eq q<$HTML_NS>) {
+        $attr_xname = q[undef, [undef, $attr_name]];
+      } else {
+        ## NOTE: "Adjust SVG attributes" (SVG only) and
+        ## "adjust foreign attributes".
+        $attr_xname = qq[
+          \@{
+            \$foreign_attr_xname->{\$attr_name} ||
+            [undef, [undef,
+                     $nsuri eq \$SVG_NS ?
+                         (\$svg_attr_name->{\$attr_name} || \$attr_name) :
+                         \$attr_name]]
+          }
+        ];
+      }
       $r .= qq{
-        for my \$attr_name (keys %{$4}) {
-          my \$attr_t = $4\->{\$attr_name};
-          my \$attr = \$self->{document}->create_attribute_ns
-              (undef, [undef, \$attr_name]);
+        for my \$attr_name (keys %{$attrs}) {
+          my \$attr_t = $attrs\->{\$attr_name};
+          my \$attr = \$self->{document}->create_attribute_ns ($attr_xname);
           \$attr->value (\$attr_t->{value});
           \$attr->set_user_data (manakai_source_line => \$attr_t->{line});
           \$attr->set_user_data (manakai_source_column => \$attr_t->{column});
@@ -79,8 +97,7 @@ while (<>) {
         }
       };
     }
-    if (defined $5) {
-      my $token_var = $5;
+    if (defined $token_var) {
       $token_var =~ s/^\s+//;
       $token_var =~ s/\s+$//;
       $r .= qq{
@@ -95,6 +112,10 @@ while (<>) {
     }
     $r;
   }ge; # MUST
+  s{!!!parse-error;}{q{$self->{parse_error}->();}}ge;
+  s{!!!parse-error\s*\(}{
+    q{$self->{parse_error}->(level => $self->{must_level}, }
+  }ge;
   s{!!!next-token;}{q{$token = $self->_get_next_token;}}ge;
   s{!!!back-token;}{
     q{

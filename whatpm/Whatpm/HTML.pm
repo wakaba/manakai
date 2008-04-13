@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.127 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.128 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -205,11 +205,94 @@ my $el_category_f = {
     mtext => FOREIGN_FLOW_CONTENT_EL,
   },
   $SVG_NS => {
-    foreignobject => FOREIGN_FLOW_CONTENT_EL, ## TODO: case
+    foreignObject => FOREIGN_FLOW_CONTENT_EL,
     desc => FOREIGN_FLOW_CONTENT_EL,
     title => FOREIGN_FLOW_CONTENT_EL,
   },
   ## NOTE: In addition, FOREIGN_EL is set to non-HTML elements.
+};
+
+my $svg_attr_name = {
+  attributetype => 'attributeType',
+  basefrequency => 'baseFrequency',
+  baseprofile => 'baseProfile',
+  calcmode => 'calcMode',
+  clippathunits => 'clipPathUnits',
+  contentscripttype => 'contentScriptType',
+  contentstyletype => 'contentStyleType',
+  diffuseconstant => 'diffuseConstant',
+  edgemode => 'edgeMode',
+  externalresourcesrequired => 'externalResourcesRequired',
+  fecolormatrix => 'feColorMatrix',
+  fecomposite => 'feComposite',
+  fegaussianblur => 'feGaussianBlur',
+  femorphology => 'feMorphology',
+  fetile => 'feTile',
+  filterres => 'filterRes',
+  filterunits => 'filterUnits',
+  glyphref => 'glyphRef',
+  gradienttransform => 'gradientTransform',
+  gradientunits => 'gradientUnits',
+  kernelmatrix => 'kernelMatrix',
+  kernelunitlength => 'kernelUnitLength',
+  keypoints => 'keyPoints',
+  keysplines => 'keySplines',
+  keytimes => 'keyTimes',
+  lengthadjust => 'lengthAdjust',
+  limitingconeangle => 'limitingConeAngle',
+  markerheight => 'markerHeight',
+  markerunits => 'markerUnits',
+  markerwidth => 'markerWidth',
+  maskcontentunits => 'maskContentUnits',
+  maskunits => 'maskUnits',
+  numoctaves => 'numOctaves',
+  pathlength => 'pathLength',
+  patterncontentunits => 'patternContentUnits',
+  patterntransform => 'patternTransform',
+  patternunits => 'patternUnits',
+  pointsatx => 'pointsAtX',
+  pointsaty => 'pointsAtY',
+  pointsatz => 'pointsAtZ',
+  preservealpha => 'preserveAlpha',
+  preserveaspectratio => 'preserveAspectRatio',
+  primitiveunits => 'primitiveUnits',
+  refx => 'refX',
+  refy => 'refY',
+  repeatcount => 'repeatCount',
+  repeatdur => 'repeatDur',
+  requiredextensions => 'requiredExtensions',
+  specularconstant => 'specularConstant',
+  specularexponent => 'specularExponent',
+  spreadmethod => 'spreadMethod',
+  startoffset => 'startOffset',
+  stddeviation => 'stdDeviation',
+  stitchtiles => 'stitchTiles',
+  surfacescale => 'surfaceScale',
+  systemlanguage => 'systemLanguage',
+  tablevalues => 'tableValues',
+  targetx => 'targetX',
+  targety => 'targetY',
+  textlength => 'textLength',
+  viewbox => 'viewBox',
+  viewtarget => 'viewTarget',
+  xchannelselector => 'xChannelSelector',
+  ychannelselector => 'yChannelSelector',
+  zoomandpan => 'zoomAndPan',
+};
+
+my $foreign_attr_xname = {
+  'xlink:actuate' => [$XLINK_NS, ['xlink', 'actuate']],
+  'xlink:arcrole' => [$XLINK_NS, ['xlink', 'arcrole']],
+  'xlink:href' => [$XLINK_NS, ['xlink', 'href']],
+  'xlink:role' => [$XLINK_NS, ['xlink', 'role']],
+  'xlink:show' => [$XLINK_NS, ['xlink', 'show']],
+  'xlink:title' => [$XLINK_NS, ['xlink', 'title']],
+  'xlink:type' => [$XLINK_NS, ['xlink', 'type']],
+  'xml:base' => [$XML_NS, ['xml', 'base']],
+  'xml:lang' => [$XML_NS, ['xml', 'lang']],
+  'xml:space' => [$XML_NS, ['xml', 'space']],
+  'xmlns' => [$XMLNS_NS, [undef, 'xmlns']],
+  'xmlns:xlink' => [$XMLNS_NS, ['xmlns', 'xlink']],
 };
 
 my $c1_entity_char = {
@@ -3950,12 +4033,11 @@ sub _tree_construction_root_element ($) {
           my $root_element;
           
       $root_element = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -4005,7 +4087,7 @@ sub _tree_construction_root_element ($) {
     my $root_element;
     
       $root_element = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'html']);
+        ($HTML_NS, [undef,  'html']);
     
         $root_element->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -4217,12 +4299,11 @@ sub _tree_construction_main ($) {
     my $el;
     
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $start_tag_name]);
+        ($HTML_NS, [undef,  $start_tag_name]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -4286,12 +4367,11 @@ sub _tree_construction_main ($) {
     my $script_el;
     
       $script_el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'script']);
+        ($HTML_NS, [undef,  'script']);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -4713,19 +4793,72 @@ sub _tree_construction_main ($) {
           ## Reprocess.
           next B;
         } else {
-          ## TODO: case fixup
+          my $nsuri = $self->{open_elements}->[-1]->[0]->namespace_uri;
+          my $tag_name = $token->{tag_name};
+          if ($nsuri eq $SVG_NS) {
+            $tag_name = {
+               altglyph => 'altGlyph',
+               altglyphdef => 'altGlyphDef',
+               altglyphitem => 'altGlyphItem',
+               animatecolor => 'animateColor',
+               animatemotion => 'animateMotion',
+               animatetransform => 'animateTransform',
+               clippath => 'clipPath',
+               feblend => 'feBlend',
+               fecolormatrix => 'feColorMatrix',
+               fecomponenttransfer => 'feComponentTransfer',
+               fecomposite => 'feComposite',
+               feconvolvematrix => 'feConvolveMatrix',
+               fediffuselighting => 'feDiffuseLighting',
+               fedisplacementmap => 'feDisplacementMap',
+               fedistantlight => 'feDistantLight',
+               feflood => 'feFlood',
+               fefunca => 'feFuncA',
+               fefuncb => 'feFuncB',
+               fefuncg => 'feFuncG',
+               fefuncr => 'feFuncR',
+               fegaussianblur => 'feGaussianBlur',
+               feimage => 'feImage',
+               femerge => 'feMerge',
+               femergenode => 'feMergeNode',
+               femorphology => 'feMorphology',
+               feoffset => 'feOffset',
+               fepointlight => 'fePointLight',
+               fespecularlighting => 'feSpecularLighting',
+               fespotlight => 'feSpotLight',
+               fetile => 'feTile',
+               feturbulence => 'feTurbulence',
+               foreignobject => 'foreignObject',
+               glyphref => 'glyphRef',
+               lineargradient => 'linearGradient',
+               radialgradient => 'radialGradient',
+               #solidcolor => 'solidColor', ## NOTE: Commented in spec (SVG1.2)
+               textpath => 'textPath',  
+            }->{$tag_name} || $tag_name;
+          }
+
+          ## "adjust SVG attributes" (SVG only) - done in insert-element-f
+
+          ## "adjust foreign attributes" - done in insert-element-f
 
           
     {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $self->{open_elements}->[-1]->[0]->namespace_uri, [undef,   $token->{tag_name}]);
+        ($nsuri, [undef,   $tag_name]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (
+          @{
+            $foreign_attr_xname->{$attr_name} ||
+            [undef, [undef,
+                     $nsuri eq $SVG_NS ?
+                         ($svg_attr_name->{$attr_name} || $attr_name) :
+                         $attr_name]]
+          }
+        );
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -4738,7 +4871,12 @@ sub _tree_construction_main ($) {
             if defined $token->{column};
       
       $insert->($el);
-      push @{$self->{open_elements}}, [$el, ($el_category_f->{$self->{open_elements}->[-1]->[0]->namespace_uri}->{ $token->{tag_name}} || 0) | FOREIGN_EL];
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$nsuri}->{ $tag_name} || 0) | FOREIGN_EL];
+
+      if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($nsuri)) {
+        $self->{parse_error}->(level => $self->{must_level}, type => 'bad namespace', token =>  $token);
+## TODO: Error type documentation
+      }
     }
   
 
@@ -4790,7 +4928,7 @@ sub _tree_construction_main ($) {
           ## As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'head']);
+        ($HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -4832,7 +4970,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'body']);
+        ($HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -4852,12 +4990,11 @@ sub _tree_construction_main ($) {
             
             
       $self->{head_element} = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -4893,7 +5030,7 @@ sub _tree_construction_main ($) {
           ## As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'head']);
+        ($HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -4937,12 +5074,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -4979,12 +5115,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -5021,12 +5156,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -5146,12 +5280,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -5233,12 +5366,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -5299,7 +5431,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'body']);
+        ($HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5321,7 +5453,7 @@ sub _tree_construction_main ($) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'head']);
+        ($HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5383,7 +5515,7 @@ sub _tree_construction_main ($) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'head']);
+        ($HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5415,7 +5547,7 @@ sub _tree_construction_main ($) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'head']);
+        ($HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5481,7 +5613,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'body']);
+        ($HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5502,7 +5634,7 @@ sub _tree_construction_main ($) {
           ## NOTE: As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'head']);
+        ($HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -5558,7 +5690,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'body']);
+        ($HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -6027,7 +6159,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'tbody']);
+        ($HTML_NS, [undef,  'tbody']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -6064,12 +6196,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -6095,7 +6226,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'tr']);
+        ($HTML_NS, [undef,  'tr']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -6124,12 +6255,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -6263,7 +6393,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'colgroup']);
+        ($HTML_NS, [undef,  'colgroup']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -6299,12 +6429,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -6422,12 +6551,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -6781,12 +6909,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -6891,12 +7018,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -6937,12 +7063,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7310,12 +7435,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7342,12 +7466,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7478,12 +7601,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7510,12 +7632,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7647,12 +7768,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7773,12 +7893,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7821,12 +7940,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7892,12 +8010,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -7946,12 +8063,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -8000,12 +8116,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -8108,12 +8223,11 @@ sub _tree_construction_main ($) {
         my $el;
         
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -8171,18 +8285,29 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'math' or
                $token->{tag_name} eq 'svg') {
         $reconstruct_active_formatting_elements->($insert_to_current);
+
+        ## "adjust SVG attributes" ('svg' only) - done in insert-element-f
+
+        ## "adjust foreign attributes" - done in insert-element-f
         
         
     {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS, [undef,   $token->{tag_name}]);
+        ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS, [undef,   $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (
+          @{
+            $foreign_attr_xname->{$attr_name} ||
+            [undef, [undef,
+                     $token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS eq $SVG_NS ?
+                         ($svg_attr_name->{$attr_name} || $attr_name) :
+                         $attr_name]]
+          }
+        );
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -8196,6 +8321,11 @@ sub _tree_construction_main ($) {
       
       $insert->($el);
       push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL];
+
+      if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS)) {
+        $self->{parse_error}->(level => $self->{must_level}, type => 'bad namespace', token =>  $token);
+## TODO: Error type documentation
+      }
     }
   
         
@@ -8243,12 +8373,11 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  $token->{tag_name}]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns
-              (undef, [undef, $attr_name]);
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
           $attr->set_user_data (manakai_source_column => $attr_t->{column});
@@ -8558,7 +8687,7 @@ sub _tree_construction_main ($) {
           my $el;
           
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'p']);
+        ($HTML_NS, [undef,  'p']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -8590,7 +8719,7 @@ sub _tree_construction_main ($) {
         my $el;
         
       $el = $self->{document}->create_element_ns
-        ( $HTML_NS, [undef,  'br']);
+        ($HTML_NS, [undef,  'br']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -8888,4 +9017,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/12 15:47:13 $
+# $Date: 2008/04/13 05:54:28 $
