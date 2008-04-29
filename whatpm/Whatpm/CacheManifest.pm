@@ -1,6 +1,6 @@
 package Whatpm::CacheManifest;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::URI::URIReference;
 
 sub parse_byte_string ($$$$$) {
@@ -38,24 +38,40 @@ sub _parse ($$$$$) {
   my $warn_level = 'w';
   my $line_number = 1;
 
-  ## Same scheme/host/port
-  my $same_shp = sub {
-    ## TODO: implement this algorithm correctly!
+  ## Same origin with the manifest's URI
+  my $same_origin = sub {
+    ## NOTE: Step numbers in this function corresponds to those in the
+    ## algorithm for determining the origin of a URI specified in HTML5.
 
+    ## 1. and 2.
     my $u1 = shift;
+    #my $m_uri = $m_uri;
+
+    ## 3.
+    return 0 unless defined $u1->uri_authority;
+    return 0 unless defined $m_uri->uri_authority;
+    ## TODO: In addition, in the case of URIs with non-server-based authority
+    ## it must also return 0.
     
+    ## 4.
     unless (lc $u1->uri_scheme eq lc $m_scheme) { ## TODO: case
       return 0;
     }
+    ## TODO: Return if $u1->uri_scheme is not a supported scheme.
+    ## NOTE: $m_scheme is always a supported URI scheme, otherwise
+    ## the manifest itself cannot be retrieved.
 
-    return 0 unless defined $u1->uri_authority;
-    return 0 unless defined $m_uri->uri_authority;
-
+    ## 5., 6., and 7.
     return 0 unless $u1->uri_host eq $m_uri->uri_host;
+    ## TODO: IDNA ToASCII
+ 
+    ## 8.
     return 0 unless $u1->uri_port eq $m_uri->uri_port;
+    ## TODO: default port
 
+    ## 9.
     return 1;
-  }; # $same_shp
+  }; # $same_origin
 
   ## Step 5
   my $input = $_[1];
@@ -99,7 +115,7 @@ sub _parse ($$$$$) {
   START_OF_LINE: while (pos $$input < length $$input) {
     $$input =~ /([\x0A\x0D\x20\x09]+)/gc;
     my $v = $1;
-    $line_number++ for $v =~ /\x0D\x0A?|\x0D/g;
+    $line_number++ for $v =~ /\x0D\x0A?|\x0A/g;
 
     ## Step 14
     $$input =~ /([^\x0A\x0D]*)/gc;
@@ -224,7 +240,7 @@ sub _parse ($$$$$) {
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
       
-      unless ($same_shp->($u1)) {
+      unless ($same_origin->($u1)) {
         $onerror->(type => 'different shp from manifest',
                    level => $must_level, line => $line_number, column => 1,
                    index => 0, value => $u1->uri_reference);
@@ -383,4 +399,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/02/16 03:47:33 $
+# $Date: 2008/04/29 08:16:46 $
