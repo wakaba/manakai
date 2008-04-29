@@ -864,7 +864,7 @@ for (qw/
          ondragstart ondrop onerror onfocus onkeydown onkeypress
          onkeyup onload onmessage onmousedown onmousemove onmouseout
          onmouseover onmouseup onmousewheel onresize onscroll onselect
-         onsubmit onunload 
+         onstorage onsubmit onunload 
      /) {
   $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
   $HTMLAttrStatus{$_} = FEATURE_HTML5_DEFAULT;
@@ -2414,13 +2414,12 @@ $Element->{$HTML_NS}->{dfn} = {
       }
     }
     if ($self->{term}->{$term}) {
-      $self->{onerror}->(node => $node, type => 'duplicate term');
       push @{$self->{term}->{$term}}, $node;
     } else {
       $self->{term}->{$term} = [$node];
     }
-## ISSUE: The HTML5 algorithm does not work with |ruby| unless |dfn|
-## has |title|.
+    ## ISSUE: The HTML5 definition for the defined term does not work with
+    ## |ruby| unless |dfn| has |title|.
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -2438,6 +2437,12 @@ $Element->{$HTML_NS}->{abbr} = {
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
+  ## NOTE: "If an abbreviation is pluralised, the expansion's grammatical
+  ## number (plural vs singular) must match the grammatical number of the
+  ## contents of the element."  Though this can be checked by machine,
+  ## it requires language-specific knowledge and dictionary, such that
+  ## we don't support the check of the requirement.
+  ## ISSUE: Is <abbr title="Cascading Style Sheets">CSS</abbr> conforming?
 };
 
 $Element->{$HTML_NS}->{acronym} = {
@@ -2588,6 +2593,7 @@ $Element->{$HTML_NS}->{time} = {
 };
 
 $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the value is to include it as contents of the element"
+## TODO: value inequalities (HTML5 revision 1463)
   status => FEATURE_HTML5_DEFAULT,
   %HTMLPhrasingContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({

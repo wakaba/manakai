@@ -35,21 +35,23 @@
 #data
 <unknown u1="" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
-/unknown;element;unsupported
+/unknown;element not defined;m
 /unknown/@u1;attribute not defined;m
 
 #data
 <unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
-/unknown;element;unsupported
-/unknown/@lang;syntax error
+/unknown;element not defined;m
+/unknown/@lang;LangTag:nosemantics:language;m
+/unknown/@lang;LangTag:syntax:illegal;m
 /unknown/@u1;attribute not defined;m
 
 #data
 <unknown class="" u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
-/unknown;element;unsupported
-/unknown/@lang;syntax error
+/unknown;element not defined;m
+/unknown/@lang;LangTag:nosemantics:language;m
+/unknown/@lang;LangTag:syntax:illegal;m
 /unknown/@u1;attribute not defined;m
 
 #data
@@ -517,9 +519,20 @@ id=""><span id="">x</span></p>
 /p/@onclick;event handler;unsupported
 
 #data
+<p onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onstorage;event handler;unsupported
+
+#data
+<unknown onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@onstorage;event handler;unsupported
+
+#data
 <p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onxxxx;attribute;unsupported
+/p/@onxxxx;attribute not defined;m
 
 #data html
 <!DOCTYPE html>
@@ -563,7 +576,7 @@ id=""><span id="">x</span></p>
 <body><p>a</p></body>
 </html>
 #errors
-/html/@application;attribute;unsupported
+/html/@application;attribute not defined;m
 
 #data html
 <!DOCTYPE html>
