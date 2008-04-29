@@ -6828,3 +6828,46 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 /i/dir;element not defined;m
 /i/dir;element not allowed:phrasing;m
 /i/dir/li;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><font>x</font></p>
+#errors
+/p/font;element not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><span><font>x</font></span></p>
+#errors
+/p/span/font;element not defined;m
+
+#data html
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <title></title>
+  <meta name="generator" content="Sample Editor 1.0 (WYSIWYG editor)">
+ </head>
+ <body>
+  <font style="display: block; border: solid">
+   <h1>Hello.</h1>
+  </font>
+  <p>
+   <font style="color: orange; background: white">How</font>
+   <font style="color: yellow; background: white">do</font>
+   <font style="color: green; background: white"><em>you</em></font>
+   <font style="color: blue; background: white">do?</font>
+  </p>
+ </body>
+</html>
+<!-- From old HTML5 draft -->
+#errors
+/html/body/font;element not defined;m
+/html/body/font/@style;attribute;unsupported
+/html/body/p/font;element not defined;m
+/html/body/p/font/@style;attribute;unsupported
+/html/body/p/font;element not defined;m
+/html/body/p/font/@style;attribute;unsupported
+/html/body/p/font;element not defined;m
+/html/body/p/font/@style;attribute;unsupported
+/html/body/p/font;element not defined;m
+/html/body/p/font/@style;attribute;unsupported
+

@@ -771,6 +771,7 @@ my $HTMLAttrChecker = {
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   ## TODO: repeat, repeat-start, repeat-min, repeat-max, repeat-template ## TODO: global
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
+  ## TODO: style [HTML5]
   tabindex => $HTMLIntegerAttrChecker,
 ## TODO: ref, template, registrationmark
   xmlns => sub {
@@ -825,6 +826,7 @@ my %HTMLAttrStatus = (
   'repeat-start' => FEATURE_WF2,
   'repeat-template' => FEATURE_WF2,
   role => FEATURE_HTML5_ROLE,
+  style => FEATURE_HTML5_DEFAULT,
   tabindex => FEATURE_HTML5_DEFAULT,
   template => FEATURE_HTML5_AT_RISK,
   title => FEATURE_HTML5_DEFAULT,  
@@ -853,7 +855,9 @@ my %HTMLM12NCommonAttrStatus = (
   rel => FEATURE_RDFA_LC,
   resource => FEATURE_RDFA_LC,
   rev => FEATURE_RDFA_LC,
-  style => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR_DEPRECATED |
+  #style => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR_DEPRECATED |
+  #    FEATURE_M12N10_REC,
+  style => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR |
       FEATURE_M12N10_REC,
   title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
 );
@@ -1874,7 +1878,7 @@ $Element->{$HTML_NS}->{br} = {
     clear => FEATURE_M12N10_REC_DEPRECATED,
     id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     sdapref => FEATURE_HTML20_RFC,
-    style => FEATURE_XHTML10_REC,
+    style => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   ## NOTE: Blank line MUST NOT be used for presentation purpose.
@@ -2746,7 +2750,7 @@ $Element->{$HTML_NS}->{bdo} = {
       class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      style => FEATURE_XHTML10_REC,
+      style => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
       title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
       sdapref => FEATURE_HTML2X_RFC,
@@ -4474,7 +4478,7 @@ $Element->{$HTML_NS}->{isindex} = {
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     prompt => FEATURE_M12N10_REC_DEPRECATED,
     sdapref => FEATURE_HTML20_RFC,
-    style => FEATURE_XHTML10_REC,
+    style => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   ## TODO: Tests
@@ -5084,10 +5088,9 @@ $Element->{$HTML_NS}->{center} = {
 
 $Element->{$HTML_NS}->{font} = {
   %HTMLTransparentChecker,
-  status => FEATURE_HTML5_AT_RISK | FEATURE_M12N10_REC_DEPRECATED,
+  status => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC_DEPRECATED,
   check_attrs => $GetHTMLAttrsChecker->({
     ## TODO: HTML4 |size|, |color|, |face|
-    ## TODO: HTML5 |style|
   }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5097,9 +5100,15 @@ $Element->{$HTML_NS}->{font} = {
     id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     size => FEATURE_M12N10_REC_DEPRECATED,
-    style => FEATURE_HTML5_AT_RISK | FEATURE_XHTML10_REC,
+    style => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
+  ## NOTE: When the |font| element was defined in the HTML5 specification,
+  ## it is allowed only in a document with the WYSIWYG signature.  The
+  ## checker does not check whether there is the signature, since the
+  ## signature is dropped, too, and has never been implemented.  (In addition,
+  ## for any |font| element an "element not defined" error is raised anyway,
+  ## such that we don't have to raise an additional error.)
 };
 
 $Element->{$HTML_NS}->{basefont} = {
