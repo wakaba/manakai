@@ -813,13 +813,49 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<base target="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:empty;m
+
+#data
+<base target="_" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:reserved;m
+
+#data
 <base target="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_Self" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
 #data
 <base target="_blank" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/base/@target;reserved browsing context name
+
+#data
+<base target="_parent" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_main" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:reserved;m
+
+#data
+<base target="_content" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:reserved;m
+
+#data
+<base target="_unknown" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:reserved;m
 
 #data
 <base target="blank" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1190,6 +1226,13 @@ id=""><span id="">x</span></p>
 <link rel="alternate" href="" target="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@target;attribute not defined;m
+/link/@target;window name:empty;m
+
+#data
+<link rel="alternate" href="" target="_" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+/link/@target;window name:reserved;m
 
 #data
 <link rel="alternate" href="" target="_self" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1200,7 +1243,12 @@ id=""><span id="">x</span></p>
 <link rel="alternate" href="" target="_blank" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@target;attribute not defined;m
-/link/@target;reserved browsing context name
+
+#data
+<link rel="alternate" href="" target="_b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+/link/@target;window name:reserved;m
 
 #data
 <link href="" rev=" " xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2424,6 +2472,13 @@ id=""><span id="">x</span></p>
 /a;no significant content;s
 
 #data
+<a href="http://test/" target=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+/a/@target;window name:empty;m
+
+#data
 <a href="http://test/" target="_self"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -2457,14 +2512,13 @@ id=""><span id="">x</span></p>
 <a href="http://test/" target="_blank"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@target;reserved browsing context name
 /a;no significant content;s
 
 #data
 <a href="http://test/" target="_main"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@target;reserved browsing context name
+/a/@target;window name:reserved;m
 /a;no significant content;s
 
 #data
@@ -2477,7 +2531,7 @@ id=""><span id="">x</span></p>
 <a href="http://test/" target="_"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@target;reserved browsing context name
+/a/@target;window name:reserved;m
 /a;no significant content;s
 
 #data
@@ -3894,6 +3948,50 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<iframe name="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:empty;m
+
+#data
+<iframe name="_" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<iframe name="_parent" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_main" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
 <iframe src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -4271,6 +4369,49 @@ id=""><span id="">x</span></p>
 #errors
 /object;no significant content;s
 /object/@align;attribute not defined;m
+
+#data
+<object name="" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
+/object/@name;window name:empty;m
+
+#data
+<object name="_" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
+/object/@name;window name:reserved;m
+
+#data
+<object name="_a" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
+/object/@name;window name:reserved;m
+
+#data
+<object name="_blank" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
+/object/@name;window name:reserved;m
+
+#data
+<object name="_parent" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
+/object/@name;window name:reserved;m
+
+#data
+<object name="_self" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
+/object/@name;window name:reserved;m
+
+#data
+<object name="_top" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
+/object/@name;window name:reserved;m
+
+#data
+<object name="abc" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
+
+#data
+<object name="self" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
+#errors
 
 #data
 <param xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4712,7 +4853,34 @@ id=""><span id="">x</span></p>
 /area/@media;media query;unsupported
 
 #data
+<area href="http://test/" coords="1,2,3,4" alt="" target=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@target;window name:empty;m
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@target;window name:reserved;m
+
+#data
 <area href="http://test/" coords="1,2,3,4" alt="" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_parent"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_top"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_blank"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -4725,7 +4893,7 @@ id=""><span id="">x</span></p>
 <area href="http://test/" coords="1,2,3,4" alt="" target="_any"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@target;reserved browsing context name
+/area/@target;window name:reserved;m
 
 #data
 <area coords="1,2,3,4" target="_self"

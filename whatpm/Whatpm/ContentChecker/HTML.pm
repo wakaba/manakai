@@ -598,19 +598,41 @@ my $HTMLUsemapAttrChecker = sub {
   ## ISSUE: UA algorithm for matching is case-insensitive; IDs only different in cases should be reported
 }; # $HTMLUsemapAttrChecker
 
+## Valid browsing context name
+my $HTMLBrowsingContextNameAttrChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  if ($value =~ /^_/) {
+    $self->{onerror}->(node => $attr, type => 'window name:reserved',
+                       level => $self->{must_level},
+                       value => $value);
+  } elsif (length $value) {
+    #
+  } else {
+    $self->{onerror}->(node => $attr, type => 'window name:empty',
+                       level => $self->{must_level});
+  }
+}; # $HTMLBrowsingContextNameAttrChecker
+
+## Valid browsing context name or keyword
 my $HTMLTargetAttrChecker = sub {
   my ($self, $attr) = @_;
   my $value = $attr->value;
   if ($value =~ /^_/) {
     $value = lc $value; ## ISSUE: ASCII case-insentitive?
     unless ({
-             _self => 1, _parent => 1, _top => 1,
+             _blank => 1,_self => 1, _parent => 1, _top => 1,
             }->{$value}) {
       $self->{onerror}->(node => $attr,
-                         type => 'reserved browsing context name');
+                         type => 'window name:reserved',
+                         level => $self->{must_level},
+                         value => $value);
     }
+  } elsif (length $value) {
+    #
   } else {
-    ## NOTE: An empty string is a valid browsing context name (same as _self).
+    $self->{onerror}->(node => $attr, type => 'window name:empty',
+                       level => $self->{must_level});
   }
 }; # $HTMLTargetAttrChecker
 
@@ -2935,6 +2957,7 @@ $Element->{$HTML_NS}->{iframe} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       ## NOTE: Not part of M12N10 Strict
   check_attrs => $GetHTMLAttrsChecker->({
+    name => $HTMLBrowsingContextNameAttrChecker,
     src => $HTMLURIAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -2947,7 +2970,8 @@ $Element->{$HTML_NS}->{iframe} = {
     longdesc => FEATURE_M12N10_REC,
     marginheight => FEATURE_M12N10_REC,
     marginwidth => FEATURE_M12N10_REC,
-    name => FEATURE_M12N10_REC_DEPRECATED,
+    #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
+    name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     scrolling => FEATURE_M12N10_REC,
     src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -3048,7 +3072,7 @@ $Element->{$HTML_NS}->{object} = {
           ## NOTE: "The object MUST be instantiated by a subsequent OBJECT ..."
           ## [HTML4] but we don't know how to test this.
       hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      ## TODO: HTML4 |name|
+      name => $HTMLBrowsingContextNameAttrChecker,
       standby => sub {}, ## NOTE: %Text; in HTML4
       type => $HTMLIMTAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
@@ -3072,7 +3096,7 @@ $Element->{$HTML_NS}->{object} = {
       height => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       hspace => FEATURE_XHTML10_REC,
       lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-      name => FEATURE_M12N10_REC,
+      name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       standby => FEATURE_M12N10_REC,
       tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
