@@ -279,6 +279,20 @@ $Whatpm::ContentChecker::LinkType = {
                                            ],
                                'status' => 'proposal'
                              },
+          'openid2.local_id' => {
+                                  'effect' => [
+                                                'external resource',
+                                                undef
+                                              ],
+                                  'status' => 'proposal'
+                                },
+          'openid2.provider' => {
+                                  'effect' => [
+                                                'external resource',
+                                                undef
+                                              ],
+                                  'status' => 'proposal'
+                                },
           'parent' => {
                         'effect' => [
                                       'hyperlink',
