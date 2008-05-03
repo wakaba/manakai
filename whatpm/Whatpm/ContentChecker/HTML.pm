@@ -823,7 +823,6 @@ my $HTMLAttrChecker = {
     ## belong to another Document tree is in the DOM?
   },
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
-  ## TODO: repeat, repeat-start, repeat-min, repeat-max, repeat-template ## TODO: global
   ref => $HTMLRefOrTemplateAttrChecker,
   registrationmark => sub {
     my ($self, $attr, $item, $element_state) = @_;
@@ -846,6 +845,31 @@ my $HTMLAttrChecker = {
                          level => $self->{must_level});
     }
   },
+  repeat => sub {
+    my ($self, $attr) = @_;
+    my $value = $attr->value;
+    if ($value eq 'template') {
+      #
+    } elsif ($value =~ /\A-?[0-9]+\z/) {
+      #
+    } else {
+      $self->{onerror}->(node => $attr, type => 'repeat:syntax error',
+                         level => $self->{must_level});
+    }
+
+    ## ISSUE: "Repetition templates may occur anywhere."  Does that mean
+    ## that the attribute MAY be specified to any element, or that the
+    ## element with that attribute (i.e. a repetition template) can be
+    ## inserted anywhere in a document tree?
+  },
+  'repeat-min' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  'repeat-max' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  'repeat-template' => sub {
+    ## ISSUE: This attribute has no conformance requirement.
+    ## ISSUE: Repetition blocks MAY have this attribute.  Then, is the
+    ## attribute allowed on an element that is not a repetition block?
+  },
+## TODO: namespaced variant of repeat-* attributes
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
   ## TODO: style [HTML5]
   tabindex => $HTMLIntegerAttrChecker,
@@ -4260,7 +4284,12 @@ $Element->{$HTML_NS}->{input} = {
     src => $HTMLURIAttrChecker,
     ## TODO: step [WF2]
     target => $HTMLTargetAttrChecker,
-    ## TODO: template ## ISSUE: conflict with datetemplate @template
+    ## NOTE: According to Web Forms 2.0, |input| attribute has |template|
+    ## attribute to support the |add| button type (as part of repetition
+    ## template feature).  It conflicts with the |template| global attribute
+    ## introduced as part of the data template feature.
+    ## NOTE: |template| attribute as defined in Web Forms 2.0 has no
+    ## author requirement.
     type => $GetHTMLEnumeratedAttrChecker->({
       text => 1, password => 1, checkbox => 1, radio => 1, submit => 1,
       reset => 1, file => 1, hidden => 1, image => 1, button => 1,
@@ -4332,6 +4361,10 @@ $Element->{$HTML_NS}->{input} = {
 
 ## TODO: Form |name| attributes: MUST NOT conflict with RFC 3106 [WF2]
 
+## NOTE: "authors who are nesting repetition blocks should position such
+## [repetition-block-related] buttons carefully to make clear which block a
+## button applies to.": I have no idea how this can be tested.
+
 $Element->{$HTML_NS}->{button} = {
   %HTMLFlowContentChecker, ## NOTE: %Flow; - something [XHTML10]
     ## TODO: -A|%formctrl;|form|fieldset [HTML4]
@@ -4350,9 +4383,16 @@ $Element->{$HTML_NS}->{button} = {
     oninvalid => $HTMLEventHandlerAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
-    ## TODO: template [WF2] ## ISSUE: Conflict with datatemplate @template
+    ## NOTE: According to Web Forms 2.0, |button| attribute has |template|
+    ## attribute to support the |add| button type (as part of repetition
+    ## template feature).  It conflicts with the |template| global attribute
+    ## introduced as part of the data template feature.
+    ## NOTE: |template| attribute as defined in Web Forms 2.0 has no
+    ## author requirement.
     type => $GetHTMLEnumeratedAttrChecker->({
       button => 1, submit => 1, reset => 1,
+      ## [WF2]
+      add => 1, remove => 1, 'move-up' => 1, 'move-down' => 1,
     }),
     value => sub {}, ## NOTE: CDATA [M12N]
   }, {
