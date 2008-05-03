@@ -864,6 +864,7 @@ my $HTMLAttrChecker = {
   },
   'repeat-min' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   'repeat-max' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  'repeat-start' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   'repeat-template' => sub {
     ## ISSUE: This attribute has no conformance requirement.
     ## ISSUE: Repetition blocks MAY have this attribute.  Then, is the

@@ -7168,3 +7168,87 @@ id=""><span id="">x</span></p>
 <p repeat="template" repeat-min="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-min;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-max="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-max="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-max="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-max="01" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-max="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-max="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-max="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-max="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-max="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-start="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-start="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-start="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-start="01" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-start="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-start="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-start="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-start="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error
+
+#data
+<p repeat="template" repeat-start="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error
