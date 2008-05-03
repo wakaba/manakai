@@ -6492,6 +6492,11 @@ id=""><span id="">x</span></p>
 /rule/@condition;selectors:no combinator;m
 
 #data
+<rule xmlns="http://www.w3.org/1999/xhtml" filter=""/>
+#errors
+/rule/@filter;attribute not defined;m
+
+#data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode=""/>
 #errors
 /nest/@mode;mode:syntax error
@@ -6550,6 +6555,273 @@ id=""><span id="">x</span></p>
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="a|b"/>
 #errors
 /nest/@filter;selectors:namespace prefix:not declared;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
+#errors
+/nest/@condition;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    template="#a">x
+  <datatemplate id="a">
+  </datatemplate>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <datatemplate id="a"></datatemplate>
+  <p template="#a">x</p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#a">x</p>
+  <datatemplate id="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#a">x<datatemplate id="a"></datatemplate></div>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#a">x</p>
+  <p id="a">y</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#">x</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="">x</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#no-such-template">x</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#">x</p>
+  <datatemplate id=""/>
+</div>
+#errors
+/div/p/@template;template:not template;m
+/div/datatemplate/@id;empty attribute value
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    template="external-template">x</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    template="external-inline-template#temlate">x</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p id="itself" template="#itself">x</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <datatemplate id="itself" template="#itself"/>x
+</div>
+#errors
+/div/datatemplate/@template;fragment points itself;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div id="a">x</div>
+  <div template="#t" ref="#a">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="#a">y</div>
+  <div id="a">x</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="#">y</div>
+  <div id="">x</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+/div/div/@id;empty attribute value
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="#">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="#no-such-element">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+/div/div/@ref;fragment points nothing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="external-html">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="external-html#element">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" id="itself" ref="#itself">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+/div/div/@ref;fragment points itself;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
+#errors
+/div/@ref;attribute not allowed;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    registrationmark="">x</div>
+#errors
+/div/@registrationmark;attribute not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"
+    registrationmark="">x</rule>
+#errors
+/rule/@registrationmark;attribute not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registrationmark="">x</div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registrationmark="xxxx">x</div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registrationmark="a b c">x</div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registrationmark="a">x</div>
+  <div registrationmark="a">x</div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <rule>
+    <div registrationmark="a">x</div>
+  </rule>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <rule>
+  </rule>
+  <div registrationmark="a">x</div>
+</rule>
+#errors
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml">
+  <rule>
+  </rule>
+  <div registrationmark="a">x</div>
+</datatemplate>
+#errors
+/datatemplate/div;element not allowed:datatemplate
+/datatemplate/div/@registrationmark;attribute not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div>
+    <div registrationmark="a">x</div>
+  </div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div>x
+    <nest registrationmark="a"/>
+  </div>
+</rule>
+#errors
+/rule/div/nest/@registrationmark;attribute not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div>
+    <rule registrationmark="">
+      x
+    </rule>
+  </div>
+</rule>
+#errors
+/rule/div/rule;element not allowed:flow;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registartionmark="a">x</div>
+</rule>
+#errors
+/rule/div/@registartionmark;attribute not defined;m
 
 #data
 <div align="" xmlns="http://www.w3.org/1999/xhtml">x</div>

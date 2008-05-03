@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.77 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.78 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -409,6 +409,8 @@ sub check_element ($$$;$) {
   $self->{id} = {};
   $self->{term} = {};
   $self->{usemap} = [];
+  $self->{ref} = []; # datetemplate data references
+  $self->{template} = []; # datatemplate template references
   $self->{contextmenu} = [];
   $self->{map} = {};
   $self->{menu} = {};
@@ -570,6 +572,54 @@ next unless $code;## TODO: temp.
     }
   }
 
+  for (@{$self->{template}}) {
+    ## TODO: If the document is an XML document, ...
+    ## NOTE: If the document is an HTML document:
+    ## ISSUE: We need to percent-decode?
+    F: {
+      if ($self->{id}->{$_->[0]}) {
+        my $el = $self->{id}->{$_->[0]}->[0]->owner_element;
+        if ($el->node_type == 1 and # ELEMENT_NODE
+            $el->manakai_local_name eq 'datatemplate') {
+          my $nsuri = $el->namespace_uri;
+          if (defined $nsuri and $nsuri eq $HTML_NS) {
+            if ($el eq $_->[1]->owner_element) {
+              $self->{onerror}->(node => $_->[1],
+                                 type => 'fragment points itself',
+                                 level => $self->{must_level});
+            }
+            
+            last F;
+          }
+        }
+      }
+      ## TODO: Should we raise a "fragment points nothing" error instead
+      ## if the fragment identifier identifies no element?
+
+      $self->{onerror}->(node => $_->[1], type => 'template:not template',
+                         level => $self->{must_level});
+    } # F
+  }
+  
+  for (@{$self->{ref}}) {
+    ## TOOD: If XML
+    ## NOTE: If it is an HTML document:
+    if ($_->[0] eq '') {
+      ## NOTE: It points the top of the document.
+    } elsif ($self->{id}->{$_->[0]}) {
+      if ($self->{id}->{$_->[0]}->[0]->owner_element
+              eq $_->[1]->owner_element) {
+        $self->{onerror}->(node => $_->[1], type => 'fragment points itself',
+                           level => $self->{must_level});
+      }
+    } else {
+      $self->{onerror}->(node => $_->[1], type => 'fragment points nothing',
+                         level => $self->{must_level});
+    }
+  }
+
+  ## TODO: Maybe we should have $document->manakai_get_by_fragment or something
+
   for (@{$self->{usemap}}) {
     unless ($self->{map}->{$_->[0]}) {
       $self->{onerror}->(node => $_->[1], type => 'no referenced map');
@@ -587,6 +637,8 @@ next unless $code;## TODO: temp.
   delete $self->{onerror};
   delete $self->{id};
   delete $self->{usemap};
+  delete $self->{ref};
+  delete $self->{template};
   delete $self->{map};
   return $self->{return};
 } # check_element
@@ -835,4 +887,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/04/12 10:41:30 $
+# $Date: 2008/05/03 08:00:16 $

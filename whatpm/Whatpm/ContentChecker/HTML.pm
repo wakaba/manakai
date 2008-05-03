@@ -699,6 +699,60 @@ my $HTMLColorAttrChecker = sub {
   ## TODO: HTML4 has some guideline on usage of color.
 }; # $HTMLColorAttrChecker
 
+my $HTMLRefOrTemplateAttrChecker = sub {
+  my ($self, $attr) = @_;
+  $HTMLURIAttrChecker->(@_);
+
+  my $attr_name = $attr->name;
+
+  if ($attr_name eq 'ref') {
+    unless ($attr->owner_element->has_attribute_ns (undef, 'template')) {
+      $self->{onerror}->(node => $attr, type => 'attribute not allowed',
+                         level => $self->{must_level});
+    }
+  }
+  
+  my $doc = $attr->owner_document;
+  my $doc_uri = $doc->document_uri;
+  my $uri = $doc->implementation
+      ->create_uri_reference ($attr->value)
+      ->get_absolute_reference ($doc_uri);
+  my $no_frag_uri = $uri->clone;
+  $no_frag_uri->uri_fragment (undef);
+  if ((defined $doc_uri and $doc_uri eq $no_frag_uri) or
+      (not defined $doc_uri and $no_frag_uri eq '')) {
+    my $fragid = $uri->uri_fragment;
+    if (defined $fragid) {
+      push @{$self->{$attr_name}}, [$fragid => $attr];
+    } else {
+      DOCEL: {
+        last DOCEL unless $attr_name eq 'template';
+
+        my $docel = $doc->document_element;
+        if ($docel) {
+          my $nsuri = $docel->namespace_uri;
+          if (defined $nsuri and $nsuri eq $HTML_NS) {
+            if ($docel->manakai_local_name eq 'datatemplate') {
+              last DOCEL;
+            }
+          }
+        }
+        
+        $self->{onerror}->(node => $attr, type => 'template:not template',
+                           level => $self->{must_level});
+      } # DOCEL
+    }
+  } else {
+    ## TODO: An external document is referenced.
+    ## The document MUST be an HTML or XML document.
+    ## If there is a fragment identifier, it MUST point a part of the doc.
+    ## If the attribute is |template|, the pointed part MUST be a
+    ## |datatemplat| element.
+    ## If no fragment identifier is specified, the root element MUST be
+    ## a |datatemplate| element when the attribute is |template|.
+  }
+}; # $HTMLRefOrTemplateAttrChecker
+
 my $HTMLAttrChecker = {
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
@@ -770,10 +824,32 @@ my $HTMLAttrChecker = {
   },
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   ## TODO: repeat, repeat-start, repeat-min, repeat-max, repeat-template ## TODO: global
+  ref => $HTMLRefOrTemplateAttrChecker,
+  registrationmark => sub {
+    my ($self, $attr, $item, $element_state) = @_;
+
+    ## NOTE: Any value is conforming.
+
+    if ($self->{flag}->{in_rule}) {
+      my $el = $attr->owner_element;
+      my $ln = $el->manakai_local_name;
+      if ($ln eq 'nest' or
+          ($ln eq 'rule' and not $element_state->{in_rule_original})) {
+        my $nsuri = $el->namespace_uri;
+        if (defined $nsuri and $nsuri eq $HTML_NS) {
+          $self->{onerror}->(node => $attr, type => 'attribute not allowed',
+                             level => $self->{must_level});
+        }
+      }
+    } else {
+      $self->{onerror}->(node => $attr, type => 'attribute not allowed',
+                         level => $self->{must_level});
+    }
+  },
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
   ## TODO: style [HTML5]
   tabindex => $HTMLIntegerAttrChecker,
-## TODO: ref, template, registrationmark
+  template => $HTMLRefOrTemplateAttrChecker,
   xmlns => sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
@@ -808,6 +884,8 @@ my $HTMLAttrChecker = {
         {node => $attr, type => {namespace => 1}};
   },
 };
+
+## ISSUE: Shouldn't the same-origin policy applied to the datatemplate feature?
 
 my %HTMLAttrStatus = (
   class => FEATURE_HTML5_DEFAULT,
@@ -924,6 +1002,12 @@ my $GetHTMLAttrsChecker = sub {
 
 my %HTMLChecker = (
   %Whatpm::ContentChecker::AnyChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
   check_attrs => $GetHTMLAttrsChecker->({}, \%HTMLAttrStatus),
 );
 
@@ -1079,7 +1163,10 @@ $Element->{$HTML_NS}->{html} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before head';
+
     $element_state->{uri_info}->{manifest}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -1626,6 +1713,9 @@ $Element->{$HTML_NS}->{style} = {
       $element_state->{allow_element} = 1; # unknown
       $element_state->{style_type} = $type; ## TODO: $type normalization
     }
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -1689,6 +1779,8 @@ $Element->{$HTML_NS}->{body} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -1724,6 +1816,8 @@ $Element->{$HTML_NS}->{blockquote} = {
     my ($self, $item, $element_state) = @_;
   
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -1749,6 +1843,9 @@ $Element->{$HTML_NS}->{h1} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->{flag}->{has_hn} = 1;
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -1774,6 +1871,9 @@ $Element->{$HTML_NS}->{header} = {
                                 $HTMLSectioningContent);
     $element_state->{has_hn_original} = $self->{flag}->{has_hn};
     $self->{flag}->{has_hn} = 0;
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -1798,6 +1898,9 @@ $Element->{$HTML_NS}->{footer} = {
                                 {$HTML_NS => {footer => 1}},
                                 $HTMLSectioningContent,
                                 $HTMLHeadingContent);
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -1823,6 +1926,9 @@ $Element->{$HTML_NS}->{address} = {
     $self->_add_minus_elements ($element_state,
                                 {$HTML_NS => {footer => 1, address => 1}},
                                 $HTMLSectioningContent, $HTMLHeadingContent);
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -1891,6 +1997,9 @@ $Element->{$HTML_NS}->{dialog} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before dt';
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -2101,6 +2210,9 @@ $Element->{$HTML_NS}->{dl} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before dt';
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -2281,6 +2393,9 @@ $Element->{$HTML_NS}->{a} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -2309,6 +2424,8 @@ $Element->{$HTML_NS}->{q} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 ## TODO: "Quotation punctuation (such as quotation marks), if any, must be
@@ -2424,6 +2541,9 @@ $Element->{$HTML_NS}->{dfn} = {
     }
     ## ISSUE: The HTML5 definition for the defined term does not work with
     ## |ruby| unless |dfn| has |title|.
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -2804,6 +2924,8 @@ $Element->{$HTML_NS}->{ins} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -2836,6 +2958,8 @@ $Element->{$HTML_NS}->{del} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -2991,6 +3115,8 @@ $Element->{$HTML_NS}->{iframe} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -3239,6 +3365,8 @@ $Element->{$HTML_NS}->{video} = {
 
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{poster}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -3396,6 +3524,9 @@ $Element->{$HTML_NS}->{map} = {
     my ($self, $item, $element_state) = @_;
     $element_state->{in_map_original} = $self->{flag}->{in_map};
     $self->{flag}->{in_map} = 1;
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3599,6 +3730,9 @@ $Element->{$HTML_NS}->{area} = {
                          type => 'element not allowed:area',
                          level => $self->{must_level});
     }
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -3640,6 +3774,8 @@ $Element->{$HTML_NS}->{table} = {
     $element_state->{phase} = 'before caption';
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -4066,6 +4202,8 @@ $Element->{$HTML_NS}->{form} = {
 
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4122,7 +4260,7 @@ $Element->{$HTML_NS}->{input} = {
     src => $HTMLURIAttrChecker,
     ## TODO: step [WF2]
     target => $HTMLTargetAttrChecker,
-    ## TODO: template
+    ## TODO: template ## ISSUE: conflict with datetemplate @template
     type => $GetHTMLEnumeratedAttrChecker->({
       text => 1, password => 1, checkbox => 1, radio => 1, submit => 1,
       reset => 1, file => 1, hidden => 1, image => 1, button => 1,
@@ -4187,6 +4325,8 @@ $Element->{$HTML_NS}->{input} = {
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4210,7 +4350,7 @@ $Element->{$HTML_NS}->{button} = {
     oninvalid => $HTMLEventHandlerAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
-    ## TODO: template [WF2]
+    ## TODO: template [WF2] ## ISSUE: Conflict with datatemplate @template
     type => $GetHTMLEnumeratedAttrChecker->({
       button => 1, submit => 1, reset => 1,
     }),
@@ -4247,6 +4387,8 @@ $Element->{$HTML_NS}->{button} = {
 
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4318,6 +4460,8 @@ $Element->{$HTML_NS}->{select} = {
 
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4337,6 +4481,8 @@ $Element->{$HTML_NS}->{datalist} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4436,6 +4582,8 @@ $Element->{$HTML_NS}->{textarea} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4487,6 +4635,8 @@ $Element->{$HTML_NS}->{isindex} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4536,6 +4686,8 @@ $Element->{$HTML_NS}->{script} = {
     }
 
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -4594,6 +4746,9 @@ $Element->{$HTML_NS}->{noscript} = {
       $self->_add_minus_elements ($element_state,
                                   {$HTML_NS => {noscript => 1}});
     }
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -4675,6 +4830,8 @@ $Element->{$HTML_NS}->{'event-source'} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4750,6 +4907,8 @@ $Element->{$HTML_NS}->{datagrid} = {
     $self->_add_minus_elements ($element_state,
                                 {$HTML_NS => {a => 1, datagrid => 1}});
     $element_state->{phase} = 'any';
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   ## Flow -(text* table Flow*) | table | select | datalist | Empty
   check_child_element => sub {
@@ -4856,6 +5015,8 @@ $Element->{$HTML_NS}->{command} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{icon}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -4907,6 +5068,9 @@ $Element->{$HTML_NS}->{menu} = {
     $element_state->{phase} = 'li or phrasing';
     $element_state->{in_menu_original} = $self->{flag}->{in_menu};
     $self->{flag}->{in_menu} = 1;
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -5003,13 +5167,22 @@ $Element->{$HTML_NS}->{rule} = {
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+
     $self->_add_plus_elements ($element_state, {$HTML_NS => {nest => 1}});
+    $element_state->{in_rule_original} = $self->{flag}->{in_rule};
+    $self->{flag}->{in_rule} = 1;
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub { },
   check_child_text => sub { },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+
     $self->_remove_plus_elements ($element_state);
+    delete $self->{flag}->{in_rule} unless $element_state->{in_rule_original};
+
     $HTMLChecker{check_end}->(@_);
   },
   ## NOTE: "MAY be anything that, when the parent |datatemplate|
@@ -5073,6 +5246,8 @@ $Element->{$HTML_NS}->{div} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
