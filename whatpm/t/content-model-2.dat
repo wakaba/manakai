@@ -81,6 +81,55 @@
 /p/@b;attribute;unsupported
 
 #data
+<a html:repeat="" html:b=""
+c="" xmlns:d="http://" d:e="" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;element;unsupported
+/a/@c;attribute;unsupported
+/a/@e;attribute;unsupported
+/a/@b;attribute not defined;m
+/a/@repeat;repeat:syntax error;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a="">x</p>
+#errors
+/p/@a;attribute not defined;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a=""
+    name="keywords" content="x"/>
+#errors
+/meta/@a;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a=""
+    href="">y</a>
+#errors
+/a/@a;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a=""
+    src=""/>
+#errors
+/embed/@a;attribute not defined;m
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a=""
+    href="" shape="default" alt="x"/>
+#errors
+/area/@a;attribute not defined;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="">a</p>
 #errors

@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.78 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.79 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -27,6 +27,7 @@ my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
 my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
 
 my $Namespace = {
+  '' => {loaded => 1},
   q<http://www.w3.org/2005/Atom> => {module => 'Whatpm::ContentChecker::Atom'},
   q<http://purl.org/syndication/history/1.0>
       => {module => 'Whatpm::ContentChecker::Atom'},
@@ -37,6 +38,17 @@ my $Namespace = {
   $XMLNS_NS => {loaded => 1},
   q<http://www.w3.org/1999/02/22-rdf-syntax-ns#> => {loaded => 1},
 };
+
+sub load_ns_module ($) {
+  my $nsuri = shift; # namespace URI or ''
+  unless ($Namespace->{$nsuri}->{loaded}) {
+    if ($Namespace->{$nsuri}->{module}) {
+      eval qq{ require $Namespace->{$nsuri}->{module} } or die $@;
+    } else {
+      $Namespace->{$nsuri}->{loaded} = 1;
+    }
+  }
+} # load_ns_module
 
 our $AttrChecker = {
   $XML_NS => {
@@ -158,6 +170,23 @@ $AttrChecker->{''}->{'xml:lang'} = $AttrChecker->{$XML_NS}->{lang};
 $AttrChecker->{''}->{'xml:base'} = $AttrChecker->{$XML_NS}->{base};
 $AttrChecker->{''}->{'xml:id'} = $AttrChecker->{$XML_NS}->{id};
 
+our $AttrStatus;
+
+for (qw/space lang base id/) {
+  $AttrStatus->{$XML_NS}->{$_} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
+  $AttrStatus->{''}->{"xml:$_"} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
+  ## XML 1.0: FEATURE_STATUS_CR
+  ## XML 1.1: FEATURE_STATUS_REC
+  ## XML Namespaces 1.0: FEATURE_STATUS_CR
+  ## XML Namespaces 1.1: FEATURE_STATUS_REC
+  ## XML Base: FEATURE_STATUS_REC
+  ## xml:id: FEATURE_STATUS_REC
+}
+
+$AttrStatus->{$XMLNS_NS}->{''} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
+
+## TODO: xsi:schemaLocation for XHTML2 support (very, very low priority)
+
 our %AnyChecker = (
   check_start => sub { },
   check_attrs => sub {
@@ -166,14 +195,29 @@ our %AnyChecker = (
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
+      
+      load_ns_module ($attr_ns);
+
       my $checker = $AttrChecker->{$attr_ns}->{$attr_ln}
           || $AttrChecker->{$attr_ns}->{''};
+      my $status = $AttrStatus->{$attr_ns}->{$attr_ln}
+          || $AttrStatus->{$attr_ns}->{''};
+      if (not defined $status) {
+        $status = FEATURE_ALLOWED;
+        ## NOTE: FEATURE_ALLOWED for all attributes, since the element
+        ## is not supported and therefore "attribute not defined" error
+        ## should not raised (too verbose) and global attributes should be
+        ## allowed anyway (if a global attribute has its specified creteria
+        ## for where it may be specified, then it should be checked in it's
+        ## checker function).
+      }
       if ($checker) {
         $checker->($self, $attr);
       } else {
         $self->{onerror}->(node => $attr, level => 'unsupported',
                            type => 'attribute');
       }
+      $self->_attr_status_info ($attr, $status);
     }
   },
   check_child_element => sub {
@@ -308,13 +352,7 @@ sub check_document ($$$;$) {
   
   my $docel_nsuri = $docel->namespace_uri;
   $docel_nsuri = '' unless defined $docel_nsuri;
-  unless ($Namespace->{$docel_nsuri}->{loaded}) {
-    if ($Namespace->{$docel_nsuri}->{module}) {
-      eval qq{ require $Namespace->{$docel_nsuri}->{module} } or die $@;
-    } else {
-      $Namespace->{$docel_nsuri}->{loaded} = 1;
-    }
-  }
+  load_ns_module ($docel_nsuri);
   my $docel_def = $Element->{$docel_nsuri}->{$docel->manakai_local_name} ||
     $Element->{$docel_nsuri}->{''} ||
     $ElementDefault;
@@ -440,14 +478,8 @@ next unless $code;## TODO: temp.
       my $el_nsuri = $item->{node}->namespace_uri;
       $el_nsuri = '' unless defined $el_nsuri;
       my $el_ln = $item->{node}->manakai_local_name;
-      
-      unless ($Namespace->{$el_nsuri}->{loaded}) {
-        if ($Namespace->{$el_nsuri}->{module}) {
-          eval qq{ require $Namespace->{$el_nsuri}->{module} } or die $@;
-        } else {
-          $Namespace->{$el_nsuri}->{loaded} = 1;
-        }
-      }
+
+      load_ns_module ($el_nsuri);
 
       my $element_state = {};
       my $eldef = $Element->{$el_nsuri}->{$el_ln} ||
@@ -887,4 +919,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/03 08:00:16 $
+# $Date: 2008/05/03 14:42:26 $
