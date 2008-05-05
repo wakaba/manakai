@@ -7301,3 +7301,63 @@ id=""><span id="">x</span></p>
 <p repeat="template" repeat-start="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-start;nninteger:syntax error
+
+#data
+<x html:repeat="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/x;element;unsupported
+/x/@repeat;repeat:syntax error;m
+
+#data
+<x html:repeat-start="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/x;element;unsupported
+/x/@repeat-start;nninteger:syntax error;m
+
+#data
+<x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/x;element;unsupported
+/x/@repeat-min;nninteger:syntax error;m
+
+#data
+<x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/x;element;unsupported
+/x/@repeat-max;nninteger:syntax error;m
+
+#data
+<x html:repeat-template="x" xmlns:html="http://www.w3.org/1999/xhtml"><p repeat="template" id="x" xmlns="http://www.w3.org/1999/xhtml">x</p></x>
+#errors
+/x;element;unsupported
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat="template">x</p>
+#errors
+/p/@repeat;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat-min="1" repeat="template">x</p>
+#errors
+/p/@repeat-min;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat-max="5" repeat="template">x</p>
+#errors
+/p/@repeat-max;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat-start="0" repeat="template">x</p>
+#errors
+/p/@repeat-start;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat-template="t"><q repeat="template" id="t">x</q></p>
+#errors
+/p/@repeat-template;attribute not allowed;m
+

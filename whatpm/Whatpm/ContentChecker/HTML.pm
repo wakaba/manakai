@@ -769,6 +769,21 @@ my $HTMLRefOrTemplateAttrChecker = sub {
   }
 }; # $HTMLRefOrTemplateAttrChecker
 
+my $HTMLRepeatIndexAttrChecker = sub {
+  my ($self, $attr) = @_;
+
+  if (defined $attr->namespace_uri) {
+    my $oe = $attr->owner_element;
+    my $oe_nsuri = $oe->namespace_uri;
+    if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) {
+      $self->{onerror}->(node => $attr, type => 'attribute not allowed',
+                         level => $self->{must_level});
+    }
+  }
+  
+  $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_);
+}; # $HTMLRepeatIndexAttrChecker
+
 my $HTMLAttrChecker = {
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
@@ -863,6 +878,16 @@ my $HTMLAttrChecker = {
   },
   repeat => sub {
     my ($self, $attr) = @_;
+
+    if (defined $attr->namespace_uri) {
+      my $oe = $attr->owner_element;
+      my $oe_nsuri = $oe->namespace_uri;
+      if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $attr, type => 'attribute not allowed',
+                           level => $self->{must_level});
+      }
+    }
+
     my $value = $attr->value;
     if ($value eq 'template') {
       #
@@ -878,10 +903,21 @@ my $HTMLAttrChecker = {
     ## element with that attribute (i.e. a repetition template) can be
     ## inserted anywhere in a document tree?
   },
-  'repeat-min' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-  'repeat-max' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-  'repeat-start' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  'repeat-min' => $HTMLRepeatIndexAttrChecker,
+  'repeat-max' => $HTMLRepeatIndexAttrChecker,
+  'repeat-start' => $HTMLRepeatIndexAttrChecker,
   'repeat-template' => sub {
+    my ($self, $attr) = @_;
+
+    if (defined $attr->namespace_uri) {
+      my $oe = $attr->owner_element;
+      my $oe_nsuri = $oe->namespace_uri;
+      if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $attr, type => 'attribute not allowed',
+                           level => $self->{must_level});
+      }
+    }
+
     ## ISSUE: This attribute has no conformance requirement.
     ## ISSUE: Repetition blocks MAY have this attribute.  Then, is the
     ## attribute allowed on an element that is not a repetition block?
