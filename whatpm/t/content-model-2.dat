@@ -1362,18 +1362,18 @@ id=""><span id="">x</span></p>
 /meta;attribute missing:content
 
 #data
-<meta http-equiv="refresh" content="10; a.html"
+<meta http-equiv="refresh" content="10; url=a.html"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
 #data
-<meta http-equiv="refresh" content="10; a.html" name="dns"
+<meta http-equiv="refresh" content="10; url=a.html" name="dns"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@http-equiv;attribute not allowed
 
 #data
-<meta http-equiv="refresh" content="10; a.html" charset="us-ascii"
+<meta http-equiv="refresh" content="10; url=a.html" charset="us-ascii"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@charset;attribute not allowed
@@ -1653,6 +1653,165 @@ id=""><span id="">x</span></p>
 /html/head/meta/@charset;attribute not allowed
 /html/head/meta/@content;meta content-type syntax error;m
 /html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=Content-Type content="text/html;charset=us-ascii">
+<meta http-equiv=Content-Type content="text/html;charset=us-ascii">
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@http-equiv;duplicate http-equiv;m
+/html/head/meta;element not allowed:meta charset;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<link rel="stylesheet" href="" title="style1"/>		
+<link rel="stylesheet" href="" title="style2"/>		
+<meta http-equiv="Default-Style" content="style1"/>
+<meta http-equiv="default-style" content="style2"/>
+</head>
+#errors
+/head/meta/@http-equiv;duplicate http-equiv;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="13"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="0"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="000000013"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="+12"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="12.0"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="12 "/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="  12"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="44;url=http://www.example.com/"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content=" 45; url=aaa"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="0 ; url=bb"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url = aa"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="5; url=http://www.example.com/"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url= http://test/"/>
+</head>
+#errors
+/head/meta/@content;URI::syntax error:iriref3987;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url=[a]"/>
+</head>
+#errors
+/head/meta/@content;URI::syntax error:iriref3987;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url=&quot;http://&quot;"/>
+</head>
+#errors
+/head/meta/@content;URI::syntax error:iriref3987;m
+/head/meta/@content;URI::empty path;w
+/head/meta/@content;URI::non-DNS host;w
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url=http://www.example.com/"/>
+<meta http-equiv="Refresh" content="4; url=http://www.example.com/"/>
+</head>
+#errors
+/head/meta/@http-equiv;duplicate http-equiv;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url=http://www.example.com/"/>
+<base href=""/>
+</head>
+#errors
+/head/base;basehref after URI attribute
 
 #data
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>

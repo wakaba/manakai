@@ -1841,14 +1841,16 @@ $Element->{$HTML_NS}->{meta} = {
     ## TODO: pragma conformance
     if (defined $http_equiv_attr) { ## An enumerated attribute
       my $keyword = lc $http_equiv_attr->value; ## TODO: ascii case?
-      if ({
-           'refresh' => 1,
-           'default-style' => 1,
-          }->{$keyword}) {
-        #
 
-        ## TODO: More than one occurence is a MUST-level error (revision 1180).
-      } elsif ($keyword eq 'content-type') {
+      if ($self->{has_http_equiv}->{$keyword}) {
+        $self->{onerror}->(type => 'duplicate http-equiv', value => $keyword,
+                           node => $http_equiv_attr,
+                           level => $self->{must_level});
+      } else {
+        $self->{has_http_equiv}->{$keyword} = 1;
+      }
+
+      if ($keyword eq 'content-type') {
         ## TODO: refs in "text/html; charset=" are not disallowed since rev.1275.
 
         $check_charset_decl->();
@@ -1861,6 +1863,35 @@ $Element->{$HTML_NS}->{meta} = {
           } else {
             $self->{onerror}->(node => $content_attr,
                                type => 'meta content-type syntax error',
+                               level => $self->{must_level});
+          }
+        }
+      } elsif ($keyword eq 'default-style') {
+        ## ISSUE: Not defined yet in the spec.
+      } elsif ($keyword eq 'refresh') {
+        if ($content_attr) {
+          my $content = $content_attr->value;
+          if ($content =~ /\A[0-9]+\z/) {
+            ## NOTE: Valid non-negative integer.
+            #
+          } elsif ($content =~ s/\A[0-9]+;[\x09-\x0D\x20]+[Uu][Rr][Ll]=//) {
+            ## ISSUE: Relative references are allowed? (RFC 3987 "IRI" is an absolute reference with optional fragment identifier.)
+            Whatpm::URIChecker->check_iri_reference ($content, sub {
+              my %opt = @_;
+              $self->{onerror}->(node => $content_attr, level => $opt{level},
+                                 type => 'URI::'.$opt{type}.
+                                 (defined $opt{position} ? ':'.$opt{position} : ''));
+            });
+            $self->{has_uri_attr} = 1; ## NOTE: One of "attributes with URIs".
+
+            $element_state->{uri_info}->{content}->{node} = $content_attr;
+            $element_state->{uri_info}->{content}->{type}->{hyperlink} = 1;
+            ## TODO: absolute
+            push @{$self->{return}->{uri}->{$content} ||= []},
+                $element_state->{uri_info}->{content};
+          } else {
+            $self->{onerror}->(node => $content_attr,
+                               type => 'refresh:syntax error',
                                level => $self->{must_level});
           }
         }
