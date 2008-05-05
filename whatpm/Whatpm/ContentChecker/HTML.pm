@@ -526,6 +526,19 @@ my $GetHTMLFloatingPointNumberAttrChecker = sub {
   };
 }; # $GetHTMLFloatingPointNumberAttrChecker
 
+## HTML4 %Length;
+my $HTMLLengthAttrChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  unless ($value =~ /\A[0-9]+%?\z/) {
+    $self->{onerror}->(node => $attr, type => 'length:syntax error',
+                       level => $self->{must_level});
+  }
+
+  ## NOTE: HTML4 definition is too vague - it does not define the syntax
+  ## of percentage value at all (!).
+}; # $HTMLLengthAttrChecker
+
 ## "A valid MIME type, optionally with parameters. [RFC 2046]"
 ## ISSUE: RFC 2046 does not define syntax of media types.
 ## ISSUE: The definition of "a valid MIME type" is unknown.
@@ -1880,7 +1893,8 @@ $Element->{$HTML_NS}->{meta} = {
               my %opt = @_;
               $self->{onerror}->(node => $content_attr, level => $opt{level},
                                  type => 'URI::'.$opt{type}.
-                                 (defined $opt{position} ? ':'.$opt{position} : ''));
+                                 (defined $opt{position} ? ':'.$opt{position} : ''),
+                                 value => $content);
             });
             $self->{has_uri_attr} = 1; ## NOTE: One of "attributes with URIs".
 
@@ -3980,7 +3994,8 @@ $Element->{$HTML_NS}->{table} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: HTML4 |cellspacing|, |cellpadding|
+    cellpadding => $HTMLLengthAttrChecker,
+    cellspacing => $HTMLLengthAttrChecker,
     frame => $GetHTMLEnumeratedAttrChecker->({
       void => 1, above => 1, below => 1, hsides => 1, vsides => 1,
       lhs => 1, rhs => 1, box => 1, border => 1,
@@ -4148,7 +4163,8 @@ my %cellalign = (
                          level => $self->{fact_level}); ## TODO: type
     }
   },
-  ## TODO: HTML4 |charoff|  
+  charoff => $HTMLLengthAttrChecker,
+
   ## HTML4 %cellvalign;
   valign => $GetHTMLEnumeratedAttrChecker->({
     top => 1, middle => 1, bottom => 1, baseline => 1,
@@ -4849,8 +4865,6 @@ $Element->{$HTML_NS}->{output} = {
   ## NOTE: "The output  element should be used when ..." [WF2]
 };
 
-## TODO: repetition template
-
 $Element->{$HTML_NS}->{isindex} = {
   %HTMLEmptyChecker,
   status => FEATURE_M12N10_REC_DEPRECATED |
@@ -4884,7 +4898,7 @@ $Element->{$HTML_NS}->{script} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     ## TODO: HTML4 |charset|
-    ## TODO: HTML4 |language|
+    language => sub {}, ## NOTE: No syntax constraint according to HTML4.
       src => $HTMLURIAttrChecker,
       defer => $GetHTMLBooleanAttrChecker->('defer'),
       async => $GetHTMLBooleanAttrChecker->('async'),

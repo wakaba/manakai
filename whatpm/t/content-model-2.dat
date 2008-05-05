@@ -5574,6 +5574,154 @@ id=""><span id="">x</span></p>
 /table/@rules;enumerated:invalid
 
 #data
+<table cellpadding="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+
+#data
+<table cellpadding="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+
+#data
+<table cellpadding="1%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+
+#data
+<table cellpadding="1000%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+
+#data
+<table cellpadding="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellpadding="1 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellpadding=" 4" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellpadding="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellpadding="1,45" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellpadding="1*" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellpadding="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellpadding="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellpadding="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellpadding;attribute not defined;m
+/table/@cellpadding;length:syntax error;m
+
+#data
+<table cellspacing="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+
+#data
+<table cellspacing="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+
+#data
+<table cellspacing="1%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+
+#data
+<table cellspacing="1000%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+
+#data
+<table cellspacing="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
+<table cellspacing="1 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
+<table cellspacing=" 4" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
+<table cellspacing="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
+<table cellspacing="1,45" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
+<table cellspacing="1*" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
+<table cellspacing="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
+<table cellspacing="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
+<table cellspacing="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@cellspacing;attribute not defined;m
+/table/@cellspacing;length:syntax error;m
+
+#data
 <caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /caption/@align;attribute not defined;m
@@ -5665,6 +5813,22 @@ id=""><span id="">x</span></p>
 /colgroup/@span;nninteger:syntax error
 
 #data
+<colgroup charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@charoff;attribute not defined;m
+
+#data
+<colgroup charoff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@charoff;attribute not defined;m
+
+#data
+<colgroup charoff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@charoff;attribute not defined;m
+/colgroup/@charoff;length:syntax error;m
+
+#data
 <col xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -5692,9 +5856,89 @@ id=""><span id="">x</span></p>
 /col/@span;nninteger:syntax error
 
 #data
+<col charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@charoff;attribute not defined;m
+
+#data
+<col charoff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@charoff;attribute not defined;m
+
+#data
+<col charoff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@charoff;attribute not defined;m
+/col/@charoff;length:syntax error;m
+
+#data
+<thead charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@charoff;attribute not defined;m
+
+#data
+<thead charoff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@charoff;attribute not defined;m
+
+#data
+<thead charoff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@charoff;attribute not defined;m
+/thead/@charoff;length:syntax error;m
+
+#data
+<tbody charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@charoff;attribute not defined;m
+
+#data
+<tbody charoff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@charoff;attribute not defined;m
+
+#data
+<tbody charoff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@charoff;attribute not defined;m
+/tbody/@charoff;length:syntax error;m
+
+#data
+<tfoot charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@charoff;attribute not defined;m
+
+#data
+<tfoot charoff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@charoff;attribute not defined;m
+
+#data
+<tfoot charoff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@charoff;attribute not defined;m
+/tfoot/@charoff;length:syntax error;m
+
+#data
 <tr bgcolor="blue" xmlns="http://www.w3.org/1999/xhtml"><td>x</td></tr>
 #errors
 /tr/@bgcolor;attribute not defined;m
+
+#data
+<tr charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@charoff;attribute not defined;m
+
+#data
+<tr charoff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@charoff;attribute not defined;m
+
+#data
+<tr charoff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@charoff;attribute not defined;m
+/tr/@charoff;length:syntax error;m
 
 #data
 <td colspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5717,6 +5961,38 @@ id=""><span id="">x</span></p>
 #errors
 /td/@rowspan;nninteger:out of range
 /td;no significant content;s
+
+#data
+<td charoff="1" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@charoff;attribute not defined;m
+
+#data
+<td charoff="0%" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@charoff;attribute not defined;m
+
+#data
+<td charoff="1px" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@charoff;attribute not defined;m
+/td/@charoff;length:syntax error;m
+
+#data
+<th charoff="1" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@charoff;attribute not defined;m
+
+#data
+<th charoff="0%" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@charoff;attribute not defined;m
+
+#data
+<th charoff="1px" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@charoff;attribute not defined;m
+/th/@charoff;length:syntax error;m
 
 #data
 <th colspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6174,6 +6450,54 @@ id=""><span id="">x</span></p>
 #data
 <script src="" defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<script language="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;attribute not defined;m
+/script;script:text/javascript;unsupported
+
+#data
+<script langage="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@langage;attribute not defined;m
+/script;script:text/javascript;unsupported
+
+#data
+<script languege="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@languege;attribute not defined;m
+/script;script:text/javascript;unsupported
+
+#data
+<script language="JavaScript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;attribute not defined;m
+/script;script:text/JavaScript;unsupported
+
+#data
+<script language="jscript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;attribute not defined;m
+/script;script:text/jscript;unsupported
+
+#data
+<script language="javascript1.2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;attribute not defined;m
+/script;script:text/javascript1.2;unsupported
+
+#data
+<script language="vbscript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;attribute not defined;m
+/script;script:text/vbscript;unsupported
+
+#data
+<script language="XML" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;attribute not defined;m
+/script;script:text/XML;unsupported
 
 #data
 <event-source xmlns="http://www.w3.org/1999/xhtml"/>
