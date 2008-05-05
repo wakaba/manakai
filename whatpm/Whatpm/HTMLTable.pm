@@ -1,12 +1,11 @@
 package Whatpm::HTMLTable;
 use strict;
 
-## r1376
-
 ## An implementation of "Forming a table" algorithm in HTML5
-sub form_table ($$$) {
-  my (undef, $table_el, $onerror) = @_;
+sub form_table ($$$;$) {
+  my (undef, $table_el, $onerror, $must_level) = @_;
   $onerror ||= sub { };
+  $must_level ||= 'm';
   
   ## Step 1
   my $x_width = 0;
@@ -23,30 +22,60 @@ sub form_table ($$$) {
     #caption
     column => [],
     column_group => [],
-    # no |row| since HTML5 algorithm doesn't associate rows with <tr>s
+    row => [], ## NOTE: HTML5 algorithm doesn't associate rows with <tr>s.
     row_group => [],
     cell => [],
   };
   
-  my @has_anchored_cell;
+  my @column_has_anchored_cell;
+  my @row_has_anchored_cell;
   my @column_generated_by;
-  my $check_empty_column = sub {
-    for (0 .. $x_width - 1) {
-      unless ($has_anchored_cell[$_]) {
-        if ($table->{column}->[$_]) {
-          $onerror->(type => 'column with no anchored cell',
-                     node => $table->{column}->[$_]->{element});
-        } else {
-          $onerror->(type => 'colspan creates column with no anchored cell',
-                     node => $column_generated_by[$_]);
-        }
-      }
-    }
-  }; # $check_empty_column
+  my @row_generated_by;
   
   ## Step 5
   my @table_child = @{$table_el->child_nodes};
-  return $table unless @table_child; # don't call $check_empty_column
+  return $table unless @table_child;
+
+  my $process_row_group;
+  my $end = sub {
+    ## Step 20 (End)
+    for (@$pending_tfoot) {
+      $process_row_group->($_);
+    }
+    
+    ## Step 21
+    for (0 .. $x_width - 1) {
+      unless ($column_has_anchored_cell[$_]) {
+        if ($table->{column}->[$_]) {
+          $onerror->(type => 'column with no anchored cell',
+                     node => $table->{column}->[$_]->{element},
+                     level => $must_level);
+        } else {
+          $onerror->(type => 'colspan creates column with no anchored cell',
+                     node => $column_generated_by[$_],
+                    level => $must_level);
+        }
+        last; # only one error.
+      }
+    }
+    for (0 .. $y_height - 1) {
+      unless ($row_has_anchored_cell[$_]) {
+        if ($table->{row}->[$_]) {
+          $onerror->(type => 'row with no anchored cell',
+                     node => $table->{row}->[$_]->{element},
+                     level => $must_level);
+        } else {
+          $onerror->(type => 'rowspan creates row with no anchored cell',
+                     node => $row_generated_by[$_],
+                     level => $must_level);
+        }
+        last; # only one error.
+      }
+    }
+    
+    ## Step 22
+    #return $table;
+  }; # $end
 
   ## Step 6, 7, 9
   my $current_element;
@@ -76,9 +105,10 @@ sub form_table ($$$) {
       }->{$current_ln};
     } else {
       ## End of subsection
-      $check_empty_column->();
+
       ## Step 6 2nd paragraph
-      last ROWS;
+      $end->();
+      return $table;
     }
   } # NEXT_CHILD
 
@@ -157,9 +187,10 @@ sub form_table ($$$) {
         }->{$current_ln};
       } else {
         ## End of subsection
-        $check_empty_column->();
+        
         ## Step 5 of overall steps 2nd paragraph
-        last ROWS;
+        $end->();
+        return $table;
       }
     } # NEXT_CHILD
   }
@@ -188,6 +219,7 @@ sub form_table ($$$) {
 
     ## Step 3
     my $tr = shift;
+    $table->{row}->[$y_current] = {element => $tr};
     my @tdth = grep {
       $_->node_type == 1 and
       defined $_->namespace_uri and
@@ -196,10 +228,11 @@ sub form_table ($$$) {
     } @{$tr->child_nodes};
     my $current_cell = shift @tdth;
 
-## ISSUE: Support for empty <tr></tr> (removed at revision 1376).
-
     ## Step 4
     $growing_downward_growing_cells->();
+
+return unless $current_cell;
+## ISSUE: Support for empty <tr></tr> (removed at revision 1376).
 
     CELL: while (1) {
       ## Step 5: cells
@@ -240,6 +273,8 @@ sub form_table ($$$) {
       
       ## Step 11
       if ($y_height < $y_current + $rowspan) {
+        @row_generated_by[$_] = $current_cell
+            for $y_height .. $y_current + $rowspan - 1;
         $y_height = $y_current + $rowspan;
         $y_max_node = $current_cell;
       }
@@ -251,13 +286,15 @@ sub form_table ($$$) {
                   x => $x_current, y => $y_current,
                   width => $colspan, height => $rowspan,
                  };
-      $has_anchored_cell[$x_current] = 1;
+      $column_has_anchored_cell[$x_current] = 1;
+      $row_has_anchored_cell[$y_current] = 1;
       for my $x ($x_current .. ($x_current + $colspan - 1)) {
         for my $y ($y_current .. ($y_current + $rowspan - 1)) {
           unless ($table->{cell}->[$x]->[$y]) {
             $table->{cell}->[$x]->[$y] = [$cell];
           } else {
-            $onerror->(type => "cell overlapping:$x:$y", node => $current_cell);
+            $onerror->(type => "cell overlapping:$x:$y", node => $current_cell,
+                       level => $must_level);
             push @{$table->{cell}->[$x]->[$y]}, $cell;
           }
         }
@@ -284,7 +321,7 @@ sub form_table ($$$) {
     } # CELL
   }; # $process_row
 
-  my $process_row_group = sub ($) {
+  $process_row_group = sub ($) {
     ## Step 1
     my $y_start = $y_height;
 
@@ -309,10 +346,6 @@ sub form_table ($$$) {
     ## Step 4
     ## Ending a row group
       ## Step 1
-      if ($y_current < $y_height) {
-        $onerror->(type => 'rowspan expands table', node => $y_max_node);
-      }
-      ## Step 2
       while ($y_current < $y_height) {
         ## Step 1
         $growing_downward_growing_cells->();
@@ -320,7 +353,7 @@ sub form_table ($$$) {
         ## Step 2
         $y_current++;
       }
-      ## Step 3
+      ## Step 2
       @downward_growing_cells = ();
   }; # $process_row_group
 
@@ -343,14 +376,9 @@ sub form_table ($$$) {
           tr => 1,
         }->{$current_ln};
       } else {
-        ## Step 11 2nd sentense
-        if ($y_current != $y_height) {
-          $onerror->(type => 'no cell in last row', node => $table_el);
-        }
-        ## End of subsection
-        $check_empty_column->();
         ## Step 6 2nd paragraph
-        last ROWS;
+        $end->();
+        return $table;
       }
     } # NEXT_CHILD
 
@@ -364,16 +392,14 @@ sub form_table ($$$) {
     ## Step 15
     ## Ending a row group
       ## Step 1
-      if ($y_current < $y_height) {
-        $onerror->(type => 'rowspan expands table', node => $y_max_node);
-      }
-      ## Step 2
       while ($y_current < $y_height) {
         ## Step 1
-        $y_current++;
         $growing_downward_growing_cells->();
+
+        ## Step 2
+        $y_current++;
       }
-      ## Step 3
+      ## Step 2
       @downward_growing_cells = ();
 
     ## Step 16
@@ -394,16 +420,11 @@ sub form_table ($$$) {
     redo ROWS;
   } # ROWS
 
-  ## Step 20 (End)
-  for (@$pending_tfoot) {
-    $process_row_group->($_);
-  }
-
-  ## Step 21
+  $end->();
   return $table;
 } # form_table
 
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2008/05/05 06:57:07 $
+## $Date: 2008/05/05 08:00:25 $

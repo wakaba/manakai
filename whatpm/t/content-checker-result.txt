@@ -1,7 +1,7 @@
 1..2192
 # Running under perl version 5.008007 for linux
-# Current time local: Mon May  5 13:29:13 2008
-# Current time GMT:   Mon May  5 04:29:13 2008
+# Current time local: Mon May  5 16:50:38 2008
+# Current time GMT:   Mon May  5 07:50:38 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2384,19 +2384,51 @@ ok 2241
 ok 2242
 ok 2243
 # t/table-1.dat
-ok 2244
-ok 2245
-ok 2246
-ok 2247
-ok 2248
-ok 2249
-ok 2250
+not ok 2244
+# Test 2244 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2244)
+#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody></table>)
+not ok 2245
+# Test 2245 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2245)
+#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody> </table>)
+not ok 2246
+# Test 2246 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2246)
+#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/> </tbody></table>)
+not ok 2247
+# Test 2247 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2247)
+#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tbody> <tr/></tbody></table>)
+not ok 2248
+# Test 2248 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2248)
+#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"> <tbody><tr/></tbody></table>)
+not ok 2249
+# Test 2249 got: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2249)
+#      Expected: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml">
+#<tbody><tr><td/></tr><tr/></tbody></table>)
+not ok 2250
+# Test 2250 got: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2250)
+#      Expected: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th" (<table xmlns="http://www.w3.org/1999/xhtml">
+#<tbody><tr><td rowspan="2"/></tr><tr/></tbody></table>)
 ok 2251
-ok 2252
-ok 2253
-ok 2254
-ok 2255
-ok 2256
+not ok 2252
+# Test 2252 got: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2252)
+#      Expected: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml">
+#<tbody><tr><td/></tr><tr/><tr/></tbody></table>)
+#      Line 4 is changed:
+#       - "/table;table:no cell in last row"
+#       + "/table/tbody;table:row with no anchored cell"
+not ok 2253
+# Test 2253 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell\n/table/thead/tr/td;no significant content;s" (t/ContentChecker.t at line 99 fail #2253)
+#      Expected: "/table/tbody/tr;child element missing:td|th\n/table/thead/tr/td;no significant content;s\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml">
+#<thead><tr><td/></tr></thead><tbody><tr/></tbody></table>)
+not ok 2254
+# Test 2254 got: "/table/tbody/tr;child element missing:td|th\n/table/thead/tr;child element missing:td|th\n/table/thead;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2254)
+#      Expected: "/table/tbody/tr;child element missing:td|th\n/table/thead/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml">
+#<thead><tr/></thead><tbody><tr/></tbody></table>)
+not ok 2255
+# Test 2255 got: "/table/tr;child element missing:td|th\n/table/tr;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2255)
+#      Expected: "/table/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tr/></table>)
+not ok 2256
+# Test 2256 got: "/table/tr;child element missing:td|th\n/table/tr;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2256)
+#      Expected: "/table/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tr/> </table>)
 # t/content-model-atom-1.dat
 ok 2257
 ok 2258
