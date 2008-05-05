@@ -27,12 +27,11 @@ algorithm as defined in the HTML5 specification.
 
 =cut
 
-## TODO: HTML5 revision 1282 (feed BOM)
 ## TODO: HTML5 revision 1288 (no Content-Encoding safebar, so on)
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -291,6 +290,8 @@ sub get_sniffed_type ($%) {
 
     ## Algorithm: "Content-Type sniffing: unknown type"
 
+    ## NOTE: The "unknown" algorithm does not support HTML with BOM.
+
     ## Step 1
     my $bytes = substr $opt{get_file_head}->(512), 0, 512;
     
@@ -370,11 +371,16 @@ sub get_sniffed_type ($%) {
     ## Step 4
     pos ($bytes) = 0;
 
-    ## Step 5-8
+    ## Step 5
+    if (substr ($bytes, 0, 3) eq "\xEF\xBB\xBF") {
+      pos ($bytes) = 3; # skip UTF-8 BOM.
+    }
+
+    ## Step 6-9
     1 while $bytes =~ /\G(?:[\x09\x20\x0A\x0D]+|<!--.*?-->|<![^>]*>|<\?.*?\?>)/gcs;
     return ($official_type, 'text/html') unless $bytes =~ /\G</gc;
 
-    ## Step 9
+    ## Step 10
     if ($bytes =~ /\Grss/gc) {
       return ($official_type, 'application/rss+xml');
     } elsif ($bytes =~ /\Gfeed/gc) {
@@ -385,8 +391,8 @@ sub get_sniffed_type ($%) {
       return ($official_type, 'text/html');
     }
 
-    ## Step 10
-    ## ISSUE: Step 10 is not defined yet in the spec
+    ## Step 11
+    ## ISSUE: Step 11 is not defined yet in the spec
     if ($bytes =~ /\G([^>]+)/gc) {
       my $by = $1;
       if ($by =~ m!xmlns[^>=]*=[\x20\x0A\x0D\x09]*["']http://www\.w3\.org/1999/02/22-rdf-syntax-ns#["']! and
@@ -395,11 +401,11 @@ sub get_sniffed_type ($%) {
       }
     }
 
-    ## Step 11
+    ## Step 12
     return ($official_type, 'text/html');
   }
 
-  ## Step 7
+  ## Step 8
   return ($official_type, $official_type);
 } # get_sniffed_type
 
@@ -416,7 +422,7 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -424,4 +430,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/03/01 00:42:52 $
+# $Date: 2008/05/05 04:21:20 $

@@ -2,7 +2,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 1734 }
+BEGIN { plan tests => 1989 }
 
 use Whatpm::ContentType;
 
@@ -232,6 +232,13 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq<\xEF\xBB\xBF<!DOCTYPE HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)<!DOCTYPE HTML',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
     qq<<!DOCTYPE html>\x0A...>,
     q<text/plain>, 0,
     q<text/plain>, '<!DOCTYPE html',
@@ -302,6 +309,13 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq<\xEF\xBB\xBF<html>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)<html>',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
     qq<<html>\x0A...>,
     q<text/plain>, 0,
     q<text/plain>, '<html>(LF)...',
@@ -334,6 +348,13 @@ for my $v (
     q<text/plain>, 0,
     q<text/plain>, '<html xmlns="...">',
     q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\xEF\xBB\xBF<html xmlns="http://www.w3.org/1999/xhtml">>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)<html xmlns="...">',
+    q<text/plain>,
     q<text/html>,
   ],
   [
@@ -554,6 +575,13 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq<\xEF\xBB\xBF<?xml version="1.0"?><html />>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)<?xml?><html/>',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
     x (qw(25 21 50 53 2d 41 64 6f 62 65 2d 32 2e 30 0a 25
           25 43 72 65 61 74 6f 72 3a 20 64 76 69 70 73 20
           35 2e 34 38 35 20 43 6f 70 79 72 69 67 68 74 20
@@ -653,9 +681,23 @@ for my $v (
     q<application/rss+xml>,
   ],
   [
+    qq<\xEF\xBB\xBF<rss><title>RSS feed</title></rss>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)RSS unversioned',
+    q<text/plain>,
+    q<application/rss+xml>,
+  ],
+  [
     q<<rss version="2.0"><title>RSS feed</title></rss>>,
     q<text/plain>, 0,
     q<text/plain>, 'RSS 2.0',
+    q<text/plain>,
+    q<application/rss+xml>,
+  ],
+  [
+    qq<\xEF\xBB\xBF<rss version="2.0"><title>RSS feed</title></rss>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)RSS 2.0',
     q<text/plain>,
     q<application/rss+xml>,
   ],
@@ -667,9 +709,23 @@ for my $v (
     q<application/rss+xml>,
   ],
   [
+    qq<\xEF\xBB\xBF<?xml version="1.0"?><rss><title>RSS feed</title></rss>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)<?xml?>RSS',
+    q<text/plain>,
+    q<application/rss+xml>,
+  ],
+  [
     qq<<!-- RSS 2.0 --> \x0A<rss version="2.0"><title>RSS feed</title></rss>>,
     q<text/plain>, 0,
     q<text/plain>, 'Comment S RSS',
+    q<text/plain>,
+    q<application/rss+xml>,
+  ],
+  [
+    qq<\xEF\xBB\xBF<!-- RSS 2.0 --> \x0A<rss version="2.0"><title>RSS feed</title></rss>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)Comment S RSS',
     q<text/plain>,
     q<application/rss+xml>,
   ],
@@ -681,9 +737,23 @@ for my $v (
     q<application/rss+xml>,
   ],
   [
+    qq<\xEF\xBB\xBF<!-- RSS 2.0 --><!DOCTYPE rss []><rss version="2.0"><title>RSS feed</title></rss>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)Comment DOCTYPE RSS',
+    q<text/plain>,
+    q<application/rss+xml>,
+  ],
+  [
     q<<rdf:RDF><channel></channel></rdf:RDF>>,
     q<text/plain>, 0,
     q<text/plain>, 'RSS 1.0 no namespace',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<\xEF\xBB\xBF<rdf:RDF><channel></channel></rdf:RDF>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)RSS 1.0 no namespace',
     q<text/plain>,
     q<text/html>,
   ],
@@ -693,6 +763,15 @@ for my $v (
            <channel></channel></rdf:RDF>>,
     q<text/plain>, 0,
     q<text/plain>, 'RSS 1.0 namespaced 1',
+    q<text/plain>,
+    q<application/rss+xml>,
+  ],
+  [
+    qq<\xEF\xBB\xBF<rdf:RDF xmlns="http://purl.org/rss/1.0/"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+           <channel></channel></rdf:RDF>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)RSS 1.0 namespaced 1',
     q<text/plain>,
     q<application/rss+xml>,
   ],
@@ -734,6 +813,13 @@ for my $v (
     q<application/atom+xml>,
   ],
   [
+    qq<\xEF\xBB\xBF<feed xmlns="http://www.w3.org/2005/Atom"><id>...</id></feed>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)Atom feed',
+    q<text/plain>,
+    q<application/atom+xml>,
+  ],
+  [
     q<<feed><id>...</id></feed>>,
     q<text/plain>, 0,
     q<text/plain>, 'unnamespaced Atom feed',
@@ -748,6 +834,13 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq<\xEF\xBB\xBF<entry xmlns="http://www.w3.org/2005/Atom"><id>...</id></entry>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)Atom entry',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
     q<<html xmlns="http://www.w3.org/1999/xhtml"><head><feed xmlns="http://www.w3.org/2005/Atom"><id>...</id></feed></head>>,
     q<text/plain>, 0,
     q<text/plain>, 'Atom in HTML',
@@ -755,9 +848,23 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq<\xEF\xBF\xBB<html xmlns="http://www.w3.org/1999/xhtml"><head><feed xmlns="http://www.w3.org/2005/Atom"><id>...</id></feed></head>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)Atom in HTML',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
     q<<Atom:feed xmlns="http://www.w3.org/2005/Atom"><Atom:id>...</Atom:id></Atom:feed>>,
     q<text/plain>, 0,
     q<text/plain>, 'prefixed Atom entry',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<\xEF\xBB\xBF<Atom:feed xmlns="http://www.w3.org/2005/Atom"><Atom:id>...</Atom:id></Atom:feed>>,
+    q<text/plain>, 0,
+    q<text/plain>, '(UTF-8 BOM)prefixed Atom entry',
     q<text/plain>,
     q<text/html>,
   ],
@@ -820,5 +927,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2007/11/18 04:48:36 $
+## $Date: 2008/05/05 04:21:20 $
 1;
