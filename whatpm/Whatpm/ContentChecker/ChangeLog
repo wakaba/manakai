@@ -1,5 +1,12 @@
 2008-05-05  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: Empty <tbod>, <thead>, <tfoot>, and <tr> are
+	no longer content model error (they might be raise
+	table model error, however).  All table model error
+	parameters should propagate.
+
+2008-05-05  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm: Raise an error if a repeat* global attrbute
 	is used for an HTML element.
 

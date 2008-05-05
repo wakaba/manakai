@@ -1,7 +1,7 @@
 1..2192
 # Running under perl version 5.008007 for linux
-# Current time local: Mon May  5 16:50:38 2008
-# Current time GMT:   Mon May  5 07:50:38 2008
+# Current time local: Mon May  5 17:25:05 2008
+# Current time GMT:   Mon May  5 08:25:05 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2384,52 +2384,19 @@ ok 2241
 ok 2242
 ok 2243
 # t/table-1.dat
-not ok 2244
-# Test 2244 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2244)
-#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody></table>)
-not ok 2245
-# Test 2245 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2245)
-#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody> </table>)
-not ok 2246
-# Test 2246 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2246)
-#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/> </tbody></table>)
-not ok 2247
-# Test 2247 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2247)
-#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tbody> <tr/></tbody></table>)
-not ok 2248
-# Test 2248 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2248)
-#      Expected: "/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"> <tbody><tr/></tbody></table>)
-not ok 2249
-# Test 2249 got: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2249)
-#      Expected: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml">
-#<tbody><tr><td/></tr><tr/></tbody></table>)
-not ok 2250
-# Test 2250 got: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2250)
-#      Expected: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th" (<table xmlns="http://www.w3.org/1999/xhtml">
-#<tbody><tr><td rowspan="2"/></tr><tr/></tbody></table>)
+ok 2244
+ok 2245
+ok 2246
+ok 2247
+ok 2248
+ok 2249
+ok 2250
 ok 2251
-not ok 2252
-# Test 2252 got: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2252)
-#      Expected: "/table/tbody/tr/td;no significant content;s\n/table/tbody/tr;child element missing:td|th\n/table/tbody/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml">
-#<tbody><tr><td/></tr><tr/><tr/></tbody></table>)
-#      Line 4 is changed:
-#       - "/table;table:no cell in last row"
-#       + "/table/tbody;table:row with no anchored cell"
-not ok 2253
-# Test 2253 got: "/table/tbody/tr;child element missing:td|th\n/table/tbody;table:row with no anchored cell\n/table/thead/tr/td;no significant content;s" (t/ContentChecker.t at line 99 fail #2253)
-#      Expected: "/table/tbody/tr;child element missing:td|th\n/table/thead/tr/td;no significant content;s\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml">
-#<thead><tr><td/></tr></thead><tbody><tr/></tbody></table>)
-not ok 2254
-# Test 2254 got: "/table/tbody/tr;child element missing:td|th\n/table/thead/tr;child element missing:td|th\n/table/thead;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2254)
-#      Expected: "/table/tbody/tr;child element missing:td|th\n/table/thead/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml">
-#<thead><tr/></thead><tbody><tr/></tbody></table>)
-not ok 2255
-# Test 2255 got: "/table/tr;child element missing:td|th\n/table/tr;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2255)
-#      Expected: "/table/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tr/></table>)
-not ok 2256
-# Test 2256 got: "/table/tr;child element missing:td|th\n/table/tr;table:row with no anchored cell" (t/ContentChecker.t at line 99 fail #2256)
-#      Expected: "/table/tr;child element missing:td|th\n/table;table:no cell in last row" (<table xmlns="http://www.w3.org/1999/xhtml"><tr/> </table>)
-# t/content-model-atom-1.dat
+ok 2252
+ok 2253
+ok 2254
+ok 2255
+ok 2256
 ok 2257
 ok 2258
 ok 2259
@@ -2439,6 +2406,7 @@ ok 2262
 ok 2263
 ok 2264
 ok 2265
+# t/content-model-atom-1.dat
 ok 2266
 ok 2267
 ok 2268
@@ -2476,8 +2444,17 @@ ok 2299
 ok 2300
 ok 2301
 ok 2302
-not ok 2303
-# Test 2303 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 99 fail #2303)
+ok 2303
+ok 2304
+ok 2305
+ok 2306
+ok 2307
+ok 2308
+ok 2309
+ok 2310
+ok 2311
+not ok 2312
+# Test 2312 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 99 fail #2312)
 #      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
 #<id>about:</id>
 #<author><name>x</name></author>
@@ -2486,8 +2463,8 @@ not ok 2303
 #<title>x</title>
 #<content type="image/png"/>
 #</entry>)
-not ok 2304
-# Test 2304 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 99 fail #2304)
+not ok 2313
+# Test 2313 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 99 fail #2313)
 #      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
 #<id>about:</id>
 #<author><name>x</name></author>
@@ -2496,19 +2473,10 @@ not ok 2304
 #<title>x</title>
 #<content type="message/rfc822"/>
 #</entry>)
-ok 2305
-ok 2306
-ok 2307
-# t/content-model-atom-2.dat
-ok 2308
-ok 2309
-ok 2310
-ok 2311
-ok 2312
-ok 2313
 ok 2314
 ok 2315
 ok 2316
+# t/content-model-atom-2.dat
 ok 2317
 ok 2318
 ok 2319
@@ -2524,9 +2492,18 @@ ok 2328
 ok 2329
 ok 2330
 ok 2331
+ok 2332
+ok 2333
+ok 2334
+ok 2335
+ok 2336
+ok 2337
+ok 2338
+ok 2339
+ok 2340
 # t/content-model-atom-threading-1.dat
-not ok 2332
-# Test 2332 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 99 fail #2332)
+not ok 2341
+# Test 2341 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 99 fail #2341)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2556,8 +2533,8 @@ not ok 2332
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 2333
-# Test 2333 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 99 fail #2333)
+not ok 2342
+# Test 2342 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 99 fail #2342)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2583,17 +2560,17 @@ not ok 2333
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 2334
-ok 2335
-ok 2336
-ok 2337
-ok 2338
-ok 2339
-ok 2340
-ok 2341
-ok 2342
 ok 2343
 ok 2344
 ok 2345
 ok 2346
 ok 2347
+ok 2348
+ok 2349
+ok 2350
+ok 2351
+ok 2352
+ok 2353
+ok 2354
+ok 2355
+ok 2356

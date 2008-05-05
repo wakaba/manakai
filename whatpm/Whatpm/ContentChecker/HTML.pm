@@ -4077,7 +4077,8 @@ $Element->{$HTML_NS}->{table} = {
     require Whatpm::HTMLTable;
     Whatpm::HTMLTable->form_table ($item->{node}, sub {
       my %opt = @_;
-      $self->{onerror}->(type => 'table:'.$opt{type}, node => $opt{node});
+      $opt{type} = 'table:' . $opt{type};
+      $self->{onerror}->(%opt);
     });
     push @{$self->{return}->{table}}, $item->{node};
 
@@ -4210,7 +4211,7 @@ $Element->{$HTML_NS}->{tbody} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
-      $element_state->{has_tr} = 1;
+      #
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed');
     }
@@ -4220,15 +4221,6 @@ $Element->{$HTML_NS}->{tbody} = {
     if ($has_significant) {
       $self->{onerror}->(node => $child_node, type => 'character not allowed');
     }
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    unless ($element_state->{has_tr}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'child element missing:tr');
-    }
-
-    $HTMLChecker{check_end}->(@_);
   },
 };
 
@@ -4267,7 +4259,7 @@ $Element->{$HTML_NS}->{tr} = {
       #
     } elsif ($child_nsuri eq $HTML_NS and
              ($child_ln eq 'td' or $child_ln eq 'th')) {
-      $element_state->{has_cell} = 1;
+      #
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed');
     }
@@ -4277,15 +4269,6 @@ $Element->{$HTML_NS}->{tr} = {
     if ($has_significant) {
       $self->{onerror}->(node => $child_node, type => 'character not allowed');
     }
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    unless ($element_state->{has_cell}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'child element missing:td|th');
-    }
-
-    $HTMLChecker{check_end}->(@_);
   },
 };
 

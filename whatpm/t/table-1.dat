@@ -1,53 +1,46 @@
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody></table>
 #errors
-/table;table:no cell in last row
-/table/tbody/tr;child element missing:td|th
+/table/tbody/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody> </table>
 #errors
-/table;table:no cell in last row
-/table/tbody/tr;child element missing:td|th
+/table/tbody/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/> </tbody></table>
 #errors
-/table;table:no cell in last row
-/table/tbody/tr;child element missing:td|th
+/table/tbody/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tbody> <tr/></tbody></table>
 #errors
-/table;table:no cell in last row
-/table/tbody/tr;child element missing:td|th
+/table/tbody/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"> <tbody><tr/></tbody></table>
 #errors
-/table;table:no cell in last row
-/table/tbody/tr;child element missing:td|th
+/table/tbody/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td/></tr><tr/></tbody></table>
 #errors
-/table;table:no cell in last row
-/table/tbody/tr;child element missing:td|th
 /table/tbody/tr/td;no significant content;s
+/table/tbody/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td rowspan="2"/></tr><tr/></tbody></table>
 #errors
-/table/tbody/tr;child element missing:td|th
 /table/tbody/tr/td;no significant content;s
+/table/tbody/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td/></tr><tr/><tr><td/></tr></tbody></table>
 #errors
-/table/tbody/tr;child element missing:td|th
 /table/tbody/tr/td;no significant content;s
 /table/tbody/tr/td;no significant content;s
 
@@ -55,41 +48,95 @@
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td/></tr><tr/><tr/></tbody></table>
 #errors
-/table/tbody/tr;child element missing:td|th
-/table/tbody/tr;child element missing:td|th
-/table;table:no cell in last row
+/table/tbody/tr;table:row with no anchored cell;m
 /table/tbody/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <thead><tr><td/></tr></thead><tbody><tr/></tbody></table>
 #errors
-/table;table:no cell in last row
-/table/tbody/tr;child element missing:td|th
+/table/tbody/tr;table:row with no anchored cell;m
 /table/thead/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <thead><tr/></thead><tbody><tr/></tbody></table>
 #errors
-/table/thead/tr;child element missing:td|th
-/table;table:no cell in last row
-/table/tbody/tr;child element missing:td|th
+/table/thead/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tr/></table>
 #errors
-/table;table:no cell in last row
-/table/tr;child element missing:td|th
+/table/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tr/> </table>
 #errors
-/table;table:no cell in last row
-/table/tr;child element missing:td|th
+/table/tr;table:row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"> <tr/></table>
 #errors
-/table;table:no cell in last row
-/table/tr;child element missing:td|th
+/table/tr;table:row with no anchored cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr/>
+<tr><td>x</td></tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td>x</td></tr>
+<tr/>
+</table>
+#errors
+/table/tr;table:row with no anchored cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td>x</td></tr>
+<tr/>
+<tr/>
+</table>
+#errors
+/table/tr;table:row with no anchored cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td rowspan="43">x</td></tr>
+</table>
+#errors
+/table/tr/td;table:rowspan creates row with no anchored cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td rowspan="2">x</td></tr>
+<tr/>
+</table>
+#errors
+/table/tr;table:row with no anchored cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td rowspan="2">x</td></tr>
+<tr><td>y</td></tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<colgroup><col/><col/></colgroup>
+<tr><td>x</td></tr>
+</table>
+#errors
+/table/colgroup/col;table:column with no anchored cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td colspan="42">x</td></tr>
+</table>
+#errors
+/table/tr/td;table:colspan creates column with no anchored cell;m
+
