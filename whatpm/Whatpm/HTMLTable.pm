@@ -36,14 +36,27 @@ sub form_table ($$$;$) {
   my @table_child = @{$table_el->child_nodes};
   return $table unless @table_child;
 
+  ## Step 6
+  for (0..$#table_child) {
+    my $el = $table_child[$_];
+    next unless $el->node_type == 1; # ELEMENT_NODE
+    next unless $el->manakai_local_name eq 'caption';
+    my $nsuri = $el->namespace_uri;
+    next unless defined $nsuri;
+    next unless $nsuri eq q<http://www.w3.org/1999/xhtml>;
+    $table->{caption} = {element => $el};
+    splice @table_child, $_, 1, ();
+    last;
+  }
+
   my $process_row_group;
   my $end = sub {
-    ## Step 20 (End)
+    ## Step 19 (End)
     for (@$pending_tfoot) {
       $process_row_group->($_);
     }
     
-    ## Step 21
+    ## Step 20
     for (0 .. $x_width - 1) {
       unless ($column_has_anchored_cell[$_]) {
         if ($table->{column}->[$_]) {
@@ -73,11 +86,11 @@ sub form_table ($$$;$) {
       }
     }
     
-    ## Step 22
+    ## Step 21
     #return $table;
   }; # $end
 
-  ## Step 6, 7, 9
+  ## Step 7, 8
   my $current_element;
   my $current_ln;
   NEXT_CHILD: {
@@ -89,14 +102,7 @@ sub form_table ($$$;$) {
         $nsuri eq q<http://www.w3.org/1999/xhtml>;
       $current_ln = $current_element->manakai_local_name;
 
-      if ($current_ln eq 'caption' and not defined $table->{caption}) {
-        ## Step 8
-        $table->{caption} = {element => $current_element};
-        redo NEXT_CHILD; # Step 9
-      }
-
       redo NEXT_CHILD unless {
-        #caption => 1, ## Step 7
         colgroup => 1,
         thead => 1,
         tbody => 1,
@@ -104,17 +110,15 @@ sub form_table ($$$;$) {
         tr => 1,
       }->{$current_ln};
     } else {
-      ## End of subsection
-
       ## Step 6 2nd paragraph
       $end->();
       return $table;
     }
   } # NEXT_CHILD
 
-  ## Step 10
-  while ($current_ln eq 'colgroup') { # Step 10, Step 10.4
-    ## Step 10.1: column groups
+  ## Step 9
+  while ($current_ln eq 'colgroup') { # Step 9, Step 9.4
+    ## Step 9.1: column groups
     my @col = grep {
       $_->node_type == 1 and
       defined $_->namespace_uri and
@@ -168,7 +172,7 @@ sub form_table ($$$;$) {
       $table->{column_group}->[$_] = $cg for $cg->{x} .. $x_width - 1;
     }
     
-    ## Step 10.2, 10.3
+    ## Step 9.2, 9.3
     NEXT_CHILD: {
       $current_element = shift @table_child;
       if (defined $current_element) {
@@ -195,10 +199,10 @@ sub form_table ($$$;$) {
     } # NEXT_CHILD
   }
 
-  ## Step 11
+  ## Step 10
   my $y_current = 0;
 
-  ## Step 12
+  ## Step 11
   my @downward_growing_cells;
 
   my $growing_downward_growing_cells = sub {
@@ -357,7 +361,7 @@ return unless $current_cell;
       @downward_growing_cells = ();
   }; # $process_row_group
 
-  ## Step 13: rows
+  ## Step 12: rows
   unshift @table_child, $current_element;
   ROWS: {
     NEXT_CHILD: {
@@ -382,14 +386,14 @@ return unless $current_cell;
       }
     } # NEXT_CHILD
 
-    ## Step 14
+    ## Step 13
     if ($current_ln eq 'tr') {
       $process_row->($current_element);
       # advance (done at the first of ROWS)
       redo ROWS;
     }
 
-    ## Step 15
+    ## Step 14
     ## Ending a row group
       ## Step 1
       while ($y_current < $y_height) {
@@ -402,21 +406,21 @@ return unless $current_cell;
       ## Step 2
       @downward_growing_cells = ();
 
-    ## Step 16
+    ## Step 15
     if ($current_ln eq 'tfoot') {
       push @$pending_tfoot, $current_element;
       # advance (done at the top of ROWS)
       redo ROWS;
     }
 
-    ## Step 17
+    ## Step 16
     # thead or tbody
     $process_row_group->($current_element);
 
-    ## Step 18
+    ## Step 17
     # Advance (done at the top of ROWS).
 
-    ## Step 19
+    ## Step 18
     redo ROWS;
   } # ROWS
 
@@ -427,4 +431,4 @@ return unless $current_cell;
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2008/05/05 08:00:25 $
+## $Date: 2008/05/05 08:36:55 $
