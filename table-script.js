@@ -43,7 +43,7 @@ function tableToCanvas (table, parent, idPrefix) {
 var columnNumber = table.column.length;
 if (columnNumber < table.cell.length) columnNumber = table.cell.length;
 var rowNumber = 0;
-for (var i = 1; i < table.cell.length; i++) {
+for (var i = 0; i < table.cell.length; i++) {
   if (table.cell[i] && rowNumber < table.cell[i].length) {
     rowNumber = table.cell[i].length;
   }
@@ -60,7 +60,7 @@ canvas.height = param.cellTop
     + param.cellBottom;
 
 var y = param.rowTop;
-for (var i = 1; i < table.row_group.length; i++) {
+for (var i = 0; i < table.row_group.length; i++) {
   var rg = table.row_group[i];
   c2d.beginPath ();
   if (rg.type == 'thead') {
@@ -92,7 +92,7 @@ for (var i = 1; i < table.row_group.length; i++) {
 c2d.beginPath ();
 c2d.strokeStyle = param.explicitColumnGroupStrokeStyle;
 var x = param.columnLeft;
-for (var i = 1; i < table.column_group.length; i++) {
+for (var i = 0; i < table.column_group.length; i++) {
   var cg = table.column_group[i];
   c2d.moveTo (x, param.columnGroupTop);
   x += (param.columnWidth + param.columnSpacing) * cg.width;
@@ -103,7 +103,7 @@ c2d.stroke ();
 c2d.closePath ();
 
 var x = param.columnLeft;
-for (var i = 1; i < columnNumber; i++) {
+for (var i = 0; i < columnNumber; i++) {
   var c = table.column[i];
   c2d.beginPath ();
   c2d.moveTo (x, param.columnTop);
@@ -120,10 +120,10 @@ for (var i = 1; i < columnNumber; i++) {
 
 var map = document.createElement ('map');
 var x = param.cellLeft;
-for (var i = 1; i < table.cell.length; i++) {
+for (var i = 0; i < table.cell.length; i++) {
   var y = param.cellTop;
   if (!table.cell[i]) continue;
-  for (var j = 1; j < table.cell[i].length; j++) {
+  for (var j = 0; j < table.cell[i].length; j++) {
     var c = table.cell[i][j];
     if (c && ((c[0].x == i && c[0].y == j) || c.length > 1)) {
       c2d.beginPath ();
@@ -161,7 +161,7 @@ for (var i = 1; i < table.cell.length; i++) {
 }
 
 var y = param.rowTop;
-for (var i = 1; i < rowNumber; i++) {
+for (var i = 0; i < rowNumber; i++) {
   c2d.beginPath ();
   c2d.moveTo (param.rowLeft, y);
   y += param.rowHeight + param.rowSpacing;
@@ -197,4 +197,4 @@ This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 */
-/* $Date: 2008/02/10 02:30:14 $ */
+/* $Date: 2008/05/05 06:11:34 $ */
