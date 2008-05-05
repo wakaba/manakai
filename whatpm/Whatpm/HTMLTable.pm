@@ -14,8 +14,11 @@ sub form_table ($$$) {
   ## Step 2
   my $y_height = 0;
   my $y_max_node;
-  
+
   ## Step 3
+  my $pending_tfoot = [];
+  
+  ## Step 4
   my $table = {
     #caption
     column => [],
@@ -41,11 +44,11 @@ sub form_table ($$$) {
     }
   }; # $check_empty_column
   
-  ## Step 4
+  ## Step 5
   my @table_child = @{$table_el->child_nodes};
-  return unless @table_child; # don't call $check_empty_column
+  return $table unless @table_child; # don't call $check_empty_column
 
-  ## Step 5, 6, 8
+  ## Step 6, 7, 9
   my $current_element;
   my $current_ln;
   NEXT_CHILD: {
@@ -58,13 +61,13 @@ sub form_table ($$$) {
       $current_ln = $current_element->manakai_local_name;
 
       if ($current_ln eq 'caption' and not defined $table->{caption}) {
-        ## Step 7
+        ## Step 8
         $table->{caption} = {element => $current_element};
-        redo NEXT_CHILD; # Step 8
+        redo NEXT_CHILD; # Step 9
       }
 
       redo NEXT_CHILD unless {
-        #caption => 1, ## Step 6
+        #caption => 1, ## Step 7
         colgroup => 1,
         thead => 1,
         tbody => 1,
@@ -74,14 +77,14 @@ sub form_table ($$$) {
     } else {
       ## End of subsection
       $check_empty_column->();
-      ## Step 5 2nd paragraph
-      return $table;
+      ## Step 6 2nd paragraph
+      last ROWS;
     }
   } # NEXT_CHILD
 
-  ## Step 9
-  while ($current_ln eq 'colgroup') { # Step 9, Step 9.4
-    ## Step 9.1: column groups
+  ## Step 10
+  while ($current_ln eq 'colgroup') { # Step 10, Step 10.4
+    ## Step 10.1: column groups
     my @col = grep {
       $_->node_type == 1 and
       defined $_->namespace_uri and
@@ -135,7 +138,7 @@ sub form_table ($$$) {
       $table->{column_group}->[$_] = $cg for $cg->{x} .. $x_width - 1;
     }
     
-    ## Step 9.2, 9.3
+    ## Step 10.2, 10.3
     NEXT_CHILD: {
       $current_element = shift @table_child;
       if (defined $current_element) {
@@ -156,15 +159,15 @@ sub form_table ($$$) {
         ## End of subsection
         $check_empty_column->();
         ## Step 5 of overall steps 2nd paragraph
-        return $table;
+        last ROWS;
       }
     } # NEXT_CHILD
   }
 
-  ## Step 10
+  ## Step 11
   my $y_current = 0;
 
-  ## Step 11
+  ## Step 12
   my @downward_growing_cells;
 
   my $growing_downward_growing_cells = sub {
@@ -281,7 +284,47 @@ sub form_table ($$$) {
     } # CELL
   }; # $process_row
 
-  ## Step 12: rows
+  my $process_row_group = sub ($) {
+    ## Step 1
+    my $y_start = $y_height;
+
+    ## Step 2
+    for (grep {
+      $_->node_type == 1 and
+      defined $_->namespace_uri and
+      $_->namespace_uri eq q<http://www.w3.org/1999/xhtml> and
+      $_->manakai_local_name eq 'tr'
+    } @{$_[0]->child_nodes}) {
+      $process_row->($_);
+    }
+
+    ## Step 3
+    if ($y_height > $y_start) {
+      my $rg = {element => $current_element, ## ISSUE: "element being processed"?
+                x => 0, y => $y_start,
+                height => $y_height - $y_start};
+      $table->{row_group}->[$_] = $rg for $y_start .. $y_height - 1;
+    }
+
+    ## Step 4
+    ## Ending a row group
+      ## Step 1
+      if ($y_current < $y_height) {
+        $onerror->(type => 'rowspan expands table', node => $y_max_node);
+      }
+      ## Step 2
+      while ($y_current < $y_height) {
+        ## Step 1
+        $growing_downward_growing_cells->();
+
+        ## Step 2
+        $y_current++;
+      }
+      ## Step 3
+      @downward_growing_cells = ();
+  }; # $process_row_group
+
+  ## Step 13: rows
   unshift @table_child, $current_element;
   ROWS: {
     NEXT_CHILD: {
@@ -300,24 +343,25 @@ sub form_table ($$$) {
           tr => 1,
         }->{$current_ln};
       } else {
-        ## Step 10 2nd sentense
+        ## Step 11 2nd sentense
         if ($y_current != $y_height) {
           $onerror->(type => 'no cell in last row', node => $table_el);
         }
         ## End of subsection
         $check_empty_column->();
-        ## Step 5 2nd paragraph
-        return $table;
+        ## Step 6 2nd paragraph
+        last ROWS;
       }
     } # NEXT_CHILD
 
-    ## Step 13
+    ## Step 14
     if ($current_ln eq 'tr') {
       $process_row->($current_element);
+      # advance (done at the first of ROWS)
       redo ROWS;
     }
 
-    ## Step 14
+    ## Step 15
     ## Ending a row group
       ## Step 1
       if ($y_current < $y_height) {
@@ -331,51 +375,35 @@ sub form_table ($$$) {
       }
       ## Step 3
       @downward_growing_cells = ();
-      
-    ## Step 15
-    my $y_start = $y_height;
 
     ## Step 16
-    for (grep {
-      $_->node_type == 1 and
-      defined $_->namespace_uri and
-      $_->namespace_uri eq q<http://www.w3.org/1999/xhtml> and
-      $_->manakai_local_name eq 'tr'
-    } @{$current_element->child_nodes}) {
-      $process_row->($_);
+    if ($current_ln eq 'tfoot') {
+      push @$pending_tfoot, $current_element;
+      # advance (done at the top of ROWS)
+      redo ROWS;
     }
 
     ## Step 17
-    if ($y_height > $y_start) {
-      my $rg = {element => $current_element,
-                x => 0, y => $y_start,
-                height => $y_height - $y_start};
-      $table->{row_group}->[$_] = $rg for $y_start .. $y_height - 1;
-    }
+    # thead or tbody
+    $process_row_group->($current_element);
 
     ## Step 18
-    ## Ending a row group
-      ## Step 1
-      if ($y_current < $y_height) {
-        $onerror->(type => 'rowspan expands table', node => $y_max_node);
-      }
-      ## Step 2
-      while ($y_current < $y_height) {
-        ## Step 1
-        $growing_downward_growing_cells->();
-
-        ## Step 2
-        $y_current++;
-      }
-      ## Step 3
-      @downward_growing_cells = ();
+    # Advance (done at the top of ROWS).
 
     ## Step 19
-    redo ROWS; # Step 12
+    redo ROWS;
   } # ROWS
+
+  ## Step 20 (End)
+  for (@$pending_tfoot) {
+    $process_row_group->($_);
+  }
+
+  ## Step 21
+  return $table;
 } # form_table
 
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2008/05/05 06:12:43 $
+## $Date: 2008/05/05 06:57:07 $
