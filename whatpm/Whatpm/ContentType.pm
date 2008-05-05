@@ -13,7 +13,6 @@ Whatpm::ContentType - HTML5 Content Type Sniffer
       return $first_n_bytes_of_the_entity;
     },
     http_content_type_byte => $content_type_field_body_of_the_entity_in_bytes,
-    has_http_content_encoding => $is_there_cotntent_encoding_field ? 1 : 0,
     supported_image_types => {
       'image/jpeg' => 1, 'image/png' => 1, 'image/gif' => 1, # for example
     },
@@ -27,11 +26,9 @@ algorithm as defined in the HTML5 specification.
 
 =cut
 
-## TODO: HTML5 revision 1288 (no Content-Encoding safebar, so on)
-
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -183,12 +180,7 @@ if no more bytes is available.
 
 =item has_http_content_encoding
 
-Whether the entity has HTTP C<Content-Encoding> header field specified.
-
-This parameter MUST be set to a true value
-if and only if the entity is transfered over HTTP
-and the HTTP response entity contains the C<Content-Encoding>
-header field.
+I<This parameter is obsolete and has no effect.>
 
 =item http_content_type_byte
 
@@ -227,12 +219,12 @@ sub get_sniffed_type ($%) {
   ## <http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing>
   
   ## Step 1
-  if (not $opt{has_http_content_encoding} and
-      defined $opt{http_content_type_byte}) {
+  if (defined $opt{http_content_type_byte}) {
     ## ISSUE: Is leading LWS ignored?
     if ($opt{http_content_type_byte} eq 'text/plain' or
         $opt{http_content_type_byte} eq 'text/plain; charset=ISO-8859-1' or
-        $opt{http_content_type_byte} eq 'text/plain; charset=iso-8859-1') {
+        $opt{http_content_type_byte} eq 'text/plain; charset=iso-8859-1' or
+        $opt{http_content_type_byte} eq 'text/plain; charset=UTF-8') {
       ## Content-Type sniffing: text or binary
       ## <http://www.whatwg.org/specs/web-apps/current-work/#content-type4>
 
@@ -430,4 +422,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/05 04:21:20 $
+# $Date: 2008/05/05 04:41:32 $

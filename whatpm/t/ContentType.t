@@ -2,7 +2,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 1989 }
+BEGIN { plan tests => 2023 }
 
 use Whatpm::ContentType;
 
@@ -101,7 +101,7 @@ for my $v (
   [
     qq<\x0054647347474747744334>,
     q<text/plain>, 1,
-    q<text/plain>, 'NULL with Content-Encoding',
+    q<application/octet-stream>, 'NULL with Content-Encoding',
     q<application/octet-stream>,
     q<text/html>,
   ],
@@ -198,8 +198,22 @@ for my $v (
   ],
   [
     qq<\x02>,
+    q<text/plain; charset=UTF-8>, 0,
+    q<application/octet-stream>, '0x02 (text/plain; charset=UTF-8)',
+    q<application/octet-stream>,
+    q<text/html>,
+  ],
+  [
+    qq<\x02>,
     q<text/plain; charset=isO-8859-1>, 0,
     q<text/plain>, '0x02; charset=isO-8859-1',
+    q<application/octet-stream>,
+    q<text/html>,
+  ],
+  [
+    qq<\x02>,
+    q<text/plain; charset=utf-8>, 0,
+    q<text/plain>, '0x02; charset=utf-8',
     q<application/octet-stream>,
     q<text/html>,
   ],
@@ -873,7 +887,6 @@ for my $v (
   my $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
     return $v->[0]; 
   }, http_content_type_byte => $v->[1],
-  has_http_content_encoding => $v->[2],
   supported_image_types => {'image/jpeg' => 1});
   ok $st, $v->[3], 'Text or binary: ' . $v->[4];
 
@@ -927,5 +940,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2008/05/05 04:21:20 $
+## $Date: 2008/05/05 04:41:32 $
 1;
