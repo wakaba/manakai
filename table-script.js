@@ -16,9 +16,10 @@ function tableToCanvas (table, parent, idPrefix) {
     rowHeight: 20,
     rowSpacing: 5,
     rowGroupLeft: 10,
+    rowGroupFillLeft: 20, /* Must be same as columnLeft */
     rowLeft: 15,
     cellTop: 20,
-    cellLeft: 20,
+    cellLeft: 20, /* Must be same as columnLeft */
     cellBottom: 20,
     cellRight: 20,
     explicitColumnGroupStrokeStyle: 'black',
@@ -79,7 +80,7 @@ for (var i = 0; i < table.row_group.length; i++) {
   c2d.stroke ();
   c2d.closePath ();
   c2d.beginPath ();
-  c2d.rect (param.rowGroupLeft,
+  c2d.rect (param.rowGroupFillLeft,
             y,
             (param.columnWidth + param.columnSpacing) * columnNumber - param.columnSpacing,
             dy - param.rowSpacing);
@@ -197,4 +198,4 @@ This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 */
-/* $Date: 2008/05/05 06:11:34 $ */
+/* $Date: 2008/05/05 06:56:01 $ */
