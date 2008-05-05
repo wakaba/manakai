@@ -42,7 +42,6 @@
       return $first_n_bytes_of_the_entity;
     },
     http_content_type_byte =&gt; $content_type_field_body_of_the_entity_in_bytes,
-    has_http_content_encoding =&gt; $is_there_cotntent_encoding_field ? 1 : 0,
     supported_image_types =&gt; {
       'image/jpeg' =&gt; 1, 'image/png' =&gt; 1, 'image/gif' =&gt; 1, # for example
     },
@@ -115,13 +114,7 @@ if no more bytes is available.</p>
 <dt><strong><a name="item_has_http_content_encoding">has_http_content_encoding</a></strong><br />
 </dt>
 <dd>
-Whether the entity has HTTP <code>Content-Encoding</code> header field specified.
-</dd>
-<dd>
-<p>This parameter MUST be set to a true value
-if and only if the entity is transfered over HTTP
-and the HTTP response entity contains the <code>Content-Encoding</code>
-header field.</p>
+<em>This parameter is obsolete and has no effect.</em>
 </dd>
 <p></p>
 <dt><strong><a name="item_http_content_type_byte">http_content_type_byte</a></strong><br />
@@ -172,7 +165,7 @@ considered as supported.</p>
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>Copyright 2007-2008 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
 <p>This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.</p>
 

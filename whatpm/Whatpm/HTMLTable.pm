@@ -1,16 +1,18 @@
 package Whatpm::HTMLTable;
 use strict;
 
+## r1376
+
 ## An implementation of "Forming a table" algorithm in HTML5
 sub form_table ($$$) {
   my (undef, $table_el, $onerror) = @_;
   $onerror ||= sub { };
   
   ## Step 1
-  my $x_max = 0;
+  my $x_width = 0;
 
   ## Step 2
-  my $y_max = 0;
+  my $y_height = 0;
   my $y_max_node;
   
   ## Step 3
@@ -26,7 +28,7 @@ sub form_table ($$$) {
   my @has_anchored_cell;
   my @column_generated_by;
   my $check_empty_column = sub {
-    for (1..$x_max) {
+    for (0 .. $x_width - 1) {
       unless ($has_anchored_cell[$_]) {
         if ($table->{column}->[$_]) {
           $onerror->(type => 'column with no anchored cell',
@@ -40,8 +42,6 @@ sub form_table ($$$) {
   }; # $check_empty_column
   
   ## Step 4
-  ## "If the table element has no table children, then return the table (which will be empty), and abort these steps."
-  ## ISSUE: What is "table children"?
   my @table_child = @{$table_el->child_nodes};
   return unless @table_child; # don't call $check_empty_column
 
@@ -90,7 +90,7 @@ sub form_table ($$$) {
     } @{$current_element->child_nodes};
     if (@col) {
       ## Step 1
-      my $x_start = $x_max + 1;
+      my $x_start = $x_width;
       
       ## Step 2, 6
       while (@col) {
@@ -106,15 +106,15 @@ sub form_table ($$$) {
         ## ISSUE: If span=0, what is /span/ value?
         
         ## Step 4, 5
-        $table->{column}->[++$x_max] = {element => $current_column} for 1..$span;
+        $table->{column}->[++$x_width] = {element => $current_column}
+            for 1..$span;
       }
       
       ## Step 7
       my $cg = {element => $current_element,
-                x => $x_start, y => 1,
-                width => $x_max - $x_start - 1}; ## ISSUE: Spec incorrect
-      $cg->{width} = $x_max - $x_start + 1;
-      $table->{column_group}->[$_] = $cg for $x_start .. $x_max;
+                x => $x_start, y => 0,
+                width => $x_width - $x_start};
+      $table->{column_group}->[$_] = $cg for $x_start .. $x_width - 1;
     } else { # no <col> children
       ## Step 1
       my $span = 1;
@@ -126,13 +126,13 @@ sub form_table ($$$) {
       ## ISSUE: If span=0, what is /span/ value?
       
       ## Step 2
-      $x_max += $span;
+      $x_width += $span;
       
       ## Step 3
       my $cg = {element => $current_element,
-                x => $x_max - $span + 1, y => 1,
+                x => $x_width - $span, y => 0,
                 width => $span};
-      $table->{column_group}->[$_] = $cg for (($x_max - $span + 1) .. $x_max);
+      $table->{column_group}->[$_] = $cg for $cg->{x} .. $x_width - 1;
     }
     
     ## Step 9.2, 9.3
@@ -168,16 +168,6 @@ sub form_table ($$$) {
   my @downward_growing_cells;
 
   my $growing_downward_growing_cells = sub {
-    ## Step 1
-    return unless @downward_growing_cells;
-
-    ## Step 2
-    if ($y_max < $y_current) {
-      $y_max++;
-      undef $y_max_node;
-    }
-
-    ## Step 3
     for (@downward_growing_cells) {
       for my $x ($_->[1] .. ($_->[1] + $_->[2] - 1)) {
         $table->{cell}->[$x]->[$y_current] = [$_->[0]];
@@ -188,15 +178,12 @@ sub form_table ($$$) {
 
   my $process_row = sub {
     ## Step 1
-    $y_current++;
+    $y_height++ if $y_height == $y_current;
     
     ## Step 2
-    $growing_downward_growing_cells->();
-    
-    ## Step 3
-    my $x_current = 1;
+    my $x_current = 0;
 
-    ## Step 4
+    ## Step 3
     my $tr = shift;
     my @tdth = grep {
       $_->node_type == 1 and
@@ -204,63 +191,57 @@ sub form_table ($$$) {
       $_->namespace_uri eq q<http://www.w3.org/1999/xhtml> and
       {td => 1, th => 1}->{$_->manakai_local_name}
     } @{$tr->child_nodes};
-    #return unless @tdth; # redundant with |while| below
+    my $current_cell = shift @tdth;
 
-    ## Step 5, 16, 17, 18
-    ## ISSUE: Step 18 says "step 5 (cells)" while "cells" is step 6.
-    while (@tdth) {
-      my $current_cell = shift @tdth;
-    
-      ## Step 6: cells
+## ISSUE: Support for empty <tr></tr> (removed at revision 1376).
+
+    ## Step 4
+    $growing_downward_growing_cells->();
+
+    CELL: while (1) {
+      ## Step 5: cells
       $x_current++
-        while ($x_current <= $x_max and
+        while ($x_current < $x_width and
                $table->{cell}->[$x_current]->[$y_current]);
 
-      ## Step 7
-      if ($x_current > $x_max) {
-        $x_max++;
-      }
+      ## Step 6
+      $x_width++ if $x_current == $x_width;
 
-      ## Step 8
-      ## ISSUE: How to parse |colspan| is not explicitly specified
-      ## (while |span| was).
-      ## <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-November/007981.html>
+      ## Step 7
       my $colspan = 1;
       my $attr_value = $current_cell->get_attribute_ns (undef, 'colspan');
       if (defined $attr_value and $attr_value =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
         $colspan = $1 || 1;
       }
       
-      ## Step 9
+      ## Step 8
       my $rowspan = 1;
-      ## ISSUE: How to parse
-      ## <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-November/007981.html>
       my $attr_value = $current_cell->get_attribute_ns (undef, 'rowspan');
       if (defined $attr_value and $attr_value =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
         $rowspan = $1;
       }
       
-      ## Step 10
+      ## Step 9
       my $cell_grows_downward;
       if ($rowspan == 0) {
         $cell_grows_downward = 1;
         $rowspan = 1;
       }
       
-      ## Step 11
-      if ($x_max < $x_current + $colspan - 1) { 
+      ## Step 10
+      if ($x_width < $x_current + $colspan) { 
         @column_generated_by[$_] = $current_cell
-          for $x_max + 1 .. $x_current + $colspan - 1;
-        $x_max = $x_current + $colspan - 1;
+          for $x_width .. $x_current + $colspan - 1;
+        $x_width = $x_current + $colspan;
       }
       
-      ## Step 12
-      if ($y_max < $y_current + $rowspan - 1) {
-        $y_max = $y_current + $rowspan - 1;
+      ## Step 11
+      if ($y_height < $y_current + $rowspan) {
+        $y_height = $y_current + $rowspan;
         $y_max_node = $current_cell;
       }
       
-      ## Step 13
+      ## Step 12
       my $cell = {
                   is_header => ($current_cell->manakai_local_name eq 'th'),
                   element => $current_cell,
@@ -279,14 +260,25 @@ sub form_table ($$$) {
         }
       }
       
-      ## Step 14
+      ## Step 13
       if ($cell_grows_downward) {
         push @downward_growing_cells, [$cell, $x_current, $colspan];
       }
       
-      ## Step 15
+      ## Step 14
       $x_current += $colspan;
-    }
+
+      ## Step 15-17
+      $current_cell = shift @tdth;
+      if (defined $current_cell) {
+        ## Step 16-17
+        #
+      } else {
+        ## Step 15
+        $y_current++;
+        last CELL;
+      }
+    } # CELL
   }; # $process_row
 
   ## Step 12: rows
@@ -309,7 +301,7 @@ sub form_table ($$$) {
         }->{$current_ln};
       } else {
         ## Step 10 2nd sentense
-        if ($y_current != $y_max) {
+        if ($y_current != $y_height) {
           $onerror->(type => 'no cell in last row', node => $table_el);
         }
         ## End of subsection
@@ -328,11 +320,11 @@ sub form_table ($$$) {
     ## Step 14
     ## Ending a row group
       ## Step 1
-      if ($y_current < $y_max) {
+      if ($y_current < $y_height) {
         $onerror->(type => 'rowspan expands table', node => $y_max_node);
       }
       ## Step 2
-      while ($y_current < $y_max) {
+      while ($y_current < $y_height) {
         ## Step 1
         $y_current++;
         $growing_downward_growing_cells->();
@@ -341,7 +333,7 @@ sub form_table ($$$) {
       @downward_growing_cells = ();
       
     ## Step 15
-    my $y_start = $y_max + 1;
+    my $y_start = $y_height;
 
     ## Step 16
     for (grep {
@@ -354,24 +346,26 @@ sub form_table ($$$) {
     }
 
     ## Step 17
-    if ($y_max >= $y_start) {
+    if ($y_height > $y_start) {
       my $rg = {element => $current_element,
-                x => 1, y => $y_start,
-                height => $y_max - $y_start + 1};
-      $table->{row_group}->[$_] = $rg for $y_start .. $y_max;
+                x => 0, y => $y_start,
+                height => $y_height - $y_start};
+      $table->{row_group}->[$_] = $rg for $y_start .. $y_height - 1;
     }
 
     ## Step 18
     ## Ending a row group
       ## Step 1
-      if ($y_current < $y_max) {
+      if ($y_current < $y_height) {
         $onerror->(type => 'rowspan expands table', node => $y_max_node);
       }
       ## Step 2
-      while ($y_current < $y_max) {
+      while ($y_current < $y_height) {
         ## Step 1
-        $y_current++;
         $growing_downward_growing_cells->();
+
+        ## Step 2
+        $y_current++;
       }
       ## Step 3
       @downward_growing_cells = ();
@@ -384,4 +378,4 @@ sub form_table ($$$) {
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2007/08/04 13:23:36 $
+## $Date: 2008/05/05 06:12:43 $
