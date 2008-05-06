@@ -6288,6 +6288,46 @@ id=""><span id="">x</span></p>
 /td/@char;char:syntax error;m
 
 #data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td headers="a">x</td><th id="a">x</th></tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td headers=" a a  ">x</td><th id="a">x</th></tr>
+</table>
+#errors
+/table/tr/td/@headers;duplicate token;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td headers=" b  ">x</td><th id="a">x</th></tr>
+</table>
+#errors
+/table/tr/td/@headers;no header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td headers=" b c ">x</td><th id="a">x</th></tr>
+</table>
+#errors
+/table/tr/td/@headers;no header cell;m
+/table/tr/td/@headers;no header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td headers=" b">x</td><th id="a">x</th><td id="b">y</td></tr>
+</table>
+#errors
+/table/tr/td/@headers;no header cell;m
+
+#data
+<td header="c" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@header;attribute not defined;m
+
+#data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script;script:text/javascript;unsupported

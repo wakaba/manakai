@@ -1,5 +1,15 @@
 2008-05-06  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Noted that those returned in |table| are
+	no longer table elements, but table objects returned
+	by Whatpm::HTMLTable.
+
+	* HTMLTable.pm (form_table): Return table element node
+	as |$table->{element}|.
+	(assign_header): Support for the |headers=""| attribute.
+
+2008-05-06  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTMLTable.pm (assign_header): New function; first version
 	with no support for headers="".
 	(form_table): Include table width and height to the returned

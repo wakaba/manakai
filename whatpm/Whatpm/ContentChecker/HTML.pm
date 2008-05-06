@@ -4121,12 +4121,14 @@ $Element->{$HTML_NS}->{table} = {
 
     ## Table model errors
     require Whatpm::HTMLTable;
-    Whatpm::HTMLTable->form_table ($item->{node}, sub {
+    my $table = Whatpm::HTMLTable->form_table ($item->{node}, sub {
       my %opt = @_;
       $opt{type} = 'table:' . $opt{type};
       $self->{onerror}->(%opt);
-    });
-    push @{$self->{return}->{table}}, $item->{node};
+    }, $self->{must_level});
+    Whatpm::HTMLTable->assign_header
+        ($table, $self->{onerror}, $self->{must_level});
+    push @{$self->{return}->{table}}, $table;
 
     $HTMLChecker{check_end}->(@_);
   },
@@ -4328,7 +4330,12 @@ $Element->{$HTML_NS}->{td} = {
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
-    ## TODO: HTML5 |headers|
+    headers => sub {
+      ## NOTE: Will be checked by Whatpm::HTMLTable->assign_header.
+      ## Though that method does not check the |headers| attribute of a
+      ## |td| element if the element does not form a table, in that case
+      ## the |td| element is non-conforming anyway.
+    },
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker
@@ -4343,7 +4350,7 @@ $Element->{$HTML_NS}->{td} = {
     char => FEATURE_M12N10_REC,
     charoff => FEATURE_M12N10_REC,
     colspan => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    headers => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+    headers => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     height => FEATURE_M12N10_REC_DEPRECATED,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     nowrap => FEATURE_M12N10_REC_DEPRECATED,
@@ -4363,7 +4370,7 @@ $Element->{$HTML_NS}->{th} = {
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
-    ## TODO: HTML5 |headers|
+    ## TODO: HTML4(?) |headers|
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker

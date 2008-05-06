@@ -27,6 +27,7 @@ sub form_table ($$$;$) {
     cell => [],
     height => 0,
     width => 0,
+    element => $table_el,
   };
   
   my @column_has_anchored_cell;
@@ -474,6 +475,10 @@ sub assign_header ($$;$$) {
     }
   }; # $assign_header
 
+  my @headers_cell;
+  my $id_to_cell = {};
+  ## ISSUE: ID duplication, non-TH reference
+
   for my $x (0 .. $table->{width} - 1) {
     for my $y (0 .. $table->{height} - 1) {
       my $cell = $table->{cell}->[$x]->[$y];
@@ -482,6 +487,11 @@ sub assign_header ($$;$$) {
       next if $cell->{y} != $y;
       if ($cell) {
         if ($cell->{is_header}) {
+          my $id = $cell->{element}->get_attribute_ns (undef, 'id');
+          if (defined $id and not $id_to_cell->{$id}) {
+            $id_to_cell->{$id} = $cell;
+          }
+
           my $scope = $cell->{element}->get_attribute_ns (undef, 'scope');
           $scope = $scope ? lc $scope : ''; ## TODO: case
           if ($scope eq 'row') {
@@ -604,16 +614,47 @@ sub assign_header ($$;$$) {
             # (we have already done)
           }
         } else { # data cell
-          
+          if ($cell->{element} and
+              $cell->{element}->has_attribute_ns (undef, 'headers')) {
+            push @headers_cell, $cell;
+          }
         }
       }
     }
   }
 
+  for my $headers_cell (@headers_cell) {
+    my @headers = split /[\x09-\x0D\x20]+/,
+        $headers_cell->{element}->get_attribute_ns (undef, 'headers');
+    my %headers;
+    for my $header_id (@headers) {
+      next unless length $header_id;
+      if ($headers{$header_id}) {
+        $onerror->(type => 'duplicate token', value => $header_id,
+                   node => $headers_cell->{element}->get_attribute_node_ns
+                       (undef, 'headers'),
+                   level => $must_level);
+        next;
+      }
+      $headers{$header_id} = 1;
+
+      if ($id_to_cell->{$header_id}) {
+        my $header_cell = $id_to_cell->{$header_id};
+        $headers_cell->{header}->{$header_cell->{x}}->{$header_cell->{y}} = 1;
+      } else {
+        $onerror->(type => 'no header cell', value => $header_id,
+                   node => $headers_cell->{element}->get_attribute_node_ns
+                       (undef, 'headers'),
+                   level => $must_level);
+      }
+    }
+  }
 
   ## NOTE: The "tree order" constraints in the spec algorithm are irrelevant
   ## in fact.
+
+  ## NOTE: We does not support ID attributes other than HTML "id" attribute.
 } # assign_header
 
 1;
-## $Date: 2008/05/06 07:49:16 $
+## $Date: 2008/05/06 08:59:09 $

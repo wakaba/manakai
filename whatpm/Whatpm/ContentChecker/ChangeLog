@@ -1,3 +1,10 @@
+2008-05-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTML.pm: Invoke |Whatpm::HTMLTable->assign_header| for each
+	table object.  Return the table object, not table element.
+	The |headers=""| checker for |td| elements are now noop.
+	Set the status of |headers=""| attribute as HTML5's one.
+
 2008-05-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTML.pm ($HTMLLengthAttrChecker): New.

@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.79 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.80 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -460,7 +460,9 @@ sub check_element ($$$;$) {
   #$self->{has_base};
   $self->{return} = {
     class => {},
-    id => $self->{id}, table => [], term => $self->{term},
+    id => $self->{id},
+    table => [], # table objects returned by Whatpm::HTMLTable
+    term => $self->{term},
     uri => {}, # URIs other than those in RDF triples
                      ## TODO: xmlns="", SYSTEM "", atom:* src="", xml:base=""
     rdf => [],
@@ -919,4 +921,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/03 14:42:26 $
+# $Date: 2008/05/06 08:59:09 $
