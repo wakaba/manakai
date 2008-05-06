@@ -65,6 +65,8 @@ if ($mode eq '/table') {
     my $table = Whatpm::HTMLTable->form_table ($table_el);
     Whatpm::HTMLTable->assign_header ($table);
 
+    delete $table->{element};
+
     for (@{$table->{column_group}}, @{$table->{column}}, $table->{caption},
          @{$table->{row}}) {
       next unless $_;
@@ -118,4 +120,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/05/06 07:50:28 $
+## $Date: 2008/05/06 08:47:09 $

@@ -37,6 +37,7 @@ function tableToCanvas (table, parent, idPrefix) {
     headerCellStrokeStyle: 'black',
     dataCellFillStyle: 'rgba(0, 0, 0, 0)',
     dataCellStrokeStyle: 'black',
+    emptyDataCellStrokeStyle: '#C0C0C0',
     overlappingCellFillStyle: 'red',
     overlappingCellStrokeStyle: 'rgba(0, 0, 0, 0)',
     highlightCellFillStyle: 'yellow'
@@ -140,7 +141,10 @@ for (var i = 0; i < table.cell.length; i++) {
         c2d.fillStyle = c[0].is_header
             ? param.headerCellFillStyle : param.dataCellFillStyle;
         c2d.strokeStyle = c[0].is_header
-            ? param.headerCellStrokeStyle : param.dataCellStrokeStyle;
+            ? param.headerCellStrokeStyle
+            : c[0].is_empty
+                ? param.emptyDataCellStrokeStyle
+                : param.dataCellStrokeStyle;
         if (c[0].id) {
           var area = document.createElement ('area');
           area.shape = 'rect';
@@ -244,4 +248,4 @@ This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 */
-/* $Date: 2008/05/06 07:50:28 $ */
+/* $Date: 2008/05/06 08:47:09 $ */
