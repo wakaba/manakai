@@ -25,6 +25,8 @@ sub form_table ($$$;$) {
     row => [], ## NOTE: HTML5 algorithm doesn't associate rows with <tr>s.
     row_group => [],
     cell => [],
+    height => 0,
+    width => 0,
   };
   
   my @column_has_anchored_cell;
@@ -112,6 +114,8 @@ sub form_table ($$$;$) {
     } else {
       ## Step 6 2nd paragraph
       $end->();
+      $table->{width} = $x_width;
+      $table->{height} = $y_height;
       return $table;
     }
   } # NEXT_CHILD
@@ -143,7 +147,7 @@ sub form_table ($$$;$) {
         ## ISSUE: If span=0, what is /span/ value?
         
         ## Step 4, 5
-        $table->{column}->[++$x_width] = {element => $current_column}
+        $table->{column}->[$x_width++] = {element => $current_column}
             for 1..$span;
       }
       
@@ -194,6 +198,8 @@ sub form_table ($$$;$) {
         
         ## Step 5 of overall steps 2nd paragraph
         $end->();
+        $table->{width} = $x_width;
+        $table->{height} = $y_height;
         return $table;
       }
     } # NEXT_CHILD
@@ -303,6 +309,24 @@ return unless $current_cell;
           }
         }
       }
+
+      ## Whether the cell is an empty data cell or not
+      if (not $cell->{is_header}) {
+        $cell->{is_empty} = 1;
+        for my $node (@{$current_cell->child_nodes}) {
+          my $nt = $node->node_type;
+          if ($nt == 3 or $nt == 4) { # TEXT_NODE / CDATA_SECTION_NODE
+            if ($node->data =~ /\P{Zs}/) { ## TOOD: non-Zs class
+              delete $cell->{is_empty};
+              last;
+            }
+          } elsif ($nt == 1) { # ELEMENT_NODE
+            delete $cell->{is_empty};
+            last;
+          }
+        }
+        ## NOTE: Entity references are not supported
+      }
       
       ## Step 13
       if ($cell_grows_downward) {
@@ -382,6 +406,8 @@ return unless $current_cell;
       } else {
         ## Step 6 2nd paragraph
         $end->();
+        $table->{width} = $x_width;
+        $table->{height} = $y_height;
         return $table;
       }
     } # NEXT_CHILD
@@ -425,10 +451,169 @@ return unless $current_cell;
   } # ROWS
 
   $end->();
+  $table->{width} = $x_width;
+  $table->{height} = $y_height;
   return $table;
 } # form_table
 
-## TODO: Implement scope="" algorithm
+sub assign_header ($$;$$) {
+  my (undef, $table, $onerror, $must_level) = @_;
+  $onerror ||= sub { };
+  $must_level ||= 'm';
+
+  my $assign_header = sub ($$$) {
+    my $_cell = shift;
+    my ($x, $y) = @_;
+
+    for my $__cell (@{$_cell or []}) {
+      if ($__cell and $__cell->{element} and
+          not $__cell->{is_header} and
+          not $__cell->{element}->has_attribute_ns (undef, 'headers')) {
+        $__cell->{header}->{$x}->{$y} = 1;
+      }
+    }
+  }; # $assign_header
+
+  for my $x (0 .. $table->{width} - 1) {
+    for my $y (0 .. $table->{height} - 1) {
+      my $cell = $table->{cell}->[$x]->[$y];
+      $cell = $cell->[0] if $cell; # anchored cell is always ->{cell}[][][0].
+      next if $cell->{x} != $x;
+      next if $cell->{y} != $y;
+      if ($cell) {
+        if ($cell->{is_header}) {
+          my $scope = $cell->{element}->get_attribute_ns (undef, 'scope');
+          $scope = $scope ? lc $scope : ''; ## TODO: case
+          if ($scope eq 'row') {
+            for my $_x ($x + $cell->{width} .. $table->{width} - 1) {
+              for my $_y ($y .. $y + $cell->{height} - 1) {
+                $assign_header->($table->{cell}->[$_x]->[$_y] => $x, $y);
+              }
+            }
+          } elsif ($scope eq 'col') {
+            for my $_x ($x .. $x + $cell->{width} - 1) {
+              for my $_y ($y .. $table->{height} - 1) {
+                $assign_header->($table->{cell}->[$_x]->[$_y] => $x, $y);
+              }
+            }
+          } elsif ($scope eq 'rowgroup') {
+            ## NOTE: A cell cannot exceed across a row group boundary.
+            if ($table->{row_group}->[$y] and
+                $table->{row_group}->[$y]->{height}) {
+              for my $_x ($x .. $table->{width} - 1) {
+                for my $_y ($y ..
+                            $table->{row_group}->[$y]->{y} +
+                            $table->{row_group}->[$y]->{height} - 1) {
+                  $assign_header->($table->{cell}->[$_x]->[$_y] => $x, $y);
+                }
+              }
+            }
+            ## TODO: Should we raise a warning?
+          } elsif ($scope eq 'colgroup') {
+            if ($table->{column_group}->[$x] and
+                $table->{column_group}->{width} and
+                $table->{column_group}->[$x]->{x} == $x) { # anchored
+              for my $_x ($x .. 
+                          $table->{column_group}->[$x]->{x} + 
+                          $table->{column_group}->[$x]->{width} - 1) {
+                for my $_y ($y .. $table->{height} - 1) {
+                  $assign_header->($table->{cell}->[$_x]->[$_y] => $x, $y);
+                }
+              }
+            }
+            ## TODO: Warning?
+          } else { # auto
+            ## 1.
+            my $header_width = $cell->{width};
+            W: for ($x + $cell->{width} .. $table->{width} - 1) {
+              my $_cell = $table->{cell}->[$_]->[$y];
+              for (@{$_cell or []}) {
+                if ($_->{element} and not $_->{is_empty}) {
+                  last W; # not empty
+                }
+              }
+              $header_width++;
+            } # W
+
+            ## 2.
+            my $_x = $x + $header_width;
+
+            ## 3.
+            HORIZONTAL: {
+              last HORIZONTAL if $_x == $table->{width}; # goto Vertical
+
+              ## 4. # goto Vertical
+              last HORIZONTAL
+                  if $table->{cell}->[$_x]->[$y] and
+                      $table->{cell}->[$_x]->[$y]->[0] and # anchored
+                      $table->{cell}->[$_x]->[$y]->[0]->{is_header};
+
+              ## 5.
+              for my $_y ($y .. $y + $cell->{height} - 1) {
+                $assign_header->($table->{cell}->[$_x]->[$_y] => $x, $y);
+              }
+
+              ## 6.
+              $_x++;
+
+              ## 7.
+              redo HORIZONTAL;
+            } # HORIZONTAL
+
+            ## 8. Vertical
+            my $_y = $y + $cell->{height};
+
+            VERTICAL: {
+              ## 9. # goto END
+              last VERTICAL if $_y == $table->{height};
+
+              ## 10.
+              if ($table->{cell}->[$x]->[$_y]) {
+                my $h_cell = $table->{cell}->[$x]->[$_y]->[0]; # anchored cell
+                if ($h_cell and $h_cell->{is_header}) {
+                  ## 10.1.
+                  my $width = $h_cell->{width};
+                  W: for ($h_cell->{x} + $width .. $table->{width} - 1) {
+                    my $_cell = $table->{cell}->[$_]->[$y];
+                    for (@{$_cell or []}) {
+                      if ($_->{element} and not $_->{is_empty}) {
+                        last W; # not empty
+                      }
+                    }
+                    $width++;
+                  } # W
+                    
+                  ## 10.2. # goto end
+                  last VERTICAL if $width == $header_width;
+                } # 10.
+              }
+
+              ## 11.
+              for my $_x ($x .. $x + $header_width - 1) {
+                $assign_header->($table->{cell}->[$_x]->[$_y] => $x, $y);
+              }
+
+              ## 12.
+              $_y++;
+
+              ## 13. # goto vertical (wrong)
+              redo VERTICAL;
+            } # VERTICAL
+
+            ## 14. End
+            # (we have already done)
+          }
+        } else { # data cell
+          
+        }
+      }
+    }
+  }
+
+
+  ## NOTE: The "tree order" constraints in the spec algorithm are irrelevant
+  ## in fact.
+} # assign_header
 
 1;
-## $Date: 2008/05/05 08:36:55 $
+## $Date: 2008/05/06 07:49:16 $

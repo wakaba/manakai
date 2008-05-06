@@ -1,3 +1,11 @@
+2008-05-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTMLTable.pm (assign_header): New function; first version
+	with no support for headers="".
+	(form_table): Include table width and height to the returned
+	table object for covenience.  Indexing in column assignement was wrong.
+	Set whether a data cell is empty or not for convenience.
+
 2008-05-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTMLTable.pm: Robuster caption support (HTML5 revision 1393).
