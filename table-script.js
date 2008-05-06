@@ -38,8 +38,11 @@ function tableToCanvas (table, parent, idPrefix) {
     dataCellFillStyle: 'rgba(0, 0, 0, 0)',
     dataCellStrokeStyle: 'black',
     overlappingCellFillStyle: 'red',
-    overlappingCellStrokeStyle: 'rgba(0, 0, 0, 0)'
+    overlappingCellStrokeStyle: 'rgba(0, 0, 0, 0)',
+    highlightCellFillStyle: 'yellow'
   };
+
+  canvas.drawTable = function () {
 
 var columnNumber = table.column.length;
 if (columnNumber < table.cell.length) columnNumber = table.cell.length;
@@ -145,6 +148,11 @@ for (var i = 0; i < table.cell.length; i++) {
           area.alt = 'Cell (' + c[0].x + ', ' + c[0].y + ')';
           area.href = '#' + idPrefix + 'node-' + c[0].id;
           area.id = idPrefix + 'cell-' + c[0].id;
+          area.onmouseover = (function (v) {
+            return function () {
+              canvas.highlightCells (v);
+            };
+          }) (c[0].header);
           map.appendChild (area);
         }
       } else {
@@ -176,15 +184,53 @@ for (var i = 0; i < rowNumber; i++) {
   c2d.closePath ();
 }
 
+    return map;
+  }; // canvas.drawTable
+
+  canvas.highlightCells = function (cells) {
+    var c2d = this.getContext ('2d');
+
+    for (var x in cells) {
+      for (var y in cells[x]) {
+        if (cells[x][y]) {
+          var cell = table.cell[x][y][0];
+          c2d.beginPath ();
+          c2d.rect
+              (param.cellLeft + (param.columnWidth + param.columnSpacing) * x,
+               param.cellTop + (param.rowHeight + param.rowSpacing) * y,
+               (param.columnWidth + param.columnSpacing) * cell.width - param.columnSpacing,
+               (param.rowHeight + param.rowSpacing) * cell.height - param.rowSpacing);
+          c2d.fillStyle = param.highlightCellFillStyle;
+          c2d.fill ();
+          c2d.stroke ();
+          c2d.closePath ();
+        }
+      }
+    }
+    this.updateImgElement ();
+  } // canvas.highlightCells
+
+  var map = canvas.drawTable ();
   if (map.hasChildNodes ()) {
     var mapid = /* idPrefix + */ 'table-map-' + ++document.TableMapId;
     map.name = mapid;
     parent.appendChild (map);
     var img = document.createElement ('img');
-    img.src = canvas.toDataURL ();
     img.useMap = '#' + mapid;
+    canvas.updateImgElement = function () {
+      img.src = this.toDataURL ();
+    };
+    img.onmouseover = function (e) {
+      if (e.target == e.currentTarget) {
+        canvas.drawTable ();
+        canvas.updateImgElement ();
+      }
+    };
+    canvas.updateImgElement ();
     parent.appendChild (img);
     canvas.style.display = 'none';
+  } else {
+    canvas.updateImgElement = function () {};
   }
 } // tableToCanvas
 
@@ -198,4 +244,4 @@ This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 */
-/* $Date: 2008/05/05 06:56:01 $ */
+/* $Date: 2008/05/06 07:50:28 $ */

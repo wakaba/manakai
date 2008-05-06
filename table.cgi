@@ -63,8 +63,10 @@ if ($mode eq '/table') {
     $i++; print STDOUT "<h1>Table $i</h1>\n";
 
     my $table = Whatpm::HTMLTable->form_table ($table_el);
+    Whatpm::HTMLTable->assign_header ($table);
 
-    for (@{$table->{column_group}}, @{$table->{column}}, $table->{caption}) {
+    for (@{$table->{column_group}}, @{$table->{column}}, $table->{caption},
+         @{$table->{row}}) {
       next unless $_;
       delete $_->{element};
     }
@@ -81,6 +83,7 @@ if ($mode eq '/table') {
       for (@{$_}) {
         next unless $_;
         for (@$_) {
+          $_->{id} = ''.$_->{element} if defined $_->{element};
           delete $_->{element};
           $_->{is_header} = $_->{is_header} ? 1 : 0;
         }
@@ -115,4 +118,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/02/10 02:30:14 $
+## $Date: 2008/05/06 07:50:28 $
