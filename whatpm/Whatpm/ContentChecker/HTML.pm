@@ -9,6 +9,11 @@ sub FEATURE_HTML5_ROLE () {
       ## TODO: svg:*/@role
 }
 
+sub FEATURE_HTML5_COMPLETE () {
+  Whatpm::ContentChecker::FEATURE_STATUS_REC |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
+}
+
 sub FEATURE_HTML5_LC () {
   Whatpm::ContentChecker::FEATURE_STATUS_LC |
   Whatpm::ContentChecker::FEATURE_ALLOWED
@@ -3712,14 +3717,14 @@ $Element->{$HTML_NS}->{source} = {
 
 $Element->{$HTML_NS}->{canvas} = {
   %HTMLTransparentChecker,
-  status => FEATURE_HTML5_LC,
+  status => FEATURE_HTML5_COMPLETE,
   check_attrs => $GetHTMLAttrsChecker->({
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
-    height => FEATURE_HTML5_LC,
-    width => FEATURE_HTML5_LC,
+    height => FEATURE_HTML5_COMPLETE,
+    width => FEATURE_HTML5_COMPLETE,
   }),
 };
 

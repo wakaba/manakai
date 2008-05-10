@@ -145,7 +145,6 @@ sub form_table ($$$;$) {
         if (defined $col_span and $col_span =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
           $span = $1 || 1;
         }
-        ## ISSUE: If span=0, what is /span/ value?
         
         ## Step 4, 5
         $table->{column}->[$x_width++] = {element => $current_column}
@@ -165,7 +164,6 @@ sub form_table ($$$;$) {
       if (defined $col_span and $col_span =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
         $span = $1 || 1;
       }
-      ## ISSUE: If span=0, what is /span/ value?
       
       ## Step 2
       $x_width += $span;
@@ -657,4 +655,4 @@ sub assign_header ($$;$$) {
 } # assign_header
 
 1;
-## $Date: 2008/05/06 08:59:09 $
+## $Date: 2008/05/10 10:06:49 $
