@@ -44,7 +44,7 @@ update-_NamedEntityList.pm:
 	$(RMALL) Entities.html
 
 Entities.html:
-	$(WGET) -O $@ http://www.whatwg.org/specs/web-apps/current-work/multipage/section-entities.html
+	$(WGET) -O $@ http://www.whatwg.org/specs/web-apps/current-work/multipage/section-named.html
 
 _LinkTypeList.pm: mklinktypelist.pl RelExtensions.html
 	perl $< > $@
@@ -69,4 +69,4 @@ HTML-clean:
 	cd HTML && make clean
 
 ## License: Public Domain.
-## $Date: 2007/11/19 12:18:27 $
+## $Date: 2008/05/10 12:13:43 $

@@ -364,7 +364,7 @@ return unless $current_cell;
 
     ## Step 3
     if ($y_height > $y_start) {
-      my $rg = {element => $current_element, ## ISSUE: "element being processed"?
+      my $rg = {element => $current_element, ## ISSUE: "element being processed"?  Otherwise, $current_element may be a thead element while the element being processed is a tfoot element, for example.
                 x => 0, y => $y_start,
                 height => $y_height - $y_start};
       $table->{row_group}->[$_] = $rg for $y_start .. $y_height - 1;
@@ -655,4 +655,4 @@ sub assign_header ($$;$$) {
 } # assign_header
 
 1;
-## $Date: 2008/05/10 10:06:49 $
+## $Date: 2008/05/10 12:13:43 $
