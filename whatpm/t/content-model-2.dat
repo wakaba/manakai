@@ -445,7 +445,7 @@ id=""><span id="">x</span></p>
 #data
 <p irrelevant=" " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant="irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -454,57 +454,55 @@ id=""><span id="">x</span></p>
 #data
 <p irrelevant=" irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant="irrelevant " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant=" irrelevant " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant="Irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
 
 #data
 <p irrelevant="IRRELEVANT" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
 
 #data
 <p irrelevant="relevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant="irrelevants" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant="false" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant="true" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant="yes" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p irrelevant="on" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@irrelevant;boolean:invalid
+/p/@irrelevant;boolean:invalid;m
 
 #data
 <p tabindex="-1" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -2324,27 +2322,26 @@ id=""><span id="">x</span></p>
 #data
 <ol reversed="REVERSED" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@reversed;boolean:invalid
 
 #data
 <ol reversed="  reversed  " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@reversed;boolean:invalid
+/ol/@reversed;boolean:invalid;m
 
 #data
 <ol reversed="yes" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@reversed;boolean:invalid
+/ol/@reversed;boolean:invalid;m
 
 #data
 <ol reversed="on" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@reversed;boolean:invalid
+/ol/@reversed;boolean:invalid;m
 
 #data
 <ol reversed="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@reversed;boolean:invalid
+/ol/@reversed;boolean:invalid;m
 
 #data
 <ol reverse="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2354,7 +2351,7 @@ id=""><span id="">x</span></p>
 #data
 <ol reversed="reverse" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@reversed;boolean:invalid
+/ol/@reversed;boolean:invalid;m
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
@@ -2502,7 +2499,12 @@ id=""><span id="">x</span></p>
 <ol compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /ol/@compact;attribute not defined;m
-/ol/@compact;boolean:invalid
+
+#data
+<ol compact="Compat" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/ol/@compact;attribute not defined;m
+/ol/@compact;boolean:invalid;m
 
 #data
 <ul compact="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2518,7 +2520,12 @@ id=""><span id="">x</span></p>
 <ul compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /ul/@compact;attribute not defined;m
-/ul/@compact;boolean:invalid
+
+#data
+<ul compact="compat" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/ul/@compact;attribute not defined;m
+/ul/@compact;boolean:invalid;m
 
 #data
 <dir compact="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2536,7 +2543,13 @@ id=""><span id="">x</span></p>
 <dir compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /dir/@compact;attribute not defined;m
-/dir/@compact;boolean:invalid
+/dir;element not defined;m
+
+#data
+<dir compact="combact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/dir/@compact;attribute not defined;m
+/dir/@compact;boolean:invalid;m
 /dir;element not defined;m
 
 #data
@@ -2555,7 +2568,13 @@ id=""><span id="">x</span></p>
 <menu compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /menu/@compact;attribute not defined;m
-/menu/@compact;boolean:invalid
+/menu;no significant content;s
+
+#data
+<menu compact="conpact" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/menu/@compact;attribute not defined;m
+/menu/@compact;boolean:invalid;m
 /menu;no significant content;s
 
 #data
@@ -2572,7 +2591,12 @@ id=""><span id="">x</span></p>
 <dl compact="Compact" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
 /dl/@compact;attribute not defined;m
-/dl/@compact;boolean:invalid
+
+#data
+<dl compact="compacts" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/dl/@compact;attribute not defined;m
+/dl/@compact;boolean:invalid;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3981,7 +4005,13 @@ id=""><span id="">x</span></p>
 <img alt="" src="http://test/" ismap="true"/>
 </a>
 #errors
-/a/img/@ismap;boolean:invalid
+/a/img/@ismap;boolean:invalid;m
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="IsMap"/>
+</a>
+#errors
 
 #data
 <div  xmlns="http://www.w3.org/1999/xhtml">
@@ -4407,14 +4437,20 @@ id=""><span id="">x</span></p>
 <object data="" declare="yes" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@declare;attribute not defined;m
-/object/@declare;boolean:invalid
+/object/@declare;boolean:invalid;m
 /object;no significant content;s
 
 #data
 <object data="" declare="no" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@declare;attribute not defined;m
-/object/@declare;boolean:invalid
+/object/@declare;boolean:invalid;m
+/object;no significant content;s
+
+#data
+<object data="" declare="Declare" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@declare;attribute not defined;m
 /object;no significant content;s
 
 #data
@@ -4723,7 +4759,13 @@ id=""><span id="">x</span></p>
 <video autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video/@autoplay;boolean:invalid
+/video/@autoplay;boolean:invalid;m
+/video;element missing:source;m
+
+#data
+<video autoplay="AUTOPlay" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
 /video;element missing:source;m
 
 #data
@@ -4739,9 +4781,29 @@ id=""><span id="">x</span></p>
 /video;element missing:source;m
 
 #data
+<video controls="Controls" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;element missing:source;m
+
+#data
 <video controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/video/@controls;boolean:invalid
+/video/@controls;boolean:invalid;m
+/video;no significant content;s
+/video;element missing:source;m
+
+#data
+<video controls="control" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@controls;boolean:invalid;m
+/video;no significant content;s
+/video;element missing:source;m
+
+#data
+<video control="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@control;attribute not defined;m
 /video;no significant content;s
 /video;element missing:source;m
 
@@ -4794,9 +4856,15 @@ id=""><span id="">x</span></p>
 /audio;element missing:source;m
 
 #data
+<audio autoplay="AUTOPLAY" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;element missing:source;m
+
+#data
 <audio autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/audio/@autoplay;boolean:invalid
+/audio/@autoplay;boolean:invalid;m
 /audio;no significant content;s
 /audio;element missing:source;m
 
@@ -4813,9 +4881,15 @@ id=""><span id="">x</span></p>
 /audio;element missing:source;m
 
 #data
+<audio controls="CONTROLS" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;element missing:source;m
+
+#data
 <audio controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/audio/@controls;boolean:invalid
+/audio/@controls;boolean:invalid;m
 /audio;no significant content;s
 /audio;element missing:source;m
 
@@ -5501,10 +5575,15 @@ id=""><span id="">x</span></p>
 /area/@nohref;attribute not defined;m
 
 #data
+<area shape="default" nohref="noHREF" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@nohref;attribute not defined;m
+
+#data
 <area shape="default" nohref="http://example/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@nohref;attribute not defined;m
-/area/@nohref;boolean:invalid
+/area/@nohref;boolean:invalid;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6082,10 +6161,15 @@ id=""><span id="">x</span></p>
 /td/@nowrap;attribute not defined;m
 
 #data
+<td nowrap="NoWrap" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@nowrap;attribute not defined;m
+
+#data
 <td nowrap="yes" xmlns="http://www.w3.org/1999/xhtml">x</td>
 #errors
 /td/@nowrap;attribute not defined;m
-/td/@nowrap;boolean:invalid
+/td/@nowrap;boolean:invalid;m
 
 #data
 <th nowrap="" xmlns="http://www.w3.org/1999/xhtml">x</th>
@@ -6103,10 +6187,15 @@ id=""><span id="">x</span></p>
 /th/@nowrap;attribute not defined;m
 
 #data
+<th nowrap="NOwrap" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@nowrap;attribute not defined;m
+
+#data
 <th nowrap="yes" xmlns="http://www.w3.org/1999/xhtml">x</th>
 #errors
 /th/@nowrap;attribute not defined;m
-/th/@nowrap;boolean:invalid
+/th/@nowrap;boolean:invalid;m
 
 #data
 <td abbr="" xmlns="http://www.w3.org/1999/xhtml">x</td>
@@ -6434,16 +6523,21 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<script defer="DEFER" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script;script:text/javascript;unsupported
+
+#data
 <script defer="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@defer;boolean:invalid
+/script/@defer;boolean:invalid;m
 /script;script:text/javascript;unsupported
 
 #data
 <script src="http://test/" defer="true"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@defer;boolean:invalid
+/script/@defer;boolean:invalid;m
 
 #data
 <script async="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6468,14 +6562,19 @@ id=""><span id="">x</span></p>
 #data
 <script async="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@async;boolean:invalid
+/script/@async;boolean:invalid;m
 /script;script:text/javascript;unsupported
 
 #data
 <script src="http://test/" async="true"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@async;boolean:invalid
+/script/@async;boolean:invalid;m
+
+#data
+<script src="http://test/" async="aSync"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
 
 #data
 <script defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6574,13 +6673,12 @@ id=""><span id="">x</span></p>
 <details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
-/details/@open;boolean:invalid
 /details;element missing:legend;m
 
 #data
 <details open="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details/@open;boolean:invalid
+/details/@open;boolean:invalid;m
 /details;no significant content;s
 /details;element missing:legend;m
 
@@ -6600,9 +6698,14 @@ id=""><span id="">x</span></p>
 /datagrid;no significant content;s
 
 #data
+<datagrid disabled="Disabled" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/datagrid;no significant content;s
+
+#data
 <datagrid disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid/@disabled;boolean:invalid
+/datagrid/@disabled;boolean:invalid;m
 /datagrid;no significant content;s
 
 #data
@@ -6616,9 +6719,14 @@ id=""><span id="">x</span></p>
 /datagrid;no significant content;s
 
 #data
+<datagrid multiple="MULTIPLE" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/datagrid;no significant content;s
+
+#data
 <datagrid multiple="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid/@multiple;boolean:invalid
+/datagrid/@multiple;boolean:invalid;m
 /datagrid;no significant content;s
 
 #data
@@ -6634,9 +6742,13 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<command default="DEFAULT" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
 <command default="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@default;boolean:invalid
+/command/@default;boolean:invalid;m
 
 #data
 <command checked="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6647,9 +6759,13 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<command checked="Checked" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
 <command checked="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@checked;boolean:invalid
+/command/@checked;boolean:invalid;m
 
 #data
 <command hidden="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6660,9 +6776,13 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<command hidden="HIDDEN" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
 <command hidden="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@hidden;boolean:invalid
+/command/@hidden;boolean:invalid;m
 
 #data
 <command disabled="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6673,9 +6793,13 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<command disabled="Disabled" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
 <command disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@disabled;boolean:invalid
+/command/@disabled;boolean:invalid;m
 
 #data
 <command label="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6877,13 +7001,17 @@ id=""><span id="">x</span></p>
 #data
 <menu autosubmit="yes" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/menu/@autosubmit;boolean:invalid
+/menu/@autosubmit;boolean:invalid;m
+/menu;no significant content;s
+
+#data
+<menu autosubmit="AUTOSubmit" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
 /menu;no significant content;s
 
 #data
 <menu autosubmit="AutoSubmit" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/menu/@autosubmit;boolean:invalid
 /menu;no significant content;s
 
 #data

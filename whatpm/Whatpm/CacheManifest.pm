@@ -1,6 +1,6 @@
 package Whatpm::CacheManifest;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::URI::URIReference;
 
 sub parse_byte_string ($$$$$) {
@@ -77,8 +77,8 @@ sub _parse ($$$$$) {
   my $input = $_[1];
   
   ## Step 1: MUST bytes --UTF-8--> characters.
-  ## NOTE: illegal(s) -> U+FFFD, U+0000 -> U+FFFD
-  $$input =~ tr/\x00/\x{FFFD}/;
+  ## NOTE: illegal(s) -> U+FFFD, #U+0000 -> U+FFFD (commented out in r1553).
+  #$$input =~ tr/\x00/\x{FFFD}/;
 
   ## Step 2
   my $explicit_uris = [];
@@ -399,4 +399,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/04/29 08:16:46 $
+# $Date: 2008/05/10 06:04:39 $

@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.80 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.81 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -427,6 +427,8 @@ sub check_document ($$$;$) {
   return $return;
 } # check_document
 
+## Check an element.  The element is checked as if it is an orphan node (i.e.
+## an element without a parent node).
 sub check_element ($$$;$) {
   my ($self, $el, $onerror, $onsubdoc) = @_;
   $self = bless {}, $self unless ref $self;
@@ -921,4 +923,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/06 08:59:09 $
+# $Date: 2008/05/10 06:04:39 $

@@ -282,9 +282,10 @@ my $GetHTMLBooleanAttrChecker = sub {
   my $local_name = shift;
   return sub {
     my ($self, $attr) = @_;
-    my $value = $attr->value;
+    my $value = lc $attr->value; ## TODO: case
     unless ($value eq $local_name or $value eq '') {
-      $self->{onerror}->(node => $attr, type => 'boolean:invalid');
+      $self->{onerror}->(node => $attr, type => 'boolean:invalid',
+                         level => $self->{must_level});
     }
   };
 }; # $GetHTMLBooleanAttrChecker
