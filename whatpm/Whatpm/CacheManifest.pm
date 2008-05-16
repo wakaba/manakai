@@ -1,6 +1,6 @@
 package Whatpm::CacheManifest;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::URI::URIReference;
 
 sub parse_byte_string ($$$$$) {
@@ -215,19 +215,19 @@ sub _parse ($$$$$) {
       }
 
       if (defined $u1->uri_fragment) {
+        $u1->uri_fragment (undef);
         $onerror->(type => 'URI fragment not allowed',
                    level => $must_level, line => $line_number, column => 1,
                    index => 0, value => $p1);
         ## NOTE: MUST in writing section.
-        ## ISSUE: Not dropped
       }
 
       if (defined $u2->uri_fragment) {
+        $u2->uri_fragment (undef);
         $onerror->(type => 'URI fragment not allowed',
                    level => $must_level, line => $line_number, column => 1,
                    index => 1, value => $p2);
         ## NOTE: MUST in writing section.
-        ## ISSUE: Not dropped
       }
 
       $u1 = $u1->get_absolute_reference ($_[3]);
@@ -399,4 +399,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/10 06:04:39 $
+# $Date: 2008/05/16 13:56:16 $

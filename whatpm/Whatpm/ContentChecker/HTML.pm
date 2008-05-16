@@ -720,6 +720,67 @@ my $HTMLAccesskeyAttrChecker = sub {
   ## or wherever the access key is to apply." [HTML4] (informative)
 }; # $HTMLAccesskeyAttrChecker
 
+my $HTMLCharsetChecker = sub {
+  my ($charset_value, $self, $attr) = @_;
+
+  ## NOTE: Though the case-sensitivility of |charset| attribute value
+  ## is not explicitly spelled in the HTML5 spec, the Character Set
+  ## registry of IANA, which is referenced from HTML5 spec, says that
+  ## charset name is case-insensitive.
+  $charset_value =~ tr/A-Z/a-z/; ## NOTE: ASCII Case-insensitive.
+  
+  require Message::Charset::Info;
+  my $charset = $Message::Charset::Info::IANACharset->{$charset_value};
+      
+  ## ISSUE: What is "valid character encoding name"?  Syntactically valid?
+  ## Syntactically valid and registered?  What about x-charset names?
+  unless (Message::Charset::Info::is_syntactically_valid_iana_charset_name
+              ($charset_value)) {
+    $self->{onerror}->(node => $attr,
+                       type => 'charset:syntax error:'.$charset_value, ## TODO
+                       level => $self->{must_level});
+  }
+  
+  if ($charset) {
+    ## ISSUE: What is "the preferred name for that encoding" (for a charset
+    ## with no "preferred MIME name" label)?
+    my $charset_status = $charset->{iana_names}->{$charset_value} || 0;
+    if (($charset_status &
+         Message::Charset::Info::PREFERRED_CHARSET_NAME ())
+            != Message::Charset::Info::PREFERRED_CHARSET_NAME ()) {
+      $self->{onerror}->(node => $attr,
+                         type => 'charset:not preferred:'.
+                             $charset_value, ## TODO
+                         level => $self->{must_level});
+    }
+    if (($charset_status &
+         Message::Charset::Info::REGISTERED_CHARSET_NAME ())
+            != Message::Charset::Info::REGISTERED_CHARSET_NAME ()) {
+      if ($charset_value =~ /^x-/) {
+        $self->{onerror}->(node => $attr,
+                           type => 'charset:private:'.$charset_value, ## TODO
+                           level => $self->{good_level});
+      } else {
+        $self->{onerror}->(node => $attr,
+                           type => 'charset:not registered:'.
+                               $charset_value, ## TODO
+                           level => $self->{good_level});
+      }
+    }
+## TODO: non-preferred-name error for following cases:
+  } elsif ($charset_value =~ /^x-/) {
+    $self->{onerror}->(node => $attr,
+                       type => 'charset:private:'.$charset_value, ## TODO
+                       level => $self->{good_level});
+  } else {
+    $self->{onerror}->(node => $attr,
+                       type => 'charset:not registered:'.$charset_value, ## TODO
+                       level => $self->{good_level});
+  }
+  
+  return ($charset, $charset_value);
+}; # $HTMLCharsetChecker
+
 my $HTMLColorAttrChecker = sub {
   my ($self, $attr) = @_;
   
@@ -1589,7 +1650,10 @@ $Element->{$HTML_NS}->{link} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
-      ## TODO: HTML4 |charset|
+      charset => sub {
+        my ($self, $attr) = @_;
+        $HTMLCharsetChecker->($attr->value, @_);
+      },
       href => $HTMLURIAttrChecker,
       rel => sub { $HTMLLinkTypesAttrChecker->(0, $item, @_) },
       rev => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
@@ -1602,7 +1666,9 @@ $Element->{$HTML_NS}->{link} = {
     }, {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
-      charset => FEATURE_M12N10_REC,
+      charset => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
+          ## NOTE: |charset| attribute had been part of HTML5 spec though
+          ## it had been commented out.
       href => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       hreflang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
@@ -1777,14 +1843,11 @@ $Element->{$HTML_NS}->{meta} = {
 
     my $check_charset = sub ($$) {
       my ($attr, $charset_value) = @_;
-      ## NOTE: Though the case-sensitivility of |charset| attribute value
-      ## is not explicitly spelled in the HTML5 spec, the Character Set
-      ## registry of IANA, which is referenced from HTML5 spec, says that
-      ## charset name is case-insensitive.
-      $charset_value =~ tr/A-Z/a-z/; ## NOTE: ASCII Case-insensitive.
 
-      require Message::Charset::Info;
-      my $charset = $Message::Charset::Info::IANACharset->{$charset_value};
+      my $charset;
+      ($charset, $charset_value)
+          = $HTMLCharsetChecker->($charset_value, $self, $attr);
+
       my $ic = $item->{node}->owner_document->input_encoding;
       if (defined $ic) {
         ## TODO: Test for this case
@@ -1802,51 +1865,6 @@ $Element->{$HTML_NS}->{meta} = {
         $self->{onerror}->(node => $attr,
                            type => 'mismatched charset name::'.$charset_value, ## TODO: |value|
                            level => 'unsupported');
-      }
-      
-      ## ISSUE: What is "valid character encoding name"?  Syntactically valid?
-      ## Syntactically valid and registered?  What about x-charset names?
-      unless (Message::Charset::Info::is_syntactically_valid_iana_charset_name
-                  ($charset_value)) {
-        $self->{onerror}->(node => $attr,
-                           type => 'charset:syntax error:'.$charset_value, ## TODO
-                           level => $self->{must_level});
-      }
-
-      if ($charset) {
-        ## ISSUE: What is "the preferred name for that encoding" (for a charset
-        ## with no "preferred MIME name" label)?
-        my $charset_status = $charset->{iana_names}->{$charset_value} || 0;
-        if (($charset_status &
-             Message::Charset::Info::PREFERRED_CHARSET_NAME ())
-                != Message::Charset::Info::PREFERRED_CHARSET_NAME ()) {
-          $self->{onerror}->(node => $attr,
-                             type => 'charset:not preferred:'.
-                                 $charset_value, ## TODO
-                             level => $self->{must_level});
-        }
-        if (($charset_status &
-             Message::Charset::Info::REGISTERED_CHARSET_NAME ())
-                != Message::Charset::Info::REGISTERED_CHARSET_NAME ()) {
-          if ($charset_value =~ /^x-/) {
-            $self->{onerror}->(node => $attr,
-                               type => 'charset:private:'.$charset_value, ## TODO
-                               level => $self->{good_level});
-          } else {
-            $self->{onerror}->(node => $attr,
-                               type => 'charset:not registered:'.
-                                   $charset_value, ## TODO
-                               level => $self->{good_level});
-          }
-        }
-      } elsif ($charset_value =~ /^x-/) {
-        $self->{onerror}->(node => $attr,
-                             type => 'charset:private:'.$charset_value, ## TODO
-                             level => $self->{good_level});
-      } else {
-        $self->{onerror}->(node => $attr,
-                             type => 'charset:not registered:'.$charset_value, ## TODO
-                             level => $self->{good_level});
       }
 
       if ($attr->get_user_data ('manakai_has_reference')) {
@@ -2590,7 +2608,10 @@ $Element->{$HTML_NS}->{a} = {
 
         $checker = {
           accesskey => $HTMLAccesskeyAttrChecker,
-          ## TODO: HTML4 |charset|
+          charset => sub {
+            my ($self, $attr) = @_;
+            $HTMLCharsetChecker->($attr->value, @_);
+          },
           ## TODO: HTML4 |coords|
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
@@ -4913,17 +4934,27 @@ $Element->{$HTML_NS}->{script} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: HTML4 |charset|
+    charset => sub {
+      my ($self, $attr) = @_;
+
+      unless ($attr->owner_element->has_attribute_ns (undef, 'src')) {
+        $self->{onerror}->(type => 'attribute not allowed',
+                           node => $attr,
+                           level => $self->{must_level});
+      }
+
+      $HTMLCharsetChecker->($attr->value, @_);
+    },
     language => sub {}, ## NOTE: No syntax constraint according to HTML4.
-      src => $HTMLURIAttrChecker,
+      src => $HTMLURIAttrChecker, ## TODO: pointed resource MUST be in type of type="" (resource error)
       defer => $GetHTMLBooleanAttrChecker->('defer'),
       async => $GetHTMLBooleanAttrChecker->('async'),
-      type => $HTMLIMTAttrChecker,
+      type => $HTMLIMTAttrChecker, ## TODO: MUST NOT: |charset=""| parameter
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     async => FEATURE_HTML5_DEFAULT,
-    charset => FEATURE_M12N10_REC,
+    charset => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     defer => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     event => FEATURE_HTML4_REC_RESERVED,
     for => FEATURE_HTML4_REC_RESERVED,
@@ -4992,6 +5023,11 @@ $Element->{$HTML_NS}->{script} = {
       $HTMLChecker{check_end}->(@_);
     }
   },
+  ## TODO: There MUST be |type| unless the script type is JavaScript. (resource error)
+  ## NOTE: "When used to include script data, the script data must be embedded
+  ## inline, the format of the data must be given using the type attribute,
+  ## and the src attribute must not be specified." - not testable.
+      ## TODO: It would be possible to err <script type=text/plain src=...>
 };
 ## ISSUE: Significant check and text child node
 

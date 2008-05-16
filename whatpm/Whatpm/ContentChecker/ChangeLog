@@ -1,5 +1,11 @@
 2008-05-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: Fact out generic charset name checking code
+	to $HTMLCharsetChecker.  Support for charset="" attributes
+	on <a>, <link>, and <script> elements.
+
+2008-05-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm ($GetHTMLFloatingPointNumberAttrChecker): More than
 	one "." characters were allowed in a floating point number
 	incorrectly.

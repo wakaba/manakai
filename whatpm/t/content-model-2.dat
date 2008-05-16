@@ -1330,6 +1330,41 @@ id=""><span id="">x</span></p>
 /link;attribute missing:rel
 
 #data
+<link href="" rel="alternate"
+    charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+
+#data
+<link href="" rel="alternate"
+    charset="x-sjis" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:not preferred:x-sjis;m
+/link/@charset;charset:private:x-sjis;w
+
+#data
+<link href="" rel="alternate"
+    charset="not-registered" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:not registered:not-registered;w
+
+#data
+<link href="" rel="alternate"
+    charset="Shift JIS" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:syntax error:shift jis;m
+
+#data
+<link href="" rel="alternate"
+    charset="ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:not preferred:ascii;m
+
+#data
 <meta xmlns="http://www.w3.org/1999/xhtml">
   <!-- TODO: <meta> tests are not complete -->
 </meta>
@@ -2837,6 +2872,17 @@ id=""><span id="">x</span></p>
 #errors
 /a/@target;attribute not allowed
 /a;no significant content;s
+
+#data
+<a charset="" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@charset;attribute not defined;m
+/a/@charset;charset:syntax error;m
+
+#data
+<a charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@charset;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -5664,6 +5710,11 @@ id=""><span id="">x</span></p>
 /area/@nohref;boolean:invalid;m
 
 #data
+<area shape="default" charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@charset;attribute not defined;m
+
+#data
 <table xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -6714,6 +6765,23 @@ id=""><span id="">x</span></p>
 <script language="XML" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
+/script;script:text/XML;unsupported
+
+#data
+<script charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script;script:text/XML;unsupported
+/script/@charset;attribute not allowed;m
+
+#data
+<script src="" charset="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script;script:text/XML;unsupported
+/script/@charset;charset:syntax error;m
+
+#data
+<script src="" charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
 /script;script:text/XML;unsupported
 
 #data
