@@ -521,7 +521,8 @@ my $GetHTMLFloatingPointNumberAttrChecker = sub {
   return sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
-    if ($value =~ /\A-?[0-9.]+\z/ and $value =~ /[0-9]/) {
+    if ($value =~ /\A-?[0-9]+(?>\.[0-9]*)?\z/ or
+        $value =~ /\A-?\.[0-9]+\z/) {
       unless ($range_check->($value + 0)) {
         $self->{onerror}->(node => $attr, type => 'float:out of range');
       }
@@ -3697,12 +3698,14 @@ $Element->{$HTML_NS}->{source} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
-      src => $HTMLURIAttrChecker,
-      type => $HTMLIMTAttrChecker,
       media => $HTMLMQAttrChecker,
+      pixelratio => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+      src => $HTMLURIAttrChecker, ## ISSUE: Negative or zero pixelratio=""
+      type => $HTMLIMTAttrChecker,
     }, {
       %HTMLAttrStatus,
       media => FEATURE_HTML5_DEFAULT,
+      pixelratio => FEATURE_HTML5_DEFAULT,
       src => FEATURE_HTML5_DEFAULT,
       type => FEATURE_HTML5_DEFAULT,
     })->(@_);

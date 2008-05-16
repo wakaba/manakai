@@ -4951,6 +4951,84 @@ id=""><span id="">x</span></p>
 /source/@media;media query;unsupported
 
 #data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio=""/>
+#errors
+/source/@pixelratio;float:syntax error
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="1"/>
+#errors
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="1.00"/>
+#errors
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.001"/>
+#errors
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="10.4"/>
+#errors
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="1."/>
+#errors
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio=".1"/>
+#errors
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="+0.2"/>
+#errors
+/source/@pixelratio;float:syntax error
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="43 "/>
+#errors
+/source/@pixelratio;float:syntax error
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="aaaa"/>
+#errors
+/source/@pixelratio;float:syntax error
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="4 + 0.2"/>
+#errors
+/source/@pixelratio;float:syntax error
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0..3"/>
+#errors
+/source/@pixelratio;float:syntax error
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.4."/>
+#errors
+/source/@pixelratio;float:syntax error
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="."/>
+#errors
+/source/@pixelratio;float:syntax error
+
+#data
 <canvas xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas;no significant content;s
