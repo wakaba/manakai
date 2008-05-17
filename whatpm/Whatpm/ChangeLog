@@ -1,5 +1,11 @@
 2008-05-17  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src (parse_char_stream): New method.
+	(parse_char_string): This method is now defined as an invocation
+	of the |parse_char_stream| method.
+
+2008-05-17  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src (parse_byte_string): Report various status
 	of the sniffing as info-level errors.  Support for new
 	decoding framework in parser resestting.

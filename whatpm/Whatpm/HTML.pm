@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.131 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.132 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -528,11 +528,16 @@ sub parse_byte_string ($$$$;$) {
 ## such as |parse_byte_string| in this module, must ensure that it does
 ## strip the BOM and never strip any ZWNBSP.
 
-*parse_char_string = \&parse_string;
+sub parse_char_string ($$$;$) {
+  my $self = shift;
+  open my $input, '<:utf8', ref $_[0] ? $_[0] : \($_[0]);
+  return $self->parse_char_stream ($input, @_[1..$#_]);
+} # parse_char_string
+*parse_string = \&parse_char_string;
 
-sub parse_string ($$$;$) {
+sub parse_char_stream ($$$;$) {
   my $self = ref $_[0] ? shift : shift->new;
-  my $s = ref $_[0] ? $_[0] : \($_[0]);
+  my $input = $_[0];
   $self->{document} = $_[1];
   @{$self->{document}->child_nodes} = ();
 
@@ -551,8 +556,9 @@ sub parse_string ($$$;$) {
     pop @{$self->{prev_char}};
     unshift @{$self->{prev_char}}, $self->{next_char};
 
-    $self->{next_char} = -1 and return if $i >= length $$s;
-    $self->{next_char} = ord substr $$s, $i++, 1;
+    my $char = $input->getc;
+    $self->{next_char} = -1 and return unless defined $char;
+    $self->{next_char} = ord $char;
 
     ($self->{line_prev}, $self->{column_prev})
         = ($self->{line}, $self->{column});
@@ -564,7 +570,10 @@ sub parse_string ($$$;$) {
       $self->{column} = 0;
     } elsif ($self->{next_char} == 0x000D) { # CR
       
-      $i++ if substr ($$s, $i, 1) eq "\x0A";
+      my $next = $input->getc;
+      if ($next ne "\x0A") {
+        $input->ungetc ($next);
+      }
       $self->{next_char} = 0x000A; # LF # MUST
       $self->{line}++;
       $self->{column} = 0;
@@ -617,7 +626,7 @@ sub parse_string ($$$;$) {
   delete $self->{parse_error}; # remove loop
 
   return $self->{document};
-} # parse_string
+} # parse_char_stream
 
 sub new ($) {
   my $class = shift;
@@ -9194,4 +9203,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/17 05:34:23 $
+# $Date: 2008/05/17 07:31:49 $
