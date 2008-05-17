@@ -1,13 +1,27 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub UNREGISTERED_CHARSET_NAME () { 0b1 }
+    ## Names for non-standard encodings/implementations for Perl encodings
 sub REGISTERED_CHARSET_NAME () { 0b10 }
-sub PRIMARY_CHARSET_NAME () { 0b100 | REGISTERED_CHARSET_NAME }
+    ## Names for standard encodings for Perl encodings
+sub PRIMARY_CHARSET_NAME () { 0b100 }
     ## "Name:" field for IANA names
-sub PREFERRED_CHARSET_NAME () { 0b1000 | REGISTERED_CHARSET_NAME }
+    ## Canonical name for Perl encodings
+sub PREFERRED_CHARSET_NAME () { 0b1000 }
     ## "preferred MIME name" for IANA names
+
+sub FALLBACK_ENCODING_IMPL () { 0b10000 }
+    ## For Perl encodings: Not a name of the encoding, the encoding
+    ## for the name might be useful as a fallback when the correct
+    ## encoding is not supported.
+sub NONCONFORMING_ENCODING_IMPL () { FALLBACK_ENCODING_IMPL }
+    ## For Perl encodings: Not a conforming implementation of the encoding,
+    ## though it seems that the intention was to implement that encoding.
+sub ERROR_REPORTING_ENCODING_IMPL () { 0b100000 }
+    ## For Perl encodings: Support error reporting via |manakai_onerror|
+    ## handler.
 
 ## iana_status
 sub STATUS_COMMON () { 0b1 }
@@ -39,22 +53,22 @@ $Charset->{'us-ascii'}
 = $IANACharset->{'ibm367'}
 = $IANACharset->{'cp367'}
 = $IANACharset->{'csascii'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'ansi_x3.4-1968' => PRIMARY_CHARSET_NAME,
+    'ansi_x3.4-1968' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-6' => REGISTERED_CHARSET_NAME,
     'ansi_x3.4-1986' => REGISTERED_CHARSET_NAME,
     'iso_646.irv:1991' => REGISTERED_CHARSET_NAME,
     'ascii' => REGISTERED_CHARSET_NAME,
     'iso646-us' => REGISTERED_CHARSET_NAME,
-    'us-ascii' => PREFERRED_CHARSET_NAME,
+    'us-ascii' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'us' => REGISTERED_CHARSET_NAME,
     'ibm367' => REGISTERED_CHARSET_NAME,
     'cp367' => REGISTERED_CHARSET_NAME,
     'csascii' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-1'}
 = $IANACharset->{'iso_8859-1:1987'}
@@ -66,12 +80,12 @@ $Charset->{'iso-8859-1'}
 = $IANACharset->{'ibm819'}
 = $IANACharset->{'cp819'}
 = $IANACharset->{'csisolatin1'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-1:1987' => PRIMARY_CHARSET_NAME,
+    'iso_8859-1:1987' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-100' => REGISTERED_CHARSET_NAME,
     'iso_8859-1' => REGISTERED_CHARSET_NAME,
-    'iso-8859-1' => PREFERRED_CHARSET_NAME,
+    'iso-8859-1' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'latin1' => REGISTERED_CHARSET_NAME,
     'l1' => REGISTERED_CHARSET_NAME,
     'ibm819' => REGISTERED_CHARSET_NAME,
@@ -79,7 +93,7 @@ $Charset->{'iso-8859-1'}
     'csisolatin1' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-2'}
 = $IANACharset->{'iso_8859-2:1987'}
@@ -89,18 +103,18 @@ $Charset->{'iso-8859-2'}
 = $IANACharset->{'latin2'}
 = $IANACharset->{'l2'}
 = $IANACharset->{'csisolatin2'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-2:1987' => PRIMARY_CHARSET_NAME,
+    'iso_8859-2:1987' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-101' => REGISTERED_CHARSET_NAME,
     'iso_8859-2' => REGISTERED_CHARSET_NAME,
-    'iso-8859-2' => PREFERRED_CHARSET_NAME,
+    'iso-8859-2' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'latin2' => REGISTERED_CHARSET_NAME,
     'l2' => REGISTERED_CHARSET_NAME,
     'csisolatin2' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-3'}
 = $IANACharset->{'iso_8859-3:1988'}
@@ -110,18 +124,18 @@ $Charset->{'iso-8859-3'}
 = $IANACharset->{'latin3'}
 = $IANACharset->{'l3'}
 = $IANACharset->{'csisolatin3'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-3:1988' => PRIMARY_CHARSET_NAME,
+    'iso_8859-3:1988' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-109' => REGISTERED_CHARSET_NAME,
     'iso_8859-3' => REGISTERED_CHARSET_NAME,
-    'iso-8859-3' => PREFERRED_CHARSET_NAME,
+    'iso-8859-3' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'latin3' => REGISTERED_CHARSET_NAME,
     'l3' => REGISTERED_CHARSET_NAME,
     'csisolatin3' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-4'}
 = $IANACharset->{'iso_8859-4:1988'}
@@ -131,18 +145,18 @@ $Charset->{'iso-8859-4'}
 = $IANACharset->{'latin4'}
 = $IANACharset->{'l4'}
 = $IANACharset->{'csisolatin4'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-4:1988' => PRIMARY_CHARSET_NAME,
+    'iso_8859-4:1988' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-110' => REGISTERED_CHARSET_NAME,
     'iso_8859-4' => REGISTERED_CHARSET_NAME,
-    'iso-8859-4' => PREFERRED_CHARSET_NAME,
+    'iso-8859-4' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'latin4' => REGISTERED_CHARSET_NAME,
     'l4' => REGISTERED_CHARSET_NAME,
     'csisolatin4' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-5'}
 = $IANACharset->{'iso_8859-5:1988'}
@@ -151,17 +165,17 @@ $Charset->{'iso-8859-5'}
 = $IANACharset->{'iso-8859-5'}
 = $IANACharset->{'cyrillic'}
 = $IANACharset->{'csisolatincyrillic'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-5:1988' => PRIMARY_CHARSET_NAME,
+    'iso_8859-5:1988' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-144' => REGISTERED_CHARSET_NAME,
     'iso_8859-5' => REGISTERED_CHARSET_NAME,
-    'iso-8859-5' => PREFERRED_CHARSET_NAME,
+    'iso-8859-5' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cyrillic' => REGISTERED_CHARSET_NAME,
     'csisolatincyrillic' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-6'}
 = $IANACharset->{'iso_8859-6:1987'}
@@ -172,12 +186,12 @@ $Charset->{'iso-8859-6'}
 = $IANACharset->{'asmo-708'}
 = $IANACharset->{'arabic'}
 = $IANACharset->{'csisolatinarabic'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-6:1987' => PRIMARY_CHARSET_NAME,
+    'iso_8859-6:1987' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-127' => REGISTERED_CHARSET_NAME,
     'iso_8859-6' => REGISTERED_CHARSET_NAME,
-    'iso-8859-6' => PREFERRED_CHARSET_NAME,
+    'iso-8859-6' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'ecma-114' => REGISTERED_CHARSET_NAME,
     'asmo-708' => REGISTERED_CHARSET_NAME,
     'arabic' => REGISTERED_CHARSET_NAME,
@@ -188,7 +202,7 @@ $Charset->{'iso-8859-6'}
       ## but have same character names (maybe).
       ## NOTE: According to RFC 2046, charset left-hand half of "iso-8859-6"
       ## is same as "us-ascii".
-};
+});
 
 $Charset->{'iso-8859-7'}
 = $IANACharset->{'iso_8859-7:1987'}
@@ -200,12 +214,12 @@ $Charset->{'iso-8859-7'}
 = $IANACharset->{'greek'}
 = $IANACharset->{'greek8'}
 = $IANACharset->{'csisolatingreek'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-7:1987' => PRIMARY_CHARSET_NAME,
+    'iso_8859-7:1987' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-126' => REGISTERED_CHARSET_NAME,
     'iso_8859-7' => REGISTERED_CHARSET_NAME,
-    'iso-8859-7' => PREFERRED_CHARSET_NAME,
+    'iso-8859-7' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'elot_928' => REGISTERED_CHARSET_NAME,
     'ecma-118' => REGISTERED_CHARSET_NAME,
     'greek' => REGISTERED_CHARSET_NAME,
@@ -213,7 +227,7 @@ $Charset->{'iso-8859-7'}
     'csisolatingreek' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-8'}
 = $IANACharset->{'iso_8859-8:1988'}
@@ -222,17 +236,17 @@ $Charset->{'iso-8859-8'}
 = $IANACharset->{'iso-8859-8'}
 = $IANACharset->{'hebrew'}
 = $IANACharset->{'csisolatinhebrew'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-8:1988' => PRIMARY_CHARSET_NAME,
+    'iso_8859-8:1988' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-138' => REGISTERED_CHARSET_NAME,
     'iso_8859-8' => REGISTERED_CHARSET_NAME,
-    'iso-8859-8' => PREFERRED_CHARSET_NAME,
+    'iso-8859-8' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'hebrew' => REGISTERED_CHARSET_NAME,
     'csisolatinhebrew' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-9'}
 = $IANACharset->{'iso_8859-9:1989'}
@@ -242,18 +256,18 @@ $Charset->{'iso-8859-9'}
 = $IANACharset->{'latin5'}
 = $IANACharset->{'l5'}
 = $IANACharset->{'csisolatin5'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_8859-9:1989' => PRIMARY_CHARSET_NAME,
+    'iso_8859-9:1989' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-148' => REGISTERED_CHARSET_NAME,
     'iso_8859-9' => REGISTERED_CHARSET_NAME,
-    'iso-8859-9' => PREFERRED_CHARSET_NAME,
+    'iso-8859-9' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'latin5' => REGISTERED_CHARSET_NAME,
     'l5' => REGISTERED_CHARSET_NAME,
     'csisolatin5' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-8859-10'}
 = $IANACharset->{'iso-8859-10'}
@@ -262,9 +276,9 @@ $Charset->{'iso-8859-10'}
 = $IANACharset->{'iso_8859-10:1992'}
 = $IANACharset->{'csisolatin6'}
 = $IANACharset->{'latin6'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso-8859-10' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME,
+    'iso-8859-10' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-157' => REGISTERED_CHARSET_NAME,
     'l6' => REGISTERED_CHARSET_NAME,
     'iso_8859-10:1992' => REGISTERED_CHARSET_NAME,
@@ -272,164 +286,164 @@ $Charset->{'iso-8859-10'}
     'latin6' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso_6937-2-add'}
 = $IANACharset->{'iso_6937-2-add'}
 = $IANACharset->{'iso-ir-142'}
 = $IANACharset->{'csisotextcomm'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso_6937-2-add' => PRIMARY_CHARSET_NAME,
+    'iso_6937-2-add' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-142' => REGISTERED_CHARSET_NAME,
     'csisotextcomm' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'jis_x0201'}
 = $IANACharset->{'jis_x0201'}
 = $IANACharset->{'x0201'}
 = $IANACharset->{'cshalfwidthkatakana'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'jis_x0201' => PRIMARY_CHARSET_NAME,
+    'jis_x0201' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'x0201' => REGISTERED_CHARSET_NAME,
     'cshalfwidthkatakana' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'jis_encoding'}
 = $IANACharset->{'jis_encoding'}
 = $IANACharset->{'csjisencoding'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'jis_encoding' => PRIMARY_CHARSET_NAME,
+    'jis_encoding' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csjisencoding' => REGISTERED_CHARSET_NAME,
   },
   ## NOTE: What is this?
-};
+});
 
 $Charset->{'shift_jis'}
 = $IANACharset->{'shift_jis'}
 = $IANACharset->{'ms_kanji'}
 = $IANACharset->{'csshiftjis'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'shift_jis' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME,
+    'shift_jis' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'ms_kanji' => REGISTERED_CHARSET_NAME,
     'csshiftjis' => REGISTERED_CHARSET_NAME,
   },
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'x-sjis'}
 = $IANACharset->{'x-sjis'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
     'x-sjis' => UNREGISTERED_CHARSET_NAME,
   },
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'euc-jp'}
 = $IANACharset->{'extended_unix_code_packed_format_for_japanese'}
 = $IANACharset->{'cseucpkdfmtjapanese'}
 = $IANACharset->{'euc-jp'}
 = $IANACharset->{'x-euc-jp'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'extended_unix_code_packed_format_for_japanese' => PRIMARY_CHARSET_NAME,
+    'extended_unix_code_packed_format_for_japanese' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cseucpkdfmtjapanese' => REGISTERED_CHARSET_NAME,
-    'euc-jp' => PREFERRED_CHARSET_NAME,
+    'euc-jp' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'x-euc-jp'}
 = $IANACharset->{'x-euc-jp'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
     'x-euc-jp' => UNREGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'extended_unix_code_fixed_width_for_japanese'}
 = $IANACharset->{'extended_unix_code_fixed_width_for_japanese'}
 = $IANACharset->{'cseucfixwidjapanese'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'extended_unix_code_fixed_width_for_japanese' => PRIMARY_CHARSET_NAME,
+    'extended_unix_code_fixed_width_for_japanese' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cseucfixwidjapanese' => REGISTERED_CHARSET_NAME,
   },
-};
+});
 
 ## TODO: ...
 
 $Charset->{'euc-kr'}
 = $IANACharset->{'euc-kr'}
 = $IANACharset->{'cseuckr'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'euc-kr' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME,
+    'euc-kr' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cseuckr' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 $Charset->{'iso-2022-jp'}
 = $IANACharset->{'iso-2022-jp'}
 = $IANACharset->{'csiso2022jp'}
 = $IANACharset->{'iso2022jp'}
 = $IANACharset->{'junet-code'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso-2022-jp' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME,
+    'iso-2022-jp' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csiso2022jp' => REGISTERED_CHARSET_NAME,
     'iso2022jp' => UNREGISTERED_CHARSET_NAME,
     'junet-code' => UNREGISTERED_CHARSET_NAME,
   },
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'iso-2022-jp-2'}
 = $IANACharset->{'iso-2022-jp-2'}
 = $IANACharset->{'csiso2022jp2'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'iso-2022-jp-2' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME,
+    'iso-2022-jp-2' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csiso2022jp2' => REGISTERED_CHARSET_NAME,
   },
   mime_text_suitable => 1,
-};
+});
 
 ## TODO: ...
 
 $Charset->{'utf-8'}
 = $IANACharset->{'utf-8'}
 = $IANACharset->{'x-utf-8'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'utf-8' => PRIMARY_CHARSET_NAME,
+    'utf-8' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'x-utf-8' => UNREGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'utf-8n'}
 = $IANACharset->{'utf-8n'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
     'utf-8n' => UNREGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
   mime_text_suitable => 1,
-};
+});
 
 ## TODO: ...
 
@@ -438,119 +452,210 @@ $Charset->{'gbk'}
 = $IANACharset->{'cp936'}
 = $IANACharset->{'ms936'}
 = $IANACharset->{'windows-936'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'gbk' => PRIMARY_CHARSET_NAME,
+    'gbk' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cp936' => REGISTERED_CHARSET_NAME,
     'ms936' => REGISTERED_CHARSET_NAME,
     'windows-936' => REGISTERED_CHARSET_NAME,
   },
   iana_status => STATUS_COMMON | STATUS_OBSOLETE,
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'gb18030'}
 = $IANACharset->{'gb18030'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'gb18030' => PRIMARY_CHARSET_NAME,
+    'gb18030' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
   iana_status => STATUS_COMMON,
   mime_text_suitable => 1,
-};
+});
 
 ## TODO: ...
 
 $Charset->{'utf-16be'}
 = $IANACharset->{'utf-16be'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'utf-16be' => PRIMARY_CHARSET_NAME,
+    'utf-16be' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
-};
+});
 
 $Charset->{'utf-16le'}
 = $IANACharset->{'utf-16le'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'utf-16le' => PRIMARY_CHARSET_NAME,
+    'utf-16le' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
-};
+});
 
 $Charset->{'utf-16'}
 = $IANACharset->{'utf-16'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'utf-16' => PRIMARY_CHARSET_NAME,
+    'utf-16' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
-};
+});
 
 ## TODO: ...
 
 $Charset->{'windows-31j'}
 = $IANACharset->{'windows-31j'}
 = $IANACharset->{'cswindows31j'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'windows-31j' => PRIMARY_CHARSET_NAME,
+    'windows-31j' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cswindows31j' => REGISTERED_CHARSET_NAME,
   },
   iana_status => STATUS_LIMITED_USE, # maybe
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'gb2312'}
 = $IANACharset->{'gb2312'}
 = $IANACharset->{'csgb2312'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'gb2312' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME,
+    'gb2312' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csgb2312' => REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
   mime_text_suitable => 1,
-};
+});
 
 $Charset->{'big5'}
 = $IANACharset->{'big5'}
 = $IANACharset->{'csbig5'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'big5' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME,
+    'big5' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csbig5' => REGISTERED_CHARSET_NAME,
   },
   mime_text_suitable => 1,
-};
+});
 
 ## TODO: ...
 
 $Charset->{'big5-hkscs'}
 = $IANACharset->{'big5-hkscs'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'big5-hkscs' => PRIMARY_CHARSET_NAME,
+    'big5-hkscs' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
   mime_text_suitable => 1,
-};
+});
 
 ## TODO: ...
 
 $Charset->{'windows-1252'}
 = $IANACharset->{'windows-1252'}
-= {
+= __PACKAGE__->new ({
   iana_names => {
-    'windows-1252' => PRIMARY_CHARSET_NAME,
+    'windows-1252' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
   is_html_ascii_superset => 1,
-};
+});
 
 ## TODO: ...
 
+sub new ($$) {
+  return bless $_[1], $_[0];
+} # new
+
+## NOTE: A class method
+sub get_by_iana_name ($$) {
+  my $name = $_[1];
+  $name =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+  unless ($IANACharset->{$name}) {
+    $IANACharset->{$name} = __PACKAGE__->new ({
+      iana_names => {
+        $name => UNREGISTERED_CHARSET_NAME,
+      },
+    });
+  }
+  return $IANACharset->{$name};
+} # get_by_iana_name
+
+sub get_perl_encoding ($;%) {
+  my ($self, %opt) = @_;
+  
+  require Encode;
+
+  if ($opt{allow_error_reporting}) {
+    for my $perl_name (keys %{$self->{perl_names} or {}}) {
+      my $perl_status = $self->{perl_names}->{$perl_name};
+      next unless $perl_status & ERROR_REPORTING_ENCODING_IMPL;
+      next unless $perl_status & FALLBACK_ENCODING_IMPL;
+      
+      my $e = Encode::find_encoding ($perl_name);
+      if ($e) {
+        return ($e, $perl_status);
+      }
+    }
+  }
+  
+  for my $perl_name (keys %{$self->{perl_names} or {}}) {
+    my $perl_status = $self->{perl_names}->{$perl_name};
+    next if $perl_status & ERROR_REPORTING_ENCODING_IMPL;
+    next if $perl_status & FALLBACK_ENCODING_IMPL;
+    
+    my $e = Encode::find_encoding ($perl_name);
+    if ($e) {
+      return ($e, $perl_status);
+    }
+  }
+  
+  if ($opt{allow_fallback}) {
+    for my $perl_name (keys %{$self->{perl_names} or {}}) {
+      my $perl_status = $self->{perl_names}->{$perl_name};
+      next unless $perl_status & FALLBACK_ENCODING_IMPL;
+      
+      my $e = Encode::find_encoding ($perl_name);
+      if ($e) {
+        return ($e, $perl_status);
+      }
+    }
+
+    for my $iana_name (keys %{$self->{iana_names} or {}}) {
+      my $e = Encode::find_encoding ($iana_name);
+      if ($e) {
+        return ($e, FALLBACK_ENCODING_IMPL);
+      }
+    }
+  }
+  
+  return (undef, 0);
+} # get_perl_encoding
+
+sub get_iana_name ($) {
+  my $self = shift;
+  
+  my $primary;
+  my $other;
+  for my $iana_name (keys %{$self->{iana_names} or {}}) {
+    my $name_status = $self->{iana_names}->{$iana_name};
+    if ($name_status & PREFERRED_CHARSET_NAME) {
+      return $iana_name;
+    } elsif ($name_status & PRIMARY_CHARSET_NAME) {
+      $primary = $iana_name;
+    } elsif ($name_status & REGISTERED_CHARSET_NAME) {
+      $other = $iana_name;
+    } else {
+      $other ||= $iana_name;
+    }
+  }
+
+  return $primary || $other;
+} # get_iana_name
+
+## NOTE: A non-method function
 sub is_syntactically_valid_iana_charset_name ($) {
   my $name = shift;
   return $name =~ /\A[\x20-\x7E]{1,40}\z/;
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2007/12/22 06:29:32 $
+## $Date: 2008/05/17 08:46:02 $
 
