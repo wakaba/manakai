@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.130 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.131 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -337,6 +337,12 @@ sub parse_byte_string ($$$$;$) {
   my $bytes_s = ref $_[0] ? $_[0] : \($_[0]);
   my $s;
 
+  my $onerror = $_[2] || sub {
+    my (%opt) = @_;
+    warn "Parse error ($opt{type})\n";
+  };
+  $self->{parse_error} = $onerror; # updated later by parse_char_string
+
   ## HTML5 encoding sniffing algorithm
   require Message::Charset::Info;
   my $charset;
@@ -404,6 +410,10 @@ sub parse_byte_string ($$$$;$) {
           (allow_error_reporting => 1,
            allow_fallback => 1);
       if ($e) {
+        $self->{parse_error}->(level => $self->{must_level}, type => 'sniffing:chardet', ## TODO: type name
+                        value => $charset_name,
+                        level => $self->{info_level},
+                        line => 1, column => 1);
         $self->{confident} = 0;
         last SNIFFING;
       }
@@ -416,51 +426,70 @@ sub parse_byte_string ($$$$;$) {
         ## detectable in the step 6.
     ($e, $e_status) = $charset->get_perl_encoding (allow_error_reporting => 1,
                                                    allow_fallback => 1);
+    $self->{parse_error}->(level => $self->{must_level}, type => 'sniffing:default', ## TODO: type name
+                    value => 'windows-1252',
+                    level => $self->{info_level},
+                    line => 1, column => 1);
     $self->{confident} = 0;
   } # SNIFFING
 
+  $self->{input_encoding} = $charset->get_iana_name;
   if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
-    
+    $self->{parse_error}->(level => $self->{must_level}, type => 'chardecode:fallback', ## TODO: type name
+                    value => $e->name,
+                    level => $self->{unsupported_level},
+                    line => 1, column => 1);
   } elsif (not ($e_status &
                 Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL())) {
-    
+    $self->{parse_error}->(level => $self->{must_level}, type => 'chardecode:no error', ## TODO: type name
+                    value => $self->{input_encoding},
+                    level => $self->{unsupported_level},
+                    line => 1, column => 1);
   }
   $s = \ $e->decode ($$bytes_s);
-  $self->{input_encoding} = $charset->get_iana_name;
 
   $self->{change_encoding} = sub {
     my $self = shift;
-    my $charset_name = lc shift;
+    $charset_name = shift;
     my $token = shift;
-    ## TODO: if $charset_name is supported
-    ## TODO: normalize charset name
 
-    ## "Change the encoding" algorithm:
+    $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
+    ($e, $e_status) = $charset->get_perl_encoding
+        (allow_error_reporting => 1, allow_fallback => 1);
+    
+    if ($e) { # if supported
+      ## "Change the encoding" algorithm:
 
-    ## Step 1    
-    if ($charset_name eq 'utf-16') { ## ISSUE: UTF-16BE -> UTF-8? UTF-16LE -> UTF-8?
-      $charset_name = 'utf-8';
+      ## Step 1    
+      if ($charset->{iana_names}->{'utf-16'}) { ## ISSUE: UTF-16BE -> UTF-8? UTF-16LE -> UTF-8?
+        $charset = Message::Charset::Info->get_by_iana_name ('utf-8');
+        ($e, $e_status) = $charset->get_perl_encoding;
+      }
+      $charset_name = $charset->get_iana_name;
+      
+      ## Step 2
+      if (defined $self->{input_encoding} and
+          $self->{input_encoding} eq $charset_name) {
+        $self->{parse_error}->(level => $self->{must_level}, type => 'charset label:matching', ## TODO: type
+                        value => $charset_name,
+                        level => $self->{info_level});
+        $self->{confident} = 1;
+        return;
+      }
+
+      $self->{parse_error}->(level => $self->{must_level}, type => 'charset label detected:'.$self->{input_encoding}.
+          ':'.$charset_name, level => 'w', token => $token);
+      
+      ## Step 3
+      # if (can) {
+        ## change the encoding on the fly.
+        #$self->{confident} = 1;
+        #return;
+      # }
+      
+      ## Step 4
+      throw Whatpm::HTML::RestartParser ();
     }
-
-    ## Step 2
-    if (defined $self->{input_encoding} and
-        $self->{input_encoding} eq $charset_name) {
-      $self->{confident} = 1;
-      return;
-    }
-
-    $self->{parse_error}->(level => $self->{must_level}, type => 'charset label detected:'.$self->{input_encoding}.
-        ':'.$charset_name, level => 'w', token => $token);
-
-    ## Step 3
-    # if (can) {
-      ## change the encoding on the fly.
-      #$self->{confident} = 1;
-      #return;
-    # }
-
-    ## Step 4
-    throw Whatpm::HTML::RestartParser (charset => $charset_name);
   }; # $self->{change_encoding}
 
   my @args = @_; shift @args; # $s
@@ -468,9 +497,22 @@ sub parse_byte_string ($$$$;$) {
   try {
     $return = $self->parse_char_string ($s, @args);  
   } catch Whatpm::HTML::RestartParser with {
-    my $charset_name = shift->{charset};
-    $s = \ (Encode::decode ($charset_name, $$bytes_s));    
-    $self->{input_encoding} = $charset_name; ## TODO: normalize
+    ## NOTE: Invoked after {change_encoding}.
+
+    $self->{input_encoding} = $charset->get_iana_name;
+    if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
+      $self->{parse_error}->(level => $self->{must_level}, type => 'chardecode:fallback', ## TODO: type name
+                      value => $e->name,
+                      level => $self->{unsupported_level},
+                      line => 1, column => 1);
+    } elsif (not ($e_status &
+                  Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL())) {
+      $self->{parse_error}->(level => $self->{must_level}, type => 'chardecode:no error', ## TODO: type name
+                      value => $self->{input_encoding},
+                      level => $self->{unsupported_level},
+                      line => 1, column => 1);
+    }
+    $s = \ $e->decode ($$bytes_s);
     $self->{confident} = 1;
     $return = $self->parse_char_string ($s, @args);
   };
@@ -579,7 +621,14 @@ sub parse_string ($$$;$) {
 
 sub new ($) {
   my $class = shift;
-  my $self = bless {}, $class;
+  my $self = bless {
+    must_level => 'm',
+    should_level => 's',
+    good_level => 'w',
+    warn_level => 'w',
+    info_level => 'i',
+    unsupported_level => 'u',
+  }, $class;
   $self->{set_next_char} = sub {
     $self->{next_char} = -1;
   };
@@ -5278,8 +5327,10 @@ sub _tree_construction_main ($) {
               my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
 
               unless ($self->{confident}) {
-                if ($token->{attributes}->{charset}) { ## TODO: And if supported
+                if ($token->{attributes}->{charset}) {
                   
+                  ## NOTE: Whether the encoding is supported or not is handled
+                  ## in the {change_encoding} callback.
                   $self->{change_encoding}
                       ->($self, $token->{attributes}->{charset}->{value},
                          $token);
@@ -5289,13 +5340,14 @@ sub _tree_construction_main ($) {
                                            $token->{attributes}->{charset}
                                                ->{has_reference});
                 } elsif ($token->{attributes}->{content}) {
-                  ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
                   if ($token->{attributes}->{content}->{value}
                       =~ /\A[^;]*;[\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
                           [\x09-\x0D\x20]*=
                           [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                           ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
                     
+                    ## NOTE: Whether the encoding is supported or not is handled
+                    ## in the {change_encoding} callback.
                     $self->{change_encoding}
                         ->($self, defined $1 ? $1 : defined $2 ? $2 : $3,
                            $token);
@@ -7754,8 +7806,10 @@ sub _tree_construction_main ($) {
         my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
 
         unless ($self->{confident}) {
-          if ($token->{attributes}->{charset}) { ## TODO: And if supported
+          if ($token->{attributes}->{charset}) {
             
+            ## NOTE: Whether the encoding is supported or not is handled
+            ## in the {change_encoding} callback.
             $self->{change_encoding}
                 ->($self, $token->{attributes}->{charset}->{value}, $token);
             
@@ -7764,13 +7818,14 @@ sub _tree_construction_main ($) {
                                      $token->{attributes}->{charset}
                                          ->{has_reference});
           } elsif ($token->{attributes}->{content}) {
-            ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
             if ($token->{attributes}->{content}->{value}
                 =~ /\A[^;]*;[\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
                     [\x09-\x0D\x20]*=
                     [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                     ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
               
+              ## NOTE: Whether the encoding is supported or not is handled
+              ## in the {change_encoding} callback.
               $self->{change_encoding}
                   ->($self, defined $1 ? $1 : defined $2 ? $2 : $3, $token);
               $meta_el->[0]->get_attribute_node_ns (undef, 'content')
@@ -9139,4 +9194,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/17 04:54:10 $
+# $Date: 2008/05/17 05:34:23 $

@@ -1,5 +1,12 @@
 2008-05-17  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src (parse_byte_string): Report various status
+	of the sniffing as info-level errors.  Support for new
+	decoding framework in parser resestting.
+	(new): Various default error levels were not set.
+
+2008-05-17  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src (parse_byte_string): HTML5 encoding siniffing
 	algorithm, except for the actual sniffing, is implemented
 	with new framework with Message::Charset::Info.
