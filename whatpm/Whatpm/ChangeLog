@@ -1,5 +1,12 @@
 2008-05-17  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src (parse_byte_string): Use streaming decoder
+	rather than converting the whole byte string and then parsing.
+	Propagate errors in character encoding layer.
+	(get_next_token): Precise error reporting for |bare stago| error.
+
+2008-05-17  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src (parse_char_stream): New method.
 	(parse_char_string): This method is now defined as an invocation
 	of the |parse_char_stream| method.

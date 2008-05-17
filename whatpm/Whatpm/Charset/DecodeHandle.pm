@@ -526,11 +526,33 @@ sub uri_to_name ($$$) {
   return undef;
 } # uri_to_name
 
+require IO::Handle;
+
+package Whatpm::Charset::DecodeHandle::ByteBuffer;
+
+sub new ($$) {
+  my $self = bless {
+    buffer => '',
+  }, shift;
+  $self->{filehandle} = shift;
+  return $self;
+} # new
+
+sub read {
+  my $self = shift;
+  my $pos = length $self->{buffer};
+  my $r = $self->{filehandle}->read ($self->{buffer}, $_[1], $pos);
+  substr ($_[0], $_[2]) = substr ($self->{buffer}, $pos);
+  return $r;
+} # read
+
+sub close { $_[0]->{filehandle}->close }
+
 package Whatpm::Charset::DecodeHandle::Encode;
 
 sub charset ($) { $_[0]->{charset} }
 
-sub close ($) { CORE::close $_[0]->{filehandle} }
+sub close ($) { $_[0]->{filehandle}->close }
 
 sub getc ($) {
   my $self = $_[0];
@@ -538,16 +560,16 @@ sub getc ($) {
   
   my $error;
   if ($self->{continue}) {
-    if (read $self->{filehandle}, $self->{byte_buffer}, 256,
-        length $self->{byte_buffer}) {
+    if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
+                                   length $self->{byte_buffer})) {
       # 
     } else {
       $error = 1;
     }
     $self->{continue} = 0;
   } elsif (512 > length $self->{byte_buffer}) {
-    read $self->{filehandle}, $self->{byte_buffer}, 256,
-        length $self->{byte_buffer};
+    $self->{filehandle}->read ($self->{byte_buffer}, 256,
+                               length $self->{byte_buffer});
   }
 
   my $r;
@@ -613,16 +635,16 @@ sub getc ($) {
 
   my $error;
   if ($self->{continue}) {
-    if (read $self->{filehandle}, $self->{byte_buffer}, 256,
-        length $self->{byte_buffer}) {
+    if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
+                                   length $self->{byte_buffer})) {
       # 
     } else {
       $error = 1;
     }
     $self->{continue} = 0;
   } elsif (512 > length $self->{byte_buffer}) {
-    read $self->{filehandle}, $self->{byte_buffer}, 256,
-        length $self->{byte_buffer};
+    $self->{filehandle}->read ($self->{byte_buffer}, 256,
+                               length $self->{byte_buffer});
   }
   
   my $r;
@@ -683,16 +705,16 @@ sub getc ($) {
   A: {
     my $error;
     if ($self->{continue}) {
-      if (read $self->{filehandle}, $self->{byte_buffer}, 256,
-          length $self->{byte_buffer}) {
+      if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
+                                     length $self->{byte_buffer})) {
         # 
       } else {
         $error = 1;
       }
       $self->{continue} = 0;
     } elsif (512 > length $self->{byte_buffer}) {
-      read $self->{filehandle}, $self->{byte_buffer}, 256,
-          length $self->{byte_buffer};
+      $self->{filehandle}->read ($self->{byte_buffer}, 256,
+                                 length $self->{byte_buffer});
     }
     
     unless ($error) {
@@ -797,16 +819,16 @@ sub getc ($) {
 
   my $error;
   if ($self->{continue}) {
-    if (read $self->{filehandle}, $self->{byte_buffer}, 256,
-        length $self->{byte_buffer}) {
+    if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
+                                   length $self->{byte_buffer})) {
       # 
     } else {
       $error = 1;
     }
     $self->{continue} = 0;
   } elsif (512 > length $self->{byte_buffer}) {
-    read $self->{filehandle}, $self->{byte_buffer}, 256,
-        length $self->{byte_buffer};
+    $self->{filehandle}->read ($self->{byte_buffer}, 256,
+                               length $self->{byte_buffer});
   }
 
   my $r;
@@ -1425,4 +1447,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2007/07/15 16:51:14 $
+## $Date: 2008/05/17 12:29:24 $

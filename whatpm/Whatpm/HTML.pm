@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.132 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.133 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -334,8 +334,7 @@ my $c1_entity_char = {
 sub parse_byte_string ($$$$;$) {
   my $self = ref $_[0] ? shift : shift->new;
   my $charset_name = shift;
-  my $bytes_s = ref $_[0] ? $_[0] : \($_[0]);
-  my $s;
+  open my $byte_stream, '<', ref $_[0] ? $_[0] : \($_[0]);
 
   my $onerror = $_[2] || sub {
     my (%opt) = @_;
@@ -346,7 +345,8 @@ sub parse_byte_string ($$$$;$) {
   ## HTML5 encoding sniffing algorithm
   require Message::Charset::Info;
   my $charset;
-  my ($e, $e_status);
+  my $buffer;
+  my ($char_stream, $e_status);
 
   SNIFFING: {
 
@@ -355,39 +355,45 @@ sub parse_byte_string ($$$$;$) {
       $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
 
       ## ISSUE: Unsupported encoding is not ignored according to the spec.
-      ($e, $e_status) = $charset->get_perl_encoding
-          (allow_error_reporting => 1,
+      ($char_stream, $e_status) = $charset->get_decode_handle
+          ($byte_stream, allow_error_reporting => 1,
            allow_fallback => 1);
-      if ($e) {
+      if ($char_stream) {
         $self->{confident} = 1;
         last SNIFFING;
+      } else {
+        ## TODO: unsupported error
       }
     }
 
     ## Step 2
-    # wait
+    my $byte_buffer = '';
+    for (1..1024) {
+      my $char = $byte_stream->getc;
+      last unless defined $char;
+      $byte_buffer .= $char;
+    } ## TODO: timeout
 
     ## Step 3
-    my $head = substr ($$bytes_s, 0, 3);
-    if ($head =~ /^\xFE\xFF/) {
+    if ($byte_buffer =~ /^\xFE\xFF/) {
       $charset = Message::Charset::Info->get_by_iana_name ('utf-16be');
-      ($e, $e_status) = $charset->get_perl_encoding
-          (allow_error_reporting => 1,
-           allow_fallback => 1);
+      ($char_stream, $e_status) = $charset->get_decode_handle
+          ($byte_stream, allow_error_reporting => 1,
+           allow_fallback => 1, byte_buffer => \$byte_buffer);
       $self->{confident} = 1;
       last SNIFFING;
-    } elsif ($head =~ /^\xFF\xFE/) {
+    } elsif ($byte_buffer =~ /^\xFF\xFE/) {
       $charset = Message::Charset::Info->get_by_iana_name ('utf-16le');
-      ($e, $e_status) = $charset->get_perl_encoding
-          (allow_error_reporting => 1,
-           allow_fallback => 1);
+      ($char_stream, $e_status) = $charset->get_decode_handle
+          ($byte_stream, allow_error_reporting => 1,
+           allow_fallback => 1, byte_buffer => \$byte_buffer);
       $self->{confident} = 1;
       last SNIFFING;
-    } elsif ($head eq "\xEF\xBB\xBF") {
+    } elsif ($byte_buffer =~ /^\xEF\xBB\xBF/) {
       $charset = Message::Charset::Info->get_by_iana_name ('utf-8');
-      ($e, $e_status) = $charset->get_perl_encoding
-          (allow_error_reporting => 1,
-           allow_fallback => 1);
+      ($char_stream, $e_status) = $charset->get_decode_handle
+          ($byte_stream, allow_error_reporting => 1,
+           allow_fallback => 1, byte_buffer => \$byte_buffer);
       $self->{confident} = 1;
       last SNIFFING;
     }
@@ -401,15 +407,19 @@ sub parse_byte_string ($$$$;$) {
     ## Step 6
     require Whatpm::Charset::UniversalCharDet;
     $charset_name = Whatpm::Charset::UniversalCharDet->detect_byte_string
-        (substr ($$bytes_s, 0, 1024));
+        ($byte_buffer);
     if (defined $charset_name) {
       $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
 
       ## ISSUE: Unsupported encoding is not ignored according to the spec.
-      ($e, $e_status) = $charset->get_perl_encoding
-          (allow_error_reporting => 1,
-           allow_fallback => 1);
-      if ($e) {
+      require Whatpm::Charset::DecodeHandle;
+      $buffer = Whatpm::Charset::DecodeHandle::ByteBuffer->new
+          ($byte_stream);
+      ($char_stream, $e_status) = $charset->get_decode_handle
+          ($buffer, allow_error_reporting => 1,
+           allow_fallback => 1, byte_buffer => \$byte_buffer);
+      if ($char_stream) {
+        $buffer->{buffer} = $byte_buffer;
         $self->{parse_error}->(level => $self->{must_level}, type => 'sniffing:chardet', ## TODO: type name
                         value => $charset_name,
                         level => $self->{info_level},
@@ -424,8 +434,15 @@ sub parse_byte_string ($$$$;$) {
     $charset = Message::Charset::Info->get_by_iana_name ('windows-1252');
         ## NOTE: We choose |windows-1252| here, since |utf-8| should be 
         ## detectable in the step 6.
-    ($e, $e_status) = $charset->get_perl_encoding (allow_error_reporting => 1,
-                                                   allow_fallback => 1);
+    require Whatpm::Charset::DecodeHandle;
+    $buffer = Whatpm::Charset::DecodeHandle::ByteBuffer->new
+        ($byte_stream);
+    ($char_stream, $e_status)
+        = $charset->get_decode_handle ($buffer,
+                                       allow_error_reporting => 1,
+                                       allow_fallback => 1,
+                                       byte_buffer => \$byte_buffer);
+    $buffer->{buffer} = $byte_buffer;
     $self->{parse_error}->(level => $self->{must_level}, type => 'sniffing:default', ## TODO: type name
                     value => 'windows-1252',
                     level => $self->{info_level},
@@ -436,7 +453,7 @@ sub parse_byte_string ($$$$;$) {
   $self->{input_encoding} = $charset->get_iana_name;
   if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
     $self->{parse_error}->(level => $self->{must_level}, type => 'chardecode:fallback', ## TODO: type name
-                    value => $e->name,
+                    value => $self->{input_encoding},
                     level => $self->{unsupported_level},
                     line => 1, column => 1);
   } elsif (not ($e_status &
@@ -446,7 +463,6 @@ sub parse_byte_string ($$$$;$) {
                     level => $self->{unsupported_level},
                     line => 1, column => 1);
   }
-  $s = \ $e->decode ($$bytes_s);
 
   $self->{change_encoding} = sub {
     my $self = shift;
@@ -454,16 +470,19 @@ sub parse_byte_string ($$$$;$) {
     my $token = shift;
 
     $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
-    ($e, $e_status) = $charset->get_perl_encoding
-        (allow_error_reporting => 1, allow_fallback => 1);
+    ($char_stream, $e_status) = $charset->get_decode_handle
+        ($byte_stream, allow_error_reporting => 1, allow_fallback => 1,
+         byte_buffer => \ $buffer->{buffer});
     
-    if ($e) { # if supported
+    if ($char_stream) { # if supported
       ## "Change the encoding" algorithm:
 
       ## Step 1    
       if ($charset->{iana_names}->{'utf-16'}) { ## ISSUE: UTF-16BE -> UTF-8? UTF-16LE -> UTF-8?
         $charset = Message::Charset::Info->get_by_iana_name ('utf-8');
-        ($e, $e_status) = $charset->get_perl_encoding;
+        ($char_stream, $e_status) = $charset->get_decode_handle
+            ($byte_stream,
+             byte_buffer => \ $buffer->{buffer});
       }
       $charset_name = $charset->get_iana_name;
       
@@ -492,17 +511,26 @@ sub parse_byte_string ($$$$;$) {
     }
   }; # $self->{change_encoding}
 
+  my $char_onerror = sub {
+    my (undef, $type, %opt) = @_;
+    $self->{parse_error}->(level => $self->{must_level}, %opt, type => $type);
+    if ($opt{octets}) {
+      ${$opt{octets}} = "\x{FFFD}"; # relacement character
+    }
+  };
+  $char_stream->onerror ($char_onerror);
+
   my @args = @_; shift @args; # $s
   my $return;
   try {
-    $return = $self->parse_char_string ($s, @args);  
+    $return = $self->parse_char_stream ($char_stream, @args);  
   } catch Whatpm::HTML::RestartParser with {
     ## NOTE: Invoked after {change_encoding}.
 
     $self->{input_encoding} = $charset->get_iana_name;
     if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
       $self->{parse_error}->(level => $self->{must_level}, type => 'chardecode:fallback', ## TODO: type name
-                      value => $e->name,
+                      value => $self->{input_encoding},
                       level => $self->{unsupported_level},
                       line => 1, column => 1);
     } elsif (not ($e_status &
@@ -512,9 +540,9 @@ sub parse_byte_string ($$$$;$) {
                       level => $self->{unsupported_level},
                       line => 1, column => 1);
     }
-    $s = \ $e->decode ($$bytes_s);
     $self->{confident} = 1;
-    $return = $self->parse_char_string ($s, @args);
+    $char_stream->onerror ($char_onerror);
+    $return = $self->parse_char_stream ($char_stream, @args);
   };
   return $return;
 } # parse_byte_string
@@ -1062,7 +1090,9 @@ sub _get_next_token ($) {
           redo A;
         } else {
           
-          $self->{parse_error}->(level => $self->{must_level}, type => 'bare stago');
+          $self->{parse_error}->(level => $self->{must_level}, type => 'bare stago',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev});
           $self->{state} = DATA_STATE;
           ## reconsume
 
@@ -9203,4 +9233,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/17 07:31:49 $
+# $Date: 2008/05/17 12:29:24 $
