@@ -1,6 +1,6 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub UNREGISTERED_CHARSET_NAME () { 0b1 }
     ## Names for non-standard encodings/implementations for Perl encodings
@@ -28,11 +28,19 @@ sub STATUS_COMMON () { 0b1 }
 sub STATUS_LIMITED_USE () { 0b10 }
 sub STATUS_OBSOLETE () { 0b100 }
 
+## category
+sub CHARSET_CATEGORY_BLOCK_SAFE () { 0b1 }
+    ## NOTE: Stateless
+sub CHARSET_CATEGORY_EUCJP () { 0b10 }
+sub CHARSET_CATEGORY_SJIS () { 0b100 }
+
 ## iana_names
+
 ## is_html_ascii_superset: "superset of US-ASCII (specifically, ANSI_X3.4-1968)
 ##     for bytes in the range 0x09 - 0x0D, 0x20, 0x21, 0x22, 0x26, 0x27,
 ##     0x2C - 0x3F, 0x41 - 0x5A, and 0x61 - 0x7A" [HTML5]
 ## is_ebcdic_based
+  ## TODO: These flags are obsolete - should be replaced by category
 
 ## ISSUE: Shift_JIS is a superset of US-ASCII?  ISO-2022-JP is?
 ## ISSUE: 0x5F (_) should be added to the range?
@@ -54,6 +62,7 @@ $Charset->{'us-ascii'}
 = $IANACharset->{'cp367'}
 = $IANACharset->{'csascii'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'ansi_x3.4-1968' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-6' => REGISTERED_CHARSET_NAME,
@@ -81,6 +90,7 @@ $Charset->{'iso-8859-1'}
 = $IANACharset->{'cp819'}
 = $IANACharset->{'csisolatin1'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-1:1987' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-100' => REGISTERED_CHARSET_NAME,
@@ -104,6 +114,7 @@ $Charset->{'iso-8859-2'}
 = $IANACharset->{'l2'}
 = $IANACharset->{'csisolatin2'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-2:1987' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-101' => REGISTERED_CHARSET_NAME,
@@ -125,6 +136,7 @@ $Charset->{'iso-8859-3'}
 = $IANACharset->{'l3'}
 = $IANACharset->{'csisolatin3'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-3:1988' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-109' => REGISTERED_CHARSET_NAME,
@@ -146,6 +158,7 @@ $Charset->{'iso-8859-4'}
 = $IANACharset->{'l4'}
 = $IANACharset->{'csisolatin4'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-4:1988' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-110' => REGISTERED_CHARSET_NAME,
@@ -166,6 +179,7 @@ $Charset->{'iso-8859-5'}
 = $IANACharset->{'cyrillic'}
 = $IANACharset->{'csisolatincyrillic'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-5:1988' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-144' => REGISTERED_CHARSET_NAME,
@@ -187,6 +201,7 @@ $Charset->{'iso-8859-6'}
 = $IANACharset->{'arabic'}
 = $IANACharset->{'csisolatinarabic'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-6:1987' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-127' => REGISTERED_CHARSET_NAME,
@@ -215,6 +230,7 @@ $Charset->{'iso-8859-7'}
 = $IANACharset->{'greek8'}
 = $IANACharset->{'csisolatingreek'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-7:1987' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-126' => REGISTERED_CHARSET_NAME,
@@ -237,6 +253,7 @@ $Charset->{'iso-8859-8'}
 = $IANACharset->{'hebrew'}
 = $IANACharset->{'csisolatinhebrew'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-8:1988' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-138' => REGISTERED_CHARSET_NAME,
@@ -257,6 +274,7 @@ $Charset->{'iso-8859-9'}
 = $IANACharset->{'l5'}
 = $IANACharset->{'csisolatin5'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_8859-9:1989' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-148' => REGISTERED_CHARSET_NAME,
@@ -277,6 +295,7 @@ $Charset->{'iso-8859-10'}
 = $IANACharset->{'csisolatin6'}
 = $IANACharset->{'latin6'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso-8859-10' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-157' => REGISTERED_CHARSET_NAME,
@@ -293,6 +312,7 @@ $Charset->{'iso_6937-2-add'}
 = $IANACharset->{'iso-ir-142'}
 = $IANACharset->{'csisotextcomm'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'iso_6937-2-add' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'iso-ir-142' => REGISTERED_CHARSET_NAME,
@@ -306,6 +326,7 @@ $Charset->{'jis_x0201'}
 = $IANACharset->{'x0201'}
 = $IANACharset->{'cshalfwidthkatakana'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'jis_x0201' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'x0201' => REGISTERED_CHARSET_NAME,
@@ -318,6 +339,7 @@ $Charset->{'jis_encoding'}
 = $IANACharset->{'jis_encoding'}
 = $IANACharset->{'csjisencoding'}
 = __PACKAGE__->new ({
+  category => 0,
   iana_names => {
     'jis_encoding' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csjisencoding' => REGISTERED_CHARSET_NAME,
@@ -330,10 +352,16 @@ $Charset->{'shift_jis'}
 = $IANACharset->{'ms_kanji'}
 = $IANACharset->{'csshiftjis'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_SJIS | CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'shift_jis' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'ms_kanji' => REGISTERED_CHARSET_NAME,
     'csshiftjis' => REGISTERED_CHARSET_NAME,
+  },
+  perl_names => {
+    'shift-jis-1997' => UNREGISTERED_CHARSET_NAME,
+    shiftjis => PRIMARY_CHARSET_NAME | NONCONFORMING_ENCODING_IMPL,
+        ## NOTE: Unicode mapping is wrong.
   },
   mime_text_suitable => 1,
 });
@@ -341,8 +369,23 @@ $Charset->{'shift_jis'}
 $Charset->{'x-sjis'}
 = $IANACharset->{'x-sjis'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_SJIS | CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'x-sjis' => UNREGISTERED_CHARSET_NAME,
+  },
+  mime_text_suitable => 1,
+});
+
+$Charset->{shift_jisx0213}
+= $IANACharset->{shift_jisx0213}
+= __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_SJIS | CHARSET_CATEGORY_BLOCK_SAFE,
+  iana_names => {
+    shift_jisx0213 => UNREGISTERED_CHARSET_NAME,
+  },
+  perl_names => {
+    #shift_jisx0213 (non-standard - i don't know its conformance)
+    'shift-jis-1997' => FALLBACK_ENCODING_IMPL,
   },
   mime_text_suitable => 1,
 });
@@ -353,10 +396,20 @@ $Charset->{'euc-jp'}
 = $IANACharset->{'euc-jp'}
 = $IANACharset->{'x-euc-jp'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_EUCJP | CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'extended_unix_code_packed_format_for_japanese' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cseucpkdfmtjapanese' => REGISTERED_CHARSET_NAME,
     'euc-jp' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
+  },
+  perl_names => {
+    'euc-jp-1997' => UNREGISTERED_CHARSET_NAME | ERROR_REPORTING_ENCODING_IMPL,
+        ## NOTE: Though the IANA definition references the 1990 version
+        ## of EUC-JP, the 1997 version of JIS standard claims that the version
+        ## is same coded character set as the 1990 version, such that we
+        ## consider the EUC-JP 1990 version is same as the 1997 version.
+    'euc-jp' => PREFERRED_CHARSET_NAME | NONCONFORMING_ENCODING_IMPL,
+        ## NOTE: Unicode mapping is wrong.
   },
   is_html_ascii_superset => 1,
   mime_text_suitable => 1,
@@ -365,6 +418,7 @@ $Charset->{'euc-jp'}
 $Charset->{'x-euc-jp'}
 = $IANACharset->{'x-euc-jp'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_EUCJP | CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'x-euc-jp' => UNREGISTERED_CHARSET_NAME,
   },
@@ -376,6 +430,7 @@ $Charset->{'extended_unix_code_fixed_width_for_japanese'}
 = $IANACharset->{'extended_unix_code_fixed_width_for_japanese'}
 = $IANACharset->{'cseucfixwidjapanese'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'extended_unix_code_fixed_width_for_japanese' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cseucfixwidjapanese' => REGISTERED_CHARSET_NAME,
@@ -388,6 +443,7 @@ $Charset->{'euc-kr'}
 = $IANACharset->{'euc-kr'}
 = $IANACharset->{'cseuckr'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'euc-kr' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cseuckr' => REGISTERED_CHARSET_NAME,
@@ -401,6 +457,7 @@ $Charset->{'iso-2022-jp'}
 = $IANACharset->{'iso2022jp'}
 = $IANACharset->{'junet-code'}
 = __PACKAGE__->new ({
+  category => 0,
   iana_names => {
     'iso-2022-jp' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csiso2022jp' => REGISTERED_CHARSET_NAME,
@@ -414,6 +471,7 @@ $Charset->{'iso-2022-jp-2'}
 = $IANACharset->{'iso-2022-jp-2'}
 = $IANACharset->{'csiso2022jp2'}
 = __PACKAGE__->new ({
+  category => 0,
   iana_names => {
     'iso-2022-jp-2' => PREFERRED_CHARSET_NAME | PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csiso2022jp2' => REGISTERED_CHARSET_NAME,
@@ -427,6 +485,7 @@ $Charset->{'utf-8'}
 = $IANACharset->{'utf-8'}
 = $IANACharset->{'x-utf-8'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'utf-8' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'x-utf-8' => UNREGISTERED_CHARSET_NAME,
@@ -438,6 +497,7 @@ $Charset->{'utf-8'}
 $Charset->{'utf-8n'}
 = $IANACharset->{'utf-8n'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'utf-8n' => UNREGISTERED_CHARSET_NAME,
   },
@@ -453,6 +513,7 @@ $Charset->{'gbk'}
 = $IANACharset->{'ms936'}
 = $IANACharset->{'windows-936'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'gbk' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cp936' => REGISTERED_CHARSET_NAME,
@@ -466,6 +527,7 @@ $Charset->{'gbk'}
 $Charset->{'gb18030'}
 = $IANACharset->{'gb18030'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'gb18030' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -478,6 +540,7 @@ $Charset->{'gb18030'}
 $Charset->{'utf-16be'}
 = $IANACharset->{'utf-16be'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'utf-16be' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -486,6 +549,7 @@ $Charset->{'utf-16be'}
 $Charset->{'utf-16le'}
 = $IANACharset->{'utf-16le'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'utf-16le' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -494,6 +558,7 @@ $Charset->{'utf-16le'}
 $Charset->{'utf-16'}
 = $IANACharset->{'utf-16'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'utf-16' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -505,6 +570,7 @@ $Charset->{'windows-31j'}
 = $IANACharset->{'windows-31j'}
 = $IANACharset->{'cswindows31j'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_SJIS | CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'windows-31j' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'cswindows31j' => REGISTERED_CHARSET_NAME,
@@ -517,6 +583,7 @@ $Charset->{'gb2312'}
 = $IANACharset->{'gb2312'}
 = $IANACharset->{'csgb2312'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'gb2312' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csgb2312' => REGISTERED_CHARSET_NAME,
@@ -529,6 +596,7 @@ $Charset->{'big5'}
 = $IANACharset->{'big5'}
 = $IANACharset->{'csbig5'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'big5' => PRIMARY_CHARSET_NAME | PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
     'csbig5' => REGISTERED_CHARSET_NAME,
@@ -541,6 +609,7 @@ $Charset->{'big5'}
 $Charset->{'big5-hkscs'}
 = $IANACharset->{'big5-hkscs'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'big5-hkscs' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -552,6 +621,7 @@ $Charset->{'big5-hkscs'}
 $Charset->{'windows-1252'}
 = $IANACharset->{'windows-1252'}
 = __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'windows-1252' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -578,17 +648,90 @@ sub get_by_iana_name ($$) {
   return $IANACharset->{$name};
 } # get_by_iana_name
 
+sub get_decode_handle ($$;%) {
+  my $self = shift;
+  my $byte_stream = shift;
+  my %opt = @_;
+
+  my $obj = {
+    character_queue => [],
+    filehandle => $byte_stream,
+    charset => '', ## TODO: We set a charset name for input_encoding (when we get identify-by-URI nonsense away)
+    byte_buffer => $opt{byte_buffer} ? ${$opt{byte_buffer}} : '', ## TODO: ref, instead of value, should be used
+    onerror => $opt{onerror} || sub {},
+  };
+
+  require Whatpm::Charset::DecodeHandle;
+  if ($self->{iana_names}->{'iso-2022-jp'}) {
+    $obj->{state_2440} = 'gl-jis-1978';
+    $obj->{state_2442} = 'gl-jis-1983';
+    $obj->{state} = 'state_2842';
+    eval {
+      require Encode::GLJIS1978;
+      require Encode::GLJIS1983;
+    };
+    if (Encode::find_encoding ($obj->{state_2440}) and
+        Encode::find_encoding ($obj->{state_2442})) {
+      return ((bless $obj, 'Whatpm::Charset::DecodeHandle::ISO2022JP'),
+              PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME);
+    }
+  } elsif ($self->{xml_names}->{'iso-2022-jp'}) {
+    $obj->{state_2440} = 'gl-jis-1997-swapped';
+    $obj->{state_2442} = 'gl-jis-1997';
+    $obj->{state} = 'state_2842';
+    eval {
+      require Encode::GLJIS1997Swapped;
+      require Encode::GLJIS1997;
+    };
+    if (Encode::find_encoding ($obj->{state_2440}) and
+        Encode::find_encoding ($obj->{state_2442})) {
+      return ((bless $obj, 'Whatpm::Charset::DecodeHandle::ISO2022JP'),
+              PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME);
+    }
+  }
+
+  my ($e, $e_status) = $self->get_perl_encoding (%opt);
+  if ($e) {
+    $obj->{perl_encoding_name} = $e->name;
+    if ($self->{category} & CHARSET_CATEGORY_EUCJP) {
+      return ((bless $obj, 'Whatpm::Charset::DecodeHandle::EUCJP'),
+              $e_status);
+    } elsif ($self->{category} & CHARSET_CATEGORY_SJIS) {
+      return ((bless $obj, 'Whatpm::Charset::DecodeHandle::ShiftJIS'),
+              $e_status);
+    } elsif ($self->{category} & CHARSET_CATEGORY_BLOCK_SAFE) {
+      return ((bless $obj, 'Whatpm::Charset::DecodeHandle::Encode'),
+              $e_status);
+    } else {
+      ## TODO: no encoding error (?)
+      return (undef, 0);
+    }
+  } else {
+    ## TODO: no encoding error(?)
+    return (undef, 0);
+  }
+} # get_decode_handle
+
 sub get_perl_encoding ($;%) {
   my ($self, %opt) = @_;
   
   require Encode;
+  my $load_encode = sub {
+    my $name = shift;
+    if ($name eq 'euc-jp-1997') {
+      require Encode::EUCJP1997;
+    } elsif ($name eq 'shift-jis-1997') {
+      require Encode::ShiftJIS1997;
+    }
+  }; # $load_encode
 
   if ($opt{allow_error_reporting}) {
     for my $perl_name (keys %{$self->{perl_names} or {}}) {
       my $perl_status = $self->{perl_names}->{$perl_name};
       next unless $perl_status & ERROR_REPORTING_ENCODING_IMPL;
-      next unless $perl_status & FALLBACK_ENCODING_IMPL;
+      next if $perl_status & FALLBACK_ENCODING_IMPL;
       
+      $load_encode->($perl_name);
       my $e = Encode::find_encoding ($perl_name);
       if ($e) {
         return ($e, $perl_status);
@@ -600,7 +743,8 @@ sub get_perl_encoding ($;%) {
     my $perl_status = $self->{perl_names}->{$perl_name};
     next if $perl_status & ERROR_REPORTING_ENCODING_IMPL;
     next if $perl_status & FALLBACK_ENCODING_IMPL;
-    
+
+    $load_encode->($perl_name);
     my $e = Encode::find_encoding ($perl_name);
     if ($e) {
       return ($e, $perl_status);
@@ -612,6 +756,7 @@ sub get_perl_encoding ($;%) {
       my $perl_status = $self->{perl_names}->{$perl_name};
       next unless $perl_status & FALLBACK_ENCODING_IMPL;
       
+      $load_encode->($perl_name);
       my $e = Encode::find_encoding ($perl_name);
       if ($e) {
         return ($e, $perl_status);
@@ -619,6 +764,7 @@ sub get_perl_encoding ($;%) {
     }
 
     for my $iana_name (keys %{$self->{iana_names} or {}}) {
+      $load_encode->($iana_name);
       my $e = Encode::find_encoding ($iana_name);
       if ($e) {
         return ($e, FALLBACK_ENCODING_IMPL);
@@ -657,5 +803,5 @@ sub is_syntactically_valid_iana_charset_name ($) {
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2008/05/17 08:46:02 $
+## $Date: 2008/05/17 12:32:14 $
 

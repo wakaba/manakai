@@ -1,3 +1,12 @@
+2008-05-17  Wakaba  <wakaba@suika.fam.cx>
+
+	* Info.pm: Charset definitions now have |category| properties.
+	Property |perl_names| is added to |shift_jis| and |euc-jp|.
+	Charset definition for |shift_jisx0213| is added.
+	(get_decode_handle): New.
+	(get_perl_encoding): Auto-load encode modules for internal use
+	by DecodeHandle (part of Whatpm module).
+
 2007-11-23  Wakaba  <wakaba@suika.fam.cx>
 
 	* Info.pm (is_syntactically_valid_iana_charset_name): Function
