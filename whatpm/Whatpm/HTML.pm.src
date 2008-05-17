@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.132 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.133 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -333,49 +333,124 @@ my $c1_entity_char = {
 
 sub parse_byte_string ($$$$;$) {
   my $self = ref $_[0] ? shift : shift->new;
-  my $charset = shift;
+  my $charset_name = shift;
   my $bytes_s = ref $_[0] ? $_[0] : \($_[0]);
   my $s;
-  
-  if (defined $charset) {
-    require Encode; ## TODO: decode(utf8) don't delete BOM
-    $s = \ (Encode::decode ($charset, $$bytes_s));
-    $self->{input_encoding} = lc $charset; ## TODO: normalize name
-    $self->{confident} = 1;
-  } else {
-    ## TODO: Implement HTML5 detection algorithm
+
+  ## HTML5 encoding sniffing algorithm
+  require Message::Charset::Info;
+  my $charset;
+  my ($e, $e_status);
+
+  SNIFFING: {
+
+    ## Step 1
+    if (defined $charset_name) {
+      $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
+
+      ## ISSUE: Unsupported encoding is not ignored according to the spec.
+      ($e, $e_status) = $charset->get_perl_encoding
+          (allow_error_reporting => 1,
+           allow_fallback => 1);
+      if ($e) {
+        $self->{confident} = 1;
+        last SNIFFING;
+      }
+    }
+
+    ## Step 2
+    # wait
+
+    ## Step 3
+    my $head = substr ($$bytes_s, 0, 3);
+    if ($head =~ /^\xFE\xFF/) {
+      $charset = Message::Charset::Info->get_by_iana_name ('utf-16be');
+      ($e, $e_status) = $charset->get_perl_encoding
+          (allow_error_reporting => 1,
+           allow_fallback => 1);
+      $self->{confident} = 1;
+      last SNIFFING;
+    } elsif ($head =~ /^\xFF\xFE/) {
+      $charset = Message::Charset::Info->get_by_iana_name ('utf-16le');
+      ($e, $e_status) = $charset->get_perl_encoding
+          (allow_error_reporting => 1,
+           allow_fallback => 1);
+      $self->{confident} = 1;
+      last SNIFFING;
+    } elsif ($head eq "\xEF\xBB\xBF") {
+      $charset = Message::Charset::Info->get_by_iana_name ('utf-8');
+      ($e, $e_status) = $charset->get_perl_encoding
+          (allow_error_reporting => 1,
+           allow_fallback => 1);
+      $self->{confident} = 1;
+      last SNIFFING;
+    }
+
+    ## Step 4
+    ## TODO: <meta charset>
+
+    ## Step 5
+    ## TODO: from history
+
+    ## Step 6
     require Whatpm::Charset::UniversalCharDet;
-    $charset = Whatpm::Charset::UniversalCharDet->detect_byte_string
+    $charset_name = Whatpm::Charset::UniversalCharDet->detect_byte_string
         (substr ($$bytes_s, 0, 1024));
-    $charset ||= 'windows-1252';
-    $s = \ (Encode::decode ($charset, $$bytes_s));
-    $self->{input_encoding} = $charset;
+    if (defined $charset_name) {
+      $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
+
+      ## ISSUE: Unsupported encoding is not ignored according to the spec.
+      ($e, $e_status) = $charset->get_perl_encoding
+          (allow_error_reporting => 1,
+           allow_fallback => 1);
+      if ($e) {
+        $self->{confident} = 0;
+        last SNIFFING;
+      }
+    }
+
+    ## Step 7: default
+    ## TODO: Make this configurable.
+    $charset = Message::Charset::Info->get_by_iana_name ('windows-1252');
+        ## NOTE: We choose |windows-1252| here, since |utf-8| should be 
+        ## detectable in the step 6.
+    ($e, $e_status) = $charset->get_perl_encoding (allow_error_reporting => 1,
+                                                   allow_fallback => 1);
     $self->{confident} = 0;
+  } # SNIFFING
+
+  if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
+    
+  } elsif (not ($e_status &
+                Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL())) {
+    
   }
+  $s = \ $e->decode ($$bytes_s);
+  $self->{input_encoding} = $charset->get_iana_name;
 
   $self->{change_encoding} = sub {
     my $self = shift;
-    my $charset = lc shift;
+    my $charset_name = lc shift;
     my $token = shift;
-    ## TODO: if $charset is supported
+    ## TODO: if $charset_name is supported
     ## TODO: normalize charset name
 
     ## "Change the encoding" algorithm:
 
     ## Step 1    
-    if ($charset eq 'utf-16') { ## ISSUE: UTF-16BE -> UTF-8? UTF-16LE -> UTF-8?
-      $charset = 'utf-8';
+    if ($charset_name eq 'utf-16') { ## ISSUE: UTF-16BE -> UTF-8? UTF-16LE -> UTF-8?
+      $charset_name = 'utf-8';
     }
 
     ## Step 2
     if (defined $self->{input_encoding} and
-        $self->{input_encoding} eq $charset) {
+        $self->{input_encoding} eq $charset_name) {
       $self->{confident} = 1;
       return;
     }
 
     !!!parse-error (type => 'charset label detected:'.$self->{input_encoding}.
-        ':'.$charset, level => 'w', token => $token);
+        ':'.$charset_name, level => 'w', token => $token);
 
     ## Step 3
     # if (can) {
@@ -385,7 +460,7 @@ sub parse_byte_string ($$$$;$) {
     # }
 
     ## Step 4
-    throw Whatpm::HTML::RestartParser (charset => $charset);
+    throw Whatpm::HTML::RestartParser (charset => $charset_name);
   }; # $self->{change_encoding}
 
   my @args = @_; shift @args; # $s
@@ -393,9 +468,9 @@ sub parse_byte_string ($$$$;$) {
   try {
     $return = $self->parse_char_string ($s, @args);  
   } catch Whatpm::HTML::RestartParser with {
-    my $charset = shift->{charset};
-    $s = \ (Encode::decode ($charset, $$bytes_s));    
-    $self->{input_encoding} = $charset; ## TODO: normalize
+    my $charset_name = shift->{charset};
+    $s = \ (Encode::decode ($charset_name, $$bytes_s));    
+    $self->{input_encoding} = $charset_name; ## TODO: normalize
     $self->{confident} = 1;
     $return = $self->parse_char_string ($s, @args);
   };
@@ -7214,4 +7289,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/04/13 10:36:40 $
+# $Date: 2008/05/17 04:54:11 $
