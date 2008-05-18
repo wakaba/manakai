@@ -603,7 +603,17 @@ sub getc ($) {
 
   if ($error) {
     $r = substr $self->{byte_buffer}, 0, 1, '';
-    $self->{onerror}->($self, 'illegal-octets-error', octets => \$r);
+    my $fallback = $self->{fallback}->{$r};
+    if (defined $fallback) {
+      ## NOTE: This is an HTML5 parse error.  Applied to Web ISO-8859-1
+      ## and Web ISO-8859-11 encodings.
+      $self->{onerror}->($self, 'fallback-char-error', octets => \$r,
+                         char => \$fallback,
+                         level => $self->{must_level});
+      return $fallback;
+    } else {
+      $self->{onerror}->($self, 'illegal-octets-error', octets => \$r);
+    }
   }
 
   return $r;
@@ -1460,4 +1470,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/05/18 04:15:52 $
+## $Date: 2008/05/18 06:07:22 $

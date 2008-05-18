@@ -1,5 +1,12 @@
 2008-05-18  Wakaba  <wakaba@suika.fam.cx>
 
+	* WebThai.pm, WebLatin1.pm: New modules.
+
+	* DecodeHandle.pm: Support for fallback character mappings,
+	used for WebLatin1 and WebThai encodings.
+
+2008-05-18  Wakaba  <wakaba@suika.fam.cx>
+
 	* DecodeHandle.pm (ShiftJIS): \xF0-\xFC should be considered
 	as part of double-byte characters for more user-friendly error
 	recovery.
