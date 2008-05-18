@@ -1,6 +1,6 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub UNREGISTERED_CHARSET_NAME () { 0b1 }
     ## Names for non-standard encodings/implementations for Perl encodings
@@ -19,9 +19,13 @@ sub FALLBACK_ENCODING_IMPL () { 0b10000 }
 sub NONCONFORMING_ENCODING_IMPL () { FALLBACK_ENCODING_IMPL }
     ## For Perl encodings: Not a conforming implementation of the encoding,
     ## though it seems that the intention was to implement that encoding.
+sub SEMICONFORMING_ENCODING_IMPL () { 0b1000000 }
+    ## For Perl encodings: The implementation itself (returned by
+    ## |get_perl_encoding|) is non-conforming.  The decode handle
+    ## implementation (returned by |get_decode_handle|) is conforming.
 sub ERROR_REPORTING_ENCODING_IMPL () { 0b100000 }
     ## For Perl encodings: Support error reporting via |manakai_onerror|
-    ## handler.
+    ## handler when the encoding is handled with decode handle.
 
 ## iana_status
 sub STATUS_COMMON () { 0b1 }
@@ -359,7 +363,8 @@ $Charset->{'shift_jis'}
     'csshiftjis' => REGISTERED_CHARSET_NAME,
   },
   perl_names => {
-    'shift-jis-1997' => UNREGISTERED_CHARSET_NAME,
+    'shift-jis-1997' => UNREGISTERED_CHARSET_NAME |
+        ERROR_REPORTING_ENCODING_IMPL,
     shiftjis => PRIMARY_CHARSET_NAME | NONCONFORMING_ENCODING_IMPL,
         ## NOTE: Unicode mapping is wrong.
   },
@@ -372,6 +377,10 @@ $Charset->{'x-sjis'}
   category => CHARSET_CATEGORY_SJIS | CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'x-sjis' => UNREGISTERED_CHARSET_NAME,
+  },
+  perl_names => {
+    'shift-jis-1997' => UNREGISTERED_CHARSET_NAME | FALLBACK_ENCODING_IMPL |
+        ERROR_REPORTING_ENCODING_IMPL,
   },
   mime_text_suitable => 1,
 });
@@ -408,7 +417,8 @@ $Charset->{'euc-jp'}
         ## of EUC-JP, the 1997 version of JIS standard claims that the version
         ## is same coded character set as the 1990 version, such that we
         ## consider the EUC-JP 1990 version is same as the 1997 version.
-    'euc-jp' => PREFERRED_CHARSET_NAME | NONCONFORMING_ENCODING_IMPL,
+    'euc-jp' => PREFERRED_CHARSET_NAME | NONCONFORMING_ENCODING_IMPL |
+        ERROR_REPORTING_ENCODING_IMPL,
         ## NOTE: Unicode mapping is wrong.
   },
   is_html_ascii_superset => 1,
@@ -422,7 +432,11 @@ $Charset->{'x-euc-jp'}
   iana_names => {
     'x-euc-jp' => UNREGISTERED_CHARSET_NAME,
   },
-  is_html_ascii_superset => 1,
+  perl_names => {
+    'euc-jp-1997' => FALLBACK_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
+    'euc-jp' => FALLBACK_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
+  },
+  is_html_ascii_superset => 1,  is_html_ascii_superset => 1,
   mime_text_suitable => 1,
 });
 
@@ -488,8 +502,19 @@ $Charset->{'utf-8'}
   category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'utf-8' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
+        ## NOTE: IANA name "utf-8" references RFC 3629.  According to the RFC,
+        ## the definitive definition is one specified in the Unicode Standard.
     'x-utf-8' => UNREGISTERED_CHARSET_NAME,
   },
+  perl_names => {
+    'utf-8-strict' => PRIMARY_CHARSET_NAME | SEMICONFORMING_ENCODING_IMPL |
+        ERROR_REPORTING_ENCODING_IMPL,
+        ## NOTE: It does not support non-Unicode UCS characters (conforming).
+        ## It does detect illegal sequences (conforming).
+        ## It does not support surrpgate pairs (conforming).
+        ## It does not support BOMs (non-conforming).
+  },
+  bom_pattern => qr/\xEF\xBB\xBF/,
   is_html_ascii_superset => 1,
   mime_text_suitable => 1,
 });
@@ -500,6 +525,11 @@ $Charset->{'utf-8n'}
   category => CHARSET_CATEGORY_BLOCK_SAFE,
   iana_names => {
     'utf-8n' => UNREGISTERED_CHARSET_NAME,
+        ## NOTE: Is there any normative definition for the charset?
+        ## What variant of UTF-8 should we use for the charset?
+  },
+  perl_names => {
+    'utf-8-strict' => PRIMARY_CHARSET_NAME | ERROR_REPORTING_ENCODING_IMPL,
   },
   is_html_ascii_superset => 1,
   mime_text_suitable => 1,
@@ -690,7 +720,8 @@ sub get_decode_handle ($$;%) {
     }
   }
 
-  my ($e, $e_status) = $self->get_perl_encoding (%opt);
+  my ($e, $e_status) = $self->get_perl_encoding
+      (%opt, allow_semiconforming => 1);
   if ($e) {
     $obj->{perl_encoding_name} = $e->name;
     if ($self->{category} & CHARSET_CATEGORY_EUCJP) {
@@ -700,6 +731,7 @@ sub get_decode_handle ($$;%) {
       return ((bless $obj, 'Whatpm::Charset::DecodeHandle::ShiftJIS'),
               $e_status);
     } elsif ($self->{category} & CHARSET_CATEGORY_BLOCK_SAFE) {
+      $obj->{bom_pattern} = $self->{bom_pattern};
       return ((bless $obj, 'Whatpm::Charset::DecodeHandle::Encode'),
               $e_status);
     } else {
@@ -730,6 +762,8 @@ sub get_perl_encoding ($;%) {
       my $perl_status = $self->{perl_names}->{$perl_name};
       next unless $perl_status & ERROR_REPORTING_ENCODING_IMPL;
       next if $perl_status & FALLBACK_ENCODING_IMPL;
+      next if $perl_status & SEMICONFORMING_ENCODING_IMPL and
+          not $opt{allow_semiconforming};
       
       $load_encode->($perl_name);
       my $e = Encode::find_encoding ($perl_name);
@@ -743,6 +777,8 @@ sub get_perl_encoding ($;%) {
     my $perl_status = $self->{perl_names}->{$perl_name};
     next if $perl_status & ERROR_REPORTING_ENCODING_IMPL;
     next if $perl_status & FALLBACK_ENCODING_IMPL;
+    next if $perl_status & SEMICONFORMING_ENCODING_IMPL and
+        not $opt{allow_semiconforming};
 
     $load_encode->($perl_name);
     my $e = Encode::find_encoding ($perl_name);
@@ -754,8 +790,14 @@ sub get_perl_encoding ($;%) {
   if ($opt{allow_fallback}) {
     for my $perl_name (keys %{$self->{perl_names} or {}}) {
       my $perl_status = $self->{perl_names}->{$perl_name};
-      next unless $perl_status & FALLBACK_ENCODING_IMPL;
-      
+      next unless $perl_status & FALLBACK_ENCODING_IMPL or
+          $perl_status & SEMICONFORMING_ENCODING_IMPL;
+      ## NOTE: We don't prefer semi-conforming implementations to 
+      ## non-conforming implementations, since semi-conforming implementations
+      ## will never be conforming without assist of the callee, and in such
+      ## cases the callee should set the |allow_semiconforming| option upon
+      ## the invocation of the method anyway.
+  
       $load_encode->($perl_name);
       my $e = Encode::find_encoding ($perl_name);
       if ($e) {
@@ -803,5 +845,5 @@ sub is_syntactically_valid_iana_charset_name ($) {
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2008/05/17 12:32:14 $
+## $Date: 2008/05/18 03:49:36 $
 
