@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.133 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.134 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -513,7 +513,8 @@ sub parse_byte_string ($$$$;$) {
 
   my $char_onerror = sub {
     my (undef, $type, %opt) = @_;
-    $self->{parse_error}->(level => $self->{must_level}, %opt, type => $type);
+    $self->{parse_error}->(level => $self->{must_level}, %opt, type => $type,
+                    line => $self->{line}, column => $self->{column} + 1);
     if ($opt{octets}) {
       ${$opt{octets}} = "\x{FFFD}"; # relacement character
     }
@@ -9233,4 +9234,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/17 12:29:24 $
+# $Date: 2008/05/18 03:46:26 $

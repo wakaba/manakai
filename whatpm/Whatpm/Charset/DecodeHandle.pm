@@ -574,6 +574,15 @@ sub getc ($) {
 
   my $r;
   unless ($error) {
+    if (not $self->{bom_checked}) {
+      if (defined $self->{bom_pattern}) {
+        if ($self->{byte_buffer} =~ s/^$self->{bom_pattern}//) {
+          $self->{has_bom} = 1;
+        }
+      }
+      $self->{bom_checked} = 1;
+    }
+
     my $string = Encode::decode ($self->{perl_encoding_name},
                                  $self->{byte_buffer},
                                  Encode::FB_QUIET ());
@@ -1447,4 +1456,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/05/17 12:29:24 $
+## $Date: 2008/05/18 03:46:30 $
