@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.137 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.138 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -332,9 +332,16 @@ my $c1_entity_char = {
 }; # $c1_entity_char
 
 sub parse_byte_string ($$$$;$) {
+  my $self = shift;
+  my $charset_name = shift;
+  open my $input, '<', ref $_[0] ? $_[0] : \($_[0]);
+  return $self->parse_byte_stream ($charset_name, $input, @_[1..$#_]);
+} # parse_byte_string
+
+sub parse_byte_stream ($$$$;$) {
   my $self = ref $_[0] ? shift : shift->new;
   my $charset_name = shift;
-  open my $byte_stream, '<', ref $_[0] ? $_[0] : \($_[0]);
+  my $byte_stream = $_[0];
 
   my $onerror = $_[2] || sub {
     my (%opt) = @_;
@@ -546,7 +553,7 @@ sub parse_byte_string ($$$$;$) {
     $return = $self->parse_char_stream ($char_stream, @args);
   };
   return $return;
-} # parse_byte_string
+} # parse_byte_stream
 
 ## NOTE: HTML5 spec says that the encoding layer MUST NOT strip BOM
 ## and the HTML layer MUST ignore it.  However, we does strip BOM in
@@ -7384,4 +7391,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/18 03:46:27 $
+# $Date: 2008/05/18 04:15:48 $

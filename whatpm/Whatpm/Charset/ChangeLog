@@ -1,5 +1,11 @@
 2008-05-18  Wakaba  <wakaba@suika.fam.cx>
 
+	* DecodeHandle.pm (ShiftJIS): \xF0-\xFC should be considered
+	as part of double-byte characters for more user-friendly error
+	recovery.
+
+2008-05-18  Wakaba  <wakaba@suika.fam.cx>
+
 	* DecodeHandle.pm (getc): Ignore BOM if BOM pattern is specified.
 
 2008-05-17  Wakaba  <wakaba@suika.fam.cx>

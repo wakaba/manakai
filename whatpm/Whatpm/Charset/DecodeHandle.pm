@@ -863,12 +863,16 @@ sub getc ($) {
   if ($error) {
     $r = substr $self->{byte_buffer}, 0, 1, '';
     my $etype = 'illegal-octets-error';
-    if ($r =~ /^[\x81-\x9F\xE0-\xEF]/) {
+    if ($r =~ /^[\x81-\x9F\xE0-\xFC]/) {
       if ($self->{byte_buffer} =~ s/(.)//s) {
         $r .= $1;                     # not limited to \x40-\xFC - \x7F
         $etype = 'unassigned-code-point-error';
       }
-    } elsif ($r =~ /^[\x80\xA0\xF0-\xFF]/) {
+      ## NOTE: Range [\xF0-\xFC] is unassigned and may be used as a single-byte
+      ## character or as the first-byte of a double-byte character according
+      ## to JIS X 0208:1997 Appendix 1.  However, the current practice is 
+      ## use the range as the first-byte of double-byte characters.
+    } elsif ($r =~ /^[\x80\xA0\xFD-\xFF]/) {
       $etype = 'unassigned-code-point-error';
     }
     $self->{onerror}->($self, $etype, octets => \$r);
@@ -1456,4 +1460,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/05/18 03:46:30 $
+## $Date: 2008/05/18 04:15:52 $
