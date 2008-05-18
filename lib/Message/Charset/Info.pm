@@ -1,6 +1,6 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub UNREGISTERED_CHARSET_NAME () { 0b1 }
     ## Names for non-standard encodings/implementations for Perl encodings
@@ -105,6 +105,40 @@ $Charset->{'iso-8859-1'}
     'ibm819' => REGISTERED_CHARSET_NAME,
     'cp819' => REGISTERED_CHARSET_NAME,
     'csisolatin1' => REGISTERED_CHARSET_NAME,
+  },
+  perl_names => {
+    'web-latin1' => UNREGISTERED_CHARSET_NAME | SEMICONFORMING_ENCODING_IMPL |
+        ERROR_REPORTING_ENCODING_IMPL,
+    'iso-8859-1' => FALLBACK_ENCODING_IMPL,
+  },
+  fallback => {
+    "\x80" => "\x{20AC}",
+    "\x82" => "\x{201A}",
+    "\x83" => "\x{0192}",
+    "\x84" => "\x{201E}",
+    "\x85" => "\x{2026}",
+    "\x86" => "\x{2020}",
+    "\x87" => "\x{2021}",
+    "\x88" => "\x{02C6}",
+    "\x89" => "\x{2030}",
+    "\x8A" => "\x{0160}",
+    "\x8B" => "\x{2039}",
+    "\x8C" => "\x{0152}",
+    "\x8E" => "\x{017D}",
+    "\x91" => "\x{2018}",
+    "\x92" => "\x{2019}",
+    "\x93" => "\x{201C}",
+    "\x94" => "\x{201D}",
+    "\x95" => "\x{2022}",
+    "\x96" => "\x{2013}",
+    "\x97" => "\x{2014}",
+    "\x98" => "\x{02DC}",
+    "\x99" => "\x{2122}",
+    "\x9A" => "\x{0161}",
+    "\x9B" => "\x{203A}",
+    "\x9C" => "\x{0153}",
+    "\x9E" => "\x{017E}",
+    "\x9F" => "\x{0178}",
   },
   is_html_ascii_superset => 1,
 });
@@ -364,8 +398,9 @@ $Charset->{'shift_jis'}
   },
   perl_names => {
     'shift-jis-1997' => UNREGISTERED_CHARSET_NAME |
+        SEMICONFORMING_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
+    shiftjis => PRIMARY_CHARSET_NAME | NONCONFORMING_ENCODING_IMPL |
         ERROR_REPORTING_ENCODING_IMPL,
-    shiftjis => PRIMARY_CHARSET_NAME | NONCONFORMING_ENCODING_IMPL,
         ## NOTE: Unicode mapping is wrong.
   },
   mime_text_suitable => 1,
@@ -379,8 +414,7 @@ $Charset->{'x-sjis'}
     'x-sjis' => UNREGISTERED_CHARSET_NAME,
   },
   perl_names => {
-    'shift-jis-1997' => UNREGISTERED_CHARSET_NAME | FALLBACK_ENCODING_IMPL |
-        ERROR_REPORTING_ENCODING_IMPL,
+    'shift-jis-1997' => FALLBACK_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
   },
   mime_text_suitable => 1,
 });
@@ -394,7 +428,8 @@ $Charset->{shift_jisx0213}
   },
   perl_names => {
     #shift_jisx0213 (non-standard - i don't know its conformance)
-    'shift-jis-1997' => FALLBACK_ENCODING_IMPL,
+    'shift-jis-1997' => FALLBACK_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
+    'shiftjis' => FALLBACK_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
   },
   mime_text_suitable => 1,
 });
@@ -412,7 +447,8 @@ $Charset->{'euc-jp'}
     'euc-jp' => PREFERRED_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
   perl_names => {
-    'euc-jp-1997' => UNREGISTERED_CHARSET_NAME | ERROR_REPORTING_ENCODING_IMPL,
+    'euc-jp-1997' => UNREGISTERED_CHARSET_NAME |
+        SEMICONFORMING_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
         ## NOTE: Though the IANA definition references the 1990 version
         ## of EUC-JP, the 1997 version of JIS standard claims that the version
         ## is same coded character set as the 1990 version, such that we
@@ -660,6 +696,59 @@ $Charset->{'windows-1252'}
 
 ## TODO: ...
 
+$Charset->{'tis-620'}
+= $IANACharset->{'tis-620'}
+= __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
+  iana_names => {
+    'tis-620' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
+  },
+  perl_names => {
+    'tis-620' => FALLBACK_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
+        ## NOTE: An alias of |iso-8859-11|.
+  },
+  is_html_ascii_superset => 1,
+});
+
+$Charset->{'iso-8859-11'}
+= $IANACharset->{'iso-8859-11'}
+= __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
+  iana_names => {
+    'iso-8859-11' => UNREGISTERED_CHARSET_NAME,
+        ## NOTE: The Web Thai encoding, i.e. windows-874.
+  },
+  perl_names => {
+    'windows-874' => FALLBACK_ENCODING_IMPL | ERROR_REPORTING_ENCODING_IMPL,
+    'web-thai' => UNREGISTERED_CHARSET_NAME | ERROR_REPORTING_ENCODING_IMPL,
+  },
+  fallback => {
+    "\x80" => "\x{20AC}",
+    "\x85" => "\x{2026}",
+    "\x91" => "\x{2018}",
+    "\x92" => "\x{2019}",
+    "\x93" => "\x{201C}",
+    "\x94" => "\x{201D}",
+    "\x95" => "\x{2022}",
+    "\x96" => "\x{2013}",
+    "\x97" => "\x{2014}",
+  },
+  is_html_ascii_superset => 1,
+});
+
+$Charset->{'windows-874'}
+= $IANACharset->{'windows-874'}
+= __PACKAGE__->new ({
+  category => CHARSET_CATEGORY_BLOCK_SAFE,
+  iana_names => {
+    'windows-874' => UNREGISTERED_CHARSET_NAME,
+  },
+  perl_names => {
+    'windows-874' => REGISTERED_CHARSET_NAME | ERROR_REPORTING_ENCODING_IMPL,
+  },
+  is_html_ascii_superset => 1,
+});
+
 sub new ($$) {
   return bless $_[1], $_[0];
 } # new
@@ -689,6 +778,8 @@ sub get_decode_handle ($$;%) {
     charset => '', ## TODO: We set a charset name for input_encoding (when we get identify-by-URI nonsense away)
     byte_buffer => $opt{byte_buffer} ? ${$opt{byte_buffer}} : '', ## TODO: ref, instead of value, should be used
     onerror => $opt{onerror} || sub {},
+    must_level => 'm',
+    fact_level => 'm',
   };
 
   require Whatpm::Charset::DecodeHandle;
@@ -730,13 +821,17 @@ sub get_decode_handle ($$;%) {
     } elsif ($self->{category} & CHARSET_CATEGORY_SJIS) {
       return ((bless $obj, 'Whatpm::Charset::DecodeHandle::ShiftJIS'),
               $e_status);
-    } elsif ($self->{category} & CHARSET_CATEGORY_BLOCK_SAFE) {
+    #} elsif ($self->{category} & CHARSET_CATEGORY_BLOCK_SAFE) {
+    } else {
+      $e_status |= FALLBACK_ENCODING_IMPL
+          unless $self->{category} & CHARSET_CATEGORY_BLOCK_SAFE;
       $obj->{bom_pattern} = $self->{bom_pattern};
+      $obj->{fallback} = $self->{fallback};
       return ((bless $obj, 'Whatpm::Charset::DecodeHandle::Encode'),
               $e_status);
-    } else {
-      ## TODO: no encoding error (?)
-      return (undef, 0);
+    #} else {
+    #  ## TODO: no encoding error (?)
+    #  return (undef, 0);
     }
   } else {
     ## TODO: no encoding error(?)
@@ -754,6 +849,10 @@ sub get_perl_encoding ($;%) {
       require Encode::EUCJP1997;
     } elsif ($name eq 'shift-jis-1997') {
       require Encode::ShiftJIS1997;
+    } elsif ($name eq 'web-latin1') {
+      require Whatpm::Charset::WebLatin1;
+    } elsif ($name eq 'web-thai') {
+      require Whatpm::Charset::WebThai;
     }
   }; # $load_encode
 
@@ -845,5 +944,5 @@ sub is_syntactically_valid_iana_charset_name ($) {
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2008/05/18 03:49:36 $
+## $Date: 2008/05/18 06:09:50 $
 

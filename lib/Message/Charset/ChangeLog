@@ -1,5 +1,13 @@
 2008-05-18  Wakaba  <wakaba@suika.fam.cx>
 
+	* Info.pm: Support for WebLatin encoding.  Support for Thai
+	encodings.  Support for non-block-safe encodings.  However,
+	for non-block-safe encodings we cannot assume that it works
+	well on our decode handle framework, therefore they are marked
+	as "fallback" mode (i.e. its result is unknown).
+
+2008-05-18  Wakaba  <wakaba@suika.fam.cx>
+
 	* Info.pm (SEMICONFORMING_ENCODING_IMPL): New.  Distinguish full
 	non-conformance from semi-conformance, where we can something
 	to make the decoder conformant.
