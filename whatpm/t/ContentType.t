@@ -2,7 +2,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 2023 }
+BEGIN { plan tests => 2040 }
 
 use Whatpm::ContentType;
 
@@ -688,6 +688,13 @@ for my $v (
     q<text/html>,
   ],
   [
+    x (qw(00 00 01 00 b6 2a 00 00 00 00 00 00 36 00 00 00 28 00)),
+    q<text/plain>, 0,
+    q<application/octet-stream>, 'Microsoft Windows icon',
+    q<image/vnd.microsoft.icon>,
+    q<text/html>,
+  ],
+  [
     q<<rss><title>RSS feed</title></rss>>,
     q<text/plain>, 0,
     q<text/plain>, 'RSS unversioned',
@@ -925,7 +932,7 @@ for my $v (
     },
     http_content_type_byte => $img_type,
     supported_image_types => {qw(image/png 1 image/jpeg 1 image/gif 1
-                                 image/bmp 1)});
+                                 image/bmp 1 image/vnd.microsoft.icon 1)});
     ok $st, $v->[5] =~ m#^image/# ? $v->[5] : $img_type,
         'Image (all): ' . $v->[4];
   }
@@ -940,5 +947,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2008/05/05 04:41:32 $
+## $Date: 2008/05/24 10:56:31 $
 1;

@@ -28,7 +28,7 @@ algorithm as defined in the HTML5 specification.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -98,6 +98,11 @@ our @UnknownSniffingTable = (
     "\x42\x4D",
     "image/bmp",
   ],
+  [
+    "\xFF\xFF\xFF\xFF",
+    "\x00\x00\x01\x00",
+    "image/vnd.microsoft.icon",
+  ],
 );
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type2>.
@@ -125,6 +130,10 @@ my @ImageSniffingTable = (
   [
     "\x42\x4D",
     "image/bmp",
+  ],
+  [
+    "\x00\x00\x01\x00",
+    "image/vnd.microsoft.icon",
   ],
 );
 ## NOTE: Ensure |$bytes| to be longer than pattern when a new image type
@@ -422,4 +431,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/05 04:41:32 $
+# $Date: 2008/05/24 10:56:31 $
