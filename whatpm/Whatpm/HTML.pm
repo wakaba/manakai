@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.139 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.140 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4072,84 +4072,78 @@ sub _tree_construction_initial ($) {
       } elsif (defined $token->{public_identifier}) {
         my $pubid = $token->{public_identifier};
         $pubid =~ tr/a-z/A-z/;
-        if ({
-          "+//SILMARIL//DTD HTML PRO V0R11 19970101//EN" => 1,
-          "-//ADVASOFT LTD//DTD HTML 3.0 ASWEDIT + EXTENSIONS//EN" => 1,
-          "-//AS//DTD HTML 3.0 ASWEDIT + EXTENSIONS//EN" => 1,
-          "-//IETF//DTD HTML 2.0 LEVEL 1//EN" => 1,
-          "-//IETF//DTD HTML 2.0 LEVEL 2//EN" => 1,
-          "-//IETF//DTD HTML 2.0 STRICT LEVEL 1//EN" => 1,
-          "-//IETF//DTD HTML 2.0 STRICT LEVEL 2//EN" => 1,
-          "-//IETF//DTD HTML 2.0 STRICT//EN" => 1,
-          "-//IETF//DTD HTML 2.0//EN" => 1,
-          "-//IETF//DTD HTML 2.1E//EN" => 1,
-          "-//IETF//DTD HTML 3.0//EN" => 1,
-          "-//IETF//DTD HTML 3.0//EN//" => 1,
-          "-//IETF//DTD HTML 3.2 FINAL//EN" => 1,
-          "-//IETF//DTD HTML 3.2//EN" => 1,
-          "-//IETF//DTD HTML 3//EN" => 1,
-          "-//IETF//DTD HTML LEVEL 0//EN" => 1,
-          "-//IETF//DTD HTML LEVEL 0//EN//2.0" => 1,
-          "-//IETF//DTD HTML LEVEL 1//EN" => 1,
-          "-//IETF//DTD HTML LEVEL 1//EN//2.0" => 1,
-          "-//IETF//DTD HTML LEVEL 2//EN" => 1,
-          "-//IETF//DTD HTML LEVEL 2//EN//2.0" => 1,
-          "-//IETF//DTD HTML LEVEL 3//EN" => 1,
-          "-//IETF//DTD HTML LEVEL 3//EN//3.0" => 1,
-          "-//IETF//DTD HTML STRICT LEVEL 0//EN" => 1,
-          "-//IETF//DTD HTML STRICT LEVEL 0//EN//2.0" => 1,
-          "-//IETF//DTD HTML STRICT LEVEL 1//EN" => 1,
-          "-//IETF//DTD HTML STRICT LEVEL 1//EN//2.0" => 1,
-          "-//IETF//DTD HTML STRICT LEVEL 2//EN" => 1,
-          "-//IETF//DTD HTML STRICT LEVEL 2//EN//2.0" => 1,
-          "-//IETF//DTD HTML STRICT LEVEL 3//EN" => 1,
-          "-//IETF//DTD HTML STRICT LEVEL 3//EN//3.0" => 1,
-          "-//IETF//DTD HTML STRICT//EN" => 1,
-          "-//IETF//DTD HTML STRICT//EN//2.0" => 1,
-          "-//IETF//DTD HTML STRICT//EN//3.0" => 1,
-          "-//IETF//DTD HTML//EN" => 1,
-          "-//IETF//DTD HTML//EN//2.0" => 1,
-          "-//IETF//DTD HTML//EN//3.0" => 1,
-          "-//METRIUS//DTD METRIUS PRESENTATIONAL//EN" => 1,
-          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 HTML STRICT//EN" => 1,
-          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 HTML//EN" => 1,
-          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 TABLES//EN" => 1,
-          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 HTML STRICT//EN" => 1,
-          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 HTML//EN" => 1,
-          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 TABLES//EN" => 1,
-          "-//NETSCAPE COMM. CORP.//DTD HTML//EN" => 1,
-          "-//NETSCAPE COMM. CORP.//DTD STRICT HTML//EN" => 1,
-          "-//O'REILLY AND ASSOCIATES//DTD HTML 2.0//EN" => 1,
-          "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED 1.0//EN" => 1,
-          "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED RELAXED 1.0//EN" => 1,
-          "-//SOFTQUAD SOFTWARE//DTD HOTMETAL PRO 6.0::19990601::EXTENSIONS TO HTML 4.0//EN" => 1,
-          "-//SOFTQUAD//DTD HOTMETAL PRO 4.0::19971010::EXTENSIONS TO HTML 4.0//EN" => 1,
-          "-//SPYGLASS//DTD HTML 2.0 EXTENDED//EN" => 1,
-          "-//SQ//DTD HTML 2.0 HOTMETAL + EXTENSIONS//EN" => 1,
-          "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA HTML//EN" => 1,
-          "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA STRICT HTML//EN" => 1,
-          "-//W3C//DTD HTML 3 1995-03-24//EN" => 1,
-          "-//W3C//DTD HTML 3.2 DRAFT//EN" => 1,
-          "-//W3C//DTD HTML 3.2 FINAL//EN" => 1,
-          "-//W3C//DTD HTML 3.2//EN" => 1,
-          "-//W3C//DTD HTML 3.2S DRAFT//EN" => 1,
-          "-//W3C//DTD HTML 4.0 FRAMESET//EN" => 1,
-          "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN" => 1,
-          "-//W3C//DTD HTML EXPERIMETNAL 19960712//EN" => 1,
-          "-//W3C//DTD HTML EXPERIMENTAL 970421//EN" => 1,
-          "-//W3C//DTD W3 HTML//EN" => 1,
-          "-//W3O//DTD W3 HTML 3.0//EN" => 1,
-          "-//W3O//DTD W3 HTML 3.0//EN//" => 1,
-          "-//W3O//DTD W3 HTML STRICT 3.0//EN//" => 1,
-          "-//WEBTECHS//DTD MOZILLA HTML 2.0//EN" => 1,
-          "-//WEBTECHS//DTD MOZILLA HTML//EN" => 1,
-          "-/W3C/DTD HTML 4.0 TRANSITIONAL/EN" => 1,
-          "HTML" => 1,
-        }->{$pubid}) {
+        my $prefix = [
+          "+//SILMARIL//DTD HTML PRO V0R11 19970101//",
+          "-//ADVASOFT LTD//DTD HTML 3.0 ASWEDIT + EXTENSIONS//",
+          "-//AS//DTD HTML 3.0 ASWEDIT + EXTENSIONS//",
+          "-//IETF//DTD HTML 2.0 LEVEL 1//",
+          "-//IETF//DTD HTML 2.0 LEVEL 2//",
+          "-//IETF//DTD HTML 2.0 STRICT LEVEL 1//",
+          "-//IETF//DTD HTML 2.0 STRICT LEVEL 2//",
+          "-//IETF//DTD HTML 2.0 STRICT//",
+          "-//IETF//DTD HTML 2.0//",
+          "-//IETF//DTD HTML 2.1E//",
+          "-//IETF//DTD HTML 3.0//",
+          "-//IETF//DTD HTML 3.2 FINAL//",
+          "-//IETF//DTD HTML 3.2//",
+          "-//IETF//DTD HTML 3//",
+          "-//IETF//DTD HTML LEVEL 0//",
+          "-//IETF//DTD HTML LEVEL 1//",
+          "-//IETF//DTD HTML LEVEL 2//",
+          "-//IETF//DTD HTML LEVEL 3//",
+          "-//IETF//DTD HTML STRICT LEVEL 0//",
+          "-//IETF//DTD HTML STRICT LEVEL 1//",
+          "-//IETF//DTD HTML STRICT LEVEL 2//",
+          "-//IETF//DTD HTML STRICT LEVEL 3//",
+          "-//IETF//DTD HTML STRICT//",
+          "-//IETF//DTD HTML//",
+          "-//METRIUS//DTD METRIUS PRESENTATIONAL//",
+          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 HTML STRICT//",
+          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 HTML//",
+          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 TABLES//",
+          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 HTML STRICT//",
+          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 HTML//",
+          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 TABLES//",
+          "-//NETSCAPE COMM. CORP.//DTD HTML//",
+          "-//NETSCAPE COMM. CORP.//DTD STRICT HTML//",
+          "-//O'REILLY AND ASSOCIATES//DTD HTML 2.0//",
+          "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED 1.0//",
+          "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED RELAXED 1.0//",
+          "-//SOFTQUAD SOFTWARE//DTD HOTMETAL PRO 6.0::19990601::EXTENSIONS TO HTML 4.0//",
+          "-//SOFTQUAD//DTD HOTMETAL PRO 4.0::19971010::EXTENSIONS TO HTML 4.0//",
+          "-//SPYGLASS//DTD HTML 2.0 EXTENDED//",
+          "-//SQ//DTD HTML 2.0 HOTMETAL + EXTENSIONS//",
+          "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA HTML//",
+          "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA STRICT HTML//",
+          "-//W3C//DTD HTML 3 1995-03-24//",
+          "-//W3C//DTD HTML 3.2 DRAFT//",
+          "-//W3C//DTD HTML 3.2 FINAL//",
+          "-//W3C//DTD HTML 3.2//",
+          "-//W3C//DTD HTML 3.2S DRAFT//",
+          "-//W3C//DTD HTML 4.0 FRAMESET//",
+          "-//W3C//DTD HTML 4.0 TRANSITIONAL//",
+          "-//W3C//DTD HTML EXPERIMETNAL 19960712//",
+          "-//W3C//DTD HTML EXPERIMENTAL 970421//",
+          "-//W3C//DTD W3 HTML//",
+          "-//W3O//DTD W3 HTML 3.0//",
+          "-//WEBTECHS//DTD MOZILLA HTML 2.0//",
+          "-//WEBTECHS//DTD MOZILLA HTML//",
+        ]; # $prefix
+        my $match;
+        for (@$prefix) {
+          if (substr ($prefix, 0, length $_) eq $_) {
+            $match = 1;
+            last;
+          }
+        }
+        if ($match or
+            $pubid eq "-//W3O//DTD W3 HTML STRICT 3.0//EN//" or
+            $pubid eq "-/W3C/DTD HTML 4.0 TRANSITIONAL/EN" or
+            $pubid eq "HTML") {
           
           $self->{document}->manakai_compat_mode ('quirks');
-        } elsif ($pubid eq "-//W3C//DTD HTML 4.01 FRAMESET//EN" or
-                 $pubid eq "-//W3C//DTD HTML 4.01 TRANSITIONAL//EN") {
+        } elsif ($pubid =~ m[^-//W3C//DTD HTML 4.01 FRAMESET//] or
+                 $pubid =~ m[^-//W3C//DTD HTML 4.01 TRANSITIONAL//]) {
           if (defined $token->{system_identifier}) {
             
             $self->{document}->manakai_compat_mode ('quirks');
@@ -4157,8 +4151,8 @@ sub _tree_construction_initial ($) {
             
             $self->{document}->manakai_compat_mode ('limited quirks');
           }
-        } elsif ($pubid eq "-//W3C//DTD XHTML 1.0 FRAMESET//EN" or
-                 $pubid eq "-//W3C//DTD XHTML 1.0 TRANSITIONAL//EN") {
+        } elsif ($pubid =~ m[^-//W3C//DTD XHTML 1.0 FRAMESET//] or
+                 $pubid =~ m[^-//W3C//DTD XHTML 1.0 TRANSITIONAL//]) {
           
           $self->{document}->manakai_compat_mode ('limited quirks');
         } else {
@@ -4171,7 +4165,8 @@ sub _tree_construction_initial ($) {
         my $sysid = $token->{system_identifier};
         $sysid =~ tr/A-Z/a-z/;
         if ($sysid eq "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd") {
-          ## TODO: Check the spec: PUBLIC "(limited quirks)" "(quirks)"
+          ## NOTE: Ensure that |PUBLIC "(limited quirks)" "(quirks)"| is 
+          ## marked as quirks.
           $self->{document}->manakai_compat_mode ('quirks');
           
         } else {
@@ -9318,4 +9313,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/24 10:32:29 $
+# $Date: 2008/05/24 10:48:57 $
