@@ -1,6 +1,6 @@
 package Whatpm::HTML::Serializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub get_inner_html ($$$) {
   my (undef, $node, $on_error) = @_;
@@ -64,7 +64,7 @@ sub get_inner_html ($$$) {
         spacer => 1, wbr => 1,
       }->{$tag_name};
 
-      $s .= "\x0A" if $tag_name eq 'pre' or $tag_name eq 'textarea';
+      $s .= "\x0A" if {pre => 1, textarea => 1, listing => 1}->{$tag_name};
 
       if (not $in_cdata and {
         style => 1, script => 1, xmp => 1, iframe => 1,
@@ -115,4 +115,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/03/02 03:39:41 $
+## $Date: 2008/05/24 10:58:19 $
