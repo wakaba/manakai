@@ -1,7 +1,7 @@
-1..1068
+1..1073
 # Running under perl version 5.008007 for linux
-# Current time local: Sat May 24 19:13:42 2008
-# Current time GMT:   Sat May 24 10:13:42 2008
+# Current time local: Sat May 24 19:27:51 2008
+# Current time GMT:   Sat May 24 10:27:51 2008
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -158,10 +158,18 @@ ok 124
 ok 125
 ok 126
 ok 127
-ok 128
+not ok 128
+# Test 128 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            qq'',\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 206 fail #128)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            qq'',\n            0\n          ]\n        ];\n" (<!doctype! system'': qq'<!doctype! system\x{27}\x{27}')
+#     Line 3 is missing:
+#      - "          qq'ParseError',\n"
 ok 129
 ok 130
-ok 131
+not ok 131
+# Test 131 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            qq'',\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 206 fail #131)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            qq'',\n            0\n          ]\n        ];\n" (<!doctype! system"" : qq'<!doctype! system"" ')
+#     Line 3 is missing:
+#      - "          qq'ParseError',\n"
 ok 132
 ok 133
 ok 134

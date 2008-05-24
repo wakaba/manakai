@@ -460,3 +460,24 @@ control character
 #document-fragment p escaped
 | "\U0010ffff"
 
+#data
+<!DOCTYPE HTML SYSTEM "x"
+#errors
+not HTML5
+#document
+| <!DOCTYPE HTML SYSTEM "x">
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML SYSTEM "x"y>
+#errors
+string after SYSTEM literal
+not HTML5
+#document
+| <!DOCTYPE HTML SYSTEM "x">
+| <html>
+|   <head>
+|   <body>
+

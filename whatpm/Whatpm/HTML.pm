@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.138 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.139 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3561,7 +3561,6 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == -1) {
         
-        $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
         ## reconsume
@@ -9319,4 +9318,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/24 10:18:25 $
+# $Date: 2008/05/24 10:32:29 $
