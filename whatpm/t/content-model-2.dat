@@ -1850,13 +1850,11 @@ id=""><span id="">x</span></p>
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /style/@type;IMT:syntax error
-/style;style:;unsupported
 
 #data
 <style type="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /style/@type;IMT:syntax error
-/style;style:text;unsupported
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1879,7 +1877,6 @@ id=""><span id="">x</span></p>
        but syntactically correct. -->
 </style>
 #errors
-/style;style:text/css; charset=us-ascii;unsupported
 
 #data
 <style media="all" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6693,33 +6690,33 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:syntax error
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script type="text/javascript;e4x=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
 /script/@type;IMT:parameter not allowed:e4x;m
-/script;script:text/javascript;e4x=1;unsupported
+/script;SUBDOC
 
 #data
 <script type="text/JavaScript;E4X=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
 /script/@type;IMT:parameter not allowed:e4x;m
-/script;script:text/JavaScript;E4X=1;unsupported
+/script;SUBDOC
 
 #data
 <script type="text/javascript;e4x=&quot;1&quot;"
@@ -6727,7 +6724,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /script/@type;IMT:obsolete subtype;w
 /script/@type;IMT:parameter not allowed:e4x;m
-/script;script:text/javascript;e4x="1";unsupported
+/script;SUBDOC
 
 #data
 <script type="text/javascript;e4x=&quot;\1&quot;"
@@ -6735,7 +6732,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /script/@type;IMT:obsolete subtype;w
 /script/@type;IMT:parameter not allowed:e4x;m
-/script;script:text/javascript;e4x="\1";unsupported
+/script;SUBDOC
 
 #data
 <script type="text/javascript; ~=a"
@@ -6744,7 +6741,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /script/@type;IMT:obsolete subtype;w
 /script/@type;IMT:attribute:syntax error:~;m
 /script/@type;IMT:parameter not allowed:~;m
-/script;script:text/javascript; ~=a;unsupported
+/script;SUBDOC
 
 #data
 <script type="text~/javascript"
@@ -6753,7 +6750,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /script/@type;IMT:type;unsupported
 /script/@type;IMT:unregistered type;w
 /script/@type;IMT:type:syntax error:text~;m
-/script;script:text~/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script type="text/javascript~"
@@ -6761,7 +6758,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /script/@type;IMT:subtype;unsupported
 /script/@type;IMT:subtype:syntax error:javascript~;m
-/script;script:text/javascript~;unsupported
+/script;SUBDOC
 
 #data
 <script src="http://test/" type="text/javascript"
@@ -6779,7 +6776,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <script defer="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script src="http://test/" defer=""
@@ -6789,7 +6786,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <script defer="defer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script src="http://test/" defer="defer"
@@ -6799,13 +6796,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <script defer="DEFER" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script defer="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@defer;boolean:invalid;m
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script src="http://test/" defer="true"
@@ -6816,7 +6813,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <script async="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script src="http://test/" async=""
@@ -6826,7 +6823,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <script async="async" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script src="http://test/" async="async"
@@ -6837,7 +6834,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <script async="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@async;boolean:invalid;m
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script src="http://test/" async="true"
@@ -6853,12 +6850,12 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <script defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script defer="defer" async="async" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script src="" defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6868,66 +6865,63 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <script language="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script langage="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@langage;attribute not defined;m
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script languege="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@languege;attribute not defined;m
-/script;script:text/javascript;unsupported
+/script;SUBDOC
 
 #data
 <script language="JavaScript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;script:text/JavaScript;unsupported
+/script;SUBDOC
 
 #data
 <script language="jscript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;script:text/jscript;unsupported
+/script;SUBDOC
 
 #data
 <script language="javascript1.2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;script:text/javascript1.2;unsupported
+/script;SUBDOC
 
 #data
 <script language="vbscript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;script:text/vbscript;unsupported
+/script;SUBDOC
 
 #data
 <script language="XML" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;script:text/XML;unsupported
 
 #data
 <script charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/XML;unsupported
 /script/@charset;attribute not allowed;m
+/script;SUBDOC
 
 #data
 <script src="" charset="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/XML;unsupported
 /script/@charset;charset:syntax error;m
 
 #data
 <script src="" charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;script:text/XML;unsupported
 
 #data
 <event-source xmlns="http://www.w3.org/1999/xhtml"/>

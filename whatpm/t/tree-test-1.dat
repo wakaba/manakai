@@ -5540,6 +5540,60 @@ no </select> before <input>
 |     "a"
 
 #data
+<!DOCTYPE HTML><select><textarea></textarea>
+#errors
+<textarea> in <select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <textarea>
+
+#data
+<!DOCTYPE HTML><select><option><textarea></textarea>
+#errors
+<textarea> in <select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|     <textarea>
+
+#data
+<!DOCTYPE HTML><select><optgroup><textarea></textarea>
+#errors
+<textarea> in <select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <optgroup>
+|     <textarea>
+
+#data
+<!DOCTYPE HTML><table><tr><td><select><textarea></textarea></table>
+#errors
+<textarea> in <select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|             <textarea>
+
+#data
 <!DOCTYPE HTML><select><table></table>
 #errors
 <table> in <select>
@@ -6549,3 +6603,124 @@ unexpected end-of-file
 |   <head>
 |   <body>
 |     <span>
+
+#data
+<!DOCTYPE HTML><svg>
+#errors
+end of file in foreign content
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+
+#data
+<!DOCTYPE HTML><svg><g>
+#errors
+end of file in foreign content
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|       <g>
+
+#data
+<!DOCTYPE HTML><svg><switch requiredfeatures></switch></svg>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|       <switch>
+|         requiredFeatures=""
+
+#data
+<!DOCTYPE HTML><svg><rect x="1" y="1" width="2" height="2" fill="black"><animate attributeNAME="x" begin="0s" dur="9s" fill="freeze" from="300" to="0"/></rect></svg>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|       <rect>
+|         fill="black"
+|         height="2"
+|         width="2"
+|         x="1"
+|         y="1"
+|         <animate>
+|           attributeName="x"
+|           begin="0s"
+|           dur="9s"
+|           fill="freeze"
+|           from="300"
+|           to="0"
+
+#data
+<!DOCTYPE HTML><svg><dt>
+#errors
+<dt> in <svg>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|     <dt>
+
+#data
+<!DOCTYPE HTML><svg><h4>
+#errors
+<h4> in <svg>
+h4 not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|     <h4>
+
+#data
+<!DOCTYPE HTML><svg><listing>
+#errors
+<listing> in <svg>
+no </listing>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|     <listing>
+
+#data
+<!DOCTYPE HTML><svg><ol></ol>
+#errors
+<ol> in <svg>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|     <ol>
+
+#data
+<!DOCTYPE HTML><svg><strike></strike>
+#errors
+<strike> in <svg>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|     <strike>
+

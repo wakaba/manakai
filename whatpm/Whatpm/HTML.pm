@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.142 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.143 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -211,6 +211,7 @@ my $el_category_f = {
 };
 
 my $svg_attr_name = {
+  attributename => 'attributeName',
   attributetype => 'attributeType',
   basefrequency => 'baseFrequency',
   baseprofile => 'baseProfile',
@@ -221,11 +222,6 @@ my $svg_attr_name = {
   diffuseconstant => 'diffuseConstant',
   edgemode => 'edgeMode',
   externalresourcesrequired => 'externalResourcesRequired',
-  fecolormatrix => 'feColorMatrix',
-  fecomposite => 'feComposite',
-  fegaussianblur => 'feGaussianBlur',
-  femorphology => 'feMorphology',
-  fetile => 'feTile',
   filterres => 'filterRes',
   filterunits => 'filterUnits',
   glyphref => 'glyphRef',
@@ -259,6 +255,7 @@ my $svg_attr_name = {
   repeatcount => 'repeatCount',
   repeatdur => 'repeatDur',
   requiredextensions => 'requiredExtensions',
+  requiredfeatures => 'requiredFeatures',
   specularconstant => 'specularConstant',
   specularexponent => 'specularExponent',
   spreadmethod => 'spreadMethod',
@@ -5013,13 +5010,13 @@ sub _tree_construction_main ($) {
           #
         } elsif ({
                   b => 1, big => 1, blockquote => 1, body => 1, br => 1,
-                  center => 1, code => 1, dd => 1, div => 1, dl => 1, em => 1,
-                  embed => 1, font => 1, h1 => 1, h2 => 1, h3 => 1, ## No h4!
-                  h5 => 1, h6 => 1, head => 1, hr => 1, i => 1, img => 1,
-                  li => 1, menu => 1, meta => 1, nobr => 1, p => 1, pre => 1,
-                  ruby => 1, s => 1, small => 1, span => 1, strong => 1,
-                  sub => 1, sup => 1, table => 1, tt => 1, u => 1, ul => 1,
-                  var => 1,
+                  center => 1, code => 1, dd => 1, div => 1, dl => 1, dt => 1,
+                  em => 1, embed => 1, font => 1, h1 => 1, h2 => 1, h3 => 1,
+                  h4 => 1, h5 => 1, h6 => 1, head => 1, hr => 1, i => 1,
+                  img => 1, li => 1, listing => 1, menu => 1, meta => 1,
+                  nobr => 1, ol => 1, p => 1, pre => 1, ruby => 1, s => 1,
+                  small => 1, span => 1, strong => 1, strike => 1, sub => 1,
+                  sup => 1, table => 1, tt => 1, u => 1, ul => 1, var => 1,
                  }->{$token->{tag_name}}) {
           
           $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
@@ -5136,10 +5133,18 @@ sub _tree_construction_main ($) {
         
         #
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
-        ## NOTE: "using the rules for secondary insertion mode" then "continue"
         
-        #
-        ## TODO: ...
+        $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                        value => $self->{open_elements}->[-1]->[0]
+                            ->manakai_local_name,
+                        token => $token);
+
+        pop @{$self->{open_elements}}
+            while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
+
+        $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
+        ## Reprocess.
+        next B;
       } else {
         die "$0: $token->{type}: Unknown token type";        
       }
@@ -7353,8 +7358,9 @@ sub _tree_construction_main ($) {
           
           $token = $self->_get_next_token;
           next B;
-        } elsif ($token->{tag_name} eq 'select' or
-                 $token->{tag_name} eq 'input' or
+        } elsif ({
+                   select => 1, input => 1, textarea => 1,
+                 }->{$token->{tag_name}} or
                  ($self->{insertion_mode} == IN_SELECT_IN_TABLE_IM and
                   {
                    caption => 1, table => 1,
@@ -9310,4 +9316,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/24 11:57:47 $
+# $Date: 2008/05/24 14:19:54 $

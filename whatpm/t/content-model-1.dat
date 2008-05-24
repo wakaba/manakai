@@ -149,7 +149,7 @@
 #errors
 /head;child element missing:title
 /head/script/@type;IMT:obsolete subtype;w
-/head/script;script:text/javascript;unsupported
+/head/script;SUBDOC
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -274,7 +274,7 @@
 </head>
 #errors
 /head/script/@type;IMT:obsolete subtype;w
-/head/script;script:text/javascript;unsupported
+/head/script;SUBDOC
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -283,7 +283,7 @@
 </head>
 #errors
 /head/script/@type;IMT:obsolete subtype;w
-/head/script;script:text/javascript;unsupported
+/head/script;SUBDOC
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -900,7 +900,7 @@ p {color: green}
 </body>
 #errors
 /body/script/@type;IMT:obsolete subtype;w
-/body/script;script:text/javascript;unsupported
+/body/script;SUBDOC
 /body;no significant content;s
 
 #data
@@ -1120,7 +1120,7 @@ para
 </section>
 #errors
 /section/script/@type;IMT:obsolete subtype;w
-/section/script;script:text/javascript;unsupported
+/section/script;SUBDOC
 /section;no significant content;s
 
 #data
@@ -5192,7 +5192,7 @@ xxxx
 #errors
 /head/noscript;in XML:noscript
 /head/noscript/script;element not allowed:head noscript;m
-/head/noscript/script;script:text/javascript;unsupported
+/head/noscript/script;SUBDOC
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -6124,7 +6124,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><script><nest/></script></rule>
 #errors
-/rule/script;script:text/javascript;unsupported
+/rule/script;SUBDOC
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/></footer></rule>

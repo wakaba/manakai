@@ -1,7 +1,7 @@
 1..2192
 # Running under perl version 5.008007 for linux
-# Current time local: Sat May 24 20:51:48 2008
-# Current time GMT:   Sat May 24 11:51:48 2008
+# Current time local: Sat May 24 23:14:35 2008
+# Current time GMT:   Sat May 24 14:14:35 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2133,15 +2133,11 @@ ok 2033
 ok 2034
 ok 2035
 ok 2036
-not ok 2037
-# Test 2037 got: "/script/@charset;attribute not allowed;m\n/script;script:text/javascript;unsupported" (t/ContentChecker.t at line 99 fail #2037)
-#      Expected: "/script/@charset;attribute not allowed;m\n/script;script:text/XML;unsupported" (<script charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2037
 not ok 2038
 # Test 2038 got: "/script/@charset;charset:not registered:;w\n/script/@charset;charset:syntax error:;m" (t/ContentChecker.t at line 99 fail #2038)
-#      Expected: "/script/@charset;charset:syntax error;m\n/script;script:text/XML;unsupported" (<script src="" charset="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2039
-# Test 2039 got: "" (t/ContentChecker.t at line 99 fail #2039)
-#      Expected: "/script;script:text/XML;unsupported" (<script src="" charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>)
+#      Expected: "/script/@charset;charset:syntax error;m" (<script src="" charset="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2039
 ok 2040
 ok 2041
 ok 2042
