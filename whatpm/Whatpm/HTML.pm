@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.136 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.137 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4329,31 +4329,36 @@ sub _reset_insertion_mode ($) {
       if ($self->{open_elements}->[0]->[0] eq $node->[0]) {
         $last = 1;
         if (defined $self->{inner_html_node}) {
-          if ($self->{inner_html_node}->[1] & TABLE_CELL_EL) {
-            
-            #
-          } else {
-            
-            $node = $self->{inner_html_node};
-          }
+          
+          $node = $self->{inner_html_node};
+        } else {
+          die "_reset_insertion_mode: t27";
         }
       }
-    
-    ## Step 4..14
-    my $new_mode;
-    if ($node->[1] & FOREIGN_EL) {
-      ## NOTE: Strictly spaking, the line below only applies to MathML and
-      ## SVG elements.  Currently the HTML syntax supports only MathML and
-      ## SVG elements as foreigners.
-      $new_mode = $self->{insertion_mode} | IN_FOREIGN_CONTENT_IM;
-      ## ISSUE: What is set as the secondary insertion mode?
-    } else {
-      $new_mode = {
+      
+      ## Step 4..14
+      my $new_mode;
+      if ($node->[1] & FOREIGN_EL) {
+        
+        ## NOTE: Strictly spaking, the line below only applies to MathML and
+        ## SVG elements.  Currently the HTML syntax supports only MathML and
+        ## SVG elements as foreigners.
+        $new_mode = $self->{insertion_mode} | IN_FOREIGN_CONTENT_IM;
+        ## ISSUE: What is set as the secondary insertion mode?
+      } elsif ($node->[1] & TABLE_CELL_EL) {
+        if ($last) {
+          
+          #
+        } else {
+          
+          $new_mode = IN_CELL_IM;
+        }
+      } else {
+        
+        $new_mode = {
                       select => IN_SELECT_IM,
                       ## NOTE: |option| and |optgroup| do not set
                       ## insertion mode to "in select" by themselves.
-                      td => IN_CELL_IM,
-                      th => IN_CELL_IM,
                       tr => IN_ROW_IM,
                       tbody => IN_TABLE_BODY_IM,
                       thead => IN_TABLE_BODY_IM,
@@ -4365,8 +4370,8 @@ sub _reset_insertion_mode ($) {
                       body => IN_BODY_IM,
                       frameset => IN_FRAMESET_IM,
                      }->{$node->[0]->manakai_local_name};
-    }
-    $self->{insertion_mode} = $new_mode and return if defined $new_mode;
+      }
+      $self->{insertion_mode} = $new_mode and return if defined $new_mode;
       
       ## Step 15
       if ($node->[1] & HTML_EL) {
@@ -9274,4 +9279,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/24 04:26:26 $
+# $Date: 2008/05/24 09:59:52 $
