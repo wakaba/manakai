@@ -1,6 +1,6 @@
 package Whatpm::HTML::Serializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 sub get_inner_html ($$$) {
   my (undef, $node, $on_error) = @_;
@@ -51,7 +51,7 @@ sub get_inner_html ($$$) {
         $attr_value =~ s/&/&amp;/g;
         $attr_value =~ s/</&lt;/g;
         $attr_value =~ s/>/&gt;/g;
-        $attr_value =~ s/"/&quot;/g;
+        $attr_value =~ s/"/&quot;/g; # in attribute mode
         $attr_value =~ s/\xA0/&nbsp;/g;
         $s .= $attr_value . '"';
       }
@@ -84,7 +84,7 @@ sub get_inner_html ($$$) {
         $value =~ s/&/&amp;/g;
         $value =~ s/</&lt;/g;
         $value =~ s/>/&gt;/g;
-        $value =~ s/"/&quot;/g;
+        #$value =~ s/"/&quot;/g;
         $value =~ s/\xA0/&nbsp;/g;
         $s .= $value;
       }
@@ -115,4 +115,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/05/24 10:58:19 $
+## $Date: 2008/05/24 12:04:21 $
