@@ -738,21 +738,19 @@ unmatched </p>
 |   <head>
 |     <noscript>
 |   <body>
-|     <p>
 
 ## When scripting is disabled
 #data
 <!DOCTYPE HTML><head><noscript></br>
 #errors
 </br> in <noscript> in <head>
-</br>
+</br> after </head>
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <noscript>
 |   <body>
-|     <br>
 
 ## When scripting is disabled
 #data
@@ -798,13 +796,13 @@ unexpected end of file (no </noscript>)
 <!DOCTYPE HTML><head></head></head><link><body>
 #errors
 </head> after </head>
-<link> in <body>
+<link> after </head>
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <body>
 |     <link>
+|   <body>
 
 #data
 <!DOCTYPE HTML></noscript><head><body>
@@ -832,13 +830,13 @@ unexpected end of file (no </noscript>)
 <!DOCTYPE HTML><head></head></noscript><link><body>
 #errors
 </noscript> after </head>
-<link> in <body>
+<link> after </head>
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <body>
 |     <link>
+|   <body>
 
 ## When scripting is disabled
 #data
@@ -877,18 +875,164 @@ unexpected end of file (no </noscript>)
 | <html>
 |   <head>
 |   <body>
-|     <p>
 
 #data
 <!DOCTYPE HTML></br>
 #errors
-</br>
+</br> after </head>
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |   <body>
-|     <br>
+
+#data
+<!DOCTYPE HTML></head></p>
+#errors
+</p> after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></body><link>x
+#errors
+</body> in head
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <link>
+|   <body>
+|     "x"
+
+#data
+<head></html><link>
+#errors
+no <!DOCTYPE>
+</html> in <head>
+#document
+| <html>
+|   <head>
+|     <link>
+|   <body>
+
+#data
+<head></p><link>
+#errors
+no <!DOCTYPE>
+</p> in head
+#document
+| <html>
+|   <head>
+|     <link>
+|   <body>
+
+#data
+<head></head></p>
+#errors
+no <!DOCTYPE>
+</p> after </head>
+#document
+| <html>
+|   <head>
+|   <body>
+
+#data
+</p>
+#errors
+no <!DOCTYPE>
+</p> before </head>
+#document
+| <html>
+|   <head>
+|   <body>
+
+#data
+<head></head></div>
+#errors
+no <!DOCTYPE>
+</div> after </head>
+#document
+| <html>
+|   <head>
+|   <body>
+
+#data
+<head></head></unknown>
+#errors
+no <!DOCTYPE>
+</unknown> after </head>
+#document
+| <html>
+|   <head>
+|   <body>
+
+#data
+<head></head></head>
+#errors
+no <!DOCTYPE>
+</head> after </head>
+#document
+| <html>
+|   <head>
+|   <body>
+
+#data
+<head></head></html>x
+#errors
+no <!DOCTYPE>
+</html> after </head>
+#document
+| <html>
+|   <head>
+|   <body>
+|     "x"
+
+#data
+<head></head></body><body>y</body>
+#errors
+no <!DOCTYPE>
+</body> after </head>
+#document
+| <html>
+|   <head>
+|   <body>
+|     "y"
+
+#data
+<head></head></noscript>
+#errors
+no <!DOCTYPE>
+</noscript> after </head>
+#document
+| <html>
+|   <head>
+|   <body>
+
+#data
+<head></head></style>
+#errors
+no <!DOCTYPE>
+</style> after </head>
+#document
+| <html>
+|   <head>
+|   <body>
+
+#data
+<head></br><link>
+#errors
+no <!DOCTYPE>
+</br> in </head>
+<link> in </head>
+#document
+| <html>
+|   <head>
+|     <link>
+|   <body>
 
 #data
 <!DOCTYPE HTML><head></head></img>
@@ -913,6 +1057,7 @@ unmatched </div>
 #data
 <!DOCTYPE HTML><head></head></body>
 #errors
+</body> after </head>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -922,6 +1067,7 @@ unmatched </div>
 #data
 <!DOCTYPE HTML><head></head></html>
 #errors
+</html> after </head>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -3159,13 +3305,36 @@ unexpected end of file
 </body></html><html a>
 #errors
 no <!DOCTYPE>
-<html> after </html>
+</body> before head
+</html> before head
 <html> in body
 #document
 | <html>
 |   a=""
 |   <head>
 |   <body>
+
+#data
+</html>
+#errors
+no <!DOCTYPE>
+</html> before head
+#document
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!----></html>x
+#errors
+no <!DOCTYPE>
+</html> before head
+#document
+| <!--  -->
+| <html>
+|   <head>
+|   <body>
+|     "x"
 
 #data
 <body></body></html><html a>

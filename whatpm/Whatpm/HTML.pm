@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.135 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.136 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -10,6 +10,8 @@ use Error qw(:try);
 
 ## TODO: 1252 parse error (revision 1264)
 ## TODO: 8859-11 = 874 (revision 1271)
+
+require IO::Handle;
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 my $MML_NS = q<http://www.w3.org/1998/Math/MathML>;
@@ -566,7 +568,9 @@ sub parse_byte_stream ($$$$;$) {
 
 sub parse_char_string ($$$;$) {
   my $self = shift;
-  open my $input, '<:utf8', ref $_[0] ? $_[0] : \($_[0]);
+  require utf8;
+  my $s = ref $_[0] ? $_[0] : \($_[0]);
+  open my $input, '<' . (utf8::is_utf8 ($$s) ? ':utf8' : ''), $s;
   return $self->parse_char_stream ($input, @_[1..$#_]);
 } # parse_char_string
 *parse_string = \&parse_char_string;
@@ -592,7 +596,13 @@ sub parse_char_stream ($$$;$) {
     pop @{$self->{prev_char}};
     unshift @{$self->{prev_char}}, $self->{next_char};
 
-    my $char = $input->getc;
+    my $char;
+    if (defined $self->{next_next_char}) {
+      $char = $self->{next_next_char};
+      delete $self->{next_next_char};
+    } else {
+      $char = $input->getc;
+    }
     $self->{next_char} = -1 and return unless defined $char;
     $self->{next_char} = ord $char;
 
@@ -607,8 +617,8 @@ sub parse_char_stream ($$$;$) {
     } elsif ($self->{next_char} == 0x000D) { # CR
       
       my $next = $input->getc;
-      if ($next ne "\x0A") {
-        $input->ungetc ($next);
+      if (defined $next and $next ne "\x0A") {
+        $self->{next_next_char} = $next;
       }
       $self->{next_char} = 0x000A; # LF # MUST
       $self->{line}++;
@@ -5211,7 +5221,11 @@ sub _tree_construction_main ($) {
             next B;
           } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
             
-            #
+            $self->{parse_error}->(level => $self->{must_level}, type => 'after head:head', token => $token); ## TODO: error type
+            ## Ignore the token
+            
+            $token = $self->_get_next_token;
+            next B;
           } else {
             
             $self->{parse_error}->(level => $self->{must_level}, type => 'in head:head', token => $token); # or in head noscript
@@ -5684,9 +5698,14 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = AFTER_HEAD_IM;
                 $token = $self->_get_next_token;
                 next B;
-              } else {
+              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 
-                #
+                $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:head', token => $token);
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                next B;
+              } else {
+                die "$0: $self->{insertion_mode}: Unknown insertion mode";
               }
             } elsif ($token->{tag_name} eq 'noscript') {
               if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
@@ -5695,7 +5714,8 @@ sub _tree_construction_main ($) {
                 $self->{insertion_mode} = IN_HEAD_IM;
                 $token = $self->_get_next_token;
                 next B;
-              } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
+              } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM or
+                       $self->{insertion_mode} == AFTER_HEAD_IM) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:noscript', token => $token);
                 ## Ignore the token ## ISSUE: An issue in the spec.
@@ -5708,41 +5728,33 @@ sub _tree_construction_main ($) {
             } elsif ({
                       body => 1, html => 1,
                      }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
-                
-                ## As if <head>
-                
-      $self->{head_element} = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'head']);
-    
-        $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
-            if defined $token->{line};
-        $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
-            if defined $token->{column};
-      
-                $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
-                push @{$self->{open_elements}},
-                    [$self->{head_element}, $el_category->{head}];
-
-                $self->{insertion_mode} = IN_HEAD_IM;
-                ## Reprocess in the "in head" insertion mode...
-              } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
+              if ($self->{insertion_mode} == BEFORE_HEAD_IM or
+                  $self->{insertion_mode} == IN_HEAD_IM or
+                  $self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 
                 $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 next B;
-              } else {
+              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 
+                $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:' . $token->{tag_name}, token => $token);
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                next B;
+              } else {
+                die "$0: $self->{insertion_mode}: Unknown insertion mode";
               }
-               
-              #
-            } elsif ({
-                      p => 1, br => 1,
-                     }->{$token->{tag_name}}) {
+            } elsif ($token->{tag_name} eq 'p') {
+              
+              $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:p', token => $token);
+              ## Ignore the token
+              $token = $self->_get_next_token;
+              next B;
+            } elsif ($token->{tag_name} eq 'br') {
               if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 
-                ## As if <head>
+                ## (before head) as if <head>, (in head) as if </head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
         ($HTML_NS, [undef,  'head']);
@@ -5753,27 +5765,48 @@ sub _tree_construction_main ($) {
             if defined $token->{column};
       
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
-                push @{$self->{open_elements}},
-                    [$self->{head_element}, $el_category->{head}];
-
-                $self->{insertion_mode} = IN_HEAD_IM;
-                ## Reprocess in the "in head" insertion mode...
-              } else {
+                $self->{insertion_mode} = AFTER_HEAD_IM;
+  
+                ## Reprocess in the "after head" insertion mode...
+              } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
                 
-              }
+                ## As if </head>
+                pop @{$self->{open_elements}};
+                $self->{insertion_mode} = AFTER_HEAD_IM;
+  
+                ## Reprocess in the "after head" insertion mode...
+              } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
+                
+                ## ISSUE: Two parse errors for <head><noscript></br>
+                $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:br', token => $token);
+                ## As if </noscript>
+                pop @{$self->{open_elements}};
+                $self->{insertion_mode} = IN_HEAD_IM;
 
-              #
-            } else {
-              if ($self->{insertion_mode} == AFTER_HEAD_IM) {
+                ## Reprocess in the "in head" insertion mode...
+                ## As if </head>
+                pop @{$self->{open_elements}};
+                $self->{insertion_mode} = AFTER_HEAD_IM;
+
+                ## Reprocess in the "after head" insertion mode...
+              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 
                 #
               } else {
-                
-                $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                next B;
+                die "$0: $self->{insertion_mode}: Unknown insertion mode";
               }
+
+              ## ISSUE: does not agree with IE7 - it doesn't ignore </br>.
+              $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:br', token => $token);
+              ## Ignore the token
+              $token = $self->_get_next_token;
+              next B;
+            } else {
+              
+              $self->{parse_error}->(level => $self->{must_level}, type => 'unmatched end tag:'.$token->{tag_name}, token => $token);
+              ## Ignore the token
+              $token = $self->_get_next_token;
+              next B;
             }
 
             if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
@@ -9241,4 +9274,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/18 04:15:48 $
+# $Date: 2008/05/24 04:26:26 $
