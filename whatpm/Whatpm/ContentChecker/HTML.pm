@@ -296,17 +296,28 @@ my $GetHTMLBooleanAttrChecker = sub {
 }; # $GetHTMLBooleanAttrChecker
 
 ## Unordered set of space-separated tokens
-my $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
-  my ($self, $attr) = @_;
-  my %word;
-  for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
-    unless ($word{$word}) {
-      $word{$word} = 1;
-    } else {
-      $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
+my $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
+  my $allowed_words = shift;
+  return sub {
+    my ($self, $attr) = @_;
+    my %word;
+    for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
+      unless ($word{$word}) {
+        $word{$word} = 1;
+        if (not defined $allowed_words or
+            $allowed_words->{$word}) {
+          #
+        } else {
+          $self->{onerror}->(node => $attr, type => 'word not allowed', ## TODO: type name
+                             value => $word,
+                             level => $self->{must_level});
+        }
+      } else {
+        $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
+      }
     }
-  }
-}; # $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker
+  };
+}; # $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker
 
 ## |rel| attribute (unordered set of space separated tokens,
 ## whose allowed values are defined by the section on link types)
@@ -1656,7 +1667,7 @@ $Element->{$HTML_NS}->{link} = {
       },
       href => $HTMLURIAttrChecker,
       rel => sub { $HTMLLinkTypesAttrChecker->(0, $item, @_) },
-      rev => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
+      rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
       media => $HTMLMQAttrChecker,
       hreflang => $HTMLLanguageTagAttrChecker,
       target => $HTMLTargetAttrChecker,
@@ -2617,7 +2628,7 @@ $Element->{$HTML_NS}->{a} = {
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
                      rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
-          rev => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
+          rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
           ## TODO: HTML4 |shape|
                      media => $HTMLMQAttrChecker,
           ## TODO: HTML4/XHTML1 |name|
@@ -3301,6 +3312,12 @@ $Element->{$HTML_NS}->{figure} = {
 };
 ## TODO: Test for <nest/> in <figure/>
 
+my $AttrCheckerNotImplemented = sub {
+  my ($self, $attr) = @_;
+  $self->{onerror}->(node => $attr, level => 'unsupported',
+                     type => 'attribute');
+};
+
 $Element->{$HTML_NS}->{img} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -3326,9 +3343,9 @@ $Element->{$HTML_NS}->{img} = {
       },
       longdesc => $HTMLURIAttrChecker,
       ## TODO: HTML4 |name|
-      ## TODO: height
+      height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
       vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      ## TODO: width
+      width => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
     }, {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
@@ -3369,25 +3386,33 @@ $Element->{$HTML_NS}->{iframe} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       ## NOTE: Not part of M12N10 Strict
   check_attrs => $GetHTMLAttrsChecker->({
+    height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
     name => $HTMLBrowsingContextNameAttrChecker,
+    sandbox => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->({
+      'allow-same-origin' => 1, 'allow-forms' => 1, 'allow-scripts' => 1,
+    }),
+    seemless => $GetHTMLBooleanAttrChecker->('seemless'),
     src => $HTMLURIAttrChecker,
+    width => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_XHTML10_REC,
     class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     frameborder => FEATURE_M12N10_REC,
-    height => FEATURE_M12N10_REC,
+    height => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     longdesc => FEATURE_M12N10_REC,
     marginheight => FEATURE_M12N10_REC,
     marginwidth => FEATURE_M12N10_REC,
     #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
     name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    sandbox => FEATURE_HTML5_DEFAULT,
     scrolling => FEATURE_M12N10_REC,
+    seemless => FEATURE_HTML5_DEFAULT,
     src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    width => FEATURE_M12N10_REC,
+    width => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -3424,12 +3449,12 @@ $Element->{$HTML_NS}->{embed} = {
           $has_src = 1;
         } elsif ($attr_ln eq 'type') {
           $checker = $HTMLIMTAttrChecker;
+        } elsif ($attr_ln eq 'width' or $attr_ln eq 'height') {
+          $checker = $AttrCheckerNotImplemented; ## TODO: because spec does not define them yet.
         } elsif ($attr_ln =~ /^data-/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
-          ## TODO: height
-          ## TODO: width
           $checker = $HTMLAttrChecker->{$attr_ln}
             || sub { }; ## NOTE: Any local attribute is ok.
           $status = FEATURE_HTML5_DEFAULT | FEATURE_ALLOWED;
@@ -3492,9 +3517,9 @@ $Element->{$HTML_NS}->{object} = {
       standby => sub {}, ## NOTE: %Text; in HTML4
       type => $HTMLIMTAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
+      height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
       vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      ## TODO: width
-      ## TODO: height
+      width => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
     }, {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
@@ -3622,7 +3647,8 @@ $Element->{$HTML_NS}->{video} = {
     autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
     controls => $GetHTMLBooleanAttrChecker->('controls'),
     poster => $HTMLURIAttrChecker,
-    ## TODO: width, height
+    height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
+    width => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
   }, {
     %HTMLAttrStatus,
     autoplay => FEATURE_HTML5_LC,
@@ -4424,12 +4450,6 @@ $Element->{$HTML_NS}->{th} = {
     valign => FEATURE_M12N10_REC,
     width => FEATURE_M12N10_REC_DEPRECATED,
   }),
-};
-
-my $AttrCheckerNotImplemented = sub {
-  my ($self, $attr) = @_;
-  $self->{onerror}->(node => $attr, level => 'unsupported',
-                     type => 'attribute');
 };
 
 $Element->{$HTML_NS}->{form} = {
@@ -5464,7 +5484,7 @@ $Element->{$HTML_NS}->{rule} = {
   status => FEATURE_HTML5_AT_RISK,
   check_attrs => $GetHTMLAttrsChecker->({
     condition => $HTMLSelectorsAttrChecker,
-    mode => $HTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker,
+    mode => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
   }, {
     %HTMLAttrStatus,
     condition => FEATURE_HTML5_AT_RISK,

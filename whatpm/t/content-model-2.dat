@@ -4298,6 +4298,151 @@ id=""><span id="">x</span></p>
 /iframe/@src;URI::syntax error:iriref3987;m
 
 #data
+<iframe src="" sandbox="" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="  " xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="
+" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-same-origin" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-same-origin
+  " xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="  allow-same-origin " xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-scripts
+" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-same-origin
+allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-forms" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-form"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-script"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-origin"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-script"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-plugins"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="xxx_origin_please_suggest_a_better_name"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="unrestricted-forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="unrestricted-scripts"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="Allow-Forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="disallow-form"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-forms allow-forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;duplicate token:allow-forms
+
+#data
+<iframe src="" seemless=""
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" seemless="  "
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@seemless;boolean:invalid;m
+
+#data
+<iframe src="" seemless="seemless"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" seemless="Seemless"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" seemless="seemless "
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@seemless;boolean:invalid;m
+
+#data
+<iframe src="" seemless="yes"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@seemless;boolean:invalid;m
+
+#data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /embed;attribute missing:src
