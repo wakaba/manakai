@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.140 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.141 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -1827,6 +1827,26 @@ sub _get_next_token ($) {
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         !!!next-input-character;
         redo A;
+      } elsif ($self->{next_char} == -1) {
+        !!!parse-error (type => 'unclosed tag'); 
+        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (122.3);
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          if ($self->{current_token}->{attributes}) {
+            !!!cp (122.1);
+            !!!parse-error (type => 'end tag attribute');
+          } else {
+            ## NOTE: This state should never be reached.
+            !!!cp (122.2);
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        !!!emit ($self->{current_token}); # start tag or end tag
+        redo A;
       } else {
         !!!cp ('124.1');
         !!!parse-error (type => 'no space between attributes');
@@ -1858,6 +1878,26 @@ sub _get_next_token ($) {
 
         !!!emit ($self->{current_token}); # start tag or end tag
 
+        redo A;
+      } elsif ($self->{next_char} == -1) {
+        !!!parse-error (type => 'unclosed tag');
+        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+          !!!cp (124.7);
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          if ($self->{current_token}->{attributes}) {
+            !!!cp (124.5);
+            !!!parse-error (type => 'end tag attribute');
+          } else {
+            ## NOTE: This state should never be reached.
+            !!!cp (124.6);
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        !!!emit ($self->{current_token}); # start tag or end tag
         redo A;
       } else {
         !!!cp ('124.4');
@@ -7437,4 +7477,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/24 09:59:52 $
+# $Date: 2008/05/24 10:18:26 $

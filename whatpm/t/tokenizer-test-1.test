@@ -925,6 +925,28 @@
 
 {"description": "end tag not closed (after attribute value single quoted)",
 "input": "</p class='a' ",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "start tag not closed (after attribute value (quoted))",
+"input": "<p class='a'",
+"output": ["ParseError", ["StartTag", "p", {"class": "a"}]]},
+
+{"description": "end tag not closed (after attribute value (quoted))",
+"input": "</p class='a'",
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+
+{"description": "start tag not closed (self-closing start tag)",
+"input": "<p class='a'/",
+"output": ["ParseError", ["StartTag", "p", {"class": "a"}]]},
+
+{"description": "end tag not closed (self-closing start tag)",
+"input": "</p/",
+"output": ["ParseError", ["EndTag", "p"]]},
+
+{"description": "end tag not closed (self-closing start tag)",
+"input": "</p class='a'/",
 "output": ["ParseError", "ParseError", ["EndTag", "p"]]}
+
+
 
 ]}
