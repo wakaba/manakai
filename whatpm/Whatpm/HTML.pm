@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.140 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.141 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5441,7 +5441,7 @@ sub _tree_construction_main ($) {
                                                ->{has_reference});
                 } elsif ($token->{attributes}->{content}) {
                   if ($token->{attributes}->{content}->{value}
-                      =~ /\A[^;]*;[\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
+                      =~ /[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
                           [\x09-\x0D\x20]*=
                           [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                           ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
@@ -7938,7 +7938,7 @@ sub _tree_construction_main ($) {
                                          ->{has_reference});
           } elsif ($token->{attributes}->{content}) {
             if ($token->{attributes}->{content}->{value}
-                =~ /\A[^;]*;[\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
+                =~ /[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
                     [\x09-\x0D\x20]*=
                     [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                     ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
@@ -9313,4 +9313,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/24 10:48:57 $
+# $Date: 2008/05/24 11:07:24 $
