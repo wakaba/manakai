@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.144 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.145 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4371,8 +4371,7 @@ sub _reset_insertion_mode ($) {
         ## NOTE: Strictly spaking, the line below only applies to MathML and
         ## SVG elements.  Currently the HTML syntax supports only MathML and
         ## SVG elements as foreigners.
-        $new_mode = $self->{insertion_mode} | IN_FOREIGN_CONTENT_IM;
-        ## ISSUE: What is set as the secondary insertion mode?
+        $new_mode = IN_BODY_IM | IN_FOREIGN_CONTENT_IM;
       } elsif ($node->[1] & TABLE_CELL_EL) {
         if ($last) {
           
@@ -5508,7 +5507,8 @@ sub _tree_construction_main ($) {
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               next B;
-            } elsif ($token->{tag_name} eq 'style') {
+            } elsif ($token->{tag_name} eq 'style' or
+                     $token->{tag_name} eq 'noframes') {
               ## NOTE: Or (scripting is enabled and tag_name eq 'noscript' and
               ## insertion mode IN_HEAD_IM)
               ## NOTE: There is a "as if in head" code clone.
@@ -7765,7 +7765,7 @@ sub _tree_construction_main ($) {
           next B;
         } elsif ($token->{tag_name} eq 'noframes') {
           
-          ## NOTE: As if in body.
+          ## NOTE: As if in head.
           $parse_rcdata->(CDATA_CONTENT_MODEL);
           next B;
         } else {
@@ -8424,7 +8424,7 @@ sub _tree_construction_main ($) {
                 xmp => 1,
                 iframe => 1,
                 noembed => 1,
-                noframes => 1,
+                noframes => 1, ## NOTE: This is an "as if in head" code clone.
                 noscript => 0, ## TODO: 1 if scripting is enabled
                }->{$token->{tag_name}}) {
         if ($token->{tag_name} eq 'xmp') {
@@ -9317,4 +9317,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/25 06:03:56 $
+# $Date: 2008/05/25 07:54:33 $

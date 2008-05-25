@@ -1149,8 +1149,8 @@ no </noframes>
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <body>
 |     <noframes>
+|   <body>
 
 #data
 <!DOCTYPE HTML><noframes></noframes>
@@ -1159,8 +1159,8 @@ no </noframes>
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <body>
 |     <noframes>
+|   <body>
 
 #data
 <!DOCTYPE HTML><noframes>a</noframes>
@@ -1169,9 +1169,9 @@ no </noframes>
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <body>
 |     <noframes>
 |       "a"
+|   <body>
 
 #data
 <!DOCTYPE HTML><noframes>
@@ -1181,8 +1181,8 @@ no </noframes>
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <body>
 |     <noframes>
+|   <body>
 
 #data
 <!DOCTYPE HTML><noframes></noframes>
@@ -1191,8 +1191,8 @@ no </noframes>
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
-|   <body>
 |     <noframes>
+|   <body>
 
 #data
 <!DOCTYPE HTML><noframes>a</noframes>
@@ -1202,8 +1202,8 @@ no </noframes>
 | <html>
 |   <head>
 |   <body>
-|     <noframes>
 |       "a"
+|     <noframes>
 
 #data
 <!DOCTYPE HTML><xmp>
@@ -3330,6 +3330,54 @@ unexpected end of file
 |   <frameset>
 |   <noframes>
 |     "</noframe>"
+
+#data
+<!DOCTYPE HTML><noframes>x</noframes><!---->
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noframes>
+|       "x"
+|     <!--  -->
+|   <body>
+
+#data
+<!DOCTYPE HTML><head><noframes>x</noframes><!---->
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noframes>
+|       "x"
+|     <!--  -->
+|   <body>
+
+#data
+<!DOCTYPE HTML><head></head><noframes>x</noframes><!---->
+#errors
+<noframes> after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noframes>
+|       "x"
+|   <!--  -->
+|   <body>
+
+#data
+<!DOCTYPE HTML><body><noframes>x</noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noframes>
+|       "x"
 
 #data
 </body></html><html a>
