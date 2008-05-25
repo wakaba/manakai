@@ -1365,6 +1365,107 @@ id=""><span id="">x</span></p>
 /link/@charset;charset:not preferred:ascii;m
 
 #data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes=""/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="    "/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="any"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="1x1"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="100x100 32x31"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="any 100x200"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="   16x16 "/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="ANY"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="32X32"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="any any"/>
+#errors
+/link/@sizes;duplicate token;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="16x16 16x16"/>
+#errors
+/link/@sizes;duplicate token;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="032x032"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    size=""/>
+#errors
+/link/@size;attribute not defined;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    height="16" width="16"/>
+#errors
+/link/@height;attribute not defined;m
+/link/@width;attribute not defined;m
+
+#data
+<link rel="shortcut icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes=""/>
+#errors
+/link/@rel;link type:shortcut;unsupported
+
+#data
+<link rel="alternate" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes=""/>
+#errors
+/link/@sizes;attribute not allowed;m
+
+#data
+<a rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="">x</a>
+#errors
+/a/@rel;link type:bad context:icon
+/a/@sizes;attribute not defined;m
+
+#data
 <meta xmlns="http://www.w3.org/1999/xhtml">
   <!-- TODO: <meta> tests are not complete -->
 </meta>

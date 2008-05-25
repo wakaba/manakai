@@ -301,7 +301,7 @@ my $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
   return sub {
     my ($self, $attr) = @_;
     my %word;
-    for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
+    for my $word (grep {length $_} split /[\x09-\x0D\x20]+/, $attr->value) {
       unless ($word{$word}) {
         $word{$word} = 1;
         if (not defined $allowed_words or
@@ -324,7 +324,7 @@ my $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
 my $HTMLLinkTypesAttrChecker = sub {
   my ($a_or_area, $todo, $self, $attr, $item, $element_state) = @_;
   my %word;
-  for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
+  for my $word (grep {length $_} split /[\x09-\x0D\x20]+/, $attr->value) {
     unless ($word{$word}) {
       $word{$word} = 1;
     } elsif ($word eq 'up') {
@@ -416,6 +416,8 @@ my $HTMLLinkTypesAttrChecker = sub {
   if ($is_resource and not $a_or_area) {
     $element_state->{uri_info}->{href}->{type}->{resource} = 1;
   }
+
+  $element_state->{link_rel} = \%word;
 }; # $HTMLLinkTypesAttrChecker
 
 ## TODO: "When an author uses a new type not defined by either this specification or the Wiki page, conformance checkers should offer to add the value to the Wiki, with the details described above, with the "proposal" status."
@@ -924,7 +926,7 @@ my $HTMLAttrChecker = {
   class => sub {
     my ($self, $attr) = @_;
     my %word;
-    for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
+    for my $word (grep {length $_} split /[\x09-\x0D\x20]+/, $attr->value) {
       unless ($word{$word}) {
         $word{$word} = 1;
         push @{$self->{return}->{class}->{$word}||=[]}, $attr;
@@ -1661,6 +1663,7 @@ $Element->{$HTML_NS}->{link} = {
   %HTMLEmptyChecker,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
+    my $sizes_attr;
     $GetHTMLAttrsChecker->({
       charset => sub {
         my ($self, $attr) = @_;
@@ -1671,6 +1674,29 @@ $Element->{$HTML_NS}->{link} = {
       rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
       media => $HTMLMQAttrChecker,
       hreflang => $HTMLLanguageTagAttrChecker,
+      sizes => sub {
+        my ($self, $attr) = @_;
+        $sizes_attr = $attr;
+        my %word;
+        for my $word (grep {length $_}
+                      split /[\x09-\x0D\x20]+/, $attr->value) {
+          unless ($word{$word}) {
+            $word{$word} = 1;
+            if ($word eq 'any' or $word =~ /\A[1-9][0-9]*x[1-9][0-9]*\z/) {
+              #
+            } else {
+              $self->{onerror}->(node => $attr, 
+                                 type => 'sizes:syntax error', ## TODO: type name
+                                 value => $word,
+                                 level => $self->{must_level});
+            }
+          } else {
+            $self->{onerror}->(node => $attr, type => 'duplicate token',
+                               value => $word,
+                               level => $self->{must_level});
+          }
+        }
+      },
       target => $HTMLTargetAttrChecker,
       type => $HTMLIMTAttrChecker,
       ## NOTE: Though |title| has special semantics,
@@ -1690,19 +1716,28 @@ $Element->{$HTML_NS}->{link} = {
       rel => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       rev => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       sdapref => FEATURE_HTML20_RFC,
+      sizes => FEATURE_HTML5_DEFAULT,
       target => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       urn => FEATURE_HTML20_RFC,
     })->($self, $item, $element_state);
+
     if ($item->{node}->has_attribute_ns (undef, 'href')) {
       $self->{has_hyperlink_element} = 1 if $item->{has_hyperlink_link_type};
     } else {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:href');
     }
+
     unless ($item->{node}->has_attribute_ns (undef, 'rel')) {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing:rel');
+    }
+    
+    if ($sizes_attr and not $element_state->{link_rel}->{icon}) {
+      $self->{onerror}->(node => $sizes_attr,
+                         type => 'attribute not allowed',
+                         level => $self->{must_level});
     }
   },
 };

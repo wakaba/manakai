@@ -1,7 +1,7 @@
 1..2192
 # Running under perl version 5.008007 for linux
-# Current time local: Sun May 25 17:05:57 2008
-# Current time GMT:   Sun May 25 08:05:57 2008
+# Current time local: Sun May 25 17:35:07 2008
+# Current time GMT:   Sun May 25 08:35:07 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -457,9 +457,7 @@ not ok 415
 not ok 416
 # Test 416 got: "/datagrid/\"aa\";character not allowed\n/datagrid/datalist;no significant content;s" (t/ContentChecker.t at line 99 fail #416)
 #     Expected: "/datagrid/\"aa\";character not allowed" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/>aa</datagrid>)
-not ok 417
-# Test 417 got: "/datagrid/datagrid;element not allowed:minus;m" (t/ContentChecker.t at line 99 fail #417)
-#     Expected: "/datagrid/datagrid;element not allowed:minus;m\n/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datagrid/></datagrid>)
+ok 417
 ok 418
 ok 419
 ok 420
@@ -1241,14 +1239,9 @@ ok 1162
 ok 1163
 ok 1164
 ok 1165
-Parse error (bare ero) at line 2 column 19
 ok 1166
 ok 1167
-not ok 1168
-# Test 1168 got: "/meta;attribute missing:content\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (t/ContentChecker.t at line 99 fail #1168)
-#      Expected: "/meta;attribute missing:content;m\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
-#    http-equiv="content-type"
-#    />)
+ok 1168
 ok 1169
 ok 1170
 ok 1171
@@ -1260,14 +1253,18 @@ ok 1176
 ok 1177
 ok 1178
 ok 1179
-Parse error (bad attribute value) at line 2 column 56
 ok 1180
 ok 1181
 ok 1182
 ok 1183
+Parse error (bare ero) at line 2 column 19
 ok 1184
 ok 1185
-ok 1186
+not ok 1186
+# Test 1186 got: "/meta;attribute missing:content\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (t/ContentChecker.t at line 99 fail #1186)
+#      Expected: "/meta;attribute missing:content;m\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
+#    http-equiv="content-type"
+#    />)
 ok 1187
 ok 1188
 ok 1189
@@ -1279,6 +1276,7 @@ ok 1194
 ok 1195
 ok 1196
 ok 1197
+Parse error (bad attribute value) at line 2 column 56
 ok 1198
 ok 1199
 ok 1200
@@ -1299,14 +1297,7 @@ ok 1214
 ok 1215
 ok 1216
 ok 1217
-not ok 1218
-# Test 1218 got: "/section/style/@scope;attribute not defined;m\n/section/style;SUBDOC\n/section/style;element not allowed:flow style;m\n/section;no significant content;s" (t/ContentChecker.t at line 99 fail #1218)
-#      Expected: "/section/style/@scope;attribute;unsupported\n/section/style;SUBDOC\n/section/style;element not allowed:flow style;m\n/section;no significant content;s" (<section xmlns="http://www.w3.org/1999/xhtml">
-#<style scope=""/>
-#</section>)
-#      Line 1 is changed:
-#       - "/section/style/@scope;attribute;unsupported\n"
-#       + "/section/style/@scope;attribute not defined;m\n"
+ok 1218
 ok 1219
 ok 1220
 ok 1221
@@ -1324,44 +1315,51 @@ ok 1232
 ok 1233
 ok 1234
 ok 1235
-ok 1236
+not ok 1236
+# Test 1236 got: "/section/style/@scope;attribute not defined;m\n/section/style;SUBDOC\n/section/style;element not allowed:flow style;m\n/section;no significant content;s" (t/ContentChecker.t at line 99 fail #1236)
+#      Expected: "/section/style/@scope;attribute;unsupported\n/section/style;SUBDOC\n/section/style;element not allowed:flow style;m\n/section;no significant content;s" (<section xmlns="http://www.w3.org/1999/xhtml">
+#<style scope=""/>
+#</section>)
+#      Line 1 is changed:
+#       - "/section/style/@scope;attribute;unsupported\n"
+#       + "/section/style/@scope;attribute not defined;m\n"
 ok 1237
-not ok 1238
-# Test 1238 got: "/address/@align;attribute not defined;m\n/address/@align;attribute;unsupported\n/address;no significant content;s" (t/ContentChecker.t at line 99 fail #1238)
-#      Expected: "/address/@align;attribute;unsupported\n/address;no significant content;s" (<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1238
 ok 1239
 ok 1240
 ok 1241
-not ok 1242
-# Test 1242 got: "/hr/@align;attribute not defined;m\n/hr/@align;attribute;unsupported" (t/ContentChecker.t at line 99 fail #1242)
-#      Expected: "/hr/@align;attribute;unsupported" (<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1242
 ok 1243
 ok 1244
 ok 1245
 ok 1246
 ok 1247
 ok 1248
-not ok 1249
-# Test 1249 got: "/dialog/@compact;attribute not defined;m" (t/ContentChecker.t at line 99 fail #1249)
-#      Expected: "/dialog/@compact;attribute;unsupported" (<dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1249
 ok 1250
 ok 1251
 ok 1252
 ok 1253
 ok 1254
 ok 1255
-ok 1256
+not ok 1256
+# Test 1256 got: "/address/@align;attribute not defined;m\n/address/@align;attribute;unsupported\n/address;no significant content;s" (t/ContentChecker.t at line 99 fail #1256)
+#      Expected: "/address/@align;attribute;unsupported\n/address;no significant content;s" (<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1257
 ok 1258
 ok 1259
-ok 1260
+not ok 1260
+# Test 1260 got: "/hr/@align;attribute not defined;m\n/hr/@align;attribute;unsupported" (t/ContentChecker.t at line 99 fail #1260)
+#      Expected: "/hr/@align;attribute;unsupported" (<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1261
 ok 1262
 ok 1263
 ok 1264
 ok 1265
 ok 1266
-ok 1267
+not ok 1267
+# Test 1267 got: "/dialog/@compact;attribute not defined;m" (t/ContentChecker.t at line 99 fail #1267)
+#      Expected: "/dialog/@compact;attribute;unsupported" (<dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1268
 ok 1269
 ok 1270
@@ -1431,9 +1429,7 @@ ok 1333
 ok 1334
 ok 1335
 ok 1336
-not ok 1337
-# Test 1337 got: "/a/@charset;attribute not defined;m\n/a/@charset;charset:not registered:;w\n/a/@charset;charset:syntax error:;m" (t/ContentChecker.t at line 99 fail #1337)
-#      Expected: "/a/@charset;attribute not defined;m\n/a/@charset;charset:syntax error;m" (<a charset="" xmlns="http://www.w3.org/1999/xhtml">x</a>)
+ok 1337
 ok 1338
 ok 1339
 ok 1340
@@ -1451,7 +1447,9 @@ ok 1351
 ok 1352
 ok 1353
 ok 1354
-ok 1355
+not ok 1355
+# Test 1355 got: "/a/@charset;attribute not defined;m\n/a/@charset;charset:not registered:;w\n/a/@charset;charset:syntax error:;m" (t/ContentChecker.t at line 99 fail #1355)
+#      Expected: "/a/@charset;attribute not defined;m\n/a/@charset;charset:syntax error;m" (<a charset="" xmlns="http://www.w3.org/1999/xhtml">x</a>)
 ok 1356
 ok 1357
 ok 1358
@@ -1736,9 +1734,7 @@ ok 1636
 ok 1637
 ok 1638
 ok 1639
-not ok 1640
-# Test 1640 got: "/object/@declare;attribute not defined;m\n/object;no significant content;s" (t/ContentChecker.t at line 99 fail #1640)
-#      Expected: "/object/@declare;attribute not defined;m" (<object data="" declare="declare" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1640
 ok 1641
 ok 1642
 ok 1643
@@ -1756,7 +1752,9 @@ ok 1654
 ok 1655
 ok 1656
 ok 1657
-ok 1658
+not ok 1658
+# Test 1658 got: "/object/@declare;attribute not defined;m\n/object;no significant content;s" (t/ContentChecker.t at line 99 fail #1658)
+#      Expected: "/object/@declare;attribute not defined;m" (<object data="" declare="declare" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1659
 ok 1660
 ok 1661
@@ -1858,9 +1856,7 @@ ok 1756
 ok 1757
 ok 1758
 ok 1759
-not ok 1760
-# Test 1760 got: "/map/@name;attribute not defined;m\n/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (t/ContentChecker.t at line 99 fail #1760)
-#      Expected: "/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1760
 ok 1761
 ok 1762
 ok 1763
@@ -1878,7 +1874,9 @@ ok 1774
 ok 1775
 ok 1776
 ok 1777
-ok 1778
+not ok 1778
+# Test 1778 got: "/map/@name;attribute not defined;m\n/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (t/ContentChecker.t at line 99 fail #1778)
+#      Expected: "/map/@name;attribute;unsupported\n/map;attribute missing:id\n/map;no significant content;s" (<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1779
 ok 1780
 ok 1781
@@ -1946,9 +1944,7 @@ ok 1842
 ok 1843
 ok 1844
 ok 1845
-not ok 1846
-# Test 1846 got: "/area/@rev;attribute not defined;m\n/area/@rev;attribute;unsupported" (t/ContentChecker.t at line 99 fail #1846)
-#      Expected: "/area/@rev;attribute not defined;m" (<area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1846
 ok 1847
 ok 1848
 ok 1849
@@ -1957,12 +1953,8 @@ ok 1851
 ok 1852
 ok 1853
 ok 1854
-not ok 1855
-# Test 1855 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 99 fail #1855)
-#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1856
-# Test 1856 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 99 fail #1856)
-#      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1855
+ok 1856
 ok 1857
 ok 1858
 ok 1859
@@ -1970,7 +1962,9 @@ ok 1860
 ok 1861
 ok 1862
 ok 1863
-ok 1864
+not ok 1864
+# Test 1864 got: "/area/@rev;attribute not defined;m\n/area/@rev;attribute;unsupported" (t/ContentChecker.t at line 99 fail #1864)
+#      Expected: "/area/@rev;attribute not defined;m" (<area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1865
 ok 1866
 ok 1867
@@ -1979,8 +1973,12 @@ ok 1869
 ok 1870
 ok 1871
 ok 1872
-ok 1873
-ok 1874
+not ok 1873
+# Test 1873 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 99 fail #1873)
+#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 1874
+# Test 1874 got: "/table/@border;attribute not defined;m\n/table/@border;attribute;unsupported" (t/ContentChecker.t at line 99 fail #1874)
+#      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 1875
 ok 1876
 ok 1877
@@ -2150,9 +2148,7 @@ ok 2040
 ok 2041
 ok 2042
 ok 2043
-not ok 2044
-# Test 2044 got: "/script/@charset;charset:not registered:;w\n/script/@charset;charset:syntax error:;m" (t/ContentChecker.t at line 99 fail #2044)
-#      Expected: "/script/@charset;charset:syntax error;m" (<script src="" charset="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2044
 ok 2045
 ok 2046
 ok 2047
@@ -2162,33 +2158,17 @@ ok 2050
 ok 2051
 ok 2052
 ok 2053
-not ok 2054
-# Test 2054 got: "" (t/ContentChecker.t at line 99 fail #2054)
-#      Expected: "/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2055
-# Test 2055 got: "" (t/ContentChecker.t at line 99 fail #2055)
-#      Expected: "/datagrid;no significant content;s" (<datagrid disabled="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2056
-# Test 2056 got: "" (t/ContentChecker.t at line 99 fail #2056)
-#      Expected: "/datagrid;no significant content;s" (<datagrid disabled="disabled" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2057
-# Test 2057 got: "" (t/ContentChecker.t at line 99 fail #2057)
-#      Expected: "/datagrid;no significant content;s" (<datagrid disabled="Disabled" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2058
-# Test 2058 got: "/datagrid/@disabled;boolean:invalid;m" (t/ContentChecker.t at line 99 fail #2058)
-#      Expected: "/datagrid/@disabled;boolean:invalid;m\n/datagrid;no significant content;s" (<datagrid disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2059
-# Test 2059 got: "" (t/ContentChecker.t at line 99 fail #2059)
-#      Expected: "/datagrid;no significant content;s" (<datagrid multiple="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2060
-# Test 2060 got: "" (t/ContentChecker.t at line 99 fail #2060)
-#      Expected: "/datagrid;no significant content;s" (<datagrid multiple="multiple" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2061
-# Test 2061 got: "" (t/ContentChecker.t at line 99 fail #2061)
-#      Expected: "/datagrid;no significant content;s" (<datagrid multiple="MULTIPLE" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2054
+ok 2055
+ok 2056
+ok 2057
+ok 2058
+ok 2059
+ok 2060
+ok 2061
 not ok 2062
-# Test 2062 got: "/datagrid/@multiple;boolean:invalid;m" (t/ContentChecker.t at line 99 fail #2062)
-#      Expected: "/datagrid/@multiple;boolean:invalid;m\n/datagrid;no significant content;s" (<datagrid multiple="true" xmlns="http://www.w3.org/1999/xhtml"/>)
+# Test 2062 got: "/script/@charset;charset:not registered:;w\n/script/@charset;charset:syntax error:;m" (t/ContentChecker.t at line 99 fail #2062)
+#      Expected: "/script/@charset;charset:syntax error;m" (<script src="" charset="" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2063
 ok 2064
 ok 2065
@@ -2198,15 +2178,33 @@ ok 2068
 ok 2069
 ok 2070
 ok 2071
-ok 2072
-ok 2073
-ok 2074
-ok 2075
-ok 2076
-ok 2077
-ok 2078
-ok 2079
-ok 2080
+not ok 2072
+# Test 2072 got: "" (t/ContentChecker.t at line 99 fail #2072)
+#      Expected: "/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2073
+# Test 2073 got: "" (t/ContentChecker.t at line 99 fail #2073)
+#      Expected: "/datagrid;no significant content;s" (<datagrid disabled="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2074
+# Test 2074 got: "" (t/ContentChecker.t at line 99 fail #2074)
+#      Expected: "/datagrid;no significant content;s" (<datagrid disabled="disabled" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2075
+# Test 2075 got: "" (t/ContentChecker.t at line 99 fail #2075)
+#      Expected: "/datagrid;no significant content;s" (<datagrid disabled="Disabled" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2076
+# Test 2076 got: "/datagrid/@disabled;boolean:invalid;m" (t/ContentChecker.t at line 99 fail #2076)
+#      Expected: "/datagrid/@disabled;boolean:invalid;m\n/datagrid;no significant content;s" (<datagrid disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2077
+# Test 2077 got: "" (t/ContentChecker.t at line 99 fail #2077)
+#      Expected: "/datagrid;no significant content;s" (<datagrid multiple="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2078
+# Test 2078 got: "" (t/ContentChecker.t at line 99 fail #2078)
+#      Expected: "/datagrid;no significant content;s" (<datagrid multiple="multiple" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2079
+# Test 2079 got: "" (t/ContentChecker.t at line 99 fail #2079)
+#      Expected: "/datagrid;no significant content;s" (<datagrid multiple="MULTIPLE" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2080
+# Test 2080 got: "/datagrid/@multiple;boolean:invalid;m" (t/ContentChecker.t at line 99 fail #2080)
+#      Expected: "/datagrid/@multiple;boolean:invalid;m\n/datagrid;no significant content;s" (<datagrid multiple="true" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2081
 ok 2082
 ok 2083
@@ -2351,12 +2349,8 @@ ok 2221
 ok 2222
 ok 2223
 ok 2224
-not ok 2225
-# Test 2225 got: "/select/@accesskey;char:syntax error;m\n/select;no significant content;s" (t/ContentChecker.t at line 99 fail #2225)
-#      Expected: "/select/@accesskey;char:syntax error;m" (<select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2226
-# Test 2226 got: "/select;no significant content;s" (t/ContentChecker.t at line 99 fail #2226)
-#      Expected: "" (<select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2225
+ok 2226
 ok 2227
 ok 2228
 ok 2229
@@ -2373,8 +2367,12 @@ ok 2239
 ok 2240
 ok 2241
 ok 2242
-ok 2243
-ok 2244
+not ok 2243
+# Test 2243 got: "/select/@accesskey;char:syntax error;m\n/select;no significant content;s" (t/ContentChecker.t at line 99 fail #2243)
+#      Expected: "/select/@accesskey;char:syntax error;m" (<select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2244
+# Test 2244 got: "/select;no significant content;s" (t/ContentChecker.t at line 99 fail #2244)
+#      Expected: "" (<select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2245
 ok 2246
 ok 2247
@@ -2382,66 +2380,66 @@ ok 2248
 ok 2249
 ok 2250
 ok 2251
-not ok 2252
-# Test 2252 got: "/input/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2252)
-#      Expected: "" (<input type="add" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2253
-# Test 2253 got: "/button/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2253)
-#      Expected: "" (<button type="add" xmlns="http://www.w3.org/1999/xhtml">x</button>)
-not ok 2254
-# Test 2254 got: "/input/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2254)
-#      Expected: "" (<input type="remove" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2255
-# Test 2255 got: "/input/@type;attribute not defined;m\n/input/@type;enumerated:invalid" (t/ContentChecker.t at line 99 fail #2255)
-#      Expected: "/input/@type;enumerated:invalid" (<input type="delete" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2256
-# Test 2256 got: "/button/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2256)
-#      Expected: "" (<button type="remove" xmlns="http://www.w3.org/1999/xhtml">x</button>)
-not ok 2257
-# Test 2257 got: "/button/@type;attribute not defined;m\n/button/@type;enumerated:invalid" (t/ContentChecker.t at line 99 fail #2257)
-#      Expected: "/button/@type;enumerated:invalid" (<button type="delete" xmlns="http://www.w3.org/1999/xhtml">x</button>)
-not ok 2258
-# Test 2258 got: "/input/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2258)
-#      Expected: "" (<input type="move-up" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2259
-# Test 2259 got: "/button/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2259)
-#      Expected: "" (<button type="move-up" xmlns="http://www.w3.org/1999/xhtml">x</button>)
-not ok 2260
-# Test 2260 got: "/input/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2260)
-#      Expected: "" (<input type="move-down" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2261
-# Test 2261 got: "/button/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2261)
-#      Expected: "" (<button type="move-down" xmlns="http://www.w3.org/1999/xhtml">x</button>)
-not ok 2262
-# Test 2262 got: "/div/input/@type;attribute not defined;m\n/div/input;element not allowed:flow;m" (t/ContentChecker.t at line 99 fail #2262)
-#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<input type="add" template="t"/>
-#<p repeat="template" id="t">x</p>
-#</div>)
-not ok 2263
-# Test 2263 got: "/div/button/@type;attribute not defined;m\n/div/button;element not allowed:flow;m" (t/ContentChecker.t at line 99 fail #2263)
-#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<button type="add" template="t">x</button>
-#<p repeat="template" id="t">x</p>
-#</div>)
+ok 2252
+ok 2253
+ok 2254
+ok 2255
+ok 2256
+ok 2257
+ok 2258
+ok 2259
+ok 2260
+ok 2261
+ok 2262
+ok 2263
 ok 2264
 ok 2265
 ok 2266
 ok 2267
 ok 2268
 ok 2269
-ok 2270
-ok 2271
-ok 2272
-ok 2273
-ok 2274
-ok 2275
-ok 2276
-ok 2277
-ok 2278
-ok 2279
-ok 2280
-ok 2281
+not ok 2270
+# Test 2270 got: "/input/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2270)
+#      Expected: "" (<input type="add" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2271
+# Test 2271 got: "/button/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2271)
+#      Expected: "" (<button type="add" xmlns="http://www.w3.org/1999/xhtml">x</button>)
+not ok 2272
+# Test 2272 got: "/input/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2272)
+#      Expected: "" (<input type="remove" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2273
+# Test 2273 got: "/input/@type;attribute not defined;m\n/input/@type;enumerated:invalid" (t/ContentChecker.t at line 99 fail #2273)
+#      Expected: "/input/@type;enumerated:invalid" (<input type="delete" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2274
+# Test 2274 got: "/button/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2274)
+#      Expected: "" (<button type="remove" xmlns="http://www.w3.org/1999/xhtml">x</button>)
+not ok 2275
+# Test 2275 got: "/button/@type;attribute not defined;m\n/button/@type;enumerated:invalid" (t/ContentChecker.t at line 99 fail #2275)
+#      Expected: "/button/@type;enumerated:invalid" (<button type="delete" xmlns="http://www.w3.org/1999/xhtml">x</button>)
+not ok 2276
+# Test 2276 got: "/input/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2276)
+#      Expected: "" (<input type="move-up" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2277
+# Test 2277 got: "/button/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2277)
+#      Expected: "" (<button type="move-up" xmlns="http://www.w3.org/1999/xhtml">x</button>)
+not ok 2278
+# Test 2278 got: "/input/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2278)
+#      Expected: "" (<input type="move-down" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2279
+# Test 2279 got: "/button/@type;attribute not defined;m" (t/ContentChecker.t at line 99 fail #2279)
+#      Expected: "" (<button type="move-down" xmlns="http://www.w3.org/1999/xhtml">x</button>)
+not ok 2280
+# Test 2280 got: "/div/input/@type;attribute not defined;m\n/div/input;element not allowed:flow;m" (t/ContentChecker.t at line 99 fail #2280)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<input type="add" template="t"/>
+#<p repeat="template" id="t">x</p>
+#</div>)
+not ok 2281
+# Test 2281 got: "/div/button/@type;attribute not defined;m\n/div/button;element not allowed:flow;m" (t/ContentChecker.t at line 99 fail #2281)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<button type="add" template="t">x</button>
+#<p repeat="template" id="t">x</p>
+#</div>)
 ok 2282
 ok 2283
 ok 2284
@@ -2452,22 +2450,15 @@ ok 2288
 ok 2289
 ok 2290
 ok 2291
-not ok 2292
-# Test 2292 got: "/x/@repeat-start;nninteger:syntax error\n/x;element;unsupported" (t/ContentChecker.t at line 99 fail #2292)
-#      Expected: "/x/@repeat-start;nninteger:syntax error;m\n/x;element;unsupported" (<x html:repeat-start="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
-not ok 2293
-# Test 2293 got: "/x/@repeat-min;nninteger:syntax error\n/x;element;unsupported" (t/ContentChecker.t at line 99 fail #2293)
-#      Expected: "/x/@repeat-min;nninteger:syntax error;m\n/x;element;unsupported" (<x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
-not ok 2294
-# Test 2294 got: "/x/@repeat-max;nninteger:syntax error\n/x;element;unsupported" (t/ContentChecker.t at line 99 fail #2294)
-#      Expected: "/x/@repeat-max;nninteger:syntax error;m\n/x;element;unsupported" (<x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
+ok 2292
+ok 2293
+ok 2294
 ok 2295
 ok 2296
 ok 2297
 ok 2298
 ok 2299
 ok 2300
-# t/content-model-3.dat
 ok 2301
 ok 2302
 ok 2303
@@ -2477,21 +2468,25 @@ ok 2306
 ok 2307
 ok 2308
 ok 2309
-ok 2310
+not ok 2310
+# Test 2310 got: "/x/@repeat-start;nninteger:syntax error\n/x;element;unsupported" (t/ContentChecker.t at line 99 fail #2310)
+#      Expected: "/x/@repeat-start;nninteger:syntax error;m\n/x;element;unsupported" (<x html:repeat-start="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
 not ok 2311
-# Test 2311 got: "/a;element;unsupported" (t/ContentChecker.t at line 99 fail #2311)
-#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
-ok 2312
+# Test 2311 got: "/x/@repeat-min;nninteger:syntax error\n/x;element;unsupported" (t/ContentChecker.t at line 99 fail #2311)
+#      Expected: "/x/@repeat-min;nninteger:syntax error;m\n/x;element;unsupported" (<x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
+not ok 2312
+# Test 2312 got: "/x/@repeat-max;nninteger:syntax error\n/x;element;unsupported" (t/ContentChecker.t at line 99 fail #2312)
+#      Expected: "/x/@repeat-max;nninteger:syntax error;m\n/x;element;unsupported" (<x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
 ok 2313
 ok 2314
 ok 2315
 ok 2316
 ok 2317
 ok 2318
+# t/content-model-3.dat
 ok 2319
 ok 2320
 ok 2321
-# t/content-model-4.dat
 ok 2322
 ok 2323
 ok 2324
@@ -2499,7 +2494,9 @@ ok 2325
 ok 2326
 ok 2327
 ok 2328
-ok 2329
+not ok 2329
+# Test 2329 got: "/a;element;unsupported" (t/ContentChecker.t at line 99 fail #2329)
+#      Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;element;unsupported" (<xmlns:a/>)
 ok 2330
 ok 2331
 ok 2332
@@ -2510,6 +2507,7 @@ ok 2336
 ok 2337
 ok 2338
 ok 2339
+# t/content-model-4.dat
 ok 2340
 ok 2341
 ok 2342
@@ -2539,7 +2537,6 @@ ok 2365
 ok 2366
 ok 2367
 ok 2368
-# t/content-model-5.dat
 ok 2369
 ok 2370
 ok 2371
@@ -2558,6 +2555,7 @@ ok 2383
 ok 2384
 ok 2385
 ok 2386
+# t/content-model-5.dat
 ok 2387
 ok 2388
 ok 2389
@@ -2567,11 +2565,8 @@ ok 2392
 ok 2393
 ok 2394
 ok 2395
-# t/content-model-6.dat
 ok 2396
-not ok 2397
-# Test 2397 got: "/p/@data;attribute;unsupported\n/p;element;unsupported" (t/ContentChecker.t at line 99 fail #2397)
-#      Expected: "/p/@data;attribute not defined;m" (<p xmlns="http://ww.w3.org/1999/xhtml" data="">x</p>)
+ok 2397
 ok 2398
 ok 2399
 ok 2400
@@ -2579,7 +2574,6 @@ ok 2401
 ok 2402
 ok 2403
 ok 2404
-# t/table-1.dat
 ok 2405
 ok 2406
 ok 2407
@@ -2589,8 +2583,11 @@ ok 2410
 ok 2411
 ok 2412
 ok 2413
+# t/content-model-6.dat
 ok 2414
-ok 2415
+not ok 2415
+# Test 2415 got: "/p/@data;attribute;unsupported\n/p;element;unsupported" (t/ContentChecker.t at line 99 fail #2415)
+#      Expected: "/p/@data;attribute not defined;m" (<p xmlns="http://ww.w3.org/1999/xhtml" data="">x</p>)
 ok 2416
 ok 2417
 ok 2418
@@ -2598,11 +2595,11 @@ ok 2419
 ok 2420
 ok 2421
 ok 2422
+# t/table-1.dat
 ok 2423
 ok 2424
 ok 2425
 ok 2426
-# t/content-model-atom-1.dat
 ok 2427
 ok 2428
 ok 2429
@@ -2621,6 +2618,7 @@ ok 2441
 ok 2442
 ok 2443
 ok 2444
+# t/content-model-atom-1.dat
 ok 2445
 ok 2446
 ok 2447
@@ -2649,30 +2647,11 @@ ok 2469
 ok 2470
 ok 2471
 ok 2472
-not ok 2473
-# Test 2473 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 99 fail #2473)
-#      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
-#<id>about:</id>
-#<author><name>x</name></author>
-#<link rel="alternate" href=""/>
-#<updated>2000-01-02T03:04:05Z</updated>
-#<title>x</title>
-#<content type="image/png"/>
-#</entry>)
-not ok 2474
-# Test 2474 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 99 fail #2474)
-#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
-#<id>about:</id>
-#<author><name>x</name></author>
-#<link rel="alternate" href=""/>
-#<updated>2000-01-02T03:04:05Z</updated>
-#<title>x</title>
-#<content type="message/rfc822"/>
-#</entry>)
+ok 2473
+ok 2474
 ok 2475
 ok 2476
 ok 2477
-# t/content-model-atom-2.dat
 ok 2478
 ok 2479
 ok 2480
@@ -2686,20 +2665,57 @@ ok 2487
 ok 2488
 ok 2489
 ok 2490
-ok 2491
-ok 2492
+not ok 2491
+# Test 2491 got: "/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 99 fail #2491)
+#      Expected: "/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="image/png"/>
+#</entry>)
+not ok 2492
+# Test 2492 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:subtype;unsupported\n/entry/content;atom|content not supported;u\n/entry;element missing:atom|summary;m" (t/ContentChecker.t at line 99 fail #2492)
+#      Expected: "/entry/content/@type;IMT:composite;m\n/entry;element missing:atom|summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="message/rfc822"/>
+#</entry>)
 ok 2493
 ok 2494
 ok 2495
+# t/content-model-atom-2.dat
 ok 2496
 ok 2497
 ok 2498
 ok 2499
 ok 2500
 ok 2501
+ok 2502
+ok 2503
+ok 2504
+ok 2505
+ok 2506
+ok 2507
+ok 2508
+ok 2509
+ok 2510
+ok 2511
+ok 2512
+ok 2513
+ok 2514
+ok 2515
+ok 2516
+ok 2517
+ok 2518
+ok 2519
 # t/content-model-atom-threading-1.dat
-not ok 2502
-# Test 2502 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 99 fail #2502)
+not ok 2520
+# Test 2520 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 99 fail #2520)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2729,8 +2745,8 @@ not ok 2502
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 2503
-# Test 2503 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 99 fail #2503)
+not ok 2521
+# Test 2521 got: "/feed/entry/in-reply-to/@type;IMT:subtype;unsupported\n/feed/entry/link/@type;IMT:subtype;unsupported\n/feed;element missing:atom|link|self;s" (t/ContentChecker.t at line 99 fail #2521)
 #      Expected: "/feed;element missing:atom|link|self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2756,17 +2772,17 @@ not ok 2503
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 2504
-ok 2505
-ok 2506
-ok 2507
-ok 2508
-ok 2509
-ok 2510
-ok 2511
-ok 2512
-ok 2513
-ok 2514
-ok 2515
-ok 2516
-ok 2517
+ok 2522
+ok 2523
+ok 2524
+ok 2525
+ok 2526
+ok 2527
+ok 2528
+ok 2529
+ok 2530
+ok 2531
+ok 2532
+ok 2533
+ok 2534
+ok 2535
