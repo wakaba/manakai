@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.143 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.144 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -8446,6 +8446,8 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           next B;
         } else {
+          delete $self->{self_closing};
+
           my $at = $token->{attributes};
           my $form_attrs;
           $form_attrs->{action} = $at->{action} if $at->{action};
@@ -8489,7 +8491,6 @@ sub _tree_construction_main ($) {
                          line => $token->{line}, column => $token->{column}},
                         {type => END_TAG_TOKEN, tag_name => 'form',
                          line => $token->{line}, column => $token->{column}};
-           ## NOTE: Not acknowledged.
           unshift @{$self->{token}}, (@tokens);
           $token = $self->_get_next_token;
           next B;
@@ -9316,4 +9317,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/05/24 14:19:54 $
+# $Date: 2008/05/25 06:03:56 $

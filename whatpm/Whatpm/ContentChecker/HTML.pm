@@ -3634,7 +3634,7 @@ $Element->{$HTML_NS}->{object} = {
 
 $Element->{$HTML_NS}->{param} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
@@ -3647,9 +3647,9 @@ $Element->{$HTML_NS}->{param} = {
     }, {
       %HTMLAttrStatus,
       id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      name => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      name => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       type => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      value => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      value => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       valuetype => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     })->(@_);
     unless ($item->{node}->has_attribute_ns (undef, 'name')) {
