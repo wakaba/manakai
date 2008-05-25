@@ -1,6 +1,8 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+
+## TODO: More drastic charset name aliasing is now part of HTML5...
 
 sub UNREGISTERED_CHARSET_NAME () { 0b1 }
     ## Names for non-standard encodings/implementations for Perl encodings
@@ -37,6 +39,8 @@ sub CHARSET_CATEGORY_BLOCK_SAFE () { 0b1 }
     ## NOTE: Stateless
 sub CHARSET_CATEGORY_EUCJP () { 0b10 }
 sub CHARSET_CATEGORY_SJIS () { 0b100 }
+sub CHARSET_CATEGORY_UTF16 () { 0b1000 }
+    ## NOTE: "A UTF-16 encoding" in HTML5.
 
 ## iana_names
 
@@ -606,7 +610,7 @@ $Charset->{'gb18030'}
 $Charset->{'utf-16be'}
 = $IANACharset->{'utf-16be'}
 = __PACKAGE__->new ({
-  category => CHARSET_CATEGORY_BLOCK_SAFE,
+  category => CHARSET_CATEGORY_BLOCK_SAFE | CHARSET_CATEGORY_UTF16,
   iana_names => {
     'utf-16be' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -615,7 +619,7 @@ $Charset->{'utf-16be'}
 $Charset->{'utf-16le'}
 = $IANACharset->{'utf-16le'}
 = __PACKAGE__->new ({
-  category => CHARSET_CATEGORY_BLOCK_SAFE,
+  category => CHARSET_CATEGORY_BLOCK_SAFE | CHARSET_CATEGORY_UTF16,
   iana_names => {
     'utf-16le' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -624,7 +628,7 @@ $Charset->{'utf-16le'}
 $Charset->{'utf-16'}
 = $IANACharset->{'utf-16'}
 = __PACKAGE__->new ({
-  category => CHARSET_CATEGORY_BLOCK_SAFE,
+  category => CHARSET_CATEGORY_BLOCK_SAFE | CHARSET_CATEGORY_UTF16,
   iana_names => {
     'utf-16' => PRIMARY_CHARSET_NAME | REGISTERED_CHARSET_NAME,
   },
@@ -944,5 +948,5 @@ sub is_syntactically_valid_iana_charset_name ($) {
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2008/05/18 06:09:50 $
+## $Date: 2008/05/25 08:54:15 $
 

@@ -1,10 +1,12 @@
 package Message::DOM::HTML::HTMLElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
 require Message::DOM::Element;
 
 ## TODO: interface
+
+## TODO: "reflect" definition need to be updated (both implementation and Perl binding specification) - see HTML5 for latest definition
 
 sub AUTOLOAD {
   my $method_name = our $AUTOLOAD;
@@ -494,5 +496,5 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/01/14 13:56:35 $
+## $Date: 2008/05/25 08:54:15 $
 
