@@ -28,7 +28,7 @@ algorithm as defined in the HTML5 specification.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -247,9 +247,8 @@ sub get_sniffed_type ($%) {
         return 'text/plain'
             if $by =~ /^\xFE\xFF/ or
                 $by =~ /^\xFF\xFE/ or
-                $by =~ /^\x00\x00\xFE\xFF/ or
+                #$by =~ /^\x00\x00\xFE\xFF/ or
                 $by =~ /^\xEF\xBB\xBF/;
-        ## ISSUE: There is an ISSUE in the spec.
       }
 
       ## Step 4
@@ -321,7 +320,7 @@ sub get_sniffed_type ($%) {
       return ($official_type, 'text/plain')
           if $by =~ /^\xFE\xFF/ or
               $by =~ /^\xFF\xFE/ or
-              $by =~ /^\x00\x00\xFE\xFF/ or
+              #$by =~ /^\x00\x00\xFE\xFF/ or
               $by =~ /^\xEF\xBB\xBF/;
     }
 
@@ -431,4 +430,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/24 10:56:31 $
+# $Date: 2008/05/25 08:53:48 $

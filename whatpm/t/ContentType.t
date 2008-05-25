@@ -80,8 +80,8 @@ for my $v (
   [
     qq<\x00\x00\xFE\xFF54647347474747744334>,
     q<text/plain>, 0,
-    q<text/plain>, 'UTF-32BE BOM',
-    q<text/plain>,
+    q<application/octet-stream>, 'UTF-32BE BOM',
+    q<application/octet-stream>,
     q<text/html>,
   ],
   [
@@ -136,8 +136,8 @@ for my $v (
   [
     qq<\x00\x00\xFE\xFF>,
     q<text/plain>, 0,
-    q<text/plain>, 'UTF-32BE BOM only',
-    q<text/plain>,
+    q<application/octet-stream>, 'UTF-32BE BOM only',
+    q<application/octet-stream>,
     q<text/html>,
   ],
   [
@@ -947,5 +947,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2008/05/24 10:56:31 $
+## $Date: 2008/05/25 08:53:49 $
 1;
