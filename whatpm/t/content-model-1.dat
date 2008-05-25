@@ -3302,7 +3302,6 @@ aaa
 /div/p;no significant content;s
 /div/p/a;no significant content;s
 /div/ol/li;no significant content;s
-/div/ol/li/datagrid;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -3327,12 +3326,14 @@ aaa
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">  </datagrid>
 #errors
-/datagrid;no significant content;s
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><!----></datagrid>
+#errors
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">aaa</datagrid>
@@ -3343,6 +3344,11 @@ aaa
 #errors
 /datagrid;no significant content;s
 /datagrid/p;no significant content;s
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><br/></datagrid>
+#errors
+/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/><p/></datagrid>
@@ -3397,7 +3403,27 @@ aaa
 /datagrid/table;element not allowed
 
 #data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">xx<select/></datagrid>
+#errors
+/datagrid/select;element not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">xx<datalist/></datagrid>
+#errors
+/datagrid/datalist;element not allowed
+
+#data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<p/><table/></datagrid>
+#errors
+/datagrid/p;no significant content;s
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">xx<p/><select/></datagrid>
+#errors
+/datagrid/p;no significant content;s
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">xx<p/><datalist/></datagrid>
 #errors
 /datagrid/p;no significant content;s
 
@@ -3428,8 +3454,6 @@ aaa
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datagrid/></datagrid>
 #errors
 /datagrid/datagrid;element not allowed:minus;m
-/datagrid;no significant content;s
-/datagrid/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><div><datagrid/></div></datagrid>
@@ -3437,7 +3461,6 @@ aaa
 /datagrid/div/datagrid;element not allowed:minus;m
 /datagrid;no significant content;s
 /datagrid/div;no significant content;s
-/datagrid/div/datagrid;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">
@@ -3490,7 +3513,6 @@ aaa
 #errors
 /a/datagrid;element not allowed:minus;m
 /a;no significant content;s
-/a/datagrid;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -3500,7 +3522,6 @@ aaa
 /a/span/datagrid;element not allowed:minus;m
 /a;no significant content;s
 /a/span;no significant content;s
-/a/span/datagrid;no significant content;s
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"></em>
@@ -6516,7 +6537,6 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <datagrid><nest/></datagrid>
 </rule>
 #errors
-/rule/datagrid;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">

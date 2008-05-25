@@ -1369,6 +1369,7 @@ my %HTMLFlowContentChecker = (
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+    ## NOTE: A modified copy of the code below is in |datagrid| checker.
     if ($element_state->{has_significant}) {
       $item->{real_parent_state}->{has_significant} = 1;
     } elsif ($item->{transparent}) {
@@ -5281,7 +5282,8 @@ $Element->{$HTML_NS}->{datagrid} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
-  ## Flow -(text* table Flow*) | table | select | datalist | Empty
+  ## NOTE: Flow -(text* (table|select|datalist) Flow*) | table | select |
+  ## datalist | Empty
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -5295,7 +5297,9 @@ $Element->{$HTML_NS}->{datagrid} = {
       if ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
         if (not $element_state->{has_element} and 
             $child_nsuri eq $HTML_NS and
-            $child_ln eq 'table') {
+            {
+              table => 1, select => 1, datalist => 1,
+            }->{$child_ln}) {
           $self->{onerror}->(node => $child_el,
                              type => 'element not allowed');
         } else {
@@ -5313,7 +5317,6 @@ $Element->{$HTML_NS}->{datagrid} = {
       } elsif ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
         $element_state->{has_element} = 1;
         $element_state->{phase} = 'flow';
-        ## TODO: transparent?
       } else {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed');        
@@ -5342,15 +5345,30 @@ $Element->{$HTML_NS}->{datagrid} = {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
 
-    if ($element_state->{phase} eq 'none') {
-      $HTMLChecker{check_end}->(@_);
+    if ($element_state->{phase} eq 'flow') {
+      if ($element_state->{has_significant}) {
+        $item->{real_parent_state}->{has_significant} = 1;
+      } elsif ($item->{transparent}) {
+        #
+      } else {
+        $self->{onerror}->(node => $item->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content');
+      }
     } else {
-      $HTMLPhrasingContentChecker{check_end}->(@_);
+      ## NOTE: Since the content model explicitly allows a |datagird| element
+      ## being empty, we don't raise "no significant content" error for this
+      ## element when there is no element.  (We should raise an error for
+      ## |<datagrid><br></datagrid>|, however.)
+      ## NOTE: As a side-effect, when the |datagrid| element only contains
+      ## non-conforming content, then the |phase| flag has not changed from
+      ## |any|, no "no significant content" error is raised neither.
+      ## NOTE: Another side-effect of the current implementation:
+      ## |<daragrid><datagrid/></datagrid>| has no "no significant content"
+      ## error at all.
+      $HTMLChecker{check_end}->(@_);
     }
   },
-    ## ISSUE: "xxx<table/>" is disallowed; "<select/>aaa" and "<datalist/>aa"
-    ## are not disallowed (assuming that form control contents are also
-    ## flow content).
 };
 
 $Element->{$HTML_NS}->{command} = {
