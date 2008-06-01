@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.147 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.148 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -829,10 +829,6 @@ sub _initialize_tokenizer ($) {
 ## NOTE: The "self-closing flag" is hold as |$self->{self_closing}|.
 ##     |->{self_closing}| is used to save the value of |$self->{self_closing}|
 ##     while the token is pushed back to the stack.
-
-## ISSUE: "When a DOCTYPE token is created, its
-## <i>self-closing flag</i> must be unset (its other state is that it
-## be set), and its attributes list must be empty.": Wrong subject?
 
 ## Emitted token MUST immediately be handled by the tree construction state.
 
@@ -3556,7 +3552,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == -1) {
         
-
+        $self->{parse_error}->(level => $self->{must_level}, type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
 
@@ -9318,4 +9314,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/06/01 05:35:52 $
+# $Date: 2008/06/01 06:47:08 $

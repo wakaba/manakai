@@ -756,16 +756,16 @@
 
 {"description": "<a href=''rel=''/>",
 "input": "<a href=''rel=''/>",
-"output": ["ParseError", "ParseError",
-    ["StartTag", "a", {"href": "", "rel": ""}]]},
+"output": ["ParseError",
+    ["StartTag", "a", {"href": "", "rel": ""}, true]]},
 
 {"description": "<link href=''rel=''/>",
 "input": "<link href=''rel=''/>",
-"output": ["ParseError", ["StartTag", "link", {"href": "", "rel": ""}]]},
+"output": ["ParseError", ["StartTag", "link", {"href": "", "rel": ""}, true]]},
 
 {"description": "permitted slash after a space",
 "input": "<br />",
-"output": [["StartTag", "br", {}]]},
+"output": [["StartTag", "br", {}, true]]},
 
 {"description": "slash in tag after a space",
 "input": "<br / >",
@@ -773,7 +773,7 @@
 
 {"description": "non-permitted slash after a space",
 "input": "<b />",
-"output": ["ParseError", ["StartTag", "b", {}]]},
+"output": [["StartTag", "b", {}, true]]},
 
 {"description": "end tag (non-)permitted slash after a space",
 "input": "</br />",
@@ -781,7 +781,7 @@
 
 {"description": "permitted slash after attribute name",
 "input": "<br class/>",
-"output": [["StartTag", "br", {"class": ""}]]},
+"output": [["StartTag", "br", {"class": ""}, true]]},
 
 {"description": "slash in tag after attribute name",
 "input": "<br class/ >",
@@ -789,7 +789,7 @@
 
 {"description": "non permitted slash after attribute name",
 "input": "<b class/>",
-"output": ["ParseError", ["StartTag", "b", {"class": ""}]]},
+"output": [["StartTag", "b", {"class": ""}, true]]},
 
 {"description": "end tag (non-)permitted slash after attribute name",
 "input": "</br class/>",
@@ -797,11 +797,11 @@
 
 {"description": "permitted slash in after attribute name state",
 "input": "<br class />",
-"output": [["StartTag", "br", {"class": ""}]]},
+"output": [["StartTag", "br", {"class": ""}, true]]},
 
 {"description": "non permitted slash in after attribute name state",
 "input": "<b class />",
-"output": ["ParseError", ["StartTag", "b", {"class": ""}]]},
+"output": [["StartTag", "b", {"class": ""}, true]]},
 
 {"description": "end tag (non-)permitted slash in after attribute name state",
 "input": "</br class />",

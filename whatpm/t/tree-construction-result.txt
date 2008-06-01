@@ -1,7 +1,7 @@
 1..1920
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Jun  1 14:38:07 2008
-# Current time GMT:   Sun Jun  1 05:38:07 2008
+# Current time local: Sun Jun  1 15:42:42 2008
+# Current time GMT:   Sun Jun  1 06:42:42 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -108,7 +108,10 @@ ok 101
 ok 102
 ok 103
 ok 104
-ok 105
+not ok 105
+# Test 105 got: "2" (t/HTML-tree.t at line 161 fail #53)
+#     Expected: "1" (Parse error: qq'<!DOCTYPE HTML SYSTEM "x"'; 1:25:unclosed DOCTYPE, 1:25:not HTML5;not HTML5)
+#  t/HTML-tree.t line 161 is:     join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
 ok 106
 ok 107
 ok 108
@@ -138,7 +141,6 @@ ok 130
 not ok 131
 # Test 131 got: "3" (t/HTML-tree.t at line 161 fail #66)
 #     Expected: "1" (Parse error: qq'<html><head></body></html>'; 1:7:no DOCTYPE, 1:20:unmatched end tag:body, 1:26:unmatched end tag:html;Line: 1 Col: 6 Unexpected start tag (html). Expected DOCTYPE.)
-#  t/HTML-tree.t line 161 is:     join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
 ok 132
 ok 133
 ok 134
