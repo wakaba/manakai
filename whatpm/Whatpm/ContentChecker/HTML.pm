@@ -1253,7 +1253,7 @@ my $GetHTMLAttrsChecker = sub {
       my $checker;
       my $status;
       if ($attr_ns eq '') {
-        if ($attr_ln =~ /^data-/) {
+        if ($attr_ln =~ /^data-./s) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -1789,7 +1789,7 @@ $Element->{$HTML_NS}->{meta} = {
         } elsif ($attr_ln eq 'scheme') {
           ## NOTE: <http://suika.fam.cx/2007/html/standards#html-meta-scheme>
           $checker = sub {};
-        } elsif ($attr_ln =~ /^data-/) {
+        } elsif ($attr_ln =~ /^data-./s) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -2700,7 +2700,7 @@ $Element->{$HTML_NS}->{a} = {
                    }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
-        } elsif ($attr_ln =~ /^data-/) {
+        } elsif ($attr_ln =~ /^data-./s) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -3514,7 +3514,7 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $HTMLIMTAttrChecker;
         } elsif ($attr_ln eq 'width' or $attr_ln eq 'height') {
           $checker = $AttrCheckerNotImplemented; ## TODO: because spec does not define them yet.
-        } elsif ($attr_ln =~ /^data-/) {
+        } elsif ($attr_ln =~ /^data-./s) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -3973,7 +3973,7 @@ $Element->{$HTML_NS}->{area} = {
                    }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
-        } elsif ($attr_ln =~ /^data-/) {
+        } elsif ($attr_ln =~ /^data-./s) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -5751,7 +5751,7 @@ XHTML2: blockcode (Common), h (Common), separator (Common), l (Common),
 di (Common), nl (Common), handler (Common, type), standby (Common),
 summary (Common)
 
-Access & XHTML2: access
+Access & XHTML2: access (LC)
 
 XML Events & XForms (for XHTML2 support; very, very low priority)
 

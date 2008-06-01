@@ -95,7 +95,7 @@ $Whatpm::ContentChecker::LinkType = {
                                        'hyperlink',
                                        'hyperlink'
                                      ],
-                         'status' => 'accepted'
+                         'status' => 'proposal'
                        },
           'contents' => {
                           'effect' => [

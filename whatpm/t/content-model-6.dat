@@ -12,12 +12,20 @@
 <p xmlns="http://www.w3.org/1999/xhtml"
     data-="custom data">x</p>
 #errors
+/p/@data-;attribute not defined;m
 
 #data
 <unknown xmlns="http://www.w3.org/1999/xhtml"
     data-1="" data-2="custom data">x</unknown>
 #errors
 /unknown;element not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    data-="custom data">x</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@data-;attribute not defined;m
 
 #data
 <p xmlns="http://www.example.com/non-html"
@@ -34,9 +42,21 @@
 #errors
 
 #data
+<meta name="keywords" content="a,b" xmlns="http://www.w3.org/1999/xhtml"
+    data-="custom data"/>
+#errors
+/meta/@data-;attribute not defined;m
+
+#data
 <a xmlns="http://www.w3.org/1999/xhtml"
     data-1="" data-2="custom data">x</a>
 #errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    data-="custom data">x</a>
+#errors
+/a/@data-;attribute not defined;m
 
 #data
 <area xmlns="http://www.w3.org/1999/xhtml"
@@ -45,13 +65,31 @@
 #errors
 
 #data
+<area xmlns="http://www.w3.org/1999/xhtml"
+    data-="custom data" href="" alt="x" shape="default"/>
+#errors
+/area/@data-;attribute not defined;m
+
+#data
 <embed xmlns="http://www.w3.org/1999/xhtml"
     src=""
     data-1="" data-2="custom data"/>
 #errors
 
 #data
+<embed xmlns="http://www.w3.org/1999/xhtml"
+    data-="custom data" src=""/>
+#errors
+/embed/@data-;attribute not defined;m
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml"
     data=""
     data-1="" data-2="custom data">x</object>
 #errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    data-="custom data" data="">x</object>
+#errors
+/object/@data-;attribute not defined;m

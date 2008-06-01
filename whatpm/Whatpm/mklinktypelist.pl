@@ -31,10 +31,10 @@ my $LinkTypes = {
     status => 'accepted',
     effect => [undef, 'hyperlink'],
   },
-  contact => {
-    status => 'accepted',
-    effect => ['hyperlink', 'hyperlink'],
-  },
+#  contact => {
+#    status => 'accepted',
+#    effect => ['hyperlink', 'hyperlink'],
+#  },
   contents => {
     status => 'synonym', # index
     effect => ['hyperlink', 'hyperlink'],

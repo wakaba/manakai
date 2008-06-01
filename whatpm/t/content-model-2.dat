@@ -1217,6 +1217,12 @@ id=""><span id="">x</span></p>
 /link/@rel;link type:proposed:edit;s
 
 #data
+<link rel="contact" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:proposed:contact;s
+
+#data
 <link rel="script" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -2768,6 +2774,7 @@ id=""><span id="">x</span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a;no significant content;s
+/a/@rel;link type:proposed:contact;s
 
 #data
 <a href="http://test/" rel="author author" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5883,6 +5890,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@rel;link type:proposed:edit;s
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="contact" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;link type:proposed:contact;s
 
 #data
 <area shape="rect" coords="1,2,3,4"
