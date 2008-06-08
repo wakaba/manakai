@@ -5253,9 +5253,33 @@ xxxx
 </map>
 #errors
 /map;no significant content;s
+/map;attribute missing:name;m
+
+#data
+<map name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt="a"/>
+</map>
+#errors
+/map;no significant content;s
+
+#data
+<map id="map1" name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt="a"/>
+</map>
+#errors
+/map;no significant content;s
 
 #data
 <map id="map1" xmlns="http://www.w3.org/1999/xhtml">
+<p><area shape="default" href="" alt="a"/></p>
+</map>
+#errors
+/map;no significant content;s
+/map/p;no significant content;s
+/map;attribute missing:name;m
+
+#data
+<map name="map1" xmlns="http://www.w3.org/1999/xhtml">
 <p><area shape="default" href="" alt="a"/></p>
 </map>
 #errors
@@ -5270,11 +5294,22 @@ xxxx
 /map;no significant content;s
 /map/map;no significant content;s
 /map/map/p;no significant content;s
+/map;attribute missing:name;m
+/map/map;attribute missing:name;m
+
+#data
+<map name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<map name="map2"><p><area shape="default" href="" alt="a"/></p></map>
+</map>
+#errors
+/map;no significant content;s
+/map/map;no significant content;s
+/map/map/p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="map1">
-<map id="map2"/>
+<map name="map1">
+<map name="map2"/>
 </map>
 <area shape="default" href="" alt="a"/></div>
 #errors
@@ -5284,8 +5319,8 @@ xxxx
 /div/area;element not allowed:area;m
 
 #data
-<map id="map1" xmlns="http://www.w3.org/1999/xhtml">
-<map id="map2"/><p><area shape="default" href="" alt="a"/></p>
+<map name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<map name="map2"/><p><area shape="default" href="" alt="a"/></p>
 </map>
 #errors
 /map;no significant content;s
@@ -5294,7 +5329,7 @@ xxxx
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="map2"/><p><area shape="default" href="" alt="a"/></p>
+<map name="map2"/><p><area shape="default" href="" alt="a"/></p>
 </div>
 #errors
 /div;no significant content;s

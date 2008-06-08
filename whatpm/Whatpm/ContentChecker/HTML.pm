@@ -645,15 +645,18 @@ my $HTMLEventHandlerAttrChecker = sub {
 
 my $HTMLUsemapAttrChecker = sub {
   my ($self, $attr) = @_;
-  ## MUST be a valid hashed ID reference to a |map| element
+  ## MUST be a valid hash-name reference to a |map| element.
   my $value = $attr->value;
   if ($value =~ s/^#//) {
-    ## ISSUE: Is |usemap="#"| conformant? (c.f. |id=""| is non-conformant.)
+    ## NOTE: |usemap="#"| is conforming, though it identifies no |map| element
+    ## according to the "rules for parsing a hash-name reference" algorithm.
+    ## The document is non-conforming anyway, since |<map name="">| (empty
+    ## name) is non-conforming.
     push @{$self->{usemap}}, [$value => $attr];
   } else {
     $self->{onerror}->(node => $attr, type => '#idref:syntax error');
   }
-  ## NOTE: Space characters in hashed ID references are conforming.
+  ## NOTE: Space characters in hash-name references are conforming.
   ## ISSUE: UA algorithm for matching is case-insensitive; IDs only different in cases should be reported
 }; # $HTMLUsemapAttrChecker
 
@@ -3261,6 +3264,9 @@ $Element->{$HTML_NS}->{ruby} = {
 
     $element_state->{phase} = 'before-rb';
     #$element_state->{has_sig}
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   ## NOTE: (phrasing, (rt | (rp, rt, rp)))+
   check_child_element => sub {
@@ -3515,9 +3521,12 @@ $Element->{$HTML_NS}->{rp} = {
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_DEFAULT,
   }),
-  check_end => sub {
+  check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{text} = '';
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
@@ -4157,12 +4166,13 @@ $Element->{$HTML_NS}->{map} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     my $has_id;
+    my $has_name;
     $GetHTMLAttrsChecker->({
       id => sub {
-        ## NOTE: same as global |id=""|, with |$self->{map}| registeration
+        ## NOTE: Same as the global |id=""|, with |$self->{map}| registration.
         my ($self, $attr) = @_;
         my $value = $attr->value;
-        if (length $value > 0) {
+        if (length $value) {
           if ($self->{id}->{$value}) {
             $self->{onerror}->(node => $attr, type => 'duplicate ID');
             push @{$self->{id}->{$value}}, $attr;
@@ -4176,17 +4186,32 @@ $Element->{$HTML_NS}->{map} = {
         if ($value =~ /[\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $attr, type => 'space in ID');
         }
-        $self->{map}->{$value} ||= $attr;
-        $has_id = 1;
+        #$self->{map}->{$value} ||= $attr;
+        $has_id = [$value, $attr];
       },
-      ## TODO: HTML4 |name|
+      name => sub {
+        my ($self, $attr) = @_;
+        my $value = $attr->value;
+        if (length $value) {
+          ## NOTE: Duplication is not non-conforming.
+          ## NOTE: Space characters are not non-conforming.
+          #
+        } else {
+          $self->{onerror}->(node => $attr,
+                             type => 'empty attribute value',
+                             level => $self->{must_level});
+        }
+        $self->{map}->{$value} ||= $attr;
+        $has_name = [$value, $attr];
+      },
     }, {
       %HTMLAttrStatus,
       class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-      name => FEATURE_M12N10_REC_DEPRECATED,
+      #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
+      name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       onclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       ondblclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       onmousedown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -4199,8 +4224,18 @@ $Element->{$HTML_NS}->{map} = {
       onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     })->(@_);
-    $self->{onerror}->(node => $item->{node}, type => 'attribute missing:id')
-        unless $has_id;
+
+    if ($has_name and $has_id) {
+      if ($has_name->[0] ne $has_id->[0]) {
+        $self->{onerror}->(node => $has_id->[1],
+                           type => 'id ne name', ## TODO: type
+                           level => $self->{must_level});
+      }
+    } elsif (not $has_name) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing:name',
+                         level => $self->{must_level});
+    }
   },
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -6040,7 +6075,7 @@ $Element->{$HTML_NS}->{basefont} = {
 ## frame frameborder longdesc marginheight marginwidth noresize scrolling src name(deprecated) class,id,title,style(x10)
 ## noframes Common, lang(xhtml10)
 
-## TODO: CR: ruby rb rt rp rbc rtc @rbspan (M12NXHTML2Common)
+## TODO: CR: rbc rtc @rbspan (M12NXHTML2Common)
 
 ## TODO: xmp, listing, plaintext FEATURE_HTML32_REC_OBSOLETE
 ## TODO: ^^^ lang, dir, id, class [HTML 2.x] sdaform [HTML 2.0]

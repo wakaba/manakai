@@ -4215,10 +4215,12 @@ id=""><span id="">x</span></p>
 </div>
 #errors
 /div/map;no significant content;s
+/div/map;attribute missing:name;m
+/div/p/img/@usemap;no referenced map
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="aa"/>
+<map name="aa"/>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
@@ -4226,7 +4228,46 @@ id=""><span id="">x</span></p>
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa" id="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/map;no significant content;s
+
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/map;no significant content;s
+/div/map;no significant content;s
+/div/map;attribute missing:name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
 <map id="a a"/>
+<p><img src="http://test/" alt="" usemap="#a a"/></p>
+</div>
+#errors
+/div/map/@id;space in ID
+/div/map;no significant content;s
+/div/map;attribute missing:name;m
+/div/p/img/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a a"/>
+<p><img src="http://test/" alt="" usemap="#a a"/></p>
+</div>
+#errors
+/div/map;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a a" id="a a"/>
 <p><img src="http://test/" alt="" usemap="#a a"/></p>
 </div>
 #errors
@@ -4241,6 +4282,17 @@ id=""><span id="">x</span></p>
 #errors
 /div/map/@id;space in ID
 /div/map;no significant content;s
+/div/map;attribute missing:name;m
+/div/p/img/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="a a" name="a a"/>
+<p><img src="http://test/" alt="" usemap="#a%20a"/></p>
+</div>
+#errors
+/div/map/@id;space in ID
+/div/map;no significant content;s
 /div/p/img/@usemap;no referenced map
 
 #data
@@ -4250,10 +4302,30 @@ id=""><span id="">x</span></p>
 </div>
 #errors
 /div/map;no significant content;s
+/div/map;attribute missing:name;m
+/div/p/img/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="&#x4E00;"/>
+<p><img src="http://test/" alt="" usemap="#&#x4E00;"/></p>
+</div>
+#errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#bb"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map
+/div/map;no significant content;s
+/div/map;attribute missing:name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
 <p><img src="http://test/" alt="" usemap="#bb"/></p>
 </div>
 #errors
@@ -4268,10 +4340,32 @@ id=""><span id="">x</span></p>
 </div>
 #errors
 /div/map;no significant content;s
+/div/map;attribute missing:name;m
+/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#AA"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map
+/div/map;no significant content;s
+/div/map;attribute missing:name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
 <p><img src="http://test/" alt="" usemap="#AA"/></p>
 </div>
 #errors
@@ -4286,6 +4380,16 @@ id=""><span id="">x</span></p>
 #errors
 /div/p/img/@usemap;no referenced map
 /div/map;no significant content;s
+/div/map;attribute missing:name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="AA"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4295,6 +4399,53 @@ id=""><span id="">x</span></p>
 #errors
 /div/p/img/@usemap;no referenced map
 /div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a name="aa">x</a>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/a/@name;attribute not defined;m
+/div/p/img/@usemap;no referenced map
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a" id="b">x</map>
+</div>
+#errors
+/div/map/@id;id ne name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a" id="A">x</map>
+</div>
+#errors
+/div/map/@id;id ne name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="A" id="a">x</map>
+</div>
+#errors
+/div/map/@id;id ne name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="">x</map>
+<img src="" alt="" usemap="#"/>
+</div>
+#errors
+/div/map/@name;empty attribute value;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a">x</map>
+<map name="a">x</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
 
 #data
 <img alt="" src="" align="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4657,10 +4808,20 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 </div>
 #errors
 /div/map;no significant content;s
+/div/p/object/@usemap;no referenced map
+/div/map;attribute missing:name;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="aa"/>
+<p><object data="http://test/" usemap="#aa">x</object></p>
+<map name="aa"/>
+</div>
+#errors
+/div/map;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
 <p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
@@ -4668,7 +4829,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="&#x4E00;"/>
+<map name="&#x4E00;"/>
 <p><object data="http://test/" usemap="#&#x4E00;">x</object></p>
 </div>
 #errors
@@ -4676,7 +4837,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="aa"/>
+<map name="aa"/>
 <p><object data="http://test/" usemap="#bb">x</object></p>
 </div>
 #errors
@@ -4685,7 +4846,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="aa"/>
+<map name="aa"/>
 <p><object data="http://test/" usemap="#aa">x</object></p>
 <p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
@@ -4694,7 +4855,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="aa"/>
+<map name="aa"/>
 <p><object data="http://test/" usemap="#AA">x</object></p>
 </div>
 #errors
@@ -4703,7 +4864,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="AA"/>
+<map name="AA"/>
 <p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
@@ -5416,24 +5577,22 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <map xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/map;attribute missing:id
+/map;attribute missing:name;m
 /map;no significant content;s
 
 #data
 <map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/map;attribute missing:id
-/map/@name;attribute;unsupported
 /map;no significant content;s
 
 #data
-<map id="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
-<map id="aa"/>
+<map name="aa" id="aa"/>
 <p id="aa">x</p>
 </div>
 #errors
@@ -5443,16 +5602,16 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p id="aa">x</p>
-<map id="aa"/>
+<map id="aa" name="aa"/>
 </div>
 #errors
 /div/map/@id;duplicate ID
 /div/map;no significant content;s
 
 #data
-<map id="" xmlns="http://www.w3.org/1999/xhtml"/>
+<map name="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/map/@id;empty attribute value
+/map/@name;empty attribute value;m
 /map;no significant content;s
 
 #data
