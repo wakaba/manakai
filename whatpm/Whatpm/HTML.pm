@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.148 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.149 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -45,6 +45,8 @@ sub MISC_SPECIAL_EL () { 0b1000000000000000000000000 }
 sub FOREIGN_EL () { 0b10000000000000000000000000 }
 sub FOREIGN_FLOW_CONTENT_EL () { 0b100000000000000000000000000 }
 sub MML_AXML_EL () { 0b1000000000000000000000000000 }
+sub RUBY_EL () { 0b10000000000000000000000000000 }
+sub RUBY_COMPONENT_EL () { 0b100000000000000000000000000000 }
 
 sub TABLE_ROWS_EL () {
   TABLE_EL |
@@ -52,15 +54,25 @@ sub TABLE_ROWS_EL () {
   TABLE_ROW_GROUP_EL
 }
 
+## NOTE: Used in "generate implied end tags" algorithm.
+## NOTE: There is a code where a modified version of END_TAG_OPTIONAL_EL
+## is used in "generate implied end tags" implementation (search for the
+## function mae).
 sub END_TAG_OPTIONAL_EL () {
   DD_EL |
   DT_EL |
   LI_EL |
-  P_EL
+  P_EL |
+  RUBY_COMPONENT_EL
 }
 
+## NOTE: Used in </body> and EOF algorithms.
 sub ALL_END_TAG_OPTIONAL_EL () {
-  END_TAG_OPTIONAL_EL |
+  DD_EL |
+  DT_EL |
+  LI_EL |
+  P_EL |
+
   BODY_EL |
   HTML_EL |
   TABLE_CELL_EL |
@@ -96,7 +108,12 @@ sub SPECIAL_EL () {
   ADDRESS_EL |
   BODY_EL |
   DIV_EL |
-  END_TAG_OPTIONAL_EL |
+
+  DD_EL |
+  DT_EL |
+  LI_EL |
+  P_EL |
+
   FORM_EL |
   FRAMESET_EL |
   HEADING_EL |
@@ -170,6 +187,9 @@ my $el_category = {
   param => MISC_SPECIAL_EL,
   plaintext => MISC_SPECIAL_EL,
   pre => MISC_SPECIAL_EL,
+  rp => RUBY_COMPONENT_EL,
+  rt => RUBY_COMPONENT_EL,
+  ruby => RUBY_EL,
   s => FORMATTING_EL,
   script => MISC_SPECIAL_EL,
   select => SELECT_EL,
@@ -6761,7 +6781,7 @@ sub _tree_construction_main ($) {
                 next B;
               }
               
-## TODO: Followings are removed from the latest spec.
+## TODO: Followings are removed from the latest spec. 
               ## generate implied end tags
               while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
                 
@@ -8556,6 +8576,63 @@ sub _tree_construction_main ($) {
         }
         $token = $self->_get_next_token;
         next B;
+      } elsif ($token->{tag_name} eq 'rt' or
+               $token->{tag_name} eq 'rp') {
+        ## has a |ruby| element in scope
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
+          if ($node->[1] & RUBY_EL) {
+            
+            ## generate implied end tags
+            while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
+              
+              pop @{$self->{open_elements}};
+            }
+            unless ($self->{open_elements}->[-1]->[1] & RUBY_EL) {
+              
+              $self->{parse_error}->(level => $self->{must_level}, type => 'not closed',
+                              value => $self->{open_elements}->[-1]->[0]
+                                  ->manakai_local_name,
+                              token => $token);
+              pop @{$self->{open_elements}}
+                  while not $self->{open_elements}->[-1]->[1] & RUBY_EL;
+            }
+            last INSCOPE;
+          } elsif ($node->[1] & SCOPING_EL) {
+            
+            last INSCOPE;
+          }
+        } # INSCOPE
+
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
+
+        
+        $token = $self->_get_next_token;
+        redo B;
       } elsif ($token->{tag_name} eq 'math' or
                $token->{tag_name} eq 'svg') {
         $reconstruct_active_formatting_elements->($insert_to_current);
@@ -8805,10 +8882,13 @@ sub _tree_construction_main ($) {
         } else {
           ## Step 1. generate implied end tags
           while ({
+                  ## END_TAG_OPTIONAL_EL
                   dd => ($token->{tag_name} ne 'dd'),
                   dt => ($token->{tag_name} ne 'dt'),
                   li => ($token->{tag_name} ne 'li'),
                   p => 1,
+                  rt => 1,
+                  rp => 1,
                  }->{$self->{open_elements}->[-1]->[0]->manakai_local_name}) {
             
             pop @{$self->{open_elements}};
@@ -9037,8 +9117,11 @@ sub _tree_construction_main ($) {
             ## generate implied end tags
             while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
               
-              ## ISSUE: Can this case be reached?
+              ## NOTE: |<ruby><rt></ruby>|.
+              ## ISSUE: <ruby><rt></rt> will also take this code path,
+              ## which seems wrong.
               pop @{$self->{open_elements}};
+              $node_i++;
             }
         
             ## Step 2
@@ -9055,7 +9138,7 @@ sub _tree_construction_main ($) {
             }
             
             ## Step 3
-            splice @{$self->{open_elements}}, $node_i;
+            splice @{$self->{open_elements}}, $node_i if $node_i < 0;
 
             $token = $self->_get_next_token;
             last S2;
@@ -9314,4 +9397,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/06/01 06:47:08 $
+# $Date: 2008/06/08 05:08:41 $

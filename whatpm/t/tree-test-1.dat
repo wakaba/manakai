@@ -6683,6 +6683,291 @@ unexpected end-of-file
 |     <span>
 
 #data
+<!DOCTYPE HTML><ruby><ol><li><p>a<rt>b
+#errors
+no </ol>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <ol>
+|         <li>
+|           <p>
+|             "a"
+|       <rt>
+|         "b"
+
+#data
+<!DOCTYPE HTML><ruby><marquee><p>a<rt>b
+#errors
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <marquee>
+|         <p>
+|           "a"
+|           <rt>
+|             "b"
+
+#data
+<!DOCTYPE HTML><ruby>a<rt>b<p>c
+#errors
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       "a"
+|       <rt>
+|         "b"
+|         <p>
+|           "c"
+
+#data
+<!DOCTYPE HTML><p><ruby>a<rt>b<p>c
+#errors
+no </ruby>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <ruby>
+|         "a"
+|         <rt>
+|           "b"
+|     <p>
+|       "c"
+
+#data
+<!DOCTYPE HTML><ruby>a<rt>b</ruby>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       "a"
+|       <rt>
+|         "b"
+
+#data
+<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <rb>
+|         "a"
+|       <rt>
+|         "b"
+
+#data
+<!DOCTYPE HTML><ruby><rb>a<rt>b</ruby>
+#errors
+no </rb>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <rb>
+|         "a"
+|       <rt>
+|         "b"
+
+#data
+<!DOCTYPE HTML><ruby>a<rp>b<rt>c<rp>d</ruby>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       "a"
+|       <rp>
+|         "b"
+|       <rt>
+|         "c"
+|       <rp>
+|         "d"
+
+#data
+<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       "a"
+|       <rt>
+|         "b"
+
+#data
+<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       "a"
+|       <rp>
+|         "b"
+|       <rt>
+|         "c"
+|       <rp>
+|         "d"
+
+#data
+<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <rb>
+|         "a"
+|       <rp>
+|         "b"
+|       <rt>
+|         "c"
+|       <rp>
+|         "d"
+
+#data
+<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>
+#errors
+no </rtc>
+unexpected </rtc>
+no </rtc>
+unexpected </rtc>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <rbc>
+|         <rb>
+|           "a"
+|         <rb>
+|           "b"
+|       <rtc>
+|       <rt>
+|         "c"
+|       <rt>
+|         "d"
+|       <rtc>
+|       <rt>
+|         "e"
+|       <rt>
+|         "f"
+
+#data
+<!DOCTYPE HTML>
+... <ruby>
+ SAI <rt> sai </rt>
+ TOU <rt> tou </rt>
+ NOBU <rt> nobu </rt>
+ O <rt> o         </rt>
+</ruby> ...
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "... "
+|     <ruby>
+|       "
+ SAI "
+|       <rt>
+|         " sai "
+|       "
+ TOU "
+|       <rt>
+|         " tou "
+|       "
+ NOBU "
+|       <rt>
+|         " nobu "
+|       "
+ O "
+|       <rt>
+|         " o         "
+|       "
+"
+|     " ..."
+
+#data
+<!DOCTYPE HTML><div><rt></div>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <rt>
+
+#data
+<!DOCTYPE HTML><div><rp></div>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <rp>
+
+#data
+<!DOCTYPE HTML><div><rt><rp></div>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <rt>
+|         <rp>
+
+#data
+<!DOCTYPE HTML><ul><li><rt></ul>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <rt>
+
+#data
 <!DOCTYPE HTML><svg>
 #errors
 end of file in foreign content

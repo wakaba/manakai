@@ -3383,7 +3383,7 @@ my $AttrCheckerNotImplemented = sub {
 
 $Element->{$HTML_NS}->{img} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
@@ -3413,19 +3413,19 @@ $Element->{$HTML_NS}->{img} = {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
       align => FEATURE_M12N10_REC_DEPRECATED,
-      alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+      alt => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
       border => FEATURE_M12N10_REC_DEPRECATED,
-      height => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+      height => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
       hspace => FEATURE_M12N10_REC_DEPRECATED,
-      ismap => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      ismap => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
       longdesc => FEATURE_M12N10_REC,
       name => FEATURE_M12N10_REC_DEPRECATED,
       sdapref => FEATURE_HTML20_RFC,
-      src => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      usemap => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      src => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      usemap => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       vspace => FEATURE_M12N10_REC_DEPRECATED,
-      width => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+      width => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     })->($self, $item, $element_state);
     unless ($item->{node}->has_attribute_ns (undef, 'alt')) {
       $self->{onerror}->(node => $item->{node},
@@ -3488,7 +3488,7 @@ $Element->{$HTML_NS}->{iframe} = {
 
 $Element->{$HTML_NS}->{embed} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_DEFAULT,
+  status => FEATURE_HTML5_WD,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     my $has_src;
@@ -3501,8 +3501,8 @@ $Element->{$HTML_NS}->{embed} = {
       my $status = {
         %HTMLAttrStatus,
         height => FEATURE_HTML5_DEFAULT,
-        src => FEATURE_HTML5_DEFAULT,
-        type => FEATURE_HTML5_DEFAULT,
+        src => FEATURE_HTML5_WD,
+        type => FEATURE_HTML5_WD,
         width => FEATURE_HTML5_DEFAULT,
       }->{$attr_ln};
 
@@ -3520,7 +3520,7 @@ $Element->{$HTML_NS}->{embed} = {
         } else {
           $checker = $HTMLAttrChecker->{$attr_ln}
             || sub { }; ## NOTE: Any local attribute is ok.
-          $status = FEATURE_HTML5_DEFAULT | FEATURE_ALLOWED;
+          $status = FEATURE_HTML5_WD | FEATURE_ALLOWED;
         }
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
