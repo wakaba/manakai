@@ -1,7 +1,7 @@
 1..1920
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Jun  8 14:03:40 2008
-# Current time GMT:   Sun Jun  8 05:03:40 2008
+# Current time local: Sun Jun  8 21:17:15 2008
+# Current time GMT:   Sun Jun  8 12:17:15 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -1921,21 +1921,13 @@ not ok 1743
 # Test 1743 got: "4" (t/HTML-tree.t at line 161 fail #872)
 #      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; 4:0:not closed, 5:0:not closed, 6:0:not closed, 7:0:not closed;)
 ok 1744
-not ok 1745
-# Test 1745 got: "1" (t/HTML-tree.t at line 161 fail #873)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><div><rt></div>'; 1:30:not closed;)
+ok 1745
 ok 1746
-not ok 1747
-# Test 1747 got: "1" (t/HTML-tree.t at line 161 fail #874)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><div><rp></div>'; 1:30:not closed;)
+ok 1747
 ok 1748
-not ok 1749
-# Test 1749 got: "1" (t/HTML-tree.t at line 161 fail #875)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><div><rt><rp></div>'; 1:34:not closed;)
+ok 1749
 ok 1750
-not ok 1751
-# Test 1751 got: "1" (t/HTML-tree.t at line 161 fail #876)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ul><li><rt></ul>'; 1:32:not closed;)
+ok 1751
 ok 1752
 ok 1753
 ok 1754

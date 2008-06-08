@@ -3890,7 +3890,322 @@ wormhole connection.</mark></p>
 /p/dfn/em;no significant content;s
 /p/dfn/em/dfn;no significant content;s
 
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"></ruby>
+#errors
+/ruby;no significant content;s
+/ruby;element missing:rt;m
 
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">    </ruby>
+#errors
+/ruby;no significant content;s
+/ruby;element missing:rt;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">xxxx</ruby>
+#errors
+/ruby;element missing:rt;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">xxxx<rt>yyyy</rt></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">xxxx<rt>yyyy</rt>   </ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">xxxx<rt>yyyy</rt>zzzz</ruby>
+#errors
+/ruby;element missing:rt;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">xx<rt>yy</rt>zz<rt>aa</rt></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rt>y</rt>z<rt>w</rt>a</ruby>
+#errors
+/ruby;element missing:rt;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rt>y</rt> a<rt> b </rt>c<rt>d</rt></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rt></rt></ruby>
+#errors
+/ruby/rt;no significant content;s
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rt>y</rt>z<rt></rt></ruby>
+#errors
+/ruby/rt;no significant content;s
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"><rt>y</rt></ruby>
+#errors
+/ruby/rt;no significant content before;s
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rt>y</rt><rt>z</rt></ruby>
+#errors
+/ruby/rt;no significant content before;s
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt></ruby>
+#errors
+/ruby;element missing:rp;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp></ruby>
+#errors
+/ruby;element missing:rt;m
+/ruby;element missing:rp;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X</ruby>
+#errors
+/ruby;element missing:rt;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X<rt>Y</rt></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X<rp>(</rp></ruby>
+#errors
+/ruby;element missing:rt;m
+/ruby;element missing:rp;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X<rp>(</rp><rt>Y</rt></ruby>
+#errors
+/ruby;element missing:rp;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X<rp>(</rp><rt>Y</rt><rp>)</rp></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rp>)</rp></ruby>
+#errors
+/ruby/rp;ps element missing:rt;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rt>z</rt><rp>)</rp></ruby>
+#errors
+/ruby/rt;ps element missing:rp;m
+/ruby/rt;no significant content before;s
+/ruby/rp;no significant content before;s
+/ruby/rp;rp:syntax error;m
+/ruby;element missing:rt;m
+/ruby;element missing:rp;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"><rp>(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/rp;no significant content before;s
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>(</rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp></rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>))</rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>) </rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)<!----> </rp></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)<!---->)</rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt></rt><rp>)</rp></ruby>
+#errors
+/ruby/rt;no significant content;s
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"><rp>(</rp><rt></rt><rp>)</rp></ruby>
+#errors
+/ruby/rp;no significant content before;s
+/ruby/rt;no significant content;s
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp></rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>( </rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp> <!-- -->(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>[(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>)</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>[</rp><rt>y</rt><rp>]</rp></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>[</rp><rt><p>y</p></rt><rp>]</rp></ruby>
+#errors
+/ruby/rt/p;element not allowed:phrasing;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"><span>x</span><rp>(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"><rb>x</rb><rp>(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/rb;element not defined;m
+/ruby/rb;element not allowed:ruby base;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"><p>x</p><rp>(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/p;element not allowed:ruby base;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"><rb></rb>x<rp>(</rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/rb;element not defined;m
+/ruby/rb;element not allowed:ruby base;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml"><rbc><rb>x</rb><rb>c</rb></rbc><rtc/><rt>y</rt><rt>d</rt></ruby>
+#errors
+/ruby/rbc;element not defined;m
+/ruby/rbc;element not allowed:ruby base;m
+/ruby/rbc/rb;element not defined;m
+/ruby/rbc/rb;element not defined;m
+/ruby/rtc;element not defined;m
+/ruby/rtc;element not allowed:ruby base;m
+/ruby/rt;no significant content before;s
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp><span>(</span></rp><rt>y</rt><rp>)</rp></ruby>
+#errors
+/ruby/rp/span;element not allowed
+/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt><span>y</span></rt><rp>)</rp></ruby>
+#errors
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp><span>)</span></rp></ruby>
+#errors
+/ruby/rp/span;element not allowed
+/ruby/rp;rp:syntax error;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>(</rp><rt>y</rt><rp>)</rp></ruby></p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><ruby><rp>(</rp><rt>y</rt><rp>)</rp></ruby></p>
+#errors
+/p/ruby/rp;no significant content before;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><ruby><rt></rt></ruby></p>
+#errors
+/p;no significant content;s
+/p/ruby/rt;no significant content before;s
+/p/ruby/rt;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><ruby><rt></rt></ruby>x</p>
+#errors
+/p/ruby/rt;no significant content before;s
+/p/ruby/rt;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">x<ruby><rt></rt></ruby></p>
+#errors
+/p/ruby/rt;no significant content before;s
+/p/ruby/rt;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><ruby><rt></rt>x</ruby></p>
+#errors
+/p/ruby/rt;no significant content before;s
+/p/ruby/rt;no significant content;s
+/p/ruby;element missing:rt;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><ruby><rp>(</rp><rt></rt><rp>)</rp></ruby></p>
+#errors
+/p/ruby/rp;no significant content before;s
+/p/ruby/rt;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><rt></rt></p>
+#errors
+/p;no significant content;s
+/p/rt;no significant content;s
+/p/rt;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><rt>x</rt></p>
+#errors
+/p/rt;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><rp>x</rp></p>
+#errors
+/p/rp;element not allowed:phrasing;m
+/p/rp;rp:syntax error;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><rp>(</rp></p>
+#errors
+/p/rp;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><rp>)</rp></p>
+#errors
+/p/rp;element not allowed:phrasing;m
+/p/rp;rp:syntax error;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -6022,6 +6337,106 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/></ruby></rule>
+#errors
+/rule/ruby;no significant content;s
+/rule/ruby;element missing:rt;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/><rt>x</rt></ruby></rule>
+#errors
+/rule/ruby/rt;no significant content before;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/>x<rt>y</rt></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<nest/><rt>y</rt></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rt>y</rt><nest/></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rt><nest/></rt></ruby></rule>
+#errors
+/rule/ruby/rt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp><nest/>(</rp><rt>y</rt><rp>)</rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp><nest/></rp><rt>y</rt><rp>)</rp></ruby></rule>
+#errors
+/rule/ruby/rp;rp:syntax error;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>(<nest/>(</rp><rt>y</rt><rp>]</rp></ruby></rule>
+#errors
+/rule/ruby/rp;rp:syntax error;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt><nest/></rt><rp>]</rp></ruby></rule>
+#errors
+/rule/ruby/rt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><rp>]<nest/></rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><rp>]<nest/></rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><nest/><rt>y</rt><rp>]</rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><nest/><rp>]</rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>c</rt><rp>]</rp><nest/></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>c</rt><nest/></ruby></rule>
+#errors
+/rule/ruby;element missing:rp;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rt><nest/></rt></rule>
+#errors
+/rule/rt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rt>x<nest/></rt></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rp><nest/></rp></rule>
+#errors
+/rule/rp;rp:syntax error;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rp>(<nest/></rp></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rp><nest/>)</rp></rule>
+#errors
+/rule/rp;rp:syntax error;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rb><nest/></rb></rule>
+#errors
+/rule/rb;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ins><nest/></ins></rule>

@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.81 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.82 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -236,6 +236,7 @@ our %AnyChecker = (
   check_child_text => sub { },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+    ## NOTE: There is a modified copy of the code below for |html:ruby|.
     if ($element_state->{has_significant}) {
       $item->{real_parent_state}->{has_significant} = 1;
     }    
@@ -923,4 +924,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/10 06:04:39 $
+# $Date: 2008/06/08 12:22:54 $

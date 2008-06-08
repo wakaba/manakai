@@ -81,6 +81,10 @@ sub FEATURE_M12N11_LC () {
   Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
 
+sub FEATURE_RUBY_REC () {
+  Whatpm::ContentChecker::FEATURE_STATUS_CR
+}
+
 ## NOTE: M12N10 status is based on its abstract module definition.
 ## It contains a number of problems.  (However, again, it's a REC!)
 sub FEATURE_M12N10_REC () {
@@ -176,13 +180,16 @@ my $HTMLFlowContent = {
     br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
-    b => 1, bdo => 1, script => 1, noscript => 1, 'event-source' => 1,
-    command => 1, font => 1,
+    b => 1, bdo => 1, ruby => 1,
+    script => 1, noscript => 1, 'event-source' => 1, command => 1,
     a => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
     
+    ## NOTE: Dropped
+    font => 1,
+
     ins => 1, del => 1,
 
     ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
@@ -223,12 +230,15 @@ my $HTMLPhrasingContent = {
     br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
-    b => 1, bdo => 1, script => 1, noscript => 1, 'event-source' => 1,
-    command => 1, font => 1,
+    b => 1, bdo => 1, ruby => 1,
+    script => 1, noscript => 1, 'event-source' => 1, command => 1,
     a => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
+
+    ## NOTE: Dropped
+    font => 1,
 
     ## NOTE: Transparent.    
     ins => 1, del => 1,
@@ -1088,6 +1098,7 @@ my %HTMLM12NCommonAttrStatus = (
   content => FEATURE_RDFA_LC,
   datatype => FEATURE_RDFA_LC,
   dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  href => FEATURE_RDFA_LC,
   id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   instanceof => FEATURE_RDFA_LC,
   onclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -1180,6 +1191,7 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   content => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
   datatype => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
   dir => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  href => FEATURE_RDFA_LC,
   id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   instanceof => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
   property => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
@@ -1707,14 +1719,14 @@ $Element->{$HTML_NS}->{link} = {
       charset => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
           ## NOTE: |charset| attribute had been part of HTML5 spec though
           ## it had been commented out.
-      href => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       hreflang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
       media => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       methods => FEATURE_HTML20_RFC,
-      rel => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      rev => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      rev => FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       sdapref => FEATURE_HTML20_RFC,
       sizes => FEATURE_HTML5_DEFAULT,
       target => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -2660,7 +2672,7 @@ $Element->{$HTML_NS}->{a} = {
           coords => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           cryptopts => FEATURE_RFC2659,
           dn => FEATURE_RFC2659,
-          href => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
           media => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED,
@@ -2670,8 +2682,8 @@ $Element->{$HTML_NS}->{a} = {
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_DEFAULT,
-          rel => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-          rev => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          rev => FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           sdapref => FEATURE_HTML20_RFC,
           shape => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -3234,6 +3246,304 @@ $Element->{$HTML_NS}->{bdo} = {
     }
   },
   ## ISSUE: The spec does not directly say that |dir| is a enumerated attr.
+};
+
+$Element->{$HTML_NS}->{ruby} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_RUBY_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus, # XHTML 1.1 & XHTML 2.0 & XHTML+RDFa 1.0
+    lang => FEATURE_HTML5_DEFAULT,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{phase} = 'before-rb';
+    #$element_state->{has_sig}
+  },
+  ## NOTE: (phrasing, (rt | (rp, rt, rp)))+
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{must_level});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{phase} eq 'before-rb') {
+      if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+        $element_state->{phase} = 'in-rb';
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $child_el,
+                           level => $self->{should_level},
+                           type => 'no significant content before'); ## TODO: type
+        $element_state->{phase} = 'after-rt';
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $child_el,
+                           level => $self->{should_level},
+                           type => 'no significant content before'); ## TODO: type
+        $element_state->{phase} = 'after-rp1';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:ruby base', ## TODO: type
+                           level => $self->{must_level});
+        $element_state->{phase} = 'in-rb';
+      }
+    } elsif ($element_state->{phase} eq 'in-rb') {
+      if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+        #$element_state->{phase} = 'in-rb';
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+        unless ($element_state->{has_significant}) {
+          $self->{onerror}->(node => $child_el,
+                             level => $self->{should_level},
+                             type => 'no significant content before'); ## TODO: type
+        }
+        $element_state->{phase} = 'after-rt';
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+        unless ($element_state->{has_significant}) {
+          $self->{onerror}->(node => $child_el,
+                             level => $self->{should_level},
+                             type => 'no significant content before'); ## TODO: type
+        }
+        $element_state->{phase} = 'after-rp1';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:ruby base', ## TODO: type
+                           level => $self->{must_level});
+        #$element_state->{phase} = 'in-rb';
+      }
+    } elsif ($element_state->{phase} eq 'after-rt') {
+      if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+        if ($element_state->{has_significant}) {
+          $element_state->{has_sig} = 1;
+          delete $element_state->{has_significant};
+        }
+        $element_state->{phase} = 'in-rb';
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $child_el,
+                           level => $self->{should_level},
+                           type => 'no significant content before'); ## TODO: type
+        $element_state->{phase} = 'after-rp1';
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $child_el,
+                           level => $self->{should_level},
+                           type => 'no significant content before'); ## TODO: type
+        #$element_state->{phase} = 'after-rt';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:ruby base', ## TODO: type
+                           level => $self->{must_level});
+        if ($element_state->{has_significant}) {
+          $element_state->{has_sig} = 1;
+          delete $element_state->{has_significant};
+        }
+        $element_state->{phase} = 'in-rb';
+      }
+    } elsif ($element_state->{phase} eq 'after-rp1') {
+      if ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+        $element_state->{phase} = 'after-rp-rt';
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $child_el, 
+                           type => 'ps element missing:rt', ## TODO: type
+                           level => $self->{must_level});
+        $element_state->{phase} = 'after-rp2';
+      } else {
+        $self->{onerror}->(node => $child_el, 
+                           type => 'ps element missing:rt', ## TODO: type
+                           level => $self->{must_level});
+        $self->{onerror}->(node => $child_el, 
+                           type => 'ps element missing:rp', ## TODO: type
+                           level => $self->{must_level});
+        unless ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+          $self->{onerror}->(node => $child_el,
+                             type => 'element not allowed:ruby base', ## TODO: type
+                             level => $self->{must_level});
+        }
+        if ($element_state->{has_significant}) {
+          $element_state->{has_sig} = 1;
+          delete $element_state->{has_significant};
+        }
+        $element_state->{phase} = 'in-rb';
+      }
+    } elsif ($element_state->{phase} eq 'after-rp-rt') {
+      if ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+        $element_state->{phase} = 'after-rp2';
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $child_el, 
+                           type => 'ps element missing:rp', ## TODO: type
+                           level => $self->{must_level});
+        $self->{onerror}->(node => $child_el,
+                           level => $self->{should_level},
+                           type => 'no significant content before'); ## TODO: type
+        $element_state->{phase} = 'after-rt';
+      } else {
+        $self->{onerror}->(node => $child_el, 
+                           type => 'ps element missing:rp', ## TODO: type
+                           level => $self->{must_level});
+        unless ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+          $self->{onerror}->(node => $child_el,
+                             type => 'element not allowed:ruby base', ## TODO: type
+                             level => $self->{must_level});
+        }
+        if ($element_state->{has_significant}) {
+          $element_state->{has_sig} = 1;
+          delete $element_state->{has_significant};
+        }
+        $element_state->{phase} = 'in-rb';
+      }
+    } elsif ($element_state->{phase} eq 'after-rp2') {
+      if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+        if ($element_state->{has_significant}) {
+          $element_state->{has_sig} = 1;
+          delete $element_state->{has_significant};
+        }
+        $element_state->{phase} = 'in-rb';
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $child_el,
+                           level => $self->{should_level},
+                           type => 'no significant content before'); ## TODO: type
+        $element_state->{phase} = 'after-rt';
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+        $self->{onerror}->(node => $child_el,
+                           level => $self->{should_level},
+                           type => 'no significant content before'); ## TODO: type
+        $element_state->{phase} = 'after-rp1';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:ruby base', ## TODO: type
+                           level => $self->{must_level});
+        if ($element_state->{has_significant}) {
+          $element_state->{has_sig} = 1;
+          delete $element_state->{has_significant};
+        }
+        $element_state->{phase} = 'in-rb';
+      }
+    } else {
+      die "check_child_element: Bad |ruby| phase: $element_state->{phase}";
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      if ($element_state->{phase} eq 'before-rb') {
+        $element_state->{phase} = 'in-rb';
+      } elsif ($element_state->{phase} eq 'in-rb') {
+        #
+      } elsif ($element_state->{phase} eq 'after-rt' or
+               $element_state->{phase} eq 'after-rp2') {
+        $element_state->{phase} = 'in-rb';
+      } elsif ($element_state->{phase} eq 'after-rp1') {
+        $self->{onerror}->(node => $child_node, 
+                           type => 'ps element missing:rt', ## TODO: type
+                           level => $self->{must_level});
+        $self->{onerror}->(node => $child_node, 
+                           type => 'ps element missing:rp', ## TODO: type
+                           level => $self->{must_level});
+        $element_state->{phase} = 'in-rb';
+      } elsif ($element_state->{phase} eq 'after-rp-rt') {
+        $self->{onerror}->(node => $child_node, 
+                           type => 'ps element missing:rp', ## TODO: type
+                           level => $self->{must_level});
+        $element_state->{phase} = 'in-rb';
+      } else {
+        die "check_child_text: Bad |ruby| phase: $element_state->{phase}";
+      }
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+
+    if ($element_state->{phase} eq 'before-rb') {
+      $self->{onerror}->(node => $item->{node},
+                         level => $self->{should_level},
+                         type => 'no significant content');
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:rt', ## TODO: type
+                         level => $self->{must_level});
+    } elsif ($element_state->{phase} eq 'in-rb') {
+      unless ($element_state->{has_significant}) {
+        $self->{onerror}->(node => $item->{node},
+                           level => $self->{should_level},
+                           type => 'no significant content at the end'); ## TODO: type
+      }
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:rt', ## TODO: type
+                         level => $self->{must_level});
+    } elsif ($element_state->{phase} eq 'after-rt' or
+             $element_state->{phase} eq 'after-rp2') {
+      #
+    } elsif ($element_state->{phase} eq 'after-rp1') {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:rt', ## TODO: type
+                         level => $self->{must_level});
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:rp', ## TODO: type
+                         level => $self->{must_level});
+    } elsif ($element_state->{phase} eq 'after-rp-rt') {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:rp', ## TODO: type
+                         level => $self->{must_level});
+    } else {
+      die "check_child_text: Bad |ruby| phase: $element_state->{phase}";
+    }
+
+    ## NOTE: A modified version of |check_end| of %AnyChecker.
+    if ($element_state->{has_significant} or $element_state->{has_sig}) {
+      $item->{real_parent_state}->{has_significant} = 1;
+    }    
+  },
+};
+
+$Element->{$HTML_NS}->{rt} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_RUBY_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    lang => FEATURE_HTML5_DEFAULT,
+  }),
+};
+
+$Element->{$HTML_NS}->{rp} = {
+  %HTMLTextChecker,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_RUBY_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    lang => FEATURE_HTML5_DEFAULT,
+  }),
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{text} = '';
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $element_state->{text} .= $child_node->data;
+      ## NOTE: |<rp> <!---->(</rp>| is allowed.
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my $p_class = ($item->{parent_state} and
+                   $item->{parent_state}->{phase} and
+                   $item->{parent_state}->{phase} eq 'after-rp2')
+        ? qr/\p{Pe}/ : qr/\p{Ps}/;
+    if ($element_state->{text} =~ /\A$p_class\z/) {
+        #=~ /\A[\x09-\x0D\x20]*${p_class}[\x09-\x0D\x20]*\z/) {
+      #
+    } else {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'rp:syntax error', ## TODO: type
+                         level => $self->{must_level});
+    }
+
+    $HTMLTextChecker{check_end}->(@_);
+  },  
 };
 
 =pod
@@ -3927,7 +4237,7 @@ $Element->{$HTML_NS}->{area} = {
           accesskey => FEATURE_M12N10_REC,
           alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           coords => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          href => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+          href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_DEFAULT,
           lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
           media => FEATURE_HTML5_DEFAULT,
@@ -3935,7 +4245,7 @@ $Element->{$HTML_NS}->{area} = {
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_DEFAULT,
-          rel => FEATURE_HTML5_DEFAULT,
+          rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC,
           shape => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
