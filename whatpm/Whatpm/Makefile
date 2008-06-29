@@ -5,7 +5,7 @@ CP = cp
 RM = rm
 RMALL = $(RM) -fr
 
-all: Charset-all CSS-all HTML-all \
+all: Charset-all CSS-all HTML-all XML-all \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
   CacheManifest.html
@@ -18,6 +18,9 @@ CSS-all:
 
 HTML-all:
 	cd HTML && make all
+
+XML-all:
+	cd XML && make all
 
 update: update-remove-old _NamedEntityList.pm _LinkTypeList.pm
 
@@ -56,7 +59,7 @@ update-_LinkTypeList.pm:
 RelExtensions.html:
 	$(WGET) http://wiki.whatwg.org/wiki/RelExtensions -O $@
 
-clean: Charset-clean CSS-clean HTML-clean
+clean: Charset-clean CSS-clean HTML-clean XML-clean
 	$(RMALL) *~ *.bak *.tmp
 
 Charset-clean:
@@ -68,5 +71,8 @@ CSS-clean:
 HTML-clean:
 	cd HTML && make clean
 
+XML-clean:
+	cd XML && make clean
+
 ## License: Public Domain.
-## $Date: 2008/06/15 07:14:00 $
+## $Date: 2008/06/29 11:15:54 $

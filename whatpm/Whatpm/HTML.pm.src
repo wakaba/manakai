@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.151 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.152 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3317,7 +3317,7 @@ sub _tree_construction_root_element ($) {
   B: {
       if ($token->{type} == DOCTYPE_TOKEN) {
         !!!cp ('t19');
-        !!!parse-error (type => 'in html:#DOCTYPE', token => $token);
+        !!!parse-error (type => 'in html:#DOCTYPE', token => $token); ## TODO: type
         ## Ignore the token
         ## Stay in the insertion mode.
         !!!next-token;
@@ -7531,4 +7531,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/06/08 05:08:42 $
+# $Date: 2008/06/29 11:15:53 $
