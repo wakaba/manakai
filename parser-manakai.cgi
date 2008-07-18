@@ -49,7 +49,7 @@ if (@mode == 3 and $mode[0] eq 'html' and
 
   my $onerror = sub {
     my (%opt) = @_;
-    print STDOUT "$opt{line},$opt{column},$opt{type}\n";
+    print STDOUT "$opt{line},$opt{column},$opt{type};$opt{level};$opt{value}\n";
   };
 
   $doc = $dom->create_document;
@@ -289,4 +289,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/04/12 15:57:56 $
+## $Date: 2008/07/18 14:44:17 $
