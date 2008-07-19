@@ -623,7 +623,8 @@ sub parse_char_string ($$;$) {
         DOMString => 1, Object => 1, unsigned => 1, short => 1, long => 1,
         '::' => 1, identifier => 1,
       }->{$token->{type}}) {
-
+        # reconsume
+        $state = 'before exception member type';
       } elsif ($token->{type} eq '}') {
         $token = $get_next_token->();
         $state = 'before semicolon';
@@ -800,6 +801,29 @@ sub parse_char_string ($$;$) {
         $nest_level = 0;
         $next_state = 'before interface member';
       }
+    } elsif ($state eq 'before exception member type') {
+      if ({
+        any => 1, boolean => 1, octet => 1, float => 1,
+        DOMString => 1, Object => 1, short => 1, long => 1, unsigned => 1,
+        '::' => 1, identifier => 1,
+      }->{$token->{type}}) {
+        $current_type = $get_type->();
+        if (defined $current_type) {
+          # next token
+          $state = 'before exception member identifier';
+        } else {
+          # reconsume
+          $state = 'ignore';
+          $nest_level = 0;
+          $next_state = 'before exception member';
+        }
+      } else {
+        $onerror->(type => 'before type', level => $self->{must_level});
+        # reconsume
+        $state = 'ignore';
+        $nest_level = 0;
+        $next_state = 'before exception member';
+      }
     } elsif ($state eq 'before operation type') {
       if ({
         any => 1, boolean => 1, octet => 1, float => 1,
@@ -880,7 +904,23 @@ sub parse_char_string ($$;$) {
       # reconsume
       $state = 'ignore';
       $nest_level = 0;
-      #$next_state = $next_state;
+      $next_state = 'before interface member';
+    } elsif ($state eq 'before exception member identifier') {
+      if ($token->{type} eq 'identifier') {
+        ## TODO: unescape
+        push @current, Whatpm::WebIDL::ExceptionMember->new ($token->{value});
+        $current[-1]->type ($current_type);
+        $token = $get_next_token->();
+        $state = 'before semicolon';
+        $next_state = 'before exception member';
+      } else {
+        $onerror->(type => 'exception member identifier',
+                   level => $self->{must_level});
+        # reconsume
+        $state = 'ignore';
+        $nest_level = 0;
+        $next_state = 'before exception member';
+      }
     } elsif ($state eq 'before operation identifier') {
       if ($token->{type} eq 'identifier') {
         ## TODO: unescape
@@ -913,7 +953,7 @@ sub parse_char_string ($$;$) {
       # reconsume
       $state = 'ignore';
       $nest_level = 0;
-      #$next_state = $next_state;
+      $next_state = 'before interface member';
     } elsif ($state eq 'before argument identifier') {
       if ($token->{type} eq 'identifier') {
         ## TODO: unescape
@@ -943,7 +983,7 @@ sub parse_char_string ($$;$) {
       # reconsume
       $state = 'ignore';
       $nest_level = 0;
-      #$next_state = $next_state;
+      $next_state = 'before interface member';
     } elsif ($state eq 'before argument') {
       if ($token->{type} eq '[') {
         $token = $get_next_token->();
@@ -1132,8 +1172,14 @@ sub append_inheritance ($$) {
 } # append_inheritance
 
 sub idl_text ($) {
-  my $r = 'interface ' . $_[0]->node_name . "{\x0A"; ## TODO: escape
-  for (@{$_[0]->{child_nodes}}) { ## TODO: inheritances
+  my $self = shift;
+  my $r = 'interface ' . $self->node_name;
+  if (@{$self->{inheritances}}) {
+    $r .= ' : '; ## TODO: ...
+    $r .= join ', ', map {join '::', @{$_}} @{$self->{inheritances}};
+  }
+  $r .= " {\x0A"; ## TODO: escape
+  for (@{$self->{child_nodes}}) {
     $r .= '  ' . $_->idl_text;
   }
   $r .= "};\x0A";
@@ -1142,6 +1188,15 @@ sub idl_text ($) {
 
 package Whatpm::WebIDL::Exception;
 push our @ISA, 'Whatpm::WebIDL::Definition';
+
+sub idl_text ($) {
+  my $r = 'exception ' . $_[0]->node_name . "{\x0A"; ## TODO: escape
+  for (@{$_[0]->{child_nodes}}) {
+    $r .= '  ' . $_->idl_text;
+  }
+  $r .= "};\x0A";
+  return $r;
+} # idl_text
 
 package Whatpm::WebIDL::Typedef;
 push our @ISA, 'Whatpm::WebIDL::Definition';
@@ -1310,6 +1365,22 @@ sub new ($$) {
 
 sub idl_text ($) {
   return 'in ' . $_[0]->type_text . ' ' . $_[0]->node_name; ## TODO: escape
+} # idl_text
+
+*node_name = \&Whatpm::WebIDL::Definition::node_name;
+
+*type = \&Whatpm::WebIDL::Definition::type;
+
+*type_text = \&Whatpm::WebIDL::Definition::type_text;
+
+package Whatpm::WebIDL::ExceptionMember;
+
+sub new ($$) {
+  return bless {node_name => ''.$_[1], type => ['::any::']}, $_[0];
+} # new
+
+sub idl_text ($) {
+  return $_[0]->type_text . ' ' . $_[0]->node_name . ";\x0A"; ## TODO: escape
 } # idl_text
 
 *node_name = \&Whatpm::WebIDL::Definition::node_name;
