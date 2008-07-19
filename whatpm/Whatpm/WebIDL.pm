@@ -1290,7 +1290,7 @@ sub idl_text ($) {
   my $self = shift;
   my $r = $self->_xattrs_text;
   $r .= ' ' if length $r;
-  $r = 'exception ' . $self->node_name . "{\x0A"; ## TODO: escape
+  $r = 'exception ' . $self->node_name . " {\x0A"; ## TODO: escape
   for (@{$self->{child_nodes}}) {
     $r .= '  ' . $_->idl_text;
   }

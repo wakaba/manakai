@@ -62,6 +62,14 @@ project.</p>
   conformance checker.</dd>
 <dt><a href="Whatpm/URIChecker.html"><code>Whatpm::URIChecker</code></a></dt>
   <dd>An IRI reference conformance checker.</dd>
+
+<dt><a href="Whatpm/WebIDL.html"><code>Whatpm::WebIDL</code></a></dt>
+  <dd>A WebIDL fragment parser.  It parses an IDL fragment, whether conforming
+  or not, and constructs a DOM-like object model for further processing.
+  Non-conforming (or broken) IDL fragment-like string will be parsed using
+  CSS-like error-tolerant parsing rules, e.g. ignoring anything until next
+  <code>;</code> character.
+
 <dt><a href="Whatpm/XMLSerializer.html"><code>Whatpm::XMLSerializer</code></a></dt>
   <dd>A simple XML serializer.</dd>
   </dl>
@@ -71,7 +79,7 @@ project.</p>
 
   <p>Note also that some modules have no documentation for now.</p>
   </dd>
-<dt id=spec>Specification</dt>
+<dt id=spec>Specifications</dt>
   <dd><dl>
     <dt id=spec-ssft><a href="http://suika.fam.cx/www/markup/selectors/ssft/ssft"><abbr title="Selectors Serialization Format for Testing">SSFT</abbr>
     Specification</a></dt>
@@ -203,6 +211,8 @@ repository</a>.</p>
     <a href="t/tokenizer-result">HTML tokenization</a>,
     <a href="t/tree-construction-result">HTML tree construction</a>,
     <a href="t/content-checker-result"><code>Whatpm::ContentChecker</code></a>).</li>
+  <li>Merge with the <a href="http://suika.fam.cx/www/2006/manakai/">manakai-core</a>
+      code tree.
   <li>Charset detection.</li>
   <li>Validation for <code>meta</code>.</li>
   <li>Validation for media queries, IRIs (against URI schemes), language tags,
@@ -232,7 +242,7 @@ parser test data</a>.</p>
 <div class="section" id="license">
 <h2>License</h2>
 
-<p>Copyright 2007 Wakaba 
+<p>Copyright 2007‐2008 Wakaba 
 <code class="mail">&lt;<a href="mailto:w@suika.fam.cx"
     rel="author">w@suika.fam.cx</a>></code>.</p>
 

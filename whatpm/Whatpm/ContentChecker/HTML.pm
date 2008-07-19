@@ -2430,7 +2430,12 @@ $Element->{$HTML_NS}->{pre} = {
   
     ## TODO: Flag to enable/disable IDL checking?
     my $class = $item->{node}->get_attribute ('class');
-    if ($class =~ /\bidl\b/) { ## TODO: use classList.has
+    if ($class =~ /\bidl(?>-code)?\b/) { ## TODO: use classList.has
+      ## NOTE: pre.idl: WHATWG, XHR, Selectors API, CSSOM specs
+      ## NOTE: pre.code > code.idl-code: WebIDL spec
+      ## NOTE: pre.idl-code: DOM1 spec
+      ## NOTE: div.idl-code > pre: DOM, ProgressEvent specs
+      ## NOTE: pre.schema: ReSpec-generated specs
       $self->{onsubdoc}->({s => $item->{node}->text_content,
                            container_node => $item->{node},
                            media_type => 'text/x-webidl',
