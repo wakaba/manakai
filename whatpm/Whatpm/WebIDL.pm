@@ -250,8 +250,7 @@ sub parse_char_string ($$;$) {
         $state = 'before def';
       } elsif ($token->{type} eq '}' and @current > 1) {
         $token = $get_next_token->();
-        $state = 'before semicolon';
-        $next_state = 'before definitions';
+        $state = 'before block semicolon';
       } elsif ($token->{type} eq 'eof') {
         last;
       } else {
@@ -263,10 +262,6 @@ sub parse_char_string ($$;$) {
         $next_state = 'before definitions';
       }
     } elsif ($state eq 'before xattr') {
-      
-      ## TODO: methodType methodName ([broken xattr] ...); is not well
-      ## handled on forward-compatible parsing (i.e. pop @current).
-
       if ($token->{type} eq 'identifier') {
         ## TODO: _escape
         ## ISSUE: Duplicate attributes
@@ -470,10 +465,6 @@ sub parse_char_string ($$;$) {
         $state = 'before const type';
         $next_state = 'before definitions';
         next;
-      } elsif ($token->{type} eq 'eof') {
-        ## NOTE: Any extended attributes are ignored.
-        $onerror->(type => 'before def:eof', level => 'm', token => $token);
-        last;
       } else {
         $onerror->(type => 'before definition', level => 'm',
                    token => $token);
@@ -518,11 +509,9 @@ sub parse_char_string ($$;$) {
         }
       } else {
         $onerror->(type => 'scoped name', level => $self->{must_level});
-        pop @current; # interface
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before definitions';
       }
     } elsif ($state eq 'before exception name') {
       my $name = $get_scoped_name->();
@@ -549,19 +538,15 @@ sub parse_char_string ($$;$) {
         } else {
           $onerror->(type => 'after exception name',
                      level => $self->{must_level});
-          pop @current; # operation/attribute
           # reconsume
           $state = 'ignore';
           $nest_level = 0;
-          $next_state = 'before interface member';
         }
       } else {
         $onerror->(type => 'scoped name', level => $self->{must_level});
-        pop @current; # operation/attribute
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before interface member';
       }
     } elsif ($state eq 'before interface block') {
       if ($token->{type} eq '{') {
@@ -572,10 +557,8 @@ sub parse_char_string ($$;$) {
         $onerror->(type => 'before interface block',
                    level => $self->{must_level});
         # reconsume
-        pop @current; # interface
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before definitions';
       }
     } elsif ($state eq 'before exception block') {
       if ($token->{type} eq '{') {
@@ -586,10 +569,8 @@ sub parse_char_string ($$;$) {
         $onerror->(type => 'before exception block',
                    level => $self->{must_level});
         # reconsume
-        pop @current; # exception
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before definitions';
       }
     } elsif ($state eq 'before members') {
       $xattrs = [];
@@ -599,8 +580,7 @@ sub parse_char_string ($$;$) {
         #$next_state = $next_state; # 'before interface member' or ...
       } elsif ($token->{type} eq '}') {
         $token = $get_next_token->();
-        $state = 'before semicolon';
-        $next_state = 'before definitions';
+        $state = 'before block semicolon';
       } else {
         # reconsume
         $state = $next_state; # ... 'before exception member'
@@ -638,18 +618,13 @@ sub parse_char_string ($$;$) {
         $state = 'before semicolon';
         $next_state = 'before definitions';
       } elsif ($token->{type} eq 'eof') {
-        $onerror->(type => 'before interface member:eof',
-                   level => $self->{must_level});
-        $current[-2]->append_child ($current[-1]);
         last;
       } else {
         $onerror->(type => 'before interface member',
                    level => $self->{must_level});
         # reconsume
-        pop @current; # interface
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before interface member';
       }
     } elsif ($state eq 'before exception member') {
       if ({
@@ -664,18 +639,13 @@ sub parse_char_string ($$;$) {
         $state = 'before semicolon';
         $next_state = 'before definitions';
       } elsif ($token->{type} eq 'eof') {
-        $onerror->(type => 'before exception member:eof',
-                   level => $self->{must_level});
-        $current[-2]->append_child ($current[-1]);
         last;
       } else {
         $onerror->(type => 'before exception member',
                    level => $self->{must_level});
         # reconsume
-        pop @current; # interface
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before exception member';
       }
     } elsif ($state eq 'before typedef type') {
       if ({
@@ -897,18 +867,14 @@ sub parse_char_string ($$;$) {
           $state = 'before argument identifier';
         } else {
           # reconsume
-          pop @current; # operation
           $state = 'ignore';
           $nest_level = 0;
-          $next_state = 'before interface member';
         }
       } else {
         $onerror->(type => 'before type', level => $self->{must_level});
-        pop @current; # operation
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before interface member';
       }
     } elsif ($state eq 'before attribute identifier') {
       if ($token->{type} eq 'identifier') {
@@ -958,7 +924,6 @@ sub parse_char_string ($$;$) {
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before exception member';
       }
     } elsif ($state eq 'before operation identifier') {
       if ($token->{type} eq 'identifier') {
@@ -980,7 +945,6 @@ sub parse_char_string ($$;$) {
             next;
           }
         } else {
-          pop @current;
           $onerror->(type => 'arguments lparen',
                      level => $self->{must_level});
           #
@@ -1024,11 +988,9 @@ sub parse_char_string ($$;$) {
                    level => $self->{must_level});
         #
       }
-      pop @current; # operation
       # reconsume
       $state = 'ignore';
       $nest_level = 0;
-      $next_state = 'before interface member';
     } elsif ($state eq 'before argument') {
       $xattrs = [];
       if ($token->{type} eq '[') {
@@ -1046,10 +1008,8 @@ sub parse_char_string ($$;$) {
       } else {
         $onerror->(type => 'argument in',
                    level => $self->{must_level});
-        pop @current; # operation
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before interface member';
       }
     } elsif ($state eq 'before raises') {
       if ($token->{type} eq 'raises') {
@@ -1068,39 +1028,76 @@ sub parse_char_string ($$;$) {
       } else {
         $onerror->(type => 'raises lparen',
                    level => $self->{must_level});
-        pop @current; # operation
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before interface member';
       }
     } elsif ($state eq 'before semicolon') {
       if ($token->{type} eq ';') {
         $current[-2]->append_child ($current[-1]);
         pop @current;
         $token = $get_next_token->();
-        $state = {
-          #'before definitions',
-          'before interface member' => 'before members', # keep $next_state
-          'before exception member' => 'before members', #   as is
-        }->{$next_state} || $next_state;
+        if ($current[-1]->isa ('Whatpm::WebIDL::Definitions') or
+            $current[-1]->isa ('Whatpm::WebIDL::Module')) {
+          $state = 'before definitions';
+        } elsif ($current[-1]->isa ('Whatpm::WebIDL::Interface')) {
+          $state = 'before members';
+          $next_state = 'before interface member';
+        } else {
+          $state = 'before members';
+          $next_state = 'before exception member';
+        }
       } else {
-        pop @current;
         $onerror->(type => 'before semicolon', level => 'm',
                    token => $token);
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before definitions';
+      }
+    } elsif ($state eq 'before block semicolon') {
+      if ($token->{type} eq ';') {
+        $current[-2]->append_child ($current[-1]);
+        pop @current;
+        $token = $get_next_token->();
+        if ($current[-1]->isa ('Whatpm::WebIDL::Definitions') or
+            $current[-1]->isa ('Whatpm::WebIDL::Module')) {
+          $state = 'before definitions';
+        } elsif ($current[-1]->isa ('Whatpm::WebIDL::Interface')) {
+          $state = 'before members';
+          $next_state = 'before interface member';
+        } else {
+          $state = 'before members';
+          $next_state = 'before exception member';
+        }
+      } else {
+        $onerror->(type => 'before semicolon', level => 'm',
+                   token => $token);
+        pop @current; # avoid appended by 'ignore'
+        # reconsume
+        $state = 'ignore';
+        $nest_level = 0;
       }
     } elsif ($state eq 'ignore') {
-      if (($nest_level == 0 and $token->{type} eq ';') or
-          (@current > 1 and not $nest_level and $token->{type} eq '}')) {
+      if ($nest_level == 0 and $token->{type} eq ';') {
+        while (@current > 1) {
+          if ($current[-1]->isa ('Whatpm::WebIDL::Interface') or
+              $current[-1]->isa ('Whatpm::WebIDL::Exception') or
+              $current[-1]->isa ('Whatpm::WebIDL::Module')) {
+            last;
+          }
+          pop @current;
+        }
+
         $token = $get_next_token->();
-        $state = {
-          #'before definitions',
-          'before interface member' => 'before members', # keep $next_state
-          'before exception member' => 'before members', #   as is
-        }->{$next_state} || $next_state;
+        if ($current[-1]->isa ('Whatpm::WebIDL::Definitions') or
+            $current[-1]->isa ('Whatpm::WebIDL::Module')) {
+          $state = 'before definitions';
+        } elsif ($current[-1]->isa ('Whatpm::WebIDL::Interface')) {
+          $state = 'before members';
+          $next_state = 'before interface member';
+        } else {
+          $state = 'before members';
+          $next_state = 'before exception member';
+        }
       } elsif ($token->{type} eq '{') {
         $nest_level++;
         $token = $get_next_token->();
@@ -1110,6 +1107,15 @@ sub parse_char_string ($$;$) {
         $token = $get_next_token->();
         # stay in the state
       } elsif ($token->{type} eq 'eof') {
+        while (@current > 1) {
+          if ($current[-1]->isa ('Whatpm::WebIDL::Interface') or
+              $current[-1]->isa ('Whatpm::WebIDL::Exception') or
+              $current[-1]->isa ('Whatpm::WebIDL::Module')) {
+            last;
+          }
+          pop @current;
+        }
+
         last;
       } else {
         # ignore the token
@@ -1122,7 +1128,11 @@ sub parse_char_string ($$;$) {
   }
 
   if (@current > 1) {
-    $onerror->(type => 'block not closed', level => $self->{must_level});    
+    $onerror->(type => 'premature end of file', level => $self->{must_level});
+    while (@current > 1) {
+      $current[-2]->append_child ($current[-1]);
+      pop @current;
+    }
   }
 
   $get_type = undef; # unlink loop
