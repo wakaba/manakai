@@ -2425,6 +2425,20 @@ $Element->{$HTML_NS}->{pre} = {
     sdaform => FEATURE_HTML20_RFC,
     width => FEATURE_M12N10_REC_DEPRECATED,
   }),
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+  
+    ## TODO: Flag to enable/disable IDL checking?
+    my $class = $item->{node}->get_attribute ('class');
+    if ($class =~ /\bidl\b/) { ## TODO: use classList.has
+      $self->{onsubdoc}->({s => $item->{node}->text_content,
+                           container_node => $item->{node},
+                           media_type => 'text/x-webidl',
+                           is_char_string => 1});
+    }
+
+    $HTMLChecker{check_end}->(@_);
+  },
 };
 
 $Element->{$HTML_NS}->{ol} = {

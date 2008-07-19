@@ -1209,16 +1209,32 @@ sub type ($;$) {
   return $_[0]->{type};
 } # type
 
+{
+  my $serialize_type;
+  my $serialize_type_depth = 0;
+  $serialize_type = sub ($) {
+    my $type = shift;
+    if ($type->[0] eq '::sequence::') {
+      if ($serialize_type_depth++ == 1024) {
+        return 'sequence<<<sequence too deep>>>';
+      } else {
+        return 'sequence<' . $serialize_type->($type->[1]) . '>';
+      }
+    } else {
+      return join '::', map {
+        /^::([^:]+)::$/ ? $1 : $_ ## TODO: escape
+      } @{$type};
+    }
+  }; # $serialize_type
+
 sub type_text ($) {
   my $type = $_[0]->{type};
   return undef unless defined $type;
-  
-  if ($type->[0] eq '::sequence::') {
-    return 'sequence<' . (join '::', @{$type->[1]}) . '>'; ## TODO: escape, nested
-  } else {
-    return join '::', @$type; ## TODO: escape
-  }
+
+  return $serialize_type->($type);
 } # type_text
+
+}
 
 package Whatpm::WebIDL::Module;
 push our @ISA, 'Whatpm::WebIDL::Definition';
