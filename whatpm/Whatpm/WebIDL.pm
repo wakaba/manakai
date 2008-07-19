@@ -117,6 +117,7 @@ sub parse_char_string ($$;$) {
       push @$name, $token->{value};
       $token = $get_next_token->();
       while ($token->{type} eq '::') {
+        $token = $get_next_token->();
         if ($token->{type} eq 'identifier') {
           ## TODO: unescape
           push @$name, $token->{value};
@@ -130,6 +131,7 @@ sub parse_char_string ($$;$) {
     } elsif ($token->{type} eq '::') {
       push @$name, '';
       while ($token->{type} eq '::') {
+        $token = $get_next_token->();
         if ($token->{type} eq 'identifier') {
           ## TODO: unescape
           push @$name, $token->{value};
@@ -489,6 +491,45 @@ sub parse_char_string ($$;$) {
         $nest_level = 0;
         $next_state = 'before definitions';
       }
+    } elsif ($state eq 'before exception name') {
+      my $name = $get_scoped_name->();
+      if (defined $name) {
+        my $method = $next_state eq '*raises' ? 'append_raises' :
+              $next_state eq '*getraises' ? 'append_getraises' :
+              'append_setraises';
+        $current[-1]->$method ($name);
+
+        if ($token->{type} eq ',') {
+          $token = $get_next_token->();
+          # stay in the state
+        } elsif ($token->{type} eq ')') {
+          $token = $get_next_token->();
+          if ($next_state eq '*getraises' and $token->{type} eq 'setraises') {
+            $token = $get_next_token->();
+            $state = 'after raises';
+            $next_state = '*setraises';
+          } else {
+            # reprocess
+            $state = 'before semicolon';
+            $next_state = 'before interface member';
+          }
+        } else {
+          $onerror->(type => 'after exception name',
+                     level => $self->{must_level});
+          pop @current; # operation/attribute
+          # reconsume
+          $state = 'ignore';
+          $nest_level = 0;
+          $next_state = 'before interface member';
+        }
+      } else {
+        $onerror->(type => 'scoped name', level => $self->{must_level});
+        pop @current; # operation/attribute
+        # reconsume
+        $state = 'ignore';
+        $nest_level = 0;
+        $next_state = 'before interface member';
+      }
     } elsif ($state eq 'before interface block') {
       if ($token->{type} eq '{') {
         $token = $get_next_token->();
@@ -817,11 +858,13 @@ sub parse_char_string ($$;$) {
         $token = $get_next_token->();
         if ($token->{type} eq 'getraises') {
           $token = $get_next_token->();
-          $state = 'after getraises';
+          $state = 'after raises';
+          $next_state = '*getraises';
           next;
         } elsif ($token->{type} eq 'setraises') {
           $token = $get_next_token->();
-          $state = 'after setraises';
+          $state = 'after raises';
+          $next_state = '*setraises';
           next;
         } else {
           # reconsume
@@ -848,8 +891,8 @@ sub parse_char_string ($$;$) {
           $token = $get_next_token->();
           if ($token->{type} eq ')') {
             $token = $get_next_token->();
-            $state = 'before semicolon';
-            $next_state = 'before interface member';
+            $state = 'before raises';
+            $next_state = '*raises';
             next;
           } else {
             # reconsume
@@ -926,17 +969,24 @@ sub parse_char_string ($$;$) {
       if ($token->{type} eq 'raises') {
         $token = $get_next_token->();
         $state = 'after raises';
+        $next_state = '*raises';
       } else {
         # reconsume
         $state = 'before semicolon';
         $next_state = 'before interface member';
       }
     } elsif ($state eq 'after raises') {
-      
-    } elsif ($state eq 'after getraises') {
-
-    } elsif ($state eq 'after setraises') {
-
+      if ($token->{type} eq '(') {
+        $token = $get_next_token->();
+        $state = 'before exception name';
+      } else {
+        $onerror->(type => 'raises lparen',
+                   level => $self->{must_level});
+        pop @current; # operation
+        $state = 'ignore';
+        $nest_level = 0;
+        $next_state = 'before interface member';
+      }
     } elsif ($state eq 'before semicolon') {
       if ($token->{type} eq ';') {
         $current[-2]->append_child ($current[-1]);
@@ -1176,8 +1226,20 @@ push our @ISA, 'Whatpm::WebIDL::InterfaceMember';
 sub new ($$) {
   my $self = shift->SUPER::new (@_);
   $self->{type} = ['::any::'];
+  $self->{getraises} = [];
+  $self->{setraises} = [];
   return $self;
 } # new
+
+sub append_getraises ($$) {
+  ## TODO: error check, etc.
+  push @{$_[0]->{getraises}}, $_[1];
+} # append_getraises
+
+sub append_setraises ($$) {
+  ## TODO: error check, etc.
+  push @{$_[0]->{setraises}}, $_[1];
+} # append_setraises
 
 sub readonly ($;$) {
   if (@_ > 1) {
@@ -1188,9 +1250,23 @@ sub readonly ($;$) {
 } # readonly
 
 sub idl_text ($) {
-  return (($_[0]->readonly ? 'readonly ' : '') . 'attribute ' . $_[0]->type_text . ' ' . $_[0]->node_name . ";\x0A");
+  my $self = shift;
+  my $r = ($self->readonly ? 'readonly ' : '') . 'attribute ' . $self->type_text . ' ' . $self->node_name;
   ## TODO: escape
-  ## TODO: raises
+  if (@{$self->{getraises}}) {
+    $r .= ' getraises (';
+    ## todo: ...
+    $r .= join ', ', map {join '::', @{$_}} @{$self->{getraises}};
+    $r .= ')';
+  }
+  if (@{$self->{setraises}}) {
+    $r .= ' setraises (';
+    ## todo: ...
+    $r .= join ', ', map {join '::', @{$_}} @{$self->{setraises}};
+    $r .= ')';
+  }
+  $r .= ";\x0A";
+  return $r;
 } # idl_text
 
 package Whatpm::WebIDL::Operation;
@@ -1200,15 +1276,28 @@ sub new ($$) {
   my $self = shift->SUPER::new (@_);
   $self->{type} = ['::any::'];
   $self->{child_nodes} = [];
+  $self->{raises} = [];
   return $self;
 } # new
 
 *append_child = \&Whatpm::WebIDL::Definition::append_child;
 
+sub append_raises ($$) {
+  ## TODO: error check, etc.
+  push @{$_[0]->{raises}}, $_[1];
+} # append_raises
+
 sub idl_text ($) {
-  my $r = $_[0]->type_text . ' ' . $_[0]->node_name . ' ('; ## TODO: escape
-  $r .= join ', ', map {$_->idl_text} @{$_[0]->{child_nodes}};
-  $r .= ')'; ## TODO: raises
+  my $self = shift;
+  my $r = $self->type_text . ' ' . $self->node_name . ' ('; ## TODO: escape
+  $r .= join ', ', map {$_->idl_text} @{$self->{child_nodes}};
+  $r .= ')';
+  if (@{$self->{raises}}) {
+    $r .= ' raises (';
+    ## todo: ...
+    $r .= join ', ', map {join '::', @{$_}} @{$self->{raises}};
+    $r .= ')';
+  }
   $r .= ";\x0A";
   return $r;
 } # idl_text
