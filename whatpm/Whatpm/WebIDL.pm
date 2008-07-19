@@ -85,6 +85,7 @@ sub parse_char_string ($$;$) {
   my $nest_level = 0;
   my $next_state;
   my $xattrs;
+  my $prev_xattrs = [];
   my $last_xattr;
   my $read_only;
   my $current_type;
@@ -238,14 +239,13 @@ sub parse_char_string ($$;$) {
 
   while (1) {
     if ($state eq 'before definitions') {
+      $xattrs = [];
       if ($token->{type} eq '[') {
-        $xattrs = {};
         $token = $get_next_token->();
         $state = 'before xattr';
         $next_state = 'before def';
       } elsif ({module => 1, interface => 1, exception => 1,
                typedef => 1, valuetype => 1, const => 1}->{$token->{type}}) {
-        $xattrs = {};
         # reconsume
         $state = 'before def';
       } elsif ($token->{type} eq '}' and @current > 1) {
@@ -271,40 +271,58 @@ sub parse_char_string ($$;$) {
         ## TODO: _escape
         ## ISSUE: Duplicate attributes
         ## ISSUE: Unkown attributes
-        $xattrs->{$token->{value}} = '';
-        $last_xattr = $token->{value};
+        push @current, Whatpm::WebIDL::ExtendedAttribute->new ($token->{value});
+        push @$xattrs, $current[-1];
         $token = $get_next_token->();
         $state = 'after xattr';
-      } elsif ($token->{type} eq 'eof') {
-        $onerror->(type => 'before xattr:eof', level => 'm', token => $token);
-        $token = $get_next_token->();
-        $state = 'after xattrlist';
       } else {
         $onerror->(type => 'before xattr', level => 'm', token => $token);
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before definitions';
+        $next_state = 'before definitions'; ## TODO:
       }
     } elsif ($state eq 'after xattr') {
       if ($token->{type} eq '=') {
         $token = $get_next_token->();
         $state = 'before xattrarg';
+      } elsif ($token->{type} eq '(') {
+        $token = $get_next_token->();
+        if ($token->{type} eq ')') {
+          $token = $get_next_token->();
+          push @$prev_xattrs, $xattrs;
+          $state = 'after xattrarg';
+        } else {
+          push @$prev_xattrs, $xattrs;
+          # reconsume
+          $state = 'before argument';
+        }
       } else {
+        push @$prev_xattrs, $xattrs;
         # reconsume
         $state = 'after xattrarg';
       }
     } elsif ($state eq 'before xattrarg') {
       if ($token->{type} eq 'identifier') {
         ## TODO: escape
-        $xattrs->{$last_xattr} = $token->{value};
+        $current[-1]->value ($token->{value});
         $token = $get_next_token->();
-        $state = 'after xattrarg';
-      } elsif ($token->{type} eq 'eof') {
-        # any extended attributes are ignored
-        $onerror->(type => 'after xattrarg:eof', level => 'm',
-                   token => $token);
-        last;
+        if ($token->{type} eq '(') {
+          $token = $get_next_token->();
+          if ($token->{type} eq ')') {
+            push @$prev_xattrs, $xattrs;
+            $token = $get_next_token->();
+            $state = 'after xattrarg';
+          } else {
+            push @$prev_xattrs, $xattrs;
+            # reconsume
+            $state = 'before argument';
+          }
+        } else {
+          push @$prev_xattrs, $xattrs;
+          # reconsume
+          $state = 'after xattrarg';
+        }
       } else {
         $onerror->(type => 'after xattrarg', level => 'm', token => $token);
         # reconsume
@@ -313,22 +331,32 @@ sub parse_char_string ($$;$) {
         $next_state = 'before definitions';        
       }
     } elsif ($state eq 'after xattrarg') {
+      pop @current; # xattr
+      $xattrs = pop @$prev_xattrs;
       if ($token->{type} eq ',') {
         $token = $get_next_token->();
         $state = 'before xattr';
       } elsif ($token->{type} eq ']') {
         $token = $get_next_token->();
-        $state = $next_state; # 'before def' or 'before interface member'
-      } elsif ($token->{type} eq 'eof') {
-        # any extended attributes are ignored
-        $onerror->(type => 'after xattr:eof', level => 'm', token => $token);
-        last;
+        if ($current[-1]->isa ('Whatpm::WebIDL::Definitions') or
+            $current[-1]->isa ('Whatpm::WebIDL::Module')) {
+          $state = 'before definitions';
+        } elsif ($current[-1]->isa ('Whatpm::WebIDL::Interface')) {
+          $state = 'before interface member';
+        } elsif ($current[-1]->isa ('Whatpm::WebIDL::Exception')) {
+          $state = 'before exception member';
+        } elsif ($current[-1]->isa ('Whatpm::WebIDL::Operation') or
+                 $current[-1]->isa ('Whatpm::WebIDL::ExtendedAttribute')) {
+          $state = 'before argument in';
+        } else {
+          die "$0: Unknown xattr context: " . ref $current[-1];
+        }
       } else {
         $onerror->(type => 'after xattr', level => 'm', token => $token);
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
-        $next_state = 'before definitions';
+        $next_state = 'before definitions'; ## TODO:
       }
     } elsif ($state eq 'before def') {
       if ($token->{type} eq 'module') {
@@ -336,6 +364,7 @@ sub parse_char_string ($$;$) {
         if ($token->{type} eq 'identifier') {
           ## TODO: escape
           push @current, Whatpm::WebIDL::Module->new ($token->{value});
+          $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
           $token = $get_next_token->();
           $state = 'before module block';
           next;
@@ -349,6 +378,7 @@ sub parse_char_string ($$;$) {
         if ($token->{type} eq 'identifier') {
           ## TODO: escape
           push @current, Whatpm::WebIDL::Interface->new ($token->{value});
+          $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
           $token = $get_next_token->();
           $state = 'before interface inheritance';
           next;
@@ -362,6 +392,7 @@ sub parse_char_string ($$;$) {
         if ($token->{type} eq 'identifier') {
           ## TODO: escape
           push @current, Whatpm::WebIDL::Exception->new ($token->{value});
+          $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
           $token = $get_next_token->();
           $state = 'before exception block';
           next;
@@ -379,11 +410,13 @@ sub parse_char_string ($$;$) {
         if ($token->{type} eq 'identifier') {
           ## TODO: escape
           push @current, Whatpm::WebIDL::Valuetype->new ($token->{value});
+          $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
           $token = $get_next_token->();
           $state = 'before boxed type';
           next;
         } elsif ($token->{type} eq 'DOMString') {
           push @current, Whatpm::WebIDL::Valuetype->new ('::DOMString::');
+          $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
           $token = $get_next_token->();
           if ($token->{type} eq 'sequence') {
             $token = $get_next_token->();
@@ -559,6 +592,7 @@ sub parse_char_string ($$;$) {
         $next_state = 'before definitions';
       }
     } elsif ($state eq 'before members') {
+      $xattrs = [];
       if ($token->{type} eq '[') {
         $token = $get_next_token->();
         $state = 'before xattr';
@@ -721,12 +755,14 @@ sub parse_char_string ($$;$) {
         ## TODO: unescape
         push @current, Whatpm::WebIDL::Typedef->new ($token->{value});
         $current[-1]->type ($current_type);
+        $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
         $token = $get_next_token->();
         $state = 'before semicolon';
         $next_state = 'before definitions';
       } elsif ($token->{type} eq 'DOMString') {
         push @current, Whatpm::WebIDL::Typedef->new ('::DOMString::');
         $current[-1]->type ($current_type);
+        $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
         $token = $get_next_token->();
         $state = 'before semicolon';
         $next_state = 'before defnitions';
@@ -743,6 +779,7 @@ sub parse_char_string ($$;$) {
         ## TODO: unescape
         push @current, Whatpm::WebIDL::Const->new ($token->{value});
         $current[-1]->type ($current_type);
+        $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
         $token = $get_next_token->();
         if ($token->{type} eq '=') {
           $token = $get_next_token->();
@@ -879,6 +916,7 @@ sub parse_char_string ($$;$) {
         push @current, Whatpm::WebIDL::Attribute->new ($token->{value});
         $current[-1]->readonly ($read_only);
         $current[-1]->type ($current_type);
+        $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
         $token = $get_next_token->();
         if ($token->{type} eq 'getraises') {
           $token = $get_next_token->();
@@ -910,6 +948,7 @@ sub parse_char_string ($$;$) {
         ## TODO: unescape
         push @current, Whatpm::WebIDL::ExceptionMember->new ($token->{value});
         $current[-1]->type ($current_type);
+        $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
         $token = $get_next_token->();
         $state = 'before semicolon';
         $next_state = 'before exception member';
@@ -926,6 +965,7 @@ sub parse_char_string ($$;$) {
         ## TODO: unescape
         push @current, Whatpm::WebIDL::Operation->new ($token->{value});
         $current[-1]->type ($current_type);
+        $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
         $token = $get_next_token->();
         if ($token->{type} eq '(') {
           $token = $get_next_token->();
@@ -959,11 +999,16 @@ sub parse_char_string ($$;$) {
         ## TODO: unescape
         my $arg = Whatpm::WebIDL::Argument->new ($token->{value});
         $arg->type ($current_type);
+        $arg->set_extended_attribute_node ($_) for @$xattrs;
         $current[-1]->append_child ($arg);
         $token = $get_next_token->();
         if ($token->{type} eq ')') {
           $token = $get_next_token->();
-          $state = 'before raises';
+          if ($current[-1]->isa ('Whatpm::WebIDL::Operation')) {
+            $state = 'before raises';
+          } else {
+            $state = 'after xattrarg';
+          }
           next;
         } elsif ($token->{type} eq ',') {
           $token = $get_next_token->();
@@ -985,6 +1030,7 @@ sub parse_char_string ($$;$) {
       $nest_level = 0;
       $next_state = 'before interface member';
     } elsif ($state eq 'before argument') {
+      $xattrs = [];
       if ($token->{type} eq '[') {
         $token = $get_next_token->();
         $state = 'before xattr';
@@ -1118,9 +1164,29 @@ sub node_name ($) {
   return $_[0]->{node_name};
 } # node_name
 
+sub set_extended_attribute_node ($$) {
+  my $self = shift;
+  ## TODO: check
+  push @{$self->{xattrs} ||= []}, shift;
+} # set_extended_attribute_node
+
 sub idl_text ($) {
   return '[[ERROR: ' . (ref $_[0]) . '->idl_text]]';
 } # idl_text
+
+sub _xattrs_text ($) {
+  my $self = shift;
+
+  unless ($self->{xattrs} and
+          @{$self->{xattrs}}) {
+    return '';
+  }
+
+  my $r = '[';
+  $r .= join ', ', map {$_->idl_text} @{$self->{xattrs}};
+  $r .= ']';
+  return $r;
+} # _xattrs_text
 
 sub type ($;$) {
   if (@_ > 1) {
@@ -1148,8 +1214,11 @@ package Whatpm::WebIDL::Module;
 push our @ISA, 'Whatpm::WebIDL::Definition';
 
 sub idl_text ($) {
-  my $r = 'module ' . $_[0]->node_name . "{\x0A\x0A"; ## TODO: escape
-  for (@{$_[0]->{child_nodes}}) {
+  my $self = shift;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
+  $r .= 'module ' . $self->node_name . "{\x0A\x0A"; ## TODO: escape
+  for (@{$self->{child_nodes}}) {
     $r .= $_->idl_text;
   }
   $r .= "\x0A};\x0A";
@@ -1173,7 +1242,9 @@ sub append_inheritance ($$) {
 
 sub idl_text ($) {
   my $self = shift;
-  my $r = 'interface ' . $self->node_name;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
+  $r = 'interface ' . $self->node_name;
   if (@{$self->{inheritances}}) {
     $r .= ' : '; ## TODO: ...
     $r .= join ', ', map {join '::', @{$_}} @{$self->{inheritances}};
@@ -1190,8 +1261,11 @@ package Whatpm::WebIDL::Exception;
 push our @ISA, 'Whatpm::WebIDL::Definition';
 
 sub idl_text ($) {
-  my $r = 'exception ' . $_[0]->node_name . "{\x0A"; ## TODO: escape
-  for (@{$_[0]->{child_nodes}}) {
+  my $self = shift;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
+  $r = 'exception ' . $self->node_name . "{\x0A"; ## TODO: escape
+  for (@{$self->{child_nodes}}) {
     $r .= '  ' . $_->idl_text;
   }
   $r .= "};\x0A";
@@ -1208,8 +1282,12 @@ sub new ($$) {
 } # new
 
 sub idl_text ($) {
+  my $self = shift;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
   ## TODO: escape
-  return 'typedef ' . $_[0]->type_text . ' ' . $_[0]->node_name . ";\x0A";
+  $r .= 'typedef ' . $self->type_text . ' ' . $self->node_name . ";\x0A";
+  return $r;
 } # idl_text
 
 package Whatpm::WebIDL::Valuetype;
@@ -1222,8 +1300,12 @@ sub new ($$) {
 } # new
 
 sub idl_text ($) {
+  my $self = shift;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
   ## TODO: escape
-  return 'valuetype ' . $_[0]->node_name . ' ' . $_[0]->type_text . ";\x0A";
+  $r .= 'valuetype ' . $self->node_name . ' ' . $self->type_text . ";\x0A";
+  return $r;
 } # idl_text
 
 package Whatpm::WebIDL::InterfaceMember;
@@ -1232,9 +1314,13 @@ sub new ($$) {
   return bless {node_name => ''.$_[1]}, $_[0];
 } # new
 
+*_xattrs_text = \&Whatpm::WebIDL::Definition::_xattrs_text;
+
 *idl_text = \&Whatpm::WebIDL::Definition::idl_text;
 
 *node_name = \&Whatpm::WebIDL::Definition::node_name;
+
+*set_extended_attribute_node = \&Whatpm::WebIDL::Definition::set_extended_attribute_node;
 
 *type = \&Whatpm::WebIDL::Definition::type;
 
@@ -1272,7 +1358,11 @@ sub value_text ($) {
 } # value_text
 
 sub idl_text ($) {
-  return 'const ' . $_[0]->type_text . ' ' . $_[0]->node_name . ' = ' . $_[0]->value_text . ";\x0A"; ## TODO: escape
+  my $self = shift;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
+  $r .= 'const ' . $self->type_text . ' ' . $self->node_name . ' = ' . $self->value_text . ";\x0A"; ## TODO: escape
+  return $r;
 } # idl_text
 
 package Whatpm::WebIDL::Attribute;
@@ -1306,7 +1396,9 @@ sub readonly ($;$) {
 
 sub idl_text ($) {
   my $self = shift;
-  my $r = ($self->readonly ? 'readonly ' : '') . 'attribute ' . $self->type_text . ' ' . $self->node_name;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
+  $r .= ($self->readonly ? 'readonly ' : '') . 'attribute ' . $self->type_text . ' ' . $self->node_name;
   ## TODO: escape
   if (@{$self->{getraises}}) {
     $r .= ' getraises (';
@@ -1344,7 +1436,9 @@ sub append_raises ($$) {
 
 sub idl_text ($) {
   my $self = shift;
-  my $r = $self->type_text . ' ' . $self->node_name . ' ('; ## TODO: escape
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
+  $r .= $self->type_text . ' ' . $self->node_name . ' ('; ## TODO: escape
   $r .= join ', ', map {$_->idl_text} @{$self->{child_nodes}};
   $r .= ')';
   if (@{$self->{raises}}) {
@@ -1364,10 +1458,18 @@ sub new ($$) {
 } # new
 
 sub idl_text ($) {
-  return 'in ' . $_[0]->type_text . ' ' . $_[0]->node_name; ## TODO: escape
+  my $self = shift;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
+  $r .= 'in ' . $self->type_text . ' ' . $self->node_name; ## TODO: escape
+  return $r;
 } # idl_text
 
+*_xattrs_text = \&Whatpm::WebIDL::Definition::_xattrs_text;
+
 *node_name = \&Whatpm::WebIDL::Definition::node_name;
+
+*set_extended_attribute_node = \&Whatpm::WebIDL::Definition::set_extended_attribute_node;
 
 *type = \&Whatpm::WebIDL::Definition::type;
 
@@ -1380,13 +1482,57 @@ sub new ($$) {
 } # new
 
 sub idl_text ($) {
-  return $_[0]->type_text . ' ' . $_[0]->node_name . ";\x0A"; ## TODO: escape
+  my $self = shift;
+  my $r = $self->_xattrs_text;
+  $r .= ' ' if length $r;
+  $r .= $self->type_text . ' ' . $self->node_name . ";\x0A"; ## TODO: escape
+  return $r;
 } # idl_text
 
+*_xattrs_text = \&Whatpm::WebIDL::Definition::_xattrs_text;
+
 *node_name = \&Whatpm::WebIDL::Definition::node_name;
+
+*set_extended_attribute_node = \&Whatpm::WebIDL::Definition::set_extended_attribute_node;
 
 *type = \&Whatpm::WebIDL::Definition::type;
 
 *type_text = \&Whatpm::WebIDL::Definition::type_text;
+
+package Whatpm::WebIDL::ExtendedAttribute;
+
+sub new ($$) {
+  return bless {child_nodes => [], node_name => ''.$_[1]};
+} # new
+
+*append_child = \&Whatpm::WebIDL::Definition::append_child;
+
+sub idl_text ($) {
+  my $self = shift;
+  my $r = $self->node_name; ## TODO:] esceape
+  if (defined $self->{value}) {
+    $r .= '=' . $self->{value}; ## TODO: escape
+  }
+  if (@{$self->{child_nodes}}) {
+    $r .= ' (';
+    $r .= join ', ', map {$_->idl_text} @{$self->{child_nodes}};
+    $r .= ')';
+  }
+  return $r;
+} # idl_text
+
+*node_name = \&Whatpm::WebIDL::Definition::node_name;
+
+sub value ($;$) {
+  if (@_ > 1) {
+    if (defined $_[1]) {
+      $_[0]->{value} = ''.$_[1];
+    } else {
+      delete $_[0]->{value};
+    }
+  }
+
+  return $_[0]->{value};
+} # value
 
 1;
