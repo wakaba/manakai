@@ -20,3 +20,250 @@ interface xyz;
 #document
 | interface xyz;
 
+#data
+module m {
+interface x {
+  attribute long a;
+  attribute long b;
+};};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   attribute long a;
+|   attribute long b;
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  attribute long a;
+  attribute long a;
+};};
+#errors
+4;duplicate interface member;m
+#document
+| module m {
+| 
+| interface x {
+|   attribute long a;
+|   attribute long a;
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  attribute long a;
+};
+interface x {
+  attribute long a;
+};};
+#errors
+5;duplicate qname;m
+
+#data
+module m {
+interface x {
+  attribute long a;
+  attribute long _a;
+};};
+#errors
+4;duplicate interface member;m
+
+#data
+module m {
+interface x {
+  attribute long a;
+  attribute long __a;
+};};
+#errors
+
+#data
+module m {
+interface x {
+  attribute long a;
+  const long a = 1;
+};};
+#errors
+4;duplicate interface member;m
+
+#data
+module m {
+interface x {
+  long a ();
+  long a ();
+};};
+#errors
+
+#data
+interface x {};
+interface y : x {};
+#errors
+1;non-module definition;s
+2;non-module definition;s
+
+#data
+interface x;
+interface y : x {};
+#errors
+1;non-module definition;s
+2;non-module definition;s
+
+#data
+interface x : y {};
+#errors
+1;non-module definition;s
+1;interface not defined;m;y
+
+#data
+module m {
+  interface x {};
+  interface y : x {};
+};
+#errors
+
+#data
+module m {
+  interface x {};
+};
+module n {
+  interface y : x {};
+};
+#errors
+5;interface not defined;m;x
+
+#data
+module m {
+  interface x : y::DOMString {};
+};
+#errors
+2;interface not defined;m;y::DOMString
+
+#data
+module m {
+  interface _DOMString {};
+  interface x : _DOMString {};
+};
+#errors
+
+#data
+module m {
+  interface _DOMString {};
+  interface x : m::_DOMString {};
+};
+#errors
+3;interface not defined;m;m::DOMString
+
+#data
+module m {
+  interface _DOMString {};
+  interface x : m::DOMString {};
+};
+#errors
+3;interface not defined;m;m::DOMString
+
+#data
+module m {
+  interface _DOMString {};
+  interface x : ::m::_DOMString {};
+};
+#errors
+3;interface not defined;m;::m::DOMString
+
+#data
+interface x {}; // defines x1
+module m {
+  interface y : x {}; // inherits x1
+  interface x : x {}; // defines x2, which inherits x1
+  interface z : x {}; // inherits x2
+};
+#errors
+1;non-module definition;s
+
+#data
+module m {
+  interface x : x {};
+};
+#errors
+2;interface not defined;m;x
+
+#data
+module m {
+  interface y : x {};
+  interface x {};
+};
+#errors
+2;interface not defined;m;x
+
+#data
+module m {
+  interface x {};
+  interface y {};
+  interface z : x, y {};
+};
+#errors
+
+#data
+module m {
+  interface x : ::x {};
+};
+#errors
+2;interface not defined;m;::x
+
+#data
+module m {
+  interface x {};
+};
+module n {
+  interface y : m::x {};
+};
+#errors
+
+#data
+module m {
+  interface x {};
+  module n {
+    interface y : x {};
+  };
+};
+#errors
+4;interface not defined;m;x
+
+#data
+module m {
+  module n {
+    interface x {};
+  };
+};
+module l {
+  interface y : m::n::x {};
+};
+#errors
+
+#data
+module m {
+  module n {};
+  interface x : n {};
+};
+#errors
+3;interface not defined;m;n
+
+#data
+module m {
+  exception x {};
+  interface y : x {};
+};
+#errors
+3;interface not defined;m;x
+
+#data
+module m {
+  interface x;
+  interface y : x {};
+};
+#errors

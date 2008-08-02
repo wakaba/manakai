@@ -1,5 +1,20 @@
 2008-08-02  Wakaba  <wakaba@suika.fam.cx>
 
+	* WebIDL.pm ($get_scoped_name): Now scoped names are stored
+	in its stringified format ("scoped name" as defined in the
+	spec).  Note that future version of this module should not use
+	array references for type values and the |type_text| attribute
+	should be made obsolete.
+	(parse_char_string): Unescape attribute names.
+	(check): Support for checking of whether inherited interfaces
+	are actually defined or not.  Support for checking of whether
+	interface member identifiers are duplicated or not.
+	($serialize_type): Scoped names are returned as is.  A future
+	version of this code should escape identifiers other than "DOMString",
+	otherwise the idl_text would be non-conforming.
+
+2008-08-02  Wakaba  <wakaba@suika.fam.cx>
+
 	* WebIDL.pm (parse_char_string): Set line/column numbers
 	to generated nodes.  Unescape identifiers.  Extended attributes
 	for Definition's were ignored.

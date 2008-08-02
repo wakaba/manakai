@@ -85,7 +85,8 @@ sub test ($) {
     my %opt = @_;
     push @errors, join ';',
       ($opt{node} ? $opt{node}->get_user_data ('manakai_source_line') || $opt{line} : $opt{line} . '.' . $opt{column}),
-      $opt{type}, $opt{level};
+      $opt{type}, $opt{level},
+      (defined $opt{text} ? ($opt{text}) : ());
   };
 
   my $p = Whatpm::WebIDL::Parser->new;
@@ -104,4 +105,4 @@ sub test ($) {
 } # test
 
 ## License: Public Domain.
-## $Date: 2008/08/02 06:03:26 $
+## $Date: 2008/08/02 12:51:52 $

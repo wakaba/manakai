@@ -110,23 +110,27 @@ sub parse_char_string ($$;$) {
   }; # $onerror
 
   my $get_scoped_name = sub {
+    ## NOTE: Convert a |ScopedName| into a "scoped name".
+
     my $name = [];
 
     ## NOTE: "DOMString" is not a scoped name, while "::DOMString"
     ## and "x::DOMString" are.
 
     if ($token->{type} eq 'identifier') {
-      ## TODO: unescape
-      push @$name, $token->{value};
+      my $identifier = $token->{value};
+      $identifier =~ s/^_//;
+      push @$name, $identifier;
       $token = $get_next_token->();
       while ($token->{type} eq '::') {
         $token = $get_next_token->();
         if ($token->{type} eq 'identifier') {
-          ## TODO: unescape
-          push @$name, $token->{value};
+          my $identifier = $token->{value};
+          $identifier =~ s/^_//;
+          push @$name, $identifier;
           $token = $get_next_token->();
         } elsif ($token->{type} eq 'DOMString') {
-          push @$name, '::DOMString::';
+          push @$name, 'DOMString';
           $token = $get_next_token->();
           last;
         }
@@ -136,11 +140,12 @@ sub parse_char_string ($$;$) {
       while ($token->{type} eq '::') {
         $token = $get_next_token->();
         if ($token->{type} eq 'identifier') {
-          ## TODO: unescape
-          push @$name, $token->{value};
+          my $identifier = $token->{value};
+          $identifier =~ s/^_//;
+          push @$name, $identifier;
           $token = $get_next_token->();
         } elsif ($token->{type} eq 'DOMString') {
-          push @$name, '::DOMString::';
+          push @$name, 'DOMString';
           $token = $get_next_token->();
           last;
         } else {
@@ -155,7 +160,7 @@ sub parse_char_string ($$;$) {
       # reconsume
       return undef;
     }
-    return $name;
+    return join '::', @$name;
   }; # $get_scoped_name
 
   my $get_type;
@@ -910,8 +915,9 @@ sub parse_char_string ($$;$) {
       }
     } elsif ($state eq 'before attribute identifier') {
       if ($token->{type} eq 'identifier') {
-        ## TODO: unescape
-        push @current, Whatpm::WebIDL::Attribute->new ($token->{value});
+        my $identifier = $token->{value};
+        $identifier =~ s/^_//;
+        push @current, Whatpm::WebIDL::Attribute->new ($identifier);
         $current[-1]->set_user_data (manakai_source_line => $line);
         $current[-1]->set_user_data (manakai_source_column => $column);
         $current[-1]->readonly ($read_only);
@@ -1241,16 +1247,45 @@ sub idl_text ($) {
 sub check ($$) {
   my ($self, $onerror) = @_;
 
-  my $items = [map { {node => $_} } @{$self->{child_nodes}}];
+  my $items = [map { {node => $_, scope => '::'} } @{$self->{child_nodes}}];
 
   my $defined_qnames = {};
 
   while (@$items) {
     my $item = shift @$items;
-    if ($item->{node}->isa ('Whatpm::WebIDL::Definition')) {
+    if ($item->{node}->isa ('Whatpm::WebIDL::Definition') and
+        not $item->{defined_members}) {
       if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
+        for my $i_sn (@{$item->{node}->{inheritances}}) {
+          if ($i_sn =~ /::DOMString\z/) {
+            #
+          } elsif ($i_sn =~ /^::/) {
+            if ($defined_qnames->{$i_sn}) {
+              next;
+            } 
+            #
+          } else {
+            if ($defined_qnames->{$item->{scope} . $i_sn} and
+                $defined_qnames->{$item->{scope} . $i_sn}->{node}
+                    ->isa ('Whatpm::WebIDL::Interface')) {
+              next;
+            } elsif ($defined_qnames->{'::' . $i_sn} and
+                     $defined_qnames->{'::' . $i_sn}->{node}
+                         ->isa ('Whatpm::WebIDL::Interface')) {
+              next;
+            }
+            #
+          }
+
+          $onerror->(type => 'interface not defined',
+                     level => 'm',
+                     node => $item->{node},
+                     text => $i_sn);
+        }
+
+        my $defined_members = {};
         unshift @$items,
-            map { {node => $_, parent => $item->{node}} }
+            map { {node => $_, defined_members => $defined_members} }
             @{$item->{node}->{child_nodes}};
         
         unless ($item->{parent}) {
@@ -1270,7 +1305,10 @@ sub check ($$) {
         }
       } elsif ($item->{node}->isa ('Whatpm::WebIDL::Module')) {
         unshift @$items,
-            map { {node => $_, parent => $item->{node}} }
+            map {
+              {node => $_, parent => $item->{node},
+               scope => $item->{scope} . $item->{node}->node_name . '::'}
+            }
             @{$item->{node}->{child_nodes}};
       } else {
         unless ($item->{parent}) {
@@ -1285,24 +1323,54 @@ sub check ($$) {
         ## NOTE: "The identifier of a definition MUST  be locally unique":
         ## Redundant with another requirement below.
 
+        ## ISSUE: |interface x; interface x {};| is non-conforming
+        ## according to the current spec text.
+
+        ## ISSUE: |interface x;| with no |interface x {};| is conforming
+        ## according to the current spec text.
+
         $onerror->(type => 'duplicate qname',
                    level => 'm',
                    node => $item->{node});
       } else {
-        $defined_qnames->{$qname} = 1;
+        $defined_qnames->{$qname} = $item;
+        ## NOTE: This flag must be turned on AFTER inheritance check is
+        ## performed (c.f. |interface x : x {};|).
       }
     } elsif ($item->{node}->isa ('Whatpm::WebIDL::InterfaceMember')) {
       if ($item->{node}->isa ('Whatpm::WebIDL::Operation')) {
         unshift @$items,
             map { {node => $_, parent => $item->{node}} }
             @{$item->{node}->{child_nodes}};
+      } else {
+        my $name = $item->{node}->node_name;
+        if ($item->{defined_members}->{$name}) {
+          $onerror->(type => 'duplicate interface member',
+                     level => 'm',
+                     node => $item->{node});
+          ## ISSUE: Whether the example below is conforming or not
+          ## is ambigious:
+          ## |interface a { attribute any b; any b (); };|
+        } else {
+          $item->{defined_members}->{$name} = 1;
+        }
       }
     }
 
     my $xattrs = $item->{node}->{xattrs} || [];
     for my $xattr (@$xattrs) {
       my $xattr_name = $xattr->node_name;
-      if ($xattr_name eq 'ExceptionConsts') {
+      if ({
+           Constructor => 1, NamedConstructor => 1, NativeObject => 1,
+           NoInterfaceObject => 1, Stringifies => 1,
+          }->{$xattr_name}) {
+        if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
+          
+          next;
+        } else {
+          #
+        }
+      } elsif ($xattr_name eq 'ExceptionConsts') {
         if ($item->{node}->isa ('Whatpm::WebIDL::Module')) {
           
           next;
@@ -1372,21 +1440,24 @@ sub type ($;$) {
   return $_[0]->{type};
 } # type
 
-{
   my $serialize_type;
   my $serialize_type_depth = 0;
   $serialize_type = sub ($) {
     my $type = shift;
-    if ($type->[0] eq '::sequence::') {
-      if ($serialize_type_depth++ == 1024) {
-        return 'sequence<<<sequence too deep>>>';
+    if (ref $type) {
+      if ($type->[0] eq '::sequence::') {
+        if ($serialize_type_depth++ == 1024) {
+          return 'sequence<<<sequence too deep>>>';
+        } else {
+          return 'sequence<' . $serialize_type->($type->[1]) . '>';
+        }
       } else {
-        return 'sequence<' . $serialize_type->($type->[1]) . '>';
+        return join '::', map {
+          /^::([^:]+)::$/ ? $1 : $_ ## TODO: escape
+        } @{$type};
       }
     } else {
-      return join '::', map {
-        /^::([^:]+)::$/ ? $1 : $_ ## TODO: escape
-      } @{$type};
+      return $type; ## TODO: escape identifiers...
     }
   }; # $serialize_type
 
@@ -1396,8 +1467,6 @@ sub type_text ($) {
 
   return $serialize_type->($type);
 } # type_text
-
-}
 
 package Whatpm::WebIDL::Module;
 push our @ISA, 'Whatpm::WebIDL::Definition';
@@ -1442,7 +1511,7 @@ sub idl_text ($) {
 
   if (@{$self->{inheritances}}) {
     $r .= ' : '; ## TODO: ...
-    $r .= join ', ', map {join '::', @{$_}} @{$self->{inheritances}};
+    $r .= join ', ', map {$serialize_type->($_)} @{$self->{inheritances}};
   }
   $r .= " {\x0A"; ## TODO: escape
   for (@{$self->{child_nodes}}) {
