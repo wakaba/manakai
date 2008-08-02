@@ -373,6 +373,8 @@ sub parse_char_string ($$;$) {
         if ($token->{type} eq 'identifier') {
           ## TODO: escape
           push @current, Whatpm::WebIDL::Interface->new ($token->{value});
+          $current[-1]->set_user_data (manakai_source_line => $line);
+          $current[-1]->set_user_data (manakai_source_column => $column);
           $current[-1]->set_extended_attribute_node ($_) for @$xattrs;
           $token = $get_next_token->();
           $state = 'before interface inheritance';
@@ -453,7 +455,7 @@ sub parse_char_string ($$;$) {
                        level => $self->{must_level});
             #
           }
-          shift @current; # valuetype
+          pop @current; # valuetype
           #
         } else {
           $onerror->(type => 'valuetype identifier',
@@ -491,6 +493,11 @@ sub parse_char_string ($$;$) {
       if ($token->{type} eq ':') {
         $token = $get_next_token->();
         $state = 'before parent interface name';
+      } elsif ($token->{type} eq ';') {
+        $current[-1]->is_forward_declaration (1);
+        # reconsume
+        $state = 'before semicolon';
+        $next_state = 'before interface member';
       } else {
         # reconsume
         $state = 'before interface block';
@@ -556,6 +563,7 @@ sub parse_char_string ($$;$) {
       } else {
         $onerror->(type => 'before interface block',
                    level => $self->{must_level});
+        pop @current; # interface
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -683,7 +691,7 @@ sub parse_char_string ($$;$) {
           $state = 'before semicolon';
           $next_state = 'before definitions';
         } else {
-          shift @current; # valuetype
+          pop @current; # valuetype
           # reconsume
           $state = 'ignore';
           $nest_level = 0;
@@ -691,7 +699,7 @@ sub parse_char_string ($$;$) {
         }
       } else {
         $onerror->(type => 'before boxed type', level => $self->{must_level});
-        shift @current; # valuetype
+        pop @current; # valuetype
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -1140,22 +1148,10 @@ sub parse_char_string ($$;$) {
   return $defs;
 } # parse_char_string
 
-package Whatpm::WebIDL::Definitions;
+package Whatpm::WebIDL::Node;
 
 sub new ($) {
   return bless {child_nodes => []}, $_[0];
-} # new
-
-*append_child = \&Whatpm::WebIDL::Definition::append_child;
-
-sub idl_text ($) {
-  return join "\x0A", map {$_->idl_text} @{$_[0]->{child_nodes}};
-} # idl_text
-
-package Whatpm::WebIDL::Definition;
-
-sub new ($$) {
-  return bless {child_nodes => [], node_name => ''.$_[1]}, $_[0];
 } # new
 
 sub append_child ($$) {
@@ -1170,19 +1166,64 @@ sub append_child ($$) {
   return $child;
 } # append_child
 
+sub child_nodes ($) {
+  return [@{$_[0]->{child_nodes}}]; # dead list
+} # child_nodes
+
+sub idl_text ($) {
+  return '[[ERROR: ' . (ref $_[0]) . '->idl_text]]';
+} # idl_text
+
 sub node_name ($) {
-  return $_[0]->{node_name};
+  return $_[0]->{node_name}; # may be undef
 } # node_name
+
+sub get_user_data ($$) {
+  return $_[0]->{user_data}->{$_[1]};
+} # get_user_data
+
+sub set_user_data ($$$) {
+  if (defined $_[2]) {
+    $_[0]->{user_data}->{$_[1]} = ''.$_[2];
+  } else {
+    delete $_[0]->{user_data}->{$_[1]};
+  }
+} # set_user_data
+
+package Whatpm::WebIDL::Definitions;
+push our @ISA, 'Whatpm::WebIDL::Node';
+
+sub idl_text ($) {
+  return join "\x0A", map {$_->idl_text} @{$_[0]->{child_nodes}};
+} # idl_text
+
+sub check ($$) {
+  my ($self, $onerror) = @_;
+
+  for my $def (@{$self->{child_nodes}}) {
+    if ($def->isa ('Whatpm::WebIDL::Module')) {
+
+    } else {
+      $onerror->(type => 'non-module definition',
+                 level => 's',
+                 node => $def);
+    }
+  }
+
+} # check
+
+package Whatpm::WebIDL::Definition;
+push our @ISA, 'Whatpm::WebIDL::Node';
+
+sub new ($$) {
+  return bless {child_nodes => [], node_name => ''.$_[1]}, $_[0];
+} # new
 
 sub set_extended_attribute_node ($$) {
   my $self = shift;
   ## TODO: check
   push @{$self->{xattrs} ||= []}, shift;
 } # set_extended_attribute_node
-
-sub idl_text ($) {
-  return '[[ERROR: ' . (ref $_[0]) . '->idl_text]]';
-} # idl_text
 
 sub _xattrs_text ($) {
   my $self = shift;
@@ -1243,7 +1284,7 @@ sub idl_text ($) {
   my $self = shift;
   my $r = $self->_xattrs_text;
   $r .= ' ' if length $r;
-  $r .= 'module ' . $self->node_name . "{\x0A\x0A"; ## TODO: escape
+  $r .= 'module ' . $self->node_name . " {\x0A\x0A"; ## TODO: escape
   for (@{$self->{child_nodes}}) {
     $r .= $_->idl_text;
   }
@@ -1271,6 +1312,12 @@ sub idl_text ($) {
   my $r = $self->_xattrs_text;
   $r .= ' ' if length $r;
   $r = 'interface ' . $self->node_name;
+
+  if ($self->{is_forward_declaration}) {
+    $r .= ";\x0A";
+    return $r;
+  }
+
   if (@{$self->{inheritances}}) {
     $r .= ' : '; ## TODO: ...
     $r .= join ', ', map {join '::', @{$_}} @{$self->{inheritances}};
@@ -1282,6 +1329,18 @@ sub idl_text ($) {
   $r .= "};\x0A";
   return $r;
 } # idl_text
+
+sub is_forward_declaration ($;$) {
+  if (@_ > 1) {
+    if ($_[1]) {
+      $_[0]->{is_forward_declaration} = 1;
+    } else {
+      delete $_[0]->{is_forward_declaration};
+    }
+  }
+
+  return $_[0]->{is_forward_declaration};
+} # is_forward_declaration
 
 package Whatpm::WebIDL::Exception;
 push our @ISA, 'Whatpm::WebIDL::Definition';
@@ -1335,16 +1394,15 @@ sub idl_text ($) {
 } # idl_text
 
 package Whatpm::WebIDL::InterfaceMember;
+push our @ISA, 'Whatpm::WebIDL::Node';
 
 sub new ($$) {
   return bless {node_name => ''.$_[1]}, $_[0];
 } # new
 
+sub child_nodes ($) { return [] }
+
 *_xattrs_text = \&Whatpm::WebIDL::Definition::_xattrs_text;
-
-*idl_text = \&Whatpm::WebIDL::Definition::idl_text;
-
-*node_name = \&Whatpm::WebIDL::Definition::node_name;
 
 *set_extended_attribute_node = \&Whatpm::WebIDL::Definition::set_extended_attribute_node;
 
@@ -1453,8 +1511,6 @@ sub new ($$) {
   return $self;
 } # new
 
-*append_child = \&Whatpm::WebIDL::Definition::append_child;
-
 sub append_raises ($$) {
   ## TODO: error check, etc.
   push @{$_[0]->{raises}}, $_[1];
@@ -1478,6 +1534,7 @@ sub idl_text ($) {
 } # idl_text
 
 package Whatpm::WebIDL::Argument;
+push our @ISA, 'Whatpm::WebIDL::Node';
 
 sub new ($$) {
   return bless {node_name => ''.$_[1], type => ['::any::']}, $_[0];
@@ -1493,8 +1550,6 @@ sub idl_text ($) {
 
 *_xattrs_text = \&Whatpm::WebIDL::Definition::_xattrs_text;
 
-*node_name = \&Whatpm::WebIDL::Definition::node_name;
-
 *set_extended_attribute_node = \&Whatpm::WebIDL::Definition::set_extended_attribute_node;
 
 *type = \&Whatpm::WebIDL::Definition::type;
@@ -1502,6 +1557,7 @@ sub idl_text ($) {
 *type_text = \&Whatpm::WebIDL::Definition::type_text;
 
 package Whatpm::WebIDL::ExceptionMember;
+push our @ISA, 'Whatpm::WebIDL::Node';
 
 sub new ($$) {
   return bless {node_name => ''.$_[1], type => ['::any::']}, $_[0];
@@ -1517,8 +1573,6 @@ sub idl_text ($) {
 
 *_xattrs_text = \&Whatpm::WebIDL::Definition::_xattrs_text;
 
-*node_name = \&Whatpm::WebIDL::Definition::node_name;
-
 *set_extended_attribute_node = \&Whatpm::WebIDL::Definition::set_extended_attribute_node;
 
 *type = \&Whatpm::WebIDL::Definition::type;
@@ -1526,12 +1580,11 @@ sub idl_text ($) {
 *type_text = \&Whatpm::WebIDL::Definition::type_text;
 
 package Whatpm::WebIDL::ExtendedAttribute;
+push our @ISA, 'Whatpm::WebIDL::Node';
 
 sub new ($$) {
   return bless {child_nodes => [], node_name => ''.$_[1]};
 } # new
-
-*append_child = \&Whatpm::WebIDL::Definition::append_child;
 
 sub idl_text ($) {
   my $self = shift;
@@ -1546,8 +1599,6 @@ sub idl_text ($) {
   }
   return $r;
 } # idl_text
-
-*node_name = \&Whatpm::WebIDL::Definition::node_name;
 
 sub value ($;$) {
   if (@_ > 1) {

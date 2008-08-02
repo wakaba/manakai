@@ -1,3 +1,21 @@
+2008-08-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* WebIDL.pm (parse_char_string): Set line/column numbers
+	to interface object experimentally.  s/shift/pop/g, shift
+	would make things wrong.  Support for interface forward
+	declarations was missing.  Broken interface declarations
+	with no block were not ignored entirely.
+	(Whatpm::WebIDL::Node): New abstract class.  This class
+	makes things easier.
+	(child_nodes): New attribute.  Unlike DOM's attribute with
+	same name, this attribute returns a dead list of nodes for
+	simplicity.
+	(get_user_data, set_user_data): New methods.
+	(Module idl_text): A SPACE character should be inserted
+	before the |{| character.
+	(Interface idl_text): Support for interface forward declarations.
+	(is_forward_declaration): New attribute.
+
 2008-07-19  Wakaba  <wakaba@suika.fam.cx>
 
 	* WebIDL.pm (type_text): Better serializer.

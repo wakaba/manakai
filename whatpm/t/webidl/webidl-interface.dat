@@ -1,0 +1,22 @@
+#data
+interface abc;
+#errors
+1;non-module definition;s
+#document
+| interface abc;
+
+#data
+interface abc : def;
+#errors
+1.20;before interface block;m
+#document
+
+#data
+interface abc : def;
+interface xyz;
+#errors
+1.20;before interface block;m
+2;non-module definition;s
+#document
+| interface xyz;
+

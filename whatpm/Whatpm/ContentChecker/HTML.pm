@@ -5465,6 +5465,7 @@ $Element->{$HTML_NS}->{script} = {
       $self->{onerror}->(node => $child_node,
                          type => 'character not allowed');
     }
+    $element_state->{text} .= $child_node->text_content;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;

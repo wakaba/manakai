@@ -1,0 +1,42 @@
+#data
+#errors
+#document
+
+#data
+        //
+#errors
+#document
+
+#data
+interface abc {
+};
+#errors
+1;non-module definition;s
+#document
+| interface abc {
+| };
+
+#data
+module abc {
+};
+#errors
+#document
+| module abc {
+| 
+| 
+| };
+
+#data
+module abc {
+};interface xyz {};
+#errors
+2;non-module definition;s
+#document
+| module abc {
+| 
+| 
+| };
+| 
+| interface xyz {
+| };
+
