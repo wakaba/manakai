@@ -40,3 +40,131 @@ module abc {
 | interface xyz {
 | };
 
+#data
+module abc {
+  interface xyz {
+  };
+};
+#errors
+#document
+| module abc {
+| 
+| interface xyz {
+| };
+| 
+| };
+
+#data
+interface a {};
+interface b {};
+#errors
+1;non-module definition;s
+2;non-module definition;s
+
+#data
+interface a {};
+interface a {};
+#errors
+2;duplicate qname;m
+1;non-module definition;s
+2;non-module definition;s
+
+#data
+module a {
+interface b {};
+};
+module a {
+interface b {};
+};
+#errors
+4;duplicate qname;m
+5;duplicate qname;m
+
+#data
+module a {};
+interface a {};
+#errors
+2;duplicate qname;m
+2;non-module definition;s
+
+#data
+module a {};
+module _a {};
+#errors
+2;duplicate qname;m
+
+#data
+module a {};
+module __a {};
+#errors
+
+#data
+module a {
+interface _b {};
+interface _b{}
+;
+};
+#errors
+3;duplicate qname;m
+
+#data
+[ExceptionConsts, abc] interface x {
+  [abc, ExceptionConsts] attribute a b;
+  [abc, ExceptionConsts] void m ([abc, ExceptionConsts] in long a);
+  [abc, ExceptionConsts] const boolean d = FALSE;
+};
+[abc, ExceptionConsts] module fd {
+  [abc, ExceptionConsts] interface d {
+    
+  };
+  [ExceptionConsts, xxx] exception xx {
+    [ExceptionConsts, eee] long b;
+  };
+};
+[abc, ExceptionConsts] const boolean y = TRUE;
+[def] typedef a b;
+#errors
+1;non-module definition;s
+1;xattr not applicable;i
+1;unknown xattr;u
+2;unknown xattr;u
+2;xattr not applicable;i
+3;unknown xattr;u
+3;xattr not applicable;i
+3;unknown xattr;u
+3;xattr not applicable;i
+4;unknown xattr;u
+4;xattr not applicable;i
+6;unknown xattr;u
+7;unknown xattr;u
+7;xattr not applicable;i
+10;unknown xattr;u
+10;xattr not applicable;i
+11;unknown xattr;u
+11;xattr not applicable;i
+14;unknown xattr;u
+14;xattr not applicable;i
+14;non-module definition;s
+15;unknown xattr;u
+15;non-module definition;s
+#document
+| [ExceptionConsts, abc] interface x {
+|   [abc, ExceptionConsts] attribute a b;
+|   [abc, ExceptionConsts] void m ([abc, ExceptionConsts] in long a);
+|   [abc, ExceptionConsts] const boolean d = FALSE;
+| };
+| 
+| [abc, ExceptionConsts] module fd {
+| 
+| [abc, ExceptionConsts] interface d {
+| };
+| [ExceptionConsts, xxx] exception xx {
+|   [ExceptionConsts, eee] long b;
+| };
+| 
+| };
+| 
+| [abc, ExceptionConsts] const boolean y = TRUE;
+| 
+| [def] typedef a b;
+

@@ -1,6 +1,20 @@
 2008-08-02  Wakaba  <wakaba@suika.fam.cx>
 
 	* WebIDL.pm (parse_char_string): Set line/column numbers
+	to generated nodes.  Unescape identifiers.  Extended attributes
+	for Definition's were ignored.
+	(append_child): Set |parent_node| attribute.
+	(parent_node): New attribute.
+	(check): Support interface/exception members.  Support
+	extended attributes.  Support definition identifier uniqueness
+	constraint.
+	(qualified_name): New attribute.
+	(Interface/Exception idl_text): Extended attributes were
+	not prepended to the returned text.
+
+2008-08-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* WebIDL.pm (parse_char_string): Set line/column numbers
 	to interface object experimentally.  s/shift/pop/g, shift
 	would make things wrong.  Support for interface forward
 	declarations was missing.  Broken interface declarations
