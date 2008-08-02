@@ -1,5 +1,27 @@
 2008-08-02  Wakaba  <wakaba@suika.fam.cx>
 
+	* WebIDL.pm ($integer): Order of selections are changed to match
+	hexadecimal numbers (the original pattern, taken from the spec,
+	was not work for hexadecimal numbers, because the "0" prefix
+	matches to the [0-7]* part (as an empty string) and therefore
+	it does not match with remaining "x..." part of a "0x..." integer
+	literal.
+	($get_type): It now returns a string, not an array reference,
+	for regular types and |sequence| types (i.e. it in any case
+	returns a string).
+	($get_next_token): The second item in the array that represents
+	a integer or float token is now a Perl number value, not the
+	original string representation of the number.
+	(check): Support for const value consistency checking.
+	No extended attribute is defined for constants.
+	(Node subclasses): Use simple strings rather than array references
+	for default data type values.
+	($serialize_type): Type values are now simple strings.
+	(value): If the new attribute value is a false value, then
+	a FALSE value is set to the attribute.
+
+2008-08-02  Wakaba  <wakaba@suika.fam.cx>
+
 	* WebIDL.pm ($get_scoped_name): Now scoped names are stored
 	in its stringified format ("scoped name" as defined in the
 	spec).  Note that future version of this module should not use

@@ -3,7 +3,8 @@ use strict;
 
 package Whatpm::WebIDL::Parser;
 
-my $integer = qr/-?0([0-7]*|[Xx][0-9A-Fa-f]+)|[1-9][0-9]*/;
+my $integer = qr/-?0([Xx][0-9A-Fa-f]+|[0-7]*)|[1-9][0-9]*/;
+  ## ISSUE: Spec's pattern is wrong as a Perl5 regular expression.
 my $float = qr/-?([0-9]+\.[0-9]*|[0-9]*\.[0-9]+)([Ee][+-]?[0-9]+)?|[0-9]+[Ee][+-]?[0-9]+/;
 my $identifier = qr/[A-Z_a-z][0-9A-Z_a-z]*/;
 my $whitespace = qr<[\t\n\r ]+|[\t\n\r ]*((//.*|/\*.*?\*/)[\t\n\r ]*)+>;
@@ -170,20 +171,20 @@ sub parse_char_string ($$;$) {
       void => 1, any => 1, boolean => 1, octet => 1, float => 1,
       DOMString => 1, Object => 1, short => 1,
     }->{$token->{type}}) {
-      $r = ['::'.$token->{type}.'::'];
+      $r = '::'.$token->{type}.'::';
       $token = $get_next_token->();
     } elsif ($token->{type} eq 'unsigned') {
       $token = $get_next_token->();
       if ($token->{type} eq 'short') {
-        $r = ['::unsigned '.$token->{type}.'::'];
+        $r = '::unsigned '.$token->{type}.'::';
         $token = $get_next_token->();
       } elsif ($token->{type} eq 'long') {
         $token = $get_next_token->();
         if ($token->{type} eq 'long') {
-          $r = ['::unsigned long long::'];
+          $r = '::unsigned long long::';
           $token = $get_next_token->();
         } else {
-          $r = ['::unsigned long::'];
+          $r = '::unsigned long::';
           # reconsume
         }
       } else {
@@ -193,10 +194,10 @@ sub parse_char_string ($$;$) {
     } elsif ($token->{type} eq 'long') {
       $token = $get_next_token->();
       if ($token->{type} eq 'long') {
-        $r = ['::long long::'];
+        $r = '::long long::';
         $token = $get_next_token->();
       } else {
-        $r = ['::long::'];
+        $r = '::long::';
         # reconsume
       }
     } elsif ($token->{type} eq '::' or $token->{type} eq 'identifier') {
@@ -219,7 +220,7 @@ sub parse_char_string ($$;$) {
           my $type = $get_type->();
           if (defined $type) {
             if ($token->{type} eq '>') {
-              $r = ['::sequence::', $type];
+              $r = '::::sequence::::' . $type;
               $token = $get_next_token->();
             } else {
               $onerror->(type => 'sequence gt', level => $self->{must_level});
@@ -446,8 +447,7 @@ sub parse_char_string ($$;$) {
                 if ($token->{type} eq 'short') {
                   $token = $get_next_token->();
                   if ($token->{type} eq '>') {
-                    $current[-1]->type
-                        (['::sequence::', ['::unsigned short::']]);
+                    $current[-1]->type ('::::sequence::::::unsigned short::');
                     $token = $get_next_token->();
                     $state = 'before semicolon';
                     $next_state = 'before definitions';
@@ -808,8 +808,21 @@ sub parse_char_string ($$;$) {
       if ($token->{type} eq 'TRUE' or $token->{type} eq 'FALSE') {
         $current[-1]->value ([$token->{type}]);
         #
-      } elsif ($token->{type} eq 'integer' or $token->{type} eq 'float') {
-        $current[-1]->value ([$token->{type}, $token->{value}]);
+      } elsif ($token->{type} eq 'integer') {
+        if ($token->{value} =~ /^0[Xx]/) {
+          $current[-1]->value ([$token->{type}, hex substr $token->{value},2]);
+        } elsif ($token->{value} =~ /^-0[Xx]/) {
+          $current[-1]->value ([$token->{type},-hex substr $token->{value},3]);
+        } elsif ($token->{value} =~ /^0/) {
+          $current[-1]->value ([$token->{type}, oct $token->{value}]);
+        } elsif ($token->{value} =~ /^-0/) {
+          $current[-1]->value ([$token->{type},-oct substr $token->{value},1]);
+        } else {
+          $current[-1]->value ([$token->{type}, 0+$token->{value}]);
+        }
+        #
+      } elsif ($token->{type} eq 'float') {
+        $current[-1]->value ([$token->{type}, 0+$token->{value}]);
         #
       } else {
         # reconsume
@@ -1247,6 +1260,109 @@ sub idl_text ($) {
 sub check ($$) {
   my ($self, $onerror) = @_;
 
+  my $check_const_value = sub ($) {
+    my $item = shift;
+    
+    my $type = $item->{node}->type;
+    my $value = $item->{node}->value;
+    
+    ## NOTE: Although it is not explicitly spelled out in the spec,
+    ## it can be assumed, imho, that "any" type accepts all of these
+    ## constant values.
+    ## ISSUE: Should I ask the editor to clarify the spec about this?
+
+        if ($value->[0] eq 'TRUE' or $value->[0] eq 'FALSE') {
+          if ($type eq '::boolean::') {
+            #
+          } elsif ($type eq '::any::') {
+            #
+          } else {
+            $onerror->(type => 'const type mismatch',
+                       level => 'm',
+                       node => $item->{node},
+                       text => $item->{node}->type_text,
+                       value => $value->[0]);
+          }
+        } elsif ($value->[0] eq 'integer') {
+          if ($type eq '::octet::') {
+            if ($value->[1] < 0 or 255 < $value->[1]) {
+              $onerror->(type => 'const value out of range',
+                         level => 'm',
+                         node => $item->{node},
+                         value => $value->[1]);
+            }
+          } elsif ($type eq '::short::') {
+            if ($value->[1] < -32768 or 32767 < $value->[1]) {
+              $onerror->(type => 'const value out of range',
+                         level => 'm',
+                         node => $item->{node},
+                         value => $value->[1]);
+            }
+          } elsif ($type eq '::unsigned short::') {
+            if ($value->[1] < 0 or 65535 < $value->[1]) {
+              $onerror->(type => 'const value out of range',
+                         level => 'm',
+                         node => $item->{node},
+                         value => $value->[1]);
+            }
+          } elsif ($type eq '::long::') {
+            if ($value->[1] < -2147483648 or 2147483647 < $value->[1]) {
+              $onerror->(type => 'const value out of range',
+                         level => 'm',
+                         node => $item->{node},
+                         value => $value->[1]);
+            }
+          } elsif ($type eq '::unsigned long::') {
+            if ($value->[1] < 0 or 4294967295 < $value->[1]) {
+              $onerror->(type => 'const value out of range',
+                         level => 'm',
+                         node => $item->{node},
+                         value => $value->[1]);
+            }
+          } elsif ($type eq '::long long::') {
+            if ($value->[1] < -9223372036854775808 or
+                9223372036854775807 < $value->[1]) {
+              $onerror->(type => 'const value out of range',
+                         level => 'm',
+                         node => $item->{node},
+                         value => $value->[1]);
+            }
+          } elsif ($type eq '::unsigned long long::') {
+            if ($value->[1] < 0 or 18446744073709551615 < $value->[1]) {
+              $onerror->(type => 'const value out of range',
+                         level => 'm',
+                         node => $item->{node},
+                         value => $value->[1]);
+            }
+          } elsif ($type eq '::any::') {
+            if ($value->[1] < -9223372036854775808 or
+                18446744073709551615 < $value->[1]) {
+              $onerror->(type => 'const value out of range',
+                         level => 'm',
+                         node => $item->{node},
+                         value => $value->[1]);
+            }
+          } else {
+            $onerror->(type => 'const type mismatch',
+                       level => 'm',
+                       node => $item->{node},
+                       text => $item->{node}->type_text,
+                       value => $value->[1]);
+          }
+        } elsif ($value->[0] eq 'float') {
+          if ($type eq '::float::' or $type eq '::any::') {
+            #
+          } else {
+            $onerror->(type => 'const type mismatch',
+                       level => 'm',
+                       node => $item->{node},
+                       text => $item->{node}->type_text,
+                       value => $value->[1]);
+          }
+        }
+        ## NOTE: Otherwise, an error of the implementation or the application.
+  }; # $check_const_value
+
   my $items = [map { {node => $_, scope => '::'} } @{$self->{child_nodes}}];
 
   my $defined_qnames = {};
@@ -1310,6 +1426,14 @@ sub check ($$) {
                scope => $item->{scope} . $item->{node}->node_name . '::'}
             }
             @{$item->{node}->{child_nodes}};
+      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Const')) {
+        $check_const_value->($item);
+        
+        unless ($item->{parent}) {
+          $onerror->(type => 'non-module definition',
+                     level => 's',
+                     node => $item->{node});
+        }
       } else {
         unless ($item->{parent}) {
           $onerror->(type => 'non-module definition',
@@ -1354,6 +1478,10 @@ sub check ($$) {
         } else {
           $item->{defined_members}->{$name} = 1;
         }
+
+        if ($item->{node}->isa ('Whatpm::WebIDL::Const')) {
+          $check_const_value->($item);
+        }
       }
     }
 
@@ -1377,6 +1505,8 @@ sub check ($$) {
         } else {
           #
         }
+      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Const')) {
+        #
       } else {
         $onerror->(type => 'unknown xattr',
                    level => 'u',
@@ -1434,28 +1564,19 @@ sub type ($;$) {
     if (defined $_[1]) {
       $_[0]->{type} = $_[1];
     } else {
-      $_[0]->{type} = ['::any::'];
+      $_[0]->{type} = '::any::';
     }
   }
   return $_[0]->{type};
 } # type
 
   my $serialize_type;
-  my $serialize_type_depth = 0;
   $serialize_type = sub ($) {
     my $type = shift;
-    if (ref $type) {
-      if ($type->[0] eq '::sequence::') {
-        if ($serialize_type_depth++ == 1024) {
-          return 'sequence<<<sequence too deep>>>';
-        } else {
-          return 'sequence<' . $serialize_type->($type->[1]) . '>';
-        }
-      } else {
-        return join '::', map {
-          /^::([^:]+)::$/ ? $1 : $_ ## TODO: escape
-        } @{$type};
-      }
+    if ($type =~ s/^::::sequence:::://) {
+      return 'sequence<' . $serialize_type->($type) . '>';
+    } elsif ($type =~ /\A::([^:]+)::\z/) {
+      return $1;
     } else {
       return $type; ## TODO: escape identifiers...
     }
@@ -1553,7 +1674,7 @@ push our @ISA, 'Whatpm::WebIDL::Definition';
 
 sub new ($$) {
   my $self = shift->SUPER::new (@_);
-  $self->{type} = ['::any::'];
+  $self->{type} = '::any::';
   return $self;
 } # new
 
@@ -1571,7 +1692,7 @@ push our @ISA, 'Whatpm::WebIDL::Definition';
 
 sub new ($$) {
   my $self = shift->SUPER::new (@_);
-  $self->{type} = ['::boolean::'];
+  $self->{type} = '::boolean::';
   return $self;
 } # new
 
@@ -1606,14 +1727,18 @@ push our @ISA, 'Whatpm::WebIDL::Definition', 'Whatpm::WebIDL::InterfaceMember';
 
 sub new ($$) {
   my $self = shift->SUPER::new (@_); # Definition->new should be called
-  $self->{type} = ['::boolean::'];
+  $self->{type} = '::boolean::';
   $self->{value} = ['FALSE'];
   return $self;
 } # new
 
 sub value ($;$) {
   if (@_ > 1) {
-    $_[0]->{value} = $_[1];
+    if (defined $_[1]) {
+      $_[0]->{value} = $_[1];
+    } else {
+      $_[0]->{value} = ['FALSE'];
+    }
   }
   
   return $_[0]->{value};
@@ -1645,7 +1770,7 @@ push our @ISA, 'Whatpm::WebIDL::InterfaceMember';
 
 sub new ($$) {
   my $self = shift->SUPER::new (@_);
-  $self->{type} = ['::any::'];
+  $self->{type} = '::any::';
   $self->{getraises} = [];
   $self->{setraises} = [];
   return $self;
@@ -1696,7 +1821,7 @@ push our @ISA, 'Whatpm::WebIDL::InterfaceMember';
 
 sub new ($$) {
   my $self = shift->SUPER::new (@_);
-  $self->{type} = ['::any::'];
+  $self->{type} = '::any::';
   $self->{child_nodes} = [];
   $self->{raises} = [];
   return $self;
@@ -1728,7 +1853,7 @@ package Whatpm::WebIDL::Argument;
 push our @ISA, 'Whatpm::WebIDL::Node';
 
 sub new ($$) {
-  return bless {node_name => ''.$_[1], type => ['::any::']}, $_[0];
+  return bless {node_name => ''.$_[1], type => '::any::'}, $_[0];
 } # new
 
 sub idl_text ($) {
@@ -1751,7 +1876,7 @@ package Whatpm::WebIDL::ExceptionMember;
 push our @ISA, 'Whatpm::WebIDL::Node';
 
 sub new ($$) {
-  return bless {node_name => ''.$_[1], type => ['::any::']}, $_[0];
+  return bless {node_name => ''.$_[1], type => '::any::'}, $_[0];
 } # new
 
 sub idl_text ($) {

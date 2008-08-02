@@ -267,3 +267,138 @@ module m {
   interface y : x {};
 };
 #errors
+
+#data
+module m {
+  interface i {
+    const long t = 234;
+  };
+};
+#errors
+
+#data
+module m {
+  interface i {
+    const boolean t = 234;
+  };
+};
+#errors
+3:234;const type mismatch;m;boolean
+
+#data
+module m {
+  interface i {
+    const unsigned long t = -02;
+  };
+};
+#errors
+3:-2;const value out of range;m
+
+#data
+module m {
+  interface i {
+    const any t = 234;
+  };
+};
+#errors
+
+#data
+module m {
+  interface i {
+    const long t = 234.4;
+  };
+};
+#errors
+3:234.4;const type mismatch;m;long
+
+#data
+module m {
+  interface i {
+    const long t =TRUE;
+  };
+};
+#errors
+3:TRUE;const type mismatch;m;long
+
+#data
+module m {
+  interface i {
+    const DOMString t = 234;
+  };
+};
+#errors
+3:234;const type mismatch;m;DOMString
+
+#data
+module m {
+  const octet LF = 0x0A;
+};
+#errors
+#document
+| module m {
+| 
+| const octet LF = 10;
+| 
+| };
+
+#data
+module m {
+  const octet LF = 0X0a;
+};
+#errors
+#document
+| module m {
+| 
+| const octet LF = 10;
+| 
+| };
+
+#data
+module m {
+  const octet LF = 012;
+};
+#errors
+#document
+| module m {
+| 
+| const octet LF = 10;
+| 
+| };
+
+#data
+module m {
+  const octet LF = 10;
+};
+#errors
+#document
+| module m {
+| 
+| const octet LF = 10;
+| 
+| };
+
+#data
+module m {
+  const octet LF = 10.00;
+};
+#errors
+2:10;const type mismatch;m;octet
+#document
+| module m {
+| 
+| const octet LF = 10;
+| 
+| };
+
+#data
+module m {
+  const octet CR = -0x0D;
+};
+#errors
+2:-13;const value out of range;m
+#document
+| module m {
+| 
+| const octet CR = -13;
+| 
+| };

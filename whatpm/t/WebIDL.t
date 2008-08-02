@@ -84,7 +84,8 @@ sub test ($) {
   my $onerror = sub {
     my %opt = @_;
     push @errors, join ';',
-      ($opt{node} ? $opt{node}->get_user_data ('manakai_source_line') || $opt{line} : $opt{line} . '.' . $opt{column}),
+      ($opt{node} ? $opt{node}->get_user_data ('manakai_source_line') || $opt{line} : $opt{line} . '.' . $opt{column}) .
+          (defined $opt{value} ? ':' . $opt{value} : ''),
       $opt{type}, $opt{level},
       (defined $opt{text} ? ($opt{text}) : ());
   };
@@ -105,4 +106,4 @@ sub test ($) {
 } # test
 
 ## License: Public Domain.
-## $Date: 2008/08/02 12:51:52 $
+## $Date: 2008/08/02 15:14:24 $
