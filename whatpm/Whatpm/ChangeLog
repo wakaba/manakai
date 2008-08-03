@@ -1,5 +1,11 @@
 2008-08-03  Wakaba  <wakaba@suika.fam.cx>
 
+	* WebIDL.pm (parse_char_string): Simplified error
+	reporting process for broken ignored valuetype definition.
+	(Valuetype idl_text): Support for special "DOMString" name.
+
+2008-08-03  Wakaba  <wakaba@suika.fam.cx>
+
 	* WebIDL.pm ($get_scoped_name): Append "::::" if the last
 	terminal of the ScopedName is "DOMString", such that whether
 	the last part of the scoped name is "DOMString" or "_DOMString"

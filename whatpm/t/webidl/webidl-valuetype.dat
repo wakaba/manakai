@@ -123,11 +123,13 @@ valuetype DOMString sequence<unsigned short>;
 #errors
 1;non-module definition;s
 1;ignored valuetype;i
+#document
+| valuetype DOMString sequence<unsigned short>;
 
 #data
 valuetype DOMString long;
 #errors
-1.24;valuetype DOMString sequence;m
+1.24;valuetype DOMString;m
 
 #data
 valuetype _DOMString sequence<unsigned short>;
@@ -153,3 +155,65 @@ module m {
 #errors
 2;ignored valuetype;i
 4;type not defined;m;m::DOMString
+
+#data
+valuetype DOMString sequence<long>;
+#errors
+1.33;valuetype DOMString;m
+
+#data
+valuetype DOMString sequence<short>;
+#errors
+1.34;valuetype DOMString;m
+
+#data
+valuetype DOMString sequence<long;
+interface i {};
+#errors
+1.33;valuetype DOMString;m
+2;non-module definition;s
+
+#data
+valuetype DOMString sequence<;
+interface i {};
+#errors
+1.30;valuetype DOMString;m
+2;non-module definition;s
+
+#data
+valuetype DOMString sequence<unsigned;
+interface i{};
+#errors
+1.38;valuetype DOMString;m
+2;non-module definition;s
+
+#data
+valuetype DOMString sequence<
+interface i {};
+interface j {};
+#errors
+2.9;valuetype DOMString;m
+3;non-module definition;s
+
+#data
+valuetype DOMString sequence<unsigned short long>;
+#errors
+1.48;valuetype DOMString;m
+
+#data
+valuetype DOMString sequence<sequence<unsigned short>>;
+#errors
+1.37;valuetype DOMString;m
+
+#data
+valuetype DOMString sequence<DOMString>;
+#errors
+1.38;valuetype DOMString;m
+
+#data
+valuetype DOMString sequence<unsigned;short>;
+interface i {};
+#errors
+1.38;valuetype DOMString;m
+1.43;before definitions;m
+2;non-module definition;s

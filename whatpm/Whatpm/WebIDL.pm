@@ -453,30 +453,22 @@ sub parse_char_string ($$;$) {
                     $next_state = 'before definitions';
                     next;
                   } else {
-                    $onerror->(type => 'valuetype DOMString sequence lt unsigned short gt',
-                               level => $self->{must_level});
                     #                
                   }
                 } else {
-                  $onerror->(type => 'valuetype DOMString sequence lt unsigned short',
-                             level => $self->{must_level});
                   #                
                 }
               } else {
-                $onerror->(type => 'valuetype DOMString sequence lt unsigned',
-                           level => $self->{must_level});
                 #
               }
             } else {
-              $onerror->(type => 'valuetype DOMString sequence lt',
-                         level => $self->{must_level});
               #
             }
           } else {
-            $onerror->(type => 'valuetype DOMString sequence',
-                       level => $self->{must_level});
             #
           }
+          $onerror->(type => 'valuetype DOMString',
+                     level => $self->{must_level});
           pop @current; # valuetype
           #
         } else {
@@ -1868,8 +1860,10 @@ sub idl_text ($) {
   my $self = shift;
   my $r = $self->_xattrs_text;
   $r .= ' ' if length $r;
+  my $name = $self->node_name;
+  $name = 'DOMString' if $name eq '::DOMString::';
   ## TODO: escape
-  $r .= 'valuetype ' . $self->node_name . ' ' . $self->type_text . ";\x0A";
+  $r .= 'valuetype ' . $name . ' ' . $self->type_text . ";\x0A";
   return $r;
 } # idl_text
 
