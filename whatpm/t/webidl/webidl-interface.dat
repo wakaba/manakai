@@ -44,7 +44,7 @@ interface x {
   attribute long a;
 };};
 #errors
-4;duplicate interface member;m
+4;duplicate member;m
 #document
 | module m {
 | 
@@ -73,7 +73,7 @@ interface x {
   attribute long _a;
 };};
 #errors
-4;duplicate interface member;m
+4;duplicate member;m
 
 #data
 module m {
@@ -90,7 +90,18 @@ interface x {
   const long a = 1;
 };};
 #errors
-4;duplicate interface member;m
+4;duplicate member;m
+
+#data
+module m {
+  interface x {
+    attribute long a;
+  };
+  interface y {
+    attribute long a;
+  };
+};
+#errors
 
 #data
 module m {
@@ -1319,6 +1330,7 @@ module m {
   };
 };
 #errors
+2;typedef ignored;i
 4;exception not defined;m;e
 
 #data
@@ -1330,4 +1342,5 @@ module m {
   };
 };
 #errors
+3;not boxable type;m;ee
 5;exception not defined;m;e

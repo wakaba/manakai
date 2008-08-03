@@ -1,0 +1,64 @@
+#data
+exception e {
+  long a;
+};
+#errors
+1;non-module definition;s
+#document
+| exception e {
+|   long a;
+| };
+
+#data
+exception e {
+  long a;
+  long a;
+};
+#errors
+1;non-module definition;s
+3;duplicate member;m
+
+#data
+exception e {
+  long a;
+  long _a;
+};
+#errors
+1;non-module definition;s
+3;duplicate member;m
+
+#data
+exception e {
+  long a;
+  boolean a;
+};
+#errors
+1;non-module definition;s
+3;duplicate member;m
+
+#data
+exception e {
+  long a;
+  long b;
+};
+#errors
+1;non-module definition;s
+
+#data
+exception e {
+  long a;
+  long __a;
+};
+#errors
+1;non-module definition;s
+
+#data
+exception e {
+  long a;
+};
+exception f {
+  long a;
+};
+#errors
+1;non-module definition;s
+4;non-module definition;s

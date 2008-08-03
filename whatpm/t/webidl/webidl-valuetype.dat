@@ -1,0 +1,155 @@
+#data
+valuetype a long;
+#errors
+1;non-module definition;s
+#document
+| valuetype a long;
+
+#data
+valuetype b unsigned long;
+#errors
+1;non-module definition;s
+#document
+| valuetype b unsigned long;
+
+#data
+valuetype c sequence<long>;
+#errors
+1;non-module definition;s
+#document
+| valuetype c sequence<long>;
+
+#data
+valuetype d sequence<sequence<DOMString>>;
+#errors
+1;non-module definition;s
+#document
+| valuetype d sequence<sequence<DOMString>>;
+
+#data
+interface Node {};
+valuetype e Node;
+#errors
+1;non-module definition;s
+2;non-module definition;s
+2;not boxable type;m;Node
+
+#data
+valuetype v long;
+valuetype w v;
+#errors
+1;non-module definition;s
+2;non-module definition;s
+2;not boxable type;m;v
+
+#data
+valuetype x y;
+#errors
+1;non-module definition;s
+1;not boxable type;m;y
+
+#data
+module m {
+  valuetype t long;
+};
+#errors
+
+#data
+interface Node {};
+valuetype c sequence<Node>;
+#errors
+1;non-module definition;s
+2;non-module definition;s
+
+#data
+valuetype a any;
+#errors
+1.15;before boxed type;m
+
+#data
+exception ee {};
+valuetype e ee;
+#errors
+1;non-module definition;s
+2;non-module definition;s
+2;not boxable type;m;ee
+
+#data
+module m {
+  valuetype a m;
+};
+#errors
+2;not boxable type;m;m
+
+#data
+module m {
+  typedef long a;
+  valuetype b ::m::a;
+};
+#errors
+
+#data
+typedef unsigned short a;
+valuetype b ::a;
+#errors
+1;non-module definition;s
+2;non-module definition;s
+
+#data
+typedef octet a;
+typedef a b;
+typedef b c;
+valuetype d c;
+#errors
+1;non-module definition;s
+2;non-module definition;s
+3;non-module definition;s
+4;non-module definition;s
+
+#data
+typedef any a;
+typedef a b;
+typedef b c;
+valuetype d c;
+#errors
+1;non-module definition;s
+2;non-module definition;s
+3;non-module definition;s
+4;non-module definition;s
+4;not boxable type;m;c
+
+#data
+valuetype DOMString sequence<unsigned short>;
+#errors
+1;non-module definition;s
+1;ignored valuetype;i
+
+#data
+valuetype DOMString long;
+#errors
+1.24;valuetype DOMString sequence;m
+
+#data
+valuetype _DOMString sequence<unsigned short>;
+#errors
+1;non-module definition;s
+
+#data
+valuetype _DOMString sequence<unsigned short>;
+interface a {
+  attribute _DOMString b;
+};
+#errors
+1;non-module definition;s
+2;non-module definition;s
+
+#data
+module m {
+  valuetype DOMString sequence<unsigned short>;
+  interface a {
+    attribute m::DOMString b;
+  };
+};
+#errors
+2;ignored valuetype;i
+4;type not defined;m;m::DOMString

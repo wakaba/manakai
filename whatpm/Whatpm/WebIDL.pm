@@ -131,7 +131,7 @@ sub parse_char_string ($$;$) {
           push @$name, $identifier;
           $token = $get_next_token->();
         } elsif ($token->{type} eq 'DOMString') {
-          push @$name, 'DOMString';
+          push @$name, 'DOMString', '', '';
           $token = $get_next_token->();
           last;
         }
@@ -146,7 +146,7 @@ sub parse_char_string ($$;$) {
           push @$name, $identifier;
           $token = $get_next_token->();
         } elsif ($token->{type} eq 'DOMString') {
-          push @$name, 'DOMString';
+          push @$name, 'DOMString', '', '';
           $token = $get_next_token->();
           last;
         } else {
@@ -964,8 +964,9 @@ sub parse_char_string ($$;$) {
       $next_state = 'before interface member';
     } elsif ($state eq 'before exception member identifier') {
       if ($token->{type} eq 'identifier') {
-        ## TODO: unescape
-        push @current, Whatpm::WebIDL::ExceptionMember->new ($token->{value});
+        my $identifier = $token->{value};
+        $identifier =~ s/^_//;
+        push @current, Whatpm::WebIDL::ExceptionMember->new ($identifier);
         $current[-1]->set_user_data (manakai_source_line => $line);
         $current[-1]->set_user_data (manakai_source_column => $column);
         $current[-1]->type ($current_type);
@@ -1368,7 +1369,11 @@ sub check ($$) {
     my $i_sn = shift;
     my $scope = shift;
     
-    if ($i_sn =~ /::DOMString\z/) {
+    if ($i_sn =~ /\A::([^:]+)::\z/ or
+        $i_sn =~ /^::::sequence::::/) {
+      return undef;
+    } elsif ($i_sn =~ /::DOMString\z/ or
+             $i_sn =~ /::DOMString::::\z/) {
       return undef;
     } elsif ($i_sn =~ /^::/) {
       if ($defined_qnames->{$i_sn}) {
@@ -1392,12 +1397,29 @@ sub check ($$) {
   while (@$items) {
     my $item = shift @$items;
     if ($item->{node}->isa ('Whatpm::WebIDL::Definition') and
-        not $item->{defined_members}) {
+        not $item->{defined_members} # Const in Interface does not have that
+    ) {
+      if ($item->{node}->isa ('Whatpm::WebIDL::Module')) {
+        unshift @$items,
+            map {
+              {node => $_, parent => $item->{node},
+               scope => $item->{scope} . $item->{node}->node_name . '::'}
+            }
+            @{$item->{node}->{child_nodes}};
+      } else {
+        unless ($item->{parent}) {
+          $onerror->(type => 'non-module definition',
+                     level => 's',
+                     node => $item->{node});
+        }
+      }
+
       if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
         for my $i_sn (@{$item->{node}->{inheritances}}) {
           my $def = $resolve->($i_sn, $item->{scope});
 
           unless ($def and $def->{node}->isa ('Whatpm::WebIDL::Interface')) {
+            $i_sn =~ s/::DOMString::::\z/::DOMString/;
             $onerror->(type => 'interface not defined',
                        level => 'm',
                        node => $item->{node},
@@ -1410,43 +1432,70 @@ sub check ($$) {
             map { {node => $_, defined_members => $defined_members,
                    scope => $item->{scope}} }
             @{$item->{node}->{child_nodes}};
-        
-        unless ($item->{parent}) {
-          $onerror->(type => 'non-module definition',
-                     level => 's',
-                     node => $item->{node});
-        }
       } elsif ($item->{node}->isa ('Whatpm::WebIDL::Exception')) {
+        my $defined_members = {};
         unshift @$items,
-            map { {node => $_, parent => $item->{node},
+            map { {node => $_, defined_members => $defined_members,
                    scope => $item->{scope}} }
-            @{$item->{node}->{child_nodes}};
-        
-        unless ($item->{parent}) {
-          $onerror->(type => 'non-module definition',
-                     level => 's',
-                     node => $item->{node});
-        }
-      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Module')) {
-        unshift @$items,
-            map {
-              {node => $_, parent => $item->{node},
-               scope => $item->{scope} . $item->{node}->node_name . '::'}
-            }
             @{$item->{node}->{child_nodes}};
       } elsif ($item->{node}->isa ('Whatpm::WebIDL::Const')) {
         $check_const_value->($item);
-        
-        unless ($item->{parent}) {
-          $onerror->(type => 'non-module definition',
-                     level => 's',
+      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Typedef')) {
+        my $name = $item->{node}->node_name;
+        my $type = $item->{node}->type;
+        if ($name eq '::DOMString::' or
+            $type eq '::DOMString::' or
+            $type =~ /::DOMString::::\z/) {
+          $onerror->(type => 'typedef ignored',
+                     level => 'i',
                      node => $item->{node});
         }
-      } else {
-        unless ($item->{parent}) {
-          $onerror->(type => 'non-module definition',
-                     level => 's',
+        ## ISSUE: Refernece to a non-defined interface is not non-conforming.
+
+        ## ISSUE: What does "ignored" mean?
+        ## "typedef dom::DOMString a; typedef long a;" is conforming?
+        ## "typedef dom::DOMString b; interface c { attribute b d; };" is?
+
+        ## ISSUE: Is "sequence<undefinedtype>" conforming?
+
+        if ($type =~ /\A::([^:]+)::\z/) {
+          $item->{allow_null} = {
+            boolean => 1, octet => 1, short => 1, 'unsigned short' => 1,
+            long => 1, 'unsigned long' => 1, 'long long' => 1, 
+            'unsigned long long' => 1, float => 1,
+          }->{$1};
+        } elsif ($type =~ /^::::sequence::::/) {
+          $item->{allow_null} = 1;
+        } else {
+          my $def = $resolve->($type, $item->{scope});
+          $item->{allow_null} = $def->{allow_null};
+        }
+      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Valuetype')) {
+        my $name = $item->{node}->node_name;
+        if ($name eq '::DOMString::') {
+          $onerror->(type => 'ignored valuetype',
+                     level => 'i',
                      node => $item->{node});
+        } else {
+          my $type = $item->{node}->type;
+          if ($type =~ /\A::[^:]+::\z/) {
+            #
+          } elsif ($type =~ /^::::sequence::::/) {
+            ## ISSUE: Is "sequence<unknowntype>" conforming?
+          } else {
+            my $def = $resolve->($type, $item->{scope});
+            if ($def and 
+                $def->{allow_null}) {
+              #
+            } else {
+              ## ISSUE: It is not explicitly specified that ScopedName
+              ## must refer a defined type.
+              $onerror->(type => 'not boxable type',
+                         level => 'm',
+                         node => $item->{node},
+                         text => $item->{node}->type_text);
+            }
+          }
         }
       }
 
@@ -1478,7 +1527,7 @@ sub check ($$) {
       } else {
         my $name = $item->{node}->node_name;
         if ($item->{defined_members}->{$name}) {
-          $onerror->(type => 'duplicate interface member',
+          $onerror->(type => 'duplicate member',
                      level => 'm',
                      node => $item->{node});
           ## ISSUE: Whether the example below is conforming or not
@@ -1527,8 +1576,18 @@ sub check ($$) {
       } elsif ($item->{node}->isa ('Whatpm::WebIDL::Const')) {
         $check_const_value->($item);
       }
-    } elsif ($item->{node}->isa ('Whatpm::WebIDL::Argument')) {
+    } elsif ($item->{node}->isa ('Whatpm::WebIDL::Argument') or
+             $item->{node}->isa ('Whatpm::WebIDL::ExceptionMember')) {
       ## ISSUE: No uniqueness constraints for arguments in an operation.
+
+      my $name = $item->{node}->node_name;
+      if ($item->{defined_members}->{$name}) {
+        $onerror->(type => 'duplicate member',
+                   level => 'm',
+                   node => $item->{node});
+      } else {
+        $item->{defined_members}->{$name} = 1;
+      }
 
       my $type = $item->{node}->type;
       if ($type =~ /\A::[^:]+::\z/) { # note that sequence<> not allowed
@@ -1545,7 +1604,7 @@ sub check ($$) {
                      node => $item->{node},
                      text => $item->{node}->type_text);
         }
-      }      
+      }
     }
 
     my $xattrs = $item->{node}->{xattrs} || [];
@@ -1587,9 +1646,17 @@ sub check ($$) {
         }
       } elsif ({
                 Constructor => 1, NamedConstructor => 1, NativeObject => 1,
-                NoInterfaceObject => 1, Stringifies => 1,
+                Stringifies => 1,
                }->{$xattr_name}) {
         if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
+          
+          next;
+        } else {
+          #
+        }
+      } elsif ($xattr_name eq 'NoInterfaceObject') {
+        if ($item->{node}->isa ('Whatpm::WebIDL::Interface') or
+            $item->{node}->isa ('Whatpm::WebIDL::Exception')) {
           
           next;
         } else {
@@ -1602,7 +1669,8 @@ sub check ($$) {
         } else {
           #
         }
-      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Const')) {
+      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Const') or
+               $item->{node}->isa ('Whatpm::WebIDL::ExceptionMember')) {
         #
       } else {
         $onerror->(type => 'unknown xattr',
@@ -1675,6 +1743,7 @@ sub type ($;$) {
     } elsif ($type =~ /\A::([^:]+)::\z/) {
       return $1;
     } else {
+      $type =~ s/::DOMString::::\z/::DOMString/;
       return $type; ## TODO: escape identifiers...
     }
   }; # $serialize_type
@@ -1779,8 +1848,10 @@ sub idl_text ($) {
   my $self = shift;
   my $r = $self->_xattrs_text;
   $r .= ' ' if length $r;
+  my $node_name = $self->node_name;
+  $node_name = 'DOMString' if $node_name eq '::DOMString::';
   ## TODO: escape
-  $r .= 'typedef ' . $self->type_text . ' ' . $self->node_name . ";\x0A";
+  $r .= 'typedef ' . $self->type_text . ' ' . $node_name . ";\x0A";
   return $r;
 } # idl_text
 

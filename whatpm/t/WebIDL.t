@@ -18,6 +18,9 @@ require Whatpm::WebIDL;
 for my $file_name (grep {$_} split /\s+/, qq[
                       ${dir_name}webidl-defs.dat
                       ${dir_name}webidl-interface.dat
+                      ${dir_name}webidl-exception.dat
+                      ${dir_name}webidl-typedef.dat
+                      ${dir_name}webidl-valuetype.dat
                      ]) {
   open my $file, '<', $file_name
     or die "$0: $file_name: $!";
@@ -106,4 +109,4 @@ sub test ($) {
 } # test
 
 ## License: Public Domain.
-## $Date: 2008/08/02 15:14:24 $
+## $Date: 2008/08/03 07:14:00 $

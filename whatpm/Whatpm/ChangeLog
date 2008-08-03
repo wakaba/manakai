@@ -1,5 +1,23 @@
 2008-08-03  Wakaba  <wakaba@suika.fam.cx>
 
+	* WebIDL.pm ($get_scoped_name): Append "::::" if the last
+	terminal of the ScopedName is "DOMString", such that whether
+	the last part of the scoped name is "DOMString" or "_DOMString"
+	later.  It is necessary to determine whether a |typedef|
+	definition should be ignored or not.
+	(parse_char_string): Unescape the identifier of
+	exception members.
+	($resolve): Return undef for builtin types and sequence<T>
+	types (we might not have to do this, however...).
+	(check): Support checking for Exceptions, Valuetypes,
+	and Typedefs.
+	($serialize_type): Support for "DOMString::::" syntax.
+	(Typedef idl_text): Output Type as "DOMString" if it
+	is really "DOMString" (i.e. its internal representation
+	is "::DOMString::").
+
+2008-08-03  Wakaba  <wakaba@suika.fam.cx>
+
 	* WebIDL.pm ($resolve): New code, based on resolve code
 	for constant types in the |check| method.
 	(check): Support for checking of attributes, operations, and

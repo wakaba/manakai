@@ -1,0 +1,121 @@
+#data
+typedef a DOMString;
+#errors
+1;non-module definition;s
+1;typedef ignored;i
+#document
+| typedef a DOMString;
+
+#data
+module m {
+  typedef a DOMString;
+};
+#errors
+2;typedef ignored;i
+#document
+| module m {
+| 
+| typedef a DOMString;
+| 
+| };
+
+#data
+typedef a _DOMString;
+#errors
+1;non-module definition;s
+
+#data
+typedef DOMString a;
+#errors
+1;non-module definition;s
+1;typedef ignored;i
+#document
+| typedef DOMString a;
+
+#data
+typedef _DOMString a;
+#errors
+1;non-module definition;s
+
+#data
+typedef m::DOMString a;
+#errors
+1;non-module definition;s
+1;typedef ignored;i
+#document
+| typedef m::DOMString a;
+
+#data
+typedef ::DOMString a;
+#errors
+1;non-module definition;s
+1;typedef ignored;i
+#document
+| typedef ::DOMString a;
+
+#data
+typedef ::m::DOMString a;
+#errors
+1;non-module definition;s
+1;typedef ignored;i
+#document
+| typedef ::m::DOMString a;
+
+#data
+typedef m::_DOMString a;
+#errors
+1;non-module definition;s
+
+#data
+typedef ::m::_DOMString a;
+#errors
+1;non-module definition;s
+
+#data
+typedef ::_DOMString a;
+#errors
+1;non-module definition;s
+
+#data
+typedef dom::DOMString DOMString;
+#errors
+1;non-module definition;s
+1;typedef ignored;i
+#document
+| typedef dom::DOMString DOMString;
+
+#data
+typedef sequence<unsigned  short> DOMString;
+#errors
+1;non-module definition;s
+1;typedef ignored;i
+#document
+| typedef sequence<unsigned short> DOMString;
+
+#data
+module m {
+  typedef dom::DOMString a;
+  typedef long a;
+};
+#errors
+3;duplicate qname;m
+2;typedef ignored;i
+
+#data
+module m {
+  typedef long a;
+  typedef dom::DOMString a;
+};
+#errors
+3;duplicate qname;m
+3;typedef ignored;i
+
+#data
+module m {
+  typedef dom::DOMString a;
+  interface b {
+    attribute a c;
+  };
+};
+#errors
+2;typedef ignored;i
