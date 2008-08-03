@@ -1363,9 +1363,31 @@ sub check ($$) {
         ## NOTE: Otherwise, an error of the implementation or the application.
   }; # $check_const_value
 
-  my $items = [map { {node => $_, scope => '::'} } @{$self->{child_nodes}}];
-
   my $defined_qnames = {};
+  my $resolve = sub ($$) {
+    my $i_sn = shift;
+    my $scope = shift;
+    
+    if ($i_sn =~ /::DOMString\z/) {
+      return undef;
+    } elsif ($i_sn =~ /^::/) {
+      if ($defined_qnames->{$i_sn}) {
+        return $defined_qnames->{$i_sn};
+      } else {
+        return undef;
+      }
+    } else {
+      if ($defined_qnames->{$scope . $i_sn}) {
+        return $defined_qnames->{$scope . $i_sn};
+      } elsif ($defined_qnames->{'::' . $i_sn}) {
+        return $defined_qnames->{'::' . $i_sn};
+      } else {
+        return undef;
+      }
+    }
+  }; # $resolve
+
+  my $items = [map { {node => $_, scope => '::'} } @{$self->{child_nodes}}];
 
   while (@$items) {
     my $item = shift @$items;
@@ -1373,35 +1395,20 @@ sub check ($$) {
         not $item->{defined_members}) {
       if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
         for my $i_sn (@{$item->{node}->{inheritances}}) {
-          if ($i_sn =~ /::DOMString\z/) {
-            #
-          } elsif ($i_sn =~ /^::/) {
-            if ($defined_qnames->{$i_sn}) {
-              next;
-            } 
-            #
-          } else {
-            if ($defined_qnames->{$item->{scope} . $i_sn} and
-                $defined_qnames->{$item->{scope} . $i_sn}->{node}
-                    ->isa ('Whatpm::WebIDL::Interface')) {
-              next;
-            } elsif ($defined_qnames->{'::' . $i_sn} and
-                     $defined_qnames->{'::' . $i_sn}->{node}
-                         ->isa ('Whatpm::WebIDL::Interface')) {
-              next;
-            }
-            #
-          }
+          my $def = $resolve->($i_sn, $item->{scope});
 
-          $onerror->(type => 'interface not defined',
-                     level => 'm',
-                     node => $item->{node},
-                     text => $i_sn);
+          unless ($def and $def->{node}->isa ('Whatpm::WebIDL::Interface')) {
+            $onerror->(type => 'interface not defined',
+                       level => 'm',
+                       node => $item->{node},
+                       text => $i_sn);
+          }
         }
 
         my $defined_members = {};
         unshift @$items,
-            map { {node => $_, defined_members => $defined_members} }
+            map { {node => $_, defined_members => $defined_members,
+                   scope => $item->{scope}} }
             @{$item->{node}->{child_nodes}};
         
         unless ($item->{parent}) {
@@ -1411,7 +1418,8 @@ sub check ($$) {
         }
       } elsif ($item->{node}->isa ('Whatpm::WebIDL::Exception')) {
         unshift @$items,
-            map { {node => $_, parent => $item->{node}} }
+            map { {node => $_, parent => $item->{node},
+                   scope => $item->{scope}} }
             @{$item->{node}->{child_nodes}};
         
         unless ($item->{parent}) {
@@ -1463,8 +1471,9 @@ sub check ($$) {
       }
     } elsif ($item->{node}->isa ('Whatpm::WebIDL::InterfaceMember')) {
       if ($item->{node}->isa ('Whatpm::WebIDL::Operation')) {
+        ## NOTE: Arguments
         unshift @$items,
-            map { {node => $_, parent => $item->{node}} }
+            map { {node => $_, scope => $item->{scope}} }
             @{$item->{node}->{child_nodes}};
       } else {
         my $name = $item->{node}->node_name;
@@ -1478,20 +1487,108 @@ sub check ($$) {
         } else {
           $item->{defined_members}->{$name} = 1;
         }
-
-        if ($item->{node}->isa ('Whatpm::WebIDL::Const')) {
-          $check_const_value->($item);
-        }
       }
+
+      if ($item->{node}->isa ('Whatpm::WebIDL::Attribute') or
+          $item->{node}->isa ('Whatpm::WebIDL::Operation')) {
+        my $type = $item->{node}->type;
+        if ($type =~ /\A::[^:]+::\z/) { # note that sequence<> not allowed
+          #
+        } else { # scoped name
+          my $def = $resolve->($type, $item->{scope});
+          
+          unless ($def and
+                  ($def->{node}->isa ('Whatpm::WebIDL::Interface') or
+                   $def->{node}->isa ('Whatpm::WebIDL::Typedef') or
+                   $def->{node}->isa ('Whatpm::WebIDL::Valuetype'))) {
+            $onerror->(type => 'type not defined',
+                       level => 'm',
+                       node => $item->{node},
+                       text => $item->{node}->type_text);
+          }
+        }
+                
+        for (@{$item->{node}->{raises} or []}, # for operations
+             @{$item->{node}->{getraises} or []}, # for attributes
+             @{$item->{node}->{setraises} or []}) { # for attributes
+          my $def = $resolve->($_, $item->{scope});
+          
+          unless ($def and
+                  $def->{node}->isa ('Whatpm::WebIDL::Exception')) {
+            $onerror->(type => 'exception not defined',
+                       level => 'm',
+                       node => $item->{node},
+                       text => $_);
+          }
+        }
+        
+        ## ISSUE: readonly setraises is not disallowed
+        ## ISSUE: raises (x,x) and raises (x,::x) and etc. are not disallowed
+      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Const')) {
+        $check_const_value->($item);
+      }
+    } elsif ($item->{node}->isa ('Whatpm::WebIDL::Argument')) {
+      ## ISSUE: No uniqueness constraints for arguments in an operation.
+
+      my $type = $item->{node}->type;
+      if ($type =~ /\A::[^:]+::\z/) { # note that sequence<> not allowed
+        #
+      } else { # scoped name
+        my $def = $resolve->($type, $item->{scope});
+        
+        unless ($def and
+                ($def->{node}->isa ('Whatpm::WebIDL::Interface') or
+                 $def->{node}->isa ('Whatpm::WebIDL::Typedef') or
+                 $def->{node}->isa ('Whatpm::WebIDL::Valuetype'))) {
+          $onerror->(type => 'type not defined',
+                     level => 'm',
+                     node => $item->{node},
+                     text => $item->{node}->type_text);
+        }
+      }      
     }
 
     my $xattrs = $item->{node}->{xattrs} || [];
     for my $xattr (@$xattrs) {
       my $xattr_name = $xattr->node_name;
       if ({
-           Constructor => 1, NamedConstructor => 1, NativeObject => 1,
-           NoInterfaceObject => 1, Stringifies => 1,
+           Null => 1, Undefined => 1,
           }->{$xattr_name}) {
+        if ($item->{node}->isa ('Whatpm::WebIDL::Attribute') or
+            $item->{node}->isa ('Whatpm::WebIDL::Argument')) {
+
+          next;
+        } else {
+          #
+        }
+      } elsif ({
+                IndexGetter => 1, IndexSetter => 1,
+                NameGetter => 1, NameSetter => 1,
+               }->{$xattr_name}) {
+        if ($item->{node}->isa ('Whatpm::WebIDL::Operation')) {
+
+          next;
+        } else {
+          #
+        }
+      } elsif ($xattr_name eq 'PutForwards') {
+        if ($item->{node}->isa ('Whatpm::WebIDL::Attribute')) {
+
+          next;
+        } else {
+          #
+        }
+      } elsif ($xattr_name eq 'Variadic') {
+        if ($item->{node}->isa ('Whatpm::WebIDL::Operation')) {
+
+          next;
+        } else {
+          #
+        }
+      } elsif ({
+                Constructor => 1, NamedConstructor => 1, NativeObject => 1,
+                NoInterfaceObject => 1, Stringifies => 1,
+               }->{$xattr_name}) {
         if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
           
           next;
@@ -1803,13 +1900,13 @@ sub idl_text ($) {
   if (@{$self->{getraises}}) {
     $r .= ' getraises (';
     ## todo: ...
-    $r .= join ', ', map {join '::', @{$_}} @{$self->{getraises}};
+    $r .= join ', ', map {$serialize_type->($_)} @{$self->{getraises}};
     $r .= ')';
   }
   if (@{$self->{setraises}}) {
     $r .= ' setraises (';
     ## todo: ...
-    $r .= join ', ', map {join '::', @{$_}} @{$self->{setraises}};
+    $r .= join ', ', map {$serialize_type->($_)} @{$self->{setraises}};
     $r .= ')';
   }
   $r .= ";\x0A";
@@ -1842,7 +1939,7 @@ sub idl_text ($) {
   if (@{$self->{raises}}) {
     $r .= ' raises (';
     ## todo: ...
-    $r .= join ', ', map {join '::', @{$_}} @{$self->{raises}};
+    $r .= join ', ', map {$serialize_type->($_)} @{$self->{raises}};
     $r .= ')';
   }
   $r .= ";\x0A";

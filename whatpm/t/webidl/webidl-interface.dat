@@ -402,3 +402,932 @@ module m {
 | const octet CR = -13;
 | 
 | };
+
+#data
+interface x {};
+module m {
+  typedef long x;
+  interface y : x {};
+};
+#errors
+1;non-module definition;s
+4;interface not defined;m;x
+
+#data
+module m {
+  interface x {
+    attribute long a;
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   attribute long a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    attribute unsigned short a;
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   attribute unsigned short a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    attribute Object a;
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   attribute Object a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    attribute DOMString a;
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   attribute DOMString a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    attribute _DOMString a;
+  };
+};
+#errors
+3;type not defined;m;DOMString
+
+#data
+module m {
+  interface x {
+    attribute m::DOMString a;
+  };
+};
+#errors
+3;type not defined;m;m::DOMString
+#document
+| module m {
+| 
+| interface x {
+|   attribute m::DOMString a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    attribute m::_DOMString a;
+  };
+};
+#errors
+3;type not defined;m;m::DOMString
+
+#data
+module m {
+  exception ex {};
+  interface x {
+    attribute ex x;
+  };
+};
+#errors
+4;type not defined;m;ex
+
+#data
+module m {
+  typedef long l;
+  interface x {
+    attribute l mylong;
+  };
+};
+#errors
+
+#data
+module m {
+  valuetype mystr sequence<octet>;
+  interface x {
+    attribute mystr text;
+  };
+};
+#errors
+
+#data
+module m {
+  const boolean v = TRUE;
+  interface x {
+    attribute v myvalue;
+  };
+};
+#errors
+4;type not defined;m;v
+
+#data
+module m {
+  interface x {
+    attribute x a;
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   attribute x a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    attribute m::x a;
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   attribute m::x a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface y {};
+  interface x {
+    attribute y a;
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface y {
+| };
+| interface x {
+|   attribute y a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    attribute y a;
+  };
+  interface y {
+  };
+};
+#errors
+3;type not defined;m;y
+#document
+| module m {
+| 
+| interface x {
+|   attribute y a;
+| };
+| interface y {
+| };
+| 
+| };
+
+#data
+interface y {};
+module m {
+  interface x {
+    attribute y a;
+  };
+};
+#errors
+1;non-module definition;s
+#document
+| interface y {
+| };
+| 
+| module m {
+| 
+| interface x {
+|   attribute y a;
+| };
+| 
+| };
+
+#data
+interface y {};
+module m {
+  interface x {
+    attribute ::y a;
+  };
+};
+#errors
+1;non-module definition;s
+#document
+| interface y {
+| };
+| 
+| module m {
+| 
+| interface x {
+|   attribute ::y a;
+| };
+| 
+| };
+
+#data
+module m {
+  interface y {};
+  interface x {
+    attribute ::m::y a;
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface y {
+| };
+| interface x {
+|   attribute ::m::y a;
+| };
+| 
+| };
+
+#data
+module m {
+  exception x {};
+  interface y {
+    attribute boolean a getraises (x);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| exception x {
+| };
+| interface y {
+|   attribute boolean a getraises (x);
+| };
+| 
+| };
+
+#data
+module m {
+  exception x {};
+  interface y {
+    attribute boolean a getraises (x,x);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| exception x {
+| };
+| interface y {
+|   attribute boolean a getraises (x, x);
+| };
+| 
+| };
+
+#data
+module m {
+  exception x {};
+  interface y {
+    attribute boolean a getraises (x, ::m::x);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| exception x {
+| };
+| interface y {
+|   attribute boolean a getraises (x, ::m::x);
+| };
+| 
+| };
+
+#data
+module m {
+  exception x {};
+  interface y {
+    attribute boolean a getraises (x, z);
+  };
+};
+#errors
+4;exception not defined;m;z
+
+#data
+module m {
+  
+  interface y {
+    attribute boolean a getraises (z);
+  };
+};
+#errors
+4;exception not defined;m;z
+
+#data
+module m {
+  exception _DOMString {};
+  interface y {
+    attribute boolean a getraises (_DOMString);
+  };
+};
+#errors
+
+#data
+module m {
+  exception _DOMString {};
+  interface y {
+    attribute boolean a getraises (m::_DOMString);
+  };
+};
+#errors
+4;exception not defined;m;m::DOMString
+
+#data
+exception _DOMString {};
+module m {
+  interface y {
+    attribute boolean a getraises (::_DOMString);
+  };
+};
+#errors
+1;non-module definition;s
+4;exception not defined;m;::DOMString
+
+#data
+module m {
+  interface y {
+    attribute boolean a getraises (x);
+  };
+  exception x {};
+};
+#errors
+3;exception not defined;m;x
+
+#data
+module m {
+  interface x {};
+  interface y {
+    attribute boolean a getraises (x);
+  };
+};
+#errors
+4;exception not defined;m;x
+
+#data
+module m {
+  typedef long x;
+  interface y {
+    attribute boolean a getraises (x);
+  };
+};
+#errors
+4;exception not defined;m;x
+
+#data
+module m {
+  exception ex {}; typedef ex x;
+  interface y {
+    attribute boolean a getraises (x);
+  };
+};
+#errors
+4;exception not defined;m;x
+
+#data
+module m {
+  valuetype x boolean;
+  interface y {
+    attribute boolean a getraises (x);
+  };
+};
+#errors
+4;exception not defined;m;x
+
+#data
+module m {
+  exception x {};
+  interface y {
+    attribute boolean a setraises (x);
+  };
+};
+#errors
+
+#data
+module m {
+ 
+  interface y {
+    attribute boolean a setraises (x);
+  };
+};
+#errors
+4;exception not defined;m;x
+
+#data
+module m {
+  exception x {};
+  interface y {
+    attribute boolean a getraises (x) setraises (x);
+  };
+};
+#errors
+
+#data
+module m {
+  exception x {};
+  interface y {
+    attribute boolean a getraises (x) setraises (z);
+  };
+};
+#errors
+4;exception not defined;m;z
+
+#data
+module m {
+  interface x {
+    void m ();
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   void m ();
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    long m ();
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   long m ();
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    long long m ();
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   long long m ();
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    DOMString m ();
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   DOMString m ();
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    x m ();
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   x m ();
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    m::x m ();
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   m::x m ();
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    ::m::x m ();
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   ::m::x m ();
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    m method ();
+  };
+};
+#errors
+3;type not defined;m;m
+
+#data
+module m {
+  interface x {
+    _DOMString method ();
+  };
+};
+#errors
+3;type not defined;m;DOMString
+
+#data
+module m {
+  interface _DOMString {};
+  interface x {
+    _DOMString method ();
+  };
+};
+#errors
+
+#data
+module m {
+  interface _DOMString {};
+  interface x {
+    m::_DOMString method ();
+  };
+};
+#errors
+4;type not defined;m;m::DOMString
+
+#data
+module m {
+  interface u {};
+  interface x {
+    u method ();
+  };
+};
+#errors
+
+#data
+interface f {};
+module m {
+  interface x {
+    f method ();
+  };
+};
+#errors
+1;non-module definition;s
+
+#data
+module m {
+  interface x {
+    z method ();
+  };
+};
+#errors
+3;type not defined;m;z
+
+#data
+module m {
+  typedef long z;
+  interface x {
+    z method ();
+  };
+};
+#errors
+
+#data
+module m {
+  interface x {
+    _long method ();
+  };
+};
+#errors
+3;type not defined;m;long
+
+#data
+module m {
+  valuetype s sequence<DOMString>;
+  interface x {
+    s method ();
+  };
+};
+#errors
+
+#data
+module m {
+  exception e {};
+  interface x {
+    e method ();
+  };
+};
+#errors
+4;type not defined;m;e
+
+#data
+module m {
+  interface x {
+    void method (in boolean b);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   void method (in boolean b);
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    void method (in boolean b, in long c);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   void method (in boolean b, in long c);
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    void method (in DOMString b);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   void method (in DOMString b);
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    void method (in x b);
+  };
+};
+#errors
+
+#data
+module m {
+  interface x {
+    void method (in m::x b);
+  };
+};
+#errors
+
+#data
+module m {
+  interface x {
+    void method (in ::m::x b);
+  };
+};
+#errors
+
+#data
+module m {
+  typedef sequence<DOMString> ss;
+  interface x {
+    void method (in ss b);
+  };
+};
+#errors
+
+#data
+module m 
+{
+  valuetype a long;
+  interface x {
+    void method (in a b);
+  };
+};
+#errors
+
+#data
+module m {
+  exception ex {};
+  interface x {
+    void method (in ex b);
+  };
+};
+#errors
+4;type not defined;m;ex
+
+#data
+module m {
+  interface x {
+    void method (in _DOMString b);
+  };
+};
+#errors
+3;type not defined;m;DOMString
+
+#data
+module m {
+  interface x {
+    void method (in y b);
+  };
+  interface y {};
+};
+#errors
+3;type not defined;m;y
+
+#data
+module m {
+  exception e {};
+  interface x {
+    void method () raises (e);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| exception e {
+| };
+| interface x {
+|   void method () raises (e);
+| };
+| 
+| };
+
+#data
+module m {
+  exception e {};
+  interface x {
+    void method () raises (e,e);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| exception e {
+| };
+| interface x {
+|   void method () raises (e, e);
+| };
+| 
+| };
+
+#data
+module m {
+  exception e {};
+  exception f {};
+  interface x {
+    void method () raises (e, f);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| exception e {
+| };
+| exception f {
+| };
+| interface x {
+|   void method () raises (e, f);
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    void method () raises (e);
+  };
+};
+#errors
+3;exception not defined;m;e
+
+#data
+module m {
+  interface x {
+    void method () raises (e);
+  };
+  exception e {};
+};
+#errors
+3;exception not defined;m;e
+
+#data
+module m {
+  interface e {};
+  interface x {
+    void method () raises (e);
+  };
+};
+#errors
+4;exception not defined;m;e
+
+#data
+module m {
+  valuetype e long;
+  interface x {
+    void method () raises (e);
+  };
+};
+#errors
+4;exception not defined;m;e
+
+#data
+module m {
+  typedef DOMString e;
+  interface x {
+    void method () raises (e);
+  };
+};
+#errors
+4;exception not defined;m;e
+
+#data
+module m {
+  exception ee {};
+  valuetype e ee;
+  interface x {
+    void method () raises (e);
+  };
+};
+#errors
+5;exception not defined;m;e

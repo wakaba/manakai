@@ -1,3 +1,13 @@
+2008-08-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* WebIDL.pm ($resolve): New code, based on resolve code
+	for constant types in the |check| method.
+	(check): Support for checking of attributes, operations, and
+	arguments.
+	(Attribute/Operation idl_text): Exception names in getraises,
+	setraises, and raises clauses is serizlied by |$serialize_type|
+	code.
+
 2008-08-02  Wakaba  <wakaba@suika.fam.cx>
 
 	* WebIDL.pm ($integer): Order of selections are changed to match
