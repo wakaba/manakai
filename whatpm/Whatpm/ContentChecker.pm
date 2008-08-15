@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.83 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.84 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -304,6 +304,7 @@ $Element->{q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>}->{RDF} = {
     my $rdf = Whatpm::RDFXML->new;
     ## TODO: Should we make bnodeid unique in a document?
     $rdf->{onerror} = $self->{onerror};
+    $rdf->{level} = $self->{level};
     $rdf->{ontriple} = sub {
       my %opt = @_;
       push @$triple,
@@ -343,9 +344,13 @@ my $default_error_level = {
   info => 'i',
   uncertain => 'u',
 
-  fact => 'm',
+  html4_fact => 'm',
   xml_error => 'm', ## TODO: correct?
   nc => 'm', ## XML Namespace Constraints ## TODO: correct?
+
+  rdf_fact => 'm',
+  rdf_grammer => 'm',
+  rdf_lc_must => 'm',
 };
 
 sub check_document ($$$;$) {
@@ -955,4 +960,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/08/15 12:46:44 $
+# $Date: 2008/08/15 14:13:42 $

@@ -3,9 +3,9 @@ use strict;
 
 ## An implementation of "Forming a table" algorithm in HTML5
 sub form_table ($$$;$) {
-  my (undef, $table_el, $onerror, $must_level) = @_;
+  my (undef, $table_el, $onerror, $levels) = @_;
   $onerror ||= sub { };
-  $must_level ||= 'm';
+  $levels ||= {must => 'm'};
   
   ## Step 1
   my $x_width = 0;
@@ -65,11 +65,11 @@ sub form_table ($$$;$) {
         if ($table->{column}->[$_]) {
           $onerror->(type => 'column with no anchored cell',
                      node => $table->{column}->[$_]->{element},
-                     level => $must_level);
+                     level => $levels->{must});
         } else {
           $onerror->(type => 'colspan creates column with no anchored cell',
                      node => $column_generated_by[$_],
-                    level => $must_level);
+                     level => $levels->{must});
         }
         last; # only one error.
       }
@@ -79,11 +79,11 @@ sub form_table ($$$;$) {
         if ($table->{row}->[$_]) {
           $onerror->(type => 'row with no anchored cell',
                      node => $table->{row}->[$_]->{element},
-                     level => $must_level);
+                     level => $levels->{must});
         } else {
           $onerror->(type => 'rowspan creates row with no anchored cell',
                      node => $row_generated_by[$_],
-                     level => $must_level);
+                     level => $levels->{must});
         }
         last; # only one error.
       }
@@ -302,8 +302,10 @@ return unless $current_cell;
           unless ($table->{cell}->[$x]->[$y]) {
             $table->{cell}->[$x]->[$y] = [$cell];
           } else {
-            $onerror->(type => "cell overlapping:$x:$y", node => $current_cell,
-                       level => $must_level);
+            $onerror->(type => 'cell overlapping',
+                       text => "$x,$y",
+                       node => $current_cell,
+                       level => $levels->{must});
             push @{$table->{cell}->[$x]->[$y]}, $cell;
           }
         }
@@ -456,9 +458,9 @@ return unless $current_cell;
 } # form_table
 
 sub assign_header ($$;$$) {
-  my (undef, $table, $onerror, $must_level) = @_;
+  my (undef, $table, $onerror, $levels) = @_;
   $onerror ||= sub { };
-  $must_level ||= 'm';
+  $levels ||= {must => 'm'};
 
   my $assign_header = sub ($$$) {
     my $_cell = shift;
@@ -631,7 +633,7 @@ sub assign_header ($$;$$) {
         $onerror->(type => 'duplicate token', value => $header_id,
                    node => $headers_cell->{element}->get_attribute_node_ns
                        (undef, 'headers'),
-                   level => $must_level);
+                   level => $levels->{must});
         next;
       }
       $headers{$header_id} = 1;
@@ -640,10 +642,10 @@ sub assign_header ($$;$$) {
         my $header_cell = $id_to_cell->{$header_id};
         $headers_cell->{header}->{$header_cell->{x}}->{$header_cell->{y}} = 1;
       } else {
-        $onerror->(type => 'no header cell', value => $header_id,
+        $onerror->(type => 'no referenced header cell', value => $header_id,
                    node => $headers_cell->{element}->get_attribute_node_ns
                        (undef, 'headers'),
-                   level => $must_level);
+                   level => $levels->{must});
       }
     }
   }
@@ -655,4 +657,4 @@ sub assign_header ($$;$$) {
 } # assign_header
 
 1;
-## $Date: 2008/05/10 12:13:43 $
+## $Date: 2008/08/15 14:13:42 $

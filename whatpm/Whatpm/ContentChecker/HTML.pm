@@ -755,7 +755,7 @@ my $HTMLAccesskeyAttrChecker = sub {
   my $value = $attr->value;
   if (length $value != 1) {
     $self->{onerror}->(node => $attr, type => 'char:syntax error',
-                       level => $self->{level}->{fact});
+                       level => $self->{level}->{html4_fact});
   }
 
   ## NOTE: "Note. Authors should consider the input method of the expected
@@ -839,7 +839,7 @@ my $HTMLColorAttrChecker = sub {
 
   if ($value !~ /\A(?>#[0-9A-F]+|black|silver|gray|white|maroon|red|purple|fuchsia|green|lime|olive|yellow|navy|blue|teal|aqua)\z/i) {
     $self->{onerror}->(node => $attr, type => 'color:syntax error',
-                       level => $self->{level}->{fact});
+                       level => $self->{level}->{html4_fact});
   }
 
   ## TODO: HTML4 has some guideline on usage of color.
@@ -1634,7 +1634,7 @@ $Element->{$HTML_NS}->{head} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'child element missing',
                          text => 'title',
-                         layer => $self->{level}->{must});
+                         level => $self->{level}->{must});
     }
     $self->{flag}->{in_head} = $element_state->{in_head_original};
 
@@ -4813,7 +4813,7 @@ my %cellalign = (
     my $value = $attr->value;
     if (length $value != 1) {
       $self->{onerror}->(node => $attr, type => 'char:syntax error',
-                         level => $self->{level}->{fact});
+                         level => $self->{level}->{html4_fact});
     }
   },
   charoff => $HTMLLengthAttrChecker,

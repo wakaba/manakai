@@ -22,8 +22,15 @@ use Char::Class::XML qw(InXML_NCNameStartChar10 InXMLNCNameChar10);
 require Whatpm::URIChecker;
 
 sub new ($) {
-  my $self = bless {fact_level => 'm', grammer_level => 'm',
-                    info_level => 'i', next_id => 0}, shift;
+  my $self = bless {
+    level => {
+      rdf_fact => 'm',
+      rdf_grammer => 'm',
+      rdf_lc_must => 'm',
+      info => 'i',
+    },
+    next_id => 0,
+  }, shift;
   $self->{onerror} = sub {
     my %opt = @_;
     warn $opt{type}, "\n";
@@ -90,13 +97,13 @@ sub convert_document ($$) {
         $has_element = 1;
       } else {
         $self->{onerror}->(type => 'second node element',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $cn);
       }
     } elsif ($cn->node_type == $cn->TEXT_NODE or
              $cn->node_type == $cn->CDATA_SECTION_NODE) {
       $self->{onerror}->(type => 'character not allowed',
-                         level => $self->{grammer_level},
+                         level => $self->{level}->{rdf_grammer},
                          node => $cn);
     }
   }
@@ -110,7 +117,7 @@ my $check_rdf_namespace = sub {
   if (substr ($node_nsuri, 0, length $RDF_URI) eq $RDF_URI and
       length $RDF_URI < length $node_nsuri) {
     $self->{onerror}->(type => 'bad rdf namespace',
-                       level => $self->{fact_level}, # Section 5.1
+                       level => $self->{level}->{rdf_fact}, # Section 5.1
                        node => $node);
   }
 }; # $check_rdf_namespace
@@ -142,7 +149,7 @@ sub convert_rdf_element ($$%) {
 
     $check_rdf_namespace->($self, $attr);
     $self->{onerror}->(type => 'attribute not allowed',
-                       level => $self->{grammer_level},
+                       level => $self->{level}->{rdf_grammer},
                        node => $attr);
   }
 
@@ -154,7 +161,7 @@ sub convert_rdf_element ($$%) {
              $cn->node_type == $cn->CDATA_SECTION_NODE) {
       if ($cn->data =~ /[^\x09\x0A\x0D\x20]/) {
         $self->{onerror}->(type => 'character not allowed',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $cn);
       }
     }
@@ -203,10 +210,7 @@ my $uri_attr = sub {
   my $abs_uri = $resolve->($attr->value, $attr);
 
   Whatpm::URIChecker->check_iri_reference ($abs_uri, sub {
-    my %opt = @_;
-    $self->{onerror}->(node => $attr, level => $opt{level},
-                       type => 'URI::'.$opt{type}.
-                       (defined $opt{position} ? ':'.$opt{position} : ''));
+    $self->{onerror}->(@_, node => $attr);
   });
 
   return $abs_uri;
@@ -217,15 +221,15 @@ my $id_attr = sub {
   
   my $id = $attr->value;
   unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
-    $self->{onerror}->(type => 'syntax error', ## TODO: type
-                       level => $self->{grammer_level},
+    $self->{onerror}->(type => 'XML 1.0 NCName:syntax error',
+                       level => $self->{level}->{rdf_grammer},
                        node => $attr);
   }
 
   my $base_uri = $attr->base_uri;
   if ($self->{id}->{$base_uri}->{$id}) {
-    $self->{onerror}->(type => 'duplicate rdf id', ## TODO: type
-                       level => $self->{small_must_level},
+    $self->{onerror}->(type => 'duplicate rdf id',
+                       level => $self->{level}->{rdf_lc_must},
                        node => $attr);
     ## TODO: RDF Validator?
   } else {
@@ -241,20 +245,20 @@ my $check_local_attr = sub {
   if ({
        ID => 1, about => 1, resource => 1, parseType => 1, type => 1,
       }->{$attr_xuri}) {
-    $self->{onerror}->(type => 'unqualified rdf attr', ## TODO: type
-                       level => $self->{should_level},
+    $self->{onerror}->(type => 'unqualified rdf attr',
+                       level => $self->{level}->{should},
                        node => $attr);
     if ($node->has_attribute_ns ($RDF_URI, $attr_xuri)) {
-      $self->{onerror}->(type => 'duplicate unqualified attr',## TODO: type
-                         level => $self->{fact_level},
+      $self->{onerror}->(type => 'duplicate unqualified attr',
+                         level => $self->{level}->{rdf_fact},
                          node => $attr);
       ## NOTE: <? rdfa:bout="" about=""> and such are not catched
       ## by this check; but who cares?  rdfa:bout="" is itself illegal.
     }
     $attr_xuri = $RDF_URI . $attr_xuri;
   } else {
-    $self->{onerror}->(type => 'unqualified attr', ## TODO: type
-                       level => $self->{fact_level},
+    $self->{onerror}->(type => 'unqualified attr',
+                       level => $self->{level}->{rdf_fact},
                        node => $attr);
     ## TODO: RDF Validator?
   }
@@ -279,7 +283,7 @@ sub convert_node_element ($$;%) {
     %oldTerms,
   }->{$xuri}) {
     $self->{onerror}->(type => 'element not allowed',
-                       level => $self->{grammer_level},
+                       level => $self->{level}->{rdf_grammer},
                        node => $node);
 
     ## TODO: W3C RDF Validator: Continue validation, but triples that would
@@ -318,7 +322,7 @@ sub convert_node_element ($$;%) {
         $subject = {uri => $id_attr->($self, $attr)};
       } else {
         $self->{onerror}->(type => 'attribute not allowed',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $attr);
 
         ## TODO: Ignore triple as W3C RDF Validator does
@@ -327,15 +331,15 @@ sub convert_node_element ($$;%) {
       unless (defined $subject) {
         my $id = $attr->value;
         unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
-          $self->{onerror}->(type => 'syntax error', ## TODO: type
-                             level => $self->{grammer_level},
+          $self->{onerror}->(type => 'XML 1.0 NCName:syntax error',
+                             level => $self->{level}->{rdf_grammer},
                              node => $self);
         }
 
         $subject = {bnodeid => $get_bnodeid->($id)};
       } else {
         $self->{onerror}->(type => 'attribute not allowed',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $attr);
 
         ## TODO: Ignore triple as W3C RDF Validator does
@@ -345,7 +349,7 @@ sub convert_node_element ($$;%) {
         $subject = {uri => $uri_attr->($self, $attr)};
       } else {
         $self->{onerror}->(type => 'attribute not allowed',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $attr);
 
         ## TODO: Ignore triple as W3C RDF Validator does
@@ -359,7 +363,7 @@ sub convert_node_element ($$;%) {
       %oldTerms,
     }->{$attr_xuri}) {
       $self->{onerror}->(type => 'attribute not allowed',
-                         level => $self->{grammer_level},
+                         level => $self->{level}->{rdf_grammer},
                          node => $attr);
 
       ## TODO: W3C RDF Validator: Ignore triples
@@ -409,7 +413,7 @@ sub convert_node_element ($$;%) {
              $cn_type == $cn->CDATA_SECTION_NODE) {
       if ($cn->data =~ /[^\x09\x0A\x0D\x20]/) {
         $self->{onerror}->(type => 'character not allowed',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $cn);
       }
     }
@@ -445,7 +449,7 @@ sub convert_property_element ($$%) {
        %oldTerms,
       }->{$xuri}) {
     $self->{onerror}->(type => 'element not allowed',
-                       level => $self->{grammer_level},
+                       level => $self->{level}->{rdf_grammer},
                        node => $node);
     ## TODO: RDF Validator?
   }
@@ -496,7 +500,7 @@ sub convert_property_element ($$%) {
       %oldTerms,
     }->{$attr_xuri}) {
       $self->{onerror}->(type => 'attribute not allowed',
-                         level => $self->{grammer_level},
+                         level => $self->{level}->{rdf_grammer},
                          node => $attr);
       ## TODO: RDF Validator?
     } else {
@@ -511,7 +515,7 @@ sub convert_property_element ($$%) {
     for my $attr ($resource_attr, $nodeid_attr, $dt_attr) {
       next unless $attr;
       $self->{onerror}->(type => 'attribute not allowed',
-                         level => $self->{grammer_level},
+                         level => $self->{level}->{rdf_grammer},
                          node => $attr);
       ## TODO: RDF Validator?
     }
@@ -538,7 +542,7 @@ sub convert_property_element ($$%) {
                $cn_type == $cn->CDATA_SECTION_NODE) {
         if ($cn->data =~ /[^\x09\x0A\x0D\x20]/) {
           $self->{onerror}->(type => 'character not allowed',
-                             level => $self->{grammer_level},
+                             level => $self->{level}->{rdf_grammer},
                              node => $cn);
         }
       }
@@ -549,7 +553,7 @@ sub convert_property_element ($$%) {
     for my $attr ($resource_attr, $nodeid_attr, $dt_attr) {
       next unless $attr;
       $self->{onerror}->(type => 'attribute not allowed',
-                         level => $self->{grammer_level},
+                         level => $self->{level}->{rdf_grammer},
                          node => $attr);
       ## TODO: RDF Validator?
     }
@@ -565,7 +569,7 @@ sub convert_property_element ($$%) {
                $cn->node_type == $cn->CDATA_SECTION_NODE) {
         if ($cn->data =~ /[^\x09\x0A\x0D\x20]/) {
           $self->{onerror}->(type => 'character not allowed',
-                             level => $self->{grammer_level},
+                             level => $self->{level}->{rdf_grammer},
                              node => $cn);
         }
       }
@@ -609,14 +613,14 @@ sub convert_property_element ($$%) {
       # |parseTypeOtherPropertyElt| ## TODO: What RDF Validator does?
 
       $self->{onerror}->(type => 'parse type other',
-                         level => $self->{info_level},
+                         level => $self->{level}->{rdf_info},
                          node => $parse_attr);
     }
 
     for my $attr ($resource_attr, $nodeid_attr, $dt_attr) {
       next unless $attr;
       $self->{onerror}->(type => 'attribute not allowed',
-                         level => $self->{grammer_level},
+                         level => $self->{level}->{rdf_grammer},
                          node => $attr);
       ## TODO: RDF Validator?
     }
@@ -653,14 +657,14 @@ sub convert_property_element ($$%) {
             $mode = 'resource';
           } else {
             $self->{onerror}->(type => 'element not allowed',
-                               level => $self->{grammer_level},
+                               level => $self->{level}->{rdf_grammer},
                                node => $cn);
             ## TODO: RDF Validator?
           }
         } else {
           ## TODO: What RDF Validator does?
           $self->{onerror}->(type => 'second node element',
-                             level => $self->{grammer_level},
+                             level => $self->{level}->{rdf_grammer},
                              node => $cn);
         }
       } elsif ($cn_type == $cn->TEXT_NODE or
@@ -674,7 +678,7 @@ sub convert_property_element ($$%) {
             $mode = 'literal';
           } else {
             $self->{onerror}->(type => 'character not allowed',
-                               level => $self->{grammer_level},
+                               level => $self->{level}->{rdf_grammer},
                                node => $cn);
             ## TODO: RDF Validator?
           }
@@ -694,7 +698,7 @@ sub convert_property_element ($$%) {
       for my $attr (@prop_attr, $resource_attr, $nodeid_attr, $dt_attr) {
         next unless $attr;
         $self->{onerror}->(type => 'attribute not allowed',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $attr);
         ## TODO: RDF Validator?
       }
@@ -713,7 +717,7 @@ sub convert_property_element ($$%) {
       for my $attr (@prop_attr, $resource_attr, $nodeid_attr) {
         next unless $attr;
         $self->{onerror}->(type => 'attribute not allowed',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $attr);
         ## TODO: RDF Validator?
       }
@@ -744,7 +748,7 @@ sub convert_property_element ($$%) {
       for my $attr ($dt_attr) {
         next unless $attr;
         $self->{onerror}->(type => 'attribute not allowed',
-                           level => $self->{grammer_level},
+                           level => $self->{level}->{rdf_grammer},
                            node => $attr);
         ## TODO: RDF Validator?
       }
@@ -762,15 +766,15 @@ sub convert_property_element ($$%) {
           $object = {uri => $uri_attr->($self, $resource_attr)};
           if (defined $nodeid_attr) {
             $self->{onerror}->(type => 'attribute not allowed',
-                               level => $self->{grammer_level},
+                               level => $self->{level}->{rdf_grammer},
                                node => $nodeid_attr);
              ## TODO: RDF Validator?
           }
         } elsif ($nodeid_attr) {
           my $id = $nodeid_attr->value;
           unless ($id =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
-            $self->{onerror}->(type => 'syntax error', ## TODO: type
-                               level => $self->{grammer_level},
+            $self->{onerror}->(type => 'XML 1.0 NCName:syntax error',
+                               level => $self->{level}->{rdf_grammer},
                                node => $self);
           }
           $object = {bnodeid => $get_bnodeid->($id)};
