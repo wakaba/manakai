@@ -2123,6 +2123,8 @@ $Element->{$HTML_NS}->{style} = {
 
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{text} = '';
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -5615,6 +5617,8 @@ $Element->{$HTML_NS}->{script} = {
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{text} = '';
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
