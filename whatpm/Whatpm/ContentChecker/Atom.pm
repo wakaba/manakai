@@ -47,8 +47,9 @@ my $GetAtomAttrsChecker = sub {
       } elsif ($attr_ln eq '') {
         #
       } else {
-        $self->{onerror}->(node => $attr, level => 'unsupported',
-                           type => 'attribute');
+        $self->{onerror}->(node => $attr,
+                           type => 'unknown attribute',
+                           level => $self->{level}->{uncertain});
         ## ISSUE: No comformance createria for unknown attributes in the spec
       }
 
@@ -67,11 +68,7 @@ my $AtomLanguageTagAttrChecker = sub {
   my $value = $attr->value;
   require Whatpm::LangTag;
   Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
-    my %opt = @_;
-    my $type = 'LangTag:'.$opt{type};
-    $type .= ':' . $opt{subtag} if defined $opt{subtag};
-    $self->{onerror}->(node => $attr, type => $type, value => $opt{value},
-                       level => $opt{level});
+    $self->{onerror}->(@_, node => $attr);
   });
   ## ISSUE: RFC 4646 (3066bis)?
 }; # $AtomLanguageTagAttrChecker
@@ -97,7 +94,9 @@ my %AtomTextConstruct = (
         $element_state->{type} = $value;
       } else {
         ## NOTE: IMT MUST NOT be used here.
-        $self->{onerror}->(node => $attr, type => 'keyword:invalid');
+        $self->{onerror}->(node => $attr,
+                           type => 'invalid attribute value',
+                           level => $self->{level}->{must});
       }
     }, # checked in |checker|
   }, {
@@ -109,7 +108,7 @@ my %AtomTextConstruct = (
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } else {
@@ -117,7 +116,7 @@ my %AtomTextConstruct = (
           $element_state->{type} eq 'html') { # MUST NOT
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed:atom|TextConstruct',
-                           level => $self->{must_level});
+                           level => $self->{level}->{must});
       } elsif ($element_state->{type} eq 'xhtml') {
         if ($child_nsuri eq q<http://www.w3.org/1999/xhtml> and
             $child_ln eq 'div') { # MUST
@@ -125,7 +124,7 @@ my %AtomTextConstruct = (
             $self->{onerror}
                 ->(node => $child_el,
                    type => 'element not allowed:atom|TextConstruct',
-                   level => $self->{must_level});
+                   level => $self->{level}->{must});
           } else {
             $element_state->{has_div} = 1;
             ## TODO: SHOULD be suitable for handling as HTML [XHTML10]
@@ -133,7 +132,7 @@ my %AtomTextConstruct = (
         } else {
           $self->{onerror}->(node => $child_el,
                              type => 'element not allowed:atom|TextConstruct',
-                             level => $self->{must_level});
+                             level => $self->{level}->{must});
         }
       } else {
         die "atom:TextConstruct type error: $element_state->{type}";
@@ -151,7 +150,7 @@ my %AtomTextConstruct = (
       if ($has_significant) {
         $self->{onerror}->(node => $child_node,
                            type => 'character not allowed:atom|TextConstruct',
-                           level => $self->{must_level});
+                           level => $self->{level}->{must});
       }
     } else {
       die "atom:TextConstruct type error: $element_state->{type}";
@@ -162,8 +161,9 @@ my %AtomTextConstruct = (
     if ($element_state->{type} eq 'xhtml') {
       unless ($element_state->{has_div}) {
         $self->{onerror}->(node => $item->{node},
-                           type => 'element missing:div',
-                           level => $self->{must_level});
+                           type => 'child element missing',
+                           text => 'div',
+                           level => $self->{level}->{must});
       }
     } elsif ($element_state->{type} eq 'html') {
       ## TODO: SHOULD be suitable for handling as HTML [HTML4]
@@ -187,7 +187,7 @@ my %AtomPersonConstruct = (
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq $ATOM_NS) {
@@ -196,7 +196,7 @@ my %AtomPersonConstruct = (
           $self->{onerror}
               ->(node => $child_el,
                  type => 'element not allowed:atom|PersonConstruct',
-                 level => $self->{must_level});
+                 level => $self->{level}->{must});
         } else {
           $element_state->{has_name} = 1;
         }
@@ -205,7 +205,7 @@ my %AtomPersonConstruct = (
           $self->{onerror}
               ->(node => $child_el,
                  type => 'element not allowed:atom|PersonConstruct',
-                 level => $self->{must_level});
+                 level => $self->{level}->{must});
         } else {
           $element_state->{has_uri} = 1;
         }
@@ -214,7 +214,7 @@ my %AtomPersonConstruct = (
           $self->{onerror}
               ->(node => $child_el,
                  type => 'element not allowed:atom|PersonConstruct',
-                 level => $self->{must_level});
+                 level => $self->{level}->{must});
         } else {
           $element_state->{has_email} = 1;
         }
@@ -222,13 +222,13 @@ my %AtomPersonConstruct = (
         $self->{onerror}
             ->(node => $child_el,
                type => 'element not allowed:atom|PersonConstruct',
-               level => $self->{must_level});
+               level => $self->{level}->{must});
       }
     } else {
       $self->{onerror}
           ->(node => $child_el,
              type => 'element not allowed:atom|PersonConstruct',
-             level => $self->{must_level});
+             level => $self->{level}->{must});
     }
     ## TODO: extension element
   },
@@ -237,7 +237,7 @@ my %AtomPersonConstruct = (
     if ($has_significant) {
       $self->{onerror}->(node => $child_node,
                          type => 'character not allowed:atom|PersonConstruct',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     }
   },
   check_end => sub {
@@ -245,8 +245,9 @@ my %AtomPersonConstruct = (
 
     unless ($element_state->{has_name}) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|name',
-                         level => $self->{must_level});
+                         type => 'child element missing:atom',
+                         text => 'name',
+                         level => $self->{level}->{must});
     }
 
     $AtomChecker{check_end}->(@_);
@@ -290,10 +291,7 @@ $Element->{$ATOM_NS}->{uri} = {
 
     ## NOTE: There MUST NOT be any white space.
     Whatpm::URIChecker->check_iri_reference ($element_state->{value}, sub {
-      my %opt = @_;
-      $self->{onerror}->(node => $item->{node}, level => $opt{level},
-                         type => 'URI::'.$opt{type}.
-                         (defined $opt{position} ? ':'.$opt{position} : ''));
+      $self->{onerror}->(@_, node => $item->{node});
     });
 
     $AtomChecker{check_end}->(@_);
@@ -314,7 +312,7 @@ $Element->{$ATOM_NS}->{email} = {
     ## TODO: addr-spec
     $self->{onerror}->(node => $item->{node},
                        type => 'addr-spec not supported',
-                       level => $self->{unsupported_level});
+                       level => $self->{level}->{uncertain});
 
     $AtomChecker{check_end}->(@_);
   },
@@ -345,35 +343,34 @@ my %AtomDateConstruct = (
 
       ## Check additional constraints described or referenced in
       ## comments of ABNF rules for |date-time|.
-      my $level = $self->{must_level};
       if (0 < $M and $M < 13) {      
         $self->{onerror}->(node => $node, type => 'datetime:bad day',
-                           level => $level)
+                           level => $self->{level}->{must})
             if $d < 1 or
                 $d > [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]->[$M];
         $self->{onerror}->(node => $node, type => 'datetime:bad day',
-                           level => $level)
+                           level => $self->{level}->{must})
             if $M == 2 and $d == 29 and
                 not ($y % 400 == 0 or ($y % 4 == 0 and $y % 100 != 0));
       } else {
         $self->{onerror}->(node => $node, type => 'datetime:bad month',
-                           level => $level);
+                           level => $self->{level}->{must});
       }
       $self->{onerror}->(node => $node, type => 'datetime:bad hour',
-                         level => $level) if $h > 23;
+                         level => $self->{level}->{must}) if $h > 23;
       $self->{onerror}->(node => $node, type => 'datetime:bad minute',
-                         level => $level) if $m > 59;
+                         level => $self->{level}->{must}) if $m > 59;
       $self->{onerror}->(node => $node, type => 'datetime:bad second',
-                         level => $level)
+                         level => $self->{level}->{must})
           if $s > 60; ## NOTE: Validness of leap seconds are not checked.
       $self->{onerror}->(node => $node, type => 'datetime:bad timezone hour',
-                         level => $level) if $zh > 23;
+                         level => $self->{level}->{must}) if $zh > 23;
       $self->{onerror}->(node => $node, type => 'datetime:bad timezone minute',
-                         level => $level) if $zm > 59;
+                         level => $self->{level}->{must}) if $zm > 59;
     } else {
       $self->{onerror}->(node => $item->{node},
                          type => 'datetime:syntax error',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     }
     ## NOTE: SHOULD be accurate as possible (cannot be checked)
 
@@ -393,7 +390,7 @@ $Element->{$ATOM_NS}->{entry} = {
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq $ATOM_NS) {
@@ -445,7 +442,8 @@ $Element->{$ATOM_NS}->{entry} = {
         $not_allowed = 1;
       }
       if ($not_allowed) {
-        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+        $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                           level => $self->{level}->{must});
       }
     } elsif ($child_nsuri eq $THR_NS and $child_ln eq 'in-reply-to') {
       ## ISSUE: Where |thr:in-reply-to| is allowed is not explicit;y
@@ -455,14 +453,15 @@ $Element->{$ATOM_NS}->{entry} = {
       #
     } else {
       ## TODO: extension element
-      $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
     }
   },
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       $self->{onerror}->(node => $child_node, type => 'character not allowed',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     }
   },
   check_end => sub {
@@ -493,8 +492,9 @@ $Element->{$ATOM_NS}->{entry} = {
         }
         
         $self->{onerror}->(node => $item->{node},
-                           type => 'element missing:atom|author',
-                           level => $self->{must_level});
+                           type => 'child element missing:atom',
+                           text => 'author',
+                           level => $self->{level}->{must});
       } # A
     }
 
@@ -506,27 +506,35 @@ $Element->{$ATOM_NS}->{entry} = {
 
     unless ($element_state->{has_element}->{id}) { # MUST
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|id');
+                         type => 'child element missing:atom',
+                         text => 'id',
+                         level => $self->{level}->{must});
     }
     unless ($element_state->{has_element}->{title}) { # MUST
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|title');
+                         type => 'child element missing:atom',
+                         text => 'title',
+                         level => $self->{level}->{must});
     }
     unless ($element_state->{has_element}->{updated}) { # MUST
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|updated');
+                         type => 'child element missing:atom',
+                         text => 'updated',
+                         level => $self->{level}->{must});
     }
     if (not $element_state->{has_element}->{content} and
         not $element_state->{has_element}->{'link.alternate'}) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|link|alternate');
+                         type => 'child element missing:atom:link:alternate',
+                         level => $self->{level}->{must});
     }
 
     if ($element_state->{require_summary} and
         not $element_state->{has_element}->{summary}) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|summary',
-                         level => $self->{must_level});
+                         type => 'child element missing:atom',
+                         text => 'summary',
+                         level => $self->{level}->{must});
     }
   },
 };
@@ -543,7 +551,7 @@ $Element->{$ATOM_NS}->{feed} = {
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq $ATOM_NS) {
@@ -597,18 +605,20 @@ $Element->{$ATOM_NS}->{feed} = {
       } else {
         $not_allowed = 1;
       }
-      $self->{onerror}->(node => $child_el, type => 'element not allowed')
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must})
           if $not_allowed;
     } else {
       ## TODO: extension element
-      $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
     }
   },
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       $self->{onerror}->(node => $child_node, type => 'character not allowed',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     }
   },
   check_end => sub {
@@ -617,8 +627,9 @@ $Element->{$ATOM_NS}->{feed} = {
     if ($element_state->{has_no_author_entry} and
         not $element_state->{has_element}->{author}) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|author',
-                         level => $self->{must_level});
+                         type => 'child element missing:atom',
+                         text => 'author',
+                         level => $self->{level}->{must});
       ## ISSUE: If there is no |atom:entry| element,
       ## there should be an |atom:author| element?
     }
@@ -627,19 +638,26 @@ $Element->{$ATOM_NS}->{feed} = {
 
     unless ($element_state->{has_element}->{id}) { # MUST
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|id');
+                         type => 'child element missing:atom',
+                         text => 'id',
+                         level => $self->{level}->{must});
     }
     unless ($element_state->{has_element}->{title}) { # MUST
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|title');
+                         type => 'child element missing:atom',
+                         text => 'title',
+                         level => $self->{level}->{must});
     }
     unless ($element_state->{has_element}->{updated}) { # MUST
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom|updated');
+                         type => 'element missing:atom',
+                         text => 'updated',
+                         level => $self->{level}->{must});
     }
     unless ($element_state->{has_element}->{'link.self'}) {
-      $self->{onerror}->(node => $item->{node}, level => 's',
-                         type => 'element missing:atom|link|self');
+      $self->{onerror}->(node => $item->{node}, 
+                         type => 'element missing:atom:link:self',
+                         level => $self->{level}->{should});
     }
 
     $AtomChecker{check_end}->(@_);
@@ -662,10 +680,7 @@ $Element->{$ATOM_NS}->{content} = {
 
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
-        my %opt = @_;
-        $self->{onerror}->(node => $item->{node}, level => $opt{level},
-                           type => 'URI::'.$opt{type}.
-                           (defined $opt{position} ? ':'.$opt{position} : ''));
+        $self->{onerror}->(@_, node => $item->{node});
       });
     },
     type => sub {
@@ -696,13 +711,11 @@ $Element->{$ATOM_NS}->{content} = {
           }
           require Whatpm::IMTChecker;
           Whatpm::IMTChecker->check_imt (sub {
-            my %opt = @_;
-            $self->{onerror}->(node => $attr, level => $opt{level},
-                               type => 'IMT:'.$opt{type});
+            $self->{onerror}->(@_, node => $attr);
           }, @type);
         } else {
           $self->{onerror}->(node => $attr, type => 'IMT:syntax error',
-                             level => $self->{must_level});
+                             level => $self->{level}->{must});
         }
       }
 
@@ -716,7 +729,7 @@ $Element->{$ATOM_NS}->{content} = {
         $value = 'mime_text';
       } elsif ($value =~ m!^(?>message|multipart)/!i) {
         $self->{onerror}->(node => $attr, type => 'IMT:composite',
-                           level => $self->{must_level});
+                           level => $self->{level}->{must});
         $item->{parent_state}->{require_summary} = 1;
       } else {
         $item->{parent_state}->{require_summary} = 1;
@@ -735,7 +748,7 @@ $Element->{$ATOM_NS}->{content} = {
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } else {
@@ -745,12 +758,12 @@ $Element->{$ATOM_NS}->{content} = {
         # MUST NOT
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed:atom|content',
-                           level => $self->{must_level});
+                           level => $self->{level}->{must});
       } elsif ($element_state->{type} eq 'xhtml') {
         if ($element_state->{has_div}) {
           $self->{onerror}->(node => $child_el,
                              type => 'element not allowed:atom|content',
-                             level => $self->{must_level});
+                             level => $self->{level}->{must});
         } else {
           ## TODO: SHOULD be suitable for handling as HTML [XHTML10]
           $element_state->{has_div} = 1;
@@ -760,7 +773,7 @@ $Element->{$ATOM_NS}->{content} = {
         if ($element_state->{has_src}) {
           $self->{onerror}->(node => $child_el,
                              type => 'element not allowed:atom|content',
-                             level => $self->{must_level});
+                             level => $self->{level}->{must});
         }
       } else {
         ## NOTE: Elements are not explicitly disallowed.
@@ -777,13 +790,13 @@ $Element->{$ATOM_NS}->{content} = {
     if ($has_significant) {
       if ($element_state->{has_src}) {
         $self->{onerror}->(node => $child_node,
-                           type => 'character not allowed',
-                           level => $self->{must_level});
+                           type => 'character not allowed:empty',
+                           level => $self->{level}->{must});
       } elsif ($element_state->{type} eq 'xhtml' or
                $element_state->{type} eq 'xml') {
         $self->{onerror}->(node => $child_node,
                            type => 'character not allowed:atom|content',
-                           level => $self->{must_level});
+                           level => $self->{level}->{must});
       }
     }
 
@@ -798,22 +811,24 @@ $Element->{$ATOM_NS}->{content} = {
     if ($element_state->{has_src}) {
       if (not $element_state->{has_type}) {
         $self->{onerror}->(node => $item->{node},
-                           type => 'attribute missing:type',
-                           level => $self->{should_level});
+                           type => 'attribute missing',
+                           text => 'type',
+                           level => $self->{level}->{should});
       } elsif ($element_state->{type} eq 'text' or
                $element_state->{type} eq 'html' or
                $element_state->{type} eq 'xhtml') {
         $self->{onerror}
             ->(node => $item->{node}->get_attribute_node_ns (undef, 'type'),
-               type => 'not IMT', level => $self->{must_level});
+               type => 'not IMT', level => $self->{level}->{must});
       }
     }
 
     if ($element_state->{type} eq 'xhtml') {
       unless ($element_state->{has_div}) {
         $self->{onerror}->(node => $item->{node},
-                           type => 'element missing:div',
-                           level => $self->{must_level});
+                           type => 'element missing',
+                           text => 'div',
+                           level => $self->{level}->{must});
       }
     } elsif ($element_state->{type} eq 'html') {
       ## TODO: SHOULD be suitable for handling as HTML [HTML4]
@@ -828,10 +843,10 @@ $Element->{$ATOM_NS}->{content} = {
       ## If no @src, this would normally mean it contains a 
       ## single child element that would serve as the root element.
       $self->{onerror}->(node => $item->{node},
-                         level => $self->{unsupported_level},
                          type => 'atom|content not supported',
-                         value => $item->{node}->get_attribute_ns
-                             (undef, 'type'));
+                         text => $item->{node}->get_attribute_ns
+                             (undef, 'type'),
+                         level => $self->{level}->{uncertain});
     } elsif ($element_state->{type} eq 'text' or
              $element_state->{type} eq 'mime-text') {
       #
@@ -842,10 +857,10 @@ $Element->{$ATOM_NS}->{content} = {
 
       ## NOTE: SHOULD be suitable for the indicated media type.
       $self->{onerror}->(node => $item->{node},
-                         level => $self->{unsupported_level},
                          type => 'atom|content not supported',
-                         value => $item->{node}->get_attribute_ns
-                             (undef, 'type'));
+                         text => $item->{node}->get_attribute_ns
+                             (undef, 'type'),
+                         level => $self->{level}->{uncertain});
     }
 
     $AtomChecker{check_end}->(@_);
@@ -863,10 +878,7 @@ $Element->{$ATOM_NS}->{category} = {
       my ($self, $attr) = @_;
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri ($attr->value, sub {
-        my %opt = @_;
-        $self->{onerror}->(node => $attr, level => $opt{level},
-                           type => 'URI::'.$opt{type}.
-                           (defined $opt{position} ? ':'.$opt{position} : ''));
+        $self->{onerror}->(@_, node => $attr);
       });
     },
     term => sub {
@@ -885,7 +897,9 @@ $Element->{$ATOM_NS}->{category} = {
     my ($self, $item, $element_state) = @_;
     unless ($element_state->{has_term}) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'attribute missing:term');
+                         type => 'attribute missing',
+                         text => 'term',
+                         level => $self->{level}->{must});
     }
 
     $AtomChecker{check_end}->(@_);
@@ -904,10 +918,7 @@ $Element->{$ATOM_NS}->{generator} = {
       my ($self, $attr) = @_;
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
-        my %opt = @_;
-        $self->{onerror}->(node => $attr, level => $opt{level},
-                           type => 'URI::'.$opt{type}.
-                           (defined $opt{position} ? ':'.$opt{position} : ''));
+        $self->{onerror}->(@_, node => $attr);
       });
       ## NOTE: Dereferencing SHOULD produce a representation
       ## that is relevant to the agent.
@@ -941,10 +952,7 @@ $Element->{$ATOM_NS}->{icon} = {
     ## NOTE: No MUST.
     ## NOTE: There MUST NOT be any white space.
     Whatpm::URIChecker->check_iri_reference ($element_state->{value}, sub {
-      my %opt = @_;
-      $self->{onerror}->(node => $item->{node}, level => $opt{level},
-                         type => 'URI::'.$opt{type}.
-                         (defined $opt{position} ? ':'.$opt{position} : ''));
+      $self->{onerror}->(@_, node => $item->{node});
     });
 
     ## NOTE: Image SHOULD be 1:1 and SHOULD be small
@@ -969,10 +977,7 @@ $Element->{$ATOM_NS}->{id} = {
 
     ## NOTE: There MUST NOT be any white space.
     Whatpm::URIChecker->check_iri ($element_state->{value}, sub {
-      my %opt = @_;
-      $self->{onerror}->(node => $item->{node}, level => $opt{level},
-                         type => 'URI::'.$opt{type}.
-                         (defined $opt{position} ? ':'.$opt{position} : ''));
+      $self->{onerror}->(@_, node => $item->{node});
     });
     ## TODO: SHOULD be normalized
 
@@ -1001,12 +1006,11 @@ my $AtomIMTAttrChecker = sub {
         }
         require Whatpm::IMTChecker;
         Whatpm::IMTChecker->check_imt (sub {
-          my %opt = @_;
-          $self->{onerror}->(node => $attr, level => $opt{level},
-                             type => 'IMT:'.$opt{type});
+          $self->{onerror}->(@_, node => $attr);
         }, @type);
       } else {
-        $self->{onerror}->(node => $attr, type => 'IMT:syntax error');
+        $self->{onerror}->(node => $attr, type => 'IMT:syntax error',
+                           level => $self->{level}->{must});
       }
 }; # $AtomIMTAttrChecker
 
@@ -1014,10 +1018,7 @@ my $AtomIRIReferenceAttrChecker = sub {
   my ($self, $attr) = @_;
   ## NOTE: There MUST NOT be any white space.
   Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
-    my %opt = @_;
-    $self->{onerror}->(node => $attr, level => $opt{level},
-                       type => 'URI::'.$opt{type}.
-                       (defined $opt{position} ? ':'.$opt{position} : ''));
+    $self->{onerror}->(@_, node => $attr);
   });
 }; # $AtomIRIReferenceAttrChecker
 
@@ -1036,10 +1037,7 @@ $Element->{$ATOM_NS}->{link} = {
 
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri ($value, sub {
-        my %opt = @_;
-        $self->{onerror}->(node => $attr, level => $opt{level},
-                           type => 'URI::'.$opt{type}.
-                           (defined $opt{position} ? ':'.$opt{position} : ''));
+        $self->{onerror}->(@_, node => $attr);
       });
 
       ## TODO: Warn if unregistered
@@ -1069,13 +1067,17 @@ $Element->{$ATOM_NS}->{link} = {
 
     unless ($item->{node}->has_attribute_ns (undef, 'href')) { # MUST
       $self->{onerror}->(node => $item->{node},
-                         type => 'attribute missing:href');
+                         type => 'attribute missing',
+                         text => 'href',
+                         level => $self->{level}->{must});
     }
 
     if ($item->{node}->rel eq $LINK_REL . 'enclosure' and
         not $item->{node}->has_attribute_ns (undef, 'length')) {
-      $self->{onerror}->(node => $item->{node}, level => 's',
-                         type => 'attribute missing:length');
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'length',
+                         level => $self->{level}->{should});
     }
   },
 };
@@ -1097,10 +1099,7 @@ $Element->{$ATOM_NS}->{logo} = {
 
     ## NOTE: There MUST NOT be any white space.
     Whatpm::URIChecker->check_iri_reference ($element_state->{value}, sub {
-      my %opt = @_;
-      $self->{onerror}->(node => $item->{node}, level => $opt{level},
-                         type => 'URI::'.$opt{type}.
-                         (defined $opt{position} ? ':'.$opt{position} : ''));
+      $self->{onerror}->(@_, node => $item->{node});
     });
     
     ## NOTE: Image SHOULD be 2:1
@@ -1123,7 +1122,7 @@ $Element->{$ATOM_NS}->{source} = {
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq $ATOM_NS) {
@@ -1173,18 +1172,20 @@ $Element->{$ATOM_NS}->{source} = {
         $not_allowed = 1;
       }
       if ($not_allowed) {
-        $self->{onerror}->(node => $child_el, type => 'element not allowed');
+        $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                           level => $self->{level}->{must});
       }
     } else {
       ## TODO: extension element
-      $self->{onerror}->(node => $child_el, type => 'element not allowed');
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
     }
   },
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       $self->{onerror}->(node => $child_node, type => 'character not allowed',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     }
   },
 };
@@ -1225,10 +1226,7 @@ $Element->{$THR_NS}->{'in-reply-to'} = {
       ## NOTE: Same as |atom:id|.
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri ($attr->value, sub {
-        my %opt = @_;
-        $self->{onerror}->(node => $attr, level => $opt{level},
-                           type => 'URI::'.$opt{type}.
-                           (defined $opt{position} ? ':'.$opt{position} : ''));
+        $self->{onerror}->(@_, node => $attr);
       });
 
       ## TODO: Check against ID guideline...
@@ -1249,8 +1247,9 @@ $Element->{$THR_NS}->{'in-reply-to'} = {
   
     unless ($element_state->{has_ref}) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'attribute missing:ref',
-                         level => $self->{must_level});
+                         type => 'attribute missing',
+                         text => 'ref',
+                         level => $self->{level}->{must});
     }
 
     $AtomChecker{check_end}->(@_);
@@ -1271,13 +1270,13 @@ $Element->{$THR_NS}->{total} = {
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } else {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     }
   },
   check_child_text => sub {
@@ -1290,8 +1289,8 @@ $Element->{$THR_NS}->{total} = {
     ## NOTE: xsd:nonNegativeInteger
     unless ($element_state->{value} =~ /\A(?>[0-9]+|-0+)\z/) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'syntax error', ## TODO: 
-                         level => $self->{must_level});
+                         type => 'invalid attribute value', 
+                         level => $self->{level}->{must});
     }
 
     $AtomChecker{check_end}->(@_);

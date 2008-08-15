@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.82 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.83 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -59,7 +59,7 @@ our $AttrChecker = {
         #
       } else {
         ## NOTE: An XML "error"
-        $self->{onerror}->(node => $attr, level => 'error',
+        $self->{onerror}->(node => $attr, level => $self->{level}->{xml_error},
                            type => 'invalid attribute value');
       }
     },
@@ -71,11 +71,7 @@ our $AttrChecker = {
       } else {
         require Whatpm::LangTag;
         Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
-          my %opt = @_;
-          my $type = 'LangTag:'.$opt{type};
-          $type .= ':' . $opt{subtag} if defined $opt{subtag};
-          $self->{onerror}->(node => $attr, type => $type,
-                             value => $opt{value}, level => $opt{level});
+          $self->{onerror}->(@_, node => $attr);
         });
       }
 
@@ -89,7 +85,8 @@ our $AttrChecker = {
       ## TODO: test data
 
       if ($attr->owner_document->manakai_is_html) { # MUST NOT
-        $self->{onerror}->(node => $attr, type => 'in HTML:xml:lang');
+        $self->{onerror}->(node => $attr, type => 'in HTML:xml:lang',
+                           level => $self->{level}->{must});
 ## TODO: Test data...
       }
     },
@@ -98,7 +95,9 @@ our $AttrChecker = {
       my $value = $attr->value;
       if ($value =~ /[^\x{0000}-\x{10FFFF}]/) { ## ISSUE: Should we disallow noncharacters?
         $self->{onerror}->(node => $attr,
-                           type => 'invalid attribute value');
+                           type => 'invalid attribute value',
+                           level => $self->{level}->{fact}, ## TODO: correct?
+                          );
       }
       ## NOTE: Conformance to URI standard is not checked since there is
       ## no author requirement on conformance in the XML Base specification.
@@ -111,9 +110,10 @@ our $AttrChecker = {
       $value =~ s/\x20$//;
       ## TODO: NCName in XML 1.0 or 1.1
       ## TODO: declared type is ID?
-      if ($self->{id}->{$value}) { ## NOTE: An xml:id error
-        $self->{onerror}->(node => $attr, level => 'error', 
-                           type => 'duplicate ID');
+      if ($self->{id}->{$value}) {
+        $self->{onerror}->(node => $attr,
+                           type => 'duplicate ID',
+                           level => $self->{level}->{xml_id_error});
         push @{$self->{id}->{$value}}, $attr;
       } else {
         $self->{id}->{$value} = [$attr];
@@ -127,21 +127,29 @@ our $AttrChecker = {
       my $value = $attr->value;
       if ($value eq $XML_NS and $ln ne 'xml') {
         $self->{onerror}
-          ->(node => $attr, level => 'NC',
-             type => 'Reserved Prefixes and Namespace Names:=xml');
+          ->(node => $attr,
+             type => 'Reserved Prefixes and Namespace Names:Name',
+             text => $value,
+             level => $self->{level}->{nc});
       } elsif ($value eq $XMLNS_NS) {
         $self->{onerror}
-          ->(node => $attr, level => 'NC',
-             type => 'Reserved Prefixes and Namespace Names:=xmlns');
+          ->(node => $attr,
+             type => 'Reserved Prefixes and Namespace Names:Name',
+             text => $value,
+             level => $self->{level}->{nc});
       }
       if ($ln eq 'xml' and $value ne $XML_NS) {
         $self->{onerror}
-          ->(node => $attr, level => 'NC',
-             type => 'Reserved Prefixes and Namespace Names:xmlns:xml=');
+          ->(node => $attr,
+             type => 'Reserved Prefixes and Namespace Names:Prefix',
+             text => $ln,
+             level => $self->{level}->{nc});
       } elsif ($ln eq 'xmlns') {
         $self->{onerror}
-          ->(node => $attr, level => 'NC',
-             type => 'Reserved Prefixes and Namespace Names:xmlns:xmlns=');
+          ->(node => $attr, 
+             type => 'Reserved Prefixes and Namespace Names:Prefix',
+             text => $ln,
+             level => $self->{level}->{nc});
       }
       ## TODO: If XML 1.0 and empty
     },
@@ -153,12 +161,16 @@ our $AttrChecker = {
       my $value = $attr->value;
       if ($value eq $XML_NS) {
         $self->{onerror}
-          ->(node => $attr, level => 'NC',
-             type => 'Reserved Prefixes and Namespace Names:=xml');
+          ->(node => $attr,
+             type => 'Reserved Prefixes and Namespace Names:Name',
+             text => $value,
+             level => $self->{level}->{nc});
       } elsif ($value eq $XMLNS_NS) {
         $self->{onerror}
-          ->(node => $attr, level => 'NC',
-             type => 'Reserved Prefixes and Namespace Names:=xmlns');
+          ->(node => $attr,
+             type => 'Reserved Prefixes and Namespace Names:Name',
+             text => $value,
+             level => $self->{level}->{nc});
       }
     },
   },
@@ -214,8 +226,9 @@ our %AnyChecker = (
       if ($checker) {
         $checker->($self, $attr);
       } else {
-        $self->{onerror}->(node => $attr, level => 'unsupported',
-                           type => 'attribute');
+        $self->{onerror}->(node => $attr,
+                           type => 'unknown attribute',
+                           level => $self->{level}->{uncertain});
       }
       $self->_attr_status_info ($attr, $status);
     }
@@ -226,7 +239,7 @@ our %AnyChecker = (
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } else {
@@ -249,8 +262,9 @@ our $ElementDefault = {
       ## NOTE: No "element not defined" error - it is not supported anyway.
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->{onerror}->(node => $item->{node}, level => 'unsupported',
-                       type => 'element');
+    $self->{onerror}->(node => $item->{node},
+                       type => 'unknown element',
+                       level => $self->{level}->{uncertain});
   },
 };
 
@@ -321,6 +335,19 @@ $Element->{q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>}->{RDF} = {
   },
 };
 
+my $default_error_level = {
+  must => 'm',
+  should => 's',
+  warn => 'w',
+  good => 'w',
+  info => 'i',
+  uncertain => 'u',
+
+  fact => 'm',
+  xml_error => 'm', ## TODO: correct?
+  nc => 'm', ## XML Namespace Constraints ## TODO: correct?
+};
+
 sub check_document ($$$;$) {
   my ($self, $doc, $onerror, $onsubdoc) = @_;
   $self = bless {}, $self unless ref $self;
@@ -329,19 +356,15 @@ sub check_document ($$$;$) {
     warn "A subdocument is not conformance-checked";
   };
 
-  $self->{must_level} = 'm';
-  $self->{fact_level} = 'm';
-  $self->{should_level} = 's';
-  $self->{good_level} = 'w';
-  $self->{info_level} = 'i';
-  $self->{unsupported_level} = 'u';
+  $self->{level} ||= $default_error_level;
 
   ## TODO: If application/rdf+xml, RDF/XML mode should be invoked.
 
   my $docel = $doc->document_element;
   unless (defined $docel) {
     ## ISSUE: Should we check content of Document node?
-    $onerror->(node => $doc, type => 'no document element');
+    $onerror->(node => $doc, type => 'no document element',
+               level => $self->{level}->{must});
     ## ISSUE: Is this non-conforming (to what spec)?  Or just a warning?
     return {
             class => {},
@@ -363,10 +386,12 @@ sub check_document ($$$;$) {
     unless ($doc->manakai_is_html) {
       #
     } else {
-      $onerror->(node => $docel, type => 'element not allowed:root:xml');
+      $onerror->(node => $docel, type => 'element not allowed:root:xml',
+                 level => $self->{level}->{must});
     }
   } else {
-    $onerror->(node => $docel, type => 'element not allowed:root');
+    $onerror->(node => $docel, type => 'element not allowed:root',
+               level => $self->{level}->{must});
   }
 
   ## TODO: Check for other items other than document element
@@ -384,14 +409,16 @@ sub check_document ($$$;$) {
       if (not $doc->manakai_has_bom and
           not defined $doc->manakai_charset) {
         unless ($charset->{is_html_ascii_superset}) {
-          $onerror->(node => $doc, level => $self->{must_level},
-                     type => 'non ascii superset:'.$charset_name);
+          $onerror->(node => $doc, level => $self->{level}->{must},
+                     type => 'non ascii superset',
+                     text => $charset_name);
         }
         
         if (not $self->{has_charset} and ## TODO: This does not work now.
             not $charset->{iana_names}->{'us-ascii'}) {
-          $onerror->(node => $doc, level => $self->{must_level},
-                     type => 'no character encoding declaration:'.$charset_name);
+          $onerror->(node => $doc, level => $self->{level}->{must},
+                     type => 'no character encoding declaration',
+                     text => $charset_name);
         }
       }
 
@@ -402,27 +429,34 @@ sub check_document ($$$;$) {
                $charset->{iana_names}->{'utf-32'} or ## ISSUE: UTF-32BE? UTF-32LE?
                $charset->{is_ebcdic_based}) {
         $onerror->(node => $doc,
-                   type => 'character encoding:'.$charset_name,
-                   level => $self->{should_level});
+                   type => 'bad character encoding',
+                   text => $charset_name,
+                   level => $self->{level}->{should},
+                   layer => 'encode');
       } elsif ($charset->{iana_names}->{'cesu-8'} or
                $charset->{iana_names}->{'utf-8'} or ## ISSUE: UNICODE-1-1-UTF-7?
                $charset->{iana_names}->{'bocu-1'} or
                $charset->{iana_names}->{'scsu'}) {
         $onerror->(node => $doc,
-                   type => 'character encoding:'.$charset_name,
-                   level => $self->{must_level});
+                   type => 'disallowed character encoding',
+                   text => $charset_name,
+                   level => $self->{level}->{must},
+                   layer => 'encode');
       } else {
         $onerror->(node => $doc,
-                   type => 'character encoding:'.$charset_name,
-                   level => $self->{good_level});
+                   type => 'non-utf-8 character encoding',
+                   text => $charset_name,
+                   level => $self->{level}->{good},
+                   layer => 'encode');
       }
     }
   } elsif ($doc->manakai_is_html) {
     ## NOTE: MUST and SHOULD requirements above cannot be tested,
     ## since the document has no input charset encoding information.
     $onerror->(node => $doc,
-               type => 'character encoding:',
-               level => 'unsupported');
+               type => 'character encoding unchecked',
+               level => $self->{level}->{info},
+               layer => 'encode');
   }
 
   return $return;
@@ -438,12 +472,7 @@ sub check_element ($$$;$) {
     warn "A subdocument is not conformance-checked";
   };
 
-  $self->{must_level} = 'm';
-  $self->{fact_level} = 'm';
-  $self->{should_level} = 's';
-  $self->{good_level} = 'w';
-  $self->{info_level} = 'i';
-  $self->{unsupported_level} = 'u';
+  $self->{level} ||= $default_error_level;
 
   $self->{plus_elements} = {};
   $self->{minus_elements} = {};
@@ -503,20 +532,20 @@ next unless $code;## TODO: temp.
             $eldef->{status} & FEATURE_STATUS_WD ? 'wd' : 'non-standard';
         $self->{onerror}->(node => $item->{node},
                            type => 'status:'.$status.':element',
-                           level => $self->{info_level});
+                           level => $self->{level}->{info});
       }
       if (not ($eldef->{status} & FEATURE_ALLOWED)) {
         $self->{onerror}->(node => $item->{node},
                            type => 'element not defined',
-                           level => $self->{must_level});
+                           level => $self->{level}->{must});
       } elsif ($eldef->{status} & FEATURE_DEPRECATED_SHOULD) {
         $self->{onerror}->(node => $item->{node},
                            type => 'deprecated:element',
-                           level => $self->{should_level});
+                           level => $self->{level}->{should});
       } elsif ($eldef->{status} & FEATURE_DEPRECATED_INFO) {
         $self->{onerror}->(node => $item->{node},
                            type => 'deprecated:element',
-                           level => $self->{info_level});
+                           level => $self->{level}->{info});
       }
 
       my @new_item;
@@ -623,7 +652,7 @@ next unless $code;## TODO: temp.
             if ($el eq $_->[1]->owner_element) {
               $self->{onerror}->(node => $_->[1],
                                  type => 'fragment points itself',
-                                 level => $self->{must_level});
+                                 level => $self->{level}->{must});
             }
             
             last F;
@@ -634,7 +663,7 @@ next unless $code;## TODO: temp.
       ## if the fragment identifier identifies no element?
 
       $self->{onerror}->(node => $_->[1], type => 'template:not template',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     } # F
   }
   
@@ -647,11 +676,11 @@ next unless $code;## TODO: temp.
       if ($self->{id}->{$_->[0]}->[0]->owner_element
               eq $_->[1]->owner_element) {
         $self->{onerror}->(node => $_->[1], type => 'fragment points itself',
-                           level => $self->{must_level});
+                           level => $self->{level}->{must});
       }
     } else {
       $self->{onerror}->(node => $_->[1], type => 'fragment points nothing',
-                         level => $self->{must_level});
+                         level => $self->{level}->{must});
     }
   }
 
@@ -659,13 +688,15 @@ next unless $code;## TODO: temp.
 
   for (@{$self->{usemap}}) {
     unless ($self->{map}->{$_->[0]}) {
-      $self->{onerror}->(node => $_->[1], type => 'no referenced map');
+      $self->{onerror}->(node => $_->[1], type => 'no referenced map',
+                         level => $self->{level}->{must});
     }
   }
 
   for (@{$self->{contextmenu}}) {
     unless ($self->{menu}->{$_->[0]}) {
-      $self->{onerror}->(node => $_->[1], type => 'no referenced menu');
+      $self->{onerror}->(node => $_->[1], type => 'no referenced menu',
+                         level => $self->{level}->{must});
     }
   }
 
@@ -736,15 +767,15 @@ sub _attr_status_info ($$$) {
   if (not ($status_code & FEATURE_ALLOWED)) {
     $self->{onerror}->(node => $attr,
                        type => 'attribute not defined',
-                       level => $self->{must_level});
+                       level => $self->{level}->{must});
   } elsif ($status_code & FEATURE_DEPRECATED_SHOULD) {
     $self->{onerror}->(node => $attr,
                        type => 'deprecated:attr',
-                       level => $self->{should_level});
+                       level => $self->{level}->{should});
   } elsif ($status_code & FEATURE_DEPRECATED_INFO) {
     $self->{onerror}->(node => $attr,
                        type => 'deprecated:attr',
-                       level => $self->{info_level});
+                       level => $self->{level}->{info});
   }
 
   my $status;
@@ -761,7 +792,7 @@ sub _attr_status_info ($$$) {
   }
   $self->{onerror}->(node => $attr,
                      type => 'status:'.$status.':attr',
-                     level => $self->{info_level});
+                     level => $self->{level}->{info});
 } # _attr_status_info
 
 sub _add_minuses ($@) {
@@ -924,4 +955,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/06/08 12:22:54 $
+# $Date: 2008/08/15 12:46:44 $
