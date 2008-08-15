@@ -114,7 +114,7 @@ while (<>) {
   }ge; # MUST
   s{!!!parse-error;}{q{$self->{parse_error}->();}}ge;
   s{!!!parse-error\s*\(}{
-    q{$self->{parse_error}->(level => $self->{must_level}, }
+    q{$self->{parse_error}->(level => $self->{level}->{must}, }
   }ge;
   s{!!!next-token;}{q{$token = $self->_get_next_token;}}ge;
   s{!!!back-token;}{
