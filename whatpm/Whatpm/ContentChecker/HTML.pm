@@ -457,7 +457,7 @@ my $HTMLURIAttrChecker = sub {
   my $value = $attr->value;
   Whatpm::URIChecker->check_iri_reference ($value, sub {
     $self->{onerror}->(@_, node => $attr);
-  });
+  }), $self->{level};
   $self->{has_uri_attr} = 1; ## TODO: <html manifest>
 
   my $attr_name = $attr->name;
@@ -479,7 +479,7 @@ my $HTMLSpaceURIsAttrChecker = sub {
   for my $value (split /[\x09-\x0D\x20]+/, $attr->value) {
     Whatpm::URIChecker->check_iri_reference ($value, sub {
       $self->{onerror}->(value => $value, @_, node => $attr, index => $i);
-    });
+    }, $self->{level});
 
     ## TODO: absolute
     push @{$self->{return}->{uri}->{$value} ||= []},
@@ -636,7 +636,7 @@ my $HTMLLanguageTagAttrChecker = sub {
   require Whatpm::LangTag;
   Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
     $self->{onerror}->(@_, node => $attr);
-  });
+  }, $self->{level});
   ## ISSUE: RFC 4646 (3066bis)?
 
   ## TODO: testdata
@@ -948,7 +948,7 @@ my $HTMLAttrChecker = {
       require Whatpm::LangTag;
       Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
         $self->{onerror}->(@_, node => $attr);
-      });
+      }, $self->{level});
     }
     ## ISSUE: RFC 4646 (3066bis)?
     unless ($attr->owner_document->manakai_is_html) {
@@ -1981,7 +1981,7 @@ $Element->{$HTML_NS}->{meta} = {
         if ($charset ne $ic_charset) {
           $self->{onerror}->(node => $attr,
                              type => 'mismatched charset name',
-                             text => $ic.
+                             text => $ic,
                              value => $charset_value,
                              level => $self->{level}->{must});
         }
@@ -2045,7 +2045,7 @@ $Element->{$HTML_NS}->{meta} = {
             ## ISSUE: Relative references are allowed? (RFC 3987 "IRI" is an absolute reference with optional fragment identifier.)
             Whatpm::URIChecker->check_iri_reference ($content, sub {
               $self->{onerror}->(value => $content, @_, node => $content_attr);
-            });
+            }, $self->{level});
             $self->{has_uri_attr} = 1; ## NOTE: One of "attributes with URIs".
 
             $element_state->{uri_info}->{content}->{node} = $content_attr;

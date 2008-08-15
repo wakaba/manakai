@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.84 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.85 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -72,7 +72,7 @@ our $AttrChecker = {
         require Whatpm::LangTag;
         Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
           $self->{onerror}->(@_, node => $attr);
-        });
+        }, $self->{level});
       }
 
       ## NOTE: "The values of the attribute are language identifiers
@@ -342,11 +342,19 @@ my $default_error_level = {
   warn => 'w',
   good => 'w',
   info => 'i',
+
   uncertain => 'u',
 
   html4_fact => 'm',
   xml_error => 'm', ## TODO: correct?
   nc => 'm', ## XML Namespace Constraints ## TODO: correct?
+
+  uri_syntax => 'm',
+  uri_fact => 'm',
+  uri_lc_must => 'm',
+  uri_lc_should => 'w',
+
+  langtag_fact => 'm',
 
   rdf_fact => 'm',
   rdf_grammer => 'm',
@@ -960,4 +968,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/08/15 14:13:42 $
+# $Date: 2008/08/15 16:02:02 $

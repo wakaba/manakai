@@ -145,6 +145,7 @@ sub convert_rdf_element ($$%) {
       next if $prefix =~ /^[Xx][Mm][Ll]/;
     } else {
       next if $attr->manakai_local_name =~ /^[Xx][Mm][Ll]/;
+      ## TODO: "ignored" warning...
     }
 
     $check_rdf_namespace->($self, $attr);
@@ -209,9 +210,10 @@ my $uri_attr = sub {
 
   my $abs_uri = $resolve->($attr->value, $attr);
 
+  ## TODO: check as RDF URI reference
   Whatpm::URIChecker->check_iri_reference ($abs_uri, sub {
     $self->{onerror}->(@_, node => $attr);
-  });
+  }, $self->{level});
 
   return $abs_uri;
 }; # $uri_attr
@@ -729,7 +731,7 @@ sub convert_property_element ($$%) {
             ->(subject => $opt{subject},
                predicate => {uri => $xuri},
                object => {value => $text,
-                          datatype => $uri_attr->$self, ($dt_attr->value)},
+                          datatype => $uri_attr->($self, $dt_attr)},
                ## ISSUE: No resolve() in the spec (but spec says that
                ## xml:base is applied also to rdf:datatype).
                node => $node,
@@ -808,6 +810,10 @@ sub convert_property_element ($$%) {
     }
   }
 } # convert_property_element
+
+## TODO: We need to normalize language tags into lowercase (see RDF abstract
+## syntax spec) before invoking callbak.  In addition, we need to validate
+## them against RFC 3066 (fact-level, referencing abstract syntax spec).
 
 1;
 

@@ -69,7 +69,7 @@ my $AtomLanguageTagAttrChecker = sub {
   require Whatpm::LangTag;
   Whatpm::LangTag->check_rfc3066_language_tag ($value, sub {
     $self->{onerror}->(@_, node => $attr);
-  });
+  }, $self->{level});
   ## ISSUE: RFC 4646 (3066bis)?
 }; # $AtomLanguageTagAttrChecker
 
@@ -292,7 +292,7 @@ $Element->{$ATOM_NS}->{uri} = {
     ## NOTE: There MUST NOT be any white space.
     Whatpm::URIChecker->check_iri_reference ($element_state->{value}, sub {
       $self->{onerror}->(@_, node => $item->{node});
-    });
+    }, $self->{level});
 
     $AtomChecker{check_end}->(@_);
   },
@@ -681,7 +681,7 @@ $Element->{$ATOM_NS}->{content} = {
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
         $self->{onerror}->(@_, node => $item->{node});
-      });
+      }, $self->{level});
     },
     type => sub {
       my ($self, $attr, $item, $element_state) = @_;
@@ -879,7 +879,7 @@ $Element->{$ATOM_NS}->{category} = {
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri ($attr->value, sub {
         $self->{onerror}->(@_, node => $attr);
-      });
+      }, $self->{level});
     },
     term => sub {
       my ($self, $attr, $item, $element_state) = @_;
@@ -919,7 +919,7 @@ $Element->{$ATOM_NS}->{generator} = {
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
         $self->{onerror}->(@_, node => $attr);
-      });
+      }, $self->{level});
       ## NOTE: Dereferencing SHOULD produce a representation
       ## that is relevant to the agent.
     },
@@ -953,7 +953,7 @@ $Element->{$ATOM_NS}->{icon} = {
     ## NOTE: There MUST NOT be any white space.
     Whatpm::URIChecker->check_iri_reference ($element_state->{value}, sub {
       $self->{onerror}->(@_, node => $item->{node});
-    });
+    }, $self->{level});
 
     ## NOTE: Image SHOULD be 1:1 and SHOULD be small
 
@@ -978,7 +978,7 @@ $Element->{$ATOM_NS}->{id} = {
     ## NOTE: There MUST NOT be any white space.
     Whatpm::URIChecker->check_iri ($element_state->{value}, sub {
       $self->{onerror}->(@_, node => $item->{node});
-    });
+    }, $self->{level});
     ## TODO: SHOULD be normalized
 
     $AtomChecker{check_end}->(@_);
@@ -1019,7 +1019,7 @@ my $AtomIRIReferenceAttrChecker = sub {
   ## NOTE: There MUST NOT be any white space.
   Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
     $self->{onerror}->(@_, node => $attr);
-  });
+  }, $self->{level});
 }; # $AtomIRIReferenceAttrChecker
 
 $Element->{$ATOM_NS}->{link} = {
@@ -1038,7 +1038,7 @@ $Element->{$ATOM_NS}->{link} = {
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri ($value, sub {
         $self->{onerror}->(@_, node => $attr);
-      });
+      }, $self->{level});
 
       ## TODO: Warn if unregistered
 
@@ -1100,7 +1100,7 @@ $Element->{$ATOM_NS}->{logo} = {
     ## NOTE: There MUST NOT be any white space.
     Whatpm::URIChecker->check_iri_reference ($element_state->{value}, sub {
       $self->{onerror}->(@_, node => $item->{node});
-    });
+    }, $self->{level});
     
     ## NOTE: Image SHOULD be 2:1
 
@@ -1227,7 +1227,7 @@ $Element->{$THR_NS}->{'in-reply-to'} = {
       ## NOTE: There MUST NOT be any white space.
       Whatpm::URIChecker->check_iri ($attr->value, sub {
         $self->{onerror}->(@_, node => $attr);
-      });
+      }, $self->{level});
 
       ## TODO: Check against ID guideline...
     },

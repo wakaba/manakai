@@ -1,9 +1,17 @@
 package Whatpm::LangTag;
 use strict;
 
-sub parse_rfc4646_langtag ($$$) {
+my $default_error_levels = {
+  langtag_fact => 'm',
+  must => 'm',
+  should => 's',
+  good => 'w',
+};
+
+sub parse_rfc4646_langtag ($$;$$) {
   my $tag = $_[1];
   my $onerror = $_[2] || sub { };
+  my $levels = $_[3] || $default_error_levels;
 
   my @tag = split /-/, $tag, -1;
 
@@ -29,8 +37,9 @@ sub parse_rfc4646_langtag ($$$) {
           delete $r{language};
           return \%r;
         } else {
-          $onerror->(type => 'syntax', subtag => 'language',
-                     value => $r{language});
+          $onerror->(type => 'langtag:language:syntax',
+                     value => $r{language},
+                     level => $levels->{langtag_fact});
         }
       }
     } elsif (length $r{language} <= 3) {
@@ -40,12 +49,14 @@ sub parse_rfc4646_langtag ($$$) {
     } elsif (length $r{language} <= 8) {
       #
     } else {
-      $onerror->(type => 'syntax', subtag => 'language',
-                 value => $r{language});
+      $onerror->(type => 'langtag:language:syntax',
+                 value => $r{language},
+                 level => $levels->{langtag_fact});
     }
   } else {
-    $onerror->(type => 'syntax', subtag => 'language',
-               value => $r{language});
+    $onerror->(type => 'langtag:language:syntax',
+               value => $r{language},
+               level => $levels->{langtag_fact});
   }
 
   if (defined $r{language}) {
@@ -67,8 +78,9 @@ sub parse_rfc4646_langtag ($$$) {
     while (@tag >= 2 and $tag[0] =~ /\A[A-WYZa-wyz0-9]\z/ and
            $tag[1] =~ /\A[A-Za-z0-9]{2,8}\z/) {
       if ($has_extension{$tag[0]}++) {
-        $onerror->(type => 'duplication', subtag => 'extension',
-                   value => $_);
+        $onerror->(type => 'langtag:extension:duplication',
+                   value => $tag[0],
+                   level => $levels->{must});
       }
       my $ext = [shift @tag => shift @tag];
       while (@tag and $tag[0] =~ /\A[A-Za-z0-9]{2,8}\z/) {
@@ -81,8 +93,9 @@ sub parse_rfc4646_langtag ($$$) {
   if (@tag >= 2 and $tag[0] =~ /\A[Xx]\z/) {
     for (@tag) {
       unless (/\A[A-Za-z0-9]{1,8}\z/) {
-        $onerror->(type => 'syntax', subtag => 'privateuse',
-                   value => $_);
+        $onerror->(type => 'langtag:privateuse:syntax',
+                   value => $_,
+                   level => $levels->{must}); # RFC 4646 Section 2.2.7.
       }
     }
     @{$r{privateuse}} = @tag;
@@ -101,8 +114,9 @@ sub parse_rfc4646_langtag ($$$) {
              };
     } else {
       for (@tag) {
-        $onerror->(type => 'syntax', subtag => 'illegal',
-                   value => $_);
+        $onerror->(type => 'langtag:illegal',
+                   value => $_,
+                   level => $levels->{langtag_fact});
       }
       push @{$r{illegal}}, @tag;
     }
@@ -111,14 +125,10 @@ sub parse_rfc4646_langtag ($$$) {
   return \%r;
 } # parse_rfc4646_langtag
 
-sub check_rfc3066_language_tag ($$$;%) {
+sub check_rfc3066_language_tag ($$;$$) {
   my $tag = $_[1];
   my $onerror = $_[2] || sub { };
-  my %opt = @_[3..$#_];
-  my $must_level = $opt{must_level} || 'm';
-  my $should_level = $opt{should_level} || 's';
-  my $fact_level = $opt{fact_level} || 'm';
-  my $good_level = $opt{good_level} || 'g';
+  my $levels = $_[3] || $default_error_levels;
 
   ## TODO: If ISO 639 and 3166 have strong recommendation
   ## for case of codes, bad-case-error should be $should_level.
@@ -131,22 +141,25 @@ sub check_rfc3066_language_tag ($$$;%) {
   my @tag = split /-/, $tag, -1;
 
   if ($tag[0] =~ /\A[0-9]+\z/) {
-    $onerror->(type => 'syntax', subtag => 'illegal',
-               value => $tag[0], level => $fact_level);
+    $onerror->(type => 'langtag:illegal',
+               value => $tag[0],
+               level => $levels->{langtag_fact});
   }
 
   for (@tag) {
     unless (/\A[A-Za-z0-9]{1,8}\z/) {
-      $onerror->(type => 'syntax', subtag => 'illegal',
-                 value => $_, level => $fact_level);
+      $onerror->(type => 'langtag:illegal',
+                 value => $_,
+                 level => $levels->{langtag_fact});
     }
   }
 
   if ($tag[0] =~ /\A[A-Za-z]{2}\z/) {
     ## TODO: ISO 639-1
     if ($tag[0] =~ /[A-Z]/) {
-      $onerror->(type => 'case', subtag => 'language',
-                 value => $tag[0], level => $good_level);
+      $onerror->(type => 'langtag:language:case',
+                 value => $tag[0],
+                 level => $levels->{good});
     }
   } elsif ($tag[0] =~ /\A[A-Za-z]{3}\z/) {
     ## TODO: ISO 639-2
@@ -154,38 +167,43 @@ sub check_rfc3066_language_tag ($$$;%) {
     ## TODO: MUST use 2-letter code if any
     ## TODO: MUST use /T code, if any, rather than /B code.
     if ($tag[0] =~ /\A[Uu][Nn][Dd]\z/) {
-      $onerror->(type => 'und', subtag => 'language',
-                 value => $tag[0], level => $should_level);
+      $onerror->(type => 'langtag:language:und',
+                 level => $levels->{should});
       ## NOTE: SHOULD NOT, unless the protocol in use forces to give a value.
     } elsif ($tag[0] =~ /\A[Mm][Uu][Ll]\z/) {
-      $onerror->(type => 'mul', subtag => 'language',
-                 value => $tag[0], level => $should_level);
+      $onerror->(type => 'langtag:language:mul',
+                 level => $levels->{should});
       ## NOTE: SHOULD NOT, if the protocol allows specifying multiple langs.
     }
   } elsif ($tag[0] =~ /\A[Ii]\z/) {
     #
   } elsif ($tag[0] =~ /\A[Xx]\z/) {
-    $onerror->(type => 'private',
-               value => $tag, level => $good_level);
+    $onerror->(type => 'langtag:private',
+               value => $tag,
+               level => $levels->{good});
   } else {
-    $onerror->(type => 'nosemantics', subtag => 'language',
-               value => $tag[0], level => $fact_level);
+    $onerror->(type => 'langtag:language:nosemantics',
+               value => $tag[0],
+               level => $levels->{langtag_fact});
   }
 
   if (@tag >= 1) {
     if ($tag[1] =~ /\A[0-9A-Za-z]{2}\z/) {
       ## TODO: ISO 3166
       if ($tag[1] =~ /[a-z]/) {
-        $onerror->(type => 'case', subtag => 'region',
-                   value => $tag[1], level => $good_level);
+        $onerror->(type => 'langtag:region:case',
+                   value => $tag[1],
+                   level => $levels->{good});
       }      
       if ($tag[1] =~ /\A(?>[Aa][Aa]|[Qq][M-Zm-z]|[Xx][A-Za-z]|[Zz][Zz])\z/) {
-        $onerror->(type => 'private', subtag => 'region',
-                   value => $tag[1], level => $must_level);
+        $onerror->(type => 'langtag:region:private',
+                   value => $tag[1],
+                   level => $levels->{must});
       }
     } elsif (length $tag[1] == 1) {
-      $onerror->(type => 'nosemantics', subtag => 'region',
-                 value => $tag[1], level => $fact_level);
+      $onerror->(type => 'langtag:region:nosemantics', 
+                 value => $tag[1],
+                 level => $levels->{langtag_fact});
     }
   }
 
