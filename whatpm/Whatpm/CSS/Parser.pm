@@ -3788,11 +3788,22 @@ $Prop->{cursor} = {
     F: {
       if ($t->{type} == IDENT_TOKEN) {
         my $v = lc $t->{value}; ## TODO: case
-        $t = $tt->get_next_token;
         if ($Prop->{$prop_name}->{keyword}->{$v}) {
           push @prop_value, ['KEYWORD', $v];
+          $t = $tt->get_next_token;
+          last F;
+        } elsif ($v eq 'hand' and
+                 $Prop->{$prop_name}->{keyword}->{pointer}) {
+          ## TODO: add test
+          $onerror->(type => 'CSS cursor hand',
+                     level => $self->{level}->{must}, # not valid <'cursor'>
+                     uri => \$self->{href},
+                     token => $t);
+          push @prop_value, ['KEYWORD', 'pointer'];
+          $t = $tt->get_next_token;
           last F;
         } elsif ($v eq 'inherit' and @prop_value == 1) {
+          $t = $tt->get_next_token;
           return ($t, {$prop_name => ['INHERIT']});
         } else {
           $onerror->(type => 'CSS syntax error', text => qq['$prop_name'],
@@ -6811,4 +6822,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/08/16 07:35:23 $
+## $Date: 2008/08/16 08:37:40 $
