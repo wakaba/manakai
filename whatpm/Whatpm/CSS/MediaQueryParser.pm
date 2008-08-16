@@ -1,12 +1,17 @@
 package Whatpm::CSS::MediaQueryParser;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Whatpm::CSS::Tokenizer qw(:token);
 
 sub new ($) {
-  my $self = bless {onerror => sub { },
-                    must_level => 'm', unsupported_level => 'u'}, shift;
+  my $self = bless {
+    onerror => sub { },
+    level => {
+      must => 'm',
+      uncertain => 'u',
+    },
+  }, shift;
   #$self->{href} = \(uri in which the MQ appears);
   return $self;
 } # new
@@ -40,7 +45,7 @@ sub parse_char_string ($$) {
 
   if ($t->{type} != EOF_TOKEN) {
     $self->{onerror}->(type => 'mq syntax error',
-                       level => $self->{must_level},
+                       level => $self->{level}->{must},
                        uri => \$self->{href},
                        token => $t);
     return undef;
@@ -74,7 +79,7 @@ sub _parse_mq_with_tokenizer ($$$) {
       } else {
         push @$r, [['#type', 'unknown']];
         $self->{onerror}->(type => 'unknown media type',
-                           level => $self->{unsupported_level},
+                           level => $self->{level}->{uncertain},
                            uri => \$self->{href},
                            token => $t);
       }
@@ -82,13 +87,13 @@ sub _parse_mq_with_tokenizer ($$$) {
     } elsif ($t->{type} == NUMBER_TOKEN or $t->{type} == DIMENSION_TOKEN) {
       push @$r, [['#type', 'unknown']];
       $self->{onerror}->(type => 'unknown media type',
-                         level => $self->{unsupported_level},
+                         level => $self->{level}->{uncertain},
                          uri => \$self->{href},
                          token => $t);
       $t = $tt->get_next_token;
     } else {
       $self->{onerror}->(type => 'mq syntax error',
-                         level => $self->{must_level},
+                         level => $self->{level}->{must},
                          uri => \$self->{href},
                          token => $t);    
       return ($t, undef);

@@ -1,26 +1,31 @@
 package Whatpm::CacheManifest;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::URI::URIReference;
 
-sub parse_byte_string ($$$$$) {
+sub parse_byte_string ($$$$;$$) {
   require Encode;
   my $s = Encode::decode ('utf-8', $_[1]);
   return $_[0]->_parse (\$s, $_[2], $_[3], $_[4] || sub {
     my %err = @_;
     warn $err{type}, "\n";
-  });
+  }, $_[5]);
 } # parse_byte_string
 
-sub parse_char_string ($$$$$) {
+sub parse_char_string ($$$$;$$) {
   return $_[0]->_parse (\($_[1]), $_[2], $_[3], $_[4] || sub {
     my %err = @_;
     warn $err{type}, "\n";
-  });
+  }, $_[5]);
 } # parse_char_string
 
-sub _parse ($$$$$) {
-  #my (undef, $input, $manifest_uri, $base_uri, $onerror) = @_;
+my $default_error_levels = {
+  must => 'm',
+  info => 'i',
+};
+
+sub _parse ($$$$$$) {
+  #my (undef, $input, $manifest_uri, $base_uri, $onerror, $levels) = @_;
 
   ## NOTE: A manifest MUST be labeled as text/cache-manifest.  (This should
   ## be checked in upper-level).
@@ -34,8 +39,8 @@ sub _parse ($$$$$) {
   my $m_scheme = $m_uri->uri_scheme;
 
   my $onerror = $_[4];
-  my $must_level = 'm';
-  my $warn_level = 'w';
+  my $levels = $_[5] || $default_error_levels;
+
   my $line_number = 1;
 
   ## Same origin with the manifest's URI
@@ -46,6 +51,7 @@ sub _parse ($$$$$) {
     ## 1. and 2.
     my $u1 = shift;
     #my $m_uri = $m_uri;
+
 
     ## 3.
     return 0 unless defined $u1->uri_authority;
@@ -97,7 +103,7 @@ sub _parse ($$$$$) {
 
   ## Step 8-10
   unless ($$input =~ /^CACHE MANIFEST[\x20\x09]*(?![^\x0D\x0A])/gc) {
-    $onerror->(type => 'not manifest', level => $must_level,
+    $onerror->(type => 'not manifest', level => $levels->{must},
                line => $line_number, column => 1); ## NOTE: MUST in syntax.
     return; ## Not a manifest.
   }
@@ -161,8 +167,9 @@ sub _parse ($$$$$) {
       my $uri = Message::DOM::DOMImplementation->create_uri_reference ($line);
 
       unless ($uri->is_iri_reference_3987) {
-        $onerror->(type => 'URI::syntax error:iriref3987',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'syntax error:iriref3987',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    value => $line);
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
@@ -171,8 +178,9 @@ sub _parse ($$$$$) {
 
       if (defined $uri->uri_fragment) {
         $uri->uri_fragment (undef);
-        $onerror->(type => 'URI fragment not allowed',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'URL fragment not allowed',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    value => $line);
         ## NOTE: MUST in writing section.
       }
@@ -180,7 +188,8 @@ sub _parse ($$$$$) {
       my $scheme = $uri->uri_scheme;
       unless (defined $scheme and $scheme eq $m_scheme) {
         $onerror->(type => 'different scheme from manifest',
-                   level => $warn_level, line => $line_number, column => 1,
+                   level => $levels->{info},
+                   line => $line_number, column => 1,
                    value => $uri->uri_reference);
         next START_OF_LINE;
       }
@@ -190,8 +199,9 @@ sub _parse ($$$$$) {
       my ($p1, $p2) = split /[\x20\x09]+/, $line, 2;
 
       unless (defined $p2) {
-        $onerror->(type => 'no fallback entry URI',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'no fallback entry URL',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    value => $line);
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
@@ -199,8 +209,9 @@ sub _parse ($$$$$) {
       my $u1 = Message::DOM::DOMImplementation->create_uri_reference ($p1);
 
       unless ($u1->is_iri_reference_3987) {
-        $onerror->(type => 'URI::syntax error:iriref3987',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'syntax error:iriref3987',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    index => 0, value => $p1);
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
@@ -208,24 +219,27 @@ sub _parse ($$$$$) {
       my $u2 = Message::DOM::DOMImplementation->create_uri_reference ($p2);
 
       unless ($u2->is_iri_reference_3987) {
-        $onerror->(type => 'URI::syntax error:iriref3987',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'syntax error:iriref3987',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    index => 1, value => $p2);
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
 
       if (defined $u1->uri_fragment) {
         $u1->uri_fragment (undef);
-        $onerror->(type => 'URI fragment not allowed',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'URL fragment not allowed',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    index => 0, value => $p1);
         ## NOTE: MUST in writing section.
       }
 
       if (defined $u2->uri_fragment) {
         $u2->uri_fragment (undef);
-        $onerror->(type => 'URI fragment not allowed',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'URL fragment not allowed',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    index => 1, value => $p2);
         ## NOTE: MUST in writing section.
       }
@@ -235,14 +249,16 @@ sub _parse ($$$$$) {
 
       if (exists $fallback_uris->{$u1->uri_reference}) {
         $onerror->(type => 'duplicate oc namespace',
-                   level => $must_level, line => $line_number, column => 1,
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    index => 0, value => $u1->uri_reference);
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
       
       unless ($same_origin->($u1)) {
-        $onerror->(type => 'different shp from manifest',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'different origin from manifest',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    index => 0, value => $u1->uri_reference);
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
@@ -250,7 +266,8 @@ sub _parse ($$$$$) {
       my $u2_scheme = $u2->uri_scheme;
       unless (defined $u2_scheme and $u2_scheme eq $m_scheme) {
         $onerror->(type => 'different scheme from manifest',
-                   level => $warn_level, line => $line_number, column => 1,
+                   level => $levels->{info},
+                   line => $line_number, column => 1,
                    index => 1, value => $u2->uri_reference);
         next START_OF_LINE;
       }
@@ -260,8 +277,9 @@ sub _parse ($$$$$) {
       my $uri = Message::DOM::DOMImplementation->create_uri_reference ($line);
 
       unless ($uri->is_iri_reference_3987) {
-        $onerror->(type => 'URI::syntax error:iriref3987',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'syntax error:iriref3987',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    value => $line);
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
@@ -270,8 +288,9 @@ sub _parse ($$$$$) {
 
       if (defined $uri->uri_fragment) {
         $uri->uri_fragment (undef);
-        $onerror->(type => 'URI fragment not allowed',
-                   level => $must_level, line => $line_number, column => 1,
+        $onerror->(type => 'URL fragment not allowed',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
                    value => $line);
         ## NOTE: MUST in writing section.
       }
@@ -279,7 +298,8 @@ sub _parse ($$$$$) {
       my $scheme = $uri->uri_scheme;
       unless (defined $scheme and $scheme eq $m_scheme) {
         $onerror->(type => 'different scheme from manifest',
-                   level => $warn_level, line => $line_number, column => 1,
+                   level => $levels->{info},
+                   line => $line_number, column => 1,
                    value => $uri->uri_reference);
         next START_OF_LINE;
       }
@@ -296,11 +316,12 @@ sub _parse ($$$$$) {
           $m_uri->uri_reference];
 } # _parse
 
-sub check_manifest ($$$) {
-  my (undef, $manifest, $onerror) = @_;
+sub check_manifest ($$$;$) {
+  my (undef, $manifest, $onerror, $levels) = @_;
 
   my $listed = {};
-  my $must_level = 'm';
+
+  $levels ||= $default_error_levels;
 
   require Whatpm::URIChecker;
 
@@ -309,18 +330,14 @@ sub check_manifest ($$$) {
     $listed->{$uri} = 1;
 
     Whatpm::URIChecker->check_iri_reference ($uri, sub {
-      my %opt = @_;
-      $onerror->(level => $opt{level}, value => $uri,
-                 index => $i,
-                 type => 'URI::'.$opt{type}.
-                 (defined $opt{position} ? ':'.$opt{position} : ''));
+      $onerror->(value => $uri, @_, index => $i);
     });
 
     ## ISSUE: Literal equivalence, right?
     if ($uri eq $manifest->[3]) {
-      $onerror->(level => $must_level, value => $uri,
+      $onerror->(level => $levels->{must}, value => $uri,
                  index => $i,
-                 type => 'manifest URI');
+                 type => 'same as manifest URL');
     }
 
     $i++;
@@ -328,16 +345,13 @@ sub check_manifest ($$$) {
 
   for my $uri1 (sort {$a cmp $b} keys %{$manifest->[1]}) {
     Whatpm::URIChecker->check_iri_reference ($uri1, sub {
-      my %opt = @_;
-      $onerror->(level => $opt{level}, index => 0, value => $uri1,
-                 type => 'URI::'.$opt{type}.
-                 (defined $opt{position} ? ':'.$opt{position} : ''));
+      $onerror->(value => $uri1, @_, index => 0);
     });
 
     if ($uri1 eq $manifest->[3]) {
-      $onerror->(level => $must_level, value => $uri1,
+      $onerror->(level => $levels->{must}, value => $uri1,
                  index => $i,
-                 type => 'manifest URI');
+                 type => 'same as manifest URL');
     }
 
     $i++;
@@ -346,17 +360,13 @@ sub check_manifest ($$$) {
     $listed->{$uri2} = 1;
 
     Whatpm::URIChecker->check_iri_reference ($uri2, sub {
-      my %opt = @_;
-      $onerror->(level => $opt{level}, index => 1, value => $uri2,
-                 index => $i,
-                 type => 'URI::'.$opt{type}.
-                 (defined $opt{position} ? ':'.$opt{position} : ''));
+      $onerror->(value => $uri2, @_, index => 1);
     });
 
     if ($uri2 eq $manifest->[3]) {
-      $onerror->(level => $must_level, value => $uri2,
+      $onerror->(level => $levels->{must}, value => $uri2,
                  index => $i,
-                 type => 'manifest URI');
+                 type => 'same as manifest URL');
     }
 
     $i++;
@@ -366,22 +376,18 @@ sub check_manifest ($$$) {
     if ($listed->{$uri}) {
       $onerror->(type => 'both in entries and whitelist',
                  index => $i,
-                 level => $must_level, value => $uri);
+                 level => $levels->{must}, value => $uri);
       ## NOTE: MUST in writing section.
     }
 
     Whatpm::URIChecker->check_iri_reference ($uri, sub {
-      my %opt = @_;
-      $onerror->(level => $opt{level}, value => $uri,
-                 index => $i,
-                 type => 'URI::'.$opt{type}.
-                 (defined $opt{position} ? ':'.$opt{position} : ''));
+      $onerror->(value => $uri, @_, index => $i);
     });
 
     if ($uri eq $manifest->[3]) {
-      $onerror->(level => $must_level, value => $uri,
+      $onerror->(level => $levels->{must}, value => $uri,
                  index => $i,
-                 type => 'manifest URI');
+                 type => 'same as manifest URL');
     }
 
     $i++;
@@ -399,4 +405,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/16 13:56:16 $
+# $Date: 2008/08/16 07:35:22 $

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.150 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.151 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4021,6 +4021,8 @@ sub _initialize_tree_constructor ($) {
   ## TODO: Turn mutation events off # MUST
   ## TODO: Turn loose Document option (manakai extension) on
   $self->{document}->manakai_is_html (1); # MUST
+  $self->{document}->set_user_data (manakai_source_line => 1);
+  $self->{document}->set_user_data (manakai_source_column => 1);
 } # _initialize_tree_constructor
 
 sub _terminate_tree_constructor ($) {
@@ -9510,4 +9512,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/15 08:32:41 $
+# $Date: 2008/08/16 07:35:23 $

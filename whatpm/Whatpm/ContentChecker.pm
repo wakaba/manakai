@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.85 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.86 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -422,14 +422,16 @@ sub check_document ($$$;$) {
       if (not $doc->manakai_has_bom and
           not defined $doc->manakai_charset) {
         unless ($charset->{is_html_ascii_superset}) {
-          $onerror->(node => $doc, level => $self->{level}->{must},
+          $onerror->(node => $doc,
+                     level => $self->{level}->{must},
                      type => 'non ascii superset',
                      text => $charset_name);
         }
         
         if (not $self->{has_charset} and ## TODO: This does not work now.
             not $charset->{iana_names}->{'us-ascii'}) {
-          $onerror->(node => $doc, level => $self->{level}->{must},
+          $onerror->(node => $doc,
+                     level => $self->{level}->{must},
                      type => 'no character encoding declaration',
                      text => $charset_name);
         }
@@ -968,4 +970,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/08/15 16:02:02 $
+# $Date: 2008/08/16 07:35:23 $
