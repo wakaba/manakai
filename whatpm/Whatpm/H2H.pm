@@ -164,8 +164,9 @@ sub _shift_token ($) {
           if ($line =~ s/^<([a-z0-9]+)\s*//) {
             my $tagname = $1;
             push @token, {type => 'start', value => $tagname};
-            while ($line =~ s/^([a-z-]+)\s*=\s*"([^"]*)"\s*//) {
-              push @token, {type => $1, value => $attrvalue->($2)};
+            while ($line =~ s/^([a-z-]+)\s*=\s*(?>"([^"]*)"|([^\s">]*))\s*//) {
+              push @token, {type => $1,
+                            value => $attrvalue->(defined $2 ? $2 : $3)};
             }
             $line =~ s#^/?\s*>##;
             push @token, {type => 'end', value => $tagname}
@@ -568,4 +569,4 @@ sub _construct_tree ($) {
 } # _construct_tree
 
 1;
-## $Date: 2007/08/05 09:24:56 $
+## $Date: 2008/08/17 05:09:12 $

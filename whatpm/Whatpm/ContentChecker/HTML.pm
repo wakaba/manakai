@@ -1154,11 +1154,11 @@ my %HTMLM12NCommonAttrStatus = (
 
 my %XHTML2CommonAttrStatus = (
   ## Core
-  class => FEATURE_XHTML2_ED,
-  id => FEATURE_XHTML2_ED,
+  class => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED,
+  id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED,
   #xml:id
   layout => FEATURE_XHTML2_ED,
-  title => FEATURE_XHTML2_ED,
+  title => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED,
 
   ## Hypertext
   cite => FEATURE_XHTML2_ED,
@@ -1175,7 +1175,7 @@ my %XHTML2CommonAttrStatus = (
   #xml:lang
 
   ## Bi-directional
-  dir => FEATURE_XHTML2_ED,
+  dir => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED,
 
   ## Edit
   edit => FEATURE_XHTML2_ED,
@@ -1206,10 +1206,10 @@ my %XHTML2CommonAttrStatus = (
   rev => FEATURE_XHTML2_ED,
 
   ## Role
-  role => FEATURE_XHTML2_ED,
+  role => FEATURE_HTML5_ROLE | FEATURE_XHTML2_ED,
 
   ## Style
-  style => FEATURE_XHTML2_ED, # "strongly discouraged"
+  style => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED, # "strongly discouraged"
 );
 
 my %HTMLM12NXHTML2CommonAttrStatus = (
