@@ -1,9 +1,23 @@
 package Whatpm::IMTChecker;
 use strict;
 
-## ISSUE: RFC 2046 is so poorly written specification that
-## what we should do is unclear...  It's even worse than
-## RFC 1521, which contains BNF rules for parameter values.
+## NOTE: RFC 2046 sucks, it is a poorly written specification such that
+## what we should do is not entirely clear and it does define almost nothing
+## from the today's viewpoint...  Suprisingly, it's even worse than
+## RFC 1521, the previous version of that specification, which does
+## contain BNF rules for parameter values at least.
+
+my $default_error_levels = {
+  must => 'm',
+  warn => 'w',
+  info => 'i',
+  uncertain => 'u',
+
+  mime_must => 'm', # lowercase "must"
+  mime_fact => 'm',
+  mime_strongly_discouraged => 'w',
+  mime_discouraged => 'w',
+};
 
 our $Type;
 
@@ -63,8 +77,8 @@ $Type->{text}->{subtype}->{plain} = {
 $Type->{text}->{subtype}->{html} = { # RFC 2854
   parameter => {
     charset => {registered => 1}, ## TODO: UTF-8 is preferred ## TODO: strongly recommended that it always be present ## NOTE: Syntax and range are not defined.
-    level => {obsolete => 1}, # RFC 1866
-    version => {obsolete => 1}, # HTML 3.0
+    level => {obsolete => 'mime_fact'}, # RFC 1866
+    version => {obsolete => 'mime_fact'}, # HTML 3.0
   },
   registered => 1,
 };
@@ -78,9 +92,11 @@ $Type->{text}->{subtype}->{javascript} = { # RFC 4329
   parameter => {
     charset => {syntax => 'mime-charset', registered => 1}, ## TODO: SHOULD be registered
     e4x => {checker => sub { # HTML5 (but informative?)
-      my ($value, $onerror) = @_;
+      my ($self, $value, $onerror) = @_;
       unless ($value eq '1') {
-        $onerror->(type => 'value syntax error:e4x', level => 'm');
+        $onerror->(type => 'e4x:syntax error',
+                   level => $self->{level}->{info},
+                   value => $value);
         ## NOTE: Whether values other than "1" is non-conformant
         ## or not is not defined actually...
       }
@@ -131,8 +147,9 @@ $Type->{video}->{subtype}->{'3gpp2'} = { # RFC 4393
 };
 $Type->{application}->{subtype}->{'octet-stream'} = {
   parameter => {
-    conversions => {obsolete => 1, registered => 1}, # RFC 1341 ## TODO: syntax
-    name => {obsolete => 1, registered => 1}, # RFC 1341
+    conversions => {obsolete => 'mime_fact',
+                    registered => 1}, # RFC 1341 ## TODO: syntax
+    name => {obsolete => 'mime_fact', registered => 1}, # RFC 1341
     padding => {registered => 1}, # RFC 2046
     type => {registered => 1}, # RFC 2046
   },
@@ -152,9 +169,11 @@ $Type->{application}->{subtype}->{ecmascript} = { # RFC 4329
 };
 $Type->{multipart}->{parameter}->{boundary} = {
   checker => sub {
-    my ($value, $onerror) = @_;
+    my ($self, $value, $onerror) = @_;
     if ($value !~ /\A[0-9A-Za-z'()+_,.\x2F:=?-]{0,69}[0-9A-Za-z'()+_,.\x2F:=?\x20-]\z/) {
-      $onerror->(type => 'value syntax error:boundary', level => 'm');
+      $onerror->(type => 'boundary:syntax error',
+                 level => $self->{level}->{mime_fact}, # TODO: correct?
+                 value => $value);
     }
   },
   required => 1,
@@ -183,16 +202,20 @@ $Type->{message}->{subtype}->{'external-body'} = {
   registered => 1,
 };
 
-our $MUSTLevel = 'm'; ## NOTE: RFC 2119 "MUST".
-our $StronglyDiscouragedLevel = 's'; ## NOTE: "strongly discouraged".
+sub new ($) {
+  my $self = bless {}, shift;
+
+  $self->{level} = $default_error_levels;
+
+  return $self;
+} # new
 
 sub check_imt ($$$$@) {
-  my (undef, $onerror, $type, $subtype, @parameter) = @_;
+  my $self = ref $_[0] ? shift : shift->new;
+  my ($onerror, $type, $subtype, @parameter) = @_;
 
   require Message::IMT::InternetMediaType;
   my $dom = Message::DOM::DOMImplementation->new;
-
-  local $Error::Depth = $Error::Depth + 1;
 
   my $imt = $dom->create_internet_media_type ($type, $subtype);
   while (@parameter) {
@@ -208,17 +231,24 @@ sub check_imt ($$$$@) {
   ## NOTE: RFC 2045 (MIME), RFC 2616 (HTTP/1.1), and RFC 4288 (IMT
   ## registration) have different requirements on type and subtype names.
   if ($type !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
-    $onerror->(type => 'type:syntax error:'.$type, level => $MUSTLevel);
+    $onerror->(type => 'IMT:type syntax error',
+               level => $self->{level}->{must}, # RFC 4288 4.2.
+               value => $type);
   }
   if ($subtype !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
-    $onerror->(type => 'subtype:syntax error:'.$subtype, level => $MUSTLevel);
+    $onerror->(type => 'IMT:subtype syntax error',
+               level => $self->{level}->{must}, # RFC 4288 4.2.
+               value => $subtype);
   }
 
   my $type_def = $Type->{$type};
   my $has_param;
 
   if ($type =~ /^x-/) {
-    $onerror->(type => 'private type', level => $StronglyDiscouragedLevel);
+    $onerror->(type => 'IMT:private type',
+               level => $self->{level}->{mime_strongly_discouraged},
+               value => $type); # RFC 2046 6.
+    ## NOTE: "discouraged" in RFC 4288 3.4.
   } elsif (not $type_def or not $type_def->{registered}) {
   #} elsif ($type_def and not $type_def->{registered}) {
     ## NOTE: Top-level type is seldom added.
@@ -228,27 +258,42 @@ sub check_imt ($$$$@) {
     ## is not an author requirement, but a requirement for media
     ## type specfication author and it does not restrict use of 
     ## unregistered value).
-    $onerror->(type => 'unregistered type', level => 'w');
+    $onerror->(type => 'IMT:unregistered type',
+               level => $self->{level}->{mime_must},
+               value => $type);
   }
 
   if ($type_def) {
     my $subtype_def = $type_def->{subtype}->{$subtype};
 
     if ($subtype =~ /^x[-\.]/) {
-      $onerror->(type => 'private subtype', level => 'w');
-      ## NOTE: "x." is discouraged in RFC 4288.
+      $onerror->(type => 'IMT:private subtype',
+                 level => $self->{level}->{mime_discouraged},
+                 value => $type . '/' . $subtype);
+      ## NOTE: "x." and "x-" are discouraged in RFC 4288 3.4.
     } elsif ($subtype_def and not $subtype_def->{registered}) {
       ## NOTE: RFC 2046 6. "Any format without a rigorous and public
       ## definition must be named with an "X-" prefix" (strictly, this
       ## is not an author requirement, but a requirement for media
       ## type specfication author and it does not restrict use of
       ## unregistered value).
-      $onerror->(type => 'unregistered subtype', level => 'w');
+      $onerror->(type => 'IMT:unregistered subtype',
+                 level => $self->{level}->{mime_must},
+                 value => $type . '/' . $subtype);
     }
     
     if ($subtype_def) {
+      ## NOTE: Semantics (including its relationship between conformance)
+      ## is not defined for the "intended usage" keywords of the IMT
+      ## registration template.
       if ($subtype_def->{obsolete}) {
-        $onerror->(type => 'obsolete subtype', level => 'w');
+        $onerror->(type => 'IMT:obsolete subtype',
+                   level => $self->{level}->{warn},
+                   value => $type . '/' . $subtype);
+      } elsif ($subtype_def->{limited_use}) {
+        $onerror->(type => 'IMT:limited use subtype',
+                   level => $self->{level}->{warn},
+                   value => $type . '/' . $subtype);        
       }
 
       for (0..$imt->parameter_length-1) {
@@ -256,8 +301,9 @@ sub check_imt ($$$$@) {
         my $value = $imt->get_value ($_);
 
         if ($attr !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
-          $onerror->(type => 'attribute:syntax error:'.$attr,
-                     level => $MUSTLevel);
+          $onerror->(type => 'IMT:attribute syntax error',
+                     level => $self->{level}->{mime_fact}, # RFC 4288 4.3.
+                     value => $attr);
         }
 
         $has_param->{$attr} = 1;
@@ -277,13 +323,21 @@ sub check_imt ($$$$@) {
               }
             }
             ## TODO: syntax |MIME date-time|
-            if ($param_def->{checker}) {
-              $param_def->{checker}->($value, $onerror);
-            }
-            if ($param_def->{obsolete}) {
-              ## TODO: error level
-              $onerror->(type => 'obsolete parameter:'.$attr, level => 'm');
-            }
+          } elsif ($param_def->{checker}) {
+            $param_def->{checker}->($self, $value, $onerror);
+          }
+           
+          if ($param_def->{obsolete}) {
+            $onerror->(type => 'IMT:obsolete parameter',
+                       level => $self->{level}->{$param_def->{obsolete}},
+                       value => $attr);
+            ## NOTE: The value of |$param_def->{obsolete}|, if it has a
+            ## true value, must be "mime_fact", which represents that
+            ## the parameter is defined in a previous version of the MIME
+            ## specification (or a related specification) and then
+            ## removed or marked as obsolete such that it seems that use of
+            ## that parameter is made non-conforming without using any
+            ## explicit statement on that fact.
           }
         }
         if (not $param_def or not $param_def->{registered}) {
@@ -291,13 +345,16 @@ sub check_imt ($$$$@) {
             ## NOTE: The parameter names SHOULD be fully specified for
             ## personal or vendor tree subtype [RFC 4288].  Therefore, there
             ## might be unknown parameters and still conforming.
-            $onerror->(type => 'parameter:'.$attr, level => 'unsupported');
+            $onerror->(type => 'IMT:unknown parameter',
+                       level => $self->{level}->{uncertain},
+                       value => $attr);
           } else {
             ## NOTE: The parameter names MUST be fully specified for
             ## standard tree.  Therefore, unknown parameter is non-conforming,
             ## unless it is standardized later.
-            $onerror->(type => 'parameter not allowed:'.$attr,
-                       level => $MUSTLevel);
+            $onerror->(type => 'IMT:parameter not allowed',
+                       level => $self->{level}->{mime_fact},
+                       value => $attr);
           }
         }
       }
@@ -305,23 +362,32 @@ sub check_imt ($$$$@) {
       for (keys %{$subtype_def->{parameter} or {}}) {
         if ($subtype_def->{parameter}->{$_}->{required} and
             not $has_param->{$_}) {
-          $onerror->(type => 'parameter missing:'.$_, level => 'm');
+          $onerror->(type => 'IMT:parameter missing',
+                     level => $self->{level}->{mime_fact},
+                     text => $_,
+                     value => $type . '/' . $subtype);
         }
       }
     } else {
-      $onerror->(type => 'subtype', level => 'unsupported');
+      ## NOTE: Since subtypes are frequently added to the IANAREG and such
+      ## that our database might be out-of-date, we don't raise an error
+      ## for an unknown subtype, instead we report an "uncertain" status.
+      $onerror->(type => 'IMT:unknown subtype',
+                 level => $self->{level}->{uncertain},
+                 value => $type . '/' . $subtype);
     }
 
     for (keys %{$type_def->{parameter} or {}}) {
       if ($type_def->{parameter}->{$_}->{required} and
           not $has_param->{$_}) {
-        $onerror->(type => 'parameter missing:'.$_, level => 'm');
+        $onerror->(type => 'IMT:parameter missing',
+                   level => $self->{level}->{mime_fact},
+                   text => $_,
+                   value => $type . '/' . $subtype);
       }
     }
-  } else {
-    $onerror->(type => 'type', level => 'unsupported');
   }
 } # check_imt
 
 1;
-## $Date: 2007/11/23 14:47:49 $
+## $Date: 2008/08/29 13:34:36 $

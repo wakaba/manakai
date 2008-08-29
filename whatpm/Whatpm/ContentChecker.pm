@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.86 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.87 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -353,6 +353,11 @@ my $default_error_level = {
   uri_fact => 'm',
   uri_lc_must => 'm',
   uri_lc_should => 'w',
+
+  mime_must => 'm', # lowercase "must"
+  mime_fact => 'm',
+  mime_strongly_discouraged => 'w',
+  mime_discouraged => 'w',
 
   langtag_fact => 'm',
 
@@ -970,4 +975,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/08/16 07:35:23 $
+# $Date: 2008/08/29 13:34:36 $

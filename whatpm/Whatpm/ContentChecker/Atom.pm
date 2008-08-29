@@ -710,7 +710,9 @@ $Element->{$ATOM_NS}->{content} = {
             }
           }
           require Whatpm::IMTChecker;
-          Whatpm::IMTChecker->check_imt (sub {
+          my $ic = Whatpm::IMTChecker->new;
+          $ic->{level} = $self->{level};
+          $ic->check_imt (sub {
             $self->{onerror}->(@_, node => $attr);
           }, @type);
         } else {
@@ -1005,7 +1007,9 @@ my $AtomIMTAttrChecker = sub {
           }
         }
         require Whatpm::IMTChecker;
-        Whatpm::IMTChecker->check_imt (sub {
+        my $ic = Whatpm::IMTChecker->new;
+        $ic->{level} = $self->{level};
+        $ic->check_imt (sub {
           $self->{onerror}->(@_, node => $attr);
         }, @type);
       } else {
