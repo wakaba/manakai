@@ -1,5 +1,13 @@
 2008-08-30  Wakaba  <wakaba@suika.fam.cx>
 
+	* URIChecker.pm: Set parameters representing where in the
+	value the error occurs for errors.  Report unknown
+	address format error in warning level, since address
+	formats are rarely added.  Path segments starting with "/.."
+	were misinterpreted as a dot-segment.
+
+2008-08-30  Wakaba  <wakaba@suika.fam.cx>
+
 	* URIChecker.pm (check_iri_reference): Requires
 	|Message::DOM::DOMImplementation|.
 

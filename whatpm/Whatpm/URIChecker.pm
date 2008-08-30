@@ -15,6 +15,7 @@ my $default_error_levels = {
 
   rdf_fact => 'm',
 
+  warn => 'w',
   uncertain => 'u',
 };
 
@@ -54,7 +55,9 @@ sub check_iri_reference ($$$;$) {
   pos ($uri_s) = 0;
   while ($uri_s =~ /%([a-f][0-9A-Fa-f]|[0-9A-F][a-f])/g) {
     $onerror->(type => 'URL:lowercase hexadecimal digit',
-               position => $-[0] + 1, level => $levels->{uri_lc_should});
+               level => $levels->{uri_lc_should},
+               value => $uri_s,
+               pos_start => $-[0], pos_end => $+[0] - 1);
     ## shoult not
   }
 
@@ -66,7 +69,9 @@ sub check_iri_reference ($$$;$) {
   pos ($uri_s) = 0;
   while ($uri_s =~ /%(2[DdEe]|4[1-9A-Fa-f]|5[AaFf]|6[1-9A-Fa-f]|7[AaEe])/g) {
     $onerror->(type => 'URL:percent-encoded unreserved',
-               position => $-[0] + 1, level => $levels->{uri_lc_should});
+               level => $levels->{uri_lc_should},
+               value => $uri_s,
+               pos_start => $-[0], pos_end => $+[0] - 1);
     ## should
     ## should
   }
@@ -83,7 +88,8 @@ sub check_iri_reference ($$$;$) {
     $scheme_canon =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'C', hex $1/ge;
     if ($scheme_canon =~ tr/A-Z/a-z/) {
       $onerror->(type => 'URL:uppercase scheme name',
-                 level => $levels->{uri_lc_should});
+                 level => $levels->{uri_lc_should},
+                 value => $scheme, value_mark => qr/[A-Z]+/);
       ## should
     }
   }
@@ -95,7 +101,8 @@ sub check_iri_reference ($$$;$) {
   my $ui = $uri_o->uri_userinfo;
   if (defined $ui and $ui =~ /:/) {
     $onerror->(type => 'URL:password', level => $levels->{uri_lc_should});
-    ## deprecated
+    # deprecated, should be considered an error
+    ## NOTE: We intentionally don't set |value| parameter.
   }
 
   ## RFC 3986 3.2.2., 6.2.2.1., RFC 3987 5.3.2.1.
@@ -103,44 +110,51 @@ sub check_iri_reference ($$$;$) {
   if (defined $host) {
     if ($host =~ /^\[([vV][0-9A-Fa-f]+)\./) {
       $onerror->(type => 'URL:address format',
-                 value => $1, level => $levels->{uncertain});
-    }
+                 level => $levels->{warn},
+                 text => $1,
+                 value => $host, pos_start => $-[1], pos_end => $+[1] - 1);
+      ## NOTE: No conformance creteria is defined for new address format,
+      ## nor is any standardization process.
+   }
     my $hostnp = $host;
     $hostnp =~ s/%([0-9A-Fa-f][0-9A-Fa-f])//g;
     if ($hostnp =~ /[A-Z]/) {
       $onerror->(type => 'URL:uppercase host',
                  level => $levels->{uri_lc_should},
-                 value => $host);
+                 value => $hostnp, value_mark => qr/[A-Z]+/);
       ## should
     }
       
     if ($host =~ /^\[/) {
       #
     } else {
-      $host = Encode::encode ('utf8', $host);
-      $host =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'C', hex $1/ge;
+      my $host_np = Encode::encode ('utf8', $host);
+      $host_np =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'C', hex $1/ge;
 
-      if ($host eq '') {
+      if ($host_np eq '') {
         ## NOTE: Although not explicitly mentioned, an empty host
         ## should be considered as an exception for the recommendation
         ## that a host "should" be a DNS name.
-      } elsif ($host !~ /\A(?>[A-Za-z0-9](?>[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?>\.(?>[A-Za-z0-9](?>[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*\.?\z/) {
+      } elsif ($host_np !~ /\A(?>[A-Za-z0-9](?>[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(?>\.(?>[A-Za-z0-9](?>[A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*\.?\z/) {
         $onerror->(type => 'URL:non-DNS host',
-                   level => $levels->{uri_lc_should});
+                   level => $levels->{uri_lc_should},
+                   value => $host_np);
         ## should
         ## should be IDNA encoding if wish to maximize interoperability
       } elsif (length $host > 255) {
         ## NOTE: This length might be incorrect if there were percent-encoded
         ## UTF-8 bytes; however, the above condition catches all non-ASCII.
         $onerror->(type => 'URL:long host',
-                   level => $levels->{uri_lc_should});
+                   level => $levels->{uri_lc_should},
+                   value => $host_np,
+                   pos_start => 256, pos_end => length $host);
         ## should
       }
       
       ## FQDN should be followed by "." if necessary --- untestable
       
       ## must be UTF-8
-      unless ($host =~ /\A(?>
+      unless ($host_np =~ /\A(?>
           [\x00-\x7F] |
           [\xC2-\xDF][\x80-\xBF] |                          # UTF8-2
           [\xE0][\xA0-\xBF][\x80-\xBF] |
@@ -152,7 +166,8 @@ sub check_iri_reference ($$$;$) {
           [\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF]           # UTF8-4
       )*\z/x) {
         $onerror->(type => 'URL:non UTF-8 host',
-                   level => $levels->{uri_lc_must});
+                   level => $levels->{uri_lc_must},
+                   value => $host); # not $host_np
         # must
       }
     }
@@ -164,12 +179,15 @@ sub check_iri_reference ($$$;$) {
     if ($port =~ /\A([0-9]+)\z/) {
       if ($DefaultPort->{$scheme_canon} == $1) {
         $onerror->(type => 'URL:default port',
-                   level => $levels->{uri_lc_should});
+                   level => $levels->{uri_lc_should},
+                   value => $port);
         ## should
       }
     } elsif ($port eq '') {
       $onerror->(type => 'URL:empty port',
-                 level => $levels->{uri_lc_should});
+                 level => $levels->{uri_lc_should},
+                 value => $uri_o->uri_authority,
+                 value_mark_end => 1);
       ## should
     }
   }
@@ -198,7 +216,7 @@ sub check_iri_reference ($$$;$) {
   my $path = $uri_o->uri_path;
   if (defined $scheme) {
     if (
-        $path =~ m!/\.\.! or
+        $path =~ m!/\.\./! or
         $path =~ m!/\./! or
         $path =~ m!/\.\.\z! or
         $path =~ m!/\.\z! or
@@ -208,7 +226,9 @@ sub check_iri_reference ($$$;$) {
         $path eq '.'
        ) {
       $onerror->(type => 'URL:dot-segment',
-                 level => $levels->{uri_lc_should});
+                 level => $levels->{uri_lc_should},
+                 value => $path,
+                 value_mark => qr[(?<=/)\.\.?(?=/|\z)|\A\.\.?(?=/|\z)]);
       ## should
     }
   }
@@ -218,7 +238,8 @@ sub check_iri_reference ($$$;$) {
   if (defined $authority) {
     if ($path eq '') {
       $onerror->(type => 'URL:empty path', 
-                 level => $levels->{uri_lc_should});
+                 level => $levels->{uri_lc_should},
+                 value => $uri_s);
       ## should
     }
   }
@@ -230,7 +251,8 @@ sub check_iri_reference ($$$;$) {
   if (defined $host and $host eq '' and
       (defined $ui or defined $port)) {
     $onerror->(type => 'URL:empty host',
-               level => $levels->{uri_lc_should});
+               level => $levels->{uri_lc_should},
+               value => $authority);
     ## should # when empty authority is allowed
   }
 
@@ -294,4 +316,4 @@ sub check_rdf_uri_reference ($$$;$) {
 } # check_rdf_uri_reference
 
 1;
-## $Date: 2008/08/30 04:31:57 $
+## $Date: 2008/08/30 05:31:38 $
