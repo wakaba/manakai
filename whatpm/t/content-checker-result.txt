@@ -1,7 +1,7 @@
 1..2646
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Aug 30 22:39:20 2008
-# Current time GMT:   Sat Aug 30 13:39:20 2008
+# Current time local: Sat Aug 30 23:35:45 2008
+# Current time GMT:   Sat Aug 30 14:35:45 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2626,12 +2626,12 @@ ok 2513
 ok 2514
 ok 2515
 ok 2516
-# t/content-model-5.dat
 ok 2517
 ok 2518
 ok 2519
 ok 2520
 ok 2521
+# t/content-model-5.dat
 ok 2522
 ok 2523
 ok 2524
@@ -2654,12 +2654,12 @@ ok 2540
 ok 2541
 ok 2542
 ok 2543
-# t/content-model-6.dat
 ok 2544
 ok 2545
 ok 2546
 ok 2547
 ok 2548
+# t/content-model-6.dat
 ok 2549
 ok 2550
 ok 2551
@@ -2671,12 +2671,12 @@ ok 2556
 ok 2557
 ok 2558
 ok 2559
-# t/table-1.dat
 ok 2560
 ok 2561
 ok 2562
 ok 2563
 ok 2564
+# t/table-1.dat
 ok 2565
 ok 2566
 ok 2567
@@ -2694,12 +2694,12 @@ ok 2578
 ok 2579
 ok 2580
 ok 2581
-# t/content-model-atom-1.dat
 ok 2582
 ok 2583
 ok 2584
 ok 2585
 ok 2586
+# t/content-model-atom-1.dat
 ok 2587
 ok 2588
 ok 2589
@@ -2741,8 +2741,13 @@ ok 2624
 ok 2625
 ok 2626
 ok 2627
-not ok 2628
-# Test 2628 got: "/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (t/ContentChecker.t at line 100 fail #2628)
+ok 2628
+ok 2629
+ok 2630
+ok 2631
+ok 2632
+not ok 2633
+# Test 2633 got: "/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (t/ContentChecker.t at line 100 fail #2633)
 #      Expected: "/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
 #<id>about:</id>
 #<author><name>x</name></author>
@@ -2751,8 +2756,8 @@ not ok 2628
 #<title>x</title>
 #<content type="image/png"/>
 #</entry>)
-not ok 2629
-# Test 2629 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;message/rfc822;u\n/entry;child element missing:atom;summary;m" (t/ContentChecker.t at line 100 fail #2629)
+not ok 2634
+# Test 2634 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;message/rfc822;u\n/entry;child element missing:atom;summary;m" (t/ContentChecker.t at line 100 fail #2634)
 #      Expected: "/entry/content/@type;IMT:composite;m\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
 #<id>about:</id>
 #<author><name>x</name></author>
@@ -2761,15 +2766,10 @@ not ok 2629
 #<title>x</title>
 #<content type="message/rfc822"/>
 #</entry>)
-ok 2630
-ok 2631
-ok 2632
-# t/content-model-atom-2.dat
-ok 2633
-ok 2634
 ok 2635
 ok 2636
 ok 2637
+# t/content-model-atom-2.dat
 ok 2638
 ok 2639
 ok 2640
@@ -2789,9 +2789,14 @@ ok 2653
 ok 2654
 ok 2655
 ok 2656
+ok 2657
+ok 2658
+ok 2659
+ok 2660
+ok 2661
 # t/content-model-atom-threading-1.dat
-not ok 2657
-# Test 2657 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/ContentChecker.t at line 100 fail #2657)
+not ok 2662
+# Test 2662 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/ContentChecker.t at line 100 fail #2662)
 #      Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2821,8 +2826,8 @@ not ok 2657
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 2658
-# Test 2658 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/ContentChecker.t at line 100 fail #2658)
+not ok 2663
+# Test 2663 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/ContentChecker.t at line 100 fail #2663)
 #      Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -2848,11 +2853,6 @@ not ok 2658
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 2659
-ok 2660
-ok 2661
-ok 2662
-ok 2663
 ok 2664
 ok 2665
 ok 2666
@@ -2862,3 +2862,8 @@ ok 2669
 ok 2670
 ok 2671
 ok 2672
+ok 2673
+ok 2674
+ok 2675
+ok 2676
+ok 2677

@@ -2,7 +2,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 2040 }
+BEGIN { plan tests => 2178 }
 
 use Whatpm::ContentType;
 
@@ -889,6 +889,13 @@ for my $v (
     q<text/plain>,
     q<text/html>,
   ],
+  [
+    qq<<svg xmlns="http://www.w3.org/2000/svg"></svg>>,
+    q<text/plain>, 0,
+    q<text/plain>, 'SVG document',
+    q<text/plain>,
+    q<text/html>,
+  ],
 ) {
   ## Text or binary
   my $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
@@ -944,8 +951,18 @@ for my $v (
   http_content_type_byte => 'text/html',
   supported_image_types => {'image/jpeg' => 1});
   ok $st, $v->[6], 'Feed or HTML: ' . $v->[4];
+
+  ## image/svg+xml is always treated as image/svg+xml
+  $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
+    return $v->[0];
+  },
+  http_content_type_byte => 'image/svg+xml',
+  supported_image_types => {});
+  ok $st, 'image/svg+xml', 'SVG: ' . $v->[4];
+
+  ## TODO: We should test image sniffing rules standalone actually...
 }
 
 ## License: Public Domain.
-## $Date: 2008/05/25 08:53:49 $
+## $Date: 2008/08/30 14:37:46 $
 1;

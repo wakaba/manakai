@@ -317,7 +317,7 @@ return unless $current_cell;
         for my $node (@{$current_cell->child_nodes}) {
           my $nt = $node->node_type;
           if ($nt == 3 or $nt == 4) { # TEXT_NODE / CDATA_SECTION_NODE
-            if ($node->data =~ /\P{Zs}/) { ## TOOD: non-Zs class
+            if ($node->data =~ /\P{WhiteSpace}/) {
               delete $cell->{is_empty};
               last;
             }
@@ -657,4 +657,4 @@ sub assign_header ($$;$$) {
 } # assign_header
 
 1;
-## $Date: 2008/08/15 14:13:42 $
+## $Date: 2008/08/30 14:37:46 $

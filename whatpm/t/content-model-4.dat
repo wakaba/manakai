@@ -203,6 +203,28 @@
 /p/dfn;no significant content;s
 
 #data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23 14:44:44Z</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23&#x3000;14:44:44Z</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23&#x0a;14:44:44Z</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-2314:44:44Z</time>
+#errors
+/time;dateortime:syntax error;m
+
+#data
+<time datetime="2008-12-23&#x3000;14:44:44Z" xmlns="http://www.w3.org/1999/xhtml">today</time>
+#errors
+/time/@datetime;dateortime:syntax error;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml">
 <a href="../../.." rel="up up up up">d</a>
 <a href="../.." rel="up up up">c</a>

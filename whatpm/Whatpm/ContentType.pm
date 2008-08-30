@@ -28,7 +28,7 @@ algorithm as defined in the HTML5 specification.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -270,14 +270,14 @@ sub get_sniffed_type ($%) {
     if ($opt{http_content_type_byte} =~ m#^$lws($token/$token)$lws(?>;$lws$token=(?>$token|"(?>[\x21\x23-\x5B\x5D-\x7E\x80-\xFF]|$lws|\\[\x00-\x7F])*")$lws)*\z#) {
       ## Strip parameters
       $official_type = $1;
-      $official_type =~ tr/A-Z/a-z/;
+      $official_type =~ tr/A-Z/a-z/; ## ASCII case-insensitive
     }
     ## If there is an error, no official type.
   } elsif (defined $official_type) {
     ## Strip parameters
     if ($official_type =~ m#^[\x09\x0A\x0D\x20]*([^/;,\s]+/[^/;,\s]+)#) {
       $official_type = $1;
-      $official_type =~ tr/A-Z/a-z/;
+      $official_type =~ tr/A-Z/a-z/; ## ASCII case-insensitive
     }
   }
 
@@ -344,6 +344,10 @@ sub get_sniffed_type ($%) {
     ## Content-Type sniffing: image
     ## <http://www.whatwg.org/specs/web-apps/current-work/#content-type6>
 
+    if ($official_type eq 'image/svg+xml') {
+      return ($official_type, $official_type);
+    }
+    
     my $bytes = substr $opt{get_file_head}->(8), 0, 8;
 
     ## Table
@@ -430,4 +434,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/05/25 08:53:48 $
+# $Date: 2008/08/30 14:37:46 $

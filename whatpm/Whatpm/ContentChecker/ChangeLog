@@ -1,5 +1,12 @@
 2008-08-30  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: Use White_Space instead of Zs for date or time
+	string in content (HTML5 revision 2094).  Make "YYYY-MM-DDHH:MM" (that
+	misses a white space or "T" literal between day and hour) 
+	not raise two errors.
+
+2008-08-30  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm: |xml:lang| attribute value must be same
 	as |lang| attribute value for HTML elements (HTML5 revision 2062
 	and so on).  |lang| attribute in XML document is no longer

@@ -3122,7 +3122,7 @@ $Element->{$HTML_NS}->{time} = {
       $input_node = $attr;
     } else {
       $input = $item->{node}->text_content;
-      $reg_sp = qr/\p{Zs}*/;
+      $reg_sp = qr/\p{WhiteSpace}*/;
       $input_node = $item->{node};
 
       ## ISSUE: What is the definition for "successfully extracts a date
@@ -3135,28 +3135,28 @@ $Element->{$HTML_NS}->{time} = {
     my $second;
     if ($input =~ /
       \A
-      [\x09-\x0D\x20]*
+      $reg_sp
       ([0-9]+) # 1
       (?>
         -([0-9]+) # 2
-        -([0-9]+) # 3
-        [\x09-\x0D\x20]*
+        -((?>[0-9]+)) # 3 # Use (?>) such that yyyy-mm-ddhh:mm does not match
+        $reg_sp
         (?>
           T
-          [\x09-\x0D\x20]*
+          $reg_sp
         )?
         ([0-9]+) # 4
         :([0-9]+) # 5
         (?>
           :([0-9]+(?>\.[0-9]*)?|\.[0-9]*) # 6
         )?
-        [\x09-\x0D\x20]*
+        $reg_sp
         (?>
           Z
-          [\x09-\x0D\x20]*
+          $reg_sp
         |
           [+-]([0-9]+):([0-9]+) # 7, 8
-          [\x09-\x0D\x20]*
+          $reg_sp
         )?
         \z
       |
@@ -3164,7 +3164,8 @@ $Element->{$HTML_NS}->{time} = {
         (?>
           :([0-9]+(?>\.[0-9]*)?|\.[0-9]*) # 10
         )?
-        [\x09-\x0D\x20]*\z
+        $reg_sp
+        \z
       )
     /x) {
       if (defined $2) { ## YYYY-MM-DD T? hh:mm
