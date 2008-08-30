@@ -3248,6 +3248,8 @@ $Element->{$HTML_NS}->{time} = {
 
 $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the value is to include it as contents of the element"
 ## TODO: value inequalities (HTML5 revision 1463)
+## TODO: content checking
+## TODO: content or value must contain number (rev 2053)
   status => FEATURE_HTML5_DEFAULT,
   %HTMLPhrasingContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6078,7 +6080,7 @@ $Element->{$HTML_NS}->{menu} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_HTML2X_RFC,
-    autosubmit => FEATURE_HTML5_WD,
+    autosubmit => FEATURE_HTML5_DROPPED,
     compat => FEATURE_M12N10_REC_DEPRECATED,
     label => FEATURE_HTML5_WD,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,

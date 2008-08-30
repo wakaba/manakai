@@ -226,7 +226,7 @@ sub form_table ($$$;$) {
     ## Step 2
     my $x_current = 0;
 
-    ## Step 3
+    ## Step 5
     my $tr = shift;
     $table->{row}->[$y_current] = {element => $tr};
     my @tdth = grep {
@@ -237,50 +237,50 @@ sub form_table ($$$;$) {
     } @{$tr->child_nodes};
     my $current_cell = shift @tdth;
 
-    ## Step 4
+    ## Step 3
     $growing_downward_growing_cells->();
 
-return unless $current_cell;
-## ISSUE: Support for empty <tr></tr> (removed at revision 1376).
+    ## Step 4
+    return unless $current_cell;
 
     CELL: while (1) {
-      ## Step 5: cells
+      ## Step 6: cells
       $x_current++
         while ($x_current < $x_width and
                $table->{cell}->[$x_current]->[$y_current]);
 
-      ## Step 6
+      ## Step 7
       $x_width++ if $x_current == $x_width;
 
-      ## Step 7
+      ## Step 8
       my $colspan = 1;
       my $attr_value = $current_cell->get_attribute_ns (undef, 'colspan');
       if (defined $attr_value and $attr_value =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
         $colspan = $1 || 1;
       }
       
-      ## Step 8
+      ## Step 9
       my $rowspan = 1;
       my $attr_value = $current_cell->get_attribute_ns (undef, 'rowspan');
       if (defined $attr_value and $attr_value =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
         $rowspan = $1;
       }
       
-      ## Step 9
+      ## Step 10
       my $cell_grows_downward;
       if ($rowspan == 0) {
         $cell_grows_downward = 1;
         $rowspan = 1;
       }
       
-      ## Step 10
+      ## Step 11
       if ($x_width < $x_current + $colspan) { 
         @column_generated_by[$_] = $current_cell
           for $x_width .. $x_current + $colspan - 1;
         $x_width = $x_current + $colspan;
       }
       
-      ## Step 11
+      ## Step 12
       if ($y_height < $y_current + $rowspan) {
         @row_generated_by[$_] = $current_cell
             for $y_height .. $y_current + $rowspan - 1;
@@ -288,7 +288,7 @@ return unless $current_cell;
         $y_max_node = $current_cell;
       }
       
-      ## Step 12
+      ## Step 13
       my $cell = {
                   is_header => ($current_cell->manakai_local_name eq 'th'),
                   element => $current_cell,
@@ -329,21 +329,21 @@ return unless $current_cell;
         ## NOTE: Entity references are not supported
       }
       
-      ## Step 13
+      ## Step 14
       if ($cell_grows_downward) {
         push @downward_growing_cells, [$cell, $x_current, $colspan];
       }
       
-      ## Step 14
+      ## Step 15
       $x_current += $colspan;
 
-      ## Step 15-17
+      ## Step 16-18
       $current_cell = shift @tdth;
       if (defined $current_cell) {
-        ## Step 16-17
+        ## Step 17-18
         #
       } else {
-        ## Step 15
+        ## Step 16
         $y_current++;
         last CELL;
       }
@@ -549,33 +549,33 @@ sub assign_header ($$;$$) {
             my $_x = $x + $header_width;
 
             ## 3.
+            my $_y = $y + $cell->{height}; # $cell->{height} == header_{height}
+
+            ## 4.
             HORIZONTAL: {
               last HORIZONTAL if $_x == $table->{width}; # goto Vertical
 
-              ## 4. # goto Vertical
+              ## 5. # goto Vertical
               last HORIZONTAL
                   if $table->{cell}->[$_x]->[$y] and
                       $table->{cell}->[$_x]->[$y]->[0] and # anchored
                       $table->{cell}->[$_x]->[$y]->[0]->{is_header};
 
-              ## 5.
+              ## 6.
               for my $_y ($y .. $y + $cell->{height} - 1) {
                 $assign_header->($table->{cell}->[$_x]->[$_y] => $x, $y);
               }
 
-              ## 6.
+              ## 7.
               $_x++;
 
-              ## 7.
+              ## 8.
               redo HORIZONTAL;
             } # HORIZONTAL
 
-            ## 8. Vertical
-            my $_y = $y + $cell->{height};
-
+            ## 9. Vertical
             VERTICAL: {
-              ## 9. # goto END
-              last VERTICAL if $_y == $table->{height};
+              last VERTICAL if $_y == $table->{height}; # goto END
 
               ## 10.
               if ($table->{cell}->[$x]->[$_y]) {
@@ -657,4 +657,4 @@ sub assign_header ($$;$$) {
 } # assign_header
 
 1;
-## $Date: 2008/08/30 14:37:46 $
+## $Date: 2008/08/30 15:14:32 $
