@@ -272,7 +272,6 @@ id=""><span id="">x</span></p>
 #data
 <p lang="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@lang;in XML:lang;m
 
 #data
 <p xml:lang="" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -281,7 +280,139 @@ id=""><span id="">x</span></p>
 #data html
 <!DOCTYPE HTML><title>x</title><p xml:lang="">x</p>
 #errors
-/html/body/p/@xml:lang;in HTML:xml:lang;m
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@xml:lang;xml:lang not allowed;m
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang lang>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang=ja lang=ja>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang=en lang=EN>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@lang;langtag:language:case;w
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang=En lang=en>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang=ja lang=en>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@xml:lang;xml:lang ne lang;m
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang="&#x130;t" lang=it>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@xml:lang;xml:lang ne lang;m
+
+#data html
+<!DOCTYPE HTML><title>x</title><p lang="&#x130;t" xml:lang=it>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@xml:lang;xml:lang ne lang;m
+/html/body/p/@lang;langtag:illegal;m
+/html/body/p/@lang;langtag:language:nosemantics;m
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang="&#x131;t" lang=it>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@xml:lang;xml:lang ne lang;m
+
+#data html
+<!DOCTYPE HTML><title>x</title><p lang="&#x131;t" xml:lang=it>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@xml:lang;xml:lang ne lang;m
+/html/body/p/@lang;langtag:illegal;m
+/html/body/p/@lang;langtag:language:nosemantics;m
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang=en- lang=en->x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@lang;langtag:illegal;m
+
+#data html
+<!DOCTYPE HTML><title>x</title><p xml:lang=en lang>x
+#errors
+/html/body/p/@xml:lang;in HTML:xml:lang;i
+/html/body/p/@xml:lang;xml:lang ne lang;m
+
+#data
+<p xml:lang="" lang="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p xml:lang="en" lang="EN" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@lang;langtag:language:case;w
+
+#data
+<p xml:lang="eN" lang="en" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@lang;langtag:language:case;w
+
+#data
+<p xml:lang="en" lang="ja" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@lang;xml:lang ne lang;m
+
+#data
+<p xml:lang="it" lang="&#x130;t" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@lang;xml:lang ne lang;m
+/p/@lang;langtag:illegal;m
+/p/@lang;langtag:language:nosemantics;m
+
+#data
+<p lang="it" xml:lang="&#x130;t" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@lang;xml:lang ne lang;m
+/p/@lang;langtag:illegal;m
+/p/@lang;langtag:language:nosemantics;m
+
+#data
+<p xml:lang="it" lang="&#x131;t" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@lang;xml:lang ne lang;m
+/p/@lang;langtag:illegal;m
+/p/@lang;langtag:language:nosemantics;m
+
+#data
+<p lang="it" xml:lang="&#x131;t" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@lang;xml:lang ne lang;m
+/p/@lang;langtag:illegal;m
+/p/@lang;langtag:language:nosemantics;m
+
+#data
+<p xml:lang="" lang="en" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@lang;xml:lang ne lang;m
+
+#data
+<p xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p lang="en" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
 
 #data
 <p dir="" xmlns="http://www.w3.org/1999/xhtml">x</p>

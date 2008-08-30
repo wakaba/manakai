@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.88 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.89 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -83,6 +83,24 @@ our $AttrChecker = {
       ## allowed today?
 
       ## TODO: test data
+
+      my $nsuri = $attr->owner_element->namespace_uri;
+      if (defined $nsuri and $nsuri eq $HTML_NS) {
+        my $lang_attr = $attr->owner_element->get_attribute_node_ns
+            (undef, 'lang');
+        if ($lang_attr) {
+          my $lang_attr_value = $lang_attr->value;
+          $lang_attr_value =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+          my $value = $value;
+          $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+          if ($lang_attr_value ne $value) {
+            ## NOTE: HTML5 Section "The |lang| and |xml:lang| attributes"
+            $self->{onerror}->(node => $attr,
+                               type => 'xml:lang ne lang',
+                               level => $self->{level}->{must});
+          }
+        }
+      }
 
       if ($attr->owner_document->manakai_is_html) { # MUST NOT
         $self->{onerror}->(node => $attr, type => 'in HTML:xml:lang',
@@ -179,6 +197,8 @@ our $AttrChecker = {
 ## ISSUE: Should we really allow these attributes?
 $AttrChecker->{''}->{'xml:space'} = $AttrChecker->{$XML_NS}->{space};
 $AttrChecker->{''}->{'xml:lang'} = $AttrChecker->{$XML_NS}->{lang};
+    ## NOTE: Checker for (null, "xml:lang") attribute is shadowed for
+    ## HTML elements in Whatpm::ContentChecker::HTML.
 $AttrChecker->{''}->{'xml:base'} = $AttrChecker->{$XML_NS}->{base};
 $AttrChecker->{''}->{'xml:id'} = $AttrChecker->{$XML_NS}->{id};
 
@@ -346,6 +366,8 @@ my $default_error_level = {
   uncertain => 'u',
 
   html4_fact => 'm',
+  html5_no_may => 'm',
+
   xml_error => 'm', ## TODO: correct?
   xml_id_error => 'm', ## TODO: ?
   nc => 'm', ## XML Namespace Constraints ## TODO: correct?
@@ -976,4 +998,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/08/30 10:26:39 $
+# $Date: 2008/08/30 12:33:36 $

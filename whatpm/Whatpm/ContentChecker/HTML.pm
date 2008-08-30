@@ -953,12 +953,12 @@ my $HTMLAttrChecker = {
       }, $self->{level});
     }
     ## ISSUE: RFC 4646 (3066bis)?
-    unless ($attr->owner_document->manakai_is_html) {
-      $self->{onerror}->(node => $attr, type => 'in XML:lang',
-                         level => $self->{level}->{must});
-    }
 
     ## TODO: test data
+
+    ## NOTE: Inconsistency between |lang| and |xml:lang| attributes are
+    ## non-conforming.  Such errors are detected by the checkers of
+    ## |{}xml:lang| and |{xml}:lang| attributes.
   },
   dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
   class => sub {
@@ -1061,6 +1061,40 @@ my $HTMLAttrChecker = {
   ## TODO: style [HTML5]
   tabindex => $HTMLIntegerAttrChecker,
   template => $HTMLRefOrTemplateAttrChecker,
+  'xml:lang' => sub {
+    my ($self, $attr) = @_;
+    
+    if ($attr->owner_document->manakai_is_html) {
+      $self->{onerror}->(type => 'in HTML:xml:lang',
+                         level => $self->{level}->{info},
+                         node => $attr);
+      ## NOTE: This is not an error, but the attribute will be ignored.
+    } else {
+      $self->{onerror}->(type => 'in XML:xml:lang',
+                         level => $self->{level}->{html5_no_may},
+                         node => $attr);
+      ## TODO: We need to add test for this error.
+    }
+    
+    my $lang_attr = $attr->owner_element->get_attribute_node_ns
+        (undef, 'lang');
+    if ($lang_attr) {
+      my $lang_attr_value = $lang_attr->value;
+      $lang_attr_value =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+      my $value = $attr->value;
+      $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+      if ($lang_attr_value ne $value) {
+        $self->{onerror}->(type => 'xml:lang ne lang',
+                           level => $self->{level}->{must},
+                           node => $attr);
+      }
+    } else {
+      $self->{onerror}->(type => 'xml:lang not allowed',
+                         level => $self->{level}->{must},
+                         node => $attr);
+      ## TODO: We need to add test for <x {xml}:lang {}xml:lang>.
+    }
+  },
   xmlns => sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
