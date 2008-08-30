@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.155 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.156 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -1540,7 +1540,13 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        !!!cp (82);
+        if ($self->{next_char} == 0x0022 or # "
+            $self->{next_char} == 0x0027) { # '
+          !!!cp (78);
+          !!!parse-error (type => 'bad attribute name');
+        } else {
+          !!!cp (82);
+        }
         $self->{current_attribute}
             = {name => chr ($self->{next_char}),
                value => '',
@@ -1575,6 +1581,7 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
+        !!!parse-error (type => 'empty unquoted attribute value');
         if ($self->{current_token}->{type} == START_TAG_TOKEN) {
           !!!cp (87);
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
@@ -7648,4 +7655,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/30 12:57:05 $
+# $Date: 2008/08/30 13:43:50 $

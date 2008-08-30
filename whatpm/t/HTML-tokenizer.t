@@ -30,6 +30,7 @@ BEGIN { plan tests => 1073 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
+$Data::Dumper::Sortkeys = 1;
 sub Data::Dumper::qquote {
   my $s = shift;
   $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
@@ -206,4 +207,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/06/01 06:47:12 $
+## $Date: 2008/08/30 13:43:50 $

@@ -1,5 +1,14 @@
 2008-08-30  Wakaba  <wakaba@suika.fam.cx>
 
+	* tokenizer-test-1.dat: '"' and "'" at the end of attribute
+	name (after another attribute) now raise parse error (HTML5
+	revision 2123).  Empty unquoted attribute is no
+	longer allowed (HTML5 revision 2122).
+
+	* HTML-tokenizer.t: Hash keys were not sorted when dumped.
+
+2008-08-30  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML-tree.dat: tree-test-3.dat added.
 
 	* tree-test-3.dat: Test data for definitionURL="" are added (cf.

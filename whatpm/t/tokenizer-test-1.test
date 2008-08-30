@@ -702,6 +702,34 @@
 "input": "<span =x\"=\"x\">",
 "output": ["ParseError", "ParseError", ["StartTag", "span", {"=x\"": "x"}]]},
 
+{"description": "bad attribute name (HTML5 revision 2123), '",
+"input": "<foo bar '>",
+"output": ["ParseError", ["StartTag", "foo", {"bar": "", "'": ""}]]},
+
+{"description": "bad attribute name (HTML5 revision 2123), \"",
+"input": "<foo bar \">",
+"output": ["ParseError", ["StartTag", "foo", {"bar": "", "\"": ""}]]},
+
+{"description": "bad attribute name (HTML5 revision 2123), 'x",
+"input": "<foo bar 'x>",
+"output": ["ParseError", ["StartTag", "foo", {"bar": "", "'x": ""}]]},
+
+{"description": "bad attribute name (HTML5 revision 2123), \"x",
+"input": "<foo bar \"x>",
+"output": ["ParseError", ["StartTag", "foo", {"bar": "", "\"x": ""}]]},
+
+{"description": "empty unquoted attribute value (HTML5 revision 2122)",
+"input": "<foo bar=>",
+"output": ["ParseError", ["StartTag", "foo", {"bar": ""}]]},
+
+{"description": "empty unquoted attribute value (HTML5 revision 2122)",
+"input": "</foo bar=>",
+"output": ["ParseError", "ParseError", ["EndTag", "foo"]]},
+
+{"description": "empty unquoted attribute value followed by another attr",
+"input": "<foo bar= baz=>",
+"output": ["ParseError", ["StartTag", "foo", {"bar": "baz="}]]},
+
 {"description":"&\"",
 "input": "&\"",
 "output": ["ParseError", ["Character", "&\""]]},
@@ -853,7 +881,7 @@
 
 {"description": "<a a=>",
 "input": "<a a=>",
-"output": [["StartTag", "a", {"a": ""}]]},
+"output": ["ParseError", ["StartTag", "a", {"a": ""}]]},
 
 {"description": "end tag attribute (before attribute, >)",
 "input": "</p class=\"\"  >",
@@ -889,7 +917,7 @@
 
 {"description": "end tag attribute (before attribute value)",
 "input": "</p class=>",
-"output": ["ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
 
 {"description": "end tag not closed (before attribute value)",
 "input": "</p class=",
