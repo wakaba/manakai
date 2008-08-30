@@ -38,7 +38,7 @@ sub check_iri_reference ($$$;$) {
   my $onerror = $_[2];
   my $levels = $_[3] || $default_error_levels;
 
-  require Message::URI::URIReference;
+  require Message::DOM::DOMImplementation;
   my $dom = Message::DOM::DOMImplementation->new;
   my $uri_o = $dom->create_uri_reference ($_[1]);
   my $uri_s = $uri_o->uri_reference;
@@ -294,4 +294,4 @@ sub check_rdf_uri_reference ($$$;$) {
 } # check_rdf_uri_reference
 
 1;
-## $Date: 2008/08/15 16:02:02 $
+## $Date: 2008/08/30 04:31:57 $

@@ -22,99 +22,99 @@ my $Cases = [
   },
   {
     data => q<%7Fabc:efg>,
-    errors => ['m::syntax error'],
+    errors => ['m::syntax error:iriref3987'],
   },
   {
     data => q<http://test/[53::0]>,
-    errors => ['m::syntax error'],
+    errors => ['m::syntax error:iriref3987'],
   },
   {
     data => q<100%!>,
-    errors => ['m::syntax error'],
+    errors => ['m::syntax error:iriref3987'],
   },
   {
     data => q<%a2>,
-    errors => ['s:1:lowercase hexadecimal digit'],
+    errors => ['w:1:URL:lowercase hexadecimal digit'],
   },
   {
     data => q<%a2?>,
-    errors => ['s:1:lowercase hexadecimal digit'],
+    errors => ['w:1:URL:lowercase hexadecimal digit'],
   },
   {
     data => q<?%a2>,
-    errors => ['s:2:lowercase hexadecimal digit'],
+    errors => ['w:2:URL:lowercase hexadecimal digit'],
   },
   {
     data => q<%a2%1b>,
-    errors => ['s:1:lowercase hexadecimal digit',
-               's:4:lowercase hexadecimal digit'],
+    errors => ['w:1:URL:lowercase hexadecimal digit',
+               'w:4:URL:lowercase hexadecimal digit'],
   },
   {
     data => q<http://%5b/>,
-    errors => ['s:8:lowercase hexadecimal digit',
-               's::non-DNS host'],
+    errors => ['w:8:URL:lowercase hexadecimal digit',
+               'w::URL:non-DNS host'],
   },
   {
     data => q<http://%5b/%25a/bv/%cc>,
-    errors => ['s:8:lowercase hexadecimal digit',
-               's:20:lowercase hexadecimal digit',
-               's::non-DNS host'],
+    errors => ['w:8:URL:lowercase hexadecimal digit',
+               'w:20:URL:lowercase hexadecimal digit',
+               'w::URL:non-DNS host'],
   },
   {
     data => q<%41>,
-    errors => ['s:1:percent-encoded unreserved'],
+    errors => ['w:1:URL:percent-encoded unreserved'],
   },
   {
     data => q<%41%7E>,
-    errors => ['s:1:percent-encoded unreserved',
-               's:4:percent-encoded unreserved'],
+    errors => ['w:1:URL:percent-encoded unreserved',
+               'w:4:URL:percent-encoded unreserved'],
   },
   {
     data => q</%41>,
-    errors => ['s:2:percent-encoded unreserved'],
+    errors => ['w:2:URL:percent-encoded unreserved'],
   },
   {
     data => q<http://%5a/>,
-    errors => ['s:8:lowercase hexadecimal digit',
-               's:8:percent-encoded unreserved'],
+    errors => ['w:8:URL:lowercase hexadecimal digit',
+               'w:8:URL:percent-encoded unreserved'],
   },
   {
     data => q<./%2E%2E>,
-    errors => ['s:3:percent-encoded unreserved',
-               's:6:percent-encoded unreserved'],
+    errors => ['w:3:URL:percent-encoded unreserved',
+               'w:6:URL:percent-encoded unreserved'],
   },
   {
     data => q<http://www.example.com/%7Euser/>,
-    errors => ['s:24:percent-encoded unreserved'],
+    errors => ['w:24:URL:percent-encoded unreserved'],
   },
   {
     data => q<HTTP://example/>,
-    errors => ['s::uppercase scheme name'],
+    errors => ['w::URL:uppercase scheme name'],
   },
   {
     data => q<Http://example/>,
-    errors => ['s::uppercase scheme name'],
+    errors => ['w::URL:uppercase scheme name'],
   },
   {
     data => q<datA:,>,
-    errors => ['s::uppercase scheme name'],
+    errors => ['w::URL:uppercase scheme name'],
   },
   {
     data => q<dat%41:,>,
-    errors => ['m::syntax error',
-               's::uppercase scheme name',
-               's:4:percent-encoded unreserved'],
+    errors => ['m::syntax error:iriref3987',
+               'w::URL:uppercase scheme name',
+               'w:4:URL:percent-encoded unreserved'],
   },
   {
     data => q<g%5A:,>,
-    errors => ['m::syntax error',
-               's::uppercase scheme name',
-               's:2:percent-encoded unreserved'],
+    errors => ['m::syntax error:iriref3987',
+               'w::URL:uppercase scheme name',
+               'w:2:URL:percent-encoded unreserved'],
   },
   {
     data => q<g%7A:,>,
-    errors => ['m::syntax error',
-               's:2:percent-encoded unreserved'],
+    errors => ['m::syntax error:iriref3987',
+               'w:2:URL:percent-encoded unreserved'],
   },
   {
     data => q<http://www.test:2222/>,
@@ -126,19 +126,19 @@ my $Cases = [
   },
   {
     data => q<http://www@example:/>,
-    errors => ['s::empty port'],
+    errors => ['w::URL:empty port'],
   },
   {
     data => q<http://www.test:/>,
-    errors => ['s::empty port'],
+    errors => ['w::URL:empty port'],
   },
   {
     data => q<http://user:password@example/>,
-    errors => ['s::password'],
+    errors => ['w::URL:password'],
   },
   {
     data => q<http://EXAMPLE/>,
-    errors => ['s::uppercase host'],
+    errors => ['w::URL:uppercase host:EXAMPLE'],
   },
   {
     data => q<http://USER@example/>,
@@ -146,16 +146,16 @@ my $Cases = [
   },
   {
     data => q<http://[v0.aaa]/>,
-    errors => ['unsupported::address format not supported:v0'],
+    errors => ['u::URL:address format:v0'],
   },
   {
     data => q<http://user@[v0.aaa]/>,
-    errors => ['unsupported::address format not supported:v0'],
+    errors => ['u::URL:address format:v0'],
   },
   {
     data => q<http://user@[V0A.aaa]/>,
-    errors => ['unsupported::address format not supported:V0A',
-               's::uppercase host'],
+    errors => ['u::URL:address format:V0A',
+               'w::URL:uppercase host:[V0A.aaa]'],
   },
   {
     data => q<http://127.0.0.1/>,
@@ -167,7 +167,7 @@ my $Cases = [
   },
   {
     data => q<http://1234567890123456789012345678901234567890123456789012345678901234.test/>,
-    errors => ['s::non-DNS host'],
+    errors => ['w::URL:non-DNS host'],
   },
   {
     data => q<http://123456789012345678901234567890123456789012345678901234567890123.123456789012345678901234567890123456789012345678901234567890123.123456789012345678901234567890123456789012345678901234567890123.123456789012345678901234567890123456789012345678901234567890123/>,
@@ -175,15 +175,15 @@ my $Cases = [
   },
   {
     data => q<http://123456789012345678901234567890123456789012345678901234567890123.123456789012345678901234567890123456789012345678901234567890123.123456789012345678901234567890123456789012345678901234567890123.123456789012345678901234567890123456789012345678901234567890123./>,
-    errors => ['s::long host'],
+    errors => ['w::URL:long host'],
   },
   {
     data => q<http://a_b.test/>,
-    errors => ['s::non-DNS host'],
+    errors => ['w::URL:non-DNS host'],
   },
   {
     data => q<http://%61.test/>,
-    errors => ['s:8:percent-encoded unreserved'],
+    errors => ['w:8:URL:percent-encoded unreserved'],
   },
   {
     data => q<http://a.test/>,
@@ -203,11 +203,11 @@ my $Cases = [
   },
   {
     data => q<http://a-.test/>,
-    errors => ['s::non-DNS host'],
+    errors => ['w::URL:non-DNS host'],
   },
   {
     data => q<http://-a.test/>,
-    errors => ['s::non-DNS host'],
+    errors => ['w::URL:non-DNS host'],
   },
   {
     data => q<http://a.b.test/>,
@@ -223,16 +223,16 @@ my $Cases = [
   },
   {
     data => qq<http://\x{123}\x{456}.test/>,
-    errors => ['s::non-DNS host'],
+    errors => ['w::URL:non-DNS host'],
   },
   {
     data => qq<http://\x{4E00}%80.test/>,
-    errors => ['s::non-DNS host',
-               'm::non UTF-8 host'],
+    errors => ['w::URL:non-DNS host',
+               'm::URL:non UTF-8 host'],
   },
   {
     data => q<http://a.%E3%81%82%E3%81%84.test/>,
-    errors => ['s::non-DNS host'],
+    errors => ['w::URL:non-DNS host'],
   },
   {
     data => q<example://a/b/c/%7Bfoo%7D>,
@@ -240,11 +240,11 @@ my $Cases = [
   },
   {
     data => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
-    errors => ['s::uppercase scheme name',
-               's:22:percent-encoded unreserved',
-               's:26:lowercase hexadecimal digit',
-               's:32:lowercase hexadecimal digit',
-               's::dot-segment'],
+    errors => ['w::URL:uppercase scheme name',
+               'w:22:URL:percent-encoded unreserved',
+               'w:26:URL:lowercase hexadecimal digit',
+               'w:32:URL:lowercase hexadecimal digit',
+               'w::URL:dot-segment'],
   },
   {
     data => q<example://a/.htaccess>,
@@ -252,11 +252,11 @@ my $Cases = [
   },
   {
     data => q<example://a/.>,
-    errors => ['s::dot-segment'],
+    errors => ['w::URL:dot-segment'],
   },
   {
     data => q<http://example.com>,
-    errors => ['s::empty path'],
+    errors => ['w::URL:empty path'],
   },
   {
     data => q<http://example.com/>,
@@ -264,26 +264,26 @@ my $Cases = [
   },
   {
     data => q<http://example.com:/>,
-    errors => ['s::empty port'],
+    errors => ['w::URL:empty port'],
   },
   {
     data => q<http://example.com:80/>,
-    errors => ['s::default port'],
+    errors => ['w::URL:default port'],
   },
   {
     data => q<hTTP://example.com:80/>,
-    errors => ['s::uppercase scheme name',
-               's::default port'],
+    errors => ['w::URL:uppercase scheme name',
+               'w::URL:default port'],
   },
   {
     data => q<%68ttp://example.com:80/>,
-    errors => ['m::syntax error',
-               's:1:percent-encoded unreserved',
-               's::default port'],
+    errors => ['m::syntax error:iriref3987',
+               'w:1:URL:percent-encoded unreserved',
+               'w::URL:default port'],
   },
   {
     data => q<file://user@/>,
-    errors => ['s::empty host'],
+    errors => ['w::URL:empty host'],
   },
   {
     data => q<http://example.com/?>,
@@ -307,8 +307,8 @@ my $Cases = [
   },
   {
     data => qq<http://r\xE9sum\xE9.example.org>,
-    errors => ['s::non-DNS host',
-               's::empty path'],
+    errors => ['w::URL:non-DNS host',
+               'w::URL:empty path'],
   },
   {
     data => qq<http://validator.w3.org/check?uri=http%3A%2F%2Fr\xE9;sum\xE9.example.com>,
@@ -332,8 +332,8 @@ my $Cases = [
   },
   {
     data => q<http://xn--99zt52a.example.org/%e2%80%ae>,
-    errors => ['s:32:lowercase hexadecimal digit',
-               's:38:lowercase hexadecimal digit'],
+    errors => ['w:32:URL:lowercase hexadecimal digit',
+               'w:38:URL:lowercase hexadecimal digit'],
   },
   {
     data => qq<example://a/b/c/%7Bfoo%7D/ros\xE9>,
@@ -341,11 +341,11 @@ my $Cases = [
   },
   {
     data => qq<eXAMPLE://a/./b/../b/%63/%7bfoo%7d/ros%C3%A9>,
-    errors => ['s::uppercase scheme name',
-               's:22:percent-encoded unreserved',
-               's:26:lowercase hexadecimal digit',
-               's:32:lowercase hexadecimal digit',
-               's::dot-segment'],
+    errors => ['w::URL:uppercase scheme name',
+               'w:22:URL:percent-encoded unreserved',
+               'w:26:URL:lowercase hexadecimal digit',
+               'w:32:URL:lowercase hexadecimal digit',
+               'w::URL:dot-segment'],
   },
   {
     data => qq<http://www.example.org/r\xE9sum\xE9.html>,
@@ -370,7 +370,8 @@ for my $test (@$Cases) {
     my %opt = @_;
     push @errors, $opt{level} . ':' .
         (defined $opt{position} ? $opt{position} : '') . ':' . 
-        $opt{type};
+        $opt{type} .
+        (defined $opt{value} ? ':' . $opt{value} : '');
   });
   @errors = sort {$a cmp $b} @errors;
 
