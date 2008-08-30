@@ -1,41 +1,41 @@
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody></table>
 #errors
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody> </table>
 #errors
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/> </tbody></table>
 #errors
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tbody> <tr/></tbody></table>
 #errors
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"> <tbody><tr/></tbody></table>
 #errors
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td/></tr><tr/></tbody></table>
 #errors
 /table/tbody/tr/td;no significant content;s
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td rowspan="2"/></tr><tr/></tbody></table>
 #errors
 /table/tbody/tr/td;no significant content;s
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -48,36 +48,36 @@
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tbody><tr><td/></tr><tr/><tr/></tbody></table>
 #errors
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 /table/tbody/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <thead><tr><td/></tr></thead><tbody><tr/></tbody></table>
 #errors
-/table/tbody/tr;table:row with no anchored cell;m
+/table/tbody/tr;row with no anchored cell;m
 /table/thead/tr/td;no significant content;s
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <thead><tr/></thead><tbody><tr/></tbody></table>
 #errors
-/table/thead/tr;table:row with no anchored cell;m
+/table/thead/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tr/></table>
 #errors
-/table/tr;table:row with no anchored cell;m
+/table/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"><tr/> </table>
 #errors
-/table/tr;table:row with no anchored cell;m
+/table/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"> <tr/></table>
 #errors
-/table/tr;table:row with no anchored cell;m
+/table/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -92,7 +92,7 @@
 <tr/>
 </table>
 #errors
-/table/tr;table:row with no anchored cell;m
+/table/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -101,14 +101,14 @@
 <tr/>
 </table>
 #errors
-/table/tr;table:row with no anchored cell;m
+/table/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tr><td rowspan="43">x</td></tr>
 </table>
 #errors
-/table/tr/td;table:rowspan creates row with no anchored cell;m
+/table/tr/td;rowspan creates row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -116,7 +116,7 @@
 <tr/>
 </table>
 #errors
-/table/tr;table:row with no anchored cell;m
+/table/tr;row with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
@@ -131,12 +131,12 @@
 <tr><td>x</td></tr>
 </table>
 #errors
-/table/colgroup/col;table:column with no anchored cell;m
+/table/colgroup/col;column with no anchored cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tr><td colspan="42">x</td></tr>
 </table>
 #errors
-/table/tr/td;table:colspan creates column with no anchored cell;m
+/table/tr/td;colspan creates column with no anchored cell;m
 

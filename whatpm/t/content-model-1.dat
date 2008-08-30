@@ -1,7 +1,7 @@
 #data
 <html></html>
 #errors
-/html;element;unsupported
+/html;unknown element;u
 
 #data
 <unknown xmlns="http://www.w3.org/1999/xhtml"></unknown>
@@ -18,80 +18,80 @@
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"></html>
 #errors
-/html;child element missing:head
-/html;child element missing:body
+/html;child element missing;head;m
+/html;child element missing;body;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head></html>
 #errors
-/html;child element missing:body
-/html/head;child element missing:title
+/html;child element missing;body;m
+/html/head;child element missing;title;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><body></body></html>
 #errors
-/html/body;ps element missing:head
+/html/body;ps element missing;head;m
 /html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><p></p></html>
 #errors
-/html/p;element not allowed
-/html;child element missing:head
-/html;child element missing:body
+/html/p;element not allowed;m
+/html;child element missing;head;m
+/html;child element missing;body;m
 /html/p;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">a</html>
 #errors
-/html/"a";character not allowed
-/html;child element missing:head
-/html;child element missing:body
+/html/"a";character not allowed;m
+/html;child element missing;head;m
+/html;child element missing;body;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"> </html>
 #errors
-/html;child element missing:head
-/html;child element missing:body
+/html;child element missing;head;m
+/html;child element missing;body;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>
 #errors
-/html/head;child element missing:title
+/html/head;child element missing;title;m
 /html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head>a<body></body></html>
 #errors
-/html/head;child element missing:title
-/html/"a";character not allowed
+/html/head;child element missing;title;m
+/html/"a";character not allowed;m
 /html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">a<head></head><body></body></html>
 #errors
-/html/"a";character not allowed
-/html/head;child element missing:title
+/html/"a";character not allowed;m
+/html/head;child element missing;title;m
 /html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body>a</html>
 #errors
-/html/head;child element missing:title
-/html/"a";character not allowed
+/html/head;child element missing;title;m
+/html/"a";character not allowed;m
 /html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"> <head></head> <body></body> </html>
 #errors
-/html/head;child element missing:title
+/html/head;child element missing;title;m
 /html/body;no significant content;s
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body><p></p></html>
 #errors
-/html/head;child element missing:title
-/html/p;element not allowed
+/html/head;child element missing;title;m
+/html/p;element not allowed;m
 /html/body;no significant content;s
 /html/p;no significant content;s
 
@@ -100,28 +100,28 @@
 <base href="http://www.w3.org/"/>
 </head>
 #errors
-/head;child element missing:title
+/head;child element missing;title;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <command/>
 </head>
 #errors
-/head;child element missing:title
+/head;child element missing;title;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <event-source/>
 </head>
 #errors
-/head;child element missing:title
+/head;child element missing;title;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <link rel="author" href="mailto:a@example.com"/>
 </head>
 #errors
-/head;child element missing:title
+/head;child element missing;title;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -131,23 +131,23 @@
 <body>x</body>
 </html>
 #errors
-/html/head;child element missing:title
+/html/head;child element missing;title;m
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <meta name="keywords" content="html5"/>
 </head>
 #errors
-/head;child element missing:title
+/head;child element missing;title;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <script type="text/javascript"/>
 </head>
 #errors
-/head;child element missing:title
+/head;child element missing;title;m
 /head/script/@type;IMT:obsolete subtype;w
 /head/script;SUBDOC
 
@@ -156,7 +156,7 @@
 <style type="text/css"/>
 </head>
 #errors
-/head;child element missing:title
+/head;child element missing;title;m
 /head/style;SUBDOC
 
 #data
@@ -226,7 +226,7 @@
 <title/>
 </head>
 #errors
-/head/meta;attribute missing:name|http-equiv|charset
+/head/meta;attribute missing:name|http-equiv|charset;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -238,7 +238,7 @@
 </html>
 #errors
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -251,7 +251,7 @@
 #errors
 /html/head/meta;element not allowed:meta charset;m
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -321,29 +321,29 @@
 </html>
 #errors
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
-/html/head/base;attribute missing:href|target
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/base;attribute missing:href|target;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="us-ascii"/><title>x</title><base/></head>
 <body>y</body></html>
 #errors
-/html/head/base;attribute missing:href|target
+/html/head/base;attribute missing:href|target;m
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>y</title><base/></head><body>ty</body></html>
 #errors
-/html/head/base;attribute missing:href|target
+/html/head/base;attribute missing:href|target;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>x</title><base/><meta charset="us-ascii"/></head><body>x</body></html>
 #errors
-/html/head/base;attribute missing:href|target
+/html/head/base;attribute missing:href|target;m
 /html/head/meta;element not allowed:meta charset;m
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -356,7 +356,7 @@
 </html>
 #errors
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -370,7 +370,7 @@
 #errors
 /html/head/meta;element not allowed:meta charset;m
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -384,7 +384,7 @@
 #errors
 /html/head/meta;element not allowed:meta charset;m
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -414,7 +414,7 @@
 #errors
 /html/head/meta;element not allowed:meta charset;m
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -427,7 +427,7 @@
 </html>
 #errors
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -462,8 +462,8 @@
 <title>x</title>
 </head>
 #errors
-/head/base;element not allowed:base
-/head/base;basehref after URI attribute
+/head/base;element not allowed:base;m
+/head/base;basehref after URL attribute;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -472,7 +472,7 @@
 <title>x</title>
 </head>
 #errors
-/head/base;element not allowed:base
+/head/base;element not allowed:base;m
 /head/base/@target;window name:empty;m
 
 #data
@@ -482,7 +482,7 @@
 <title>x</title>
 </head>
 #errors
-/head/base;element not allowed:base
+/head/base;element not allowed:base;m
 /head/base/@target;window name:empty;m
 
 #data
@@ -497,7 +497,7 @@
 <body>x</body>
 </html>
 #errors
-/html/head;element not allowed
+/html/head;element not allowed;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -512,9 +512,9 @@
 <body>x</body>
 </html>
 #errors
-/html/head;element not allowed
-/html/head/base;element not allowed:base
-/html/head/base;basehref after URI attribute
+/html/head;element not allowed;m
+/html/head/base;element not allowed:base;m
+/html/head/base;basehref after URL attribute;m
 
 #data
 <link rel="author" href="mailto:a@example.com"
@@ -544,14 +544,14 @@
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"> </meta>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">a</meta>
@@ -559,7 +559,7 @@
 /meta;element not allowed:meta charset;m
 /meta/"a";character not allowed:empty;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"><p/></meta>
@@ -567,7 +567,7 @@
 /meta;element not allowed:meta charset;m
 /meta/p;element not allowed:empty;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 /meta/p;no significant content;s
 
 #data
@@ -580,7 +580,7 @@
 </html>
 #errors
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -594,9 +594,9 @@
 #errors
 /html/head/meta;in XML:charset;m
 /html/head/meta;element not allowed:meta charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::iso-8859-1;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -609,7 +609,7 @@
 #errors
 /html/head/meta;in XML:charset;m
 /html/head/meta;element not allowed:meta charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -623,10 +623,10 @@
 <body>x</body>
 </html>
 #errors
-/html/head;element not allowed
+/html/head;element not allowed;m
 /html/head/meta;in XML:charset;m
 /html/head/meta;element not allowed:meta charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -637,10 +637,10 @@
 </head>
 </html>
 #errors
-/html/body;ps element missing:head
-/html/head;element not allowed
+/html/body;ps element missing;head;m
+/html/head;element not allowed;m
 /html/head/meta;in XML:charset;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <svg xmlns="http://www.w3.org/2000/svg">
@@ -657,7 +657,9 @@
 #errors
 /svg/foreignObject/html/head/meta;element not allowed:meta charset;m
 /svg/foreignObject/html/head/meta;in XML:charset;m
-/svg/foreignObject/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/svg/foreignObject/html/head/meta/@charset;mismatched charset name not checked;u
+/svg;unknown element;u
+/svg/foreignObject;unknown element;u
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -667,7 +669,7 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -677,7 +679,7 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -687,11 +689,11 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/meta;element not allowed:head noscript;m
 /head/noscript/meta;element not allowed:meta charset;m
 /head/noscript/meta;in XML:charset;m
-/head/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/noscript/meta/@charset;mismatched charset name not checked;u
 
 #data html
 <!DOCTYPE HTML>
@@ -699,7 +701,7 @@
 <title>x</title>
 <body>y</body>
 #errors
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;mismatched charset name not checked;u
 
 #data html
 <!DOCTYPE HTML>
@@ -707,7 +709,7 @@
 <meta http-equiv=content-type content="text/html; charset=us-ascii">
 <body>y</body>
 #errors
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;mismatched charset name not checked;u
 /html/head/meta;element not allowed:meta charset;m
 
 #data html
@@ -717,8 +719,8 @@
 <title>x</title>
 <body>y</body>
 #errors
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@content;mismatched charset name not checked;u
 /html/head/meta;element not allowed:meta charset;m
 
 #data html
@@ -728,8 +730,8 @@
 <title>x</title>
 <body>y</body>
 #errors
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@charset;mismatched charset name not checked;u
 /html/head/meta;element not allowed:meta charset;m
 
 #data html
@@ -739,8 +741,8 @@
 <title>x</title>
 <body>y</body>
 #errors
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@content;mismatched charset name not checked;u
 /html/head/meta;element not allowed:meta charset;m
 /html/head/meta/@http-equiv;duplicate http-equiv;m
 
@@ -752,9 +754,9 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/meta;element not allowed:head noscript;m
-/head/noscript/meta;attribute missing:name|http-equiv|charset
+/head/noscript/meta;attribute missing:name|http-equiv|charset;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -764,8 +766,8 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
-/head/noscript/meta/@http-equiv;enumerated:invalid
+/head/noscript;in XML:noscript;m
+/head/noscript/meta/@http-equiv;enumerated:invalid;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -775,7 +777,7 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/meta;element not allowed:head noscript;m
 
 #data
@@ -786,9 +788,9 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
-/head/noscript/meta/@http-equiv;attribute not allowed
-/head/noscript/meta/@http-equiv;enumerated:invalid
+/head/noscript;in XML:noscript;m
+/head/noscript/meta/@http-equiv;attribute not allowed;m
+/head/noscript/meta/@http-equiv;enumerated:invalid;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -798,11 +800,11 @@
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/meta;element not allowed:head noscript;m
 /head/noscript/meta;element not allowed:meta charset;m
 /head/noscript/meta;in XML:charset;m
-/head/noscript/meta/@content;mismatched charset name::us-ascii;unsupported
+/head/noscript/meta/@content;mismatched charset name not checked;u
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -813,7 +815,7 @@
 </head>
 #errors
 /head/noscript/style;SUBDOC
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -825,7 +827,7 @@
 #errors
 /head/noscript/style;element not allowed:head noscript;m
 /head/noscript/style;SUBDOC
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -836,7 +838,7 @@
 </head>
 #errors
 /head/noscript/base;element not allowed:head noscript;m
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -846,9 +848,9 @@
 </noscript>
 </head>
 #errors
-/head/noscript/unknown;element;unsupported
+/head/noscript/unknown;unknown element;u
 /head/noscript/unknown;element not allowed:head noscript;m
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>
@@ -914,12 +916,14 @@ p {color: green}
 <svg xmlns="http://www.w3.org/2000/svg"/>
 </body>
 #errors
+/body/svg;unknown element;u
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
 <math xmlns="http://www.w3.org/1998/Math/MathML"/>
 </body>
 #errors
+/body/math;unknown element;u
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -1025,7 +1029,7 @@ para
 </body>
 #errors
 /body/unknown;element not allowed:flow;m
-/body/unknown;element;unsupported
+/body/unknown;unknown element;u
 /body/style;SUBDOC
 /body;no significant content;s
 
@@ -1231,7 +1235,7 @@ para
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/header;element missing:hn
+/header;element missing:hn;m
 /header;no significant content;s
 
 #data
@@ -1332,7 +1336,7 @@ para
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><header/></header>
 #errors
 /header/header;element not allowed:minus;m
-/header/header;element missing:hn
+/header/header;element missing:hn;m
 /header;no significant content;s
 /header/h1;no significant content;s
 /header/header;no significant content;s
@@ -1347,7 +1351,7 @@ para
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><h1/><header></header></div>
 #errors
-/div/header;element missing:hn
+/div/header;element missing:hn;m
 /div;no significant content;s
 /div/h1;no significant content;s
 /div/header;no significant content;s
@@ -1355,7 +1359,7 @@ para
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><header></header><h1/></div>
 #errors
-/div/header;element missing:hn
+/div/header;element missing:hn;m
 /div;no significant content;s
 /div/header;no significant content;s
 /div/h1;no significant content;s
@@ -1365,7 +1369,7 @@ para
 <header></header></div>
 #errors
 /div;no significant content;s
-/div/header;element missing:hn
+/div/header;element missing:hn;m
 /div/header;no significant content;s
 /div/header/h1;no significant content;s
 /div/header;no significant content;s
@@ -1374,7 +1378,7 @@ para
 <div xmlns="http://www.w3.org/1999/xhtml"><header></header>
 <header><h1/></header></div>
 #errors
-/div/header;element missing:hn
+/div/header;element missing:hn;m
 /div;no significant content;s
 /div/header;no significant content;s
 /div/header;no significant content;s
@@ -1385,7 +1389,7 @@ para
 <header><h1/><header></header></header></div>
 #errors
 /div/header/header;element not allowed:minus;m
-/div/header/header;element missing:hn
+/div/header/header;element missing:hn;m
 /div;no significant content;s
 /div/header;no significant content;s
 /div/header/h1;no significant content;s
@@ -1396,7 +1400,7 @@ para
 <header/><h1/></header></div>
 #errors
 /div/header/header;element not allowed:minus;m
-/div/header/header;element missing:hn
+/div/header/header;element missing:hn;m
 /div;no significant content;s
 /div/header;no significant content;s
 /div/header/header;no significant content;s
@@ -1406,7 +1410,7 @@ para
 <div xmlns="http://www.w3.org/1999/xhtml">
 <header><h1><header></header></h1></header></div>
 #errors
-/div/header/h1/header;element missing:hn
+/div/header/h1/header;element missing:hn;m
 /div/header/h1/header;element not allowed:minus;m
 /div;no significant content;s
 /div/header;no significant content;s
@@ -1490,14 +1494,14 @@ para
 <header xmlns="http://www.w3.org/1999/xhtml"><aside/></header>
 #errors
 /header/aside;element not allowed:minus;m
-/header;element missing:hn
+/header;element missing:hn;m
 /header;no significant content;s
 /header/aside;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml">xx</header>
 #errors
-/header;element missing:hn
+/header;element missing:hn;m
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml">xx<h1>xx</h1></header>
@@ -3388,29 +3392,29 @@ aaa
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/><table/></datagrid>
 #errors
-/datagrid/table;element not allowed
+/datagrid/table;element not allowed;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/><p/><table/></datagrid>
 #errors
-/datagrid/p;element not allowed
-/datagrid/table;element not allowed
+/datagrid/p;element not allowed;m
+/datagrid/table;element not allowed;m
 /datagrid/p;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<table/></datagrid>
 #errors
-/datagrid/table;element not allowed
+/datagrid/table;element not allowed;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<select/></datagrid>
 #errors
-/datagrid/select;element not allowed
+/datagrid/select;element not allowed;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<datalist/></datagrid>
 #errors
-/datagrid/datalist;element not allowed
+/datagrid/datalist;element not allowed;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<p/><table/></datagrid>
@@ -3438,17 +3442,17 @@ aaa
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/>aa</datagrid>
 #errors
-/datagrid/"aa";character not allowed
+/datagrid/"aa";character not allowed;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><select/>aa</datagrid>
 #errors
-/datagrid/"aa";character not allowed
+/datagrid/"aa";character not allowed;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/>aa</datagrid>
 #errors
-/datagrid/"aa";character not allowed
+/datagrid/"aa";character not allowed;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datagrid/></datagrid>
@@ -3729,9 +3733,9 @@ aaa
 the person writing this quote is clearly not American.</p>
 </div>
 #errors
-/div/p/@lang;in XML:lang
-/div/blockquote/@lang;in XML:lang
-/div/p/@lang;in XML:lang
+/div/p/@lang;in XML:lang;m
+/div/blockquote/@lang;in XML:lang;m
+/div/p/@lang;in XML:lang;m
 
 #data
 <!-- From HTML5 Spec -->
@@ -3894,18 +3898,18 @@ wormhole connection.</mark></p>
 <ruby xmlns="http://www.w3.org/1999/xhtml"></ruby>
 #errors
 /ruby;no significant content;s
-/ruby;element missing:rt;m
+/ruby;element missing;rt;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">    </ruby>
 #errors
 /ruby;no significant content;s
-/ruby;element missing:rt;m
+/ruby;element missing;rt;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">xxxx</ruby>
 #errors
-/ruby;element missing:rt;m
+/ruby;element missing;rt;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">xxxx<rt>yyyy</rt></ruby>
@@ -3918,7 +3922,7 @@ wormhole connection.</mark></p>
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">xxxx<rt>yyyy</rt>zzzz</ruby>
 #errors
-/ruby;element missing:rt;m
+/ruby;element missing;rt;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">xx<rt>yy</rt>zz<rt>aa</rt></ruby>
@@ -3927,7 +3931,7 @@ wormhole connection.</mark></p>
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rt>y</rt>z<rt>w</rt>a</ruby>
 #errors
-/ruby;element missing:rt;m
+/ruby;element missing;rt;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rt>y</rt> a<rt> b </rt>c<rt>d</rt></ruby>
@@ -3960,18 +3964,18 @@ wormhole connection.</mark></p>
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt></ruby>
 #errors
-/ruby;element missing:rp;m
+/ruby;element missing;rp;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp></ruby>
 #errors
-/ruby;element missing:rt;m
-/ruby;element missing:rp;m
+/ruby;element missing;rt;m
+/ruby;element missing;rp;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X</ruby>
 #errors
-/ruby;element missing:rt;m
+/ruby;element missing;rt;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X<rt>Y</rt></ruby>
@@ -3980,13 +3984,13 @@ wormhole connection.</mark></p>
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X<rp>(</rp></ruby>
 #errors
-/ruby;element missing:rt;m
-/ruby;element missing:rp;m
+/ruby;element missing;rt;m
+/ruby;element missing;rp;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X<rp>(</rp><rt>Y</rt></ruby>
 #errors
-/ruby;element missing:rp;m
+/ruby;element missing;rp;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)</rp>X<rp>(</rp><rt>Y</rt><rp>)</rp></ruby>
@@ -3995,17 +3999,17 @@ wormhole connection.</mark></p>
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rp>)</rp></ruby>
 #errors
-/ruby/rp;ps element missing:rt;m
+/ruby/rp;ps element missing;rt;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rt>z</rt><rp>)</rp></ruby>
 #errors
-/ruby/rt;ps element missing:rp;m
+/ruby/rt;ps element missing;rp;m
 /ruby/rt;no significant content before;s
 /ruby/rp;no significant content before;s
 /ruby/rp;rp:syntax error;m
-/ruby;element missing:rt;m
-/ruby;element missing:rp;m
+/ruby;element missing;rt;m
+/ruby;element missing;rp;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml"><rp>(</rp><rt>y</rt><rp>)</rp></ruby>
@@ -4124,7 +4128,7 @@ wormhole connection.</mark></p>
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp><span>(</span></rp><rt>y</rt><rp>)</rp></ruby>
 #errors
-/ruby/rp/span;element not allowed
+/ruby/rp/span;element not allowed:text;m
 /ruby/rp;rp:syntax error;m
 
 #data
@@ -4134,7 +4138,7 @@ wormhole connection.</mark></p>
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp><span>)</span></rp></ruby>
 #errors
-/ruby/rp/span;element not allowed
+/ruby/rp/span;element not allowed:text;m
 /ruby/rp;rp:syntax error;m
 
 #data
@@ -4170,7 +4174,7 @@ wormhole connection.</mark></p>
 #errors
 /p/ruby/rt;no significant content before;s
 /p/ruby/rt;no significant content;s
-/p/ruby;element missing:rt;m
+/p/ruby;element missing;rt;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><ruby><rp>(</rp><rt></rt><rp>)</rp></ruby></p>
@@ -4591,29 +4595,29 @@ xxxx
 <video xmlns="http://www.w3.org/1999/xhtml"></video>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml">  </video>
 #errors
-/video;element missing:source;m
+/video;child element missing;source;m
 /video;no significant content;s
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml">xx</video>
 #errors
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>xx</video>
 #errors
-/video;element missing:source;m
+/video;child element missing;source;m
 /video/style;SUBDOC
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><p>xx</p></video>
 #errors
-/video;element missing:source;m
+/video;child element missing;source;m
 /video/style;SUBDOC
 
 #data
@@ -4694,29 +4698,29 @@ xxxx
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><video></video></div>
 #errors
-/div/video;element missing:source;m
+/div/video;child element missing;source;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><video>  </video></div>
 #errors
-/div/video;element missing:source;m
+/div/video;child element missing;source;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><video>xx</video></div>
 #errors
-/div/video;element missing:source;m
+/div/video;child element missing;source;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><video><style scoped=""/>xx</video></div>
 #errors
-/div/video;element missing:source;m
+/div/video;child element missing;source;m
 /div/video/style;SUBDOC
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <video><style scoped=""/><p>xx</p></video></div>
 #errors
-/div/video;element missing:source;m
+/div/video;child element missing;source;m
 /div/video/style;SUBDOC
 
 #data
@@ -4798,22 +4802,22 @@ xxxx
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><video></video></em>
 #errors
-/em/video;element missing:source;m
+/em/video;child element missing;source;m
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><video>  </video></em>
 #errors
-/em/video;element missing:source;m
+/em/video;child element missing;source;m
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><video>xx</video></em>
 #errors
-/em/video;element missing:source;m
+/em/video;child element missing;source;m
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><video><style scoped=""/>xx</video></em>
 #errors
-/em/video;element missing:source;m
+/em/video;child element missing;source;m
 /em/video/style;SUBDOC
 /em/video/style;element not allowed:phrasing;m
 
@@ -4821,7 +4825,7 @@ xxxx
 <em xmlns="http://www.w3.org/1999/xhtml">
 <video><style scoped=""/><p>xx</p></video></em>
 #errors
-/em/video;element missing:source;m
+/em/video;child element missing;source;m
 /em/video/style;SUBDOC
 /em/video/style;element not allowed:phrasing;m
 /em/video/p;element not allowed:phrasing;m
@@ -4915,29 +4919,29 @@ xxxx
 <audio xmlns="http://www.w3.org/1999/xhtml"></audio>
 #errors
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml">  </audio>
 #errors
-/audio;element missing:source;m
+/audio;child element missing;source;m
 /audio;no significant content;s
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml">xx</audio>
 #errors
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>xx</audio>
 #errors
-/audio;element missing:source;m
+/audio;child element missing;source;m
 /audio/style;SUBDOC
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><p>xx</p></audio>
 #errors
-/audio;element missing:source;m
+/audio;child element missing;source;m
 /audio/style;SUBDOC
 
 #data
@@ -5018,29 +5022,29 @@ xxxx
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><audio></audio></div>
 #errors
-/div/audio;element missing:source;m
+/div/audio;child element missing;source;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><audio>  </audio></div>
 #errors
-/div/audio;element missing:source;m
+/div/audio;child element missing;source;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><audio>xx</audio></div>
 #errors
-/div/audio;element missing:source;m
+/div/audio;child element missing;source;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><audio><style scoped=""/>xx</audio></div>
 #errors
-/div/audio;element missing:source;m
+/div/audio;child element missing;source;m
 /div/audio/style;SUBDOC
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <audio><style scoped=""/><p>xx</p></audio></div>
 #errors
-/div/audio;element missing:source;m
+/div/audio;child element missing;source;m
 /div/audio/style;SUBDOC
 
 #data
@@ -5122,22 +5126,22 @@ xxxx
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><audio></audio></em>
 #errors
-/em/audio;element missing:source;m
+/em/audio;child element missing;source;m
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><audio>  </audio></em>
 #errors
-/em/audio;element missing:source;m
+/em/audio;child element missing;source;m
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><audio>xx</audio></em>
 #errors
-/em/audio;element missing:source;m
+/em/audio;child element missing;source;m
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><audio><style scoped=""/>xx</audio></em>
 #errors
-/em/audio;element missing:source;m
+/em/audio;child element missing;source;m
 /em/audio/style;SUBDOC
 /em/audio/style;element not allowed:phrasing;m
 
@@ -5145,7 +5149,7 @@ xxxx
 <em xmlns="http://www.w3.org/1999/xhtml">
 <audio><style scoped=""/><p>xx</p></audio></em>
 #errors
-/em/audio;element missing:source;m
+/em/audio;child element missing;source;m
 /em/audio/style;SUBDOC
 /em/audio/style;element not allowed:phrasing;m
 /em/audio/p;element not allowed:phrasing;m
@@ -5253,7 +5257,7 @@ xxxx
 </map>
 #errors
 /map;no significant content;s
-/map;attribute missing:name;m
+/map;attribute missing;name;m
 
 #data
 <map name="map1" xmlns="http://www.w3.org/1999/xhtml">
@@ -5276,7 +5280,7 @@ xxxx
 #errors
 /map;no significant content;s
 /map/p;no significant content;s
-/map;attribute missing:name;m
+/map;attribute missing;name;m
 
 #data
 <map name="map1" xmlns="http://www.w3.org/1999/xhtml">
@@ -5294,8 +5298,8 @@ xxxx
 /map;no significant content;s
 /map/map;no significant content;s
 /map/map/p;no significant content;s
-/map;attribute missing:name;m
-/map/map;attribute missing:name;m
+/map;attribute missing;name;m
+/map/map;attribute missing;name;m
 
 #data
 <map name="map1" xmlns="http://www.w3.org/1999/xhtml">
@@ -5518,7 +5522,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/p;element not allowed:head noscript;m
 /head/noscript/p;no significant content;s
 
@@ -5530,8 +5534,8 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
-/head/noscript/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
+/head/noscript/noscript;in XML:noscript;m
 /head/noscript/noscript;element not allowed:head noscript;m
 
 #data
@@ -5542,7 +5546,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -5552,7 +5556,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/style;SUBDOC
 
 #data
@@ -5563,7 +5567,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/script;element not allowed:head noscript;m
 /head/noscript/script;SUBDOC
 
@@ -5575,7 +5579,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/meta;element not allowed:head noscript;m
 
 #data
@@ -5586,7 +5590,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/base;element not allowed:head noscript;m
 
 #data
@@ -5597,7 +5601,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/event-source;element not allowed:head noscript;m
 
 #data
@@ -5608,7 +5612,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/title;element not allowed:head noscript;m
 
 #data
@@ -5620,7 +5624,7 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
 /head/noscript/style;SUBDOC
 
 #data
@@ -5634,8 +5638,8 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
-/head/noscript/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
+/head/noscript/noscript;in XML:noscript;m
 /head/noscript/noscript;element not allowed:head noscript;m
 /head/noscript/noscript/style;SUBDOC
 
@@ -5650,8 +5654,8 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
-/head/noscript/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
+/head/noscript/noscript;in XML:noscript;m
 /head/noscript/noscript;element not allowed:head noscript;m
 /head/noscript/noscript/p;element not allowed:head noscript;m
 /head/noscript/noscript/p;no significant content;s
@@ -5667,20 +5671,20 @@ xxxx
 </noscript>
 </head>
 #errors
-/head/noscript;in XML:noscript
-/head/noscript/noscript;in XML:noscript
+/head/noscript;in XML:noscript;m
+/head/noscript/noscript;in XML:noscript;m
 /head/noscript/noscript;element not allowed:head noscript;m
 /head/noscript/noscript/meta;element not allowed:head noscript;m
 /head/noscript/noscript/meta;element not allowed:meta charset;m
 /head/noscript/noscript/meta;in XML:charset;m
-/head/noscript/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
+/head/noscript/noscript/meta/@charset;mismatched charset name not checked;u
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
 <meta name="keywords" content=""/>
 </noscript>
 #errors
-/noscript;in XML:noscript
+/noscript;in XML:noscript;m
 /noscript;no significant content;s
 /noscript/meta;element not allowed:flow;m
 
@@ -5690,7 +5694,7 @@ xxxx
 </noscript>
 #errors
 /noscript;no significant content;s
-/noscript;in XML:noscript
+/noscript;in XML:noscript;m
 /noscript/title;element not allowed:flow;m
 
 #data
@@ -5699,7 +5703,7 @@ xxxx
 </noscript>
 #errors
 /noscript;no significant content;s
-/noscript;in XML:noscript
+/noscript;in XML:noscript;m
 /noscript/link;element not allowed:flow;m
 
 #data
@@ -5708,7 +5712,7 @@ xxxx
 </noscript>
 #errors
 /noscript;no significant content;s
-/noscript;in XML:noscript
+/noscript;in XML:noscript;m
 /noscript/style;element not allowed:flow style;m
 /noscript/style;SUBDOC
 
@@ -5718,7 +5722,7 @@ xxxx
 </noscript>
 #errors
 /noscript;no significant content;s
-/noscript;in XML:noscript
+/noscript;in XML:noscript;m
 /noscript/style;SUBDOC
 
 #data
@@ -5727,11 +5731,11 @@ xxxx
 </noscript>
 #errors
 /noscript;no significant content;s
-/noscript;in XML:noscript
+/noscript;in XML:noscript;m
 /noscript/meta;element not allowed:flow;m
 /noscript/meta;element not allowed:meta charset;m
 /noscript/meta;in XML:charset;m
-/noscript/meta/@charset;mismatched charset name::us-ascii;unsupported
+/noscript/meta/@charset;mismatched charset name not checked;u
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -5739,11 +5743,11 @@ xxxx
 </noscript>
 #errors
 /noscript;no significant content;s
-/noscript;in XML:noscript
+/noscript;in XML:noscript;m
 /noscript/meta;element not allowed:flow;m
 /noscript/meta;element not allowed:meta charset;m
 /noscript/meta;in XML:charset;m
-/noscript/meta/@content;mismatched charset name::us-ascii;unsupported
+/noscript/meta/@content;mismatched charset name not checked;u
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -5751,38 +5755,38 @@ xxxx
 </noscript>
 #errors
 /noscript;no significant content;s
-/noscript;in XML:noscript
+/noscript;in XML:noscript;m
 /noscript/noscript;element not allowed:minus;m
-/noscript/noscript;in XML:noscript
+/noscript/noscript;in XML:noscript;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"></details>
 #errors
 /details;no significant content;s
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">   </details>
 #errors
 /details;no significant content;s
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">xxxx</details>
 #errors
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><p></p></details>
 #errors
-/details;element missing:legend;m
+/details;child element missing;legend;m
 /details;no significant content;s
 /details/p;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><p>xxx</p></details>
 #errors
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend>xxx</details>
@@ -5857,17 +5861,17 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><rule/>aa</datatemplate>
 #errors
-/datatemplate/"aa";character not allowed
+/datatemplate/"aa";character not allowed;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml">aa<rule/></datatemplate>
 #errors
-/datatemplate/"aa";character not allowed
+/datatemplate/"aa";character not allowed;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><p/></datatemplate>
 #errors
-/datatemplate/p;element not allowed:datatemplate
+/datatemplate/p;element not allowed:datatemplate;m
 /datatemplate/p;no significant content;s
 
 #data
@@ -5929,14 +5933,14 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><unknown xmlns=""/></rule>
 #errors
-/rule/unknown;element;unsupported
+/rule/unknown;unknown element;u
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <unknown xmlns="http://www.example.org/"/>
 </rule>
 #errors
-/rule/unknown;element;unsupported
+/rule/unknown;unknown element;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><rule/></p>
@@ -6003,7 +6007,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><nest/></datatemplate>
 #errors
-/datatemplate/nest;element not allowed:datatemplate
+/datatemplate/nest;element not allowed:datatemplate;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><nest/></rule>
@@ -6036,7 +6040,6 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><textarea><nest/></textarea></rule>
 #errors
-/rule/textarea;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><section><nest/></section></rule>
@@ -6377,7 +6380,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/></ruby></rule>
 #errors
 /rule/ruby;no significant content;s
-/rule/ruby;element missing:rt;m
+/rule/ruby;element missing;rt;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/><rt>x</rt></ruby></rule>
@@ -6443,7 +6446,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>c</rt><nest/></ruby></rule>
 #errors
-/rule/ruby;element missing:rp;m
+/rule/ruby;element missing;rp;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rt><nest/></rt></rule>
@@ -6485,8 +6488,8 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html><nest/></html></rule>
 #errors
-/rule/html;child element missing:head
-/rule/html;child element missing:body
+/rule/html;child element missing;head;m
+/rule/html;child element missing;body;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -6514,7 +6517,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <head><title/></head><body/><nest/><body/>
 </html></rule>
 #errors
-/rule/html/body;element not allowed
+/rule/html/body;element not allowed;m
 /rule/html/body;no significant content;s
 /rule/html/body;no significant content;s
 
@@ -6523,14 +6526,14 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <head><title/></head><nest/>
 </html></rule>
 #errors
-/rule/html;child element missing:body
+/rule/html;child element missing;body;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
 <nest/><body/>
 </html></rule>
 #errors
-/rule/html/body;ps element missing:head
+/rule/html/body;ps element missing;head;m
 /rule/html/body;no significant content;s
 
 #data
@@ -6545,7 +6548,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <head><nest/></head>
 </rule>
 #errors
-/rule/head;child element missing:title
+/rule/head;child element missing;title;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -6578,7 +6581,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /rule/head/meta;element not allowed:meta charset;m
 /rule/head/meta;in XML:charset;m
-/rule/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/rule/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -6587,7 +6590,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /rule/head/meta;element not allowed:meta charset;m
 /rule/head/meta;in XML:charset;m
-/rule/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/rule/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><style><nest/></style></rule>
@@ -6672,7 +6675,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <dialog><dt/><nest/></dialog>
 </rule>
 #errors
-/rule/dialog;child element missing:dd
+/rule/dialog;child element missing;dd;m
 /rule/dialog/dt;no significant content;s
 
 #data
@@ -6688,7 +6691,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <dialog><dt/><dd/><dt/><nest/></dialog>
 </rule>
 #errors
-/rule/dialog;child element missing:dd
+/rule/dialog;child element missing;dd;m
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dd;no significant content;s
 /rule/dialog/dt;no significant content;s
@@ -6716,7 +6719,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <dialog><dt/><nest/><dt/><dd/></dialog>
 </rule>
 #errors
-/rule/dialog/dt;ps element missing:dd
+/rule/dialog/dt;ps element missing;dd;m
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dd;no significant content;s
@@ -6726,7 +6729,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <dialog><nest/><dt/></dialog>
 </rule>
 #errors
-/rule/dialog;child element missing:dd
+/rule/dialog;child element missing;dd;m
 /rule/dialog/dt;no significant content;s
 
 #data
@@ -6762,13 +6765,13 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/><dt/></dl></rule>
 #errors
-/rule/dl;child element missing:dd
+/rule/dl;child element missing;dd;m
 /rule/dl/dt;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><nest/></dl></rule>
 #errors
-/rule/dl;child element missing:dd
+/rule/dl;child element missing;dd;m
 /rule/dl/dt;no significant content;s
 
 #data
@@ -6886,7 +6889,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <table><caption/><nest/><caption/><tr><td/></tr></table>
 </rule>
 #errors
-/rule/table/caption;element not allowed
+/rule/table/caption;element not allowed;m
 /rule/table/caption;no significant content;s
 /rule/table/caption;no significant content;s
 /rule/table/tr/td;no significant content;s
@@ -6975,14 +6978,14 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <head><title/><noscript><nest/></noscript></head>
 </rule>
 #errors
-/rule/head/noscript;in XML:noscript
+/rule/head/noscript;in XML:noscript;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><head><title/>
 <noscript><link rel="alternate" href=""/><nest/></noscript>
 </head></rule>
 #errors
-/rule/head/noscript;in XML:noscript
+/rule/head/noscript;in XML:noscript;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -7001,7 +7004,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <datagrid><nest/><table/><p/></datagrid>
 </rule>
 #errors
-/rule/datagrid/p;element not allowed
+/rule/datagrid/p;element not allowed;m
 /rule/datagrid/p;no significant content;s
 
 #data
@@ -7017,7 +7020,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <datagrid><table/><nest/><p/></datagrid>
 </rule>
 #errors
-/rule/datagrid/p;element not allowed
+/rule/datagrid/p;element not allowed;m
 /rule/datagrid/p;no significant content;s
 
 #data
@@ -7072,7 +7075,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <menu>aa<nest/><li/></menu>
 </rule>
 #errors
-/rule/menu/li;element not allowed
+/rule/menu/li;element not allowed;m
 /rule/menu/li;no significant content;s
 
 #data
@@ -7080,7 +7083,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <menu><li/><nest/>aa</menu>
 </rule>
 #errors
-/rule/menu/"aa";character not allowed
+/rule/menu/"aa";character not allowed;m
 /rule/menu/li;no significant content;s
 
 #data
@@ -7173,15 +7176,15 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/><a:entry><a:id>http://www.example.org/1/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry></a:feed>
 </rule>
 #errors
-/rule/feed/entry;element missing:atom|author;m
+/rule/feed/entry;child element missing:atom;author;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><a:entry><a:id>http://www.example.org/1/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry><nest/><a:entry><a:id>http://www.example.org/2/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry></a:feed>
 </rule>
 #errors
-/rule/feed/entry;element missing:atom|author;m
-/rule/feed/entry;element missing:atom|author;m
+/rule/feed/entry;child element missing:atom;author;m
+/rule/feed/entry;child element missing:atom;author;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -7189,7 +7192,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <nest></nest>
 </div>
 #errors
-/div/datatemplate/nest;element not allowed:datatemplate
+/div/datatemplate/nest;element not allowed:datatemplate;m
 /div/nest;element not allowed:flow;m
 /div;no significant content;s
 
@@ -7198,7 +7201,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <datatemplate><rule></rule><nest></nest></datatemplate>
 </div>
 #errors
-/div/datatemplate/nest;element not allowed:datatemplate
+/div/datatemplate/nest;element not allowed:datatemplate;m
 /div;no significant content;s
 
 #data
@@ -7275,13 +7278,13 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /dir;element not defined;m
 /dir/li;no significant content;s
-/dir/"a";character not allowed
+/dir/"a";character not allowed;m
 
 #data
 <dir xmlns="http://www.w3.org/1999/xhtml">a</dir>
 #errors
 /dir;element not defined;m
-/dir/"a";character not allowed
+/dir/"a";character not allowed;m
 
 #data
 <dir xmlns="http://www.w3.org/1999/xhtml"><p/></dir>
@@ -7337,13 +7340,13 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <!-- From old HTML5 draft -->
 #errors
 /html/body/font;element not defined;m
-/html/body/font/@style;attribute;unsupported
+/html/body/font/@style;unknown attribute;u
 /html/body/p/font;element not defined;m
-/html/body/p/font/@style;attribute;unsupported
+/html/body/p/font/@style;unknown attribute;u
 /html/body/p/font;element not defined;m
-/html/body/p/font/@style;attribute;unsupported
+/html/body/p/font/@style;unknown attribute;u
 /html/body/p/font;element not defined;m
-/html/body/p/font/@style;attribute;unsupported
+/html/body/p/font/@style;unknown attribute;u
 /html/body/p/font;element not defined;m
-/html/body/p/font/@style;attribute;unsupported
+/html/body/p/font/@style;unknown attribute;u
 

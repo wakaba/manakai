@@ -828,7 +828,7 @@ $Element->{$ATOM_NS}->{content} = {
     if ($element_state->{type} eq 'xhtml') {
       unless ($element_state->{has_div}) {
         $self->{onerror}->(node => $item->{node},
-                           type => 'element missing',
+                           type => 'child element missing',
                            text => 'div',
                            level => $self->{level}->{must});
       }

@@ -1,5 +1,15 @@
 2008-08-30  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Error level definition for |xml_id_error|
+	was missing.
+
+	* URIChecker.pm: The end of the URL should be marked as the
+	error location for an empty path error.  The position
+	between the userinfo and the port components should be
+	marked as the error location for an empty host error.
+
+2008-08-30  Wakaba  <wakaba@suika.fam.cx>
+
 	* URIChecker.pm: Set parameters representing where in the
 	value the error occurs for errors.  Report unknown
 	address format error in warning level, since address

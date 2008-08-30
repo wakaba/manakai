@@ -130,6 +130,8 @@ sub check_rfc3066_language_tag ($$;$$) {
   my $onerror = $_[2] || sub { };
   my $levels = $_[3] || $default_error_levels;
 
+  ## TODO: Should we raise a different type of error for empty language tags?
+
   ## TODO: If ISO 639 and 3166 have strong recommendation
   ## for case of codes, bad-case-error should be $should_level.
   ## NOTE: They are marked as $good_level for now, since

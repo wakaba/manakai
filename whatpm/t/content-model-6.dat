@@ -6,6 +6,12 @@
 #data
 <p xmlns="http://ww.w3.org/1999/xhtml" data="">x</p>
 #errors
+/p/@data;unknown attribute;u
+/p;unknown element;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" data="">x</p>
+#errors
 /p/@data;attribute not defined;m
 
 #data
@@ -31,9 +37,9 @@
 <p xmlns="http://www.example.com/non-html"
     data-1="" data-2="custom data">x</p>
 #errors
-/p;element;unsupported
-/p/@data-1;attribute;unsupported
-/p/@data-2;attribute;unsupported
+/p;unknown element;u
+/p/@data-1;unknown attribute;u
+/p/@data-2;unknown attribute;u
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml"
@@ -80,7 +86,6 @@
 <embed xmlns="http://www.w3.org/1999/xhtml"
     data-="custom data" src=""/>
 #errors
-/embed/@data-;attribute not defined;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml"
@@ -92,4 +97,3 @@
 <object xmlns="http://www.w3.org/1999/xhtml"
     data-="custom data" data="">x</object>
 #errors
-/object/@data-;attribute not defined;m

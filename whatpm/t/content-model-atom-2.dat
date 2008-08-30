@@ -5,14 +5,14 @@
 #data
 <feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang="!" href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>
 #errors
-/feed/link/@hreflang;LangTag:syntax:illegal;m
-/feed/link/@hreflang;LangTag:nosemantics:language;m
+/feed/link/@hreflang;langtag:illegal;m
+/feed/link/@hreflang;langtag:language:nosemantics;m
 
 #data
 <feed xmlns="http://www.w3.org/2005/Atom"><link rel="self" hreflang=" en " href="http://example.org/1"/><id>tag:example.org,1</id><title/><updated>2005-07-31T12:29:29Z</updated></feed>
 #errors
-/feed/link/@hreflang;LangTag:syntax:illegal;m
-/feed/link/@hreflang;LangTag:nosemantics:language;m
+/feed/link/@hreflang;langtag:illegal;m
+/feed/link/@hreflang;langtag:language:nosemantics;m
 
 #data
 <feed xmlns="http://www.w3.org/2005/Atom"><updated>2005-07-31T12:29:29Z</updated><link rel="self" href="http://example.org/1"/><id>tag:example.org,1</id><title/></feed>
@@ -219,10 +219,10 @@
 
 </feed>
 #errors
-/feed/entry/foo;element not allowed
-/feed/entry/foo;element;unsupported
-/feed/entry/foo;element not allowed
-/feed/entry/foo;element;unsupported
+/feed/entry/foo;element not allowed;m
+/feed/entry/foo;unknown element;u
+/feed/entry/foo;element not allowed;m
+/feed/entry/foo;unknown element;u
 
 #data
 <?xml version="1.0" encoding="iso-8859-1"?>
@@ -261,5 +261,5 @@
 #errors
 /feed/author/email;addr-spec not supported;u
 /feed/author/email;addr-spec not supported;u
-/feed/generator/@uri;URI::empty path;w
+/feed/generator/@uri;URL:empty path;w
 

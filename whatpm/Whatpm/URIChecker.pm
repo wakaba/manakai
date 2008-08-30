@@ -239,7 +239,7 @@ sub check_iri_reference ($$$;$) {
     if ($path eq '') {
       $onerror->(type => 'URL:empty path', 
                  level => $levels->{uri_lc_should},
-                 value => $uri_s);
+                 value => $uri_s, value_mark_end => 1);
       ## should
     }
   }
@@ -252,7 +252,9 @@ sub check_iri_reference ($$$;$) {
       (defined $ui or defined $port)) {
     $onerror->(type => 'URL:empty host',
                level => $levels->{uri_lc_should},
-               value => $authority);
+               value => $authority,
+               pos_start => defined $ui ? 1 + length $ui : 0,
+               pos_end => defined $ui ? 1 + length $ui : 0);
     ## should # when empty authority is allowed
   }
 
@@ -316,4 +318,4 @@ sub check_rdf_uri_reference ($$$;$) {
 } # check_rdf_uri_reference
 
 1;
-## $Date: 2008/08/30 05:31:38 $
+## $Date: 2008/08/30 10:26:39 $

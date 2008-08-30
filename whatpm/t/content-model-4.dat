@@ -304,7 +304,7 @@
 #data
 <a xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer">.</a>
 #errors
-/a/@rel;link type:noreferer;unsupported
+/a/@rel;unknown link type;u
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer">.</a>
@@ -314,7 +314,7 @@
 <area xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer" alt="X"
     coords="1,2,3,4"/>
 #errors
-/area/@rel;link type:noreferer;unsupported
+/area/@rel;unknown link type;u
 
 #data
 <area xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer" alt="X"
@@ -324,46 +324,46 @@
 #data
 <link xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer"/>
 #errors
-/link/@rel;link type:noreferer;unsupported
+/link/@rel;unknown link type;u
 
 #data
 <link xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer"/>
 #errors
-/link/@rel;link type:bad context:noreferrer
+/link/@rel;link type:bad context;m
 
 #data
 <link xmlns="http://www.w3.org/1999/xhtml" href="" rel="openid.server"/>
 #errors
-/link/@rel;link type:proposed:openid.server;s
+/link/@rel;link type:proposed;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml" href="" rel="openid.server">a</a>
 #errors
-/a/@rel;link type:proposed:openid.server;s
-/a/@rel;link type:bad context:openid.server
+/a/@rel;link type:proposed;s
+/a/@rel;link type:bad context;m
 
 #data
 <area xmlns="http://www.w3.org/1999/xhtml" href="" shape="default"
     alt="" rel="openid.server"/>
 #errors
-/area/@rel;link type:proposed:openid.server;s
-/area/@rel;link type:bad context:openid.server
+/area/@rel;link type:proposed;s
+/area/@rel;link type:bad context;m
 
 #data
 <link xmlns="http://www.w3.org/1999/xhtml" href="" rel="service"/>
 #errors
-/link/@rel;link type:proposed:service;s
+/link/@rel;link type:proposed;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml" href="" rel="service">a</a>
 #errors
-/a/@rel;link type:proposed:service;s
-/a/@rel;link type:bad context:service
+/a/@rel;link type:proposed;s
+/a/@rel;link type:bad context;m
 
 #data
 <area xmlns="http://www.w3.org/1999/xhtml" href="" shape="default"
     alt="" rel="service"/>
 #errors
-/area/@rel;link type:proposed:service;s
-/area/@rel;link type:bad context:service
+/area/@rel;link type:proposed;s
+/area/@rel;link type:bad context;m
 

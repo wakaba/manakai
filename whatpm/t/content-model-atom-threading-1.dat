@@ -29,7 +29,7 @@
      </entry>
    </feed>
 #errors
-/feed;element missing:atom|link|self;s
+/feed;child element missing:atom:link:self;s
 
 #data
 <!-- From RFC 4685 -->
@@ -58,7 +58,7 @@
      </entry>
    </feed>
 #errors
-/feed;element missing:atom|link|self;s
+/feed;child element missing:atom:link:self;s
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"
@@ -71,7 +71,7 @@
 <thr:total></thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 
 #data
@@ -109,7 +109,7 @@
 <thr:total>+0</thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"
@@ -134,7 +134,7 @@
 <thr:total>0.00</thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"
@@ -159,7 +159,7 @@
 <thr:total>33,44</thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"
@@ -172,7 +172,7 @@
 <thr:total>444 </thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"
@@ -185,7 +185,7 @@
 <thr:total>+233</thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"
@@ -198,7 +198,7 @@
 <thr:total>.444</thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"
@@ -211,7 +211,7 @@
 <thr:total> 44</thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"
@@ -224,7 +224,7 @@
 <thr:total>40,444</thr:total>
 </entry>
 #errors
-/entry/total;syntax error;m
+/entry/total;invalid attribute value;m
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom"

@@ -2,7 +2,7 @@
 use strict;
 
 use Test;
-BEGIN { plan tests => 2192 }
+BEGIN { plan tests => 2646 }
 
 my @FILES = qw[
   t/content-model-1.dat
@@ -88,6 +88,7 @@ sub test ($) {
          #
        } else {
          push @error, get_node_path ($opt{node}) . ';' . $opt{type} .
+             (defined $opt{text} ? ';' . $opt{text} : '') .
              (defined $opt{level} ? ';'.$opt{level} : '');
        }
      }, sub {
@@ -126,4 +127,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2008/04/13 10:36:41 $
+## $Date: 2008/08/30 10:26:39 $

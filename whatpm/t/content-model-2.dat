@@ -1,36 +1,36 @@
 #data
 <unknown u1=""></unknown>
 #errors
-/unknown;element;unsupported
-/unknown/@u1;attribute;unsupported
+/unknown;unknown element;u
+/unknown/@u1;unknown attribute;u
 
 #data
 <unknown u1="" u2=""></unknown>
 #errors
-/unknown;element;unsupported
-/unknown/@u1;attribute;unsupported
-/unknown/@u2;attribute;unsupported
+/unknown;unknown element;u
+/unknown/@u1;unknown attribute;u
+/unknown/@u2;unknown attribute;u
 
 #data
 <unknown u1="" xmlns=""></unknown>
 #errors
-/unknown;element;unsupported
-/unknown/@u1;attribute;unsupported
+/unknown;unknown element;u
+/unknown/@u1;unknown attribute;u
 
 #data
 <unknown xml:lang="!" xmlns=""></unknown>
 #errors
-/unknown;element;unsupported
-/unknown/@lang;LangTag:nosemantics:language;m
-/unknown/@lang;LangTag:syntax:illegal;m
+/unknown;unknown element;u
+/unknown/@lang;langtag:language:nosemantics;m
+/unknown/@lang;langtag:illegal;m
 
 #data
 <unknown u1="" xml:lang="!" xmlns=""></unknown>
 #errors
-/unknown;element;unsupported
-/unknown/@lang;LangTag:nosemantics:language;m
-/unknown/@lang;LangTag:syntax:illegal;m
-/unknown/@u1;attribute;unsupported
+/unknown;unknown element;u
+/unknown/@lang;langtag:language:nosemantics;m
+/unknown/@lang;langtag:illegal;m
+/unknown/@u1;unknown attribute;u
 
 #data
 <unknown u1="" xmlns="http://www.w3.org/1999/xhtml"></unknown>
@@ -42,16 +42,16 @@
 <unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
 /unknown;element not defined;m
-/unknown/@lang;LangTag:nosemantics:language;m
-/unknown/@lang;LangTag:syntax:illegal;m
+/unknown/@lang;langtag:language:nosemantics;m
+/unknown/@lang;langtag:illegal;m
 /unknown/@u1;attribute not defined;m
 
 #data
 <unknown class="" u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
 /unknown;element not defined;m
-/unknown/@lang;LangTag:nosemantics:language;m
-/unknown/@lang;LangTag:syntax:illegal;m
+/unknown/@lang;langtag:language:nosemantics;m
+/unknown/@lang;langtag:illegal;m
 /unknown/@u1;attribute not defined;m
 
 #data
@@ -78,15 +78,15 @@
 <p xmlns="http://www.w3.org/1999/xhtml"
     a:b="" xmlns:a="http://www.example.test/">a</p>
 #errors
-/p/@b;attribute;unsupported
+/p/@b;unknown attribute;u
 
 #data
 <a html:repeat="" html:b=""
 c="" xmlns:d="http://" d:e="" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
-/a;element;unsupported
-/a/@c;attribute;unsupported
-/a/@e;attribute;unsupported
+/a;unknown element;u
+/a/@c;unknown attribute;u
+/a/@e;unknown attribute;u
 /a/@b;attribute not defined;m
 /a/@repeat;repeat:syntax error;m
 
@@ -133,7 +133,7 @@ c="" xmlns:d="http://" d:e="" xmlns:html="http://www.w3.org/1999/xhtml"/>
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="">a</p>
 #errors
-/p/@id;empty attribute value
+/p/@id;empty attribute value;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -144,51 +144,51 @@ id="a">a</p>
 <p xmlns="http://www.w3.org/1999/xhtml"
 id=" ">a</p>
 #errors
-/p/@id;space in ID
+/p/@id;space in ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="&#x9;">a</p>
 #errors
-/p/@id;space in ID
+/p/@id;space in ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="&#xA;">a</p>
 #errors
-/p/@id;space in ID
+/p/@id;space in ID;m
 
 #data
 <?xml version="1.1"?>
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="&#xB;">a</p>
 #errors
-/p/@id;space in ID
+/p/@id;space in ID;m
 
 #data
 <?xml version="1.1"?>
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="&#xC;">a</p>
 #errors
-/p/@id;space in ID
+/p/@id;space in ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="&#xD;">a</p>
 #errors
-/p/@id;space in ID
+/p/@id;space in ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="a ">a</p>
 #errors
-/p/@id;space in ID
+/p/@id;space in ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="a b">a</p>
 #errors
-/p/@id;space in ID
+/p/@id;space in ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -199,22 +199,22 @@ id="aaaaaaa">a</p>
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="a"><span id="a">a</span></p>
 #errors
-/p/span/@id;duplicate ID
+/p/span/@id;duplicate ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="a b"><span id="a b">x</span></p>
 #errors
-/p/@id;space in ID
-/p/span/@id;duplicate ID
-/p/span/@id;space in ID
+/p/@id;space in ID;m
+/p/span/@id;duplicate ID;m
+/p/span/@id;space in ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
 id=""><span id="">x</span></p>
 #errors
-/p/@id;empty attribute value
-/p/span/@id;empty attribute value
+/p/@id;empty attribute value;m
+/p/span/@id;empty attribute value;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -231,9 +231,9 @@ id=""><span id="">x</span></p>
   <span id=" a ">x</span>
 </p>
 #errors
-/p/span/@id;space in ID
-/p/span/@id;space in ID
-/p/span/@id;space in ID
+/p/span/@id;space in ID;m
+/p/span/@id;space in ID;m
+/p/span/@id;space in ID;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -272,7 +272,7 @@ id=""><span id="">x</span></p>
 #data
 <p lang="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@lang;in XML:lang
+/p/@lang;in XML:lang;m
 
 #data
 <p xml:lang="" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -281,12 +281,12 @@ id=""><span id="">x</span></p>
 #data html
 <!DOCTYPE HTML><title>x</title><p xml:lang="">x</p>
 #errors
-/html/body/p/@xml:lang;in HTML:xml:lang
+/html/body/p/@xml:lang;in HTML:xml:lang;m
 
 #data
 <p dir="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@dir;enumerated:invalid
+/p/@dir;enumerated:invalid;m
 
 #data
 <p dir="ltr" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -295,12 +295,12 @@ id=""><span id="">x</span></p>
 #data
 <p dir=" ltr" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@dir;enumerated:invalid
+/p/@dir;enumerated:invalid;m
 
 #data
 <p dir="ltr " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@dir;enumerated:invalid
+/p/@dir;enumerated:invalid;m
 
 #data
 <!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
@@ -312,7 +312,7 @@ id=""><span id="">x</span></p>
 <!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
 <p dir="ltr&#x0C;" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@dir;enumerated:invalid
+/p/@dir;enumerated:invalid;m
 
 #data
 <p dir="LTR" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -333,12 +333,12 @@ id=""><span id="">x</span></p>
 #data
 <p dir="rtltr" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@dir;enumerated:invalid
+/p/@dir;enumerated:invalid;m
 
 #data
 <p dir="XXXXXX" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@dir;enumerated:invalid
+/p/@dir;enumerated:invalid;m
 
 #data
 <p class="" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -365,19 +365,19 @@ id=""><span id="">x</span></p>
 #data
 <p class="a a" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@class;duplicate token:a
+/p/@class;duplicate token;m
 
 #data
 <?xml version="1.1"?>
 <p class="  aa&#xC; aa" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@class;duplicate token:aa
+/p/@class;duplicate token;m
 
 #data
 <p class="a a a" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@class;duplicate token:a
-/p/@class;duplicate token:a
+/p/@class;duplicate token;m
+/p/@class;duplicate token;m
 
 #data
 <p class="I i &#x0131;" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -406,32 +406,32 @@ id=""><span id="">x</span></p>
 #data
 <p contenteditable="none" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@contenteditable;enumerated:invalid
+/p/@contenteditable;enumerated:invalid;m
 
 #data
 <p contenteditable="true " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@contenteditable;enumerated:invalid
+/p/@contenteditable;enumerated:invalid;m
 
 #data
 <p contenteditable="yes" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@contenteditable;enumerated:invalid
+/p/@contenteditable;enumerated:invalid;m
 
 #data
 <p contenteditable="contenteditable" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@contenteditable;enumerated:invalid
+/p/@contenteditable;enumerated:invalid;m
 
 #data
 <p contenteditable="inherit" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@contenteditable;enumerated:invalid
+/p/@contenteditable;enumerated:invalid;m
 
 #data
 <p contenteditable="yes" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@contenteditable;enumerated:invalid
+/p/@contenteditable;enumerated:invalid;m
 
 #data
 <p contentEditable="" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -523,58 +523,58 @@ id=""><span id="">x</span></p>
 #data
 <p tabindex="1.0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@tabindex;integer:syntax error
+/p/@tabindex;integer:syntax error;m
 
 #data
 <p tabindex="+1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@tabindex;integer:syntax error
+/p/@tabindex;integer:syntax error;m
 
 #data
 <p tabindex="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@tabindex;integer:syntax error
+/p/@tabindex;integer:syntax error;m
 
 #data
 <p tabindex="+1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@tabindex;integer:syntax error
+/p/@tabindex;integer:syntax error;m
 
 #data
 <p onabort="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onabort;event handler;unsupported
+/p/@onabort;event handler;u
 
 #data
 <p onbeforeunload="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onbeforeunload;event handler;unsupported
+/p/@onbeforeunload;event handler;u
 
 #data
 <p onblur="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onblur;event handler;unsupported
+/p/@onblur;event handler;u
 
 #data
 <p onchange="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onchange;event handler;unsupported
+/p/@onchange;event handler;u
 
 #data
 <p onclick="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onclick;event handler;unsupported
+/p/@onclick;event handler;u
 
 #data
 <p onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onstorage;event handler;unsupported
+/p/@onstorage;event handler;u
 
 #data
 <unknown onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</unknown>
 #errors
 /unknown;element not defined;m
-/unknown/@onstorage;event handler;unsupported
+/unknown/@onstorage;event handler;u
 
 #data
 <p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -605,7 +605,7 @@ id=""><span id="">x</span></p>
 <body><p>a</p></body>
 </html>
 #errors
-/html/@manifest;URI::syntax error:iriref3987;m
+/html/@manifest;syntax error:iriref3987;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -614,7 +614,7 @@ id=""><span id="">x</span></p>
 <body><p>a</p></body>
 </html>
 #errors
-/html/@manifest;URI::syntax error:iriref3987;m
+/html/@manifest;syntax error:iriref3987;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -641,7 +641,7 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html/@xmlns;invalid attribute value
+/html/@xmlns;invalid attribute value;m
 /html/body;no significant content;s
 
 #data html
@@ -651,7 +651,7 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html/@xmlns;invalid attribute value
+/html/@xmlns;invalid attribute value;m
 /html/body;no significant content;s
 
 #data html
@@ -661,7 +661,7 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html/@xmlns;invalid attribute value
+/html/@xmlns;invalid attribute value;m
 /html/body;no significant content;s
 
 #data html
@@ -671,7 +671,7 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html/@xmlns;invalid attribute value
+/html/@xmlns;invalid attribute value;m
 /html/body;no significant content;s
 
 #data html
@@ -681,7 +681,7 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html/@xmlns;invalid attribute value
+/html/@xmlns;invalid attribute value;m
 /html/body;no significant content;s
 
 #data html
@@ -691,7 +691,7 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html/@xmlns;invalid attribute value
+/html/@xmlns;invalid attribute value;m
 /html/body;no significant content;s
 
 #data
@@ -708,10 +708,10 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html;element;unsupported
-/html/head;element;unsupported
-/html/head/title;element;unsupported
-/html/body;element;unsupported
+/html;unknown element;u
+/html/head;unknown element;u
+/html/head/title;unknown element;u
+/html/body;unknown element;u
 
 #data html
 <!DOCTYPE html>
@@ -735,7 +735,7 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <p xmlns="">x</p>
 #errors
-/html/body/p/@xmlns;invalid attribute value
+/html/body/p/@xmlns;invalid attribute value;m
 /html/body/p/@xmlns;attribute not allowed;m
 
 #data html
@@ -752,7 +752,7 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <unknown xmlns="http://www.w3.org/1999/html">x</unknown>
 #errors
-/html/body/unknown/@xmlns;invalid attribute value
+/html/body/unknown/@xmlns;invalid attribute value;m
 /html/body/unknown/@xmlns;attribute not allowed;m
 /html/body/unknown;element not defined;m
 /html/body/unknown;element not allowed:flow;m
@@ -766,8 +766,8 @@ id=""><span id="">x</span></p>
 </title>
 </svg>
 #errors
-/html/body/svg;element;unsupported
-/html/body/svg/title;element;unsupported
+/html/body/svg;unknown element;u
+/html/body/svg/title;unknown element;u
 
 #data html
 <!DOCTYPE HTML>
@@ -778,9 +778,9 @@ id=""><span id="">x</span></p>
 </title>
 </svg>
 #errors
-/html/body/svg;element;unsupported
-/html/body/svg/title;element;unsupported
-/html/body/svg/title/p/@xmlns;invalid attribute value
+/html/body/svg;unknown element;u
+/html/body/svg/title;unknown element;u
+/html/body/svg/title/p/@xmlns;invalid attribute value;m
 
 #data html
 <!DOCTYPE HTML>
@@ -791,9 +791,9 @@ id=""><span id="">x</span></p>
 </title>
 </svg>
 #errors
-/html/body/svg;element;unsupported
-/html/body/svg/title;element;unsupported
-/html/body/svg/title/div/p/@xmlns;invalid attribute value
+/html/body/svg;unknown element;u
+/html/body/svg/title;unknown element;u
+/html/body/svg/title/div/p/@xmlns;invalid attribute value;m
 /html/body/svg/title/div/p/@xmlns;attribute not allowed;m
 
 #data
@@ -839,22 +839,22 @@ id=""><span id="">x</span></p>
 </head>
 #errors
 /head/@profile;attribute not defined;m
-/head/@profile;URIs::syntax error:iriref3987:0;m
+/head/@profile;syntax error:iriref3987;m
 
 #data
 <base xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/base;attribute missing:href|target
+/base;attribute missing:href|target;m
 
 #data
 <base title="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/base;attribute missing:href|target
+/base;attribute missing:href|target;m
 
 #data
 <base href="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/base/@href;URI::syntax error:iriref3987;m
+/base/@href;syntax error:iriref3987;m
 
 #data
 <base href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -928,7 +928,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;basehref after URI attribute
+/head/base;basehref after URL attribute;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -961,7 +961,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;basehref after URI attribute
+/head/base;basehref after URL attribute;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -978,7 +978,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;basehref after URI attribute
+/head/base;basehref after URL attribute;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -995,7 +995,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;basetarget after hyperlink
+/head/base;basetarget after hyperlink;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1012,8 +1012,8 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;basehref after URI attribute
-/head/base;basetarget after hyperlink
+/head/base;basehref after URL attribute;m
+/head/base;basetarget after hyperlink;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1046,7 +1046,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/link/@rel;duplicate token:stylesheet
+/head/link/@rel;duplicate token;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1055,7 +1055,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;basetarget after hyperlink
+/head/base;basetarget after hyperlink;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1064,7 +1064,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;basetarget after hyperlink
+/head/base;basetarget after hyperlink;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1073,7 +1073,7 @@ id=""><span id="">x</span></p>
 <title/>
 </head>
 #errors
-/head/base;basetarget after hyperlink
+/head/base;basetarget after hyperlink;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1083,7 +1083,7 @@ id=""><span id="">x</span></p>
 </head>
 #errors
 /head/a;element not allowed:metadata;m
-/head/base;basetarget after hyperlink
+/head/base;basetarget after hyperlink;m
 /head/a;no significant content;s
 
 #data
@@ -1094,7 +1094,7 @@ id=""><span id="">x</span></p>
 </head>
 #errors
 /head/area;element not allowed:metadata;m
-/head/base;basetarget after hyperlink
+/head/base;basetarget after hyperlink;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1104,7 +1104,7 @@ id=""><span id="">x</span></p>
 </head>
 #errors
 /head/area;element not allowed:metadata;m
-/head/base;basehref after URI attribute
+/head/base;basehref after URL attribute;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1114,7 +1114,7 @@ id=""><span id="">x</span></p>
 </head>
 #errors
 /head/video;element not allowed:metadata;m
-/head/base;basehref after URI attribute
+/head/base;basehref after URL attribute;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -1131,18 +1131,18 @@ id=""><span id="">x</span></p>
 #data
 <link xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link;attribute missing:href
-/link;attribute missing:rel
+/link;attribute missing;href;m
+/link;attribute missing;rel;m
 
 #data
 <link href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link;attribute missing:rel
+/link;attribute missing;rel;m
 
 #data
 <link rel="author" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link;attribute missing:href
+/link;attribute missing;href;m
 
 #data
 <link rel="stylesheet" href="http://www.test/"
@@ -1153,19 +1153,19 @@ id=""><span id="">x</span></p>
 <link rel="stylesheet" href="://www.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@href;URI::syntax error:iriref3987;m
+/link/@href;syntax error:iriref3987;m
 
 #data
 <link rel="stylesheet" href="http://www.test/" type=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@type;IMT:syntax error
+/link/@type;IMT:syntax error;m
 
 #data
 <link rel="stylesheet" href="http://www.test/" type="text"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@type;IMT:syntax error
+/link/@type;IMT:syntax error;m
 
 #data
 <link rel="stylesheet" href="http://www.test/" type="text/css"
@@ -1196,43 +1196,43 @@ id=""><span id="">x</span></p>
 <link rel="author author" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@rel;duplicate token:author
+/link/@rel;duplicate token;m
 
 #data
 <link rel="bookmark" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@rel;link type:bad context:bookmark
+/link/@rel;link type:bad context;m
 
 #data
 <link rel="previous" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@rel;link type:non-conforming:previous
+/link/@rel;link type:non-conforming;m
 
 #data
 <link rel="edit" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@rel;link type:proposed:edit;s
+/link/@rel;link type:proposed;s
 
 #data
 <link rel="contact" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@rel;link type:proposed:contact;s
+/link/@rel;link type:proposed;s
 
 #data
 <link rel="script" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@rel;link type:non-conforming:script
+/link/@rel;link type:non-conforming;m
 
 #data
 <link rel="example-link-type" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@rel;link type:example-link-type;unsupported
+/link/@rel;unknown link type;u
 
 #data
 <link rel="alternate stylesheet" href="http://test/" title=""
@@ -1243,7 +1243,7 @@ id=""><span id="">x</span></p>
 <link rel="author" href="http://test/" hreflang=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@hreflang;LangTag:nosemantics:language;m
+/link/@hreflang;langtag:language:nosemantics;m
 
 #data
 <link rel="author" href="http://test/" hreflang="en"
@@ -1254,15 +1254,15 @@ id=""><span id="">x</span></p>
 <link media="all"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link;attribute missing:href
-/link;attribute missing:rel
-/link/@media;media query;unsupported
+/link;attribute missing;href;m
+/link;attribute missing;rel;m
+/link/@media;media query;u
 
 #data
 <link rel="author" href="http://test/" media="all"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@media;media query;unsupported
+/link/@media;media query;u
 
 #data
 <link href="http://test/" rel="author" target="_self"
@@ -1277,7 +1277,7 @@ id=""><span id="">x</span></p>
   <title>x</title>
 </head>
 #errors
-/head/link/@rel;link type:duplicate:pingback
+/head/link/@rel;link type:duplicate;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1286,7 +1286,7 @@ id=""><span id="">x</span></p>
   <title>x</title>
 </head>
 #errors
-/head/link/@rel;link type:duplicate:pingback
+/head/link/@rel;link type:duplicate;m
 
 #data
 <link rel="alternate" href="" target="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1320,20 +1320,20 @@ id=""><span id="">x</span></p>
 <link href="" rev=" " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@rev;attribute not defined;m
-/link;attribute missing:rel
+/link;attribute missing;rel;m
 
 #data
 <link href="" rev="made" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@rev;attribute not defined;m
-/link;attribute missing:rel
+/link;attribute missing;rel;m
 
 #data
 <link href="" rev="made made" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@rev;attribute not defined;m
-/link/@rev;duplicate token:made
-/link;attribute missing:rel
+/link/@rev;duplicate token;m
+/link;attribute missing;rel;m
 
 #data
 <link href="" rel="alternate"
@@ -1346,29 +1346,37 @@ id=""><span id="">x</span></p>
     charset="x-sjis" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@charset;attribute not defined;m
-/link/@charset;charset:not preferred:x-sjis;m
-/link/@charset;charset:private:x-sjis;w
+/link/@charset;charset:not preferred;m
+/link/@charset;charset:private;w
 
 #data
 <link href="" rel="alternate"
     charset="not-registered" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@charset;attribute not defined;m
-/link/@charset;charset:not registered:not-registered;w
+/link/@charset;charset:not registered;w
 
 #data
 <link href="" rel="alternate"
     charset="Shift JIS" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@charset;attribute not defined;m
-/link/@charset;charset:syntax error:shift jis;m
+/link/@charset;charset:not registered;w
+
+#data
+<link href="" rel="alternate"
+    charset="Shift&#x4e00;JIS" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:syntax error;m
+/link/@charset;charset:not registered;w
 
 #data
 <link href="" rel="alternate"
     charset="ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@charset;attribute not defined;m
-/link/@charset;charset:not preferred:ascii;m
+/link/@charset;charset:not preferred;m
 
 #data
 <link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1456,7 +1464,7 @@ id=""><span id="">x</span></p>
 <link rel="shortcut icon" href="" xmlns="http://www.w3.org/1999/xhtml"
     sizes=""/>
 #errors
-/link/@rel;link type:shortcut;unsupported
+/link/@rel;unknown link type;u
 
 #data
 <link rel="alternate" href="" xmlns="http://www.w3.org/1999/xhtml"
@@ -1468,7 +1476,7 @@ id=""><span id="">x</span></p>
 <a rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
     sizes="">x</a>
 #errors
-/a/@rel;link type:bad context:icon
+/a/@rel;link type:bad context;m
 /a/@sizes;attribute not defined;m
 
 #data
@@ -1476,12 +1484,12 @@ id=""><span id="">x</span></p>
   <!-- TODO: <meta> tests are not complete -->
 </meta>
 #errors
-/meta;attribute missing:name|http-equiv|charset
+/meta;attribute missing:name|http-equiv|charset;m
 
 #data
 <meta name="dns" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;attribute missing:content
+/meta;attribute missing;content;m
 
 #data
 <meta name="dns" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1492,14 +1500,14 @@ id=""><span id="">x</span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
-/meta/@charset;attribute not allowed
+/meta/@charset;attribute not allowed;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 
 #data
 <meta http-equiv="refresh" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta;attribute missing:content
+/meta;attribute missing;content;m
 
 #data
 <meta http-equiv="refresh" content="10; url=a.html"
@@ -1510,114 +1518,114 @@ id=""><span id="">x</span></p>
 <meta http-equiv="refresh" content="10; url=a.html" name="dns"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta/@http-equiv;attribute not allowed
+/meta/@http-equiv;attribute not allowed;m
 
 #data
 <meta http-equiv="refresh" content="10; url=a.html" charset="us-ascii"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta/@charset;attribute not allowed
+/meta/@charset;attribute not allowed;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 /meta;element not allowed:meta charset;m
 
 #data
 <meta http-equiv="" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta/@http-equiv;enumerated:invalid
+/meta/@http-equiv;enumerated:invalid;m
 
 #data
 <meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta/@content;attribute not allowed
-/meta;attribute missing:name|http-equiv
+/meta/@content;attribute not allowed;m
+/meta;attribute missing:name|http-equiv;m
 
 #data
 <meta charset="us-ascii" content="example.net"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
-/meta/@content;attribute not allowed
+/meta/@content;attribute not allowed;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 
 #data
 <meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meta/@content;attribute not allowed
-/meta;attribute missing:name|http-equiv
+/meta/@content;attribute not allowed;m
+/meta;attribute missing:name|http-equiv;m
 
 #data html
 <!DOCTYPE HTML><html><head><meta charset="us-ascii"><title>x</title></head><body><p>x
 #errors
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
 <meta charset="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::;unsupported
-/meta/@charset;charset:syntax error:;m
-/meta/@charset;charset:not registered:;w
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:syntax error;m
+/meta/@charset;charset:not registered;w
 
 #data
 <meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 
 #data
 <meta charset="US-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::us-ascii;unsupported
+/meta/@charset;mismatched charset name not checked;u
 
 #data
 <meta charset="csiso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::csiso2022jp;unsupported
-/meta/@charset;charset:not preferred:csiso2022jp;m
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
 
 #data
 <meta charset="iso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::iso2022jp;unsupported
-/meta/@charset;charset:not preferred:iso2022jp;m
-/meta/@charset;charset:not registered:iso2022jp;w
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+/meta/@charset;charset:not registered;w
 
 #data
 <meta charset="x-utf-8" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::x-utf-8;unsupported
-/meta/@charset;charset:not preferred:x-utf-8;m
-/meta/@charset;charset:private:x-utf-8;w
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+/meta/@charset;charset:private;w
 
 #data
 <meta charset="utf-8n" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::utf-8n;unsupported
-/meta/@charset;charset:not preferred:utf-8n;m
-/meta/@charset;charset:not registered:utf-8n;w
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+/meta/@charset;charset:not registered;w
 
 #data
 <meta charset="x-sjis" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@charset;mismatched charset name::x-sjis;unsupported
-/meta/@charset;charset:not preferred:x-sjis;m
-/meta/@charset;charset:private:x-sjis;w
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+/meta/@charset;charset:private;w
 
 #data html
 <!DOCTYPE HTML>
@@ -1625,7 +1633,7 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <body><p>b</p></body>
 #errors
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data html
 <!DOCTYPE HTML>
@@ -1633,8 +1641,8 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <body><p>x</p></body>
 #errors
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
-/html/head/meta/@charset;character reference in charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charref in charset;m
 
 #data html
 <!DOCTYPE HTML>
@@ -1642,8 +1650,8 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <body><p>x</p></body>
 #errors
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
-/html/head/meta/@charset;character reference in charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charref in charset;m
 
 #data html
 <!DOCTYPE HTML>
@@ -1651,8 +1659,8 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <body><p>x</p></body>
 #errors
-/html/head/meta/@charset;mismatched charset name::us-&scii;unsupported
-/html/head/meta/@charset;charset:not registered:us-&scii;w
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charset:not registered;w
 
 #data html
 <!DOCTYPE HTML>
@@ -1660,9 +1668,9 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <body><p>x</p></body>
 #errors
-/html/head/meta/@charset;mismatched charset name::us-&scii;unsupported
-/html/head/meta/@charset;charset:not registered:us-&scii;w
-/html/head/meta/@charset;character reference in charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charset:not registered;w
+/html/head/meta/@charset;charref in charset;m
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml"
@@ -1670,7 +1678,7 @@ id=""><span id="">x</span></p>
     />
 #errors
 /meta;element not allowed:meta charset;m
-/meta;attribute missing:content;m
+/meta;attribute missing;content;m
 /meta;in XML:charset;m
 
 #data
@@ -1716,7 +1724,7 @@ id=""><span id="">x</span></p>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@content;mismatched charset name::us-ascii;unsupported
+/meta/@content;mismatched charset name not checked;u
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml"
@@ -1725,7 +1733,7 @@ id=""><span id="">x</span></p>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@content;mismatched charset name::us-ascii;unsupported
+/meta/@content;mismatched charset name not checked;u
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml"
@@ -1743,7 +1751,7 @@ id=""><span id="">x</span></p>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@content;mismatched charset name::us-ascii;unsupported
+/meta/@content;mismatched charset name not checked;u
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml"
@@ -1761,8 +1769,8 @@ id=""><span id="">x</span></p>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@content;charset:not registered:"us-ascii";w
-/meta/@content;mismatched charset name::"us-ascii";unsupported
+/meta/@content;charset:not registered;w
+/meta/@content;mismatched charset name not checked;u
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml"
@@ -1771,9 +1779,9 @@ id=""><span id="">x</span></p>
 #errors
 /meta;element not allowed:meta charset;m
 /meta;in XML:charset;m
-/meta/@content;mismatched charset name::x-sjis;unsupported
-/meta/@content;charset:not preferred:x-sjis;m
-/meta/@content;charset:private:x-sjis;w
+/meta/@content;mismatched charset name not checked;u
+/meta/@content;charset:not preferred;m
+/meta/@content;charset:private;w
 
 #data html
 <!DOCTYPE HTML>
@@ -1781,8 +1789,8 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <body>y</body>
 #errors
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
-/html/head/meta/@content;character reference in charset;m
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@content;charref in charset;m
 
 #data html
 <!DOCTYPE HTML>
@@ -1790,9 +1798,9 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <body>y</body>
 #errors
-/html/head/meta/@charset;attribute not allowed
+/html/head/meta/@charset;attribute not allowed;m
 /html/head/meta/@content;meta content-type syntax error;m
-/html/head/meta/@charset;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@charset;mismatched charset name not checked;u
 
 #data html
 <!DOCTYPE HTML>
@@ -1801,8 +1809,8 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <body>y</body>
 #errors
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
-/html/head/meta/@content;mismatched charset name::us-ascii;unsupported
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@content;mismatched charset name not checked;u
 /html/head/meta/@http-equiv;duplicate http-equiv;m
 /html/head/meta;element not allowed:meta charset;m
 
@@ -1915,7 +1923,7 @@ id=""><span id="">x</span></p>
 <meta http-equiv="Refresh" content="4; url= http://test/"/>
 </head>
 #errors
-/head/meta/@content;URI::syntax error:iriref3987;m
+/head/meta/@content;syntax error:iriref3987;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1923,7 +1931,7 @@ id=""><span id="">x</span></p>
 <meta http-equiv="Refresh" content="4; url=[a]"/>
 </head>
 #errors
-/head/meta/@content;URI::syntax error:iriref3987;m
+/head/meta/@content;syntax error:iriref3987;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1931,9 +1939,9 @@ id=""><span id="">x</span></p>
 <meta http-equiv="Refresh" content="4; url=&quot;http://&quot;"/>
 </head>
 #errors
-/head/meta/@content;URI::syntax error:iriref3987;m
-/head/meta/@content;URI::empty path;w
-/head/meta/@content;URI::non-DNS host;w
+/head/meta/@content;syntax error:iriref3987;m
+/head/meta/@content;URL:empty path;w
+/head/meta/@content;URL:non-DNS host;w
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1951,17 +1959,17 @@ id=""><span id="">x</span></p>
 <base href=""/>
 </head>
 #errors
-/head/base;basehref after URI attribute
+/head/base;basehref after URL attribute;m
 
 #data
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style/@type;IMT:syntax error
+/style/@type;IMT:syntax error;m
 
 #data
 <style type="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style/@type;IMT:syntax error
+/style/@type;IMT:syntax error;m
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1989,13 +1997,13 @@ id=""><span id="">x</span></p>
 <style media="all" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /style;SUBDOC
-/style/@media;media query;unsupported
+/style/@media;media query;u
 
 #data
 <style media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /style;SUBDOC
-/style/@media;media query;unsupported
+/style/@media;media query;u
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -2079,7 +2087,7 @@ id=""><span id="">x</span></p>
 <style scope=""/>
 </section>
 #errors
-/section/style/@scope;attribute;unsupported
+/section/style/@scope;attribute not defined;m
 /section/style;element not allowed:flow style;m
 /section/style;SUBDOC
 /section;no significant content;s
@@ -2098,7 +2106,7 @@ id=""><span id="">x</span></p>
 <body background="[]" xmlns="http://www.w3.org/1999/xhtml">x</body>
 #errors
 /body/@background;attribute not defined;m
-/body/@background;URI::syntax error:iriref3987;m
+/body/@background;syntax error:iriref3987;m
 
 #data
 <body text="red" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2171,7 +2179,7 @@ id=""><span id="">x</span></p>
 #data
 <blockquote cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/blockquote/@cite;URI::syntax error:iriref3987;m
+/blockquote/@cite;syntax error:iriref3987;m
 /blockquote;no significant content;s
 
 #data
@@ -2184,7 +2192,7 @@ id=""><span id="">x</span></p>
 <h1 align="nonleft" xmlns="http://www.w3.org/1999/xhtml">x</h1>
 #errors
 /h1/@align;attribute not defined;m
-/h1/@align;enumerated:invalid
+/h1/@align;enumerated:invalid;m
 
 #data
 <h2 align="justify" xmlns="http://www.w3.org/1999/xhtml">x</h2>
@@ -2194,14 +2202,14 @@ id=""><span id="">x</span></p>
 #data
 <address align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/address/@align;attribute;unsupported
+/address/@align;attribute not defined;m
 /address;no significant content;s
 
 #data
 <p align="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /p/@align;attribute not defined;m
-/p/@align;enumerated:invalid
+/p/@align;enumerated:invalid;m
 /p;no significant content;s
 
 #data
@@ -2219,13 +2227,13 @@ id=""><span id="">x</span></p>
 #data
 <hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/hr/@align;attribute;unsupported
+/hr/@align;attribute not defined;m
 
 #data
 <br clear="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /br/@clear;attribute not defined;m
-/br/@clear;enumerated:invalid
+/br/@clear;enumerated:invalid;m
 
 #data
 <br clear="left" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2251,18 +2259,18 @@ id=""><span id="">x</span></p>
 <br clear="both" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /br/@clear;attribute not defined;m
-/br/@clear;enumerated:invalid
+/br/@clear;enumerated:invalid;m
 
 #data
 <dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/dialog/@compact;attribute;unsupported
+/dialog/@compact;attribute not defined;m
 
 #data
 <pre width="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /pre/@width;attribute not defined;m
-/pre/@width;nninteger:syntax error
+/pre/@width;nninteger:syntax error;m
 /pre;no significant content;s
 
 #data
@@ -2293,28 +2301,28 @@ id=""><span id="">x</span></p>
 <pre width="-122" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /pre/@width;attribute not defined;m
-/pre/@width;nninteger:syntax error
+/pre/@width;nninteger:syntax error;m
 /pre;no significant content;s
 
 #data
 <pre width="12.0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /pre/@width;attribute not defined;m
-/pre/@width;nninteger:syntax error
+/pre/@width;nninteger:syntax error;m
 /pre;no significant content;s
 
 #data
 <pre width="  12" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /pre/@width;attribute not defined;m
-/pre/@width;nninteger:syntax error
+/pre/@width;nninteger:syntax error;m
 /pre;no significant content;s
 
 #data
 <pre width="aaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /pre/@width;attribute not defined;m
-/pre/@width;nninteger:syntax error
+/pre/@width;nninteger:syntax error;m
 /pre;no significant content;s
 
 #data
@@ -2330,7 +2338,7 @@ id=""><span id="">x</span></p>
 #data
 <ol start="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="0" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2383,72 +2391,72 @@ id=""><span id="">x</span></p>
 #data
 <ol start="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="-1.0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="+0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="-+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="1aaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="xxxxx" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start=" 1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="1 " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start=" 1 " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="_1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="&#x4E00;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol start="&#x2212;1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ol/@start;integer:syntax error
+/ol/@start;integer:syntax error;m
 
 #data
 <ol reversed="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2497,7 +2505,7 @@ id=""><span id="">x</span></p>
 <li value=""/>
 </ol>
 #error
-/ol/li/@value;integer:syntax error
+/ol/li/@value;integer:syntax error;m
 /ol/li;no significant content;s
 
 #data
@@ -2533,7 +2541,7 @@ id=""><span id="">x</span></p>
 <li value="xxx"/>
 </ol>
 #error
-/ol/li/@value;integer:syntax error
+/ol/li/@value;integer:syntax error;m
 /ol/li;no significant content;s
 
 #data
@@ -2541,8 +2549,8 @@ id=""><span id="">x</span></p>
 <li value=""/>
 </ul>
 #error
-/ul/li/@value;attribute;unsupported
-/ul/li/@value;integer:syntax error
+/ul/li/@value;attribute not defined;m
+/ul/li/@value;integer:syntax error;m
 /ul/li;no significant content;s
 
 #data
@@ -2550,7 +2558,7 @@ id=""><span id="">x</span></p>
 <li value="1"/>
 </ul>
 #error
-/ul/li/@value;attribute;unsupported
+/ul/li/@value;attribute not defined;m
 /ul/li;no significant content;s
 
 #data
@@ -2558,7 +2566,7 @@ id=""><span id="">x</span></p>
 <li value="0"/>
 </ul>
 #error
-/ul/li/@value;attribute;unsupported
+/ul/li/@value;attribute not defined;m
 /ul/li;no significant content;s
 
 #data
@@ -2566,7 +2574,7 @@ id=""><span id="">x</span></p>
 <li value="-1"/>
 </ul>
 #error
-/ul/li/@value;attribute;unsupported
+/ul/li/@value;attribute not defined;m
 /ul/li;no significant content;s
 
 #data
@@ -2574,7 +2582,7 @@ id=""><span id="">x</span></p>
 <li value="+1"/>
 </ul>
 #error
-/ul/li/@value;attribute;unsupported
+/ul/li/@value;attribute not defined;m
 /ul/li;no significant content;s
 
 #data
@@ -2582,46 +2590,46 @@ id=""><span id="">x</span></p>
 <li value="xxx"/>
 </ul>
 #error
-/ul/li/@value;attribute;unsupported
-/ul/li/@value;integer:syntax error
+/ul/li/@value;attribute not defined;m
+/ul/li/@value;integer:syntax error;m
 /ul/li;no significant content;s
 
 #data
 <li value="" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
-/li/@value;attribute;unsupported
-/li/@value;integer:syntax error
+/li/@value;attribute not defined;m
+/li/@value;integer:syntax error;m
 /li;no significant content;s
 
 #data
 <li value="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
-/li/@value;attribute;unsupported
+/li/@value;attribute not defined;m
 /li;no significant content;s
 
 #data
 <li value="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
-/li/@value;attribute;unsupported
+/li/@value;attribute not defined;m
 /li;no significant content;s
 
 #data
 <li value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
-/li/@value;attribute;unsupported
+/li/@value;attribute not defined;m
 /li;no significant content;s
 
 #data
 <li value="+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
-/li/@value;attribute;unsupported
+/li/@value;attribute not defined;m
 /li;no significant content;s
 
 #data
 <li value="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
 #error
-/li/@value;attribute;unsupported
-/li/@value;integer:syntax error
+/li/@value;attribute not defined;m
+/li/@value;integer:syntax error;m
 /li;no significant content;s
 
 #data
@@ -2750,13 +2758,13 @@ id=""><span id="">x</span></p>
 #data
 <a href="http://test/[44::]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@href;URI::syntax error:iriref3987;m
+/a/@href;syntax error:iriref3987;m
 /a;no significant content;s
 
 #data
 <a href="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@type;IMT:syntax error
+/a/@type;IMT:syntax error;m
 /a;no significant content;s
 
 #data
@@ -2774,12 +2782,12 @@ id=""><span id="">x</span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a;no significant content;s
-/a/@rel;link type:proposed:contact;s
+/a/@rel;link type:proposed;s
 
 #data
 <a href="http://test/" rel="author author" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@rel;duplicate token:author
+/a/@rel;duplicate token;m
 /a;no significant content;s
 
 #data
@@ -2790,31 +2798,31 @@ id=""><span id="">x</span></p>
 #data
 <a href="http://test/" rel="previous" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@rel;link type:non-conforming:previous
+/a/@rel;link type:non-conforming;m
 /a;no significant content;s
 
 #data
 <a href="http://test/" rel="edit" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@rel;link type:proposed:edit;s
+/a/@rel;link type:proposed;s
 /a;no significant content;s
 
 #data
 <a href="http://test/" rel="script" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@rel;link type:non-conforming:script
+/a/@rel;link type:non-conforming;m
 /a;no significant content;s
 
 #data
 <a href="http://test/" rel="stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@rel;link type:bad context:stylesheet
+/a/@rel;link type:bad context;m
 /a;no significant content;s
 
 #data
 <a href="http://test/" rel="test-type" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@rel;link type:test-type;unsupported
+/a/@rel;unknown link type;u
 /a;no significant content;s
 
 #data
@@ -2833,14 +2841,14 @@ id=""><span id="">x</span></p>
 <a href="http://test/" ping="http://a.test/ [b.test]"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@ping;URIs::syntax error:iriref3987:1;m
+/a/@ping;syntax error:iriref3987;m
 /a;no significant content;s
 
 #data
 <a href="http://test/" hreflang=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@hreflang;LangTag:nosemantics:language;m
+/a/@hreflang;langtag:language:nosemantics;m
 /a;no significant content;s
 
 #data
@@ -2853,7 +2861,7 @@ id=""><span id="">x</span></p>
 <a href="http://test/" media="all"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@media;media query;unsupported
+/a/@media;media query;u
 /a;no significant content;s
 
 #data
@@ -2922,13 +2930,13 @@ id=""><span id="">x</span></p>
 #data
 <a type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@type;attribute not allowed
+/a/@type;attribute not allowed;m
 /a;no significant content;s
 
 #data
 <a rel="author" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@rel;attribute not allowed
+/a/@rel;attribute not allowed;m
 /a;no significant content;s
 
 #data
@@ -2950,32 +2958,32 @@ id=""><span id="">x</span></p>
 <a rev="made made" xmlns="http://www.w3.org/1999/xhtml">x</a>
 #errors
 /a/@rev;attribute not defined;m
-/a/@rev;duplicate token:made
+/a/@rev;duplicate token;m
 
 #data
 <a ping="a" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@ping;attribute not allowed
+/a/@ping;attribute not allowed;m
 /a;no significant content;s
 
 #data
 <a hreflang="en" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@hreflang;attribute not allowed
+/a/@hreflang;attribute not allowed;m
 /a;no significant content;s
 
 #data
 <a media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@media;attribute not allowed
-/a/@media;media query;unsupported
+/a/@media;attribute not allowed;m
+/a/@media;media query;u
 /a;no significant content;s
 
 #data
 <a target="_self"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@target;attribute not allowed
+/a/@target;attribute not allowed;m
 /a;no significant content;s
 
 #data
@@ -2983,6 +2991,7 @@ id=""><span id="">x</span></p>
 #errors
 /a/@charset;attribute not defined;m
 /a/@charset;charset:syntax error;m
+/a/@charset;charset:not registered;w
 
 #data
 <a charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">x</a>
@@ -2995,7 +3004,7 @@ id=""><span id="">x</span></p>
   <i><a type="text/plain">x</a></i>
 </p>
 #errors
-/p/i/a/@type;attribute not allowed
+/p/i/a/@type;attribute not allowed;m
 
 #data
 <q cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</q>
@@ -3004,7 +3013,7 @@ id=""><span id="">x</span></p>
 #data
 <q cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml">x</q>
 #errors
-/q/@cite;URI::syntax error:iriref3987;m
+/q/@cite;syntax error:iriref3987;m
 
 #data
 <big xmlns="http://www.w3.org/1999/xhtml"></big>
@@ -3113,7 +3122,7 @@ id=""><span id="">x</span></p>
 #data
 <meter value="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
@@ -3204,55 +3213,55 @@ id=""><span id="">x</span></p>
 #data
 <meter value="1aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
 <meter value="1&#x0D;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
 <meter value="1&#x0A;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
 <meter value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
 <meter value="+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
 <meter value="+1.2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
 <meter value=".-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
 <meter value="0.-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
 <meter value="." xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@value;float:syntax error
+/meter/@value;float:syntax error;m
 /meter;no significant content;s
 
 #data
@@ -3263,7 +3272,7 @@ id=""><span id="">x</span></p>
 #data
 <meter min="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@min;float:syntax error
+/meter/@min;float:syntax error;m
 /meter;no significant content;s
 
 #data
@@ -3274,7 +3283,7 @@ id=""><span id="">x</span></p>
 #data
 <meter low="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@low;float:syntax error
+/meter/@low;float:syntax error;m
 /meter;no significant content;s
 
 #data
@@ -3285,7 +3294,7 @@ id=""><span id="">x</span></p>
 #data
 <meter high="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@high;float:syntax error
+/meter/@high;float:syntax error;m
 /meter;no significant content;s
 
 #data
@@ -3296,7 +3305,7 @@ id=""><span id="">x</span></p>
 #data
 <meter max="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@max;float:syntax error
+/meter/@max;float:syntax error;m
 /meter;no significant content;s
 
 #data
@@ -3307,7 +3316,7 @@ id=""><span id="">x</span></p>
 #data
 <meter optimum="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@optimum;float:syntax error
+/meter/@optimum;float:syntax error;m
 /meter;no significant content;s
 
 #data
@@ -3333,19 +3342,19 @@ id=""><span id="">x</span></p>
 #data
 <progress max="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/progress/@max;float:out of range
+/progress/@max;float:out of range;m
 /progress;no significant content;s
 
 #data
 <progress max="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/progress/@max;float:out of range
+/progress/@max;float:out of range;m
 /progress;no significant content;s
 
 #data
 <progress max="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/progress/@max;float:syntax error
+/progress/@max;float:syntax error;m
 /progress;no significant content;s
 
 #data
@@ -3371,19 +3380,19 @@ id=""><span id="">x</span></p>
 #data
 <progress value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/progress/@value;float:out of range
+/progress/@value;float:out of range;m
 /progress;no significant content;s
 
 #data
 <progress value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/progress/@value;float:syntax error
+/progress/@value;float:syntax error;m
 /progress;no significant content;s
 
 #data
 <bdo xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
-/bdo;attribute missing:dir
+/bdo;attribute missing;dir;m
 
 #data
 <bdo dir="ltr" xmlns="http://www.w3.org/1999/xhtml">x</bdo>
@@ -3400,7 +3409,7 @@ id=""><span id="">x</span></p>
 #data
 <bdo dir="xxx" xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
-/bdo/@dir;enumerated:invalid
+/bdo/@dir;enumerated:invalid;m
 
 #data
 <tt xmlns="http://www.w3.org/1999/xhtml"></tt>
@@ -3617,49 +3626,49 @@ id=""><span id="">x</span></p>
 #data
 <ins cite="http://test/100%/" xmlns="http://www.w3.org/1999/xhtml">x</ins>
 #errors
-/ins/@cite;URI::syntax error:iriref3987;m
+/ins/@cite;syntax error:iriref3987;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-05">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-06">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-08-09">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-09-10T00:12">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-09-23T33:34:23">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-04-31T33:11:00+09">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3685,13 +3694,13 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="10000-10-31T00:44Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="-3333-03-14T14:33Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3707,13 +3716,13 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="98-02-12T11:22Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-29T00:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad day
+/ins/@datetime;datetime:bad day;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3729,43 +3738,43 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="1900-02-29T00:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad day
+/ins/@datetime;datetime:bad day;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-30T00:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad day
+/ins/@datetime;datetime:bad day;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2000-02-30T00:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad day
+/ins/@datetime;datetime:bad day;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-01-32T00:00Z">xM</ins>
 #errors
-/ins/@datetime;datetime:bad day
+/ins/@datetime;datetime:bad day;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-01-00T00:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad day
+/ins/@datetime;datetime:bad day;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-00-29T00:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad month
+/ins/@datetime;datetime:bad month;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-13-29T00:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad month
+/ins/@datetime;datetime:bad month;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3776,7 +3785,7 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T24:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad hour
+/ins/@datetime;datetime:bad hour;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3787,19 +3796,19 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:60Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad minute
+/ins/@datetime;datetime:bad minute;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00:60Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad second
+/ins/@datetime;datetime:bad second;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00:61Z">x</ins>
 #errors
-/ins/@datetime;datetime:bad second
+/ins/@datetime;datetime:bad second;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3815,7 +3824,7 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00.Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3836,25 +3845,25 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00+0900">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00A">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21t23:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3865,7 +3874,7 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00+24:00">x</ins>
 #errors
-/ins/@datetime;datetime:bad timezone hour
+/ins/@datetime;datetime:bad timezone hour;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3876,7 +3885,7 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00-24:00">x</ins>
 #errors
-/ins/@datetime;datetime:bad timezone hour
+/ins/@datetime;datetime:bad timezone hour;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3887,7 +3896,7 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00+00:14.5">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3898,31 +3907,31 @@ id=""><span id="">x</span></p>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00+00:60">x</ins>
 #errors
-/ins/@datetime;datetime:bad timezone minute
+/ins/@datetime;datetime:bad timezone minute;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00-00:60">x</ins>
 #errors
-/ins/@datetime;datetime:bad timezone minute
+/ins/@datetime;datetime:bad timezone minute;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00 00:00">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00Z ">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime=" 2007-02-21T23:00Z">s</ins>
 #errors
-/ins/@datetime;datetime:syntax error
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</del>
@@ -3931,7 +3940,7 @@ id=""><span id="">x</span></p>
 #data
 <del cite='"about:"' xmlns="http://www.w3.org/1999/xhtml">x</del>
 #errors
-/del/@cite;URI::syntax error:iriref3987;m
+/del/@cite;syntax error:iriref3987;m
 
 #data
 <del xmlns="http://www.w3.org/1999/xhtml"
@@ -3942,23 +3951,23 @@ id=""><span id="">x</span></p>
 <del xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-31T23:00Z">x</del>
 #errors
-/del/@datetime;datetime:bad day
+/del/@datetime;datetime:bad day;m
 
 #data
 <img xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img;attribute missing:alt;s
-/img;attribute missing:src
+/img;attribute missing;alt;s
+/img;attribute missing;src;m
 
 #data
 <img alt="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img;attribute missing:src
+/img;attribute missing;src;m
 
 #data
 <img src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img;attribute missing:alt;s
+/img;attribute missing;alt;s
 
 #data
 <img alt="" src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3967,7 +3976,7 @@ id=""><span id="">x</span></p>
 #data
 <img alt="" src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img/@src;URI::syntax error:iriref3987;m
+/img/@src;syntax error:iriref3987;m
 
 #data
 <img alt="" src="" longdesc="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3984,7 +3993,7 @@ id=""><span id="">x</span></p>
 <img alt="" src="" longdesc="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@longdesc;attribute not defined;m
-/img/@longdesc;URI::syntax error:iriref3987;m
+/img/@longdesc;syntax error:iriref3987;m
 
 #data
 <img alt="" src="" hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4010,61 +4019,61 @@ id=""><span id="">x</span></p>
 <img alt="" src="" hspace="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error
+/img/@hspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" vspace="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@vspace;attribute not defined;m
-/img/@vspace;nninteger:syntax error
+/img/@vspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" hspace="10px" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error
+/img/@hspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" vspace="10px" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@vspace;attribute not defined;m
-/img/@vspace;nninteger:syntax error
+/img/@vspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" hspace="0 " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error
+/img/@hspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" vspace=" 0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img/@vspace;nninteger:syntax error
+/img/@vspace;nninteger:syntax error;m
 /img/@vspace;attribute not defined;m
 
 #data
 <img alt="" src="" hspace="0%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error
+/img/@hspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" vspace="20%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@vspace;attribute not defined;m
-/img/@vspace;nninteger:syntax error
+/img/@vspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" hspace="-0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error
+/img/@hspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" vspace="-0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@vspace;attribute not defined;m
-/img/@vspace;nninteger:syntax error
+/img/@vspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" border="0" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4080,25 +4089,25 @@ id=""><span id="">x</span></p>
 <img alt="" src="" border="-0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@border;attribute not defined;m
-/img/@border;nninteger:syntax error
+/img/@border;nninteger:syntax error;m
 
 #data
 <img alt="" src="" border="10-0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@border;attribute not defined;m
-/img/@border;nninteger:syntax error
+/img/@border;nninteger:syntax error;m
 
 #data
 <img alt="" src="" border="none" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@border;attribute not defined;m
-/img/@border;nninteger:syntax error
+/img/@border;nninteger:syntax error;m
 
 #data
 <img alt="" src="" border="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@border;attribute not defined;m
-/img/@border;nninteger:syntax error
+/img/@border;nninteger:syntax error;m
 
 #data
 <img alt="" src="" noborder="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4185,28 +4194,28 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap=""/></p>
 </div>
 #errors
-/div/p/img/@usemap;#idref:syntax error
+/div/p/img/@usemap;hashref:syntax error;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><img src="http://test/" alt="" usemap="abc"/></p>
 </div>
 #errors
-/div/p/img/@usemap;#idref:syntax error
+/div/p/img/@usemap;hashref:syntax error;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><img src="http://test/" alt="" usemap="abc#"/></p>
 </div>
 #errors
-/div/p/img/@usemap;#idref:syntax error
+/div/p/img/@usemap;hashref:syntax error;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><img src="http://test/" alt="" usemap="&#x0A;#abc"/></p>
 </div>
 #errors
-/div/p/img/@usemap;#idref:syntax error
+/div/p/img/@usemap;hashref:syntax error;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4215,8 +4224,8 @@ id=""><span id="">x</span></p>
 </div>
 #errors
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
-/div/p/img/@usemap;no referenced map
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4244,7 +4253,7 @@ id=""><span id="">x</span></p>
 #errors
 /div/map;no significant content;s
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
+/div/map;attribute missing;name;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4252,10 +4261,10 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#a a"/></p>
 </div>
 #errors
-/div/map/@id;space in ID
+/div/map/@id;space in ID;m
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
-/div/p/img/@usemap;no referenced map
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4271,7 +4280,7 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#a a"/></p>
 </div>
 #errors
-/div/map/@id;space in ID
+/div/map/@id;space in ID;m
 /div/map;no significant content;s
 
 #data
@@ -4280,10 +4289,10 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#a%20a"/></p>
 </div>
 #errors
-/div/map/@id;space in ID
+/div/map/@id;space in ID;m
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
-/div/p/img/@usemap;no referenced map
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4291,9 +4300,9 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#a%20a"/></p>
 </div>
 #errors
-/div/map/@id;space in ID
+/div/map/@id;space in ID;m
 /div/map;no significant content;s
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4302,8 +4311,8 @@ id=""><span id="">x</span></p>
 </div>
 #errors
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
-/div/p/img/@usemap;no referenced map
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4319,9 +4328,9 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#bb"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
+/div/map;attribute missing;name;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4329,7 +4338,7 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#bb"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 /div/map;no significant content;s
 
 #data
@@ -4340,9 +4349,9 @@ id=""><span id="">x</span></p>
 </div>
 #errors
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
-/div/p/img/@usemap;no referenced map
-/div/p/img/@usemap;no referenced map
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
+/div/p/img/@usemap;no referenced map;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4359,9 +4368,9 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#AA"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
+/div/map;attribute missing;name;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4369,7 +4378,7 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#AA"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 /div/map;no significant content;s
 
 #data
@@ -4378,9 +4387,9 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 /div/map;no significant content;s
-/div/map;attribute missing:name;m
+/div/map;attribute missing;name;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4388,7 +4397,7 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 /div/map;no significant content;s
 
 #data
@@ -4397,7 +4406,7 @@ id=""><span id="">x</span></p>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 /div/p;no significant content;s
 
 #data
@@ -4407,7 +4416,7 @@ id=""><span id="">x</span></p>
 </div>
 #errors
 /div/a/@name;attribute not defined;m
-/div/p/img/@usemap;no referenced map
+/div/p/img/@usemap;no referenced map;m
 /div/p;no significant content;s
 
 #data
@@ -4451,25 +4460,25 @@ id=""><span id="">x</span></p>
 <img alt="" src="" align="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@align;attribute not defined;m
-/img/@align;enumerated:invalid
+/img/@align;enumerated:invalid;m
 
 #data
 <img alt="" src="" align="char" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@align;attribute not defined;m
-/img/@align;enumerated:invalid
+/img/@align;enumerated:invalid;m
 
 #data
 <img alt="" src="" align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@align;attribute not defined;m
-/img/@align;enumerated:invalid
+/img/@align;enumerated:invalid;m
 
 #data
 <img alt="" src="" align="center" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@align;attribute not defined;m
-/img/@align;enumerated:invalid
+/img/@align;enumerated:invalid;m
 
 #data
 <img alt="" src="" align="bottom" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4551,7 +4560,7 @@ id=""><span id="">x</span></p>
 #data
 <iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/iframe/@src;URI::syntax error:iriref3987;m
+/iframe/@src;syntax error:iriref3987;m
 
 #data
 <iframe src="" sandbox="" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
@@ -4663,7 +4672,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <iframe src="" sandbox="allow-forms allow-forms"
     xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
-/iframe/@sandbox;duplicate token:allow-forms
+/iframe/@sandbox;duplicate token;m
 
 #data
 <iframe src="" seemless=""
@@ -4701,7 +4710,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed;attribute missing:src
+/embed;attribute missing;src;m
 
 #data
 <embed src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4710,18 +4719,18 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <embed src="[http://test/]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed/@src;URI::syntax error:iriref3987;m
+/embed/@src;syntax error:iriref3987;m
 
 #data
 <embed src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed/@type;IMT:syntax error
+/embed/@type;IMT:syntax error;m
 
 #data
 <embed src="http://test/" type="text"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed/@type;IMT:syntax error
+/embed/@type;IMT:syntax error;m
 
 #data
 <embed src="http://test/" type="text/plain"
@@ -4732,7 +4741,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <embed src="http://test/" id=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed/@id;empty attribute value
+/embed/@id;empty attribute value;m
 
 #data
 <embed src="http://test/" a="b" c="d" checked="checked"
@@ -4742,7 +4751,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <object xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/object;attribute missing:data|type
+/object;attribute missing:data|type;m
 /object;no significant content;s
 
 #data
@@ -4753,13 +4762,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/object/@data;URI::syntax error:iriref3987;m
+/object/@data;syntax error:iriref3987;m
 /object;no significant content;s
 
 #data
 <object type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/object/@type;IMT:syntax error
+/object/@type;IMT:syntax error;m
 /object;no significant content;s
 
 #data
@@ -4778,28 +4787,28 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p><object data="http://test/" usemap="">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;#idref:syntax error
+/div/p/object/@usemap;hashref:syntax error;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><object data="http://test/" usemap="abc">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;#idref:syntax error
+/div/p/object/@usemap;hashref:syntax error;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><object data="http://test/" usemap="abc#">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;#idref:syntax error
+/div/p/object/@usemap;hashref:syntax error;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><object data="http://test/" usemap="&#x0A;#abc">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;#idref:syntax error
+/div/p/object/@usemap;hashref:syntax error;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4808,8 +4817,8 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 </div>
 #errors
 /div/map;no significant content;s
-/div/p/object/@usemap;no referenced map
-/div/map;attribute missing:name;m
+/div/p/object/@usemap;no referenced map;m
+/div/map;attribute missing;name;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -4841,7 +4850,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p><object data="http://test/" usemap="#bb">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;no referenced map
+/div/p/object/@usemap;no referenced map;m
 /div/map;no significant content;s
 
 #data
@@ -4859,7 +4868,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p><object data="http://test/" usemap="#AA">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;no referenced map
+/div/p/object/@usemap;no referenced map;m
 /div/map;no significant content;s
 
 #data
@@ -4868,7 +4877,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;no referenced map
+/div/p/object/@usemap;no referenced map;m
 /div/map;no significant content;s
 
 #data
@@ -4876,7 +4885,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" usemap="#a">x</object><menu id="a">x</menu>
 </div>
 #errors
-/div/object/@usemap;no referenced map
+/div/object/@usemap;no referenced map;m
 
 #data
 <object data="" declare="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4888,6 +4897,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" declare="declare" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@declare;attribute not defined;m
+/object;no significant content;s
 
 /object;no significant content;s
 #data
@@ -4920,7 +4930,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" classid="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@classid;attribute not defined;m
-/object/@classid;URI::syntax error:iriref3987;m
+/object/@classid;syntax error:iriref3987;m
 /object;no significant content;s
 
 #data
@@ -4933,7 +4943,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" codebase="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@codebase;attribute not defined;m
-/object/@codebase;URI::syntax error:iriref3987;m
+/object/@codebase;syntax error:iriref3987;m
 /object;no significant content;s
 
 #data
@@ -4946,14 +4956,14 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" archive="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@archive;attribute not defined;m
-/object/@archive;URIs::syntax error:iriref3987:0;m
+/object/@archive;syntax error:iriref3987;m
 /object;no significant content;s
 
 #data
 <object data="" archive="a,[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@archive;attribute not defined;m
-/object/@archive;URIs::syntax error:iriref3987:0;m
+/object/@archive;syntax error:iriref3987;m
 /object;no significant content;s
 
 #data
@@ -4966,7 +4976,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" codetype="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@codetype;attribute not defined;m
-/object/@codetype;IMT:syntax error
+/object/@codetype;IMT:syntax error;m
 /object;no significant content;s
 
 #data
@@ -4997,7 +5007,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" border="none" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@border;attribute not defined;m
-/object/@border;nninteger:syntax error
+/object/@border;nninteger:syntax error;m
 /object;no significant content;s
 
 #data
@@ -5011,7 +5021,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /object/@hspace;attribute not defined;m
 /object;no significant content;s
-/object/@hspace;nninteger:syntax error
+/object/@hspace;nninteger:syntax error;m
 
 #data
 <object data="" vspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5024,35 +5034,35 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /object;no significant content;s
 /object/@vspace;attribute not defined;m
-/object/@vspace;nninteger:syntax error
+/object/@vspace;nninteger:syntax error;m
 
 #data
 <object data="" align="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
 /object/@align;attribute not defined;m
-/object/@align;enumerated:invalid
+/object/@align;enumerated:invalid;m
 
 #data
 <object data="" align="char" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
 /object/@align;attribute not defined;m
-/object/@align;enumerated:invalid
+/object/@align;enumerated:invalid;m
 
 #data
 <object data="" align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
 /object/@align;attribute not defined;m
-/object/@align;enumerated:invalid
+/object/@align;enumerated:invalid;m
 
 #data
 <object data="" align="center" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
 /object/@align;attribute not defined;m
-/object/@align;enumerated:invalid
+/object/@align;enumerated:invalid;m
 
 #data
 <object data="" align="bottom" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5130,18 +5140,18 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <param xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/param;attribute missing:name
-/param;attribute missing:value
+/param;attribute missing;name;m
+/param;attribute missing;value;m
 
 #data
 <param name="a" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/param;attribute missing:value
+/param;attribute missing;value;m
 
 #data
 <param value="a" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/param;attribute missing:name
+/param;attribute missing;name;m
 
 #data
 <param name="a" value="b" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5170,13 +5180,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <param name="a" value="b" valuetype="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /param/@valuetype;attribute not defined;m
-/param/@valuetype;enumerated:invalid
+/param/@valuetype;enumerated:invalid;m
 
 #data
 <param name="a" value="b" type="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /param/@type;attribute not defined;m
-/param/@type;IMT:syntax error
+/param/@type;IMT:syntax error;m
 
 #data
 <param name="a" value="b" type="text/html" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5187,7 +5197,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <video xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5197,97 +5207,97 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <video src="``http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/video/@src;URI::syntax error:iriref3987;m
+/video/@src;syntax error:iriref3987;m
 /video;no significant content;s
 
 #data
 <video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
 /video/@autoplay;boolean:invalid;m
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video autoplay="AUTOPlay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video controls="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video controls="Controls" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video/@controls;boolean:invalid;m
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video controls="control" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video/@controls;boolean:invalid;m
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video control="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video/@control;attribute not defined;m
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video poster="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <video poster="abc" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/video;element missing:source;m
+/video;child element missing;source;m
 /video;no significant content;s
 
 #data
 <video poster="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/video/@poster;URI::syntax error:iriref3987;m
+/video/@poster;syntax error:iriref3987;m
 /video;no significant content;s
-/video;element missing:source;m
+/video;child element missing;source;m
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5297,63 +5307,63 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <audio src="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/audio/@src;URI::syntax error:iriref3987;m
+/audio/@src;syntax error:iriref3987;m
 /audio;no significant content;s
 
 #data
 <audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio autoplay="AUTOPLAY" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio/@autoplay;boolean:invalid;m
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio controls="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio controls="CONTROLS" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <audio controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio/@controls;boolean:invalid;m
 /audio;no significant content;s
-/audio;element missing:source;m
+/audio;child element missing;source;m
 
 #data
 <source xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source;attribute missing:src
+/source;attribute missing;src;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5362,17 +5372,17 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <source src="%http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@src;URI::syntax error:iriref3987;m
+/source/@src;syntax error:iriref3987;m
 
 #data
 <source src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@type;IMT:syntax error
+/source/@type;IMT:syntax error;m
 
 #data
 <source src="http://test/" type="video" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@type;IMT:syntax error
+/source/@type;IMT:syntax error;m
 
 #data
 <source src="http://test/" type="audio/mpeg"
@@ -5383,7 +5393,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <source src="http://test/" type="video/3gpp2; codecs=sevc,s263"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@type;IMT:syntax error
+/source/@type;IMT:syntax error;m
 
 #data
 <source src="http://test/" type="video/3gpp2; codecs=&quot;sevc,s263&quot;"
@@ -5399,19 +5409,19 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <source src="http://test/" type="video/3gpp2; codecs='sevc, s263'"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@type;IMT:syntax error
+/source/@type;IMT:syntax error;m
 
 #data
 <source src="http://test/" media="screen"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@media;media query;unsupported
+/source/@media;media query;u
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio=""/>
 #errors
-/source/@pixelratio;float:syntax error
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
@@ -5447,43 +5457,43 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="+0.2"/>
 #errors
-/source/@pixelratio;float:syntax error
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="43 "/>
 #errors
-/source/@pixelratio;float:syntax error
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="aaaa"/>
 #errors
-/source/@pixelratio;float:syntax error
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="4 + 0.2"/>
 #errors
-/source/@pixelratio;float:syntax error
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="0..3"/>
 #errors
-/source/@pixelratio;float:syntax error
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="0.4."/>
 #errors
-/source/@pixelratio;float:syntax error
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="."/>
 #errors
-/source/@pixelratio;float:syntax error
+/source/@pixelratio;float:syntax error;m
 
 #data
 <canvas xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5494,7 +5504,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <canvas width="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas;no significant content;s
-/canvas/@width;nninteger:syntax error
+/canvas/@width;nninteger:syntax error;m
 
 #data
 <canvas width="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5515,30 +5525,30 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <canvas width="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas;no significant content;s
-/canvas/@width;nninteger:syntax error
+/canvas/@width;nninteger:syntax error;m
 
 #data
 <canvas width="saaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/canvas/@width;nninteger:syntax error
+/canvas/@width;nninteger:syntax error;m
 /canvas;no significant content;s
 
 #data
 <canvas width="1&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/canvas/@width;nninteger:syntax error
+/canvas/@width;nninteger:syntax error;m
 /canvas;no significant content;s
 
 #data
 <canvas width="13344aa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/canvas/@width;nninteger:syntax error
+/canvas/@width;nninteger:syntax error;m
 /canvas;no significant content;s
 
 #data
 <canvas height="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/canvas/@height;nninteger:syntax error
+/canvas/@height;nninteger:syntax error;m
 /canvas;no significant content;s
 
 #data
@@ -5554,19 +5564,19 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <canvas height="-2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/canvas/@height;nninteger:syntax error
+/canvas/@height;nninteger:syntax error;m
 /canvas;no significant content;s
 
 #data
 <canvas height="1&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/canvas/@height;nninteger:syntax error
+/canvas/@height;nninteger:syntax error;m
 /canvas;no significant content;s
 
 #data
 <canvas height="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/canvas/@height;nninteger:syntax error
+/canvas/@height;nninteger:syntax error;m
 /canvas;no significant content;s
 
 #data
@@ -5577,7 +5587,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <map xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/map;attribute missing:name;m
+/map;attribute missing;name;m
 /map;no significant content;s
 
 #data
@@ -5596,7 +5606,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p id="aa">x</p>
 </div>
 #errors
-/div/p/@id;duplicate ID
+/div/p/@id;duplicate ID;m
 /div/map;no significant content;s
 
 #data
@@ -5605,7 +5615,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <map id="aa" name="aa"/>
 </div>
 #errors
-/div/map/@id;duplicate ID
+/div/map/@id;duplicate ID;m
 /div/map;no significant content;s
 
 #data
@@ -5617,24 +5627,24 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <area xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area;attribute missing:coords
+/area;attribute missing;coords;m
 
 #data
 <area href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area;attribute missing:alt
-/area;attribute missing:coords
+/area;attribute missing;alt;m
+/area;attribute missing;coords;m
 
 #data
 <area alt="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@alt;attribute not allowed
-/area;attribute missing:coords
+/area/@alt;attribute not allowed;m
+/area;attribute missing;coords;m
 
 #data
 <area href="http://test/" alt="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area;attribute missing:coords
+/area;attribute missing;coords;m
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
@@ -5645,14 +5655,14 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area href="%%http://test/" alt="" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@href;URI::syntax error:iriref3987;m
+/area/@href;syntax error:iriref3987;m
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
     hreflang=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@hreflang;LangTag:nosemantics:language;m
+/area/@hreflang;langtag:language:nosemantics;m
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
@@ -5664,21 +5674,21 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area coords="1,2,3,4" hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@hreflang;attribute not allowed
+/area/@hreflang;attribute not allowed;m
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
     media="screen"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@media;media query;unsupported
+/area/@media;media query;u
 
 #data
 <area coords="1,2,3,4" media="screen"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@media;attribute not allowed
-/area/@media;media query;unsupported
+/area/@media;attribute not allowed;m
+/area/@media;media query;u
 
 #data
 <area href="http://test/" coords="1,2,3,4" alt="" target=""
@@ -5727,7 +5737,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area coords="1,2,3,4" target="_self"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@target;attribute not allowed
+/area/@target;attribute not allowed;m
 
 #data
 <area coords="1,2,3,4"
@@ -5748,13 +5758,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area shape="rectangle" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@shape;enumerated:non-conforming
+/area/@shape;enumerated:non-conforming;m
 
 #data
 <area shape="rec" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@shape;enumerated:invalid
+/area/@shape;enumerated:invalid;m
 
 #data
 <area shape="default"
@@ -5770,7 +5780,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area shape="circ" coords="1,2,3"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@shape;enumerated:non-conforming
+/area/@shape;enumerated:non-conforming;m
 
 #data
 <area shape="circle" coords="1,2,3"
@@ -5786,49 +5796,49 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area shape="polygon" coords="1,2,3,4,5,6"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@shape;enumerated:non-conforming
+/area/@shape;enumerated:non-conforming;m
 
 #data
 <area shape="XXX" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@shape;enumerated:invalid
+/area/@shape;enumerated:invalid;m
 
 #data
 <area shape="circle" coords=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:syntax error
+/area/@coords;coords:syntax error;m
 
 #data
 <area shape="circle" coords="1"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:3:1
+/area/@coords;coords:number not 3;1;m
 
 #data
 <area shape="circle" coords="1,2"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:3:2
+/area/@coords;coords:number not 3;2;m
 
 #data
 <area shape="circle" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:3:4
+/area/@coords;coords:number not 3;4;m
 
 #data
 <area shape="circle" coords="1,2,3,4,5"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:3:5
+/area/@coords;coords:number not 3;5;m
 
 #data
 <area shape="circle" coords="1,2,-3"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:out of range:2
+/area/@coords;coords:out of range;m
 
 #data
 <area shape="circle" coords="1,2,0"
@@ -5849,55 +5859,55 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area shape="circle"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area;attribute missing:coords
+/area;attribute missing;coords;m
 
 #data
 <area shape="default" coords="1"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;attribute not allowed
+/area/@coords;attribute not allowed;m
 
 #data
 <area shape="poly" coords=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:syntax error
+/area/@coords;coords:syntax error;m
 
 #data
 <area shape="poly" coords="1"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:>=6:1
+/area/@coords;coords:number lt 6;1;m
 
 #data
 <area shape="poly" coords="1,2"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:>=6:2
+/area/@coords;coords:number lt 6;2;m
 
 #data
 <area shape="poly" coords="1,2,3"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:>=6:3
+/area/@coords;coords:number lt 6;3;m
 
 #data
 <area shape="poly" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:>=6:4
+/area/@coords;coords:number lt 6;4;m
 
 #data
 <area shape="poly" coords="1,2,3,4,5"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:>=6:5
+/area/@coords;coords:number lt 6;5;m
 
 #data
 <area shape="poly" coords="1,2,3,4,5,6,7"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:even:7
+/area/@coords;coords:number not even;7;m
 
 #data
 <area shape="poly" coords="-1,-23,55,455,232,0"
@@ -5913,43 +5923,43 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area shape="poly"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area;attribute missing:coords
+/area;attribute missing;coords;m
 
 #data
 <area shape="rect" coords=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:syntax error
+/area/@coords;coords:syntax error;m
 
 #data
 <area shape="rect" coords="1"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:4:1
+/area/@coords;coords:number not 4;1;m
 
 #data
 <area shape="rect" coords="1,2"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:4:2
+/area/@coords;coords:number not 4;2;m
 
 #data
 <area shape="rect" coords="1,2,3"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:4:3
+/area/@coords;coords:number not 4;3;m
 
 #data
 <area shape="rect" coords="1,2,3,4,5"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:number:4:5
+/area/@coords;coords:number not 4;5;m
 
 #data
 <area shape="rect"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area;attribute missing:coords
+/area;attribute missing;coords;m
 
 #data
 <area shape="rect" coords="0,0,1,1"
@@ -5975,41 +5985,41 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <area shape="rect" coords="646,4,3,657"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:out of range:0
+/area/@coords;coords:out of range;m
 
 #data
 <area shape="rect" coords="4,646,657,7"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@coords;coords:out of range:1
+/area/@coords;coords:out of range;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     ping="a b"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@ping;attribute not allowed
+/area/@ping;attribute not allowed;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     rel="author"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@rel;attribute not allowed
+/area/@rel;attribute not allowed;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     type="text/css"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@type;attribute not allowed
+/area/@type;attribute not allowed;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" type="text" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@type;IMT:syntax error
+/area/@type;IMT:syntax error;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
@@ -6028,7 +6038,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     href="http://test/" rel="author author" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@rel;duplicate token:author
+/area/@rel;duplicate token;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
@@ -6041,42 +6051,42 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     href="http://test/" rel="previous" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@rel;link type:non-conforming:previous
+/area/@rel;link type:non-conforming;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" rel="edit" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@rel;link type:proposed:edit;s
+/area/@rel;link type:proposed;s
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" rel="contact" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@rel;link type:proposed:contact;s
+/area/@rel;link type:proposed;s
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" rel="script" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@rel;link type:non-conforming:script
+/area/@rel;link type:non-conforming;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" rel="icon" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@rel;link type:bad context:icon
+/area/@rel;link type:bad context;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" rel="example-link-type" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@rel;link type:example-link-type;unsupported
+/area/@rel;unknown link type;u
 
 #data
 <area shape="rect" coords="1,2,3,4"
@@ -6089,15 +6099,15 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     href="http://test/" ping="a [b]" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@ping;URIs::syntax error:iriref3987:1;m
+/area/@ping;syntax error:iriref3987;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" ping="a [b] [@c]" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@ping;URIs::syntax error:iriref3987:1;m
-/area/@ping;URIs::syntax error:iriref3987:2;m
+/area/@ping;syntax error:iriref3987;m
+/area/@ping;syntax error:iriref3987;m
 
 #data
 <area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6148,7 +6158,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <table border="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /table/@border;attribute not defined;m
-/table/@border;nninteger:syntax error
+/table/@border;nninteger:syntax error;m
 
 #data
 <table border="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6174,7 +6184,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <table frame="vside" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /table/@frame;attribute not defined;m
-/table/@frame;enumerated:invalid
+/table/@frame;enumerated:invalid;m
 
 #data
 <table rules="none" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6195,7 +6205,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <table rules="group" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /table/@rules;attribute not defined;m
-/table/@rules;enumerated:invalid
+/table/@rules;enumerated:invalid;m
 
 #data
 <table cellpadding="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6370,25 +6380,25 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <caption align="middle" xmlns="http://www.w3.org/1999/xhtml">x</caption>
 #errors
 /caption/@align;attribute not defined;m
-/caption/@align;enumerated:invalid
+/caption/@align;enumerated:invalid;m
 
 #data
 <caption align="center" xmlns="http://www.w3.org/1999/xhtml">x</caption>
 #errors
 /caption/@align;attribute not defined;m
-/caption/@align;enumerated:invalid
+/caption/@align;enumerated:invalid;m
 
 #data
 <caption align="justify" xmlns="http://www.w3.org/1999/xhtml">x</caption>
 #errors
 /caption/@align;attribute not defined;m
-/caption/@align;enumerated:invalid
+/caption/@align;enumerated:invalid;m
 
 #data
 <caption align="" xmlns="http://www.w3.org/1999/xhtml">x</caption>
 #errors
 /caption/@align;attribute not defined;m
-/caption/@align;enumerated:invalid
+/caption/@align;enumerated:invalid;m
 
 #data
 <colgroup xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6397,7 +6407,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <colgroup span="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/colgroup/@span;nninteger:syntax error
+/colgroup/@span;nninteger:syntax error;m
 
 #data
 <colgroup span="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6414,27 +6424,27 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <colgroup span="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/colgroup/@span;nninteger:out of range
+/colgroup/@span;nninteger:out of range;m
 
 #data
 <colgroup span="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/colgroup/@span;nninteger:syntax error
+/colgroup/@span;nninteger:syntax error;m
 
 #data
 <colgroup span="+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/colgroup/@span;nninteger:syntax error
+/colgroup/@span;nninteger:syntax error;m
 
 #data
 <colgroup span="111.1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/colgroup/@span;nninteger:syntax error
+/colgroup/@span;nninteger:syntax error;m
 
 #data
 <colgroup span="haergrghra" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/colgroup/@span;nninteger:syntax error
+/colgroup/@span;nninteger:syntax error;m
 
 #data
 <colgroup charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6459,12 +6469,12 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <col span="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/col/@span;nninteger:syntax error
+/col/@span;nninteger:syntax error;m
 
 #data
 <col span="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/col/@span;nninteger:out of range
+/col/@span;nninteger:out of range;m
 
 #data
 <col span="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6477,7 +6487,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <col span="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/col/@span;nninteger:syntax error
+/col/@span;nninteger:syntax error;m
 
 #data
 <col charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6572,7 +6582,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <td colspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/td/@colspan;nninteger:out of range
+/td/@colspan;nninteger:out of range;m
 /td;no significant content;s
 
 #data
@@ -6583,7 +6593,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <td rowspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/td/@rowspan;nninteger:out of range
+/td/@rowspan;nninteger:out of range;m
 /td;no significant content;s
 
 #data
@@ -6627,7 +6637,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <th colspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /th;no significant content;s
-/th/@colspan;nninteger:out of range
+/th/@colspan;nninteger:out of range;m
 
 #data
 <th rowspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6637,13 +6647,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <th rowspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/th/@rowspan;nninteger:out of range
+/th/@rowspan;nninteger:out of range;m
 /th;no significant content;s
 
 #data
 <th scope="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/th/@scope;enumerated:invalid
+/th/@scope;enumerated:invalid;m
 /th;no significant content;s
 
 #data
@@ -6687,7 +6697,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <td scope="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /td/@scope;attribute not defined;m
-/td/@scope;enumerated:invalid
+/td/@scope;enumerated:invalid;m
 /td;no significant content;s
 
 #data
@@ -6788,7 +6798,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <tbody align="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
 #errors
 /tbody/@align;attribute not defined;m
-/tbody/@align;enumerated:invalid
+/tbody/@align;enumerated:invalid;m
 
 #data
 <tbody align="left" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
@@ -6819,25 +6829,25 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <tr align="centre" xmlns="http://www.w3.org/1999/xhtml"><th>x</th></tr>
 #errors
 /tr/@align;attribute not defined;m
-/tr/@align;enumerated:invalid
+/tr/@align;enumerated:invalid;m
 
 #data
 <th align="top" xmlns="http://www.w3.org/1999/xhtml">x</th>
 #errors
 /th/@align;attribute not defined;m
-/th/@align;enumerated:invalid
+/th/@align;enumerated:invalid;m
 
 #data
 <td align="bottom" xmlns="http://www.w3.org/1999/xhtml">x</td>
 #errors
 /td/@align;attribute not defined;m
-/td/@align;enumerated:invalid
+/td/@align;enumerated:invalid;m
 
 #data
 <tbody valign="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
 #errors
 /tbody/@valign;attribute not defined;m
-/tbody/@valign;enumerated:invalid
+/tbody/@valign;enumerated:invalid;m
 
 #data
 <thead valign="top" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
@@ -6863,19 +6873,19 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <td valign="center" xmlns="http://www.w3.org/1999/xhtml">x</td>
 #errors
 /td/@valign;attribute not defined;m
-/td/@valign;enumerated:invalid
+/td/@valign;enumerated:invalid;m
 
 #data
 <col valign="center" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /col/@valign;attribute not defined;m
-/col/@valign;enumerated:invalid
+/col/@valign;enumerated:invalid;m
 
 #data
 <colgroup valign="text-bottom" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /colgroup/@valign;attribute not defined;m
-/colgroup/@valign;enumerated:invalid
+/colgroup/@valign;enumerated:invalid;m
 
 #data
 <tbody char="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
@@ -6939,22 +6949,22 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <tr><td headers=" b  ">x</td><th id="a">x</th></tr>
 </table>
 #errors
-/table/tr/td/@headers;no header cell;m
+/table/tr/td/@headers;no referenced header cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tr><td headers=" b c ">x</td><th id="a">x</th></tr>
 </table>
 #errors
-/table/tr/td/@headers;no header cell;m
-/table/tr/td/@headers;no header cell;m
+/table/tr/td/@headers;no referenced header cell;m
+/table/tr/td/@headers;no referenced header cell;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tr><td headers=" b">x</td><th id="a">x</th><td id="b">y</td></tr>
 </table>
 #errors
-/table/tr/td/@headers;no header cell;m
+/table/tr/td/@headers;no referenced header cell;m
 
 #data
 <td header="c" xmlns="http://www.w3.org/1999/xhtml">x</td>
@@ -6969,7 +6979,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <script type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:syntax error
+/script/@type;IMT:syntax error;m
 /script;SUBDOC
 
 #data
@@ -6982,14 +6992,14 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <script type="text/javascript;e4x=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
-/script/@type;IMT:parameter not allowed:e4x;m
+/script/@type;IMT:parameter not allowed;m
 /script;SUBDOC
 
 #data
 <script type="text/JavaScript;E4X=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
-/script/@type;IMT:parameter not allowed:e4x;m
+/script/@type;IMT:parameter not allowed;m
 /script;SUBDOC
 
 #data
@@ -6997,7 +7007,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
-/script/@type;IMT:parameter not allowed:e4x;m
+/script/@type;IMT:parameter not allowed;m
 /script;SUBDOC
 
 #data
@@ -7005,7 +7015,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
-/script/@type;IMT:parameter not allowed:e4x;m
+/script/@type;IMT:parameter not allowed;m
 /script;SUBDOC
 
 #data
@@ -7013,25 +7023,24 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
-/script/@type;IMT:attribute:syntax error:~;m
-/script/@type;IMT:parameter not allowed:~;m
+/script/@type;IMT:attribute syntax error;m
+/script/@type;IMT:parameter not allowed;m
 /script;SUBDOC
 
 #data
 <script type="text~/javascript"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:type;unsupported
-/script/@type;IMT:unregistered type;w
-/script/@type;IMT:type:syntax error:text~;m
+/script/@type;IMT:unregistered type;m
+/script/@type;IMT:type syntax error;m
 /script;SUBDOC
 
 #data
 <script type="text/javascript~"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:subtype;unsupported
-/script/@type;IMT:subtype:syntax error:javascript~;m
+/script/@type;IMT:unknown subtype;u
+/script/@type;IMT:subtype syntax error;m
 /script;SUBDOC
 
 #data
@@ -7044,7 +7053,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <script src="http://test/%" type="text/javascript"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@src;URI::syntax error:iriref3987;m
+/script/@src;syntax error:iriref3987;m
 /script/@type;IMT:obsolete subtype;w
 
 #data
@@ -7142,6 +7151,12 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /script;SUBDOC
 
 #data
+<script langauge="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@langauge;attribute not defined;m
+/script;SUBDOC
+
+#data
 <script langage="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@langage;attribute not defined;m
@@ -7181,6 +7196,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <script language="XML" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
+/script;XML script lang;text/xml;u
 
 #data
 <script charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7192,6 +7208,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <script src="" charset="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@charset;charset:syntax error;m
+/script/@charset;charset:not registered;w
 
 #data
 <script src="" charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7208,85 +7225,76 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <event-source src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/event-source/@src;URI::syntax error:iriref3987;m
+/event-source/@src;syntax error:iriref3987;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <details open="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <details open="open" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details;no significant content;s
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <details open="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details/@open;boolean:invalid;m
 /details;no significant content;s
-/details;element missing:legend;m
+/details;child element missing;legend;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid;no significant content;s
 
 #data
 <datagrid disabled="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid;no significant content;s
 
 #data
 <datagrid disabled="disabled" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid;no significant content;s
 
 #data
 <datagrid disabled="Disabled" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid;no significant content;s
 
 #data
 <datagrid disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid/@disabled;boolean:invalid;m
-/datagrid;no significant content;s
 
 #data
 <datagrid multiple="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid;no significant content;s
 
 #data
 <datagrid multiple="multiple" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid;no significant content;s
 
 #data
 <datagrid multiple="MULTIPLE" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/datagrid;no significant content;s
 
 #data
 <datagrid multiple="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid/@multiple;boolean:invalid;m
-/datagrid;no significant content;s
 
 #data
 <command xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7403,17 +7411,17 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <command type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command type=" " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command type="default" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command type="command" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7422,22 +7430,22 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <command type="Command" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command type=" command" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command type="command " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command type="commandline" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command type="checkbox" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7446,7 +7454,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <command type="check" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command type="radio" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7455,7 +7463,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <command type="radiobutton" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@type;attribute value not allowed
+/command/@type;invalid attribute value;m
 
 #data
 <command icon="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7476,12 +7484,12 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <command icon="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@icon;URI::syntax error:iriref3987;m
+/command/@icon;syntax error:iriref3987;m
 
 #data
 <command icon="a b" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@icon;URI::syntax error:iriref3987;m
+/command/@icon;syntax error:iriref3987;m
 
 #data
 <menu xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7506,14 +7514,14 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <menu type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/menu/@type;enumerated:invalid
+/menu/@type;enumerated:invalid;m
 /menu;no significant content;s
 
 #data
 <menu type="type" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /menu;no significant content;s
-/menu/@type;enumerated:invalid
+/menu/@type;enumerated:invalid;m
 
 #data
 <menu type="toolbar" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7528,7 +7536,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <menu type=" toolbar" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/menu/@type;enumerated:invalid
+/menu/@type;enumerated:invalid;m
 /menu;no significant content;s
 
 #data
@@ -7544,7 +7552,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <menu type="context " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/menu/@type;enumerated:invalid
+/menu/@type;enumerated:invalid;m
 /menu;no significant content;s
 
 #data
@@ -7576,13 +7584,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <p contextmenu="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/p/@contextmenu;no referenced menu
+/p/@contextmenu;no referenced menu;m
 /p;no significant content;s
 
 #data
 <p contextmenu="aaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/p/@contextmenu;no referenced menu
+/p/@contextmenu;no referenced menu;m
 /p;no significant content;s
 
 #data
@@ -7590,7 +7598,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p contextmenu=""/><menu id=""/>
 </div>
 #errors
-/div/menu/@id;empty attribute value
+/div/menu/@id;empty attribute value;m
 /div;no significant content;s
 /div/p;no significant content;s
 /div/menu;no significant content;s
@@ -7609,7 +7617,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p contextmenu="a"/><menu id="A"/>
 </div>
 #errors
-/div/p/@contextmenu;no referenced menu
+/div/p/@contextmenu;no referenced menu;m
 /div;no significant content;s
 /div/p;no significant content;s
 /div/menu;no significant content;s
@@ -7644,7 +7652,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p contextmenu="a a"/><menu id="a a"/>
 </div>
 #errors
-/div/menu/@id;space in ID
+/div/menu/@id;space in ID;m
 /div;no significant content;s
 /div/p;no significant content;s
 /div/menu;no significant content;s
@@ -7654,7 +7662,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p contextmenu="a a"/><menu id="a"/>
 </div>
 #errors
-/div/p/@contextmenu;no referenced menu
+/div/p/@contextmenu;no referenced menu;m
 /div;no significant content;s
 /div/p;no significant content;s
 /div/menu;no significant content;s
@@ -7664,8 +7672,8 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p contextmenu="a  a"/><menu id="a a"/>
 </div>
 #errors
-/div/p/@contextmenu;no referenced menu
-/div/menu/@id;space in ID
+/div/p/@contextmenu;no referenced menu;m
+/div/menu/@id;space in ID;m
 /div;no significant content;s
 /div/p;no significant content;s
 /div/menu;no significant content;s
@@ -7675,7 +7683,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p contextmenu="a"/><ul id="a"/>
 </div>
 #errors
-/div/p/@contextmenu;no referenced menu
+/div/p/@contextmenu;no referenced menu;m
 /div;no significant content;s
 /div/p;no significant content;s
 
@@ -7706,22 +7714,22 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a a"/>
 #errors
-/rule/@mode;duplicate token:a
+/rule/@mode;duplicate token;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
 #errors
-/rule/@mode;duplicate token:a
+/rule/@mode;duplicate token;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition=""/>
 #errors
-/rule/@condition;selectors:no sss;m
+/rule/@condition;no sss;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="  "/>
 #errors
-/rule/@condition;selectors:no sss;m
+/rule/@condition;no sss;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a"/>
@@ -7738,17 +7746,17 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
 #errors
-/rule/@condition;selectors:namespace prefix:not declared;m
+/rule/@condition;namespace prefix:not declared;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a["/>
 #errors
-/rule/@condition;selectors:no attr name;m
+/rule/@condition;no attr name;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="*/**/*"/>
 #errors
-/rule/@condition;selectors:no combinator;m
+/rule/@condition;no combinator;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" filter=""/>
@@ -7758,12 +7766,12 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode=""/>
 #errors
-/nest/@mode;mode:syntax error
+/nest/@mode;mode:syntax error;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode=" "/>
 #errors
-/nest/@mode;mode:syntax error
+/nest/@mode;mode:syntax error;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a"/>
@@ -7772,17 +7780,17 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a "/>
 #errors
-/nest/@mode;mode:syntax error
+/nest/@mode;mode:syntax error;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
 #errors
-/nest/@mode;mode:syntax error
+/nest/@mode;mode:syntax error;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
 #errors
-/nest/@mode;mode:syntax error
+/nest/@mode;mode:syntax error;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="&#x3000;"/>
@@ -7791,12 +7799,12 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter=""/>
 #errors
-/nest/@filter;selectors:no sss;m
+/nest/@filter;no sss;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="  "/>
 #errors
-/nest/@filter;selectors:no sss;m
+/nest/@filter;no sss;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="a b"/>
@@ -7813,7 +7821,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="a|b"/>
 #errors
-/nest/@filter;selectors:namespace prefix:not declared;m
+/nest/@filter;namespace prefix:not declared;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
@@ -7884,7 +7892,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 </div>
 #errors
 /div/p/@template;template:not template;m
-/div/datatemplate/@id;empty attribute value
+/div/datatemplate/@id;empty attribute value;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"
@@ -7933,7 +7941,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
   <datatemplate id="t"/>
 </div>
 #errors
-/div/div/@id;empty attribute value
+/div/div/@id;empty attribute value;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -8044,7 +8052,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
   <div registrationmark="a">x</div>
 </datatemplate>
 #errors
-/datatemplate/div;element not allowed:datatemplate
+/datatemplate/div;element not allowed:datatemplate;m
 /datatemplate/div/@registrationmark;attribute not allowed;m
 
 #data
@@ -8086,7 +8094,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <div align="" xmlns="http://www.w3.org/1999/xhtml">x</div>
 #errors
 /div/@align;attribute not defined;m
-/div/@align;enumerated:invalid
+/div/@align;enumerated:invalid;m
 
 #data
 <div align="Left" xmlns="http://www.w3.org/1999/xhtml">x</div>
@@ -8113,13 +8121,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <div align="xxx" xmlns="http://www.w3.org/1999/xhtml">x</div>
 #errors
 /div/@align;attribute not defined;m
-/div/@align;enumerated:invalid
+/div/@align;enumerated:invalid;m
 
 #data
 <div align=" left" xmlns="http://www.w3.org/1999/xhtml">x</div>
 #errors
 /div/@align;attribute not defined;m
-/div/@align;enumerated:invalid
+/div/@align;enumerated:invalid;m
 
 #data
 <a accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</a>
@@ -8345,7 +8353,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <input type="delete" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/input/@type;enumerated:invalid
+/input/@type;enumerated:invalid;m
 
 #data
 <button type="remove" xmlns="http://www.w3.org/1999/xhtml">x</button>
@@ -8354,7 +8362,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <button type="delete" xmlns="http://www.w3.org/1999/xhtml">x</button>
 #errors
-/button/@type;enumerated:invalid
+/button/@type;enumerated:invalid;m
 
 #data
 <input type="move-up" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -8389,7 +8397,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <p repeat="template" repeat-min="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-min;nninteger:syntax error
+/p/@repeat-min;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-min="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -8406,32 +8414,32 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <p repeat="template" repeat-min="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-min;nninteger:syntax error
+/p/@repeat-min;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-min="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-min;nninteger:syntax error
+/p/@repeat-min;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-min="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-min;nninteger:syntax error
+/p/@repeat-min;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-min="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-min;nninteger:syntax error
+/p/@repeat-min;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-min="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-min;nninteger:syntax error
+/p/@repeat-min;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-max="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-max;nninteger:syntax error
+/p/@repeat-max;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-max="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -8448,32 +8456,32 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <p repeat="template" repeat-max="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-max;nninteger:syntax error
+/p/@repeat-max;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-max="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-max;nninteger:syntax error
+/p/@repeat-max;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-max="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-max;nninteger:syntax error
+/p/@repeat-max;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-max="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-max;nninteger:syntax error
+/p/@repeat-max;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-max="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-max;nninteger:syntax error
+/p/@repeat-max;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-start="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-start;nninteger:syntax error
+/p/@repeat-start;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-start="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -8490,56 +8498,56 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <p repeat="template" repeat-start="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-start;nninteger:syntax error
+/p/@repeat-start;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-start="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-start;nninteger:syntax error
+/p/@repeat-start;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-start="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-start;nninteger:syntax error
+/p/@repeat-start;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-start="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-start;nninteger:syntax error
+/p/@repeat-start;nninteger:syntax error;m
 
 #data
 <p repeat="template" repeat-start="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@repeat-start;nninteger:syntax error
+/p/@repeat-start;nninteger:syntax error;m
 
 #data
 <x html:repeat="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
-/x;element;unsupported
+/x;unknown element;u
 /x/@repeat;repeat:syntax error;m
 
 #data
 <x html:repeat-start="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
-/x;element;unsupported
+/x;unknown element;u
 /x/@repeat-start;nninteger:syntax error;m
 
 #data
 <x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
-/x;element;unsupported
+/x;unknown element;u
 /x/@repeat-min;nninteger:syntax error;m
 
 #data
 <x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
-/x;element;unsupported
+/x;unknown element;u
 /x/@repeat-max;nninteger:syntax error;m
 
 #data
 <x html:repeat-template="x" xmlns:html="http://www.w3.org/1999/xhtml"><p repeat="template" id="x" xmlns="http://www.w3.org/1999/xhtml">x</p></x>
 #errors
-/x;element;unsupported
+/x;unknown element;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"

@@ -371,7 +371,7 @@ my $HTMLLinkTypesAttrChecker = sub {
           $self->{onerror}->(node => $attr,
                              type => 'link type:bad context',
                              value => $word,
-                             $self->{level}->{must});
+                             level => $self->{level}->{must});
         }
       } elsif ($def->{status} eq 'proposal') {
         $self->{onerror}->(node => $attr,
@@ -2347,7 +2347,12 @@ $Element->{$HTML_NS}->{footer} = {
 $Element->{$HTML_NS}->{address} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: add test
+    #align => $GetHTMLEnumeratedAttrChecker->({
+    #  left => 1, center => 1, right => 1, justify => 1,
+    #}),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML2X_RFC,
@@ -2523,7 +2528,7 @@ $Element->{$HTML_NS}->{pre} = {
                            is_char_string => 1});
     }
 
-    $HTMLChecker{check_end}->(@_);
+    $HTMLPhrasingContentChecker{check_end}->(@_);
   },
 };
 
@@ -5837,7 +5842,7 @@ $Element->{$HTML_NS}->{details} = {
 
     unless ($element_state->{has_legend}) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing',
+                         type => 'child element missing',
                          text => 'legend',
                          level => $self->{level}->{must});
     }
@@ -5942,9 +5947,8 @@ $Element->{$HTML_NS}->{datagrid} = {
         #
       } else {
         $self->{onerror}->(node => $item->{node},
-                           level => $self->{should_level},
                            type => 'no significant content',
-                           level => $self->{level}->{must});
+                           level => $self->{level}->{should});
       }
     } else {
       ## NOTE: Since the content model explicitly allows a |datagird| element
