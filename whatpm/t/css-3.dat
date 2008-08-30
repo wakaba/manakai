@@ -1,37 +1,37 @@
 #data
 x|y {}
 #errors
-;1;1;m;namespace prefix:not declared;x
+;1;1;m;namespace prefix:not declared
 #cssom
 
 #data
 xYz|y {}
 #errors
-;1;1;m;namespace prefix:not declared;xYz
+;1;1;m;namespace prefix:not declared
 #cssom
 
 #data
 x|* {}
 #errors
-;1;1;m;namespace prefix:not declared;x
+;1;1;m;namespace prefix:not declared
 #cssom
 
 #data
 xYz|* {}
 #errors
-;1;1;m;namespace prefix:not declared;xYz
+;1;1;m;namespace prefix:not declared
 #cssom
 
 #data
 [x|y] {}
 #errors
-;1;2;m;namespace prefix:not declared;x
+;1;2;m;namespace prefix:not declared
 #cssom
 
 #data
 [xYz|y] {}
 #errors
-;1;2;m;namespace prefix:not declared;xYz
+;1;2;m;namespace prefix:not declared
 #cssom
 
 #data
@@ -39,7 +39,7 @@ p {
   content: attr(x|y);
 }
 #errors
-;2;17;m;namespace prefix:not declared;x
+;2;17;m;namespace prefix:not declared
 #cssom
 | <p>
 
@@ -48,7 +48,7 @@ p {
   content: attr(xYz|y);
 }
 #errors
-;2;17;m;namespace prefix:not declared;xYz
+;2;17;m;namespace prefix:not declared
 #cssom
 | <p>
 

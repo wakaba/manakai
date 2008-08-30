@@ -156,7 +156,7 @@ p {
   content: counter(a, normal);
 }
 #errors
-;2;23;m;syntax error:'content'
+;2;23;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -177,7 +177,7 @@ p {
   content: counter(a, "b");
 }
 #errors
-;2;23;m;syntax error:'content'
+;2;23;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -186,7 +186,7 @@ p {
   content: counter(a, "b", decimal);
 }
 #errors
-;2;23;m;syntax error:'content'
+;2;23;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -195,7 +195,7 @@ p {
   content: counters(a);
 }
 #errors
-;2;22;m;syntax error:'content'
+;2;22;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -204,7 +204,7 @@ p {
   content: counters(a, decimal);
 }
 #errors
-;2;24;m;syntax error:'content'
+;2;24;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -261,7 +261,7 @@ p {
   content: counters(a, "b", c);
 }
 #errors
-;2;29;m;syntax error:'content'
+;2;29;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -270,7 +270,7 @@ p {
   content: counters(a, "b", inherit);
 }
 #errors
-;2;29;m;syntax error:'content'
+;2;29;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -315,7 +315,7 @@ p {
   content: attr(a, b);
 }
 #errors
-;2;18;m;syntax error:'content'
+;2;18;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -336,7 +336,7 @@ p {
   content: attr(a|);
 }
 #errors
-;2;19;m;syntax error:'content'
+;2;19;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -345,7 +345,7 @@ p {
   content: attr(a||b);
 }
 #errors
-;2;19;m;syntax error:'content'
+;2;19;m;CSS syntax error;'content'
 #cssom
 | <p>
 
@@ -426,7 +426,7 @@ p {
   quotes:;
 }
 #errors
-;2;10;m;syntax error:'quotes'
+;2;10;m;CSS syntax error;'quotes'
 #cssom
 | <p>
 
@@ -553,7 +553,7 @@ p {
   quotes: "1";
 }
 #errors
-;2;14;m;syntax error:'quotes'
+;2;14;m;CSS syntax error;'quotes'
 #cssom
 | <p>
 
@@ -604,7 +604,7 @@ p {
   quotes: "1", "2";
 }
 #errors
-;2;14;m;syntax error:'quotes'
+;2;14;m;CSS syntax error;'quotes'
 #cssom
 | <p>
 
@@ -637,7 +637,7 @@ p {
   quotes: "1" "2" "3";
 }
 #errors
-;2;22;m;syntax error:'quotes'
+;2;22;m;CSS syntax error;'quotes'
 #cssom
 | <p>
 
@@ -670,7 +670,7 @@ p {
   quotes: 1 2;
 }
 #errors
-;2;11;m;syntax error:'quotes'
+;2;11;m;CSS syntax error;'quotes'
 #cssom
 | <p>
 
@@ -679,7 +679,7 @@ p {
   counter-reset: ;
 }
 #errors
-;2;18;m;syntax error:'counter-reset'
+;2;18;m;CSS syntax error;'counter-reset'
 #cssom
 | <p>
 
@@ -748,7 +748,7 @@ p {
   counter-reset: 4
 }
 #errors
-;2;18;m;syntax error:'counter-reset'
+;2;18;m;CSS syntax error;'counter-reset'
 #cssom
 | <p>
 
@@ -924,7 +924,7 @@ p {
   counter-increment: ;
 }
 #errors
-;2;22;m;syntax error:'counter-increment'
+;2;22;m;CSS syntax error;'counter-increment'
 #cssom
 | <p>
 
@@ -993,7 +993,7 @@ p {
   counter-increment: 4
 }
 #errors
-;2;22;m;syntax error:'counter-increment'
+;2;22;m;CSS syntax error;'counter-increment'
 #cssom
 | <p>
 
@@ -1248,7 +1248,7 @@ p {
   marker-offset: 10cml;
 }
 #errors
-;2;18;m;syntax error:'marker-offset'
+;2;18;m;CSS syntax error;'marker-offset'
 #cssom
 | <p>
 
@@ -1265,7 +1265,7 @@ p {
   marker-offset: 3;
 }
 #errors
-;2;18;m;syntax error:'marker-offset'
+;2;18;m;CSS syntax error;'marker-offset'
 #cssom
 | <p>
 
@@ -1299,7 +1299,7 @@ p {
   list-style-type: kana
 }
 #errors
-;2;20;m;syntax error:'list-style-type'
+;2;20;m;CSS syntax error;'list-style-type'
 #cssom
 | <p>
 
@@ -1316,7 +1316,7 @@ p {
   list-style-type: Hirakana;
 } 
 #errors
-;2;20;m;syntax error:'list-style-type'
+;2;20;m;CSS syntax error;'list-style-type'
 #cssom
 | <p>
 
@@ -1325,7 +1325,7 @@ p {
   list-style-type: iroha;
 }
 #errors
-;2;20;m;syntax error:'list-style-type'
+;2;20;m;CSS syntax error;'list-style-type'
 #cssom
 | <p>
 

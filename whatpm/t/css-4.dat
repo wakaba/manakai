@@ -2,14 +2,14 @@
 @import;
 p {}
 #errors
-;1;8;m;at-rule syntax error:import
+;1;8;m;at-rule syntax error;import
 #cssom
 | <p>
 
 #data
 @i '';
 #errors
-;1;1;u;at-rule not supported;i
+;1;1;u;unknown at-rule
 #cssom
 
 #data
@@ -17,7 +17,7 @@ p {}
 q{}
 r{}
 #errors
-;1;9;m;at-rule syntax error:import
+;1;9;m;at-rule syntax error;import
 ;1;12;m;no sss
 #cssom
 | <r>
@@ -27,7 +27,7 @@ r{}
 q{}
 r{}
 #errors
-;1;9;m;at-rule syntax error:import
+;1;9;m;at-rule syntax error;import
 #cssom
 | <q>
 | <r>
@@ -37,7 +37,7 @@ r{}
 q{}
 r{}
 #errors
-;1;9;m;at-rule syntax error:import
+;1;9;m;at-rule syntax error;import
 #cssom
 | <q>
 | <r>
@@ -46,7 +46,7 @@ r{}
 @import a;
 p{}
 #errors
-;1;9;m;at-rule syntax error:import
+;1;9;m;at-rule syntax error;import
 #cssom
 | <p>
 
@@ -167,19 +167,19 @@ p{}
 #data
 @import 'abc'
 #errors
-;1;14;m;at-rule syntax error:import
+;1;14;m;at-rule syntax error;import
 #cssom
 
 #data
 @import 'abc' all
 #errors
-;1;18;m;at-rule syntax error:import
+;1;18;m;at-rule syntax error;import
 #cssom
 
 #data
 @import 'abc', all;
 #errors
-;1;14;m;at-rule syntax error:import
+;1;14;m;at-rule syntax error;import
 #cssom
 
 #data
@@ -199,7 +199,7 @@ p{}
 @import 'abc';
 @charset 'iso-2022-jp';
 #errors
-;2;1;m;at-rule not allowed:charset
+;2;1;m;at-rule not allowed;charset
 #cssom
 | @import <abc> 
 
@@ -221,7 +221,7 @@ p{}
 @namespace 'n';
 @import 'abc';
 #errors
-;2;1;m;at-rule not allowed:import
+;2;1;m;at-rule not allowed;import
 #cssom
 | @namespace <n>
 
@@ -236,7 +236,7 @@ p{}
 @media all {}
 @import 'abc'
 #errors
-;2;1;m;at-rule not allowed:import
+;2;1;m;at-rule not allowed;import
 #cssom
 | @media all
 
@@ -245,7 +245,7 @@ p{}
   @import 'abc';
 }
 #errors
-;2;3;m;at-rule not allowed:import
+;2;3;m;at-rule not allowed;import
 #cssom
 | @media all
 
@@ -253,6 +253,6 @@ p{}
 p{}
 @import 'abc';
 #errors
-;2;1;m;at-rule not allowed:import
+;2;1;m;at-rule not allowed;import
 #cssom
 | <p>

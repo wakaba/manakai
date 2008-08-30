@@ -5,7 +5,7 @@ use lib qw[/home/wakaba/work/manakai2/lib]; ## TODO: ...
 
 use Test;
 
-BEGIN { plan tests => 548 }
+BEGIN { plan tests => 2210 }
 
 require Whatpm::CSS::Parser;
 require Message::DOM::Window;
@@ -100,7 +100,8 @@ for my $file_name (map {"t/$_"} qw(
       push @actual_error, join ';',
           $uri, $opt{token}->{line}, $opt{token}->{column},
           $opt{level},
-          $opt{type} . (defined $opt{value} ? ';'.$opt{value} : '');
+          $opt{type} .
+          (defined $opt{text} ? ';'.$opt{text} : '');
     };
 
     my $ss = $p->parse_char_string ($test->{data});
