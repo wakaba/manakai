@@ -74,14 +74,18 @@ while (<>) {
       if ($nsuri eq q<$HTML_NS>) {
         $attr_xname = q[undef, [undef, $attr_name]];
       } else {
-        ## NOTE: "Adjust SVG attributes" (SVG only) and
+        ## NOTE: "Adjust SVG attributes" (SVG only),
+        ## "adjust MathML attributes" (MathML only), and
         ## "adjust foreign attributes".
         $attr_xname = qq[
           \@{
             \$foreign_attr_xname->{\$attr_name} ||
             [undef, [undef,
-                     $nsuri eq \$SVG_NS ?
+                     ($nsuri) eq \$SVG_NS ?
                          (\$svg_attr_name->{\$attr_name} || \$attr_name) :
+                     ($nsuri) eq \$MML_NS ?
+                         (\$attr_name eq 'definitionurl' ?
+                             'definitionURL' : \$attr_name) :
                          \$attr_name]]
           }
         ];

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.154 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.155 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6948,6 +6948,8 @@ sub _tree_construction_main ($) {
                $token->{tag_name} eq 'svg') {
         $reconstruct_active_formatting_elements->($insert_to_current);
 
+        ## "Adjust MathML attributes" ('math' only) - done in insert-element-f
+
         ## "adjust SVG attributes" ('svg' only) - done in insert-element-f
 
         ## "adjust foreign attributes" - done in insert-element-f
@@ -7646,4 +7648,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/16 07:35:23 $
+# $Date: 2008/08/30 12:57:05 $

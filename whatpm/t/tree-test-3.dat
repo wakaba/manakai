@@ -1,0 +1,50 @@
+#data
+<!DOCTYPE HTML>
+<math definitionurl/>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <math>
+|       definitionURL=""
+
+#data
+<!DOCTYPE HTML>
+<math><mo definitionurl>+</mo></math>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <math>
+|       <mo>
+|         definitionURL=""
+|         "+"
+
+#data
+<!DOCTYPE HTML>
+<svg definitionurl/>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|       definitionurl=""
+
+#data
+<!DOCTYPE HTML>
+<svg><g definitionurl/></svg>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|       <g>
+|         definitionurl=""

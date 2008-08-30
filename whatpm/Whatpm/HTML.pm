@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.151 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.152 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -5136,8 +5136,11 @@ sub _tree_construction_main ($) {
           @{
             $foreign_attr_xname->{$attr_name} ||
             [undef, [undef,
-                     $nsuri eq $SVG_NS ?
+                     ($nsuri) eq $SVG_NS ?
                          ($svg_attr_name->{$attr_name} || $attr_name) :
+                     ($nsuri) eq $MML_NS ?
+                         ($attr_name eq 'definitionurl' ?
+                             'definitionURL' : $attr_name) :
                          $attr_name]]
           }
         );
@@ -8737,6 +8740,8 @@ sub _tree_construction_main ($) {
                $token->{tag_name} eq 'svg') {
         $reconstruct_active_formatting_elements->($insert_to_current);
 
+        ## "Adjust MathML attributes" ('math' only) - done in insert-element-f
+
         ## "adjust SVG attributes" ('svg' only) - done in insert-element-f
 
         ## "adjust foreign attributes" - done in insert-element-f
@@ -8754,8 +8759,11 @@ sub _tree_construction_main ($) {
           @{
             $foreign_attr_xname->{$attr_name} ||
             [undef, [undef,
-                     $token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS eq $SVG_NS ?
+                     ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS) eq $SVG_NS ?
                          ($svg_attr_name->{$attr_name} || $attr_name) :
+                     ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS) eq $MML_NS ?
+                         ($attr_name eq 'definitionurl' ?
+                             'definitionURL' : $attr_name) :
                          $attr_name]]
           }
         );
@@ -9512,4 +9520,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/16 07:35:23 $
+# $Date: 2008/08/30 12:57:05 $
