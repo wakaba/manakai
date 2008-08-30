@@ -3932,6 +3932,7 @@ $Element->{$HTML_NS}->{img} = {
                          type => 'attribute missing',
                          text => 'alt',
                          level => $self->{level}->{should});
+      ## TODO: ...
     }
     unless ($item->{node}->has_attribute_ns (undef, 'src')) {
       $self->{onerror}->(node => $item->{node},
@@ -3939,6 +3940,8 @@ $Element->{$HTML_NS}->{img} = {
                          text => 'src',
                          level => $self->{level}->{must});
     }
+
+    ## TODO: external resource check
 
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{lowsrc}->{type}->{embedded} = 1;
@@ -3949,7 +3952,7 @@ $Element->{$HTML_NS}->{img} = {
 
 $Element->{$HTML_NS}->{iframe} = {
   %HTMLTextChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
       ## NOTE: Not part of M12N10 Strict
   check_attrs => $GetHTMLAttrsChecker->({
     height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
@@ -3971,12 +3974,12 @@ $Element->{$HTML_NS}->{iframe} = {
     longdesc => FEATURE_M12N10_REC,
     marginheight => FEATURE_M12N10_REC,
     marginwidth => FEATURE_M12N10_REC,
-    #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
-    name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    sandbox => FEATURE_HTML5_DEFAULT,
+    #name => FEATURE_HTML5_WD | FEATURE_M12N10_REC_DEPRECATED,
+    name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    sandbox => FEATURE_HTML5_WD,
     scrolling => FEATURE_M12N10_REC,
-    seemless => FEATURE_HTML5_DEFAULT,
-    src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    seemless => FEATURE_HTML5_WD,
+    src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     width => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
@@ -4050,8 +4053,13 @@ $Element->{$HTML_NS}->{embed} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing',
                          text => 'src',
-                         level => $self->{level}->{must});
+                         level => $self->{level}->{info});
+      ## NOTE: <embed> without src="" is allowed since revision 1929.
+      ## We issues an informational message since <embed> w/o src=""
+      ## is likely an authoring error.
     }
+
+    ## TODO: external resource check
 
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
   },
