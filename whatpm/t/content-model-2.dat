@@ -620,6 +620,12 @@ id=""><span id="">x</span></p>
 /p/@irrelevant;attribute not defined;m
 
 #data
+<p irrelevant="irelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
+
+#data
 <p irrelevant="irrelevants" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
@@ -1241,7 +1247,7 @@ id=""><span id="">x</span></p>
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
-<link rel="alternate stylesheet" href=""/>
+<link rel="alternate stylesheet" href="" title="x"/>
 <base target="_self"/>
 <title/>
 </head>
@@ -1249,7 +1255,7 @@ id=""><span id="">x</span></p>
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
-<link rel="stylesheet alternate" href=""/>
+<link rel="stylesheet alternate" href="" title="x"/>
 <base target="_self"/>
 <title/>
 </head>
@@ -1257,7 +1263,7 @@ id=""><span id="">x</span></p>
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
-<link rel="alternate stylesheet stylesheet" href=""/>
+<link rel="alternate stylesheet stylesheet" href="" title="x"/>
 <base target="_self"/>
 <title/>
 </head>
@@ -1275,7 +1281,7 @@ id=""><span id="">x</span></p>
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
-<link rel="alternate up stylesheet" href=""/>
+<link rel="alternate up stylesheet" href="" title="x"/>
 <base target="_self"/>
 <title/>
 </head>
@@ -1451,7 +1457,73 @@ id=""><span id="">x</span></p>
 /link/@rel;unknown link type;u
 
 #data
+<link rel="alternate" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="alternate" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="alternate stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;title;m
+
+#data
 <link rel="alternate stylesheet" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@title;empty style sheet title;m
+
+#data
+<link rel="alternate stylesheet" href="http://test/" title="xxxxx"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet alternate" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;title;m
+
+#data
+<link rel="stylesheet alternate" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@title;empty style sheet title;m
+
+#data
+<link rel="stylesheet alternate" href="http://test/" title="x"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="alternate up stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;title;m
+
+#data
+<link rel="alternate up stylesheet" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@title;empty style sheet title;m
+
+#data
+<link rel="alternate up stylesheet" href="http://test/" title="xxxxx"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 

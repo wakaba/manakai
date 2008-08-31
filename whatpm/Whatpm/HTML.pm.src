@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.156 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.157 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -7141,6 +7141,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t413');
           !!!parse-error (type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
+          ## NOTE: Ignore the token.
         } else {
           ## Step 1. generate implied end tags
           while ({
@@ -7200,6 +7201,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t421');
           !!!parse-error (type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
+          ## NOTE: Ignore the token.
         } else {
           ## Step 1. generate implied end tags
           while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
@@ -7246,6 +7248,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t425.1');
           !!!parse-error (type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
+          ## NOTE: Ignore the token.
         } else {
           ## Step 1. generate implied end tags
           while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
@@ -7655,4 +7658,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/30 13:43:50 $
+# $Date: 2008/08/31 09:12:30 $

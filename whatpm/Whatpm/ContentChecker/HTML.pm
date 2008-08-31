@@ -1845,6 +1845,21 @@ $Element->{$HTML_NS}->{link} = {
                          type => 'attribute not allowed',
                          level => $self->{level}->{must});
     }
+
+    if ($element_state->{link_rel}->{alternate} and
+        $element_state->{link_rel}->{stylesheet}) {
+      my $title_attr = $item->{node}->get_attribute_node_ns (undef, 'title');
+      unless ($title_attr) {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'attribute missing',
+                           text => 'title',
+                           level => $self->{level}->{must});
+      } elsif ($title_attr->value eq '') {
+        $self->{onerror}->(node => $title_attr,
+                           type => 'empty style sheet title',
+                           level => $self->{level}->{must});
+      }
+    }
   },
 };
 
