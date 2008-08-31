@@ -1,6 +1,6 @@
 package Whatpm::CacheManifest;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Message::URI::URIReference;
 
 sub parse_byte_string ($$$$;$$) {
@@ -147,6 +147,16 @@ sub _parse ($$$$$$) {
       ## Step 20
       $mode = 'online whitelist';
       next START_OF_LINE;
+    } elsif ($line =~ /:\z/) {
+      ## Step 21
+      $mode = 'unknown';
+
+      $onerror->(type => 'manifest:unknown section',
+                 level => $levels->{must},
+                 line => $line_number, column => 1,
+                 value => $line);
+
+      next START_OF_LINE;
     }
 
     ## NOTE: "URIs that are to be fallback pages associated with
@@ -162,9 +172,25 @@ sub _parse ($$$$$$) {
     ## NOTE: "Relative URIs MUST be given relative to the manifest's own URI."
     ## requirement in writing section can't be tested.
 
-    ## Step 21
+    ## Step 22
+    ## "This is either a data line or it is syntactically incorrect."
+
+    ## Step 23-26
+    my $tokens = [split /[\x09\x20]+/, $line];
+    shift @$tokens if $tokens->[0] eq ''; # leading white space
+    ## NOTE: Now, @$tokens contains at least one non-empty string.
+
+    ## Step 27
     if ($mode eq 'explicit') {
-      my $uri = Message::DOM::DOMImplementation->create_uri_reference ($line);
+      if (@$tokens > 1) {
+        $onerror->(type => 'manifest:too many tokens',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
+                   value => $tokens->[1]);
+      }
+
+      my $uri = Message::DOM::DOMImplementation->create_uri_reference
+          ($tokens->[0]);
 
       unless ($uri->is_iri_reference_3987) {
         $onerror->(type => 'syntax error:iriref3987',
@@ -196,13 +222,22 @@ sub _parse ($$$$$$) {
 
       push @$explicit_uris, $uri->uri_reference;
     } elsif ($mode eq 'fallback') {
-      my ($p1, $p2) = split /[\x20\x09]+/, $line, 2;
+      if (@$tokens > 2) {
+        $onerror->(type => 'manifest:too many tokens',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
+                   value => $tokens->[2]);
+      }
+
+      my ($p1, $p2) = (@$tokens);
 
       unless (defined $p2) {
         $onerror->(type => 'no fallback entry URL',
                    level => $levels->{must},
                    line => $line_number, column => 1,
                    value => $line);
+
+        ## ISSUE: The following is dropped in r2051 (error?)
         next START_OF_LINE; ## NOTE: MUST in syntax.
       }
 
@@ -274,7 +309,15 @@ sub _parse ($$$$$$) {
 
       $fallback_uris->{$u1->uri_reference} = $u2->uri_reference;
     } elsif ($mode eq 'online whitelist') {
-      my $uri = Message::DOM::DOMImplementation->create_uri_reference ($line);
+      if (@$tokens > 1) {
+        $onerror->(type => 'manifest:too many tokens',
+                   level => $levels->{must},
+                   line => $line_number, column => 1,
+                   value => $tokens->[1]);
+      }
+
+      my $uri = Message::DOM::DOMImplementation->create_uri_reference
+          ($tokens->[0]);
 
       unless ($uri->is_iri_reference_3987) {
         $onerror->(type => 'syntax error:iriref3987',
@@ -305,13 +348,17 @@ sub _parse ($$$$$$) {
       }
 
       push @$online_whitelist_uris, $uri->uri_reference;      
+    } elsif ($mode eq 'unknown') {
+      ## NOTE: Do nothing.
+      ## NOTE: No informational message is thrown, since when the mode
+      ## is switched to the "unknown" state an error is raised.
     }
 
-    ## Step 22
+    ## Step 28
     #next START_OF_LINE;
   } # START_OF_LINE
 
-  ## Step 23
+  ## Step 29
   return [$explicit_uris, $fallback_uris, $online_whitelist_uris,
           $m_uri->uri_reference];
 } # _parse
@@ -405,4 +452,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/08/16 07:35:22 $
+# $Date: 2008/08/31 13:27:33 $
