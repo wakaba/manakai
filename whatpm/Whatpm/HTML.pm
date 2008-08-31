@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.153 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.154 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -7788,13 +7788,9 @@ sub _tree_construction_main ($) {
           } elsif ($self->{insertion_mode} == AFTER_FRAMESET_IM) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'after frameset:#text', token => $token);
-          } else { # "after html frameset"
+          } else { # "after after frameset"
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'after html:#text', token => $token);
-
-            $self->{insertion_mode} = AFTER_FRAMESET_IM;
-            ## Reprocess in the "after frameset" insertion mode.
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'after frameset:#text', token => $token);
           }
           
           ## Ignore the token.
@@ -7810,17 +7806,6 @@ sub _tree_construction_main ($) {
         
         die qq[$0: Character "$token->{data}"];
       } elsif ($token->{type} == START_TAG_TOKEN) {
-        if ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'after html',
-                          text => $token->{tag_name}, token => $token);
-
-          $self->{insertion_mode} = AFTER_FRAMESET_IM;
-          ## Process in the "after frameset" insertion mode.
-        } else {
-          
-        } 
-
         if ($token->{tag_name} eq 'frameset' and
             $self->{insertion_mode} == IN_FRAMESET_IM) {
           
@@ -7894,9 +7879,13 @@ sub _tree_construction_main ($) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'in frameset',
                             text => $token->{tag_name}, token => $token);
-          } else {
+          } elsif ($self->{insertion_mode} == AFTER_FRAMESET_IM) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'after frameset',
+                            text => $token->{tag_name}, token => $token);
+          } else { # "after after frameset"
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'after after frameset',
                             text => $token->{tag_name}, token => $token);
           }
           ## Ignore the token
@@ -7905,17 +7894,6 @@ sub _tree_construction_main ($) {
           next B;
         }
       } elsif ($token->{type} == END_TAG_TOKEN) {
-        if ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'after html:/',
-                          text => $token->{tag_name}, token => $token);
-
-          $self->{insertion_mode} = AFTER_FRAMESET_IM;
-          ## Process in the "after frameset" insertion mode.
-        } else {
-          
-        }
-
         if ($token->{tag_name} eq 'frameset' and
             $self->{insertion_mode} == IN_FRAMESET_IM) {
           if ($self->{open_elements}->[-1]->[1] & HTML_EL and
@@ -7950,9 +7928,13 @@ sub _tree_construction_main ($) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'in frameset:/',
                             text => $token->{tag_name}, token => $token);
-          } else {
+          } elsif ($self->{insertion_mode} == AFTER_FRAMESET_IM) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'after frameset:/',
+                            text => $token->{tag_name}, token => $token);
+          } else { # "after after html"
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'after after frameset:/',
                             text => $token->{tag_name}, token => $token);
           }
           ## Ignore the token
@@ -8997,6 +8979,7 @@ sub _tree_construction_main ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
+          ## NOTE: Ignore the token.
         } else {
           ## Step 1. generate implied end tags
           while ({
@@ -9056,6 +9039,7 @@ sub _tree_construction_main ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
+          ## NOTE: Ignore the token.
         } else {
           ## Step 1. generate implied end tags
           while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
@@ -9102,6 +9086,7 @@ sub _tree_construction_main ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
+          ## NOTE: Ignore the token.
         } else {
           ## Step 1. generate implied end tags
           while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
@@ -9527,4 +9512,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/30 13:43:50 $
+# $Date: 2008/08/31 12:11:42 $

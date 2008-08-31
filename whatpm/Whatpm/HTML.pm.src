@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.157 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.158 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -6301,13 +6301,9 @@ sub _tree_construction_main ($) {
           } elsif ($self->{insertion_mode} == AFTER_FRAMESET_IM) {
             !!!cp ('t312');
             !!!parse-error (type => 'after frameset:#text', token => $token);
-          } else { # "after html frameset"
+          } else { # "after after frameset"
             !!!cp ('t313');
             !!!parse-error (type => 'after html:#text', token => $token);
-
-            $self->{insertion_mode} = AFTER_FRAMESET_IM;
-            ## Reprocess in the "after frameset" insertion mode.
-            !!!parse-error (type => 'after frameset:#text', token => $token);
           }
           
           ## Ignore the token.
@@ -6323,17 +6319,6 @@ sub _tree_construction_main ($) {
         
         die qq[$0: Character "$token->{data}"];
       } elsif ($token->{type} == START_TAG_TOKEN) {
-        if ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
-          !!!cp ('t316');
-          !!!parse-error (type => 'after html',
-                          text => $token->{tag_name}, token => $token);
-
-          $self->{insertion_mode} = AFTER_FRAMESET_IM;
-          ## Process in the "after frameset" insertion mode.
-        } else {
-          !!!cp ('t317');
-        } 
-
         if ($token->{tag_name} eq 'frameset' and
             $self->{insertion_mode} == IN_FRAMESET_IM) {
           !!!cp ('t318');
@@ -6354,14 +6339,21 @@ sub _tree_construction_main ($) {
           ## NOTE: As if in head.
           $parse_rcdata->(CDATA_CONTENT_MODEL);
           next B;
+
+          ## NOTE: |<!DOCTYPE HTML><frameset></frameset></html><noframes></noframes>|
+          ## has no parse error.
         } else {
           if ($self->{insertion_mode} == IN_FRAMESET_IM) {
             !!!cp ('t321');
             !!!parse-error (type => 'in frameset',
                             text => $token->{tag_name}, token => $token);
-          } else {
+          } elsif ($self->{insertion_mode} == AFTER_FRAMESET_IM) {
             !!!cp ('t322');
             !!!parse-error (type => 'after frameset',
+                            text => $token->{tag_name}, token => $token);
+          } else { # "after after frameset"
+            !!!cp ('t322.2');
+            !!!parse-error (type => 'after after frameset',
                             text => $token->{tag_name}, token => $token);
           }
           ## Ignore the token
@@ -6370,17 +6362,6 @@ sub _tree_construction_main ($) {
           next B;
         }
       } elsif ($token->{type} == END_TAG_TOKEN) {
-        if ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
-          !!!cp ('t323');
-          !!!parse-error (type => 'after html:/',
-                          text => $token->{tag_name}, token => $token);
-
-          $self->{insertion_mode} = AFTER_FRAMESET_IM;
-          ## Process in the "after frameset" insertion mode.
-        } else {
-          !!!cp ('t324');
-        }
-
         if ($token->{tag_name} eq 'frameset' and
             $self->{insertion_mode} == IN_FRAMESET_IM) {
           if ($self->{open_elements}->[-1]->[1] & HTML_EL and
@@ -6415,9 +6396,13 @@ sub _tree_construction_main ($) {
             !!!cp ('t330');
             !!!parse-error (type => 'in frameset:/',
                             text => $token->{tag_name}, token => $token);
-          } else {
-            !!!cp ('t331');
+          } elsif ($self->{insertion_mode} == AFTER_FRAMESET_IM) {
+            !!!cp ('t330.1');
             !!!parse-error (type => 'after frameset:/',
+                            text => $token->{tag_name}, token => $token);
+          } else { # "after after html"
+            !!!cp ('t331');
+            !!!parse-error (type => 'after after frameset:/',
                             text => $token->{tag_name}, token => $token);
           }
           ## Ignore the token
@@ -7658,4 +7643,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/31 09:12:30 $
+# $Date: 2008/08/31 12:11:42 $
