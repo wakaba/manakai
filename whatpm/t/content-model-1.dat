@@ -115,6 +115,14 @@
 </head>
 #errors
 /head;child element missing;title;m
+/head/event-source;element not defined;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<eventsource/>
+</head>
+#errors
+/head;child element missing;title;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -198,11 +206,27 @@
 <title/>
 </head>
 #errors
+/head/event-source;element not defined;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<eventsource/>
+<title/>
+</head>
+#errors
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <title/>
 <event-source/>
+</head>
+#errors
+/head/event-source;element not defined;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<eventsource/>
 </head>
 #errors
 
@@ -5600,6 +5624,19 @@ xxxx
 #errors
 /head/noscript;in XML:noscript;m
 /head/noscript/event-source;element not allowed:head noscript;m
+/head/noscript/event-source;element not defined;m
+/head/noscript/event-source/@src;attribute not defined;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<eventsource src=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+/head/noscript/eventsource;element not allowed:head noscript;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -5755,6 +5792,26 @@ xxxx
 /noscript;in XML:noscript;m
 /noscript/noscript;element not allowed:minus;m
 /noscript/noscript;in XML:noscript;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><eventsource/></em>
+#errors
+/em;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><eventsource/></p>
+#errors
+/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><eventsource/></div>
+#errors
+/div;no significant content;s
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml"><eventsource/></section>
+#errors
+/section;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"></details>

@@ -5085,6 +5085,24 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /html/body/embed/@xml:space;attribute not defined;m
 
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    camelCase=""/>
+#errors
+/embed/@camelCase;attribute not defined;m
+
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    Capital=""/>
+#errors
+/embed/@Capital;attribute not defined;m
+
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    UPPERCASE=""/>
+#errors
+/embed/@UPPERCASE;attribute not defined;m
+
 #data html
 <!DOCTYPE HTML><title>x</title>
 <embed src="http://test/"
@@ -7592,15 +7610,33 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <event-source xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/event-source;element not defined;m
 
 #data
 <event-source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/event-source;element not defined;m
+/event-source/@src;attribute not defined;m
 
 #data
 <event-source src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /event-source/@src;syntax error:iriref3987;m
+/event-source;element not defined;m
+/event-source/@src;attribute not defined;m
+
+#data
+<eventsource xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<eventsource src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<eventsource src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/eventsource/@src;syntax error:iriref3987;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>

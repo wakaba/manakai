@@ -40,6 +40,10 @@ sub FEATURE_HTML5_DROPPED () {
   ## NOTE: Was part of HTML5, but was dropped.
   Whatpm::ContentChecker::FEATURE_STATUS_WD
 }
+sub FEATURE_HTML5_LC_DROPPED () {
+  ## NOTE: Was part of HTML5, but was dropped.
+  Whatpm::ContentChecker::FEATURE_STATUS_LC
+}
 sub FEATURE_WF2 () {
   Whatpm::ContentChecker::FEATURE_STATUS_LC |
   Whatpm::ContentChecker::FEATURE_ALLOWED
@@ -152,7 +156,8 @@ sub FEATURE_HTML20_RFC () { ## Proposed Standard, obsolete
 my $HTMLMetadataContent = {
   $HTML_NS => {
     title => 1, base => 1, link => 1, style => 1, script => 1, noscript => 1,
-    'event-source' => 1, command => 1, datatemplate => 1,
+    'event-source' => 1, eventsource => 1,
+    command => 1, datatemplate => 1,
     ## NOTE: A |meta| with no |name| element is not allowed as
     ## a metadata content other than |head| element.
     meta => 1,
@@ -183,7 +188,8 @@ my $HTMLFlowContent = {
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, ruby => 1,
-    script => 1, noscript => 1, 'event-source' => 1, command => 1, bb => 1,
+    script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
+    command => 1, bb => 1,
     a => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
@@ -233,7 +239,8 @@ my $HTMLPhrasingContent = {
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, ruby => 1,
-    script => 1, noscript => 1, 'event-source' => 1, command => 1, bb => 1,
+    script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
+    command => 1, bb => 1,
     a => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
@@ -4027,6 +4034,7 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } elsif ($attr_ln !~ /^[Xx][Mm][Ll]/ and
+                 $attr_ln !~ /[A-Z]/ and
                  $attr_ln =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
           $checker = $HTMLAttrChecker->{$attr_ln}
             || sub { }; ## NOTE: Any local attribute is ok.
@@ -5831,12 +5839,30 @@ $Element->{$HTML_NS}->{noscript} = {
 
 $Element->{$HTML_NS}->{'event-source'} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_LC,
+  status => FEATURE_HTML5_LC_DROPPED,
   check_attrs => $GetHTMLAttrsChecker->({
     src => $HTMLURIAttrChecker,
   }, {
     %HTMLAttrStatus,
-    src => FEATURE_HTML5_LC,
+    src => FEATURE_HTML5_LC_DROPPED,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+};
+
+$Element->{$HTML_NS}->{eventsource} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_DEFAULT,
+  check_attrs => $GetHTMLAttrsChecker->({
+    src => $HTMLURIAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    src => FEATURE_HTML5_DEFAULT,
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
