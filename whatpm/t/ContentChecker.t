@@ -11,6 +11,7 @@ my @FILES = qw[
   t/content-model-4.dat
   t/content-model-5.dat
   t/content-model-6.dat
+  t/content-model-7.dat
   t/table-1.dat
   t/content-model-atom-1.dat
   t/content-model-atom-2.dat
@@ -127,4 +128,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2008/08/30 10:26:39 $
+## $Date: 2008/08/31 06:57:32 $

@@ -5836,6 +5836,89 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 /details/legend;element not allowed:details legend;m
 
 #data
+<bb xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb;no significant content;s
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">   </bb>
+#errors
+/bb;no significant content;s
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">x</bb>
+#errors
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml"><em>x</em></bb>
+#errors
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">x<em>y</em>z</bb>
+#errors
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml"><p>x</p></bb>
+#errors
+/bb/p;element not allowed:phrasing;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>
+#errors
+/bb/meta;element not allowed:phrasing;m
+/bb;no significant content;s
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">x<script>y</script></bb>
+#errors
+/bb/script;SUBDOC
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml"><ins>x</ins></bb>
+#errors
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml"><ins><p>x</p></ins></bb>
+#errors
+/bb/ins/p;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></p>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></em>
+#errors
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></br>
+#errors
+/br/bb;element not allowed:empty;m
+
+#data
+<title xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></title>
+#errors
+/title/bb;element not allowed:text;m
+
+#data
+<td xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></td>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></ins>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><del><bb>x</bb></del>y</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><bb><style></style>x</bb></p>
+#errors
+/p/bb/style;element not allowed:phrasing;m
+/p/bb/style;SUBDOC
+
+#data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -7019,6 +7102,18 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /rule/datagrid/p;element not allowed;m
 /rule/datagrid/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><bb>x<nest/></bb></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ins><bb>x</bb></ins></rule>
+#errors
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">

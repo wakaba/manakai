@@ -572,68 +572,153 @@ id=""><span id="">x</span></p>
 #data
 <p irrelevant="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant=" " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant=" irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="irrelevant " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant=" irrelevant " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="Irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="IRRELEVANT" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="relevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="irrelevants" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="false" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="true" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="yes" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
 
 #data
 <p irrelevant="on" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@irrelevant;boolean:invalid;m
+/p/@irrelevant;attribute not defined;m
+
+#data
+<p hidden="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p hidden=" " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden="hidden" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p hidden="irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden=" hidden" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden="hidden " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden=" hidden " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden="Hidden" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p hidden="HIDDEN" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p hidden="shown" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden="hide" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden="false" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden="true" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden="yes" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data
+<p hidden="on" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
 
 #data
 <p tabindex="-1" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -7621,6 +7706,52 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <command icon="a b" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /command/@icon;syntax error:iriref3987;m
+
+#data
+<bb type="" xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb;no significant content;s
+/bb/@type;enumerated:invalid;m
+
+#data
+<bb type="type" xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb;no significant content;s
+/bb/@type;enumerated:invalid;m
+
+#data
+<bb type="null" xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb;no significant content;s
+/bb/@type;enumerated:invalid;m
+
+#data
+<bb type="makeapp" xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb;no significant content;s
+
+#data
+<bb type="make application" xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb/@type;enumerated:invalid;m
+/bb;no significant content;s
+
+#data
+<bb type="MakeApp" xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb;no significant content;s
+
+#data
+<bb type=" makeapp " xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb/@type;enumerated:invalid;m
+/bb;no significant content;s
+
+#data
+<bb type="button" xmlns="http://www.w3.org/1999/xhtml"></bb>
+#errors
+/bb/@type;enumerated:invalid;m
+/bb;no significant content;s
 
 #data
 <menu xmlns="http://www.w3.org/1999/xhtml"/>

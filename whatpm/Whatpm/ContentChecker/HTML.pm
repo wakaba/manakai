@@ -181,7 +181,7 @@ my $HTMLFlowContent = {
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, ruby => 1,
-    script => 1, noscript => 1, 'event-source' => 1, command => 1,
+    script => 1, noscript => 1, 'event-source' => 1, command => 1, bb => 1,
     a => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
@@ -231,7 +231,7 @@ my $HTMLPhrasingContent = {
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, ruby => 1,
-    script => 1, noscript => 1, 'event-source' => 1, command => 1,
+    script => 1, noscript => 1, 'event-source' => 1, command => 1, bb => 1,
     a => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
@@ -267,6 +267,7 @@ my $HTMLInteractiveContent = {
   $HTML_NS => {
     a => 1,
     datagrid => 1, ## ISSUE: Categorized as "Inetractive element"
+    bb => 1,
   },
 };
 
@@ -987,6 +988,7 @@ my $HTMLAttrChecker = {
     ## of the Document tree is in the DOM?  A menu Element node that
     ## belong to another Document tree is in the DOM?
   },
+  hidden => $GetHTMLBooleanAttrChecker->('hidden'),
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   ref => $HTMLRefOrTemplateAttrChecker,
   registrationmark => sub {
@@ -1140,8 +1142,9 @@ my %HTMLAttrStatus = (
   contextmenu => FEATURE_HTML5_WD,
   dir => FEATURE_HTML5_DEFAULT,
   draggable => FEATURE_HTML5_LC,
+  hidden => FEATURE_HTML5_DEFAULT,
   id => FEATURE_HTML5_DEFAULT,
-  irrelevant => FEATURE_HTML5_WD,
+  irrelevant => FEATURE_HTML5_DROPPED,
   lang => FEATURE_HTML5_DEFAULT,
   ref => FEATURE_HTML5_AT_RISK,
   registrationmark => FEATURE_HTML5_AT_RISK,
@@ -2180,7 +2183,7 @@ $Element->{$HTML_NS}->{style} = {
   },
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    $element_state->{text} .= $child_node->text_content;
+    $element_state->{text} .= $child_node->data;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -5697,7 +5700,7 @@ $Element->{$HTML_NS}->{script} = {
                          type => 'character not allowed:empty',
                          level => $self->{level}->{must});
     }
-    $element_state->{text} .= $child_node->text_content;
+    $element_state->{text} .= $child_node->data;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -6018,7 +6021,6 @@ $Element->{$HTML_NS}->{command} = {
     checked => $GetHTMLBooleanAttrChecker->('checked'),
     default => $GetHTMLBooleanAttrChecker->('default'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    hidden => $GetHTMLBooleanAttrChecker->('hidden'),
     icon => $HTMLURIAttrChecker,
     label => sub { }, ## NOTE: No conformance creteria
     radiogroup => sub { }, ## NOTE: No conformance creteria
@@ -6035,7 +6037,6 @@ $Element->{$HTML_NS}->{command} = {
     checked => FEATURE_HTML5_WD,
     default => FEATURE_HTML5_WD,
     disabled => FEATURE_HTML5_WD,
-    hidden => FEATURE_HTML5_WD,
     icon => FEATURE_HTML5_WD,
     label => FEATURE_HTML5_WD,
     radiogroup => FEATURE_HTML5_WD,
@@ -6048,6 +6049,18 @@ $Element->{$HTML_NS}->{command} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
+};
+
+$Element->{$HTML_NS}->{bb} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_DEFAULT,
+  check_attrs => $GetHTMLAttrsChecker->({
+    type => $GetHTMLEnumeratedAttrChecker->({makeapp => 1}),
+  }, {
+    %HTMLAttrStatus,
+    type => FEATURE_HTML5_DEFAULT,
+  }),
+  ## TODO: no interactive content descendant
 };
 
 $Element->{$HTML_NS}->{menu} = {

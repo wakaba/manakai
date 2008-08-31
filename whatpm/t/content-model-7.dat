@@ -1,0 +1,60 @@
+#data html
+<!DOCTYPE HTML><title>From HTML5 spec</title>
+<menu>
+ <li><a href="settings.html" onclick="panels.show('settings')">Settings</a>
+ <li><bb type="makeapp">Download standalone application</bb>
+ <li><a href="help.html" onclick="panels.show('help')">Help</a>
+ <li><a href="logout.html" onclick="panels.show('logout')">Sign out</a>
+</menu>
+#errors
+/html/body/menu/li/a/@onclick;event handler;u
+/html/body/menu/li/a/@onclick;event handler;u
+/html/body/menu/li/a/@onclick;event handler;u
+
+#data html
+<!DOCTYPE HTML><title>From HTML5 spec</title>
+<menu>
+ <a href="settings.html" onclick="panels.show('settings')">Settings</a> |
+ <bb type="makeapp" id="makeapp"> </bb>
+ <a href="help.html" onclick="panels.show('help')">Help</a> |
+ <a href="logout.html" onclick="panels.show('logout')">Sign out</a>
+</menu>
+<script>
+ var bb = document.getElementById('makeapp');
+ if (bb.supported && bb.enabled) {
+   bb.parentNode.nextSibling.textContent = ' | ';
+   bb.textContent = 'Download standalone application';
+ } else {
+   bb.parentNode.removeChild(bb);
+ }
+</script>
+#errors
+/html/body/menu/bb;no significant content;s
+/html/body/menu/a/@onclick;event handler;u
+/html/body/menu/a/@onclick;event handler;u
+/html/body/menu/a/@onclick;event handler;u
+/html/body/script;SUBDOC
+
+#data html
+<!DOCTYPE HTML><title>From HTML5 spec</title>
+  <h1>The Example Game</h1>
+  <section id="login">
+   <h2>Login</h2>
+   <form>
+    ...
+    <!-- calls login() once the user's credentials have been checked -->
+   </form>
+   <script>
+    function login() {
+      // switch screens
+      document.getElementById('login').hidden = true;
+      document.getElementById('game').hidden = false;
+    }
+   </script>
+  </section>
+  <section id="game" hidden>
+   ...
+  </section>
+#errors
+/html/section/script;SUBDOC
+
