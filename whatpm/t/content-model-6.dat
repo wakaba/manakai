@@ -97,3 +97,48 @@
 <object xmlns="http://www.w3.org/1999/xhtml"
     data-="custom data" data="">x</object>
 #errors
+/object/@data-;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    data-a="">x</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    data-xml="">x</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    data-xmlns="">x</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    data--abc="">x</p>
+#errors
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<p data-a:b>x</p>
+#errors
+/html/body/p/@data-a:b;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<p data-xml:lang>x</p>
+#errors
+/html/body/p/@data-xml:lang;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<p data-?>x</p>
+#errors
+/html/body/p/@data-?;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<p data-!!!>x</p>
+#errors
+/html/body/p/@data-!!!;attribute not defined;m

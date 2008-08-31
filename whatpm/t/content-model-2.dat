@@ -942,7 +942,6 @@ id=""><span id="">x</span></p>
 <body></body>
 </html>
 #errors
-/html/head/@xmlns;attribute not allowed;m
 /html/body;no significant content;s
 
 #data html
@@ -950,7 +949,6 @@ id=""><span id="">x</span></p>
 <title>x</title>
 <p xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/html/body/p/@xmlns;attribute not allowed;m
 
 #data html
 <!DOCTYPE HTML>
@@ -958,14 +956,12 @@ id=""><span id="">x</span></p>
 <p xmlns="">x</p>
 #errors
 /html/body/p/@xmlns;invalid attribute value;m
-/html/body/p/@xmlns;attribute not allowed;m
 
 #data html
 <!DOCTYPE HTML>
 <title>x</title>
 <unknown xmlns="http://www.w3.org/1999/xhtml">x</unknown>
 #errors
-/html/body/unknown/@xmlns;attribute not allowed;m
 /html/body/unknown;element not defined;m
 /html/body/unknown;element not allowed:flow;m
 
@@ -975,7 +971,6 @@ id=""><span id="">x</span></p>
 <unknown xmlns="http://www.w3.org/1999/html">x</unknown>
 #errors
 /html/body/unknown/@xmlns;invalid attribute value;m
-/html/body/unknown/@xmlns;attribute not allowed;m
 /html/body/unknown;element not defined;m
 /html/body/unknown;element not allowed:flow;m
 
@@ -1016,7 +1011,6 @@ id=""><span id="">x</span></p>
 /html/body/svg;unknown element;u
 /html/body/svg/title;unknown element;u
 /html/body/svg/title/div/p/@xmlns;invalid attribute value;m
-/html/body/svg/title/div/p/@xmlns;attribute not allowed;m
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml" version="">
@@ -5035,6 +5029,99 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <embed src="http://test/" a="b" c="d" checked="checked"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    b:c>
+#errors
+/html/body/embed/@b:c;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    xmlsucks>
+#errors
+/html/body/embed/@xmlsucks;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    :>
+#errors
+/html/body/embed/@:;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    a::b>
+#errors
+/html/body/embed/@a::b;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    -manakai-attribute>
+#errors
+/html/body/embed/@-manakai-attribute;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    xml:lang lang>
+#errors
+/html/body/embed/@xml:lang;in HTML:xml:lang;i
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml">
+#errors
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    xml:space=preserve>
+#errors
+/html/body/embed/@xml:space;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    data->
+#errors
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    data-a>
+#errors
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    data-xml:space>
+#errors
+/html/body/embed/@data-xml:space;attribute not defined;m
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    data-xmlns>
+#errors
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    data--abc>
+#errors
+
+#data html
+<!DOCTYPE HTML><title>x</title>
+<embed src="http://test/"
+    data-!>
+#errors
+/html/body/embed/@data-!;attribute not defined;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml"/>

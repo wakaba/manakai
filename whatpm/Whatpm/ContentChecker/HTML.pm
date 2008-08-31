@@ -2,6 +2,8 @@ package Whatpm::ContentChecker;
 use strict;
 require Whatpm::ContentChecker;
 
+use Char::Class::XML qw/InXML_NCNameStartChar10 InXMLNCNameChar10/;
+
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 
 sub FEATURE_HTML5_ROLE () {
@@ -1110,23 +1112,6 @@ my $HTMLAttrChecker = {
                          level => $self->{level}->{must});
       ## TODO: Test
     }
-
-    my $owner_el = $attr->owner_element;
-    ## NOTE: There should always be the owner element in the HTML namespace.
-    if ($owner_el->manakai_local_name eq 'html') {
-      #
-    } else {
-      my $parent = $owner_el->manakai_parent_element;
-      if ($parent) {
-        my $parent_ns = $parent->namespace_uri;
-        if (defined $parent_ns and $parent_ns eq $HTML_NS) {
-          $self->{onerror}->(node => $attr, type => 'attribute not allowed',
-                             level => $self->{level}->{must});
-          ## NOTE: No explicit "MUST" ("MAY ... if, and only if" be used).
-        }
-      }
-      ## NOTE: If the element has no parent, we ignore the conformance issue.
-    }
     
     ## TODO: Should be resolved?
     push @{$self->{return}->{uri}->{$value} ||= []},
@@ -1334,7 +1319,7 @@ my $GetHTMLAttrsChecker = sub {
       my $checker;
       my $status;
       if ($attr_ns eq '') {
-        if ($attr_ln =~ /^data-./s) {
+        if ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -1910,7 +1895,7 @@ $Element->{$HTML_NS}->{meta} = {
         } elsif ($attr_ln eq 'scheme') {
           ## NOTE: <http://suika.fam.cx/2007/html/standards#html-meta-scheme>
           $checker = sub {};
-        } elsif ($attr_ln =~ /^data-./s) {
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -2883,7 +2868,7 @@ $Element->{$HTML_NS}->{a} = {
                    }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
-        } elsif ($attr_ln =~ /^data-./s) {
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -4038,13 +4023,16 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $HTMLIMTAttrChecker;
         } elsif ($attr_ln eq 'width' or $attr_ln eq 'height') {
           $checker = $AttrCheckerNotImplemented; ## TODO: because spec does not define them yet.
-        } elsif ($attr_ln =~ /^data-./s) {
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
-        } else {
+        } elsif ($attr_ln !~ /^[Xx][Mm][Ll]/ and
+                 $attr_ln =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
           $checker = $HTMLAttrChecker->{$attr_ln}
             || sub { }; ## NOTE: Any local attribute is ok.
           $status = FEATURE_HTML5_WD | FEATURE_ALLOWED;
+        } else {
+          $checker = $HTMLAttrChecker->{$attr_ln};
         }
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
@@ -4544,7 +4532,7 @@ $Element->{$HTML_NS}->{area} = {
                    }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
-        } elsif ($attr_ln =~ /^data-./s) {
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
