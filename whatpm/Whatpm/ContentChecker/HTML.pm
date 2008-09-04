@@ -58,6 +58,9 @@ sub FEATURE_WF2X_DEPRECATED () {
 }
 
 ## NOTE: Metainformation Attributes Module by W3C XHTML2 WG.
+sub FEATURE_RDFA_CR () {
+  Whatpm::ContentChecker::FEATURE_STATUS_CR
+}
 sub FEATURE_RDFA_LC () {
   Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
@@ -105,7 +108,7 @@ sub FEATURE_M12N10_REC_DEPRECATED () {
   Whatpm::ContentChecker::FEATURE_STATUS_REC |
   Whatpm::ContentChecker::FEATURE_DEPRECATED_INFO
 }
-## NOTE: XHTML M12N 1.1 is a LC at the time of writing and no
+## NOTE: XHTML M12N 1.1 is in the PR status at the time of writing and no
 ## addition from 1.0.
 
 ## NOTE: XHTML10 status is based on its transitional and frameset DTDs
@@ -1156,10 +1159,10 @@ my %HTMLAttrStatus = (
 );
 
 my %HTMLM12NCommonAttrStatus = (
-  about => FEATURE_RDFA_LC,
+  about => FEATURE_RDFA_CR,
   class => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  content => FEATURE_RDFA_LC,
-  datatype => FEATURE_RDFA_LC,
+  content => FEATURE_RDFA_CR,
+  datatype => FEATURE_RDFA_CR,
   dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   href => FEATURE_RDFA_LC,
   id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -1174,15 +1177,16 @@ my %HTMLM12NCommonAttrStatus = (
   onkeypress => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeydown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  property => FEATURE_RDFA_LC,
-  rel => FEATURE_RDFA_LC,
-  resource => FEATURE_RDFA_LC,
-  rev => FEATURE_RDFA_LC,
+  property => FEATURE_RDFA_CR,
+  rel => FEATURE_RDFA_CR,
+  resource => FEATURE_RDFA_CR,
+  rev => FEATURE_RDFA_CR,
   #style => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR_DEPRECATED |
   #    FEATURE_M12N10_REC,
   style => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR |
       FEATURE_M12N10_REC,
   title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  typeof => FEATURE_RDFA_CR,
 );
 
 my %XHTML2CommonAttrStatus = (
@@ -1249,23 +1253,24 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   %HTMLM12NCommonAttrStatus,
   %XHTML2CommonAttrStatus,
 
-  about => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
+  about => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
   class => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  content => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
-  datatype => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
+  content => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
+  datatype => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
   dir => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   href => FEATURE_RDFA_LC,
   id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   instanceof => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
-  property => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
-  rel => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
-  resource => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
-  rev => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
+  property => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
+  rel => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
+  resource => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
+  rev => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
   #style => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR_DEPRECATED |
   #    FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   style => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR |
       FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   title => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  typeof => FEATURE_RDFA_CR,
 );
 
 for (qw/
@@ -1290,10 +1295,11 @@ for (qw/repeat repeat-max repeat-min repeat-start repeat-template/) {
   $AttrStatus->{$HTML_NS}->{$_} = FEATURE_WF2;
 }
 
-for (qw/about content datatype instanceof property rel resource rev/) {
-  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_RDFA_LC | FEATURE_XHTML2_ED;
+for (qw/about content datatype property rel resource rev/) {
+  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_RDFA_CR | FEATURE_XHTML2_ED;
 }
-$AttrStatus->{$HTML_NS}->{typeof} = FEATURE_RDFA_ED;
+$AttrStatus->{$HTML_NS}->{instanceof} = FEATURE_RDFA_LC | FEATURE_XHTML2_ED;
+$AttrStatus->{$HTML_NS}->{typeof} = FEATURE_RDFA_CR;
 $AttrStatus->{$HTML_NS}->{role} = FEATURE_ROLE_LC;
 for (qw/cite coords datetime edit encoding href hreflang hrefmedia hreftype
         ismap layout media nextfocus prevfocus shape src srctype style
@@ -1809,8 +1815,8 @@ $Element->{$HTML_NS}->{link} = {
       lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
       media => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       methods => FEATURE_HTML20_RFC,
-      rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      rev => FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      rev => FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       sdapref => FEATURE_HTML20_RFC,
       sizes => FEATURE_HTML5_DEFAULT,
       target => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -2847,8 +2853,8 @@ $Element->{$HTML_NS}->{a} = {
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_DEFAULT,
-          rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-          rev => FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          rev => FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           sdapref => FEATURE_HTML20_RFC,
           shape => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -4503,7 +4509,7 @@ $Element->{$HTML_NS}->{area} = {
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_DEFAULT,
-          rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC,
+          rel => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_CR,
           shape => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
