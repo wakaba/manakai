@@ -44,13 +44,17 @@ sub FEATURE_HTML5_LC_DROPPED () {
   ## NOTE: Was part of HTML5, but was dropped.
   Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
-sub FEATURE_WF2 () {
-  Whatpm::ContentChecker::FEATURE_STATUS_LC |
-  Whatpm::ContentChecker::FEATURE_ALLOWED
-}
-sub FEATURE_WF2_DEPRECATED () {
+sub FEATURE_WF2X () {
+  ## NOTE: Defined in WF2 and then incorporated into the HTML5 spec.
   Whatpm::ContentChecker::FEATURE_STATUS_LC
-  ## NOTE: MUST NOT be used.
+}
+sub FEATURE_WF2 () {
+  ## NOTE: Part of WF2, still not added to the HTML5 spec.
+  Whatpm::ContentChecker::FEATURE_STATUS_LC
+}
+sub FEATURE_WF2X_DEPRECATED () {
+  Whatpm::ContentChecker::FEATURE_STATUS_LC
+  ## NOTE: MUST NOT be used according to WF2.
 }
 
 ## NOTE: Metainformation Attributes Module by W3C XHTML2 WG.
@@ -161,8 +165,6 @@ my $HTMLMetadataContent = {
     ## NOTE: A |meta| with no |name| element is not allowed as
     ## a metadata content other than |head| element.
     meta => 1,
-    ## NOTE: Only when empty [WF2]
-    form => 1,
   },
   ## NOTE: RDF is mentioned in the HTML5 spec.
   ## TODO: Other RDF elements?
@@ -175,6 +177,7 @@ my $HTMLFlowContent = {
     h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, header => 1,
     footer => 1, address => 1, p => 1, hr => 1, dialog => 1, pre => 1,
     ol => 1, ul => 1, dl => 1, figure => 1, map => 1, table => 1,
+    form => 1, fieldset => 1,
     details => 1, ## ISSUE: "Flow element" in spec.
     datagrid => 1, ## ISSUE: "Flow element" in spec.
     datatemplate => 1,
@@ -191,6 +194,7 @@ my $HTMLFlowContent = {
     script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
     command => 1, bb => 1,
     a => 1,
+    input => 1, button => 1, label => 1, select => 1, datalist => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
@@ -242,6 +246,7 @@ my $HTMLPhrasingContent = {
     script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
     command => 1, bb => 1,
     a => 1,
+    input => 1, button => 1, label => 1, select => 1, datalist => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
@@ -257,10 +262,6 @@ my $HTMLPhrasingContent = {
 
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
     canvas => 1,
-
-    ## NOTE: WF2
-    input => 1, ## NOTE: type=hidden
-    datalist => 1, ## NOTE: block | where |select| allowed
   },
 
   ## NOTE: Embedded
@@ -275,6 +276,7 @@ my $HTMLPhrasingContent = {
 my $HTMLInteractiveContent = {
   $HTML_NS => {
     a => 1,
+    input => 1, button => 1, label => 1, select => 1,
     datagrid => 1, ## ISSUE: Categorized as "Inetractive element"
     bb => 1,
   },
@@ -5122,9 +5124,8 @@ $Element->{$HTML_NS}->{th} = {
 };
 
 $Element->{$HTML_NS}->{form} = {
-  %HTMLFlowContentChecker, ## NOTE: Flow* [WF2]
-    ## TODO: form in form is allowed in XML [WF2]
-  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  %HTMLFlowContentChecker, ## TODO: no |form| descendant
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
     'accept-charset' => $AttrCheckerNotImplemented, ## TODO: Charsets
@@ -5144,21 +5145,22 @@ $Element->{$HTML_NS}->{form} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accept => FEATURE_WF2 | FEATURE_M12N10_REC,
-    'accept-charset' => FEATURE_M12N10_REC,
-    action => FEATURE_WF2 | FEATURE_M12N10_REC,
+    accept => FEATURE_WF2X | FEATURE_M12N10_REC,
+    'accept-charset' => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     data => FEATURE_WF2,
-    enctype => FEATURE_WF2 | FEATURE_M12N10_REC,
+    enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-    method => FEATURE_WF2 | FEATURE_M12N10_REC,
-    name => FEATURE_M12N10_REC_DEPRECATED,
+    method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
+    name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onreceived => FEATURE_WF2,
     onreset => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onsubmit => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     replace => FEATURE_WF2,
     sdapref => FEATURE_HTML20_RFC,
     sdasuff => FEATURE_HTML20_RFC,
-    target => FEATURE_M12N10_REC,
+    target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <form>
@@ -5173,16 +5175,16 @@ $Element->{$HTML_NS}->{form} = {
 };
 
 $Element->{$HTML_NS}->{fieldset} = {
-  %HTMLFlowContentChecker, ## NOTE: legend, %Flow; ## TODO: legend
-  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  %HTMLFlowContentChecker, ## ISSUE: No |legend| in the spec
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     ## TODO: form [WF2]
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    disabled => FEATURE_WF2,
-    form => FEATURE_WF2,
+    disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
   ## TODO: Tests
@@ -5190,8 +5192,8 @@ $Element->{$HTML_NS}->{fieldset} = {
 };
 
 $Element->{$HTML_NS}->{input} = {
-  %HTMLEmptyChecker, ## MUST [WF2]
-  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
     accesskey => $HTMLAccesskeyAttrChecker,
@@ -5218,6 +5220,7 @@ $Element->{$HTML_NS}->{input} = {
     }),
     ## TODO: min [WF2]
     name => sub {}, ## NOTE: CDATA [M12N]
+    ## TODO: pattern
     readonly => $GetHTMLBooleanAttrChecker->('readonly'),
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     required => $GetHTMLBooleanAttrChecker->('required'),
@@ -5245,47 +5248,48 @@ $Element->{$HTML_NS}->{input} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accept => FEATURE_WF2 | FEATURE_M12N10_REC,
+    accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     'accept-charset' => FEATURE_HTML2X_RFC,
     accesskey => FEATURE_M12N10_REC,
-    action => FEATURE_WF2,
+    action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     align => FEATURE_M12N10_REC_DEPRECATED,
-    alt => FEATURE_M12N10_REC,
-    autocomplete => FEATURE_WF2,
-    autofocus => FEATURE_WF2,
-    checked => FEATURE_M12N10_REC,
+    alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    autocomplete => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    checked => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     datafld => FEATURE_HTML4_REC_RESERVED,
     dataformatas => FEATURE_HTML4_REC_RESERVED,
     datasrc => FEATURE_HTML4_REC_RESERVED,
-    disabled => FEATURE_WF2 | FEATURE_M12N10_REC,
-    enctype => FEATURE_WF2,
-    form => FEATURE_WF2,
-    inputmode => FEATURE_WF2 | FEATURE_XHTMLBASIC11_CR,
+    disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    inputmode => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
     ismap => FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-    list => FEATURE_WF2,
-    max => FEATURE_WF2,
-    maxlength => FEATURE_WF2 | FEATURE_M12N10_REC,
-    method => FEATURE_WF2,
-    min => FEATURE_WF2,
-    name => FEATURE_M12N10_REC,
+    list => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    max => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    min => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    readonly => FEATURE_WF2 | FEATURE_M12N10_REC,
+    pattern => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    readonly => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     replace => FEATURE_WF2,
-    required => FEATURE_WF2,
+    required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     sdapref => FEATURE_HTML20_RFC,
-    size => FEATURE_WF2_DEPRECATED | FEATURE_M12N10_REC,
-    src => FEATURE_M12N10_REC,
-    step => FEATURE_WF2,
+    size => FEATURE_HTML5_DEFAULT | FEATURE_WF2X_DEPRECATED | FEATURE_M12N10_REC,
+    src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    step => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    target => FEATURE_WF2,
+    target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     template => FEATURE_WF2,
-    type => FEATURE_M12N10_REC,
+    type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
-    value => FEATURE_M12N10_REC,
+    value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <input>
@@ -5307,10 +5311,8 @@ $Element->{$HTML_NS}->{input} = {
 ## button applies to.": I have no idea how this can be tested.
 
 $Element->{$HTML_NS}->{button} = {
-  %HTMLFlowContentChecker, ## NOTE: %Flow; - something [XHTML10]
-    ## TODO: -A|%formctrl;|form|fieldset [HTML4]
-    ## TODO: image map (img) in |button| is "illegal" [HTML4].
-  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  %HTMLPhrasingContentChecker, ## ISSUE: -interactive?
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accesskey => $HTMLAccesskeyAttrChecker,
     action => $HTMLURIAttrChecker,
@@ -5340,26 +5342,26 @@ $Element->{$HTML_NS}->{button} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     accesskey => FEATURE_M12N10_REC,
-    action => FEATURE_WF2,
-    autofocus => FEATURE_WF2,
+    action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     datafld => FEATURE_HTML4_REC_RESERVED,
     dataformatas => FEATURE_HTML4_REC_RESERVED,
     datasrc => FEATURE_HTML4_REC_RESERVED,
-    disabled => FEATURE_WF2 | FEATURE_M12N10_REC,
-    enctype => FEATURE_WF2,
-    form => FEATURE_WF2,
+    disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-    method => FEATURE_WF2,
-    name => FEATURE_M12N10_REC,
+    method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     oninvalid => FEATURE_WF2,
     replace => FEATURE_WF2,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    target => FEATURE_WF2,
+    target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     template => FEATURE_WF2,
-    type => FEATURE_M12N10_REC,
-    value => FEATURE_M12N10_REC,
+    type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <button>
@@ -5374,17 +5376,19 @@ $Element->{$HTML_NS}->{button} = {
 };
 
 $Element->{$HTML_NS}->{label} = {
-  %HTMLPhrasingContentChecker, ## NOTE: %Inline - label [XHTML10] ## TODO: -label
-    ## TODO: At most one form control [WF2]
-  status => FEATURE_WF2 | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  %HTMLPhrasingContentChecker, ## ISSUE: -label? -interactive? At most one form control [WF2]?
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC
+      | FEATURE_XHTML2_ED, 
   check_attrs => $GetHTMLAttrsChecker->({
     accesskey => $HTMLAccesskeyAttrChecker,
     for => $AttrCheckerNotImplemented, ## TODO: IDREF ## TODO: Must be |id| of control [HTML4] ## TODO: Or, "may only contain one control element"
+    ## TODO: form
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     accesskey => FEATURE_WF2 | FEATURE_M12N10_REC,
-    for => FEATURE_M12N10_REC,
+    for => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    form => FEATURE_HTML5_DEFAULT,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5397,7 +5401,7 @@ $Element->{$HTML_NS}->{select} = {
   %HTMLFlowContentChecker, ## TODO: (optgroup|option)* [HTML4] + [WF2] ## TODO: SHOULD avoid empty and visible [WF2]
     ## TODO: author should SELECTED at least one OPTION in non-MULTIPLE case [HTML4].
     ## TODO: more than one OPTION with SELECTED in non-MULTIPLE case is "error" [HTML4]
-  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   is_root => 1, ## TODO: SHOULD NOT in application/xhtml+xml [WF2]
   check_attrs => $GetHTMLAttrsChecker->({
     accesskey => $HTMLAccesskeyAttrChecker,
@@ -5408,30 +5412,28 @@ $Element->{$HTML_NS}->{select} = {
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
     name => sub {}, ## NOTE: CDATA [M12N]
     oninvalid => $HTMLEventHandlerAttrChecker,
-    ## TODO: pattern [WF2] ## TODO: |title| semantics
     size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     accesskey => FEATURE_WF2,
-    autofocus => FEATURE_WF2,
+    autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     data => FEATURE_WF2,
     datafld => FEATURE_HTML4_REC_RESERVED,
     dataformatas => FEATURE_HTML4_REC_RESERVED,
     datasrc => FEATURE_HTML4_REC_RESERVED,
-    disabled => FEATURE_WF2 | FEATURE_M12N10_REC,
-    form => FEATURE_WF2,
+    disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-    multiple => FEATURE_M12N10_REC,
-    name => FEATURE_M12N10_REC,
+    multiple => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     oninvalid => FEATURE_WF2,
-    pattern => FEATURE_WF2,
     sdaform => FEATURE_HTML20_RFC,
     sdapref => FEATURE_HTML20_RFC,
-    size => FEATURE_M12N10_REC,
+    size => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   ## TODO: Tests
@@ -5447,9 +5449,9 @@ $Element->{$HTML_NS}->{select} = {
 };
 
 $Element->{$HTML_NS}->{datalist} = {
-  %HTMLFlowContentChecker, ## TODO: (transparent | option)*
+  %HTMLPhrasingContentChecker, ## TODO: +option*
     ## TODO: |option| child MUST be empty [WF2]
-  status => FEATURE_WF2,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
   }, {
@@ -5468,16 +5470,16 @@ $Element->{$HTML_NS}->{datalist} = {
 };
 
 $Element->{$HTML_NS}->{optgroup} = {
-  %HTMLFlowContentChecker, ## TODO: (option|optgroup)* [HTML4] + [WF2] SHOULD avoid empty and visible [WF2]
-  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  %HTMLFlowContentChecker, ## TODO: option*
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     label => sub {}, ## NOTE: Text [M12N] ## TODO: required
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    disabled => FEATURE_WF2 | FEATURE_M12N10_REC,
-    label => FEATURE_M12N10_REC,
+    disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    label => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
   ## TODO: Tests
@@ -5486,7 +5488,7 @@ $Element->{$HTML_NS}->{optgroup} = {
 
 $Element->{$HTML_NS}->{option} = {
   %HTMLTextChecker,
-  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     label => sub {}, ## NOTE: Text [M12N]
@@ -5495,13 +5497,13 @@ $Element->{$HTML_NS}->{option} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    disabled => FEATURE_WF2, FEATURE_M12N10_REC,
-    label => FEATURE_M12N10_REC,
+    disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X |  FEATURE_M12N10_REC,
+    label => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     sdaform => FEATURE_HTML20_RFC,
     sdapref => FEATURE_HTML20_RFC,
-    selected => FEATURE_M12N10_REC,
-    value => FEATURE_M12N10_REC,
+    selected => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <option>
