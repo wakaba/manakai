@@ -58,6 +58,10 @@ sub FEATURE_WF2X_DEPRECATED () {
 }
 
 ## NOTE: Metainformation Attributes Module by W3C XHTML2 WG.
+sub FEATURE_RDFA_PR () {
+  Whatpm::ContentChecker::FEATURE_STATUS_CR
+  ## NOTE: Diff from FEATURE_RDFA_CR
+}
 sub FEATURE_RDFA_CR () {
   Whatpm::ContentChecker::FEATURE_STATUS_CR
 }
@@ -198,6 +202,7 @@ my $HTMLFlowContent = {
     command => 1, bb => 1,
     a => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
+    textarea => 1, output => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
@@ -250,6 +255,7 @@ my $HTMLPhrasingContent = {
     command => 1, bb => 1,
     a => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
+    textarea => 1, output => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
@@ -279,7 +285,7 @@ my $HTMLPhrasingContent = {
 my $HTMLInteractiveContent = {
   $HTML_NS => {
     a => 1,
-    input => 1, button => 1, label => 1, select => 1,
+    input => 1, button => 1, label => 1, select => 1, textarea => 1,
     datagrid => 1, ## ISSUE: Categorized as "Inetractive element"
     bb => 1,
   },
@@ -1164,7 +1170,7 @@ my %HTMLM12NCommonAttrStatus = (
   content => FEATURE_RDFA_CR,
   datatype => FEATURE_RDFA_CR,
   dir => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  href => FEATURE_RDFA_LC,
+  href => FEATURE_RDFA_CR,
   id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   instanceof => FEATURE_RDFA_LC,
   onclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -1258,7 +1264,7 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   content => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
   datatype => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
   dir => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  href => FEATURE_RDFA_LC,
+  href => FEATURE_RDFA_CR,
   id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   instanceof => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
   property => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
@@ -1809,7 +1815,7 @@ $Element->{$HTML_NS}->{link} = {
       charset => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
           ## NOTE: |charset| attribute had been part of HTML5 spec though
           ## it had been commented out.
-      href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       hreflang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
@@ -2141,6 +2147,7 @@ $Element->{$HTML_NS}->{style} = {
     %XHTML2CommonAttrStatus,
     dir => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     disabled => FEATURE_XHTML2_ED,
+    href => FEATURE_RDFA_PR | FEATURE_XHTML2_ED,
     id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_XHTML10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     media => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -2843,7 +2850,7 @@ $Element->{$HTML_NS}->{a} = {
           coords => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           cryptopts => FEATURE_RFC2659,
           dn => FEATURE_RFC2659,
-          href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
           media => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED,
@@ -4219,6 +4226,7 @@ $Element->{$HTML_NS}->{param} = {
       }),
     }, {
       %HTMLAttrStatus,
+      href => FEATURE_RDFA_PR,
       id => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
       name => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       type => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -4501,7 +4509,7 @@ $Element->{$HTML_NS}->{area} = {
           accesskey => FEATURE_M12N10_REC,
           alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           coords => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_LC | FEATURE_M12N10_REC,
+          href => FEATURE_HTML5_DEFAULT | FEATURE_RDFA_CR | FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_DEFAULT,
           lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
           media => FEATURE_HTML5_DEFAULT,
@@ -5130,7 +5138,7 @@ $Element->{$HTML_NS}->{th} = {
 };
 
 $Element->{$HTML_NS}->{form} = {
-  %HTMLFlowContentChecker, ## TODO: no |form| descendant
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
@@ -5147,7 +5155,7 @@ $Element->{$HTML_NS}->{form} = {
     onreceived => $HTMLEventHandlerAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
-    ## TODO: Warn for combination whose behavior is not defined.
+    ## TODO: Warn for combination whose behavior is not defined in HTML4/WF2.
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -5168,15 +5176,20 @@ $Element->{$HTML_NS}->{form} = {
     sdasuff => FEATURE_HTML20_RFC,
     target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
-  ## TODO: Tests
-  ## TODO: Tests for <nest/> in <form>
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {form => 1}});
 
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+
+    $HTMLFlowContentChecker{check_end}->(@_);
   },
 };
 
@@ -5404,7 +5417,7 @@ $Element->{$HTML_NS}->{label} = {
 };
 
 $Element->{$HTML_NS}->{select} = {
-  %HTMLFlowContentChecker, ## TODO: (optgroup|option)* [HTML4] + [WF2] ## TODO: SHOULD avoid empty and visible [WF2]
+  %HTMLChecker,
     ## TODO: author should SELECTED at least one OPTION in non-MULTIPLE case [HTML4].
     ## TODO: more than one OPTION with SELECTED in non-MULTIPLE case is "error" [HTML4]
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
@@ -5442,8 +5455,6 @@ $Element->{$HTML_NS}->{select} = {
     size => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
-  ## TODO: Tests
-  ## TODO: Tests for <nest/> in <select>
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -5452,10 +5463,36 @@ $Element->{$HTML_NS}->{select} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and
+             {
+               option => 1, optgroup => 1,
+             }->{$child_ln}) {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
 };
 
 $Element->{$HTML_NS}->{datalist} = {
-  %HTMLPhrasingContentChecker, ## TODO: +option*
+  %HTMLPhrasingContentChecker,
     ## TODO: |option| child MUST be empty [WF2]
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5464,19 +5501,96 @@ $Element->{$HTML_NS}->{datalist} = {
     %HTMLAttrStatus,
     data => FEATURE_WF2,
   }),
-  ## TODO: Tests
-  ## TODO: Tests for <nest/> in <datalist>
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+
+    $element_state->{phase} = 'any'; # any | phrasing | option
 
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
+  ## NOTE: phrasing | option*
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{phase} eq 'phrasing') {
+      if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+        #
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:phrasing',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($element_state->{phase} eq 'option') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'option') {
+        #
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($element_state->{phase} eq 'any') {
+      if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+        $element_state->{phase} = 'phrasing';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'option') {
+        $element_state->{phase} = 'option';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed',
+                           level => $self->{level}->{must});        
+      }
+    } else {
+      die "check_child_element: Bad |datalist| phase: $element_state->{phase}";
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      if ($element_state->{phase} eq 'phrasing') {
+        #
+      } elsif ($element_state->{phase} eq 'any') {
+        $element_state->{phase} = 'phrasing';
+      } else {
+        $self->{onerror}->(node => $child_node,
+                           type => 'character not allowed',
+                           level => $self->{level}->{must});
+      }
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{phase} eq 'phrasing') {
+      if ($element_state->{has_significant}) {
+        $item->{real_parent_state}->{has_significant} = 1;
+      } elsif ($item->{transparent}) {
+        #
+      } else {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'no significant content',
+                           level => $self->{level}->{should});
+      }
+    } else {
+      ## NOTE: Since the content model explicitly allows a |datalist| element
+      ## being empty, we don't raise "no significant content" error for this
+      ## element when there is no element.  (We should raise an error for
+      ## |<datalist><br></datalist>|, however.)
+      ## NOTE: As a side-effect, when the |datalist| element only contains
+      ## non-conforming content, then the |phase| flag has not changed from
+      ## |any|, no "no significant content" error is raised neither.
+      $HTMLChecker{check_end}->(@_);
+    }
+  },
 };
 
 $Element->{$HTML_NS}->{optgroup} = {
-  %HTMLFlowContentChecker, ## TODO: option*
+  %HTMLChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -5488,8 +5602,29 @@ $Element->{$HTML_NS}->{optgroup} = {
     label => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
   }),
-  ## TODO: Tests
-  ## TODO: Tests for <nest/> in <optgroup>
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln}) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'option') {
+      #
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
 };
 
 $Element->{$HTML_NS}->{option} = {
@@ -5511,13 +5646,11 @@ $Element->{$HTML_NS}->{option} = {
     selected => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
-  ## TODO: Tests
-  ## TODO: Tests for <nest/> in <option>
 };
 
 $Element->{$HTML_NS}->{textarea} = {
   %HTMLTextChecker,
-  status => FEATURE_WF2 | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $HTMLIMTAttrChecker, ## TODO: MUST be a text-based type
     accesskey => $HTMLAccesskeyAttrChecker,
@@ -5537,36 +5670,34 @@ $Element->{$HTML_NS}->{textarea} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accept => FEATURE_WF2,
+    accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     'accept-charset' => FEATURE_HTML2X_RFC,
     accesskey => FEATURE_M12N10_REC,
-    autofocus => FEATURE_WF2,
-    cols => FEATURE_M12N10_REC,
+    autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    cols => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     datafld => FEATURE_HTML4_REC_RESERVED,
     dataformatas => FEATURE_HTML4_REC_RESERVED,
     datasrc => FEATURE_HTML4_REC_RESERVED,
-    disabled => FEATURE_WF2 | FEATURE_M12N10_REC,
-    form => FEATURE_WF2,
-    inputmode => FEATURE_WF2 | FEATURE_XHTMLBASIC11_CR,
+    disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    inputmode => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-    maxlength => FEATURE_WF2,
-    name => FEATURE_M12N10_REC,
+    maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     oninvalid => FEATURE_WF2,
     onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    pattern => FEATURE_WF2,
-    readonly => FEATURE_WF2 | FEATURE_M12N10_REC,
-    required => FEATURE_WF2,
-    rows => FEATURE_M12N10_REC, 
+    pattern => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    readonly => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    rows => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC, 
     sdaform => FEATURE_HTML20_RFC,
     sdapref => FEATURE_HTML20_RFC,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    wrap => FEATURE_WF2,
+    wrap => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
   }),
-  ## TODO: Tests
-  ## TODO: Tests for <nest/> in <textarea>
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -5577,8 +5708,8 @@ $Element->{$HTML_NS}->{textarea} = {
 };
 
 $Element->{$HTML_NS}->{output} = {
-  %HTMLPhrasingContentChecker, ## Inline [WF2]
-  status => FEATURE_WF2,
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
     ## TODO: for [WF2]
     ## TODO: form [WF2]
@@ -5587,15 +5718,13 @@ $Element->{$HTML_NS}->{output} = {
     ## onforminput[WF2]
   }, {
     %HTMLAttrStatus,
-    for => FEATURE_WF2,
-    form => FEATURE_WF2,
-    name => FEATURE_WF2,
+    for => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    name => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     onchange => FEATURE_HTML5_DEFAULT | FEATURE_WF2,
     onformchange => FEATURE_WF2,
     onforminput => FEATURE_WF2,
   }),
-  ## TODO: Tests
-  ## TODO: Tests for <nest/> in <output>
   ## NOTE: "The output  element should be used when ..." [WF2]
 };
 
@@ -5649,12 +5778,12 @@ $Element->{$HTML_NS}->{script} = {
       type => $HTMLIMTAttrChecker, ## TODO: MUST NOT: |charset=""| parameter
   }, {
     %HTMLAttrStatus,
-    %HTMLM12NCommonAttrStatus,
     async => FEATURE_HTML5_DEFAULT,
     charset => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     defer => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     event => FEATURE_HTML4_REC_RESERVED,
     for => FEATURE_HTML4_REC_RESERVED,
+    href => FEATURE_RDFA_PR,
     id => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     language => FEATURE_M12N10_REC_DEPRECATED,
     src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5983,7 +6112,7 @@ $Element->{$HTML_NS}->{datagrid} = {
         }
       } else {
         $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed',
+                           type => 'element not allowed', ## TODO: :flow
                            level => $self->{level}->{must});
       }
       $element_state->{has_element} = 1;
