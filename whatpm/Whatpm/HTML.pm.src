@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.158 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.159 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -708,6 +708,7 @@ sub new ($) {
   my $class = shift;
   my $self = bless {
     level => {must => 'm',
+              should => 's',
               warn => 'w',
               info => 'i',
               uncertain => 'u'},
@@ -3154,18 +3155,25 @@ sub _tree_construction_initial ($) {
       ## language.
       my $doctype_name = $token->{name};
       $doctype_name = '' unless defined $doctype_name;
-      $doctype_name =~ tr/a-z/A-Z/; 
+      $doctype_name =~ tr/a-z/A-Z/; # ASCII case-insensitive
       if (not defined $token->{name} or # <!DOCTYPE>
-          defined $token->{public_identifier} or
           defined $token->{system_identifier}) {
         !!!cp ('t1');
         !!!parse-error (type => 'not HTML5', token => $token);
       } elsif ($doctype_name ne 'HTML') {
         !!!cp ('t2');
-        ## ISSUE: ASCII case-insensitive? (in fact it does not matter)
         !!!parse-error (type => 'not HTML5', token => $token);
+      } elsif (defined $token->{public_identifier}) {
+        if ($token->{public_identifier} eq 'XSLT-compat') {
+          !!!cp ('t1.2');
+          !!!parse-error (type => 'XSLT-compat', token => $token,
+                          level => $self->{level}->{should});
+        } else {
+          !!!parse-error (type => 'not HTML5', token => $token);
+        }
       } else {
         !!!cp ('t3');
+        #
       }
       
       my $doctype = $self->{document}->create_document_type_definition
@@ -7643,4 +7651,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/31 12:11:42 $
+# $Date: 2008/09/05 17:57:47 $

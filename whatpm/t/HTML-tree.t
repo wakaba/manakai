@@ -22,7 +22,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 2036 }
+BEGIN { plan tests => 3105 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -86,6 +86,9 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $test->{data} =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
       $test->{data} =~ s/\\U([0-9A-Fa-f]{8})/chr hex $1/ge if $escaped;
       undef $escaped;
+    } elsif (/^#shoulds$/) {
+      $test->{shoulds} = [];
+      $mode = 'shoulds';
     } elsif (/^#document$/) {
       $test->{document} = '';
       $mode = 'document';
@@ -122,6 +125,9 @@ for my $file_name (grep {$_} split /\s+/, qq[
       } elsif ($mode eq 'errors') {
         tr/\x0D\x0A//d;
         push @{$test->{errors}}, $_;
+      } elsif ($mode eq 'shoulds') {
+        tr/\x0D\x0A//d;
+        push @{$test->{shoulds}}, $_;
       }
     }
   }
@@ -136,6 +142,7 @@ sub test ($) {
 
   my $doc = Whatpm::NanoDOM::Document->new;
   my @errors;
+  my @shoulds;
   
   $SIG{INT} = sub {
     print scalar serialize ($doc);
@@ -144,7 +151,11 @@ sub test ($) {
 
   my $onerror = sub {
     my %opt = @_;
-    push @errors, join ':', $opt{line}, $opt{column}, $opt{type};
+    if ($opt{level} eq 's') {
+      push @shoulds, join ':', $opt{line}, $opt{column}, $opt{type};
+    } else {
+      push @errors, join ':', $opt{line}, $opt{column}, $opt{type};
+    }
   };
   my $result;
   unless (defined $test->{element}) {
@@ -160,6 +171,9 @@ sub test ($) {
   ok scalar @errors, scalar @{$test->{errors}},
     'Parse error: ' . Data::Dumper::qquote ($test->{data}) . '; ' . 
     join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
+  ok scalar @shoulds, scalar @{$test->{shoulds} or []},
+    'SHOULD-level error: ' . Data::Dumper::qquote ($test->{data}) . '; ' . 
+    join (', ', @shoulds) . ';' . join (', ', @{$test->{shoulds} or []});
 
   ok $result, $test->{document},
       'Document tree: ' . Data::Dumper::qquote ($test->{data});
@@ -205,4 +219,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/08/30 12:57:06 $
+## $Date: 2008/09/05 17:57:47 $

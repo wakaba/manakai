@@ -212,6 +212,98 @@ duplicate DOCTYPE
 |   <body>
 
 #data
+<!DOCTYPE HTML PUBLIC "XSLT-compat"><title></title>
+#errors
+#shoulds
+XSLT-compat
+#document
+| <!DOCTYPE HTML PUBLIC "XSLT-compat">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML PUBLIC "xslt-compat"><title></title>
+#errors
+not HTML5
+#shoulds
+#document
+| <!DOCTYPE HTML PUBLIC "xslt-compat">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML PUBLIC " XSLT-compat"><title></title>
+#errors
+not HTML5
+#shoulds
+#document
+| <!DOCTYPE HTML PUBLIC " XSLT-compat">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML PUBLIC "XSLT-compat  "><title></title>
+#errors
+not HTML5
+#shoulds
+#document
+| <!DOCTYPE HTML PUBLIC "XSLT-compat  ">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML PUBLIC "XSLT-generated"><title></title>
+#errors
+not HTML5
+#document
+| <!DOCTYPE HTML PUBLIC "XSLT-generated">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML PUBLIC "xslt-compat"><title></title>
+#errors
+not HTML5
+#document
+| <!DOCTYPE HTML PUBLIC "xslt-compat">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML PUBLIC "XSLT-compat" "http://example.com/"><title></title>
+#errors
+not HTML5
+#document
+| <!DOCTYPE HTML PUBLIC "XSLT-compat" "http://example.com/">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE NONHTML PUBLIC "XSLT-compat"><title></title>
+#errors
+not HTML5
+#document
+| <!DOCTYPE NONHTML PUBLIC "XSLT-compat">
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
 a<html>
 #errors
 no doctype
@@ -1193,17 +1285,6 @@ no </noframes>
 |   <head>
 |     <noframes>
 |   <body>
-
-#data
-<!DOCTYPE HTML><noframes>a</noframes>
-#errors
-#document
-| <!DOCTYPE HTML>
-| <html>
-|   <head>
-|   <body>
-|       "a"
-|     <noframes>
 
 #data
 <!DOCTYPE HTML><xmp>

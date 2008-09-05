@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.154 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.155 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -708,6 +708,7 @@ sub new ($) {
   my $class = shift;
   my $self = bless {
     level => {must => 'm',
+              should => 's',
               warn => 'w',
               info => 'i',
               uncertain => 'u'},
@@ -4084,18 +4085,25 @@ sub _tree_construction_initial ($) {
       ## language.
       my $doctype_name = $token->{name};
       $doctype_name = '' unless defined $doctype_name;
-      $doctype_name =~ tr/a-z/A-Z/; 
+      $doctype_name =~ tr/a-z/A-Z/; # ASCII case-insensitive
       if (not defined $token->{name} or # <!DOCTYPE>
-          defined $token->{public_identifier} or
           defined $token->{system_identifier}) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
       } elsif ($doctype_name ne 'HTML') {
         
-        ## ISSUE: ASCII case-insensitive? (in fact it does not matter)
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
+      } elsif (defined $token->{public_identifier}) {
+        if ($token->{public_identifier} eq 'XSLT-compat') {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'XSLT-compat', token => $token,
+                          level => $self->{level}->{should});
+        } else {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
+        }
       } else {
         
+        #
       }
       
       my $doctype = $self->{document}->create_document_type_definition
@@ -7874,6 +7882,9 @@ sub _tree_construction_main ($) {
           ## NOTE: As if in head.
           $parse_rcdata->(CDATA_CONTENT_MODEL);
           next B;
+
+          ## NOTE: |<!DOCTYPE HTML><frameset></frameset></html><noframes></noframes>|
+          ## has no parse error.
         } else {
           if ($self->{insertion_mode} == IN_FRAMESET_IM) {
             
@@ -9512,4 +9523,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/08/31 12:11:42 $
+# $Date: 2008/09/05 17:57:47 $
