@@ -1,7 +1,7 @@
 1..2646
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Sep  6 02:53:54 2008
-# Current time GMT:   Fri Sep  5 17:53:54 2008
+# Current time local: Sun Sep  7 21:37:55 2008
+# Current time GMT:   Sun Sep  7 12:37:55 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -3054,38 +3054,18 @@ ok 2841
 ok 2842
 ok 2843
 ok 2844
-# t/content-model-7.dat
 ok 2845
 ok 2846
-not ok 2847
-# Test 2847 got: "/html/body/section/script;SUBDOC" (t/ContentChecker.t at line 101 fail #2847)
-#      Expected: "/html/section/script;SUBDOC" (<!DOCTYPE HTML><title>From HTML5 spec</title>
-#  <h1>The Example Game</h1>
-#  <section id="login">
-#   <h2>Login</h2>
-#   <form>
-#    ...
-#    <!-- calls login() once the user's credentials have been checked -->
-#   </form>
-#   <script>
-#    function login() {
-#      // switch screens
-#      document.getElementById('login').hidden = true;
-#      document.getElementById('game').hidden = false;
-#    }
-#   </script>
-#  </section>
-#  <section id="game" hidden>
-#   ...
-#  </section>)
-# t/table-1.dat
+ok 2847
 ok 2848
 ok 2849
 ok 2850
 ok 2851
+# t/content-model-7.dat
 ok 2852
 ok 2853
 ok 2854
+# t/table-1.dat
 ok 2855
 ok 2856
 ok 2857
@@ -3101,7 +3081,6 @@ ok 2866
 ok 2867
 ok 2868
 ok 2869
-# t/content-model-atom-1.dat
 ok 2870
 ok 2871
 ok 2872
@@ -3109,6 +3088,7 @@ ok 2873
 ok 2874
 ok 2875
 ok 2876
+# t/content-model-atom-1.dat
 ok 2877
 ok 2878
 ok 2879
@@ -3148,8 +3128,15 @@ ok 2912
 ok 2913
 ok 2914
 ok 2915
-not ok 2916
-# Test 2916 got: "/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (t/ContentChecker.t at line 101 fail #2916)
+ok 2916
+ok 2917
+ok 2918
+ok 2919
+ok 2920
+ok 2921
+ok 2922
+not ok 2923
+# Test 2923 got: "/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (t/ContentChecker.t at line 101 fail #2923)
 #      Expected: "/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
 #<id>about:</id>
 #<author><name>x</name></author>
@@ -3158,8 +3145,8 @@ not ok 2916
 #<title>x</title>
 #<content type="image/png"/>
 #</entry>)
-not ok 2917
-# Test 2917 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;message/rfc822;u\n/entry;child element missing:atom;summary;m" (t/ContentChecker.t at line 101 fail #2917)
+not ok 2924
+# Test 2924 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;message/rfc822;u\n/entry;child element missing:atom;summary;m" (t/ContentChecker.t at line 101 fail #2924)
 #      Expected: "/entry/content/@type;IMT:composite;m\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
 #<id>about:</id>
 #<author><name>x</name></author>
@@ -3168,17 +3155,10 @@ not ok 2917
 #<title>x</title>
 #<content type="message/rfc822"/>
 #</entry>)
-ok 2918
-ok 2919
-ok 2920
-# t/content-model-atom-2.dat
-ok 2921
-ok 2922
-ok 2923
-ok 2924
 ok 2925
 ok 2926
 ok 2927
+# t/content-model-atom-2.dat
 ok 2928
 ok 2929
 ok 2930
@@ -3196,9 +3176,16 @@ ok 2941
 ok 2942
 ok 2943
 ok 2944
+ok 2945
+ok 2946
+ok 2947
+ok 2948
+ok 2949
+ok 2950
+ok 2951
 # t/content-model-atom-threading-1.dat
-not ok 2945
-# Test 2945 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/ContentChecker.t at line 101 fail #2945)
+not ok 2952
+# Test 2952 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/ContentChecker.t at line 101 fail #2952)
 #      Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -3228,8 +3215,8 @@ not ok 2945
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 2946
-# Test 2946 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/ContentChecker.t at line 101 fail #2946)
+not ok 2953
+# Test 2953 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/ContentChecker.t at line 101 fail #2953)
 #      Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -3255,13 +3242,6 @@ not ok 2946
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 2947
-ok 2948
-ok 2949
-ok 2950
-ok 2951
-ok 2952
-ok 2953
 ok 2954
 ok 2955
 ok 2956
@@ -3269,3 +3249,10 @@ ok 2957
 ok 2958
 ok 2959
 ok 2960
+ok 2961
+ok 2962
+ok 2963
+ok 2964
+ok 2965
+ok 2966
+ok 2967

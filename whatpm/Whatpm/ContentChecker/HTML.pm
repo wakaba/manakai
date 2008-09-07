@@ -1340,7 +1340,8 @@ my $GetHTMLAttrsChecker = sub {
       my $checker;
       my $status;
       if ($attr_ns eq '') {
-        if ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
+        if ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
+            $attr_ln !~ /[A-Z]/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -1916,7 +1917,8 @@ $Element->{$HTML_NS}->{meta} = {
         } elsif ($attr_ln eq 'scheme') {
           ## NOTE: <http://suika.fam.cx/2007/html/standards#html-meta-scheme>
           $checker = sub {};
-        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
+                 $attr_ln !~ /[A-Z]/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -2890,7 +2892,8 @@ $Element->{$HTML_NS}->{a} = {
                    }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
-        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
+                 $attr_ln !~ /[A-Z]/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -4045,7 +4048,8 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $HTMLIMTAttrChecker;
         } elsif ($attr_ln eq 'width' or $attr_ln eq 'height') {
           $checker = $AttrCheckerNotImplemented; ## TODO: because spec does not define them yet.
-        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
+                 $attr_ln !~ /[A-Z]/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } elsif ($attr_ln !~ /^[Xx][Mm][Ll]/ and
@@ -4556,7 +4560,8 @@ $Element->{$HTML_NS}->{area} = {
                    }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
-        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/) {
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
+                 $attr_ln !~ /[A-Z]/) {
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {

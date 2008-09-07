@@ -104,6 +104,13 @@ $Whatpm::ContentChecker::LinkType = {
                                       ],
                           'status' => 'synonym'
                         },
+          'contributor' => {
+                             'effect' => [
+                                           'hyperlink',
+                                           'hyperlink'
+                                         ],
+                             'status' => 'proposal'
+                           },
           'copyright' => {
                            'effect' => [
                                          'hyperlink',
@@ -216,6 +223,13 @@ $Whatpm::ContentChecker::LinkType = {
                                      ],
                          'status' => 'accepted'
                        },
+          'maintainer' => {
+                            'effect' => [
+                                          'hyperlink',
+                                          'hyperlink'
+                                        ],
+                            'status' => 'synonym'
+                          },
           'me' => {
                     'effect' => [
                                   'hyperlink',
@@ -420,6 +434,20 @@ $Whatpm::ContentChecker::LinkType = {
                                  ],
                      'status' => 'accepted'
                    },
+          'technicalAuthor' => {
+                                 'effect' => [
+                                               'hyperlink',
+                                               'hyperlink'
+                                             ],
+                                 'status' => 'proposal'
+                               },
+          'timesheet' => {
+                           'effect' => [
+                                         'external resource',
+                                         undef
+                                       ],
+                           'status' => 'proposal'
+                         },
           'toc' => {
                      'effect' => [
                                    'hyperlink',
@@ -434,6 +462,13 @@ $Whatpm::ContentChecker::LinkType = {
                                  ],
                      'status' => 'synonym'
                    },
+          'translator' => {
+                            'effect' => [
+                                          'hyperlink',
+                                          'hyperlink'
+                                        ],
+                            'status' => 'proposal'
+                          },
           'up' => {
                     'effect' => [
                                   'hyperlink',
@@ -441,6 +476,13 @@ $Whatpm::ContentChecker::LinkType = {
                                 ],
                     'status' => 'accepted'
                   },
+          'webmaster' => {
+                           'effect' => [
+                                         'hyperlink',
+                                         'hyperlink'
+                                       ],
+                           'status' => 'proposal'
+                         },
           'widget' => {
                         'effect' => [
                                       'hyperlink',
