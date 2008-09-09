@@ -2832,7 +2832,7 @@ $Element->{$HTML_NS}->{dd} = {
 };
 
 $Element->{$HTML_NS}->{a} = {
-  %HTMLPhrasingContentChecker,
+  %HTMLTransparentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
@@ -2949,7 +2949,7 @@ $Element->{$HTML_NS}->{a} = {
     delete $self->{flag}->{in_a_href}
         unless $element_state->{in_a_href_original};
 
-    $HTMLPhrasingContentChecker{check_end}->(@_);
+    $HTMLTransparentChecker{check_end}->(@_);
   },
 };
 

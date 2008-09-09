@@ -3276,18 +3276,97 @@ aaa
 #errors
 /a;no significant content;s
 /a/blockquote;no significant content;s
-/a/blockquote;element not allowed:phrasing;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">XXX<blockquote/></a>
 #errors
 /a/blockquote;no significant content;s
-/a/blockquote;element not allowed:phrasing;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"><a>XXX</a></a>
 #errors
 /a/a;element not allowed:minus;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a>xxx</a>
+</span>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a><em>xxx</em></a>
+</span>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a><p>xxx</p></a>
+</span>
+#errors
+/span/a/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a>x<ins>x</ins>x</a>
+</span>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<del><a>xxx</a></del>yyy
+</span>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<del><a>x<p>x</p>x</a></del>yyy
+</span>
+#errors
+/span/del/a/p;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a>xxx</a>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a>x<em>x</em>x</a>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a>x<div>x</div>x</a>
+</p>
+#errors
+/p/a/div;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a>x<p>x</p>x</a>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><h1>xxx</h1></a>
+</div>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a></a>
+x</span>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a></a>
+x</div>
+#errors
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">XXX<a>YYY</a></a>
@@ -3306,9 +3385,7 @@ aaa
 #errors
 /div;no significant content;s
 /div/p;no significant content;s
-/div/p/a;no significant content;s
 /div/ul/li;no significant content;s
-/div/ul/li/a;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -3317,9 +3394,7 @@ aaa
 #errors
 /div;no significant content;s
 /div/p;no significant content;s
-/div/p/a;no significant content;s
 /div/ol/li;no significant content;s
-/div/ol/li/a;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -3328,7 +3403,6 @@ aaa
 #errors
 /div;no significant content;s
 /div/p;no significant content;s
-/div/p/a;no significant content;s
 /div/ol/li;no significant content;s
 
 #data
@@ -3340,7 +3414,6 @@ aaa
 /details;no significant content;s
 /details/legend;no significant content;s
 /details/p;no significant content;s
-/details/p/a;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -3349,7 +3422,6 @@ aaa
 #errors
 /details;no significant content;s
 /details/legend;no significant content;s
-/details/legend/a;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3498,7 +3570,6 @@ aaa
 /datagrid/p/a;element not allowed:minus;m
 /datagrid;no significant content;s
 /datagrid/p;no significant content;s
-/datagrid/p/a;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">
@@ -3516,7 +3587,6 @@ aaa
 </details>
 </a>
 #errors
-/a/details;element not allowed:phrasing;m
 /a;no significant content;s
 /a/details;no significant content;s
 /a/details/legend;no significant content;s
@@ -5399,7 +5469,6 @@ xxxx
 <th xmlns="http://www.w3.org/1999/xhtml"><a href=""></a></th>
 #errors
 /th;no significant content;s
-/th/a;no significant content;s
 
 #data
 <th xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></th>
@@ -5850,6 +5919,7 @@ xxxx
 <select xmlns="http://www.w3.org/1999/xhtml"><a>aa</a></select>
 #errors
 /select/a;element not allowed;m
+/select/a/"aa";character not allowed;m
 
 #data
 <select xmlns="http://www.w3.org/1999/xhtml"><img src="" alt="x"/></select>

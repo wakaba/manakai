@@ -1300,7 +1300,6 @@ id=""><span id="">x</span></p>
 #errors
 /head/a;element not allowed:metadata;m
 /head/base;basetarget after hyperlink;m
-/head/a;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -3030,7 +3029,6 @@ id=""><span id="">x</span></p>
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a;no significant content;s
 
 #data
 <a href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3040,14 +3038,14 @@ id=""><span id="">x</span></p>
 #data
 <a href="http://test/[44::]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@href;syntax error:iriref3987;m
 /a;no significant content;s
+/a/@href;syntax error:iriref3987;m
 
 #data
 <a href="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@type;IMT:syntax error;m
 /a;no significant content;s
+/a/@type;IMT:syntax error;m
 
 #data
 <a href="http://test/" type="text/html" xmlns="http://www.w3.org/1999/xhtml"/>

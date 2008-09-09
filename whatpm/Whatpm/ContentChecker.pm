@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.89 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.90 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -301,7 +301,7 @@ our $HTMLEmbeddedContent = {
 };  
 
 my $HTMLTransparentElements = {
-  $HTML_NS => {qw/ins 1 del 1 font 1 noscript 1 canvas 1/},
+  $HTML_NS => {qw/ins 1 del 1 font 1 noscript 1 canvas 1 a 1/},
   ## NOTE: |html:noscript| is transparent if scripting is disabled
   ## and not in |head|.
 };
@@ -998,4 +998,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/08/30 12:33:36 $
+# $Date: 2008/09/09 04:45:13 $
