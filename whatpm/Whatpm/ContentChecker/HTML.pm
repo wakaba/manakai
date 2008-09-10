@@ -200,17 +200,14 @@ my $HTMLFlowContent = {
     b => 1, bdo => 1, ruby => 1,
     script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
     command => 1, bb => 1,
-    a => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
     textarea => 1, output => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
     
-    ## NOTE: Dropped
-    font => 1,
-
-    ins => 1, del => 1,
+    ## NOTE: Transparent.
+    a => 1, ins => 1, del => 1, font => 1,
 
     ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
     menu => 1,
@@ -253,18 +250,14 @@ my $HTMLPhrasingContent = {
     b => 1, bdo => 1, ruby => 1,
     script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
     command => 1, bb => 1,
-    a => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
     textarea => 1, output => 1,
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
 
-    ## NOTE: Dropped
-    font => 1,
-
     ## NOTE: Transparent.    
-    ins => 1, del => 1,
+    a => 1, ins => 1, del => 1, font => 1,
 
     ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
     menu => 1,

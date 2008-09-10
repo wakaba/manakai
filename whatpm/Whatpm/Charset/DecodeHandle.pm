@@ -530,6 +530,8 @@ require IO::Handle;
 
 package Whatpm::Charset::DecodeHandle::ByteBuffer;
 
+## NOTE: Provides a byte buffer wrapper object.
+
 sub new ($$) {
   my $self = bless {
     buffer => '',
@@ -549,6 +551,8 @@ sub read {
 sub close { $_[0]->{filehandle}->close }
 
 package Whatpm::Charset::DecodeHandle::Encode;
+
+## NOTE: Provides a Perl |Encode| module wrapper object.
 
 sub charset ($) { $_[0]->{charset} }
 
@@ -605,14 +609,19 @@ sub getc ($) {
     $r = substr $self->{byte_buffer}, 0, 1, '';
     my $fallback = $self->{fallback}->{$r};
     if (defined $fallback) {
-      ## NOTE: This is an HTML5 parse error.  Applied to Web ISO-8859-1
-      ## and Web ISO-8859-11 encodings.
+      ## NOTE: This is an HTML5 parse error.
       $self->{onerror}->($self, 'fallback-char-error', octets => \$r,
                          char => \$fallback,
-                         level => $self->{must_level});
+                         level => $self->{level}->{$self->{error_level}->{'fallback-char-error'}});
       return $fallback;
+    } elsif (exists $self->{fallback}->{$r}) {
+      ## NOTE: This is an HTML5 parse error.  In addition, the octet
+      ## is not assigned with a character.
+      $self->{onerror}->($self, 'fallback-unassigned-error', octets => \$r,
+                         level => $self->{level}->{$self->{error_level}->{'fallback-unassigned-error'}});
     } else {
-      $self->{onerror}->($self, 'illegal-octets-error', octets => \$r);
+      $self->{onerror}->($self, 'illegal-octets-error', octets => \$r,
+                         level => $self->{level}->{$self->{error_level}->{'illegal-octets-error'}});
     }
   }
 
@@ -707,7 +716,8 @@ sub getc ($) {
     } elsif ($r eq "\xA0" or $r eq "\xFF") {
       $etype = 'unassigned-code-point-error';
     }
-    $self->{onerror}->($self, $etype, octets => \$r);
+    $self->{onerror}->($self, $etype, octets => \$r,
+                       level => $self->{level}->{$self->{error_level}->{$etype}});
   }
   
   return $r;
@@ -768,7 +778,8 @@ sub getc ($) {
           } else {
             $r = undef;
             $self->{onerror}->($self, 'invalid-state-error',
-                               state => $self->{state});
+                               state => $self->{state},
+                               level => $self->{level}->{$self->{error_level}->{'invalid-state-error'}});
           }
         }
       } elsif ($self->{state} eq 'state_2442') { # 1983
@@ -784,7 +795,8 @@ sub getc ($) {
           } else {
             $r = undef;
             $self->{onerror}->($self, 'invalid-state-error',
-                               state => $self->{state});
+                               state => $self->{state},
+                               level => $self->{level}->{$self->{error_level}->{'invalid-state-error'}});
           }
         }
       } elsif ($self->{state} eq 'state_2440') { # 1978
@@ -800,7 +812,8 @@ sub getc ($) {
           } else {
             $r = undef;
             $self->{onerror}->($self, 'invalid-state-error',
-                               state => $self->{state});
+                               state => $self->{state},
+                               level => $self->{level}->{$self->{error_level}->{'invalid-state-error'}});
           }
         }
       } else {
@@ -822,7 +835,8 @@ sub getc ($) {
         $r .= "(H";
         $self->{state} = 'state_284A';
       }
-      $self->{onerror}->($self, $etype, octets => \$r);
+      $self->{onerror}->($self, $etype, octets => \$r,
+                         level => $self->{level}->{$self->{error_level}->{$etype}});
     }
   } # A
   
@@ -885,7 +899,8 @@ sub getc ($) {
     } elsif ($r =~ /^[\x80\xA0\xFD-\xFF]/) {
       $etype = 'unassigned-code-point-error';
     }
-    $self->{onerror}->($self, $etype, octets => \$r);
+    $self->{onerror}->($self, $etype, octets => \$r,
+                       level => $self->{level}->{$self->{error_level}->{$etype}});
   }
 
   return $r;
@@ -1470,4 +1485,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/05/18 06:07:22 $
+## $Date: 2008/09/10 10:27:09 $

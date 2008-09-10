@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.159 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.160 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -372,6 +372,12 @@ sub parse_byte_stream ($$$$;$) {
   my ($char_stream, $e_status);
 
   SNIFFING: {
+    ## NOTE: By setting |allow_fallback| option true when the
+    ## |get_decode_handle| method is invoked, we ignore what the HTML5
+    ## spec requires, i.e. unsupported encoding should be ignored.
+      ## TODO: We should not do this unless the parser is invoked
+      ## in the conformance checking mode, in which this behavior
+      ## would be useful.
 
     ## Step 1
     if (defined $charset_name) {
@@ -475,20 +481,23 @@ sub parse_byte_stream ($$$$;$) {
     $self->{confident} = 0;
   } # SNIFFING
 
-  $self->{input_encoding} = $charset->get_iana_name;
   if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
+    $self->{input_encoding} = $charset->get_iana_name; ## TODO: Should we set actual charset decoder's encoding name?
     !!!parse-error (type => 'chardecode:fallback',
-                    text => $self->{input_encoding},
+                    #text => $self->{input_encoding},
                     level => $self->{level}->{uncertain},
                     line => 1, column => 1,
                     layer => 'encode');
   } elsif (not ($e_status &
                 Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL())) {
+    $self->{input_encoding} = $charset->get_iana_name;
     !!!parse-error (type => 'chardecode:no error',
                     text => $self->{input_encoding},
                     level => $self->{level}->{uncertain},
                     line => 1, column => 1,
                     layer => 'encode');
+  } else {
+    $self->{input_encoding} = $charset->get_iana_name;
   }
 
   $self->{change_encoding} = sub {
@@ -560,20 +569,23 @@ sub parse_byte_stream ($$$$;$) {
   } catch Whatpm::HTML::RestartParser with {
     ## NOTE: Invoked after {change_encoding}.
 
-    $self->{input_encoding} = $charset->get_iana_name;
     if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
+      $self->{input_encoding} = $charset->get_iana_name; ## TODO: Should we set actual charset decoder's encoding name?
       !!!parse-error (type => 'chardecode:fallback',
-                      text => $self->{input_encoding},
                       level => $self->{level}->{uncertain},
+                      #text => $self->{input_encoding},
                       line => 1, column => 1,
                       layer => 'encode');
     } elsif (not ($e_status &
                   Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL())) {
+      $self->{input_encoding} = $charset->get_iana_name;
       !!!parse-error (type => 'chardecode:no error',
                       text => $self->{input_encoding},
                       level => $self->{level}->{uncertain},
                       line => 1, column => 1,
                       layer => 'encode');
+    } else {
+      $self->{input_encoding} = $charset->get_iana_name;
     }
     $self->{confident} = 1;
     $char_stream->onerror ($char_onerror);
@@ -7651,4 +7663,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/05 17:57:47 $
+# $Date: 2008/09/10 10:27:08 $

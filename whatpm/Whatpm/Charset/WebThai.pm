@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-package Whatpm::Charset::WebLatin1;
+package Whatpm::Charset::WebThai;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## NOTE: This module does not expect that its standalone uses.
 ## See Message::Charset::Info for how it is used.
@@ -41,5 +41,40 @@ sub decode ($$;$) {
   }
 } # decode
 
+package Whatpm::Charset::WebThai::WebTIS620;
+push our @ISA, 'Encode::Encoding';
+__PACKAGE__->Define (qw/web-tis-620/);
+
+sub encode ($$;$) {
+  # $self, $str, $chk
+  if ($_[2]) {
+    if ($_[1] =~ s/^([\x00-\x7F\x{0E01}-\x{0E3A}\x{0E3F}-\x{0E5B}]+)//) {
+      return Encode::encode ('tis-620', $1);
+    } else {
+      return '';
+    }
+  } else {
+    my $r = $_[1];
+    $r =~ s/[^\x00-\x7F\x{0E01}-\x{0E3A}\x{0E3F}-\x{0E5B}]/?/g;
+    return Encode::encode ('tis-620', $r);
+  }
+} # encode
+
+sub decode ($$;$) {
+  # $self, $s, $chk
+  if ($_[2]) {
+    my $r = '';
+    while (1) {
+      if ($_[1] =~ s/^([\x00-\x7F\xA1-\xDA\xDF-\xFB]+)//) {
+        $r .= Encode::decode ('tis-620', $1);
+      } else {
+        return $r;
+      }
+    }
+  } else {
+    return Encode::decode ('windows-874', $_[1]);
+  }
+} # decode
+
 1;
-## $Date: 2008/05/18 06:07:22 $
+## $Date: 2008/09/10 10:27:09 $

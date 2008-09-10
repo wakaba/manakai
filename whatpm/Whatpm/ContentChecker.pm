@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.90 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.91 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -372,21 +372,33 @@ my $default_error_level = {
   xml_id_error => 'm', ## TODO: ?
   nc => 'm', ## XML Namespace Constraints ## TODO: correct?
 
+  ## |Whatpm::URIChecker|
   uri_syntax => 'm',
   uri_fact => 'm',
   uri_lc_must => 'm',
   uri_lc_should => 'w',
 
+  ## |Whatpm::IMTChecker|
   mime_must => 'm', # lowercase "must"
   mime_fact => 'm',
   mime_strongly_discouraged => 'w',
   mime_discouraged => 'w',
 
+  ## |Whatpm::LangTag|
   langtag_fact => 'm',
 
+  ## |Whatpm::RDFXML|
   rdf_fact => 'm',
   rdf_grammer => 'm',
   rdf_lc_must => 'm',
+
+  ## |Message::Charset::Info| and |Whatpm::Charset::DecodeHandle|
+  charset_variant => 'm',
+    ## An error caused by use of a variant charset that is not conforming
+    ## to the original charset (e.g. use of 0x80 in an ISO-8859-1 document
+    ## which is interpreted as a Windows-1252 document instead).
+  charset_fact => 'm',
+  iso_shall => 'm',
 };
 
 sub check_document ($$$;$) {
@@ -470,7 +482,7 @@ sub check_document ($$$;$) {
       } elsif ($charset->{iana_names}->{'jis_x0212-1990'} or
                $charset->{iana_names}->{'x-jis0208'} or
                $charset->{iana_names}->{'utf-32'} or ## ISSUE: UTF-32BE? UTF-32LE?
-               $charset->{is_ebcdic_based}) {
+               ($charset->{category} & Message::Charset::Info::CHARSET_CATEGORY_EBCDIC ())) {
         $onerror->(node => $doc,
                    type => 'bad character encoding',
                    text => $charset_name,
@@ -998,4 +1010,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/09 04:45:13 $
+# $Date: 2008/09/10 10:27:07 $
