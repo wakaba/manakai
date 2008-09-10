@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.156 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.157 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -381,7 +381,9 @@ sub parse_byte_stream ($$$$;$) {
 
     ## Step 1
     if (defined $charset_name) {
-      $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
+      $charset = Message::Charset::Info->get_by_html_name ($charset_name);
+          ## TODO: Is this ok?  Transfer protocol's parameter should be
+          ## interpreted in its semantics?
 
       ## ISSUE: Unsupported encoding is not ignored according to the spec.
       ($char_stream, $e_status) = $charset->get_decode_handle
@@ -405,21 +407,21 @@ sub parse_byte_stream ($$$$;$) {
 
     ## Step 3
     if ($byte_buffer =~ /^\xFE\xFF/) {
-      $charset = Message::Charset::Info->get_by_iana_name ('utf-16be');
+      $charset = Message::Charset::Info->get_by_html_name ('utf-16be');
       ($char_stream, $e_status) = $charset->get_decode_handle
           ($byte_stream, allow_error_reporting => 1,
            allow_fallback => 1, byte_buffer => \$byte_buffer);
       $self->{confident} = 1;
       last SNIFFING;
     } elsif ($byte_buffer =~ /^\xFF\xFE/) {
-      $charset = Message::Charset::Info->get_by_iana_name ('utf-16le');
+      $charset = Message::Charset::Info->get_by_html_name ('utf-16le');
       ($char_stream, $e_status) = $charset->get_decode_handle
           ($byte_stream, allow_error_reporting => 1,
            allow_fallback => 1, byte_buffer => \$byte_buffer);
       $self->{confident} = 1;
       last SNIFFING;
     } elsif ($byte_buffer =~ /^\xEF\xBB\xBF/) {
-      $charset = Message::Charset::Info->get_by_iana_name ('utf-8');
+      $charset = Message::Charset::Info->get_by_html_name ('utf-8');
       ($char_stream, $e_status) = $charset->get_decode_handle
           ($byte_stream, allow_error_reporting => 1,
            allow_fallback => 1, byte_buffer => \$byte_buffer);
@@ -438,7 +440,7 @@ sub parse_byte_stream ($$$$;$) {
     $charset_name = Whatpm::Charset::UniversalCharDet->detect_byte_string
         ($byte_buffer);
     if (defined $charset_name) {
-      $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
+      $charset = Message::Charset::Info->get_by_html_name ($charset_name);
 
       ## ISSUE: Unsupported encoding is not ignored according to the spec.
       require Whatpm::Charset::DecodeHandle;
@@ -461,7 +463,7 @@ sub parse_byte_stream ($$$$;$) {
 
     ## Step 7: default
     ## TODO: Make this configurable.
-    $charset = Message::Charset::Info->get_by_iana_name ('windows-1252');
+    $charset = Message::Charset::Info->get_by_html_name ('windows-1252');
         ## NOTE: We choose |windows-1252| here, since |utf-8| should be 
         ## detectable in the step 6.
     require Whatpm::Charset::DecodeHandle;
@@ -505,7 +507,7 @@ sub parse_byte_stream ($$$$;$) {
     $charset_name = shift;
     my $token = shift;
 
-    $charset = Message::Charset::Info->get_by_iana_name ($charset_name);
+    $charset = Message::Charset::Info->get_by_html_name ($charset_name);
     ($char_stream, $e_status) = $charset->get_decode_handle
         ($byte_stream, allow_error_reporting => 1, allow_fallback => 1,
          byte_buffer => \ $buffer->{buffer});
@@ -516,7 +518,7 @@ sub parse_byte_stream ($$$$;$) {
       ## Step 1    
       if ($charset->{category} &
           Message::Charset::Info::CHARSET_CATEGORY_UTF16 ()) {
-        $charset = Message::Charset::Info->get_by_iana_name ('utf-8');
+        $charset = Message::Charset::Info->get_by_html_name ('utf-8');
         ($char_stream, $e_status) = $charset->get_decode_handle
             ($byte_stream,
              byte_buffer => \ $buffer->{buffer});
@@ -9535,4 +9537,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/10 10:27:07 $
+# $Date: 2008/09/10 10:46:50 $
