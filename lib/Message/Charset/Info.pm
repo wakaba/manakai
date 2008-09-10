@@ -1,6 +1,6 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## TODO: Certain encodings MUST NOT be implemented [HTML5].
 
@@ -1080,6 +1080,24 @@ sub new ($$) {
 } # new
 
 ## NOTE: A class method
+sub get_by_html_name ($$) {
+  my $name = $_[1];
+  $name =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+  my $iana_name = $name;
+  $name =~ s/[\x09-\x0D\x20-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]//g;
+      ## NOTE: U+000B is included.
+  unless ($HTMLCharset->{$name} || $IANACharset->{$name}) {
+    $IANACharset->{$iana_name} =
+    $HTMLCharset->{$name} = __PACKAGE__->new ({
+      iana_names => {
+        $iana_name => UNREGISTERED_CHARSET_NAME,
+      },
+    });
+  }
+  return $HTMLCharset->{$name} || $IANACharset->{$name};
+} # get_by_html_name
+
+## NOTE: A class method
 sub get_by_iana_name ($$) {
   my $name = $_[1];
   $name =~ tr/A-Z/a-z/; ## ASCII case-insensitive
@@ -1302,5 +1320,5 @@ sub is_syntactically_valid_iana_charset_name ($) {
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2008/09/10 10:28:57 $
+## $Date: 2008/09/10 10:47:15 $
 
