@@ -46,7 +46,7 @@ sub getc ($) {
     push @{$self->{new_queue}}, split //, $s;
   }  
   $char = shift @{$self->{new_queue}};
-  
+
   my $char_code = ord $char;
 
   if ({

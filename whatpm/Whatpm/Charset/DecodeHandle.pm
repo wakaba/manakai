@@ -1,6 +1,9 @@
 package Whatpm::Charset::DecodeHandle;
 use strict;
 
+## NOTE: |Message::Charset::Info| uses this module without calling
+## the constructor.
+
 my $XML_AUTO_CHARSET = q<http://suika.fam.cx/www/2006/03/xml-entity/>;
 my $IANA_CHARSET = q<urn:x-suika-fam-cx:charset:>;
 my $PERL_CHARSET = q<http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.>;
@@ -10,6 +13,7 @@ my $XML_CHARSET = q<http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.>;
 sub create_decode_handle ($$$;$) {
   my $csdef = $Whatpm::Charset::CharsetDef->{$_[1]};
   my $obj = {
+             char_buffer => \(my $s = ''),
              character_queue => [],
              filehandle => $_[2],
              charset => $_[1],
@@ -561,8 +565,45 @@ sub charset ($) { $_[0]->{charset} }
 sub close ($) { $_[0]->{filehandle}->close }
 
 sub getc ($) {
+  my $c = '';
+  my $l = $_[0]->read ($c, 1);
+  if ($l) {
+    return $c;
+  } else {
+    return undef;
+  }
+} # getc
+
+sub read ($$$;$) {
   my $self = $_[0];
-  return shift @{$self->{character_queue}} if @{$self->{character_queue}};
+  # $scalar = $_[1];
+  my $length = $_[2];
+  my $offset = $_[3] || 0;
+  my $count = 0;
+  my $eof;
+
+  A: {
+    return $count if $length < 1;
+
+    if (my $l = length ${$self->{char_buffer}}) {
+      if ($l >= $length) {
+        substr ($_[1], $offset) = substr (${$self->{char_buffer}}, 0, $length);
+        $count += $length;
+        substr (${$self->{char_buffer}}, 0, $length) = '';
+        $length = 0;
+        return $count;
+      } else {
+        substr ($_[1], $offset) = ${$self->{char_buffer}};
+        $count += $l;
+        $length -= $l;
+        ${$self->{char_buffer}} = '';
+      }
+      $offset = length $_[1];
+    }
+
+    if ($eof) {
+      return $count;
+    }
   
   my $error;
   if ($self->{continue}) {
@@ -574,11 +615,14 @@ sub getc ($) {
     }
     $self->{continue} = 0;
   } elsif (512 > length $self->{byte_buffer}) {
-    $self->{filehandle}->read ($self->{byte_buffer}, 256,
-                               length $self->{byte_buffer});
+    if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
+                                   length $self->{byte_buffer})) {
+      #
+    } else {
+      $eof = 1;
+    }
   }
 
-  my $r;
   unless ($error) {
     if (not $self->{bom_checked}) {
       if (defined $self->{bom_pattern}) {
@@ -593,8 +637,7 @@ sub getc ($) {
                                  $self->{byte_buffer},
                                  Encode::FB_QUIET ());
     if (length $string) {
-      push @{$self->{character_queue}}, split //, $string;
-      $r = shift @{$self->{character_queue}};
+      $self->{char_buffer} = \$string;
       if (length $self->{byte_buffer}) {
         $self->{continue} = 1;
       }
@@ -602,32 +645,36 @@ sub getc ($) {
       if (length $self->{byte_buffer}) {
         $error = 1;
       } else {
-        $r = undef;
+        ## NOTE: No further input
+        redo A;
       }
     }
   }
 
   if ($error) {
-    $r = substr $self->{byte_buffer}, 0, 1, '';
+    my $r = substr $self->{byte_buffer}, 0, 1, '';
     my $fallback = $self->{fallback}->{$r};
     if (defined $fallback) {
       ## NOTE: This is an HTML5 parse error.
       $self->{onerror}->($self, 'fallback-char-error', octets => \$r,
                          char => \$fallback,
                          level => $self->{level}->{$self->{error_level}->{'fallback-char-error'}});
-      return $fallback;
+      ${$self->{char_buffer}} .= $fallback;
     } elsif (exists $self->{fallback}->{$r}) {
       ## NOTE: This is an HTML5 parse error.  In addition, the octet
       ## is not assigned with a character.
       $self->{onerror}->($self, 'fallback-unassigned-error', octets => \$r,
                          level => $self->{level}->{$self->{error_level}->{'fallback-unassigned-error'}});
+      ${$self->{char_buffer}} .= $r;
     } else {
       $self->{onerror}->($self, 'illegal-octets-error', octets => \$r,
                          level => $self->{level}->{$self->{error_level}->{'illegal-octets-error'}});
+      ${$self->{char_buffer}} .= $r;
     }
   }
 
-  return $r;
+    redo A;
+  } # A
 } # getc
 
 sub has_bom ($) { $_[0]->{has_bom} }
@@ -655,24 +702,6 @@ sub onerror ($;$) {
 sub ungetc ($$) {
   unshift @{$_[0]->{character_queue}}, chr int ($_[1] or 0);
 } # ungetc
-
-## TODO: This is not good for performance.  Should be replaced
-## by read-centric implementation.
-sub read ($$$;$) {
-  #my ($self, $scalar, $length, $offset) = @_;
-  my $length = $_[2];
-  my $r = '';
-  while ($length > 0) {
-    my $c = $_[0]->getc;
-    last unless defined $c;
-    $r .= $c;
-    $length--;
-  }
-  substr ($_[1], $_[3]) = $r;
-      ## NOTE: This would do different thing from what Perl's |read| do
-      ## if $offset points beyond the end of the $scalar.
-  return length $r;
-} # read
 
 package Whatpm::Charset::DecodeHandle::EUCJP;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
@@ -742,6 +771,24 @@ sub getc ($) {
   
   return $r;
 } # getc
+
+## TODO: This is not good for performance.  Should be replaced
+## by read-centric implementation.
+sub read ($$$;$) {
+  #my ($self, $scalar, $length, $offset) = @_;
+  my $length = $_[2];
+  my $r = '';
+  while ($length > 0) {
+    my $c = $_[0]->getc;
+    last unless defined $c;
+    $r .= $c;
+    $length--;
+  }
+  substr ($_[1], $_[3]) = $r;
+      ## NOTE: This would do different thing from what Perl's |read| do
+      ## if $offset points beyond the end of the $scalar.
+  return length $r;
+} # read
 
 package Whatpm::Charset::DecodeHandle::ISO2022JP;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
@@ -863,6 +910,24 @@ sub getc ($) {
   return $r;
 } # getc
 
+## TODO: This is not good for performance.  Should be replaced
+## by read-centric implementation.
+sub read ($$$;$) {
+  #my ($self, $scalar, $length, $offset) = @_;
+  my $length = $_[2];
+  my $r = '';
+  while ($length > 0) {
+    my $c = $_[0]->getc;
+    last unless defined $c;
+    $r .= $c;
+    $length--;
+  }
+  substr ($_[1], $_[3]) = $r;
+      ## NOTE: This would do different thing from what Perl's |read| do
+      ## if $offset points beyond the end of the $scalar.
+  return length $r;
+} # read
+
 package Whatpm::Charset::DecodeHandle::ShiftJIS;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
 
@@ -925,6 +990,24 @@ sub getc ($) {
 
   return $r;
 } # getc
+
+## TODO: This is not good for performance.  Should be replaced
+## by read-centric implementation.
+sub read ($$$;$) {
+  #my ($self, $scalar, $length, $offset) = @_;
+  my $length = $_[2];
+  my $r = '';
+  while ($length > 0) {
+    my $c = $_[0]->getc;
+    last unless defined $c;
+    $r .= $c;
+    $length--;
+  }
+  substr ($_[1], $_[3]) = $r;
+      ## NOTE: This would do different thing from what Perl's |read| do
+      ## if $offset points beyond the end of the $scalar.
+  return length $r;
+} # read
 
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:us-ascii'} = 
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:us'} = 
@@ -1505,4 +1588,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/11 09:55:56 $
+## $Date: 2008/09/11 12:09:38 $
