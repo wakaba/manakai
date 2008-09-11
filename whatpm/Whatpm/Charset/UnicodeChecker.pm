@@ -17,6 +17,7 @@ use strict;
 sub new_handle ($$) {
   my $self = bless {
     queue => [],
+    new_queue => [],
     onerror => sub {},
     level => {
       unicode_should => 'w',
@@ -37,7 +38,15 @@ sub new_handle ($$) {
 sub getc ($) {
   my $self = $_[0];
   return shift @{$self->{queue}} if @{$self->{queue}};
-  my $char = $self->{handle}->getc;
+
+  my $char;
+  unless (@{$self->{new_queue}}) {
+    my $s = '';
+    $self->{handle}->read ($s, 256) or return undef;
+    push @{$self->{new_queue}}, split //, $s;
+  }  
+  $char = shift @{$self->{new_queue}};
+  
   my $char_code = ord $char;
 
   if ({

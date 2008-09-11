@@ -545,6 +545,8 @@ sub read {
   my $pos = length $self->{buffer};
   my $r = $self->{filehandle}->read ($self->{buffer}, $_[1], $pos);
   substr ($_[0], $_[2]) = substr ($self->{buffer}, $pos);
+      ## NOTE: This would do different behavior from Perl's standard
+      ## |read| when $pos points beyond the end of the string.
   return $r;
 } # read
 
@@ -653,6 +655,24 @@ sub onerror ($;$) {
 sub ungetc ($$) {
   unshift @{$_[0]->{character_queue}}, chr int ($_[1] or 0);
 } # ungetc
+
+## TODO: This is not good for performance.  Should be replaced
+## by read-centric implementation.
+sub read ($$$;$) {
+  #my ($self, $scalar, $length, $offset) = @_;
+  my $length = $_[2];
+  my $r = '';
+  while ($length > 0) {
+    my $c = $_[0]->getc;
+    last unless defined $c;
+    $r .= $c;
+    $length--;
+  }
+  substr ($_[1], $_[3]) = $r;
+      ## NOTE: This would do different thing from what Perl's |read| do
+      ## if $offset points beyond the end of the $scalar.
+  return length $r;
+} # read
 
 package Whatpm::Charset::DecodeHandle::EUCJP;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
@@ -1485,4 +1505,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/10 10:27:09 $
+## $Date: 2008/09/11 09:55:56 $
