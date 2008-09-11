@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.161 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.162 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -354,7 +354,8 @@ sub parse_byte_string ($$$$;$) {
   return $self->parse_byte_stream ($charset_name, $input, @_[1..$#_]);
 } # parse_byte_string
 
-sub parse_byte_stream ($$$$;$) {
+sub parse_byte_stream ($$$$;$$) {
+  # my ($self, $charset_name, $byte_stream, $doc, $onerror, $get_wrapper) = @_;
   my $self = ref $_[0] ? shift : shift->new;
   my $charset_name = shift;
   my $byte_stream = $_[0];
@@ -364,6 +365,10 @@ sub parse_byte_stream ($$$$;$) {
     warn "Parse error ($opt{type})\n";
   };
   $self->{parse_error} = $onerror; # updated later by parse_char_string
+
+  my $get_wrapper = $_[3] || sub ($) {
+    return $_[0]; # $_[0] = byte stream handle, returned = arg to char handle
+  };
 
   ## HTML5 encoding sniffing algorithm
   require Message::Charset::Info;
@@ -562,12 +567,14 @@ sub parse_byte_stream ($$$$;$) {
       ${$opt{octets}} = "\x{FFFD}"; # relacement character
     }
   };
-  $char_stream->onerror ($char_onerror);
+
+  my $wrapped_char_stream = $get_wrapper->($char_stream);
+  $wrapped_char_stream->onerror ($char_onerror);
 
   my @args = @_; shift @args; # $s
   my $return;
   try {
-    $return = $self->parse_char_stream ($char_stream, @args);  
+    $return = $self->parse_char_stream ($wrapped_char_stream, @args);  
   } catch Whatpm::HTML::RestartParser with {
     ## NOTE: Invoked after {change_encoding}.
 
@@ -590,8 +597,11 @@ sub parse_byte_stream ($$$$;$) {
       $self->{input_encoding} = $charset->get_iana_name;
     }
     $self->{confident} = 1;
-    $char_stream->onerror ($char_onerror);
-    $return = $self->parse_char_stream ($char_stream, @args);
+
+    $wrapped_char_stream = $get_wrapper->($char_stream);
+    $wrapped_char_stream->onerror ($char_onerror);
+
+    $return = $self->parse_char_stream ($wrapped_char_stream, @args);
   };
   return $return;
 } # parse_byte_stream
@@ -605,14 +615,18 @@ sub parse_byte_stream ($$$$;$) {
 ## such as |parse_byte_string| in this module, must ensure that it does
 ## strip the BOM and never strip any ZWNBSP.
 
-sub parse_char_string ($$$;$) {
+sub parse_char_string ($$$;$$) {
+  #my ($self, $s, $doc, $onerror, $get_wrapper) = @_;
   my $self = shift;
   require utf8;
   my $s = ref $_[0] ? $_[0] : \($_[0]);
   open my $input, '<' . (utf8::is_utf8 ($$s) ? ':utf8' : ''), $s;
+  if ($_[3]) {
+    $input = $_[3]->($input);
+  }
   return $self->parse_char_stream ($input, @_[1..$#_]);
 } # parse_char_string
-*parse_string = \&parse_char_string;
+*parse_string = \&parse_char_string; ## NOTE: Alias for backward compatibility.
 
 sub parse_char_stream ($$$;$) {
   my $self = ref $_[0] ? shift : shift->new;
@@ -7458,11 +7472,12 @@ sub _tree_construction_main ($) {
   ## TODO: script stuffs
 } # _tree_construct_main
 
-sub set_inner_html ($$$) {
+sub set_inner_html ($$$;$) {
   my $class = shift;
   my $node = shift;
   my $s = \$_[0];
   my $onerror = $_[1];
+  my $get_wrapper = $_[2] || sub ($) { return $_[0] };
 
   ## ISSUE: Should {confident} be true?
 
@@ -7481,11 +7496,13 @@ sub set_inner_html ($$$) {
     }
 
     ## Step 3, 4, 5 # MUST
-    $class->parse_string ($$s => $node, $onerror);
+    $class->parse_char_string ($$s => $node, $onerror, $get_wrapper);
   } elsif ($nt == 1) {
     ## TODO: If non-html element
 
     ## NOTE: Most of this code is copied from |parse_string|
+
+## TODO: Support for $get_wrapper
 
     ## Step 1 # MUST
     my $this_doc = $node->owner_document;
@@ -7665,4 +7682,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/10 10:46:50 $
+# $Date: 2008/09/11 09:12:27 $

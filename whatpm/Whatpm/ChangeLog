@@ -1,3 +1,10 @@
+2008-09-11  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTML.pm.src: Methods now accept additional parameter, $get_wrapper,
+	which can be used to insert some wrapper between the character
+	stream handle and the tokenizer.  (It is currently not supported
+	for |set_inner_html| for |Element|s).
+
 2008-09-10  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTML.pm.src: Ignore punctuations in charset names.
