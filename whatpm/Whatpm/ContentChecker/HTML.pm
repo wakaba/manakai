@@ -5197,12 +5197,14 @@ $Element->{$HTML_NS}->{fieldset} = {
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     ## TODO: form [WF2]
+    ## TODO: name [HTML5]
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+    name => FEATURE_HTML5_DEFAULT,
   }),
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <fieldset>
