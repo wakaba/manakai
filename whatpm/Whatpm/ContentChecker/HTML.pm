@@ -5685,6 +5685,7 @@ $Element->{$HTML_NS}->{textarea} = {
     name => sub {}, ## NOTE: CDATA [M12N]
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,
+    oninput => $HTMLEventHandlerAttrChecker,
     ## TODO: pattern [WF2] ## TODO: |title| special semantics
     readonly => $GetHTMLBooleanAttrChecker->('readonly'),
     required => $GetHTMLBooleanAttrChecker->('required'),
