@@ -582,6 +582,9 @@ sub read ($$$;$) {
   my $count = 0;
   my $eof;
 
+  ## NOTE: It is incompatible with the standard Perl semantics
+  ## if $offset is greater than the length of $scalar.
+
   A: {
     return $count if $length < 1;
 
@@ -1588,4 +1591,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/11 12:09:38 $
+## $Date: 2008/09/12 03:31:40 $
