@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.165 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.166 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -669,6 +669,7 @@ sub parse_char_stream ($$$;$) {
       $self->{column} = 0;
     } elsif ($self->{next_char} == 0x000D) { # CR
       
+## TODO: support for abort/streaming
       my $next = $input->getc;
       if (defined $next and $next ne "\x0A") {
         $self->{next_next_char} = $next;
@@ -3210,6 +3211,7 @@ sub _get_next_token ($) {
         ## Return nothing.
         #
       } elsif ($self->{next_char} == 0x0023) { # #
+        
         $self->{state} = ENTITY_HASH_STATE;
         $self->{state_keyword} = '#';
         
@@ -3220,6 +3222,7 @@ sub _get_next_token ($) {
                 $self->{next_char} <= 0x005A) or # A..Z
                (0x0061 <= $self->{next_char} and
                 $self->{next_char} <= 0x007A)) { # a..z
+        
         require Whatpm::_NamedEntityList;
         $self->{state} = ENTITY_NAME_STATE;
         $self->{state_keyword} = chr $self->{next_char};
@@ -3243,6 +3246,7 @@ sub _get_next_token ($) {
       ## process of the tokenizer.
 
       if ($self->{prev_state} == DATA_STATE) {
+        
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => '&',
@@ -3251,6 +3255,7 @@ sub _get_next_token ($) {
                  });
         redo A;
       } else {
+        
         $self->{current_attribute}->{value} .= '&';
         $self->{state} = $self->{prev_state};
         ## Reconsume.
@@ -3259,6 +3264,7 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == ENTITY_HASH_STATE) {
       if ($self->{next_char} == 0x0078 or # x
           $self->{next_char} == 0x0058) { # X
+        
         $self->{state} = HEXREF_X_STATE;
         $self->{state_keyword} .= chr $self->{next_char};
         
@@ -3267,6 +3273,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0030 <= $self->{next_char} and
                $self->{next_char} <= 0x0039) { # 0..9
+        
         $self->{state} = NCR_NUM_STATE;
         $self->{state_keyword} = $self->{next_char} - 0x0030;
         
@@ -3274,7 +3281,6 @@ sub _get_next_token ($) {
   
         redo A;
       } else {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare nero',
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 1);
@@ -3284,6 +3290,7 @@ sub _get_next_token ($) {
         ## value in the later processing.
 
         if ($self->{prev_state} == DATA_STATE) {
+          
           $self->{state} = $self->{prev_state};
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
@@ -3293,6 +3300,7 @@ sub _get_next_token ($) {
                    });
           redo A;
         } else {
+          
           $self->{current_attribute}->{value} .= '&#';
           $self->{state} = $self->{prev_state};
           ## Reconsume.
@@ -3353,6 +3361,7 @@ sub _get_next_token ($) {
       }
 
       if ($self->{prev_state} == DATA_STATE) {
+        
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => chr $code,
@@ -3360,6 +3369,7 @@ sub _get_next_token ($) {
                  });
         redo A;
       } else {
+        
         $self->{current_attribute}->{value} .= chr $code;
         $self->{current_attribute}->{has_reference} = 1;
         $self->{state} = $self->{prev_state};
@@ -3371,12 +3381,12 @@ sub _get_next_token ($) {
           (0x0041 <= $self->{next_char} and $self->{next_char} <= 0x0046) or
           (0x0061 <= $self->{next_char} and $self->{next_char} <= 0x0066)) {
         # 0..9, A..F, a..f
+        
         $self->{state} = HEXREF_HEX_STATE;
         $self->{state_keyword} = 0;
         ## Reconsume.
         redo A;
       } else {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare hcro',
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 2);
@@ -3386,6 +3396,7 @@ sub _get_next_token ($) {
         ## element or the attribute value in the later processing.
 
         if ($self->{prev_state} == DATA_STATE) {
+          
           $self->{state} = $self->{prev_state};
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
@@ -3395,6 +3406,7 @@ sub _get_next_token ($) {
                    });
           redo A;
         } else {
+          
           $self->{current_attribute}->{value} .= '&' . $self->{state_keyword};
           $self->{state} = $self->{prev_state};
           ## Reconsume.
@@ -3473,6 +3485,7 @@ sub _get_next_token ($) {
       }
 
       if ($self->{prev_state} == DATA_STATE) {
+        
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => chr $code,
@@ -3480,6 +3493,7 @@ sub _get_next_token ($) {
                  });
         redo A;
       } else {
+        
         $self->{current_attribute}->{value} .= chr $code;
         $self->{current_attribute}->{has_reference} = 1;
         $self->{state} = $self->{prev_state};
@@ -3569,6 +3583,7 @@ sub _get_next_token ($) {
       ## appropriate attribute value state anyway.
  
       if ($self->{prev_state} == DATA_STATE) {
+        
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN,
@@ -3578,6 +3593,7 @@ sub _get_next_token ($) {
                  });
         redo A;
       } else {
+        
         $self->{current_attribute}->{value} .= $data;
         $self->{current_attribute}->{has_reference} = 1 if $has_ref;
         $self->{state} = $self->{prev_state};
@@ -9096,4 +9112,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 11:31:08 $
+# $Date: 2008/09/13 12:25:44 $

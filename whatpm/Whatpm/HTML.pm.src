@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.169 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.170 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -669,6 +669,7 @@ sub parse_char_stream ($$$;$) {
       $self->{column} = 0;
     } elsif ($self->{next_char} == 0x000D) { # CR
       !!!cp ('j2');
+## TODO: support for abort/streaming
       my $next = $input->getc;
       if (defined $next and $next ne "\x0A") {
         $self->{next_next_char} = $next;
@@ -2946,6 +2947,7 @@ sub _get_next_token ($) {
         ## Return nothing.
         #
       } elsif ($self->{next_char} == 0x0023) { # #
+        !!!cp (999);
         $self->{state} = ENTITY_HASH_STATE;
         $self->{state_keyword} = '#';
         !!!next-input-character;
@@ -2954,6 +2956,7 @@ sub _get_next_token ($) {
                 $self->{next_char} <= 0x005A) or # A..Z
                (0x0061 <= $self->{next_char} and
                 $self->{next_char} <= 0x007A)) { # a..z
+        !!!cp (998);
         require Whatpm::_NamedEntityList;
         $self->{state} = ENTITY_NAME_STATE;
         $self->{state_keyword} = chr $self->{next_char};
@@ -2975,6 +2978,7 @@ sub _get_next_token ($) {
       ## process of the tokenizer.
 
       if ($self->{prev_state} == DATA_STATE) {
+        !!!cp (997);
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN, data => '&',
@@ -2983,6 +2987,7 @@ sub _get_next_token ($) {
                  });
         redo A;
       } else {
+        !!!cp (996);
         $self->{current_attribute}->{value} .= '&';
         $self->{state} = $self->{prev_state};
         ## Reconsume.
@@ -2991,18 +2996,19 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == ENTITY_HASH_STATE) {
       if ($self->{next_char} == 0x0078 or # x
           $self->{next_char} == 0x0058) { # X
+        !!!cp (995);
         $self->{state} = HEXREF_X_STATE;
         $self->{state_keyword} .= chr $self->{next_char};
         !!!next-input-character;
         redo A;
       } elsif (0x0030 <= $self->{next_char} and
                $self->{next_char} <= 0x0039) { # 0..9
+        !!!cp (994);
         $self->{state} = NCR_NUM_STATE;
         $self->{state_keyword} = $self->{next_char} - 0x0030;
         !!!next-input-character;
         redo A;
       } else {
-        !!!cp (1019);
         !!!parse-error (type => 'bare nero',
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 1);
@@ -3012,6 +3018,7 @@ sub _get_next_token ($) {
         ## value in the later processing.
 
         if ($self->{prev_state} == DATA_STATE) {
+          !!!cp (1019);
           $self->{state} = $self->{prev_state};
           ## Reconsume.
           !!!emit ({type => CHARACTER_TOKEN,
@@ -3021,6 +3028,7 @@ sub _get_next_token ($) {
                    });
           redo A;
         } else {
+          !!!cp (993);
           $self->{current_attribute}->{value} .= '&#';
           $self->{state} = $self->{prev_state};
           ## Reconsume.
@@ -3077,6 +3085,7 @@ sub _get_next_token ($) {
       }
 
       if ($self->{prev_state} == DATA_STATE) {
+        !!!cp (992);
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN, data => chr $code,
@@ -3084,6 +3093,7 @@ sub _get_next_token ($) {
                  });
         redo A;
       } else {
+        !!!cp (991);
         $self->{current_attribute}->{value} .= chr $code;
         $self->{current_attribute}->{has_reference} = 1;
         $self->{state} = $self->{prev_state};
@@ -3095,12 +3105,12 @@ sub _get_next_token ($) {
           (0x0041 <= $self->{next_char} and $self->{next_char} <= 0x0046) or
           (0x0061 <= $self->{next_char} and $self->{next_char} <= 0x0066)) {
         # 0..9, A..F, a..f
+        !!!cp (990);
         $self->{state} = HEXREF_HEX_STATE;
         $self->{state_keyword} = 0;
         ## Reconsume.
         redo A;
       } else {
-        !!!cp (1005);
         !!!parse-error (type => 'bare hcro',
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 2);
@@ -3110,6 +3120,7 @@ sub _get_next_token ($) {
         ## element or the attribute value in the later processing.
 
         if ($self->{prev_state} == DATA_STATE) {
+          !!!cp (1005);
           $self->{state} = $self->{prev_state};
           ## Reconsume.
           !!!emit ({type => CHARACTER_TOKEN,
@@ -3119,6 +3130,7 @@ sub _get_next_token ($) {
                    });
           redo A;
         } else {
+          !!!cp (989);
           $self->{current_attribute}->{value} .= '&' . $self->{state_keyword};
           $self->{state} = $self->{prev_state};
           ## Reconsume.
@@ -3189,6 +3201,7 @@ sub _get_next_token ($) {
       }
 
       if ($self->{prev_state} == DATA_STATE) {
+        !!!cp (988);
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN, data => chr $code,
@@ -3196,6 +3209,7 @@ sub _get_next_token ($) {
                  });
         redo A;
       } else {
+        !!!cp (987);
         $self->{current_attribute}->{value} .= chr $code;
         $self->{current_attribute}->{has_reference} = 1;
         $self->{state} = $self->{prev_state};
@@ -3279,6 +3293,7 @@ sub _get_next_token ($) {
       ## appropriate attribute value state anyway.
  
       if ($self->{prev_state} == DATA_STATE) {
+        !!!cp (986);
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN,
@@ -3288,6 +3303,7 @@ sub _get_next_token ($) {
                  });
         redo A;
       } else {
+        !!!cp (985);
         $self->{current_attribute}->{value} .= $data;
         $self->{current_attribute}->{has_reference} = 1 if $has_ref;
         $self->{state} = $self->{prev_state};
@@ -7864,4 +7880,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 11:31:09 $
+# $Date: 2008/09/13 12:25:44 $
