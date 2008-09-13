@@ -1,5 +1,14 @@
 2008-09-13  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: Remove |{char}|, which is no longer used.
+	Remove |{entity_in_attr}| and |{last_attribute_value_state}|
+	and replaced by |{prev_state}|.
+
+	* mkhtmlparser.pl: Remove |{char}| feature.
+	Remove |!!!back-next-input-character;| macro.
+
+2008-09-13  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: Finally we get rid of all the inner loops.  Remove
 	entity related tokenizer states in favor of new states
 	implementing the consume character reference algorithm.

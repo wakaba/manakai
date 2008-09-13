@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.168 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.169 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -874,13 +874,14 @@ sub _initialize_tokenizer ($) {
   my $self = shift;
   $self->{state} = DATA_STATE; # MUST
   #$self->{state_keyword}; # initialized when used
+  #$self->{entity__value}; # initialized when used
+  #$self->{entity__match}; # initialized when used
   $self->{content_model} = PCDATA_CONTENT_MODEL; # be
   undef $self->{current_token};
   undef $self->{current_attribute};
   undef $self->{last_emitted_start_tag_name};
-  undef $self->{last_attribute_value_state};
+  #$self->{prev_state}; # initialized when used
   delete $self->{self_closing};
-  $self->{char} = [];
   # $self->{next_char}
   !!!next-input-character;
   $self->{token} = [];
@@ -912,20 +913,8 @@ sub _initialize_tokenizer ($) {
 ## has completed loading.  If one has, then it MUST be executed
 ## and removed from the list.
 
-## NOTE: HTML5 "Writing HTML documents" section, applied to
-## documents and not to user agents and conformance checkers,
-## contains some requirements that are not detected by the
-## parsing algorithm:
-## - Some requirements on character encoding declarations. ## TODO
-## - "Elements MUST NOT contain content that their content model disallows."
-##   ... Some are parse error, some are not (will be reported by c.c.).
-## - Polytheistic slash SHOULD NOT be used. (Applied only to atheists.) ## TODO
-## - Text (in elements, attributes, and comments) SHOULD NOT contain
-##   control characters other than space characters. ## TODO: (what is control character? C0, C1 and DEL?  Unicode control character?)
-
-## TODO: HTML5 poses authors two SHOULD-level requirements that cannot
-## be detected by the HTML5 parsing algorithm:
-## - Text, 
+## TODO: Polytheistic slash SHOULD NOT be used. (Applied only to atheists.)
+## (This requirement was dropped from HTML5 spec, unfortunately.)
 
 sub _get_next_token ($) {
   my $self = shift;
@@ -953,8 +942,8 @@ sub _get_next_token ($) {
           ## "entity data state".  In this implementation, the tokenizer
           ## is switched to the |ENTITY_STATE|, which is an implementation
           ## of the "consume a character reference" algorithm.
-          $self->{entity_in_attr} = 0;
           $self->{entity_additional} = -1;
+          $self->{prev_state} = DATA_STATE;
           $self->{state} = ENTITY_STATE;
           !!!next-input-character;
           redo A;
@@ -1698,12 +1687,11 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
         !!!cp (96);
-        $self->{last_attribute_value_state} = $self->{state};
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_in_attr} = 1;
+        $self->{prev_state} = $self->{state};
         $self->{entity_additional} = 0x0022; # "
         $self->{state} = ENTITY_STATE;
         !!!next-input-character;
@@ -1746,13 +1734,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
         !!!cp (102);
-        $self->{last_attribute_value_state} = $self->{state};
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_in_attr} = 1;
         $self->{entity_additional} = 0x0027; # '
+        $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         !!!next-input-character;
         redo A;
@@ -1798,13 +1785,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
         !!!cp (108);
-        $self->{last_attribute_value_state} = $self->{state};
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_in_attr} = 1;
         $self->{entity_additional} = -1;
+        $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         !!!next-input-character;
         redo A;
@@ -2988,18 +2974,18 @@ sub _get_next_token ($) {
       ## appended to the parent element or the attribute value in later
       ## process of the tokenizer.
 
-      if ($self->{entity_in_attr}) {
-        $self->{current_attribute}->{value} .= '&';
-        $self->{state} = $self->{last_attribute_value_state};
-        ## Reconsume.
-        redo A;
-      } else {
-        $self->{state} = DATA_STATE;
+      if ($self->{prev_state} == DATA_STATE) {
+        $self->{state} = $self->{prev_state};
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN, data => '&',
                   line => $self->{line_prev},
                   column => $self->{column_prev},
                  });
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= '&';
+        $self->{state} = $self->{prev_state};
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == ENTITY_HASH_STATE) {
@@ -3025,19 +3011,19 @@ sub _get_next_token ($) {
         ## and then "&#" is appended to the parent element or the attribute 
         ## value in the later processing.
 
-        if ($self->{entity_in_attr}) {
-          $self->{current_attribute}->{value} .= '&#';
-          $self->{state} = $self->{last_attribute_value_state};
-          ## Reconsume.
-          redo A;
-        } else {
-          $self->{state} = DATA_STATE;
+        if ($self->{prev_state} == DATA_STATE) {
+          $self->{state} = $self->{prev_state};
           ## Reconsume.
           !!!emit ({type => CHARACTER_TOKEN,
                     data => '&#',
                     line => $self->{line_prev},
                     column => $self->{column_prev} - 1,
                    });
+          redo A;
+        } else {
+          $self->{current_attribute}->{value} .= '&#';
+          $self->{state} = $self->{prev_state};
+          ## Reconsume.
           redo A;
         }
       }
@@ -3090,19 +3076,18 @@ sub _get_next_token ($) {
         $code = $c1_entity_char->{$code};
       }
 
-      if ($self->{entity_in_attr}) {
-        $self->{current_attribute}->{value} .= chr $code;
-        $self->{current_attribute}->{has_reference} = 1;
-        $self->{state} = $self->{last_attribute_value_state};
-        ## Reconsume.
-        redo A;
-      } else {
-        $self->{state} = DATA_STATE;
+      if ($self->{prev_state} == DATA_STATE) {
+        $self->{state} = $self->{prev_state};
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN, data => chr $code,
-                  has_reference => 1,
                   line => $l, column => $c,
                  });
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= chr $code;
+        $self->{current_attribute}->{has_reference} = 1;
+        $self->{state} = $self->{prev_state};
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == HEXREF_X_STATE) {
@@ -3124,19 +3109,19 @@ sub _get_next_token ($) {
         ## and then "&#" followed by "X" or "x" is appended to the parent
         ## element or the attribute value in the later processing.
 
-        if ($self->{entity_in_attr}) {
-          $self->{current_attribute}->{value} .= '&' . $self->{state_keyword};
-          $self->{state} = $self->{last_attribute_value_state};
-          ## Reconsume.
-          redo A;
-        } else {
-          $self->{state} = DATA_STATE;
+        if ($self->{prev_state} == DATA_STATE) {
+          $self->{state} = $self->{prev_state};
           ## Reconsume.
           !!!emit ({type => CHARACTER_TOKEN,
                     data => '&' . $self->{state_keyword},
                     line => $self->{line_prev},
                     column => $self->{column_prev} - length $self->{state_keyword},
                    });
+          redo A;
+        } else {
+          $self->{current_attribute}->{value} .= '&' . $self->{state_keyword};
+          $self->{state} = $self->{prev_state};
+          ## Reconsume.
           redo A;
         }
       }
@@ -3203,19 +3188,18 @@ sub _get_next_token ($) {
         $code = $c1_entity_char->{$code};
       }
 
-      if ($self->{entity_in_attr}) {
-        $self->{current_attribute}->{value} .= chr $code;
-        $self->{current_attribute}->{has_reference} = 1;
-        $self->{state} = $self->{last_attribute_value_state};
-        ## Reconsume.
-        redo A;
-      } else {
-        $self->{state} = DATA_STATE;
+      if ($self->{prev_state} == DATA_STATE) {
+        $self->{state} = $self->{prev_state};
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN, data => chr $code,
-                  has_reference => 1,
                   line => $l, column => $c,
                  });
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= chr $code;
+        $self->{current_attribute}->{has_reference} = 1;
+        $self->{state} = $self->{prev_state};
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == ENTITY_NAME_STATE) {
@@ -3264,7 +3248,8 @@ sub _get_next_token ($) {
         #
       } elsif ($self->{entity__match} < 0) {
         !!!parse-error (type => 'no refc');
-        if ($self->{entity_in_attr} and $self->{entity__match} < -1) {
+        if ($self->{prev_state} != DATA_STATE and # in attribute
+            $self->{entity__match} < -1) {
           !!!cp (1024);
           $data = '&' . $self->{state_keyword};
           #
@@ -3293,20 +3278,20 @@ sub _get_next_token ($) {
       ## that would not be consumed are appended in the data state or in an
       ## appropriate attribute value state anyway.
  
-      if ($self->{entity_in_attr}) {
-        $self->{current_attribute}->{value} .= $data;
-        $self->{current_attribute}->{has_reference} = 1 if $has_ref;
-        $self->{state} = $self->{last_attribute_value_state};
-        ## Reconsume.
-        redo A;
-      } else {
-        $self->{state} = DATA_STATE;
+      if ($self->{prev_state} == DATA_STATE) {
+        $self->{state} = $self->{prev_state};
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN,
-                  data => $data, has_reference => $has_ref,
+                  data => $data,
                   line => $self->{line_prev},
                   column => $self->{column_prev} + 1 - length $self->{state_keyword},
                  });
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= $data;
+        $self->{current_attribute}->{has_reference} = 1 if $has_ref;
+        $self->{state} = $self->{prev_state};
+        ## Reconsume.
         redo A;
       }
     } else {
@@ -7879,4 +7864,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 10:49:21 $
+# $Date: 2008/09/13 11:31:09 $

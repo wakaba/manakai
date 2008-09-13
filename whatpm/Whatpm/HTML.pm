@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.164 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.165 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -812,12 +812,15 @@ sub CDATA_SECTION_MSE1_STATE () { 40 } # "CDATA section state" in the spec
 sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 sub PUBLIC_STATE () { 42 } # "after DOCTYPE name state" in the spec
 sub SYSTEM_STATE () { 43 } # "after DOCTYPE name state" in the spec
-sub ENTITY_STATE () { 44 } # "consume a character reference" in the spec
-sub ENTITY_HASH_STATE () { 45 } # "consume a character reference" in the spec
-sub NCR_NUM_STATE () { 46 } # "consume a character reference" in the spec
-sub HEXREF_X_STATE () { 47 } # "consume a character reference" in the spec
-sub HEXREF_HEX_STATE () { 48 } # "consume a character reference" in the spec
-sub ENTITY_NAME_STATE () { 49 } # "consume a character reference" in the spec
+## NOTE: "Entity data state", "entity in attribute value state", and
+## "consume a character reference" algorithm are jointly implemented
+## using the following six states:
+sub ENTITY_STATE () { 44 }
+sub ENTITY_HASH_STATE () { 45 }
+sub NCR_NUM_STATE () { 46 }
+sub HEXREF_X_STATE () { 47 }
+sub HEXREF_HEX_STATE () { 48 }
+sub ENTITY_NAME_STATE () { 49 }
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -871,20 +874,17 @@ sub _initialize_tokenizer ($) {
   my $self = shift;
   $self->{state} = DATA_STATE; # MUST
   #$self->{state_keyword}; # initialized when used
+  #$self->{entity__value}; # initialized when used
+  #$self->{entity__match}; # initialized when used
   $self->{content_model} = PCDATA_CONTENT_MODEL; # be
   undef $self->{current_token};
   undef $self->{current_attribute};
   undef $self->{last_emitted_start_tag_name};
-  undef $self->{last_attribute_value_state};
+  #$self->{prev_state}; # initialized when used
   delete $self->{self_closing};
-  $self->{char} = [];
   # $self->{next_char}
   
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
   $self->{token} = [];
   # $self->{escape}
@@ -915,20 +915,8 @@ sub _initialize_tokenizer ($) {
 ## has completed loading.  If one has, then it MUST be executed
 ## and removed from the list.
 
-## NOTE: HTML5 "Writing HTML documents" section, applied to
-## documents and not to user agents and conformance checkers,
-## contains some requirements that are not detected by the
-## parsing algorithm:
-## - Some requirements on character encoding declarations. ## TODO
-## - "Elements MUST NOT contain content that their content model disallows."
-##   ... Some are parse error, some are not (will be reported by c.c.).
-## - Polytheistic slash SHOULD NOT be used. (Applied only to atheists.) ## TODO
-## - Text (in elements, attributes, and comments) SHOULD NOT contain
-##   control characters other than space characters. ## TODO: (what is control character? C0, C1 and DEL?  Unicode control character?)
-
-## TODO: HTML5 poses authors two SHOULD-level requirements that cannot
-## be detected by the HTML5 parsing algorithm:
-## - Text, 
+## TODO: Polytheistic slash SHOULD NOT be used. (Applied only to atheists.)
+## (This requirement was dropped from HTML5 spec, unfortunately.)
 
 sub _get_next_token ($) {
   my $self = shift;
@@ -956,15 +944,11 @@ sub _get_next_token ($) {
           ## "entity data state".  In this implementation, the tokenizer
           ## is switched to the |ENTITY_STATE|, which is an implementation
           ## of the "consume a character reference" algorithm.
-          $self->{entity_in_attr} = 0;
           $self->{entity_additional} = -1;
+          $self->{prev_state} = DATA_STATE;
           $self->{state} = ENTITY_STATE;
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           redo A;
         } else {
@@ -995,11 +979,7 @@ sub _get_next_token ($) {
           
           $self->{state} = TAG_OPEN_STATE;
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           redo A;
         } else {
@@ -1036,11 +1016,7 @@ sub _get_next_token ($) {
                   };
       ## Stay in the data state
       
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
       return  ($token);
@@ -1051,11 +1027,7 @@ sub _get_next_token ($) {
         if ($self->{next_char} == 0x002F) { # /
           
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           redo A;
@@ -1076,22 +1048,14 @@ sub _get_next_token ($) {
           
           $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           redo A;
         } elsif ($self->{next_char} == 0x002F) { # /
           
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           redo A;
         } elsif (0x0041 <= $self->{next_char} and
@@ -1104,11 +1068,7 @@ sub _get_next_token ($) {
                column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           redo A;
         } elsif (0x0061 <= $self->{next_char} and
@@ -1120,11 +1080,7 @@ sub _get_next_token ($) {
                                     column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           redo A;
         } elsif ($self->{next_char} == 0x003E) { # >
@@ -1134,11 +1090,7 @@ sub _get_next_token ($) {
                           column => $self->{column_prev});
           $self->{state} = DATA_STATE;
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
           return  ({type => CHARACTER_TOKEN, data => '<>',
@@ -1210,11 +1162,7 @@ sub _get_next_token ($) {
                line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif (0x0061 <= $self->{next_char} and
@@ -1225,11 +1173,7 @@ sub _get_next_token ($) {
                                   line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -1239,11 +1183,7 @@ sub _get_next_token ($) {
                         column => $self->{column_prev} - 1);
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -1284,11 +1224,7 @@ sub _get_next_token ($) {
           ## Stay in the state.
           $self->{state_keyword} .= $nch;
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           redo A;
         } else {
@@ -1343,11 +1279,7 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -1368,11 +1300,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1385,11 +1313,7 @@ sub _get_next_token ($) {
           # start tag or end tag
         ## Stay in this state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -1419,11 +1343,7 @@ sub _get_next_token ($) {
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -1432,11 +1352,7 @@ sub _get_next_token ($) {
           # start tag or end tag
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -1449,11 +1365,7 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -1473,11 +1385,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1492,22 +1400,14 @@ sub _get_next_token ($) {
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x002F) { # /
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -1549,11 +1449,7 @@ sub _get_next_token ($) {
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -1580,11 +1476,7 @@ sub _get_next_token ($) {
         $before_leave->();
         $self->{state} = AFTER_ATTRIBUTE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003D) { # =
@@ -1592,11 +1484,7 @@ sub _get_next_token ($) {
         $before_leave->();
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -1615,11 +1503,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1631,11 +1515,7 @@ sub _get_next_token ($) {
         $self->{current_attribute}->{name} .= chr ($self->{next_char} + 0x0020);
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x002F) { # /
@@ -1643,11 +1523,7 @@ sub _get_next_token ($) {
         $before_leave->();
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -1685,11 +1561,7 @@ sub _get_next_token ($) {
         $self->{current_attribute}->{name} .= chr ($self->{next_char});
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -1702,22 +1574,14 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003D) { # =
         
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -1738,11 +1602,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1757,22 +1617,14 @@ sub _get_next_token ($) {
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x002F) { # /
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -1812,11 +1664,7 @@ sub _get_next_token ($) {
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;        
       }
@@ -1829,22 +1677,14 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
         
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
@@ -1856,11 +1696,7 @@ sub _get_next_token ($) {
         
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -1882,11 +1718,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1925,11 +1757,7 @@ sub _get_next_token ($) {
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -1938,29 +1766,20 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
         
-        $self->{last_attribute_value_state} = $self->{state};
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_in_attr} = 1;
+        $self->{prev_state} = $self->{state};
         $self->{entity_additional} = 0x0022; # "
         $self->{state} = ENTITY_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -1991,11 +1810,7 @@ sub _get_next_token ($) {
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2004,29 +1819,20 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
         
-        $self->{last_attribute_value_state} = $self->{state};
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_in_attr} = 1;
         $self->{entity_additional} = 0x0027; # '
+        $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -2057,11 +1863,7 @@ sub _get_next_token ($) {
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2074,29 +1876,20 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0026) { # &
         
-        $self->{last_attribute_value_state} = $self->{state};
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_in_attr} = 1;
         $self->{entity_additional} = -1;
+        $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -2117,11 +1910,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # start tag or end tag
@@ -2164,11 +1953,7 @@ sub _get_next_token ($) {
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2181,11 +1966,7 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -2206,11 +1987,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # start tag or end tag
@@ -2220,11 +1997,7 @@ sub _get_next_token ($) {
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -2275,11 +2048,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # start tag or end tag
@@ -2323,11 +2092,7 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # comment
@@ -2344,11 +2109,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
         ## Stay in the state.
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2359,11 +2120,7 @@ sub _get_next_token ($) {
         
         $self->{state} = MD_HYPHEN_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0044 or # D
@@ -2373,11 +2130,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_DOCTYPE_STATE;
         $self->{state_keyword} = chr $self->{next_char};
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
@@ -2387,11 +2140,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_CDATA_STATE;
         $self->{state_keyword} = '[';
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -2417,11 +2166,7 @@ sub _get_next_token ($) {
                                  };
         $self->{state} = COMMENT_START_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -2460,11 +2205,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{state_keyword} .= chr $self->{next_char};
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ((length $self->{state_keyword}) == 6 and
@@ -2478,11 +2219,7 @@ sub _get_next_token ($) {
                                   column => $self->{column_prev} - 7,
                                  };
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -2511,11 +2248,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{state_keyword} .= chr $self->{next_char};
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{state_keyword} eq '[CDATA' and
@@ -2527,11 +2260,7 @@ sub _get_next_token ($) {
                                   column => $self->{column_prev} - 7};
         $self->{state} = CDATA_SECTION_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -2553,11 +2282,7 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_START_DASH_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -2565,11 +2290,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment');
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # comment
@@ -2590,11 +2311,7 @@ sub _get_next_token ($) {
             .= chr ($self->{next_char});
         $self->{state} = COMMENT_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2603,11 +2320,7 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -2615,11 +2328,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment');
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # comment
@@ -2640,11 +2349,7 @@ sub _get_next_token ($) {
             .= '-' . chr ($self->{next_char});
         $self->{state} = COMMENT_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2653,11 +2358,7 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_DASH_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -2674,11 +2375,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2687,11 +2384,7 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -2708,11 +2401,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{data} .= '-' . chr ($self->{next_char}); # comment
         $self->{state} = COMMENT_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2721,11 +2410,7 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # comment
@@ -2739,11 +2424,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{data} .= '-'; # comment
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
@@ -2763,11 +2444,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{data} .= '--' . chr ($self->{next_char}); # comment
         $self->{state} = COMMENT_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } 
@@ -2780,11 +2457,7 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -2803,11 +2476,7 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -2815,11 +2484,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # DOCTYPE (quirks)
@@ -2841,11 +2506,7 @@ sub _get_next_token ($) {
 ## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = DOCTYPE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2859,22 +2520,14 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # DOCTYPE
@@ -2896,11 +2549,7 @@ sub _get_next_token ($) {
           .= chr ($self->{next_char}); # DOCTYPE
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -2913,22 +2562,14 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # DOCTYPE
@@ -2949,11 +2590,7 @@ sub _get_next_token ($) {
         $self->{state} = PUBLIC_STATE;
         $self->{state_keyword} = chr $self->{next_char};
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0053 or # S
@@ -2961,11 +2598,7 @@ sub _get_next_token ($) {
         $self->{state} = SYSTEM_STATE;
         $self->{state_keyword} = chr $self->{next_char};
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -2975,11 +2608,7 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3003,11 +2632,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{state_keyword} .= chr $self->{next_char};
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ((length $self->{state_keyword}) == 5 and
@@ -3016,11 +2641,7 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -3054,11 +2675,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{state_keyword} .= chr $self->{next_char};
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ((length $self->{state_keyword}) == 5 and
@@ -3067,11 +2684,7 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -3093,11 +2706,7 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} eq 0x0022) { # "
@@ -3105,11 +2714,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{public_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} eq 0x0027) { # '
@@ -3117,11 +2722,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{public_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} eq 0x003E) { # >
@@ -3130,11 +2731,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         $self->{current_token}->{quirks} = 1;
@@ -3159,11 +2756,7 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3172,11 +2765,7 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -3185,11 +2774,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         $self->{current_token}->{quirks} = 1;
@@ -3213,11 +2798,7 @@ sub _get_next_token ($) {
             .= chr $self->{next_char};
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3226,11 +2807,7 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -3239,11 +2816,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         $self->{current_token}->{quirks} = 1;
@@ -3267,11 +2840,7 @@ sub _get_next_token ($) {
             .= chr $self->{next_char};
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3283,11 +2852,7 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
@@ -3295,11 +2860,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0027) { # '
@@ -3307,22 +2868,14 @@ sub _get_next_token ($) {
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # DOCTYPE
@@ -3346,11 +2899,7 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3362,11 +2911,7 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0022) { # "
@@ -3374,11 +2919,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x0027) { # '
@@ -3386,11 +2927,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -3398,11 +2935,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         $self->{current_token}->{quirks} = 1;
@@ -3427,11 +2960,7 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3440,11 +2969,7 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -3453,11 +2978,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         $self->{current_token}->{quirks} = 1;
@@ -3481,11 +3002,7 @@ sub _get_next_token ($) {
             .= chr $self->{next_char};
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3494,11 +3011,7 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
@@ -3507,11 +3020,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         $self->{current_token}->{quirks} = 1;
@@ -3535,11 +3044,7 @@ sub _get_next_token ($) {
             .= chr $self->{next_char};
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3551,22 +3056,14 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # DOCTYPE
@@ -3589,11 +3086,7 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3602,11 +3095,7 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
 
         return  ($self->{current_token}); # DOCTYPE
@@ -3625,11 +3114,7 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3642,21 +3127,13 @@ sub _get_next_token ($) {
         
         $self->{state} = CDATA_SECTION_MSE1_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == -1) {
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         if (length $self->{current_token}->{data}) { # character
           
@@ -3671,11 +3148,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{data} .= chr $self->{next_char};
         ## Stay in the state.
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       }
@@ -3686,11 +3159,7 @@ sub _get_next_token ($) {
         
         $self->{state} = CDATA_SECTION_MSE2_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -3704,11 +3173,7 @@ sub _get_next_token ($) {
       if ($self->{next_char} == 0x003E) { # >
         $self->{state} = DATA_STATE;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         if (length $self->{current_token}->{data}) { # character
           
@@ -3723,11 +3188,7 @@ sub _get_next_token ($) {
         $self->{current_token}->{data} .= ']'; ## Add first "]" of "]]]".
         ## Stay in the state.
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -3752,11 +3213,7 @@ sub _get_next_token ($) {
         $self->{state} = ENTITY_HASH_STATE;
         $self->{state_keyword} = '#';
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ((0x0041 <= $self->{next_char} and
@@ -3769,11 +3226,7 @@ sub _get_next_token ($) {
         $self->{entity__value} = $self->{state_keyword};
         $self->{entity__match} = 0;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -3789,18 +3242,18 @@ sub _get_next_token ($) {
       ## appended to the parent element or the attribute value in later
       ## process of the tokenizer.
 
-      if ($self->{entity_in_attr}) {
-        $self->{current_attribute}->{value} .= '&';
-        $self->{state} = $self->{last_attribute_value_state};
-        ## Reconsume.
-        redo A;
-      } else {
-        $self->{state} = DATA_STATE;
+      if ($self->{prev_state} == DATA_STATE) {
+        $self->{state} = $self->{prev_state};
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => '&',
                   line => $self->{line_prev},
                   column => $self->{column_prev},
                  });
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= '&';
+        $self->{state} = $self->{prev_state};
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == ENTITY_HASH_STATE) {
@@ -3809,11 +3262,7 @@ sub _get_next_token ($) {
         $self->{state} = HEXREF_X_STATE;
         $self->{state_keyword} .= chr $self->{next_char};
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif (0x0030 <= $self->{next_char} and
@@ -3821,11 +3270,7 @@ sub _get_next_token ($) {
         $self->{state} = NCR_NUM_STATE;
         $self->{state_keyword} = $self->{next_char} - 0x0030;
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } else {
@@ -3838,19 +3283,19 @@ sub _get_next_token ($) {
         ## and then "&#" is appended to the parent element or the attribute 
         ## value in the later processing.
 
-        if ($self->{entity_in_attr}) {
-          $self->{current_attribute}->{value} .= '&#';
-          $self->{state} = $self->{last_attribute_value_state};
-          ## Reconsume.
-          redo A;
-        } else {
-          $self->{state} = DATA_STATE;
+        if ($self->{prev_state} == DATA_STATE) {
+          $self->{state} = $self->{prev_state};
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
                     data => '&#',
                     line => $self->{line_prev},
                     column => $self->{column_prev} - 1,
                    });
+          redo A;
+        } else {
+          $self->{current_attribute}->{value} .= '&#';
+          $self->{state} = $self->{prev_state};
+          ## Reconsume.
           redo A;
         }
       }
@@ -3863,21 +3308,13 @@ sub _get_next_token ($) {
         
         ## Stay in the state.
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003B) { # ;
         
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         #
       } else {
@@ -3915,19 +3352,18 @@ sub _get_next_token ($) {
         $code = $c1_entity_char->{$code};
       }
 
-      if ($self->{entity_in_attr}) {
-        $self->{current_attribute}->{value} .= chr $code;
-        $self->{current_attribute}->{has_reference} = 1;
-        $self->{state} = $self->{last_attribute_value_state};
-        ## Reconsume.
-        redo A;
-      } else {
-        $self->{state} = DATA_STATE;
+      if ($self->{prev_state} == DATA_STATE) {
+        $self->{state} = $self->{prev_state};
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => chr $code,
-                  has_reference => 1,
                   line => $l, column => $c,
                  });
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= chr $code;
+        $self->{current_attribute}->{has_reference} = 1;
+        $self->{state} = $self->{prev_state};
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == HEXREF_X_STATE) {
@@ -3949,19 +3385,19 @@ sub _get_next_token ($) {
         ## and then "&#" followed by "X" or "x" is appended to the parent
         ## element or the attribute value in the later processing.
 
-        if ($self->{entity_in_attr}) {
-          $self->{current_attribute}->{value} .= '&' . $self->{state_keyword};
-          $self->{state} = $self->{last_attribute_value_state};
-          ## Reconsume.
-          redo A;
-        } else {
-          $self->{state} = DATA_STATE;
+        if ($self->{prev_state} == DATA_STATE) {
+          $self->{state} = $self->{prev_state};
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
                     data => '&' . $self->{state_keyword},
                     line => $self->{line_prev},
                     column => $self->{column_prev} - length $self->{state_keyword},
                    });
+          redo A;
+        } else {
+          $self->{current_attribute}->{value} .= '&' . $self->{state_keyword};
+          $self->{state} = $self->{prev_state};
+          ## Reconsume.
           redo A;
         }
       }
@@ -3973,11 +3409,7 @@ sub _get_next_token ($) {
         $self->{state_keyword} += $self->{next_char} - 0x0030;
         ## Stay in the state.
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif (0x0061 <= $self->{next_char} and
@@ -3987,11 +3419,7 @@ sub _get_next_token ($) {
         $self->{state_keyword} += $self->{next_char} - 0x0060 + 9;
         ## Stay in the state.
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif (0x0041 <= $self->{next_char} and
@@ -4001,21 +3429,13 @@ sub _get_next_token ($) {
         $self->{state_keyword} += $self->{next_char} - 0x0040 + 9;
         ## Stay in the state.
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         redo A;
       } elsif ($self->{next_char} == 0x003B) { # ;
         
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
         #
       } else {
@@ -4052,19 +3472,18 @@ sub _get_next_token ($) {
         $code = $c1_entity_char->{$code};
       }
 
-      if ($self->{entity_in_attr}) {
-        $self->{current_attribute}->{value} .= chr $code;
-        $self->{current_attribute}->{has_reference} = 1;
-        $self->{state} = $self->{last_attribute_value_state};
-        ## Reconsume.
-        redo A;
-      } else {
-        $self->{state} = DATA_STATE;
+      if ($self->{prev_state} == DATA_STATE) {
+        $self->{state} = $self->{prev_state};
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => chr $code,
-                  has_reference => 1,
                   line => $l, column => $c,
                  });
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= chr $code;
+        $self->{current_attribute}->{has_reference} = 1;
+        $self->{state} = $self->{prev_state};
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == ENTITY_NAME_STATE) {
@@ -4085,11 +3504,7 @@ sub _get_next_token ($) {
             $self->{entity__value} = $EntityChar->{$self->{state_keyword}};
             $self->{entity__match} = 1;
             
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
             #
           } else {
@@ -4098,11 +3513,7 @@ sub _get_next_token ($) {
             $self->{entity__match} = -1;
             ## Stay in the state.
             
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
             redo A;
           }
@@ -4112,11 +3523,7 @@ sub _get_next_token ($) {
           $self->{entity__match} *= 2;
           ## Stay in the state.
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
+    $self->{set_next_char}->($self);
   
           redo A;
         }
@@ -4131,7 +3538,8 @@ sub _get_next_token ($) {
         #
       } elsif ($self->{entity__match} < 0) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc');
-        if ($self->{entity_in_attr} and $self->{entity__match} < -1) {
+        if ($self->{prev_state} != DATA_STATE and # in attribute
+            $self->{entity__match} < -1) {
           
           $data = '&' . $self->{state_keyword};
           #
@@ -4160,20 +3568,20 @@ sub _get_next_token ($) {
       ## that would not be consumed are appended in the data state or in an
       ## appropriate attribute value state anyway.
  
-      if ($self->{entity_in_attr}) {
-        $self->{current_attribute}->{value} .= $data;
-        $self->{current_attribute}->{has_reference} = 1 if $has_ref;
-        $self->{state} = $self->{last_attribute_value_state};
-        ## Reconsume.
-        redo A;
-      } else {
-        $self->{state} = DATA_STATE;
+      if ($self->{prev_state} == DATA_STATE) {
+        $self->{state} = $self->{prev_state};
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN,
-                  data => $data, has_reference => $has_ref,
+                  data => $data,
                   line => $self->{line_prev},
                   column => $self->{column_prev} + 1 - length $self->{state_keyword},
                  });
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= $data;
+        $self->{current_attribute}->{has_reference} = 1 if $has_ref;
+        $self->{state} = $self->{prev_state};
+        ## Reconsume.
         redo A;
       }
     } else {
@@ -9688,4 +9096,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 10:49:21 $
+# $Date: 2008/09/13 11:31:08 $
