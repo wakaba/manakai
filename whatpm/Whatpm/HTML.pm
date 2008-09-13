@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.159 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.160 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -804,9 +804,10 @@ sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
 sub SELF_CLOSING_START_TAG_STATE () { 34 }
 sub CDATA_BLOCK_STATE () { 35 }
-sub MD_HYPHEN_STATE () { 36 }
-sub MD_DOCTYPE_STATE () { 37 }
-sub MD_CDATA_STATE () { 38 }
+sub MD_HYPHEN_STATE () { 36 } # "markup declaration open state" in the spec
+sub MD_DOCTYPE_STATE () { 37 } # "markup declaration open state" in the spec
+sub MD_CDATA_STATE () { 38 } # "markup declaration open state" in the spec
+sub CDATA_PCDATA_CLOSE_TAG_STATE () { 39 } # "close tag open state" in the spec
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -1182,63 +1183,18 @@ sub _get_next_token ($) {
         die "$0: $self->{content_model} in tag open";
       }
     } elsif ($self->{state} == CLOSE_TAG_OPEN_STATE) {
+      ## NOTE: The "close tag open state" in the spec is implemented as
+      ## |CLOSE_TAG_OPEN_STATE| and |CDATA_PCDATA_CLOSE_TAG_STATE|.
+
       my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1); # "<"of"</"
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if (defined $self->{last_emitted_start_tag_name}) {
 
-          ## NOTE: <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>
-          my @next_char;
-          TAGNAME: for (my $i = 0; $i < length $self->{last_emitted_start_tag_name}; $i++) {
-            push @next_char, $self->{next_char};
-            my $c = ord substr ($self->{last_emitted_start_tag_name}, $i, 1);
-            my $C = 0x0061 <= $c && $c <= 0x007A ? $c - 0x0020 : $c;
-            if ($self->{next_char} == $c or $self->{next_char} == $C) {
-              
-              
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-              next TAGNAME;
-            } else {
-              
-              $self->{next_char} = shift @next_char; # reconsume
-              unshift @{$self->{char}},  (@next_char);
-              $self->{state} = DATA_STATE;
-
-              return  ({type => CHARACTER_TOKEN, data => '</',
-                        line => $l, column => $c,
-                       });
-  
-              redo A;
-            }
-          }
-          push @next_char, $self->{next_char};
-      
-          unless ($self->{next_char} == 0x0009 or # HT
-                  $self->{next_char} == 0x000A or # LF
-                  $self->{next_char} == 0x000B or # VT
-                  $self->{next_char} == 0x000C or # FF
-                  $self->{next_char} == 0x0020 or # SP 
-                  $self->{next_char} == 0x003E or # >
-                  $self->{next_char} == 0x002F or # /
-                  $self->{next_char} == -1) {
-            
-            $self->{next_char} = shift @next_char; # reconsume
-            unshift @{$self->{char}},  (@next_char);
-            $self->{state} = DATA_STATE;
-            return  ({type => CHARACTER_TOKEN, data => '</',
-                      line => $l, column => $c,
-                     });
-            redo A;
-          } else {
-            
-            $self->{next_char} = shift @next_char;
-            unshift @{$self->{char}},  (@next_char);
-            # and consume...
-          }
+          ## NOTE: See <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>.
+          $self->{state} = CDATA_PCDATA_CLOSE_TAG_STATE;
+          $self->{state_keyword} = '';
+          ## Reconsume.
+          redo A;
         } else {
           ## No start tag token has ever been emitted
           
@@ -1250,7 +1206,7 @@ sub _get_next_token ($) {
           redo A;
         }
       }
-      
+
       if (0x0041 <= $self->{next_char} and
           $self->{next_char} <= 0x005A) { # A..Z
         
@@ -1315,8 +1271,74 @@ sub _get_next_token ($) {
                                   line => $self->{line_prev}, # "<" of "</"
                                   column => $self->{column_prev} - 1,
                                  };
-        ## $self->{next_char} is intentionally left as is
+        ## NOTE: $self->{next_char} is intentionally left as is.
+        ## Although the "anything else" case of the spec not explicitly
+        ## states that the next input character is to be reconsumed,
+        ## it will be included to the |data| of the comment token
+        ## generated from the bogus end tag, as defined in the
+        ## "bogus comment state" entry.
         redo A;
+      }
+    } elsif ($self->{state} == CDATA_PCDATA_CLOSE_TAG_STATE) {
+      my $ch = substr $self->{last_emitted_start_tag_name}, length $self->{state_keyword}, 1;
+      if (length $ch) {
+        my $CH = $ch;
+        $ch =~ tr/a-z/A-Z/;
+        my $nch = chr $self->{next_char};
+        if ($nch eq $ch or $nch eq $CH) {
+          
+          ## Stay in the state.
+          $self->{state_keyword} .= $nch;
+          
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+          redo A;
+        } else {
+          
+          $self->{state} = DATA_STATE;
+          ## Reconsume.
+          return  ({type => CHARACTER_TOKEN,
+                    data => '</' . $self->{state_keyword},
+                    line => $self->{line_prev},
+                    column => $self->{column_prev} - 1 - length $self->{state_keyword},
+                   });
+          redo A;
+        }
+      } else { # after "<{tag-name}"
+        unless ({
+                 0x0009 => 1, # HT
+                 0x000A => 1, # LF
+                 0x000B => 1, # VT
+                 0x000C => 1, # FF
+                 0x0020 => 1, # SP
+                 0x003E => 1, # >
+                 0x002F => 1, # /
+                 -1 => 1, # EOF
+                }->{$self->{next_char}}) {
+          
+          ## Reconsume.
+          $self->{state} = DATA_STATE;
+          return  ({type => CHARACTER_TOKEN,
+                    data => '</' . $self->{state_keyword},
+                    line => $self->{line_prev},
+                    column => $self->{column_prev} - 1 - length $self->{state_keyword},
+                   });
+          redo A;
+        } else {
+          
+          $self->{current_token}
+              = {type => END_TAG_TOKEN,
+                 tag_name => $self->{last_emitted_start_tag_name},
+                 line => $self->{line_prev},
+                 column => $self->{column_prev} - 1 - length $self->{state_keyword}};
+          $self->{state} = TAG_NAME_STATE;
+          ## Reconsume.
+          redo A;
+        }
       }
     } elsif ($self->{state} == TAG_NAME_STATE) {
       if ($self->{next_char} == 0x0009 or # HT
@@ -2393,7 +2415,7 @@ sub _get_next_token ($) {
 
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment',
                       line => $self->{line_prev},
-                      column_prev => $self->{column_prev} - 1);
+                      column => $self->{column_prev} - 1);
       ## Reconsume.
       $self->{state} = BOGUS_COMMENT_STATE;
       $self->{current_token} = {type => COMMENT_TOKEN, data => '',
@@ -9521,4 +9543,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 04:19:55 $
+# $Date: 2008/09/13 06:33:39 $

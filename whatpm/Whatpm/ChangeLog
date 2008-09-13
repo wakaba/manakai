@@ -1,5 +1,12 @@
 2008-09-13  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: |CLOSE_TAG_OPEN_STATE| is broken into
+	itself and new |CDATA_PCDATA_CLOSE_TAG_STATE| so that
+	no longer does the tokenizer have to push back next input
+	characters in those states.
+
+2008-09-13  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: |MARKUP_DECLARATION_OPEN_STATE| broken
 	into four states so that no longer does the tokenizer have to push
 	back next input characters in that state.
