@@ -49,6 +49,7 @@ if ($DEBUG) {
 
 for my $file_name (grep {$_} split /\s+/, qq[
                       ${test_dir_name}tokenizer-test-2.dat
+                      ${test_dir_name}tokenizer-test-3.dat
                       ${dir_name}tests1.dat
                       ${dir_name}tests2.dat
                       ${dir_name}tests3.dat
@@ -219,4 +220,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/09/05 17:57:47 $
+## $Date: 2008/09/13 04:19:56 $

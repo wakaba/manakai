@@ -1,0 +1,87 @@
+#data
+<!DOCTYPE HTML>
+<p><svg><![CDATA[aa<p>aa]]></svg>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <svg>
+|         "aa<p>aa"
+
+#data
+<!DOCTYPE HTML>
+<p><svg><![CDATA aa<p>aa]]></svg>
+#errors
+bogus <!
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <svg>
+|         <!-- [CDATA aa<p -->
+|         "aa]]>"
+
+#data
+<!DOCTYPE HTML>
+<p><svg><![CDATa[aa<p>aa]]></svg>
+#errors
+bogus <!
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <svg>
+|         <!-- [CDATa[aa<p -->
+|         "aa]]>"
+
+#data
+<!DOCTYPE HTML>
+<p><svg><![CD[aa<p>aa]]></svg>
+#errors
+bogus <!
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <svg>
+|         <!-- [CD[aa<p -->
+|         "aa]]>"
+
+#data
+<!DOCTYPE HTML>
+<p><svg><![C[aa<p>aa]]></svg>
+#errors
+bogus <!
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <svg>
+|         <!-- [C[aa<p -->
+|         "aa]]>"
+
+#data
+<!DOCTYPE HTML>
+<p><svg><![[aa<p>aa]]></svg>
+#errors
+bogus <!
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <svg>
+|         <!-- [[aa<p -->
+|         "aa]]>"

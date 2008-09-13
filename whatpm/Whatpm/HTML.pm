@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.158 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.159 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -804,6 +804,9 @@ sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
 sub SELF_CLOSING_START_TAG_STATE () { 34 }
 sub CDATA_BLOCK_STATE () { 35 }
+sub MD_HYPHEN_STATE () { 36 }
+sub MD_DOCTYPE_STATE () { 37 }
+sub MD_CDATA_STATE () { 38 }
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -856,6 +859,7 @@ sub IN_COLUMN_GROUP_IM () { 0b10 }
 sub _initialize_tokenizer ($) {
   my $self = shift;
   $self->{state} = DATA_STATE; # MUST
+  #$self->{state_keyword}; # initialized when used
   $self->{content_model} = PCDATA_CONTENT_MODEL; # be
   undef $self->{current_token}; # start tag, end tag, comment, or DOCTYPE
   undef $self->{current_attribute};
@@ -2343,40 +2347,10 @@ sub _get_next_token ($) {
       die "$0: _get_next_token: unexpected case [BC]";
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## (only happen if PCDATA state)
-
-      my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1);
-
-      my @next_char;
-      push @next_char, $self->{next_char};
       
       if ($self->{next_char} == 0x002D) { # -
         
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-        push @next_char, $self->{next_char};
-        if ($self->{next_char} == 0x002D) { # -
-          
-          $self->{current_token} = {type => COMMENT_TOKEN, data => '',
-                                    line => $l, column => $c,
-                                   };
-          $self->{state} = COMMENT_START_STATE;
-          
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-          redo A;
-        } else {
-          
-        }
-      } elsif ($self->{next_char} == 0x0044 or # D
-               $self->{next_char} == 0x0064) { # d
+        $self->{state} = MD_HYPHEN_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -2384,95 +2358,27 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
-        push @next_char, $self->{next_char};
-        if ($self->{next_char} == 0x004F or # O
-            $self->{next_char} == 0x006F) { # o
-          
+        redo A;
+      } elsif ($self->{next_char} == 0x0044 or # D
+               $self->{next_char} == 0x0064) { # d
+        ## ASCII case-insensitive.
+        
+        $self->{state} = MD_DOCTYPE_STATE;
+        $self->{state_keyword} = chr $self->{next_char};
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
         $self->{set_next_char}->($self);
       }
   
-          push @next_char, $self->{next_char};
-          if ($self->{next_char} == 0x0043 or # C
-              $self->{next_char} == 0x0063) { # c
-            
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-            push @next_char, $self->{next_char};
-            if ($self->{next_char} == 0x0054 or # T
-                $self->{next_char} == 0x0074) { # t
-              
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-              push @next_char, $self->{next_char};
-              if ($self->{next_char} == 0x0059 or # Y
-                  $self->{next_char} == 0x0079) { # y
-                
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                push @next_char, $self->{next_char};
-                if ($self->{next_char} == 0x0050 or # P
-                    $self->{next_char} == 0x0070) { # p
-                  
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                  push @next_char, $self->{next_char};
-                  if ($self->{next_char} == 0x0045 or # E
-                      $self->{next_char} == 0x0065) { # e
-                    
-                    ## TODO: What a stupid code this is!
-                    $self->{state} = DOCTYPE_STATE;
-                    $self->{current_token} = {type => DOCTYPE_TOKEN,
-                                              quirks => 1,
-                                              line => $l, column => $c,
-                                             };
-                    
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                    redo A;
-                  } else {
-                    
-                  }
-                } else {
-                  
-                }
-              } else {
-                
-              }
-            } else {
-              
-            }
-          } else {
-            
-          }
-        } else {
-          
-        }
+        redo A;
       } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
                $self->{open_elements}->[-1]->[1] & FOREIGN_EL and
                $self->{next_char} == 0x005B) { # [
+                        
+        $self->{state} = MD_CDATA_STATE;
+        $self->{state_keyword} = '[';
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -2480,96 +2386,157 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
-        push @next_char, $self->{next_char};
-        if ($self->{next_char} == 0x0043) { # C
-          
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-          push @next_char, $self->{next_char};
-          if ($self->{next_char} == 0x0044) { # D
-            
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-            push @next_char, $self->{next_char};
-            if ($self->{next_char} == 0x0041) { # A
-              
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-              push @next_char, $self->{next_char};
-              if ($self->{next_char} == 0x0054) { # T
-                
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                push @next_char, $self->{next_char};
-                if ($self->{next_char} == 0x0041) { # A
-                  
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                  push @next_char, $self->{next_char};
-                  if ($self->{next_char} == 0x005B) { # [
-                    
-                    $self->{state} = CDATA_BLOCK_STATE;
-                    
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                    redo A;
-                  } else {
-                    
-                  }
-                } else {
-                  
-                }
-              } else {
-                                
-              }
-            } else {
-              
-            }
-          } else {
-            
-          }
-        } else {
-          
-        }
+        redo A;
       } else {
         
       }
 
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment');
-      $self->{next_char} = shift @next_char;
-      unshift @{$self->{char}},  (@next_char);
+      $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment',
+                      line => $self->{line_prev},
+                      column_prev => $self->{column_prev} - 1);
+      ## Reconsume.
       $self->{state} = BOGUS_COMMENT_STATE;
       $self->{current_token} = {type => COMMENT_TOKEN, data => '',
-                                line => $l, column => $c,
+                                line => $self->{line_prev},
+                                column => $self->{column_prev} - 1,
                                };
       redo A;
-      
-      ## ISSUE: typos in spec: chacacters, is is a parse error
-      ## ISSUE: spec is somewhat unclear on "is the first character that will be in the comment"; what is "that will be in the comment" is what the algorithm defines, isn't it?
+    } elsif ($self->{state} == MD_HYPHEN_STATE) {
+      if ($self->{next_char} == 0x002D) { # -
+        
+        $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+                                  line => $self->{line_prev},
+                                  column => $self->{column_prev} - 2,
+                                 };
+        $self->{state} = COMMENT_START_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 2);
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{current_token} = {type => COMMENT_TOKEN,
+                                  data => '-',
+                                  line => $self->{line_prev},
+                                  column => $self->{column_prev} - 2,
+                                 };
+        redo A;
+      }
+    } elsif ($self->{state} == MD_DOCTYPE_STATE) {
+      ## ASCII case-insensitive.
+      if ($self->{next_char} == [
+            undef,
+            0x004F, # O
+            0x0043, # C
+            0x0054, # T
+            0x0059, # Y
+            0x0050, # P
+          ]->[length $self->{state_keyword}] or
+          $self->{next_char} == [
+            undef,
+            0x006F, # o
+            0x0063, # c
+            0x0074, # t
+            0x0079, # y
+            0x0070, # p
+          ]->[length $self->{state_keyword}]) {
+        
+        ## Stay in the state.
+        $self->{state_keyword} .= chr $self->{next_char};
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } elsif ((length $self->{state_keyword}) == 6 and
+               ($self->{next_char} == 0x0045 or # E
+                $self->{next_char} == 0x0065)) { # e
+        
+        $self->{state} = DOCTYPE_STATE;
+        $self->{current_token} = {type => DOCTYPE_TOKEN,
+                                  quirks => 1,
+                                  line => $self->{line_prev},
+                                  column => $self->{column_prev} - 7,
+                                 };
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } else {
+                
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 1 - length $self->{state_keyword});
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{current_token} = {type => COMMENT_TOKEN,
+                                  data => $self->{state_keyword},
+                                  line => $self->{line_prev},
+                                  column => $self->{column_prev} - 1 - length $self->{state_keyword},
+                                 };
+        redo A;
+      }
+    } elsif ($self->{state} == MD_CDATA_STATE) {
+      if ($self->{next_char} == {
+            '[' => 0x0043, # C
+            '[C' => 0x0044, # D
+            '[CD' => 0x0041, # A
+            '[CDA' => 0x0054, # T
+            '[CDAT' => 0x0041, # A
+          }->{$self->{state_keyword}}) {
+        
+        ## Stay in the state.
+        $self->{state_keyword} .= chr $self->{next_char};
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{state_keyword} eq '[CDATA' and
+               $self->{next_char} == 0x005B) { # [
+        
+        $self->{state} = CDATA_BLOCK_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 1 - length $self->{state_keyword});
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{current_token} = {type => COMMENT_TOKEN,
+                                  data => $self->{state_keyword},
+                                  line => $self->{line_prev},
+                                  column => $self->{column_prev} - 1 - length $self->{state_keyword},
+                                 };
+        redo A;
+      }
     } elsif ($self->{state} == COMMENT_START_STATE) {
       if ($self->{next_char} == 0x002D) { # -
         
@@ -9554,4 +9521,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/11 09:12:27 $
+# $Date: 2008/09/13 04:19:55 $
