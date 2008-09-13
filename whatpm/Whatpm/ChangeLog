@@ -1,6 +1,12 @@
 2008-09-13  Wakaba  <wakaba@suika.fam.cx>
 
-	* HTML.pm: "Consume a character reference" algorithm is
+	* HTML.pm.src: Finally we get rid of all the inner loops.  Remove
+	entity related tokenizer states in favor of new states
+	implementing the consume character reference algorithm.
+
+2008-09-13  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTML.pm.src: "Consume a character reference" algorithm is
 	now implemented as a tokenizer's state, rather than
 	a method, with minimum changes (more changes will
 	be made, in due course).  "Bogus comment state"'s inner
@@ -8,7 +14,7 @@
 
 2008-09-13  Wakaba  <wakaba@suika.fam.cx>
 
-	* HTML.pm: Make |PUBLIC| and |SYSTEM| keyword tokenizing
+	* HTML.pm.src: Make |PUBLIC| and |SYSTEM| keyword tokenizing
 	into their own tokenizer states.
 
 2008-09-13  Wakaba  <wakaba@suika.fam.cx>

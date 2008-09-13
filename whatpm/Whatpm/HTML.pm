@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.163 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.164 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -769,7 +769,7 @@ sub RCDATA_CONTENT_MODEL () { CM_ENTITY | CM_LIMITED_MARKUP }
 sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
 
 sub DATA_STATE () { 0 }
-sub ENTITY_DATA_STATE () { 1 }
+#sub ENTITY_DATA_STATE () { 1 }
 sub TAG_OPEN_STATE () { 2 }
 sub CLOSE_TAG_OPEN_STATE () { 3 }
 sub TAG_NAME_STATE () { 4 }
@@ -780,7 +780,7 @@ sub BEFORE_ATTRIBUTE_VALUE_STATE () { 8 }
 sub ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE () { 9 }
 sub ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE () { 10 }
 sub ATTRIBUTE_VALUE_UNQUOTED_STATE () { 11 }
-sub ENTITY_IN_ATTRIBUTE_VALUE_STATE () { 12 }
+#sub ENTITY_IN_ATTRIBUTE_VALUE_STATE () { 12 }
 sub MARKUP_DECLARATION_OPEN_STATE () { 13 }
 sub COMMENT_START_STATE () { 14 }
 sub COMMENT_START_DASH_STATE () { 15 }
@@ -813,6 +813,11 @@ sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 sub PUBLIC_STATE () { 42 } # "after DOCTYPE name state" in the spec
 sub SYSTEM_STATE () { 43 } # "after DOCTYPE name state" in the spec
 sub ENTITY_STATE () { 44 } # "consume a character reference" in the spec
+sub ENTITY_HASH_STATE () { 45 } # "consume a character reference" in the spec
+sub NCR_NUM_STATE () { 46 } # "consume a character reference" in the spec
+sub HEXREF_X_STATE () { 47 } # "consume a character reference" in the spec
+sub HEXREF_HEX_STATE () { 48 } # "consume a character reference" in the spec
+sub ENTITY_NAME_STATE () { 49 } # "consume a character reference" in the spec
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -951,7 +956,6 @@ sub _get_next_token ($) {
           ## "entity data state".  In this implementation, the tokenizer
           ## is switched to the |ENTITY_STATE|, which is an implementation
           ## of the "consume a character reference" algorithm.
-          #$self->{state} = ENTITY_DATA_STATE;
           $self->{entity_in_attr} = 0;
           $self->{entity_additional} = -1;
           $self->{state} = ENTITY_STATE;
@@ -1040,25 +1044,6 @@ sub _get_next_token ($) {
   
 
       return  ($token);
-
-      redo A;
-    } elsif ($self->{state} == ENTITY_DATA_STATE) {
-      my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
-
-      my $token = $self->{entity_return};
-
-      $self->{state} = DATA_STATE;
-      # next-input-character is already done
-
-      unless (defined $token) {
-        
-        return  ({type => CHARACTER_TOKEN, data => '&',
-                  line => $l, column => $c,
-                 });
-      } else {
-        
-        return  ($token);
-      }
 
       redo A;
     } elsif ($self->{state} == TAG_OPEN_STATE) {
@@ -1967,7 +1952,6 @@ sub _get_next_token ($) {
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        #$self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         $self->{entity_in_attr} = 1;
         $self->{entity_additional} = 0x0022; # "
         $self->{state} = ENTITY_STATE;
@@ -2034,7 +2018,6 @@ sub _get_next_token ($) {
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        #$self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         $self->{entity_in_attr} = 1;
         $self->{entity_additional} = 0x0027; # '
         $self->{state} = ENTITY_STATE;
@@ -2105,7 +2088,6 @@ sub _get_next_token ($) {
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        #$self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         $self->{entity_in_attr} = 1;
         $self->{entity_additional} = -1;
         $self->{state} = ENTITY_STATE;
@@ -2190,22 +2172,6 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == ENTITY_IN_ATTRIBUTE_VALUE_STATE) {
-      my $token = $self->{entity_return};
-
-      unless (defined $token) {
-        
-        $self->{current_attribute}->{value} .= '&';
-      } else {
-        
-        $self->{current_attribute}->{value} .= $token->{data};
-	$self->{current_attribute}->{has_reference} = $token->{has_reference};
-        ## ISSUE: spec says "append the returned character token to the current attribute's value"
-      }
-
-      $self->{state} = $self->{last_attribute_value_state};
-      # next-input-character is already done
-      redo A;
     } elsif ($self->{state} == AFTER_ATTRIBUTE_VALUE_QUOTED_STATE) {
       if ($self->{next_char} == 0x0009 or # HT
           $self->{next_char} == 0x000A or # LF
@@ -3771,37 +3737,20 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
-
     } elsif ($self->{state} == ENTITY_STATE) {
-      my $in_attr = $self->{entity_in_attr};
-      my $additional = $self->{entity_additional};
-
-  my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
-
-  if ({
-       0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, # HT, LF, VT, FF,
-       0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, & # 0x000D # CR
-       $additional => 1,
+      if ({
+        0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, # HT, LF, VT, FF,
+        0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, &
+        $self->{entity_additional} => 1,
       }->{$self->{next_char}}) {
-    
-    ## Don't consume
-    ## No error
-    $self->{entity_return} = undef;
-    $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
-    redo A;
-  } elsif ($self->{next_char} == 0x0023) { # #
-    
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-    if ($self->{next_char} == 0x0078 or # x
-        $self->{next_char} == 0x0058) { # X
-      my $code;
-      X: {
-        my $x_char = $self->{next_char};
+        
+        ## Don't consume
+        ## No error
+        ## Return nothing.
+        #
+      } elsif ($self->{next_char} == 0x0023) { # #
+        $self->{state} = ENTITY_HASH_STATE;
+        $self->{state_keyword} = '#';
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -3809,95 +3758,16 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
-        if (0x0030 <= $self->{next_char} and 
-            $self->{next_char} <= 0x0039) { # 0..9
-          
-          $code ||= 0;
-          $code *= 0x10;
-          $code += $self->{next_char} - 0x0030;
-          redo X;
-        } elsif (0x0061 <= $self->{next_char} and
-                 $self->{next_char} <= 0x0066) { # a..f
-          
-          $code ||= 0;
-          $code *= 0x10;
-          $code += $self->{next_char} - 0x0060 + 9;
-          redo X;
-        } elsif (0x0041 <= $self->{next_char} and
-                 $self->{next_char} <= 0x0046) { # A..F
-          
-          $code ||= 0;
-          $code *= 0x10;
-          $code += $self->{next_char} - 0x0040 + 9;
-          redo X;
-        } elsif (not defined $code) { # no hexadecimal digit
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare hcro', line => $l, column => $c);
-          unshift @{$self->{char}},  ($x_char, $self->{next_char});
-          $self->{next_char} = 0x0023; # #
-          $self->{entity_return} = undef;
-          $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
-          redo A;
-        } elsif ($self->{next_char} == 0x003B) { # ;
-          
-          
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-        } else {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc', line => $l, column => $c);
-        }
-
-        if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
-                          text => (sprintf 'U+%04X', $code),
-                          line => $l, column => $c);
-          $code = 0xFFFD;
-        } elsif ($code > 0x10FFFF) {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
-                          text => (sprintf 'U-%08X', $code),
-                          line => $l, column => $c);
-          $code = 0xFFFD;
-        } elsif ($code == 0x000D) {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'CR character reference', line => $l, column => $c);
-          $code = 0x000A;
-        } elsif (0x80 <= $code and $code <= 0x9F) {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'C1 character reference', text => (sprintf 'U+%04X', $code), line => $l, column => $c);
-          $code = $c1_entity_char->{$code};
-        }
-
-        $self->{entity_return} = {type => CHARACTER_TOKEN, data => chr $code,
-                has_reference => 1,
-                line => $l, column => $c,
-               };
-        $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
         redo A;
-      } # X
-    } elsif (0x0030 <= $self->{next_char} and
-             $self->{next_char} <= 0x0039) { # 0..9
-      my $code = $self->{next_char} - 0x0030;
-      
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-      
-      while (0x0030 <= $self->{next_char} and 
-                $self->{next_char} <= 0x0039) { # 0..9
-        
-        $code *= 10;
-        $code += $self->{next_char} - 0x0030;
-        
+      } elsif ((0x0041 <= $self->{next_char} and
+                $self->{next_char} <= 0x005A) or # A..Z
+               (0x0061 <= $self->{next_char} and
+                $self->{next_char} <= 0x007A)) { # a..z
+        require Whatpm::_NamedEntityList;
+        $self->{state} = ENTITY_NAME_STATE;
+        $self->{state_keyword} = chr $self->{next_char};
+        $self->{entity__value} = $self->{state_keyword};
+        $self->{entity__match} = 0;
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -3905,9 +3775,102 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero');
+        ## Return nothing.
+        #
       }
 
-      if ($self->{next_char} == 0x003B) { # ;
+      ## NOTE: No character is consumed by the "consume a character
+      ## reference" algorithm.  In other word, there is an "&" character
+      ## that does not introduce a character reference, which would be
+      ## appended to the parent element or the attribute value in later
+      ## process of the tokenizer.
+
+      if ($self->{entity_in_attr}) {
+        $self->{current_attribute}->{value} .= '&';
+        $self->{state} = $self->{last_attribute_value_state};
+        ## Reconsume.
+        redo A;
+      } else {
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        return  ({type => CHARACTER_TOKEN, data => '&',
+                  line => $self->{line_prev},
+                  column => $self->{column_prev},
+                 });
+        redo A;
+      }
+    } elsif ($self->{state} == ENTITY_HASH_STATE) {
+      if ($self->{next_char} == 0x0078 or # x
+          $self->{next_char} == 0x0058) { # X
+        $self->{state} = HEXREF_X_STATE;
+        $self->{state_keyword} .= chr $self->{next_char};
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } elsif (0x0030 <= $self->{next_char} and
+               $self->{next_char} <= 0x0039) { # 0..9
+        $self->{state} = NCR_NUM_STATE;
+        $self->{state_keyword} = $self->{next_char} - 0x0030;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare nero',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 1);
+
+        ## NOTE: According to the spec algorithm, nothing is returned,
+        ## and then "&#" is appended to the parent element or the attribute 
+        ## value in the later processing.
+
+        if ($self->{entity_in_attr}) {
+          $self->{current_attribute}->{value} .= '&#';
+          $self->{state} = $self->{last_attribute_value_state};
+          ## Reconsume.
+          redo A;
+        } else {
+          $self->{state} = DATA_STATE;
+          ## Reconsume.
+          return  ({type => CHARACTER_TOKEN,
+                    data => '&#',
+                    line => $self->{line_prev},
+                    column => $self->{column_prev} - 1,
+                   });
+          redo A;
+        }
+      }
+    } elsif ($self->{state} == NCR_NUM_STATE) {
+      if (0x0030 <= $self->{next_char} and 
+          $self->{next_char} <= 0x0039) { # 0..9
+        
+        $self->{state_keyword} *= 10;
+        $self->{state_keyword} += $self->{next_char} - 0x0030;
+        
+        ## Stay in the state.
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_char} == 0x003B) { # ;
         
         
       if (@{$self->{char}}) {
@@ -3916,11 +3879,17 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
+        #
       } else {
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc', line => $l, column => $c);
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc');
+        ## Reconsume.
+        #
       }
 
+      my $code = $self->{state_keyword};
+      my $l = $self->{line_prev};
+      my $c = $self->{column_prev};
       if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
@@ -3945,66 +3914,203 @@ sub _get_next_token ($) {
                         line => $l, column => $c);
         $code = $c1_entity_char->{$code};
       }
-      
-      $self->{entity_return} = {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1,
-              line => $l, column => $c,
-             };
-      $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
-      redo A;
-    } else {
-      
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare nero', line => $l, column => $c);
-      unshift @{$self->{char}},  ($self->{next_char});
-      $self->{next_char} = 0x0023; # #
-      $self->{entity_return} = undef;
-      $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
-      redo A;
-    }
-  } elsif ((0x0041 <= $self->{next_char} and
-            $self->{next_char} <= 0x005A) or
-           (0x0061 <= $self->{next_char} and
-            $self->{next_char} <= 0x007A)) {
-    my $entity_name = chr $self->{next_char};
-    
+
+      if ($self->{entity_in_attr}) {
+        $self->{current_attribute}->{value} .= chr $code;
+        $self->{current_attribute}->{has_reference} = 1;
+        $self->{state} = $self->{last_attribute_value_state};
+        ## Reconsume.
+        redo A;
+      } else {
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        return  ({type => CHARACTER_TOKEN, data => chr $code,
+                  has_reference => 1,
+                  line => $l, column => $c,
+                 });
+        redo A;
+      }
+    } elsif ($self->{state} == HEXREF_X_STATE) {
+      if ((0x0030 <= $self->{next_char} and $self->{next_char} <= 0x0039) or
+          (0x0041 <= $self->{next_char} and $self->{next_char} <= 0x0046) or
+          (0x0061 <= $self->{next_char} and $self->{next_char} <= 0x0066)) {
+        # 0..9, A..F, a..f
+        $self->{state} = HEXREF_HEX_STATE;
+        $self->{state_keyword} = 0;
+        ## Reconsume.
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare hcro',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 2);
+
+        ## NOTE: According to the spec algorithm, nothing is returned,
+        ## and then "&#" followed by "X" or "x" is appended to the parent
+        ## element or the attribute value in the later processing.
+
+        if ($self->{entity_in_attr}) {
+          $self->{current_attribute}->{value} .= '&' . $self->{state_keyword};
+          $self->{state} = $self->{last_attribute_value_state};
+          ## Reconsume.
+          redo A;
+        } else {
+          $self->{state} = DATA_STATE;
+          ## Reconsume.
+          return  ({type => CHARACTER_TOKEN,
+                    data => '&' . $self->{state_keyword},
+                    line => $self->{line_prev},
+                    column => $self->{column_prev} - length $self->{state_keyword},
+                   });
+          redo A;
+        }
+      }
+    } elsif ($self->{state} == HEXREF_HEX_STATE) {
+      if (0x0030 <= $self->{next_char} and $self->{next_char} <= 0x0039) {
+        # 0..9
+        
+        $self->{state_keyword} *= 0x10;
+        $self->{state_keyword} += $self->{next_char} - 0x0030;
+        ## Stay in the state.
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
         $self->{set_next_char}->($self);
       }
   
-
-    my $value = $entity_name;
-    my $match = 0;
-    require Whatpm::_NamedEntityList;
-    our $EntityChar;
-
-    while (length $entity_name < 30 and
-           ## NOTE: Some number greater than the maximum length of entity name
-           ((0x0041 <= $self->{next_char} and # a
-             $self->{next_char} <= 0x005A) or # x
-            (0x0061 <= $self->{next_char} and # a
-             $self->{next_char} <= 0x007A) or # z
-            (0x0030 <= $self->{next_char} and # 0
-             $self->{next_char} <= 0x0039) or # 9
-            $self->{next_char} == 0x003B)) { # ;
-      $entity_name .= chr $self->{next_char};
-      if (defined $EntityChar->{$entity_name}) {
-        if ($self->{next_char} == 0x003B) { # ;
-          
-          $value = $EntityChar->{$entity_name};
-          $match = 1;
-          
+        redo A;
+      } elsif (0x0061 <= $self->{next_char} and
+               $self->{next_char} <= 0x0066) { # a..f
+        
+        $self->{state_keyword} *= 0x10;
+        $self->{state_keyword} += $self->{next_char} - 0x0060 + 9;
+        ## Stay in the state.
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
         $self->{set_next_char}->($self);
       }
   
-          last;
+        redo A;
+      } elsif (0x0041 <= $self->{next_char} and
+               $self->{next_char} <= 0x0046) { # A..F
+        
+        $self->{state_keyword} *= 0x10;
+        $self->{state_keyword} += $self->{next_char} - 0x0040 + 9;
+        ## Stay in the state.
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_char} == 0x003B) { # ;
+        
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        #
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc',
+                        line => $self->{line},
+                        column => $self->{column});
+        ## Reconsume.
+        #
+      }
+
+      my $code = $self->{state_keyword};
+      my $l = $self->{line_prev};
+      my $c = $self->{column_prev};
+      if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
+                        text => (sprintf 'U+%04X', $code),
+                        line => $l, column => $c);
+        $code = 0xFFFD;
+      } elsif ($code > 0x10FFFF) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
+                        text => (sprintf 'U-%08X', $code),
+                        line => $l, column => $c);
+        $code = 0xFFFD;
+      } elsif ($code == 0x000D) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'CR character reference', line => $l, column => $c);
+        $code = 0x000A;
+      } elsif (0x80 <= $code and $code <= 0x9F) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'C1 character reference', text => (sprintf 'U+%04X', $code), line => $l, column => $c);
+        $code = $c1_entity_char->{$code};
+      }
+
+      if ($self->{entity_in_attr}) {
+        $self->{current_attribute}->{value} .= chr $code;
+        $self->{current_attribute}->{has_reference} = 1;
+        $self->{state} = $self->{last_attribute_value_state};
+        ## Reconsume.
+        redo A;
+      } else {
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        return  ({type => CHARACTER_TOKEN, data => chr $code,
+                  has_reference => 1,
+                  line => $l, column => $c,
+                 });
+        redo A;
+      }
+    } elsif ($self->{state} == ENTITY_NAME_STATE) {
+      if (length $self->{state_keyword} < 30 and
+          ## NOTE: Some number greater than the maximum length of entity name
+          ((0x0041 <= $self->{next_char} and # a
+            $self->{next_char} <= 0x005A) or # x
+           (0x0061 <= $self->{next_char} and # a
+            $self->{next_char} <= 0x007A) or # z
+           (0x0030 <= $self->{next_char} and # 0
+            $self->{next_char} <= 0x0039) or # 9
+           $self->{next_char} == 0x003B)) { # ;
+        our $EntityChar;
+        $self->{state_keyword} .= chr $self->{next_char};
+        if (defined $EntityChar->{$self->{state_keyword}}) {
+          if ($self->{next_char} == 0x003B) { # ;
+            
+            $self->{entity__value} = $EntityChar->{$self->{state_keyword}};
+            $self->{entity__match} = 1;
+            
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+            #
+          } else {
+            
+            $self->{entity__value} = $EntityChar->{$self->{state_keyword}};
+            $self->{entity__match} = -1;
+            ## Stay in the state.
+            
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+            redo A;
+          }
         } else {
           
-          $value = $EntityChar->{$entity_name};
-          $match = -1;
+          $self->{entity__value} .= chr $self->{next_char};
+          $self->{entity__match} *= 2;
+          ## Stay in the state.
           
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -4012,64 +4118,64 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
+          redo A;
+        }
+      }
+
+      my $data;
+      my $has_ref;
+      if ($self->{entity__match} > 0) {
+        
+        $data = $self->{entity__value};
+        $has_ref = 1;
+        #
+      } elsif ($self->{entity__match} < 0) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc');
+        if ($self->{entity_in_attr} and $self->{entity__match} < -1) {
+          
+          $data = '&' . $self->{state_keyword};
+          #
+        } else {
+          
+          $data = $self->{entity__value};
+          $has_ref = 1;
+          #
         }
       } else {
         
-        $value .= chr $self->{next_char};
-        $match *= 2;
-        
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev});
+        $data = '&' . $self->{state_keyword};
+        #
       }
   
-      }
-    }
-    
-    if ($match > 0) {
-      
-      $self->{entity_return} = {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
-              line => $l, column => $c,
-             };
-      $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
-      redo A;
-    } elsif ($match < 0) {
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc', line => $l, column => $c);
-      if ($in_attr and $match < -1) {
-        
-        $self->{entity_return} = {type => CHARACTER_TOKEN, data => '&'.$entity_name,
-                line => $l, column => $c,
-               };
-        $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+      ## NOTE: In these cases, when a character reference is found,
+      ## it is consumed and a character token is returned, or, otherwise,
+      ## nothing is consumed and returned, according to the spec algorithm.
+      ## In this implementation, anything that has been examined by the
+      ## tokenizer is appended to the parent element or the attribute value
+      ## as string, either literal string when no character reference or
+      ## entity-replaced string otherwise, in this stage, since any characters
+      ## that would not be consumed are appended in the data state or in an
+      ## appropriate attribute value state anyway.
+ 
+      if ($self->{entity_in_attr}) {
+        $self->{current_attribute}->{value} .= $data;
+        $self->{current_attribute}->{has_reference} = 1 if $has_ref;
+        $self->{state} = $self->{last_attribute_value_state};
+        ## Reconsume.
         redo A;
       } else {
-        
-        $self->{entity_return} = {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
-                line => $l, column => $c,
-               };
-        $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        return  ({type => CHARACTER_TOKEN,
+                  data => $data, has_reference => $has_ref,
+                  line => $self->{line_prev},
+                  column => $self->{column_prev} + 1 - length $self->{state_keyword},
+                 });
         redo A;
       }
-    } else {
-      
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero', line => $l, column => $c);
-      ## NOTE: "No characters are consumed" in the spec.
-      $self->{entity_return} = {type => CHARACTER_TOKEN, data => '&'.$value,
-              line => $l, column => $c,
-             };
-      $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
-      redo A;
-    }
-  } else {
-    
-    ## no characters are consumed
-    $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero', line => $l, column => $c);
-    $self->{entity_return} = undef;
-    $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
-    redo A;
-  }
-
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -9582,4 +9688,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 09:02:28 $
+# $Date: 2008/09/13 10:49:21 $
