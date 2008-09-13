@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.161 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.162 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -810,6 +810,8 @@ sub MD_CDATA_STATE () { 38 } # "markup declaration open state" in the spec
 sub CDATA_PCDATA_CLOSE_TAG_STATE () { 39 } # "close tag open state" in the spec
 sub CDATA_SECTION_MSE1_STATE () { 40 } # "CDATA section state" in the spec
 sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
+sub PUBLIC_STATE () { 42 } # "after DOCTYPE name state" in the spec
+sub SYSTEM_STATE () { 43 } # "after DOCTYPE name state" in the spec
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -2962,6 +2964,8 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_char} == 0x0050 or # P
                $self->{next_char} == 0x0070) { # p
+        $self->{state} = PUBLIC_STATE;
+        $self->{state_keyword} = chr $self->{next_char};
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -2969,73 +2973,11 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
-        if ($self->{next_char} == 0x0055 or # U
-            $self->{next_char} == 0x0075) { # u
-          
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-          if ($self->{next_char} == 0x0042 or # B
-              $self->{next_char} == 0x0062) { # b
-            
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-            if ($self->{next_char} == 0x004C or # L
-                $self->{next_char} == 0x006C) { # l
-              
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-              if ($self->{next_char} == 0x0049 or # I
-                  $self->{next_char} == 0x0069) { # i
-                
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                if ($self->{next_char} == 0x0043 or # C
-                    $self->{next_char} == 0x0063) { # c
-                  
-                  $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
-                  
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                  redo A;
-                } else {
-                  
-                }
-              } else {
-                
-              }
-            } else {
-              
-            }
-          } else {
-            
-          }
-        } else {
-          
-        }
-
-        #
+        redo A;
       } elsif ($self->{next_char} == 0x0053 or # S
                $self->{next_char} == 0x0073) { # s
+        $self->{state} = SYSTEM_STATE;
+        $self->{state_keyword} = chr $self->{next_char};
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -3043,73 +2985,13 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
-        if ($self->{next_char} == 0x0059 or # Y
-            $self->{next_char} == 0x0079) { # y
-          
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-          if ($self->{next_char} == 0x0053 or # S
-              $self->{next_char} == 0x0073) { # s
-            
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-            if ($self->{next_char} == 0x0054 or # T
-                $self->{next_char} == 0x0074) { # t
-              
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-              if ($self->{next_char} == 0x0045 or # E
-                  $self->{next_char} == 0x0065) { # e
-                
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                if ($self->{next_char} == 0x004D or # M
-                    $self->{next_char} == 0x006D) { # m
-                  
-                  $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
-                  
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                  redo A;
-                } else {
-                  
-                }
-              } else {
-                
-              }
-            } else {
-              
-            }
-          } else {
-            
-          }
-        } else {
-          
-        }
-
-        #
+        redo A;
       } else {
         
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name');
+        $self->{current_token}->{quirks} = 1;
+
+        $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -3117,15 +2999,110 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
-        #
+        redo A;
       }
+    } elsif ($self->{state} == PUBLIC_STATE) {
+      ## ASCII case-insensitive
+      if ($self->{next_char} == [
+            undef, 
+            0x0055, # U
+            0x0042, # B
+            0x004C, # L
+            0x0049, # I
+          ]->[length $self->{state_keyword}] or
+          $self->{next_char} == [
+            undef, 
+            0x0075, # u
+            0x0062, # b
+            0x006C, # l
+            0x0069, # i
+          ]->[length $self->{state_keyword}]) {
+        
+        ## Stay in the state.
+        $self->{state_keyword} .= chr $self->{next_char};
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } elsif ((length $self->{state_keyword}) == 5 and
+               ($self->{next_char} == 0x0043 or # C
+                $self->{next_char} == 0x0063)) { # c
+        
+        $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} + 1 - length $self->{state_keyword});
+        $self->{current_token}->{quirks} = 1;
 
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name');
-      $self->{current_token}->{quirks} = 1;
+        $self->{state} = BOGUS_DOCTYPE_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == SYSTEM_STATE) {
+      ## ASCII case-insensitive
+      if ($self->{next_char} == [
+            undef, 
+            0x0059, # Y
+            0x0053, # S
+            0x0054, # T
+            0x0045, # E
+          ]->[length $self->{state_keyword}] or
+          $self->{next_char} == [
+            undef, 
+            0x0079, # y
+            0x0073, # s
+            0x0074, # t
+            0x0065, # e
+          ]->[length $self->{state_keyword}]) {
+        
+        ## Stay in the state.
+        $self->{state_keyword} .= chr $self->{next_char};
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } elsif ((length $self->{state_keyword}) == 5 and
+               ($self->{next_char} == 0x004D or # M
+                $self->{next_char} == 0x006D)) { # m
+        
+        $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} + 1 - length $self->{state_keyword});
+        $self->{current_token}->{quirks} = 1;
 
-      $self->{state} = BOGUS_DOCTYPE_STATE;
-      # next-input-character is already done
-      redo A;
+        $self->{state} = BOGUS_DOCTYPE_STATE;
+        ## Reconsume.
+        redo A;
+      }
     } elsif ($self->{state} == BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
@@ -9568,4 +9545,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 07:51:32 $
+# $Date: 2008/09/13 08:21:35 $
