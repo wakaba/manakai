@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.164 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.165 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -803,11 +803,13 @@ sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
 sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
 sub SELF_CLOSING_START_TAG_STATE () { 34 }
-sub CDATA_BLOCK_STATE () { 35 }
+sub CDATA_SECTION_STATE () { 35 }
 sub MD_HYPHEN_STATE () { 36 } # "markup declaration open state" in the spec
 sub MD_DOCTYPE_STATE () { 37 } # "markup declaration open state" in the spec
 sub MD_CDATA_STATE () { 38 } # "markup declaration open state" in the spec
 sub CDATA_PCDATA_CLOSE_TAG_STATE () { 39 } # "close tag open state" in the spec
+sub CDATA_SECTION_MSE1_STATE () { 40 } # "CDATA section state" in the spec
+sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -862,7 +864,7 @@ sub _initialize_tokenizer ($) {
   $self->{state} = DATA_STATE; # MUST
   #$self->{state_keyword}; # initialized when used
   $self->{content_model} = PCDATA_CONTENT_MODEL; # be
-  undef $self->{current_token}; # start tag, end tag, comment, or DOCTYPE
+  undef $self->{current_token};
   undef $self->{current_attribute};
   undef $self->{last_emitted_start_tag_name};
   undef $self->{last_attribute_value_state};
@@ -2151,7 +2153,11 @@ sub _get_next_token ($) {
       } elsif ($self->{state_keyword} eq '[CDATA' and
                $self->{next_char} == 0x005B) { # [
         !!!cp (135.2);
-        $self->{state} = CDATA_BLOCK_STATE;
+        $self->{current_token} = {type => CHARACTER_TOKEN,
+                                  data => '',
+                                  line => $self->{line_prev},
+                                  column => $self->{column_prev} - 7};
+        $self->{state} = CDATA_SECTION_STATE;
         !!!next-input-character;
         redo A;
       } else {
@@ -2876,60 +2882,74 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       }
-    } elsif ($self->{state} == CDATA_BLOCK_STATE) {
-      my $s = '';
+    } elsif ($self->{state} == CDATA_SECTION_STATE) {
+      ## NOTE: "CDATA section state" in the state is jointly implemented
+      ## by three states, |CDATA_SECTION_STATE|, |CDATA_SECTION_MSE1_STATE|,
+      ## and |CDATA_SECTION_MSE2_STATE|.
       
-      my ($l, $c) = ($self->{line}, $self->{column});
-
-      CS: while ($self->{next_char} != -1) {
-        if ($self->{next_char} == 0x005D) { # ]
-          !!!next-input-character;
-          if ($self->{next_char} == 0x005D) { # ]
-            !!!next-input-character;
-            MDC: {
-              if ($self->{next_char} == 0x003E) { # >
-                !!!cp (221.1);
-                !!!next-input-character;
-                last CS;
-              } elsif ($self->{next_char} == 0x005D) { # ]
-                !!!cp (221.2);
-                $s .= ']';
-                !!!next-input-character;
-                redo MDC;
-              } else {
-                !!!cp (221.3);
-                $s .= ']]';
-                #
-              }
-            } # MDC
-          } else {
-            !!!cp (221.4);
-            $s .= ']';
-            #
-          }
-        } else {
-          !!!cp (221.5);
-          #
-        }
-        $s .= chr $self->{next_char};
+      if ($self->{next_char} == 0x005D) { # ]
+        !!!cp (221.1);
+        $self->{state} = CDATA_SECTION_MSE1_STATE;
         !!!next-input-character;
-      } # CS
-
-      $self->{state} = DATA_STATE;
-      ## next-input-character done or EOF, which is reconsumed.
-
-      if (length $s) {
-        !!!cp (221.6);
-        !!!emit ({type => CHARACTER_TOKEN, data => $s,
-                  line => $l, column => $c});
+        redo A;
+      } elsif ($self->{next_char} == -1) {
+        $self->{state} = DATA_STATE;
+        !!!next-input-character;
+        if (length $self->{current_token}->{data}) { # character
+          !!!cp (221.2);
+          !!!emit ($self->{current_token}); # character
+        } else {
+          !!!cp (221.3);
+          ## No token to emit. $self->{current_token} is discarded.
+        }        
+        redo A;
       } else {
-        !!!cp (221.7);
+        !!!cp (221.4);
+        $self->{current_token}->{data} .= chr $self->{next_char};
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
       }
 
-      redo A;
-
       ## ISSUE: "text tokens" in spec.
-      ## TODO: Streaming support
+    } elsif ($self->{state} == CDATA_SECTION_MSE1_STATE) {
+      if ($self->{next_char} == 0x005D) { # ]
+        !!!cp (221.5);
+        $self->{state} = CDATA_SECTION_MSE2_STATE;
+        !!!next-input-character;
+        redo A;
+      } else {
+        !!!cp (221.6);
+        $self->{current_token}->{data} .= ']';
+        $self->{state} = CDATA_SECTION_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == CDATA_SECTION_MSE2_STATE) {
+      if ($self->{next_char} == 0x003E) { # >
+        $self->{state} = DATA_STATE;
+        !!!next-input-character;
+        if (length $self->{current_token}->{data}) { # character
+          !!!cp (221.7);
+          !!!emit ($self->{current_token}); # character
+        } else {
+          !!!cp (221.8);
+          ## No token to emit. $self->{current_token} is discarded.
+        }
+        redo A;
+      } elsif ($self->{next_char} == 0x005D) { # ]
+        !!!cp (221.9); # character
+        $self->{current_token}->{data} .= ']'; ## Add first "]" of "]]]".
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
+      } else {
+        !!!cp (221.11);
+        $self->{current_token}->{data} .= ']]'; # character
+        $self->{state} = CDATA_SECTION_STATE;
+        ## Reconsume.
+        redo A;
+      }
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -7718,4 +7738,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 06:33:39 $
+# $Date: 2008/09/13 07:51:33 $

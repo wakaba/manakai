@@ -85,3 +85,19 @@ bogus <!
 |       <svg>
 |         <!-- [[aa<p -->
 |         "aa]]>"
+
+#data
+<!DOCTYPE HTML><svg><![CDATA[a]b]]c]]>d]]>e<g/>f</svg>g<p>h
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg>
+|       "a]b]]cd]]>e"
+|       <g>
+|       "f"
+|     "g"
+|     <p>
+|       "h"

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.160 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.161 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -803,11 +803,13 @@ sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
 sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
 sub SELF_CLOSING_START_TAG_STATE () { 34 }
-sub CDATA_BLOCK_STATE () { 35 }
+sub CDATA_SECTION_STATE () { 35 }
 sub MD_HYPHEN_STATE () { 36 } # "markup declaration open state" in the spec
 sub MD_DOCTYPE_STATE () { 37 } # "markup declaration open state" in the spec
 sub MD_CDATA_STATE () { 38 } # "markup declaration open state" in the spec
 sub CDATA_PCDATA_CLOSE_TAG_STATE () { 39 } # "close tag open state" in the spec
+sub CDATA_SECTION_MSE1_STATE () { 40 } # "CDATA section state" in the spec
+sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -862,7 +864,7 @@ sub _initialize_tokenizer ($) {
   $self->{state} = DATA_STATE; # MUST
   #$self->{state_keyword}; # initialized when used
   $self->{content_model} = PCDATA_CONTENT_MODEL; # be
-  undef $self->{current_token}; # start tag, end tag, comment, or DOCTYPE
+  undef $self->{current_token};
   undef $self->{current_attribute};
   undef $self->{last_emitted_start_tag_name};
   undef $self->{last_attribute_value_state};
@@ -1189,17 +1191,16 @@ sub _get_next_token ($) {
       my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1); # "<"of"</"
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if (defined $self->{last_emitted_start_tag_name}) {
-
-          ## NOTE: See <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>.
           $self->{state} = CDATA_PCDATA_CLOSE_TAG_STATE;
           $self->{state_keyword} = '';
           ## Reconsume.
           redo A;
         } else {
           ## No start tag token has ever been emitted
+          ## NOTE: See <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>.
           
-          # next-input-character is already done
           $self->{state} = DATA_STATE;
+          ## Reconsume.
           return  ({type => CHARACTER_TOKEN, data => '</',
                     line => $l, column => $c,
                    });
@@ -2536,7 +2537,11 @@ sub _get_next_token ($) {
       } elsif ($self->{state_keyword} eq '[CDATA' and
                $self->{next_char} == 0x005B) { # [
         
-        $self->{state} = CDATA_BLOCK_STATE;
+        $self->{current_token} = {type => CHARACTER_TOKEN,
+                                  data => '',
+                                  line => $self->{line_prev},
+                                  column => $self->{column_prev} - 7};
+        $self->{state} = CDATA_SECTION_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -3669,66 +3674,43 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == CDATA_BLOCK_STATE) {
-      my $s = '';
+    } elsif ($self->{state} == CDATA_SECTION_STATE) {
+      ## NOTE: "CDATA section state" in the state is jointly implemented
+      ## by three states, |CDATA_SECTION_STATE|, |CDATA_SECTION_MSE1_STATE|,
+      ## and |CDATA_SECTION_MSE2_STATE|.
       
-      my ($l, $c) = ($self->{line}, $self->{column});
-
-      CS: while ($self->{next_char} != -1) {
-        if ($self->{next_char} == 0x005D) { # ]
+      if ($self->{next_char} == 0x005D) { # ]
+        
+        $self->{state} = CDATA_SECTION_MSE1_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_char} == -1) {
+        $self->{state} = DATA_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        if (length $self->{current_token}->{data}) { # character
           
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-          if ($self->{next_char} == 0x005D) { # ]
-            
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-            MDC: {
-              if ($self->{next_char} == 0x003E) { # >
-                
-                
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                last CS;
-              } elsif ($self->{next_char} == 0x005D) { # ]
-                
-                $s .= ']';
-                
-      if (@{$self->{char}}) {
-        $self->{next_char} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_char}->($self);
-      }
-  
-                redo MDC;
-              } else {
-                
-                $s .= ']]';
-                #
-              }
-            } # MDC
-          } else {
-            
-            $s .= ']';
-            #
-          }
+          return  ($self->{current_token}); # character
         } else {
           
-          #
-        }
-        $s .= chr $self->{next_char};
+          ## No token to emit. $self->{current_token} is discarded.
+        }        
+        redo A;
+      } else {
+        
+        $self->{current_token}->{data} .= chr $self->{next_char};
+        ## Stay in the state.
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -3736,23 +3718,66 @@ sub _get_next_token ($) {
         $self->{set_next_char}->($self);
       }
   
-      } # CS
-
-      $self->{state} = DATA_STATE;
-      ## next-input-character done or EOF, which is reconsumed.
-
-      if (length $s) {
-        
-        return  ({type => CHARACTER_TOKEN, data => $s,
-                  line => $l, column => $c});
-      } else {
-        
+        redo A;
       }
 
-      redo A;
-
       ## ISSUE: "text tokens" in spec.
-      ## TODO: Streaming support
+    } elsif ($self->{state} == CDATA_SECTION_MSE1_STATE) {
+      if ($self->{next_char} == 0x005D) { # ]
+        
+        $self->{state} = CDATA_SECTION_MSE2_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } else {
+        
+        $self->{current_token}->{data} .= ']';
+        $self->{state} = CDATA_SECTION_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == CDATA_SECTION_MSE2_STATE) {
+      if ($self->{next_char} == 0x003E) { # >
+        $self->{state} = DATA_STATE;
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        if (length $self->{current_token}->{data}) { # character
+          
+          return  ($self->{current_token}); # character
+        } else {
+          
+          ## No token to emit. $self->{current_token} is discarded.
+        }
+        redo A;
+      } elsif ($self->{next_char} == 0x005D) { # ]
+         # character
+        $self->{current_token}->{data} .= ']'; ## Add first "]" of "]]]".
+        ## Stay in the state.
+        
+      if (@{$self->{char}}) {
+        $self->{next_char} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_char}->($self);
+      }
+  
+        redo A;
+      } else {
+        
+        $self->{current_token}->{data} .= ']]'; # character
+        $self->{state} = CDATA_SECTION_STATE;
+        ## Reconsume.
+        redo A;
+      }
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -9543,4 +9568,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 06:33:39 $
+# $Date: 2008/09/13 07:51:32 $
