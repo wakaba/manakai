@@ -1,5 +1,13 @@
 2008-09-13  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: "Consume a character reference" algorithm is
+	now implemented as a tokenizer's state, rather than
+	a method, with minimum changes (more changes will
+	be made, in due course).  "Bogus comment state"'s inner
+	loop gets removed.
+
+2008-09-13  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm: Make |PUBLIC| and |SYSTEM| keyword tokenizing
 	into their own tokenizer states.
 

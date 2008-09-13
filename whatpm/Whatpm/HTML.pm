@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.162 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.163 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -812,6 +812,7 @@ sub CDATA_SECTION_MSE1_STATE () { 40 } # "CDATA section state" in the spec
 sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 sub PUBLIC_STATE () { 42 } # "after DOCTYPE name state" in the spec
 sub SYSTEM_STATE () { 43 } # "after DOCTYPE name state" in the spec
+sub ENTITY_STATE () { 44 } # "consume a character reference" in the spec
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -946,7 +947,14 @@ sub _get_next_token ($) {
 	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
             not $self->{escape}) {
           
-          $self->{state} = ENTITY_DATA_STATE;
+          ## NOTE: In the spec, the tokenizer is switched to the 
+          ## "entity data state".  In this implementation, the tokenizer
+          ## is switched to the |ENTITY_STATE|, which is an implementation
+          ## of the "consume a character reference" algorithm.
+          #$self->{state} = ENTITY_DATA_STATE;
+          $self->{entity_in_attr} = 0;
+          $self->{entity_additional} = -1;
+          $self->{state} = ENTITY_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -1035,11 +1043,9 @@ sub _get_next_token ($) {
 
       redo A;
     } elsif ($self->{state} == ENTITY_DATA_STATE) {
-      ## (cannot happen in CDATA state)
-
       my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
-      
-      my $token = $self->_tokenize_attempt_to_consume_an_entity (0, -1);
+
+      my $token = $self->{entity_return};
 
       $self->{state} = DATA_STATE;
       # next-input-character is already done
@@ -1957,7 +1963,14 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x0026) { # &
         
         $self->{last_attribute_value_state} = $self->{state};
-        $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
+        ## NOTE: In the spec, the tokenizer is switched to the 
+        ## "entity in attribute value state".  In this implementation, the
+        ## tokenizer is switched to the |ENTITY_STATE|, which is an
+        ## implementation of the "consume a character reference" algorithm.
+        #$self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
+        $self->{entity_in_attr} = 1;
+        $self->{entity_additional} = 0x0022; # "
+        $self->{state} = ENTITY_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -2017,7 +2030,14 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x0026) { # &
         
         $self->{last_attribute_value_state} = $self->{state};
-        $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
+        ## NOTE: In the spec, the tokenizer is switched to the 
+        ## "entity in attribute value state".  In this implementation, the
+        ## tokenizer is switched to the |ENTITY_STATE|, which is an
+        ## implementation of the "consume a character reference" algorithm.
+        #$self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
+        $self->{entity_in_attr} = 1;
+        $self->{entity_additional} = 0x0027; # '
+        $self->{state} = ENTITY_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -2081,7 +2101,14 @@ sub _get_next_token ($) {
       } elsif ($self->{next_char} == 0x0026) { # &
         
         $self->{last_attribute_value_state} = $self->{state};
-        $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
+        ## NOTE: In the spec, the tokenizer is switched to the 
+        ## "entity in attribute value state".  In this implementation, the
+        ## tokenizer is switched to the |ENTITY_STATE|, which is an
+        ## implementation of the "consume a character reference" algorithm.
+        #$self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
+        $self->{entity_in_attr} = 1;
+        $self->{entity_additional} = -1;
+        $self->{state} = ENTITY_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
@@ -2164,13 +2191,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ENTITY_IN_ATTRIBUTE_VALUE_STATE) {
-      my $token = $self->_tokenize_attempt_to_consume_an_entity
-          (1,
-           $self->{last_attribute_value_state}
-             == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE ? 0x0022 : # "
-           $self->{last_attribute_value_state}
-             == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE ? 0x0027 : # '
-           -1);
+      my $token = $self->{entity_return};
 
       unless (defined $token) {
         
@@ -2328,15 +2349,14 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
       ## (only happen if PCDATA state)
+
+      ## NOTE: Unlike spec's "bogus comment state", this implementation
+      ## consumes characters one-by-one basis.
       
-      ## NOTE: Set by the previous state
-      #my $token = {type => COMMENT_TOKEN, data => ''};
-
-      BC: {
-        if ($self->{next_char} == 0x003E) { # >
-          
-          $self->{state} = DATA_STATE;
-          
+      if ($self->{next_char} == 0x003E) { # >
+        
+        $self->{state} = DATA_STATE;
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
@@ -2344,32 +2364,28 @@ sub _get_next_token ($) {
       }
   
 
-          return  ($self->{current_token}); # comment
+        return  ($self->{current_token}); # comment
+        redo A;
+      } elsif ($self->{next_char} == -1) { 
+        
+        $self->{state} = DATA_STATE;
+        ## reconsume
 
-          redo A;
-        } elsif ($self->{next_char} == -1) { 
-          
-          $self->{state} = DATA_STATE;
-          ## reconsume
-
-          return  ($self->{current_token}); # comment
-
-          redo A;
-        } else {
-          
-          $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
-          
+        return  ($self->{current_token}); # comment
+        redo A;
+      } else {
+        
+        $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
+        ## Stay in the state.
+        
       if (@{$self->{char}}) {
         $self->{next_char} = shift @{$self->{char}};
       } else {
         $self->{set_next_char}->($self);
       }
   
-          redo BC;
-        }
-      } # BC
-
-      die "$0: _get_next_token: unexpected case [BC]";
+        redo A;
+      }
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## (only happen if PCDATA state)
       
@@ -3755,16 +3771,10 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
-    } else {
-      die "$0: $self->{state}: Unknown state";
-    }
-  } # A   
 
-  die "$0: _get_next_token: unexpected case";
-} # _get_next_token
-
-sub _tokenize_attempt_to_consume_an_entity ($$$) {
-  my ($self, $in_attr, $additional) = @_;
+    } elsif ($self->{state} == ENTITY_STATE) {
+      my $in_attr = $self->{entity_in_attr};
+      my $additional = $self->{entity_additional};
 
   my ($l, $c) = ($self->{line_prev}, $self->{column_prev});
 
@@ -3776,7 +3786,9 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
     
     ## Don't consume
     ## No error
-    return undef;
+    $self->{entity_return} = undef;
+    $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+    redo A;
   } elsif ($self->{next_char} == 0x0023) { # #
     
       if (@{$self->{char}}) {
@@ -3823,7 +3835,9 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare hcro', line => $l, column => $c);
           unshift @{$self->{char}},  ($x_char, $self->{next_char});
           $self->{next_char} = 0x0023; # #
-          return undef;
+          $self->{entity_return} = undef;
+          $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+          redo A;
         } elsif ($self->{next_char} == 0x003B) { # ;
           
           
@@ -3860,10 +3874,12 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
           $code = $c1_entity_char->{$code};
         }
 
-        return {type => CHARACTER_TOKEN, data => chr $code,
+        $self->{entity_return} = {type => CHARACTER_TOKEN, data => chr $code,
                 has_reference => 1,
                 line => $l, column => $c,
                };
+        $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+        redo A;
       } # X
     } elsif (0x0030 <= $self->{next_char} and
              $self->{next_char} <= 0x0039) { # 0..9
@@ -3930,15 +3946,19 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
         $code = $c1_entity_char->{$code};
       }
       
-      return {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1,
+      $self->{entity_return} = {type => CHARACTER_TOKEN, data => chr $code, has_reference => 1,
               line => $l, column => $c,
              };
+      $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+      redo A;
     } else {
       
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare nero', line => $l, column => $c);
       unshift @{$self->{char}},  ($self->{next_char});
       $self->{next_char} = 0x0023; # #
-      return undef;
+      $self->{entity_return} = undef;
+      $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+      redo A;
     }
   } elsif ((0x0041 <= $self->{next_char} and
             $self->{next_char} <= 0x005A) or
@@ -4009,37 +4029,54 @@ sub _tokenize_attempt_to_consume_an_entity ($$$) {
     
     if ($match > 0) {
       
-      return {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
+      $self->{entity_return} = {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
               line => $l, column => $c,
              };
+      $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+      redo A;
     } elsif ($match < 0) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc', line => $l, column => $c);
       if ($in_attr and $match < -1) {
         
-        return {type => CHARACTER_TOKEN, data => '&'.$entity_name,
+        $self->{entity_return} = {type => CHARACTER_TOKEN, data => '&'.$entity_name,
                 line => $l, column => $c,
                };
+        $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+        redo A;
       } else {
         
-        return {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
+        $self->{entity_return} = {type => CHARACTER_TOKEN, data => $value, has_reference => 1,
                 line => $l, column => $c,
                };
+        $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+        redo A;
       }
     } else {
       
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero', line => $l, column => $c);
       ## NOTE: "No characters are consumed" in the spec.
-      return {type => CHARACTER_TOKEN, data => '&'.$value,
+      $self->{entity_return} = {type => CHARACTER_TOKEN, data => '&'.$value,
               line => $l, column => $c,
              };
+      $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+      redo A;
     }
   } else {
     
     ## no characters are consumed
     $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero', line => $l, column => $c);
-    return undef;
+    $self->{entity_return} = undef;
+    $self->{state} = $self->{entity_in_attr} ? ENTITY_IN_ATTRIBUTE_VALUE_STATE : ENTITY_DATA_STATE;
+    redo A;
   }
-} # _tokenize_attempt_to_consume_an_entity
+
+    } else {
+      die "$0: $self->{state}: Unknown state";
+    }
+  } # A   
+
+  die "$0: _get_next_token: unexpected case";
+} # _get_next_token
 
 sub _initialize_tree_constructor ($) {
   my $self = shift;
@@ -9545,4 +9582,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/13 08:21:35 $
+# $Date: 2008/09/13 09:02:28 $
