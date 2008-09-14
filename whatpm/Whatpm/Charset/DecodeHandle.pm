@@ -449,7 +449,7 @@ sub create_decode_handle ($$$;$) {
       $obj->{perl_encoding_name} = $csdef->{perl_name}->[0];
       require Encode::ShiftJIS1997;
       if (Encode::find_encoding ($obj->{perl_encoding_name})) {
-        return bless $obj, 'Whatpm::Charset::DecodeHandle::ShiftJIS';
+        return bless $obj, 'Whatpm::Charset::DecodeHandle::Encode';
       }
     } elsif ($csdef->{is_block_safe}) {
       $obj->{perl_encoding_name} = $csdef->{perl_name}->[0];
@@ -722,7 +722,22 @@ sub read ($$$;$) {
       my $etype = 'illegal-octets-error';
       my %earg;
       if ($self->{category}
-              & Message::Charset::Info::CHARSET_CATEGORY_EUCJP) {
+              & Message::Charset::Info::CHARSET_CATEGORY_SJIS) {
+        if ($r =~ /^[\x81-\x9F\xE0-\xFC]/) {
+          if ($self->{byte_buffer} =~ s/(.)//s) {
+            $r .= $1;                     # not limited to \x40-\xFC - \x7F
+            $etype = 'unassigned-code-point-error';
+          }
+          ## NOTE: Range [\xF0-\xFC] is unassigned and may be used as a
+          ## single-byte character or as the first-byte of a double-byte
+          ## character, according to JIS X 0208:1997 Appendix 1.  However, the
+          ## current practice is using the range as first-bytes of double-byte
+          ## characters.
+        } elsif ($r =~ /^[\x80\xA0\xFD-\xFF]/) {
+          $etype = 'unassigned-code-point-error';
+        }
+      } elsif ($self->{category}
+                   & Message::Charset::Info::CHARSET_CATEGORY_EUCJP) {
         if ($r =~ /^[\xA1-\xFE]/) {
           if ($self->{byte_buffer} =~ s/^([\xA1-\xFE])//) {
             $r .= $1;
@@ -1002,103 +1017,6 @@ sub read ($$$;$) {
   substr ($_[1], $_[3]) = $r;
       ## NOTE: This would do different thing from what Perl's |read| do
       ## if $offset points beyond the end of the $scalar.
-  return length $r;
-} # read
-
-sub manakai_read_until ($$$;$) {
-  #my ($self, $scalar, $pattern, $offset) = @_;
-  my $self = $_[0];
-  my $c = $self->getc;
-  if ($c =~ /^$_[2]/) {
-    substr ($_[1], $_[3]) = $c;
-    return 1;
-  } elsif (defined $c) {
-    $self->ungetc (ord $c);
-    return 0;
-  } else {
-    return 0;
-  }
-} # manakai_read_until
-
-package Whatpm::Charset::DecodeHandle::ShiftJIS;
-push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
-
-sub getc ($) {
-  my $self = $_[0];
-  return shift @{$self->{character_queue}} if @{$self->{character_queue}};
-
-  my $error;
-  if ($self->{continue}) {
-    if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
-                                   length $self->{byte_buffer})) {
-      # 
-    } else {
-      $error = 1;
-    }
-    $self->{continue} = 0;
-  } elsif (512 > length $self->{byte_buffer}) {
-    $self->{filehandle}->read ($self->{byte_buffer}, 256,
-                               length $self->{byte_buffer});
-  }
-
-  my $r;
-  unless ($error) {
-    my $string = Encode::decode ($self->{perl_encoding_name},
-                                 $self->{byte_buffer},
-                                 Encode::FB_QUIET ());
-    if (length $string) {
-      push @{$self->{character_queue}}, split //, $string;
-      $r = shift @{$self->{character_queue}};
-      if (length $self->{byte_buffer}) {
-        $self->{continue} = 1;
-      }
-    } else {
-      if (length $self->{byte_buffer}) {
-        $error = 1;
-      } else {
-        $r = undef;
-      }
-    }
-  }
-  
-  if ($error) {
-    $r = substr $self->{byte_buffer}, 0, 1, '';
-    my $etype = 'illegal-octets-error';
-    if ($r =~ /^[\x81-\x9F\xE0-\xFC]/) {
-      if ($self->{byte_buffer} =~ s/(.)//s) {
-        $r .= $1;                     # not limited to \x40-\xFC - \x7F
-        $etype = 'unassigned-code-point-error';
-      }
-      ## NOTE: Range [\xF0-\xFC] is unassigned and may be used as a single-byte
-      ## character or as the first-byte of a double-byte character according
-      ## to JIS X 0208:1997 Appendix 1.  However, the current practice is 
-      ## use the range as the first-byte of double-byte characters.
-    } elsif ($r =~ /^[\x80\xA0\xFD-\xFF]/) {
-      $etype = 'unassigned-code-point-error';
-    }
-    $self->{onerror}->($self, $etype, octets => \$r,
-                       level => $self->{level}->{$self->{error_level}->{$etype}});
-  }
-
-  return $r;
-} # getc
-
-## TODO: This is not good for performance.  Should be replaced
-## by read-centric implementation.
-sub read ($$$;$) {
-  #my ($self, $scalar, $length, $offset) = @_;
-  my $length = $_[2];
-  my $r = '';
-  while ($length > 0) {
-    my $c = $_[0]->getc;
-    last unless defined $c;
-    $r .= $c;
-    $length--;
-  }
-  substr ($_[1], $_[3]) = $r;
-      ## NOTE: This would do different thing from what Perl's |read| do
-      ## if $offset points beyond the end of the $scalar.
-
   return length $r;
 } # read
 
@@ -1696,4 +1614,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/14 06:58:28 $
+## $Date: 2008/09/14 07:19:47 $

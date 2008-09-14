@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.175 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.176 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -3340,7 +3340,7 @@ sub _get_next_token ($) {
         !!!cp (1026);
         !!!parse-error (type => 'bare ero',
                         line => $self->{line_prev},
-                        column => $self->{column_prev});
+                        column => $self->{column_prev} - length $self->{state_keyword});
         $data = '&' . $self->{state_keyword};
         #
       }
@@ -7948,4 +7948,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/14 06:58:28 $
+# $Date: 2008/09/14 07:19:47 $
