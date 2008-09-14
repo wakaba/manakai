@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.172 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.173 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -1743,6 +1743,10 @@ sub _get_next_token ($) {
       } else {
         !!!cp (100);
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
+        $self->{read_until}->($self->{current_attribute}->{value},
+                              q["&],
+                              length $self->{current_attribute}->{value});
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -1790,6 +1794,10 @@ sub _get_next_token ($) {
       } else {
         !!!cp (106);
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
+        $self->{read_until}->($self->{current_attribute}->{value},
+                              q['&],
+                              length $self->{current_attribute}->{value});
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -1872,6 +1880,10 @@ sub _get_next_token ($) {
           !!!cp (116);
         }
         $self->{current_attribute}->{value} .= chr ($self->{next_char});
+        $self->{read_until}->($self->{current_attribute}->{value},
+                              q["'=& >],
+                              length $self->{current_attribute}->{value});
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -2016,6 +2028,10 @@ sub _get_next_token ($) {
       } else {
         !!!cp (126);
         $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
+        $self->{read_until}->($self->{current_token}->{data},
+                              q[>],
+                              length $self->{current_token}->{data});
+
         ## Stay in the state.
         !!!next-input-character;
         redo A;
@@ -2250,6 +2266,10 @@ sub _get_next_token ($) {
       } else {
         !!!cp (147);
         $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
+        $self->{read_until}->($self->{current_token}->{data},
+                              q[-],
+                              length $self->{current_token}->{data});
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -2615,6 +2635,10 @@ sub _get_next_token ($) {
         !!!cp (190);
         $self->{current_token}->{public_identifier} # DOCTYPE
             .= chr $self->{next_char};
+        $self->{read_until}->($self->{current_token}->{public_identifier},
+                              q[">],
+                              length $self->{current_token}->{public_identifier});
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -2651,6 +2675,10 @@ sub _get_next_token ($) {
         !!!cp (194);
         $self->{current_token}->{public_identifier} # DOCTYPE
             .= chr $self->{next_char};
+        $self->{read_until}->($self->{current_token}->{public_identifier},
+                              q['>],
+                              length $self->{current_token}->{public_identifier});
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -2787,6 +2815,10 @@ sub _get_next_token ($) {
         !!!cp (210);
         $self->{current_token}->{system_identifier} # DOCTYPE
             .= chr $self->{next_char};
+        $self->{read_until}->($self->{current_token}->{system_identifier},
+                              q[">],
+                              length $self->{current_token}->{system_identifier});
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -2823,6 +2855,10 @@ sub _get_next_token ($) {
         !!!cp (214);
         $self->{current_token}->{system_identifier} # DOCTYPE
             .= chr $self->{next_char};
+        $self->{read_until}->($self->{current_token}->{system_identifier},
+                              q['>],
+                              length $self->{current_token}->{system_identifier});
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -2883,6 +2919,9 @@ sub _get_next_token ($) {
         redo A;
       } else {
         !!!cp (221);
+        my $s = '';
+        $self->{read_until}->($s, q[>], 0);
+
         ## Stay in the state
         !!!next-input-character;
         redo A;
@@ -2911,6 +2950,10 @@ sub _get_next_token ($) {
       } else {
         !!!cp (221.4);
         $self->{current_token}->{data} .= chr $self->{next_char};
+        $self->{read_until}->($self->{current_token}->{data},
+                              q<]>,
+                              length $self->{current_token}->{data});
+
         ## Stay in the state.
         !!!next-input-character;
         redo A;
@@ -7905,4 +7948,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/14 03:07:58 $
+# $Date: 2008/09/14 03:59:08 $

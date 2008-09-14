@@ -755,7 +755,7 @@ sub manakai_read_until ($$$;$) {
         $self->{char_buffer_pos} = 0;
       }
     }
-    substr ($_[1], $_[3]) = substr ($s, $+[0]);
+    substr ($_[1], $_[3]) = substr ($s, $-[0], $+[0] - $-[0]);
     return $+[0];
   } elsif (length $s) {
     if ($self->{char_buffer_pos} > length $s) {
@@ -1725,4 +1725,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/14 03:07:58 $
+## $Date: 2008/09/14 03:59:08 $
