@@ -151,7 +151,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $p->{prev_char} = [-1, -1, -1];
       $p->{next_char} = -1;
 
-      $p->{getc_until} = sub { return undef };
+      $p->{read_until} = sub { return 0 };
       
       $p->{parse_error} = sub {
         push @token, 'ParseError';
@@ -209,4 +209,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/09/14 01:51:08 $
+## $Date: 2008/09/14 03:07:58 $

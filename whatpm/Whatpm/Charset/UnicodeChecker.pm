@@ -172,21 +172,23 @@ sub getc ($) {
   return $char;
 } # getc
 
-sub manakai_getc_until ($$) {
-  my ($self, $pattern) = @_;
-
+sub manakai_read_until ($$$;$) {
+  #my ($self, $scalar, $pattern, $offset) = @_;
+  my $self = shift;
+  
   if (@{$self->{queue}}) {
-    if ($self->{queue}->[0] =~ /^$pattern/) {
-      return shift @{$self->{queue}};
+    if ($self->{queue}->[0] =~ /^$_[1]/) {
+      substr ($_[0], $_[2]) = shift @{$self->{queue}};
+      return 1;
     } else {
-      return undef;
+      return 0;
     }
   }
 
   ## TODO: impl check
   
-  return $self->{handle}->manakai_getc_until ($pattern);
-} # manakai_getc_until
+  return $self->{handle}->manakai_read_until (@_);
+} # manakai_read_until
 
 sub ungetc ($$) {
   unshift @{$_[0]->{queue}}, chr int ($_[1] or 0);

@@ -590,17 +590,18 @@ sub read ($$$$) {
   return $count;
 } # read
 
-sub manakai_getc_until ($$) {
-  my ($self, $pattern) = @_;
+sub manakai_read_until ($$$;$) {
+  #my ($self, $scalar, $pattern, $offset) = @_;
+  my $self = $_[0];
   pos (${$self->{string}}) = $self->{pos};
-  if (${$self->{string}} =~ /\G(?>$pattern)+/) {
-    my $s = substr (${$self->{string}}, $-[0], $+[0] - $-[0]);
+  if (${$self->{string}} =~ /\G(?>$_[2])+/) {
+    substr ($_[1], $_[3]) = substr (${$self->{string}}, $-[0], $+[0] - $-[0]);
     $self->{pos} += $+[0] - $-[0];
-    return \$s;
+    return $+[0] - $-[0];
   } else {
-    return undef;
+    return 0;
   }
-} # manakai_getc_until
+} # manakai_read_until
 
 sub ungetc ($$) {
   my $self = shift;
@@ -738,11 +739,12 @@ sub read ($$$;$) {
   } # A
 } # read
 
-sub manakai_getc_until ($$) {
-  my ($self, $pattern) = @_;
+sub manakai_read_until ($$$;$) {
+  #my ($self, $scalar, $pattern, $offset) = @_;
+  my $self = $_[0];
   my $s = '';
   $self->read ($s, 255);
-  if ($s =~ /^(?>$pattern)+/) {
+  if ($s =~ /^(?>$_[2])+/) {
     my $rem_length = (length $s) - $+[0];
     if ($rem_length) {
       if ($self->{char_buffer_pos} > $rem_length) {
@@ -752,9 +754,9 @@ sub manakai_getc_until ($$) {
             = substr ($s, $+[0]);
         $self->{char_buffer_pos} = 0;
       }
-      substr ($s, $+[0]) = '';
     }
-    return \$s;
+    substr ($_[1], $_[3]) = substr ($s, $+[0]);
+    return $+[0];
   } elsif (length $s) {
     if ($self->{char_buffer_pos} > length $s) {
       $self->{char_buffer_pos} -= length $s;
@@ -763,8 +765,8 @@ sub manakai_getc_until ($$) {
       $self->{char_buffer_pos} = 0;
     }
   }
-  return undef;
-} # manakai_getc_until
+  return 0;
+} # manakai_read_until
 
 sub has_bom ($) { $_[0]->{has_bom} }
 
@@ -879,18 +881,20 @@ sub read ($$$;$) {
   return length $r;
 } # read
 
-sub manakai_getc_until ($$) {
-  my ($self, $pattern) = @_;
+sub manakai_read_until ($$$;$) {
+  #my ($self, $scalar, $pattern, $offset) = @_;
+  my $self = $_[0];
   my $c = $self->getc;
-  if ($c =~ /^$pattern/) {
-    return \$c;
+  if ($c =~ /^$_[2]/) {
+    substr ($_[1], $_[3]) = $c;
+    return 1;
   } elsif (defined $c) {
     $self->ungetc (ord $c);
-    return undef;
+    return 0;
   } else {
-    return undef;
+    return 0;
   }
-} # manakai_getc_until
+} # manakai_read_until
 
 package Whatpm::Charset::DecodeHandle::ISO2022JP;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
@@ -1030,18 +1034,20 @@ sub read ($$$;$) {
   return length $r;
 } # read
 
-sub manakai_getc_until ($$) {
-  my ($self, $pattern) = @_;
+sub manakai_read_until ($$$;$) {
+  #my ($self, $scalar, $pattern, $offset) = @_;
+  my $self = $_[0];
   my $c = $self->getc;
-  if ($c =~ /^$pattern/) {
-    return \$c;
+  if ($c =~ /^$_[2]/) {
+    substr ($_[1], $_[3]) = $c;
+    return 1;
   } elsif (defined $c) {
     $self->ungetc (ord $c);
-    return undef;
+    return 0;
   } else {
-    return undef;
+    return 0;
   }
-} # manakai_getc_until
+} # manakai_read_until
 
 package Whatpm::Charset::DecodeHandle::ShiftJIS;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
@@ -1125,18 +1131,20 @@ sub read ($$$;$) {
   return length $r;
 } # read
 
-sub manakai_getc_until ($$) {
-  my ($self, $pattern) = @_;
+sub manakai_read_until ($$$;$) {
+  #my ($self, $scalar, $pattern, $offset) = @_;
+  my $self = $_[0];
   my $c = $self->getc;
-  if ($c =~ /^$pattern/) {
-    return \$c;
+  if ($c =~ /^$_[2]/) {
+    substr ($_[1], $_[3]) = $c;
+    return 1;
   } elsif (defined $c) {
     $self->ungetc (ord $c);
-    return undef;
+    return 0;
   } else {
-    return undef;
+    return 0;
   }
-} # manakai_getc_until
+} # manakai_read_until
 
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:us-ascii'} = 
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:us'} = 
@@ -1717,4 +1725,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/14 01:51:08 $
+## $Date: 2008/09/14 03:07:58 $

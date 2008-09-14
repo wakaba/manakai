@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.171 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.172 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -714,41 +714,22 @@ sub parse_char_stream ($$$;$) {
   $self->{prev_char} = [-1, -1, -1];
   $self->{next_char} = -1;
 
-  $self->{getc_until} = sub { return undef };
-#  if ($input->can ('manakai_getc_until')) {
-    $self->{getc_until} = sub {
-      my $special_range = shift;
-      return undef if defined $self->{next_next_char};
-      my $s = $input->manakai_getc_until
-          (qr/(?![$special_range\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/);
-      if ($s) {
-        $self->{column} += length $$s;
-        $self->{column_prev} += length $$s;
-        $self->{prev_char} = [-1, -1, -1];
-        $self->{next_char} = -1;
-      }
-      return $s;
-    }; # $self->{getc_until}
-#  } else {
-#    $self->{getc_until} = sub {
-#      my $special_range = shift;
-#      return undef if defined $self->{next_next_char};
-#      my $c = $input->getc;
-#      if ($c =~ /^(?![$special_range\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/) {
-#        $self->{column}++;
-#        $self->{column_prev}++;
-#        $self->{prev_char} = [-1, -1, -1];
-#        $self->{next_char} = -1;
-#        return \$c;
-#      } elsif (defined $c) {
-#        #$input->ungetc (ord $c);
-#        $self->{next_next_char} = $c;
-#        return undef;
-#      } else {
-#        return undef;
-#      }
-#    }; # $self->{getc_until}
-#  }
+  $self->{read_until} = sub {
+    #my ($scalar, $specials_range, $offset) = @_;
+    my $specials_range = $_[1];
+    return 0 if defined $self->{next_next_char};
+    my $count = $input->manakai_read_until
+       ($_[0],
+        qr/(?![$specials_range\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/,
+        $_[2]);
+    if ($count) {
+      $self->{column} += $count;
+      $self->{column_prev} += $count;
+      $self->{prev_char} = [-1, -1, -1];
+      $self->{next_char} = -1;
+    }
+    return $count;
+  }; # $self->{read_until}
 
   my $onerror = $_[2] || sub {
     my (%opt) = @_;
@@ -1046,11 +1027,7 @@ sub _get_next_token ($) {
                    data => chr $self->{next_char},
                    line => $self->{line}, column => $self->{column},
                   };
-
-      my $s = $self->{getc_until}->(q[-!<>&]);
-      if ($s) {
-        $token->{data} .= $$s;
-      }
+      $self->{read_until}->($token->{data}, q[-!<>&], length $token->{data});
 
       ## Stay in the data state
       !!!next-input-character;
@@ -7818,10 +7795,10 @@ sub set_inner_html ($$$;$) {
     $p->{prev_char} = [-1, -1, -1];
     $p->{next_char} = -1;
 
-    $p->{getc_until} = sub {
+    $p->{read_until} = sub {
       ## TODO: ...
-      return undef;
-    }; # $p->{getc_until};
+      return 0;
+    }; # $p->{read_until};
 
     my $ponerror = $onerror || sub {
       my (%opt) = @_;
@@ -7928,4 +7905,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/14 01:51:08 $
+# $Date: 2008/09/14 03:07:58 $
