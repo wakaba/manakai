@@ -1,5 +1,10 @@
 2008-09-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: It turns out that U+FFFD don't have to
+	be added to the list of excluded characters.
+
+2008-09-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src ($char_onerror): Have character decoder's |line|
 	and |column| a higher priority than the one set by the
 	tokenizer's input handler.
