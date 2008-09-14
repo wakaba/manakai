@@ -1,6 +1,6 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## TODO: Certain encodings MUST NOT be implemented [HTML5].
 
@@ -1117,6 +1117,7 @@ sub get_decode_handle ($$;%) {
   my %opt = @_;
 
   my $obj = {
+    category => $self->{category},
     char_buffer => \(my $s = ''),
     char_buffer_pos => 0,
     character_queue => [],
@@ -1182,10 +1183,7 @@ sub get_decode_handle ($$;%) {
       (%opt, allow_semiconforming => 1);
   if ($e) {
     $obj->{perl_encoding_name} = $e->name;
-    if ($self->{category} & CHARSET_CATEGORY_EUCJP) {
-      return ((bless $obj, 'Whatpm::Charset::DecodeHandle::EUCJP'),
-              $e_status);
-    } elsif ($self->{category} & CHARSET_CATEGORY_SJIS) {
+    if ($self->{category} & CHARSET_CATEGORY_SJIS) {
       return ((bless $obj, 'Whatpm::Charset::DecodeHandle::ShiftJIS'),
               $e_status);
     #} elsif ($self->{category} & CHARSET_CATEGORY_BLOCK_SAFE) {
@@ -1322,5 +1320,5 @@ sub is_syntactically_valid_iana_charset_name ($) {
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2008/09/14 03:08:32 $
+## $Date: 2008/09/14 06:59:08 $
 
