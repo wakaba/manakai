@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.173 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.174 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -496,7 +496,7 @@ sub parse_byte_stream ($$$$;$$) {
                     line => 1, column => 1,
                     layer => 'encode');
   } elsif (not ($e_status &
-                Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL())) {
+                Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL ())) {
     $self->{input_encoding} = $charset->get_iana_name;
     $self->{parse_error}->(level => $self->{level}->{must}, type => 'chardecode:no error',
                     text => $self->{input_encoding},
@@ -586,7 +586,7 @@ sub parse_byte_stream ($$$$;$$) {
                       line => 1, column => 1,
                       layer => 'encode');
     } elsif (not ($e_status &
-                  Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL())) {
+                  Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL ())) {
       $self->{input_encoding} = $charset->get_iana_name;
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'chardecode:no error',
                       text => $self->{input_encoding},
@@ -639,6 +639,7 @@ sub parse_char_stream ($$$;$) {
   $self->{confident} = 1 unless exists $self->{confident};
   $self->{document}->input_encoding ($self->{input_encoding})
       if defined $self->{input_encoding};
+## TODO: |{input_encoding}| is needless?
 
   my $i = 0;
   $self->{line_prev} = $self->{line} = 1;
@@ -649,15 +650,19 @@ sub parse_char_stream ($$$;$) {
     pop @{$self->{prev_char}};
     unshift @{$self->{prev_char}}, $self->{next_char};
 
-    my $char;
+    my $char = '';
     if (defined $self->{next_next_char}) {
       $char = $self->{next_next_char};
       delete $self->{next_next_char};
+      $self->{next_char} = ord $char;
     } else {
-      $char = $input->getc;
+      if ($input->read ($char, 1)) {
+        $self->{next_char} = ord $char;
+      } else {
+        $self->{next_char} = -1;
+        return;
+      }
     }
-    $self->{next_char} = -1 and return unless defined $char;
-    $self->{next_char} = ord $char;
 
     ($self->{line_prev}, $self->{column_prev})
         = ($self->{line}, $self->{column});
@@ -670,8 +675,8 @@ sub parse_char_stream ($$$;$) {
     } elsif ($self->{next_char} == 0x000D) { # CR
       
 ## TODO: support for abort/streaming
-      my $next = $input->getc;
-      if (defined $next and $next ne "\x0A") {
+      my $next = '';
+      if ($input->read ($next, 1) and $next ne "\x0A") {
         $self->{next_next_char} = $next;
       }
       $self->{next_char} = 0x000A; # LF # MUST
@@ -4867,9 +4872,11 @@ sub _tree_construction_main ($) {
           unless ($self->{insertion_mode} == BEFORE_HEAD_IM) {
             
             $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
+            #
           } else {
             
             ## Ignore the token.
+            #
           }
           unless (length $token->{data}) {
             
@@ -9016,15 +9023,19 @@ sub set_inner_html ($$$$;$) {
       pop @{$self->{prev_char}};
       unshift @{$self->{prev_char}}, $self->{next_char};
 
-      my $char;
+      my $char = '';
       if (defined $self->{next_next_char}) {
         $char = $self->{next_next_char};
         delete $self->{next_next_char};
+        $self->{next_char} = ord $char;
       } else {
-        $char = $input->getc;
+        if ($input->read ($char, 1)) {
+          $self->{next_char} = ord $char;
+        } else {
+          $self->{next_char} = -1;
+          return;
+        }
       }
-      $self->{next_char} = -1 and return unless defined $char;
-      $self->{next_char} = ord $char;
 
       ($p->{line_prev}, $p->{column_prev}) = ($p->{line}, $p->{column});
       $p->{column}++;
@@ -9035,8 +9046,8 @@ sub set_inner_html ($$$$;$) {
         
       } elsif ($self->{next_char} == 0x000D) { # CR
 ## TODO: support for abort/streaming
-        my $next = $input->getc;
-        if (defined $next and $next ne "\x0A") {
+        my $next = '';
+        if ($input->read ($next, 1) and $next ne "\x0A") {
           $self->{next_next_char} = $next;
         }
         $self->{next_char} = 0x000A; # LF # MUST
@@ -9114,6 +9125,14 @@ sub set_inner_html ($$$$;$) {
       $ponerror->(line => $p->{line}, column => $p->{column}, @_);
     };
     
+    my $char_onerror = sub {
+      my (undef, $type, %opt) = @_;
+      $ponerror->(layer => 'encode',
+                  line => $p->{line}, column => $p->{column} + 1,
+                  %opt, type => $type);
+    }; # $char_onerror
+    $input->onerror ($char_onerror);
+
     $p->_initialize_tokenizer;
     $p->_initialize_tree_constructor;
 
@@ -9205,4 +9224,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/14 09:05:54 $
+# $Date: 2008/09/14 11:57:41 $

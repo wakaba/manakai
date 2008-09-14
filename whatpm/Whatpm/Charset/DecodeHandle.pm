@@ -614,6 +614,8 @@ sub ungetc ($$) {
 
 sub close ($) { }
 
+sub onerror ($;$) { }
+
 package Whatpm::Charset::DecodeHandle::Encode;
 
 ## NOTE: Provides a Perl |Encode| module wrapper object.
@@ -1614,4 +1616,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/14 07:19:47 $
+## $Date: 2008/09/14 11:57:41 $

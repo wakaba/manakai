@@ -33,33 +33,43 @@ sub new_handle ($$) {
   return $self;
 } # new_handle
 
-## TODO: We need to do some perf optimization
+my $check_char = sub ($$) {
+  my ($self, $char_code) = @_;
 
-sub getc ($) {
-  my $self = $_[0];
-  return shift @{$self->{queue}} if @{$self->{queue}};
-
-  my $char;
-  unless (@{$self->{new_queue}}) {
-    my $s = '';
-    $self->{handle}->read ($s, 1) or return undef;
-    push @{$self->{new_queue}}, split //, $s;
-  }  
-  $char = shift @{$self->{new_queue}};
-
-  my $char_code = ord $char;
-
+  if ($char_code == 0x000D) {
+    $self->{line_diff}++;
+    $self->{column_diff} = 0;
+    $self->{set_column} = 1;
+    $self->{has_cr} = 1;
+    return;
+  } elsif ($char_code == 0x000A) {
+    if ($self->{has_cr}) {
+      delete $self->{has_cr};
+    } else {
+      $self->{line_diff}++;
+      $self->{column_diff} = 0;
+      $self->{set_column} = 1;
+    }
+    return;
+  } else {
+    $self->{column_diff}++;
+    delete $self->{has_cr};
+  }
+  
   if ({
-    0x0340 => 1, 0x0341 => 1, 0x17A3 => 1, 0x17D3 => 1,
-    0x206A => 1, 0x206B => 1, 0x206C => 1, 0x206D => 1,
-    0x206E => 1, 0x206F => 1, 0xE0001 => 1,
-  }->{$char_code} or
-  (0xE0020 <= $char_code and $char_code <= 0xE007F)) {
+       0x0340 => 1, 0x0341 => 1, 0x17A3 => 1, 0x17D3 => 1,
+       0x206A => 1, 0x206B => 1, 0x206C => 1, 0x206D => 1,
+       0x206E => 1, 0x206F => 1, 0xE0001 => 1,
+      }->{$char_code} or
+      (0xE0020 <= $char_code and $char_code <= 0xE007F)) {
     ## NOTE: From Unicode 5.1.0 |PropList.txt| (Deprecated).
     $self->{onerror}->(type => 'unicode deprecated',
                        text => (sprintf 'U+%04X', $char_code),
                        layer => 'charset',
-                       level => $self->{level}->{unicode_deprecated});
+                       level => $self->{level}->{unicode_deprecated},
+                       line_diff => $self->{line_diff},
+                       column_diff => $self->{column_diff},
+                       ($self->{set_column} ? (column => 1) : ()));
   } elsif ((0xFDD0 <= $char_code and $char_code <= 0xFDDF) or
            {
              0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
@@ -76,7 +86,10 @@ sub getc ($) {
     $self->{onerror}->(type => 'nonchar',
                        text => (sprintf 'U+%04X', $char_code),
                        layer => 'charset',
-                       level => $self->{level}->{unicode_should});
+                       level => $self->{level}->{unicode_should},
+                       line_diff => $self->{line_diff},
+                       column_diff => $self->{column_diff},
+                       ($self->{set_column} ? (column => 1) : ()));
   } elsif ({
             0x0344 => 1, # COMBINING GREEK DIALYTIKA TONOS
             0x03D3 => 1, 0x03D4 => 1, # GREEK UPSILON WITH ...
@@ -125,7 +138,10 @@ sub getc ($) {
       $self->{onerror}->(type => 'unicode should',
                          text => (sprintf 'U+%04X', $char_code),
                          layer => 'charset',
-                         level => $self->{level}->{unicode_should});
+                         level => $self->{level}->{unicode_should},
+                         line_diff => $self->{line_diff},
+                         column_diff => $self->{column_diff},
+                         ($self->{set_column} ? (column => 1) : ()));
     }
   } elsif ({
             ## Styled overlines/underlines in CJK Compatibility Forms
@@ -148,7 +164,10 @@ sub getc ($) {
     $self->{onerror}->(type => 'unicode discouraged',
                        text => (sprintf 'U+%04X', $char_code),
                        layer => 'charset',
-                       level => $self->{level}->{unicode_discouraged});
+                       level => $self->{level}->{unicode_discouraged},
+                       line_diff => $self->{line_diff},
+                       column_diff => $self->{column_diff},
+                       ($self->{set_column} ? (column => 1) : ()));
   } elsif ({
             0x055A => 1, 0x0559 =>1, # greek punctuations
             
@@ -159,7 +178,10 @@ sub getc ($) {
     $self->{onerror}->(type => 'unicode not preferred',
                        text => (sprintf 'U+%04X', $char_code),
                        layer => 'charset',
-                       level => $self->{level}->{unicode_preferred});
+                       level => $self->{level}->{unicode_preferred},
+                       line_diff => $self->{line_diff},
+                       column_diff => $self->{column_diff},
+                       ($self->{set_column} ? (column => 1) : ()));
   }
 
   ## TODO: "khanda ta" should be represented by U+09CE
@@ -168,26 +190,35 @@ sub getc ($) {
   ## TODO: IDS syntax
 
   ## TODO: langtag syntax
+}; # $check_char
 
-  return $char;
-} # getc
+sub read ($$$;$) {
+  my $self = shift;
+  my $offset = $_[2] || 0;
+  my $count = $self->{handle}->read (@_);
+  $self->{line_diff} = 0;
+  $self->{column_diff} = -1;
+  delete $self->{set_column};
+  delete $self->{has_cr};
+  for ($offset .. ($offset + $count - 1)) {
+    $check_char->($self, ord substr $_[0], $_, 1);
+  }
+  return $count;
+} # read
 
 sub manakai_read_until ($$$;$) {
   #my ($self, $scalar, $pattern, $offset) = @_;
   my $self = shift;
-  
-  if (@{$self->{queue}}) {
-    if ($self->{queue}->[0] =~ /^$_[1]/) {
-      substr ($_[0], $_[2]) = shift @{$self->{queue}};
-      return 1;
-    } else {
-      return 0;
-    }
+  my $offset = $_[2] || 0;
+  my $count = $self->{handle}->manakai_read_until (@_);
+  $self->{line_diff} = 0;
+  $self->{column_diff} = -1;
+  delete $self->{set_column};
+  delete $self->{has_cr};
+  for ($offset .. ($offset + $count - 1)) {
+    $check_char->($self, ord substr $_[0], $_, 1);
   }
-
-  ## TODO: impl check
-  
-  return $self->{handle}->manakai_read_until (@_);
+  return $count;
 } # manakai_read_until
 
 sub ungetc ($$) {

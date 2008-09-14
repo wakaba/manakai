@@ -1,5 +1,10 @@
 2008-09-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: Use |read| instead of |getc|.  |set_inner_html|
+	would report character error from now.
+
+2008-09-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: White-space-leaded non-white-space character
 	tokens in "before head insertion mode" was not
 	correctly handled.
