@@ -14,6 +14,7 @@ sub create_decode_handle ($$$;$) {
   my $csdef = $Whatpm::Charset::CharsetDef->{$_[1]};
   my $obj = {
              char_buffer => \(my $s = ''),
+             char_buffer_pos => 0,
              character_queue => [],
              filehandle => $_[2],
              charset => $_[1],
@@ -556,6 +557,59 @@ sub read {
 
 sub close { $_[0]->{filehandle}->close }
 
+package Whatpm::Charset::DecodeHandle::CharString;
+
+## NOTE: Same as Perl's standard |open $handle, '<', \$char_string|,
+## but supports |ungetc| and other extensions.
+
+sub new ($$) {
+  my $self = bless {pos => 0}, shift;
+  $self->{string} = shift; # must be a scalar ref
+  return $self;
+} # new
+
+sub getc ($) {
+  my $self = shift;
+  if ($self->{pos} < length ${$self->{string}}) {
+    return substr ${$self->{string}}, $self->{pos}++, 1;
+  } else {
+    return undef;
+  }
+} # getc
+
+sub read ($$$$) {
+  #my ($self, $scalar, $length, $offset) = @_;
+  my $self = $_[0];
+  my $length = $_[2] || 0;
+  my $offset = $_[3];
+  ## NOTE: We don't support standard Perl semantics if $offset is
+  ## greater than the length of $scalar.
+  substr ($_[1], $offset) = substr (${$self->{string}}, $self->{pos}, $length);
+  my $count = (length $_[1]) - $offset;
+  $self->{pos} += $count;
+  return $count;
+} # read
+
+sub manakai_getc_until ($$) {
+  my ($self, $pattern) = @_;
+  pos (${$self->{string}}) = $self->{pos};
+  if (${$self->{string}} =~ /\G(?>$pattern)+/) {
+    my $s = substr (${$self->{string}}, $-[0], $+[0] - $-[0]);
+    $self->{pos} += $+[0] - $-[0];
+    return \$s;
+  } else {
+    return undef;
+  }
+} # manakai_getc_until
+
+sub ungetc ($$) {
+  my $self = shift;
+  ## Ignore second parameter.
+  $self->{pos}-- if $self->{pos} > 0;
+} # ungetc
+
+sub close ($) { }
+
 package Whatpm::Charset::DecodeHandle::Encode;
 
 ## NOTE: Provides a Perl |Encode| module wrapper object.
@@ -581,25 +635,28 @@ sub read ($$$;$) {
   my $offset = $_[3] || 0;
   my $count = 0;
   my $eof;
-
   ## NOTE: It is incompatible with the standard Perl semantics
   ## if $offset is greater than the length of $scalar.
 
   A: {
     return $count if $length < 1;
 
-    if (my $l = length ${$self->{char_buffer}}) {
+    if (my $l = (length ${$self->{char_buffer}}) - $self->{char_buffer_pos}) {
       if ($l >= $length) {
-        substr ($_[1], $offset) = substr (${$self->{char_buffer}}, 0, $length);
+        substr ($_[1], $offset)
+            = substr (${$self->{char_buffer}}, $self->{char_buffer_pos},
+                      $length);
         $count += $length;
-        substr (${$self->{char_buffer}}, 0, $length) = '';
+        $self->{char_buffer_pos} += $length;
         $length = 0;
         return $count;
       } else {
-        substr ($_[1], $offset) = ${$self->{char_buffer}};
+        substr ($_[1], $offset)
+            = substr (${$self->{char_buffer}}, $self->{char_buffer_pos});
         $count += $l;
         $length -= $l;
         ${$self->{char_buffer}} = '';
+        $self->{char_buffer_pos} = 0;
       }
       $offset = length $_[1];
     }
@@ -641,6 +698,7 @@ sub read ($$$;$) {
                                  Encode::FB_QUIET ());
     if (length $string) {
       $self->{char_buffer} = \$string;
+      $self->{char_buffer_pos} = 0;
       if (length $self->{byte_buffer}) {
         $self->{continue} = 1;
       }
@@ -678,7 +736,35 @@ sub read ($$$;$) {
 
     redo A;
   } # A
-} # getc
+} # read
+
+sub manakai_getc_until ($$) {
+  my ($self, $pattern) = @_;
+  my $s = '';
+  $self->read ($s, 255);
+  if ($s =~ /^(?>$pattern)+/) {
+    my $rem_length = (length $s) - $+[0];
+    if ($rem_length) {
+      if ($self->{char_buffer_pos} > $rem_length) {
+        $self->{char_buffer_pos} -= $rem_length;
+      } else {
+        substr (${$self->{char_buffer}}, 0, $self->{char_buffer_pos})
+            = substr ($s, $+[0]);
+        $self->{char_buffer_pos} = 0;
+      }
+      substr ($s, $+[0]) = '';
+    }
+    return \$s;
+  } elsif (length $s) {
+    if ($self->{char_buffer_pos} > length $s) {
+      $self->{char_buffer_pos} -= length $s;
+    } else {
+      substr (${$self->{char_buffer}}, 0, $self->{char_buffer_pos}) = $s;
+      $self->{char_buffer_pos} = 0;
+    }
+  }
+  return undef;
+} # manakai_getc_until
 
 sub has_bom ($) { $_[0]->{has_bom} }
 
@@ -792,6 +878,19 @@ sub read ($$$;$) {
       ## if $offset points beyond the end of the $scalar.
   return length $r;
 } # read
+
+sub manakai_getc_until ($$) {
+  my ($self, $pattern) = @_;
+  my $c = $self->getc;
+  if ($c =~ /^$pattern/) {
+    return \$c;
+  } elsif (defined $c) {
+    $self->ungetc (ord $c);
+    return undef;
+  } else {
+    return undef;
+  }
+} # manakai_getc_until
 
 package Whatpm::Charset::DecodeHandle::ISO2022JP;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
@@ -931,6 +1030,19 @@ sub read ($$$;$) {
   return length $r;
 } # read
 
+sub manakai_getc_until ($$) {
+  my ($self, $pattern) = @_;
+  my $c = $self->getc;
+  if ($c =~ /^$pattern/) {
+    return \$c;
+  } elsif (defined $c) {
+    $self->ungetc (ord $c);
+    return undef;
+  } else {
+    return undef;
+  }
+} # manakai_getc_until
+
 package Whatpm::Charset::DecodeHandle::ShiftJIS;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
 
@@ -1009,8 +1121,22 @@ sub read ($$$;$) {
   substr ($_[1], $_[3]) = $r;
       ## NOTE: This would do different thing from what Perl's |read| do
       ## if $offset points beyond the end of the $scalar.
+
   return length $r;
 } # read
+
+sub manakai_getc_until ($$) {
+  my ($self, $pattern) = @_;
+  my $c = $self->getc;
+  if ($c =~ /^$pattern/) {
+    return \$c;
+  } elsif (defined $c) {
+    $self->ungetc (ord $c);
+    return undef;
+  } else {
+    return undef;
+  }
+} # manakai_getc_until
 
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:us-ascii'} = 
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:us'} = 
@@ -1591,4 +1717,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/12 03:31:40 $
+## $Date: 2008/09/14 01:51:08 $

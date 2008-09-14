@@ -1,3 +1,13 @@
+2008-09-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTML.pm.src (parse_char_string): Use newly created
+	|Whatpm::Charset::DecodeHandle::CharString| instead of Perl's
+	standard feature to |open| a string as a filehandle,
+	since Perl's string filehandle seems not supporting |ungetc|
+	method correctly.
+	(parse_char_stream): Define |{getc_until}| method.
+	(DATA_STATE): Experimental support for |getc_until| feature.
+
 2008-09-13  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTML.pm.src: Check points added to newly added branches.

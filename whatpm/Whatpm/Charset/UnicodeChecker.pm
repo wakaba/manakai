@@ -42,7 +42,7 @@ sub getc ($) {
   my $char;
   unless (@{$self->{new_queue}}) {
     my $s = '';
-    $self->{handle}->read ($s, 256) or return undef;
+    $self->{handle}->read ($s, 1) or return undef;
     push @{$self->{new_queue}}, split //, $s;
   }  
   $char = shift @{$self->{new_queue}};
@@ -171,6 +171,22 @@ sub getc ($) {
 
   return $char;
 } # getc
+
+sub manakai_getc_until ($$) {
+  my ($self, $pattern) = @_;
+
+  if (@{$self->{queue}}) {
+    if ($self->{queue}->[0] =~ /^$pattern/) {
+      return shift @{$self->{queue}};
+    } else {
+      return undef;
+    }
+  }
+
+  ## TODO: impl check
+  
+  return $self->{handle}->manakai_getc_until ($pattern);
+} # manakai_getc_until
 
 sub ungetc ($$) {
   unshift @{$_[0]->{queue}}, chr int ($_[1] or 0);
