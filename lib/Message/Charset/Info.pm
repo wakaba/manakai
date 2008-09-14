@@ -1,6 +1,6 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## TODO: Certain encodings MUST NOT be implemented [HTML5].
 
@@ -1183,23 +1183,13 @@ sub get_decode_handle ($$;%) {
       (%opt, allow_semiconforming => 1);
   if ($e) {
     $obj->{perl_encoding_name} = $e->name;
-    if ($self->{category} & CHARSET_CATEGORY_SJIS) {
-      return ((bless $obj, 'Whatpm::Charset::DecodeHandle::ShiftJIS'),
-              $e_status);
-    #} elsif ($self->{category} & CHARSET_CATEGORY_BLOCK_SAFE) {
-    } else {
-      $e_status |= FALLBACK_ENCODING_IMPL
-          unless $self->{category} & CHARSET_CATEGORY_BLOCK_SAFE;
-      $obj->{bom_pattern} = $self->{bom_pattern};
-      $obj->{fallback} = $self->{fallback};
-      return ((bless $obj, 'Whatpm::Charset::DecodeHandle::Encode'),
-              $e_status);
-    #} else {
-    #  ## TODO: no encoding error (?)
-    #  return (undef, 0);
+    unless ($self->{category} & CHARSET_CATEGORY_BLOCK_SAFE) {
+      $e_status |= FALLBACK_ENCODING_IMPL;
     }
+    $obj->{bom_pattern} = $self->{bom_pattern};
+    $obj->{fallback} = $self->{fallback};
+    return ((bless $obj, 'Whatpm::Charset::DecodeHandle::Encode'), $e_status);
   } else {
-    ## TODO: no encoding error(?)
     return (undef, 0);
   }
 } # get_decode_handle
@@ -1320,5 +1310,5 @@ sub is_syntactically_valid_iana_charset_name ($) {
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2008/09/14 06:59:08 $
+## $Date: 2008/09/14 07:20:17 $
 
