@@ -2,7 +2,7 @@
 use strict;
 
 my $DEBUG = $ENV{DEBUG};
-
+use lib qw[/home/wakaba/work/manakai2/lib];
 my $dir_name;
 my $test_dir_name;
 BEGIN {
@@ -220,4 +220,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/09/13 04:19:56 $
+## $Date: 2008/09/14 09:05:55 $

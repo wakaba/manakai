@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.172 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.173 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -4870,14 +4870,13 @@ sub _tree_construction_main ($) {
           } else {
             
             ## Ignore the token.
-            $token = $self->_get_next_token;
-            next B;
           }
           unless (length $token->{data}) {
             
             $token = $self->_get_next_token;
             next B;
           }
+## TODO: set $token->{column} appropriately
         }
 
         if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
@@ -8965,10 +8964,10 @@ sub _tree_construction_main ($) {
   ## TODO: script stuffs
 } # _tree_construct_main
 
-sub set_inner_html ($$$;$) {
+sub set_inner_html ($$$$;$) {
   my $class = shift;
   my $node = shift;
-  my $s = \$_[0];
+  #my $s = \$_[0];
   my $onerror = $_[1];
   my $get_wrapper = $_[2] || sub ($) { return $_[0] };
 
@@ -8989,7 +8988,7 @@ sub set_inner_html ($$$;$) {
     }
 
     ## Step 3, 4, 5 # MUST
-    $class->parse_char_string ($$s => $node, $onerror, $get_wrapper);
+    $class->parse_char_string ($_[0] => $node, $onerror, $get_wrapper);
   } elsif ($nt == 1) {
     ## TODO: If non-html element
 
@@ -9008,14 +9007,24 @@ sub set_inner_html ($$$;$) {
     my $i = 0;
     $p->{line_prev} = $p->{line} = 1;
     $p->{column_prev} = $p->{column} = 0;
+    require Whatpm::Charset::DecodeHandle;
+    my $input = Whatpm::Charset::DecodeHandle::CharString->new (\($_[0]));
+    $input = $get_wrapper->($input);
     $p->{set_next_char} = sub {
       my $self = shift;
 
       pop @{$self->{prev_char}};
       unshift @{$self->{prev_char}}, $self->{next_char};
 
-      $self->{next_char} = -1 and return if $i >= length $$s;
-      $self->{next_char} = ord substr $$s, $i++, 1;
+      my $char;
+      if (defined $self->{next_next_char}) {
+        $char = $self->{next_next_char};
+        delete $self->{next_next_char};
+      } else {
+        $char = $input->getc;
+      }
+      $self->{next_char} = -1 and return unless defined $char;
+      $self->{next_char} = ord $char;
 
       ($p->{line_prev}, $p->{column_prev}) = ($p->{line}, $p->{column});
       $p->{column}++;
@@ -9025,7 +9034,11 @@ sub set_inner_html ($$$;$) {
         $p->{column} = 0;
         
       } elsif ($self->{next_char} == 0x000D) { # CR
-        $i++ if substr ($$s, $i, 1) eq "\x0A";
+## TODO: support for abort/streaming
+        my $next = $input->getc;
+        if (defined $next and $next ne "\x0A") {
+          $self->{next_next_char} = $next;
+        }
         $self->{next_char} = 0x000A; # LF # MUST
         $p->{line}++;
         $p->{column} = 0;
@@ -9071,9 +9084,21 @@ sub set_inner_html ($$$;$) {
     $p->{next_char} = -1;
 
     $p->{read_until} = sub {
-      ## TODO: ...
-      return 0;
-    }; # $p->{read_until};
+      #my ($scalar, $specials_range, $offset) = @_;
+      my $specials_range = $_[1];
+      return 0 if defined $p->{next_next_char};
+      my $count = $input->manakai_read_until
+        ($_[0],
+         qr/(?![$specials_range\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/,
+         $_[2]);
+      if ($count) {
+        $p->{column} += $count;
+        $p->{column_prev} += $count;
+        $p->{prev_char} = [-1, -1, -1];
+        $p->{next_char} = -1;
+      }
+      return $count;
+    }; # $p->{read_until}
 
     my $ponerror = $onerror || sub {
       my (%opt) = @_;
@@ -9180,4 +9205,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/14 07:19:47 $
+# $Date: 2008/09/14 09:05:54 $

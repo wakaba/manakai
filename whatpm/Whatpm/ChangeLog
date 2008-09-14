@@ -1,5 +1,14 @@
 2008-09-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: White-space-leaded non-white-space character
+	tokens in "before head insertion mode" was not
+	correctly handled.
+	(set_inner_html): Reimplemented using CharString decodehandle
+	class.  Support for $get_wrapper argument.  Support
+	for |{read_until}| feature.
+
+2008-09-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: Make a "bare ero" error for unknown
 	entities point the "&" character.
 
