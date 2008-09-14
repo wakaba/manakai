@@ -797,104 +797,159 @@ sub ungetc ($$) {
 package Whatpm::Charset::DecodeHandle::EUCJP;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
 
-sub getc ($) {
-  my $self = $_[0];
-  return shift @{$self->{character_queue}} if @{$self->{character_queue}};
-
-  my $error;
-  if ($self->{continue}) {
-    if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
-                                   length $self->{byte_buffer})) {
-      # 
-    } else {
-      $error = 1;
-    }
-    $self->{continue} = 0;
-  } elsif (512 > length $self->{byte_buffer}) {
-    $self->{filehandle}->read ($self->{byte_buffer}, 256,
-                               length $self->{byte_buffer});
-  }
-  
-  my $r;
-  unless ($error) {
-    my $string = Encode::decode ($self->{perl_encoding_name},
-                                 $self->{byte_buffer},
-                                 Encode::FB_QUIET ());
-    if (length $string) {
-      push @{$self->{character_queue}}, split //, $string;
-      $r = shift @{$self->{character_queue}};
-      if (length $self->{byte_buffer}) {
-        $self->{continue} = 1;
-      }
-    } else {
-      if (length $self->{byte_buffer}) {
-        $error = 1;
-      } else {
-        $r = undef;
-      }
-    }
-  }
-
-  if ($error) {
-    $r = substr $self->{byte_buffer}, 0, 1, '';
-    my $etype = 'illegal-octets-error';
-    if ($r =~ /^[\xA1-\xFE]/) {
-      if ($self->{byte_buffer} =~ s/^([\xA1-\xFE])//) {
-        $r .= $1;
-        $etype = 'unassigned-code-point-error';
-      }
-    } elsif ($r eq "\x8F") {
-      if ($self->{byte_buffer} =~ s/^([\xA1-\xFE][\xA1-\xFE]?)//) {
-        $r .= $1;
-        $etype = 'unassigned-code-point-error' if length $1 == 2;
-      }
-    } elsif ($r eq "\x8E") {
-      if ($self->{byte_buffer} =~ s/^([\xA1-\xFE])//) {
-        $r .= $1;
-        $etype = 'unassigned-code-point-error';
-      }
-    } elsif ($r eq "\xA0" or $r eq "\xFF") {
-      $etype = 'unassigned-code-point-error';
-    }
-    $self->{onerror}->($self, $etype, octets => \$r,
-                       level => $self->{level}->{$self->{error_level}->{$etype}});
-  }
-  
-  return $r;
-} # getc
-
-## TODO: This is not good for performance.  Should be replaced
-## by read-centric implementation.
 sub read ($$$;$) {
-  #my ($self, $scalar, $length, $offset) = @_;
-  my $length = $_[2];
-  my $r = '';
-  while ($length > 0) {
-    my $c = $_[0]->getc;
-    last unless defined $c;
-    $r .= $c;
-    $length--;
-  }
-  substr ($_[1], $_[3]) = $r;
-      ## NOTE: This would do different thing from what Perl's |read| do
-      ## if $offset points beyond the end of the $scalar.
-  return length $r;
-} # read
-
-sub manakai_read_until ($$$;$) {
-  #my ($self, $scalar, $pattern, $offset) = @_;
   my $self = $_[0];
-  my $c = $self->getc;
-  if ($c =~ /^$_[2]/) {
-    substr ($_[1], $_[3]) = $c;
-    return 1;
-  } elsif (defined $c) {
-    $self->ungetc (ord $c);
-    return 0;
-  } else {
-    return 0;
-  }
-} # manakai_read_until
+  #my $scalar = $_[1];
+  my $length = $_[2];
+  my $offset = $_[3] || 0;
+  my $count = 0;
+  my $eof;
+  ## NOTE: It is incompatible with the standard Perl semantics
+  ## if $offset is greater than the length of $scalar.
+
+  A: {
+    return $count if $length < 1;
+
+    if (my $l = (length ${$self->{char_buffer}}) - $self->{char_buffer_pos}) {
+      if ($l >= $length) {
+        substr ($_[1], $offset)
+            = substr (${$self->{char_buffer}}, $self->{char_buffer_pos},
+                      $length);
+        $count += $length;
+        $self->{char_buffer_pos} += $length;
+        $length = 0;
+        return $count;
+      } else {
+        substr ($_[1], $offset)
+            = substr (${$self->{char_buffer}}, $self->{char_buffer_pos});
+        $count += $l;
+        $length -= $l;
+        ${$self->{char_buffer}} = '';
+        $self->{char_buffer_pos} = 0;
+      }
+      $offset = length $_[1];
+    }
+
+    if ($eof) {
+      return $count;
+    }
+
+    my $error;
+    if ($self->{continue}) {
+      if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
+                                     length $self->{byte_buffer})) {
+        # 
+      } else {
+        $error = 1;
+      }
+      $self->{continue} = 0;
+    } elsif (512 > length $self->{byte_buffer}) {
+      if ($self->{filehandle}->read ($self->{byte_buffer}, 256,
+                                     length $self->{byte_buffer})) {
+        #
+      } else {
+        $eof = 1;
+      }
+    }
+
+    unless ($error) {
+      my $string = Encode::decode ($self->{perl_encoding_name},
+                                   $self->{byte_buffer},
+                                   Encode::FB_QUIET ());
+      if (length $string) {
+        $self->{char_buffer} = \$string;
+        $self->{char_buffer_pos} = 0;
+        if (length $self->{byte_buffer}) {
+          $self->{continue} = 1;
+        }
+      } else {
+        if (length $self->{byte_buffer}) {
+          $error = 1;
+        } else {
+          ## NOTE: No further input.
+          redo A;
+        }
+      }
+    }
+
+    if ($error) {
+      my $r = substr $self->{byte_buffer}, 0, 1, '';
+      my $etype = 'illegal-octets-error';
+      if ($r =~ /^[\xA1-\xFE]/) {
+        if ($self->{byte_buffer} =~ s/^([\xA1-\xFE])//) {
+          $r .= $1;
+          $etype = 'unassigned-code-point-error';
+        }
+      } elsif ($r eq "\x8F") {
+        if ($self->{byte_buffer} =~ s/^([\xA1-\xFE][\xA1-\xFE]?)//) {
+          $r .= $1;
+          $etype = 'unassigned-code-point-error' if length $1 == 2;
+        }
+      } elsif ($r eq "\x8E") {
+        if ($self->{byte_buffer} =~ s/^([\xA1-\xFE])//) {
+          $r .= $1;
+          $etype = 'unassigned-code-point-error';
+        }
+      } elsif ($r eq "\xA0" or $r eq "\xFF") {
+        $etype = 'unassigned-code-point-error';
+      }
+      ## NOTE: Fixup line/column number by counting the number of 
+      ## lines/columns in the string that is to be retuend by this
+      ## method call.
+      my $line_diff = 0;
+      my $col_diff = 0;
+      my $set_col;
+      for (my $i = 0; $i < $count; $i++) {
+        my $s = substr $_[1], $i - $count, 1;
+        if ($s eq "\x0D") {
+          $line_diff++;
+          $col_diff = 0;
+          $set_col = 1;
+          $i++ if substr ($_[1], $i - $count + 1, 1) eq "\x0A";
+        } elsif ($s eq "\x0A") {
+          $line_diff++;
+          $col_diff = 0;
+          $set_col = 1;
+        } else {
+          $col_diff++;
+        }
+      }
+      my $i = $self->{char_buffer_pos};
+      if ($count and substr (${$self->{char_buffer}}, -1, 1) eq "\x0D") {
+        if (substr (${$self->{char_buffer}}, $i, 1) eq "\x0A") {
+          $i++;
+        }
+      }
+      my $cb_length = length ${$self->{char_buffer}};
+      for (; $i < $cb_length; $i++) {
+        my $s = substr $_[1], $i, 1;
+        if ($s eq "\x0D") {
+          $line_diff++;
+          $col_diff = 0;
+          $set_col = 1;
+          $i++ if substr ($_[1], $i + 1, 1) eq "\x0A";
+        } elsif ($s eq "\x0A") {
+          $line_diff++;
+          $col_diff = 0;
+          $set_col = 1;
+        } else {
+          $col_diff++;
+        }
+      }
+      $self->{onerror}->($self, $etype, octets => \$r,
+                         level => $self->{level}->{$self->{error_level}->{$etype}},
+                         line_diff => $line_diff,
+                         ($set_col ? (column => 1) : ()),
+                         column_diff => $col_diff);
+          ## NOTE: Error handler may modify |octets| parameter, which
+          ## would be returned as part of the output.  Note that what
+          ## is returned would affect what |manakai_read_until| returns.
+      ${$self->{char_buffer}} .= $r;
+    }
+
+    redo A;
+  } # A
+} # read
 
 package Whatpm::Charset::DecodeHandle::ISO2022JP;
 push our @ISA, 'Whatpm::Charset::DecodeHandle::Encode';
@@ -1725,4 +1780,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/14 03:59:08 $
+## $Date: 2008/09/14 06:32:49 $

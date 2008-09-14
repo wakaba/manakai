@@ -1,5 +1,14 @@
 2008-09-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src ($char_onerror): Have character decoder's |line|
+	and |column| a higher priority than the one set by the
+	tokenizer's input handler.
+	($self->{read_until}): Exclude U+FFFD (but this might
+	not be necessary, since now we do line/column fixup in
+	the character decode handle).
+
+2008-09-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: Use |{read_until}| where possible.
 
 2008-09-14  Wakaba  <wakaba@suika.fam.cx>
