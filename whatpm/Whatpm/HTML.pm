@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.175 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.176 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -659,7 +659,7 @@ sub parse_char_stream ($$$;$) {
 
       my $count = $input->manakai_read_until
          ($self->{char_buffer},
-          qr/(?!\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/,
+          qr/(?![\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/,
           $self->{char_buffer_pos});
       if ($count) {
         $self->{line_prev} = $self->{line};
@@ -730,26 +730,44 @@ sub parse_char_stream ($$$;$) {
       }
     }
   };
-  $self->{prev_char} = [-1, -1, -1];
-  $self->{next_char} = -1;
 
   $self->{read_until} = sub {
     #my ($scalar, $specials_range, $offset) = @_;
-    my $specials_range = $_[1];
     return 0 if defined $self->{next_next_char};
-    my $count = $input->manakai_read_until
-       ($_[0],
-        qr/(?![$specials_range\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/,
-        $_[2]);
-    if ($count) {
-      $self->{column} += $count;
-      $self->{column_prev} += $count;
-      $self->{prev_char} = [-1, -1, -1];
-      $self->{next_char} = -1;
+
+    my $pattern = qr/(?![$_[1]\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/;
+    my $offset = $_[2] || 0;
+
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      pos ($self->{char_buffer}) = $self->{char_buffer_pos};
+      if ($self->{char_buffer} =~ /\G(?>$pattern)+/) {
+        substr ($_[0], $offset)
+            = substr ($self->{char_buffer}, $-[0], $+[0] - $-[0]);
+        my $count = $+[0] - $-[0];
+        if ($count) {
+          $self->{column} += $count;
+          $self->{char_buffer_pos} += $count;
+          $self->{line_prev} = $self->{line};
+          $self->{column_prev} = $self->{column} - 1;
+          $self->{prev_char} = [-1, -1, -1];
+          $self->{next_char} = -1;
+        }
+        return $count;
+      } else {
+        return 0;
+      }
+    } else {
+      my $count = $input->manakai_read_until ($_[0], $pattern, $_[2]);
+      if ($count) {
+        $self->{column} += $count;
+        $self->{line_prev} = $self->{line};
+        $self->{column_prev} = $self->{column} - 1;
+        $self->{prev_char} = [-1, -1, -1];
+        $self->{next_char} = -1;
+      }
+      return $count;
     }
-    return $count;
   }; # $self->{read_until}
-$self->{read_until}=sub{0};
 
   my $onerror = $_[2] || sub {
     my (%opt) = @_;
@@ -923,7 +941,8 @@ sub _initialize_tokenizer ($) {
   delete $self->{self_closing};
   $self->{char_buffer} = '';
   $self->{char_buffer_pos} = 0;
-  # $self->{next_char}
+  $self->{prev_char} = [-1, -1, -1];
+  $self->{next_char} = -1;
   
     pop @{$self->{prev_char}};
     unshift @{$self->{prev_char}}, $self->{next_char};
@@ -10632,15 +10651,29 @@ sub set_inner_html ($$$$;$) {
     $p->{set_next_char} = sub {
       my $self = shift;
 
-      pop @{$self->{prev_char}};
-      unshift @{$self->{prev_char}}, $self->{next_char};
-
       my $char = '';
       if (defined $self->{next_next_char}) {
         $char = $self->{next_next_char};
         delete $self->{next_next_char};
         $self->{next_char} = ord $char;
       } else {
+        $self->{char_buffer} = '';
+        $self->{char_buffer_pos} = 0;
+        
+        my $count = $input->manakai_read_until
+            ($self->{char_buffer},
+             qr/(?![\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/,
+               $self->{char_buffer_pos});
+        if ($count) {
+          $self->{line_prev} = $self->{line};
+          $self->{column_prev} = $self->{column};
+          $self->{column}++;
+          $self->{next_char}
+              = ord substr ($self->{char_buffer},
+                            $self->{char_buffer_pos}++, 1);
+          return;
+        }
+        
         if ($input->read ($char, 1)) {
           $self->{next_char} = ord $char;
         } else {
@@ -10703,24 +10736,42 @@ sub set_inner_html ($$$$;$) {
         }
       }
     };
-    $p->{prev_char} = [-1, -1, -1];
-    $p->{next_char} = -1;
 
     $p->{read_until} = sub {
       #my ($scalar, $specials_range, $offset) = @_;
-      my $specials_range = $_[1];
       return 0 if defined $p->{next_next_char};
-      my $count = $input->manakai_read_until
-        ($_[0],
-         qr/(?![$specials_range\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/,
-         $_[2]);
-      if ($count) {
-        $p->{column} += $count;
-        $p->{column_prev} += $count;
-        $p->{prev_char} = [-1, -1, -1];
-        $p->{next_char} = -1;
+
+      my $pattern = qr/(?![$_[1]\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/;
+      my $offset = $_[2] || 0;
+      
+      if ($p->{char_buffer_pos} < length $p->{char_buffer}) {
+        pos ($p->{char_buffer}) = $p->{char_buffer_pos};
+        if ($p->{char_buffer} =~ /\G(?>$pattern)+/) {
+          substr ($_[0], $offset)
+              = substr ($p->{char_buffer}, $-[0], $+[0] - $-[0]);
+          my $count = $+[0] - $-[0];
+          if ($count) {
+            $p->{column} += $count;
+            $p->{char_buffer_pos} += $count;
+            $p->{line_prev} = $p->{line};
+            $p->{column_prev} = $p->{column} - 1;
+            $p->{prev_char} = [-1, -1, -1];
+            $p->{next_char} = -1;
+          }
+          return $count;
+        } else {
+          return 0;
+        }
+      } else {
+        my $count = $input->manakai_read_until ($_[0], $pattern, $_[2]);
+        if ($count) {
+          $p->{column} += $count;
+          $p->{column_prev} += $count;
+          $p->{prev_char} = [-1, -1, -1];
+          $p->{next_char} = -1;
+        }
+        return $count;
       }
-      return $count;
     }; # $p->{read_until}
 
     my $ponerror = $onerror || sub {
@@ -10836,4 +10887,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/14 13:09:00 $
+# $Date: 2008/09/14 14:35:43 $

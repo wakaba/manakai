@@ -110,8 +110,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $p->{set_next_char} = sub {
         my $self = shift;
 
-        pop @{$self->{prev_char}};
-        unshift @{$self->{prev_char}}, $self->{next_char};
+#        pop @{$self->{prev_char}};
+#        unshift @{$self->{prev_char}}, $self->{next_char};
 
         $self->{next_char} = -1 and return if $i >= length $s;
         $self->{next_char} = ord substr $s, $i++, 1;
@@ -148,8 +148,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
           push @token, 'ParseError';
         }
       };
-      $p->{prev_char} = [-1, -1, -1];
-      $p->{next_char} = -1;
+
+
 
       $p->{read_until} = sub { return 0 };
       
@@ -209,4 +209,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/09/14 03:07:58 $
+## $Date: 2008/09/14 14:35:43 $

@@ -1,5 +1,12 @@
 2008-09-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: Regexp typo fixed.  |{prev_char}|
+	and |{next_char}| initializations are moved to initialization
+	method.  |{read_until}| now supports buffering.  Sync |set_inner_html|
+	with |parse_char_stream|.
+
+2008-09-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src (parse_char_stream): Make |set_next_char|
 	invoke |manakai_read_until|, not only |read|, where
 	possible, to decrease the number of |read| method calls.
