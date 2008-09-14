@@ -1,5 +1,14 @@
 2008-09-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src (parse_char_stream): Make |set_next_char|
+	invoke |manakai_read_until|, not only |read|, where
+	possible, to decrease the number of |read| method calls.
+
+	* mkhtmlparser.pl: Related changes to the aforementioned
+	modification.
+
+2008-09-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: Use |read| instead of |getc|.  |set_inner_html|
 	would report character error from now.
 

@@ -6,7 +6,18 @@ my $DEBUG = $ENV{DEBUG};
 while (<>) {
   s/!!!emit\b/return /;
   s{!!!next-input-character;}{q{
-    $self->{set_next_char}->($self);
+    pop @{$self->{prev_char}};
+    unshift @{$self->{prev_char}}, $self->{next_char};
+
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{next_char}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_next_char}->($self);
+    }
   }}ge;
   s{!!!nack\s*\(\s*'([^']+)'\s*\)\s*;}{
     ($DEBUG ? qq{

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.178 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.179 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -643,12 +643,10 @@ sub parse_char_stream ($$$;$) {
 
   my $i = 0;
   $self->{line_prev} = $self->{line} = 1;
-  $self->{column_prev} = $self->{column} = 0;
+  $self->{column_prev} = -1;
+  $self->{column} = 0;
   $self->{set_next_char} = sub {
     my $self = shift;
-
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
 
     my $char = '';
     if (defined $self->{next_next_char}) {
@@ -656,6 +654,22 @@ sub parse_char_stream ($$$;$) {
       delete $self->{next_next_char};
       $self->{next_char} = ord $char;
     } else {
+      $self->{char_buffer} = '';
+      $self->{char_buffer_pos} = 0;
+
+      my $count = $input->manakai_read_until
+         ($self->{char_buffer},
+          qr/(?!\x{FDD0}-\x{FDDF}\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}])[\x20-\x7E\xA0-\x{D7FF}\x{E000}-\x{10FFFD}]/,
+          $self->{char_buffer_pos});
+      if ($count) {
+        $self->{line_prev} = $self->{line};
+        $self->{column_prev} = $self->{column};
+        $self->{column}++;
+        $self->{next_char}
+            = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+        return;
+      }
+
       if ($input->read ($char, 1)) {
         $self->{next_char} = ord $char;
       } else {
@@ -735,6 +749,7 @@ sub parse_char_stream ($$$;$) {
     }
     return $count;
   }; # $self->{read_until}
+$self->{read_until}=sub{0};
 
   my $onerror = $_[2] || sub {
     my (%opt) = @_;
@@ -906,6 +921,8 @@ sub _initialize_tokenizer ($) {
   undef $self->{last_emitted_start_tag_name};
   #$self->{prev_state}; # initialized when used
   delete $self->{self_closing};
+  $self->{char_buffer} = '';
+  $self->{char_buffer_pos} = 0;
   # $self->{next_char}
   !!!next-input-character;
   $self->{token} = [];
@@ -7992,4 +8009,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/14 11:57:41 $
+# $Date: 2008/09/14 13:09:01 $
