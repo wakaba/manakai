@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.180 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.181 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -853,7 +853,7 @@ sub CDATA_SECTION_STATE () { 35 }
 sub MD_HYPHEN_STATE () { 36 } # "markup declaration open state" in the spec
 sub MD_DOCTYPE_STATE () { 37 } # "markup declaration open state" in the spec
 sub MD_CDATA_STATE () { 38 } # "markup declaration open state" in the spec
-sub CDATA_PCDATA_CLOSE_TAG_STATE () { 39 } # "close tag open state" in the spec
+sub CDATA_RCDATA_CLOSE_TAG_STATE () { 39 } # "close tag open state" in the spec
 sub CDATA_SECTION_MSE1_STATE () { 40 } # "CDATA section state" in the spec
 sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 sub PUBLIC_STATE () { 42 } # "after DOCTYPE name state" in the spec
@@ -867,6 +867,7 @@ sub NCR_NUM_STATE () { 46 }
 sub HEXREF_X_STATE () { 47 }
 sub HEXREF_HEX_STATE () { 48 }
 sub ENTITY_NAME_STATE () { 49 }
+sub PCDATA_STATE () { 50 } # "data state" in the spec
 
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
@@ -992,9 +993,79 @@ sub _get_next_token ($) {
   }
 
   A: {
-    if ($self->{state} == DATA_STATE) {
+    if ($self->{state} == PCDATA_STATE) {
+      ## NOTE: Same as |DATA_STATE|, but only for |PCDATA| content model.
+
       if ($self->{nc} == 0x0026) { # &
-        delete $self->{s_kwd};
+        ## NOTE: In the spec, the tokenizer is switched to the 
+        ## "entity data state".  In this implementation, the tokenizer
+        ## is switched to the |ENTITY_STATE|, which is an implementation
+        ## of the "consume a character reference" algorithm.
+        $self->{entity_add} = -1;
+        $self->{prev_state} = DATA_STATE;
+        $self->{state} = ENTITY_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003C) { # <
+        
+        $self->{state} = TAG_OPEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        
+        return  ({type => END_OF_FILE_TOKEN,
+                  line => $self->{line}, column => $self->{column}});
+        last A; ## TODO: ok?
+      } else {
+        
+        #
+      }
+
+      # Anything else
+      my $token = {type => CHARACTER_TOKEN,
+                   data => chr $self->{nc},
+                   line => $self->{line}, column => $self->{column},
+                  };
+      $self->{read_until}->($token->{data}, q[<&], length $token->{data});
+
+      ## Stay in the state.
+      
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+      return  ($token);
+      redo A;
+    } elsif ($self->{state} == DATA_STATE) {
+      $self->{s_kwd} = '' unless defined $self->{s_kwd};
+      if ($self->{nc} == 0x0026) { # &
+        $self->{s_kwd} = '';
 	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
             not $self->{escape}) {
           
@@ -1023,14 +1094,8 @@ sub _get_next_token ($) {
         }
       } elsif ($self->{nc} == 0x002D) { # -
 	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
-          if (defined $self->{s_kwd}) {
-            
-            $self->{s_kwd} .= '-';
-          } else {
-            
-            $self->{s_kwd} = '-';
-          }
-
+          $self->{s_kwd} .= '-';
+          
           if ($self->{s_kwd} eq '<!--') {
             
             $self->{escape} = 1; # unless $self->{escape};
@@ -1048,17 +1113,17 @@ sub _get_next_token ($) {
         
         #
       } elsif ($self->{nc} == 0x0021) { # !
-        if (defined $self->{s_kwd}) {
+        if (length $self->{s_kwd}) {
           
           $self->{s_kwd} .= '!';
           #
         } else {
           
+          #$self->{s_kwd} = '';
           #
         }
         #
       } elsif ($self->{nc} == 0x003C) { # <
-        delete $self->{s_kwd};
         if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
             (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
              not $self->{escape})) {
@@ -1078,12 +1143,13 @@ sub _get_next_token ($) {
           redo A;
         } else {
           
+          $self->{s_kwd} = '';
           #
         }
       } elsif ($self->{nc} == 0x003E) { # >
         if ($self->{escape} and
             ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
-          if (defined $self->{s_kwd} and $self->{s_kwd} eq '--') {
+          if ($self->{s_kwd} eq '--') {
             
             delete $self->{escape};
           } else {
@@ -1093,17 +1159,17 @@ sub _get_next_token ($) {
           
         }
         
-        delete $self->{s_kwd};
+        $self->{s_kwd} = '';
         #
       } elsif ($self->{nc} == -1) {
         
-        delete $self->{s_kwd};
+        $self->{s_kwd} = '';
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
         last A; ## TODO: ok?
       } else {
         
-        delete $self->{s_kwd};
+        $self->{s_kwd} = '';
         #
       }
 
@@ -1114,10 +1180,15 @@ sub _get_next_token ($) {
                   };
       if ($self->{read_until}->($token->{data}, q[-!<>&],
                                 length $token->{data})) {
-        delete $self->{s_kwd};
+        $self->{s_kwd} = '';
       }
 
-      ## Stay in the data state
+      ## Stay in the data state.
+      if ($self->{content_model} == PCDATA_CONTENT_MODEL) {
+        $self->{state} = PCDATA_STATE;
+      } else {
+        ## Stay in the state.
+      }
       
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1129,9 +1200,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
       return  ($token);
-
       redo A;
     } elsif ($self->{state} == TAG_OPEN_STATE) {
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
@@ -1294,12 +1363,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == CLOSE_TAG_OPEN_STATE) {
       ## NOTE: The "close tag open state" in the spec is implemented as
-      ## |CLOSE_TAG_OPEN_STATE| and |CDATA_PCDATA_CLOSE_TAG_STATE|.
+      ## |CLOSE_TAG_OPEN_STATE| and |CDATA_RCDATA_CLOSE_TAG_STATE|.
 
       my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1); # "<"of"</"
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if (defined $self->{last_stag_name}) {
-          $self->{state} = CDATA_PCDATA_CLOSE_TAG_STATE;
+          $self->{state} = CDATA_RCDATA_CLOSE_TAG_STATE;
           $self->{s_kwd} = '';
           ## Reconsume.
           redo A;
@@ -1400,7 +1469,7 @@ sub _get_next_token ($) {
         ## "bogus comment state" entry.
         redo A;
       }
-    } elsif ($self->{state} == CDATA_PCDATA_CLOSE_TAG_STATE) {
+    } elsif ($self->{state} == CDATA_RCDATA_CLOSE_TAG_STATE) {
       my $ch = substr $self->{last_stag_name}, length $self->{s_kwd}, 1;
       if (length $ch) {
         my $CH = $ch;
@@ -10433,4 +10502,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/15 09:02:27 $
+# $Date: 2008/09/15 09:27:53 $
