@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<html lang=en>
+<head>
+<title>Handle objects used by Whatpm</title>
+<link rel=stylesheet href="http://suika.fam.cx/www/style/html/xhtml">
+<link rel=author title=Wakaba href="http://suika.fam.cx/~wakaba/who?" lang=ja>
+<link rel=license href="#license">
+<link rel=top href="../../readme">
+</head>
+<body>
+<h1>Handle objects used by Whatpm</h1>
+
+<div class=section id=intro>
+<h2>Introduction</h2>
+
+<p>Some modules of Whatpm uses handle (filehandle or <code>IO::Handle</code>)
+like objects to represents various kinds of input streams.
+This document describes interfaces of handle objects used by them.
+</div>
+
+<div class=section id=interfaces>
+<h2>Interfaces</h2>
+
+<div class=section id=interface-charstream-input>
+<h3>Character stream input handles</h3>
+
+<p>An object implementing the <dfn
+id=term-charstream-input-interface>character stream input
+interface</dfn> is expected to provides a character stream input.  It
+has to exposes at least the following methods:
+
+<dl>
+<dt id=charstream-input-close><code>close ()</code>
+  <dd>Close the stream.  Once the stream is closed, <code>read</code> and
+  <code>manakai_read_until</code> methods should not be invoked.  If called,
+  the result is undefined.
+<dt id=charstream-input-onerror><code>onerror ([<var>CODE</var>])</code>
+  <dd>On getting, i.e. no argument is specified, return the error handler
+  function, if it is explicitly specified, or <code>undef</code> otherwise.
+  Handle objects might define the default error handler.  Even if the default
+  error handler is set as the error handler, i.e. no explicit error handler
+  is set, <code>undef</code> is returned.
+  
+  <p>On setting, i.e. an argument is specified, the specified value is set
+  as the error handler.  It has to be a <code>CODE</code> reference; otherwise,
+  the behavior of the handle object is undefined.  As a special case, if 
+  <code>undef</code> is specified as the new value, any explicitly specified
+  error handler is unset and the default error handler, if any, is set.
+
+  <p class=ed>@@ The error handler would ...
+<dt id=charstream-input-read><code>read (<var>SCALAR</var>, <var>LENGTH</var>, [<var>OFFSET</var>])</code>
+  <dd>Read characters from the input stream.  This method should behave in 
+  a similar manner as the <code>read</code> method of a <code>IO::Handle</code>
+  object that provides a character stream, except when the <var>OFFSET</var>
+  argument is a negative value, in which case the result is undefined.
+<dt id=charstream-input-manakai-read-until><code>manakai_read_until (<var>SCALAR</var>, <var>PATTERN</var>, [<var>OFFSET</var>])</code>
+  <dd>Read characters from the input stream, like the 
+  <a href="#charstream-input-read"><code>read</code></a> method,
+  but the number of read characters are not specified by length, but
+  determined by the pattern match.  Any character matching the regular
+  expression <var>PATTERN</var> is read.  The number of read characters is
+  returned.  If no character matches the <var>PATTERN</var>, then no character
+  is read and zero (<code>0</code>) is returned.  Note that the method don't
+  have to return all characters matching the <var>PATTERN</var> once; for
+  example, the method may decide to stop reading when the 256th character
+  is read.  The <var>OFFSET</var> argument, if specified, must be greater than
+  or equal to zero (<code>0</code>); otherwise, the result is undefined.
+</dl>
+
+<p>Following classes are implementing this interface:
+  <ul>
+  <li><a href=DecodeHandle.html><code>Whatpm::Charset::DecodeHandle::CharString</code></a>
+      (The class method
+      <code>Whatpm::Charset::DecodeHandle::CharString->new</code>
+      would generate an instance of this class.)
+  <li><a href=DecodeHandle.html><code>Whatpm::Charset::DecodeHandle::Encode</code></a>
+      (The <code>get_decode_handle</code> method on a 
+      <code>Message::Charset::Info</code> object would generate an instance of
+      this class.)
+  <li><a href=DecodeHandle.html><code>Whatpm::Charset::DecodeHandle::ISO2022JP</code></a>
+      (The <code>get_decode_handle</code> method on a 
+      <code>Message::Charset::Info</code> object would generate an instance of
+      this class.)
+  <li><a href=UnicodeChecker.html><code>Whatpm::Charset::UnicodeChecker</code></a>
+      (The class method
+      <code>Whatpm::Charset::UnicodeChecker->new_handle</code>
+      would generate an instance of this class.)
+  </ul>
+
+<p>Following method arguments expects objects with this interface:
+  <ul>
+  <li>The first argument of the
+      <a href="../HTML.html#item_parse_char_stream"><code>parse_char_stream</code></a>
+      method of <a href="../HTML.html"><code>Whatpm::HTML</code></a> objects
+  <li>The first argument of the <code>new_handle</code> method of
+      the <a href="UnicodeChecker.html"><code>Whatpm::Charset::UnicodeChecker</code></a>
+      class
+  </ul>
+
+<!--
+Required (provided) methods:
+  Whatpm::HTML->parse_char_stream: read, manakai_read_until
+  Whatpm::HTML->parse_byte_stream: onerror [+ parse_char_stream]
+  Whatpm::Charset::UnicodeChecker: read, manakai_read_until, close,
+      charset, has_bom, input_encoding, onerror
+      (+ ungetc, new_handle)
+  Whatpm::Charset::DecodeHandle::CharString: (new, getc, read,
+      manakai_read_until, ungetc, onerror, close)
+  Whatpm::Charset::DecodeHandle::Encode: (charset, close, getc, read,
+      manakai_read_until, has_bom, input_encoding, input_encoding, ungetc)
+  Whatpm::Charset::DecodeHandle::ISO2022JP: (getc, read, manakai_read_until
+      [+ Whatpm::Charset::DecodeHandle::Encode])
+  Message::DOM::XMLParserTemp: getc, ungetc, input_encoding, close
+  WebHACC::Language::Base: onerror, read
+-->
+
+</div>
+
+<div class=section id=interface-bytestream-input>
+<h3>Byte stream input handles</h3>
+
+<p>An object implementing the <dfn
+id=term-bytestream-input-interface>byte stream input interface</dfn>
+is expected to provides a byte (or octet) stream input.  It has to
+exposes at least the following methods:
+
+<dl>
+<dt id=bytestream-input-close><code>close</code>
+  <dd>Close the stream.  Once the stream is closed, the <code>read</code>
+  method should not be invoked.  If called, the results is undefined.
+<dt id=bytestream-input-read><code>read (<var>SCALAR</var>, <var>LENGTH</var>, [<var>OFFSET</var>])</code>
+  <dd>Read characters from the input stream.  This method should behave in 
+  a similar manner as the <code>read</code> method of a <code>IO::Handle</code>
+  object that provides a byte stream, except when the <var>OFFSET</var>
+  argument is a negative value, in which case the result is undefined.
+</dl>
+
+<p>Following classes are implementing this interface:
+  <ul>
+  <li><a href="DecodeHandle.html"><code>Whatpm::Charset::DecodeHandle::ByteBuffer</code></a>
+      (The class method
+      <code>Whatpm::Charset::DecodeHandle::ByteBuffer->new</code>
+      would generate an instance of this class.)
+  </ul>
+
+<p>In addition, an <code>IO::Handle</code> object (i.e. an
+object-oriented representation of Perl handles) can be used where this
+interface is expected, since the object has the methods mandated by
+this interface.
+
+<p>Following method arguments expects objects with this interface:
+  <ul>
+  <li>The first argument of the <code>get_decode_handle</code> method of
+      <code>Message::Charset::Info</code> objects
+  </ul>
+
+<!--
+  Whatpm::Charset::DecodeHandle::ByteBuffer: read, close
+      (new, read, close)
+  Whatpm::Charset::DecodeHandle::Encode: close, read
+  Whatpm::Charset::DecodeHandle::ISO2022JP: read
+      [+ Whatpm::Charset::DecodeHandle::Encode]
+  Whatpm::Charset::DecodeHandle->create_decode_handle: read
+  Message::Charset::Info->get_decode_handle:
+      [+ Whatpm::Charset::DecodeHandle::*]
+-->
+
+</div>
+
+</div>
+
+<div class=section id=license>
+<h2>License</h2>
+
+<p>Copyright 2008 <a href="http://suika.fam.cx/~wakaba/who?"
+rel=author lang=ja>Wakaba</a> <code class=mail>&lt;<a
+href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>></code>
+
+<p>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+</div>
+
+</body>
+</html>
