@@ -36,6 +36,7 @@ if ($mode eq '/csstext') {
   };
 
   $p->{prop}->{$_} = 1 for qw/
+    alignment-baseline
     background background-attachment background-color background-image
     background-position background-position-x background-position-y
     background-repeat border border-bottom border-bottom-color
@@ -47,7 +48,7 @@ if ($mode eq '/csstext') {
     border-style border-top border-top-color border-top-style border-top-width
     border-width bottom
     caption-side clear clip color content counter-increment counter-reset
-    cursor direction display empty-cells float font
+    cursor direction display dominant-baseline empty-cells float font
     font-family font-size font-size-adjust font-stretch
     font-style font-variant font-weight height left
     letter-spacing line-height
@@ -59,9 +60,9 @@ if ($mode eq '/csstext') {
     padding padding-bottom padding-left padding-right padding-top
     page page-break-after page-break-before page-break-inside
     position quotes right size table-layout
-    text-align text-decoration text-indent text-transform
+    text-align text-anchor text-decoration text-indent text-transform
     top unicode-bidi vertical-align visibility white-space width widows
-    word-spacing z-index
+    word-spacing writing-mode z-index
   /;
   $p->{prop_value}->{display}->{$_} = 1 for qw/
     block inline inline-block inline-table list-item none
@@ -72,6 +73,11 @@ if ($mode eq '/csstext') {
   $p->{prop_value}->{position}->{$_} = 1 for qw/
     absolute fixed relative static
   /;
+  for (qw/-moz-max-content -moz-min-content -moz-fit-content -moz-available/) {
+    $p->{prop_value}->{width}->{$_} = 1;
+    $p->{prop_value}->{'min-width'}->{$_} = 1;
+    $p->{prop_value}->{'max-width'}->{$_} = 1;
+  }
   $p->{prop_value}->{float}->{$_} = 1 for qw/
     left right none
   /;
@@ -138,6 +144,21 @@ if ($mode eq '/csstext') {
   $p->{prop_value}->{'white-space'}->{$_} = 1 for qw/
     normal pre nowrap pre-line pre-wrap -moz-pre-wrap
   /;
+  $p->{prop_value}->{'writing-mode'}->{$_} = 1 for qw/
+    lr rl tb lr-tb rl-tb tb-rl
+  /;
+  $p->{prop_value}->{'text-anchor'}->{$_} = 1 for qw/
+    start middle end
+  /;
+  $p->{prop_value}->{'dominant-baseline'}->{$_} = 1 for qw/
+    auto use-script no-change reset-size ideographic alphabetic
+    hanging mathematical central middle text-after-edge text-before-edge
+  /;
+  $p->{prop_value}->{'alignment-baseline'}->{$_} = 1 for qw/
+    auto baseline before-edge text-before-edge middle central
+    after-edge text-after-edge ideographic alphabetic hanging
+    mathematical
+  /;
   $p->{prop_value}->{'text-decoration'}->{$_} = 1 for qw/
     none blink underline overline line-through
   /;
@@ -187,6 +208,7 @@ if ($mode eq '/csstext') {
     pseudo_element => $p->{pseudo_element},
   };
 
+  $p->init;
   $p->{href} = 'thismessage:/';
 
   my $ss = $p->parse_char_string ($s);
@@ -328,4 +350,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/02/10 07:36:04 $
+## $Date: 2008/09/15 14:35:31 $
