@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.91 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.92 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -225,11 +225,13 @@ our %AnyChecker = (
     my ($self, $item, $element_state) = @_;
     for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
-      $attr_ns = '' unless defined $attr_ns;
+      if (defined $attr_ns) {
+        load_ns_module ($attr_ns);
+      } else {
+        $attr_ns = '';
+      }
       my $attr_ln = $attr->manakai_local_name;
       
-      load_ns_module ($attr_ns);
-
       my $checker = $AttrChecker->{$attr_ns}->{$attr_ln}
           || $AttrChecker->{$attr_ns}->{''};
       my $status = $AttrStatus->{$attr_ns}->{$attr_ln}
@@ -428,8 +430,11 @@ sub check_document ($$$;$) {
   ## ISSUE: Unexpanded entity references and HTML5 conformance
   
   my $docel_nsuri = $docel->namespace_uri;
-  $docel_nsuri = '' unless defined $docel_nsuri;
-  load_ns_module ($docel_nsuri);
+  if (defined $docel_nsuri) {
+    load_ns_module ($docel_nsuri);
+  } else {
+    $docel_nsuri = '';
+  }
   my $docel_def = $Element->{$docel_nsuri}->{$docel->manakai_local_name} ||
     $Element->{$docel_nsuri}->{''} ||
     $ElementDefault;
@@ -565,11 +570,13 @@ next unless $code;## TODO: temp.
       $code->(@$item);
     } elsif ($item->{type} eq 'element') {
       my $el_nsuri = $item->{node}->namespace_uri;
-      $el_nsuri = '' unless defined $el_nsuri;
+      if (defined $el_nsuri) {
+        load_ns_module ($el_nsuri);
+      } else {
+        $el_nsuri = '';
+      }
       my $el_ln = $item->{node}->manakai_local_name;
-
-      load_ns_module ($el_nsuri);
-
+      
       my $element_state = {};
       my $eldef = $Element->{$el_nsuri}->{$el_ln} ||
           $Element->{$el_nsuri}->{''} ||
@@ -1010,4 +1017,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/10 10:27:07 $
+# $Date: 2008/09/15 02:54:12 $

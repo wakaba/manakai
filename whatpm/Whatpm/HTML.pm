@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.176 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.177 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## ISSUE:
@@ -628,6 +628,23 @@ sub parse_char_string ($$$;$$) {
 } # parse_char_string
 *parse_string = \&parse_char_string; ## NOTE: Alias for backward compatibility.
 
+my $disallowed_control_chars =
+{
+ 0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
+ 0x2FFFE => 1, 0x2FFFF => 1, 0x3FFFE => 1, 0x3FFFF => 1,
+ 0x4FFFE => 1, 0x4FFFF => 1, 0x5FFFE => 1, 0x5FFFF => 1,
+ 0x6FFFE => 1, 0x6FFFF => 1, 0x7FFFE => 1, 0x7FFFF => 1,
+ 0x8FFFE => 1, 0x8FFFF => 1, 0x9FFFE => 1, 0x9FFFF => 1,
+ 0xAFFFE => 1, 0xAFFFF => 1, 0xBFFFE => 1, 0xBFFFF => 1,
+ 0xCFFFE => 1, 0xCFFFF => 1, 0xDFFFE => 1, 0xDFFFF => 1,
+ 0xEFFFE => 1, 0xEFFFF => 1, 0xFFFFE => 1, 0xFFFFF => 1,
+ 0x10FFFE => 1, 0x10FFFF => 1,
+};
+$disallowed_control_chars->{$_} = 1
+    for 0x0001 .. 0x0008, 0x000E .. 0x001F, 0x007F .. 0x009F,
+        0xD800 .. 0xDFFF, 0xFDD0 .. 0xFDDF;
+## ISSUE: U+FDE0-U+FDEF are not excluded
+
 sub parse_char_stream ($$$;$) {
   my $self = ref $_[0] ? shift : shift->new;
   my $input = $_[0];
@@ -645,7 +662,7 @@ sub parse_char_stream ($$$;$) {
   $self->{line_prev} = $self->{line} = 1;
   $self->{column_prev} = -1;
   $self->{column} = 0;
-  $self->{set_next_char} = sub {
+  $self->{set_next_char} = \&stream_getc;sub stream_getc {
     my $self = shift;
 
     my $char = '';
@@ -703,23 +720,7 @@ sub parse_char_stream ($$$;$) {
       
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
       $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
-    } elsif ($self->{next_char} <= 0x0008 or
-             (0x000E <= $self->{next_char} and $self->{next_char} <= 0x001F) or
-             (0x007F <= $self->{next_char} and $self->{next_char} <= 0x009F) or
-             (0xD800 <= $self->{next_char} and $self->{next_char} <= 0xDFFF) or
-             (0xFDD0 <= $self->{next_char} and $self->{next_char} <= 0xFDDF) or
-## ISSUE: U+FDE0-U+FDEF are not excluded
-             {
-              0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
-              0x2FFFE => 1, 0x2FFFF => 1, 0x3FFFE => 1, 0x3FFFF => 1,
-              0x4FFFE => 1, 0x4FFFF => 1, 0x5FFFE => 1, 0x5FFFF => 1,
-              0x6FFFE => 1, 0x6FFFF => 1, 0x7FFFE => 1, 0x7FFFF => 1,
-              0x8FFFE => 1, 0x8FFFF => 1, 0x9FFFE => 1, 0x9FFFF => 1,
-              0xAFFFE => 1, 0xAFFFF => 1, 0xBFFFE => 1, 0xBFFFF => 1,
-              0xCFFFE => 1, 0xCFFFF => 1, 0xDFFFE => 1, 0xDFFFF => 1,
-              0xEFFFE => 1, 0xEFFFF => 1, 0xFFFFE => 1, 0xFFFFF => 1,
-              0x10FFFE => 1, 0x10FFFF => 1,
-             }->{$self->{next_char}}) {
+    } elsif ($disallowed_control_chars->{$self->{next_char}}) {
       
       if ($self->{next_char} < 0x10000) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'control char',
@@ -10887,4 +10888,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/14 14:35:43 $
+# $Date: 2008/09/15 02:54:12 $
