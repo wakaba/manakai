@@ -6,9 +6,6 @@ my $DEBUG = $ENV{DEBUG};
 while (<>) {
   s/!!!emit\b/return /;
   s{!!!next-input-character;}{q{
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};

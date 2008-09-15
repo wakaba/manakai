@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.179 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.180 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -726,7 +726,6 @@ sub parse_char_stream ($$$;$$) {
           $self->{char_buffer_pos} += $count;
           $self->{line_prev} = $self->{line};
           $self->{column_prev} = $self->{column} - 1;
-          $self->{prev_char} = [-1, -1, -1];
           $self->{nc} = -1;
         }
         return $count;
@@ -739,7 +738,6 @@ sub parse_char_stream ($$$;$$) {
         $self->{column} += $count;
         $self->{line_prev} = $self->{line};
         $self->{column_prev} = $self->{column} - 1;
-        $self->{prev_char} = [-1, -1, -1];
         $self->{nc} = -1;
       }
       return $count;
@@ -932,13 +930,9 @@ sub _initialize_tokenizer ($) {
   delete $self->{self_closing};
   $self->{char_buffer} = '';
   $self->{char_buffer_pos} = 0;
-  $self->{prev_char} = [-1, -1, -1];
   $self->{nc} = -1; # next input character
   #$self->{next_nc}
   
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1000,6 +994,7 @@ sub _get_next_token ($) {
   A: {
     if ($self->{state} == DATA_STATE) {
       if ($self->{nc} == 0x0026) { # &
+        delete $self->{s_kwd};
 	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
             not $self->{escape}) {
           
@@ -1011,9 +1006,6 @@ sub _get_next_token ($) {
           $self->{prev_state} = DATA_STATE;
           $self->{state} = ENTITY_STATE;
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1031,31 +1023,48 @@ sub _get_next_token ($) {
         }
       } elsif ($self->{nc} == 0x002D) { # -
 	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
-          unless ($self->{escape}) {
-            if ($self->{prev_char}->[0] == 0x002D and # -
-                $self->{prev_char}->[1] == 0x0021 and # !
-                $self->{prev_char}->[2] == 0x003C) { # <
-              
-              $self->{escape} = 1;
-            } else {
-              
-            }
+          if (defined $self->{s_kwd}) {
+            
+            $self->{s_kwd} .= '-';
           } else {
             
+            $self->{s_kwd} = '-';
+          }
+
+          if ($self->{s_kwd} eq '<!--') {
+            
+            $self->{escape} = 1; # unless $self->{escape};
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '---') {
+            
+            $self->{s_kwd} = '--';
+            #
+          } else {
+            
+            #
           }
         }
         
         #
+      } elsif ($self->{nc} == 0x0021) { # !
+        if (defined $self->{s_kwd}) {
+          
+          $self->{s_kwd} .= '!';
+          #
+        } else {
+          
+          #
+        }
+        #
       } elsif ($self->{nc} == 0x003C) { # <
+        delete $self->{s_kwd};
         if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
             (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
              not $self->{escape})) {
           
           $self->{state} = TAG_OPEN_STATE;
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1074,8 +1083,7 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == 0x003E) { # >
         if ($self->{escape} and
             ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
-          if ($self->{prev_char}->[0] == 0x002D and # -
-              $self->{prev_char}->[1] == 0x002D) { # -
+          if (defined $self->{s_kwd} and $self->{s_kwd} eq '--') {
             
             delete $self->{escape};
           } else {
@@ -1085,27 +1093,32 @@ sub _get_next_token ($) {
           
         }
         
+        delete $self->{s_kwd};
         #
       } elsif ($self->{nc} == -1) {
         
+        delete $self->{s_kwd};
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
         last A; ## TODO: ok?
       } else {
         
+        delete $self->{s_kwd};
+        #
       }
+
       # Anything else
       my $token = {type => CHARACTER_TOKEN,
                    data => chr $self->{nc},
                    line => $self->{line}, column => $self->{column},
                   };
-      $self->{read_until}->($token->{data}, q[-!<>&], length $token->{data});
+      if ($self->{read_until}->($token->{data}, q[-!<>&],
+                                length $token->{data})) {
+        delete $self->{s_kwd};
+      }
 
       ## Stay in the data state
       
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1125,9 +1138,6 @@ sub _get_next_token ($) {
         if ($self->{nc} == 0x002F) { # /
           
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1140,26 +1150,27 @@ sub _get_next_token ($) {
   
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           redo A;
+        } elsif ($self->{nc} == 0x0021) { # !
+          
+          $self->{s_kwd} = '<' unless $self->{escape};
+          #
         } else {
           
-          ## reconsume
-          $self->{state} = DATA_STATE;
-
-          return  ({type => CHARACTER_TOKEN, data => '<',
-                    line => $self->{line_prev},
-                    column => $self->{column_prev},
-                   });
-
-          redo A;
+          #
         }
+
+        ## reconsume
+        $self->{state} = DATA_STATE;
+        return  ({type => CHARACTER_TOKEN, data => '<',
+                  line => $self->{line_prev},
+                  column => $self->{column_prev},
+                 });
+        redo A;
       } elsif ($self->{content_model} & CM_FULL_MARKUP) { # PCDATA
         if ($self->{nc} == 0x0021) { # !
           
           $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1175,9 +1186,6 @@ sub _get_next_token ($) {
           
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1199,9 +1207,6 @@ sub _get_next_token ($) {
                column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1222,9 +1227,6 @@ sub _get_next_token ($) {
                                     column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1243,9 +1245,6 @@ sub _get_next_token ($) {
                           column => $self->{column_prev});
           $self->{state} = DATA_STATE;
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1326,9 +1325,6 @@ sub _get_next_token ($) {
                line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1348,9 +1344,6 @@ sub _get_next_token ($) {
                                   line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1369,9 +1362,6 @@ sub _get_next_token ($) {
                         column => $self->{column_prev} - 1);
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1421,9 +1411,6 @@ sub _get_next_token ($) {
           ## Stay in the state.
           $self->{s_kwd} .= $nch;
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1487,9 +1474,6 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1519,9 +1503,6 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1543,9 +1524,6 @@ sub _get_next_token ($) {
           # start tag or end tag
         ## Stay in this state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1584,9 +1562,6 @@ sub _get_next_token ($) {
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1604,9 +1579,6 @@ sub _get_next_token ($) {
           # start tag or end tag
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1628,9 +1600,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1659,9 +1628,6 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1685,9 +1651,6 @@ sub _get_next_token ($) {
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1703,9 +1666,6 @@ sub _get_next_token ($) {
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1756,9 +1716,6 @@ sub _get_next_token ($) {
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1794,9 +1751,6 @@ sub _get_next_token ($) {
         $before_leave->();
         $self->{state} = AFTER_ATTRIBUTE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1813,9 +1767,6 @@ sub _get_next_token ($) {
         $before_leave->();
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1843,9 +1794,6 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1866,9 +1814,6 @@ sub _get_next_token ($) {
         $self->{ca}->{name} .= chr ($self->{nc} + 0x0020);
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1885,9 +1830,6 @@ sub _get_next_token ($) {
         $before_leave->();
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1934,9 +1876,6 @@ sub _get_next_token ($) {
         $self->{ca}->{name} .= chr ($self->{nc});
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1958,9 +1897,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1976,9 +1912,6 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2008,9 +1941,6 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2034,9 +1964,6 @@ sub _get_next_token ($) {
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2052,9 +1979,6 @@ sub _get_next_token ($) {
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2103,9 +2027,6 @@ sub _get_next_token ($) {
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2127,9 +2048,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2145,9 +2063,6 @@ sub _get_next_token ($) {
         
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2168,9 +2083,6 @@ sub _get_next_token ($) {
         
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2201,9 +2113,6 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2251,9 +2160,6 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2271,9 +2177,6 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2295,9 +2198,6 @@ sub _get_next_token ($) {
         $self->{entity_add} = 0x0022; # "
         $self->{state} = ENTITY_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2341,9 +2241,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2361,9 +2258,6 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2385,9 +2279,6 @@ sub _get_next_token ($) {
         $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2431,9 +2322,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2455,9 +2343,6 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2479,9 +2364,6 @@ sub _get_next_token ($) {
         $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2511,9 +2393,6 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2569,9 +2448,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2593,9 +2469,6 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2625,9 +2498,6 @@ sub _get_next_token ($) {
         }
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2646,9 +2516,6 @@ sub _get_next_token ($) {
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2708,9 +2575,6 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2763,9 +2627,6 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2795,9 +2656,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state.
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2817,9 +2675,6 @@ sub _get_next_token ($) {
         
         $self->{state} = MD_HYPHEN_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2838,9 +2693,6 @@ sub _get_next_token ($) {
         $self->{state} = MD_DOCTYPE_STATE;
         $self->{s_kwd} = chr $self->{nc};
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2859,9 +2711,6 @@ sub _get_next_token ($) {
         $self->{state} = MD_CDATA_STATE;
         $self->{s_kwd} = '[';
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2896,9 +2745,6 @@ sub _get_next_token ($) {
                                  };
         $self->{state} = COMMENT_START_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2946,9 +2792,6 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{s_kwd} .= chr $self->{nc};
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -2971,9 +2814,6 @@ sub _get_next_token ($) {
                                   column => $self->{column_prev} - 7,
                                  };
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3011,9 +2851,6 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{s_kwd} .= chr $self->{nc};
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3034,9 +2871,6 @@ sub _get_next_token ($) {
                                   column => $self->{column_prev} - 7};
         $self->{state} = CDATA_SECTION_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3067,9 +2901,6 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_START_DASH_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3086,9 +2917,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment');
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3118,9 +2946,6 @@ sub _get_next_token ($) {
             .= chr ($self->{nc});
         $self->{state} = COMMENT_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3138,9 +2963,6 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3157,9 +2979,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment');
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3189,9 +3008,6 @@ sub _get_next_token ($) {
             .= '-' . chr ($self->{nc});
         $self->{state} = COMMENT_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3209,9 +3025,6 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_DASH_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3241,9 +3054,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3261,9 +3071,6 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3289,9 +3096,6 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= '-' . chr ($self->{nc}); # comment
         $self->{state} = COMMENT_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3309,9 +3113,6 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3334,9 +3135,6 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= '-'; # comment
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3365,9 +3163,6 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= '--' . chr ($self->{nc}); # comment
         $self->{state} = COMMENT_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3389,9 +3184,6 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3419,9 +3211,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3438,9 +3227,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3471,9 +3257,6 @@ sub _get_next_token ($) {
 ## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = DOCTYPE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3496,9 +3279,6 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3514,9 +3294,6 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3547,9 +3324,6 @@ sub _get_next_token ($) {
           .= chr ($self->{nc}); # DOCTYPE
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3571,9 +3345,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3589,9 +3360,6 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3621,9 +3389,6 @@ sub _get_next_token ($) {
         $self->{state} = PUBLIC_STATE;
         $self->{s_kwd} = chr $self->{nc};
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3640,9 +3405,6 @@ sub _get_next_token ($) {
         $self->{state} = SYSTEM_STATE;
         $self->{s_kwd} = chr $self->{nc};
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3661,9 +3423,6 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3696,9 +3455,6 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{s_kwd} .= chr $self->{nc};
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3716,9 +3472,6 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3761,9 +3514,6 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{s_kwd} .= chr $self->{nc};
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3781,9 +3531,6 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3814,9 +3561,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3833,9 +3577,6 @@ sub _get_next_token ($) {
         $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3852,9 +3593,6 @@ sub _get_next_token ($) {
         $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3872,9 +3610,6 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3908,9 +3643,6 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3928,9 +3660,6 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3948,9 +3677,6 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -3986,9 +3712,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4006,9 +3729,6 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4026,9 +3746,6 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4064,9 +3781,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4087,9 +3801,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4106,9 +3817,6 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4125,9 +3833,6 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4143,9 +3848,6 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4178,9 +3880,6 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4201,9 +3900,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4220,9 +3916,6 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4239,9 +3932,6 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4258,9 +3948,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4294,9 +3981,6 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4314,9 +3998,6 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4334,9 +4015,6 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4372,9 +4050,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4392,9 +4067,6 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4412,9 +4084,6 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4450,9 +4119,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4473,9 +4139,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4491,9 +4154,6 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4525,9 +4185,6 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4545,9 +4202,6 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4578,9 +4232,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4602,9 +4253,6 @@ sub _get_next_token ($) {
         
         $self->{state} = CDATA_SECTION_MSE1_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4619,9 +4267,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == -1) {
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4649,9 +4294,6 @@ sub _get_next_token ($) {
 
         ## Stay in the state.
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4671,9 +4313,6 @@ sub _get_next_token ($) {
         
         $self->{state} = CDATA_SECTION_MSE2_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4696,9 +4335,6 @@ sub _get_next_token ($) {
       if ($self->{nc} == 0x003E) { # >
         $self->{state} = DATA_STATE;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4722,9 +4358,6 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= ']'; ## Add first "]" of "]]]".
         ## Stay in the state.
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4759,9 +4392,6 @@ sub _get_next_token ($) {
         $self->{state} = ENTITY_HASH_STATE;
         $self->{s_kwd} = '#';
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4784,9 +4414,6 @@ sub _get_next_token ($) {
         $self->{entity__value} = $self->{s_kwd};
         $self->{entity__match} = 0;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4834,9 +4461,6 @@ sub _get_next_token ($) {
         $self->{state} = HEXREF_X_STATE;
         $self->{s_kwd} .= chr $self->{nc};
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4854,9 +4478,6 @@ sub _get_next_token ($) {
         $self->{state} = NCR_NUM_STATE;
         $self->{s_kwd} = $self->{nc} - 0x0030;
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4904,9 +4525,6 @@ sub _get_next_token ($) {
         
         ## Stay in the state.
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4921,9 +4539,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == 0x003B) { # ;
         
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -5031,9 +4646,6 @@ sub _get_next_token ($) {
         $self->{s_kwd} += $self->{nc} - 0x0030;
         ## Stay in the state.
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -5052,9 +4664,6 @@ sub _get_next_token ($) {
         $self->{s_kwd} += $self->{nc} - 0x0060 + 9;
         ## Stay in the state.
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -5073,9 +4682,6 @@ sub _get_next_token ($) {
         $self->{s_kwd} += $self->{nc} - 0x0040 + 9;
         ## Stay in the state.
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -5090,9 +4696,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == 0x003B) { # ;
         
         
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -5172,9 +4775,6 @@ sub _get_next_token ($) {
             $self->{entity__value} = $EntityChar->{$self->{s_kwd}};
             $self->{entity__match} = 1;
             
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -5192,9 +4792,6 @@ sub _get_next_token ($) {
             $self->{entity__match} = -1;
             ## Stay in the state.
             
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -5213,9 +4810,6 @@ sub _get_next_token ($) {
           $self->{entity__match} *= 2;
           ## Stay in the state.
           
-    pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{nc};
-
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -10709,7 +10303,6 @@ sub set_inner_html ($$$$;$) {
             $p->{char_buffer_pos} += $count;
             $p->{line_prev} = $p->{line};
             $p->{column_prev} = $p->{column} - 1;
-            $p->{prev_char} = [-1, -1, -1];
             $p->{nc} = -1;
           }
           return $count;
@@ -10721,7 +10314,6 @@ sub set_inner_html ($$$$;$) {
         if ($count) {
           $p->{column} += $count;
           $p->{column_prev} += $count;
-          $p->{prev_char} = [-1, -1, -1];
           $p->{nc} = -1;
         }
         return $count;
@@ -10841,4 +10433,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/15 08:09:39 $
+# $Date: 2008/09/15 09:02:27 $
