@@ -1,6 +1,6 @@
 package Message::Charset::Info;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## TODO: Certain encodings MUST NOT be implemented [HTML5].
 
@@ -1125,6 +1125,7 @@ sub get_decode_handle ($$;%) {
     charset => '', ## TODO: We set a charset name for input_encoding (when we get identify-by-URI nonsense away)
     byte_buffer => $opt{byte_buffer} ? ${$opt{byte_buffer}} : '', ## TODO: ref, instead of value, should be used
     onerror => $opt{onerror} || sub {},
+    #onerror_set
     level => $opt{level} || {
       must => 'm',
       charset_variant => 'm',
@@ -1310,5 +1311,5 @@ sub is_syntactically_valid_iana_charset_name ($) {
 } # is_suntactically_valid_iana_charset_name
 
 1;
-## $Date: 2008/09/14 07:20:17 $
+## $Date: 2008/09/15 07:19:33 $
 
