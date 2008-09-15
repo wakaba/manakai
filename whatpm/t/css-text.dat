@@ -323,10 +323,22 @@ p {
 }
 #cssom
 | <p>
-|   white-space: -moz-pre-wrap
+|   white-space: pre-wrap
 #csstext
 p {
-  white-space: -moz-pre-wrap;
+  white-space: pre-wrap;
+}
+
+#data
+p {
+  white-space: -O-pre-wrap;
+}
+#cssom
+| <p>
+|   white-space: pre-wrap
+#csstext
+p {
+  white-space: pre-wrap;
 }
 
 #data

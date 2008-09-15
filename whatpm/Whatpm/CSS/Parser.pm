@@ -1445,6 +1445,11 @@ my $one_keyword_parser = sub {
         $self->{prop_value}->{$prop_name}->{$prop_value}) {
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ["KEYWORD", $prop_value]});
+    } elsif (my $v = $Prop->{$prop_name}->{keyword_replace}->{$prop_value}) {
+      if ($self->{prop_value}->{$prop_name}->{$v}) {
+        $t = $tt->get_next_token;
+        return ($t, {$prop_name => ["KEYWORD", $v]});
+      }
     } elsif ($prop_value eq 'inherit') {
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ['INHERIT']});
@@ -1914,7 +1919,9 @@ $Prop->{'white-space'} = {
   parse => $one_keyword_parser,
   keyword => {
     normal => 1, pre => 1, nowrap => 1, 'pre-wrap' => 1, 'pre-line' => 1,
-    '-moz-pre-wrap' => 1,
+  },
+  keyword_replace => {
+    '-moz-pre-wrap' => 'pre-wrap', '-o-pre-wrap' => 'pre-wrap',
   },
   initial => ["KEYWORD", 'normal'],
   inherited => 1,
@@ -6843,4 +6850,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/09/15 14:34:24 $
+## $Date: 2008/09/15 23:45:34 $
