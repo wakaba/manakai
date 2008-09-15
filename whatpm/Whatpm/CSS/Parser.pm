@@ -2252,8 +2252,11 @@ my $length_percentage_keyword_parser = sub ($$$$$) {
     } elsif (not $has_sign and $t->{type} == IDENT_TOKEN) {
       my $value = lc $t->{value}; ## TODO: case
       if ($Prop->{$prop_name}->{keyword}->{$value}) {
-        $t = $tt->get_next_token;
-        return ($t, {$prop_name => ['KEYWORD', $value]});        
+        if ($Prop->{$prop_name}->{keyword}->{$value} == 1 or
+            $self->{prop_value}->{$prop_name}->{$value}) {
+          $t = $tt->get_next_token;
+          return ($t, {$prop_name => ['KEYWORD', $value]});        
+        }
       } elsif ($value eq 'inherit') {
         $t = $tt->get_next_token;
         return ($t, {$prop_name => ['INHERIT']});
@@ -2845,7 +2848,15 @@ $Prop->{width} = {
   key => 'width',
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
-  keyword => {auto => 1},
+  keyword => {
+    auto => 1,
+    
+    ## Firefox 3
+    '-moz-max-content' => 2, '-moz-min-content' => 2, 
+    '-moz-available' => 2, '-moz-fit-content' => 2,
+        ## NOTE: By "2", it represents that the parser must be configured
+        ## to allow these values.
+  },
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute => $compute_length,
@@ -2861,7 +2872,11 @@ $Prop->{'min-width'} = {
   key => 'min_width',
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
-  #keyword => {},
+  keyword => {
+    ## Firefox 3
+    '-moz-max-content' => 2, '-moz-min-content' => 2, 
+    '-moz-available' => 2, '-moz-fit-content' => 2,
+  },
   initial => ['DIMENSION', 0, 'px'],
   #inherited => 0,
   compute => $compute_length,
@@ -2875,7 +2890,13 @@ $Prop->{'max-width'} = {
   key => 'max_width',
   parse => $Prop->{'margin-top'}->{parse},
   #allow_negative => 0,
-  keyword => {none => 1},
+  keyword => {
+    none => 1,
+    
+    ## Firefox 3
+    '-moz-max-content' => 2, '-moz-min-content' => 2, 
+    '-moz-available' => 2, '-moz-fit-content' => 2,
+  },
   initial => ['KEYWORD', 'none'],
   #inherited => 0,
   compute => $compute_length,
@@ -6822,4 +6843,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/08/16 08:37:40 $
+## $Date: 2008/09/15 14:34:24 $
