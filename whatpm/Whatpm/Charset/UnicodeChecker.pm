@@ -14,11 +14,12 @@ use strict;
 ## the conformance.  In fact, that specification does not define the
 ## conformance class for character strings.
 
-sub new_handle ($$) {
+sub new_handle ($$;$) {
   my $self = bless {
     queue => [],
     new_queue => [],
     onerror => sub {},
+    #onerror_set
     level => {
       unicode_should => 'w',
       unicode_deprecated => 'w', # = unicode_should
@@ -27,9 +28,29 @@ sub new_handle ($$) {
       ## NOTE: We do some "unification" of levels - for example,
       ## "not encouraged" is unified with "discouraged" and
       ## "better" is unified with "preferred".
+
+      must => 'm',
+      warn => 'w',
     },
-  }, shift;
-  $self->{handle} = shift; # char stream
+  }, $_[0];
+  $self->{handle} = $_[1]; # char stream
+  my $mode = $_[2] || 'default'; # or 'html5'
+  $self->{level_map} = {
+    ## Unicode errors
+    'unicode deprecated' => 'unicode_deprecated',
+    'nonchar' => $mode eq 'html5' ? 'must' : 'unicode_should',
+        ## NOTE: HTML5 parse error.
+    'unicode should' => 'unicode_should',
+    'unicode discouraged' => 'unicode_discouraged',
+    'unicode not preferred' => 'unicode_preferred',
+
+    ## HTML5 errors (See "text" definition of the spec)
+    'control char' => $mode eq 'html5' ? 'must' : 'warn',
+        ## NOTE: HTML5 parse error.
+    'non unicode' => $mode eq 'html5' ? 'must' : 'warn',
+        ## NOTE: In HTML5, replaced by U+FFFD (not a parse error).
+  };
+  $self->{replace_non_unicode} = ($mode eq 'html5');
   return $self;
 } # new_handle
 
@@ -132,6 +153,7 @@ my $etypes = {
 
 $etypes->{$_} = 'unicode deprecated' for 0xE0020 .. 0xE007F;
 $etypes->{$_} = 'nonchar' for 0xFDD0 .. 0xFDEF;
+    ## ISSUE: U+FDE0-U+FDEF are not excluded in HTML5.
 $etypes->{$_} = 'unicode should' for 0xFA30 .. 0xFA6A, 0xFA70 .. 0xFAD9;
 $etypes->{$_} = 'unicode should' for 0x2F800 .. 0x2FA1D, 0x239B .. 0x23B3;
 $etypes->{$_} = 'unicode should'
@@ -142,17 +164,14 @@ $etypes->{$_} = 'unicode should'
     ## no character is assigned, noncharacter code points, and 
     ## U+FD3E and U+FD3F, which are explicitly allowed.
 $etypes->{$_} = 'unicode discouraged' for 0x2153 .. 0x217F;
-
-my $levels = {
-  'unicode deprecated' => 'unicode_deprecated',
-  'nonchar' => 'unicode_should',
-  'unicode should' => 'unicode_should',
-  'unicode discouraged' => 'unicode_discouraged',
-  'unicode not preferred' => 'unicode_preferred',
-};
+$etypes->{$_} = 'control char'
+    for 0x0001 .. 0x0008, 0x000E .. 0x001F, 0x007F .. 0x009F;
+$etypes->{$_} = 'control char' for 0xD800 .. 0xDFFF;
 
 my $check_char = sub ($$) {
   my ($self, $char_code) = @_;
+
+  ## NOTE: Negative $char_code is not supported.
 
   if ($char_code == 0x000D) {
     $self->{line_diff}++;
@@ -174,14 +193,27 @@ my $check_char = sub ($$) {
     delete $self->{has_cr};
   }
 
-  ## TODO: $char_code > U+10FFFF
+  if ($char_code > 0x10FFFF) {
+    $self->{onerror}->(type => 'non unicode',
+                       text => (sprintf 'U-%08X', $char_code),
+                       layer => 'charset',
+                       level => $self->{level}->{$self->{level_map}->{'non unicode'}},
+                       line_diff => $self->{line_diff},
+                       column_diff => $self->{column_diff},
+                       ($self->{set_column} ? (column => 1) : ()));
+    if ($self->{replace_non_unicode}) {
+      return "\x{FFFD}";
+    } else {
+      return;
+    }
+  }
   
   my $etype = $etypes->{$char_code};
   if (defined $etype) {
     $self->{onerror}->(type => $etype,
                        text => (sprintf 'U+%04X', $char_code),
                        layer => 'charset',
-                       level => $self->{level}->{$levels->{$etype}},
+                       level => $self->{level}->{$self->{level_map}->{$etype}},
                        line_diff => $self->{line_diff},
                        column_diff => $self->{column_diff},
                        ($self->{set_column} ? (column => 1) : ()));
@@ -193,6 +225,8 @@ my $check_char = sub ($$) {
   ## TODO: IDS syntax
 
   ## TODO: langtag syntax
+
+  return;
 }; # $check_char
 
 sub read ($$$;$) {
@@ -204,7 +238,10 @@ sub read ($$$;$) {
   delete $self->{set_column};
   delete $self->{has_cr};
   for ($offset .. ($offset + $count - 1)) {
-    $check_char->($self, ord substr $_[0], $_, 1);
+    my $c = $check_char->($self, ord substr $_[0], $_, 1);
+    if (defined $c) {
+      substr ($_[0], $_, 1) = $c;
+    }
   }
   return $count;
 } # read
@@ -219,7 +256,10 @@ sub manakai_read_until ($$$;$) {
   delete $self->{set_column};
   delete $self->{has_cr};
   for ($offset .. ($offset + $count - 1)) {
-    $check_char->($self, ord substr $_[0], $_, 1);
+    my $c = $check_char->($self, ord substr $_[0], $_, 1);
+    if (defined $c) {
+      substr ($_[0], $_, 1) = $c;
+    }
   }
   return $count;
 } # manakai_read_until
@@ -248,12 +288,14 @@ sub onerror ($;$) {
   if (@_ > 1) {
     if (defined $_[1]) {
       $_[0]->{handle}->onerror ($_[0]->{onerror} = $_[1]);
+      $_[0]->{onerror_set} = 1;
     } else {
       $_[0]->{handle}->onerror ($_[0]->{onerror} = sub {});
+      delete $_[0]->{onerror_set};
     }
   }
 
-  return $_[0]->{onerror};
+  return $_[0]->{onerror_set} ? $_[0]->{onerror} : undef;
 } # onerror
 
 1;

@@ -22,6 +22,7 @@ sub create_decode_handle ($$$;$) {
              charset => $_[1],
              byte_buffer => '',
              onerror => $_[3] || sub {},
+             #onerror_set
             };
   if ($csdef->{uri}->{$XML_AUTO_CHARSET} or
       $obj->{charset} eq $XML_AUTO_CHARSET) {
@@ -874,10 +875,16 @@ sub input_encoding ($) {
 
 sub onerror ($;$) {
   if (@_ > 1) {
-    $_[0]->{onerror} = $_[1];
+    if ($_[1]) {
+      $_[0]->{onerror} = $_[1];
+      $_[0]->{onerror_set} = 1;
+    } else {
+      $_[0]->{onerror} = sub { };
+      delete $_[0]->{onerror_set};
+    }
   }
 
-  return $_[0]->{onerror};
+  return $_[0]->{onerror_set} ? $_[0]->{onerror} : undef;
 } # onerror
 
 sub ungetc ($$) {
@@ -1616,4 +1623,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2008/09/14 11:57:41 $
+## $Date: 2008/09/15 07:19:03 $

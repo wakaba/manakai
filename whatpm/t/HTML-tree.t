@@ -2,7 +2,9 @@
 use strict;
 
 my $DEBUG = $ENV{DEBUG};
+
 use lib qw[/home/wakaba/work/manakai2/lib];
+
 my $dir_name;
 my $test_dir_name;
 BEGIN {
@@ -137,6 +139,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
 
 use Whatpm::HTML;
 use Whatpm::NanoDOM;
+use Whatpm::Charset::UnicodeChecker;
 
 sub test ($) {
   my $test = shift;
@@ -158,14 +161,19 @@ sub test ($) {
       push @errors, join ':', $opt{line}, $opt{column}, $opt{type};
     }
   };
+
+  my $chk = sub {
+    return Whatpm::Charset::UnicodeChecker->new_handle ($_[0], 'html5');
+  }; # $chk
+
   my $result;
   unless (defined $test->{element}) {
-    Whatpm::HTML->parse_string ($test->{data} => $doc, $onerror);
+    Whatpm::HTML->parse_char_string ($test->{data} => $doc, $onerror, $chk);
     $result = serialize ($doc);
   } else {
     my $el = $doc->create_element_ns
       ('http://www.w3.org/1999/xhtml', [undef, $test->{element}]);
-    Whatpm::HTML->set_inner_html ($el, $test->{data}, $onerror);
+    Whatpm::HTML->set_inner_html ($el, $test->{data}, $onerror, $chk);
     $result = serialize ($el);
   }
     
@@ -220,4 +228,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/09/14 09:05:55 $
+## $Date: 2008/09/15 07:19:03 $

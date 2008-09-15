@@ -1,5 +1,13 @@
 2008-09-15  Wakaba  <wakaba@suika.fam.cx>
 
+	* DecodeHandle.pm (onerror): Return |undef| if no explicit value
+	is set.
+
+	* UnicodeChecker.pm: Support for HTML5 parse errors.
+	(onerror): Return |undef| if no explicit value is set.
+
+2008-09-15  Wakaba  <wakaba@suika.fam.cx>
+
 	* UnicodeChecker.pm: Use hash for better performance.
 
 2008-09-14  Wakaba  <wakaba@suika.fam.cx>

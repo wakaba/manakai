@@ -1,5 +1,13 @@
 2008-09-15  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: Remove checking for control character, surrogate
+	pair, or noncharacter code points and non-Unicode code
+	points (they should be handled by Whatpm::Charset::UnicodeChecker).
+	(parse_char_stream): Support for the |$get_wrapper| argument and
+	character stream error handlers.
+
+2008-09-15  Wakaba  <wakaba@suika.fam.cx>
+
 	* ContentChecker.pm: Don't call |loda_ns_module|
 	for null-namespace elements/attributes.
 
