@@ -1,7 +1,18 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.178 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.179 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
+
+## NOTE: This module don't check all HTML5 parse errors; character
+## encoding related parse errors are expected to be handled by relevant
+## modules.
+## Parse errors for control characters that are not allowed in HTML5
+## documents, for surrogate code points, and for noncharacter code
+## points, as well as U+FFFD substitions for characters whose code points
+## is higher than U+10FFFF may be detected by combining the parser with
+## the checker implemented by Whatpm::Charset::UnicodeChecker (for its
+## usage example, see |t/HTML-tree.t| in the Whatpm package or the 
+## WebHACC::Language::HTML module in the WebHACC package).
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -641,14 +652,14 @@ sub parse_char_stream ($$$;$$) {
   $self->{line_prev} = $self->{line} = 1;
   $self->{column_prev} = -1;
   $self->{column} = 0;
-  $self->{set_next_char} = sub {
+  $self->{set_nc} = sub {
     my $self = shift;
 
     my $char = '';
-    if (defined $self->{next_next_char}) {
-      $char = $self->{next_next_char};
-      delete $self->{next_next_char};
-      $self->{next_char} = ord $char;
+    if (defined $self->{next_nc}) {
+      $char = $self->{next_nc};
+      delete $self->{next_nc};
+      $self->{nc} = ord $char;
     } else {
       $self->{char_buffer} = '';
       $self->{char_buffer_pos} = 0;
@@ -659,15 +670,15 @@ sub parse_char_stream ($$$;$$) {
         $self->{line_prev} = $self->{line};
         $self->{column_prev} = $self->{column};
         $self->{column}++;
-        $self->{next_char}
+        $self->{nc}
             = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
         return;
       }
 
       if ($input->read ($char, 1)) {
-        $self->{next_char} = ord $char;
+        $self->{nc} = ord $char;
       } else {
-        $self->{next_char} = -1;
+        $self->{nc} = -1;
         return;
       }
     }
@@ -676,30 +687,30 @@ sub parse_char_stream ($$$;$$) {
         = ($self->{line}, $self->{column});
     $self->{column}++;
     
-    if ($self->{next_char} == 0x000A) { # LF
+    if ($self->{nc} == 0x000A) { # LF
       
       $self->{line}++;
       $self->{column} = 0;
-    } elsif ($self->{next_char} == 0x000D) { # CR
+    } elsif ($self->{nc} == 0x000D) { # CR
       
 ## TODO: support for abort/streaming
       my $next = '';
       if ($input->read ($next, 1) and $next ne "\x0A") {
-        $self->{next_next_char} = $next;
+        $self->{next_nc} = $next;
       }
-      $self->{next_char} = 0x000A; # LF # MUST
+      $self->{nc} = 0x000A; # LF # MUST
       $self->{line}++;
       $self->{column} = 0;
-    } elsif ($self->{next_char} == 0x0000) { # NULL
+    } elsif ($self->{nc} == 0x0000) { # NULL
       
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
-      $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+      $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     }
   };
 
   $self->{read_until} = sub {
     #my ($scalar, $specials_range, $offset) = @_;
-    return 0 if defined $self->{next_next_char};
+    return 0 if defined $self->{next_nc};
 
     my $pattern = qr/[^$_[1]\x00\x0A\x0D]/;
     my $offset = $_[2] || 0;
@@ -716,7 +727,7 @@ sub parse_char_stream ($$$;$$) {
           $self->{line_prev} = $self->{line};
           $self->{column_prev} = $self->{column} - 1;
           $self->{prev_char} = [-1, -1, -1];
-          $self->{next_char} = -1;
+          $self->{nc} = -1;
         }
         return $count;
       } else {
@@ -729,7 +740,7 @@ sub parse_char_stream ($$$;$$) {
         $self->{line_prev} = $self->{line};
         $self->{column_prev} = $self->{column} - 1;
         $self->{prev_char} = [-1, -1, -1];
-        $self->{next_char} = -1;
+        $self->{nc} = -1;
       }
       return $count;
     }
@@ -778,8 +789,8 @@ sub new ($) {
               info => 'i',
               uncertain => 'u'},
   }, $class;
-  $self->{set_next_char} = sub {
-    $self->{next_char} = -1;
+  $self->{set_nc} = sub {
+    $self->{nc} = -1;
   };
   $self->{parse_error} = sub {
     # 
@@ -910,31 +921,32 @@ sub IN_COLUMN_GROUP_IM () { 0b10 }
 sub _initialize_tokenizer ($) {
   my $self = shift;
   $self->{state} = DATA_STATE; # MUST
-  #$self->{state_keyword}; # initialized when used
+  #$self->{s_kwd}; # state keyword - initialized when used
   #$self->{entity__value}; # initialized when used
   #$self->{entity__match}; # initialized when used
   $self->{content_model} = PCDATA_CONTENT_MODEL; # be
-  undef $self->{current_token};
-  undef $self->{current_attribute};
-  undef $self->{last_emitted_start_tag_name};
+  undef $self->{ct}; # current token
+  undef $self->{ca}; # current attribute
+  undef $self->{last_stag_name}; # last emitted start tag name
   #$self->{prev_state}; # initialized when used
   delete $self->{self_closing};
   $self->{char_buffer} = '';
   $self->{char_buffer_pos} = 0;
   $self->{prev_char} = [-1, -1, -1];
-  $self->{next_char} = -1;
+  $self->{nc} = -1; # next input character
+  #$self->{next_nc}
   
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
   $self->{token} = [];
@@ -946,8 +958,8 @@ sub _initialize_tokenizer ($) {
 ##       CHARACTER_TOKEN, or END_OF_FILE_TOKEN
 ##   ->{name} (DOCTYPE_TOKEN)
 ##   ->{tag_name} (START_TAG_TOKEN, END_TAG_TOKEN)
-##   ->{public_identifier} (DOCTYPE_TOKEN)
-##   ->{system_identifier} (DOCTYPE_TOKEN)
+##   ->{pubid} (DOCTYPE_TOKEN)
+##   ->{sysid} (DOCTYPE_TOKEN)
 ##   ->{quirks} == 1 or 0 (DOCTYPE_TOKEN): "force-quirks" flag
 ##   ->{attributes} isa HASH (START_TAG_TOKEN, END_TAG_TOKEN)
 ##        ->{name}
@@ -973,10 +985,10 @@ sub _get_next_token ($) {
   my $self = shift;
 
   if ($self->{self_closing}) {
-    $self->{parse_error}->(level => $self->{level}->{must}, type => 'nestc', token => $self->{current_token});
+    $self->{parse_error}->(level => $self->{level}->{must}, type => 'nestc', token => $self->{ct});
     ## NOTE: The |self_closing| flag is only set by start tag token.
     ## In addition, when a start tag token is emitted, it is always set to
-    ## |current_token|.
+    ## |ct|.
     delete $self->{self_closing};
   }
 
@@ -987,7 +999,7 @@ sub _get_next_token ($) {
 
   A: {
     if ($self->{state} == DATA_STATE) {
-      if ($self->{next_char} == 0x0026) { # &
+      if ($self->{nc} == 0x0026) { # &
 	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
             not $self->{escape}) {
           
@@ -995,21 +1007,21 @@ sub _get_next_token ($) {
           ## "entity data state".  In this implementation, the tokenizer
           ## is switched to the |ENTITY_STATE|, which is an implementation
           ## of the "consume a character reference" algorithm.
-          $self->{entity_additional} = -1;
+          $self->{entity_add} = -1;
           $self->{prev_state} = DATA_STATE;
           $self->{state} = ENTITY_STATE;
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           redo A;
@@ -1017,7 +1029,7 @@ sub _get_next_token ($) {
           
           #
         }
-      } elsif ($self->{next_char} == 0x002D) { # -
+      } elsif ($self->{nc} == 0x002D) { # -
 	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
           unless ($self->{escape}) {
             if ($self->{prev_char}->[0] == 0x002D and # -
@@ -1034,7 +1046,7 @@ sub _get_next_token ($) {
         }
         
         #
-      } elsif ($self->{next_char} == 0x003C) { # <
+      } elsif ($self->{nc} == 0x003C) { # <
         if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
             (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
              not $self->{escape})) {
@@ -1042,16 +1054,16 @@ sub _get_next_token ($) {
           $self->{state} = TAG_OPEN_STATE;
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           redo A;
@@ -1059,7 +1071,7 @@ sub _get_next_token ($) {
           
           #
         }
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         if ($self->{escape} and
             ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
           if ($self->{prev_char}->[0] == 0x002D and # -
@@ -1074,7 +1086,7 @@ sub _get_next_token ($) {
         }
         
         #
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
@@ -1084,7 +1096,7 @@ sub _get_next_token ($) {
       }
       # Anything else
       my $token = {type => CHARACTER_TOKEN,
-                   data => chr $self->{next_char},
+                   data => chr $self->{nc},
                    line => $self->{line}, column => $self->{column},
                   };
       $self->{read_until}->($token->{data}, q[-!<>&], length $token->{data});
@@ -1092,16 +1104,16 @@ sub _get_next_token ($) {
       ## Stay in the data state
       
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
@@ -1110,20 +1122,20 @@ sub _get_next_token ($) {
       redo A;
     } elsif ($self->{state} == TAG_OPEN_STATE) {
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
-        if ($self->{next_char} == 0x002F) { # /
+        if ($self->{nc} == 0x002F) { # /
           
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           $self->{state} = CLOSE_TAG_OPEN_STATE;
@@ -1141,90 +1153,90 @@ sub _get_next_token ($) {
           redo A;
         }
       } elsif ($self->{content_model} & CM_FULL_MARKUP) { # PCDATA
-        if ($self->{next_char} == 0x0021) { # !
+        if ($self->{nc} == 0x0021) { # !
           
           $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           redo A;
-        } elsif ($self->{next_char} == 0x002F) { # /
+        } elsif ($self->{nc} == 0x002F) { # /
           
           $self->{state} = CLOSE_TAG_OPEN_STATE;
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           redo A;
-        } elsif (0x0041 <= $self->{next_char} and
-                 $self->{next_char} <= 0x005A) { # A..Z
+        } elsif (0x0041 <= $self->{nc} and
+                 $self->{nc} <= 0x005A) { # A..Z
           
-          $self->{current_token}
+          $self->{ct}
             = {type => START_TAG_TOKEN,
-               tag_name => chr ($self->{next_char} + 0x0020),
+               tag_name => chr ($self->{nc} + 0x0020),
                line => $self->{line_prev},
                column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           redo A;
-        } elsif (0x0061 <= $self->{next_char} and
-                 $self->{next_char} <= 0x007A) { # a..z
+        } elsif (0x0061 <= $self->{nc} and
+                 $self->{nc} <= 0x007A) { # a..z
           
-          $self->{current_token} = {type => START_TAG_TOKEN,
-                                    tag_name => chr ($self->{next_char}),
+          $self->{ct} = {type => START_TAG_TOKEN,
+                                    tag_name => chr ($self->{nc}),
                                     line => $self->{line_prev},
                                     column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           redo A;
-        } elsif ($self->{next_char} == 0x003E) { # >
+        } elsif ($self->{nc} == 0x003E) { # >
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty start tag',
                           line => $self->{line_prev},
@@ -1232,16 +1244,16 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
@@ -1251,17 +1263,17 @@ sub _get_next_token ($) {
                    });
 
           redo A;
-        } elsif ($self->{next_char} == 0x003F) { # ?
+        } elsif ($self->{nc} == 0x003F) { # ?
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'pio',
                           line => $self->{line_prev},
                           column => $self->{column_prev});
           $self->{state} = BOGUS_COMMENT_STATE;
-          $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+          $self->{ct} = {type => COMMENT_TOKEN, data => '',
                                     line => $self->{line_prev},
                                     column => $self->{column_prev},
                                    };
-          ## $self->{next_char} is intentionally left as is
+          ## $self->{nc} is intentionally left as is
           redo A;
         } else {
           
@@ -1287,9 +1299,9 @@ sub _get_next_token ($) {
 
       my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1); # "<"of"</"
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
-        if (defined $self->{last_emitted_start_tag_name}) {
+        if (defined $self->{last_stag_name}) {
           $self->{state} = CDATA_PCDATA_CLOSE_TAG_STATE;
-          $self->{state_keyword} = '';
+          $self->{s_kwd} = '';
           ## Reconsume.
           redo A;
         } else {
@@ -1305,52 +1317,52 @@ sub _get_next_token ($) {
         }
       }
 
-      if (0x0041 <= $self->{next_char} and
-          $self->{next_char} <= 0x005A) { # A..Z
+      if (0x0041 <= $self->{nc} and
+          $self->{nc} <= 0x005A) { # A..Z
         
-        $self->{current_token}
+        $self->{ct}
             = {type => END_TAG_TOKEN,
-               tag_name => chr ($self->{next_char} + 0x0020),
+               tag_name => chr ($self->{nc} + 0x0020),
                line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif (0x0061 <= $self->{next_char} and
-               $self->{next_char} <= 0x007A) { # a..z
+      } elsif (0x0061 <= $self->{nc} and
+               $self->{nc} <= 0x007A) { # a..z
         
-        $self->{current_token} = {type => END_TAG_TOKEN,
-                                  tag_name => chr ($self->{next_char}),
+        $self->{ct} = {type => END_TAG_TOKEN,
+                                  tag_name => chr ($self->{nc}),
                                   line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty end tag',
                         line => $self->{line_prev}, ## "<" in "</>"
@@ -1358,20 +1370,20 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare etago');
         $self->{state} = DATA_STATE;
@@ -1386,11 +1398,11 @@ sub _get_next_token ($) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus end tag');
         $self->{state} = BOGUS_COMMENT_STATE;
-        $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+        $self->{ct} = {type => COMMENT_TOKEN, data => '',
                                   line => $self->{line_prev}, # "<" of "</"
                                   column => $self->{column_prev} - 1,
                                  };
-        ## NOTE: $self->{next_char} is intentionally left as is.
+        ## NOTE: $self->{nc} is intentionally left as is.
         ## Although the "anything else" case of the spec not explicitly
         ## states that the next input character is to be reconsumed,
         ## it will be included to the |data| of the comment token
@@ -1399,27 +1411,27 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == CDATA_PCDATA_CLOSE_TAG_STATE) {
-      my $ch = substr $self->{last_emitted_start_tag_name}, length $self->{state_keyword}, 1;
+      my $ch = substr $self->{last_stag_name}, length $self->{s_kwd}, 1;
       if (length $ch) {
         my $CH = $ch;
         $ch =~ tr/a-z/A-Z/;
-        my $nch = chr $self->{next_char};
+        my $nch = chr $self->{nc};
         if ($nch eq $ch or $nch eq $CH) {
           
           ## Stay in the state.
-          $self->{state_keyword} .= $nch;
+          $self->{s_kwd} .= $nch;
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           redo A;
@@ -1428,9 +1440,9 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
-                    data => '</' . $self->{state_keyword},
+                    data => '</' . $self->{s_kwd},
                     line => $self->{line_prev},
-                    column => $self->{column_prev} - 1 - length $self->{state_keyword},
+                    column => $self->{column_prev} - 1 - length $self->{s_kwd},
                    });
           redo A;
         }
@@ -1444,58 +1456,58 @@ sub _get_next_token ($) {
                  0x003E => 1, # >
                  0x002F => 1, # /
                  -1 => 1, # EOF
-                }->{$self->{next_char}}) {
+                }->{$self->{nc}}) {
           
           ## Reconsume.
           $self->{state} = DATA_STATE;
           return  ({type => CHARACTER_TOKEN,
-                    data => '</' . $self->{state_keyword},
+                    data => '</' . $self->{s_kwd},
                     line => $self->{line_prev},
-                    column => $self->{column_prev} - 1 - length $self->{state_keyword},
+                    column => $self->{column_prev} - 1 - length $self->{s_kwd},
                    });
           redo A;
         } else {
           
-          $self->{current_token}
+          $self->{ct}
               = {type => END_TAG_TOKEN,
-                 tag_name => $self->{last_emitted_start_tag_name},
+                 tag_name => $self->{last_stag_name},
                  line => $self->{line_prev},
-                 column => $self->{column_prev} - 1 - length $self->{state_keyword}};
+                 column => $self->{column_prev} - 1 - length $self->{s_kwd}};
           $self->{state} = TAG_NAME_STATE;
           ## Reconsume.
           redo A;
         }
       }
     } elsif ($self->{state} == TAG_NAME_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          #if ($self->{current_token}->{attributes}) {
+          #if ($self->{ct}->{attributes}) {
           #  ## NOTE: This should never be reached.
           #  !!! cp (36);
           #  !!! parse-error (type => 'end tag attribute');
@@ -1503,56 +1515,56 @@ sub _get_next_token ($) {
             
           #}
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif (0x0041 <= $self->{next_char} and
-               $self->{next_char} <= 0x005A) { # A..Z
+      } elsif (0x0041 <= $self->{nc} and
+               $self->{nc} <= 0x005A) { # A..Z
         
-        $self->{current_token}->{tag_name} .= chr ($self->{next_char} + 0x0020);
+        $self->{ct}->{tag_name} .= chr ($self->{nc} + 0x0020);
           # start tag or end tag
         ## Stay in this state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          #if ($self->{current_token}->{attributes}) {
+          #if ($self->{ct}->{attributes}) {
           #  ## NOTE: This state should never be reached.
           #  !!! cp (40);
           #  !!! parse-error (type => 'end tag attribute');
@@ -1560,171 +1572,171 @@ sub _get_next_token ($) {
             
           #}
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         # reconsume
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif ($self->{next_char} == 0x002F) { # /
+      } elsif ($self->{nc} == 0x002F) { # /
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       } else {
         
-        $self->{current_token}->{tag_name} .= chr $self->{next_char};
+        $self->{ct}->{tag_name} .= chr $self->{nc};
           # start tag or end tag
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == BEFORE_ATTRIBUTE_NAME_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif (0x0041 <= $self->{next_char} and
-               $self->{next_char} <= 0x005A) { # A..Z
+      } elsif (0x0041 <= $self->{nc} and
+               $self->{nc} <= 0x005A) { # A..Z
         
-        $self->{current_attribute}
-            = {name => chr ($self->{next_char} + 0x0020),
+        $self->{ca}
+            = {name => chr ($self->{nc} + 0x0020),
                value => '',
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x002F) { # /
+      } elsif ($self->{nc} == 0x002F) { # /
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         # reconsume
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
@@ -1732,170 +1744,170 @@ sub _get_next_token ($) {
              0x0022 => 1, # "
              0x0027 => 1, # '
              0x003D => 1, # =
-            }->{$self->{next_char}}) {
+            }->{$self->{nc}}) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
         } else {
           
         }
-        $self->{current_attribute}
-            = {name => chr ($self->{next_char}),
+        $self->{ca}
+            = {name => chr ($self->{nc}),
                value => '',
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_NAME_STATE) {
       my $before_leave = sub {
-        if (exists $self->{current_token}->{attributes} # start tag or end tag
-            ->{$self->{current_attribute}->{name}}) { # MUST
+        if (exists $self->{ct}->{attributes} # start tag or end tag
+            ->{$self->{ca}->{name}}) { # MUST
           
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate attribute', text => $self->{current_attribute}->{name}, line => $self->{current_attribute}->{line}, column => $self->{current_attribute}->{column});
-          ## Discard $self->{current_attribute} # MUST
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate attribute', text => $self->{ca}->{name}, line => $self->{ca}->{line}, column => $self->{ca}->{column});
+          ## Discard $self->{ca} # MUST
         } else {
           
-          $self->{current_token}->{attributes}->{$self->{current_attribute}->{name}}
-            = $self->{current_attribute};
+          $self->{ct}->{attributes}->{$self->{ca}->{name}}
+            = $self->{ca};
         }
       }; # $before_leave
 
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         $before_leave->();
         $self->{state} = AFTER_ATTRIBUTE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003D) { # =
+      } elsif ($self->{nc} == 0x003D) { # =
         
         $before_leave->();
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         $before_leave->();
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif (0x0041 <= $self->{next_char} and
-               $self->{next_char} <= 0x005A) { # A..Z
+      } elsif (0x0041 <= $self->{nc} and
+               $self->{nc} <= 0x005A) { # A..Z
         
-        $self->{current_attribute}->{name} .= chr ($self->{next_char} + 0x0020);
+        $self->{ca}->{name} .= chr ($self->{nc} + 0x0020);
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x002F) { # /
+      } elsif ($self->{nc} == 0x002F) { # /
         
         $before_leave->();
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
         $before_leave->();
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -1903,88 +1915,88 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         # reconsume
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
-        if ($self->{next_char} == 0x0022 or # "
-            $self->{next_char} == 0x0027) { # '
+        if ($self->{nc} == 0x0022 or # "
+            $self->{nc} == 0x0027) { # '
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
         } else {
           
         }
-        $self->{current_attribute}->{name} .= chr ($self->{next_char});
+        $self->{ca}->{name} .= chr ($self->{nc});
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == AFTER_ATTRIBUTE_NAME_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003D) { # =
+      } elsif ($self->{nc} == 0x003D) { # =
         
         $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -1992,76 +2004,76 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif (0x0041 <= $self->{next_char} and
-               $self->{next_char} <= 0x005A) { # A..Z
+      } elsif (0x0041 <= $self->{nc} and
+               $self->{nc} <= 0x005A) { # A..Z
         
-        $self->{current_attribute}
-            = {name => chr ($self->{next_char} + 0x0020),
+        $self->{ca}
+            = {name => chr ($self->{nc} + 0x0020),
                value => '',
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x002F) { # /
+      } elsif ($self->{nc} == 0x002F) { # /
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2069,115 +2081,115 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         # reconsume
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
-        if ($self->{next_char} == 0x0022 or # "
-            $self->{next_char} == 0x0027) { # '
+        if ($self->{nc} == 0x0022 or # "
+            $self->{nc} == 0x0027) { # '
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
         } else {
           
         }
-        $self->{current_attribute}
-            = {name => chr ($self->{next_char}),
+        $self->{ca}
+            = {name => chr ($self->{nc}),
                value => '',
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;        
       }
     } elsif ($self->{state} == BEFORE_ATTRIBUTE_VALUE_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP      
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP      
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0022) { # "
+      } elsif ($self->{nc} == 0x0022) { # "
         
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0026) { # &
+      } elsif ($self->{nc} == 0x0026) { # &
         
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         ## reconsume
         redo A;
-      } elsif ($self->{next_char} == 0x0027) { # '
+      } elsif ($self->{nc} == 0x0027) { # '
         
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty unquoted attribute value');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2185,35 +2197,35 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2221,90 +2233,90 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
-        if ($self->{next_char} == 0x003D) { # =
+        if ($self->{nc} == 0x003D) { # =
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute value');
         } else {
           
         }
-        $self->{current_attribute}->{value} .= chr ($self->{next_char});
+        $self->{ca}->{value} .= chr ($self->{nc});
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
-      if ($self->{next_char} == 0x0022) { # "
+      if ($self->{nc} == 0x0022) { # "
         
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0026) { # &
+      } elsif ($self->{nc} == 0x0026) { # &
         
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
         $self->{prev_state} = $self->{state};
-        $self->{entity_additional} = 0x0022; # "
+        $self->{entity_add} = 0x0022; # "
         $self->{state} = ENTITY_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed attribute value');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2312,89 +2324,89 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
         
-        $self->{current_attribute}->{value} .= chr ($self->{next_char});
-        $self->{read_until}->($self->{current_attribute}->{value},
+        $self->{ca}->{value} .= chr ($self->{nc});
+        $self->{read_until}->($self->{ca}->{value},
                               q["&],
-                              length $self->{current_attribute}->{value});
+                              length $self->{ca}->{value});
 
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
-      if ($self->{next_char} == 0x0027) { # '
+      if ($self->{nc} == 0x0027) { # '
         
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0026) { # &
+      } elsif ($self->{nc} == 0x0026) { # &
         
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_additional} = 0x0027; # '
+        $self->{entity_add} = 0x0027; # '
         $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed attribute value');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2402,92 +2414,92 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
         
-        $self->{current_attribute}->{value} .= chr ($self->{next_char});
-        $self->{read_until}->($self->{current_attribute}->{value},
+        $self->{ca}->{value} .= chr ($self->{nc});
+        $self->{read_until}->($self->{ca}->{value},
                               q['&],
-                              length $self->{current_attribute}->{value});
+                              length $self->{ca}->{value});
 
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_UNQUOTED_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # HT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # HT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0026) { # &
+      } elsif ($self->{nc} == 0x0026) { # &
         
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
         ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_additional} = -1;
+        $self->{entity_add} = -1;
         $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2495,35 +2507,35 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2531,12 +2543,12 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
@@ -2544,64 +2556,64 @@ sub _get_next_token ($) {
              0x0022 => 1, # "
              0x0027 => 1, # '
              0x003D => 1, # =
-            }->{$self->{next_char}}) {
+            }->{$self->{nc}}) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute value');
         } else {
           
         }
-        $self->{current_attribute}->{value} .= chr ($self->{next_char});
-        $self->{read_until}->($self->{current_attribute}->{value},
+        $self->{ca}->{value} .= chr ($self->{nc});
+        $self->{read_until}->($self->{ca}->{value},
                               q["'=& >],
-                              length $self->{current_attribute}->{value});
+                              length $self->{ca}->{value});
 
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == AFTER_ATTRIBUTE_VALUE_QUOTED_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2609,52 +2621,52 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif ($self->{next_char} == 0x002F) { # /
+      } elsif ($self->{nc} == 0x002F) { # /
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag'); 
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
-          if ($self->{current_token}->{attributes}) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2662,11 +2674,11 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         ## Reconsume.
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
         redo A;
       } else {
         
@@ -2676,13 +2688,13 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == SELF_CLOSING_START_TAG_STATE) {
-      if ($self->{next_char} == 0x003E) { # >
-        if ($self->{current_token}->{type} == END_TAG_TOKEN) {
+      if ($self->{nc} == 0x003E) { # >
+        if ($self->{ct}->{type} == END_TAG_TOKEN) {
           
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'nestc', token => $self->{current_token});
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'nestc', token => $self->{ct});
           ## TODO: Different type than slash in start tag
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{current_token}->{attributes}) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2697,29 +2709,29 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{current_token}->{type} == START_TAG_TOKEN) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
-          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
-        } elsif ($self->{current_token}->{type} == END_TAG_TOKEN) {
-          if ($self->{current_token}->{attributes}) {
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
+          if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           } else {
@@ -2727,11 +2739,11 @@ sub _get_next_token ($) {
             
           }
         } else {
-          die "$0: $self->{current_token}->{type}: Unknown token type";
+          die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
         ## Reconsume.
-        return  ($self->{current_token}); # start tag or end tag
+        return  ($self->{ct}); # start tag or end tag
         redo A;
       } else {
         
@@ -2747,53 +2759,53 @@ sub _get_next_token ($) {
       ## NOTE: Unlike spec's "bogus comment state", this implementation
       ## consumes characters one-by-one basis.
       
-      if ($self->{next_char} == 0x003E) { # >
+      if ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
         redo A;
-      } elsif ($self->{next_char} == -1) { 
+      } elsif ($self->{nc} == -1) { 
         
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
         redo A;
       } else {
         
-        $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
-        $self->{read_until}->($self->{current_token}->{data},
+        $self->{ct}->{data} .= chr ($self->{nc}); # comment
+        $self->{read_until}->($self->{ct}->{data},
                               q[>],
-                              length $self->{current_token}->{data});
+                              length $self->{ct}->{data});
 
         ## Stay in the state.
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -2801,63 +2813,63 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## (only happen if PCDATA state)
       
-      if ($self->{next_char} == 0x002D) { # -
+      if ($self->{nc} == 0x002D) { # -
         
         $self->{state} = MD_HYPHEN_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0044 or # D
-               $self->{next_char} == 0x0064) { # d
+      } elsif ($self->{nc} == 0x0044 or # D
+               $self->{nc} == 0x0064) { # d
         ## ASCII case-insensitive.
         
         $self->{state} = MD_DOCTYPE_STATE;
-        $self->{state_keyword} = chr $self->{next_char};
+        $self->{s_kwd} = chr $self->{nc};
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
                $self->{open_elements}->[-1]->[1] & FOREIGN_EL and
-               $self->{next_char} == 0x005B) { # [
+               $self->{nc} == 0x005B) { # [
                         
         $self->{state} = MD_CDATA_STATE;
-        $self->{state_keyword} = '[';
+        $self->{s_kwd} = '[';
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -2870,31 +2882,31 @@ sub _get_next_token ($) {
                       column => $self->{column_prev} - 1);
       ## Reconsume.
       $self->{state} = BOGUS_COMMENT_STATE;
-      $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+      $self->{ct} = {type => COMMENT_TOKEN, data => '',
                                 line => $self->{line_prev},
                                 column => $self->{column_prev} - 1,
                                };
       redo A;
     } elsif ($self->{state} == MD_HYPHEN_STATE) {
-      if ($self->{next_char} == 0x002D) { # -
+      if ($self->{nc} == 0x002D) { # -
         
-        $self->{current_token} = {type => COMMENT_TOKEN, data => '',
+        $self->{ct} = {type => COMMENT_TOKEN, data => '',
                                   line => $self->{line_prev},
                                   column => $self->{column_prev} - 2,
                                  };
         $self->{state} = COMMENT_START_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -2905,7 +2917,7 @@ sub _get_next_token ($) {
                         column => $self->{column_prev} - 2);
         $self->{state} = BOGUS_COMMENT_STATE;
         ## Reconsume.
-        $self->{current_token} = {type => COMMENT_TOKEN,
+        $self->{ct} = {type => COMMENT_TOKEN,
                                   data => '-',
                                   line => $self->{line_prev},
                                   column => $self->{column_prev} - 2,
@@ -2914,62 +2926,62 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == MD_DOCTYPE_STATE) {
       ## ASCII case-insensitive.
-      if ($self->{next_char} == [
+      if ($self->{nc} == [
             undef,
             0x004F, # O
             0x0043, # C
             0x0054, # T
             0x0059, # Y
             0x0050, # P
-          ]->[length $self->{state_keyword}] or
-          $self->{next_char} == [
+          ]->[length $self->{s_kwd}] or
+          $self->{nc} == [
             undef,
             0x006F, # o
             0x0063, # c
             0x0074, # t
             0x0079, # y
             0x0070, # p
-          ]->[length $self->{state_keyword}]) {
+          ]->[length $self->{s_kwd}]) {
         
         ## Stay in the state.
-        $self->{state_keyword} .= chr $self->{next_char};
+        $self->{s_kwd} .= chr $self->{nc};
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ((length $self->{state_keyword}) == 6 and
-               ($self->{next_char} == 0x0045 or # E
-                $self->{next_char} == 0x0065)) { # e
+      } elsif ((length $self->{s_kwd}) == 6 and
+               ($self->{nc} == 0x0045 or # E
+                $self->{nc} == 0x0065)) { # e
         
         $self->{state} = DOCTYPE_STATE;
-        $self->{current_token} = {type => DOCTYPE_TOKEN,
+        $self->{ct} = {type => DOCTYPE_TOKEN,
                                   quirks => 1,
                                   line => $self->{line_prev},
                                   column => $self->{column_prev} - 7,
                                  };
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -2977,62 +2989,62 @@ sub _get_next_token ($) {
                 
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment',
                         line => $self->{line_prev},
-                        column => $self->{column_prev} - 1 - length $self->{state_keyword});
+                        column => $self->{column_prev} - 1 - length $self->{s_kwd});
         $self->{state} = BOGUS_COMMENT_STATE;
         ## Reconsume.
-        $self->{current_token} = {type => COMMENT_TOKEN,
-                                  data => $self->{state_keyword},
+        $self->{ct} = {type => COMMENT_TOKEN,
+                                  data => $self->{s_kwd},
                                   line => $self->{line_prev},
-                                  column => $self->{column_prev} - 1 - length $self->{state_keyword},
+                                  column => $self->{column_prev} - 1 - length $self->{s_kwd},
                                  };
         redo A;
       }
     } elsif ($self->{state} == MD_CDATA_STATE) {
-      if ($self->{next_char} == {
+      if ($self->{nc} == {
             '[' => 0x0043, # C
             '[C' => 0x0044, # D
             '[CD' => 0x0041, # A
             '[CDA' => 0x0054, # T
             '[CDAT' => 0x0041, # A
-          }->{$self->{state_keyword}}) {
+          }->{$self->{s_kwd}}) {
         
         ## Stay in the state.
-        $self->{state_keyword} .= chr $self->{next_char};
+        $self->{s_kwd} .= chr $self->{nc};
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{state_keyword} eq '[CDATA' and
-               $self->{next_char} == 0x005B) { # [
+      } elsif ($self->{s_kwd} eq '[CDATA' and
+               $self->{nc} == 0x005B) { # [
         
-        $self->{current_token} = {type => CHARACTER_TOKEN,
+        $self->{ct} = {type => CHARACTER_TOKEN,
                                   data => '',
                                   line => $self->{line_prev},
                                   column => $self->{column_prev} - 7};
         $self->{state} = CDATA_SECTION_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -3040,309 +3052,309 @@ sub _get_next_token ($) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment',
                         line => $self->{line_prev},
-                        column => $self->{column_prev} - 1 - length $self->{state_keyword});
+                        column => $self->{column_prev} - 1 - length $self->{s_kwd});
         $self->{state} = BOGUS_COMMENT_STATE;
         ## Reconsume.
-        $self->{current_token} = {type => COMMENT_TOKEN,
-                                  data => $self->{state_keyword},
+        $self->{ct} = {type => COMMENT_TOKEN,
+                                  data => $self->{s_kwd},
                                   line => $self->{line_prev},
-                                  column => $self->{column_prev} - 1 - length $self->{state_keyword},
+                                  column => $self->{column_prev} - 1 - length $self->{s_kwd},
                                  };
         redo A;
       }
     } elsif ($self->{state} == COMMENT_START_STATE) {
-      if ($self->{next_char} == 0x002D) { # -
+      if ($self->{nc} == 0x002D) { # -
         
         $self->{state} = COMMENT_START_DASH_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment');
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
 
         redo A;
       } else {
         
-        $self->{current_token}->{data} # comment
-            .= chr ($self->{next_char});
+        $self->{ct}->{data} # comment
+            .= chr ($self->{nc});
         $self->{state} = COMMENT_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == COMMENT_START_DASH_STATE) {
-      if ($self->{next_char} == 0x002D) { # -
+      if ($self->{nc} == 0x002D) { # -
         
         $self->{state} = COMMENT_END_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus comment');
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
 
         redo A;
       } else {
         
-        $self->{current_token}->{data} # comment
-            .= '-' . chr ($self->{next_char});
+        $self->{ct}->{data} # comment
+            .= '-' . chr ($self->{nc});
         $self->{state} = COMMENT_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == COMMENT_STATE) {
-      if ($self->{next_char} == 0x002D) { # -
+      if ($self->{nc} == 0x002D) { # -
         
         $self->{state} = COMMENT_END_DASH_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
 
         redo A;
       } else {
         
-        $self->{current_token}->{data} .= chr ($self->{next_char}); # comment
-        $self->{read_until}->($self->{current_token}->{data},
+        $self->{ct}->{data} .= chr ($self->{nc}); # comment
+        $self->{read_until}->($self->{ct}->{data},
                               q[-],
-                              length $self->{current_token}->{data});
+                              length $self->{ct}->{data});
 
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == COMMENT_END_DASH_STATE) {
-      if ($self->{next_char} == 0x002D) { # -
+      if ($self->{nc} == 0x002D) { # -
         
         $self->{state} = COMMENT_END_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
 
         redo A;
       } else {
         
-        $self->{current_token}->{data} .= '-' . chr ($self->{next_char}); # comment
+        $self->{ct}->{data} .= '-' . chr ($self->{nc}); # comment
         $self->{state} = COMMENT_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == COMMENT_END_STATE) {
-      if ($self->{next_char} == 0x003E) { # >
+      if ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
 
         redo A;
-      } elsif ($self->{next_char} == 0x002D) { # -
+      } elsif ($self->{nc} == 0x002D) { # -
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'dash in comment',
                         line => $self->{line_prev},
                         column => $self->{column_prev});
-        $self->{current_token}->{data} .= '-'; # comment
+        $self->{ct}->{data} .= '-'; # comment
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed comment');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # comment
+        return  ($self->{ct}); # comment
 
         redo A;
       } else {
@@ -3350,44 +3362,44 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'dash in comment',
                         line => $self->{line_prev},
                         column => $self->{column_prev});
-        $self->{current_token}->{data} .= '--' . chr ($self->{next_char}); # comment
+        $self->{ct}->{data} .= '--' . chr ($self->{nc}); # comment
         $self->{state} = COMMENT_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       } 
     } elsif ($self->{state} == DOCTYPE_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -3399,322 +3411,322 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == BEFORE_DOCTYPE_NAME_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # DOCTYPE (quirks)
+        return  ($self->{ct}); # DOCTYPE (quirks)
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # DOCTYPE (quirks)
+        return  ($self->{ct}); # DOCTYPE (quirks)
 
         redo A;
       } else {
         
-        $self->{current_token}->{name} = chr $self->{next_char};
-        delete $self->{current_token}->{quirks};
+        $self->{ct}->{name} = chr $self->{nc};
+        delete $self->{ct}->{quirks};
 ## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = DOCTYPE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == DOCTYPE_NAME_STATE) {
 ## ISSUE: Redundant "First," in the spec.
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # DOCTYPE
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
-        $self->{current_token}->{name}
-          .= chr ($self->{next_char}); # DOCTYPE
+        $self->{ct}->{name}
+          .= chr ($self->{nc}); # DOCTYPE
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == AFTER_DOCTYPE_NAME_STATE) {
-      if ($self->{next_char} == 0x0009 or # HT
-          $self->{next_char} == 0x000A or # LF
-          $self->{next_char} == 0x000B or # VT
-          $self->{next_char} == 0x000C or # FF
-          $self->{next_char} == 0x0020) { # SP
+      if ($self->{nc} == 0x0009 or # HT
+          $self->{nc} == 0x000A or # LF
+          $self->{nc} == 0x000B or # VT
+          $self->{nc} == 0x000C or # FF
+          $self->{nc} == 0x0020) { # SP
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # DOCTYPE
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == 0x0050 or # P
-               $self->{next_char} == 0x0070) { # p
+      } elsif ($self->{nc} == 0x0050 or # P
+               $self->{nc} == 0x0070) { # p
         $self->{state} = PUBLIC_STATE;
-        $self->{state_keyword} = chr $self->{next_char};
+        $self->{s_kwd} = chr $self->{nc};
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0053 or # S
-               $self->{next_char} == 0x0073) { # s
+      } elsif ($self->{nc} == 0x0053 or # S
+               $self->{nc} == 0x0073) { # s
         $self->{state} = SYSTEM_STATE;
-        $self->{state_keyword} = chr $self->{next_char};
+        $self->{s_kwd} = chr $self->{nc};
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       } else {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name');
-        $self->{current_token}->{quirks} = 1;
+        $self->{ct}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == PUBLIC_STATE) {
       ## ASCII case-insensitive
-      if ($self->{next_char} == [
+      if ($self->{nc} == [
             undef, 
             0x0055, # U
             0x0042, # B
             0x004C, # L
             0x0049, # I
-          ]->[length $self->{state_keyword}] or
-          $self->{next_char} == [
+          ]->[length $self->{s_kwd}] or
+          $self->{nc} == [
             undef, 
             0x0075, # u
             0x0062, # b
             0x006C, # l
             0x0069, # i
-          ]->[length $self->{state_keyword}]) {
+          ]->[length $self->{s_kwd}]) {
         
         ## Stay in the state.
-        $self->{state_keyword} .= chr $self->{next_char};
+        $self->{s_kwd} .= chr $self->{nc};
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ((length $self->{state_keyword}) == 5 and
-               ($self->{next_char} == 0x0043 or # C
-                $self->{next_char} == 0x0063)) { # c
+      } elsif ((length $self->{s_kwd}) == 5 and
+               ($self->{nc} == 0x0043 or # C
+                $self->{nc} == 0x0063)) { # c
         
         $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -3722,8 +3734,8 @@ sub _get_next_token ($) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name',
                         line => $self->{line_prev},
-                        column => $self->{column_prev} + 1 - length $self->{state_keyword});
-        $self->{current_token}->{quirks} = 1;
+                        column => $self->{column_prev} + 1 - length $self->{s_kwd});
+        $self->{ct}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         ## Reconsume.
@@ -3731,55 +3743,55 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == SYSTEM_STATE) {
       ## ASCII case-insensitive
-      if ($self->{next_char} == [
+      if ($self->{nc} == [
             undef, 
             0x0059, # Y
             0x0053, # S
             0x0054, # T
             0x0045, # E
-          ]->[length $self->{state_keyword}] or
-          $self->{next_char} == [
+          ]->[length $self->{s_kwd}] or
+          $self->{nc} == [
             undef, 
             0x0079, # y
             0x0073, # s
             0x0074, # t
             0x0065, # e
-          ]->[length $self->{state_keyword}]) {
+          ]->[length $self->{s_kwd}]) {
         
         ## Stay in the state.
-        $self->{state_keyword} .= chr $self->{next_char};
+        $self->{s_kwd} .= chr $self->{nc};
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ((length $self->{state_keyword}) == 5 and
-               ($self->{next_char} == 0x004D or # M
-                $self->{next_char} == 0x006D)) { # m
+      } elsif ((length $self->{s_kwd}) == 5 and
+               ($self->{nc} == 0x004D or # M
+                $self->{nc} == 0x006D)) { # m
         
         $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -3787,8 +3799,8 @@ sub _get_next_token ($) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name',
                         line => $self->{line_prev},
-                        column => $self->{column_prev} + 1 - length $self->{state_keyword});
-        $self->{current_token}->{quirks} = 1;
+                        column => $self->{column_prev} + 1 - length $self->{s_kwd});
+        $self->{ct}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         ## Reconsume.
@@ -3798,273 +3810,271 @@ sub _get_next_token ($) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
-          }->{$self->{next_char}}) {
+          }->{$self->{nc}}) {
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} eq 0x0022) { # "
+      } elsif ($self->{nc} eq 0x0022) { # "
         
-        $self->{current_token}->{public_identifier} = ''; # DOCTYPE
+        $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} eq 0x0027) { # '
+      } elsif ($self->{nc} eq 0x0027) { # '
         
-        $self->{current_token}->{public_identifier} = ''; # DOCTYPE
+        $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} eq 0x003E) { # >
+      } elsif ($self->{nc} eq 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no PUBLIC literal');
 
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after PUBLIC');
-        $self->{current_token}->{quirks} = 1;
+        $self->{ct}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE) {
-      if ($self->{next_char} == 0x0022) { # "
+      if ($self->{nc} == 0x0022) { # "
         
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
-        $self->{current_token}->{public_identifier} # DOCTYPE
-            .= chr $self->{next_char};
-        $self->{read_until}->($self->{current_token}->{public_identifier},
-                              q[">],
-                              length $self->{current_token}->{public_identifier});
+        $self->{ct}->{pubid} # DOCTYPE
+            .= chr $self->{nc};
+        $self->{read_until}->($self->{ct}->{pubid}, q[">],
+                              length $self->{ct}->{pubid});
 
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE) {
-      if ($self->{next_char} == 0x0027) { # '
+      if ($self->{nc} == 0x0027) { # '
         
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed PUBLIC literal');
 
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
-        $self->{current_token}->{public_identifier} # DOCTYPE
-            .= chr $self->{next_char};
-        $self->{read_until}->($self->{current_token}->{public_identifier},
-                              q['>],
-                              length $self->{current_token}->{public_identifier});
+        $self->{ct}->{pubid} # DOCTYPE
+            .= chr $self->{nc};
+        $self->{read_until}->($self->{ct}->{pubid}, q['>],
+                              length $self->{ct}->{pubid});
 
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -4073,112 +4083,112 @@ sub _get_next_token ($) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
-          }->{$self->{next_char}}) {
+          }->{$self->{nc}}) {
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0022) { # "
+      } elsif ($self->{nc} == 0x0022) { # "
         
-        $self->{current_token}->{system_identifier} = ''; # DOCTYPE
+        $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0027) { # '
+      } elsif ($self->{nc} == 0x0027) { # '
         
-        $self->{current_token}->{system_identifier} = ''; # DOCTYPE
+        $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # DOCTYPE
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after PUBLIC literal');
-        $self->{current_token}->{quirks} = 1;
+        $self->{ct}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -4187,272 +4197,270 @@ sub _get_next_token ($) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
-          }->{$self->{next_char}}) {
+          }->{$self->{nc}}) {
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0022) { # "
+      } elsif ($self->{nc} == 0x0022) { # "
         
-        $self->{current_token}->{system_identifier} = ''; # DOCTYPE
+        $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x0027) { # '
+      } elsif ($self->{nc} == 0x0027) { # '
         
-        $self->{current_token}->{system_identifier} = ''; # DOCTYPE
+        $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
 
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after SYSTEM');
-        $self->{current_token}->{quirks} = 1;
+        $self->{ct}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE) {
-      if ($self->{next_char} == 0x0022) { # "
+      if ($self->{nc} == 0x0022) { # "
         
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
-        $self->{current_token}->{system_identifier} # DOCTYPE
-            .= chr $self->{next_char};
-        $self->{read_until}->($self->{current_token}->{system_identifier},
-                              q[">],
-                              length $self->{current_token}->{system_identifier});
+        $self->{ct}->{sysid} # DOCTYPE
+            .= chr $self->{nc};
+        $self->{read_until}->($self->{ct}->{sysid}, q[">],
+                              length $self->{ct}->{sysid});
 
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE) {
-      if ($self->{next_char} == 0x0027) { # '
+      if ($self->{nc} == 0x0027) { # '
         
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
-        $self->{current_token}->{system_identifier} # DOCTYPE
-            .= chr $self->{next_char};
-        $self->{read_until}->($self->{current_token}->{system_identifier},
-                              q['>],
-                              length $self->{current_token}->{system_identifier});
+        $self->{ct}->{sysid} # DOCTYPE
+            .= chr $self->{nc};
+        $self->{read_until}->($self->{ct}->{sysid}, q['>],
+                              length $self->{ct}->{sysid});
 
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -4461,106 +4469,106 @@ sub _get_next_token ($) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
-          }->{$self->{next_char}}) {
+          }->{$self->{nc}}) {
         
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # DOCTYPE
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        $self->{current_token}->{quirks} = 1;
-        return  ($self->{current_token}); # DOCTYPE
+        $self->{ct}->{quirks} = 1;
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after SYSTEM literal');
-        #$self->{current_token}->{quirks} = 1;
+        #$self->{ct}->{quirks} = 1;
 
         $self->{state} = BOGUS_DOCTYPE_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       }
     } elsif ($self->{state} == BOGUS_DOCTYPE_STATE) {
-      if ($self->{next_char} == 0x003E) { # >
+      if ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
 
-        return  ($self->{current_token}); # DOCTYPE
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
 
-        return  ($self->{current_token}); # DOCTYPE
+        return  ($self->{ct}); # DOCTYPE
 
         redo A;
       } else {
@@ -4571,16 +4579,16 @@ sub _get_next_token ($) {
         ## Stay in the state
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -4590,68 +4598,68 @@ sub _get_next_token ($) {
       ## by three states, |CDATA_SECTION_STATE|, |CDATA_SECTION_MSE1_STATE|,
       ## and |CDATA_SECTION_MSE2_STATE|.
       
-      if ($self->{next_char} == 0x005D) { # ]
+      if ($self->{nc} == 0x005D) { # ]
         
         $self->{state} = CDATA_SECTION_MSE1_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == -1) {
+      } elsif ($self->{nc} == -1) {
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
-        if (length $self->{current_token}->{data}) { # character
+        if (length $self->{ct}->{data}) { # character
           
-          return  ($self->{current_token}); # character
+          return  ($self->{ct}); # character
         } else {
           
-          ## No token to emit. $self->{current_token} is discarded.
+          ## No token to emit. $self->{ct} is discarded.
         }        
         redo A;
       } else {
         
-        $self->{current_token}->{data} .= chr $self->{next_char};
-        $self->{read_until}->($self->{current_token}->{data},
+        $self->{ct}->{data} .= chr $self->{nc};
+        $self->{read_until}->($self->{ct}->{data},
                               q<]>,
-                              length $self->{current_token}->{data});
+                              length $self->{ct}->{data});
 
         ## Stay in the state.
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -4659,78 +4667,78 @@ sub _get_next_token ($) {
 
       ## ISSUE: "text tokens" in spec.
     } elsif ($self->{state} == CDATA_SECTION_MSE1_STATE) {
-      if ($self->{next_char} == 0x005D) { # ]
+      if ($self->{nc} == 0x005D) { # ]
         
         $self->{state} = CDATA_SECTION_MSE2_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       } else {
         
-        $self->{current_token}->{data} .= ']';
+        $self->{ct}->{data} .= ']';
         $self->{state} = CDATA_SECTION_STATE;
         ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == CDATA_SECTION_MSE2_STATE) {
-      if ($self->{next_char} == 0x003E) { # >
+      if ($self->{nc} == 0x003E) { # >
         $self->{state} = DATA_STATE;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
-        if (length $self->{current_token}->{data}) { # character
+        if (length $self->{ct}->{data}) { # character
           
-          return  ($self->{current_token}); # character
+          return  ($self->{ct}); # character
         } else {
           
-          ## No token to emit. $self->{current_token} is discarded.
+          ## No token to emit. $self->{ct} is discarded.
         }
         redo A;
-      } elsif ($self->{next_char} == 0x005D) { # ]
+      } elsif ($self->{nc} == 0x005D) { # ]
          # character
-        $self->{current_token}->{data} .= ']'; ## Add first "]" of "]]]".
+        $self->{ct}->{data} .= ']'; ## Add first "]" of "]]]".
         ## Stay in the state.
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
       } else {
         
-        $self->{current_token}->{data} .= ']]'; # character
+        $self->{ct}->{data} .= ']]'; # character
         $self->{state} = CDATA_SECTION_STATE;
         ## Reconsume.
         redo A;
@@ -4739,54 +4747,54 @@ sub _get_next_token ($) {
       if ({
         0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, # HT, LF, VT, FF,
         0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, &
-        $self->{entity_additional} => 1,
-      }->{$self->{next_char}}) {
+        $self->{entity_add} => 1,
+      }->{$self->{nc}}) {
         
         ## Don't consume
         ## No error
         ## Return nothing.
         #
-      } elsif ($self->{next_char} == 0x0023) { # #
+      } elsif ($self->{nc} == 0x0023) { # #
         
         $self->{state} = ENTITY_HASH_STATE;
-        $self->{state_keyword} = '#';
+        $self->{s_kwd} = '#';
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ((0x0041 <= $self->{next_char} and
-                $self->{next_char} <= 0x005A) or # A..Z
-               (0x0061 <= $self->{next_char} and
-                $self->{next_char} <= 0x007A)) { # a..z
+      } elsif ((0x0041 <= $self->{nc} and
+                $self->{nc} <= 0x005A) or # A..Z
+               (0x0061 <= $self->{nc} and
+                $self->{nc} <= 0x007A)) { # a..z
         
         require Whatpm::_NamedEntityList;
         $self->{state} = ENTITY_NAME_STATE;
-        $self->{state_keyword} = chr $self->{next_char};
-        $self->{entity__value} = $self->{state_keyword};
+        $self->{s_kwd} = chr $self->{nc};
+        $self->{entity__value} = $self->{s_kwd};
         $self->{entity__match} = 0;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -4814,49 +4822,49 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
-        $self->{current_attribute}->{value} .= '&';
+        $self->{ca}->{value} .= '&';
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == ENTITY_HASH_STATE) {
-      if ($self->{next_char} == 0x0078 or # x
-          $self->{next_char} == 0x0058) { # X
+      if ($self->{nc} == 0x0078 or # x
+          $self->{nc} == 0x0058) { # X
         
         $self->{state} = HEXREF_X_STATE;
-        $self->{state_keyword} .= chr $self->{next_char};
+        $self->{s_kwd} .= chr $self->{nc};
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif (0x0030 <= $self->{next_char} and
-               $self->{next_char} <= 0x0039) { # 0..9
+      } elsif (0x0030 <= $self->{nc} and
+               $self->{nc} <= 0x0039) { # 0..9
         
         $self->{state} = NCR_NUM_STATE;
-        $self->{state_keyword} = $self->{next_char} - 0x0030;
+        $self->{s_kwd} = $self->{nc} - 0x0030;
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
@@ -4881,49 +4889,49 @@ sub _get_next_token ($) {
           redo A;
         } else {
           
-          $self->{current_attribute}->{value} .= '&#';
+          $self->{ca}->{value} .= '&#';
           $self->{state} = $self->{prev_state};
           ## Reconsume.
           redo A;
         }
       }
     } elsif ($self->{state} == NCR_NUM_STATE) {
-      if (0x0030 <= $self->{next_char} and 
-          $self->{next_char} <= 0x0039) { # 0..9
+      if (0x0030 <= $self->{nc} and 
+          $self->{nc} <= 0x0039) { # 0..9
         
-        $self->{state_keyword} *= 10;
-        $self->{state_keyword} += $self->{next_char} - 0x0030;
+        $self->{s_kwd} *= 10;
+        $self->{s_kwd} += $self->{nc} - 0x0030;
         
         ## Stay in the state.
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003B) { # ;
+      } elsif ($self->{nc} == 0x003B) { # ;
         
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         #
@@ -4934,7 +4942,7 @@ sub _get_next_token ($) {
         #
       }
 
-      my $code = $self->{state_keyword};
+      my $code = $self->{s_kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
       if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
@@ -4972,20 +4980,20 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
-        $self->{current_attribute}->{value} .= chr $code;
-        $self->{current_attribute}->{has_reference} = 1;
+        $self->{ca}->{value} .= chr $code;
+        $self->{ca}->{has_reference} = 1;
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == HEXREF_X_STATE) {
-      if ((0x0030 <= $self->{next_char} and $self->{next_char} <= 0x0039) or
-          (0x0041 <= $self->{next_char} and $self->{next_char} <= 0x0046) or
-          (0x0061 <= $self->{next_char} and $self->{next_char} <= 0x0066)) {
+      if ((0x0030 <= $self->{nc} and $self->{nc} <= 0x0039) or
+          (0x0041 <= $self->{nc} and $self->{nc} <= 0x0046) or
+          (0x0061 <= $self->{nc} and $self->{nc} <= 0x0066)) {
         # 0..9, A..F, a..f
         
         $self->{state} = HEXREF_HEX_STATE;
-        $self->{state_keyword} = 0;
+        $self->{s_kwd} = 0;
         ## Reconsume.
         redo A;
       } else {
@@ -5002,97 +5010,97 @@ sub _get_next_token ($) {
           $self->{state} = $self->{prev_state};
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
-                    data => '&' . $self->{state_keyword},
+                    data => '&' . $self->{s_kwd},
                     line => $self->{line_prev},
-                    column => $self->{column_prev} - length $self->{state_keyword},
+                    column => $self->{column_prev} - length $self->{s_kwd},
                    });
           redo A;
         } else {
           
-          $self->{current_attribute}->{value} .= '&' . $self->{state_keyword};
+          $self->{ca}->{value} .= '&' . $self->{s_kwd};
           $self->{state} = $self->{prev_state};
           ## Reconsume.
           redo A;
         }
       }
     } elsif ($self->{state} == HEXREF_HEX_STATE) {
-      if (0x0030 <= $self->{next_char} and $self->{next_char} <= 0x0039) {
+      if (0x0030 <= $self->{nc} and $self->{nc} <= 0x0039) {
         # 0..9
         
-        $self->{state_keyword} *= 0x10;
-        $self->{state_keyword} += $self->{next_char} - 0x0030;
+        $self->{s_kwd} *= 0x10;
+        $self->{s_kwd} += $self->{nc} - 0x0030;
         ## Stay in the state.
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif (0x0061 <= $self->{next_char} and
-               $self->{next_char} <= 0x0066) { # a..f
+      } elsif (0x0061 <= $self->{nc} and
+               $self->{nc} <= 0x0066) { # a..f
         
-        $self->{state_keyword} *= 0x10;
-        $self->{state_keyword} += $self->{next_char} - 0x0060 + 9;
+        $self->{s_kwd} *= 0x10;
+        $self->{s_kwd} += $self->{nc} - 0x0060 + 9;
         ## Stay in the state.
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif (0x0041 <= $self->{next_char} and
-               $self->{next_char} <= 0x0046) { # A..F
+      } elsif (0x0041 <= $self->{nc} and
+               $self->{nc} <= 0x0046) { # A..F
         
-        $self->{state_keyword} *= 0x10;
-        $self->{state_keyword} += $self->{next_char} - 0x0040 + 9;
+        $self->{s_kwd} *= 0x10;
+        $self->{s_kwd} += $self->{nc} - 0x0040 + 9;
         ## Stay in the state.
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         redo A;
-      } elsif ($self->{next_char} == 0x003B) { # ;
+      } elsif ($self->{nc} == 0x003B) { # ;
         
         
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
         #
@@ -5105,7 +5113,7 @@ sub _get_next_token ($) {
         #
       }
 
-      my $code = $self->{state_keyword};
+      my $code = $self->{s_kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
       if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
@@ -5140,82 +5148,82 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
-        $self->{current_attribute}->{value} .= chr $code;
-        $self->{current_attribute}->{has_reference} = 1;
+        $self->{ca}->{value} .= chr $code;
+        $self->{ca}->{has_reference} = 1;
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == ENTITY_NAME_STATE) {
-      if (length $self->{state_keyword} < 30 and
+      if (length $self->{s_kwd} < 30 and
           ## NOTE: Some number greater than the maximum length of entity name
-          ((0x0041 <= $self->{next_char} and # a
-            $self->{next_char} <= 0x005A) or # x
-           (0x0061 <= $self->{next_char} and # a
-            $self->{next_char} <= 0x007A) or # z
-           (0x0030 <= $self->{next_char} and # 0
-            $self->{next_char} <= 0x0039) or # 9
-           $self->{next_char} == 0x003B)) { # ;
+          ((0x0041 <= $self->{nc} and # a
+            $self->{nc} <= 0x005A) or # x
+           (0x0061 <= $self->{nc} and # a
+            $self->{nc} <= 0x007A) or # z
+           (0x0030 <= $self->{nc} and # 0
+            $self->{nc} <= 0x0039) or # 9
+           $self->{nc} == 0x003B)) { # ;
         our $EntityChar;
-        $self->{state_keyword} .= chr $self->{next_char};
-        if (defined $EntityChar->{$self->{state_keyword}}) {
-          if ($self->{next_char} == 0x003B) { # ;
+        $self->{s_kwd} .= chr $self->{nc};
+        if (defined $EntityChar->{$self->{s_kwd}}) {
+          if ($self->{nc} == 0x003B) { # ;
             
-            $self->{entity__value} = $EntityChar->{$self->{state_keyword}};
+            $self->{entity__value} = $EntityChar->{$self->{s_kwd}};
             $self->{entity__match} = 1;
             
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
             #
           } else {
             
-            $self->{entity__value} = $EntityChar->{$self->{state_keyword}};
+            $self->{entity__value} = $EntityChar->{$self->{s_kwd}};
             $self->{entity__match} = -1;
             ## Stay in the state.
             
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
             redo A;
           }
         } else {
           
-          $self->{entity__value} .= chr $self->{next_char};
+          $self->{entity__value} .= chr $self->{nc};
           $self->{entity__match} *= 2;
           ## Stay in the state.
           
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   
           redo A;
@@ -5234,7 +5242,7 @@ sub _get_next_token ($) {
         if ($self->{prev_state} != DATA_STATE and # in attribute
             $self->{entity__match} < -1) {
           
-          $data = '&' . $self->{state_keyword};
+          $data = '&' . $self->{s_kwd};
           #
         } else {
           
@@ -5246,8 +5254,8 @@ sub _get_next_token ($) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero',
                         line => $self->{line_prev},
-                        column => $self->{column_prev} - length $self->{state_keyword});
-        $data = '&' . $self->{state_keyword};
+                        column => $self->{column_prev} - length $self->{s_kwd});
+        $data = '&' . $self->{s_kwd};
         #
       }
   
@@ -5268,13 +5276,13 @@ sub _get_next_token ($) {
         return  ({type => CHARACTER_TOKEN,
                   data => $data,
                   line => $self->{line_prev},
-                  column => $self->{column_prev} + 1 - length $self->{state_keyword},
+                  column => $self->{column_prev} + 1 - length $self->{s_kwd},
                  });
         redo A;
       } else {
         
-        $self->{current_attribute}->{value} .= $data;
-        $self->{current_attribute}->{has_reference} = 1 if $has_ref;
+        $self->{ca}->{value} .= $data;
+        $self->{ca}->{has_reference} = 1 if $has_ref;
         $self->{state} = $self->{prev_state};
         ## Reconsume.
         redo A;
@@ -5352,14 +5360,14 @@ sub _tree_construction_initial ($) {
       $doctype_name = '' unless defined $doctype_name;
       $doctype_name =~ tr/a-z/A-Z/; # ASCII case-insensitive
       if (not defined $token->{name} or # <!DOCTYPE>
-          defined $token->{system_identifier}) {
+          defined $token->{sysid}) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
       } elsif ($doctype_name ne 'HTML') {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
-      } elsif (defined $token->{public_identifier}) {
-        if ($token->{public_identifier} eq 'XSLT-compat') {
+      } elsif (defined $token->{pubid}) {
+        if ($token->{pubid} eq 'XSLT-compat') {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'XSLT-compat', token => $token,
                           level => $self->{level}->{should});
@@ -5375,10 +5383,8 @@ sub _tree_construction_initial ($) {
         ($token->{name}); ## ISSUE: If name is missing (e.g. <!DOCTYPE>)?
       ## NOTE: Default value for both |public_id| and |system_id| attributes
       ## are empty strings, so that we don't set any value in missing cases.
-      $doctype->public_id ($token->{public_identifier})
-          if defined $token->{public_identifier};
-      $doctype->system_id ($token->{system_identifier})
-          if defined $token->{system_identifier};
+      $doctype->public_id ($token->{pubid}) if defined $token->{pubid};
+      $doctype->system_id ($token->{sysid}) if defined $token->{sysid};
       ## NOTE: Other DocumentType attributes are null or empty lists.
       ## ISSUE: internalSubset = null??
       $self->{document}->append_child ($doctype);
@@ -5386,8 +5392,8 @@ sub _tree_construction_initial ($) {
       if ($token->{quirks} or $doctype_name ne 'HTML') {
         
         $self->{document}->manakai_compat_mode ('quirks');
-      } elsif (defined $token->{public_identifier}) {
-        my $pubid = $token->{public_identifier};
+      } elsif (defined $token->{pubid}) {
+        my $pubid = $token->{pubid};
         $pubid =~ tr/a-z/A-z/;
         my $prefix = [
           "+//SILMARIL//DTD HTML PRO V0R11 19970101//",
@@ -5461,7 +5467,7 @@ sub _tree_construction_initial ($) {
           $self->{document}->manakai_compat_mode ('quirks');
         } elsif ($pubid =~ m[^-//W3C//DTD HTML 4.01 FRAMESET//] or
                  $pubid =~ m[^-//W3C//DTD HTML 4.01 TRANSITIONAL//]) {
-          if (defined $token->{system_identifier}) {
+          if (defined $token->{sysid}) {
             
             $self->{document}->manakai_compat_mode ('quirks');
           } else {
@@ -5478,8 +5484,8 @@ sub _tree_construction_initial ($) {
       } else {
         
       }
-      if (defined $token->{system_identifier}) {
-        my $sysid = $token->{system_identifier};
+      if (defined $token->{sysid}) {
+        my $sysid = $token->{sysid};
         $sysid =~ tr/A-Z/a-z/;
         if ($sysid eq "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd") {
           ## NOTE: Ensure that |PUBLIC "(limited quirks)" "(quirks)"| is 
@@ -10628,14 +10634,14 @@ sub set_inner_html ($$$$;$) {
     require Whatpm::Charset::DecodeHandle;
     my $input = Whatpm::Charset::DecodeHandle::CharString->new (\($_[0]));
     $input = $get_wrapper->($input);
-    $p->{set_next_char} = sub {
+    $p->{set_nc} = sub {
       my $self = shift;
 
       my $char = '';
-      if (defined $self->{next_next_char}) {
-        $char = $self->{next_next_char};
-        delete $self->{next_next_char};
-        $self->{next_char} = ord $char;
+      if (defined $self->{next_nc}) {
+        $char = $self->{next_nc};
+        delete $self->{next_nc};
+        $self->{nc} = ord $char;
       } else {
         $self->{char_buffer} = '';
         $self->{char_buffer_pos} = 0;
@@ -10647,16 +10653,16 @@ sub set_inner_html ($$$$;$) {
           $self->{line_prev} = $self->{line};
           $self->{column_prev} = $self->{column};
           $self->{column}++;
-          $self->{next_char}
+          $self->{nc}
               = ord substr ($self->{char_buffer},
                             $self->{char_buffer_pos}++, 1);
           return;
         }
         
         if ($input->read ($char, 1)) {
-          $self->{next_char} = ord $char;
+          $self->{nc} = ord $char;
         } else {
-          $self->{next_char} = -1;
+          $self->{nc} = -1;
           return;
         }
       }
@@ -10664,30 +10670,30 @@ sub set_inner_html ($$$$;$) {
       ($p->{line_prev}, $p->{column_prev}) = ($p->{line}, $p->{column});
       $p->{column}++;
 
-      if ($self->{next_char} == 0x000A) { # LF
+      if ($self->{nc} == 0x000A) { # LF
         $p->{line}++;
         $p->{column} = 0;
         
-      } elsif ($self->{next_char} == 0x000D) { # CR
+      } elsif ($self->{nc} == 0x000D) { # CR
 ## TODO: support for abort/streaming
         my $next = '';
         if ($input->read ($next, 1) and $next ne "\x0A") {
-          $self->{next_next_char} = $next;
+          $self->{next_nc} = $next;
         }
-        $self->{next_char} = 0x000A; # LF # MUST
+        $self->{nc} = 0x000A; # LF # MUST
         $p->{line}++;
         $p->{column} = 0;
         
-      } elsif ($self->{next_char} == 0x0000) { # NULL
+      } elsif ($self->{nc} == 0x0000) { # NULL
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
-        $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+        $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
       }
     };
 
     $p->{read_until} = sub {
       #my ($scalar, $specials_range, $offset) = @_;
-      return 0 if defined $p->{next_next_char};
+      return 0 if defined $p->{next_nc};
 
       my $pattern = qr/[^$_[1]\x00\x0A\x0D]/;
       my $offset = $_[2] || 0;
@@ -10704,7 +10710,7 @@ sub set_inner_html ($$$$;$) {
             $p->{line_prev} = $p->{line};
             $p->{column_prev} = $p->{column} - 1;
             $p->{prev_char} = [-1, -1, -1];
-            $p->{next_char} = -1;
+            $p->{nc} = -1;
           }
           return $count;
         } else {
@@ -10716,7 +10722,7 @@ sub set_inner_html ($$$$;$) {
           $p->{column} += $count;
           $p->{column_prev} += $count;
           $p->{prev_char} = [-1, -1, -1];
-          $p->{next_char} = -1;
+          $p->{nc} = -1;
         }
         return $count;
       }
@@ -10835,4 +10841,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/15 07:19:03 $
+# $Date: 2008/09/15 08:09:39 $

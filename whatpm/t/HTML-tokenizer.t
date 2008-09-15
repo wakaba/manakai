@@ -107,33 +107,33 @@ for my $file_name (grep {$_} split /\s+/, qq[
       my $p = Whatpm::HTML->new;
       my $i = 0;
       my @token;
-      $p->{set_next_char} = sub {
+      $p->{set_nc} = sub {
         my $self = shift;
 
 #        pop @{$self->{prev_char}};
-#        unshift @{$self->{prev_char}}, $self->{next_char};
+#        unshift @{$self->{prev_char}}, $self->{nc};
 
-        $self->{next_char} = -1 and return if $i >= length $s;
-        $self->{next_char} = ord substr $s, $i++, 1;
+        $self->{nc} = -1 and return if $i >= length $s;
+        $self->{nc} = ord substr $s, $i++, 1;
 
-        if ($self->{next_char} == 0x000D) { # CR
+        if ($self->{nc} == 0x000D) { # CR
           $i++ if substr ($s, $i, 1) eq "\x0A";
-          $self->{next_char} = 0x000A; # LF # MUST
-        } elsif ($self->{next_char} > 0x10FFFF) {
-          $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+          $self->{nc} = 0x000A; # LF # MUST
+        } elsif ($self->{nc} > 0x10FFFF) {
+          $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
           push @token, 'ParseError';
-        } elsif ($self->{next_char} == 0x0000) { # NULL
-          $self->{next_char} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+        } elsif ($self->{nc} == 0x0000) { # NULL
+          $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
           push @token, 'ParseError';
-        } elsif ($self->{next_char} <= 0x0008 or
-                 (0x000E <= $self->{next_char} and
-                  $self->{next_char} <= 0x001F) or
-                 (0x007F <= $self->{next_char} and
-                  $self->{next_char} <= 0x009F) or
-                 (0xD800 <= $self->{next_char} and
-                  $self->{next_char} <= 0xDFFF) or
-                 (0xFDD0 <= $self->{next_char} and
-                  $self->{next_char} <= 0xFDDF) or
+        } elsif ($self->{nc} <= 0x0008 or
+                 (0x000E <= $self->{nc} and
+                  $self->{nc} <= 0x001F) or
+                 (0x007F <= $self->{nc} and
+                  $self->{nc} <= 0x009F) or
+                 (0xD800 <= $self->{nc} and
+                  $self->{nc} <= 0xDFFF) or
+                 (0xFDD0 <= $self->{nc} and
+                  $self->{nc} <= 0xFDDF) or
                  {
                    0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
                    0x2FFFE => 1, 0x2FFFF => 1, 0x3FFFE => 1, 0x3FFFF => 1,
@@ -144,7 +144,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
                    0xCFFFE => 1, 0xCFFFF => 1, 0xDFFFE => 1, 0xDFFFF => 1,
                    0xEFFFE => 1, 0xEFFFF => 1, 0xFFFFE => 1, 0xFFFFF => 1,
                    0x10FFFE => 1, 0x10FFFF => 1,
-                  }->{$self->{next_char}}) {
+                  }->{$self->{nc}}) {
           push @token, 'ParseError';
         }
       };
@@ -164,7 +164,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
         PCDATA => Whatpm::HTML::PCDATA_CONTENT_MODEL (),
         PLAINTEXT => Whatpm::HTML::PLAINTEXT_CONTENT_MODEL (),
       }->{$cm};
-      $p->{last_emitted_start_tag_name} = $last_start_tag;
+      $p->{last_stag_name} = $last_start_tag;
 
       while (1) {
         my $token = $p->_get_next_token;
@@ -187,8 +187,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
           delete $p->{self_closing};
         } elsif ($token->{type} == Whatpm::HTML::DOCTYPE_TOKEN ()) {
           $test_token->[1] = $token->{name};
-          $test_token->[2] = $token->{public_identifier};
-          $test_token->[3] = $token->{system_identifier};
+          $test_token->[2] = $token->{pubid};
+          $test_token->[3] = $token->{sysid};
           $test_token->[4] = $token->{quirks} ? 0 : 1;
         }
 
@@ -209,4 +209,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/09/14 14:35:43 $
+## $Date: 2008/09/15 08:09:39 $

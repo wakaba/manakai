@@ -7,16 +7,16 @@ while (<>) {
   s/!!!emit\b/return /;
   s{!!!next-input-character;}{q{
     pop @{$self->{prev_char}};
-    unshift @{$self->{prev_char}}, $self->{next_char};
+    unshift @{$self->{prev_char}}, $self->{nc};
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
       $self->{column}++;
-      $self->{next_char}
+      $self->{nc}
           = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
     } else {
-      $self->{set_next_char}->($self);
+      $self->{set_nc}->($self);
     }
   }}ge;
   s{!!!nack\s*\(\s*'([^']+)'\s*\)\s*;}{
