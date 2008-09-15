@@ -33,6 +33,124 @@ sub new_handle ($$) {
   return $self;
 } # new_handle
 
+my $etypes = {
+              0x0340 => 'unicode deprecated',
+              0x0341 => 'unicode deprecated',
+              0x17A3 => 'unicode deprecated',
+              0x17D3 => 'unicode deprecated',
+              0x206A => 'unicode deprecated',
+              0x206B => 'unicode deprecated',
+              0x206C => 'unicode deprecated',
+              0x206D => 'unicode deprecated',
+              0x206E => 'unicode deprecated',
+              0x206F => 'unicode deprecated',
+              0xE0001 => 'unicode deprecated',
+              
+              0xFFFE => 'nonchar',
+              0xFFFF => 'nonchar',
+              0x1FFFE => 'nonchar',
+              0x1FFFF => 'nonchar',
+              0x2FFFE => 'nonchar',
+              0x2FFFF => 'nonchar',
+              0x3FFFE => 'nonchar',
+              0x3FFFF => 'nonchar',
+              0x4FFFE => 'nonchar',
+              0x4FFFF => 'nonchar',
+              0x5FFFE => 'nonchar',
+              0x5FFFF => 'nonchar',
+              0x6FFFE => 'nonchar',
+              0x6FFFF => 'nonchar',
+              0x7FFFE => 'nonchar',
+              0x7FFFF => 'nonchar',
+              0x8FFFE => 'nonchar',
+              0x8FFFF => 'nonchar',
+              0x9FFFE => 'nonchar',
+              0x9FFFF => 'nonchar',
+              0xAFFFE => 'nonchar',
+              0xAFFFF => 'nonchar',
+              0xBFFFE => 'nonchar',
+              0xBFFFF => 'nonchar',
+              0xCFFFE => 'nonchar',
+              0xCFFFF => 'nonchar',
+              0xDFFFE => 'nonchar',
+              0xDFFFF => 'nonchar',
+              0xEFFFE => 'nonchar',
+              0xEFFFF => 'nonchar',
+              0xFFFFE => 'nonchar',
+              0xFFFFF => 'nonchar',
+              0x10FFFE => 'nonchar',
+              0x10FFFF => 'nonchar',
+
+              0x0344 => 'unicode should', # COMBINING GREEK DIALYTIKA TONOS
+              0x03D3 => 'unicode should', # GREEK UPSILON WITH ...
+              0x03D4 => 'unicode should', # GREEK UPSILON WITH ...
+              0x20A4 => 'unicode should', # LIRA SIGN
+              
+              0x2126 => 'unicode should', # OHM SIGN # also, discouraged
+              0x212A => 'unicode should', # KELVIN SIGN
+              0x212B => 'unicode should', # ANGSTROM SIGN
+              
+              ## Styled overlines/underlines in CJK Compatibility Forms
+              0xFE49 => 'unicode discouraged',
+              0xFE4A => 'unicode discouraged',
+              0xFE4B => 'unicode discouraged',
+              0xFE4C => 'unicode discouraged',
+              0xFE4D => 'unicode discouraged',
+              0xFE4E => 'unicode discouraged',
+              0xFE4F => 'unicode discouraged',
+              
+              0x037E => 'unicode discouraged', # greek punctuations
+              0x0387 => 'unicode discouraged', # greek punctuations
+              
+              #0x17A3 => 'unicode discouraged', # also, deprecated
+              0x17A4 => 'unicode discouraged',
+              0x17B4 => 'unicode discouraged',
+              0x17B5 => 'unicode discouraged',
+              0x17D8 => 'unicode discouraged',
+
+              0x2121 => 'unicode discouraged', # tel
+              0x213B => 'unicode discouraged', # fax
+              #0x2120 => 'unicode discouraged', # SM (superscript)
+              #0x2122 => 'unicode discouraged', # TM (superscript)
+
+              ## inline annotations
+              0xFFF9 => 'unicode discouraged',
+              0xFFFA => 'unicode discouraged',
+              0xFFFB => 'unicode discouraged',
+
+              ## greek punctuations
+              0x055A => 'unicode not preferred',
+              0x0559 => 'unicode not preferred',
+            
+              ## degree signs
+              0x2103 => 'unicode not preferred',
+              0x2109 => 'unicode not preferred',
+              
+              ## strongly preferrs U+2060 WORD JOINTER
+              0xFEFE => 'unicode not preferred',
+             };
+
+$etypes->{$_} = 'unicode deprecated' for 0xE0020 .. 0xE007F;
+$etypes->{$_} = 'nonchar' for 0xFDD0 .. 0xFDEF;
+$etypes->{$_} = 'unicode should' for 0xFA30 .. 0xFA6A, 0xFA70 .. 0xFAD9;
+$etypes->{$_} = 'unicode should' for 0x2F800 .. 0x2FA1D, 0x239B .. 0x23B3;
+$etypes->{$_} = 'unicode should'
+    for 0xFB50 .. 0xFBB1, 0xFBD3 .. 0xFD3D, 0xFD50 .. 0xFD8F,
+        0xFD92 .. 0xFDC7, 0xFDF0 .. 0xFDFB, 0xFE70 .. 0xFE74,
+        0xFE76 .. 0xFEFC;
+    ## NOTE: Arabic Presentation Forms-A/B blocks, w/o code points where
+    ## no character is assigned, noncharacter code points, and 
+    ## U+FD3E and U+FD3F, which are explicitly allowed.
+$etypes->{$_} = 'unicode discouraged' for 0x2153 .. 0x217F;
+
+my $levels = {
+  'unicode deprecated' => 'unicode_deprecated',
+  'nonchar' => 'unicode_should',
+  'unicode should' => 'unicode_should',
+  'unicode discouraged' => 'unicode_discouraged',
+  'unicode not preferred' => 'unicode_preferred',
+};
+
 my $check_char = sub ($$) {
   my ($self, $char_code) = @_;
 
@@ -55,130 +173,15 @@ my $check_char = sub ($$) {
     $self->{column_diff}++;
     delete $self->{has_cr};
   }
+
+  ## TODO: $char_code > U+10FFFF
   
-  if ({
-       0x0340 => 1, 0x0341 => 1, 0x17A3 => 1, 0x17D3 => 1,
-       0x206A => 1, 0x206B => 1, 0x206C => 1, 0x206D => 1,
-       0x206E => 1, 0x206F => 1, 0xE0001 => 1,
-      }->{$char_code} or
-      (0xE0020 <= $char_code and $char_code <= 0xE007F)) {
-    ## NOTE: From Unicode 5.1.0 |PropList.txt| (Deprecated).
-    $self->{onerror}->(type => 'unicode deprecated',
+  my $etype = $etypes->{$char_code};
+  if (defined $etype) {
+    $self->{onerror}->(type => $etype,
                        text => (sprintf 'U+%04X', $char_code),
                        layer => 'charset',
-                       level => $self->{level}->{unicode_deprecated},
-                       line_diff => $self->{line_diff},
-                       column_diff => $self->{column_diff},
-                       ($self->{set_column} ? (column => 1) : ()));
-  } elsif ((0xFDD0 <= $char_code and $char_code <= 0xFDDF) or
-           {
-             0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
-             0x2FFFE => 1, 0x2FFFF => 1, 0x3FFFE => 1, 0x3FFFF => 1,
-             0x4FFFE => 1, 0x4FFFF => 1, 0x5FFFE => 1, 0x5FFFF => 1,
-             0x6FFFE => 1, 0x6FFFF => 1, 0x7FFFE => 1, 0x7FFFF => 1,
-             0x8FFFE => 1, 0x8FFFF => 1, 0x9FFFE => 1, 0x9FFFF => 1,
-             0xAFFFE => 1, 0xAFFFF => 1, 0xBFFFE => 1, 0xBFFFF => 1,
-             0xCFFFE => 1, 0xCFFFF => 1, 0xDFFFE => 1, 0xDFFFF => 1,
-             0xEFFFE => 1, 0xEFFFF => 1, 0xFFFFE => 1, 0xFFFFF => 1,
-             0x10FFFE => 1, 0x10FFFF => 1,
-           }->{$char_code}) {
-    ## NOTE: From Unicode 5.1.0 |PropList.txt| (Noncharacter_Code_Point).
-    $self->{onerror}->(type => 'nonchar',
-                       text => (sprintf 'U+%04X', $char_code),
-                       layer => 'charset',
-                       level => $self->{level}->{unicode_should},
-                       line_diff => $self->{line_diff},
-                       column_diff => $self->{column_diff},
-                       ($self->{set_column} ? (column => 1) : ()));
-  } elsif ({
-            0x0344 => 1, # COMBINING GREEK DIALYTIKA TONOS
-            0x03D3 => 1, 0x03D4 => 1, # GREEK UPSILON WITH ...
-            0x20A4 => 1, # LIRA SIGN
-
-            0x2126 => 1, # OHM SIGN # also, discouraged
-            0x212A => 1, # KELVIN SIGN
-            0x212B => 1, # ANGSTROM SIGN
-           }->{$char_code} or
-           (0xFB50 <= $char_code and $char_code <= 0xFDFB) or
-           (0xFE70 <= $char_code and $char_code <= 0xFEFE) or
-           (0xFA30 <= $char_code and $char_code <= 0xFA6A) or
-           (0xFA70 <= $char_code and $char_code <= 0xFAD9) or
-           (0x2F800 <= $char_code and $char_code <= 0x2FA1D) or
-           (0x239B <= $char_code and $char_code <= 0x23B3)) {
-    ## NOTE: This case must come AFTER noncharacter checking, due to
-    ## their range overwrap.
-    if ({
-         ## In the Arabic Presentation Forms-A block, but no character is
-         ## assigned in Unicode 5.1.
-         0xFBB2 => 1, 0xFBB3 => 1, 0xFBB4 => 1, 0xFBB5 => 1, 0xFBB6 => 1,
-         0xFBB7 => 1, 0xFBB8 => 1, 0xFBB9 => 1, 0xFBBA => 1, 0xFBBB => 1,
-         0xFBBC => 1, 0xFBBD => 1, 0xFBBE => 1, 0xFBBF => 1, 0xFBC0 => 1,
-         0xFBC1 => 1, 0xFBC2 => 1, 0xFBC3 => 1, 0xFBC4 => 1, 0xFBC5 => 1,
-         0xFBC6 => 1, 0xFBC7 => 1, 0xFBC8 => 1, 0xFBC9 => 1, 0xFBCA => 1,
-         0xFBCB => 1, 0xFBCC => 1, 0xFBCD => 1, 0xFBCE => 1, 0xFBCF => 1,
-         0xFBD0 => 1, 0xFBD1 => 1, 0xFBD2 => 1,
-         0xFD40 => 1, 0xFD41 => 1, 0xFD42 => 1, 0xFD43 => 1, 0xFD44 => 1,
-         0xFD45 => 1, 0xFD46 => 1, 0xFD47 => 1, 0xFD48 => 1, 0xFD49 => 1,
-         0xFD4A => 1, 0xFD4B => 1, 0xFD4C => 1, 0xFD4D => 1, 0xFD4E => 1,
-         0xFD4F => 1,
-         0xFD90 => 1, 0xFD91 => 1,
-         0xFDC8 => 1, 0xFDC9 => 1, 0xFDCA => 1, 0xFDCB => 1, 0xFDCC => 1,
-         0xFDCD => 1, 0xFDCE => 1, 0xFDCF => 1,
-         # 0xFDD0-0xFDEF noncharacters
-
-         ## In Arabic Presentation Forms-A block, but explicitly
-         ## allowed
-         0xFD3E => 1, 0xFD3F => 1,
-
-         ## In Arabic Presentation Forms-B block, unassigned
-         0xFE75 => 1, 0xFEFD => 1, 0xFEFE => 1,
-        }->{$char_code}) {
-      #
-    } else {
-      $self->{onerror}->(type => 'unicode should',
-                         text => (sprintf 'U+%04X', $char_code),
-                         layer => 'charset',
-                         level => $self->{level}->{unicode_should},
-                         line_diff => $self->{line_diff},
-                         column_diff => $self->{column_diff},
-                         ($self->{set_column} ? (column => 1) : ()));
-    }
-  } elsif ({
-            ## Styled overlines/underlines in CJK Compatibility Forms
-            0xFE49 => 1, 0xFE4A => 1, 0xFE4B => 1, 0xFE4C => 1,
-            0xFE4D => 1, 0xFE4E => 1, 0xFE4F => 1,
-            
-            0x037E => 1, 0x0387 => 1, # greek punctuations
-            
-            #0x17A3 => 1, # also, deprecated
-            0x17A4 => 1, 0x17B4 => 1, 0x17B5 => 1, 0x17D8 => 1,
-
-            0x2121 => 1, # tel
-            0x213B => 1, # fax
-            #0x2120 => 1, # SM (superscript)
-            #0x2122 => 1, # TM (superscript)
-
-            0xFFF9 => 1, 0xFFFA => 1, 0xFFFB => 1, # inline annotations
-           }->{$char_code} or
-           (0x2153 <= $char_code and $char_code <= 0x217F)) {
-    $self->{onerror}->(type => 'unicode discouraged',
-                       text => (sprintf 'U+%04X', $char_code),
-                       layer => 'charset',
-                       level => $self->{level}->{unicode_discouraged},
-                       line_diff => $self->{line_diff},
-                       column_diff => $self->{column_diff},
-                       ($self->{set_column} ? (column => 1) : ()));
-  } elsif ({
-            0x055A => 1, 0x0559 =>1, # greek punctuations
-            
-            0x2103 => 1, 0x2109 => 1, # degree signs
-
-            0xFEFE => 1, # strongly preferrs U+2060 WORD JOINTER
-           }->{$char_code}) {
-    $self->{onerror}->(type => 'unicode not preferred',
-                       text => (sprintf 'U+%04X', $char_code),
-                       layer => 'charset',
-                       level => $self->{level}->{unicode_preferred},
+                       level => $self->{level}->{$levels->{$etype}},
                        line_diff => $self->{line_diff},
                        column_diff => $self->{column_diff},
                        ($self->{set_column} ? (column => 1) : ()));
