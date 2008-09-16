@@ -242,6 +242,7 @@ module m {
   exception f { };
 };
 #errors
+1;duplicate xattr;w;ExceptionConsts
 #document
 | [ExceptionConsts=f, ExceptionConsts=f] module m {
 | 
@@ -256,6 +257,7 @@ module m {
   exception g {};
 };
 #errors
+1;duplicate xattr;w;ExceptionConsts
 #document
 | [ExceptionConsts=f, ExceptionConsts=g] module m {
 | 

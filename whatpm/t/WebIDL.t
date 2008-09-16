@@ -11,7 +11,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 1920 }
+BEGIN { plan tests => 516 }
 
 require Whatpm::WebIDL;
 
@@ -109,4 +109,4 @@ sub test ($) {
 } # test
 
 ## License: Public Domain.
-## $Date: 2008/08/03 07:14:00 $
+## $Date: 2008/09/16 10:43:18 $

@@ -1630,6 +1630,32 @@ module m {
 
 #data
 module m {
+  [Constructor] interface x;
+  interface x { };
+};
+#errors
+2;xattr not applicable;w;Constructor
+3;duplicate qname;m
+
+#data
+module m {
+  interface x;
+  [Constructor] interface x { };
+};
+#errors
+3;duplicate qname;m
+
+#data
+module m {
+  [Constructor] interface x;
+  [Constructor] interface x { };
+};
+#errors
+2;xattr not applicable;w;Constructor
+3;duplicate qname;m
+
+#data
+module m {
 interface x {
   [IndexGetter] long method (in unsigned long x);
 };
@@ -1806,6 +1832,33 @@ module m {
 #data
 module m {
 interface x {
+  [IndexGetter,IndexGetter] long method (in unsigned long x);
+};
+};
+#errors
+3;duplicate xattr;w;IndexGetter
+
+#data
+module m {
+interface x {
+  [IndexGetter,IndexSetter] long method (in unsigned long x);
+};
+};
+#errors
+3;wrong signature accessor;w;IndexSetter
+
+#data
+module m {
+interface x {
+  [NameGetter,IndexGetter] long method (in unsigned long x);
+};
+};
+#errors
+3;wrong signature accessor;w;NameGetter
+
+#data
+module m {
+interface x {
   [IndexSetter] any y ();
 };
 };
@@ -1919,6 +1972,16 @@ interface x {
 #errors
 3;xattr id not allowed;m;IndexSetter
 3;xattr arglist not allowed;m;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter,IndexSetter] long method (in unsigned long x,
+      in unsigned short y);
+};
+};
+#errors
+3;duplicate xattr;w;IndexSetter
 
 #data
 module m {
@@ -2117,6 +2180,15 @@ module m {
 #data
 module m {
 interface x {
+  [NameGetter,NameGetter] long method (in DOMString x);
+};
+};
+#errors
+3;duplicate xattr;w;NameGetter
+
+#data
+module m {
+interface x {
   [NameSetter] any y ();
 };
 };
@@ -2253,6 +2325,15 @@ interface x {
 #data
 module m {
 interface x {
+  [NameSetter,NameSetter] long method (in DOMString y,in unsigned long x);
+};
+};
+#errors
+3;duplicate xattr;w;NameSetter
+
+#data
+module m {
+interface x {
   [Null=Null] attribute DOMString x;
 };
 };
@@ -2289,6 +2370,7 @@ interface x {
 };
 };
 #errors
+3;duplicate xattr;w;Null
 
 #data
 module m {
@@ -2297,6 +2379,7 @@ interface x {
 };
 };
 #errors
+3;duplicate xattr;w;Null
 
 #data
 module m {
@@ -2426,6 +2509,15 @@ interface x {
 
 #data
 module m {
+interface x {
+  void m ([Null=Undefined] in DOMString x);
+};
+};
+#errors
+3:Undefined;xattr id value not allowed;m;Null
+
+#data
+module m {
 [Null=Null]interface x {
   attribute DOMString x;
 };
@@ -2459,3 +2551,810 @@ interface x {
 };
 #errors
 3;unknown xattr;u;null
+
+#data
+module m {
+interface y {
+  attribute DOMString p;
+};
+interface x {
+  [PutForwards=p] readonly attribute y n;
+};
+};
+#errors
+
+#data
+module m {
+interface y {
+};
+interface x {
+  [PutForwards=p] readonly attribute y n;
+};
+};
+#errors
+5:p;referenced attr not defined;m;PutForwards
+
+#data
+module m {
+interface x {
+  [PutForwards=p] readonly attribute y n;
+};
+};
+#errors
+3;type not defined;m;y
+3;attr type not interface;w;PutForwards
+
+#data
+module m {
+interface x {
+  [PutForwards=p] readonly attribute DOMString n;
+};
+};
+#errors
+3;attr type not interface;w;PutForwards
+
+#data
+module m {
+exception y {
+  long p;
+};
+interface x {
+  [PutForwards=p] readonly attribute y n;
+};
+};
+#errors
+6;type not defined;m;y
+6;attr type not interface;w;PutForwards
+
+#data
+module m {
+interface y {
+  attribute DOMString p;
+};
+interface x {
+  [PutForwards=p] attribute y n;
+};
+};
+#errors
+6;attr not readonly;w;PutForwards
+
+#data
+module m {
+interface y {
+  readonly attribute DOMString p;
+};
+interface x {
+  [PutForwards=p] readonly attribute y n;
+};
+};
+#errors
+
+#data
+module m {
+interface y {
+  attribute DOMString p;
+};
+interface x {
+  [PutForwards=p, Null=Empty] readonly attribute y n;
+};
+};
+#errors
+6;xattr for wrong type;w;Null
+
+#data
+module m {
+interface y {
+  [Null=Empty] attribute DOMString p;
+};
+interface x {
+  [PutForwards=p, Null=Null] readonly attribute y n;
+};
+};
+#errors
+6;xattr for wrong type;w;Null
+
+#data
+module m {
+typedef sequence<unsigned short> y;
+interface x {
+  [PutForwards=p] readonly attribute y n;
+};
+};
+#errors
+4;attr type not interface;w;PutForwards
+
+#data
+module m {
+interface x {
+  [PutForwards=p] readonly attribute y n;
+};
+interface y {
+  attribute DOMString p;
+};
+};
+#errors
+3;type not defined;m;y
+3;attr type not interface;w;PutForwards
+
+#data
+module m {
+interface y;
+interface x {
+  [PutForwards=p] readonly attribute y n;
+};
+interface y {
+  attribute DOMString p;
+};
+};
+#errors
+6;duplicate qname;m
+
+#data
+module m {
+interface y {
+  attribute DOMString p;
+};
+interface x {
+  [PutForwards=p,PutForwards=p] readonly attribute y n;
+};
+};
+#errors
+6;duplicate xattr;w;PutForwards
+
+#data
+module m {
+interface y {
+  attribute DOMString p;
+  attribute long q;
+};
+interface x {
+  [PutForwards=p,PutForwards=q] readonly attribute y n;
+};
+};
+#errors
+7;duplicate xattr;w;PutForwards
+
+#data
+module m {
+[Stringifies=a,Stringifies=b] interface x {
+  attribute boolean a;
+  attribute long b;
+};
+};
+#errors
+2;duplicate xattr;w;Stringifies
+
+#data
+module m {
+[Stringifies] exception x {
+};
+};
+#errors
+2;xattr not applicable;w;Stringifies
+
+#data
+[Stringifies] module m {
+interface x {
+};
+};
+#errors
+1;xattr not applicable;w;Stringifies
+
+#data
+module m {
+interface x {
+  [Stringifies] attribute DOMString b;
+};
+};
+#errors
+3;xattr not applicable;w;Stringifies
+
+#data
+module m {
+[Stringifies()] interface x {
+};
+};
+#errors
+2;xattr arglist not allowed;m;Stringifies
+
+#data
+module m {
+[Stringifies=a()] interface x {
+};
+};
+#errors
+2;xattr arglist not allowed;m;Stringifies
+2:a;referenced attr not defined;m;Stringifies
+
+#data
+module m {
+interface x {
+  void m ([Variadic] in long a);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m (in long b, [Variadic] in long a);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Variadic] in long a, in DOMString b);
+};
+};
+#errors
+3;argument after variadic;w
+
+#data
+module m {
+interface x {
+  void m ([Variadic] in long a);
+  void n (in long b);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Variadic=a] in long a);
+};
+};
+#errors
+3;xattr id not allowed;m;Variadic
+
+#data
+module m {
+interface x {
+  void m ([Variadic()] in long a);
+};
+};
+#errors
+3;xattr arglist not allowed;m;Variadic
+
+#data
+module m {
+interface x {
+  void m ([Variadic=a()] in long a);
+};
+};
+#errors
+3;xattr id not allowed;m;Variadic
+3;xattr arglist not allowed;m;Variadic
+
+#data
+module m {
+interface x {
+  void m (in long b, [Variadic,Variadic] in long a);
+};
+};
+#errors
+3;duplicate xattr;w;Variadic
+
+#data
+module m {
+[NamedConstructor=a]
+interface x {};
+};
+#errors
+
+#data
+module m {
+[NamedConstructor=a()]
+interface x {};
+};
+#errors
+
+#data
+module m {
+[NamedConstructor=a(in long b)]
+interface x {};
+};
+#errors
+
+#data
+module m {
+[NamedConstructor=a,NamedConstructor=b]
+interface x {};
+};
+#errors
+
+#data
+module m {
+[NamedConstructor=a,NamedConstructor=a]
+interface x {};
+};
+#errors
+
+#data
+module m {
+[NamedConstructor=a,NamedConstructor=a()]
+interface x {};
+};
+#errors
+
+#data
+module m {
+[NamedConstructor=a]
+interface x {};
+[NamedConstructor=a]
+interface y {};
+};
+#errors
+4:a;duplicate constructor name;m
+
+#data
+module m {
+[NamedConstructor=a]
+interface x {};
+};
+[NamedConstructor=a]
+interface y{};
+#errors
+6;non-module definition;s
+5:a;duplicate constructor name;m
+
+#data
+module m {
+[NamedConstructor=a]
+interface x {};
+[NamedConstructor=_a]
+interface y {};
+};
+#errors
+4:a;duplicate constructor name;m
+
+#data
+module m {
+[NamedConstructor=a]
+interface x {};
+};
+module n {
+[NamedConstructor=a]
+interface y {};
+};
+#errors
+6:a;duplicate constructor name;m
+
+#data
+module m {
+[NamedConstructor=x]
+interface x {};
+};
+#errors
+2:x;duplicate constructor name;m
+
+#data
+module m {
+[NamedConstructor=y]
+interface x {};
+interface y {};
+};
+#errors
+2:y;duplicate constructor name;m
+
+#data
+module m {
+exception a {};
+[NamedConstructor=a]
+interface x {};
+};
+#errors
+3:a;duplicate constructor name;m
+
+#data
+module m {
+[NamedConstructor=a]
+interface x {};
+};
+module n {
+  interface a {};
+};
+#errors
+2:a;duplicate constructor name;m
+
+#data
+module m {
+[NamedConstructor]
+interface x {};
+};
+#errors
+2;xattr id missing;m;NamedConstructor
+
+#data
+module m {
+[NamedConstructor()]
+interface x {};
+};
+#errors
+2;xattr id missing;m;NamedConstructor
+
+#data
+module m {
+[NamedConstructor=a]
+exception x {};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [NamedConstructor=a] void m ();
+};
+exception a {};
+};
+#errors
+3;xattr not applicable;w;NamedConstructor
+
+#data
+module m {
+[NamedConstructor=a]
+interface x;
+interface x {};
+};
+#errors
+2;xattr not applicable;w;NamedConstructor
+4;duplicate qname;m
+
+#data
+module m {
+[NativeObject] interface x {};
+};
+#errors
+
+#data
+module m {
+[NativeObject=FunctionOnly] interface x {};
+};
+#errors
+
+#data
+module m {
+[NativeObject=functiononly] interface x {};
+};
+#errors
+2:functiononly;xattr id value not allowed;m;NativeObject
+
+#data
+module m {
+[NativeObject()] interface x {};
+};
+#errors
+2;xattr arglist not allowed;m;NativeObject
+
+#data
+module m {
+[NativeObject=FunctionOnly()] interface x {};
+};
+#errors
+2;xattr arglist not allowed;m;NativeObject
+
+#data
+module m {
+[NativeObject] exception x {};
+};
+#errors
+2;xattr not applicable;w;NativeObject
+
+#data
+module m {
+[NativeObject] interface x;
+interface x {};
+};
+#errors
+2;xattr not applicable;w;NativeObject
+3;duplicate qname;m
+
+#data
+module m {
+[NativeObject,NativeObject] interface x {};
+};
+#errors
+2;duplicate xattr;w;NativeObject
+
+#data
+module m {
+[NativeObject,NativeObject=FunctionOnly] interface x {};
+};
+#errors
+2;duplicate xattr;w;NativeObject
+
+#data
+module m {
+[NoInterfaceObject] interface x {};
+};
+#errors
+
+#data
+module m {
+[NoInterfaceObject,NoInterfaceObject] interface x {};
+};
+#errors
+2;duplicate xattr;w;NoInterfaceObject
+
+#data
+module m {
+[NoInterfaceObject=a] interface x {};
+};
+#errors
+2;xattr id not allowed;m;NoInterfaceObject
+
+#data
+module m {
+[NoInterfaceObject()] interface x {};
+};
+#errors
+2;xattr arglist not allowed;m;NoInterfaceObject
+
+#data
+module m {
+[NoInterfaceObject=a()] interface x {};
+};
+#errors
+2;xattr id not allowed;m;NoInterfaceObject
+2;xattr arglist not allowed;m;NoInterfaceObject
+
+#data
+module m {
+[NoInterfaceObject] exception x {};
+};
+#errors
+
+#data
+[NoInterfaceObject] module m {
+interface x {};
+};
+#errors
+1;xattr not applicable;w;NoInterfaceObject
+
+#data
+module m {
+[NoInterfaceObject] interface x;
+interface x {};
+};
+#errors
+2;xattr not applicable;w;NoInterfaceObject
+3;duplicate qname;m
+
+#data
+module m {
+[NoInterfaceObject,NamedConstructor=a] interface x {};
+};
+#errors
+
+#data
+module m {
+[NamedConstructor=x] interface y {};
+[NoInterfaceObject] interface x {};
+};
+#errors
+
+#data
+module m {
+[NoInterfaceObject,NamedConstructor=x] interface x {};
+};
+#errors
+
+#data
+module m {
+[NamedConstructor=x] interface y {};
+[NoInterfaceObject] exception x {};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Undefined=Null] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Undefined=Null] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Undefined=Empty] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Undefined=Empty] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Undefined=Null,Undefined=Empty] attribute DOMString x;
+};
+};
+#errors
+3;duplicate xattr;w;Undefined
+
+#data
+module m {
+interface x {
+  void m ([Undefined=Null,Undefined=Empty] in DOMString x);
+};
+};
+#errors
+3;duplicate xattr;w;Undefined
+
+#data
+module m {
+interface x {
+  void m ([Undefined=Null,Null=Empty] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Undefined=null] attribute DOMString x;
+};
+};
+#errors
+3:null;xattr id value not allowed;m;Undefined
+
+#data
+module m {
+interface x {
+  void m ([Undefined=null] in DOMString x);
+};
+};
+#errors
+3:null;xattr id value not allowed;m;Undefined
+
+#data
+module m {
+interface x {
+  [Undefined] attribute DOMString x;
+};
+};
+#errors
+3;xattr id missing;m;Undefined
+
+#data
+module m {
+interface x {
+  void m ([Undefined] in DOMString x);
+};
+};
+#errors
+3;xattr id missing;m;Undefined
+
+#data
+module m {
+interface x {
+  [Undefined()] attribute DOMString x;
+};
+};
+#errors
+3;xattr id missing;m;Undefined
+3;xattr arglist not allowed;m;Undefined
+
+#data
+module m {
+interface x {
+  void m ([Undefined()] in DOMString x);
+};
+};
+#errors
+3;xattr id missing;m;Undefined
+3;xattr arglist not allowed;m;Undefined
+
+#data
+module m {
+interface x {
+  [Undefined=Null()] attribute DOMString x;
+};
+};
+#errors
+3;xattr arglist not allowed;m;Undefined
+
+#data
+module m {
+interface x {
+  void m ([Undefined=Null()] in DOMString x);
+};
+};
+#errors
+3;xattr arglist not allowed;m;Undefined
+
+#data
+module m {
+interface x {
+  [Undefined=Null] attribute _DOMString x;
+};
+};
+#errors
+3;xattr for wrong type;w;Undefined
+3;type not defined;m;DOMString
+
+#data
+module m {
+interface x {
+  void m ([Undefined=Null] in _DOMString x);
+};
+};
+#errors
+3;xattr for wrong type;w;Undefined
+3;type not defined;m;DOMString
+
+#data
+module m {
+interface x {
+  [Undefined=_Null] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Undefined=_Null] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Undefined=_Empty] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Undefined=_Empty] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Undefined=Undefined] in DOMString x);
+};
+};
+#errors
+3:Undefined;xattr id value not allowed;m;Undefined
+
+#data
+module m {
+[Undefined=Null]interface x {
+  attribute DOMString x;
+};
+};
+#errors
+2;xattr not applicable;w;Undefined
+
+#data
+module m {
+interface x {
+  [Undefined=Empty] void m (in DOMString x);
+};
+};
+#errors
+3;xattr not applicable;w;Undefined

@@ -1268,8 +1268,10 @@ my $xattr_defs = {
     #allow_id => 0,
     allow_arglist => 1,
     allowed_type => {Interface => 1},
+    allow_multiple => 1,
     check => sub {
-      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
 
       ## NOTE: Arguments
       unshift @$items,
@@ -1281,8 +1283,10 @@ my $xattr_defs = {
     allow_id => 1,
     #allow_arglist => 0,
     allowed_type => {Module => 1},
+    #allow_multiple => 0,
     check => sub {
-      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
 
       my $id = $xattr->value;
       if (defined $id) {
@@ -1312,8 +1316,10 @@ my $xattr_defs = {
     #allow_id => 0,
     #allow_arglist => 0,
     allowed_type => {Operation => 1},
+    #allow_multiple => 0,
     check => sub {
-      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
 
       if (@{$item->{node}->{child_nodes}} != 1 or
           $item->{node}->{child_nodes}->[0]->type_text ne 'unsigned long') {
@@ -1322,21 +1328,24 @@ my $xattr_defs = {
                    node => $xattr,
                    level => $levels->{fact});
       }
-      if ($item->{defined_accessors}->{$xattr_name}) {
+      if ($item->{defined_accessors}->{$xattr_name} and
+          $item->{defined_accessors}->{$xattr_name} ne $item->{node}) {
         $onerror->(type => 'duplicate accessor',
                    text => $xattr_name,
                    node => $xattr,
                    level => $levels->{undefined});
       }
-      $item->{defined_accessors}->{$xattr_name} = 1;
+      $item->{defined_accessors}->{$xattr_name} = $item->{node};
     },
   },
   IndexSetter => {
     #allow_id => 0,
     #allow_arglist => 0,
     allowed_type => {Operation => 1},
+    #allow_multiple => 0,
     check => sub {
-      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
 
       if (@{$item->{node}->{child_nodes}} != 2 or
           $item->{node}->{child_nodes}->[0]->type_text ne 'unsigned long') {
@@ -1345,21 +1354,24 @@ my $xattr_defs = {
                    node => $xattr,
                    level => $levels->{fact});
       }
-      if ($item->{defined_accessors}->{$xattr_name}) {
+      if ($item->{defined_accessors}->{$xattr_name} and
+          $item->{defined_accessors}->{$xattr_name} ne $item->{node}) {
         $onerror->(type => 'duplicate accessor',
                    text => $xattr_name,
                    node => $xattr,
                    level => $levels->{undefined});
       }
-      $item->{defined_accessors}->{$xattr_name} = 1;
+      $item->{defined_accessors}->{$xattr_name} = $item->{node};
     },
   },
   NameGetter => {
     #allow_id => 0,
     #allow_arglist => 0,
     allowed_type => {Operation => 1},
+    #allow_multiple => 0,
     check => sub {
-      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
 
       if (@{$item->{node}->{child_nodes}} != 1 or
           $item->{node}->{child_nodes}->[0]->type_text ne 'DOMString') {
@@ -1368,21 +1380,24 @@ my $xattr_defs = {
                    node => $xattr,
                    level => $levels->{fact});
       }
-      if ($item->{defined_accessors}->{$xattr_name}) {
+      if ($item->{defined_accessors}->{$xattr_name} and
+          $item->{defined_accessors}->{$xattr_name} ne $item->{node}) {
         $onerror->(type => 'duplicate accessor',
                    text => $xattr_name,
                    node => $xattr,
                    level => $levels->{undefined});
       }
-      $item->{defined_accessors}->{$xattr_name} = 1;
+      $item->{defined_accessors}->{$xattr_name} = $item->{node};
     },
   },
   NameSetter => {
     #allow_id => 0,
     #allow_arglist => 0,
     allowed_type => {Operation => 1},
+    #allow_multiple => 0,
     check => sub {
-      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
 
       if (@{$item->{node}->{child_nodes}} != 2 or
           $item->{node}->{child_nodes}->[0]->type ne '::DOMString::') {
@@ -1391,13 +1406,14 @@ my $xattr_defs = {
                    node => $xattr,
                    level => $levels->{fact});
       }
-      if ($item->{defined_accessors}->{$xattr_name}) {
+      if ($item->{defined_accessors}->{$xattr_name} and
+          $item->{defined_accessors}->{$xattr_name} ne $item->{node}) {
         $onerror->(type => 'duplicate accessor',
                    text => $xattr_name,
                    node => $xattr,
                    level => $levels->{undefined});
       }
-      $item->{defined_accessors}->{$xattr_name} = 1;
+      $item->{defined_accessors}->{$xattr_name} = $item->{node};
     },
   },
   Null => {
@@ -1405,10 +1421,12 @@ my $xattr_defs = {
     #allow_arglist => 0,
     allowed_type => {Argument => 1, Attribute => 1},
         ## ISSUE: Is this allwoed for extended attribute's arguments?
+    #allow_multiple => 0,
     check => sub {
-      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
       
-      ## ISSUE: [Null=Empty,Null=Null]
+      ## ISSUE: [Null=Empty] readonly attribute is not disallowed
 
       if ($item->{node}->type ne '::DOMString::') {
         $onerror->(type => 'xattr for wrong type',
@@ -1436,7 +1454,195 @@ my $xattr_defs = {
       }
     },
   },
+  PutForwards => {
+    allow_id => 1,
+    #allow_arglist => 0,
+    allowed_type => {Attribute => 1},
+    #allow_multiple => 0,
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
+
+      ## NOTE: Direct or indirect cirlic reference is not an error.
+
+      unless ($item->{node}->readonly) {
+        $onerror->(type => 'attr not readonly',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{fact});
+      }
+      
+      my $type_item = $resolve->($item->{node}->type, $item->{scope});
+      if ($type_item and
+          $type_item->{node}->isa ('Whatpm::WebIDL::Interface')) {
+        my $id = $xattr->value;
+        if (defined $id) {
+          ## ISSUE: "attribute that exists on the interface and which
+          ## has the same type as this attribute.": "same type"?
+          ## ISSUE: must be read-write attribute?
+
+          my $check = sub ($) {
+            my $type_item = shift;
+            
+            A: {
+              for my $attr (@{$type_item->{node}->{child_nodes}}) {
+                next unless $attr->isa ('Whatpm::WebIDL::Attribute');
+                if ($attr->node_name eq $id) {
+                  last A;
+                }
+              }
+              
+              $onerror->(type => 'referenced attr not defined',
+                         text => $xattr_name,
+                         value => $id,
+                         node => $xattr,
+                         level => $levels->{must});
+            } # A
+          }; # $check
+
+          if ($type_item->{node}->is_forward_declaration) {
+            ## NOTE: Checked later.
+            push @$items, {code => sub {
+              $check->($resolve->($item->{node}->type, $item->{scope}));
+            }};
+          } else {
+            $check->($type_item);
+          }
+        } else {
+          $onerror->(type => 'xattr id missing',
+                     text => $xattr_name,
+                     node => $xattr,
+                     level => $levels->{must});
+        }
+      } else {
+        ## NOTE: Builtin types, or undefined interface
+        $onerror->(type => 'attr type not interface',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{fact});
+      }
+    },
+  },
+  Stringifies => {
+    allow_id => 1,
+    #allow_arglist => 0,
+    allowed_type => {Interface => 1},
+    #allow_multiple => 0,
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
+
+      my $id = $xattr->value;
+      if (defined $id) {
+        A: {
+          for my $attr (@{$item->{node}->{child_nodes}}) {
+            next unless $attr->isa ('Whatpm::WebIDL::Attribute');
+            if ($attr->node_name eq $id) {
+              last A;
+            }
+          }
+
+          $onerror->(type => 'referenced attr not defined',
+                     text => $xattr_name,
+                     value => $id,
+                     node => $xattr,
+                     level => $levels->{must});
+        } # A
+      }
+    },
+  },
+  Variadic => {
+    #allow_id => 0,
+    #allow_arglist => 0,
+    allowed_type => {Argument => 1},
+    #allow_multiple => 0,
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
+      
+      ## ISSUE: is this allowed on extended attribute arguuments?
+
+      ## NOTE: If this is not the final argument, then an error will
+      ## be raised later.
+      $item->{has_arg_xattr}->{variadic} = 1;
+    },
+  },
+
+  ## ECMAScript specific extended attributes
+  NamedConstructor => {
+    allow_id => 1,
+    allow_arglist => 1,
+    allowed_type => {Interface => 1, Exception => 1},
+    allow_multiple => 1,
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
+      
+      ## NOTE: [NamedConstructor=a,NamedConstructor=a] is not disallowed.
+
+      my $id = $xattr->value;
+      if (defined $id) {
+        if ($constructors->{$id} and
+            $constructors->{$id}->{node} ne $item->{node}) {
+          $onerror->(type => 'duplicate constructor name',
+                     value => $id,
+                     node => $xattr,
+                     level => $levels->{must});
+        } else {
+          $constructors->{$id} = {node => $item->{node},
+                                  is_named_constructor => $xattr};
+        }
+      } else {
+        $onerror->(type => 'xattr id missing',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{must});
+      }
+    },
+  },
+  NativeObject => {
+    allow_id => 1,
+    #allow_arglist => 0,
+    allowed_type => {Interface => 1},
+    #allow_multiple => 0,
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
+
+      my $id = $xattr->value;
+      if (defined $id and $id ne 'FunctionOnly') {
+        $onerror->(type => 'xattr id value not allowed',
+                   text => $xattr_name,
+                   value => $id,
+                   node => $xattr,
+                   level => $levels->{must});
+      }
+
+      ## TODO: We should warn if the condition in the section 4.5 is not met.
+    },
+  },
+  NoInterfaceObject => {
+    #allow_id => 0,
+    #allow_arglist => 0,
+    allowed_type => {Interface => 1, Exception => 1},
+    #allow_multiple => 0,
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name,
+          $resolve, $constructors) = @_;
+
+      ## ISSUE: [Constructor, NoInterfaceObject]
+    },
+  },
+  Undefined => {
+    allow_id => 1,
+    #allow_arglist => 0,
+    allowed_type => {Argument => 1, Attribute => 1},
+        ## ISSUE: Is this allwoed for extended attribute's arguments?
+    #allow_multiple => 0,
+    #check : is set later
+  },
 }; # $xattr_defs
+$xattr_defs->{Undefined}->{check} = $xattr_defs->{Null}->{check};
 
 sub check ($$;$) {
   my ($self, $onerror, $levels) = @_;
@@ -1551,7 +1757,7 @@ sub check ($$;$) {
     my $i_sn = shift;
     my $scope = shift;
     
-    if ($i_sn =~ /\A::([^:]+)::\z/ or
+    if ($i_sn =~ /\A::(?>[^:]+)::\z/ or
         $i_sn =~ /^::::sequence::::/) {
       return undef;
     } elsif ($i_sn =~ /::DOMString\z/ or
@@ -1576,11 +1782,18 @@ sub check ($$;$) {
 
   my $items = [map { {node => $_, scope => '::'} } @{$self->{child_nodes}}];
 
+  my $constructors = {};
+      ## NOTE: Items are: identifier => {node => $interface_or_exception,
+      ## is_named_constructor => $named_constructor_xattr/undef}.
+
   while (@$items) {
     my $item = shift @$items;
-    if ($item->{node}->isa ('Whatpm::WebIDL::Definition') and
-        not $item->{defined_members} # Const in Interface does not have that
-    ) {
+    if (not $item->{node}) {
+      $item->{code}->();
+      next;
+    } elsif ($item->{node}->isa ('Whatpm::WebIDL::Definition') and
+             not $item->{defined_members}) {
+                 ## NOTE: Const in Interface does not have this.
       if ($item->{node}->isa ('Whatpm::WebIDL::Module')) {
         unshift @$items,
             map {
@@ -1697,6 +1910,13 @@ sub check ($$;$) {
         $onerror->(type => 'duplicate qname',
                    level => 'm',
                    node => $item->{node});
+
+        if ($item->{node}->isa ('Whatpm::WebIDL::Interface') and
+            $defined_qnames->{$qname}->{node}->isa
+                ('Whatpm::WebIDL::Interface') and
+            $defined_qnames->{$qname}->{node}->is_forward_declaration) {
+          $defined_qnames->{$qname} = $item;
+        }
       } else {
         $defined_qnames->{$qname} = $item;
         ## NOTE: This flag must be turned on AFTER inheritance check is
@@ -1705,8 +1925,10 @@ sub check ($$;$) {
     } elsif ($item->{node}->isa ('Whatpm::WebIDL::InterfaceMember')) {
       if ($item->{node}->isa ('Whatpm::WebIDL::Operation')) {
         ## NOTE: Arguments
+        my $has_arg_xattr = {};
         unshift @$items,
-            map { {node => $_, scope => $item->{scope}} }
+            map { {node => $_, scope => $item->{scope},
+                   has_arg_xattr => $has_arg_xattr} }
             @{$item->{node}->{child_nodes}};
       } else {
         my $name = $item->{node}->node_name;
@@ -1762,6 +1984,13 @@ sub check ($$;$) {
       }
     } elsif ($item->{node}->isa ('Whatpm::WebIDL::Argument') or
              $item->{node}->isa ('Whatpm::WebIDL::ExceptionMember')) {
+      if ($item->{has_arg_xattr}->{variadic} and
+          $item->{node}->isa ('Whatpm::WebIDL::Argument')) {
+        $onerror->(type => 'argument after variadic',
+                   node => $item->{node},
+                   level => $levels->{fact});
+      }
+
       ## ISSUE: No uniqueness constraints for arguments in an operation,
       ## so we don't check it for arguments.
 
@@ -1798,6 +2027,7 @@ sub check ($$;$) {
     }
 
     my $xattrs = $item->{node}->{xattrs} || [];
+    my $has_xattr;
     X: for my $xattr (@$xattrs) {
       my $xattr_name = $xattr->node_name;
       my $xattr_def = $xattr_defs->{$xattr_name};
@@ -1813,17 +2043,33 @@ sub check ($$;$) {
       A: {
         for my $cls (keys %{$xattr_def->{allowed_type} or {}}) {
           if ($item->{node}->isa ('Whatpm::WebIDL::' . $cls)) {
-            last A;
+            if ($cls eq 'Interface' and
+                $item->{node}->is_forward_declaration) {
+              #
+            } else {
+              last A;
+            }
           }
         }
 
         $onerror->(type => 'xattr not applicable',
                    text => $xattr_name,
-                   level => $levels->{fact},
-                   node => $xattr);
-        
+                   node => $xattr,
+                   level => $levels->{fact});
         next X;
       } # A
+
+      if ($has_xattr->{$xattr_name} and not $xattr_def->{allow_multiple}) {
+        ## ISSUE: Whether multiple extended attributes with the same
+        ## name are allowed is not explicitly specified in the spec.
+        ## It is, however, specified that some extended attributes may
+        ## be specified more than once.
+        $onerror->(type => 'duplicate xattr',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{warn});
+      }
+      $has_xattr->{$xattr_name} = 1;
 
       if (not $xattr_def->{allow_id} and defined $xattr->value) {
         $onerror->(type => 'xattr id not allowed',
@@ -1839,64 +2085,26 @@ sub check ($$;$) {
       }
 
       $xattr_def->{check}->($self, $onerror, $levels, $items, $item,
-                            $xattr, $xattr_name);
+                            $xattr, $xattr_name, $resolve, $constructors);
+    }
 
-
-      if ({
-            Undefined => 1,
-          }->{$xattr_name}) {
-        if ($item->{node}->isa ('Whatpm::WebIDL::Attribute') or
-            $item->{node}->isa ('Whatpm::WebIDL::Argument')) {
-
-          next;
-        } else {
-          #
-        }
-
-      } elsif ($xattr_name eq 'PutForwards') {
-        if ($item->{node}->isa ('Whatpm::WebIDL::Attribute')) {
-
-          next;
-        } else {
-          #
-        }
-      } elsif ($xattr_name eq 'Variadic') {
-        if ($item->{node}->isa ('Whatpm::WebIDL::Operation')) {
-
-          next;
-        } else {
-          #
-        }
-      } elsif ({NamedConstructor => 1,
-               }->{$xattr_name}) {
-        if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
-
-          next;
-        } else {
-          #
-        }
-      } elsif ({
-                NativeObject => 1,
-                Stringifies => 1,
-               }->{$xattr_name}) {
-        if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
-          
-          next;
-        } else {
-          #
-        }
-      } elsif ($xattr_name eq 'NoInterfaceObject') {
-        if ($item->{node}->isa ('Whatpm::WebIDL::Interface') or
-            $item->{node}->isa ('Whatpm::WebIDL::Exception')) {
-          
-          next;
-        } else {
-          #
-        }
-
-
+    if (not $has_xattr->{NoInterfaceObject} and
+        (($item->{node}->isa ('Whatpm::WebIDL::Interface') and
+          not $item->{node}->is_forward_declaration) or
+         $item->{node}->isa ('Whatpm::WebIDL::Exception'))) {
+      my $id = $item->{node}->node_name;
+      if ($constructors->{$id} and
+          $constructors->{$id}->{is_named_constructor}) {
+        $onerror->(type => 'duplicate constructor name',
+                   value => $id,
+                   node => $constructors->{$id}->{is_named_constructor},
+                   level => $levels->{must});
+      } else {
+        ## NOTE: Duplication is not checked in this case, since any
+        ## duplication of interface/exception identifiers are detected
+        ## by the parser.
+        $constructors->{$id} = {node => $item->{node}};
       }
-
     }
   }
 } # check

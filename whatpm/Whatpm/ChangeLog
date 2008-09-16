@@ -1,5 +1,14 @@
 2008-09-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* WebIDL.pm: Support for the reminding extended attributes are
+	added.  It does not satisfy the definition that a forward
+	interface declaration has an extended attribute.  It seems that
+	unless explicitly allowed multiple extended attributes with the
+	same name is not allowed, though it is not explicitly mentioned in
+	the spec.
+
+2008-09-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* WebIDL.pm: Unescapes extended attribute names and extended
 	attribute identifiers.  Preserve whether an extended attribute has
 	an argument list of not.  Support for extended attributes:
