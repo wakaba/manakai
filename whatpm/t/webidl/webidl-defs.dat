@@ -65,7 +65,7 @@ interface b {};
 interface a {};
 interface a {};
 #errors
-2;duplicate qname;m
+2;duplicate qname;m;::a
 1;non-module definition;s
 2;non-module definition;s
 
@@ -77,21 +77,21 @@ module a {
 interface b {};
 };
 #errors
-4;duplicate qname;m
-5;duplicate qname;m
+4;duplicate qname;m;::a
+5;duplicate qname;m;::a::b
 
 #data
 module a {};
 interface a {};
 #errors
-2;duplicate qname;m
+2;duplicate qname;m;::a
 2;non-module definition;s
 
 #data
 module a {};
 module _a {};
 #errors
-2;duplicate qname;m
+2;duplicate qname;m;::a
 
 #data
 module a {};
@@ -105,7 +105,7 @@ interface _b{}
 ;
 };
 #errors
-3;duplicate qname;m
+3;duplicate qname;m;::a::b
 
 #data
 [ExceptionConsts, abc] interface x {
@@ -457,7 +457,7 @@ valuetype DOMString sequence<unsigned short>;
 interface x{};
 };
 #errors
-2;ignored valuetype;i
+2;valuetype ignored;i
 #document
 | module m {
 | 

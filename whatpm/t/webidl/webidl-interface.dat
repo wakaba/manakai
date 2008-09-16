@@ -44,7 +44,7 @@ interface x {
   attribute long a;
 };};
 #errors
-4;duplicate member;m
+4;duplicate member;m;a
 #document
 | module m {
 | 
@@ -64,7 +64,7 @@ interface x {
   attribute long a;
 };};
 #errors
-5;duplicate qname;m
+5;duplicate qname;m;::m::x
 
 #data
 module m {
@@ -73,7 +73,7 @@ interface x {
   attribute long _a;
 };};
 #errors
-4;duplicate member;m
+4;duplicate member;m;a
 
 #data
 module m {
@@ -90,7 +90,7 @@ interface x {
   const long a = 1;
 };};
 #errors
-4;duplicate member;m
+4;duplicate member;m;a
 
 #data
 module m {
@@ -303,7 +303,7 @@ module m {
   };
 };
 #errors
-3:-2;const value out of range;m
+3:-2;const value out of range;m;unsigned long
 
 #data
 module m {
@@ -406,7 +406,7 @@ module m {
   const octet CR = -0x0D;
 };
 #errors
-2:-13;const value out of range;m
+2:-13;const value out of range;m;octet
 #document
 | module m {
 | 
@@ -1635,7 +1635,7 @@ module m {
 };
 #errors
 2;xattr not applicable;w;Constructor
-3;duplicate qname;m
+3;duplicate qname;m;::m::x
 
 #data
 module m {
@@ -1643,7 +1643,7 @@ module m {
   [Constructor] interface x { };
 };
 #errors
-3;duplicate qname;m
+3;duplicate qname;m;::m::x
 
 #data
 module m {
@@ -1652,7 +1652,7 @@ module m {
 };
 #errors
 2;xattr not applicable;w;Constructor
-3;duplicate qname;m
+3;duplicate qname;m;::m::x
 
 #data
 module m {
@@ -2687,7 +2687,7 @@ interface y {
 };
 };
 #errors
-6;duplicate qname;m
+6;duplicate qname;m;::m::y
 
 #data
 module m {
@@ -3000,7 +3000,7 @@ interface x {};
 };
 #errors
 2;xattr not applicable;w;NamedConstructor
-4;duplicate qname;m
+4;duplicate qname;m;::m::x
 
 #data
 module m {
@@ -3049,7 +3049,7 @@ interface x {};
 };
 #errors
 2;xattr not applicable;w;NativeObject
-3;duplicate qname;m
+3;duplicate qname;m;::m::x
 
 #data
 module m {
@@ -3120,7 +3120,7 @@ interface x {};
 };
 #errors
 2;xattr not applicable;w;NoInterfaceObject
-3;duplicate qname;m
+3;duplicate qname;m;::m::x
 
 #data
 module m {

@@ -1331,7 +1331,7 @@ my $xattr_defs = {
         }
         unless ($has_x) {
           $onerror->(type => 'exception not defined',
-                     value => $id,
+                     text => $id,
                      node => $xattr,
                      level => $levels->{must});
         }
@@ -1691,93 +1691,101 @@ sub check ($$;$) {
     ## constant values.
     ## ISSUE: Should I ask the editor to clarify the spec about this?
 
-        if ($value->[0] eq 'TRUE' or $value->[0] eq 'FALSE') {
-          if ($type eq '::boolean::') {
-            #
-          } elsif ($type eq '::any::') {
-            #
-          } else {
-            $onerror->(type => 'const type mismatch',
-                       level => 'm',
-                       node => $item->{node},
-                       text => $item->{node}->type_text,
-                       value => $value->[0]);
+    if ($value->[0] eq 'TRUE' or $value->[0] eq 'FALSE') {
+      if ($type eq '::boolean::') {
+        #
+      } elsif ($type eq '::any::') {
+        #
+      } else {
+        $onerror->(type => 'const type mismatch',
+                   node => $item->{node},
+                   text => $item->{node}->type_text,
+                   value => $value->[0],
+                   level => $levels->{must});
           }
         } elsif ($value->[0] eq 'integer') {
           if ($type eq '::octet::') {
             if ($value->[1] < 0 or 255 < $value->[1]) {
               $onerror->(type => 'const value out of range',
-                         level => 'm',
+                         text => $item->{node}->type_text,
+                         value => $value->[1],
                          node => $item->{node},
-                         value => $value->[1]);
+                         level => $levels->{must});
             }
           } elsif ($type eq '::short::') {
             if ($value->[1] < -32768 or 32767 < $value->[1]) {
               $onerror->(type => 'const value out of range',
-                         level => 'm',
+                         text => $item->{node}->type_text,
+                         value => $value->[1],
                          node => $item->{node},
-                         value => $value->[1]);
+                         level => $levels->{must});
             }
           } elsif ($type eq '::unsigned short::') {
             if ($value->[1] < 0 or 65535 < $value->[1]) {
               $onerror->(type => 'const value out of range',
-                         level => 'm',
+                         text => $item->{node}->type_text,
+                         value => $value->[1],
                          node => $item->{node},
-                         value => $value->[1]);
+                         level => $levels->{must});
             }
           } elsif ($type eq '::long::') {
             if ($value->[1] < -2147483648 or 2147483647 < $value->[1]) {
               $onerror->(type => 'const value out of range',
-                         level => 'm',
+                         text => $item->{node}->type_text,
+                         value => $value->[1],
                          node => $item->{node},
-                         value => $value->[1]);
+                         level => $levels->{must});
             }
           } elsif ($type eq '::unsigned long::') {
             if ($value->[1] < 0 or 4294967295 < $value->[1]) {
               $onerror->(type => 'const value out of range',
-                         level => 'm',
+                         text => $item->{node}->type_text,
+                         value => $value->[1],
                          node => $item->{node},
-                         value => $value->[1]);
+                         level => $levels->{must});
             }
           } elsif ($type eq '::long long::') {
             if ($value->[1] < -9223372036854775808 or
                 9223372036854775807 < $value->[1]) {
               $onerror->(type => 'const value out of range',
-                         level => 'm',
+                         text => $item->{node}->type_text,
+                         value => $value->[1],
                          node => $item->{node},
-                         value => $value->[1]);
+                         level => $levels->{must});
             }
           } elsif ($type eq '::unsigned long long::') {
             if ($value->[1] < 0 or 18446744073709551615 < $value->[1]) {
               $onerror->(type => 'const value out of range',
-                         level => 'm',
+                         text => $item->{node}->type_text,
+                         value => $value->[1],
                          node => $item->{node},
-                         value => $value->[1]);
+                         level => $levels->{must});
             }
           } elsif ($type eq '::any::') {
             if ($value->[1] < -9223372036854775808 or
                 18446744073709551615 < $value->[1]) {
               $onerror->(type => 'const value out of range',
-                         level => 'm',
+                         text => $item->{node}->type_text,
+                         value => $value->[1],
                          node => $item->{node},
-                         value => $value->[1]);
+                         level => $levels->{must});
             }
           } else {
             $onerror->(type => 'const type mismatch',
-                       level => 'm',
-                       node => $item->{node},
                        text => $item->{node}->type_text,
-                       value => $value->[1]);
+                       value => $value->[1],
+                       node => $item->{node},
+                       level => $levels->{must});
           }
         } elsif ($value->[0] eq 'float') {
           if ($type eq '::float::' or $type eq '::any::') {
             #
           } else {
             $onerror->(type => 'const type mismatch',
-                       level => 'm',
-                       node => $item->{node},
                        text => $item->{node}->type_text,
-                       value => $value->[1]);
+                       value => $value->[1],
+                       node => $item->{node},
+                       level => $levels->{must});
           }
         }
         ## NOTE: Otherwise, an error of the implementation or the application.
@@ -1835,8 +1843,8 @@ sub check ($$;$) {
       } else {
         unless ($item->{parent}) {
           $onerror->(type => 'non-module definition',
-                     level => 's',
-                     node => $item->{node});
+                     node => $item->{node},
+                     level => $levels->{should});
         }
       }
 
@@ -1847,9 +1855,9 @@ sub check ($$;$) {
           unless ($def and $def->{node}->isa ('Whatpm::WebIDL::Interface')) {
             $i_sn =~ s/::DOMString::::\z/::DOMString/;
             $onerror->(type => 'interface not defined',
-                       level => 'm',
                        node => $item->{node},
-                       text => $i_sn);
+                       text => $i_sn,
+                       level => $levels->{must});
           }
         }
 
@@ -1875,8 +1883,8 @@ sub check ($$;$) {
             $type eq '::DOMString::' or
             $type =~ /::DOMString::::\z/) {
           $onerror->(type => 'typedef ignored',
-                     level => 'i',
-                     node => $item->{node});
+                     node => $item->{node},
+                     level => $levels->{info});
         }
         ## ISSUE: Refernece to a non-defined interface is not non-conforming.
 
@@ -1901,9 +1909,9 @@ sub check ($$;$) {
       } elsif ($item->{node}->isa ('Whatpm::WebIDL::Valuetype')) {
         my $name = $item->{node}->node_name;
         if ($name eq '::DOMString::') {
-          $onerror->(type => 'ignored valuetype',
-                     level => 'i',
-                     node => $item->{node});
+          $onerror->(type => 'valuetype ignored',
+                     node => $item->{node},
+                     level => $levels->{info});
         } else {
           my $type = $item->{node}->type;
           if ($type =~ /\A::[^:]+::\z/) {
@@ -1919,9 +1927,9 @@ sub check ($$;$) {
               ## ISSUE: It is not explicitly specified that ScopedName
               ## must refer a defined type.
               $onerror->(type => 'not boxable type',
-                         level => 'm',
+                         text => $item->{node}->type_text,
                          node => $item->{node},
-                         text => $item->{node}->type_text);
+                         level => $levels->{must});
             }
           }
         }
@@ -1938,9 +1946,12 @@ sub check ($$;$) {
         ## ISSUE: |interface x;| with no |interface x {};| is conforming
         ## according to the current spec text.
 
+        ## ISSUE: |interface x; exception x {}|
+
         $onerror->(type => 'duplicate qname',
-                   level => 'm',
-                   node => $item->{node});
+                   node => $item->{node},
+                   level => $levels->{must},
+                   text => $qname);
 
         if ($item->{node}->isa ('Whatpm::WebIDL::Interface') and
             $defined_qnames->{$qname}->{node}->isa
@@ -1965,8 +1976,9 @@ sub check ($$;$) {
         my $name = $item->{node}->node_name;
         if ($item->{defined_members}->{$name}) {
           $onerror->(type => 'duplicate member',
-                     level => 'm',
-                     node => $item->{node});
+                     node => $item->{node},
+                     text => $name,
+                     level => $levels->{must});
           ## ISSUE: Whether the example below is conforming or not
           ## is ambigious:
           ## |interface a { attribute any b; any b (); };|
@@ -1988,9 +2000,9 @@ sub check ($$;$) {
                    $def->{node}->isa ('Whatpm::WebIDL::Typedef') or
                    $def->{node}->isa ('Whatpm::WebIDL::Valuetype'))) {
             $onerror->(type => 'type not defined',
-                       level => 'm',
                        node => $item->{node},
-                       text => $item->{node}->type_text);
+                       text => $item->{node}->type_text,
+                       level => $levels->{must});
           }
         }
                 
@@ -2002,9 +2014,9 @@ sub check ($$;$) {
           unless ($def and
                   $def->{node}->isa ('Whatpm::WebIDL::Exception')) {
             $onerror->(type => 'exception not defined',
-                       level => 'm',
+                       text => $_,
                        node => $item->{node},
-                       text => $_);
+                       level => $levels->{must});
           }
         }
         
@@ -2033,8 +2045,9 @@ sub check ($$;$) {
       my $name = $item->{node}->node_name;
       if ($item->{defined_members}->{$name}) {
         $onerror->(type => 'duplicate member',
-                   level => 'm',
-                   node => $item->{node});
+                   text => $name,
+                   node => $item->{node},
+                   level => $levels->{must});
       } else {
         $item->{defined_members}->{$name} = 1;
       }
@@ -2050,9 +2063,9 @@ sub check ($$;$) {
                  $def->{node}->isa ('Whatpm::WebIDL::Typedef') or
                  $def->{node}->isa ('Whatpm::WebIDL::Valuetype'))) {
           $onerror->(type => 'type not defined',
-                     level => 'm',
+                     text => $item->{node}->type_text,
                      node => $item->{node},
-                     text => $item->{node}->type_text);
+                     level => $levels->{must});
         }
       }
     }

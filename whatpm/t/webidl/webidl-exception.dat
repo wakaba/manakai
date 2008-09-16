@@ -16,7 +16,7 @@ exception e {
 };
 #errors
 1;non-module definition;s
-3;duplicate member;m
+3;duplicate member;m;a
 
 #data
 exception e {
@@ -25,7 +25,7 @@ exception e {
 };
 #errors
 1;non-module definition;s
-3;duplicate member;m
+3;duplicate member;m;a
 
 #data
 exception e {
@@ -34,7 +34,7 @@ exception e {
 };
 #errors
 1;non-module definition;s
-3;duplicate member;m
+3;duplicate member;m;a
 
 #data
 exception e {
@@ -150,7 +150,7 @@ exception f {
   exception f { };
 };
 #errors
-1:ff;exception not defined;m
+1;exception not defined;m;ff
 #document
 | [ExceptionConsts=ff] module m {
 | 
@@ -206,7 +206,7 @@ exception f {
   interface f { };
 };
 #errors
-1:f;exception not defined;m
+1;exception not defined;m;f
 #document
 | [ExceptionConsts=f] module m {
 | 
@@ -222,8 +222,8 @@ module m {
 [ExceptionConsts=f] module m {
 };
 #errors
-4;duplicate qname;m
-4:f;exception not defined;m
+4;duplicate qname;m;::m
+4;exception not defined;m;f
 #document
 | module m {
 | 
