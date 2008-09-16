@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.181 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.182 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -997,6 +997,7 @@ sub _get_next_token ($) {
       ## NOTE: Same as |DATA_STATE|, but only for |PCDATA| content model.
 
       if ($self->{nc} == 0x0026) { # &
+        
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity data state".  In this implementation, the tokenizer
         ## is switched to the |ENTITY_STATE|, which is an implementation
@@ -1185,8 +1186,10 @@ sub _get_next_token ($) {
 
       ## Stay in the data state.
       if ($self->{content_model} == PCDATA_CONTENT_MODEL) {
+        
         $self->{state} = PCDATA_STATE;
       } else {
+        
         ## Stay in the state.
       }
       
@@ -10502,4 +10505,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/15 09:27:53 $
+# $Date: 2008/09/16 14:41:37 $

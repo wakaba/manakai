@@ -1,0 +1,114 @@
+=head1 NAME
+
+Whatpm::WebIDL - A WebIDL Parser and Conformance Checker
+
+=head1 SYNOPSIS
+
+  use Whatpm::WebIDL;
+  
+  my $parser = Whatpm::WebIDL::Parser->new;
+  my $onerror = sub {
+    my %arg = @_;
+    warn join "\t",
+        $arg{line}, $arg{column}, $arg{level},
+        $arg{type}, $arg{text} // '', $arg{value} // '';
+  };
+  
+  my $webidl_doc = $parser->parse_char_string ($webidl_string, $onerror);
+  $webidl_doc->check ($onerror);
+
+=head1 DESCRIPTION
+
+The C<Whatpm::WebIDL> module provides a WebIDL parser, as well as a
+conformance checker that can be invoked once an IDL fragment has been
+parsed.
+
+This is an implementation of W3C Web IDL specification.
+
+=head1 METHODS
+
+The C<Whatpm::WebIDL> package itself provides no functionality.  It
+contains various packages including C<Whatpm::WebIDL::Parser>.
+
+=head2 C<Whatpm::WebIDL::Parser>
+
+The C<Whatpm::WebIDL::Parser> package, which is contained in the
+C<Whatpm::WebIDL> module, defines a class method and an instance
+method:
+
+=over 4
+
+=item I<$parser> = Whatpm::WebIDL::Parser->new;
+
+This class method creates a new instance of the WebIDL parser.
+
+=item I<$webidl_doc> = I<$parser>->parse_char_string (I<$webidl_fragment>, [I<$onerror>]);
+
+This instance method of the I<$parser> method parses a WebIDL fragment
+and returns its in-memory representation.
+
+The first argument, I<$webidl_fragment>, is the IDL fragment to be
+parsed.  It must be a string of characters (not bytes).
+
+As the second argument, I<$onerror>, a C<CODE> reference may be
+specified.  If specified, whenever a parse error is found, or a
+warning message is raised, the C<CODE> is invoked with arguments
+describing the error. @@ TODO: ref to degtailed description
+
+Note that the W3C WebIDL specification does not define how invalid
+WebIDL fragments are parsed.  This parse implements a foward
+compatible parsing rule that is similar to the CSS parsing rule; once
+a parse error is found, everything until the next C<;> character (or
+the end-of-file, if there is no C<;> character) is ignored, taking
+pairs of C<{> and C<}> characters into account.  If a fragment
+prematurely ends inside a block, then a C<};> sequence that closes the
+block is implied.  Any error that does not violate the grammer, e.g.
+any reference to an undefined interface, does not stop the parser; to
+detect such errors, the C<checker> has to be invoked later.
+
+The returned object, C<$webidl_doc>, is an in-memory representation of
+the prased IDL fragment.  It is an instance of the
+C<Whatpm::WebIDL::Definitions> class.
+
+=back
+
+=head2 C<Whatpm::WebIDL::Definitions>
+
+An object of the C<Whatpm::WebIDL::Definitions> class represents a
+WebIDL fragment (or C<Definitions> production in the WebIDL
+specification).
+
+=over 4
+
+=item I<$webidl_doc>->check (I<$onerror>, [I<$levels>]);
+
+This method checks the conformance of the WebIDL objects,
+I<$webidl_docs>.
+
+@@ TODO: documentation for I<$onerror> and I<$levels>.
+
+=back
+
+=head1 SEE ALSO
+
+WebIDL Editor's Draft
+<http://dev.w3.org/cvsweb/~checkout~/2006/webapi/WebIDL/Overview.html?content-type=text/html;%20charset=utf-8>
+
+C<WebHACC::Language::WebIDL> module, as an example of the usage of
+this module
+<http://suika.fam.cx/gate/cvs/webroot/gate/2007/html/WebHACC/Language/WebIDL.pm>
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>
+
+=head1 LICENSE
+
+Copyright 2008 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+# $Date: 2008/09/16 14:41:38 $

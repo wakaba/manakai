@@ -1,5 +1,6 @@
 package Whatpm::WebIDL;
 use strict;
+our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Whatpm::WebIDL::Parser;
 
@@ -2577,4 +2578,14 @@ sub value ($;$) {
   return $_[0]->{value};
 } # value
 
+=head1 LICENSE
+
+Copyright 2008 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
 1;
+# $Date: 2008/09/16 14:41:38 $
