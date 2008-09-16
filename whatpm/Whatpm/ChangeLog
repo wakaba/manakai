@@ -1,3 +1,14 @@
+2008-09-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* WebIDL.pm: Unescapes extended attribute names and extended
+	attribute identifiers.  Preserve whether an extended attribute has
+	an argument list of not.  Support for extended attributes:
+	Constructor, ExceptionConsts, IndexGetter, IndexSetter,
+	NameGetter, NameSetter, and Null.
+	(has_argument_list): New attribute.
+	(idl_text): Stringifies argument lists, if any, even if it is
+	empty.
+
 2008-09-15  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTML.pm.src: New state |PCDATA_STATE|.  Use an empty string for

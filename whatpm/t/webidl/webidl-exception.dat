@@ -62,3 +62,246 @@ exception f {
 #errors
 1;non-module definition;s
 4;non-module definition;s
+
+#data
+[ExceptionConsts] module m {
+  exception f { };
+};
+#errors
+1;xattr id missing;m;ExceptionConsts
+#document
+| [ExceptionConsts] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionConst] module m {
+  exception f { };
+};
+#errors
+1;unknown xattr;u;ExceptionConst
+#document
+| [ExceptionConst] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionsConsts] module m {
+  exception f { };
+};
+#errors
+1;unknown xattr;u;ExceptionsConsts
+#document
+| [ExceptionsConsts] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionsConst] module m {
+  exception f { };
+};
+#errors
+1;unknown xattr;u;ExceptionsConst
+#document
+| [ExceptionsConst] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionConsts=f] module m {
+  exception f { };
+};
+#errors
+#document
+| [ExceptionConsts=f] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionConsts=_f] module m {
+  exception f { };
+};
+#errors
+#document
+| [ExceptionConsts=f] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionConsts=ff] module m {
+  exception f { };
+};
+#errors
+1:ff;exception not defined;m
+#document
+| [ExceptionConsts=ff] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionConsts=m::f] module m {
+  exception f { };
+};
+#errors
+1.20;after xattr;m
+#document
+
+#data
+[ExceptionConsts=::f] module m {
+  exception f { };
+};
+#errors
+1.19;after xattrarg;m
+#document
+
+#data
+[ExceptionConsts=_f] module m {
+  exception f { };
+};
+#errors
+#document
+| [ExceptionConsts=f] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionConsts=f] module m {
+  exception _f { };
+};
+#errors
+#document
+| [ExceptionConsts=f] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionConsts=f] module m {
+  interface f { };
+};
+#errors
+1:f;exception not defined;m
+#document
+| [ExceptionConsts=f] module m {
+| 
+| interface f {
+| };
+| 
+| };
+
+#data
+module m {
+  exception f {};
+};
+[ExceptionConsts=f] module m {
+};
+#errors
+4;duplicate qname;m
+4:f;exception not defined;m
+#document
+| module m {
+| 
+| exception f {
+| };
+| 
+| };
+| 
+| [ExceptionConsts=f] module m {
+| 
+| 
+| };
+
+#data
+[ExceptionConsts=f,ExceptionConsts=f] module m {
+  exception f { };
+};
+#errors
+#document
+| [ExceptionConsts=f, ExceptionConsts=f] module m {
+| 
+| exception f {
+| };
+| 
+| };
+
+#data
+[ExceptionConsts=f, ExceptionConsts = g] module m {
+  exception f { };
+  exception g {};
+};
+#errors
+#document
+| [ExceptionConsts=f, ExceptionConsts=g] module m {
+| 
+| exception f {
+| };
+| exception g {
+| };
+| 
+| };
+
+#data
+[ExceptionConsts()] module m {
+  exception f { };
+};
+#errors
+1;xattr id missing;m;ExceptionConsts
+1;xattr arglist not allowed;m;ExceptionConsts
+
+#data
+[ExceptionConsts=f ()] module m {
+  exception f { };
+};
+#errors
+1;xattr arglist not allowed;m;ExceptionConsts
+
+#data
+module m {
+  [ExceptionConsts=m] exception f {
+  };
+};
+#errors
+2;xattr not applicable;w;ExceptionConsts
+
+#data
+module m {
+  [ExceptionConsts=m] interface f {
+  };
+};
+#errors
+2;xattr not applicable;w;ExceptionConsts
+
+#data
+module m {
+  interface x {
+    [ExceptionConsts=m] void m ();
+  };
+};
+#errors
+3;xattr not applicable;w;ExceptionConsts

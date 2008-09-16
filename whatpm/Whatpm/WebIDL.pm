@@ -9,12 +9,23 @@ my $float = qr/-?([0-9]+\.[0-9]*|[0-9]*\.[0-9]+)([Ee][+-]?[0-9]+)?|[0-9]+[Ee][+-
 my $identifier = qr/[A-Z_a-z][0-9A-Z_a-z]*/;
 my $whitespace = qr<[\t\n\r ]+|[\t\n\r ]*((//.*|/\*.*?\*/)[\t\n\r ]*)+>;
 
+my $default_levels = {
+                      must => 'm',
+                      should => 's',
+                      warn => 'w',
+                      fact => 'w',
+                      undefined => 'w',
+                      info => 'i',
+                      uncertain => 'u',
+                     };
+
 sub new ($) {
   my $self = bless {
     must_level => 'm',
     should_level => 's',
     warn_level => 'w',
     info_level => 'i',
+    level => $default_levels,
   }, $_[0];
   return $self;
 } # new
@@ -271,10 +282,9 @@ sub parse_char_string ($$;$) {
       }
     } elsif ($state eq 'before xattr') {
       if ($token->{type} eq 'identifier') {
-        ## TODO: _escape
-        ## ISSUE: Duplicate attributes
-        ## ISSUE: Unkown attributes
-        push @current, Whatpm::WebIDL::ExtendedAttribute->new ($token->{value});
+        my $id = $token->{value};
+        $id =~ s/^_//;
+        push @current, Whatpm::WebIDL::ExtendedAttribute->new ($id);
         $current[-1]->set_user_data (manakai_source_line => $line);
         $current[-1]->set_user_data (manakai_source_column => $column);
         push @$xattrs, $current[-1];
@@ -292,6 +302,7 @@ sub parse_char_string ($$;$) {
         $token = $get_next_token->();
         $state = 'before xattrarg';
       } elsif ($token->{type} eq '(') {
+        $current[-1]->has_argument_list (1);
         $token = $get_next_token->();
         if ($token->{type} eq ')') {
           $token = $get_next_token->();
@@ -314,6 +325,7 @@ sub parse_char_string ($$;$) {
         $current[-1]->value ($identifier);
         $token = $get_next_token->();
         if ($token->{type} eq '(') {
+          $current[-1]->has_argument_list (1);
           $token = $get_next_token->();
           if ($token->{type} eq ')') {
             push @$prev_xattrs, $xattrs;
@@ -1010,8 +1022,9 @@ sub parse_char_string ($$;$) {
       $next_state = 'before interface member';
     } elsif ($state eq 'before argument identifier') {
       if ($token->{type} eq 'identifier') {
-        ## TODO: unescape
-        my $arg = Whatpm::WebIDL::Argument->new ($token->{value});
+        my $id = $token->{value};
+        $id =~ s/^_//;
+        my $arg = Whatpm::WebIDL::Argument->new ($id);
         $arg->set_user_data (manakai_source_line => $line);
         $arg->set_user_data (manakai_source_column => $column);
         $arg->type ($current_type);
@@ -1250,8 +1263,185 @@ sub idl_text ($) {
   return join "\x0A", map {$_->idl_text} @{$_[0]->{child_nodes}};
 } # idl_text
 
-sub check ($$) {
-  my ($self, $onerror) = @_;
+my $xattr_defs = {
+  Constructor => {
+    #allow_id => 0,
+    allow_arglist => 1,
+    allowed_type => {Interface => 1},
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+
+      ## NOTE: Arguments
+      unshift @$items,
+          map { {node => $_, scope => $item->{scope}} }
+          @{$xattr->{child_nodes}};
+    },
+  },
+  ExceptionConsts => {
+    allow_id => 1,
+    #allow_arglist => 0,
+    allowed_type => {Module => 1},
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+
+      my $id = $xattr->value;
+      if (defined $id) {
+        my $has_x;
+        for my $x (@{$item->{node}->child_nodes}) {
+          next unless $x->isa ('Whatpm::WebIDL::Exception');
+          if ($x->node_name eq $id) {
+            $has_x = 1;
+            last;
+          }
+        }
+        unless ($has_x) {
+          $onerror->(type => 'exception not defined',
+                     value => $id,
+                     node => $xattr,
+                     level => $levels->{must});
+        }
+      } else {
+        $onerror->(type => 'xattr id missing',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{must});
+      }
+    },
+  },
+  IndexGetter => {
+    #allow_id => 0,
+    #allow_arglist => 0,
+    allowed_type => {Operation => 1},
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+
+      if (@{$item->{node}->{child_nodes}} != 1 or
+          $item->{node}->{child_nodes}->[0]->type_text ne 'unsigned long') {
+        $onerror->(type => 'wrong signature accessor',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{fact});
+      }
+      if ($item->{defined_accessors}->{$xattr_name}) {
+        $onerror->(type => 'duplicate accessor',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{undefined});
+      }
+      $item->{defined_accessors}->{$xattr_name} = 1;
+    },
+  },
+  IndexSetter => {
+    #allow_id => 0,
+    #allow_arglist => 0,
+    allowed_type => {Operation => 1},
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+
+      if (@{$item->{node}->{child_nodes}} != 2 or
+          $item->{node}->{child_nodes}->[0]->type_text ne 'unsigned long') {
+        $onerror->(type => 'wrong signature accessor',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{fact});
+      }
+      if ($item->{defined_accessors}->{$xattr_name}) {
+        $onerror->(type => 'duplicate accessor',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{undefined});
+      }
+      $item->{defined_accessors}->{$xattr_name} = 1;
+    },
+  },
+  NameGetter => {
+    #allow_id => 0,
+    #allow_arglist => 0,
+    allowed_type => {Operation => 1},
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+
+      if (@{$item->{node}->{child_nodes}} != 1 or
+          $item->{node}->{child_nodes}->[0]->type_text ne 'DOMString') {
+        $onerror->(type => 'wrong signature accessor',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{fact});
+      }
+      if ($item->{defined_accessors}->{$xattr_name}) {
+        $onerror->(type => 'duplicate accessor',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{undefined});
+      }
+      $item->{defined_accessors}->{$xattr_name} = 1;
+    },
+  },
+  NameSetter => {
+    #allow_id => 0,
+    #allow_arglist => 0,
+    allowed_type => {Operation => 1},
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+
+      if (@{$item->{node}->{child_nodes}} != 2 or
+          $item->{node}->{child_nodes}->[0]->type ne '::DOMString::') {
+        $onerror->(type => 'wrong signature accessor',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{fact});
+      }
+      if ($item->{defined_accessors}->{$xattr_name}) {
+        $onerror->(type => 'duplicate accessor',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{undefined});
+      }
+      $item->{defined_accessors}->{$xattr_name} = 1;
+    },
+  },
+  Null => {
+    allow_id => 1,
+    #allow_arglist => 0,
+    allowed_type => {Argument => 1, Attribute => 1},
+        ## ISSUE: Is this allwoed for extended attribute's arguments?
+    check => sub {
+      my ($self, $onerror, $levels, $items, $item, $xattr, $xattr_name) = @_;
+      
+      ## ISSUE: [Null=Empty,Null=Null]
+
+      if ($item->{node}->type ne '::DOMString::') {
+        $onerror->(type => 'xattr for wrong type',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{fact});
+      }
+
+      my $id = $xattr->value;
+      if (defined $id) {
+        if ($id eq 'Null' or $id eq 'Empty') {
+          #
+        } else {
+          $onerror->(type => 'xattr id value not allowed',
+                     text => $xattr_name,
+                     value => $id,
+                     node => $xattr,
+                     level => $levels->{must});
+        }
+      } else {
+        $onerror->(type => 'xattr id missing',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{must});
+      }
+    },
+  },
+}; # $xattr_defs
+
+sub check ($$;$) {
+  my ($self, $onerror, $levels) = @_;
+
+  $levels ||= $default_levels;
 
   my $check_const_value = sub ($) {
     my $item = shift;
@@ -1420,8 +1610,10 @@ sub check ($$) {
         }
 
         my $defined_members = {};
+        my $defined_accessors = {};
         unshift @$items,
             map { {node => $_, defined_members => $defined_members,
+                   defined_accessors => $defined_accessors,
                    scope => $item->{scope}} }
             @{$item->{node}->{child_nodes}};
       } elsif ($item->{node}->isa ('Whatpm::WebIDL::Exception')) {
@@ -1570,7 +1762,13 @@ sub check ($$) {
       }
     } elsif ($item->{node}->isa ('Whatpm::WebIDL::Argument') or
              $item->{node}->isa ('Whatpm::WebIDL::ExceptionMember')) {
-      ## ISSUE: No uniqueness constraints for arguments in an operation.
+      ## ISSUE: No uniqueness constraints for arguments in an operation,
+      ## so we don't check it for arguments.
+
+      ## ISSUE: For extended attributes, semantics of the argument
+      ## (e.g. the identifier is given by the |identifier| in the |Argument|)
+      ## is not explicitly defined.  In addition, no uniqueness constraint
+      ## is defined, so we don't check it for arguments.
 
       my $name = $item->{node}->node_name;
       if ($item->{defined_members}->{$name}) {
@@ -1600,10 +1798,52 @@ sub check ($$) {
     }
 
     my $xattrs = $item->{node}->{xattrs} || [];
-    for my $xattr (@$xattrs) {
+    X: for my $xattr (@$xattrs) {
       my $xattr_name = $xattr->node_name;
+      my $xattr_def = $xattr_defs->{$xattr_name};
+
+      unless ($xattr_def) {
+        $onerror->(type => 'unknown xattr',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{uncertain});
+        next X;
+      }
+
+      A: {
+        for my $cls (keys %{$xattr_def->{allowed_type} or {}}) {
+          if ($item->{node}->isa ('Whatpm::WebIDL::' . $cls)) {
+            last A;
+          }
+        }
+
+        $onerror->(type => 'xattr not applicable',
+                   text => $xattr_name,
+                   level => $levels->{fact},
+                   node => $xattr);
+        
+        next X;
+      } # A
+
+      if (not $xattr_def->{allow_id} and defined $xattr->value) {
+        $onerror->(type => 'xattr id not allowed',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{must});
+      }
+      if (not $xattr_def->{allow_arglist} and $xattr->has_argument_list) {
+        $onerror->(type => 'xattr arglist not allowed',
+                   text => $xattr_name,
+                   node => $xattr,
+                   level => $levels->{must});
+      }
+
+      $xattr_def->{check}->($self, $onerror, $levels, $items, $item,
+                            $xattr, $xattr_name);
+
+
       if ({
-           Null => 1, Undefined => 1,
+            Undefined => 1,
           }->{$xattr_name}) {
         if ($item->{node}->isa ('Whatpm::WebIDL::Attribute') or
             $item->{node}->isa ('Whatpm::WebIDL::Argument')) {
@@ -1612,16 +1852,7 @@ sub check ($$) {
         } else {
           #
         }
-      } elsif ({
-                IndexGetter => 1, IndexSetter => 1,
-                NameGetter => 1, NameSetter => 1,
-               }->{$xattr_name}) {
-        if ($item->{node}->isa ('Whatpm::WebIDL::Operation')) {
 
-          next;
-        } else {
-          #
-        }
       } elsif ($xattr_name eq 'PutForwards') {
         if ($item->{node}->isa ('Whatpm::WebIDL::Attribute')) {
 
@@ -1636,8 +1867,16 @@ sub check ($$) {
         } else {
           #
         }
+      } elsif ({NamedConstructor => 1,
+               }->{$xattr_name}) {
+        if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
+
+          next;
+        } else {
+          #
+        }
       } elsif ({
-                Constructor => 1, NamedConstructor => 1, NativeObject => 1,
+                NativeObject => 1,
                 Stringifies => 1,
                }->{$xattr_name}) {
         if ($item->{node}->isa ('Whatpm::WebIDL::Interface')) {
@@ -1654,26 +1893,10 @@ sub check ($$) {
         } else {
           #
         }
-      } elsif ($xattr_name eq 'ExceptionConsts') {
-        if ($item->{node}->isa ('Whatpm::WebIDL::Module')) {
-          
-          next;
-        } else {
-          #
-        }
-      } elsif ($item->{node}->isa ('Whatpm::WebIDL::Const') or
-               $item->{node}->isa ('Whatpm::WebIDL::ExceptionMember')) {
-        #
-      } else {
-        $onerror->(type => 'unknown xattr',
-                   level => 'u',
-                   node => $xattr);
-        next;
+
+
       }
 
-      $onerror->(type => 'xattr not applicable',
-                 level => 'i', ## TODO: fact_level
-                 node => $xattr);
     }
   }
 } # check
@@ -2064,13 +2287,25 @@ sub new ($$) {
   return bless {child_nodes => [], node_name => ''.$_[1]};
 } # new
 
+sub has_argument_list ($;$) {
+  if (@_ > 1) {
+    if ($_[1]) {
+      $_[0]->{has_argument_list} = 1;
+    } else {
+      delete $_[0]->{has_argument_list};
+    }
+  }
+  
+  return ($_[0]->{has_argument_list} or scalar @{$_[0]->{child_nodes}});
+} # has_argument_list
+
 sub idl_text ($) {
   my $self = shift;
   my $r = $self->node_name; ## TODO:] esceape
   if (defined $self->{value}) {
     $r .= '=' . $self->{value}; ## TODO: escape
   }
-  if (@{$self->{child_nodes}}) {
+  if ($self->has_argument_list) {
     $r .= ' (';
     $r .= join ', ', map {$_->idl_text} @{$self->{child_nodes}};
     $r .= ')';

@@ -1138,6 +1138,22 @@ module m {
 #data
 module m {
   interface x {
+    void method (in boolean _b, in long _c);
+  };
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   void method (in boolean b, in long c);
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
     void method (in DOMString b);
   };
 };
@@ -1155,6 +1171,14 @@ module m {
 module m {
   interface x {
     void method (in x b);
+  };
+};
+#errors
+
+#data
+module m {
+  interface x {
+    void method (in _x b);
   };
 };
 #errors
@@ -1344,3 +1368,1094 @@ module m {
 #errors
 3;not boxable type;m;ee
 5;exception not defined;m;e
+
+#data
+module m {
+  [Constructor] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [constructor] interface x {
+  };
+};
+#errors
+2;unknown xattr;u;constructor
+#document
+| module m {
+| 
+| [constructor] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor()] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor ()] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor(in boolean b)] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor (in boolean b)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor (in long c, in DOMString g)] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor (in long c, in DOMString g)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor( [u] in short  h)] interface x {
+  };
+};
+#errors
+2;unknown xattr;u;u
+#document
+| module m {
+| 
+| [Constructor ([u] in short h)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor  (in b  h, in x i)] interface x {
+  };
+};
+#errors
+2;type not defined;m;b
+#document
+| module m {
+| 
+| [Constructor (in b h, in x i)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor  (),Constructor] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor (), Constructor] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor  (),Constructor (in boolean c)] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor (), Constructor (in boolean c)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor  (in boolean c),Constructor (in boolean c)] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor (in boolean c), Constructor (in boolean c)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [_Constructor] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [_Constructor (in boolean _a, in _x b)] interface x {
+  };
+};
+#errors
+#document
+| module m {
+| 
+| [Constructor (in boolean a, in x b)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor=a] interface x {
+  };
+};
+#errors
+2;xattr id not allowed;m;Constructor
+#document
+| module m {
+| 
+| [Constructor=a] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor = b ( )] interface x {
+  };
+};
+#errors
+2;xattr id not allowed;m;Constructor
+#document
+| module m {
+| 
+| [Constructor=b ()] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor=b (in long c)] interface x {
+  };
+};
+#errors
+2;xattr id not allowed;m;Constructor
+#document
+| module m {
+| 
+| [Constructor=b (in long c)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  [Constructor=x([u] in long c)] interface x {
+  };
+};
+#errors
+2;xattr id not allowed;m;Constructor
+2;unknown xattr;u;u
+#document
+| module m {
+| 
+| [Constructor=x ([u] in long c)] interface x {
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    [Constructor] void m ();
+  };
+};
+#errors
+3;xattr not applicable;w;Constructor
+
+#data
+[Constructor] module m {
+  interface x {
+    void m ();
+  };
+};
+#errors
+1;xattr not applicable;w;Constructor
+
+#data
+module m {
+  interface x {
+    [Constructor] attribute long c;
+  };
+};
+#errors
+3;xattr not applicable;w;Constructor
+
+#data
+module m {
+interface x {
+  [IndexGetter] long method (in unsigned long x);
+};
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   [IndexGetter] long method (in unsigned long x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [IndexGetter] void method (in unsigned long x);
+};
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   [IndexGetter] void method (in unsigned long x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [IndexGetter] long method (in long x);
+};
+};
+#errors
+3;wrong signature accessor;w;IndexGetter
+#document
+| module m {
+| 
+| interface x {
+|   [IndexGetter] long method (in long x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [IndexGetter] long method (in DOMString x);
+};
+};
+#errors
+3;wrong signature accessor;w;IndexGetter
+#document
+| module m {
+| 
+| interface x {
+|   [IndexGetter] long method (in DOMString x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [IndexGetter] long method (in unsigned long x, in DOMString y);
+};
+};
+#errors
+3;wrong signature accessor;w;IndexGetter
+#document
+| module m {
+| 
+| interface x {
+|   [IndexGetter] long method (in unsigned long x, in DOMString y);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [IndexGetter] long method ();
+};
+};
+#errors
+3;wrong signature accessor;w;IndexGetter
+#document
+| module m {
+| 
+| interface x {
+|   [IndexGetter] long method ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [IndexGetter] long method (in unsigned long x);
+  [IndexGetter] boolean method2 (in unsigned long x);
+};
+};
+#errors
+4;duplicate accessor;w;IndexGetter
+#document
+| module m {
+| 
+| interface x {
+|   [IndexGetter] long method (in unsigned long x);
+|   [IndexGetter] boolean method2 (in unsigned long x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [IndexGetter] attribute long m;
+};
+};
+#errors
+3;xattr not applicable;w;IndexGetter
+#document
+| module m {
+| 
+| interface x {
+|   [IndexGetter] attribute long m;
+| };
+| 
+| };
+
+#data
+module m {
+  interface x {
+    [IndexGetter] long m (in unsigned long n);
+  };
+  interface y {
+    [IndexGetter] long m (in unsigned long n);
+  };
+};
+#errors
+
+#data
+module m {
+  interface x {
+    [IndexGetter=a] long m (in unsigned long n);
+  };
+};
+#errors
+3;xattr id not allowed;m;IndexGetter
+
+#data
+module m {
+  interface x {
+    [IndexGetter()] long m (in unsigned long n);
+  };
+};
+#errors
+3;xattr arglist not allowed;m;IndexGetter
+
+#data
+module m {
+  interface x {
+    [IndexGetter=a()] long m (in unsigned long n);
+  };
+};
+#errors
+3;xattr id not allowed;m;IndexGetter
+3;xattr arglist not allowed;m;IndexGetter
+
+#data
+module m {
+interface x {
+  [IndexSetter] any y ();
+};
+};
+#errors
+3;wrong signature accessor;w;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter] any y (in long a);
+};
+};
+#errors
+3;wrong signature accessor;w;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter] any y (in unsigned long a);
+};
+};
+#errors
+3;wrong signature accessor;w;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter] any y (in unsigned long a, in any b);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [IndexSetter] void y (in unsigned long a, in any b);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [IndexSetter] any y (in DOMString a, in any b);
+};
+};
+#errors
+3;wrong signature accessor;w;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter] any y (in unsigned long a, in any b, in any c);
+};
+};
+#errors
+3;wrong signature accessor;w;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter] any y (in unsigned long a, in any b);
+  [IndexSetter] any z (in unsigned long a, in any b);
+};
+};
+#errors
+4;duplicate accessor;w;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexGetter] any y (in unsigned long a);
+  [IndexSetter] any z (in unsigned long a, in DOMString b);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [IndexSetter] attribute unsigned long y;
+};
+};
+#errors
+3;xattr not applicable;w;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter=x] any y (in unsigned long a, in any b);
+};
+};
+#errors
+3;xattr id not allowed;m;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter()] any y (in unsigned long a, in any b);
+};
+};
+#errors
+3;xattr arglist not allowed;m;IndexSetter
+
+#data
+module m {
+interface x {
+  [IndexSetter=x()] any y (in unsigned long a, in any b);
+};
+};
+#errors
+3;xattr id not allowed;m;IndexSetter
+3;xattr arglist not allowed;m;IndexSetter
+
+#data
+module m {
+interface x {
+  [NameGetter] long method (in DOMString x);
+};
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   [NameGetter] long method (in DOMString x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [NameGetter] void method (in DOMString x);
+};
+};
+#errors
+#document
+| module m {
+| 
+| interface x {
+|   [NameGetter] void method (in DOMString x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [NameGetter] long method (in long x);
+};
+};
+#errors
+3;wrong signature accessor;w;NameGetter
+#document
+| module m {
+| 
+| interface x {
+|   [NameGetter] long method (in long x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [NameGetter] long method (in unsigned long x);
+};
+};
+#errors
+3;wrong signature accessor;w;NameGetter
+#document
+| module m {
+| 
+| interface x {
+|   [NameGetter] long method (in unsigned long x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [NameGetter] long method (in DOMString x, in DOMString y);
+};
+};
+#errors
+3;wrong signature accessor;w;NameGetter
+#document
+| module m {
+| 
+| interface x {
+|   [NameGetter] long method (in DOMString x, in DOMString y);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [NameGetter] long method ();
+};
+};
+#errors
+3;wrong signature accessor;w;NameGetter
+#document
+| module m {
+| 
+| interface x {
+|   [NameGetter] long method ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [NameGetter] long method (in DOMString x);
+  [NameGetter] boolean method2 (in DOMString x);
+};
+};
+#errors
+4;duplicate accessor;w;NameGetter
+#document
+| module m {
+| 
+| interface x {
+|   [NameGetter] long method (in DOMString x);
+|   [NameGetter] boolean method2 (in DOMString x);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [NameGetter] attribute long m;
+};
+};
+#errors
+3;xattr not applicable;w;NameGetter
+#document
+| module m {
+| 
+| interface x {
+|   [NameGetter] attribute long m;
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  [NameGetter] attribute DOMString m;
+};
+};
+#errors
+3;xattr not applicable;w;NameGetter
+
+#data
+module m {
+interface x {
+  [NameGetter] attribute _DOMString m;
+};
+};
+#errors
+3;xattr not applicable;w;NameGetter
+3;type not defined;m;DOMString
+
+#data
+module m {
+  interface x {
+    [NameGetter] long m (in DOMString n);
+  };
+  interface y {
+    [NameGetter] long m (in DOMString n);
+  };
+};
+#errors
+
+#data
+module m {
+  interface x {
+    [NameGetter=a] long m (in DOMString n);
+  };
+};
+#errors
+3;xattr id not allowed;m;NameGetter
+
+#data
+module m {
+  interface x {
+    [NameGetter()] long m (in DOMString n);
+  };
+};
+#errors
+3;xattr arglist not allowed;m;NameGetter
+
+#data
+module m {
+  interface x {
+    [NameGetter=a()] long m (in DOMString n);
+  };
+};
+#errors
+3;xattr id not allowed;m;NameGetter
+3;xattr arglist not allowed;m;NameGetter
+
+#data
+module m {
+interface x {
+  [NameSetter] any y ();
+};
+};
+#errors
+3;wrong signature accessor;w;NameSetter
+
+#data
+module m {
+interface x {
+  [NameSetter] any y (in DOMString a);
+};
+};
+#errors
+3;wrong signature accessor;w;NameSetter
+
+#data
+module m {
+interface x {
+  [NameSetter] any y (in unsigned long a);
+};
+};
+#errors
+3;wrong signature accessor;w;NameSetter
+
+#data
+module m {
+interface x {
+  [NameSetter] any y (in DOMString a, in any b);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [NameSetter] void y (in DOMString a, in any b);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [NameSetter] any y (in unsigned long a, in any b);
+};
+};
+#errors
+3;wrong signature accessor;w;NameSetter
+
+#data
+module m {
+interface x {
+  [NameSetter] any y (in DOMString a, in any b, in any c);
+};
+};
+#errors
+3;wrong signature accessor;w;NameSetter
+
+#data
+module m {
+interface x {
+  [NameSetter] any y (in _DOMString a, in any b);
+};
+};
+#errors
+3;wrong signature accessor;w;NameSetter
+3;type not defined;m;DOMString
+
+#data
+module m {
+interface x {
+  [NameSetter] any y (in DOMString a, in any b);
+  [NameSetter] any z (in DOMString a, in any b);
+};
+};
+#errors
+4;duplicate accessor;w;NameSetter
+
+#data
+module m {
+interface x {
+  [NameGetter] any y (in DOMString a);
+  [NameSetter] any z (in DOMString a, in DOMString b);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [IndexSetter] any y (in unsigned long a, in DOMString b);
+  [NameSetter] any z (in DOMString a, in DOMString b);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [NameSetter] attribute DOMString y;
+};
+};
+#errors
+3;xattr not applicable;w;NameSetter
+
+#data
+module m {
+interface x {
+  [NameSetter=x] any y (in DOMString a, in any b);
+};
+};
+#errors
+3;xattr id not allowed;m;NameSetter
+
+#data
+module m {
+interface x {
+  [NameSetter()] any y (in DOMString a, in any b);
+};
+};
+#errors
+3;xattr arglist not allowed;m;NameSetter
+
+#data
+module m {
+interface x {
+  [NameSetter=x()] any y (in DOMString a, in any b);
+};
+};
+#errors
+3;xattr id not allowed;m;NameSetter
+3;xattr arglist not allowed;m;NameSetter
+
+#data
+module m {
+interface x {
+  [Null=Null] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Null=Null] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Null=Empty] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Null=Empty] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Null=Null,Null=Empty] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Null=Null,Null=Empty] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Null=null] attribute DOMString x;
+};
+};
+#errors
+3:null;xattr id value not allowed;m;Null
+
+#data
+module m {
+interface x {
+  void m ([Null=null] in DOMString x);
+};
+};
+#errors
+3:null;xattr id value not allowed;m;Null
+
+#data
+module m {
+interface x {
+  [Null] attribute DOMString x;
+};
+};
+#errors
+3;xattr id missing;m;Null
+
+#data
+module m {
+interface x {
+  void m ([Null] in DOMString x);
+};
+};
+#errors
+3;xattr id missing;m;Null
+
+#data
+module m {
+interface x {
+  [Null()] attribute DOMString x;
+};
+};
+#errors
+3;xattr id missing;m;Null
+3;xattr arglist not allowed;m;Null
+
+#data
+module m {
+interface x {
+  void m ([Null()] in DOMString x);
+};
+};
+#errors
+3;xattr id missing;m;Null
+3;xattr arglist not allowed;m;Null
+
+#data
+module m {
+interface x {
+  [Null=Null()] attribute DOMString x;
+};
+};
+#errors
+3;xattr arglist not allowed;m;Null
+
+#data
+module m {
+interface x {
+  void m ([Null=Null()] in DOMString x);
+};
+};
+#errors
+3;xattr arglist not allowed;m;Null
+
+#data
+module m {
+interface x {
+  [Null=Null] attribute _DOMString x;
+};
+};
+#errors
+3;xattr for wrong type;w;Null
+3;type not defined;m;DOMString
+
+#data
+module m {
+interface x {
+  void m ([Null=Null] in _DOMString x);
+};
+};
+#errors
+3;xattr for wrong type;w;Null
+3;type not defined;m;DOMString
+
+#data
+module m {
+interface x {
+  [Null=_Null] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Null=_Null] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  [Null=_Empty] attribute DOMString x;
+};
+};
+#errors
+
+#data
+module m {
+interface x {
+  void m ([Null=_Empty] in DOMString x);
+};
+};
+#errors
+
+#data
+module m {
+[Null=Null]interface x {
+  attribute DOMString x;
+};
+};
+#errors
+2;xattr not applicable;w;Null
+
+#data
+module m {
+interface x {
+  [Null=Empty] void m (in DOMString x);
+};
+};
+#errors
+3;xattr not applicable;w;Null
+
+#data
+module m {
+interface x {
+  [null=Null] attribute DOMString x;
+};
+};
+#errors
+3;unknown xattr;u;null
+
+#data
+module m {
+interface x {
+  void m ([null=Null] in DOMString x);
+};
+};
+#errors
+3;unknown xattr;u;null
