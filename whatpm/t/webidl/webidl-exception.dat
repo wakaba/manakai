@@ -172,7 +172,7 @@ exception f {
   exception f { };
 };
 #errors
-1.19;after xattrarg;m
+1.19;before xattrarg;m
 #document
 
 #data
@@ -307,3 +307,72 @@ module m {
 };
 #errors
 3;xattr not applicable;w;ExceptionConsts
+
+#data
+module m {
+exception x;
+exception y{};
+};
+#errors
+2.12;before webidl block;m;exception
+#document
+| module m {
+| 
+| exception y {
+| };
+| 
+| };
+
+#data
+module m {
+exception x {
+0;
+long c;
+};
+};
+#errors
+3.1;before exception member;m
+#document
+| module m {
+| 
+| exception x {
+|   long c;
+| };
+| 
+| };
+
+#data
+module m {
+exception x {
+[x] 0;
+long a;
+};
+};
+#errors
+3.5;before exception member;m
+#document
+| module m {
+| 
+| exception x {
+|   long a;
+| };
+| 
+| };
+
+#data
+module m {
+exception x {
+long 0;
+long a;
+};
+};
+#errors
+3.6;no webidl identifier:exception member;m
+#document
+| module m {
+| 
+| exception x {
+|   long a;
+| };
+| 
+| };

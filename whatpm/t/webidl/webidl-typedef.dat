@@ -119,3 +119,32 @@ module m {
 };
 #errors
 2;typedef ignored;i
+
+#data
+module m {
+typedef 0 t;
+typedef long mylong;
+};
+#errors
+2.9;before webidl type;m;typedef
+#document
+| module m {
+| 
+| typedef long mylong;
+| 
+| };
+
+#data
+module m {
+typedef long 0;
+interface x {};
+};
+#errors
+2.14;no webidl identifier;m;typedef
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };

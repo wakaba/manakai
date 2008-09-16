@@ -21,10 +21,6 @@ my $default_levels = {
 
 sub new ($) {
   my $self = bless {
-    must_level => 'm',
-    should_level => 's',
-    warn_level => 'w',
-    info_level => 'i',
     level => $default_levels,
   }, $_[0];
   return $self;
@@ -110,7 +106,8 @@ sub parse_char_string ($$;$) {
     my $r = 'Line ' . $opt{line} . ' column ' . $opt{column} . ': ';
 
     if ($opt{token}) {
-      $r .= 'Token ' . (defined $opt{token}->{value} ? $opt{token}->{value} : $opt{token}->{type}) . ': ';
+      $r .= 'Token ' . (defined $opt{token}->{value}
+                        ? $opt{token}->{value} : $opt{token}->{type}) . ': ';
     }
 
     $r .= $opt{type} . ';' . $opt{level};
@@ -199,7 +196,8 @@ sub parse_char_string ($$;$) {
           # reconsume
         }
       } else {
-        $onerror->(type => 'unsigned', level => $self->{must_level});
+        $onerror->(type => 'after unsigned',
+                   level => $self->{level}->{must});
         return undef;
       }
     } elsif ($token->{type} eq 'long') {
@@ -216,7 +214,8 @@ sub parse_char_string ($$;$) {
       if (defined $r) {
         # next token
       } else { # "::" not followed by identifier or "DOMString"
-        $onerror->(type => 'scoped name', level => $self->{must_level});
+        $onerror->(type => 'scoped name:dcolon',
+                   level => $self->{level}->{must});
         return undef;
       }
     } elsif ($token->{type} eq 'sequence') {
@@ -234,7 +233,8 @@ sub parse_char_string ($$;$) {
               $r = '::::sequence::::' . $type;
               $token = $get_next_token->();
             } else {
-              $onerror->(type => 'sequence gt', level => $self->{must_level});
+              $onerror->(type => 'no sequence gt',
+                         level => $self->{level}->{must});
               return undef;
             }
           } else {
@@ -242,11 +242,13 @@ sub parse_char_string ($$;$) {
             return undef;
           }
         } else {
-          $onerror->(type => 'sequence type', level => $self->{must_level});
+          $onerror->(type => 'no sequence type',
+                     level => $self->{level}->{must});
           return undef;
         }
       } else {
-        $onerror->(type => 'sequence lt', level => $self->{must_level});
+        $onerror->(type => 'no sequence lt',
+                   level => $self->{level}->{must});
         return undef;
       }
     } else {
@@ -273,8 +275,8 @@ sub parse_char_string ($$;$) {
       } elsif ($token->{type} eq 'eof') {
         last;
       } else {
-        $onerror->(type => 'before definitions', level => 'm',
-                   token => $token);
+        $onerror->(type => 'before webidl defs',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -291,7 +293,8 @@ sub parse_char_string ($$;$) {
         $token = $get_next_token->();
         $state = 'after xattr';
       } else {
-        $onerror->(type => 'before xattr', level => 'm', token => $token);
+        $onerror->(type => 'before xattr', 
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -342,7 +345,8 @@ sub parse_char_string ($$;$) {
           $state = 'after xattrarg';
         }
       } else {
-        $onerror->(type => 'after xattrarg', level => 'm', token => $token);
+        $onerror->(type => 'before xattrarg',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -370,7 +374,8 @@ sub parse_char_string ($$;$) {
           die "$0: Unknown xattr context: " . ref $current[-1];
         }
       } else {
-        $onerror->(type => 'after xattr', level => 'm', token => $token);
+        $onerror->(type => 'after xattr',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -390,8 +395,9 @@ sub parse_char_string ($$;$) {
           $state = 'before module block';
           next;
         } else {
-          $onerror->(type => 'module identifier',
-                     level => $self->{must_level});
+          $onerror->(type => 'no webidl identifier',
+                     text => 'module',
+                     level => $self->{level}->{must});
           #
         }        
       } elsif ($token->{type} eq 'interface') {
@@ -407,8 +413,9 @@ sub parse_char_string ($$;$) {
           $state = 'before interface inheritance';
           next;
         } else {
-          $onerror->(type => 'interface identifier',
-                     level => $self->{must_level});
+          $onerror->(type => 'no webidl identifier',
+                     text => 'interface',
+                     level => $self->{level}->{must});
           #
         }        
       } elsif ($token->{type} eq 'exception') {
@@ -424,8 +431,9 @@ sub parse_char_string ($$;$) {
           $state = 'before exception block';
           next;
         } else {
-          $onerror->(type => 'exception identifier',
-                     level => $self->{must_level});
+          $onerror->(type => 'no webidl identifier',
+                     text => 'exception',
+                     level => $self->{level}->{must});
           #
         }        
       } elsif ($token->{type} eq 'typedef') {
@@ -480,12 +488,13 @@ sub parse_char_string ($$;$) {
             #
           }
           $onerror->(type => 'valuetype DOMString',
-                     level => $self->{must_level});
+                     level => $self->{level}->{must});
           pop @current; # valuetype
           #
         } else {
-          $onerror->(type => 'valuetype identifier',
-                     level => $self->{must_level});
+          $onerror->(type => 'no webidl identifier',
+                     text => 'valuetype',
+                     level => $self->{level}->{must});
           #
         }        
       } elsif ($token->{type} eq 'const') {
@@ -494,8 +503,8 @@ sub parse_char_string ($$;$) {
         $next_state = 'before definitions';
         next;
       } else {
-        $onerror->(type => 'before definition', level => 'm',
-                   token => $token);
+        $onerror->(type => 'before webidl def',
+                   level => $self->{level}->{must});
         # reconsume
         #
       }
@@ -507,8 +516,9 @@ sub parse_char_string ($$;$) {
         $token = $get_next_token->();
         $state = 'before definitions';
       } else {
-        $onerror->(type => 'before module block', level => 'm',
-                   token => $token);
+        $onerror->(type => 'before webidl block',
+                   text => 'module',
+                   level => $self->{level}->{must});
         pop @current; # module
         # reconsume
         $state = 'ignore';
@@ -541,7 +551,8 @@ sub parse_char_string ($$;$) {
           $state = 'before interface block';
         }
       } else {
-        $onerror->(type => 'scoped name', level => $self->{must_level});
+        $onerror->(type => 'scoped name', level => $self->{level}->{must});
+        pop @current; # interface
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -570,13 +581,13 @@ sub parse_char_string ($$;$) {
           }
         } else {
           $onerror->(type => 'after exception name',
-                     level => $self->{must_level});
+                     level => $self->{level}->{must});
           # reconsume
           $state = 'ignore';
           $nest_level = 0;
         }
       } else {
-        $onerror->(type => 'scoped name', level => $self->{must_level});
+        $onerror->(type => 'scoped name', level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -587,8 +598,9 @@ sub parse_char_string ($$;$) {
         $state = 'before members';
         $next_state = 'before interface member';
       } else {
-        $onerror->(type => 'before interface block',
-                   level => $self->{must_level});
+        $onerror->(type => 'before webidl block',
+                   text => 'interface',
+                   level => $self->{level}->{must});
         pop @current; # interface
         # reconsume
         $state = 'ignore';
@@ -600,8 +612,10 @@ sub parse_char_string ($$;$) {
         $state = 'before members';
         $next_state = 'before exception member';
       } else {
-        $onerror->(type => 'before exception block',
-                   level => $self->{must_level});
+        $onerror->(type => 'before webidl block',
+                   text => 'exception',
+                   level => $self->{level}->{must});
+        pop @current; # exception
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -655,7 +669,7 @@ sub parse_char_string ($$;$) {
         last;
       } else {
         $onerror->(type => 'before interface member',
-                   level => $self->{must_level});
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -676,7 +690,7 @@ sub parse_char_string ($$;$) {
         last;
       } else {
         $onerror->(type => 'before exception member',
-                   level => $self->{must_level});
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -698,7 +712,9 @@ sub parse_char_string ($$;$) {
           $next_state = 'before definitions';
         }
       } else {
-        $onerror->(type => 'before type', level => $self->{must_level});
+        $onerror->(type => 'before webidl type',
+                   text => 'typedef',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -724,7 +740,9 @@ sub parse_char_string ($$;$) {
           $next_state = 'before definitions';
         }
       } else {
-        $onerror->(type => 'before boxed type', level => $self->{must_level});
+        $onerror->(type => 'before webidl type',
+                   text => 'valuetype',
+                   level => $self->{level}->{must});
         pop @current; # valuetype
         # reconsume
         $state = 'ignore';
@@ -748,7 +766,9 @@ sub parse_char_string ($$;$) {
           #$next_state = $next_state;
         }
       } else {
-        $onerror->(type => 'before type', level => $self->{must_level});
+        $onerror->(type => 'before webidl type',
+                   text => 'const',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -775,8 +795,9 @@ sub parse_char_string ($$;$) {
         $state = 'before semicolon';
         $next_state = 'before defnitions';
       } else {
-        $onerror->(type => 'before typedef rest', 
-                   level => $self->{must_level});
+        $onerror->(type => 'no webidl identifier',
+                   text => 'typedef',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -797,11 +818,13 @@ sub parse_char_string ($$;$) {
           $state = 'before const expr';
           next;
         } else {
-          $onerror->(type => 'const eq', level => $self->{must_level});
+          $onerror->(type => 'no const eq', level => $self->{level}->{must});
           #
         }
       } else {
-        $onerror->(type => 'const identifier', level => $self->{must_level});
+        $onerror->(type => 'no webidl identifier',
+                   text => 'const',
+                   level => $self->{level}->{must});
         #
       }
       # reconsume
@@ -856,18 +879,20 @@ sub parse_char_string ($$;$) {
           $next_state = 'before interface member';
         }
       } else {
-        $onerror->(type => 'before type', level => $self->{must_level});
+        $onerror->(type => 'before webidl type', 
+                   text => 'attribute',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
         $next_state = 'before interface member';
       }
     } elsif ($state eq 'before exception member type') {
-      if ({
-        any => 1, boolean => 1, octet => 1, float => 1,
-        DOMString => 1, Object => 1, short => 1, long => 1, unsigned => 1,
-        '::' => 1, identifier => 1,
-      }->{$token->{type}}) {
+      #if ({
+      #  any => 1, boolean => 1, octet => 1, float => 1,
+      #  DOMString => 1, Object => 1, short => 1, long => 1, unsigned => 1,
+      #  '::' => 1, identifier => 1,
+      #}->{$token->{type}}) {
         $current_type = $get_type->();
         if (defined $current_type) {
           # next token
@@ -878,20 +903,21 @@ sub parse_char_string ($$;$) {
           $nest_level = 0;
           $next_state = 'before exception member';
         }
-      } else {
-        $onerror->(type => 'before type', level => $self->{must_level});
-        # reconsume
-        $state = 'ignore';
-        $nest_level = 0;
-        $next_state = 'before exception member';
-      }
+      #} else {
+      #  $onerror->(type => 'before webidl type:exception member',
+      #             level => $self->{level}->{must});
+      #  # reconsume
+      #  $state = 'ignore';
+      #  $nest_level = 0;
+      #  $next_state = 'before exception member';
+      #}
     } elsif ($state eq 'before operation type') {
-      if ({
-        any => 1, boolean => 1, octet => 1, float => 1,
-        DOMString => 1, Object => 1, short => 1, long => 1, unsigned => 1,
-        '::' => 1, identifier => 1,
-        void => 1,
-      }->{$token->{type}}) {
+      #if ({
+      #  any => 1, boolean => 1, octet => 1, float => 1,
+      #  DOMString => 1, Object => 1, short => 1, long => 1, unsigned => 1,
+      #  '::' => 1, identifier => 1,
+      #  void => 1,
+      #}->{$token->{type}}) {
         $current_type = $get_type->();
         if (defined $current_type) {
           # next token
@@ -902,13 +928,15 @@ sub parse_char_string ($$;$) {
           $nest_level = 0;
           $next_state = 'before interface member';
         }
-      } else {
-        $onerror->(type => 'before type', level => $self->{must_level});
-        # reconsume
-        $state = 'ignore';
-        $nest_level = 0;
-        $next_state = 'before interface member';
-      }
+      #} else {
+      #  $onerror->(type => 'before webidl type',
+      #             text => 'operation',
+      #             level => $self->{level}->{must});
+      #  # reconsume
+      #  $state = 'ignore';
+      #  $nest_level = 0;
+      #  $next_state = 'before interface member';
+      #}
     } elsif ($state eq 'before argument type') {
       if ({
         any => 1, boolean => 1, octet => 1, float => 1,
@@ -925,7 +953,8 @@ sub parse_char_string ($$;$) {
           $nest_level = 0;
         }
       } else {
-        $onerror->(type => 'before type', level => $self->{must_level});
+        $onerror->(type => 'before webidl type:argument',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -958,8 +987,9 @@ sub parse_char_string ($$;$) {
           next;
         }
       } else {
-        $onerror->(type => 'attribute identifier',
-                   level => $self->{must_level});
+        $onerror->(type => 'no webidl identifier',
+                   text => 'attribute',
+                   level => $self->{level}->{must});
         #
       }
       # reconsume
@@ -979,8 +1009,8 @@ sub parse_char_string ($$;$) {
         $state = 'before semicolon';
         $next_state = 'before exception member';
       } else {
-        $onerror->(type => 'exception member identifier',
-                   level => $self->{must_level});
+        $onerror->(type => 'no webidl identifier:exception member',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -1007,13 +1037,13 @@ sub parse_char_string ($$;$) {
             next;
           }
         } else {
-          $onerror->(type => 'arguments lparen',
-                     level => $self->{must_level});
+          $onerror->(type => 'no arguments lparen',
+                     level => $self->{level}->{must});
           #
         }
       } else {
-        $onerror->(type => 'operation identifier',
-                   level => $self->{must_level});
+        $onerror->(type => 'no webidl identifier:operation',
+                   level => $self->{level}->{must});
         #
       }
       # reconsume
@@ -1045,12 +1075,12 @@ sub parse_char_string ($$;$) {
           next;
         } else {
           $onerror->(type => 'after argument',
-                     level => $self->{must_level});
+                     level => $self->{level}->{must});
           #
         }
       } else {
-        $onerror->(type => 'argument identifier',
-                   level => $self->{must_level});
+        $onerror->(type => 'no webidl identifier:argument',
+                   level => $self->{level}->{must});
         #
       }
       # reconsume
@@ -1071,8 +1101,8 @@ sub parse_char_string ($$;$) {
         $token = $get_next_token->();
         $state = 'before argument type';
       } else {
-        $onerror->(type => 'argument in',
-                   level => $self->{must_level});
+        $onerror->(type => 'no argument in',
+                   level => $self->{level}->{must});
         $state = 'ignore';
         $nest_level = 0;
       }
@@ -1091,8 +1121,8 @@ sub parse_char_string ($$;$) {
         $token = $get_next_token->();
         $state = 'before exception name';
       } else {
-        $onerror->(type => 'raises lparen',
-                   level => $self->{must_level});
+        $onerror->(type => 'no raises lparen',
+                   level => $self->{level}->{must});
         $state = 'ignore';
         $nest_level = 0;
       }
@@ -1112,8 +1142,8 @@ sub parse_char_string ($$;$) {
           $next_state = 'before exception member';
         }
       } else {
-        $onerror->(type => 'before semicolon', level => 'm',
-                   token => $token);
+        $onerror->(type => 'no webidl semicolon',
+                   level => $self->{level}->{must});
         # reconsume
         $state = 'ignore';
         $nest_level = 0;
@@ -1134,8 +1164,8 @@ sub parse_char_string ($$;$) {
           $next_state = 'before exception member';
         }
       } else {
-        $onerror->(type => 'before semicolon', level => 'm',
-                   token => $token);
+        $onerror->(type => 'no webidl semicolon',
+                   level => $self->{level}->{must});
         pop @current; # avoid appended by 'ignore'
         # reconsume
         $state = 'ignore';
@@ -1193,7 +1223,8 @@ sub parse_char_string ($$;$) {
   }
 
   if (@current > 1) {
-    $onerror->(type => 'premature end of file', level => $self->{must_level});
+    $onerror->(type => 'premature end of webidl',
+               level => $self->{level}->{must});
     while (@current > 1) {
       $current[-2]->append_child ($current[-1]);
       pop @current;

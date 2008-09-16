@@ -168,3 +168,419 @@ interface _b{}
 | 
 | [def] typedef a b;
 
+#data
+typedef unsigned long mylong;
+#errors
+1;non-module definition;s
+
+#data
+module m{
+typedef unsigned mylong myownlong;
+typedef long mylong;
+};
+#errors
+2.23;after unsigned;m
+#document
+| module m {
+| 
+| typedef long mylong;
+| 
+| };
+
+#data
+module m {
+typedef ::0 y;
+typedef long mylong;
+};
+#errors
+2.11;scoped name:dcolon;m
+#document
+| module m {
+| 
+| typedef long mylong;
+| 
+| };
+
+#data
+module m {
+  typedef sequence<unsigned long a;
+typedef long mylong;
+};
+#errors
+2.34;no sequence gt;m
+#document
+| module m {
+| 
+| typedef long mylong;
+| 
+| };
+
+#data
+module m {
+typedef sequence<;
+typedef long mylong;
+};
+#errors
+2.18;no sequence type;m
+#document
+| module m {
+| 
+| typedef long mylong;
+| 
+| };
+
+#data
+module m {
+typedef sequence;
+typedef long mylong;
+};
+#errors
+2.17;no sequence lt;m
+#document
+| module m {
+| 
+| typedef long mylong;
+| 
+| };
+
+#data
+unknown;
+module m {};
+#errors
+1.7;before webidl defs;m
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+[;
+module m {};
+#errors
+1.2;before xattr;m
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+[a=];
+module m{};
+#errors
+1.4;before xattrarg;m
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+[a=b;
+module m{};
+#errors
+1.5;after xattr;m
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+[a();
+module m{};
+#errors
+1.5;after xattr;m
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+[a=b();
+module m{};
+#errors
+1.7;after xattr;m
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+[a,b;
+module m{};
+#errors
+1.5;after xattr;m
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+module {};
+module m {};
+#errors
+1.8;no webidl identifier;m;module
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+module m {
+interface;
+interface x{};
+};
+#errors
+2.10;no webidl identifier;m;interface
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+exception;
+interface x{};
+};
+#errors
+2.10;no webidl identifier;m;exception
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype;
+interface x{};
+};
+#errors
+2.10;no webidl identifier;m;valuetype
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString a;
+interface x{};
+};
+#errors
+2.21;valuetype DOMString;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString unsigned short;
+interface x{};
+};
+#errors
+2.28;valuetype DOMString;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString _DOMString;
+interface x{};
+};
+#errors
+2.30;valuetype DOMString;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString sequence<long>;
+interface x{};
+};
+#errors
+2.33;valuetype DOMString;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString sequence<unsigned long>;
+interface x{};
+};
+#errors
+2.42;valuetype DOMString;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString sequence<unsigned short>;
+interface x{};
+};
+#errors
+2;ignored valuetype;i
+#document
+| module m {
+| 
+| valuetype DOMString sequence<unsigned short>;
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString sequence;
+interface x{};
+};
+#errors
+2.29;valuetype DOMString;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString sequence<unsigned;
+interface x{};
+};
+#errors
+2.38;valuetype DOMString;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+valuetype DOMString sequence<unsigned short;
+interface x{};
+};
+#errors
+2.44;valuetype DOMString;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+[x]
+unknown;
+module m {};
+#errors
+2.7;before webidl def;m
+#document
+| module m {
+| 
+| 
+| };
+
+#data
+module m;
+module n {};
+#errors
+1.9;before webidl block;m;module
+#document
+| module n {
+| 
+| 
+| };
+
+#data
+module m {
+const 0;
+interface x {};
+};
+#errors
+2.7;before webidl type;m;const
+
+#data
+module m {
+const long a;
+interface x{};
+};
+#errors
+2.13;no const eq;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module m {
+const long 0;
+interface  x{};
+};
+#errors
+2.12;no webidl identifier;m;const
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+
+#data
+module n;
+module m {
+};
+#errors
+1.9;before webidl block;m;module
+#document
+| module m {
+| 
+| 
+| };

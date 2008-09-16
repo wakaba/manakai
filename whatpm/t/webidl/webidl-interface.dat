@@ -8,14 +8,14 @@ interface abc;
 #data
 interface abc : def;
 #errors
-1.20;before interface block;m
+1.20;before webidl block;m;interface
 #document
 
 #data
 interface abc : def;
 interface xyz;
 #errors
-1.20;before interface block;m
+1.20;before webidl block;m;interface
 2;non-module definition;s
 #document
 | interface xyz;
@@ -3358,3 +3358,415 @@ interface x {
 };
 #errors
 3;xattr not applicable;w;Undefined
+
+#data
+module m {
+interface x:
+{};
+interface y {};
+};
+#errors
+3.1;scoped name;m
+#document
+| module m {
+| 
+| interface y {
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  void m () raises 
+(y;
+  void n ();
+};
+};
+#errors
+4.3;after exception name;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  void m () raises (
+;
+  void n ();
+};
+};
+#errors
+4.1;scoped name;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x<>;
+interface y {};
+};
+#errors
+2.12;before webidl block;m;interface
+#document
+| module m {
+| 
+| interface y {
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+0abc;
+attribute boolean a;
+};
+};
+#errors
+3.1;before interface member;m
+#document
+| module m {
+| 
+| interface x {
+|   attribute boolean a;
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+attribute 0;
+attribute long a;
+};
+};
+#errors
+3.11;before webidl type;m;attribute
+#document
+| module m {
+| 
+| interface x {
+|   attribute long a;
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  void l(in 0);
+  void n(in long a);
+};
+};
+#errors
+3.13;before webidl type:argument;m
+#document
+| module m {
+| 
+| interface x {
+|   void n (in long a);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  attribute long 0;
+attribute boolean a;
+};
+};
+#errors
+3.18;no webidl identifier;m;attribute
+#document
+| module m {
+| 
+| interface x {
+|   attribute boolean a;
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+long 0();
+void m();
+};
+};
+#errors
+3.6;no webidl identifier:operation;m
+#document
+| module m {
+| 
+| interface x {
+|   void m ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+void m in long a;
+void n (in long a);
+};
+};
+#errors
+3.9;no arguments lparen;m
+#document
+| module m {
+| 
+| interface x {
+|   void n (in long a);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+void m ;
+void n (in long a);
+};
+};
+#errors
+3.8;no arguments lparen;m
+#document
+| module m {
+| 
+| interface x {
+|   void n (in long a);
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+void m (in long a;);
+void n ();
+};
+};
+#errors
+3.18;after argument;m
+3.19;before interface member;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+[m (in long a] void m();
+void n ();
+};
+};
+#errors
+3.14;after argument;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+void n (in long 0);
+void l ();
+};
+};
+#errors
+3.17;no webidl identifier:argument;m
+#document
+| module m {
+| 
+| interface x {
+|   void l ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+[a(in long 0)] void m ();
+void l ();
+};
+};
+#errors
+3.12;no webidl identifier:argument;m
+#document
+| module m {
+| 
+| interface x {
+|   void l ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+void m (long c);
+void n ();
+};
+};
+#errors
+3.12;no argument in;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+[m (long c)] void l ();
+void n ();
+};
+};
+#errors
+3.8;no argument in;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+void m () raises DOMException;
+void n();
+};
+};
+#errors
+3.29;no raises lparen;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+attribute long m getraises
+DOMException;
+void n();
+};
+};
+#errors
+4.12;no raises lparen;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+attribute short m setraises 
+DOMException;
+void n();
+};
+};
+#errors
+4.12;no raises lparen;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+attribute long x getraises (DOMException) setraises 
+DOMException;
+void n();
+};
+};
+#errors
+4.12;no raises lparen;m
+#document
+| module m {
+| 
+| interface x {
+|   void n ();
+| };
+| 
+| };
+
+#data
+module m {
+interface x {
+  void m ()
+long n ();
+boolean l ();
+};
+};
+#errors
+4.4;no webidl semicolon;m
+#document
+| module m {
+| 
+| interface x {
+|   boolean l ();
+| };
+| 
+| };
+
+#data
+module m{
+interface x{
+#errors
+2.12;premature end of webidl;m
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
+

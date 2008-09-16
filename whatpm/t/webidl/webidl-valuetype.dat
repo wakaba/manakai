@@ -64,7 +64,7 @@ valuetype c sequence<Node>;
 #data
 valuetype a any;
 #errors
-1.15;before boxed type;m
+1.15;before webidl type;m;valuetype
 
 #data
 exception ee {};
@@ -215,5 +215,20 @@ valuetype DOMString sequence<unsigned;short>;
 interface i {};
 #errors
 1.38;valuetype DOMString;m
-1.43;before definitions;m
+1.43;before webidl defs;m
 2;non-module definition;s
+
+#data
+module m {
+valuetype a 0;
+interface x {};
+};
+#errors
+2.13;before webidl type;m;valuetype
+#document
+| module m {
+| 
+| interface x {
+| };
+| 
+| };
