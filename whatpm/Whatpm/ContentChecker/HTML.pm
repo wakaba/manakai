@@ -925,7 +925,7 @@ my $HTMLRepeatIndexAttrChecker = sub {
   if (defined $attr->namespace_uri) {
     my $oe = $attr->owner_element;
     my $oe_nsuri = $oe->namespace_uri;
-    if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) {
+    if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) { ## TODO: wrong?
       $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                          level => $self->{level}->{must});
     }
@@ -1065,7 +1065,7 @@ my $HTMLAttrChecker = {
     if (defined $attr->namespace_uri) {
       my $oe = $attr->owner_element;
       my $oe_nsuri = $oe->namespace_uri;
-      if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) {
+      if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) { ## TODO: This condition is wrong?
         $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                            level => $self->{level}->{must});
       }
@@ -1075,9 +1075,19 @@ my $HTMLAttrChecker = {
     ## ISSUE: Repetition blocks MAY have this attribute.  Then, is the
     ## attribute allowed on an element that is not a repetition block?
   },
-## TODO: namespaced variant of repeat-* attributes
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
-  ## TODO: style [HTML5]
+  style => sub {
+    my ($self, $attr) = @_;
+
+    $self->{onsubdoc}->({s => $attr->value,
+                         container_node => $attr,
+                         media_type => 'text/x-css-inline',
+                         is_char_string => 1});
+
+    ## NOTE: "... MUST still be comprehensible and usable if those
+    ## attributes were removed" is a semantic requirement, it cannot
+    ## be tested.
+  },
   tabindex => $HTMLIntegerAttrChecker,
   template => $HTMLRefOrTemplateAttrChecker,
   'xml:lang' => sub {

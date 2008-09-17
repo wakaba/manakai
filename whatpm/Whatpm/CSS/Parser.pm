@@ -111,15 +111,12 @@ sub parse_char_string ($$) {
   my $sp = Whatpm::CSS::SelectorsParser->new;
   $sp->{onerror} = $self->{onerror};
   $sp->{level} = $self->{level};
-  $sp->{must_level} = $self->{must_level};
   $sp->{pseudo_element} = $self->{pseudo_element};
   $sp->{pseudo_class} = $self->{pseudo_class};
 
   my $mp = Whatpm::CSS::MediaQueryParser->new;
   $mp->{onerror} = $self->{onerror};
   $mp->{level} = $self->{level};
-  $mp->{must_level} = $self->{must_level};
-  $mp->{unsupported_level} = $self->{unsupported_level};
 
   my $nsmap = {prefix_to_uri => {}, uri_to_prefixes => {}};
   # $nsmap->{prefix_to_uri}->{p/""} = uri/undef
@@ -674,6 +671,262 @@ sub parse_char_string ($$) {
 
   return $ss;
 } # parse_char_string
+
+## TODO: Test <style>'s base URI change and url()
+
+sub parse_char_string_as_inline ($$) {
+  my $self = $_[0];
+
+  my $s = $_[1];
+  pos ($s) = 0;
+  my $line = 1;
+  my $column = 0;
+  
+  my $tt = Whatpm::CSS::Tokenizer->new;
+  my $onerror = $tt->{onerror} = $self->{onerror};
+  $tt->{get_char} = sub ($) {
+    if (pos $s < length $s) {
+      my $c = ord substr $s, pos ($s)++, 1;
+      if ($c == 0x000A) {
+        $line++;
+        $column = 0;
+      } elsif ($c == 0x000D) {
+        unless (substr ($s, pos ($s), 1) eq "\x0A") {
+          $line++;
+          $column = 0;
+        } else {
+          $column++;
+        }
+      } else {
+        $column++;
+      }
+      $_[0]->{line} = $line;
+      $_[0]->{column} = $column;
+      return $c;
+    } else {
+      $_[0]->{column} = $column + 1; ## Set the same number always.
+      return -1;
+    }
+  }; # $tt->{get_char}
+  $tt->init;
+
+  $self->{lookup_namespace_uri} = sub { ## TODO: case
+    return undef; ## TODO: get from an external source
+  }; # $sp->{lookup_namespace_uri}
+
+  require Message::DOM::CSSStyleDeclaration;
+
+  $self->{base_uri} = $self->{href} unless defined $self->{base_uri};
+
+  my $state = BEFORE_DECLARATION_STATE;
+  my $t = $tt->get_next_token;
+
+  my $current_decls = Message::DOM::CSSStyleDeclaration->____new;
+  my $closing_tokens = [];
+
+## TODO: ...
+#  $$ss->{manakai_base_uri} = $self->{base_uri};
+#  $$ss->{_parser} = $self;
+#  $$ss->{_nsmap} = $nsmap;
+
+  S: {
+    if ($state == BEFORE_DECLARATION_STATE) {
+      ## NOTE: DELIM? in declaration will be removed:
+      ## <http://csswg.inkedblade.net/spec/css2.1?s=declaration%20delim#issue-2>.
+
+      my $prop_def;
+      my $prop_value;
+      my $prop_flag = '';
+      $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+      if ($t->{type} == IDENT_TOKEN) { # property
+        my $prop_name = lc $t->{value}; ## TODO: case folding
+        my $prop_name_t = $t;
+        $t = $tt->get_next_token;
+        $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+        if ($t->{type} == COLON_TOKEN) {
+          $t = $tt->get_next_token;
+          $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+          $prop_def = $Prop->{$prop_name};
+          if ($prop_def and $self->{prop}->{$prop_name}) {
+            ($t, $prop_value)
+                = $prop_def->{parse}->($self, $prop_name, $tt, $t, $onerror);
+            if ($prop_value) {
+              ## NOTE: {parse} don't have to consume trailing spaces.
+              $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+              if ($t->{type} == EXCLAMATION_TOKEN) {
+                $t = $tt->get_next_token;
+                $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+                if ($t->{type} == IDENT_TOKEN and
+                    lc $t->{value} eq 'important') { ## TODO: case folding
+                  $prop_flag = 'important';
+                  
+                  $t = $tt->get_next_token;
+                  $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+
+                  #
+                } else {
+                  $onerror->(type => 'priority syntax error',
+                             level => $self->{level}->{must},
+                             uri => \$self->{href},
+                             token => $t);
+                  
+                  ## Reprocess.
+                  $state = IGNORED_DECLARATION_STATE;
+                  redo S;
+                }
+              }
+
+              #
+            } else {
+              ## Syntax error.
+        
+              ## Reprocess.
+              $state = IGNORED_DECLARATION_STATE;
+              redo S;
+            }
+          } else {
+            $onerror->(type => 'unknown property',
+                       level => $self->{level}->{uncertain},
+                       token => $prop_name_t, value => $prop_name,
+                       uri => \$self->{href});
+
+            #
+            $state = IGNORED_DECLARATION_STATE;
+            redo S;
+          }
+        } else {
+          $onerror->(type => 'no property colon',
+                     level => $self->{level}->{must},
+                     uri => \$self->{href},
+                     token => $t);
+
+          #
+          $state = IGNORED_DECLARATION_STATE;
+          redo S;
+        }
+      }
+
+      ## NOTE: Unlike the main parser, |RBRACE_TOKEN| does not close
+      ## the block here.
+      if ($t->{type} == SEMICOLON_TOKEN) {
+        $t = $tt->get_next_token;
+        ## Stay in the state.
+        #redo S;
+      } elsif ($t->{type} == EOF_TOKEN) {
+        ## NOTE: Unlike the main parser, no error is raised here and
+        ## exits the parser.
+        #last S;
+      } else {
+        if ($prop_value) {
+          $onerror->(type => 'no property semicolon',
+                     level => $self->{level}->{must},
+                     uri => \$self->{href},
+                     token => $t);
+        } else {
+          $onerror->(type => 'no property name',
+                     level => $self->{level}->{must},
+                     uri => \$self->{href},
+                     token => $t);
+        }
+
+        ## Reprocess.
+        $state = IGNORED_DECLARATION_STATE;
+        redo S;
+      }
+
+      my $important = ($prop_flag eq 'important');
+      for my $set_prop_name (keys %{$prop_value or {}}) {
+        my $set_prop_def = $Prop->{$set_prop_name};
+        $$current_decls->{$set_prop_def->{key}}
+            = [$prop_value->{$set_prop_name}, $prop_flag]
+            if $important or
+                not $$current_decls->{$set_prop_def->{key}} or
+                $$current_decls->{$set_prop_def->{key}}->[1] ne 'important';
+      }
+      last S if $t->{type} == EOF_TOKEN; # "color: red{EOF}" (w/ or w/o ";")
+      redo S;
+    } elsif ($state == IGNORED_DECLARATION_STATE) {
+      ## NOTE: Difference from the main parser is that support for the
+      ## |IGNORED_STATEMENT_STATE| cases is removed.
+      if (@$closing_tokens) { ## Something is yet in opening state.
+        if ($t->{type} == EOF_TOKEN) {
+          @$closing_tokens = ();
+          ## Reprocess.
+          $state = BEFORE_DECLARATION_STATE;
+          redo S;
+        } elsif ($t->{type} == $closing_tokens->[-1]) {
+          pop @$closing_tokens;
+          $t = $tt->get_next_token;
+          ## Stay in the state.
+          redo S;
+        } elsif ({
+          RBRACE_TOKEN, 1,
+          #RBRACKET_TOKEN, 1,
+          #RPAREN_TOKEN, 1,
+          SEMICOLON_TOKEN, 1,
+        }->{$t->{type}}) {
+          $t = $tt->get_next_token;
+          ## Stay in the state.
+          #
+        } else {
+          #
+        }
+      } else {
+        ## NOTE: Unlike the main parser, |RBRACE_TOKEN| does not close
+        ## the block here.
+        if ($t->{type} == SEMICOLON_TOKEN) {
+          $t = $tt->get_next_token;
+          $state = BEFORE_DECLARATION_STATE;
+          redo S;
+        } elsif ($t->{type} == EOF_TOKEN) {
+          ## Reprocess.
+          $state = $state == IGNORED_STATEMENT_STATE
+              ? BEFORE_STATEMENT_STATE : BEFORE_DECLARATION_STATE;
+          redo S;
+        #} elsif ($t->{type} == RBRACKET_TOKEN or $t->{type} == RPAREN_TOKEN) {
+        #  $t = $tt->get_next_token;
+        #  ## Stay in the state.
+        #  #
+        } else {
+          #
+        }
+      }
+
+      while (not {
+        EOF_TOKEN, 1,
+        #RBRACE_TOKEN, 1, ## NOTE: Difference from the main parser.
+        ## NOTE: ']' and ')' are disabled for browser compatibility.
+        #RBRACKET_TOKEN, 1,
+        #RPAREN_TOKEN, 1,
+        SEMICOLON_TOKEN, 1,
+      }->{$t->{type}}) {
+        if ($t->{type} == LBRACE_TOKEN) {
+          push @$closing_tokens, RBRACE_TOKEN;
+        #} elsif ($t->{type} == LBRACKET_TOKEN) {
+        #  push @$closing_tokens, RBRACKET_TOKEN;
+        #} elsif ($t->{type} == LPAREN_TOKEN or $t->{type} == FUNCTION_TOKEN) {
+        #  push @$closing_tokens, RPAREN_TOKEN;
+        }
+
+        $t = $tt->get_next_token;
+      }
+
+      ## Reprocess.
+      ## Stay in the state.
+      redo S;
+    } else {
+      die "$0: parse_char_string: Unknown state: $state";
+    }
+  } # S
+
+  ## TODO: CSSStyleDeclaration attributes ...
+
+  return $current_decls;
+} # parse_char_string_as_inline
+
+## TODO: We need test script for the method above.
 
 my $compute_as_specified = sub ($$$$) {
   #my ($self, $element, $prop_name, $specified_value) = @_;
@@ -6850,4 +7103,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/09/15 23:45:34 $
+## $Date: 2008/09/17 03:55:15 $
