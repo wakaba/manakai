@@ -1130,6 +1130,7 @@ my $parse_color = sub {
       $t = $tt->get_next_token;
       return ($t, {$prop_name => ['KEYWORD', $value]});
     } elsif ($value eq 'currentcolor' or $value eq '-moz-use-text-color') {
+      ## NOTE: '-manakai-invert-or-currentcolor' is not allowed in 'color'.
       $t = $tt->get_next_token;
       if ($prop_name eq 'color') {
         return ($t, {$prop_name => ['INHERIT']});
@@ -1367,6 +1368,7 @@ $Prop->{color} = {
           } else {
             ## NOTE: This is an error, since it should have been
             ## converted to 'inherit' at parse time.
+            ## NOTE: 'color: -manakai-invert-or-currentcolor' is not allowed.
             return ['KEYWORD', '-manakai-default'];
           }
         } elsif ($specified_value->[1] eq '-manakai-invert-or-currentcolor') {
@@ -2674,6 +2676,9 @@ $Prop->{'font-size'} = {
         }
       }
     }
+
+    ## TODO: Should we convert '-manakai-xxx-large' to '-webkit-xxx-large'
+    ## at the parse time?
     
     return $specified_value;
   },
@@ -7103,4 +7108,4 @@ $Prop->{page} = {
 };
 
 1;
-## $Date: 2008/09/17 03:55:15 $
+## $Date: 2008/09/17 07:19:30 $
