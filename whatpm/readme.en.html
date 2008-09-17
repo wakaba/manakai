@@ -13,45 +13,27 @@ Technologies (beta)</title>
 <div class="section" id="introduction">
 <h2>Introduction</h2>
 
-<p><dfn>Whatpm</dfn> is a <em>work-in-progress</em> set of <m>P</m>erl
-<m>m</m>odules for <m>W</m>eb <m>h</m>ypertext <m>a</m>pplication 
-<m>t</m>echnologies.  It is part
-of the <a href="http://suika.fam.cx/www/2006/manakai/" rel=up>manakai</a>
+<p><dfn>Whatpm</dfn> is a <em>work-in-progress</em> set of
+<mark>P</mark>erl <mark>m</mark>odules for <mark>W</mark>eb
+<mark>h</mark>ypertext <mark>a</mark>pplication
+<mark>t</mark>echnologies.  It is part of the <a
+href="http://suika.fam.cx/www/2006/manakai/" rel=up>manakai</a>
 project.</p>
 
+<p>Whatpm supports various Web standard technologies, including <a
+href="#modules-html">HTML, XHTML</a>, <a href="#modules-xml">XML</a>,
+<a hreF="#modules-css">CSS</a>, <a href="#modules-http">HTTP</a>, and
+<a href="#modules-url">URL</a>.
+</div>
+
+<div class=section id=modules>
+<h2>Modules</h2>
+
+<div class=section id=modules-html-xml>
+<h3>Modules for HTML and XML</h3>
+
+<p id=modules-html>Modules related to HTML and XHTML are as follows:
 <dl>
-<dt>Modules</dt>
-<dd><dl>
-<dt><a href="Whatpm/CacheManifest.html"><code>Whatpm::CacheManifest</code></a></dt>
-  <dd>An
-  <a href="http://www.whatwg.org/specs/web-apps/current-work/#manifests">HTML5
-  cache manifest</a> parser.</dd>
-<dt id=whatpm-charset-universalchardet><a href="Whatpm/Charset/UniversalCharDet.html"><code>Whatpm::Charset::UniversalCharDet</code></a></dt>
-  <dd>A Perl interface to universalchardet character encoding detection
-  library.</dd>
-<dt><a href="Whatpm/ContentChecker.html"><code>Whatpm::ContentChecker</code></a></dt>
-  <dd>A DOM5 HTML (in-memory representation of a document) conformance
-  checker with a partial support for Atom 1.0.  (See also
-  <a href="#demo-html-parser">demo</a>.)</dd>
-<dt><a href="Whatpm/ContentType.html"><code>Whatpm::ContentType</code></a></dt>
-  <dd>An implementation of HTML5 Content Type sniffing algorithm.</dd>
-
-  <dt><a href="Whatpm/CSS/Cascade.html"><code>Whatpm::CSS::Cascade</code></a>
-    <dd>A media-independent implementation of CSS cascading and value
-    computation.  (See also <a href="#demo-css-parser">demo</a>.)
-  <dt><a href="Whatpm/CSS/Parser.html"><code>Whatpm::CSS::Parser</code></a>
-    <dd>A CSS parser that constructs CSSOM trees from style sheets.  (See
-    also <a href="#demo-css-parser">demo</a>.)
-
-<dt><a href="Whatpm/CSS/SelectorsParser.html"><code>Whatpm::CSS::SelectorsParser</code></a></dt>
-  <dd>A <a href="http://www.w3.org/TR/css3-selectors/#grouping">group of
-  selectors</a> parser.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
-<dt><a href="Whatpm/CSS/SelectorsSerializer.html"><code>Whatpm::CSS::SelectorsSerializer</code></a></dt>
-  <dd>A <a href="http://www.w3.org/TR/css3-selectors/#grouping">group of
-  selectors</a> serializer.  (See also <a href="#spec-ssft">specification</a>
-  and <a href="#demo-css-parser">demo</a>.)</dd>
-<dt><a href="Whatpm/CSS/Tokenizer.html"><code>Whatpm::CSS::Tokenizer</code></a></dt>
-  <dd>A CSS tokenizer.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
 <dt id=module-whatpm-html><a href="Whatpm/HTML.html"><code>Whatpm::HTML</code></a></dt>
   <dd>An implementation of HTML5 document and fragment
   parsing algorithms.  It can be used
@@ -65,66 +47,156 @@ project.</p>
   <dd>An implementation of the HTML5 table algorithm.  It can be
   used to extract a table structure from a DOM <code>table</code>
   element node.  (See also <a href="#demo-html-table">demo</a>.)</dd>
+</dl>
+
+<p id=modules-xml>The module for <i>tentative</i> XML support is as follow:
+<dl>
+<dt><a href="Whatpm/XMLSerializer.html"><code>Whatpm::XMLSerializer</code></a></dt>
+  <dd>A simple XML serializer.</dd>
+</dl>
+
+<p><i>Real</i> XML parser and serializer are currently not available yet.
+
+<p id=modules-cc>The module for conformance checking of a DOM tree (i.e.
+a in-memory representation of a HTML or XML document) is as follows:
+<dl>
+<dt><a href="Whatpm/ContentChecker.html"><code>Whatpm::ContentChecker</code></a></dt>
+  <dd>A DOM5 HTML (in-memory representation of a document) conformance
+  checker with a partial support for Atom 1.0.  (See also
+  <a href="#demo-html-parser">demo</a>.)</dd>
+</dl>
+
+<p>Currently, conformance checking of HTML/XHTML and Atom documents
+is supported.
+</div>
+
+<div class=section id=modules-css>
+<h3>Modules for CSS</h3>
+
+<p>Modules for CSS and related technologies are as follows:
+<dl>
+<dt><a href="Whatpm/CSS/Cascade.html"><code>Whatpm::CSS::Cascade</code></a>
+  <dd>A media-independent implementation of CSS cascading and value
+  computation.  (See also <a href="#demo-css-parser">demo</a>.)
+<dt><a href="Whatpm/CSS/Parser.html"><code>Whatpm::CSS::Parser</code></a>
+  <dd>A CSS parser that constructs CSSOM trees from style sheets.  (See
+  also <a href="#demo-css-parser">demo</a>.)
+<dt><a href="Whatpm/CSS/SelectorsParser.html"><code>Whatpm::CSS::SelectorsParser</code></a></dt>
+  <dd>A <a href="http://www.w3.org/TR/css3-selectors/#grouping">group of
+  selectors</a> parser.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
+<dt><a href="Whatpm/CSS/SelectorsSerializer.html"><code>Whatpm::CSS::SelectorsSerializer</code></a></dt>
+  <dd>A <a href="http://www.w3.org/TR/css3-selectors/#grouping">group of
+  selectors</a> serializer.  (See also <a href="#spec-ssft">specification</a>
+  and <a href="#demo-css-parser">demo</a>.)</dd>
+<dt><a href="Whatpm/CSS/Tokenizer.html"><code>Whatpm::CSS::Tokenizer</code></a></dt>
+  <dd>A CSS tokenizer.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
+</dl>
+</div>
+
+<div class=section id=modules-http>
+<h3>Modules for HTTP</h3>
+
+<p>Modules for HTTP and related technologies are as follows:
+<dl>
+<dt><a href="Whatpm/ContentType.html"><code>Whatpm::ContentType</code></a></dt>
+  <dd>An implementation of HTML5 Content Type sniffing algorithm.</dd>
 <dt><a href="Whatpm/IMTChecker.html"><code>Whatpm::IMTChecker</code></a></dt>
   <dd>An Internet Media Type (<abbr>aka</abbr> MIME type) label
   conformance checker.</dd>
+</dl>
 
+<p>Currently, support for parsing of HTTP headers and as such is not
+yet available.
+</div>
+
+<div class=section id=modules-url>
+<h3>Module for URL</h3>
+
+<p>Module for the URL support is as follows:
+<dl>
 <dt><a href="Whatpm/URIChecker.html"><code>Whatpm::URIChecker</code></a></dt>
   <dd>An IRI reference conformance checker.</dd>
+</dl>
 
+<p>Support for HTML5's realistic definition of URL is not available yet.
+</div>
+
+<div class=section id=modules-misc>
+<h3>Modules for other technologies</h3>
+
+<p>Following modules provide support for other Web-related technologies:
+<dl>
+<dt><a href="Whatpm/CacheManifest.html"><code>Whatpm::CacheManifest</code></a></dt>
+  <dd>An
+  <a href="http://www.whatwg.org/specs/web-apps/current-work/#manifests">HTML5
+  cache manifest</a> parser.</dd>
+<dt id=whatpm-charset-universalchardet><a href="Whatpm/Charset/UniversalCharDet.html"><code>Whatpm::Charset::UniversalCharDet</code></a></dt>
+  <dd>A Perl interface to universalchardet character encoding detection
+  library.</dd>
+  <dt><a href="Whatpm/LangTag.html"><code>Whatpm::LangTag</code></a>
+    <dd>A language tag parser and conformance checker, supporting both
+    older RFC 3066 definition and latest RFC 4646 definition.  (See also
+    <a href="#demo-langtag">demo</a>.)
 <dt><a href="Whatpm/WebIDL.html"><code>Whatpm::WebIDL</code></a></dt>
   <dd>A WebIDL fragment parser.  It parses an IDL fragment, whether conforming
   or not, and constructs a DOM-like object model for further processing.
   Non-conforming (or broken) IDL fragment-like string will be parsed using
   CSS-like error-tolerant parsing rules, e.g. ignoring anything until next
   <code>;</code> character.
-
-  <dt><a href="Whatpm/LangTag.html"><code>Whatpm::LangTag</code></a>
-    <dd>A language tag parser and conformance checker, supporting both
-    older RFC 3066 definition and latest RFC 4646 definition.  (See also
-    <a href="#demo-langtag">demo</a>.)
-
-<dt><a href="Whatpm/XMLSerializer.html"><code>Whatpm::XMLSerializer</code></a></dt>
-  <dd>A simple XML serializer.</dd>
-  </dl>
+</dl>
+</div>
 
   <p>Note that all of these modules are <em>work in progress</em>
   and have <a href="#todo">a number of unresolved problems</a>.</p>
 
   <p>Note also that some modules have no documentation for now.</p>
-  </dd>
-<dt id=spec>Specifications</dt>
-  <dd><dl>
-    <dt id=spec-ssft><a href="http://suika.fam.cx/www/markup/selectors/ssft/ssft"><abbr title="Selectors Serialization Format for Testing">SSFT</abbr>
-    Specification</a></dt>
-      <dd>The specification for the serialization format used for
-      testing Selectors-related modules.</dd>
-    <dt id=spec-manakai-selectors"><a href="http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions">manakai's
-    Selectors Extensions</a></dt>
-      <dd>The specification for <code>:-manakai-<var>*</var></code>
-      pseudo-classes implemented by Selectors-related modules.</dd>
-  </dl></dd>
-<dt>Documentations</dt>
-  <dd><dl>
-<dt><a href="http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types">List of error types</a></dt>
-  <dd>Description of errors to be notified to callback functions by Whatpm
-  modules.</dd>
-    <dt><a href="Whatpm/CSS/selectors-object">Selectors object</a></dt>
-      <dd>Description of data structure for Selectors, as implemented by
-      <a href="Whatpm/CSS/SelectorsParser.html"><code>Whatpm::CSS::SelectorsParser</code></a>
-      (as output), and
-      <a href="Whatpm/CSS/SelectorsSerializer.html"><code>Whatpm::CSS::SelectorsSerializer</code></a>
-      (as input)<!--, and
-      <a href="http://suika.fam.cx/www/manakai-core/lib/Message/DOM/SelectorsAPI.html"><code>Message::DOM::SelectorsAPI</code></a>-->.</dd>
-    <dt id=doc-user-data-names><a href="http://suika.fam.cx/gate/2005/sw/manakai/Predefined%20User%20Data%20Names">List of predefined user data names</a></dt>
-      <dd>List of user data names defined by Whatpm modules.</dd>
-    <dt id=doc-handles><a href="Whatpm/Charset/handles">Handle objects</a>
-      <dd>Description of character or byte stream input handle interfaces.
-    </dl>
-  </dd>
-</dl>
+
 <!-- Whatpm::ContentChecker::*, Whatpm::H2H, Whatpm::NanoDOM, and
      Whatpm::XMLParser are intentionally omitted from the list. -->
+</div>
+
+<div class=section id=documents>
+<h2>Documents</h2>
+
+<p>For the description of functionalities provided by each module, see
+<abbr>pod</abbr> documentation of the module.  HTML version of
+<abbr>pod</abbr> documentations are linked from the <a
+href="#modules">list of modules above</a>.
+
+<p>In addition, there are additional documents for some topics:
+<dl>
+<dt><a href="http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types">List of error types</a></dt>
+<!-- @@ TODO: Need to update the link - the document above is out of date -->
+  <dd>Description of errors to be notified to callback functions by Whatpm
+  modules.</dd>
+
+<dt><a href="Whatpm/CSS/selectors-object">Selectors object</a></dt>
+  <dd>Description of data structure for Selectors, as implemented by
+  <a href="Whatpm/CSS/SelectorsParser.html"><code>Whatpm::CSS::SelectorsParser</code></a>
+  (as output), and
+  <a href="Whatpm/CSS/SelectorsSerializer.html"><code>Whatpm::CSS::SelectorsSerializer</code></a>
+  (as input)<!--, and
+  <a href="http://suika.fam.cx/www/manakai-core/lib/Message/DOM/SelectorsAPI.html"><code>Message::DOM::SelectorsAPI</code></a>-->.</dd>
+
+<dt id=doc-user-data-names><a href="http://suika.fam.cx/gate/2005/sw/manakai/Predefined%20User%20Data%20Names">List of predefined user data names</a></dt>
+  <dd>List of user data names defined by Whatpm modules.</dd>
+
+<dt id=doc-handles><a href="Whatpm/Charset/handles">Handle objects</a>
+  <dd>Description of character or byte stream input handle interfaces.
+</dl>
+
+<p>Following specifications define Whatpm-specific formats and extensions:
+<dl id=spec>
+<dt id=spec-ssft><a href="http://suika.fam.cx/www/markup/selectors/ssft/ssft"><abbr title="Selectors Serialization Format for Testing">SSFT</abbr>
+Specification</a></dt>
+  <dd>The specification for the serialization format used for
+  testing Selectors-related modules.</dd>
+
+<dt id=spec-manakai-selectors"><a href="http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions">manakai's
+Selectors Extensions</a></dt>
+  <dd>The specification for <code>:-manakai-<var>*</var></code>
+  pseudo-classes implemented by Selectors-related modules.</dd>
+</dl>
 </div>
 
 <div class="section" id="demo">
