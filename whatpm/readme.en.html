@@ -35,6 +35,14 @@ project.</p>
   <a href="#demo-html-parser">demo</a>.)</dd>
 <dt><a href="Whatpm/ContentType.html"><code>Whatpm::ContentType</code></a></dt>
   <dd>An implementation of HTML5 Content Type sniffing algorithm.</dd>
+
+  <dt><a href="Whatpm/CSS/Cascade.html"><code>Whatpm::CSS::Cascade</code></a>
+    <dd>A media-independent implementation of CSS cascading and value
+    computation.  (See also <a href="#demo-css-parser">demo</a>.)
+  <dt><a href="Whatpm/CSS/Parser.html"><code>Whatpm::CSS::Parser</code></a>
+    <dd>A CSS parser that constructs CSSOM trees from style sheets.  (See
+    also <a href="#demo-css-parser">demo</a>.)
+
 <dt><a href="Whatpm/CSS/SelectorsParser.html"><code>Whatpm::CSS::SelectorsParser</code></a></dt>
   <dd>A <a href="http://www.w3.org/TR/css3-selectors/#grouping">group of
   selectors</a> parser.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
@@ -60,6 +68,7 @@ project.</p>
 <dt><a href="Whatpm/IMTChecker.html"><code>Whatpm::IMTChecker</code></a></dt>
   <dd>An Internet Media Type (<abbr>aka</abbr> MIME type) label
   conformance checker.</dd>
+
 <dt><a href="Whatpm/URIChecker.html"><code>Whatpm::URIChecker</code></a></dt>
   <dd>An IRI reference conformance checker.</dd>
 
@@ -69,6 +78,11 @@ project.</p>
   Non-conforming (or broken) IDL fragment-like string will be parsed using
   CSS-like error-tolerant parsing rules, e.g. ignoring anything until next
   <code>;</code> character.
+
+  <dt><a href="Whatpm/LangTag.html"><code>Whatpm::LangTag</code></a>
+    <dd>A language tag parser and conformance checker, supporting both
+    older RFC 3066 definition and latest RFC 4646 definition.  (See also
+    <a href="#demo-langtag">demo</a>.)
 
 <dt><a href="Whatpm/XMLSerializer.html"><code>Whatpm::XMLSerializer</code></a></dt>
   <dd>A simple XML serializer.</dd>
@@ -109,6 +123,8 @@ project.</p>
     </dl>
   </dd>
 </dl>
+<!-- Whatpm::ContentChecker::*, Whatpm::H2H, Whatpm::NanoDOM, and
+     Whatpm::XMLParser are intentionally omitted from the list. -->
 </div>
 
 <div class="section" id="demo">
@@ -126,9 +142,23 @@ parser and checker demo, with manakai's DOM implementation</a>
 <li id=demo-html-table><a href="http://suika.fam.cx/gate/2007/html/table-interface">HTML5 table
 structure visualization demo</a>
 (<a href="http://suika.fam.cx/gate/cvs/*checkout*/webroot/gate/2007/html/table.cgi">source</a>)</li>
-<li id=demo-css-parser><a href="http://suika.fam.cx/gate/2007/css/parser-interface">CSS tokenizer
-demo</a>
+
+<li id=demo-css-parser><a href="http://suika.fam.cx/gate/2007/css/parser-interface">CSS
+tokenizer, parser, and computed style computation demo</a>
 (<a href="http://suika.fam.cx/gate/cvs/*checkout*/webroot/gate/2007/css/parser.cgi">source</a>)</li>
+
+<li id=demo-langtag><a href="http://suika.fam.cx/gate/2007/langtag/langtag-demo-interface">Language
+tag parsing and conformance checking demo</a>
+(<a href="http://suika.fam.cx/gate/cvs/*checkout*/webroot/gate/2007/langtag/langtag-demo.cgi">source</a>)
+</ul>
+</div>
+
+<div class=section id=applications>
+<h2>Application</h2>
+
+<ul>
+<li><a href="http://suika.fam.cx/gate/2007/html/cc/"><abbr>WebHACC</abbr> 
+(Web hypertext application conformance checker)</a>
 </ul>
 </div>
 
@@ -189,7 +219,7 @@ charlib</a></dt>
 module, and <a href="http://chardet.feedparser.org/">Universal Encoding
 Detector</a></dt>
   <dd>For the module <code>Whatpm::Charset::UniversalCharDet</code> being
-  meaningful, these softwares are requires on the system.  See the
+  meaningful, these softwares are required on the system.  See the
   <a href="Whatpm/Charset/UniversalCharDet.html#dependency">documentation</a>
   for more information.</dd>
 <dt><a href="http://search.cpan.org/~makamaka/JSON-1.14/"><code>JSON</code></a></dt>
@@ -206,6 +236,10 @@ Detector</a></dt>
 <p>The development version of Whatpm may be found in the 
 <a href="http://suika.fam.cx/gate/cvs/markup/html/whatpm/">CVS 
 repository</a>.</p>
+
+<p><a href="http://suika.fam.cx/gate/cvs/markup/html/whatpm/whatpm.tar.gz?tarball=1">The
+latest developmenet version of the Whatpm</a> is also available as a
+tarball.
 
 </div>
 
