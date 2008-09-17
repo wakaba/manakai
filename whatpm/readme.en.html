@@ -8,7 +8,8 @@ Technologies (beta)</title>
 <link rel="author" href="#author">
 </head>
 <body>
-<h1>Whatpm (<em>beta</em>)</h1>
+<h1>Whatpm &mdash; Perl modules for Web hypertext application technologies
+(<em>beta</em>)</h1>
 
 <div class="section" id="introduction">
 <h2>Introduction</h2>
@@ -68,6 +69,15 @@ a in-memory representation of a HTML or XML document) is as follows:
 
 <p>Currently, conformance checking of HTML/XHTML and Atom documents
 is supported.
+
+<p>For these modules, a DOM implementation that supports the manakai's
+Perl binding<!-- @@ TODO: ref --> is necessary to represent a document
+in memory.  The <a
+href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>
+package contains such an implementation,
+<code>Message::DOM::Implementation</code><!-- @@ TODO: ref -->, but it
+should also be possible to use any other implementation that supports
+the binding.
 </div>
 
 <div class=section id=modules-css>
@@ -78,6 +88,10 @@ is supported.
 <dt><a href="Whatpm/CSS/Cascade.html"><code>Whatpm::CSS::Cascade</code></a>
   <dd>A media-independent implementation of CSS cascading and value
   computation.  (See also <a href="#demo-css-parser">demo</a>.)
+<dt><a href="Whatpm/CSS/MediaQueryParser.pm"><code>Whatpm::CSS::MediaQueryParser</code></a>
+  <dd>A media query parser.
+<dt><a href="Whatpm/CSS/MediaQuerySerializer.pm"><code>Whatpm::CSS::MediaQuerySerializer</code></a>
+  <dd>A media query serializer.
 <dt><a href="Whatpm/CSS/Parser.html"><code>Whatpm::CSS::Parser</code></a>
   <dd>A CSS parser that constructs CSSOM trees from style sheets.  (See
   also <a href="#demo-css-parser">demo</a>.)
@@ -91,6 +105,12 @@ is supported.
 <dt><a href="Whatpm/CSS/Tokenizer.html"><code>Whatpm::CSS::Tokenizer</code></a></dt>
   <dd>A CSS tokenizer.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
 </dl>
+
+<p>For the <code>Whatpm::CSS::Parser</code> module reresents a CSSOM
+tree, modules in the <a
+href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>
+package are used.  Those modules also provide the serializer for the
+CSSOM tree, as the standard <code>css_text</code> attribute.
 </div>
 
 <div class=section id=modules-http>
@@ -130,6 +150,11 @@ yet available.
   <dd>An
   <a href="http://www.whatwg.org/specs/web-apps/current-work/#manifests">HTML5
   cache manifest</a> parser.</dd>
+<dt><a href="Whatpm/Charset/DecodeHandle.html"><code>Whatpm::Charset::DecodeHandle</code></a>
+  <dd>A filehandle-like wrapper <a href="#doc-handles">interface</a> to
+  decode byte stream encoded in some character encoding.
+<dt><a href="Whatpm/Charset/UnicodeChecker.html"><code>Whatpm::Charset::UnicodeChecker</code></a>
+  <dd>A Unicode character string checker.
 <dt id=whatpm-charset-universalchardet><a href="Whatpm/Charset/UniversalCharDet.html"><code>Whatpm::Charset::UniversalCharDet</code></a></dt>
   <dd>A Perl interface to universalchardet character encoding detection
   library.</dd>
