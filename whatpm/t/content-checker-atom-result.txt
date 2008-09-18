@@ -1,0 +1,173 @@
+1..2646
+# Running under perl version 5.010000 for linux
+# Current time local: Thu Sep 18 14:47:06 2008
+# Current time GMT:   Thu Sep 18 05:47:06 2008
+# Using Test.pm version 1.25
+# t/content-model-atom-1.dat
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+ok 11
+ok 12
+ok 13
+ok 14
+ok 15
+ok 16
+ok 17
+ok 18
+ok 19
+ok 20
+ok 21
+ok 22
+ok 23
+ok 24
+ok 25
+ok 26
+ok 27
+ok 28
+ok 29
+ok 30
+ok 31
+ok 32
+ok 33
+ok 34
+ok 35
+ok 36
+ok 37
+ok 38
+ok 39
+ok 40
+ok 41
+ok 42
+ok 43
+ok 44
+ok 45
+ok 46
+not ok 47
+# Test 47 got: "/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (t/content-checker.pl at line 87 fail #47)
+#    Expected: "/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="image/png"/>
+#</entry>)
+not ok 48
+# Test 48 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;message/rfc822;u\n/entry;child element missing:atom;summary;m" (t/content-checker.pl at line 87 fail #48)
+#    Expected: "/entry/content/@type;IMT:composite;m\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
+#<id>about:</id>
+#<author><name>x</name></author>
+#<link rel="alternate" href=""/>
+#<updated>2000-01-02T03:04:05Z</updated>
+#<title>x</title>
+#<content type="message/rfc822"/>
+#</entry>)
+ok 49
+ok 50
+ok 51
+# t/content-model-atom-2.dat
+ok 52
+ok 53
+ok 54
+ok 55
+ok 56
+ok 57
+ok 58
+ok 59
+ok 60
+ok 61
+ok 62
+ok 63
+ok 64
+ok 65
+ok 66
+ok 67
+ok 68
+ok 69
+ok 70
+ok 71
+ok 72
+ok 73
+ok 74
+ok 75
+# t/content-model-atom-threading-1.dat
+not ok 76
+# Test 76 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/content-checker.pl at line 87 fail #76)
+#    Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
+#   <feed xmlns="http://www.w3.org/2005/Atom"
+#         xmlns:thr="http://purl.org/syndication/thread/1.0">
+#     <id>http://www.example.org/myfeed</id>
+#     <title>My Example Feed</title>
+#     <updated>2005-07-28T12:00:00Z</updated>
+#     <link href="http://www.example.org/myfeed" />
+#     <author><name>James</name></author>
+#     <entry>
+#       <id>tag:example.org,2005:1</id>
+#       <title>My original entry</title>
+#       <updated>2006-03-01T12:12:12Z</updated>
+#       <link
+#         type="application/xhtml+xml"
+#         href="http://www.example.org/entries/1" />
+#       <summary>This is my original entry</summary>
+#     </entry>
+#     <entry>
+#       <id>tag:example.org,2005:1,1</id>
+#       <title>A response to the original</title>
+#       <updated>2006-03-01T12:12:12Z</updated>
+#       <link href="http://www.example.org/entries/1/1" />
+#       <thr:in-reply-to
+#         ref="tag:example.org,2005:1"
+#         type="application/xhtml+xml"
+#         href="http://www.example.org/entries/1"/>
+#       <summary>This is a response to the original entry</summary>
+#     </entry>
+#   </feed>)
+not ok 77
+# Test 77 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/content-checker.pl at line 87 fail #77)
+#    Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
+#   <feed xmlns="http://www.w3.org/2005/Atom"
+#         xmlns:thr="http://purl.org/syndication/thread/1.0">
+#     <id>http://www.example.org/myfeed</id>
+#     <title>My Example Feed</title>
+#     <updated>2005-07-28T12:00:00Z</updated>
+#     <link href="http://www.example.org/myfeed" />
+#     <author><name>James</name></author>
+#     <entry>
+#       <id>tag:example.org,2005:1,1</id>
+#       <title>A response to the original</title>
+#       <updated>2006-03-01T12:12:12Z</updated>
+#       <link href="http://www.example.org/entries/1/1" />
+#       <thr:in-reply-to
+#         ref="tag:example.org,2005:1,0"
+#         type="application/xhtml+xml"
+#         href="http://www.example.org/entries/1"
+#         source="http://www.example.org/myfeed" />
+#       <link
+#         rel="related"
+#         type="application/xhtml+xml"
+#         href="http://www.example.org/entries/1" />
+#       <summary>This is a response to the original entry</summary>
+#     </entry>
+#   </feed>)
+ok 78
+ok 79
+ok 80
+ok 81
+ok 82
+ok 83
+ok 84
+ok 85
+ok 86
+ok 87
+ok 88
+ok 89
+ok 90
+ok 91

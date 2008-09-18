@@ -124,8 +124,7 @@ conformance checking modules, directly or indirectly referenced from
 L<Whatpm::ContentChecker>.
 
 This script is C<require>d by various test scripts, including
-C<ContentCheker.t>, C<ContentChecker-Atom.t>, C<HTML-tokenizer-2.t>,
-and C<LangTag.t>.
+C<ContentCheker.t>, C<ContentChecker-Atom.t>, and C<LangTag.t>.
 
 =head1 AUTHOR
 
@@ -137,4 +136,4 @@ Public Domain.
 
 =cut
 
-1; ## $Date: 2008/09/18 05:31:46 $
+1; ## $Date: 2008/09/18 05:49:13 $

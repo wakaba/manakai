@@ -7,7 +7,8 @@ all: \
   content-type-files \
   tokenizer-files \
   tree-construction-files \
-  content-checker-files
+  content-checker-files \
+  langtag-files
 
 update: clean-remote-files \
   tokenizer-remote-files \
@@ -66,10 +67,19 @@ tree-construction/LICENSE:
 tree-construction-result.txt: always
 	cd .. && perl t/HTML-tree.t &> t/$@
 
-content-checker-files: content-checker-result.txt
+content-checker-files: content-checker-result.txt \
+  content-checker-atom-result.txt
 
 content-checker-result.txt: always
 	cd .. && perl t/ContentChecker.t &> t/$@
+
+content-checker-atom-result.txt: always
+	cd .. && perl t/ContentChecker-Atom.t &> t/$@
+
+langtag-files: langtag-result.txt
+
+langtag-result.txt: always
+	cd .. && perl t/LangTag.t &> t/$@
 
 clean-remote-files:
 	$(RMALL) tokenizer/*.test tokenizer/LICENSE
@@ -78,4 +88,4 @@ clean-remote-files:
 always:
 
 ## License: Public Domain.
-## $Date: 2008/04/13 06:44:27 $
+## $Date: 2008/09/18 05:49:13 $

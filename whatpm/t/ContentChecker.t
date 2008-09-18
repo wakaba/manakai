@@ -15,10 +15,7 @@ test_files (qw[
   t/content-model-6.dat
   t/content-model-7.dat
   t/table-1.dat
-  t/content-model-atom-1.dat
-  t/content-model-atom-2.dat
-  t/content-model-atom-threading-1.dat
 ]);
 
 ## License: Public Domain.
-## $Date: 2008/09/18 05:31:46 $
+## $Date: 2008/09/18 05:49:13 $
