@@ -4,7 +4,7 @@ use strict;
 use Test;
 BEGIN {
   require 't/testfiles.pl';
-  plan (tests => 2646);
+  plan (tests => 133);
 }
 
 require Whatpm::LangTag;
@@ -40,4 +40,4 @@ execute_test ($_, {
 ];
 
 ## License: Public Domain.
-## $Date: 2008/09/18 07:42:58 $
+## $Date: 2008/09/18 14:32:48 $

@@ -42,9 +42,15 @@ sub parse_rfc4646_langtag ($$;$$) {
           delete $r{language};
           return \%r;
         } else {
-          $onerror->(type => 'langtag:language:syntax',
+          ## NOTE: Well-formed processor MUST check whether a tag
+          ## conforms to the ABNF (RFC 4646 2.2.9.), SHOULD be
+          ## canonical and to be canonical, it has to be well-formed
+          ## (RFC 4646 4.4. 1.), "Private ues subtags, like other
+          ## subtags, MUST conform to the format and content
+          ## cnstraints in the ABNF." (RFC 4646 4.5.)
+         $onerror->(type => 'langtag:language:syntax',
                      value => $r{language},
-                     level => $levels->{langtag_fact});
+                     level => $levels->{must});
         }
       }
     } elsif (length $r{language} <= 3) {
@@ -54,14 +60,24 @@ sub parse_rfc4646_langtag ($$;$$) {
     } elsif (length $r{language} <= 8) {
       #
     } else {
+      ## NOTE: Well-formed processor MUST check whether a tag conforms
+      ## to the ABNF (RFC 4646 2.2.9.), SHOULD be canonical and to be
+      ## canonical, it has to be well-formed (RFC 4646 4.4. 1.)
+      ## "Private ues subtags, like other subtags, MUST conform to the
+      ## format and content cnstraints in the ABNF." (RFC 4646 4.5.)
       $onerror->(type => 'langtag:language:syntax',
                  value => $r{language},
-                 level => $levels->{langtag_fact});
+                 level => $levels->{must});
     }
   } else {
+    ## NOTE: Well-formed processor MUST check whether a tag conforms
+    ## to the ABNF (RFC 4646 2.2.9.), SHOULD be canonical and to be
+    ## canonical, it has to be well-formed (RFC 4646 4.4. 1.),
+    ## "Private ues subtags, like other subtags, MUST conform to the
+    ## format and content cnstraints in the ABNF." (RFC 4646 4.5.)
     $onerror->(type => 'langtag:language:syntax',
                value => $r{language},
-               level => $levels->{langtag_fact});
+               level => $levels->{must});
   }
 
   if (defined $r{language}) {
@@ -83,6 +99,10 @@ sub parse_rfc4646_langtag ($$;$$) {
     while (@tag >= 2 and $tag[0] =~ /\A[A-WYZa-wyz0-9]\z/ and
            $tag[1] =~ /\A[A-Za-z0-9]{2,8}\z/) {
       if ($has_extension{$tag[0]}++) {
+        ## NOTE: Well-formed processor MUST check (RFC 4646 2.2.9.)
+        ## and MUST and MUST NOT (RFC 4646 2.2.6. 4.), , SHOULD be
+        ## canonical and to be canonical, it has to be well-formed
+        ## (RFC 4646 4.4. 1.)
         $onerror->(type => 'langtag:extension:duplication',
                    value => $tag[0],
                    level => $levels->{must});
@@ -98,9 +118,14 @@ sub parse_rfc4646_langtag ($$;$$) {
   if (@tag >= 2 and $tag[0] =~ /\A[Xx]\z/) {
     for (@tag) {
       unless (/\A[A-Za-z0-9]{1,8}\z/) {
+        ## NOTE: MUST (RFC 4646 2.2.7.), Well-formed processor MUST
+        ## check whether a tag conforms to the ABNF (RFC 4646 2.2.9.),
+        ## "Private ues subtags, like other subtags, MUST conform to
+        ## the format and content cnstraints in the ABNF." (RFC 4646
+        ## 4.5.)
         $onerror->(type => 'langtag:privateuse:syntax',
                    value => $_,
-                   level => $levels->{must}); # RFC 4646 Section 2.2.7.
+                   level => $levels->{must});
       }
     }
     @{$r{privateuse}} = @tag;
@@ -122,11 +147,24 @@ sub parse_rfc4646_langtag ($$;$$) {
       ## fact-level)
 
       ## NOTE: "Variants starting with a letter MUST be at least five
-      ## character long" (RFC 4646 2.1., Note)
+      ## character long" (RFC 4646 2.1., Note, RFC 4646 2.2.5.)
 
       ## NOTE: "Sequence of private use and extension subtags MUST
       ## occur at the end of the sequence of subtags and MUST NOT be
       ## interspersed with subtags" (RFC 4646 2.2.)
+
+      ## NOTE: "An extension MUST follow at least a primary language
+      ## subtag." (RFC 4646 2.2.6. 3.)
+
+      ## NOTE: "Extension subtag MUST meet all of the requirements for
+      ## the content and format of subtags" (RFC 4646 2.2.6. 5.) and
+      ## "MUST be from two to eight characters long and consist solely
+      ## of letters or digits, with each subtag separated by a signle
+      ## '-'" (RFC 4646 2.2.6. 7.) and "singleton MUST be followed by
+      ## at least one extension subtag" (RFC 4646 2.2.6. 8.)
+
+      ## NOTE: "Private use subtags MUST conform to the format and
+      ## content constraints" (RFC 4646 2.2.7. 2.)
 
       ## NOTE: There are other "MUST"s that would cover some of cases
       ## that fall into this error.  I'm not sure that those
@@ -134,10 +172,15 @@ sub parse_rfc4646_langtag ($$;$$) {
       ## into this error...  I wonder if the spec simply said that any
       ## language tag MUST conform to the ABNF syntax...
 
+      ## NOTE: Well-formed processor MUST check whether a tag conforms
+      ## to the ABNF (RFC 4646 2.2.9.), SHOULD be canonical and to be
+      ## canonical, it has to be well-formed (RFC 4646 4.4. 1.)
+      ## "Private ues subtags, like other subtags, MUST conform to the
+      ## format and content cnstraints in the ABNF." (RFC 4646 4.5.)
       for (@tag) {
         $onerror->(type => 'langtag:illegal',
                    value => $_,
-                   level => $levels->{langtag_fact});
+                   level => $levels->{must});
       }
       push @{$r{illegal}}, @tag;
     }
@@ -153,6 +196,17 @@ sub parse_rfc4646_langtag ($$;$$) {
 sub check_rfc4646_langtag ($$$;$) {
   my (undef, $tag_o, $onerror, $levels) = @_;
   $levels ||= $default_error_levels;
+
+  ## NOTE: "strongly RECOMMENDED that users not define their own rules
+  ## for language tag choice" (RFC 4646 4.1.) - We can't test whether
+  ## a tag is chosen by his own rules.
+
+  ## NOTE: "Subtags SHOULD only be used where they add useful
+  ## distinguishing information" (RFC 4646 4.1.) - We can't test
+  ## whether a subtag is useful or not.
+
+  ## NOTE: "Use as precise a tag as possible, but no more specific
+  ## than is justified." (RFC 4646 4.1. 1.) - We can't test.
 
   require Whatpm::_LangTagReg;
   our $Registry;
@@ -193,6 +247,33 @@ sub check_rfc4646_langtag ($$$;$) {
                  level => $levels->{should});
     }
   }; # $check_case
+
+  my $check_deprecated = sub ($$$) {
+    my ($type, $actual, $def) = @_;
+
+    ## NOTE: Record of 'Preferred-Value' MUST have 'Deprecated' field.
+    ## (RFC 4646 3.1.)
+
+    ## NOTE: Transitive relationships are resolved in the
+    ## "mklangreg.pl".
+
+    if ($def->{_deprecated}) {
+      ## NOTE: Validating processors SHOULD NOT generate (RFC 4646
+      ## 3.1., RFC 4646 4.4. Note; Why only validating processors?)
+      ## and the value in the 'Preferred-Value', if any, is STRONGLY
+      ## RECOMMENDED (RFC 4646 3.1.), 'Preferred-Value' SHOULD be used
+      ## (RFC 4646 4.1. 3.), A tag SHOULD be canonical, to be
+      ## canonical a region subtag SHOULD use Preferred-Value (RFC
+      ## 4646 4.4. 2.), and to be canonical a redundant or
+      ## grandfathered tag MUST use Preferred-Value (RFC 4646
+      ## 4.4. 3.), and to be canonical other subtags MUST be canonical
+      ## (RFC 4646 4.4. 4.).
+      $onerror->(type => 'langtag:'.$type.':deprecated',
+                 text => $def->{_preferred}, # might be undef
+                 value => $actual,
+                 level => $levels->{should});
+    }
+  }; # $check_deprecated
                         
   if ($Registry->{grandfathered}->{$tag_s}) {
     ## NOTE: This is a registered grandfathered tag.
@@ -204,6 +285,8 @@ sub check_rfc4646_langtag ($$$;$) {
 
     $check_case->('grandfathered', $tag_s_orig,
                   $Registry->{grandfathered}->{$tag_s}->{_canon});
+    $check_deprecated->('grandfathered', $tag_s_orig,
+                        $Registry->{grandfathered}->{$tag_s});
   } elsif (defined $tag_o->{grandfathered}) {
     ## NOTE: The language tag does conform to the |grandfathered|
     ## syntax, but it is not a registered tag.  Though it might be
@@ -229,6 +312,8 @@ sub check_rfc4646_langtag ($$$;$) {
       
       $check_case->('redundant', $tag_s_orig,
                     $Registry->{redundant}->{$tag_s}->{_canon});      
+      $check_deprecated->('redundant', $tag_s_orig,
+                          $Registry->{redundant}->{$tag_s});      
     } else {
       ## NOTE: We don't raise non-recommended-case error for invalid
       ## tags (with no strong preference; we might change the behavior
@@ -242,11 +327,21 @@ sub check_rfc4646_langtag ($$$;$) {
           
           $check_case->('language', $tag_o->{language},
                         $Registry->{language}->{$lang}->{_canon});
+          $check_deprecated->('language', $tag_o->{language},
+                              $Registry->{language}->{$lang});
 
-          if ($lang =~ /\A[Qq][A-Ta-t][A-Za-z]\z/) {
+          if ($lang =~ /\Aq[a-t][a-z]\z/) {
             $onerror->(type => 'langtag:language:private',
                        value => $tag_o->{language},
                        level => $levels->{warn});
+          } elsif ($lang eq 'und') {
+            ## NOTE: SHOULD NOT (RFC 4646 4.1. 4.)
+            $onerror->(type => 'langtag:language:und',
+                       level => $levels->{should});
+          } elsif ($lang eq 'mul') {
+            ## NOTE: SHOULD NOT (RFC 4646 4.1. 5.)
+            $onerror->(type => 'langtag:language:mul',
+                       level => $levels->{should});
           }
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
@@ -273,79 +368,25 @@ sub check_rfc4646_langtag ($$$;$) {
         if ($Registry->{extlang}->{$extlang}) {
           ## NOTE: This is a registered extended language subtag.
           
-          my $prefixes = $Registry->{extlang}->{$extlang}->{Prefix} || {};
-          HAS_PREFIX: {
-            ## NOTE: In the first pass, it checks for literal matches.
-            for my $prefix (@$prefixes) {
-              if ($tag_s =~ /^\Q$prefix\E-/) {
-                last HAS_PREFIX;
-              }
+          my $prefixes = $Registry->{extlang}->{$extlang}->{Prefix};
+          if ($prefixes and defined $prefixes->[0]) {
+            ## NOTE: There is exactly one prefix (RFC 4646 2.2.2.).
+            if ($tag_s =~ /^\Q$prefixes->[0]\E-/) {
+              #
+            } else {
+              ## NOTE: RFC 4646 2.2.2. (MUST), RFC 4646
+              ## 2.9. ("validating" processor MUST check), RFC 4646
+              ## 4.1. (SHOULD)
+              $onerror->(type => 'langtag:extlang:prefix',
+                         value => $extlang,
+                         level => $levels->{must});
             }
-
-            ## NOTE: In the second pass, it checks for each subtag.
-            my $lang = $tag_o->{language}; # is not undef unless $tag_o broken
-            $lang =~ tr/A-Z/a-z/;
-            P: for my $prefix_s (@$prefixes) {
-              my $prefix_o = Whatpm::LangTag->parse_rfc4646_langtag
-                  ($prefix_s);
-              ## NOTE: We assumes that $prefix_s is a well-formed,
-              ## non-grandfathered tag.
-              next P unless $prefix_o->{language} eq $lang;
-              XL: for my $p_extlang (@{$prefix_o->{extlang}}) {
-                for (@{$tag_o->{extlang}}) {
-                  my $extlang = $_;
-                  $extlang =~ tr/A-Z/a-z/;
-                  if ($p_extlang eq $extlang) {
-                    next XL;
-                  }
-                }
-                next P;
-              }
-              my $p_script = $prefix_o->{script};
-              if ($p_script) {
-                my $script = $tag_o->{script};
-                next P unless defined $script;
-                $script =~ tr/A-Z/a-z/;
-                next P unless $p_script eq $script;
-              }
-              my $p_region = $prefix_o->{region};
-              if ($p_region) {
-                my $region = $tag_o->{region};
-                next P unless defined $region;
-                $region =~ tr/A-Z/a-z/;
-                next P unless $p_region eq $region;
-              }
-              XL: for my $p_variant (@{$prefix_o->{variant}}) {
-                for (@{$tag_o->{variant}}) {
-                  my $variant = $_;
-                  $variant =~ tr/A-Z/a-z/;
-                  if ($p_variant eq $variant) {
-                    next XL;
-                  }
-                }
-                next P;
-              }
-              ## NOTE: We assume that no Prefix contains extension and
-              ## privateuse subtags.
-
-              ## NOTE: Whethter |...-variant1-variant2| should match
-              ## with |...-variant2-variant1| or not is unclear.  (We
-              ## do.)  The term "Prefix" and prose in 2.2.2. seem to
-              ## assume that the former should not match to the
-              ## later...
-
-              last HAS_PREFIX;
-            }
-
-            ## NOTE: RFC 4646 2.2.2 (MUST), RFC 4646
-            ## 2.9. ("validating" processor MUST check)
-            $onerror->(type => 'langtag:extlang:no prefix',
-                       value => $extlang,
-                       level => $levels->{must});
-          } # HAS_PREFIX
+          }
 
           $check_case->('extlang', $extlang_orig,
                         $Registry->{extlang}->{$extlang}->{_canon});
+          $check_deprecated->('extlang', $extlang_orig,
+                              $Registry->{extlang}->{$extlang});
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           ## NOTE: Strictly speaking, RFC 4646 2.9. speaks for "language
@@ -367,12 +408,16 @@ sub check_rfc4646_langtag ($$$;$) {
           
           $check_case->('script', $tag_o->{script},
                         $Registry->{script}->{$script}->{_canon});
+          $check_deprecated->('script', $tag_o->{script},
+                              $Registry->{script}->{$script});
 
           ## NOTE: RFC 4646 2.2.3. "SHOULD be omitted (1) when it adds
           ## no distinguishing value to the tag or (2) when
           ## ... Suppress-Script".  (1) is semantic requirement that
-          ## we cannot check against.
-
+          ## we cannot check against.  SHOULD NOT (RFC 4646 3.1.),
+          ## SHOULD (RFC 4646 4.1.) "SHOULD NOT be used to form
+          ## language tags unless the script adds some distinguishing
+          ## information to the tag" (RFC 4646 4.1. 2.)
           if ($Registry->{language}->{$lang} and
               defined $Registry->{language}->{$lang}->{_suppress} and
               $Registry->{language}->{$lang}->{_suppress} eq $script) {
@@ -380,6 +425,12 @@ sub check_rfc4646_langtag ($$$;$) {
                        text => $lang,
                        value => $tag_o->{script},
                        level => $levels->{should});
+          }
+
+          if ($script =~ /\Aqa(?>a[a-z]|b[a-x])\z/) {
+            $onerror->(type => 'langtag:script:private',
+                       value => $tag_o->{script},
+                       level => $levels->{warn});
           }
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
@@ -397,32 +448,43 @@ sub check_rfc4646_langtag ($$$;$) {
           
           $check_case->('region', $tag_o->{region},
                         $Registry->{region}->{$region}->{_canon});
+          $check_deprecated->('region', $tag_o->{region},
+                              $Registry->{region}->{$region});
+
+          if ($region =~ /\A(?>aa|q[m-z]|x[a-z]|zz)\z/) {
+            $onerror->(type => 'langtag:region:private',
+                       value => $tag_o->{region},
+                       level => $levels->{warn});
+          }
         } else {
-          ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
+          ## NOTE: RFC 4646 2.2.4. 3. B. "UN numeric codes for
+          ## 'economic groupings' or 'other groupings' ... MUST NOT be
+          ## used", RFC 4646 2.2.4. 3. D. "UN numeric codes for
+          ## countries or areas for which ... ISO 3166 alpha-2 code
+          ## ... MUST NOT be used", RFC 4646 2.2.4. 3. F. "All other
+          ## UN numeric codes for countries or areas that do not
+          ## ... ISO 3166 alpha-2 code ... MUST NOT be used", RFC 4646
+          ## 2.2.4. 4. Note "Alphanumeric codes in Appendix X ... MUST
+          ## NOT be used", RFC 4646 2.9. ("validating" processor MUST
+          ## check)
           $onerror->(type => 'langtag:region:invalid',
                      value => $tag_o->{region},
                      level => $levels->{langtag_fact});
         }
       }
 
+      my @read_variant; # ([$original, $lowercased], ...)
       for my $variant_orig (@{$tag_o->{variant}}) {
         my $variant = $variant_orig;
         $variant =~ tr/A-Z/a-z/;
         if ($Registry->{variant}->{$variant}) {
           ## NOTE: This is a registered variant language subtag.
 
-          ## NOTE: Almost same as extlang's checking code.
-
+          my $other_variants = {};
           my $prefixes = $Registry->{variant}->{$variant}->{Prefix} || {};
           HAS_PREFIX: {
-            ## NOTE: In the first pass, it checks for literal matches.
-            for my $prefix (@$prefixes) {
-              if ($tag_s =~ /^\Q$prefix\E-/) {
-                last HAS_PREFIX;
-              }
-            }
+            ## NOTE: @$prefixes is sorted by reverse order of lengths.
 
-            ## NOTE: In the second pass, it checks for each subtag.
             my $lang = $tag_o->{language}; # is not undef unless $tag_o broken
             $lang =~ tr/A-Z/a-z/;
             P: for my $prefix_s (@$prefixes) {
@@ -455,41 +517,80 @@ sub check_rfc4646_langtag ($$$;$) {
                 $region =~ tr/A-Z/a-z/;
                 next P unless $p_region eq $region;
               }
-              XL: for my $p_variant (@{$prefix_o->{variant}}) {
-                for (@{$tag_o->{variant}}) {
-                  my $variant = $_;
-                  $variant =~ tr/A-Z/a-z/;
-                  if ($p_variant eq $variant) {
-                    next XL;
-                  }
-                }
-                next P;
-              }
-              ## NOTE: We assume that no Prefix contains extension and
-              ## privateuse subtags.
-
               ## NOTE: Whethter |...-variant1-variant2| should match
-              ## with |...-variant2-variant1| or not is unclear.  (We do.)
+              ## with |...-variant2-variant1| or not is unclear, but
+              ## it seems (from the use of the word "prefix" and the
+              ## context) that the former should not match with the
+              ## latter.
+              $other_variants = {};
+              my @t_variant = @read_variant;
+              my @p_variant = @{$prefix_o->{variant}};
+              XL: while (@t_variant) {
+                unless (@p_variant) {
+                  $other_variants->{$_->[1]} = $_->[0] for @t_variant;
+                  last XL;
+                }
 
+                my $t_v = shift @t_variant;
+                if ($t_v->[1] eq $p_variant[0]) {
+                  shift @p_variant;
+                } else {
+                  $other_variants->{$t_v->[1]} = $t_v->[0];
+                }
+              } # XL
+              next P if @p_variant;
+
+              ## NOTE: Matched.
               last HAS_PREFIX;
-            }
+            } # P
 
             ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
-            $onerror->(type => 'langtag:variant:no prefix',
+            ## and RFC 4646 4.1. (SHOULD)
+            $onerror->(type => 'langtag:variant:prefix',
                        value => $variant,
-                       level => $levels->{langtag_fact});
+                       level => $levels->{should});
           } # HAS_PREFIX
 
           $check_case->('variant', $variant_orig,
                         $Registry->{variant}->{$variant}->{_canon});
+          $check_deprecated->('variant', $variant_orig,
+                              $Registry->{variant}->{$variant});
+
+          for (keys %{$other_variants}) {
+            ## NOTE: RFC 4646 2.2.5. shows '1996' and '1901' as a bad
+            ## example and says that they SHOULD NOT be used together.
+            ## Additionally, it says that a variant registration
+            ## SHOULD include a 'Prefix' for appropriate combinations.
+            ## However, it never says that bad combinations other than
+            ## the example were non-conforming.
+            if ($variant eq $_) {
+              ## NOTE: In particular, use of same variant subtags is a
+              ## SHOULD NOT error (RFC 4646 4.1. 6.)
+              $onerror->(type => 'langtag:variant:duplication',
+                         value => $variant_orig,
+                         level => $levels->{should});
+            } else {
+              my $level = $levels->{warn};
+              $level = $levels->{should}
+                  if $variant eq '1901' and $_ eq '1996' or
+                      $_ eq '1901' and $variant eq '1996';
+              $onerror->(type => 'langtag:variant:combination',
+                         text => $variant_orig,
+                         value => $other_variants->{$_},
+                         level => $level);
+            }
+          }
+
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:variant:invalid',
                      value => $variant_orig,
                      level => $levels->{langtag_fact});
         }
+        push @read_variant, [$variant_orig, $variant];
       }
 
+      my $max_ext = 0x00;
       for my $ext (@{$tag_o->{extension}}) {
         ## NOTE: Extension subtag.  At the time of writing of this
         ## code, there is no defined extension subtag.
@@ -502,16 +603,48 @@ sub check_rfc4646_langtag ($$$;$) {
         
         ## NOTE: We don't check whether the case is lowercase or not
         ## (see note above on the case of invalid subtags).
+
+        ## NOTE: "When a language tag is to be used in a specific,
+        ## known, protocol, it is RECOMMENDED that the language tag
+        ## not contain extensions not supported by that protocol."
+        ## (RFC 4646 3.7.) - We don't check this, since there is no
+        ## extension defined.
+
+        my $ext_type = $ext->[0];
+        $ext_type =~ tr/A-Z/a-z/;
+        if ($max_ext > ord $ext_type) {
+          ## NOTE: "=" is excluded, since duplicate extension subtags
+          ## are checked at the parse time.
+
+          ## NOTE: SHOULD be canonicalized (RFC 4646 2.2.6. 11.).  A
+          ## language tag SHOULD be canonicalized, and to be canonical
+          ## extension tags SHOULD be ordered in ASCII order (RFC 4646
+          ## 4.4. 5.).
+          $onerror->(type => 'langtag:extension:order',
+                     text => chr $max_ext, # $max_ext != 0x00
+                     value => $ext->[0],
+                     level => $levels->{should});
+        } else {
+          $max_ext = ord $ext_type;
+        }
       }
 
       if (@{$tag_o->{privateuse}}) {
+        ## NOTE: "NOT RECOMMENDED where alternative exist or for
+        ## general interchange" (RFC 4646 2.2.7. 6. (RECOMMENDED),
+        ## 4.5. (SHOULD NOT)).  Whether alternative exist or not
+        ## cannot be detected by the checker (unless providing some
+        ## "well-known" private use tag list).  However, the latter
+        ## condition should in most case be met (except for internal
+        ## uses).
         $onerror->(type => 'langtag:privateuse',
                    value => (join '-', @{$tag_o->{privateuse}}),
-                   level => $levels->{warn});
+                   level => $levels->{should});
 
         for (@{$tag_o->{privateuse}}) {
           if (/\A[^A-Z]\z/ or
               /\A[^a-z]{2}\z/ or
+              /\A[^A-Z]{3}\z/ or
               /\A[^a-z][^A-Z]{3}\z/ or
               /\A[^A-Z]{5,}\z/) {
             #
@@ -529,6 +662,11 @@ sub check_rfc4646_langtag ($$$;$) {
     }
   }
 } # check_rfc4646_langtag
+
+## TODO: Should we return values that indicate whether a tag is
+## well-formed, valid, or canonical?
+
+## TODO: Type name should be added to the catalog.
 
 sub check_rfc3066_language_tag ($$;$$) {
   my $tag = $_[1];

@@ -3824,11 +3824,11 @@ $Whatpm::LangTag::Registry = {
                                    },
                          '1994' => {
                                      'Prefix' => [
-                                                   'sl-rozaj',
                                                    'sl-rozaj-biske',
                                                    'sl-rozaj-njiva',
                                                    'sl-rozaj-osojs',
-                                                   'sl-rozaj-solba'
+                                                   'sl-rozaj-solba',
+                                                   'sl-rozaj'
                                                  ],
                                      '_canon' => '1994'
                                    },
@@ -3852,13 +3852,13 @@ $Whatpm::LangTag::Registry = {
                                       },
                          'baku1926' => {
                                          'Prefix' => [
+                                                       'crh',
+                                                       'krc',
+                                                       'sah',
                                                        'az',
                                                        'ba',
-                                                       'crh',
                                                        'kk',
-                                                       'krc',
                                                        'ky',
-                                                       'sah',
                                                        'tk',
                                                        'tt',
                                                        'uz'

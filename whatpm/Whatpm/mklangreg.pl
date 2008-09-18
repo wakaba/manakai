@@ -92,6 +92,9 @@ for my $type (grep {!/^_/} keys %{$subtags}) {
     for (@{$subtag->{Prefix} or []}) {
       tr/A-Z/a-z/;
     }
+
+    $subtag->{Prefix} = [sort {length $b <=> length $a or $a cmp $b}
+                             @{$subtag->{Prefix}}] if $subtag->{Prefix};
   }
 }
 
