@@ -118,9 +118,21 @@ sub parse_rfc4646_langtag ($$;$$) {
               illegal => [],      
              };
     } else {
-      ## NOTE: Violation to the syntax/prose (RFC 4646 2.1., fact-level)
+      ## NOTE: Violation to the syntax/prose (RFC 4646 2.1.,
+      ## fact-level)
+
       ## NOTE: "Variants starting with a letter MUST be at least five
       ## character long" (RFC 4646 2.1., Note)
+
+      ## NOTE: "Sequence of private use and extension subtags MUST
+      ## occur at the end of the sequence of subtags and MUST NOT be
+      ## interspersed with subtags" (RFC 4646 2.2.)
+
+      ## NOTE: There are other "MUST"s that would cover some of cases
+      ## that fall into this error.  I'm not sure that those
+      ## requirements as a whole covers all the cases that would fall
+      ## into this error...  I wonder if the spec simply said that any
+      ## language tag MUST conform to the ABNF syntax...
 
       for (@tag) {
         $onerror->(type => 'langtag:illegal',
@@ -222,14 +234,20 @@ sub check_rfc4646_langtag ($$$;$) {
       ## tags (with no strong preference; we might change the behavior
       ## if it seems better).
 
+      my $lang = $tag_o->{language};
       if (defined $tag_o->{language}) {
-        my $lang = $tag_o->{language};
         $lang =~ tr/A-Z/a-z/;
         if ($Registry->{language}->{$lang}) {
           ## NOTE: This is a registered language subtag.
           
           $check_case->('language', $tag_o->{language},
                         $Registry->{language}->{$lang}->{_canon});
+
+          if ($lang =~ /\A[Qq][A-Ta-t][A-Za-z]\z/) {
+            $onerror->(type => 'langtag:language:private',
+                       value => $tag_o->{language},
+                       level => $levels->{warn});
+          }
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           ## NOTE: Strictly speaking, RFC 4646 2.9. speaks for "language
@@ -238,13 +256,15 @@ sub check_rfc4646_langtag ($$$;$) {
           ## subtags.
           $onerror->(type => 'langtag:language:invalid',
                      value => $tag_o->{language},
-                     level => $levels->{fact});
+                     level => $levels->{langtag_fact});
         }
       } else {
         ## NOTE: If $tag_o is an output of the method
         ## |parse_rfc4646_langtag|, then @{$tag_o->{privateuse}} is true
         ## in this case.  If $tag_o is not an output of that method,
         ## then it might not be true, but we don't support such a case.
+        
+        $lang = ''; # for later use.
       }
       
       for my $extlang_orig (@{$tag_o->{extlang}}) {
@@ -309,15 +329,19 @@ sub check_rfc4646_langtag ($$$;$) {
               ## privateuse subtags.
 
               ## NOTE: Whethter |...-variant1-variant2| should match
-              ## with |...-variant2-variant1| or not is unclear.  (We do.)
+              ## with |...-variant2-variant1| or not is unclear.  (We
+              ## do.)  The term "Prefix" and prose in 2.2.2. seem to
+              ## assume that the former should not match to the
+              ## later...
 
               last HAS_PREFIX;
             }
 
-            ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
+            ## NOTE: RFC 4646 2.2.2 (MUST), RFC 4646
+            ## 2.9. ("validating" processor MUST check)
             $onerror->(type => 'langtag:extlang:no prefix',
                        value => $extlang,
-                       level => $levels->{fact});
+                       level => $levels->{must});
           } # HAS_PREFIX
 
           $check_case->('extlang', $extlang_orig,
@@ -330,7 +354,7 @@ sub check_rfc4646_langtag ($$$;$) {
           ## subtags.
           $onerror->(type => 'langtag:extlang:invalid',
                      value => $extlang_orig,
-                     level => $levels->{fact});
+                     level => $levels->{langtag_fact});
           
         }
       }
@@ -343,11 +367,25 @@ sub check_rfc4646_langtag ($$$;$) {
           
           $check_case->('script', $tag_o->{script},
                         $Registry->{script}->{$script}->{_canon});
+
+          ## NOTE: RFC 4646 2.2.3. "SHOULD be omitted (1) when it adds
+          ## no distinguishing value to the tag or (2) when
+          ## ... Suppress-Script".  (1) is semantic requirement that
+          ## we cannot check against.
+
+          if ($Registry->{language}->{$lang} and
+              defined $Registry->{language}->{$lang}->{_suppress} and
+              $Registry->{language}->{$lang}->{_suppress} eq $script) {
+            $onerror->(type => 'langtag:script:suppress',
+                       text => $lang,
+                       value => $tag_o->{script},
+                       level => $levels->{should});
+          }
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:script:invalid',
                      value => $tag_o->{script},
-                     level => $levels->{fact});
+                     level => $levels->{langtag_fact});
         }
       }
       
@@ -363,7 +401,7 @@ sub check_rfc4646_langtag ($$$;$) {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:region:invalid',
                      value => $tag_o->{region},
-                     level => $levels->{fact});
+                     level => $levels->{langtag_fact});
         }
       }
 
@@ -439,7 +477,7 @@ sub check_rfc4646_langtag ($$$;$) {
             ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
             $onerror->(type => 'langtag:variant:no prefix',
                        value => $variant,
-                       level => $levels->{fact});
+                       level => $levels->{langtag_fact});
           } # HAS_PREFIX
 
           $check_case->('variant', $variant_orig,
@@ -448,7 +486,7 @@ sub check_rfc4646_langtag ($$$;$) {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:variant:invalid',
                      value => $variant_orig,
-                     level => $levels->{fact});
+                     level => $levels->{langtag_fact});
         }
       }
 
@@ -457,7 +495,7 @@ sub check_rfc4646_langtag ($$$;$) {
         ## code, there is no defined extension subtag.
         $onerror->(type => 'langtag:extension:unknown',
                    value => (join '-', @{$ext}),
-                   level => $levels->{fact});
+                   level => $levels->{langtag_fact});
 
         ## NOTE: Whether a language tag with unsupported extension is
         ## valid or not is unclear from the reading of RFC 4646.

@@ -114,6 +114,7 @@ for my $type (grep {!/^_/} keys %{$subtags}) {
 
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Purity = 1;
 my $value = Dumper $subtags;
 $value =~ s/\$VAR1\b/\$Whatpm::LangTag::Registry/g;
 
