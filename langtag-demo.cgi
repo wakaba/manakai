@@ -59,8 +59,22 @@ for my $n (keys %$parsed) {
 }
 
 print "\n";
+
+print "#validity\n";
+my $validity = 1;
+
+Whatpm::LangTag->check_rfc4646_langtag ($parsed, sub {
+  my %opt = @_;
+  print join "\t", %opt;
+  print "\n";
+  $validity = 0 unless {w => 1, i => 1}->{$opt{level}};
+});
+
+print "\n";
+
 print "#result\n";
 print "well-formed\t$wf\n";
+print "valid\t$validity\n";
 
 print "\n* RFC 3066\n\n";
 my $rfc3066conforming = 1;
@@ -79,4 +93,4 @@ print "\n#result\n";
 print "conforming\t$rfc3066conforming\n";
 
 ## License: Public Domain.
-# $Date: 2007/09/09 07:19:56 $
+# $Date: 2008/09/18 14:33:35 $
