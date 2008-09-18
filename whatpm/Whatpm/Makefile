@@ -5,7 +5,12 @@ CP = cp
 RM = rm
 RMALL = $(RM) -fr
 
-all: Charset-all CSS-all HTML-all XML-all \
+LANGUAGE_SUBTAG_REGISTRY = language-subtag-registry
+LANGUAGE_SUBTAG_REGISTRY_PM = _LangTagReg.pm
+
+all: \
+  _update \
+  Charset-all CSS-all HTML-all XML-all \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
   CacheManifest.html WebIDL.html
@@ -22,10 +27,14 @@ HTML-all:
 XML-all:
 	cd XML && make all
 
-update: update-remove-old _NamedEntityList.pm _LinkTypeList.pm
+update: update-remove-old _update
+
+_update:_NamedEntityList.pm _LinkTypeList.pm \
+  $(LANGUAGE_SUBTAG_REGISTRY_PM)
 
 update-remove-old: update-_NamedEntityList.pm \
-  update-_LinkTypeList.pm
+  update-_LinkTypeList.pm \
+  update-$(LANGUAGE_SUBTAG_REGISTRY_PM)
 
 HTML.pm: HTML.pm.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
@@ -59,8 +68,18 @@ update-_LinkTypeList.pm:
 RelExtensions.html:
 	$(WGET) http://wiki.whatwg.org/wiki/RelExtensions -O $@
 
+$(LANGUAGE_SUBTAG_REGISTRY):
+	$(WGET) http://www.iana.org/assignments/language-subtag-registry -O $@
+
+$(LANGUAGE_SUBTAG_REGISTRY_PM): $(LANGUAGE_SUBTAG_REGISTRY) mklangreg.pl
+	perl mklangreg.pl $< > $@
+
+update-$(LANGUAGE_SUBTAG_REGISTRY_PM):
+	$(RMALL) $(LANGUAGE_SUBTAG_REGISTRY)
+
 clean: Charset-clean CSS-clean HTML-clean XML-clean
 	$(RMALL) *~ *.bak *.tmp
+	$(RMALL) $(LANGUAGE_SUBTAG_REGISTRY)
 
 Charset-clean:
 	cd Charset && make clean
@@ -75,4 +94,4 @@ XML-clean:
 	cd XML && make clean
 
 ## License: Public Domain.
-## $Date: 2008/09/16 14:41:38 $
+## $Date: 2008/09/18 02:39:16 $
