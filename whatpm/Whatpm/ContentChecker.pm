@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.93 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.94 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -79,7 +79,7 @@ our $AttrChecker = {
       ## as defined by [IETF RFC 3066], Tags for the Identification
       ## of Languages, or its successor; in addition, the empty string
       ## may be specified." ("may" in lower case)
-      ## NOTE: Is an RFC 3066-valid (but RFC 4647-invalid) language tag
+      ## NOTE: Is an RFC 3066-valid (but RFC 4646-invalid) language tag
       ## allowed today?
 
       ## TODO: test data
@@ -1018,4 +1018,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/16 14:41:37 $
+# $Date: 2008/09/18 07:42:57 $

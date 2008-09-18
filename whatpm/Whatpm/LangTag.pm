@@ -118,6 +118,10 @@ sub parse_rfc4646_langtag ($$;$$) {
               illegal => [],      
              };
     } else {
+      ## NOTE: Violation to the syntax/prose (RFC 4646 2.1., fact-level)
+      ## NOTE: "Variants starting with a letter MUST be at least five
+      ## character long" (RFC 4646 2.1., Note)
+
       for (@tag) {
         $onerror->(type => 'langtag:illegal',
                    value => $_,
@@ -153,11 +157,41 @@ sub check_rfc4646_langtag ($$$;$) {
         @{$tag_o->{privateuse}},
         @{$tag_o->{illegal}};
   }
+  my $tag_s_orig = $tag_s;
   $tag_s =~ tr/A-Z/a-z/;
 
+  my $check_case = sub ($$$) {
+    my ($type, $actual, $expected) = @_;
+    
+    if ($expected eq '_lowercase' and $actual !~ /[A-Z]/) {
+      #
+    } elsif ($expected eq '_uppercase' and $actual !~ /[a-z]/) {
+      #
+    } elsif ($expected eq '_titlecase' and
+             substr ($actual, 0, 1) !~ /[a-z]/ and
+             substr ($actual, 1) !~ /[A-Z]/) {
+      #
+    } elsif ($expected eq $actual and
+             $expected !~ /^_/) {
+      #
+    } else {
+      ## NOTE: RECOMMENDED (RFC 4646 2.1.)
+      $onerror->(type => 'langtag:'.$type.':case',
+                 value => $actual,
+                 level => $levels->{should});
+    }
+  }; # $check_case
+                        
   if ($Registry->{grandfathered}->{$tag_s}) {
     ## NOTE: This is a registered grandfathered tag.
-    
+
+    ## NOTE: Some grandfathered tags conform to the new syntax (so
+    ## that $tag_o->{grandfathered} is undef) but still not
+    ## grandfathered, since extended langauge is currently not
+    ## registered at all.
+
+    $check_case->('grandfathered', $tag_s_orig,
+                  $Registry->{grandfathered}->{$tag_s}->{_canon});
   } elsif (defined $tag_o->{grandfathered}) {
     ## NOTE: The language tag does conform to the |grandfathered|
     ## syntax, but it is not a registered tag.  Though it might be
@@ -181,14 +215,21 @@ sub check_rfc4646_langtag ($$$;$) {
       ## and 'Preferred-Value' and 'Deprecated' field values and casing
       ## in the 'Tag' field are synced with those of the subtags.
       
-      
+      $check_case->('redundant', $tag_s_orig,
+                    $Registry->{redundant}->{$tag_s}->{_canon});      
     } else {
+      ## NOTE: We don't raise non-recommended-case error for invalid
+      ## tags (with no strong preference; we might change the behavior
+      ## if it seems better).
+
       if (defined $tag_o->{language}) {
         my $lang = $tag_o->{language};
         $lang =~ tr/A-Z/a-z/;
         if ($Registry->{language}->{$lang}) {
           ## NOTE: This is a registered language subtag.
           
+          $check_case->('language', $tag_o->{language},
+                        $Registry->{language}->{$lang}->{_canon});
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           ## NOTE: Strictly speaking, RFC 4646 2.9. speaks for "language
@@ -278,6 +319,9 @@ sub check_rfc4646_langtag ($$$;$) {
                        value => $extlang,
                        level => $levels->{fact});
           } # HAS_PREFIX
+
+          $check_case->('extlang', $extlang_orig,
+                        $Registry->{extlang}->{$extlang}->{_canon});
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           ## NOTE: Strictly speaking, RFC 4646 2.9. speaks for "language
@@ -297,6 +341,8 @@ sub check_rfc4646_langtag ($$$;$) {
         if ($Registry->{script}->{$script}) {
           ## NOTE: This is a registered script subtag.
           
+          $check_case->('script', $tag_o->{script},
+                        $Registry->{script}->{$script}->{_canon});
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:script:invalid',
@@ -311,6 +357,8 @@ sub check_rfc4646_langtag ($$$;$) {
         if ($Registry->{region}->{$region}) {
           ## NOTE: This is a registered region subtag.
           
+          $check_case->('region', $tag_o->{region},
+                        $Registry->{region}->{$region}->{_canon});
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:region:invalid',
@@ -393,6 +441,9 @@ sub check_rfc4646_langtag ($$$;$) {
                        value => $variant,
                        level => $levels->{fact});
           } # HAS_PREFIX
+
+          $check_case->('variant', $variant_orig,
+                        $Registry->{variant}->{$variant}->{_canon});
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:variant:invalid',
@@ -410,13 +461,33 @@ sub check_rfc4646_langtag ($$$;$) {
 
         ## NOTE: Whether a language tag with unsupported extension is
         ## valid or not is unclear from the reading of RFC 4646.
+        
+        ## NOTE: We don't check whether the case is lowercase or not
+        ## (see note above on the case of invalid subtags).
       }
 
       if (@{$tag_o->{privateuse}}) {
         $onerror->(type => 'langtag:privateuse',
                    value => (join '-', @{$tag_o->{privateuse}}),
                    level => $levels->{warn});
+
+        for (@{$tag_o->{privateuse}}) {
+          if (/\A[^A-Z]\z/ or
+              /\A[^a-z]{2}\z/ or
+              /\A[^a-z][^A-Z]{3}\z/ or
+              /\A[^A-Z]{5,}\z/) {
+            #
+          } else {
+            ## NOTE: RECOMMENDED (RFC 4646 2.1.)
+            $onerror->(type => 'langtag:privateuse:case',
+                       value => $_,
+                       level => $levels->{should});
+          }
+        }
       }
+
+      ## NOTE: Case of illegal subtags are not checked (see note above
+      ## on the case of invalid subtags).
     }
   }
 } # check_rfc4646_langtag
