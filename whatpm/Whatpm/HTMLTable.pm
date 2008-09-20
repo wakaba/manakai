@@ -142,7 +142,8 @@ sub form_table ($$$;$) {
         my $span = 1;
         my $col_span = $current_column->get_attribute_ns (undef, 'span');
         ## Parse non-negative integer
-        if (defined $col_span and $col_span =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
+        if (defined $col_span and
+            $col_span =~ /^[\x09\x0A\x0C\x0D\x20]*([0-9]+)/) {
           $span = $1 || 1;
         }
         
@@ -161,7 +162,8 @@ sub form_table ($$$;$) {
       my $span = 1;
       my $col_span = $current_element->get_attribute_ns (undef, 'span');
       ## Parse non-negative integer
-      if (defined $col_span and $col_span =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
+      if (defined $col_span and
+          $col_span =~ /^[\x09\x0A\x0C\x0D\x20]*([0-9]+)/) {
         $span = $1 || 1;
       }
       
@@ -255,14 +257,16 @@ sub form_table ($$$;$) {
       ## Step 8
       my $colspan = 1;
       my $attr_value = $current_cell->get_attribute_ns (undef, 'colspan');
-      if (defined $attr_value and $attr_value =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
+      if (defined $attr_value
+          and $attr_value =~ /^[\x09\x0A\x0C\x0D\x20]*([0-9]+)/) {
         $colspan = $1 || 1;
       }
       
       ## Step 9
       my $rowspan = 1;
       my $attr_value = $current_cell->get_attribute_ns (undef, 'rowspan');
-      if (defined $attr_value and $attr_value =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
+      if (defined $attr_value and
+          $attr_value =~ /^[\x09\x0A\x0C\x0D\x20]*([0-9]+)/) {
         $rowspan = $1;
       }
       
@@ -624,7 +628,7 @@ sub assign_header ($$;$$) {
   }
 
   for my $headers_cell (@headers_cell) {
-    my @headers = split /[\x09-\x0D\x20]+/,
+    my @headers = split /[\x09\x0A\x0C\x0D\x20]+/,
         $headers_cell->{element}->get_attribute_ns (undef, 'headers');
     my %headers;
     for my $header_id (@headers) {
@@ -657,4 +661,4 @@ sub assign_header ($$;$$) {
 } # assign_header
 
 1;
-## $Date: 2008/08/30 15:14:32 $
+## $Date: 2008/09/20 11:25:56 $

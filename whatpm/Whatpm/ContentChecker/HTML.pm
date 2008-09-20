@@ -338,7 +338,8 @@ my $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
   return sub {
     my ($self, $attr) = @_;
     my %word;
-    for my $word (grep {length $_} split /[\x09-\x0D\x20]+/, $attr->value) {
+    for my $word (grep {length $_}
+                  split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
       unless ($word{$word}) {
         $word{$word} = 1;
         if (not defined $allowed_words or
@@ -358,12 +359,13 @@ my $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
   };
 }; # $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker
 
-## |rel| attribute (unordered set of space separated tokens,
+## |rel| attribute (set of space separated tokens,
 ## whose allowed values are defined by the section on link types)
 my $HTMLLinkTypesAttrChecker = sub {
   my ($a_or_area, $todo, $self, $attr, $item, $element_state) = @_;
   my %word;
-  for my $word (grep {length $_} split /[\x09-\x0D\x20]+/, $attr->value) {
+  for my $word (grep {length $_}
+                split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
     unless ($word{$word}) {
       $word{$word} = 1;
     } elsif ($word eq 'up') {
@@ -501,7 +503,7 @@ my $HTMLSpaceURIsAttrChecker = sub {
               archive => 'resource'}->{$attr->name};
 
   my $i = 0;
-  for my $value (split /[\x09-\x0D\x20]+/, $attr->value) {
+  for my $value (split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
     Whatpm::URIChecker->check_iri_reference ($value, sub {
       $self->{onerror}->(value => $value, @_, node => $attr, index => $i);
     }, $self->{level});
@@ -516,15 +518,22 @@ my $HTMLSpaceURIsAttrChecker = sub {
   ## ISSUE: Leading or trailing white spaces are conformant?
   ## ISSUE: A sequence of white space characters are conformant?
   ## ISSUE: A zero-length string is conformant? (It does contain a relative reference, i.e. same as base URI.)
+  ## ISSUE: What is "space"?
   ## NOTE: Duplication seems not an error.
   $self->{has_uri_attr} = 1;
 }; # $HTMLSpaceURIsAttrChecker
 
+## NOTE: "Valid datetime".
 my $HTMLDatetimeAttrChecker = sub {
   my ($self, $attr) = @_;
   my $value = $attr->value;
   ## ISSUE: "space", not "space character" (in parsing algorihtm, "space character")
-  if ($value =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?>[\x09-\x0D\x20]+(?>T[\x09-\x0D\x20]*)?|T[\x09-\x0D\x20]*)([0-9]{2}):([0-9]{2})(?>:([0-9]{2}))?(?>\.([0-9]+))?[\x09-\x0D\x20]*(?>Z|[+-]([0-9]{2}):([0-9]{2}))\z/) {
+  if ($value =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})
+                 (?>[\x09\x0A\x0C\x0D\x20]+
+                 (?>T[\x09\x0A\x0C\x0D\x20]*)?|T[\x09\x0A\x0C\x0D\x20]*)
+                 ([0-9]{2}):([0-9]{2})(?>:([0-9]{2}))?(?>\.([0-9]+))?
+                 [\x09\x0A\x0C\x0D\x20]*
+                 (?>Z|[+-]([0-9]{2}):([0-9]{2}))\z/x) {
     my ($y, $M, $d, $h, $m, $s, $f, $zh, $zm)
         = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
     if (0 < $M and $M < 13) { ## ISSUE: This is not explicitly specified (though in parsing algorithm)
@@ -889,7 +898,7 @@ my $HTMLCharsetsAttrChecker = sub {
 
   ## ISSUE: "ordered set of space-separated tokens" is not defined.
 
-  my @value = grep {length $_} split /[\x09-\x0A\x20]+/, $attr->value;
+  my @value = grep {length $_} split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value;
   
   ## ISSUE: Uniqueness is not enforced.
 
@@ -998,7 +1007,7 @@ my $HTMLAttrChecker = {
       } else {
         $self->{id}->{$value} = [$attr];
       }
-      if ($value =~ /[\x09-\x0D\x20]/) {
+      if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
         $self->{onerror}->(node => $attr, type => 'space in ID',
                            level => $self->{level}->{must});
       }
@@ -1031,8 +1040,12 @@ my $HTMLAttrChecker = {
   dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
   class => sub {
     my ($self, $attr) = @_;
+    
+    ## NOTE: "Unordered set of unique space-separated tokens".
+
     my %word;
-    for my $word (grep {length $_} split /[\x09-\x0D\x20]+/, $attr->value) {
+    for my $word (grep {length $_}
+                  split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
       unless ($word{$word}) {
         $word{$word} = 1;
         push @{$self->{return}->{class}->{$word}||=[]}, $attr;
@@ -1851,7 +1864,7 @@ $Element->{$HTML_NS}->{link} = {
         $sizes_attr = $attr;
         my %word;
         for my $word (grep {length $_}
-                      split /[\x09-\x0D\x20]+/, $attr->value) {
+                      split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
           unless ($word{$word}) {
             $word{$word} = 1;
             if ($word eq 'any' or $word =~ /\A[1-9][0-9]*x[1-9][0-9]*\z/) {
@@ -2149,7 +2162,7 @@ $Element->{$HTML_NS}->{meta} = {
         if ($content_attr) {
           my $content = $content_attr->value;
           if ($content =~ m!^[Tt][Ee][Xx][Tt]/[Hh][Tt][Mm][Ll];
-                            [\x09-\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
+                            [\x09\x0A\x0C\x0D\x20]*[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
                             =(.+)\z!sx) {
             $check_charset->($content_attr, $1);
           } else {
@@ -2166,7 +2179,7 @@ $Element->{$HTML_NS}->{meta} = {
           if ($content =~ /\A[0-9]+\z/) {
             ## NOTE: Valid non-negative integer.
             #
-          } elsif ($content =~ s/\A[0-9]+;[\x09-\x0D\x20]+[Uu][Rr][Ll]=//) {
+          } elsif ($content =~ s/\A[0-9]+;[\x09\x0A\x0C\x0D\x20]+[Uu][Rr][Ll]=//) {
             ## ISSUE: Relative references are allowed? (RFC 3987 "IRI" is an absolute reference with optional fragment identifier.)
             Whatpm::URIChecker->check_iri_reference ($content, sub {
               $self->{onerror}->(value => $content, @_, node => $content_attr);
@@ -3137,7 +3150,7 @@ $Element->{$HTML_NS}->{dfn} = {
           }
         } elsif ($child->node_type == 3 or $child->node_type == 4) {
           ## TEXT_NODE or CDATA_SECTION_NODE
-          if ($child->data =~ /\A[\x09-\x0D\x20]+\z/) { # Inter-element whitespace
+          if ($child->data =~ /\A[\x09\x0A\x0C\x0D\x20]+\z/) { # Inter-element whitespace
             next;
           }
           undef $term;
@@ -3214,7 +3227,7 @@ $Element->{$HTML_NS}->{time} = {
     my $input_node;
     if ($attr) {
       $input = $attr->value;
-      $reg_sp = qr/[\x09-\x0D\x20]*/;
+      $reg_sp = qr/[\x09\x0A\x0C\x0D\x20]*/;
       $input_node = $attr;
     } else {
       $input = $item->{node}->text_content;
@@ -3820,7 +3833,7 @@ $Element->{$HTML_NS}->{rp} = {
                    $item->{parent_state}->{phase} eq 'after-rp2')
         ? qr/\p{Pe}/ : qr/\p{Ps}/;
     if ($element_state->{text} =~ /\A$p_class\z/) {
-        #=~ /\A[\x09-\x0D\x20]*${p_class}[\x09-\x0D\x20]*\z/) {
+        #=~ /\A[\x09\x0A\x0C\x0D\x20]*${p_class}[\x09\x0A\x0C\x0D\x20]*\z/) {
       #
     } else {
       $self->{onerror}->(node => $item->{node},
@@ -4494,7 +4507,7 @@ $Element->{$HTML_NS}->{map} = {
           $self->{onerror}->(node => $attr, type => 'empty attribute value',
                              level => $self->{level}->{must});
         }
-        if ($value =~ /[\x09-\x0D\x20]/) {
+        if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
           $self->{onerror}->(node => $attr, type => 'space in ID',
                              level => $self->{level}->{must});
         }
@@ -6382,7 +6395,7 @@ $Element->{$HTML_NS}->{menu} = {
         $self->{onerror}->(node => $attr, type => 'empty attribute value',
                            level => $self->{level}->{must});
       }
-      if ($value =~ /[\x09-\x0D\x20]/) {
+      if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
         $self->{onerror}->(node => $attr, type => 'space in ID',
                            level => $self->{level}->{must});
       }
@@ -6546,7 +6559,7 @@ $Element->{$HTML_NS}->{nest} = {
     mode => sub {
       my ($self, $attr) = @_;
       my $value = $attr->value;
-      if ($value !~ /\A[^\x09-\x0D\x20]+\z/) {
+      if ($value !~ /\A[^\x09\x0A\x0C\x0D\x20]+\z/) {
         $self->{onerror}->(node => $attr, type => 'mode:syntax error',
                            level => $self->{level}->{must});
       }

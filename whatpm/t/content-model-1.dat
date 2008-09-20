@@ -55,6 +55,14 @@
 /html;child element missing;body;m
 
 #data
+<?xml version="1.1"?>
+<html xmlns="http://www.w3.org/1999/xhtml"> &#x000b;</html>
+#errors escaped
+/html;child element missing;head;m
+/html;child element missing;body;m
+/html/" \u000b";character not allowed;m
+
+#data
 <html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>
 #errors
 /html/head;child element missing;title;m
@@ -4795,6 +4803,15 @@ aaa
 /object/param;element not allowed:flow;m
 
 #data
+<?xml version="1.1"?>
+<object xmlns="http://www.w3.org/1999/xhtml" data="">
+&#x0b;
+<param name="x" value="y"/>
+</object>
+#errors
+/object/param;element not allowed:flow;m
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml" data="">
 <p>zxx</p>
 <param name="x" value="y"/>
@@ -5067,6 +5084,12 @@ xxxx
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml">x<source src=""/></video>
+#errors
+/video/source;element not allowed:flow;m
+
+#data
+<?xml version="1.1"?>
+<video xmlns="http://www.w3.org/1999/xhtml">&#x0b;<source src=""/></video>
 #errors
 /video/source;element not allowed:flow;m
 
@@ -5391,6 +5414,12 @@ xxxx
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml">x<source src=""/></audio>
+#errors
+/audio/source;element not allowed:flow;m
+
+#data
+<?xml version="1.1"?>
+<audio xmlns="http://www.w3.org/1999/xhtml">&#x0b;<source src=""/></audio>
 #errors
 /audio/source;element not allowed:flow;m
 
@@ -8743,6 +8772,11 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /div/datatemplate/nest;element not allowed:datatemplate;m
 /div;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<div xmlns="http://www.w3.org/1999/xhtml">&#x000b;</div>
+#errors
 
 #data
 <center  xmlns="http://www.w3.org/1999/xhtml"></center>

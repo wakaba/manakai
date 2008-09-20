@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.184 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.185 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -8949,9 +8949,10 @@ sub _tree_construction_main ($) {
           } elsif ($token->{attributes}->{content}) {
             if ($token->{attributes}->{content}->{value}
                 =~ /[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
-                    [\x09-\x0D\x20]*=
-                    [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
-                    ([^"'\x09-\x0D\x20][^\x09-\x0D\x20\x3B]*))/x) {
+                    [\x09\x0A\x0C\x0D\x20]*=
+                    [\x09\x0A\x0C\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
+                    ([^"'\x09\x0A\x0C\x0D\x20][^\x09\x0A\x0C\x0D\x20\x3B]*))
+                   /x) {
               
               ## NOTE: Whether the encoding is supported or not is handled
               ## in the {change_encoding} callback.
@@ -10454,4 +10455,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/20 10:20:47 $
+# $Date: 2008/09/20 11:25:56 $

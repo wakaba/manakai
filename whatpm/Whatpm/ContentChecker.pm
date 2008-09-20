@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.95 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.96 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -697,7 +697,7 @@ next unless $code;## TODO: temp.
           }
         } elsif ($child_nt == 3 or # TEXT_NODE
                  $child_nt == 4) { # CDATA_SECTION_NODE
-          my $has_significant = ($child->data =~ /[^\x09-\x0D\x20]/);
+          my $has_significant = ($child->data =~ /[^\x09\x0A\x0C\x0D\x20]/);
           push @new_item, [$content_def->{check_child_text},
                            $self, $item, $child, $has_significant,
                            $content_state, $element_state];
@@ -990,7 +990,7 @@ sub _check_get_children ($$$) {
               last CN;
             }
           } elsif ($cnt == 3 or $cnt == 4) {
-            if ($cn->data =~ /[^\x09-\x0D\x20]/) {
+            if ($cn->data =~ /[^\x09\x0A\x0C\x0D\x20]/) {
               last CN;
             }
           }
@@ -1011,7 +1011,7 @@ sub _check_get_children ($$$) {
             last CN;
           }
         } elsif ($cnt == 3 or $cnt == 4) {
-          if ($cn->data =~ /[^\x09-\x0D\x20]/) {
+          if ($cn->data =~ /[^\x09\x0A\x0C\x0D\x20]/) {
             last CN;
           }
         }
@@ -1038,4 +1038,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/20 06:10:18 $
+# $Date: 2008/09/20 11:25:56 $

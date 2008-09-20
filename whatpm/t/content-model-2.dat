@@ -244,6 +244,31 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<?xml version="1.1"?>
+<p id="a&#xb;" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<?xml version="1.1"?>
+<p id="&#xb;b" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<?xml version="1.1"?>
+<p id="a&#xb;b" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<?xml version="1.1"?>
+<map name="a&#xb;b" id="a&#xb;b" xmlns="http://www.w3.org/1999/xhtml">x</map>
+#errors
+
+#data
+<?xml version="1.1"?>
+<menu id="a&#xb;" xmlns="http://www.w3.org/1999/xhtml">x</menu>
+#errors
+
+#data
 <p title="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
@@ -512,6 +537,21 @@ id=""><span id="">x</span></p>
 
 #data
 <p class="I i &#x0131;" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<?xml version="1.1"?>
+<p class="a &#x000b;a" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<?xml version="1.1"?>
+<p class="a a&#x000b;" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<?xml version="1.1"?>
+<p class="&#x000b;a a" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
 #data
@@ -1460,6 +1500,27 @@ id=""><span id="">x</span></p>
 /link/@rel;unknown link type;u
 
 #data
+<?xml version="1.1"?>
+<link rel="stylesheet&#x000b;" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<link rel="&#x000b;stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<link rel="alternate&#x000b;stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
 <link rel="alternate" href="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -1735,6 +1796,27 @@ id=""><span id="">x</span></p>
 #data
 <link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
     sizes="032x032"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="32x32&#x0b;"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="&#x0b;32x32"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="32x32&#x0b;44x44"/>
 #errors
 /link/@sizes;sizes:syntax error;m
 
@@ -2054,6 +2136,16 @@ id=""><span id="">x</span></p>
 /meta/@content;mismatched charset name not checked;u
 
 #data
+<?xml version="1.1"?>
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html;&#x0b;charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
 <meta xmlns="http://www.w3.org/1999/xhtml"
     http-equiv="content-type"
     content=" text/html; charset=us-ascii"/>
@@ -2182,6 +2274,15 @@ id=""><span id="">x</span></p>
 <head xmlns="http://www.w3.org/1999/xhtml">
 <title>x</title>
 <meta http-equiv="Refresh" content="44;url=http://www.example.com/"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="44;&#x0b;url=http://www.example.com/"/>
 </head>
 #errors
 /head/meta/@content;refresh:syntax error;m
@@ -3125,6 +3226,27 @@ id=""><span id="">x</span></p>
 /a;no significant content;s
 
 #data
+<?xml version="1.1"?>
+<a href="http://test/" rel="author&#x0b;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;unknown link type;u
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" rel="&#x0b;author" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;unknown link type;u
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" rel="author&#x0b;license" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;unknown link type;u
+/a;no significant content;s
+
+#data
 <a href="http://test/" ping="http://a.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -3138,6 +3260,30 @@ id=""><span id="">x</span></p>
 
 #data
 <a href="http://test/" ping="http://a.test/ [b.test]"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@ping;syntax error:iriref3987;m
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" ping="http://a.test/&#x0b;http://b.test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@ping;syntax error:iriref3987;m
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" ping="http://a.test/&#x0b;"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@ping;syntax error:iriref3987;m
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" ping="&#x0b;http://a.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@ping;syntax error:iriref3987;m
@@ -3975,6 +4121,34 @@ id=""><span id="">x</span></p>
 #errors
 
 #data
+<?xml version="1.1"?>
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13&#x000b;00:00 Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13T&#x000b;00:00 Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13&#x000b;T00:00 Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13 00:00&#x000b;Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="1979-10-14T12:00:00.001-04:00">x</ins>
 #errors
@@ -4542,7 +4716,6 @@ id=""><span id="">x</span></p>
 #errors
 /div/map;no significant content;s
 
-
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map name="aa"/>
@@ -4972,6 +5145,27 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /iframe/@sandbox;duplicate token;m
+
+#data
+<?xml version="1.1"?>
+<iframe src="" sandbox="allow-forms&#x000b;"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<?xml version="1.1"?>
+<iframe src="" sandbox="&#x000b;allow-forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<?xml version="1.1"?>
+<iframe src="" sandbox="allow-forms&#x000b;allow-scripts"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
 
 #data
 <iframe src="" seemless=""
@@ -6444,6 +6638,30 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 
 #data
+<?xml version="1.1"?>
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="author&#x0b;" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="&#x0b;author" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="author&#x0b;license" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;unknown link type;u
+
+#data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" rel="author author" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7382,6 +7600,30 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /td/@header;attribute not defined;m
 
 #data
+<?xml version="1.1"?>
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td headers="a&#x000b;">x</td><th id="a">x</th></tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
+<?xml version="1.1"?>
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td headers="&#x000b;a">x</td><th id="a">x</th></tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
+<?xml version="1.1"?>
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr><td headers="a&#x000b;b">x</td><th id="a">x</th><th id="b">y</th></tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
 <form xmlns="http://www.w3.org/1999/xhtml"
     accept-charset="">x</form>
 #errors
@@ -7399,6 +7641,27 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"
     accept-charset="euc-jp us-ascii">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x09;us-ascii">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x0a;us-ascii">x</form>
+#errors
+
+#data
+<?xml version="1.1"?>
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x0c;us-ascii">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x0d;us-ascii">x</form>
 #errors
 
 #data
@@ -7443,6 +7706,30 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     accept-charset="iso-2022-jp">x</form>
 #errors
 /form/@accept-charset;charset:not ascii compat;m
+
+#data
+<?xml version="1.1"?>
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x000b;">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+/form/@accept-charset;charset:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="&#x000b;euc-jp">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+/form/@accept-charset;charset:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x000b;us-ascii">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+/form/@accept-charset;charset:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -8285,6 +8572,21 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /rule/@mode;duplicate token;m
 
 #data
+<?xml version="1.1"?>
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;a"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a a&#x0b;"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="&#x0b;a a"/>
+#errors
+
+#data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition=""/>
 #errors
 /rule/@condition;no sss;m
@@ -8357,6 +8659,21 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="&#x3000;"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="&#x0b;a"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;a"/>
 #errors
 
 #data
