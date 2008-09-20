@@ -13,58 +13,39 @@ require Whatpm::NanoDOM;
 sub test_files (@) {
   my @FILES = @_;
 
-  for my $file_name (@FILES) {
-    open my $file, '<', $file_name or die "$0: $file_name: $!";
-    print "# $file_name\n";
-    
-    my $test;
-    my $mode = 'data';
-    while (<$file>) {
-      s/\x0D\x0A/\x0A/;
-      if (/^#data$/) {
-        undef $test;
-        $test->{data} = '';
-        $mode = 'data';
-        $test->{parse_as} = 'xml';
-      } elsif (/^#data html$/) {
-        undef $test;
-        $test->{data} = '';
-        $mode = 'data';
-        $test->{parse_as} = 'html';
-      } elsif (/^#errors$/) {
-        $test->{errors} = [];
-        $mode = 'errors';
-        $test->{data} =~ s/\x0D?\x0A\z//;       
-      } elsif (defined $test->{errors} and /^$/) {
-        test ($test);
-        undef $test;
-      } else {
-        if ($mode eq 'data') {
-          $test->{$mode} .= $_;
-        } elsif ($mode eq 'errors') {
-          tr/\x0D\x0A//d;
-          push @{$test->{errors}}, $_;
-        }
-      }
-    }
-  } # @FILES
+  require 't/testfiles.pl';
+  execute_test ($_, {
+    errors => {is_list => 1},
+  }, \&test) for @FILES;
 } # test_files
 
 my $dom = Message::DOM::DOMImplementation->new;
 sub test ($) {
   my $test = shift;
 
+  $test->{parse_as} = 'xml';
+  $test->{parse_as} = 'html'
+      if $test->{data}->[1] and $test->{data}->[1]->[0] eq 'html';
+
+  unless ($test->{data}) {
+    warn "No #data field\n";
+  } elsif (not $test->{errors}) {
+    warn "No #errors field ($test->{data}->[0])\n";
+  }
+
   my $doc;
   if ($test->{parse_as} eq 'xml') {
-    open my $fh, '<', \($test->{data});
+    open my $fh, '<', \($test->{data}->[0]);
     $doc = Message::DOM::XMLParserTemp->parse_byte_stream
-      ($fh => $dom, sub { }, charset => 'utf-8');
+      ($fh => $dom, sub {
+        warn "Document: " . $test->{data}->[0];
+      }, charset => 'utf-8');
     $doc->input_encoding (undef);
     ## NOTE: There should be no well-formedness error; if there is,
     ## then it is an error of the test case itself.
   } else {
     $doc = Whatpm::NanoDOM::Document->new;
-    Whatpm::HTML->parse_string ($test->{data} => $doc);
+    Whatpm::HTML->parse_char_string ($test->{data}->[0] => $doc);
   }
 
   my @error;
@@ -84,7 +65,7 @@ sub test ($) {
      });
   
   ok join ("\n", sort {$a cmp $b} @error),
-    join ("\n", sort {$a cmp $b} @{$test->{errors}}), $test->{data};
+    join ("\n", sort {$a cmp $b} @{$test->{errors}->[0]}), $test->{data}->[0];
 } # test
 
 sub get_node_path ($) {
@@ -136,4 +117,4 @@ Public Domain.
 
 =cut
 
-1; ## $Date: 2008/09/18 05:49:13 $
+1; ## $Date: 2008/09/20 07:00:53 $

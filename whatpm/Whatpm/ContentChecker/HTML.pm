@@ -2752,13 +2752,14 @@ $Element->{$HTML_NS}->{li} = {
         $parent_ns = '' unless defined $parent_ns;
         my $parent_ln = $parent->manakai_local_name;
         unless ($parent_ns eq $HTML_NS and $parent_ln eq 'ol') {
+          ## ISSUE: ...
           $self->{onerror}->(node => $attr,
                              type => 'unknown attribute',
                              level => $self->{level}->{uncertain});
         }
       }
       $HTMLIntegerAttrChecker->($self, $attr);
-    }, ## TODO: test
+    },
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
