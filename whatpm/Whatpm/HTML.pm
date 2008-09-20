@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.183 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.184 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -5130,7 +5130,7 @@ sub _tree_construction_initial ($) {
       
       return;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
-      if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) { # \x0D
+      if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
         ## Ignore the token
 
         unless (length $token->{data}) {
@@ -5187,7 +5187,7 @@ sub _tree_construction_root_element ($) {
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} == CHARACTER_TOKEN) {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) { # \x0D
+        if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
           ## Ignore the token.
 
           unless (length $token->{data}) {
@@ -6100,7 +6100,7 @@ sub _tree_construction_main ($) {
 
     if ($self->{insertion_mode} & HEAD_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+        if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
           unless ($self->{insertion_mode} == BEFORE_HEAD_IM) {
             
             $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -7336,7 +7336,7 @@ sub _tree_construction_main ($) {
     } elsif ($self->{insertion_mode} & TABLE_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         if (not $open_tables->[-1]->[1] and # tainted
-            $token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+            $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               
           unless (length $token->{data}) {
@@ -8161,7 +8161,7 @@ sub _tree_construction_main ($) {
       }
     } elsif ($self->{insertion_mode} == IN_COLUMN_GROUP_IM) {
           if ($token->{type} == CHARACTER_TOKEN) {
-            if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+            if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
                 
@@ -8574,7 +8574,7 @@ sub _tree_construction_main ($) {
       }
     } elsif ($self->{insertion_mode} & BODY_AFTER_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+        if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
           my $data = $1;
           ## As if in body
           $reconstruct_active_formatting_elements->($insert_to_current);
@@ -8591,14 +8591,13 @@ sub _tree_construction_main ($) {
         if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'after html:#text', token => $token);
-
-          ## Reprocess in the "after body" insertion mode.
+          #
         } else {
           
+          ## "after body" insertion mode
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'after body:#text', token => $token);
+          #
         }
-        
-        ## "after body" insertion mode
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'after body:#text', token => $token);
 
         $self->{insertion_mode} = IN_BODY_IM;
         ## reprocess
@@ -8608,15 +8607,14 @@ sub _tree_construction_main ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'after html',
                           text => $token->{tag_name}, token => $token);
-          
-          ## Reprocess in the "after body" insertion mode.
+          #
         } else {
           
+          ## "after body" insertion mode
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'after body',
+                          text => $token->{tag_name}, token => $token);
+          #
         }
-
-        ## "after body" insertion mode
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'after body',
-                        text => $token->{tag_name}, token => $token);
 
         $self->{insertion_mode} = IN_BODY_IM;
         
@@ -8628,8 +8626,9 @@ sub _tree_construction_main ($) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'after html:/',
                           text => $token->{tag_name}, token => $token);
           
-          $self->{insertion_mode} = AFTER_BODY_IM;
-          ## Reprocess in the "after body" insertion mode.
+          $self->{insertion_mode} = IN_BODY_IM;
+          ## Reprocess.
+          next B;
         } else {
           
         }
@@ -8667,7 +8666,7 @@ sub _tree_construction_main ($) {
       }
     } elsif ($self->{insertion_mode} & FRAME_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+        if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
           
           unless (length $token->{data}) {
@@ -8677,7 +8676,7 @@ sub _tree_construction_main ($) {
           }
         }
         
-        if ($token->{data} =~ s/^[^\x09\x0A\x0B\x0C\x20]+//) {
+        if ($token->{data} =~ s/^[^\x09\x0A\x0C\x20]+//) {
           if ($self->{insertion_mode} == IN_FRAMESET_IM) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'in frameset:#text', token => $token);
@@ -10455,4 +10454,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/20 09:28:29 $
+# $Date: 2008/09/20 10:20:47 $

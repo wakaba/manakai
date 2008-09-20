@@ -1,5 +1,12 @@
 2008-09-20  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: The "anything else" case for the "after after body"
+	insertion mode was not updated to swtich to the "in body"
+	insertion mode.  U+000B is no longer a space character for the
+	purpose of tree construction phase (HTML5 revision 1738).
+
+2008-09-20  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: U+000B is no longer a space character (HTML5
 	revision 1738).
 

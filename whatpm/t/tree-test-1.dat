@@ -2908,7 +2908,6 @@ a"
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body></body></html>a
 #errors
-char after </body>
 char after </html>
 #document
 | <!DOCTYPE HTML>
@@ -2922,7 +2921,6 @@ char after </html>
 <!DOCTYPE HTML><html><head><title></title></head><body></body></html> a
 #errors
 char after </html>
-char after </body>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -2935,7 +2933,6 @@ char after </body>
 <!DOCTYPE HTML><html><head><title></title></head><body></body></html>a 
 #errors
 char after </html>
-char after </body>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -2948,7 +2945,6 @@ char after </body>
 <!DOCTYPE HTML><html><head><title></title></head><body></body></html>aaa
 #errors
 char after </html>
-char after </body>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -2994,7 +2990,6 @@ char after </body>
 <!DOCTYPE HTML><html><head><title></title></head><body></body></html><p>
 #errors
 start tag after </html>
-start tag after </body>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -3007,7 +3002,6 @@ start tag after </body>
 <!DOCTYPE HTML><html><head><title></title></head><body></body></html></p>
 #errors
 end tag after </html>
-end tag after </body>
 </p> interpreted as <p></p>
 #document
 | <!DOCTYPE HTML>
@@ -3021,7 +3015,6 @@ end tag after </body>
 <!DOCTYPE HTML><html><head><title></title></head><body></body></html>  <p>
 #errors
 start tag after </html>
-start tag after </body>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -3035,7 +3028,6 @@ start tag after </body>
 <!DOCTYPE HTML><html><head><title></title></head><body></body></html>aa<p>
 #errors
 char after </html>
-char after </body>
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -7266,4 +7258,297 @@ no </listing>
 |   <body>
 |     <svg>
 |     <strike>
+
+#data escaped
+\u000b<p>
+#errors
+no DOCTYPE
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+
+#data escaped
+\u000babc
+#errors
+no DOCTYPE
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+
+#data escaped
+<!DOCTYPE HTML>\u000b<p>
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+
+#data escaped
+<!DOCTYPE HTML>\u000babc
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+
+#data escaped
+<!DOCTYPE HTML><html>\u000b<p>
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+
+#data escaped
+<!DOCTYPE HTML><html>\u000babc
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+
+#data escaped
+<!DOCTYPE HTML><head>\u000b<p>
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+
+#data escaped
+<!DOCTYPE HTML><head>\u000babc
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+
+#data escaped
+<!DOCTYPE HTML><head></head>\u000b<p>
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+
+#data escaped
+<!DOCTYPE HTML><head></head>\u000babc
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+
+#data escaped
+<!DOCTYPE HTML><head><noscript>\u000b<p>
+#errors
+no </noscript>
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     "\u000b"
+|     <p>
+
+#data escaped
+<!DOCTYPE HTML><head><noscript>\u000babc
+#errors
+no </noscript>
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     "\u000babc"
+
+#data escaped
+<!DOCTYPE HTML><table>\u000b<p></table>
+#errors
+char in table
+start tag in table
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+|     <table>
+
+#data escaped
+<!DOCTYPE HTML><table>\u000babc</table>
+#errors
+char in table
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+|     <table>
+
+#data escaped
+<!DOCTYPE HTML><table><colgroup>\u000b<p></table>
+#errors
+char in table
+start tag in table
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+|     <table>
+|       <colgroup>
+
+#data escaped
+<!DOCTYPE HTML><table><colgroup>\u000babc</table>
+#errors
+char in table
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+|     <table>
+|       <colgroup>
+
+#data escaped
+<!DOCTYPE HTML><body></body>\u000b<p>
+#errors
+char after body
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+
+#data escaped
+<!DOCTYPE HTML><body></body>\u000babc
+#errors
+char after body
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+
+#data escaped
+<!DOCTYPE HTML><frameset>\u000b<p></frameset>
+#errors
+char in frameset
+start tag in frameset
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE HTML><frameset>\u000babc</frameset>
+#errors
+char in frameset
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE HTML><frameset></frameset>\u000b<p>
+#errors
+char after frameset
+tag after frameset
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE HTML><frameset>\u000babc</frameset>
+#errors
+char after frameset
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE HTML><body></body></html>\u000b<p>
+#errors
+char after body html
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000b"
+|     <p>
+
+#data escaped
+<!DOCTYPE HTML><body></body></html>\u000babc
+#errors
+char after body html
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "\u000babc"
+
+#data escaped
+<!DOCTYPE HTML><frameset></frameset></html>\u000b<p>
+#errors
+char after frameset html
+char after frameset html
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE HTML><frameset></frameset></html>\u000babc
+#errors
+char after frameset html
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
 
