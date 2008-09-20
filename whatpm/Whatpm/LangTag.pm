@@ -666,8 +666,6 @@ sub check_rfc4646_langtag ($$$;$) {
 ## TODO: Should we return values that indicate whether a tag is
 ## well-formed, valid, or canonical?
 
-## TODO: Type name should be added to the catalog.
-
 sub check_rfc3066_language_tag ($$;$$) {
   my $tag = $_[1];
   my $onerror = $_[2] || sub { };
