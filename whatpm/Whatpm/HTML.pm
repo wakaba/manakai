@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.182 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.183 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -976,6 +976,15 @@ sub _initialize_tokenizer ($) {
 ## TODO: Polytheistic slash SHOULD NOT be used. (Applied only to atheists.)
 ## (This requirement was dropped from HTML5 spec, unfortunately.)
 
+my $is_space = {
+  0x0009 => 1, # CHARACTER TABULATION (HT)
+  0x000A => 1, # LINE FEED (LF)
+  #0x000B => 0, # LINE TABULATION (VT)
+  0x000C => 1, # FORM FEED (FF)
+  #0x000D => 1, # CARRIAGE RETURN (CR)
+  0x0020 => 1, # SPACE (SP)
+};
+
 sub _get_next_token ($) {
   my $self = shift;
 
@@ -1506,12 +1515,8 @@ sub _get_next_token ($) {
           redo A;
         }
       } else { # after "<{tag-name}"
-        unless ({
-                 0x0009 => 1, # HT
-                 0x000A => 1, # LF
-                 0x000B => 1, # VT
-                 0x000C => 1, # FF
-                 0x0020 => 1, # SP
+        unless ($is_space->{$self->{nc}} or
+	        {
                  0x003E => 1, # >
                  0x002F => 1, # /
                  -1 => 1, # EOF
@@ -1538,11 +1543,7 @@ sub _get_next_token ($) {
         }
       }
     } elsif ($self->{state} == TAG_NAME_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
@@ -1664,11 +1665,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == BEFORE_ATTRIBUTE_NAME_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -1814,11 +1811,7 @@ sub _get_next_token ($) {
         }
       }; # $before_leave
 
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         $before_leave->();
         $self->{state} = AFTER_ATTRIBUTE_NAME_STATE;
@@ -1961,11 +1954,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == AFTER_ATTRIBUTE_NAME_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -2112,11 +2101,7 @@ sub _get_next_token ($) {
         redo A;        
       }
     } elsif ($self->{state} == BEFORE_ATTRIBUTE_VALUE_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP      
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -2407,11 +2392,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_UNQUOTED_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # HT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
@@ -2533,11 +2514,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == AFTER_ATTRIBUTE_VALUE_QUOTED_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
@@ -3248,11 +3225,7 @@ sub _get_next_token ($) {
         redo A;
       } 
     } elsif ($self->{state} == DOCTYPE_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         
@@ -3275,11 +3248,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == BEFORE_DOCTYPE_NAME_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -3343,11 +3312,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_NAME_STATE) {
 ## ISSUE: Redundant "First," in the spec.
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         
@@ -3409,11 +3374,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == AFTER_DOCTYPE_NAME_STATE) {
-      if ($self->{nc} == 0x0009 or # HT
-          $self->{nc} == 0x000A or # LF
-          $self->{nc} == 0x000B or # VT
-          $self->{nc} == 0x000C or # FF
-          $self->{nc} == 0x0020) { # SP
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -3626,10 +3587,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
-      if ({
-            0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
-            #0x000D => 1, # HT, LF, VT, FF, SP, CR
-          }->{$self->{nc}}) {
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -3866,10 +3824,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
-      if ({
-            0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
-            #0x000D => 1, # HT, LF, VT, FF, SP, CR
-          }->{$self->{nc}}) {
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -3965,10 +3920,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE) {
-      if ({
-            0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
-            #0x000D => 1, # HT, LF, VT, FF, SP, CR
-          }->{$self->{nc}}) {
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -4204,10 +4156,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE) {
-      if ({
-            0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
-            #0x000D => 1, # HT, LF, VT, FF, SP, CR
-          }->{$self->{nc}}) {
+      if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
         
@@ -4449,11 +4398,11 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ENTITY_STATE) {
-      if ({
-        0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, # HT, LF, VT, FF,
-        0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, &
-        $self->{entity_add} => 1,
-      }->{$self->{nc}}) {
+      if ($is_space->{$self->{nc}} or
+          {
+            0x003C => 1, 0x0026 => 1, -1 => 1, # <, &
+            $self->{entity_add} => 1,
+          }->{$self->{nc}}) {
         
         ## Don't consume
         ## No error
@@ -6450,9 +6399,10 @@ sub _tree_construction_main ($) {
                 } elsif ($token->{attributes}->{content}) {
                   if ($token->{attributes}->{content}->{value}
                       =~ /[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
-                          [\x09-\x0D\x20]*=
-                          [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
-                          ([^"'\x09-\x0D\x20][^\x09-\x0D\x20\x3B]*))/x) {
+                          [\x09\x0A\x0C\x0D\x20]*=
+                          [\x09\x0A\x0C\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
+                          ([^"'\x09\x0A\x0C\x0D\x20]
+                           [^\x09\x0A\x0C\x0D\x20\x3B]*))/x) {
                     
                     ## NOTE: Whether the encoding is supported or not is handled
                     ## in the {change_encoding} callback.
@@ -10505,4 +10455,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/16 14:41:37 $
+# $Date: 2008/09/20 09:28:29 $
