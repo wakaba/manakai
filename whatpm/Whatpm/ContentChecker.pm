@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.94 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.95 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -301,6 +301,26 @@ our $HTMLEmbeddedContent = {
   ## NOTE: Foreign elements with content (but no metadata) are 
   ## embedded content.
 };  
+
+our $IsInHTMLInteractiveContent = sub {
+  my ($el, $nsuri, $ln) = @_;
+
+  ## NOTE: This CODE returns whether an element that is conditionally
+  ## categorizzed as an interactive content is currently in that
+  ## condition or not.  See $HTMLInteractiveContent list defined in
+  ## Whatpm::ContentChecler::HTML for the list of all (conditionally
+  ## or permanently) interactive content.
+
+  if ($nsuri eq $HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
+    return $el->has_attribute ('controls');
+  } elsif ($nsuri eq $HTML_NS and $ln eq 'menu') {
+    my $value = $el->get_attribute ('type');
+    $value =~ tr/A-Z/a-z/; # ASCII case-insensitive
+    return ($value eq 'toolbar');
+  } else {
+    return 1;
+  }
+}; # $IsInHTMLInteractiveContent
 
 my $HTMLTransparentElements = {
   $HTML_NS => {qw/ins 1 del 1 font 1 noscript 1 canvas 1 a 1/},
@@ -1018,4 +1038,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/18 07:42:57 $
+# $Date: 2008/09/20 06:10:18 $

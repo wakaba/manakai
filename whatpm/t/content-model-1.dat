@@ -3397,6 +3397,311 @@ x</div>
 /div/ol/li;no significant content;s
 
 #data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<video src="">x</video>
+</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><video src="">x</video></span>
+</a>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><video src="">x</video></a>
+<video src="">y</video>
+</div>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<video src="" controls="">x</video>
+</a>
+#errors
+/a/video;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><video src="" controls="">x</video></span>
+</a>
+#errors
+/a/span/video;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><video src="" controls="">x</video></a>
+<video src="" controls="">y</video>
+</div>
+#errors
+/div/a/video;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<audio src="">x</audio>
+</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><audio src="">x</audio></span>
+</a>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><audio src="">x</audio></a>
+<audio src="">y</audio>
+</div>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<audio src="" controls="">x</audio>
+</a>
+#errors
+/a/audio;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><audio src="" controls="">x</audio></span>
+</a>
+#errors
+/a/span/audio;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><audio src="" controls="">x</audio></a>
+<audio src="" controls="">y</audio>
+</div>
+#errors
+/div/a/audio;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<label>x</label>
+</a>
+#errors
+/a/label;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><label>x</label></span>
+</a>
+#errors
+/a/span/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><label>x</label></a>
+<label>y</label>
+</div>
+#errors
+/div/a/label;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<input/>x
+</a>
+#errors
+/a/input;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><input/>x</span>
+</a>
+#errors
+/a/span/input;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><input/>x</a>
+<input/>
+</div>
+#errors
+/div/a/input;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<button>x</button>
+</a>
+#errors
+/a/button;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><button><input/>x</button></a>
+#errors
+/a/button;element not allowed:minus;m
+/a/button/input;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><button>x</button></span>
+</a>
+#errors
+/a/span/button;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><button>x</button></a>
+<button>y</button>
+</div>
+#errors
+/div/a/button;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<select><option>x</option></select>
+</a>
+#errors
+/a/select;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><select><option>x</option></select></span>
+</a>
+#errors
+/a/span/select;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><select><option>x</option></select></a>
+<select><option>y</option></select>
+</div>
+#errors
+/div/a/select;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<textarea>x</textarea>
+</a>
+#errors
+/a/textarea;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><textarea>x</textarea></span>
+</a>
+#errors
+/a/span/textarea;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><textarea>x</textarea></a>
+<textarea>y</textarea>
+</div>
+#errors
+/div/a/textarea;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<details><legend>y</legend>x</details>
+</a>
+#errors
+/a/details;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><details><legend>y</legend>x</details></span>
+</a>
+#errors
+/a/span/details;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><details><legend>y</legend>x</details></a>
+<details><legend>y</legend>y</details>
+</div>
+#errors
+/div/a/details;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<datagrid>x</datagrid>
+</a>
+#errors
+/a/datagrid;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><datagrid>x</datagrid></span>
+</a>
+#errors
+/a/span/datagrid;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><datagrid>x</datagrid></a>
+<datagrid>y</datagrid>
+</div>
+#errors
+/div/a/datagrid;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<bb>x</bb>
+</a>
+#errors
+/a/bb;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><bb>x</bb></span>
+</a>
+#errors
+/a/span/bb;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><bb>x</bb></a>
+<bb>y</bb>
+</div>
+#errors
+/div/a/bb;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<menu>x</menu>
+</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><menu>x</menu></span>
+</a>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><menu>x</menu></a>
+<menu>y</menu>
+</div>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<menu type="toolbar">x</menu>
+</a>
+#errors
+/a/menu;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><menu type="toolbar">x</menu></span>
+</a>
+#errors
+/a/span/menu;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><menu type="toolbar">x</menu></a>
+<menu type="toolbar">y</menu>
+</div>
+#errors
+/div/a/menu;element not allowed:minus;m
+
+#data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <p><a></a></p><ol><li><datagrid/></li></ol>
 </div>
@@ -3590,6 +3895,7 @@ x</div>
 /a;no significant content;s
 /a/details;no significant content;s
 /a/details/legend;no significant content;s
+/a/details;element not allowed:minus;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -3598,11 +3904,11 @@ x</div>
 </span>
 </a>
 #errors
-/a/span/details;element not allowed:phrasing;m
 /a;no significant content;s
 /a/span;no significant content;s
 /a/span/details;no significant content;s
 /a/span/details/legend;no significant content;s
+/a/span/details;element not allowed:minus;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -6802,6 +7108,124 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /p/bb/style;element not allowed:phrasing;m
 /p/bb/style;SUBDOC
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<a>a</a>
+</bb>
+#errors
+/bb/a;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<video src="">a</video>
+</bb>
+#errors
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<video src="" controls="">a</video>
+</bb>
+#errors
+/bb/video;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<audio src="">a</audio>
+</bb>
+#errors
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<audio src="" controls="">a</audio>
+</bb>
+#errors
+/bb/audio;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<label>a</label>
+</bb>
+#errors
+/bb/label;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<input/>x
+</bb>
+#errors
+/bb/input;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<button>a</button>
+</bb>
+#errors
+/bb/button;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<select><option>a</option></select>
+</bb>
+#errors
+/bb/select;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<textarea>a</textarea>
+</bb>
+#errors
+/bb/textarea;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<details><legend>x</legend>a</details>
+</bb>
+#errors
+/bb/details;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<datagrid>a</datagrid>
+</bb>
+#errors
+/bb/datagrid;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<bb>a</bb>
+</bb>
+#errors
+/bb/bb;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<menu>a</menu>
+</bb>
+#errors
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<menu type="toolbar">a</menu>
+</bb>
+#errors
+/bb/menu;element not allowed:minus;m
+
+#data
+<bb xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate>
+<rule>
+<a:content type="xhtml" xmlns:a="http://www.w3.org/2005/Atom">
+<div>
+<a>x</a>
+</div>
+</a:content>
+</rule>
+</datatemplate>
+</bb>
+#errors
+/bb/datatemplate/rule/content/div/a;element not allowed:minus;m
+/bb/datatemplate;element not allowed:phrasing;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"/>
