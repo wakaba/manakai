@@ -28,7 +28,7 @@ algorithm as defined in the HTML5 specification.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -253,7 +253,7 @@ sub get_sniffed_type ($%) {
 
       ## Step 4
       return ('text/plain', 'application/octet-stream')
-          if $bytes =~ /[\x00-\x08\x0E-\x1A\x1C-\x1F]/;
+          if $bytes =~ /[\x00-\x08\x0B\x0E-\x1A\x1C-\x1F]/; # binary data bytes
 
       ## ISSUE: There is an ISSUE in the spec.
 
@@ -303,7 +303,7 @@ sub get_sniffed_type ($%) {
       ## $row = [Mask, Pattern, Sniffed Type, Has leading WS flag];
       my $pos = 0;
       if ($row->[3]) {
-        $pos++ while substr ($bytes, $pos, 1) =~ /^[\x09-\x0D\x20]/;
+        $pos++ while substr ($bytes, $pos, 1) =~ /^[\x09\x0A\x0C\x0D\x20]/;
       }
       my $pattern_length = length $row->[1];
       next ROW if $pos + $pattern_length > $stream_length;
@@ -326,7 +326,7 @@ sub get_sniffed_type ($%) {
 
     ## Step 4
     return ($official_type, 'application/octet-stream')
-        if $bytes =~ /[\x00-\x08\x0E-\x1A\x1C-\x1F]/;
+        if $bytes =~ /[\x00-\x08\x0B\x0E-\x1A\x1C-\x1F]/; # binary data bytes
 
     ## Step 5
     return ($official_type, 'text/plain');
@@ -434,4 +434,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/08/30 14:37:46 $
+# $Date: 2008/09/20 07:54:47 $

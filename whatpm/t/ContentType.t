@@ -2,7 +2,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 2178 }
+BEGIN { plan tests => 2286 }
 
 use Whatpm::ContentType;
 
@@ -239,6 +239,20 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq<\x0B>,
+    q<text/plain; charset=UTF-8>, 0,
+    q<application/octet-stream>, '0x0B',
+    q<application/octet-stream>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0C>,
+    q<text/plain; charset=UTF-8>, 0,
+    q<text/plain>, '0x0C',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
     qq<<!DOCTYPE HTML>\x0A...>,
     q<text/plain>, 0,
     q<text/plain>, '<!DOCTYPE HTML',
@@ -288,10 +302,17 @@ for my $v (
     q<text/html>,
   ],
   [
-    qq<     \x0A\x0B \x0D\x0A\x09<!DOCTYPE HTML>\x0A...>,
+    qq<     \x0A \x0D\x0A\x09<!DOCTYPE HTML>\x0A...>,
     q<text/plain>, 0,
     q<text/plain>, '(WS)<!DOCTYPE HTML>(LF)...',
     q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<     \x0A\x0B \x0D\x0A\x09<!DOCTYPE HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<application/octet-stream>, '(WS)(VT)<!DOCTYPE HTML>(LF)...',
+    q<application/octet-stream>,
     q<text/html>,
   ],
   [
@@ -386,10 +407,17 @@ for my $v (
     q<text/html>,
   ],
   [
-    qq<\x0B\x0D\x0A<HTML>\x0A...>,
+    qq< \x0D\x0A<HTML>\x0A...>,
     q<text/plain>, 0,
     q<text/plain>, '(WS)<HTML>(LF)...',
     q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0B\x0D\x0A<HTML>\x0A...>,
+    q<text/plain>, 0,
+    q<application/octet-stream>, '(VT)(WS)<HTML>(LF)...',
+    q<application/octet-stream>,
     q<text/html>,
   ],
   [
@@ -465,6 +493,13 @@ for my $v (
   [
     qq<\x0B\x0D\x0A<head>\x0A...>,
     q<text/plain>, 0,
+    q<application/octet-stream>, '(VT)(WS)<head>(LF)...',
+    q<application/octet-stream>,
+    q<text/html>,
+  ],
+  [
+    qq< \x0D\x0A<head>\x0A...>,
+    q<text/plain>, 0,
     q<text/plain>, '(WS)<head>(LF)...',
     q<text/html>,
     q<text/html>,
@@ -533,10 +568,17 @@ for my $v (
     q<text/html>,
   ],
   [
-    qq<\x0B\x0D\x0A<script>\x0A...>,
+    qq< \x0D\x0A<script>\x0A...>,
     q<text/plain>, 0,
     q<text/plain>, '(WS)<script>(LF)...',
     q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq<\x0B\x0D\x0A<script>\x0A...>,
+    q<text/plain>, 0,
+    q<application/octet-stream>, '(VT)(WS)<script>(LF)...',
+    q<application/octet-stream>,
     q<text/html>,
   ],
   [
@@ -912,7 +954,7 @@ for my $v (
     },
     http_content_type_byte => $ct,
     supported_image_types => {'image/jpeg' => 1});
-    ok $st, $v->[5], 'Unknown type: ' . $v->[4];
+    ok $st, $v->[5], 'Unknown type ('.$ct.'): ' . $v->[4];
   }
 
   ## Image
@@ -964,5 +1006,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2008/08/30 14:37:46 $
+## $Date: 2008/09/20 07:54:48 $
 1;
