@@ -7382,6 +7382,90 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /td/@header;attribute not defined;m
 
 #data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="   ">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp us-ascii">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp, us-ascii">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset=" euc-JP ">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset=" eucjp ">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="x-euc-jp">x</form>
+#errors
+/form/@accept-charset;charset:private;w
+/form/@accept-charset;charset:not preferred;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="us-ascii x-euc-jp">x</form>
+#errors
+/form/@accept-charset;charset:private;w
+/form/@accept-charset;charset:not preferred;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="ascii">x</form>
+#errors
+/form/@accept-charset;charset:not preferred;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="iso-2022-jp">x</form>
+#errors
+/form/@accept-charset;charset:not ascii compat;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset=""/>
+#errors
+/input/@accept-charset;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="x-euc-jp"/>
+#errors
+/input/@accept-charset;attribute not defined;m
+/input/@accept-charset;charset:private;w
+/input/@accept-charset;charset:not preferred;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="us-ascii iso-2022-jp"/>
+#errors
+/input/@accept-charset;attribute not defined;m
+/input/@accept-charset;charset:not ascii compat;m
+
+#data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script;SUBDOC

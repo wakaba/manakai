@@ -785,8 +785,12 @@ my $HTMLAccesskeyAttrChecker = sub {
   ## or wherever the access key is to apply." [HTML4] (informative)
 }; # $HTMLAccesskeyAttrChecker
 
-my $HTMLCharsetChecker = sub {
-  my ($charset_value, $self, $attr) = @_;
+my $HTMLCharsetChecker = sub ($$$;$) {
+  my ($charset_value, $self, $attr, $ascii_compat) = @_;
+
+  ## NOTE: This code is used for |charset=""| attributes, |charset=|
+  ## portion of the |content=""| attributes, and |accept-charset=""|
+  ## attributes.
 
   ## NOTE: Though the case-sensitivility of |charset| attribute value
   ## is not explicitly spelled in the HTML5 spec, the Character Set
@@ -819,6 +823,7 @@ my $HTMLCharsetChecker = sub {
                          value => $charset_value,
                          level => $self->{level}->{must});
     }
+
     if (($charset_status &
          Message::Charset::Info::REGISTERED_CHARSET_NAME ())
             != Message::Charset::Info::REGISTERED_CHARSET_NAME ()) {
@@ -834,21 +839,59 @@ my $HTMLCharsetChecker = sub {
                            level => $self->{level}->{good});
       }
     }
+    
+    if ($ascii_compat) {
+      if ($charset->{category} &
+              Message::Charset::Info::CHARSET_CATEGORY_ASCII_COMPAT ()) {
+        #
+      } else {
+        $self->{onerror}->(node => $attr,
+                           type => 'charset:not ascii compat',
+                           value => $charset_value,
+                           level => $self->{level}->{must});
+      }
+    }
+
 ## TODO: non-preferred-name error for following cases:
   } elsif ($charset_value =~ /^x-/) {
     $self->{onerror}->(node => $attr,
                        type => 'charset:private',
                        value => $charset_value,
                        level => $self->{level}->{good});
+
+    ## NOTE: Whether this is an ASCII-compatible character encoding or
+    ## not is unknown.
   } else {
     $self->{onerror}->(node => $attr,
                        type => 'charset:not registered',
                        value => $charset_value,
                        level => $self->{level}->{good});
+
+    ## NOTE: Whether this is an ASCII-compatible character encoding or
+    ## not is unknown.
   }
   
   return ($charset, $charset_value);
 }; # $HTMLCharsetChecker
+
+## NOTE: "An ordered set of space-separated tokens" where "each token
+## MUST be the preferred name of an ASCII-compatible character
+## encoding".
+my $HTMLCharsetsAttrChecker = sub {
+  my ($self, $attr) = @_;
+
+  ## ISSUE: "ordered set of space-separated tokens" is not defined.
+
+  my @value = grep {length $_} split /[\x09-\x0A\x20]+/, $attr->value;
+  
+  ## ISSUE: Uniqueness is not enforced.
+
+  for my $charset (@value) {
+    $HTMLCharsetChecker->($charset, $self, $attr, 1);
+  }
+
+  ## ISSUE: Shift_JIS is ASCII-compatible?  What about ISO-2022-JP?
+}; # $HTMLCharsetsAttrChecker
 
 my $HTMLColorAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -5154,7 +5197,7 @@ $Element->{$HTML_NS}->{form} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
-    'accept-charset' => $AttrCheckerNotImplemented, ## TODO: Charsets
+    'accept-charset' => $HTMLCharsetsAttrChecker,
     action => $HTMLURIAttrChecker, ## TODO: "User agent behavior for a value other than HTTP URI is undefined" [HTML4]
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
     enctype => $HTMLIMTAttrChecker, ## TODO: "multipart/form-data" should be used when type=file is used [HTML4] ## TODO: MUST NOT parameter [WF2]
@@ -5233,6 +5276,7 @@ $Element->{$HTML_NS}->{input} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
+    'accept-charset' => $HTMLCharsetsAttrChecker,
     accesskey => $HTMLAccesskeyAttrChecker,
     action => $HTMLURIAttrChecker,
     align => $GetHTMLEnumeratedAttrChecker->({
