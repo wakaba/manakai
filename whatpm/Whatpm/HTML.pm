@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.185 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.186 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -401,7 +401,6 @@ sub parse_byte_stream ($$$$;$$) {
           ## TODO: Is this ok?  Transfer protocol's parameter should be
           ## interpreted in its semantics?
 
-      ## ISSUE: Unsupported encoding is not ignored according to the spec.
       ($char_stream, $e_status) = $charset->get_decode_handle
           ($byte_stream, allow_error_reporting => 1,
            allow_fallback => 1);
@@ -409,7 +408,10 @@ sub parse_byte_stream ($$$$;$$) {
         $self->{confident} = 1;
         last SNIFFING;
       } else {
-        ## TODO: unsupported error
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'charset:not supported',
+                        line => 1, column => 1,
+                        value => $charset_name,
+                        level => $self->{level}->{uncertain});
       }
     }
 
@@ -10455,4 +10457,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/20 11:25:56 $
+# $Date: 2008/09/21 05:08:16 $
