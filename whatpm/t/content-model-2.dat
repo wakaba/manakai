@@ -7831,6 +7831,109 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /form/a/@name;attribute not defined;m
 
 #data
+<form xmlns="http://www.w3.org/1999/xhtml" form="a" id="a">x</form>
+#errors
+/form/@form;attribute not defined;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml" form="a">
+<legend>y</legend>
+<form id="a">x</form>
+</fieldset>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">x</form>
+<fieldset form="a"><legend>y</legend>x</fieldset>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<fieldset form="a"><legend>y</legend>x</fieldset>
+<form id="a">x</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<fieldset form="a"><legend>ty</legend>x</fieldset>
+<form xml:id="a">x</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="x">
+<fieldset form="x"><legend>y</legend>x</fieldset>
+</form>
+</div>
+#errors
+
+#data
+<fieldset form="x" xmlns="http://www.w3.org/1999/xhtml">
+<legend>y</legend>y</fieldset>
+#errors
+/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">x</form>
+<form id="b">y</form>
+<fieldset form="a b"><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">x</form>
+<fieldset form="a "><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<div id="a">x</div>
+<fieldset form="a"><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<div id="a">b</div>
+<form id="a">x</form>
+<fieldset form="a"><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/form/@id;duplicate ID;m
+/div/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">x</form>
+<div id="a">y</div>
+<fieldset form="a"><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/div/@id;duplicate ID;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml" form="a">x<input/></label>
+#errors
+/label/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label form="b">y<input/></label>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
 <input xmlns="http://www.w3.org/1999/xhtml"
     accept-charset=""/>
 #errors
@@ -7850,6 +7953,105 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /input/@accept-charset;attribute not defined;m
 /input/@accept-charset;charset:not ascii compat;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><input form="a"/>x</div>
+#errors
+/div/input/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input form="b"/>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml" form="a">x</button>
+#errors
+/button/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<button form="b">y</button>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" form="a"></select>
+#errors
+/select/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<select form="b"></select>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml" form="a">x</datalist>
+#errors
+/datalist/@form;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<datalist form="b">y</datalist>
+<form id="b">x</form>
+</div>
+#errors
+/div/datalist/@form;attribute not defined;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><optgroup form="a"/></select>
+#errors
+/select/optgroup/@form;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<select><optgroup form="b"/></select>
+<form id="b">x</form>
+</div>
+#errors
+/div/select/optgroup/@form;attribute not defined;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option form="a">x</option></select>
+#errors
+/select/option/@form;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<select><option form="b">y</option></select>
+<form id="b">x</form>
+</div>
+#errors
+/div/select/option/@form;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml" form="a">x</textarea>
+#errors
+/textarea/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<textarea form="b">y</textarea>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml" form="a">x</output>
+#errors
+/output/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<output form="b">y</output>
+<form id="b">x</form>
+</div>
+#errors
 
 #data
 <script xmlns="http://www.w3.org/1999/xhtml"/>

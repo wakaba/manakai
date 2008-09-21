@@ -699,6 +699,17 @@ my $HTMLEventHandlerAttrChecker = sub {
   ## ISSUE: Other script languages?
 }; # $HTMLEventHandlerAttrChecker
 
+my $HTMLFormAttrChecker = sub {
+  my ($self, $attr) = @_;
+
+  ## NOTE: MUST be the ID of a |form| element.
+
+  my $value = $attr->value;
+  push @{$self->{form_ref}}, [$value => $attr];
+
+  ## ISSUE: <form id=""><input form=""> (empty ID)?
+}; # $HTMLFormAttrChecker
+
 my $HTMLUsemapAttrChecker = sub {
   my ($self, $attr) = @_;
   ## MUST be a valid hash-name reference to a |map| element.
@@ -5276,6 +5287,7 @@ $Element->{$HTML_NS}->{form} = {
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+    $element_state->{id_type} = 'form';
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -5290,7 +5302,7 @@ $Element->{$HTML_NS}->{fieldset} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    ## TODO: form [WF2]
+    form => $HTMLFormAttrChecker,
     ## TODO: name [HTML5]
   }, {
     %HTMLAttrStatus,
@@ -5350,7 +5362,6 @@ $Element->{$HTML_NS}->{fieldset} = {
   },
   ## NOTE: This definition is partially reused by |details| element's
   ## checker.
-  ## TODO: Tests
   ## TODO: Tests for <nest/> in <fieldset>
 };
 
@@ -5373,7 +5384,7 @@ $Element->{$HTML_NS}->{input} = {
     checked => $GetHTMLBooleanAttrChecker->('checked'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     enctype => $HTMLIMTAttrChecker,
-    ## TODO: form [WF2]
+    form => $HTMLFormAttrChecker,
     ## TODO: inputmode [WF2]
     ismap => $GetHTMLBooleanAttrChecker->('ismap'),
     ## TODO: list [WF2]
@@ -5490,7 +5501,7 @@ $Element->{$HTML_NS}->{button} = {
     action => $HTMLURIAttrChecker,
     autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    ## TODO: form [WF2]
+    form => $HTMLFormAttrChecker,
     method => $GetHTMLEnumeratedAttrChecker->({
       get => 1, post => 1, put => 1, delete => 1,
     }),
@@ -5554,7 +5565,7 @@ $Element->{$HTML_NS}->{label} = {
   check_attrs => $GetHTMLAttrsChecker->({
     accesskey => $HTMLAccesskeyAttrChecker,
     for => $AttrCheckerNotImplemented, ## TODO: IDREF ## TODO: Must be |id| of control [HTML4] ## TODO: Or, "may only contain one control element"
-    ## TODO: form
+    form => $HTMLFormAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -5580,7 +5591,7 @@ $Element->{$HTML_NS}->{select} = {
     autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
-    ## TODO: form [WF2]
+    form => $HTMLFormAttrChecker,
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
     name => sub {}, ## NOTE: CDATA [M12N]
     onformchange => $HTMLEventHandlerAttrChecker,
@@ -5819,7 +5830,7 @@ $Element->{$HTML_NS}->{textarea} = {
     autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## TODO: SHOULD if wrap=hard [WF2]
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    ## TODO: form [WF2]
+    form => $HTMLFormAttrChecker,
     ## TODO: inputmode [WF2]
     maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     name => sub {}, ## NOTE: CDATA [M12N]
@@ -5881,7 +5892,7 @@ $Element->{$HTML_NS}->{output} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
     ## TODO: for [WF2]
-    ## TODO: form [WF2]
+    form => $HTMLFormAttrChecker,
     ## TODO: name [WF2]
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,

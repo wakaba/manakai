@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.98 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.99 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -221,7 +221,11 @@ $AttrStatus->{$XMLNS_NS}->{''} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
 ## TODO: xsi:schemaLocation for XHTML2 support (very, very low priority)
 
 our %AnyChecker = (
+  ## NOTE: |check_start| is invoked before anything on the element's
+  ## attributes and contents is checked.
   check_start => sub { },
+  ## NOTE: |check_attrs| is invoked after |check_start| and before
+  ## anything on the element's contents is checked.
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     for my $attr (@{$item->{node}->attributes}) {
@@ -256,6 +260,10 @@ our %AnyChecker = (
       $self->_attr_status_info ($attr, $status);
     }
   },
+  ## NOTE: |check_child_element| is invoked for each occurence of
+  ## child elements.  It is invoked after |check_attrs| and before
+  ## |check_end|.  |check_child_element| and |check_child_text| are
+  ## invoked for each child elements and text nodes in tree order.
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -269,7 +277,13 @@ our %AnyChecker = (
       #
     }
   },
+  ## NOTE: |check_child_text| is invoked for each occurence of child
+  ## text nodes.  It is invoked after |check_attrs| and before
+  ## |check_end|.  |check_child_element| and |check_child_text| are
+  ## invoked for each child elements and text nodes in tree order.
   check_child_text => sub { },
+  ## NOTE: |check_end| is invoked after everything on the element's
+  ## attributes and contents are checked.
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     ## NOTE: There is a modified copy of the code below for |html:ruby|.
@@ -559,8 +573,9 @@ sub check_element ($$$;$) {
   $self->{plus_elements} = {};
   $self->{minus_elements} = {};
   $self->{id} = {};
-  $self->{id_type} = {}; # 'menu' / 'labelable'
-  $self->{form} = {};
+  $self->{id_type} = {}; # 'form' / 'labelable' / 'menu'
+  $self->{form} = {}; # form/@name
+  $self->{form_ref} = []; # @form
   $self->{term} = {};
   $self->{usemap} = [];
   $self->{ref} = []; # datetemplate data references
@@ -778,6 +793,16 @@ next unless $code;## TODO: temp.
     }
   }
 
+  for (@{$self->{form_ref}}) {
+    if ($self->{id}->{$_->[0]} and
+        $self->{id_type}->{$_->[0]} eq 'form') {
+      #
+    } else {
+      $self->{onerror}->(node => $_->[1], type => 'no referenced form',
+                         level => $self->{level}->{must});
+    }
+  }
+
   for (@{$self->{contextmenu}}) {
     if ($self->{id}->{$_->[0]} and
         $self->{id_type}->{$_->[0]} eq 'menu') {
@@ -794,6 +819,7 @@ next unless $code;## TODO: temp.
   delete $self->{id};
   delete $self->{id_type};
   delete $self->{form};
+  delete $self->{form_ref};
   delete $self->{usemap};
   delete $self->{ref};
   delete $self->{template};
@@ -1045,4 +1071,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/21 11:55:49 $
+# $Date: 2008/09/21 12:37:09 $
