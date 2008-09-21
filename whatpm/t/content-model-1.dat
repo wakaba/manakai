@@ -6073,6 +6073,13 @@ xxxx
 /fieldset;child element missing;legend;m
 
 #data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legned>y</legned>x</fieldset>
+#errors
+/fieldset/legned;element not allowed:flow;m
+/fieldset/legned;element not defined;m
+/fieldset;child element missing;legend;m
+
+#data
 <fieldset xmlns="http://www.w3.org/1999/xhtml">x<legend>y</legend></fieldset>
 #errors
 /fieldset/legend;element not allowed:details legend;m

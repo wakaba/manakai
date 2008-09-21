@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.97 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.98 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -121,7 +121,7 @@ our $AttrChecker = {
       ## no author requirement on conformance in the XML Base specification.
     },
     id => sub {
-      my ($self, $attr) = @_;
+      my ($self, $attr, $item, $element_state) = @_;
       my $value = $attr->value;
       $value =~ s/[\x09\x0A\x0D\x20]+/ /g;
       $value =~ s/^\x20//;
@@ -135,6 +135,7 @@ our $AttrChecker = {
         push @{$self->{id}->{$value}}, $attr;
       } else {
         $self->{id}->{$value} = [$attr];
+        $self->{id_type}->{$value} = $element_state->{id_type} || '';
       }
     },
   },
@@ -558,6 +559,7 @@ sub check_element ($$$;$) {
   $self->{plus_elements} = {};
   $self->{minus_elements} = {};
   $self->{id} = {};
+  $self->{id_type} = {}; # 'menu' / 'labelable'
   $self->{form} = {};
   $self->{term} = {};
   $self->{usemap} = [];
@@ -565,7 +567,6 @@ sub check_element ($$$;$) {
   $self->{template} = []; # datatemplate template references
   $self->{contextmenu} = [];
   $self->{map} = {};
-  $self->{menu} = {};
   $self->{has_link_type} = {};
   $self->{flag} = {};
   #$self->{has_uri_attr};
@@ -778,7 +779,10 @@ next unless $code;## TODO: temp.
   }
 
   for (@{$self->{contextmenu}}) {
-    unless ($self->{menu}->{$_->[0]}) {
+    if ($self->{id}->{$_->[0]} and
+        $self->{id_type}->{$_->[0]} eq 'menu') {
+      #
+    } else {
       $self->{onerror}->(node => $_->[1], type => 'no referenced menu',
                          level => $self->{level}->{must});
     }
@@ -788,6 +792,7 @@ next unless $code;## TODO: temp.
   delete $self->{minus_elements};
   delete $self->{onerror};
   delete $self->{id};
+  delete $self->{id_type};
   delete $self->{form};
   delete $self->{usemap};
   delete $self->{ref};
@@ -1040,4 +1045,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/21 09:45:02 $
+# $Date: 2008/09/21 11:55:49 $

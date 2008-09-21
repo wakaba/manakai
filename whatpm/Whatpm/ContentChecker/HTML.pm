@@ -996,8 +996,7 @@ my $HTMLRepeatIndexAttrChecker = sub {
 my $HTMLAttrChecker = {
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
-    ## NOTE: |map| has its own variant of |id=""| checker
-    my ($self, $attr) = @_;
+    my ($self, $attr, $item, $element_state) = @_;
     my $value = $attr->value;
     if (length $value > 0) {
       if ($self->{id}->{$value}) {
@@ -1006,6 +1005,7 @@ my $HTMLAttrChecker = {
         push @{$self->{id}->{$value}}, $attr;
       } else {
         $self->{id}->{$value} = [$attr];
+        $self->{id_type}->{$value} = $element_state->{id_type} || '';
       }
       if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
         $self->{onerror}->(node => $attr, type => 'space in ID',
@@ -4487,33 +4487,8 @@ $Element->{$HTML_NS}->{map} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
-    my $has_id;
     my $has_name;
     $GetHTMLAttrsChecker->({
-      id => sub {
-        ## NOTE: Same as the global |id=""|, with |$self->{map}| registration.
-        my ($self, $attr) = @_;
-        my $value = $attr->value;
-        if (length $value) {
-          if ($self->{id}->{$value}) {
-            $self->{onerror}->(node => $attr, type => 'duplicate ID',
-                               level => $self->{level}->{must});
-            push @{$self->{id}->{$value}}, $attr;
-          } else {
-            $self->{id}->{$value} = [$attr];
-          }
-        } else {
-          ## NOTE: MUST contain at least one character
-          $self->{onerror}->(node => $attr, type => 'empty attribute value',
-                             level => $self->{level}->{must});
-        }
-        if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
-          $self->{onerror}->(node => $attr, type => 'space in ID',
-                             level => $self->{level}->{must});
-        }
-        #$self->{map}->{$value} ||= $attr;
-        $has_id = [$value, $attr];
-      },
       name => sub {
         my ($self, $attr) = @_;
         my $value = $attr->value;
@@ -4550,13 +4525,14 @@ $Element->{$HTML_NS}->{map} = {
       title => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     })->(@_);
 
-    if ($has_name and $has_id) {
-      if ($has_name->[0] ne $has_id->[0]) {
-        $self->{onerror}->(node => $has_id->[1],
+    if ($has_name) {
+      my $id = $item->{node}->get_attribute ('id');
+      if (defined $id and $has_name->[0] ne $id) {
+        $self->{onerror}->(node => $item->{node}->get_attribute_node ('id'),
                            type => 'id ne name',
                            level => $self->{level}->{must});
       }
-    } elsif (not $has_name) {
+    } else {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing',
                          text => 'name',
@@ -6400,30 +6376,8 @@ $Element->{$HTML_NS}->{menu} = {
   check_attrs => $GetHTMLAttrsChecker->({
     autosubmit => $GetHTMLBooleanAttrChecker->('autosubmit'),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
-    id => sub {
-      ## NOTE: same as global |id=""|, with |$self->{menu}| registeration
-      my ($self, $attr) = @_;
-      my $value = $attr->value;
-      if (length $value > 0) {
-        if ($self->{id}->{$value}) {
-          $self->{onerror}->(node => $attr, type => 'duplicate ID',
-                             level => $self->{level}->{must});
-          push @{$self->{id}->{$value}}, $attr;
-        } else {
-          $self->{id}->{$value} = [$attr];
-        }
-      } else {
-        ## NOTE: MUST contain at least one character
-        $self->{onerror}->(node => $attr, type => 'empty attribute value',
-                           level => $self->{level}->{must});
-      }
-      if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
-        $self->{onerror}->(node => $attr, type => 'space in ID',
-                           level => $self->{level}->{must});
-      }
-      $self->{menu}->{$value} ||= $attr;
-      ## ISSUE: <menu id=""><p contextmenu=""> match?
-    },
+    ## ISSUE: <menu id=""><p contextmenu=""> match?  (In the current
+    ## implementation, it does not match.)
     label => sub { }, ## NOTE: No conformance creteria
     type => $GetHTMLEnumeratedAttrChecker->({context => 1, toolbar => 1}),
   }, {
@@ -6446,6 +6400,7 @@ $Element->{$HTML_NS}->{menu} = {
 
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+    $element_state->{id_type} = 'menu';
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
