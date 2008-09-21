@@ -7732,6 +7732,105 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /form/@accept-charset;charset:syntax error;m
 
 #data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="">x</form>
+#errors
+/form/@name;empty form name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="">x</form>
+<form name="">y</form>
+</div>
+#errors
+/div/form/@name;empty form name;m
+/div/form/@name;empty form name;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="xxx">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="abc def">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name=" a ">x</form>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="abc">x</form>
+<form name="def">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a">x</form>
+<form name="a ">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a">x</form>
+<form name=" a">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a b">x</form>
+<form name="b">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="abc">x</form>
+<form name="ABC">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a">x</form>
+<form name="a">y</form>
+</div>
+#errors
+/div/form/@name;duplicate form name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a">x
+<form name="a">y</form>
+</form>
+</div>
+#errors
+/div/form/form;element not allowed:minus;m
+/div/form/form/@name;duplicate form name;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="a" id="b">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="a" id="a">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="a">x<a name="a">u</a></form>
+#errors
+/form/a/@name;attribute not defined;m
+
+#data
 <input xmlns="http://www.w3.org/1999/xhtml"
     accept-charset=""/>
 #errors

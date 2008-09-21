@@ -5245,7 +5245,25 @@ $Element->{$HTML_NS}->{form} = {
     }),
         ## NOTE: "get" SHOULD be used for idempotent submittion,
         ## "post" SHOULD be used otherwise [HTML4].  This cannot be tested.
-    name => sub { }, # CDATA in HTML4 ## TODO: must be same as |id| (informative!) [XHTML10]
+    name => sub {
+      my ($self, $attr) = @_;
+      
+      my $value = $attr->value;
+      if ($value eq '') {
+        $self->{onerror}->(type => 'empty form name',
+                           node => $attr,
+                           level => $self->{level}->{must});
+      } else {
+        if ($self->{form}->{$value}) {
+          $self->{onerror}->(type => 'duplicate form name',
+                             node => $attr,
+                             value => $value,
+                             level => $self->{level}->{must});
+        } else {
+          $self->{form}->{$value} = 1;
+        }
+      }
+    },
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,
     onreceived => $HTMLEventHandlerAttrChecker,

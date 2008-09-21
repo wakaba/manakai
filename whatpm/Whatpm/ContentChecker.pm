@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.96 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.97 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -558,6 +558,7 @@ sub check_element ($$$;$) {
   $self->{plus_elements} = {};
   $self->{minus_elements} = {};
   $self->{id} = {};
+  $self->{form} = {};
   $self->{term} = {};
   $self->{usemap} = [];
   $self->{ref} = []; # datetemplate data references
@@ -787,6 +788,7 @@ next unless $code;## TODO: temp.
   delete $self->{minus_elements};
   delete $self->{onerror};
   delete $self->{id};
+  delete $self->{form};
   delete $self->{usemap};
   delete $self->{ref};
   delete $self->{template};
@@ -1038,4 +1040,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/20 11:25:56 $
+# $Date: 2008/09/21 09:45:02 $
