@@ -5997,6 +5997,98 @@ xxxx
 /title/form;no significant content;s
 
 #data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"></fieldset>
+#errors
+/fieldset;no significant content;s
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">  </fieldset>
+#errors
+/fieldset;no significant content;s
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">x</fieldset>
+#errors
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><p>x</p></fieldset>
+#errors
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><em>x</em></fieldset>
+#errors
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><ins>x</ins></fieldset>
+#errors
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</fieldset>
+#errors
+/fieldset;child element missing;legend;m
+/fieldset/style;SUBDOC
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend>x</fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend></fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend></legend></fieldset>
+#errors
+/fieldset;no significant content;s
+/fieldset/legend;no significant content;s
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend><p>x</p></fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend><span>x</span></fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><ins><legend>y</legend>x</ins></fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><del><legend>y</legend></del><ins><legend>z</legend></ins>x</fieldset>
+#errors
+/fieldset/ins/legend;element not allowed:details legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><lengend>y</lengend>x</fieldset>
+#errors
+/fieldset/lengend;element not allowed:flow;m
+/fieldset/lengend;element not defined;m
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">x<legend>y</legend></fieldset>
+#errors
+/fieldset/legend;element not allowed:details legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">x<legend>y</legend>z</fieldset>
+#errors
+/fieldset/legend;element not allowed:details legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style><legend>y</legend>x</fieldset>
+#errors
+/fieldset/legend;element not allowed:details legend;m
+/fieldset/style;SUBDOC
+
+#data
 <input xmlns="http://www.w3.org/1999/xhtml"></input>
 #errors
 

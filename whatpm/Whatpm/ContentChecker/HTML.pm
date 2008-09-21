@@ -5310,7 +5310,7 @@ $Element->{$HTML_NS}->{form} = {
 };
 
 $Element->{$HTML_NS}->{fieldset} = {
-  %HTMLFlowContentChecker, ## ISSUE: No |legend| in the spec
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -5324,6 +5324,56 @@ $Element->{$HTML_NS}->{fieldset} = {
     lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
     name => FEATURE_HTML5_DEFAULT,
   }),
+  ## NOTE: legend, Flow
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+      $element_state->{has_non_legend} = 1;
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'legend') {
+      if ($element_state->{has_non_legend}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:details legend',
+                           level => $self->{level}->{must});
+      }
+      $element_state->{has_legend} = 1;
+      $element_state->{has_non_legend} = 1;
+    } else {
+      $HTMLFlowContentChecker{check_child_element}->(@_);
+      $element_state->{has_non_legend} = 1 unless $child_is_transparent;
+      ## TODO:
+      ## |<details><object><legend>xx</legend></object>..</details>|
+      ## should be an error, since |object| is allowed as flow,
+      ## therefore |details| part of the content model does not match.
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $element_state->{has_non_legend} = 1;
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    unless ($element_state->{has_legend}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing',
+                         text => 'legend',
+                         level => $self->{level}->{must});
+    }
+
+    $HTMLFlowContentChecker{check_end}->(@_);
+    ## ISSUE: |<details><legend>aa</legend></details>| error?
+  },
+  ## NOTE: This definition is partially reused by |details| element's
+  ## checker.
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <fieldset>
 };
@@ -6156,7 +6206,7 @@ $Element->{$HTML_NS}->{eventsource} = {
 };
 
 $Element->{$HTML_NS}->{details} = {
-  %HTMLFlowContentChecker,
+  %{$Element->{$HTML_NS}->{fieldset}},
   status => FEATURE_HTML5_WD,
   check_attrs => $GetHTMLAttrsChecker->({
     open => $GetHTMLBooleanAttrChecker->('open'),
@@ -6164,52 +6214,6 @@ $Element->{$HTML_NS}->{details} = {
     %HTMLAttrStatus,
     open => FEATURE_HTML5_WD,
   }),
-  ## NOTE: legend, Flow
-  check_child_element => sub {
-    my ($self, $item, $child_el, $child_nsuri, $child_ln,
-        $child_is_transparent, $element_state) = @_;
-    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
-      $self->{onerror}->(node => $child_el,
-                         type => 'element not allowed:minus',
-                         level => $self->{level}->{must});
-      $element_state->{has_non_legend} = 1;
-    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-      #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'legend') {
-      if ($element_state->{has_non_legend}) {
-        $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:details legend',
-                           level => $self->{level}->{must});
-      }
-      $element_state->{has_legend} = 1;
-      $element_state->{has_non_legend} = 1;
-    } else {
-      $HTMLFlowContentChecker{check_child_element}->(@_);
-      $element_state->{has_non_legend} = 1 unless $child_is_transparent;
-      ## ISSUE: |<details><object><legend>xx</legend></object>..</details>|
-      ## is conforming?
-    }
-  },
-  check_child_text => sub {
-    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($has_significant) {
-      $element_state->{has_non_legend} = 1;
-    }
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-
-    unless ($element_state->{has_legend}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'child element missing',
-                         text => 'legend',
-                         level => $self->{level}->{must});
-    }
-
-    $HTMLFlowContentChecker{check_end}->(@_);
-    ## ISSUE: |<details><legend>aa</legend></details>| error?
-  },
 };
 
 $Element->{$HTML_NS}->{datagrid} = {
