@@ -6738,6 +6738,80 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /area/@ping;syntax error:iriref3987;m
 
 #data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt=""/>
+x<area shape="rect" coords="5,6,7,8" href="" alt=""/>
+</map>
+#errors
+/map/area/@alt;empty area alt;m
+/map/area/@alt;empty area alt;m
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt=""/>
+<area shape="rect" coords="5,6,7,8" href="" alt="x"/>
+x</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt="x"/>
+<area shape="rect" coords="5,6,7,8" href="" alt=""/>
+x</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt=""/>
+<area shape="rect" coords="5,6,7,8" href="" alt=""/>
+<area shape="rect" coords="9,10,11,12" href="" alt="x"/>
+x</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="a" alt="x"/>
+<area shape="rect" coords="5,6,7,8" href="" alt=""/>
+x</map>
+#errors
+/map/area/@alt;empty area alt;m
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="a" alt=""/>
+<area shape="rect" coords="5,6,7,8" href="a" alt=""/>
+x</map>
+#errors
+/map/area/@alt;empty area alt;m
+/map/area/@alt;empty area alt;m
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="b" alt="a"/>
+<area shape="rect" coords="5,6,7,8" href="b" alt=""/>
+x</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt=""/>
+<map name="n">
+<area shape="rect" coords="5,6,7,8" href="" alt="x"/>x
+</map>
+</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt="x"/>
+<map name="n">
+<area shape="rect" coords="5,6,7,8" href="" alt=""/>x
+</map>
+</map>
+#errors
+/map/map/area/@alt;empty area alt;m
+
+#data
 <area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@rev;attribute not defined;m

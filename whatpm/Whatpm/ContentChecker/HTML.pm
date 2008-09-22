@@ -4553,14 +4553,40 @@ $Element->{$HTML_NS}->{map} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{in_map_original} = $self->{flag}->{in_map};
-    $self->{flag}->{in_map} = 1;
+    $self->{flag}->{in_map} = [@{$self->{flag}->{in_map} or []}, {}];
+        ## NOTE: |{in_map}| is a reference to the array which contains
+        ## hash references.  Hashes are corresponding to the opening
+        ## |map| elements and each of them contains the key-value
+        ## pairs corresponding to the absolute URLs for the processed
+        ## |area| elements in the |map| element corresponding to the
+        ## hash.  The key represents the resource (## TODO: use
+        ## absolute URL), while the value represents whether there is
+        ## an |area| element whose |alt| attribute is specified to a
+        ## non-empty value.  If there IS such an |area| element for
+        ## the resource specified by the key, then the value is set to
+        ## zero (|0|).  Otherwise, if there is no such an |area|
+        ## element but there is any |area| element with the empty
+        ## |alt=""| attribute, then the value contains an array
+        ## reference that contains all of such |area| elements.
 
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
-    delete $self->{flag}->{in_map} unless $element_state->{in_map_original};
+    
+    for (keys %{$self->{flag}->{in_map}->[-1]}) {
+      my $nodes = $self->{flag}->{in_map}->[-1]->{$_};
+      next unless $nodes;
+      for (@$nodes) {
+        $self->{onerror}->(type => 'empty area alt',
+                           node => $_,
+                           level => $self->{level}->{html5_no_may});
+      }
+    }
+    
+    $self->{flag}->{in_map} = $element_state->{in_map_original};
+    
     $HTMLFlowContentChecker{check_end}->(@_);
   },
 };
@@ -4662,7 +4688,23 @@ $Element->{$HTML_NS}->{area} = {
 
     if (defined $attr{href}) {
       $self->{has_hyperlink_element} = 1;
-      unless (defined $attr{alt}) {
+      if (defined $attr{alt}) {
+        my $url = $attr{href}->value; ## TODO: resolve
+        if (length $attr{alt}->value) {
+          for (@{$self->{flag}->{in_map} or []}) {
+            $_->{$url} = 0;
+          }
+        } else {
+          ## NOTE: Empty |alt=""|.  If there is another |area| element
+          ## with the same |href=""| and that |area| elemnet's
+          ## |alt=""| attribute is not an empty string, then this
+          ## is conforming.
+          for (@{$self->{flag}->{in_map} or []}) {
+            push @{$_->{$url} ||= []}, $attr{alt}
+                unless exists $_->{$url} and not $_->{$url};
+          }
+        }
+      } else {
         $self->{onerror}->(node => $item->{node},
                            type => 'attribute missing',
                            text => 'alt',
