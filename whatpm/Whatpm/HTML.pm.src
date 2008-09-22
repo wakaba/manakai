@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.190 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.191 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -323,7 +323,8 @@ my $foreign_attr_xname = {
 
 ## ISSUE: xmlns:xlink="non-xlink-ns" is not an error.
 
-my $c1_entity_char = {
+my $charref_map = {
+  0x0D => 0x000A,
   0x80 => 0x20AC,
   0x81 => 0xFFFD,
   0x82 => 0x201A,
@@ -356,7 +357,15 @@ my $c1_entity_char = {
   0x9D => 0xFFFD,
   0x9E => 0x017E,
   0x9F => 0x0178,
-}; # $c1_entity_char
+}; # $charref_map
+$charref_map->{$_} = 0xFFFD
+    for 0x0000..0x0008, 0x000B, 0x000E..0x001F, 0x007F, 
+        0xD800..0xDFFF, 0xFDD0..0xFDDF, ## ISSUE: 0xFDEF
+        0xFFFE, 0xFFFF, 0x1FFFE, 0x1FFFF, 0x2FFFE, 0x2FFFF, 0x3FFFE, 0x3FFFF,
+        0x4FFFE, 0x4FFFF, 0x5FFFE, 0x5FFFF, 0x6FFFE, 0x6FFFF, 0x7FFFE,
+        0x7FFFF, 0x8FFFE, 0x8FFFF, 0x9FFFE, 0x9FFFF, 0xAFFFE, 0xAFFFF,
+        0xBFFFE, 0xBFFFF, 0xCFFFE, 0xCFFFF, 0xDFFFE, 0xDFFFF, 0xEFFFE,
+        0xEFFFF, 0xFFFFE, 0xFFFFF, 0x10FFFE, 0x10FFFF;
 
 sub parse_byte_string ($$$$;$) {
   my $self = shift;
@@ -3174,29 +3183,18 @@ sub _get_next_token ($) {
       my $code = $self->{s_kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
-      if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+      if ($charref_map->{$code}) {
         !!!cp (1015);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
                         line => $l, column => $c);
-        $code = 0xFFFD;
+        $code = $charref_map->{$code};
       } elsif ($code > 0x10FFFF) {
         !!!cp (1016);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U-%08X', $code),
                         line => $l, column => $c);
         $code = 0xFFFD;
-      } elsif ($code == 0x000D) {
-        !!!cp (1017);
-        !!!parse-error (type => 'CR character reference',
-                        line => $l, column => $c);
-        $code = 0x000A;
-      } elsif (0x80 <= $code and $code <= 0x9F) {
-        !!!cp (1018);
-        !!!parse-error (type => 'C1 character reference',
-                        text => (sprintf 'U+%04X', $code),
-                        line => $l, column => $c);
-        $code = $c1_entity_char->{$code};
       }
 
       if ($self->{prev_state} == DATA_STATE) {
@@ -3293,26 +3291,18 @@ sub _get_next_token ($) {
       my $code = $self->{s_kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
-      if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+      if ($charref_map->{$code}) {
         !!!cp (1008);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
                         line => $l, column => $c);
-        $code = 0xFFFD;
+        $code = $charref_map->{$code};
       } elsif ($code > 0x10FFFF) {
         !!!cp (1009);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U-%08X', $code),
                         line => $l, column => $c);
         $code = 0xFFFD;
-      } elsif ($code == 0x000D) {
-        !!!cp (1010);
-        !!!parse-error (type => 'CR character reference', line => $l, column => $c);
-        $code = 0x000A;
-      } elsif (0x80 <= $code and $code <= 0x9F) {
-        !!!cp (1011);
-        !!!parse-error (type => 'C1 character reference', text => (sprintf 'U+%04X', $code), line => $l, column => $c);
-        $code = $c1_entity_char->{$code};
       }
 
       if ($self->{prev_state} == DATA_STATE) {
@@ -8036,4 +8026,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/21 05:08:16 $
+# $Date: 2008/09/22 06:04:29 $

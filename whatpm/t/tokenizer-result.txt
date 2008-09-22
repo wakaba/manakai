@@ -1,7 +1,7 @@
-1..1097
+1..1127
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Sep 21 20:17:20 2008
-# Current time GMT:   Sun Sep 21 11:17:20 2008
+# Current time local: Mon Sep 22 14:56:06 2008
+# Current time GMT:   Mon Sep 22 05:56:06 2008
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -230,7 +230,14 @@ ok 196
 ok 197
 ok 198
 ok 199
-ok 200
+not ok 200
+# Test 200 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #200)
+#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'\\x{10FFFF}'\n          ]\n        ];\n" (Maximum non-BMP numeric entity: qq'&#X10FFFF;')
+#     Got 1 extra line at line 2:
+#      + "          qq'ParseError',\n"
+#     Line 5 is changed:
+#      - "            qq'\\x{10FFFF}'\n"
+#      + "            qq'\\x{FFFD}'\n"
 ok 201
 ok 202
 ok 203
@@ -1033,17 +1040,7 @@ ok 942
 ok 943
 ok 944
 ok 945
-not ok 946
-# Test 946 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{DFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #946)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{DFFF}'\n          ]\n        ];\n" (surrogate character reference: qq'&#xD800;\x{DFFF}')
-#     Lines 3-3 are missing:
-#      - "          [\n"
-#      - "            qq'Character',\n"
-#      - "            qq'\\x{FFFD}'\n"
-#      - "          ],\n"
-#     Line 6 is changed:
-#      - "            qq'\\x{DFFF}'\n"
-#      + "            qq'\\x{FFFD}\\x{DFFF}'\n"
+ok 946
 ok 947
 ok 948
 ok 949
@@ -1060,7 +1057,17 @@ ok 959
 ok 960
 ok 961
 ok 962
-ok 963
+not ok 963
+# Test 963 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{DFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #963)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{DFFF}'\n          ]\n        ];\n" (surrogate character reference: qq'&#xD800;\x{DFFF}')
+#     Lines 3-3 are missing:
+#      - "          [\n"
+#      - "            qq'Character',\n"
+#      - "            qq'\\x{FFFD}'\n"
+#      - "          ],\n"
+#     Line 6 is changed:
+#      - "            qq'\\x{DFFF}'\n"
+#      + "            qq'\\x{FFFD}\\x{DFFF}'\n"
 ok 964
 ok 965
 ok 966
@@ -1195,3 +1202,33 @@ ok 1094
 ok 1095
 ok 1096
 ok 1097
+ok 1098
+ok 1099
+ok 1100
+ok 1101
+ok 1102
+ok 1103
+ok 1104
+ok 1105
+ok 1106
+ok 1107
+ok 1108
+ok 1109
+ok 1110
+ok 1111
+ok 1112
+ok 1113
+ok 1114
+ok 1115
+ok 1116
+ok 1117
+ok 1118
+ok 1119
+ok 1120
+ok 1121
+ok 1122
+ok 1123
+ok 1124
+ok 1125
+ok 1126
+ok 1127

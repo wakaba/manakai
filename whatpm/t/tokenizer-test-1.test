@@ -296,6 +296,30 @@
 "input":"&#x0;",
 "output":["ParseError", ["Character", "\uFFFD"]]},
 
+{"description": "U+0001 character reference",
+"input": "&#x1;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+0002 character reference",
+"input": "&#x2;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+0008 character reference",
+"input": "&#x8;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+0008 decimal character reference",
+"input": "&#8;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+0009 character reference",
+"input": "&#x9;",
+"output": [["Character", "\u0009"]]},
+
+{"description": "U+000A character reference",
+"input": "&#xa;",
+"output": [["Character", "\u000A"]]},
+
 {"description":"character entity &#13;",
 "input":"&#13;",
 "output":["ParseError", ["Character", "\u000A"]]},
@@ -311,6 +335,50 @@
 {"description":"character entity &#13; followed by a LF",
 "input":"&#13;\u000A",
 "output":["ParseError", ["Character", "\u000A\u000A"]]},
+
+{"description": "U+000B character reference",
+"input": "&#xb;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+000B decimal character reference",
+"input": "&#11;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+000C character reference",
+"input": "&#xc;",
+"output": [["Character", "\u000C"]]},
+
+{"description": "U+000E character reference",
+"input": "&#xe;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+000F character reference",
+"input": "&#xF;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+000F decimal character reference",
+"input": "&#15;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+0010 character reference",
+"input": "&#x10;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+001B character reference",
+"input": "&#x1b;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+001F character reference",
+"input": "&#x1F;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+0020 character reference",
+"input": "&#x20;",
+"output": [["Character", " "]]},
+
+{"description": "U+007F character reference",
+"input": "&#x7f;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"c1 character references",
 "input":"&#128;&#129;&#130;&#131;&#132;&#133;&#134;&#135;",
@@ -444,6 +512,58 @@
 {"description":"surrogate character reference",
 "input":"&#57343;",
 "output":["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+FDD0 character reference",
+"input": "&#xfdd0;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+FDD0 decimal character reference",
+"input": "&#64976;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+FDDF character reference",
+"input": "&#xfddf;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+FFFE character reference",
+"input": "&#xfffe;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+FFFE decimal character reference",
+"input": "&#65534;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+FFFF character reference",
+"input": "&#xffff;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+FFFF decimal character reference",
+"input": "&#65535;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+1FFFE character reference",
+"input": "&#x1fffe;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+1FFFF character reference",
+"input": "&#x1ffff;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+10FFFE character reference",
+"input": "&#x10fffe;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+10FFFE decimal character reference",
+"input": "&#1114110;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+10FFFF character reference",
+"input": "&#x10FFFF;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
+
+{"description": "U+10FFFF decimal character reference",
+"input": "&#1114111;",
+"output": ["ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"non-Unicode character reference",
 "input":"&#1114112;",

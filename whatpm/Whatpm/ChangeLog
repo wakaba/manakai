@@ -1,3 +1,9 @@
+2008-09-22  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTML.pm.src: Character references for non-space C0 characters,
+	including U+000B VT, DEL character, noncharacter code points, are
+	now converted to the U+FFFD character (cf. HTML5 revision 2138).
+
 2008-09-21  Wakaba  <wakaba@suika.fam.cx>
 
 	* ContentChecker.pm: |form=""| check support added.

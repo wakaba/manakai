@@ -165,7 +165,7 @@ $etypes->{$_} = 'unicode should'
     ## U+FD3E and U+FD3F, which are explicitly allowed.
 $etypes->{$_} = 'unicode discouraged' for 0x2153 .. 0x217F;
 $etypes->{$_} = 'control char'
-    for 0x0001 .. 0x0008, 0x000E .. 0x001F, 0x007F .. 0x009F;
+    for 0x0001 .. 0x0008, 0x000B, 0x000E .. 0x001F, 0x007F .. 0x009F;
 $etypes->{$_} = 'control char' for 0xD800 .. 0xDFFF;
 
 my $check_char = sub ($$) {
