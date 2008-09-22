@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.99 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.100 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -575,12 +575,11 @@ sub check_element ($$$;$) {
   $self->{id} = {};
   $self->{id_type} = {}; # 'form' / 'labelable' / 'menu'
   $self->{form} = {}; # form/@name
-  $self->{form_ref} = []; # @form
+  $self->{idref} = []; # @form, @for, @contextmenu
   $self->{term} = {};
   $self->{usemap} = [];
   $self->{ref} = []; # datetemplate data references
   $self->{template} = []; # datatemplate template references
-  $self->{contextmenu} = [];
   $self->{map} = {};
   $self->{has_link_type} = {};
   $self->{flag} = {};
@@ -793,22 +792,17 @@ next unless $code;## TODO: temp.
     }
   }
 
-  for (@{$self->{form_ref}}) {
-    if ($self->{id}->{$_->[0]} and
-        $self->{id_type}->{$_->[0]} eq 'form') {
+  for (@{$self->{idref}}) {
+    if ($self->{id}->{$_->[1]} and
+        $self->{id_type}->{$_->[1]} eq $_->[0]) {
       #
     } else {
-      $self->{onerror}->(node => $_->[1], type => 'no referenced form',
-                         level => $self->{level}->{must});
-    }
-  }
-
-  for (@{$self->{contextmenu}}) {
-    if ($self->{id}->{$_->[0]} and
-        $self->{id_type}->{$_->[0]} eq 'menu') {
-      #
-    } else {
-      $self->{onerror}->(node => $_->[1], type => 'no referenced menu',
+      $self->{onerror}->(node => $_->[2],
+                         type => {
+                                  form => 'no referenced form',
+                                  labelable => 'no referenced control',
+                                  menu => 'no referenced menu',
+                                 }->{$_->[0]},
                          level => $self->{level}->{must});
     }
   }
@@ -819,7 +813,7 @@ next unless $code;## TODO: temp.
   delete $self->{id};
   delete $self->{id_type};
   delete $self->{form};
-  delete $self->{form_ref};
+  delete $self->{idref};
   delete $self->{usemap};
   delete $self->{ref};
   delete $self->{template};
@@ -1071,4 +1065,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/21 12:37:09 $
+# $Date: 2008/09/22 06:48:03 $

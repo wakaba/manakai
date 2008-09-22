@@ -705,7 +705,7 @@ my $HTMLFormAttrChecker = sub {
   ## NOTE: MUST be the ID of a |form| element.
 
   my $value = $attr->value;
-  push @{$self->{form_ref}}, [$value => $attr];
+  push @{$self->{idref}}, ['form', $value => $attr];
 
   ## ISSUE: <form id=""><input form=""> (empty ID)?
 }; # $HTMLFormAttrChecker
@@ -1073,7 +1073,7 @@ my $HTMLAttrChecker = {
   contextmenu => sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
-    push @{$self->{contextmenu}}, [$value => $attr];
+    push @{$self->{idref}}, ['menu', $value => $attr];
     ## ISSUE: "The value must be the ID of a menu element in the DOM."
     ## What is "in the DOM"?  A menu Element node that is not part
     ## of the Document tree is in the DOM?  A menu Element node that
@@ -5526,6 +5526,8 @@ $Element->{$HTML_NS}->{input} = {
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{id_type} = 'labelable';
   },
 };
 
@@ -5597,6 +5599,8 @@ $Element->{$HTML_NS}->{button} = {
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{id_type} = 'labelable';
   },
 };
 
@@ -5606,7 +5610,13 @@ $Element->{$HTML_NS}->{label} = {
       | FEATURE_XHTML2_ED, 
   check_attrs => $GetHTMLAttrsChecker->({
     accesskey => $HTMLAccesskeyAttrChecker,
-    for => $AttrCheckerNotImplemented, ## TODO: IDREF ## TODO: Must be |id| of control [HTML4] ## TODO: Or, "may only contain one control element"
+    for => sub {
+      my ($self, $attr) = @_;
+      
+      ## NOTE: MUST be an ID of a labelable element.
+      
+      push @{$self->{idref}}, ['labelable', $attr->value, $attr];
+    },
     form => $HTMLFormAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -5674,6 +5684,8 @@ $Element->{$HTML_NS}->{select} = {
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{id_type} = 'labelable';
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -5926,6 +5938,8 @@ $Element->{$HTML_NS}->{textarea} = {
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{id_type} = 'labelable';
   },
 };
 
