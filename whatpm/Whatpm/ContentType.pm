@@ -28,7 +28,7 @@ algorithm as defined in the HTML5 specification.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -39,69 +39,84 @@ our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r
 ## determine that content is not HTML and thus safe from XSS attacks, but
 ## then a user agent detects it as HTML anyway and allows script to execute)."
 our @UnknownSniffingTable = (
-  ## Mask, Pattern, Sniffed Type, Has leading "WS" flag
-  [
+  ## Mask, Pattern, Sniffed Type, Has leading "WS" flag, Security Flag
+  ## (1 = Safe, 0 = Otherwise)
+  [ # <!DOCTYPE HTML
     "\xFF\xFF\xDF\xDF\xDF\xDF\xDF\xDF\xDF\xFF\xDF\xDF\xDF\xDF",
     "\x3C\x21\x44\x4F\x43\x54\x59\x50\x45\x20\x48\x54\x4D\x4C",
-    "text/html",
+    "text/html", 0, 0,
   ],
   [
     "\xFF\xDF\xDF\xDF\xDF",
     "\x3C\x48\x54\x4D\x4C", # "<HTML"
-    "text/html",
-    1,
+    "text/html", 1, 0,
   ],
   [
     "\xFF\xDF\xDF\xDF\xDF",
     "\x3C\x48\x45\x41\x44", # "<HEAD"
-    "text/html",
-    1,
+    "text/html", 1, 0,
   ],
   [
     "\xFF\xDF\xDF\xDF\xDF\xDF\xDF",
     "\x3C\x53\x43\x52\x49\x50\x54", # "<SCRIPT"
-    "text/html",
-    1,
+    "text/html", 1, 0,
   ],
   [
     "\xFF\xFF\xFF\xFF\xFF",
     "\x25\x50\x44\x46\x2D",
-    "application/pdf",
+    "application/pdf", 0, 0,
   ],
   [
     "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF",
     "\x25\x21\x50\x53\x2D\x41\x64\x6F\x62\x65\x2D",
-    "application/postscript",
+    "application/postscript", 0, 1,
   ],
+
+  [
+    "\xFF\xFF\x00\x00",
+    "\xFE\xFF\x00\x00", # UTF-16BE BOM
+    "text/plain", 0, 0,
+  ],
+  [
+    "\xFF\xFF\x00\x00",
+    "\xFF\xFE\x00\x00", # UTF-16LE BOM ## ISSUE: Spec wrong
+    "text/plain", 0, 0,
+  ],
+  [
+    "\xFF\xFF\xFF\x00",
+    "\xEF\xBB\xBF\x00", # UTF-8 BOM
+    "text/plain", 0, 0,
+  ],
+
   [
     "\xFF\xFF\xFF\xFF\xFF\xFF",
     "\x47\x49\x46\x38\x37\x61",
-    "image/gif",
+    "image/gif", 0, 1,
   ],
   [
     "\xFF\xFF\xFF\xFF\xFF\xFF",
     "\x47\x49\x46\x38\x39\x61",
-    "image/gif",
+    "image/gif", 0, 1,
   ],
   [
     "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF",
     "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A",
-    "image/png",
+    "image/png", 0, 1,
   ],
   [
     "\xFF\xFF\xFF",
     "\xFF\xD8\xFF",
-    "image/jpeg",
+    "image/jpeg", 0, 1,
   ],
   [
     "\xFF\xFF",
     "\x42\x4D",
-    "image/bmp",
+    "image/bmp", 0, 1, 
   ],
   [
     "\xFF\xFF\xFF\xFF",
     "\x00\x00\x01\x00",
-    "image/vnd.microsoft.icon",
+    "image/vnd.microsoft.icon", 0, 1,
   ],
 );
 
@@ -139,6 +154,9 @@ my @ImageSniffingTable = (
 ## NOTE: Ensure |$bytes| to be longer than pattern when a new image type
 ## is added to the table.
 
+## NOTE: From section "Content-Type sniffing: text or binary".
+my $binary_data_bytes = qr/[\x00-\x08\x0B\x0E-\x1A\x1C-\x1F]/;
+
 =head1 METHOD
 
 =over 4
@@ -154,11 +172,11 @@ type as specified in the transfer protocol metadata,
 without any parameters and in lowercase.
 
 Arguments to this method MUST be specified as name-value pairs.
-Named parameters defined for this method:
+Valid named parameters defined for this method is as follows:
 
 =over 4
 
-=item content_type_metadata
+=item content_type_metadata => I<media-type>
 
 The Content-Type metadata, in character string, as defined in HTML5.
 The value of this parameter MUST be an Internet Media Type (with
@@ -170,7 +188,7 @@ then the C<content_type_metadata> parameter has no effect.  Otherwise,
 the C<content_type_metadata> parameter MUST be specified if and only
 if any Content-Type metadata is available.
 
-=item get_file_head
+=item get_file_head => I<CODE>
 
 The code reference used to obtain first I<$n> bytes of the 
 entity sniffed.  The value of this parameter MUST be a
@@ -187,11 +205,11 @@ byte and later are discarded.  The code MAY return
 a string whose length is less than I<$n> bytes
 if no more bytes is available.
 
-=item has_http_content_encoding
+=item has_http_content_encoding => I<boolean>
 
 I<This parameter is obsolete and has no effect.>
 
-=item http_content_type_byte
+=item http_content_type_byte => I<Content-Type-field-body>
 
 The byte sequence of the C<field-body> part of the HTTP
 C<Content-Type> header field of the entity.
@@ -202,7 +220,7 @@ the entity if and only if it is transfered over HTTP
 and the HTTP response entity contains the C<Content-Type>
 header field.
 
-=item supported_image_types
+=item supported_image_types => {I<media-type> => I<boolean>, ...}
 
 A reference to the hash that contains the list of supported
 image types.
@@ -244,7 +262,7 @@ sub get_sniffed_type ($%) {
       ## Step 3
       if (length $bytes >= 4) {
         my $by = substr $bytes, 0, 4;
-        return 'text/plain'
+        return ('text/plain', 'text/plain')
             if $by =~ /^\xFE\xFF/ or
                 $by =~ /^\xFF\xFE/ or
                 #$by =~ /^\x00\x00\xFE\xFF/ or
@@ -252,13 +270,23 @@ sub get_sniffed_type ($%) {
       }
 
       ## Step 4
-      return ('text/plain', 'application/octet-stream')
-          if $bytes =~ /[\x00-\x08\x0B\x0E-\x1A\x1C-\x1F]/; # binary data bytes
-
-      ## ISSUE: There is an ISSUE in the spec.
+      return ('text/plain', 'text/plain')
+          unless $bytes =~ /$binary_data_bytes/;
 
       ## Step 5
-      return ('text/plain', 'text/plain');
+      ROW: for my $row (@UnknownSniffingTable) {
+        ## $row = [Mask, Pattern, Sniffed Type, Has leading WS flag, Security];
+        next ROW unless $row->[4]; # Safe
+        my $pattern_length = length $row->[1];
+        my $data = substr ($bytes, 0, $pattern_length);
+        return ('text/plain', $row->[2]) if $data eq $row->[1];
+
+        ## NOTE: "WS" flag and mask are ignored, since "safe" rows
+        ## don't use them.
+      }
+
+      ## Step 6
+      return ('text/plain', 'application/octet-stream');
     }
   }
 
@@ -285,9 +313,6 @@ sub get_sniffed_type ($%) {
   if (not defined $official_type or
       $official_type eq 'unknown/unknown' or
       $official_type eq 'application/unknown') {
-    ## ISSUE: Use of extension (of filename?) is disallowed (WA1 4.7.5)
-    ## even if there is no Content-Type header field (RFC 2616 7.2.1)?
-
     ## Algorithm: "Content-Type sniffing: unknown type"
 
     ## NOTE: The "unknown" algorithm does not support HTML with BOM.
@@ -300,7 +325,7 @@ sub get_sniffed_type ($%) {
 
     ## Step 3
     ROW: for my $row (@UnknownSniffingTable) {
-      ## $row = [Mask, Pattern, Sniffed Type, Has leading WS flag];
+      ## $row = [Mask, Pattern, Sniffed Type, Has leading WS flag, Security];
       my $pos = 0;
       if ($row->[3]) {
         $pos++ while substr ($bytes, $pos, 1) =~ /^[\x09\x0A\x0C\x0D\x20]/;
@@ -312,24 +337,11 @@ sub get_sniffed_type ($%) {
     }
 
     ## Step 4
-    ## Text or binary; $n=$stream_length
-   
-    ## Step 3
-    if ($stream_length >= 4) {
-      my $by = substr $bytes, 0, 4;
-      return ($official_type, 'text/plain')
-          if $by =~ /^\xFE\xFF/ or
-              $by =~ /^\xFF\xFE/ or
-              #$by =~ /^\x00\x00\xFE\xFF/ or
-              $by =~ /^\xEF\xBB\xBF/;
-    }
-
-    ## Step 4
-    return ($official_type, 'application/octet-stream')
-        if $bytes =~ /[\x00-\x08\x0B\x0E-\x1A\x1C-\x1F]/; # binary data bytes
+    return ($official_type, 'text/plain')
+        unless $bytes =~ /$binary_data_bytes/;
 
     ## Step 5
-    return ($official_type, 'text/plain');
+    return ($official_type, 'application/octet-stream');
   }
 
   ## Step 4
@@ -434,4 +446,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/20 07:54:47 $
+# $Date: 2008/10/02 10:59:04 $

@@ -2,7 +2,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 2286 }
+BEGIN { plan tests => 3752 }
 
 use Whatpm::ContentType;
 
@@ -134,6 +134,27 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq<\xFF\xFF>,
+    q<text/plain>, 0,
+    q<text/plain>, '0xFF 0xFF',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<\xFE\xFF\x00>,
+    q<text/plain>, 0,
+    q<application/octet-stream>, 'UTF-16BE BOM followed by 0x00',
+    q<application/octet-stream>,
+    q<text/html>,
+  ],
+  [
+    qq<\xFF\xFE\x00>,
+    q<text/plain>, 0,
+    q<application/octet-stream>, 'UTF-16LE BOM followed by 0x00',
+    q<application/octet-stream>,
+    q<text/html>,
+  ],
+  [
     qq<\x00\x00\xFE\xFF>,
     q<text/plain>, 0,
     q<application/octet-stream>, 'UTF-32BE BOM only',
@@ -148,6 +169,20 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq<\xFF\xFE\x00\x00>,
+    q<text/plain>, 0,
+    q<text/plain>, 'UTF-32 4321 BOM only',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<\xFE\xFF\x00\x00>,
+    q<text/plain>, 0,
+    q<text/plain>, 'UTF-32 3412 BOM only',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
     qq<\xEF\xBB\xBF>,
     q<text/plain>, 0,
     q<text/plain>, 'UTF-8 BOM only',
@@ -158,6 +193,13 @@ for my $v (
     qq<\xEF\xBB\xBF\x1A>,
     q<text/plain>, 0,
     q<text/plain>, 'UTF-8 BOM + 1',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<\xEF\xBB\xBF\x00>,
+    q<text/plain>, 0,
+    q<text/plain>, 'UTF-8 BOM followed by NULL',
     q<text/plain>,
     q<text/html>,
   ],
@@ -643,7 +685,18 @@ for my $v (
           35 2e 34 38 35 20 43 6f 70 79 72 69 67 68 74 20
           31 39 38 36 2d 39 32 20 52 61 64 69 63 61 6c 20)),
     q<text/plain>, 0,
-    q<text/plain>, 'PS',
+    q<text/plain>, # since no binary data bytes in the input.
+    'PS',
+    q<application/postscript>,
+    q<text/html>,
+  ],
+  [
+    x (qw(25 21 50 53 2d 41 64 6f 62 65 2d 32 2e 30 0a 25
+          25 43 72 65 61 74 6f 72 3a 20 64 76 69 70 73 20
+          35 2e 34 38 35 20 43 6f 70 79 72 69 67 68 74 20
+          31 39 38 36 2d 39 32 20 52 61 64 69 63 61 6c 20), 0x00),
+    q<text/plain>, 0,
+    q<application/postscript>, 'PS header followed by a NULL character',
     q<application/postscript>,
     q<text/html>,
   ],
@@ -662,7 +715,7 @@ for my $v (
           74 34 00 78 38 00 7d 3d 00 7a 55 32 7e 5a 36 7e
           5a 3a 80 40 01 84 44 05 89 49 0a 8c 4c 0d 83 4b)),
     q<text/plain>, 0,
-    q<application/octet-stream>, 'GIF87a',
+    q<image/gif>, 'GIF87a',
     q<image/gif>,
     q<text/html>,
   ],
@@ -671,7 +724,7 @@ for my $v (
           74 34 00 78 38 00 7d 3d 00 7a 55 32 7e 5a 36 7e
           5a 3a 80 40 01 84 44 05 89 49 0a 8c 4c 0d 83 4b)),
     q<text/plain>, 0,
-    q<application/octet-stream>, 'GIF89a',
+    q<image/gif>, 'GIF89a',
     q<image/gif>,
     q<text/html>,
   ],
@@ -690,7 +743,7 @@ for my $v (
           00 00 00 61 00 00 00 2a 08 03 00 00 00 94 47 c5
           3e 00 00 03 00 50 4c 54 45 ff ff ff fc 12 3c 1c)),
     q<text/plain>, 0,
-    q<application/octet-stream>, 'PNG',
+    q<image/png>, 'PNG',
     q<image/png>,
     q<text/html>,
   ],
@@ -718,21 +771,21 @@ for my $v (
           00 01 00 00 ff db 00 43 00 14 0e 0f 12 0f 0d 14
           12 10 12 17 15 14 18 1e 32 21 1e 1c 1c 1e 3d 2c)),
     q<text/plain>, 0,
-    q<application/octet-stream>, 'JPEG JFIF',
+    q<image/jpeg>, 'JPEG JFIF',
     q<image/jpeg>,
     q<text/html>,
   ],
   [
     x (qw(42 4d b6 2a 00 00 00 00 00 00 36 00 00 00 28 00)),
     q<text/plain>, 0,
-    q<application/octet-stream>, 'BMP',
+    q<image/bmp>, 'BMP',
     q<image/bmp>,
     q<text/html>,
   ],
   [
     x (qw(00 00 01 00 b6 2a 00 00 00 00 00 00 36 00 00 00 28 00)),
     q<text/plain>, 0,
-    q<application/octet-stream>, 'Microsoft Windows icon',
+    q<image/vnd.microsoft.icon>, 'Microsoft Windows icon',
     q<image/vnd.microsoft.icon>,
     q<text/html>,
   ],
@@ -945,6 +998,13 @@ for my $v (
   }, http_content_type_byte => $v->[1],
   supported_image_types => {'image/jpeg' => 1});
   ok $st, $v->[3], 'Text or binary: ' . $v->[4];
+  ## List context
+  my ($ot, $st) = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
+    return $v->[0]; 
+  }, http_content_type_byte => $v->[1],
+  supported_image_types => {'image/jpeg' => 1});
+  ok $st, $v->[3], 'Text or binary (list): ' . $v->[4];
+  ok $ot, get_official ($v->[1]), 'Text or binary official: ' . $v->[4];
 
   ## Unknown type
   for my $ct (undef, 'application/unknown', 'unknown/unknown',
@@ -956,6 +1016,13 @@ for my $v (
     supported_image_types => {'image/jpeg' => 1});
     ok $st, $v->[5], 'Unknown type ('.$ct.'): ' . $v->[4];
   }
+  ($ot, $st) = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
+    return $v->[0]; 
+  },
+  http_content_type_byte => 'unknown/unknown',
+  supported_image_types => {'image/jpeg' => 1});
+  ok $st, $v->[5], 'Unknown type (list): ' . $v->[4];
+  ok $ot, 'unknown/unknown', 'Unknown type (official): ' . $v->[4];
 
   ## Image
   for my $img_type (qw(image/png image/gif image/jpeg)) {
@@ -985,6 +1052,15 @@ for my $v (
     ok $st, $v->[5] =~ m#^image/# ? $v->[5] : $img_type,
         'Image (all): ' . $v->[4];
   }
+  ($ot, $st) = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
+    return $v->[0];
+  },
+  http_content_type_byte => 'image/png',
+  supported_image_types => {qw(image/png 1 image/jpeg 1 image/gif 1
+                               image/bmp 1 image/vnd.microsoft.icon 1)});
+  ok $st, $v->[5] =~ m#^image/# ? $v->[5] : 'image/png',
+      'Image (all list): ' . $v->[4];
+  ok $ot, 'image/png', 'Image (official): ' . $v->[4];
 
   ## Feed or HTML
   $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
@@ -993,6 +1069,14 @@ for my $v (
   http_content_type_byte => 'text/html',
   supported_image_types => {'image/jpeg' => 1});
   ok $st, $v->[6], 'Feed or HTML: ' . $v->[4];
+  ## List context
+  ($ot, $st) = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
+    return $v->[0]; 
+  },
+  http_content_type_byte => 'text/html',
+  supported_image_types => {'image/jpeg' => 1});
+  ok $st, $v->[6], 'Feed or HTML (list): ' . $v->[4];
+  ok $ot, 'text/html', 'Feed or HTML (official): ' . $v->[4];
 
   ## image/svg+xml is always treated as image/svg+xml
   $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
@@ -1001,10 +1085,26 @@ for my $v (
   http_content_type_byte => 'image/svg+xml',
   supported_image_types => {});
   ok $st, 'image/svg+xml', 'SVG: ' . $v->[4];
+  ## List context
+  ($ot, $st) = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
+    return $v->[0];
+  },
+  http_content_type_byte => 'image/svg+xml',
+  supported_image_types => {});
+  ok $st, 'image/svg+xml', 'SVG (list): ' . $v->[4];
+  ok $ot, 'image/svg+xml', 'SVG (official): ' . $v->[4];
 
   ## TODO: We should test image sniffing rules standalone actually...
 }
 
+sub get_official ($) {
+  my $s = shift;
+  $s =~ s/;.*//;
+  $s =~ s/\s+//g;
+  $s =~ tr/A-Z/a-z/;
+  return $s;
+} # get_official
+
 ## License: Public Domain.
-## $Date: 2008/09/20 07:54:48 $
+## $Date: 2008/10/02 10:59:05 $
 1;

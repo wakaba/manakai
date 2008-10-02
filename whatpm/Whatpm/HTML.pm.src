@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.191 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.192 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -366,6 +366,9 @@ $charref_map->{$_} = 0xFFFD
         0x7FFFF, 0x8FFFE, 0x8FFFF, 0x9FFFE, 0x9FFFF, 0xAFFFE, 0xAFFFF,
         0xBFFFE, 0xBFFFF, 0xCFFFE, 0xCFFFF, 0xDFFFE, 0xDFFFF, 0xEFFFE,
         0xEFFFF, 0xFFFFE, 0xFFFFF, 0x10FFFE, 0x10FFFF;
+
+## TODO: Invoke the reset algorithm when a resettable element is
+## created (cf. HTML5 revision 2259).
 
 sub parse_byte_string ($$$$;$) {
   my $self = shift;
@@ -8026,4 +8029,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/22 06:04:29 $
+# $Date: 2008/10/02 10:59:04 $
