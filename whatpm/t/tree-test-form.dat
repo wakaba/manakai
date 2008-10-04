@@ -1,0 +1,170 @@
+#data
+<option>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|       "x"
+
+#data
+<option></option>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|     "x"
+
+#data
+<optgroup>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <optgroup>
+|       "x"
+
+#data
+<optgroup></optgroup>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <optgroup>
+|     "x"
+
+#data
+<optgroup><option>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <optgroup>
+|       <option>
+|         "x"
+
+#data
+<optgroup><optgroup>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <optgroup>
+|       <optgroup>
+
+#data
+<option><option>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|     <option>
+
+#data
+<option><optgroup>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|     <optgroup>
+
+#data
+<option><span><optgroup>
+#errors
+no DOCTYPE
+no </span>
+#document
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|       <span>
+|     <optgroup>
+
+#data
+<optgroup><span><option>
+#errors
+no DOCTYPE
+no </span>
+#document
+| <html>
+|   <head>
+|   <body>
+|     <optgroup>
+|       <span>
+|         <option>
+
+#data
+<b><i></b><option>
+#errors
+no DOCTYPE
+no </i> before </b>
+unexpected EOF
+#document
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|     <i>
+|       <option>
+
+#data
+<b><i></b><optgroup>
+#errors
+no DOCTYPE
+no </i> before </b>
+unexpected EOF
+#document
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|     <i>
+|       <optgroup>
+
+#data
+<option><marquee><option>
+#errors
+no DOCTYPE
+no </marquee>
+#document
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|       <marquee>
+|         <option>
+
+#data
+<option><marquee><optgroup>
+#errors
+no DOCTYPE
+no </marquee>
+#document
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|       <marquee>
+|         <optgroup>

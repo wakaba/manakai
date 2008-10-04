@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.200 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.201 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -86,6 +86,8 @@ sub ALL_END_TAG_OPTIONAL_EL () {
   LI_EL |
   P_EL |
 
+  ## ISSUE: option, optgroup, rt, rp?
+
   BODY_EL |
   HTML_EL |
   TABLE_CELL_EL |
@@ -130,8 +132,6 @@ sub SPECIAL_EL () {
   FORM_EL |
   FRAMESET_EL |
   HEADING_EL |
-  OPTION_EL |
-  OPTGROUP_EL |
   SELECT_EL |
   TABLE_ROW_EL |
   TABLE_ROW_GROUP_EL |
@@ -7398,6 +7398,31 @@ sub _tree_construction_main ($) {
         }
         !!!next-token;
         next B;
+      } elsif ($token->{tag_name} eq 'optgroup' or
+               $token->{tag_name} eq 'option') {
+        ## has an |option| element in scope
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
+          if ($node->[1] & OPTION_EL) {
+            !!!cp ('t397.1');
+            ## NOTE: As if </option>
+            !!!back-token; # <option> or <optgroup>
+            $token = {type => END_TAG_TOKEN, tag_name => 'option',
+                      line => $token->{line}, column => $token->{column}};
+            next B;
+          } elsif ($node->[1] & SCOPING_EL) {
+            !!!cp ('t397.2');
+            last INSCOPE;
+          }
+        } # INSCOPE
+
+        $reconstruct_active_formatting_elements->($insert_to_current);
+
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
+
+        !!!nack ('t397.3');
+        !!!next-token;
+        redo B;
       } elsif ($token->{tag_name} eq 'rt' or
                $token->{tag_name} eq 'rp') {
         ## has a |ruby| element in scope
@@ -7445,9 +7470,9 @@ sub _tree_construction_main ($) {
         
         if ($self->{self_closing}) {
           pop @{$self->{open_elements}};
-          !!!ack ('t398.1');
+          !!!ack ('t398.6');
         } else {
-          !!!cp ('t398.2');
+          !!!cp ('t398.7');
           $self->{insertion_mode} |= IN_FOREIGN_CONTENT_IM;
           ## NOTE: |<body><math><mi><svg>| -> "in foreign content" insertion
           ## mode, "in body" (not "in foreign content") secondary insertion
@@ -7458,7 +7483,7 @@ sub _tree_construction_main ($) {
         next B;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
-                frameset => 1, head => 1, option => 1, optgroup => 1,
+                frameset => 1, head => 1,
                 tbody => 1, td => 1, tfoot => 1, th => 1,
                 thead => 1, tr => 1,
                }->{$token->{tag_name}}) {
@@ -8211,4 +8236,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 11:32:15 $
+# $Date: 2008/10/04 12:20:35 $

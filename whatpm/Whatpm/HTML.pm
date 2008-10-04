@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.195 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.196 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -86,6 +86,8 @@ sub ALL_END_TAG_OPTIONAL_EL () {
   LI_EL |
   P_EL |
 
+  ## ISSUE: option, optgroup, rt, rp?
+
   BODY_EL |
   HTML_EL |
   TABLE_CELL_EL |
@@ -130,8 +132,6 @@ sub SPECIAL_EL () {
   FORM_EL |
   FRAMESET_EL |
   HEADING_EL |
-  OPTION_EL |
-  OPTGROUP_EL |
   SELECT_EL |
   TABLE_ROW_EL |
   TABLE_ROW_GROUP_EL |
@@ -6097,6 +6097,8 @@ sub _tree_construction_main ($) {
         pop @{$self->{open_elements}}
             while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
 
+        ## NOTE: |<span><svg>| ... two parse errors, |<svg>| ... a parse error.
+
         $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
         ## Reprocess.
         next B;
@@ -9766,6 +9768,59 @@ sub _tree_construction_main ($) {
         }
         $token = $self->_get_next_token;
         next B;
+      } elsif ($token->{tag_name} eq 'optgroup' or
+               $token->{tag_name} eq 'option') {
+        ## has an |option| element in scope
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
+          if ($node->[1] & OPTION_EL) {
+            
+            ## NOTE: As if </option>
+            
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <option> or <optgroup>
+            $token = {type => END_TAG_TOKEN, tag_name => 'option',
+                      line => $token->{line}, column => $token->{column}};
+            next B;
+          } elsif ($node->[1] & SCOPING_EL) {
+            
+            last INSCOPE;
+          }
+        } # INSCOPE
+
+        $reconstruct_active_formatting_elements->($insert_to_current);
+
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
+
+        
+        $token = $self->_get_next_token;
+        redo B;
       } elsif ($token->{tag_name} eq 'rt' or
                $token->{tag_name} eq 'rp') {
         ## has a |ruby| element in scope
@@ -9890,7 +9945,7 @@ sub _tree_construction_main ($) {
         next B;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
-                frameset => 1, head => 1, option => 1, optgroup => 1,
+                frameset => 1, head => 1,
                 tbody => 1, td => 1, tfoot => 1, th => 1,
                 thead => 1, tr => 1,
                }->{$token->{tag_name}}) {
@@ -10707,4 +10762,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 11:32:15 $
+# $Date: 2008/10/04 12:20:35 $

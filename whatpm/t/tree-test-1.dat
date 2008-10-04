@@ -4185,24 +4185,26 @@ unexpected end of file
 #data
 <!DOCTYPE HTML>a<option>b
 #errors
-<option> in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |   <body>
-|     "ab"
+|     "a"
+|     <option>
+|       "b"
 
 #data
 <!DOCTYPE HTML>a<optgroup>b
 #errors
-<optgroup> in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |   <body>
-|     "ab"
+|     "a"
+|     <optgroup>
+|       "b"
 
 #data
 <!DOCTYPE HTML>a<tbody>b
@@ -7700,6 +7702,62 @@ no </ul>
 |       <li>
 
 #data
+<!DOCTYPE HTML><ul><li><option><li>
+#errors
+no </ul>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <option>
+|       <li>
+
+#data
+<!DOCTYPE HTML><ul><li><optgroup><li>
+#errors
+no </ul>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <optgroup>
+|       <li>
+
+#data
+<!DOCTYPE HTML><ul><li><rp><li>
+#errors
+no </ul>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <rp>
+|       <li>
+
+#data
+<!DOCTYPE HTML><ul><li><rt><li>
+#errors
+no </ul>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <rt>
+|       <li>
+
+#data
 <!DOCTYPE HTML><ul><li><unknown><li>
 #errors
 no </unknown>
@@ -8466,6 +8524,62 @@ no </dl>
 |     <dl>
 |       <dt>
 |         <time>
+|       <dt>
+
+#data
+<!DOCTYPE HTML><dl><dt><option><dt>
+#errors
+no </dl>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         <option>
+|       <dt>
+
+#data
+<!DOCTYPE HTML><dl><dt><optgroup><dt>
+#errors
+no </dl>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         <optgroup>
+|       <dt>
+
+#data
+<!DOCTYPE HTML><dl><dt><rt><dt>
+#errors
+no </dl>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         <rt>
+|       <dt>
+
+#data
+<!DOCTYPE HTML><dl><dt><rp><dt>
+#errors
+no </dl>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         <rp>
 |       <dt>
 
 #data
@@ -9788,6 +9902,54 @@ element not closed before ancestor's end tag
 |     "a"
 
 #data
+<span><option></span>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <option>
+|     "a"
+
+#data
+<span><optgroup></span>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <optgroup>
+|     "a"
+
+#data
+<span><rp></span>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <rp>
+|     "a"
+
+#data
+<span><rt></span>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <rt>
+|     "a"
+
+#data
 <span><unknown></span>a
 #errors
 no DOCTYPE
@@ -10687,9 +10849,10 @@ no DOCTYPE
 |   <head>
 |   <body>
 |     <table>
-|       <tr>
-|         <td>
-|           <option>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <option>
 
 #data
 <table><tr><td><optgroup></td></table>
@@ -10700,9 +10863,10 @@ no DOCTYPE
 |   <head>
 |   <body>
 |     <table>
-|       <tr>
-|         <td>
-|           <optgroup>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <optgroup>
 
 #data
 <table><tr><th><option></th></table>
@@ -10713,9 +10877,10 @@ no DOCTYPE
 |   <head>
 |   <body>
 |     <table>
-|       <tr>
-|         <th>
-|           <option>
+|       <tbody>
+|         <tr>
+|           <th>
+|             <option>
 
 #data
 <table><tr><th><optgroup></th></table>
@@ -10726,9 +10891,10 @@ no DOCTYPE
 |   <head>
 |   <body>
 |     <table>
-|       <tr>
-|         <th>
-|           <optgroup>
+|       <tbody>
+|         <tr>
+|           <th>
+|             <optgroup>
 
 #data
 <body></caption>
