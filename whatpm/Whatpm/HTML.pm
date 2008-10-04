@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.191 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.192 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -9249,7 +9249,6 @@ sub _tree_construction_main ($) {
         }
 
         ## 5. (a) has a |p| element in scope
-        ## ISSUE: Is this step really necessary?
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
             
@@ -9357,7 +9356,6 @@ sub _tree_construction_main ($) {
         }
 
         ## 5. (a) has a |p| element in scope
-        ## ISSUE: Is this step really necessary?
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
             
@@ -10074,6 +10072,10 @@ sub _tree_construction_main ($) {
 
                 applet => 1, button => 1, marquee => 1, object => 1,
                }->{$token->{tag_name}}) {
+        ## NOTE: Code for <li> start tags includes "as if </li>" code.
+        ## Code for <dt> or <dd> start tags includes "as if </dt> or
+        ## </dd>" code.
+
         ## has an element in scope
         my $i;
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -10232,6 +10234,7 @@ sub _tree_construction_main ($) {
         ## NOTE: As normal, except </p> implies <p> and ...
 
         ## has an element in scope
+        my $non_optional;
         my $i;
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
@@ -10242,21 +10245,32 @@ sub _tree_construction_main ($) {
           } elsif ($node->[1] & SCOPING_EL) {
             
             last INSCOPE;
+          } elsif ($node->[1] & END_TAG_OPTIONAL_EL) {
+            ## NOTE: |END_TAG_OPTIONAL_EL| includes "p"
+            
+            #
+          } else {
+            
+            $non_optional ||= $node;
+            #
           }
         } # INSCOPE
 
         if (defined $i) {
-          if ($self->{open_elements}->[-1]->[0]->manakai_local_name
-                  ne $token->{tag_name}) {
+          ## 1. Generate implied end tags
+          #
+
+          ## 2. If current node != "p", parse error
+          if ($non_optional) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
-                            text => $self->{open_elements}->[-1]->[0]
-                                ->manakai_local_name,
+                            text => $non_optional->[0]->manakai_local_name,
                             token => $token);
           } else {
             
           }
 
+          ## 3. Pop
           splice @{$self->{open_elements}}, $i;
         } else {
           
@@ -10682,4 +10696,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 07:58:58 $
+# $Date: 2008/10/04 08:29:18 $

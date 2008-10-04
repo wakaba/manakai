@@ -1,7 +1,7 @@
 1..3105
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Oct  4 16:57:31 2008
-# Current time GMT:   Sat Oct  4 07:57:31 2008
+# Current time local: Sat Oct  4 17:27:30 2008
+# Current time GMT:   Sat Oct  4 08:27:30 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -4717,4 +4717,121 @@ ok 4035
 ok 4036
 ok 4037
 ok 4038
+ok 4039
+ok 4040
+ok 4041
+ok 4042
+ok 4043
+ok 4044
+ok 4045
+ok 4046
+ok 4047
+ok 4048
+ok 4049
+ok 4050
+ok 4051
+ok 4052
+ok 4053
+ok 4054
+ok 4055
+ok 4056
+ok 4057
+ok 4058
+ok 4059
+ok 4060
+ok 4061
+ok 4062
+ok 4063
+ok 4064
+ok 4065
+ok 4066
+ok 4067
+ok 4068
+ok 4069
+ok 4070
+ok 4071
+ok 4072
+ok 4073
+ok 4074
+ok 4075
+ok 4076
+ok 4077
+ok 4078
+ok 4079
+ok 4080
+ok 4081
+ok 4082
+ok 4083
+ok 4084
+ok 4085
+ok 4086
+ok 4087
+ok 4088
+ok 4089
+ok 4090
+ok 4091
+ok 4092
+ok 4093
+ok 4094
+ok 4095
+ok 4096
+ok 4097
+ok 4098
+not ok 4099
+# Test 4099 got: "1" (t/HTML-tree.t at line 185 fail #1367)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><p><option><p></p>'; 1:27:in body;)
+ok 4100
+not ok 4101
+# Test 4101 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|     <p>\n" (t/HTML-tree.t at line 190 fail #1367)
+#      Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       <option>\n|     <p>\n" (Document tree: qq'<!DOCTYPE HTML><p><option><p></p>')
+#      Line 6 is missing:
+#       - "|       <option>\n"
+not ok 4102
+# Test 4102 got: "1" (t/HTML-tree.t at line 185 fail #1368)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><p><optgroup><p></p>'; 1:29:in body;)
+ok 4103
+not ok 4104
+# Test 4104 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|     <p>\n" (t/HTML-tree.t at line 190 fail #1368)
+#      Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       <optgroup>\n|     <p>\n" (Document tree: qq'<!DOCTYPE HTML><p><optgroup><p></p>')
+#      Line 6 is missing:
+#       - "|       <optgroup>\n"
+ok 4105
+ok 4106
+ok 4107
+ok 4108
+ok 4109
+ok 4110
+ok 4111
+ok 4112
+ok 4113
+ok 4114
+ok 4115
+ok 4116
+ok 4117
+ok 4118
+ok 4119
+ok 4120
+ok 4121
+ok 4122
+ok 4123
+ok 4124
+ok 4125
+ok 4126
+ok 4127
+ok 4128
+ok 4129
+ok 4130
+ok 4131
+ok 4132
+ok 4133
+ok 4134
+ok 4135
+ok 4136
+ok 4137
+ok 4138
+ok 4139
+ok 4140
+ok 4141
+ok 4142
+ok 4143
 # t/tree-test-phrasing.dat
