@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.193 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.194 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -10350,24 +10350,6 @@ sub _tree_construction_main ($) {
         ## Ignore the token.
         $token = $self->_get_next_token;
         next B;
-      } elsif ({
-                caption => 1, col => 1, colgroup => 1, frame => 1,
-                frameset => 1, head => 1, option => 1, optgroup => 1,
-                tbody => 1, td => 1, tfoot => 1, th => 1,
-                thead => 1, tr => 1,
-                area => 1, basefont => 1, bgsound => 1,
-                embed => 1, hr => 1, iframe => 1, image => 1,
-                img => 1, input => 1, isindex => 1, noembed => 1,
-                noframes => 1, param => 1, select => 1, spacer => 1,
-                table => 1, textarea => 1, wbr => 1,
-                noscript => 0, ## TODO: if scripting is enabled
-               }->{$token->{tag_name}}) {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                        text => $token->{tag_name}, token => $token);
-        ## Ignore the token
-        $token = $self->_get_next_token;
-        next B;
       } else {
         if ($token->{tag_name} eq 'sarcasm') {
           sleep 0.001; # take a deep breath
@@ -10719,4 +10701,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 08:58:02 $
+# $Date: 2008/10/04 09:17:54 $
