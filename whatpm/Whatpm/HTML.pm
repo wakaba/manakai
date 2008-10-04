@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.192 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.193 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -488,7 +488,6 @@ sub parse_byte_stream ($$$$;$$) {
     if (defined $charset_name) {
       $charset = Message::Charset::Info->get_by_html_name ($charset_name);
 
-      ## ISSUE: Unsupported encoding is not ignored according to the spec.
       require Whatpm::Charset::DecodeHandle;
       $buffer = Whatpm::Charset::DecodeHandle::ByteBuffer->new
           ($byte_stream);
@@ -3325,7 +3324,6 @@ sub _get_next_token ($) {
         
         $self->{ct}->{name} = chr $self->{nc};
         delete $self->{ct}->{quirks};
-## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = DOCTYPE_NAME_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -5290,8 +5288,6 @@ sub _tree_construction_root_element ($) {
     ## NOTE: Reprocess the token.
     
     return; ## Go to the "before head" insertion mode.
-
-    ## ISSUE: There is an issue in the spec
   } # B
 
   die "$0: _tree_construction_root_element: This should never be reached";
@@ -6438,7 +6434,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-              my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              my $meta_el = pop @{$self->{open_elements}};
 
               unless ($self->{confident}) {
                 if ($token->{attributes}->{charset}) {
@@ -7012,8 +7008,6 @@ sub _tree_construction_main ($) {
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
-
-          ## ISSUE: An issue in the spec.
     } elsif ($self->{insertion_mode} & BODY_IMS) {
           if ($token->{type} == CHARACTER_TOKEN) {
             
@@ -8910,8 +8904,6 @@ sub _tree_construction_main ($) {
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
-
-      ## ISSUE: An issue in spec here
     } else {
       die "$0: $self->{insertion_mode}: Unknown insertion mode";
     }
@@ -9252,6 +9244,9 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
             
+
+            ## NOTE: |<p><li>|, for example.
+
             
       $token->{self_closing} = $self->{self_closing};
       unshift @{$self->{token}}, $token;
@@ -9906,8 +9901,38 @@ sub _tree_construction_main ($) {
          ## NOTE: |<col/>| or |<frame/>| here is an error.
         $token = $self->_get_next_token;
         next B;
+      } elsif ($token->{tag_name} eq 'param' or
+               $token->{tag_name} eq 'source') {
         
-        ## ISSUE: An issue on HTML5 new elements in the spec.
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
+        pop @{$self->{open_elements}};
+
+        delete $self->{self_closing};
+        $token = $self->_get_next_token;
+        redo B;
       } else {
         if ($token->{tag_name} eq 'image') {
           
@@ -9967,8 +9992,7 @@ sub _tree_construction_main ($) {
           delete $self->{self_closing};
         } elsif ({
                   area => 1, basefont => 1, bgsound => 1, br => 1,
-                  embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
-                  #image => 1,
+                  embed => 1, img => 1, spacer => 1, wbr => 1,
                  }->{$token->{tag_name}}) {
           
           pop @{$self->{open_elements}};
@@ -10036,7 +10060,6 @@ sub _tree_construction_main ($) {
         ## up-to-date, though it has same effect as speced.
         if (@{$self->{open_elements}} > 1 and
             $self->{open_elements}->[1]->[1] & BODY_EL) {
-          ## ISSUE: There is an issue in the spec.
           unless ($self->{open_elements}->[-1]->[1] & BODY_EL) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
@@ -10696,4 +10719,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 08:29:18 $
+# $Date: 2008/10/04 08:58:02 $

@@ -1,7 +1,7 @@
 1..3105
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Oct  4 17:27:30 2008
-# Current time GMT:   Sat Oct  4 08:27:30 2008
+# Current time local: Sat Oct  4 17:53:11 2008
+# Current time GMT:   Sat Oct  4 08:53:11 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -4611,7 +4611,6 @@ ok 3930
 ok 3931
 ok 3932
 ok 3933
-# t/tree-test-flow.dat
 ok 3934
 ok 3935
 ok 3936
@@ -4660,6 +4659,7 @@ ok 3978
 ok 3979
 ok 3980
 ok 3981
+# t/tree-test-flow.dat
 ok 3982
 ok 3983
 ok 3984
@@ -4777,24 +4777,12 @@ ok 4095
 ok 4096
 ok 4097
 ok 4098
-not ok 4099
-# Test 4099 got: "1" (t/HTML-tree.t at line 185 fail #1367)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><p><option><p></p>'; 1:27:in body;)
+ok 4099
 ok 4100
-not ok 4101
-# Test 4101 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|     <p>\n" (t/HTML-tree.t at line 190 fail #1367)
-#      Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       <option>\n|     <p>\n" (Document tree: qq'<!DOCTYPE HTML><p><option><p></p>')
-#      Line 6 is missing:
-#       - "|       <option>\n"
-not ok 4102
-# Test 4102 got: "1" (t/HTML-tree.t at line 185 fail #1368)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><p><optgroup><p></p>'; 1:29:in body;)
+ok 4101
+ok 4102
 ok 4103
-not ok 4104
-# Test 4104 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|     <p>\n" (t/HTML-tree.t at line 190 fail #1368)
-#      Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       <optgroup>\n|     <p>\n" (Document tree: qq'<!DOCTYPE HTML><p><optgroup><p></p>')
-#      Line 6 is missing:
-#       - "|       <optgroup>\n"
+ok 4104
 ok 4105
 ok 4106
 ok 4107
@@ -4834,4 +4822,64 @@ ok 4140
 ok 4141
 ok 4142
 ok 4143
+ok 4144
+ok 4145
+ok 4146
+not ok 4147
+# Test 4147 got: "1" (t/HTML-tree.t at line 185 fail #1383)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><p><option><p></p>'; 1:27:in body;)
+ok 4148
+not ok 4149
+# Test 4149 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|     <p>\n" (t/HTML-tree.t at line 190 fail #1383)
+#      Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       <option>\n|     <p>\n" (Document tree: qq'<!DOCTYPE HTML><p><option><p></p>')
+#      Line 6 is missing:
+#       - "|       <option>\n"
+not ok 4150
+# Test 4150 got: "1" (t/HTML-tree.t at line 185 fail #1384)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><p><optgroup><p></p>'; 1:29:in body;)
+ok 4151
+not ok 4152
+# Test 4152 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|     <p>\n" (t/HTML-tree.t at line 190 fail #1384)
+#      Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       <optgroup>\n|     <p>\n" (Document tree: qq'<!DOCTYPE HTML><p><optgroup><p></p>')
+#      Line 6 is missing:
+#       - "|       <optgroup>\n"
+ok 4153
+ok 4154
+ok 4155
+ok 4156
+ok 4157
+ok 4158
+ok 4159
+ok 4160
+ok 4161
+ok 4162
+ok 4163
+ok 4164
+ok 4165
+ok 4166
+ok 4167
+ok 4168
+ok 4169
+ok 4170
+ok 4171
+ok 4172
+ok 4173
+ok 4174
+ok 4175
+ok 4176
+ok 4177
+ok 4178
+ok 4179
+ok 4180
+ok 4181
+ok 4182
+ok 4183
+ok 4184
+ok 4185
+ok 4186
+ok 4187
+ok 4188
+ok 4189
+ok 4190
+ok 4191
 # t/tree-test-phrasing.dat

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.197 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.198 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -488,7 +488,6 @@ sub parse_byte_stream ($$$$;$$) {
     if (defined $charset_name) {
       $charset = Message::Charset::Info->get_by_html_name ($charset_name);
 
-      ## ISSUE: Unsupported encoding is not ignored according to the spec.
       require Whatpm::Charset::DecodeHandle;
       $buffer = Whatpm::Charset::DecodeHandle::ByteBuffer->new
           ($byte_stream);
@@ -2485,7 +2484,6 @@ sub _get_next_token ($) {
         !!!cp (160);
         $self->{ct}->{name} = chr $self->{nc};
         delete $self->{ct}->{quirks};
-## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = DOCTYPE_NAME_STATE;
         !!!next-input-character;
         redo A;
@@ -3785,8 +3783,6 @@ sub _tree_construction_root_element ($) {
     ## NOTE: Reprocess the token.
     !!!ack-later;
     return; ## Go to the "before head" insertion mode.
-
-    ## ISSUE: There is an issue in the spec
   } # B
 
   die "$0: _tree_construction_root_element: This should never be reached";
@@ -4715,7 +4711,7 @@ sub _tree_construction_main ($) {
                 !!!cp ('t105');
               }
               !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
-              my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              my $meta_el = pop @{$self->{open_elements}};
 
               unless ($self->{confident}) {
                 if ($token->{attributes}->{charset}) {
@@ -5172,8 +5168,6 @@ sub _tree_construction_main ($) {
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
-
-          ## ISSUE: An issue in the spec.
     } elsif ($self->{insertion_mode} & BODY_IMS) {
           if ($token->{type} == CHARACTER_TOKEN) {
             !!!cp ('t150');
@@ -6801,8 +6795,6 @@ sub _tree_construction_main ($) {
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
-
-      ## ISSUE: An issue in spec here
     } else {
       die "$0: $self->{insertion_mode}: Unknown insertion mode";
     }
@@ -7067,6 +7059,9 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
             !!!cp ('t353');
+
+            ## NOTE: |<p><li>|, for example.
+
             !!!back-token; # <x>
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
@@ -7472,8 +7467,14 @@ sub _tree_construction_main ($) {
         !!!nack ('t401.1'); ## NOTE: |<col/>| or |<frame/>| here is an error.
         !!!next-token;
         next B;
-        
-        ## ISSUE: An issue on HTML5 new elements in the spec.
+      } elsif ($token->{tag_name} eq 'param' or
+               $token->{tag_name} eq 'source') {
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
+        pop @{$self->{open_elements}};
+
+        !!!ack ('t398.5');
+        !!!next-token;
+        redo B;
       } else {
         if ($token->{tag_name} eq 'image') {
           !!!cp ('t384');
@@ -7509,8 +7510,7 @@ sub _tree_construction_main ($) {
           !!!ack ('t388.2');
         } elsif ({
                   area => 1, basefont => 1, bgsound => 1, br => 1,
-                  embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
-                  #image => 1,
+                  embed => 1, img => 1, spacer => 1, wbr => 1,
                  }->{$token->{tag_name}}) {
           !!!cp ('t388.1');
           pop @{$self->{open_elements}};
@@ -7578,7 +7578,6 @@ sub _tree_construction_main ($) {
         ## up-to-date, though it has same effect as speced.
         if (@{$self->{open_elements}} > 1 and
             $self->{open_elements}->[1]->[1] & BODY_EL) {
-          ## ISSUE: There is an issue in the spec.
           unless ($self->{open_elements}->[-1]->[1] & BODY_EL) {
             !!!cp ('t406');
             !!!parse-error (type => 'not closed',
@@ -8222,4 +8221,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 08:29:19 $
+# $Date: 2008/10/04 08:58:02 $
