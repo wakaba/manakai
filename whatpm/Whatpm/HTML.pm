@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.190 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.191 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -9176,13 +9176,80 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
         }
         next B;
-      } elsif ({
-                ## NOTE: As normal, but imply </li> when there's another <li>
-                li => 1,
-                ## NOTE: As normal, but imply </dt> or </dd> when ...
-                dt => 1, dd => 1,
-               }->{$token->{tag_name}}) {
-        ## has a p element in scope
+      } elsif ($token->{tag_name} eq 'li') {
+        ## NOTE: As normal, but imply </li> when there's another <li> ...
+
+        ## NOTE: Special, Scope (<li><foo><li> == <li><foo><li/></foo></li>)
+          ## Interpreted as <li><foo/></li><li/> (non-conforming)
+          ## blockquote (O9.27), center (O), dd (Fx3, O, S3.1.2, IE7),
+          ## dt (Fx, O, S, IE), dl (O), fieldset (O, S, IE), form (Fx, O, S),
+          ## hn (O), pre (O), applet (O, S), button (O, S), marquee (Fx, O, S),
+          ## object (Fx)
+          ## Generate non-tree (non-conforming)
+          ## basefont (IE7 (where basefont is non-void)), center (IE),
+          ## form (IE), hn (IE)
+        ## address, div, p (<li><foo><li> == <li><foo/></li><li/>)
+          ## Interpreted as <li><foo><li/></foo></li> (non-conforming)
+          ## div (Fx, S)
+
+        my $non_optional;
+        my $i = -1;
+
+        ## 1.
+        for my $node (reverse @{$self->{open_elements}}) {
+          if ($node->[1] & LI_EL) {
+            ## 2. (a) As if </li>
+            {
+              ## If no </li> - not applied
+              #
+
+              ## Otherwise
+
+              ## 1. generate implied end tags, except for </li>
+              #
+
+              ## 2. If current node != "li", parse error
+              if ($non_optional) {
+                $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
+                                text => $non_optional->[0]->manakai_local_name,
+                                token => $token);
+                
+              } else {
+                
+              }
+
+              ## 3. Pop
+              splice @{$self->{open_elements}}, $i;
+            }
+
+            last; ## 2. (b) goto 5.
+          } elsif (
+                   ## NOTE: not "formatting" and not "phrasing"
+                   ($node->[1] & SPECIAL_EL or
+                    $node->[1] & SCOPING_EL) and
+                   ## NOTE: "li", "dt", and "dd" are in |SPECIAL_EL|.
+
+                   (not $node->[1] & ADDRESS_EL) &
+                   (not $node->[1] & DIV_EL) &
+                   (not $node->[1] & P_EL)) {
+            ## 3.
+            
+            last; ## goto 5.
+          } elsif ($node->[1] & END_TAG_OPTIONAL_EL) {
+            
+            #
+          } else {
+            
+            $non_optional ||= $node;
+            #
+          }
+          ## 4.
+          ## goto 2.
+          $i--;
+        }
+
+        ## 5. (a) has a |p| element in scope
+        ## ISSUE: Is this step really necessary?
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
             
@@ -9200,61 +9267,115 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
 
-        ## NOTE: Special, Scope (<li><foo><li> == <li><foo><li/></foo></li>)
-          ## Interpreted as <li><foo/></li><li/> (non-conforming)
-          ## blockquote (O9.27), center (O), dd (Fx3, O, S3.1.2, IE7),
-          ## dt (Fx, O, S, IE), dl (O), fieldset (O, S, IE), form (Fx, O, S),
-          ## hn (O), pre (O), applet (O, S), button (O, S), marquee (Fx, O, S),
-          ## object (Fx)
-          ## Generate non-tree (non-conforming)
-          ## basefont (IE7 (where basefont is non-void)), center (IE),
-          ## form (IE), hn (IE)
-        ## address, div, p (<li><foo><li> == <li><foo/></li><li/>)
-          ## Interpreted as <li><foo><li/></foo></li> (non-conforming)
-          ## div (Fx, S)
-          
-        ## Step 1
+        ## 5. (b) insert
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
+        
+        $token = $self->_get_next_token;
+        next B;
+      } elsif ($token->{tag_name} eq 'dt' or
+               $token->{tag_name} eq 'dd') {
+        ## NOTE: As normal, but imply </dt> or </dd> when ...
+
+        my $non_optional;
         my $i = -1;
-        my $node = $self->{open_elements}->[$i];
-        my $li_or_dtdd = {li => {li => 1},
-                          dt => {dt => 1, dd => 1},
-                          dd => {dt => 1, dd => 1}}->{$token->{tag_name}};
-        LI: {
-          ## Step 2
-          if ($li_or_dtdd->{$node->[0]->manakai_local_name}) {
-            if ($i != -1) {
-              
-              $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
-                              text => $self->{open_elements}->[-1]->[0]
-                                  ->manakai_local_name,
-                              token => $token);
-            } else {
-              
+
+        ## 1.
+        for my $node (reverse @{$self->{open_elements}}) {
+          if ($node->[1] & DT_EL or $node->[1] & DD_EL) {
+            ## 2. (a) As if </li>
+            {
+              ## If no </li> - not applied
+              #
+
+              ## Otherwise
+
+              ## 1. generate implied end tags, except for </dt> or </dd>
+              #
+
+              ## 2. If current node != "dt"|"dd", parse error
+              if ($non_optional) {
+                $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
+                                text => $non_optional->[0]->manakai_local_name,
+                                token => $token);
+                
+              } else {
+                
+              }
+
+              ## 3. Pop
+              splice @{$self->{open_elements}}, $i;
             }
-            splice @{$self->{open_elements}}, $i;
-            last LI;
+
+            last; ## 2. (b) goto 5.
+          } elsif (
+                   ## NOTE: not "formatting" and not "phrasing"
+                   ($node->[1] & SPECIAL_EL or
+                    $node->[1] & SCOPING_EL) and
+                   ## NOTE: "li", "dt", and "dd" are in |SPECIAL_EL|.
+
+                   (not $node->[1] & ADDRESS_EL) &
+                   (not $node->[1] & DIV_EL) &
+                   (not $node->[1] & P_EL)) {
+            ## 3.
+            
+            last; ## goto 5.
+          } elsif ($node->[1] & END_TAG_OPTIONAL_EL) {
+            
+            #
           } else {
             
+            $non_optional ||= $node;
+            #
           }
-          
-          ## Step 3
-          if (not ($node->[1] & FORMATTING_EL) and
-              #not $phrasing_category->{$node->[1]} and
-              ($node->[1] & SPECIAL_EL or
-               $node->[1] & SCOPING_EL) and
-              not ($node->[1] & ADDRESS_EL) and
-              not ($node->[1] & DIV_EL)) {
-            
-            last LI;
-          }
-          
-          
-          ## Step 4
+          ## 4.
+          ## goto 2.
           $i--;
-          $node = $self->{open_elements}->[$i];
-          redo LI;
-        } # LI
-          
+        }
+
+        ## 5. (a) has a |p| element in scope
+        ## ISSUE: Is this step really necessary?
+        INSCOPE: for (reverse @{$self->{open_elements}}) {
+          if ($_->[1] & P_EL) {
+            
+            
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <x>
+            $token = {type => END_TAG_TOKEN, tag_name => 'p',
+                      line => $token->{line}, column => $token->{column}};
+            next B;
+          } elsif ($_->[1] & SCOPING_EL) {
+            
+            last INSCOPE;
+          }
+        } # INSCOPE
+
+        ## 5. (b) insert
         
     {
       my $el;
@@ -10561,4 +10682,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 06:30:34 $
+# $Date: 2008/10/04 07:58:58 $
