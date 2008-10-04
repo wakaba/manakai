@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.194 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.195 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -249,7 +249,7 @@ my $el_category_f = {
     mtext => FOREIGN_FLOW_CONTENT_EL,
   },
   $SVG_NS => {
-    foreignObject => FOREIGN_FLOW_CONTENT_EL,
+    foreignObject => FOREIGN_FLOW_CONTENT_EL | MISC_SCOPING_EL,
     desc => FOREIGN_FLOW_CONTENT_EL,
     title => FOREIGN_FLOW_CONTENT_EL,
   },
@@ -10033,7 +10033,9 @@ sub _tree_construction_main ($) {
             }
           }
 
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'start tag not allowed',
+          ## NOTE: |<marquee></body>|, |<svg><foreignobject></body>|
+
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
           ## NOTE: Ignore the token.
           $token = $self->_get_next_token;
@@ -10361,7 +10363,9 @@ sub _tree_construction_main ($) {
 
         ## Step 2
         S2: {
-          if ($node->[0]->manakai_local_name eq $token->{tag_name}) {
+          my $node_tag_name = $node->[0]->manakai_local_name;
+          $node_tag_name =~ tr/A-Z/a-z/; # for SVG camelCase tag names
+          if ($node_tag_name eq $token->{tag_name}) {
             ## Step 1
             ## generate implied end tags
             while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
@@ -10374,8 +10378,10 @@ sub _tree_construction_main ($) {
             }
         
             ## Step 2
-            if ($self->{open_elements}->[-1]->[0]->manakai_local_name
-                    ne $token->{tag_name}) {
+            my $current_tag_name
+                = $self->{open_elements}->[-1]->[0]->manakai_local_name;
+            $current_tag_name =~ tr/A-Z/a-z/;
+            if ($current_tag_name ne $token->{tag_name}) {
               
               ## NOTE: <x><y></x>
               $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
@@ -10701,4 +10707,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 09:17:54 $
+# $Date: 2008/10/04 11:32:15 $

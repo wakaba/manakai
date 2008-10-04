@@ -8332,6 +8332,22 @@ eof in body
 |         <table>
 
 #data
+<!DOCTYPE HTML><ul><li><svg><foreignobject><li>
+#errors
+EOF in foreign content
+unexpected EOF
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <svg>
+|           <foreignObject>
+|             <li>
+
+#data
 <!DOCTYPE HTML><dl><dt><address><dt>
 #errors
 no </address>
@@ -9071,6 +9087,22 @@ eof in body
 |         <table>
 
 #data
+<!DOCTYPE HTML><dl><dd><svg><foreignobject><dd>
+#errors
+EOF in foreign content
+unexpected EOF
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dd>
+|         <svg>
+|           <foreignObject>
+|             <dd>
+
+#data
 <span><address></span>a
 #errors
 no DOCTYPE
@@ -9517,6 +9549,22 @@ unexpected EOF
 |     <span>
 |       <object>
 |         "a"
+
+#data
+<span><svg><foreignobject></span>a
+#errors
+no DOCTYPE
+unmatched end tag
+EOF in foreign content
+unexpected EOF
+#document
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <svg>
+|         <foreignObject>
+|           "a"
 
 #data
 <span><a></span>a
