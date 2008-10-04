@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.187 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.188 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -141,6 +141,8 @@ my $el_category = {
   address => ADDRESS_EL,
   applet => MISC_SCOPING_EL,
   area => MISC_SPECIAL_EL,
+  article => MISC_SPECIAL_EL,
+  aside => MISC_SPECIAL_EL,
   b => FORMATTING_EL,
   base => MISC_SPECIAL_EL,
   basefont => MISC_SPECIAL_EL,
@@ -154,15 +156,22 @@ my $el_category = {
   center => MISC_SPECIAL_EL,
   col => MISC_SPECIAL_EL,
   colgroup => MISC_SPECIAL_EL,
+  command => MISC_SPECIAL_EL,
+  datagrid => MISC_SPECIAL_EL,
   dd => DD_EL,
+  details => MISC_SPECIAL_EL,
+  dialog => MISC_SPECIAL_EL,
   dir => MISC_SPECIAL_EL,
   div => DIV_EL,
   dl => MISC_SPECIAL_EL,
   dt => DT_EL,
   em => FORMATTING_EL,
   embed => MISC_SPECIAL_EL,
+  eventsource => MISC_SPECIAL_EL,
   fieldset => MISC_SPECIAL_EL,
+  figure => MISC_SPECIAL_EL,
   font => FORMATTING_EL,
+  footer => MISC_SPECIAL_EL,
   form => FORM_EL,
   frame => MISC_SPECIAL_EL,
   frameset => FRAMESET_EL,
@@ -173,11 +182,13 @@ my $el_category = {
   h5 => HEADING_EL,
   h6 => HEADING_EL,
   head => MISC_SPECIAL_EL,
+  header => MISC_SPECIAL_EL,
   hr => MISC_SPECIAL_EL,
   html => HTML_EL,
   i => FORMATTING_EL,
   iframe => MISC_SPECIAL_EL,
   img => MISC_SPECIAL_EL,
+  #image => MISC_SPECIAL_EL, ## NOTE: Commented out in the spec.
   input => MISC_SPECIAL_EL,
   isindex => MISC_SPECIAL_EL,
   li => LI_EL,
@@ -186,6 +197,7 @@ my $el_category = {
   marquee => MISC_SCOPING_EL,
   menu => MISC_SPECIAL_EL,
   meta => MISC_SPECIAL_EL,
+  nav => MISC_SPECIAL_EL,
   nobr => NOBR_EL | FORMATTING_EL,
   noembed => MISC_SPECIAL_EL,
   noframes => MISC_SPECIAL_EL,
@@ -204,6 +216,7 @@ my $el_category = {
   s => FORMATTING_EL,
   script => MISC_SPECIAL_EL,
   select => SELECT_EL,
+  section => MISC_SPECIAL_EL,
   small => FORMATTING_EL,
   spacer => MISC_SPECIAL_EL,
   strike => FORMATTING_EL,
@@ -366,6 +379,9 @@ $charref_map->{$_} = 0xFFFD
         0x7FFFF, 0x8FFFE, 0x8FFFF, 0x9FFFE, 0x9FFFF, 0xAFFFE, 0xAFFFF,
         0xBFFFE, 0xBFFFF, 0xCFFFE, 0xCFFFF, 0xDFFFE, 0xDFFFF, 0xEFFFE,
         0xEFFFF, 0xFFFFE, 0xFFFFF, 0x10FFFE, 0x10FFFF;
+
+## TODO: Invoke the reset algorithm when a resettable element is
+## created (cf. HTML5 revision 2259).
 
 sub parse_byte_string ($$$$;$) {
   my $self = shift;
@@ -9122,6 +9138,19 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
+
+        ## NOTE: Special, Scope (<li><foo><li> == <li><foo><li/></foo></li>)
+          ## Interpreted as <li><foo/></li><li/> (non-conforming)
+          ## blockquote (O9.27), center (O), dd (Fx3, O, S3.1.2, IE7),
+          ## dt (Fx, O, S, IE), dl (O), fieldset (O, S, IE), form (Fx, O, S),
+          ## hn (O), pre (O), applet (O, S), button (O, S), marquee (Fx, O, S),
+          ## object (Fx)
+          ## Generate non-tree (non-conforming)
+          ## basefont (IE7 (where basefont is non-void)), center (IE),
+          ## form (IE), hn (IE)
+        ## address, div, p (<li><foo><li> == <li><foo/></li><li/>)
+          ## Interpreted as <li><foo><li/></foo></li> (non-conforming)
+          ## div (Fx, S)
           
         ## Step 1
         my $i = -1;
@@ -9743,7 +9772,7 @@ sub _tree_construction_main ($) {
           
         } elsif ({
                   b => 1, big => 1, em => 1, font => 1, i => 1,
-                  s => 1, small => 1, strile => 1,
+                  s => 1, small => 1, strike => 1,
                   strong => 1, tt => 1, u => 1,
                  }->{$token->{tag_name}}) {
           
@@ -10056,7 +10085,7 @@ sub _tree_construction_main ($) {
       } elsif ({
                 a => 1,
                 b => 1, big => 1, em => 1, font => 1, i => 1,
-                nobr => 1, s => 1, small => 1, strile => 1,
+                nobr => 1, s => 1, small => 1, strike => 1,
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
         
@@ -10155,8 +10184,13 @@ sub _tree_construction_main ($) {
               ## Ignore the token
               $token = $self->_get_next_token;
               last S2;
-            }
 
+              ## NOTE: |<span><dd></span>a|: In Safari 3.1.2 and Opera
+              ## 9.27, "a" is a child of <dd> (conforming).  In
+              ## Firefox 3.0.2, "a" is a child of <body>.  In WinIE 7,
+              ## "a" is a child of both <body> and <dd>.
+            }
+            
             
           }
           
@@ -10448,4 +10482,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/09/22 06:04:28 $
+# $Date: 2008/10/04 04:06:32 $
