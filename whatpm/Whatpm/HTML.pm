@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.189 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.190 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -9068,12 +9068,20 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ({
-                address => 1, blockquote => 1, center => 1, dir => 1, 
-                div => 1, dl => 1, fieldset => 1,
-                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
-                menu => 1, ol => 1, p => 1, ul => 1,
+                ## NOTE: Start tags for non-phrasing flow content elements
+
+                ## NOTE: The normal one
+                address => 1, article => 1, aside => 1, blockquote => 1,
+                center => 1, datagrid => 1, details => 1, dialog => 1,
+                dir => 1, div => 1, dl => 1, fieldset => 1, figure => 1,
+                footer => 1, h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1,
+                h6 => 1, header => 1, menu => 1, nav => 1, ol => 1, p => 1, 
+                section => 1, ul => 1,
+                ## NOTE: As normal, but drops leading newline
                 pre => 1, listing => 1,
+                ## NOTE: As normal, but interacts with the form element pointer
                 form => 1,
+                
                 table => 1,
                 hr => 1,
                }->{$token->{tag_name}}) {
@@ -9168,7 +9176,12 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
         }
         next B;
-      } elsif ({li => 1, dt => 1, dd => 1}->{$token->{tag_name}}) {
+      } elsif ({
+                ## NOTE: As normal, but imply </li> when there's another <li>
+                li => 1,
+                ## NOTE: As normal, but imply </dt> or </dd> when ...
+                dt => 1, dd => 1,
+               }->{$token->{tag_name}}) {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
@@ -9271,6 +9284,8 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{tag_name} eq 'plaintext') {
+        ## NOTE: As normal, but effectively ends parsing
+
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] & P_EL) {
@@ -9924,10 +9939,18 @@ sub _tree_construction_main ($) {
           next B;
         }
       } elsif ({
-                address => 1, blockquote => 1, center => 1, dir => 1,
-                div => 1, dl => 1, fieldset => 1, listing => 1,
-                menu => 1, ol => 1, pre => 1, ul => 1,
+                ## NOTE: End tags for non-phrasing flow content elements
+
+                ## NOTE: The normal ones
+                address => 1, article => 1, aside => 1, blockquote => 1,
+                center => 1, datagrid => 1, details => 1, dialog => 1,
+                dir => 1, div => 1, dl => 1, fieldset => 1, figure => 1,
+                footer => 1, header => 1, listing => 1, menu => 1, nav => 1,
+                ol => 1, pre => 1, section => 1, ul => 1,
+
+                ## NOTE: As normal, but ... optional tags
                 dd => 1, dt => 1, li => 1,
+
                 applet => 1, button => 1, marquee => 1, object => 1,
                }->{$token->{tag_name}}) {
         ## has an element in scope
@@ -9990,6 +10013,8 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{tag_name} eq 'form') {
+        ## NOTE: As normal, but interacts with the form element pointer
+
         undef $self->{form_element};
 
         ## has an element in scope
@@ -10037,6 +10062,7 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ({
+                ## NOTE: As normal, except acts as a closer for any ...
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
                }->{$token->{tag_name}}) {
         ## has an element in scope
@@ -10082,6 +10108,8 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{tag_name} eq 'p') {
+        ## NOTE: As normal, except </p> implies <p> and ...
+
         ## has an element in scope
         my $i;
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -10182,10 +10210,11 @@ sub _tree_construction_main ($) {
         ## Ignore the token
         $token = $self->_get_next_token;
         next B;
-        
-        ## ISSUE: Issue on HTML5 new elements in spec
-        
       } else {
+        if ($token->{tag_name} eq 'sarcasm') {
+          sleep 0.001; # take a deep breath
+        }
+
         ## Step 1
         my $node_i = -1;
         my $node = $self->{open_elements}->[$node_i];
@@ -10532,4 +10561,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 05:53:45 $
+# $Date: 2008/10/04 06:30:34 $
