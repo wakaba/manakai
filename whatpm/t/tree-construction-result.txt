@@ -1,7 +1,7 @@
 1..3105
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Oct  4 23:28:14 2008
-# Current time GMT:   Sat Oct  4 14:28:14 2008
+# Current time local: Sun Oct  5 02:10:36 2008
+# Current time GMT:   Sat Oct  4 17:10:36 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -161,9 +161,9 @@ ok 154
 ok 155
 ok 156
 not ok 157
-# Test 157 got: "2" (t/HTML-tree.t at line 187 fail #53)
+# Test 157 got: "2" (t/HTML-tree.t at line 192 fail #53)
 #     Expected: "1" (Parse error: qq'<!DOCTYPE HTML SYSTEM "x"'; 1:25:unclosed DOCTYPE, 1:25:not HTML5;not HTML5)
-#  t/HTML-tree.t line 187 is:     join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
+#  t/HTML-tree.t line 192 is:     join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
 ok 158
 ok 159
 ok 160
@@ -226,7 +226,7 @@ ok 214
 ok 215
 ok 216
 not ok 217
-# Test 217 got: "3" (t/HTML-tree.t at line 187 fail #73)
+# Test 217 got: "3" (t/HTML-tree.t at line 192 fail #73)
 #     Expected: "1" (Parse error: qq'<html><head></body></html>'; 1:7:no DOCTYPE, 1:20:unmatched end tag, 1:26:unmatched end tag;Line: 1 Col: 6 Unexpected start tag (html). Expected DOCTYPE.)
 ok 218
 ok 219
@@ -240,7 +240,7 @@ ok 226
 ok 227
 ok 228
 not ok 229
-# Test 229 got: "2" (t/HTML-tree.t at line 187 fail #77)
+# Test 229 got: "2" (t/HTML-tree.t at line 192 fail #77)
 #     Expected: "1" (Parse error: qq'<head></html>'; 1:7:no DOCTYPE, 1:13:unmatched end tag;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE.)
 ok 230
 ok 231
@@ -248,12 +248,12 @@ ok 232
 ok 233
 ok 234
 not ok 235
-# Test 235 got: "2" (t/HTML-tree.t at line 187 fail #79)
+# Test 235 got: "2" (t/HTML-tree.t at line 192 fail #79)
 #     Expected: "1" (Parse error: qq'</body>'; 1:7:no DOCTYPE, 1:7:unmatched end tag;Line: 1 Col: 7 Unexpected end tag (body). Expected DOCTYPE.)
 ok 236
 ok 237
 not ok 238
-# Test 238 got: "2" (t/HTML-tree.t at line 187 fail #80)
+# Test 238 got: "2" (t/HTML-tree.t at line 192 fail #80)
 #     Expected: "1" (Parse error: qq'</html>'; 1:7:no DOCTYPE, 1:7:unmatched end tag;Line: 1 Col: 7 Unexpected end tag (html). Expected DOCTYPE.)
 ok 239
 ok 240
@@ -286,56 +286,48 @@ ok 266
 ok 267
 ok 268
 ok 269
-not ok 270
-# Test 270 got: "| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <option>\n|     <option>\n|       \"X\"\n" (t/HTML-tree.t at line 192 fail #90)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <option>\n|     \"X\"\n" (Document tree: qq'<select><b><option><select><option></b></select>X')
-#     Line 6 is changed:
-#      - "|     \"X\"\n"
-#      + "|     <option>\n"
-#     Got 1 extra line at line 7:
-#      + "|       \"X\"\n"
-#  t/HTML-tree.t line 192 is:   ok $result, $test->{document},
-ok 271
+ok 270
+not ok 271
+# Test 271 got: "9" (t/HTML-tree.t at line 192 fail #91)
+#     Expected: "10" (Parse error: qq'<a><table><td><a><table></table><a></tr><a></table><b>X</b>C<a>Y'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:36:in a:a, 1:41:not closed, 1:44:in table, 1:44:in a:a, 1:44:unmatched end tag, 1:64:in a:a, 1:64:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 40 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 43 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 43 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 43 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 51 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 63 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 64 Expected closing tag. Unexpected end of file.)
 ok 272
 ok 273
 ok 274
 ok 275
 ok 276
 not ok 277
-# Test 277 got: "10" (t/HTML-tree.t at line 187 fail #93)
-#     Expected: "6" (Parse error: qq'<!-----><font><div>hello<table>excite!<b>me!<th><i>please!</tr><!--X-->'; 1:6:dash in comment, 1:15:no DOCTYPE, 1:38:in table:#text, 1:39:in table:#text, 1:42:in table, 1:44:in table:#text, 1:45:in table:#text, 1:49:missing start tag:tr, 1:64:not closed, 1:71:in body:#eof;Line: 1 Col: 7 Unexpected '-' after '--' found in comment., Line: 1 Col: 14 Unexpected start tag (font). Expected DOCTYPE., Line: 1 Col: 38 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 48 Unexpected table cell start tag (th) in the table body phase., Line: 1 Col: 63 Got table cell end tag (th) while required end tags are missing., Line: 1 Col: 71 Expected closing tag. Unexpected end of file.)
+# Test 277 got: "10" (t/HTML-tree.t at line 192 fail #93)
+#     Expected: "7" (Parse error: qq'<!-----><font><div>hello<table>excite!<b>me!<th><i>please!</tr><!--X-->'; 1:6:dash in comment, 1:15:no DOCTYPE, 1:38:in table:#text, 1:39:in table:#text, 1:42:in table, 1:44:in table:#text, 1:45:in table:#text, 1:49:missing start tag:tr, 1:64:not closed, 1:71:in body:#eof;Line: 1 Col: 7 Unexpected '-' after '--' found in comment., Line: 1 Col: 14 Unexpected start tag (font). Expected DOCTYPE., Line: 1 Col: 38 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 48 Unexpected implied end tag (b) in the table phase., Line: 1 Col: 48 Unexpected table cell start tag (th) in the table body phase., Line: 1 Col: 63 Got table cell end tag (th) while required end tags are missing., Line: 1 Col: 71 Expected closing tag. Unexpected end of file.)
 ok 278
 not ok 279
-# Test 279 got: "| <!-- - -->\n| <html>\n|   <head>\n|   <body>\n|     <font>\n|       <div>\n|         \"hello\"\n|         \"excite!\"\n|         <b>\n|           \"me!\"\n|         <table>\n|           <tbody>\n|             <tr>\n|               <th>\n|                 <i>\n|                   \"please!\"\n|             <!-- X -->\n" (t/HTML-tree.t at line 192 fail #93)
+# Test 279 got: "| <!-- - -->\n| <html>\n|   <head>\n|   <body>\n|     <font>\n|       <div>\n|         \"hello\"\n|         \"excite!\"\n|         <b>\n|           \"me!\"\n|         <table>\n|           <tbody>\n|             <tr>\n|               <th>\n|                 <i>\n|                   \"please!\"\n|             <!-- X -->\n" (t/HTML-tree.t at line 197 fail #93)
 #     Expected: "| <!-- - -->\n| <html>\n|   <head>\n|   <body>\n|     <font>\n|       <div>\n|         \"helloexcite!\"\n|         <b>\n|           \"me!\"\n|         <table>\n|           <tbody>\n|             <tr>\n|               <th>\n|                 <i>\n|                   \"please!\"\n|             <!-- X -->\n" (Document tree: qq'<!-----><font><div>hello<table>excite!<b>me!<th><i>please!</tr><!--X-->')
 #     Line 7 is changed:
 #      - "|         \"helloexcite!\"\n"
 #      + "|         \"hello\"\n"
 #     Got 1 extra line at line 8:
 #      + "|         \"excite!\"\n"
+#  t/HTML-tree.t line 197 is:   ok $result, $test->{document},
 not ok 280
-# Test 280 got: "0" (t/HTML-tree.t at line 187 fail #94)
+# Test 280 got: "0" (t/HTML-tree.t at line 192 fail #94)
 #     Expected: "1" (Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).)
 ok 281
 ok 282
 not ok 283
-# Test 283 got: "3" (t/HTML-tree.t at line 187 fail #95)
-#     Expected: "4" (Parse error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; 1:36:not closed, 1:55:unmatched end tag, 1:55:in body:#eof;Line: 1 Col: 24 Unexpected start tag option. Ignored., Line: 1 Col: 35 Unexpected start tag optgroup. Ignored., Line: 1 Col: 54 Unexpected end tag (option) in the select phase. Ignored., Line: 1 Col: 55 Expected closing tag. Unexpected end of file.)
+# Test 283 got: "3" (t/HTML-tree.t at line 192 fail #95)
+#     Expected: "2" (Parse error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; 1:36:not closed, 1:55:unmatched end tag, 1:55:in body:#eof;54: Stray end tag “option”, 55: End of file seen and there were open elements.)
 ok 284
 not ok 285
-# Test 285 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     \"A\"\n|     <option>\n|       \"B\"\n|     <optgroup>\n|       \"C\"\n|       <select>\n|         \"DE\"\n" (t/HTML-tree.t at line 192 fail #95)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     \"ABC\"\n|     <select>\n|       \"DE\"\n" (Document tree: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E')
-#     Lines 5-7 are changed:
-#      - "|     \"ABC\"\n"
-#      + "|     \"A\"\n"
-#      - "|     <select>\n"
-#      + "|     <option>\n"
-#      - "|       \"DE\"\n"
-#      + "|       \"B\"\n"
-#     Got 4 extra lines at line 8:
+# Test 285 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     \"A\"\n|     <option>\n|       \"B\"\n|     <optgroup>\n|       \"C\"\n|       <select>\n|         \"DE\"\n" (t/HTML-tree.t at line 197 fail #95)
+#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     \"A\"\n|     <option>\n|       \"B\"\n|       <optgroup>\n|         \"C\"\n|         <select>\n|           \"DE\"\n" (Document tree: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E')
+#     Lines 8-11 are changed:
+#      - "|       <optgroup>\n"
 #      + "|     <optgroup>\n"
+#      - "|         \"C\"\n"
 #      + "|       \"C\"\n"
+#      - "|         <select>\n"
 #      + "|       <select>\n"
+#      - "|           \"DE\"\n"
 #      + "|         \"DE\"\n"
 ok 286
 ok 287
@@ -400,9 +392,7 @@ ok 345
 ok 346
 ok 347
 ok 348
-not ok 349
-# Test 349 got: "3" (t/HTML-tree.t at line 187 fail #117)
-#     Expected: "4" (Parse error: qq'<font><p>hello<b>cruel</font>world'; 1:7:no DOCTYPE, 1:30:not closed, 1:34:in body:#eof;Line: 1 Col: 6 Unexpected start tag (font). Expected DOCTYPE., Line: 1 Col: 29 End tag (font) violates step 1, paragraph 3 of the adoption agency algorithm., Line: 1 Col: 29 End tag (font) violates step 1, paragraph 3 of the adoption agency algorithm., Line: 1 Col: 34 Expected closing tag. Unexpected end of file.)
+ok 349
 ok 350
 ok 351
 ok 352
@@ -469,23 +459,21 @@ ok 412
 ok 413
 ok 414
 not ok 415
-# Test 415 got: "7" (t/HTML-tree.t at line 187 fail #139)
-#     Expected: "5" (Parse error: qq'<a href="blah">aba<table><a href="foo">br<tr><td></td></tr>x</table>aoe'; 1:16:no DOCTYPE, 1:40:in table, 1:40:in a:a, 1:40:unmatched end tag, 1:42:in table:#text, 1:61:in table:#text, 1:71:in body:#eof;Line: 1 Col: 15 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 39 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 39 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 39 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 71 Expected closing tag. Unexpected end of file.)
+# Test 415 got: "7" (t/HTML-tree.t at line 192 fail #139)
+#     Expected: "8" (Parse error: qq'<a href="blah">aba<table><a href="foo">br<tr><td></td></tr>x</table>aoe'; 1:16:no DOCTYPE, 1:40:in table, 1:40:in a:a, 1:40:unmatched end tag, 1:42:in table:#text, 1:61:in table:#text, 1:71:in body:#eof;Line: 1 Col: 15 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 39 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 39 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 39 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 45 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 68 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 71 Expected closing tag. Unexpected end of file., )
 ok 416
 ok 417
 ok 418
 ok 419
 not ok 420
-# Test 420 got: "| <html>\n|   <head>\n|   <body>\n|     <a>\n|       href=\"blah\"\n|       \"aba\"\n|       \"x\"\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               <a>\n|                 href=\"foo\"\n|                 \"br\"\n|       \"aoe\"\n" (t/HTML-tree.t at line 192 fail #140)
+# Test 420 got: "| <html>\n|   <head>\n|   <body>\n|     <a>\n|       href=\"blah\"\n|       \"aba\"\n|       \"x\"\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               <a>\n|                 href=\"foo\"\n|                 \"br\"\n|       \"aoe\"\n" (t/HTML-tree.t at line 197 fail #140)
 #     Expected: "| <html>\n|   <head>\n|   <body>\n|     <a>\n|       href=\"blah\"\n|       \"abax\"\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               <a>\n|                 href=\"foo\"\n|                 \"br\"\n|       \"aoe\"\n" (Document tree: qq'<a href="blah">aba<table><tr><td><a href="foo">br</td></tr>x</table>aoe')
 #     Line 6 is changed:
 #      - "|       \"abax\"\n"
 #      + "|       \"aba\"\n"
 #     Got 1 extra line at line 7:
 #      + "|       \"x\"\n"
-not ok 421
-# Test 421 got: "6" (t/HTML-tree.t at line 187 fail #141)
-#     Expected: "4" (Parse error: qq'<table><a href="blah">aba<tr><td><a href="foo">br</td></tr>x</table>aoe'; 1:8:no DOCTYPE, 1:23:in table, 1:26:in table:#text, 1:55:not closed, 1:61:in table:#text, 1:71:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 22 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 54 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 71 Expected closing tag. Unexpected end of file.)
+ok 421
 ok 422
 ok 423
 ok 424
@@ -507,7 +495,7 @@ ok 439
 ok 440
 ok 441
 not ok 442
-# Test 442 got: "3" (t/HTML-tree.t at line 187 fail #148)
+# Test 442 got: "3" (t/HTML-tree.t at line 192 fail #148)
 #     Expected: "4" (Parse error: qq'<body><body><base><link><meta><title><p></title><body><p></body>'; 1:7:no DOCTYPE, 1:13:in body, 1:55:in body;Line: 1 Col: 6 Unexpected start tag (body). Expected DOCTYPE., Line: 1 Col: 12 Unexpected start tag (body)., Line: 1 Col: 54 Unexpected start tag (body)., Line: 1 Col: 64 Unexpected end tag (p). Missing end tag (body).)
 ok 443
 ok 444
@@ -518,31 +506,20 @@ ok 448
 ok 449
 ok 450
 not ok 451
-# Test 451 got: "10" (t/HTML-tree.t at line 187 fail #151)
+# Test 451 got: "10" (t/HTML-tree.t at line 192 fail #151)
 #     Expected: "11" (Parse error: qq'<a><table><a></table><p><a><div><a>'; 1:4:no DOCTYPE, 1:14:in table, 1:14:in a:a, 1:14:unmatched end tag, 1:28:in a:a, 1:28:unmatched end tag, 1:33:not closed, 1:35:in a:a, 1:35:unmatched end tag, 1:35:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 13 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 13 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 13 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 21 Unexpected end tag (table). Expected end tag (a)., Line: 1 Col: 27 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 27 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 32 Unexpected end tag (p). Ignored., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 35 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 35 Expected closing tag. Unexpected end of file.)
 ok 452
 ok 453
-ok 454
+not ok 454
+# Test 454 got: "2" (t/HTML-tree.t at line 192 fail #152)
+#     Expected: "3" (Parse error: qq'<head></p><meta><p>'; 1:7:no DOCTYPE, 1:11:unmatched end tag;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 10: Stray end tag “p”., 16: “meta” element outside “head”.)
 ok 455
-not ok 456
-# Test 456 got: "| <html>\n|   <head>\n|     <meta>\n|   <body>\n|     <p>\n" (t/HTML-tree.t at line 192 fail #152)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n|     <p>\n|     <meta>\n|     <p>\n" (Document tree: qq'<head></p><meta><p>')
-#     Got 1 extra line at line 3:
-#      + "|     <meta>\n"
-#     Lines 5-5 are missing:
-#      - "|     <p>\n"
-#      - "|     <meta>\n"
+ok 456
 not ok 457
-# Test 457 got: "2" (t/HTML-tree.t at line 187 fail #153)
-#     Expected: "3" (Parse error: qq'<head></html><meta><p>'; 1:7:no DOCTYPE, 1:14:unmatched end tag;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE., Line: 1 Col: 19 Unexpected start tag (meta). Expected end of file., Line: 1 Col: 19 Unexpected start tag token (meta) in the after body phase.)
+# Test 457 got: "2" (t/HTML-tree.t at line 192 fail #153)
+#     Expected: "3" (Parse error: qq'<head></html><meta><p>'; 1:7:no DOCTYPE, 1:14:unmatched end tag;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 13: Stray end tag “html”., 19: “meta” element outside “head”.)
 ok 458
-not ok 459
-# Test 459 got: "| <html>\n|   <head>\n|     <meta>\n|   <body>\n|     <p>\n" (t/HTML-tree.t at line 192 fail #153)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n|     <meta>\n|     <p>\n" (Document tree: qq'<head></html><meta><p>')
-#     Got 1 extra line at line 3:
-#      + "|     <meta>\n"
-#     Line 5 is missing:
-#      - "|     <meta>\n"
+ok 459
 ok 460
 ok 461
 ok 462
@@ -569,15 +546,13 @@ ok 482
 ok 483
 ok 484
 ok 485
-not ok 486
-# Test 486 got: "| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <option>\n|     <option>\n" (t/HTML-tree.t at line 192 fail #162)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <option>\n" (Document tree: qq'<select><b><option><select><option></b></select>')
-#     Got 1 extra line at line 6:
-#      + "|     <option>\n"
+ok 486
 ok 487
 ok 488
 ok 489
-ok 490
+not ok 490
+# Test 490 got: "10" (t/HTML-tree.t at line 192 fail #164)
+#     Expected: "11" (Parse error: qq'<a><table><td><a><table></table><a></tr><a></table><a>'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:36:in a:a, 1:41:not closed, 1:44:in table, 1:44:in a:a, 1:44:unmatched end tag, 1:54:in a:a, 1:54:unmatched end tag, 1:54:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 40 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 43 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 43 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 43 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 51 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 54 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 54 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 54 Expected closing tag. Unexpected end of file.)
 ok 491
 ok 492
 ok 493
@@ -601,19 +576,10 @@ ok 510
 ok 511
 ok 512
 ok 513
-not ok 514
-# Test 514 got: "85" (t/HTML-tree.t at line 187 fail #172)
-#     Expected: "86" (Parse error: qq'</strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>'; 1:10:no DOCTYPE, 1:10:unmatched end tag, 1:14:unmatched end tag, 1:19:unmatched end tag, 1:23:unmatched end tag, 1:27:unmatched end tag, 1:36:unmatched end tag, 1:40:unmatched end tag, 1:48:unmatched end tag, 1:53:unmatched end tag, 1:59:unmatched end tag, 1:65:unmatched end tag, 1:73:unmatched end tag, 1:80:unmatched end tag, 1:89:unmatched end tag, 1:94:unmatched end tag, 1:99:unmatched end tag, 1:104:unmatched end tag, 1:109:unmatched end tag, 1:114:unmatched end tag, 1:119:unmatched end tag, 1:126:unmatched end tag, 1:131:unmatched end tag, 1:135:unmatched end tag, 1:141:unmatched end tag, 1:149:unmatched end tag, 1:156:unmatched end tag, 1:164:unmatched end tag, 1:173:unmatched end tag, 1:181:unmatched end tag, 1:186:unmatched end tag, 1:191:unmatched end tag, 1:196:unmatched end tag, 1:204:unmatched end tag, 1:211:unmatched end tag, 1:218:unmatched end tag, 1:226:unmatched end tag, 1:231:unmatched end tag, 1:239:unmatched end tag, 1:245:unmatched end tag, 1:252:unmatched end tag, 1:259:unmatched end tag, 1:270:unmatched end tag, 1:280:unmatched end tag, 1:288:unmatched end tag, 1:297:unmatched end tag, 1:301:unmatched end tag, 1:306:unmatched end tag, 1:311:unmatched end tag, 1:321:unmatched end tag, 1:332:unmatched end tag, 1:340:unmatched end tag, 1:348:unmatched end tag, 1:356:unmatched end tag, 1:366:unmatched end tag, 1:379:unmatched end tag, 1:388:unmatched end tag, 1:394:unmatched end tag, 1:400:unmatched end tag, 1:405:unmatched end tag, 1:416:unmatched end tag, 1:426:unmatched end tag, 1:433:unmatched end tag, 1:438:unmatched end tag, 1:443:unmatched end tag, 1:448:unmatched end tag, 1:455:unmatched end tag, 1:461:unmatched end tag, 1:468:unmatched end tag, 1:477:unmatched end tag, 1:487:unmatched end tag, 1:496:unmatched end tag, 1:503:unmatched end tag, 1:514:unmatched end tag, 1:521:unmatched end tag, 1:530:unmatched end tag, 1:538:unmatched end tag, 1:548:unmatched end tag, 1:558:unmatched end tag, 1:569:unmatched end tag, 1:580:unmatched end tag, 1:591:unmatched end tag, 1:600:unmatched end tag, 1:612:unmatched end tag, 1:622:unmatched end tag;Line: 1 Col: 9 Unexpected end tag (strong). Expected DOCTYPE., Line: 1 Col: 9 Unexpected end tag (strong) after the (implied) root element., Line: 1 Col: 13 Unexpected end tag (b) after the (implied) root element., Line: 1 Col: 18 Unexpected end tag (em) after the (implied) root element., Line: 1 Col: 22 Unexpected end tag (i) after the (implied) root element., Line: 1 Col: 26 Unexpected end tag (u) after the (implied) root element., Line: 1 Col: 35 Unexpected end tag (strike) after the (implied) root element., Line: 1 Col: 39 Unexpected end tag (s) after the (implied) root element., Line: 1 Col: 47 Unexpected end tag (blink) after the (implied) root element., Line: 1 Col: 52 Unexpected end tag (tt) after the (implied) root element., Line: 1 Col: 58 Unexpected end tag (pre) after the (implied) root element., Line: 1 Col: 64 Unexpected end tag (big) after the (implied) root element., Line: 1 Col: 72 Unexpected end tag (small) after the (implied) root element., Line: 1 Col: 79 Unexpected end tag (font) after the (implied) root element., Line: 1 Col: 88 Unexpected end tag (select) after the (implied) root element., Line: 1 Col: 93 Unexpected end tag (h1) after the (implied) root element., Line: 1 Col: 98 Unexpected end tag (h2) after the (implied) root element., Line: 1 Col: 103 Unexpected end tag (h3) after the (implied) root element., Line: 1 Col: 108 Unexpected end tag (h4) after the (implied) root element., Line: 1 Col: 113 Unexpected end tag (h5) after the (implied) root element., Line: 1 Col: 118 Unexpected end tag (h6) after the (implied) root element., Line: 1 Col: 130 Unexpected end tag token (br) in the after body phase., Line: 1 Col: 130 Unexpected end tag (br). Treated as br element., Line: 1 Col: 134 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 140 This element (img) has no end tag., Line: 1 Col: 148 Unexpected end tag (title). Ignored., Line: 1 Col: 155 Unexpected end tag (span). Ignored., Line: 1 Col: 163 Unexpected end tag (style). Ignored., Line: 1 Col: 172 Unexpected end tag (script). Ignored., Line: 1 Col: 180 Unexpected end tag (table). Ignored., Line: 1 Col: 185 Unexpected end tag (th). Ignored., Line: 1 Col: 190 Unexpected end tag (td). Ignored., Line: 1 Col: 195 Unexpected end tag (tr). Ignored., Line: 1 Col: 203 This element (frame) has no end tag., Line: 1 Col: 210 This element (area) has no end tag., Line: 1 Col: 217 Unexpected end tag (link). Ignored., Line: 1 Col: 225 This element (param) has no end tag., Line: 1 Col: 230 This element (hr) has no end tag., Line: 1 Col: 238 This element (input) has no end tag., Line: 1 Col: 244 Unexpected end tag (col). Ignored., Line: 1 Col: 251 Unexpected end tag (base). Ignored., Line: 1 Col: 258 Unexpected end tag (meta). Ignored., Line: 1 Col: 269 This element (basefont) has no end tag., Line: 1 Col: 279 This element (bgsound) has no end tag., Line: 1 Col: 287 This element (embed) has no end tag., Line: 1 Col: 296 This element (spacer) has no end tag., Line: 1 Col: 300 Unexpected end tag (p). Ignored., Line: 1 Col: 305 End tag (dd) seen too early. Expected other end tag., Line: 1 Col: 310 End tag (dt) seen too early. Expected other end tag., Line: 1 Col: 320 Unexpected end tag (caption). Ignored., Line: 1 Col: 331 Unexpected end tag (colgroup). Ignored., Line: 1 Col: 339 Unexpected end tag (tbody). Ignored., Line: 1 Col: 347 Unexpected end tag (tfoot). Ignored., Line: 1 Col: 355 Unexpected end tag (thead). Ignored., Line: 1 Col: 365 End tag (address) seen too early. Expected other end tag., Line: 1 Col: 378 End tag (blockquote) seen too early. Expected other end tag., Line: 1 Col: 387 End tag (center) seen too early. Expected other end tag., Line: 1 Col: 393 Unexpected end tag (dir). Ignored., Line: 1 Col: 399 End tag (div) seen too early. Expected other end tag., Line: 1 Col: 404 End tag (dl) seen too early. Expected other end tag., Line: 1 Col: 415 End tag (fieldset) seen too early. Expected other end tag., Line: 1 Col: 425 End tag (listing) seen too early. Expected other end tag., Line: 1 Col: 432 End tag (menu) seen too early. Expected other end tag., Line: 1 Col: 437 End tag (ol) seen too early. Expected other end tag., Line: 1 Col: 442 End tag (ul) seen too early. Expected other end tag., Line: 1 Col: 447 End tag (li) seen too early. Expected other end tag., Line: 1 Col: 454 End tag (nobr) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 460 This element (wbr) has no end tag., Line: 1 Col: 467 End tag (form) seen too early. Ignored., Line: 1 Col: 476 End tag (button) seen too early. Expected other end tag., Line: 1 Col: 486 End tag (marquee) seen too early. Expected other end tag., Line: 1 Col: 495 End tag (object) seen too early. Expected other end tag., Line: 1 Col: 513 Unexpected end tag (frameset). Expected end of file., Line: 1 Col: 513 Unexpected end tag token (frameset) in the after body phase., Line: 1 Col: 513 Unexpected end tag (frameset). Ignored., Line: 1 Col: 520 Unexpected end tag (head). Ignored., Line: 1 Col: 529 Unexpected end tag (iframe). Ignored., Line: 1 Col: 537 This element (image) has no end tag., Line: 1 Col: 547 This element (isindex) has no end tag., Line: 1 Col: 557 Unexpected end tag (noembed). Ignored., Line: 1 Col: 568 Unexpected end tag (noframes). Ignored., Line: 1 Col: 579 Unexpected end tag (noscript). Ignored., Line: 1 Col: 590 Unexpected end tag (optgroup). Ignored., Line: 1 Col: 599 Unexpected end tag (option). Ignored., Line: 1 Col: 611 Unexpected end tag (plaintext). Ignored., Line: 1 Col: 622 Unexpected end tag (textarea). Ignored.)
+ok 514
 ok 515
-not ok 516
-# Test 516 got: "| <html>\n|   <head>\n|   <body>\n" (t/HTML-tree.t at line 192 fail #172)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n|     <br>\n|     <p>\n" (Document tree: qq'</strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>')
-#     Lines 4-4 are missing:
-#      - "|     <br>\n"
-#      - "|     <p>\n"
-not ok 517
-# Test 517 got: "111" (t/HTML-tree.t at line 187 fail #173)
-#     Expected: "86" (Parse error: qq'<table><tr></strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>'; 1:8:no DOCTYPE, 1:21:in table:/, 1:21:unmatched end tag, 1:25:in table:/, 1:25:unmatched end tag, 1:30:in table:/, 1:30:unmatched end tag, 1:34:in table:/, 1:34:unmatched end tag, 1:38:in table:/, 1:38:unmatched end tag, 1:47:in table:/, 1:47:unmatched end tag, 1:51:in table:/, 1:51:unmatched end tag, 1:59:in table:/, 1:59:unmatched end tag, 1:64:in table:/, 1:64:unmatched end tag, 1:70:in table:/, 1:70:unmatched end tag, 1:76:in table:/, 1:76:unmatched end tag, 1:84:in table:/, 1:84:unmatched end tag, 1:91:in table:/, 1:91:unmatched end tag, 1:100:in table:/, 1:100:unmatched end tag, 1:105:in table:/, 1:105:unmatched end tag, 1:110:in table:/, 1:110:unmatched end tag, 1:115:in table:/, 1:115:unmatched end tag, 1:120:in table:/, 1:120:unmatched end tag, 1:125:in table:/, 1:125:unmatched end tag, 1:130:in table:/, 1:130:unmatched end tag, 1:137:unmatched end tag, 1:142:in table:/, 1:142:unmatched end tag, 1:146:in table:/, 1:146:unmatched end tag, 1:152:in table:/, 1:152:unmatched end tag, 1:160:in table:/, 1:160:unmatched end tag, 1:167:in table:/, 1:167:unmatched end tag, 1:175:in table:/, 1:175:unmatched end tag, 1:184:in table:/, 1:184:unmatched end tag, 1:197:unmatched end tag, 1:202:unmatched end tag, 1:207:unmatched end tag, 1:215:unmatched end tag, 1:222:unmatched end tag, 1:229:unmatched end tag, 1:237:unmatched end tag, 1:242:unmatched end tag, 1:250:unmatched end tag, 1:256:unmatched end tag, 1:263:unmatched end tag, 1:270:unmatched end tag, 1:281:unmatched end tag, 1:291:unmatched end tag, 1:299:unmatched end tag, 1:308:unmatched end tag, 1:312:unmatched end tag, 1:317:unmatched end tag, 1:322:unmatched end tag, 1:332:unmatched end tag, 1:343:unmatched end tag, 1:351:unmatched end tag, 1:359:unmatched end tag, 1:367:unmatched end tag, 1:377:unmatched end tag, 1:390:unmatched end tag, 1:399:unmatched end tag, 1:405:unmatched end tag, 1:411:unmatched end tag, 1:416:unmatched end tag, 1:427:unmatched end tag, 1:437:unmatched end tag, 1:444:unmatched end tag, 1:449:unmatched end tag, 1:454:unmatched end tag, 1:459:unmatched end tag, 1:466:unmatched end tag, 1:472:unmatched end tag, 1:479:unmatched end tag, 1:488:unmatched end tag, 1:498:unmatched end tag, 1:507:unmatched end tag, 1:525:after html:/, 1:525:unmatched end tag, 1:532:unmatched end tag, 1:541:unmatched end tag, 1:549:unmatched end tag, 1:559:unmatched end tag, 1:569:unmatched end tag, 1:580:unmatched end tag, 1:591:unmatched end tag, 1:602:unmatched end tag, 1:611:unmatched end tag, 1:623:unmatched end tag, 1:633:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 20 Unexpected end tag (strong) in table context caused voodoo mode., Line: 1 Col: 20 End tag (strong) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 24 End tag (b) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 29 End tag (em) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 33 End tag (i) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 37 End tag (u) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 46 End tag (strike) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 50 End tag (s) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 58 Unexpected end tag (blink). Ignored., Line: 1 Col: 63 End tag (tt) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 69 End tag (pre) seen too early. Expected other end tag., Line: 1 Col: 75 End tag (big) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 83 End tag (small) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 90 End tag (font) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 99 Unexpected end tag (select). Ignored., Line: 1 Col: 104 End tag (h1) seen too early. Expected other end tag., Line: 1 Col: 109 End tag (h2) seen too early. Expected other end tag., Line: 1 Col: 114 End tag (h3) seen too early. Expected other end tag., Line: 1 Col: 119 End tag (h4) seen too early. Expected other end tag., Line: 1 Col: 124 End tag (h5) seen too early. Expected other end tag., Line: 1 Col: 129 End tag (h6) seen too early. Expected other end tag., Line: 1 Col: 136 Unexpected end tag (body) in the table row phase. Ignored., Line: 1 Col: 141 Unexpected end tag (br). Treated as br element., Line: 1 Col: 145 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 151 This element (img) has no end tag., Line: 1 Col: 159 Unexpected end tag (title). Ignored., Line: 1 Col: 166 Unexpected end tag (span). Ignored., Line: 1 Col: 174 Unexpected end tag (style). Ignored., Line: 1 Col: 183 Unexpected end tag (script). Ignored., Line: 1 Col: 196 Unexpected end tag (th). Ignored., Line: 1 Col: 201 Unexpected end tag (td). Ignored., Line: 1 Col: 206 Unexpected end tag (tr). Ignored., Line: 1 Col: 214 This element (frame) has no end tag., Line: 1 Col: 221 This element (area) has no end tag., Line: 1 Col: 228 Unexpected end tag (link). Ignored., Line: 1 Col: 236 This element (param) has no end tag., Line: 1 Col: 241 This element (hr) has no end tag., Line: 1 Col: 249 This element (input) has no end tag., Line: 1 Col: 255 Unexpected end tag (col). Ignored., Line: 1 Col: 262 Unexpected end tag (base). Ignored., Line: 1 Col: 269 Unexpected end tag (meta). Ignored., Line: 1 Col: 280 This element (basefont) has no end tag., Line: 1 Col: 290 This element (bgsound) has no end tag., Line: 1 Col: 298 This element (embed) has no end tag., Line: 1 Col: 307 This element (spacer) has no end tag., Line: 1 Col: 311 Unexpected end tag (p). Ignored., Line: 1 Col: 316 End tag (dd) seen too early. Expected other end tag., Line: 1 Col: 321 End tag (dt) seen too early. Expected other end tag., Line: 1 Col: 331 Unexpected end tag (caption). Ignored., Line: 1 Col: 342 Unexpected end tag (colgroup). Ignored., Line: 1 Col: 350 Unexpected end tag (tbody). Ignored., Line: 1 Col: 358 Unexpected end tag (tfoot). Ignored., Line: 1 Col: 366 Unexpected end tag (thead). Ignored., Line: 1 Col: 376 End tag (address) seen too early. Expected other end tag., Line: 1 Col: 389 End tag (blockquote) seen too early. Expected other end tag., Line: 1 Col: 398 End tag (center) seen too early. Expected other end tag., Line: 1 Col: 404 Unexpected end tag (dir). Ignored., Line: 1 Col: 410 End tag (div) seen too early. Expected other end tag., Line: 1 Col: 415 End tag (dl) seen too early. Expected other end tag., Line: 1 Col: 426 End tag (fieldset) seen too early. Expected other end tag., Line: 1 Col: 436 End tag (listing) seen too early. Expected other end tag., Line: 1 Col: 443 End tag (menu) seen too early. Expected other end tag., Line: 1 Col: 448 End tag (ol) seen too early. Expected other end tag., Line: 1 Col: 453 End tag (ul) seen too early. Expected other end tag., Line: 1 Col: 458 End tag (li) seen too early. Expected other end tag., Line: 1 Col: 465 End tag (nobr) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 471 This element (wbr) has no end tag., Line: 1 Col: 478 End tag (form) seen too early. Ignored., Line: 1 Col: 487 End tag (button) seen too early. Expected other end tag., Line: 1 Col: 497 End tag (marquee) seen too early. Expected other end tag., Line: 1 Col: 506 End tag (object) seen too early. Expected other end tag., Line: 1 Col: 524 Unexpected end tag (frameset). Expected end of file., Line: 1 Col: 524 Unexpected end tag token (frameset) in the after body phase., Line: 1 Col: 524 Unexpected end tag (frameset). Ignored., Line: 1 Col: 531 Unexpected end tag (head). Ignored., Line: 1 Col: 540 Unexpected end tag (iframe). Ignored., Line: 1 Col: 548 This element (image) has no end tag., Line: 1 Col: 558 This element (isindex) has no end tag., Line: 1 Col: 568 Unexpected end tag (noembed). Ignored., Line: 1 Col: 579 Unexpected end tag (noframes). Ignored., Line: 1 Col: 590 Unexpected end tag (noscript). Ignored., Line: 1 Col: 601 Unexpected end tag (optgroup). Ignored., Line: 1 Col: 610 Unexpected end tag (option). Ignored., Line: 1 Col: 622 Unexpected end tag (plaintext). Ignored., Line: 1 Col: 633 Unexpected end tag (textarea). Ignored.)
+ok 516
+ok 517
 ok 518
 ok 519
 ok 520
@@ -641,9 +607,7 @@ ok 540
 ok 541
 ok 542
 ok 543
-not ok 544
-# Test 544 got: "1" (t/HTML-tree.t at line 187 fail #182)
-#     Expected: "2" (Parse error: qq'<!DOCTYPE html><font><p><b>test</font>'; 1:38:not closed;Line: 1 Col: 38 End tag (font) violates step 1, paragraph 3 of the adoption agency algorithm., Line: 1 Col: 38 End tag (font) violates step 1, paragraph 3 of the adoption agency algorithm.)
+ok 544
 ok 545
 ok 546
 ok 547
@@ -653,7 +617,7 @@ ok 550
 ok 551
 ok 552
 not ok 553
-# Test 553 got: "5" (t/HTML-tree.t at line 187 fail #185)
+# Test 553 got: "5" (t/HTML-tree.t at line 192 fail #185)
 #     Expected: "3" (Parse error: qq'<table><plaintext><td>'; 1:8:no DOCTYPE, 1:19:in table, 1:22:in table:#text, 1:22:in table:#text, 1:22:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 18 Unexpected start tag (plaintext) in table context caused voodoo mode., Line: 1 Col: 22 Expected closing tag. Unexpected end of file.)
 ok 554
 ok 555
@@ -734,11 +698,7 @@ ok 629
 ok 630
 ok 631
 ok 632
-not ok 633
-# Test 633 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <optgroup>\n|         <option>\n|       <option>\n|     <option>\n" (t/HTML-tree.t at line 192 fail #211)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <optgroup>\n|         <option>\n|       <option>\n" (Document tree: qq'<!DOCTYPE html><select><optgroup><option></optgroup><option><select><option>')
-#     Got 1 extra line at line 9:
-#      + "|     <option>\n"
+ok 633
 ok 634
 ok 635
 ok 636
@@ -785,24 +745,20 @@ ok 676
 ok 677
 ok 678
 not ok 679
-# Test 679 got: "1" (t/HTML-tree.t at line 187 fail #227)
+# Test 679 got: "1" (t/HTML-tree.t at line 192 fail #227)
 #     Expected: "2" (Parse error: qq'<!DOCTYPE html>X</body><html id="x">'; 1:36:not first start tag;Line: 1 Col: 36 Unexpected start tag token (html) in the after body phase., Line: 1 Col: 36 html needs to be the first start tag.)
 ok 680
 ok 681
 ok 682
 ok 683
 ok 684
-not ok 685
-# Test 685 got: "1" (t/HTML-tree.t at line 187 fail #229)
-#     Expected: "2" (Parse error: qq'<!DOCTYPE html>X</html>X'; 1:24:after html:#text;Line: 1 Col: 24 Unexpected non-space characters. Expected end of file., Line: 1 Col: 24 Unexpected non-space characters in the after body phase.)
+ok 685
 ok 686
 ok 687
 ok 688
 ok 689
 ok 690
-not ok 691
-# Test 691 got: "1" (t/HTML-tree.t at line 187 fail #231)
-#     Expected: "2" (Parse error: qq'<!DOCTYPE html>X</html><p>X'; 1:27:after html;Line: 1 Col: 26 Unexpected start tag (p). Expected end of file., Line: 1 Col: 26 Unexpected start tag token (p) in the after body phase.)
+ok 691
 ok 692
 ok 693
 ok 694
@@ -814,17 +770,19 @@ ok 699
 ok 700
 ok 701
 ok 702
-# t/tree-construction/tests3.dat
 ok 703
 ok 704
 ok 705
+# t/tree-construction/tests3.dat
 ok 706
 ok 707
 ok 708
 ok 709
 ok 710
 ok 711
-ok 712
+not ok 712
+# Test 712 got: "3" (t/HTML-tree.t at line 192 fail #238)
+#     Expected: "2" (Parse error: qq'<head></head><!-- --><style></style><!-- --><script></script>'; 1:7:no DOCTYPE, 1:29:after head, 1:53:after head;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE., Line: 1 Col: 28 Unexpected start tag (style) that can be in head. Moved.)
 ok 713
 ok 714
 ok 715
@@ -848,17 +806,17 @@ ok 732
 ok 733
 ok 734
 ok 735
-not ok 736
-# Test 736 got: "2" (t/HTML-tree.t at line 187 fail #246)
-#     Expected: "1" (Parse error: qq'<!DOCTYPE html><HTML><META><HEAD></HEAD></HTML>'; 1:34:in head:head, 1:47:unmatched end tag;Line: 1 Col: 33 Unexpected start tag head in existing head. Ignored.)
+ok 736
 ok 737
 ok 738
 not ok 739
-# Test 739 got: "2" (t/HTML-tree.t at line 187 fail #247)
-#     Expected: "1" (Parse error: qq'<!DOCTYPE html><HTML><HEAD><head></HEAD></HTML>'; 1:34:in head:head, 1:47:unmatched end tag;Line: 1 Col: 33 Unexpected start tag head in existing head. Ignored.)
+# Test 739 got: "2" (t/HTML-tree.t at line 192 fail #247)
+#     Expected: "1" (Parse error: qq'<!DOCTYPE html><HTML><META><HEAD></HEAD></HTML>'; 1:34:in head:head, 1:47:unmatched end tag;Line: 1 Col: 33 Unexpected start tag head in existing head. Ignored.)
 ok 740
 ok 741
-ok 742
+not ok 742
+# Test 742 got: "2" (t/HTML-tree.t at line 192 fail #248)
+#     Expected: "1" (Parse error: qq'<!DOCTYPE html><HTML><HEAD><head></HEAD></HTML>'; 1:34:in head:head, 1:47:unmatched end tag;Line: 1 Col: 33 Unexpected start tag head in existing head. Ignored.)
 ok 743
 ok 744
 ok 745
@@ -882,10 +840,10 @@ ok 762
 ok 763
 ok 764
 ok 765
-# t/tree-construction/tests4.dat
 ok 766
 ok 767
 ok 768
+# t/tree-construction/tests4.dat
 ok 769
 ok 770
 ok 771
@@ -901,13 +859,15 @@ ok 780
 ok 781
 ok 782
 ok 783
-ok 784
+not ok 784
+# Test 784 got: "0" (t/HTML-tree.t at line 192 fail #262)
+#     Expected: "1" (Parse error: qq'setting html\x{27}s innerHTML'; ;Line: 1 Col: 24 Unexpected EOF in inner html mode.)
 ok 785
 ok 786
-# t/tree-construction/tests5.dat
 ok 787
 ok 788
 ok 789
+# t/tree-construction/tests5.dat
 ok 790
 ok 791
 ok 792
@@ -949,35 +909,27 @@ ok 827
 ok 828
 ok 829
 ok 830
-not ok 831
-# Test 831 got: "| <html>\n|   <head>\n|     <noscript>\n|       <!-- </noscript> -->\n|   <body>\n" (t/HTML-tree.t at line 192 fail #277)
+ok 831
+ok 832
+ok 833
+not ok 834
+# Test 834 got: "| <html>\n|   <head>\n|     <noscript>\n|       <!-- </noscript> -->\n|   <body>\n" (t/HTML-tree.t at line 197 fail #278)
 #     Expected: "| <html>\n|   <head>\n|     <noscript>\n|       \"<!--</noscript>-->\"\n|   <body>\n" (Document tree: qq'<noscript><!--</noscript>--></noscript>')
 #     Line 4 is changed:
 #      - "|       \"<!--</noscript>-->\"\n"
 #      + "|       <!-- </noscript> -->\n"
 # t/tree-construction/tests6.dat
-ok 832
-ok 833
-ok 834
-not ok 835
-# Test 835 got: "1" (t/HTML-tree.t at line 187 fail #279)
-#     Expected: "3" (Parse error: qq'<!doctype html></html> <head>'; 1:23:unmatched end tag;Line: 1 Col: 29 Unexpected start tag (head). Expected end of file., Line: 1 Col: 29 Unexpected start tag token (head) in the after body phase., Line: 1 Col: 29 Unexpected start tag head. Ignored.)
+ok 835
 ok 836
-not ok 837
-# Test 837 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n" (t/HTML-tree.t at line 192 fail #279)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     \" \"\n" (Document tree: qq'<!doctype html></html> <head>')
-#     Line 5 is missing:
-#      - "|     \" \"\n"
-ok 838
+ok 837
+not ok 838
+# Test 838 got: "1" (t/HTML-tree.t at line 192 fail #280)
+#     Expected: "2" (Parse error: qq'<!doctype html></html> <head>'; 1:23:unmatched end tag;22: Stray end tag �html�., 29: Stray start tag �head�.)
 ok 839
-not ok 840
-# Test 840 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <meta>\n|   <body>\n" (t/HTML-tree.t at line 192 fail #280)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <meta>\n" (Document tree: qq'<!doctype html></body><meta>')
-#     Got 1 extra line at line 4:
-#      + "|     <meta>\n"
-#     Line 6 is missing:
-#      - "|     <meta>\n"
-ok 841
+ok 840
+not ok 841
+# Test 841 got: "1" (t/HTML-tree.t at line 192 fail #281)
+#     Expected: "2" (Parse error: qq'<!doctype html></body><meta>'; 1:23:unmatched end tag;22: Stray end tag �body�., 28: �meta� element outside �head�.)
 ok 842
 ok 843
 ok 844
@@ -1079,15 +1031,17 @@ ok 939
 ok 940
 ok 941
 ok 942
-not ok 943
-# Test 943 got: "3" (t/HTML-tree.t at line 187 fail #315)
-#     Expected: "4" (Parse error: qq'<table><tr><div><td>'; 1:8:no DOCTYPE, 1:17:in table, 1:20:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 16 Unexpected start tag (div) in table context caused voodoo mode., Line: 1 Col: 20 Unexpected implied end tag (div) in the table row phase., Line: 1 Col: 20 Expected closing tag. Unexpected end of file.)
+ok 943
 ok 944
 ok 945
-ok 946
+not ok 946
+# Test 946 got: "3" (t/HTML-tree.t at line 192 fail #316)
+#     Expected: "4" (Parse error: qq'<table><tr><div><td>'; 1:8:no DOCTYPE, 1:17:in table, 1:20:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 16 Unexpected start tag (div) in table context caused voodoo mode., Line: 1 Col: 20 Unexpected implied end tag (div) in the table row phase., Line: 1 Col: 20 Expected closing tag. Unexpected end of file.)
 ok 947
 ok 948
-ok 949
+not ok 949
+# Test 949 got: "7" (t/HTML-tree.t at line 192 fail #317)
+#     Expected: "6" (Parse error: qq'<caption><col><colgroup><tbody><tfoot><thead><tr>'; 1:10:unmatched end tag, 1:15:unmatched end tag, 1:25:unmatched end tag, 1:32:unmatched end tag, 1:39:unmatched end tag, 1:46:unmatched end tag, 1:49:in body:#eof;Line: 1 Col: 9 Unexpected start tag (caption)., Line: 1 Col: 14 Unexpected start tag (col)., Line: 1 Col: 24 Unexpected start tag (colgroup)., Line: 1 Col: 31 Unexpected start tag (tbody)., Line: 1 Col: 38 Unexpected start tag (tfoot)., Line: 1 Col: 45 Unexpected start tag (thead).)
 ok 950
 ok 951
 ok 952
@@ -1108,64 +1062,66 @@ ok 966
 ok 967
 ok 968
 ok 969
-not ok 970
-# Test 970 got: "2" (t/HTML-tree.t at line 187 fail #324)
-#     Expected: "1" (Parse error: qq'<html></html><!-- foo -->'; 1:7:no DOCTYPE, 1:14:unmatched end tag;Line: 1 Col: 6 Unexpected start tag (html). Expected DOCTYPE.)
+ok 970
 ok 971
-not ok 972
-# Test 972 got: "| <html>\n|   <!--  foo  -->\n|   <head>\n|   <body>\n" (t/HTML-tree.t at line 192 fail #324)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n| <!--  foo  -->\n" (Document tree: qq'<html></html><!-- foo -->')
-#     Got 1 extra line at line 2:
-#      + "|   <!--  foo  -->\n"
-#     Line 5 is missing:
-#      - "| <!--  foo  -->\n"
+ok 972
 ok 973
 ok 974
 ok 975
-ok 976
+not ok 976
+# Test 976 got: "1" (t/HTML-tree.t at line 192 fail #326)
+#     Expected: "2" (Parse error: qq'<body></body></html>'; 1:20:unmatched end tag;Line: 1 Col: 20 Unexpected html end tag in inner html mode., Line: 1 Col: 20 Unexpected EOF in inner html mode.)
 ok 977
 ok 978
-not ok 979
-# Test 979 got: "2" (t/HTML-tree.t at line 187 fail #327)
-#     Expected: "1" (Parse error: qq'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html></html>'; 1:51:not HTML5, 1:63:unmatched end tag;doctype-error)
+ok 979
 ok 980
-not ok 981
-# Test 981 got: "| <!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n| <html>\n|   <head>\n|   <body>\n" (t/HTML-tree.t at line 192 fail #327)
+ok 981
+not ok 982
+# Test 982 got: "2" (t/HTML-tree.t at line 192 fail #328)
+#     Expected: "1" (Parse error: qq'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html></html>'; 1:51:not HTML5, 1:63:unmatched end tag;doctype-error)
+ok 983
+not ok 984
+# Test 984 got: "| <!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n| <html>\n|   <head>\n|   <body>\n" (t/HTML-tree.t at line 197 fail #328)
 #     Expected: "| <!DOCTYPE html \"-//W3C//DTD HTML 4.01//EN\" \"\">\n| <html>\n|   <head>\n|   <body>\n" (Document tree: qq'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html></html>')
 #     Line 1 is changed:
 #      - "| <!DOCTYPE html \"-//W3C//DTD HTML 4.01//EN\" \"\">\n"
 #      + "| <!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n"
 # t/tree-construction/tests7.dat
-ok 982
-ok 983
-ok 984
 ok 985
 ok 986
-ok 987
-ok 988
+not ok 987
+# Test 987 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <title>\n|       \"X\"\n" (t/HTML-tree.t at line 197 fail #329)
+#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|       \"X\"\n|   <body>\n" (Document tree: qq'<!doctype html><body><title>X</title>')
+#     Got 1 extra line at line 4:
+#      + "|   <body>\n"
+#     Line 7 is missing:
+#      - "|   <body>\n"
+not ok 988
+# Test 988 got: "1" (t/HTML-tree.t at line 192 fail #330)
+#     Expected: "2" (Parse error: qq'<!doctype html><table><title>X</title></table>'; 1:30:in table;Line: 1 Col: 29 Unexpected start tag (title) in table context caused voodoo mode., Line: 1 Col: 38 Unexpected end tag (title) in table context caused voodoo mode.)
 ok 989
-ok 990
+not ok 990
+# Test 990 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <title>\n|       \"X\"\n|     <table>\n" (t/HTML-tree.t at line 197 fail #330)
+#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|       \"X\"\n|   <body>\n|     <table>\n" (Document tree: qq'<!doctype html><table><title>X</title></table>')
+#     Got 1 extra line at line 4:
+#      + "|   <body>\n"
+#     Line 7 is missing:
+#      - "|   <body>\n"
 ok 991
 ok 992
 ok 993
 ok 994
 ok 995
-not ok 996
-# Test 996 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|       \"X\"\n|   <body>\n" (t/HTML-tree.t at line 192 fail #332)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <title>\n|       \"X\"\n" (Document tree: qq'<!doctype html></body><title>X</title>')
-#     Line 4 is missing:
-#      - "|   <body>\n"
-#     Got 1 extra line at line 6:
-#      + "|   <body>\n"
+ok 996
 ok 997
 ok 998
 ok 999
-not ok 1000
-# Test 1000 got: "2" (t/HTML-tree.t at line 187 fail #334)
-#      Expected: "1" (Parse error: qq'<!doctype html><table> X<meta></table>'; 1:25:in table:#text, 1:31:in table;characters-in-table)
+ok 1000
 ok 1001
 ok 1002
-ok 1003
+not ok 1003
+# Test 1003 got: "2" (t/HTML-tree.t at line 192 fail #335)
+#      Expected: "1" (Parse error: qq'<!doctype html><table> X<meta></table>'; 1:25:in table:#text, 1:31:in table;Line: 1 Col: 24 Unexpected non-space characters in table context caused voodoo mode.)
 ok 1004
 ok 1005
 ok 1006
@@ -1186,15 +1142,19 @@ ok 1020
 ok 1021
 ok 1022
 ok 1023
-ok 1024
+not ok 1024
+# Test 1024 got: "0" (t/HTML-tree.t at line 192 fail #342)
+#      Expected: "1" (Parse error: qq'<!doctype html><table><style> <tr>x </style> </table>'; ;Line: 1 Col: 44 Unexpected end tag (style) in table context caused voodoo mode.)
 ok 1025
 ok 1026
 not ok 1027
-# Test 1027 got: "3" (t/HTML-tree.t at line 187 fail #343)
-#      Expected: "1" (Parse error: qq'<!doctype html><table>X<style> <tr>x </style> </table>'; 1:24:in table:#text, 1:31:in table, 1:47:in table:#text;xxxx)
+# Test 1027 got: "0" (t/HTML-tree.t at line 192 fail #343)
+#      Expected: "1" (Parse error: qq'<!doctype html><table><TBODY><script> <tr>x </script> </table>'; ;Line: 1 Col: 53 Unexpected end tag (script) in table context caused voodoo mode.)
 ok 1028
 ok 1029
-ok 1030
+not ok 1030
+# Test 1030 got: "3" (t/HTML-tree.t at line 192 fail #344)
+#      Expected: "2" (Parse error: qq'<!doctype html><table>X<style> <tr>x </style> </table>'; 1:24:in table:#text, 1:31:in table, 1:47:in table:#text;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 45 Unexpected end tag (style) in table context caused voodoo mode.)
 ok 1031
 ok 1032
 ok 1033
@@ -1209,63 +1169,62 @@ ok 1041
 ok 1042
 ok 1043
 ok 1044
-not ok 1045
-# Test 1045 got: "2" (t/HTML-tree.t at line 187 fail #349)
-#      Expected: "1" (Parse error: qq'<!doctype html><table>X<input type=hidDEN></table>'; 1:24:in table:#text, 1:43:in table;input-in-table)
+ok 1045
 ok 1046
 ok 1047
-ok 1048
+not ok 1048
+# Test 1048 got: "2" (t/HTML-tree.t at line 192 fail #350)
+#      Expected: "1" (Parse error: qq'<!doctype html><table>X<input type=hidDEN></table>'; 1:24:in table:#text, 1:43:in table;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode.)
 ok 1049
 ok 1050
 ok 1051
 ok 1052
 ok 1053
-not ok 1054
-# Test 1054 got: "2" (t/HTML-tree.t at line 187 fail #352)
-#      Expected: "1" (Parse error: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>'; 1:45:in table, 1:64:in table;input-in-table)
+ok 1054
 ok 1055
 ok 1056
-ok 1057
+not ok 1057
+# Test 1057 got: "2" (t/HTML-tree.t at line 192 fail #353)
+#      Expected: "1" (Parse error: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>'; 1:45:in table, 1:64:in table;Line: 1 Col: 44 Unexpected start tag (input) in table context caused voodoo mode.)
 ok 1058
 ok 1059
 ok 1060
 ok 1061
 ok 1062
-not ok 1063
-# Test 1063 got: "1" (t/HTML-tree.t at line 187 fail #355)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE hTmL><html></html>'; 1:28:unmatched end tag;)
+ok 1063
 ok 1064
 ok 1065
 not ok 1066
-# Test 1066 got: "1" (t/HTML-tree.t at line 187 fail #356)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><html></html>'; 1:28:unmatched end tag;)
+# Test 1066 got: "1" (t/HTML-tree.t at line 192 fail #356)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE hTmL><html></html>'; 1:28:unmatched end tag;)
 ok 1067
 ok 1068
-ok 1069
+not ok 1069
+# Test 1069 got: "1" (t/HTML-tree.t at line 192 fail #357)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><html></html>'; 1:28:unmatched end tag;)
 ok 1070
 ok 1071
 not ok 1072
-# Test 1072 got: "5" (t/HTML-tree.t at line 187 fail #358)
-#      Expected: "1" (Parse error: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>'; 1:31:in table, 1:34:in table:#text, 1:38:in table:/, 1:39:in table:#text, 1:56:in table:#text;unexpected-start-tag-implies-table-voodoo)
+# Test 1072 got: "1" (t/HTML-tree.t at line 192 fail #358)
+#      Expected: "2" (Parse error: qq'<body>X</body></body>'; 1:21:after body:/;Line: 1 Col: 21 Unexpected end tag token (body) in the after body phase., Line: 1 Col: 21 Unexpected EOF in inner html mode.)
 ok 1073
-not ok 1074
-# Test 1074 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <div>\n|       <a>\n|         \"foo\"\n|       \" \"\n|       \" \"\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               \"bar\"\n" (t/HTML-tree.t at line 192 fail #358)
-#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <div>\n|       <a>\n|         \"foo\"\n|       \"  \"\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               \"bar\"" (Document tree: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>')
+ok 1074
+not ok 1075
+# Test 1075 got: "5" (t/HTML-tree.t at line 192 fail #359)
+#      Expected: "2" (Parse error: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>'; 1:31:in table, 1:34:in table:#text, 1:38:in table:/, 1:39:in table:#text, 1:56:in table:#text;Line: 1 Col: 30 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 37 Unexpected end tag (a) in table context caused voodoo mode.)
+ok 1076
+not ok 1077
+# Test 1077 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <div>\n|       <a>\n|         \"foo\"\n|       \" \"\n|       \" \"\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               \"bar\"\n" (t/HTML-tree.t at line 197 fail #359)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <div>\n|       <a>\n|         \"foo\"\n|       \"  \"\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               \"bar\"\n" (Document tree: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>')
 #      Line 8 is changed:
 #       - "|       \"  \"\n"
 #       + "|       \" \"\n"
 #      Got 1 extra line at line 9:
 #       + "|       \" \"\n"
-#      Line 14 is changed:
-#       - "|               \"bar\""
-#       + "|               \"bar\"\n"
-# t/tree-test-1.dat
-ok 1075
-ok 1076
-ok 1077
 ok 1078
 ok 1079
 ok 1080
+# t/tree-construction/tests8.dat
 ok 1081
 ok 1082
 ok 1083
@@ -1278,12 +1237,21 @@ ok 1089
 ok 1090
 ok 1091
 ok 1092
-ok 1093
+not ok 1093
+# Test 1093 got: "10" (t/HTML-tree.t at line 192 fail #365)
+#      Expected: "6" (Parse error: qq'<table><div>x<div></div>x</span>x'; 1:8:no DOCTYPE, 1:13:in table, 1:14:in table:#text, 1:19:in table, 1:25:in table:/, 1:26:in table:#text, 1:33:in table:/, 1:33:unmatched end tag, 1:33:in table:#text, 1:33:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 12 Unexpected start tag (div) in table context caused voodoo mode., Line: 1 Col: 24 Unexpected end tag (div) in table context caused voodoo mode., Line: 1 Col: 32 Unexpected end tag (span) in table context caused voodoo mode., Line: 1 Col: 32 Unexpected end tag (span). Ignored., Line: 1 Col: 33 Expected closing tag. Unexpected end of file.)
 ok 1094
 ok 1095
 ok 1096
 ok 1097
-ok 1098
+not ok 1098
+# Test 1098 got: "| <html>\n|   <head>\n|   <body>\n|     \"x\"\n|     \"x\"\n|     <table>\n" (t/HTML-tree.t at line 197 fail #366)
+#      Expected: "| <html>\n|   <head>\n|   <body>\n|     \"xx\"\n|     <table>\n" (Document tree: qq'x<table>x')
+#      Line 4 is changed:
+#       - "|     \"xx\"\n"
+#       + "|     \"x\"\n"
+#      Got 1 extra line at line 5:
+#       + "|     \"x\"\n"
 ok 1099
 ok 1100
 ok 1101
@@ -1293,12 +1261,23 @@ ok 1104
 ok 1105
 ok 1106
 ok 1107
+# t/tree-construction/tests9.dat
 ok 1108
 ok 1109
-ok 1110
+not ok 1110
+# Test 1110 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n" (t/HTML-tree.t at line 197 fail #370)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n" (Document tree: qq'<!DOCTYPE html><math></math>')
+#      Line 5 is changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
 ok 1111
 ok 1112
-ok 1113
+not ok 1113
+# Test 1113 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n" (t/HTML-tree.t at line 197 fail #371)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n" (Document tree: qq'<!DOCTYPE html><body><math></math>')
+#      Line 5 is changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
 ok 1114
 ok 1115
 ok 1116
@@ -1307,37 +1286,148 @@ ok 1118
 ok 1119
 ok 1120
 ok 1121
-ok 1122
+not ok 1122
+# Test 1122 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|     <table>\n" (t/HTML-tree.t at line 197 fail #374)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|     <table>\n" (Document tree: qq'<!DOCTYPE html><body><table><math></math></table>')
+#      Line 5 is changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
 ok 1123
 ok 1124
-ok 1125
+not ok 1125
+# Test 1125 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       <mi>\n|         \"foo\"\n|     <table>\n" (t/HTML-tree.t at line 197 fail #375)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mi>\n|         \"foo\"\n|     <table>\n" (Document tree: qq'<!DOCTYPE html><body><table><math><mi>foo</mi></math></table>')
+#      Lines 5-6 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
 ok 1126
 ok 1127
-ok 1128
+not ok 1128
+# Test 1128 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       <mi>\n|         \"foo\"\n|       <mi>\n|         \"bar\"\n|     <table>\n" (t/HTML-tree.t at line 197 fail #376)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mi>\n|         \"foo\"\n|       <math mi>\n|         \"bar\"\n|     <table>\n" (Document tree: qq'<!DOCTYPE html><body><table><math><mi>foo</mi><mi>bar</mi></math></table>')
+#      Lines 5-6 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#      Line 8 is changed:
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
 ok 1129
 ok 1130
-ok 1131
+not ok 1131
+# Test 1131 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       <mi>\n|         \"foo\"\n|       <mi>\n|         \"bar\"\n|     <table>\n|       <tbody>\n" (t/HTML-tree.t at line 197 fail #377)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mi>\n|         \"foo\"\n|       <math mi>\n|         \"bar\"\n|     <table>\n|       <tbody>\n" (Document tree: qq'<!DOCTYPE html><body><table><tbody><math><mi>foo</mi><mi>bar</mi></math></tbody></table>')
+#      Lines 5-6 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#      Line 8 is changed:
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
 ok 1132
 ok 1133
-ok 1134
+not ok 1134
+# Test 1134 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       <mi>\n|         \"foo\"\n|       <mi>\n|         \"bar\"\n|     <table>\n|       <tbody>\n|         <tr>\n" (t/HTML-tree.t at line 197 fail #378)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mi>\n|         \"foo\"\n|       <math mi>\n|         \"bar\"\n|     <table>\n|       <tbody>\n|         <tr>\n" (Document tree: qq'<!DOCTYPE html><body><table><tbody><tr><math><mi>foo</mi><mi>bar</mi></math></tr></tbody></table>')
+#      Lines 5-6 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#      Line 8 is changed:
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
 ok 1135
 ok 1136
-ok 1137
+not ok 1137
+# Test 1137 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <tbody>\n|         <tr>\n|           <td>\n|             <math>\n|               <mi>\n|                 \"foo\"\n|               <mi>\n|                 \"bar\"\n" (t/HTML-tree.t at line 197 fail #379)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <tbody>\n|         <tr>\n|           <td>\n|             <math math>\n|               <math mi>\n|                 \"foo\"\n|               <math mi>\n|                 \"bar\"\n" (Document tree: qq'<!DOCTYPE html><body><table><tbody><tr><td><math><mi>foo</mi><mi>bar</mi></math></td></tr></tbody></table>')
+#      Lines 9-10 are changed:
+#       - "|             <math math>\n"
+#       + "|             <math>\n"
+#       - "|               <math mi>\n"
+#       + "|               <mi>\n"
+#      Line 12 is changed:
+#       - "|               <math mi>\n"
+#       + "|               <mi>\n"
 ok 1138
 ok 1139
-ok 1140
+not ok 1140
+# Test 1140 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <tbody>\n|         <tr>\n|           <td>\n|             <math>\n|               <mi>\n|                 \"foo\"\n|               <mi>\n|                 \"bar\"\n|             <p>\n|               \"baz\"\n" (t/HTML-tree.t at line 197 fail #380)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <tbody>\n|         <tr>\n|           <td>\n|             <math math>\n|               <math mi>\n|                 \"foo\"\n|               <math mi>\n|                 \"bar\"\n|             <p>\n|               \"baz\"\n" (Document tree: qq'<!DOCTYPE html><body><table><tbody><tr><td><math><mi>foo</mi><mi>bar</mi></math><p>baz</td></tr></tbody></table>')
+#      Lines 9-10 are changed:
+#       - "|             <math math>\n"
+#       + "|             <math>\n"
+#       - "|               <math mi>\n"
+#       + "|               <mi>\n"
+#      Line 12 is changed:
+#       - "|               <math mi>\n"
+#       + "|               <mi>\n"
 ok 1141
 ok 1142
-ok 1143
+not ok 1143
+# Test 1143 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <math>\n|           <mi>\n|             \"foo\"\n|           <mi>\n|             \"bar\"\n|         <p>\n|           \"baz\"\n" (t/HTML-tree.t at line 197 fail #381)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <math math>\n|           <math mi>\n|             \"foo\"\n|           <math mi>\n|             \"bar\"\n|         <p>\n|           \"baz\"\n" (Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi></math><p>baz</caption></table>')
+#      Lines 7-8 are changed:
+#       - "|         <math math>\n"
+#       + "|         <math>\n"
+#       - "|           <math mi>\n"
+#       + "|           <mi>\n"
+#      Line 10 is changed:
+#       - "|           <math mi>\n"
+#       + "|           <mi>\n"
 ok 1144
 ok 1145
-ok 1146
-ok 1147
+not ok 1146
+# Test 1146 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <math>\n|           <mi>\n|             \"foo\"\n|           <mi>\n|             \"bar\"\n|         <p>\n|           \"baz\"\n|     <p>\n|       \"quux\"\n" (t/HTML-tree.t at line 197 fail #382)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <math math>\n|           <math mi>\n|             \"foo\"\n|           <math mi>\n|             \"bar\"\n|         <p>\n|           \"baz\"\n|     <p>\n|       \"quux\"\n" (Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux')
+#      Lines 7-8 are changed:
+#       - "|         <math math>\n"
+#       + "|         <math>\n"
+#       - "|           <math mi>\n"
+#       + "|           <mi>\n"
+#      Line 10 is changed:
+#       - "|           <math mi>\n"
+#       + "|           <mi>\n"
+not ok 1147
+# Test 1147 got: "3" (t/HTML-tree.t at line 192 fail #383)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'; 1:79:unmatched end tag, 1:82:not closed, 1:85:in body:#eof;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.)
 ok 1148
-ok 1149
-ok 1150
+not ok 1149
+# Test 1149 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <math>\n|           <mi>\n|             \"foo\"\n|           <mi>\n|             \"bar\"\n|           \"baz\"\n|         <p>\n|           \"quux\"\n" (t/HTML-tree.t at line 197 fail #383)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <math math>\n|           <math mi>\n|             \"foo\"\n|           <math mi>\n|             \"bar\"\n|           \"baz\"\n|     <p>\n|       \"quux\"\n" (Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux')
+#      Lines 7-8 are changed:
+#       - "|         <math math>\n"
+#       + "|         <math>\n"
+#       - "|           <math mi>\n"
+#       + "|           <mi>\n"
+#      Line 10 is changed:
+#       - "|           <math mi>\n"
+#       + "|           <mi>\n"
+#      Lines 13-14 are changed:
+#       - "|     <p>\n"
+#       + "|         <p>\n"
+#       - "|       \"quux\"\n"
+#       + "|           \"quux\"\n"
+not ok 1150
+# Test 1150 got: "6" (t/HTML-tree.t at line 192 fail #384)
+#      Expected: "5" (Parse error: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; 1:45:in table, 1:57:in table:/, 1:69:in table:/, 1:72:not closed, 1:72:in table, 1:75:in table:#text;44: Start tag “math” seen in “table”., 56: Stray end tag “mi”., 68: Stray end tag “mi”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.)
 ok 1151
-ok 1152
+not ok 1152
+# Test 1152 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       <mi>\n|         \"foo\"\n|       <mi>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n|     <table>\n|       <colgroup>\n|     <p>\n|       \"quux\"\n" (t/HTML-tree.t at line 197 fail #384)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mi>\n|         \"foo\"\n|       <math mi>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n|     <table>\n|       <colgroup>\n|     <p>\n|       \"quux\"\n" (Document tree: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux')
+#      Lines 5-6 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#      Line 8 is changed:
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
 ok 1153
 ok 1154
 ok 1155
@@ -1346,10 +1436,30 @@ ok 1157
 ok 1158
 ok 1159
 ok 1160
-ok 1161
+not ok 1161
+# Test 1161 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       <mi>\n|         \"foo\"\n|       <mi>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n" (t/HTML-tree.t at line 197 fail #387)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mi>\n|         \"foo\"\n|       <math mi>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n" (Document tree: qq'<!DOCTYPE html><body></body></html><math><mi>foo</mi><mi>bar</mi><p>baz')
+#      Lines 5-6 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#      Line 8 is changed:
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
 ok 1162
 ok 1163
-ok 1164
+not ok 1164
+# Test 1164 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       <mi>\n|         \"foo\"\n|       <mi>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n" (t/HTML-tree.t at line 197 fail #388)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mi>\n|         \"foo\"\n|       <math mi>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n" (Document tree: qq'<!DOCTYPE html><body></body><math><mi>foo</mi><mi>bar</mi><p>baz')
+#      Lines 5-6 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#      Line 8 is changed:
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
 ok 1165
 ok 1166
 ok 1167
@@ -1358,22 +1468,73 @@ ok 1169
 ok 1170
 ok 1171
 ok 1172
-ok 1173
+not ok 1173
+# Test 1173 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     <math>\n|       xlink:href=\"foo\"\n" (t/HTML-tree.t at line 197 fail #391)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     <math math>\n|       xlink href=\"foo\"\n" (Document tree: qq'<!DOCTYPE html><body xlink:href=foo><math xlink:href=foo></math>')
+#      Lines 6-7 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       xlink href=\"foo\"\n"
+#       + "|       xlink:href=\"foo\"\n"
 ok 1174
 ok 1175
-ok 1176
+not ok 1176
+# Test 1176 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <math>\n|       <mi>\n|         xlink:href=\"foo\"\n|         xml:lang=\"en\"\n" (t/HTML-tree.t at line 197 fail #392)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <math math>\n|       <math mi>\n|         xlink href=\"foo\"\n|         xml lang=\"en\"\n" (Document tree: qq'<!DOCTYPE html><body xlink:href=foo xml:lang=en><math><mi xml:lang=en xlink:href=foo></mi></math>')
+#      Lines 7-10 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#       - "|         xlink href=\"foo\"\n"
+#       + "|         xlink:href=\"foo\"\n"
+#       - "|         xml lang=\"en\"\n"
+#       + "|         xml:lang=\"en\"\n"
 ok 1177
 ok 1178
-ok 1179
+not ok 1179
+# Test 1179 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <math>\n|       <mi>\n|         xlink:href=\"foo\"\n|         xml:lang=\"en\"\n" (t/HTML-tree.t at line 197 fail #393)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <math math>\n|       <math mi>\n|         xlink href=\"foo\"\n|         xml lang=\"en\"\n" (Document tree: qq'<!DOCTYPE html><body xlink:href=foo xml:lang=en><math><mi xml:lang=en xlink:href=foo /></math>')
+#      Lines 7-10 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#       - "|         xlink href=\"foo\"\n"
+#       + "|         xlink:href=\"foo\"\n"
+#       - "|         xml lang=\"en\"\n"
+#       + "|         xml:lang=\"en\"\n"
 ok 1180
 ok 1181
-ok 1182
+not ok 1182
+# Test 1182 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <math>\n|       <mi>\n|         xlink:href=\"foo\"\n|         xml:lang=\"en\"\n|       \"bar\"\n" (t/HTML-tree.t at line 197 fail #394)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <math math>\n|       <math mi>\n|         xlink href=\"foo\"\n|         xml lang=\"en\"\n|       \"bar\"\n" (Document tree: qq'<!DOCTYPE html><body xlink:href=foo xml:lang=en><math><mi xml:lang=en xlink:href=foo />bar</math>')
+#      Lines 7-10 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mi>\n"
+#       + "|       <mi>\n"
+#       - "|         xlink href=\"foo\"\n"
+#       + "|         xlink:href=\"foo\"\n"
+#       - "|         xml lang=\"en\"\n"
+#       + "|         xml:lang=\"en\"\n"
+# t/tree-construction/tests10.dat
 ok 1183
 ok 1184
-ok 1185
+not ok 1185
+# Test 1185 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n" (t/HTML-tree.t at line 197 fail #395)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n" (Document tree: qq'<!DOCTYPE html><svg></svg>')
+#      Line 5 is changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
 ok 1186
 ok 1187
-ok 1188
+not ok 1188
+# Test 1188 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n" (t/HTML-tree.t at line 197 fail #396)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n" (Document tree: qq'<!DOCTYPE html><body><svg></svg>')
+#      Line 5 is changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
 ok 1189
 ok 1190
 ok 1191
@@ -1382,37 +1543,148 @@ ok 1193
 ok 1194
 ok 1195
 ok 1196
-ok 1197
+not ok 1197
+# Test 1197 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|     <table>\n" (t/HTML-tree.t at line 197 fail #399)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|     <table>\n" (Document tree: qq'<!DOCTYPE html><body><table><svg></svg></table>')
+#      Line 5 is changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
 ok 1198
 ok 1199
-ok 1200
+not ok 1200
+# Test 1200 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <g>\n|         \"foo\"\n|     <table>\n" (t/HTML-tree.t at line 197 fail #400)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg g>\n|         \"foo\"\n|     <table>\n" (Document tree: qq'<!DOCTYPE html><body><table><svg><g>foo</g></svg></table>')
+#      Lines 5-6 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
 ok 1201
 ok 1202
-ok 1203
+not ok 1203
+# Test 1203 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <g>\n|         \"foo\"\n|       <g>\n|         \"bar\"\n|     <table>\n" (t/HTML-tree.t at line 197 fail #401)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg g>\n|         \"foo\"\n|       <svg g>\n|         \"bar\"\n|     <table>\n" (Document tree: qq'<!DOCTYPE html><body><table><svg><g>foo</g><g>bar</g></svg></table>')
+#      Lines 5-6 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#      Line 8 is changed:
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
 ok 1204
 ok 1205
-ok 1206
+not ok 1206
+# Test 1206 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <g>\n|         \"foo\"\n|       <g>\n|         \"bar\"\n|     <table>\n|       <tbody>\n" (t/HTML-tree.t at line 197 fail #402)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg g>\n|         \"foo\"\n|       <svg g>\n|         \"bar\"\n|     <table>\n|       <tbody>\n" (Document tree: qq'<!DOCTYPE html><body><table><tbody><svg><g>foo</g><g>bar</g></svg></tbody></table>')
+#      Lines 5-6 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#      Line 8 is changed:
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
 ok 1207
 ok 1208
-ok 1209
+not ok 1209
+# Test 1209 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <g>\n|         \"foo\"\n|       <g>\n|         \"bar\"\n|     <table>\n|       <tbody>\n|         <tr>\n" (t/HTML-tree.t at line 197 fail #403)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg g>\n|         \"foo\"\n|       <svg g>\n|         \"bar\"\n|     <table>\n|       <tbody>\n|         <tr>\n" (Document tree: qq'<!DOCTYPE html><body><table><tbody><tr><svg><g>foo</g><g>bar</g></svg></tr></tbody></table>')
+#      Lines 5-6 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#      Line 8 is changed:
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
 ok 1210
 ok 1211
-ok 1212
+not ok 1212
+# Test 1212 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <tbody>\n|         <tr>\n|           <td>\n|             <svg>\n|               <g>\n|                 \"foo\"\n|               <g>\n|                 \"bar\"\n" (t/HTML-tree.t at line 197 fail #404)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <tbody>\n|         <tr>\n|           <td>\n|             <svg svg>\n|               <svg g>\n|                 \"foo\"\n|               <svg g>\n|                 \"bar\"\n" (Document tree: qq'<!DOCTYPE html><body><table><tbody><tr><td><svg><g>foo</g><g>bar</g></svg></td></tr></tbody></table>')
+#      Lines 9-10 are changed:
+#       - "|             <svg svg>\n"
+#       + "|             <svg>\n"
+#       - "|               <svg g>\n"
+#       + "|               <g>\n"
+#      Line 12 is changed:
+#       - "|               <svg g>\n"
+#       + "|               <g>\n"
 ok 1213
 ok 1214
-ok 1215
+not ok 1215
+# Test 1215 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <tbody>\n|         <tr>\n|           <td>\n|             <svg>\n|               <g>\n|                 \"foo\"\n|               <g>\n|                 \"bar\"\n|             <p>\n|               \"baz\"\n" (t/HTML-tree.t at line 197 fail #405)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <tbody>\n|         <tr>\n|           <td>\n|             <svg svg>\n|               <svg g>\n|                 \"foo\"\n|               <svg g>\n|                 \"bar\"\n|             <p>\n|               \"baz\"\n" (Document tree: qq'<!DOCTYPE html><body><table><tbody><tr><td><svg><g>foo</g><g>bar</g></svg><p>baz</td></tr></tbody></table>')
+#      Lines 9-10 are changed:
+#       - "|             <svg svg>\n"
+#       + "|             <svg>\n"
+#       - "|               <svg g>\n"
+#       + "|               <g>\n"
+#      Line 12 is changed:
+#       - "|               <svg g>\n"
+#       + "|               <g>\n"
 ok 1216
 ok 1217
-ok 1218
+not ok 1218
+# Test 1218 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <svg>\n|           <g>\n|             \"foo\"\n|           <g>\n|             \"bar\"\n|         <p>\n|           \"baz\"\n" (t/HTML-tree.t at line 197 fail #406)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <svg svg>\n|           <svg g>\n|             \"foo\"\n|           <svg g>\n|             \"bar\"\n|         <p>\n|           \"baz\"\n" (Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g></svg><p>baz</caption></table>')
+#      Lines 7-8 are changed:
+#       - "|         <svg svg>\n"
+#       + "|         <svg>\n"
+#       - "|           <svg g>\n"
+#       + "|           <g>\n"
+#      Line 10 is changed:
+#       - "|           <svg g>\n"
+#       + "|           <g>\n"
 ok 1219
 ok 1220
-ok 1221
-ok 1222
+not ok 1221
+# Test 1221 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <svg>\n|           <g>\n|             \"foo\"\n|           <g>\n|             \"bar\"\n|         <p>\n|           \"baz\"\n|     <p>\n|       \"quux\"\n" (t/HTML-tree.t at line 197 fail #407)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <svg svg>\n|           <svg g>\n|             \"foo\"\n|           <svg g>\n|             \"bar\"\n|         <p>\n|           \"baz\"\n|     <p>\n|       \"quux\"\n" (Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g><p>baz</table><p>quux')
+#      Lines 7-8 are changed:
+#       - "|         <svg svg>\n"
+#       + "|         <svg>\n"
+#       - "|           <svg g>\n"
+#       + "|           <g>\n"
+#      Line 10 is changed:
+#       - "|           <svg g>\n"
+#       + "|           <g>\n"
+not ok 1222
+# Test 1222 got: "3" (t/HTML-tree.t at line 192 fail #408)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; 1:74:unmatched end tag, 1:77:not closed, 1:80:in body:#eof;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.)
 ok 1223
-ok 1224
-ok 1225
+not ok 1224
+# Test 1224 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <svg>\n|           <g>\n|             \"foo\"\n|           <g>\n|             \"bar\"\n|           \"baz\"\n|         <p>\n|           \"quux\"\n" (t/HTML-tree.t at line 197 fail #408)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <table>\n|       <caption>\n|         <svg svg>\n|           <svg g>\n|             \"foo\"\n|           <svg g>\n|             \"bar\"\n|           \"baz\"\n|     <p>\n|       \"quux\"\n" (Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux')
+#      Lines 7-8 are changed:
+#       - "|         <svg svg>\n"
+#       + "|         <svg>\n"
+#       - "|           <svg g>\n"
+#       + "|           <g>\n"
+#      Line 10 is changed:
+#       - "|           <svg g>\n"
+#       + "|           <g>\n"
+#      Lines 13-14 are changed:
+#       - "|     <p>\n"
+#       + "|         <p>\n"
+#       - "|       \"quux\"\n"
+#       + "|           \"quux\"\n"
+not ok 1225
+# Test 1225 got: "6" (t/HTML-tree.t at line 192 fail #409)
+#      Expected: "5" (Parse error: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; 1:44:in table, 1:54:in table:/, 1:64:in table:/, 1:67:not closed, 1:67:in table, 1:70:in table:#text;44: Start tag “svg” seen in “table”., 56: Stray end tag “g”., 68: Stray end tag “g”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.)
 ok 1226
-ok 1227
+not ok 1227
+# Test 1227 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <g>\n|         \"foo\"\n|       <g>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n|     <table>\n|       <colgroup>\n|     <p>\n|       \"quux\"\n" (t/HTML-tree.t at line 197 fail #409)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg g>\n|         \"foo\"\n|       <svg g>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n|     <table>\n|       <colgroup>\n|     <p>\n|       \"quux\"\n" (Document tree: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux')
+#      Lines 5-6 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#      Line 8 is changed:
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
 ok 1228
 ok 1229
 ok 1230
@@ -1421,10 +1693,30 @@ ok 1232
 ok 1233
 ok 1234
 ok 1235
-ok 1236
+not ok 1236
+# Test 1236 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <g>\n|         \"foo\"\n|       <g>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n" (t/HTML-tree.t at line 197 fail #412)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg g>\n|         \"foo\"\n|       <svg g>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n" (Document tree: qq'<!DOCTYPE html><body></body></html><svg><g>foo</g><g>bar</g><p>baz')
+#      Lines 5-6 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#      Line 8 is changed:
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
 ok 1237
 ok 1238
-ok 1239
+not ok 1239
+# Test 1239 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <g>\n|         \"foo\"\n|       <g>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n" (t/HTML-tree.t at line 197 fail #413)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg g>\n|         \"foo\"\n|       <svg g>\n|         \"bar\"\n|     <p>\n|       \"baz\"\n" (Document tree: qq'<!DOCTYPE html><body></body><svg><g>foo</g><g>bar</g><p>baz')
+#      Lines 5-6 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#      Line 8 is changed:
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
 ok 1240
 ok 1241
 ok 1242
@@ -1433,49 +1725,471 @@ ok 1244
 ok 1245
 ok 1246
 ok 1247
-ok 1248
+not ok 1248
+# Test 1248 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     <svg>\n|       xlink:href=\"foo\"\n" (t/HTML-tree.t at line 197 fail #416)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     <svg svg>\n|       xlink href=\"foo\"\n" (Document tree: qq'<!DOCTYPE html><body xlink:href=foo><svg xlink:href=foo></svg>')
+#      Lines 6-7 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       xlink href=\"foo\"\n"
+#       + "|       xlink:href=\"foo\"\n"
 ok 1249
 ok 1250
-ok 1251
+not ok 1251
+# Test 1251 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <svg>\n|       <g>\n|         xlink:href=\"foo\"\n|         xml:lang=\"en\"\n" (t/HTML-tree.t at line 197 fail #417)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <svg svg>\n|       <svg g>\n|         xlink href=\"foo\"\n|         xml lang=\"en\"\n" (Document tree: qq'<!DOCTYPE html><body xlink:href=foo xml:lang=en><svg><g xml:lang=en xlink:href=foo></g></svg>')
+#      Lines 7-10 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#       - "|         xlink href=\"foo\"\n"
+#       + "|         xlink:href=\"foo\"\n"
+#       - "|         xml lang=\"en\"\n"
+#       + "|         xml:lang=\"en\"\n"
 ok 1252
 ok 1253
-ok 1254
+not ok 1254
+# Test 1254 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <svg>\n|       <g>\n|         xlink:href=\"foo\"\n|         xml:lang=\"en\"\n" (t/HTML-tree.t at line 197 fail #418)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <svg svg>\n|       <svg g>\n|         xlink href=\"foo\"\n|         xml lang=\"en\"\n" (Document tree: qq'<!DOCTYPE html><body xlink:href=foo xml:lang=en><svg><g xml:lang=en xlink:href=foo /></svg>')
+#      Lines 7-10 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#       - "|         xlink href=\"foo\"\n"
+#       + "|         xlink:href=\"foo\"\n"
+#       - "|         xml lang=\"en\"\n"
+#       + "|         xml:lang=\"en\"\n"
 ok 1255
 ok 1256
-ok 1257
+not ok 1257
+# Test 1257 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <svg>\n|       <g>\n|         xlink:href=\"foo\"\n|         xml:lang=\"en\"\n|       \"bar\"\n" (t/HTML-tree.t at line 197 fail #419)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     xlink:href=\"foo\"\n|     xml:lang=\"en\"\n|     <svg svg>\n|       <svg g>\n|         xlink href=\"foo\"\n|         xml lang=\"en\"\n|       \"bar\"\n" (Document tree: qq'<!DOCTYPE html><body xlink:href=foo xml:lang=en><svg><g xml:lang=en xlink:href=foo />bar</svg>')
+#      Lines 7-10 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg g>\n"
+#       + "|       <g>\n"
+#       - "|         xlink href=\"foo\"\n"
+#       + "|         xlink:href=\"foo\"\n"
+#       - "|         xml lang=\"en\"\n"
+#       + "|         xml:lang=\"en\"\n"
+# t/tree-construction/tests11.dat
 ok 1258
 ok 1259
-ok 1260
+not ok 1260
+# Test 1260 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       attributeName=\"\"\n|       attributeType=\"\"\n|       baseFrequency=\"\"\n|       baseProfile=\"\"\n|       calcMode=\"\"\n|       clipPathUnits=\"\"\n|       contentScriptType=\"\"\n|       contentStyleType=\"\"\n|       diffuseConstant=\"\"\n|       edgeMode=\"\"\n|       externalResourcesRequired=\"\"\n|       filterRes=\"\"\n|       filterUnits=\"\"\n|       glyphRef=\"\"\n|       gradientTransform=\"\"\n|       gradientUnits=\"\"\n|       kernelMatrix=\"\"\n|       kernelUnitLength=\"\"\n|       keyPoints=\"\"\n|       keySplines=\"\"\n|       keyTimes=\"\"\n|       lengthAdjust=\"\"\n|       limitingConeAngle=\"\"\n|       markerHeight=\"\"\n|       markerUnits=\"\"\n|       markerWidth=\"\"\n|       maskContentUnits=\"\"\n|       maskUnits=\"\"\n|       numOctaves=\"\"\n|       pathLength=\"\"\n|       patternContentUnits=\"\"\n|       patternTransform=\"\"\n|       patternUnits=\"\"\n|       pointsAtX=\"\"\n|       pointsAtY=\"\"\n|       pointsAtZ=\"\"\n|       preserveAlpha=\"\"\n|       preserveAspectRatio=\"\"\n|       primitiveUnits=\"\"\n|       refX=\"\"\n|       refY=\"\"\n|       repeatCount=\"\"\n|       repeatDur=\"\"\n|       requiredExtensions=\"\"\n|       requiredFeatures=\"\"\n|       specularConstant=\"\"\n|       specularExponent=\"\"\n|       spreadMethod=\"\"\n|       startOffset=\"\"\n|       stdDeviation=\"\"\n|       stitchTiles=\"\"\n|       surfaceScale=\"\"\n|       systemLanguage=\"\"\n|       tableValues=\"\"\n|       targetX=\"\"\n|       targetY=\"\"\n|       textLength=\"\"\n|       viewBox=\"\"\n|       viewTarget=\"\"\n|       xChannelSelector=\"\"\n|       yChannelSelector=\"\"\n|       zoomAndPan=\"\"\n" (t/HTML-tree.t at line 197 fail #420)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       attributeName=\"\"\n|       attributeType=\"\"\n|       baseFrequency=\"\"\n|       baseProfile=\"\"\n|       calcMode=\"\"\n|       clipPathUnits=\"\"\n|       contentScriptType=\"\"\n|       contentStyleType=\"\"\n|       diffuseConstant=\"\"\n|       edgeMode=\"\"\n|       externalResourcesRequired=\"\"\n|       filterRes=\"\"\n|       filterUnits=\"\"\n|       glyphRef=\"\"\n|       gradientTransform=\"\"\n|       gradientUnits=\"\"\n|       kernelMatrix=\"\"\n|       kernelUnitLength=\"\"\n|       keyPoints=\"\"\n|       keySplines=\"\"\n|       keyTimes=\"\"\n|       lengthAdjust=\"\"\n|       limitingConeAngle=\"\"\n|       markerHeight=\"\"\n|       markerUnits=\"\"\n|       markerWidth=\"\"\n|       maskContentUnits=\"\"\n|       maskUnits=\"\"\n|       numOctaves=\"\"\n|       pathLength=\"\"\n|       patternContentUnits=\"\"\n|       patternTransform=\"\"\n|       patternUnits=\"\"\n|       pointsAtX=\"\"\n|       pointsAtY=\"\"\n|       pointsAtZ=\"\"\n|       preserveAlpha=\"\"\n|       preserveAspectRatio=\"\"\n|       primitiveUnits=\"\"\n|       refX=\"\"\n|       refY=\"\"\n|       repeatCount=\"\"\n|       repeatDur=\"\"\n|       requiredExtensions=\"\"\n|       requiredFeatures=\"\"\n|       specularConstant=\"\"\n|       specularExponent=\"\"\n|       spreadMethod=\"\"\n|       startOffset=\"\"\n|       stdDeviation=\"\"\n|       stitchTiles=\"\"\n|       surfaceScale=\"\"\n|       systemLanguage=\"\"\n|       tableValues=\"\"\n|       targetX=\"\"\n|       targetY=\"\"\n|       textLength=\"\"\n|       viewBox=\"\"\n|       viewTarget=\"\"\n|       xChannelSelector=\"\"\n|       yChannelSelector=\"\"\n|       zoomAndPan=\"\"\n" (Document tree: qq'<!DOCTYPE html><body><svg attributeName=\x{27}\x{27} attributeType=\x{27}\x{27} baseFrequency=\x{27}\x{27} baseProfile=\x{27}\x{27} calcMode=\x{27}\x{27} clipPathUnits=\x{27}\x{27} contentScriptType=\x{27}\x{27} contentStyleType=\x{27}\x{27} diffuseConstant=\x{27}\x{27} edgeMode=\x{27}\x{27} externalResourcesRequired=\x{27}\x{27} filterRes=\x{27}\x{27} filterUnits=\x{27}\x{27} glyphRef=\x{27}\x{27} gradientTransform=\x{27}\x{27} gradientUnits=\x{27}\x{27} kernelMatrix=\x{27}\x{27} kernelUnitLength=\x{27}\x{27} keyPoints=\x{27}\x{27} keySplines=\x{27}\x{27} keyTimes=\x{27}\x{27} lengthAdjust=\x{27}\x{27} limitingConeAngle=\x{27}\x{27} markerHeight=\x{27}\x{27} markerUnits=\x{27}\x{27} markerWidth=\x{27}\x{27} maskContentUnits=\x{27}\x{27} maskUnits=\x{27}\x{27} numOctaves=\x{27}\x{27} pathLength=\x{27}\x{27} patternContentUnits=\x{27}\x{27} patternTransform=\x{27}\x{27} patternUnits=\x{27}\x{27} pointsAtX=\x{27}\x{27} pointsAtY=\x{27}\x{27} pointsAtZ=\x{27}\x{27} preserveAlpha=\x{27}\x{27} preserveAspectRatio=\x{27}\x{27} primitiveUnits=\x{27}\x{27} refX=\x{27}\x{27} refY=\x{27}\x{27} repeatCount=\x{27}\x{27} repeatDur=\x{27}\x{27} requiredExtensions=\x{27}\x{27} requiredFeatures=\x{27}\x{27} specularConstant=\x{27}\x{27} specularExponent=\x{27}\x{27} spreadMethod=\x{27}\x{27} startOffset=\x{27}\x{27} stdDeviation=\x{27}\x{27} stitchTiles=\x{27}\x{27} surfaceScale=\x{27}\x{27} systemLanguage=\x{27}\x{27} tableValues=\x{27}\x{27} targetX=\x{27}\x{27} targetY=\x{27}\x{27} textLength=\x{27}\x{27} viewBox=\x{27}\x{27} viewTarget=\x{27}\x{27} xChannelSelector=\x{27}\x{27} yChannelSelector=\x{27}\x{27} zoomAndPan=\x{27}\x{27}></svg>')
+#      Line 5 is changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
 ok 1261
 ok 1262
-ok 1263
+not ok 1263
+# Test 1263 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       attributeName=\"\"\n|       attributeType=\"\"\n|       baseFrequency=\"\"\n|       baseProfile=\"\"\n|       calcMode=\"\"\n|       clipPathUnits=\"\"\n|       contentScriptType=\"\"\n|       contentStyleType=\"\"\n|       diffuseConstant=\"\"\n|       edgeMode=\"\"\n|       externalResourcesRequired=\"\"\n|       filterRes=\"\"\n|       filterUnits=\"\"\n|       glyphRef=\"\"\n|       gradientTransform=\"\"\n|       gradientUnits=\"\"\n|       kernelMatrix=\"\"\n|       kernelUnitLength=\"\"\n|       keyPoints=\"\"\n|       keySplines=\"\"\n|       keyTimes=\"\"\n|       lengthAdjust=\"\"\n|       limitingConeAngle=\"\"\n|       markerHeight=\"\"\n|       markerUnits=\"\"\n|       markerWidth=\"\"\n|       maskContentUnits=\"\"\n|       maskUnits=\"\"\n|       numOctaves=\"\"\n|       pathLength=\"\"\n|       patternContentUnits=\"\"\n|       patternTransform=\"\"\n|       patternUnits=\"\"\n|       pointsAtX=\"\"\n|       pointsAtY=\"\"\n|       pointsAtZ=\"\"\n|       preserveAlpha=\"\"\n|       preserveAspectRatio=\"\"\n|       primitiveUnits=\"\"\n|       refX=\"\"\n|       refY=\"\"\n|       repeatCount=\"\"\n|       repeatDur=\"\"\n|       requiredExtensions=\"\"\n|       requiredFeatures=\"\"\n|       specularConstant=\"\"\n|       specularExponent=\"\"\n|       spreadMethod=\"\"\n|       startOffset=\"\"\n|       stdDeviation=\"\"\n|       stitchTiles=\"\"\n|       surfaceScale=\"\"\n|       systemLanguage=\"\"\n|       tableValues=\"\"\n|       targetX=\"\"\n|       targetY=\"\"\n|       textLength=\"\"\n|       viewBox=\"\"\n|       viewTarget=\"\"\n|       xChannelSelector=\"\"\n|       yChannelSelector=\"\"\n|       zoomAndPan=\"\"\n" (t/HTML-tree.t at line 197 fail #421)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       attributeName=\"\"\n|       attributeType=\"\"\n|       baseFrequency=\"\"\n|       baseProfile=\"\"\n|       calcMode=\"\"\n|       clipPathUnits=\"\"\n|       contentScriptType=\"\"\n|       contentStyleType=\"\"\n|       diffuseConstant=\"\"\n|       edgeMode=\"\"\n|       externalResourcesRequired=\"\"\n|       filterRes=\"\"\n|       filterUnits=\"\"\n|       glyphRef=\"\"\n|       gradientTransform=\"\"\n|       gradientUnits=\"\"\n|       kernelMatrix=\"\"\n|       kernelUnitLength=\"\"\n|       keyPoints=\"\"\n|       keySplines=\"\"\n|       keyTimes=\"\"\n|       lengthAdjust=\"\"\n|       limitingConeAngle=\"\"\n|       markerHeight=\"\"\n|       markerUnits=\"\"\n|       markerWidth=\"\"\n|       maskContentUnits=\"\"\n|       maskUnits=\"\"\n|       numOctaves=\"\"\n|       pathLength=\"\"\n|       patternContentUnits=\"\"\n|       patternTransform=\"\"\n|       patternUnits=\"\"\n|       pointsAtX=\"\"\n|       pointsAtY=\"\"\n|       pointsAtZ=\"\"\n|       preserveAlpha=\"\"\n|       preserveAspectRatio=\"\"\n|       primitiveUnits=\"\"\n|       refX=\"\"\n|       refY=\"\"\n|       repeatCount=\"\"\n|       repeatDur=\"\"\n|       requiredExtensions=\"\"\n|       requiredFeatures=\"\"\n|       specularConstant=\"\"\n|       specularExponent=\"\"\n|       spreadMethod=\"\"\n|       startOffset=\"\"\n|       stdDeviation=\"\"\n|       stitchTiles=\"\"\n|       surfaceScale=\"\"\n|       systemLanguage=\"\"\n|       tableValues=\"\"\n|       targetX=\"\"\n|       targetY=\"\"\n|       textLength=\"\"\n|       viewBox=\"\"\n|       viewTarget=\"\"\n|       xChannelSelector=\"\"\n|       yChannelSelector=\"\"\n|       zoomAndPan=\"\"\n" (Document tree: qq'<!DOCTYPE html><BODY><SVG ATTRIBUTENAME=\x{27}\x{27} ATTRIBUTETYPE=\x{27}\x{27} BASEFREQUENCY=\x{27}\x{27} BASEPROFILE=\x{27}\x{27} CALCMODE=\x{27}\x{27} CLIPPATHUNITS=\x{27}\x{27} CONTENTSCRIPTTYPE=\x{27}\x{27} CONTENTSTYLETYPE=\x{27}\x{27} DIFFUSECONSTANT=\x{27}\x{27} EDGEMODE=\x{27}\x{27} EXTERNALRESOURCESREQUIRED=\x{27}\x{27} FILTERRES=\x{27}\x{27} FILTERUNITS=\x{27}\x{27} GLYPHREF=\x{27}\x{27} GRADIENTTRANSFORM=\x{27}\x{27} GRADIENTUNITS=\x{27}\x{27} KERNELMATRIX=\x{27}\x{27} KERNELUNITLENGTH=\x{27}\x{27} KEYPOINTS=\x{27}\x{27} KEYSPLINES=\x{27}\x{27} KEYTIMES=\x{27}\x{27} LENGTHADJUST=\x{27}\x{27} LIMITINGCONEANGLE=\x{27}\x{27} MARKERHEIGHT=\x{27}\x{27} MARKERUNITS=\x{27}\x{27} MARKERWIDTH=\x{27}\x{27} MASKCONTENTUNITS=\x{27}\x{27} MASKUNITS=\x{27}\x{27} NUMOCTAVES=\x{27}\x{27} PATHLENGTH=\x{27}\x{27} PATTERNCONTENTUNITS=\x{27}\x{27} PATTERNTRANSFORM=\x{27}\x{27} PATTERNUNITS=\x{27}\x{27} POINTSATX=\x{27}\x{27} POINTSATY=\x{27}\x{27} POINTSATZ=\x{27}\x{27} PRESERVEALPHA=\x{27}\x{27} PRESERVEASPECTRATIO=\x{27}\x{27} PRIMITIVEUNITS=\x{27}\x{27} REFX=\x{27}\x{27} REFY=\x{27}\x{27} REPEATCOUNT=\x{27}\x{27} REPEATDUR=\x{27}\x{27} REQUIREDEXTENSIONS=\x{27}\x{27} REQUIREDFEATURES=\x{27}\x{27} SPECULARCONSTANT=\x{27}\x{27} SPECULAREXPONENT=\x{27}\x{27} SPREADMETHOD=\x{27}\x{27} STARTOFFSET=\x{27}\x{27} STDDEVIATION=\x{27}\x{27} STITCHTILES=\x{27}\x{27} SURFACESCALE=\x{27}\x{27} SYSTEMLANGUAGE=\x{27}\x{27} TABLEVALUES=\x{27}\x{27} TARGETX=\x{27}\x{27} TARGETY=\x{27}\x{27} TEXTLENGTH=\x{27}\x{27} VIEWBOX=\x{27}\x{27} VIEWTARGET=\x{27}\x{27} XCHANNELSELECTOR=\x{27}\x{27} YCHANNELSELECTOR=\x{27}\x{27} ZOOMANDPAN=\x{27}\x{27}></SVG>')
+#      Line 5 is changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
 ok 1264
 ok 1265
-ok 1266
+not ok 1266
+# Test 1266 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       attributeName=\"\"\n|       attributeType=\"\"\n|       baseFrequency=\"\"\n|       baseProfile=\"\"\n|       calcMode=\"\"\n|       clipPathUnits=\"\"\n|       contentScriptType=\"\"\n|       contentStyleType=\"\"\n|       diffuseConstant=\"\"\n|       edgeMode=\"\"\n|       externalResourcesRequired=\"\"\n|       filterRes=\"\"\n|       filterUnits=\"\"\n|       glyphRef=\"\"\n|       gradientTransform=\"\"\n|       gradientUnits=\"\"\n|       kernelMatrix=\"\"\n|       kernelUnitLength=\"\"\n|       keyPoints=\"\"\n|       keySplines=\"\"\n|       keyTimes=\"\"\n|       lengthAdjust=\"\"\n|       limitingConeAngle=\"\"\n|       markerHeight=\"\"\n|       markerUnits=\"\"\n|       markerWidth=\"\"\n|       maskContentUnits=\"\"\n|       maskUnits=\"\"\n|       numOctaves=\"\"\n|       pathLength=\"\"\n|       patternContentUnits=\"\"\n|       patternTransform=\"\"\n|       patternUnits=\"\"\n|       pointsAtX=\"\"\n|       pointsAtY=\"\"\n|       pointsAtZ=\"\"\n|       preserveAlpha=\"\"\n|       preserveAspectRatio=\"\"\n|       primitiveUnits=\"\"\n|       refX=\"\"\n|       refY=\"\"\n|       repeatCount=\"\"\n|       repeatDur=\"\"\n|       requiredExtensions=\"\"\n|       requiredFeatures=\"\"\n|       specularConstant=\"\"\n|       specularExponent=\"\"\n|       spreadMethod=\"\"\n|       startOffset=\"\"\n|       stdDeviation=\"\"\n|       stitchTiles=\"\"\n|       surfaceScale=\"\"\n|       systemLanguage=\"\"\n|       tableValues=\"\"\n|       targetX=\"\"\n|       targetY=\"\"\n|       textLength=\"\"\n|       viewBox=\"\"\n|       viewTarget=\"\"\n|       xChannelSelector=\"\"\n|       yChannelSelector=\"\"\n|       zoomAndPan=\"\"\n" (t/HTML-tree.t at line 197 fail #422)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       attributeName=\"\"\n|       attributeType=\"\"\n|       baseFrequency=\"\"\n|       baseProfile=\"\"\n|       calcMode=\"\"\n|       clipPathUnits=\"\"\n|       contentScriptType=\"\"\n|       contentStyleType=\"\"\n|       diffuseConstant=\"\"\n|       edgeMode=\"\"\n|       externalResourcesRequired=\"\"\n|       filterRes=\"\"\n|       filterUnits=\"\"\n|       glyphRef=\"\"\n|       gradientTransform=\"\"\n|       gradientUnits=\"\"\n|       kernelMatrix=\"\"\n|       kernelUnitLength=\"\"\n|       keyPoints=\"\"\n|       keySplines=\"\"\n|       keyTimes=\"\"\n|       lengthAdjust=\"\"\n|       limitingConeAngle=\"\"\n|       markerHeight=\"\"\n|       markerUnits=\"\"\n|       markerWidth=\"\"\n|       maskContentUnits=\"\"\n|       maskUnits=\"\"\n|       numOctaves=\"\"\n|       pathLength=\"\"\n|       patternContentUnits=\"\"\n|       patternTransform=\"\"\n|       patternUnits=\"\"\n|       pointsAtX=\"\"\n|       pointsAtY=\"\"\n|       pointsAtZ=\"\"\n|       preserveAlpha=\"\"\n|       preserveAspectRatio=\"\"\n|       primitiveUnits=\"\"\n|       refX=\"\"\n|       refY=\"\"\n|       repeatCount=\"\"\n|       repeatDur=\"\"\n|       requiredExtensions=\"\"\n|       requiredFeatures=\"\"\n|       specularConstant=\"\"\n|       specularExponent=\"\"\n|       spreadMethod=\"\"\n|       startOffset=\"\"\n|       stdDeviation=\"\"\n|       stitchTiles=\"\"\n|       surfaceScale=\"\"\n|       systemLanguage=\"\"\n|       tableValues=\"\"\n|       targetX=\"\"\n|       targetY=\"\"\n|       textLength=\"\"\n|       viewBox=\"\"\n|       viewTarget=\"\"\n|       xChannelSelector=\"\"\n|       yChannelSelector=\"\"\n|       zoomAndPan=\"\"\n" (Document tree: qq'<!DOCTYPE html><body><svg attributename=\x{27}\x{27} attributetype=\x{27}\x{27} basefrequency=\x{27}\x{27} baseprofile=\x{27}\x{27} calcmode=\x{27}\x{27} clippathunits=\x{27}\x{27} contentscripttype=\x{27}\x{27} contentstyletype=\x{27}\x{27} diffuseconstant=\x{27}\x{27} edgemode=\x{27}\x{27} externalresourcesrequired=\x{27}\x{27} filterres=\x{27}\x{27} filterunits=\x{27}\x{27} glyphref=\x{27}\x{27} gradienttransform=\x{27}\x{27} gradientunits=\x{27}\x{27} kernelmatrix=\x{27}\x{27} kernelunitlength=\x{27}\x{27} keypoints=\x{27}\x{27} keysplines=\x{27}\x{27} keytimes=\x{27}\x{27} lengthadjust=\x{27}\x{27} limitingconeangle=\x{27}\x{27} markerheight=\x{27}\x{27} markerunits=\x{27}\x{27} markerwidth=\x{27}\x{27} maskcontentunits=\x{27}\x{27} maskunits=\x{27}\x{27} numoctaves=\x{27}\x{27} pathlength=\x{27}\x{27} patterncontentunits=\x{27}\x{27} patterntransform=\x{27}\x{27} patternunits=\x{27}\x{27} pointsatx=\x{27}\x{27} pointsaty=\x{27}\x{27} pointsatz=\x{27}\x{27} preservealpha=\x{27}\x{27} preserveaspectratio=\x{27}\x{27} primitiveunits=\x{27}\x{27} refx=\x{27}\x{27} refy=\x{27}\x{27} repeatcount=\x{27}\x{27} repeatdur=\x{27}\x{27} requiredextensions=\x{27}\x{27} requiredfeatures=\x{27}\x{27} specularconstant=\x{27}\x{27} specularexponent=\x{27}\x{27} spreadmethod=\x{27}\x{27} startoffset=\x{27}\x{27} stddeviation=\x{27}\x{27} stitchtiles=\x{27}\x{27} surfacescale=\x{27}\x{27} systemlanguage=\x{27}\x{27} tablevalues=\x{27}\x{27} targetx=\x{27}\x{27} targety=\x{27}\x{27} textlength=\x{27}\x{27} viewbox=\x{27}\x{27} viewtarget=\x{27}\x{27} xchannelselector=\x{27}\x{27} ychannelselector=\x{27}\x{27} zoomandpan=\x{27}\x{27}></svg>')
+#      Line 5 is changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
 ok 1267
 ok 1268
-ok 1269
+not ok 1269
+# Test 1269 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       attributename=\"\"\n|       attributetype=\"\"\n|       basefrequency=\"\"\n|       baseprofile=\"\"\n|       calcmode=\"\"\n|       clippathunits=\"\"\n|       contentscripttype=\"\"\n|       contentstyletype=\"\"\n|       diffuseconstant=\"\"\n|       edgemode=\"\"\n|       externalresourcesrequired=\"\"\n|       filterres=\"\"\n|       filterunits=\"\"\n|       glyphref=\"\"\n|       gradienttransform=\"\"\n|       gradientunits=\"\"\n|       kernelmatrix=\"\"\n|       kernelunitlength=\"\"\n|       keypoints=\"\"\n|       keysplines=\"\"\n|       keytimes=\"\"\n|       lengthadjust=\"\"\n|       limitingconeangle=\"\"\n|       markerheight=\"\"\n|       markerunits=\"\"\n|       markerwidth=\"\"\n|       maskcontentunits=\"\"\n|       maskunits=\"\"\n|       numoctaves=\"\"\n|       pathlength=\"\"\n|       patterncontentunits=\"\"\n|       patterntransform=\"\"\n|       patternunits=\"\"\n|       pointsatx=\"\"\n|       pointsaty=\"\"\n|       pointsatz=\"\"\n|       preservealpha=\"\"\n|       preserveaspectratio=\"\"\n|       primitiveunits=\"\"\n|       refx=\"\"\n|       refy=\"\"\n|       repeatcount=\"\"\n|       repeatdur=\"\"\n|       requiredextensions=\"\"\n|       requiredfeatures=\"\"\n|       specularconstant=\"\"\n|       specularexponent=\"\"\n|       spreadmethod=\"\"\n|       startoffset=\"\"\n|       stddeviation=\"\"\n|       stitchtiles=\"\"\n|       surfacescale=\"\"\n|       systemlanguage=\"\"\n|       tablevalues=\"\"\n|       targetx=\"\"\n|       targety=\"\"\n|       textlength=\"\"\n|       viewbox=\"\"\n|       viewtarget=\"\"\n|       xchannelselector=\"\"\n|       ychannelselector=\"\"\n|       zoomandpan=\"\"\n" (t/HTML-tree.t at line 197 fail #423)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       attributename=\"\"\n|       attributetype=\"\"\n|       basefrequency=\"\"\n|       baseprofile=\"\"\n|       calcmode=\"\"\n|       clippathunits=\"\"\n|       contentscripttype=\"\"\n|       contentstyletype=\"\"\n|       diffuseconstant=\"\"\n|       edgemode=\"\"\n|       externalresourcesrequired=\"\"\n|       filterres=\"\"\n|       filterunits=\"\"\n|       glyphref=\"\"\n|       gradienttransform=\"\"\n|       gradientunits=\"\"\n|       kernelmatrix=\"\"\n|       kernelunitlength=\"\"\n|       keypoints=\"\"\n|       keysplines=\"\"\n|       keytimes=\"\"\n|       lengthadjust=\"\"\n|       limitingconeangle=\"\"\n|       markerheight=\"\"\n|       markerunits=\"\"\n|       markerwidth=\"\"\n|       maskcontentunits=\"\"\n|       maskunits=\"\"\n|       numoctaves=\"\"\n|       pathlength=\"\"\n|       patterncontentunits=\"\"\n|       patterntransform=\"\"\n|       patternunits=\"\"\n|       pointsatx=\"\"\n|       pointsaty=\"\"\n|       pointsatz=\"\"\n|       preservealpha=\"\"\n|       preserveaspectratio=\"\"\n|       primitiveunits=\"\"\n|       refx=\"\"\n|       refy=\"\"\n|       repeatcount=\"\"\n|       repeatdur=\"\"\n|       requiredextensions=\"\"\n|       requiredfeatures=\"\"\n|       specularconstant=\"\"\n|       specularexponent=\"\"\n|       spreadmethod=\"\"\n|       startoffset=\"\"\n|       stddeviation=\"\"\n|       stitchtiles=\"\"\n|       surfacescale=\"\"\n|       systemlanguage=\"\"\n|       tablevalues=\"\"\n|       targetx=\"\"\n|       targety=\"\"\n|       textlength=\"\"\n|       viewbox=\"\"\n|       viewtarget=\"\"\n|       xchannelselector=\"\"\n|       ychannelselector=\"\"\n|       zoomandpan=\"\"\n" (Document tree: qq'<!DOCTYPE html><body><math attributeName=\x{27}\x{27} attributeType=\x{27}\x{27} baseFrequency=\x{27}\x{27} baseProfile=\x{27}\x{27} calcMode=\x{27}\x{27} clipPathUnits=\x{27}\x{27} contentScriptType=\x{27}\x{27} contentStyleType=\x{27}\x{27} diffuseConstant=\x{27}\x{27} edgeMode=\x{27}\x{27} externalResourcesRequired=\x{27}\x{27} filterRes=\x{27}\x{27} filterUnits=\x{27}\x{27} glyphRef=\x{27}\x{27} gradientTransform=\x{27}\x{27} gradientUnits=\x{27}\x{27} kernelMatrix=\x{27}\x{27} kernelUnitLength=\x{27}\x{27} keyPoints=\x{27}\x{27} keySplines=\x{27}\x{27} keyTimes=\x{27}\x{27} lengthAdjust=\x{27}\x{27} limitingConeAngle=\x{27}\x{27} markerHeight=\x{27}\x{27} markerUnits=\x{27}\x{27} markerWidth=\x{27}\x{27} maskContentUnits=\x{27}\x{27} maskUnits=\x{27}\x{27} numOctaves=\x{27}\x{27} pathLength=\x{27}\x{27} patternContentUnits=\x{27}\x{27} patternTransform=\x{27}\x{27} patternUnits=\x{27}\x{27} pointsAtX=\x{27}\x{27} pointsAtY=\x{27}\x{27} pointsAtZ=\x{27}\x{27} preserveAlpha=\x{27}\x{27} preserveAspectRatio=\x{27}\x{27} primitiveUnits=\x{27}\x{27} refX=\x{27}\x{27} refY=\x{27}\x{27} repeatCount=\x{27}\x{27} repeatDur=\x{27}\x{27} requiredExtensions=\x{27}\x{27} requiredFeatures=\x{27}\x{27} specularConstant=\x{27}\x{27} specularExponent=\x{27}\x{27} spreadMethod=\x{27}\x{27} startOffset=\x{27}\x{27} stdDeviation=\x{27}\x{27} stitchTiles=\x{27}\x{27} surfaceScale=\x{27}\x{27} systemLanguage=\x{27}\x{27} tableValues=\x{27}\x{27} targetX=\x{27}\x{27} targetY=\x{27}\x{27} textLength=\x{27}\x{27} viewBox=\x{27}\x{27} viewTarget=\x{27}\x{27} xChannelSelector=\x{27}\x{27} yChannelSelector=\x{27}\x{27} zoomAndPan=\x{27}\x{27}></math>')
+#      Line 5 is changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
 ok 1270
 ok 1271
-ok 1272
+not ok 1272
+# Test 1272 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <altGlyph>\n|       <altGlyphDef>\n|       <altGlyphItem>\n|       <animateColor>\n|       <animateMotion>\n|       <animateTransform>\n|       <clipPath>\n|       <feBlend>\n|       <feColorMatrix>\n|       <feComponentTransfer>\n|       <feComposite>\n|       <feConvolveMatrix>\n|       <feDiffuseLighting>\n|       <feDisplacementMap>\n|       <feDistantLight>\n|       <feFlood>\n|       <feFuncA>\n|       <feFuncB>\n|       <feFuncG>\n|       <feFuncR>\n|       <feGaussianBlur>\n|       <feImage>\n|       <feMerge>\n|       <feMergeNode>\n|       <feMorphology>\n|       <feOffset>\n|       <fePointLight>\n|       <feSpecularLighting>\n|       <feSpotLight>\n|       <feTile>\n|       <feTurbulence>\n|       <foreignObject>\n|       <glyphRef>\n|       <linearGradient>\n|       <radialGradient>\n|       <textPath>\n" (t/HTML-tree.t at line 197 fail #424)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg altGlyph>\n|       <svg altGlyphDef>\n|       <svg altGlyphItem>\n|       <svg animateColor>\n|       <svg animateMotion>\n|       <svg animateTransform>\n|       <svg clipPath>\n|       <svg feBlend>\n|       <svg feColorMatrix>\n|       <svg feComponentTransfer>\n|       <svg feComposite>\n|       <svg feConvolveMatrix>\n|       <svg feDiffuseLighting>\n|       <svg feDisplacementMap>\n|       <svg feDistantLight>\n|       <svg feFlood>\n|       <svg feFuncA>\n|       <svg feFuncB>\n|       <svg feFuncG>\n|       <svg feFuncR>\n|       <svg feGaussianBlur>\n|       <svg feImage>\n|       <svg feMerge>\n|       <svg feMergeNode>\n|       <svg feMorphology>\n|       <svg feOffset>\n|       <svg fePointLight>\n|       <svg feSpecularLighting>\n|       <svg feSpotLight>\n|       <svg feTile>\n|       <svg feTurbulence>\n|       <svg foreignObject>\n|       <svg glyphRef>\n|       <svg linearGradient>\n|       <svg radialGradient>\n|       <svg textPath>\n" (Document tree: qq'<!DOCTYPE html><body><svg><altGlyph /><altGlyphDef /><altGlyphItem /><animateColor /><animateMotion /><animateTransform /><clipPath /><feBlend /><feColorMatrix /><feComponentTransfer /><feComposite /><feConvolveMatrix /><feDiffuseLighting /><feDisplacementMap /><feDistantLight /><feFlood /><feFuncA /><feFuncB /><feFuncG /><feFuncR /><feGaussianBlur /><feImage /><feMerge /><feMergeNode /><feMorphology /><feOffset /><fePointLight /><feSpecularLighting /><feSpotLight /><feTile /><feTurbulence /><foreignObject /><glyphRef /><linearGradient /><radialGradient /><textPath /></svg>')
+#      Lines 5-41 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg altGlyph>\n"
+#       + "|       <altGlyph>\n"
+#       - "|       <svg altGlyphDef>\n"
+#       + "|       <altGlyphDef>\n"
+#       - "|       <svg altGlyphItem>\n"
+#       + "|       <altGlyphItem>\n"
+#       - "|       <svg animateColor>\n"
+#       + "|       <animateColor>\n"
+#       - "|       <svg animateMotion>\n"
+#       + "|       <animateMotion>\n"
+#       - "|       <svg animateTransform>\n"
+#       + "|       <animateTransform>\n"
+#       - "|       <svg clipPath>\n"
+#       + "|       <clipPath>\n"
+#       - "|       <svg feBlend>\n"
+#       + "|       <feBlend>\n"
+#       - "|       <svg feColorMatrix>\n"
+#       + "|       <feColorMatrix>\n"
+#       - "|       <svg feComponentTransfer>\n"
+#       + "|       <feComponentTransfer>\n"
+#       - "|       <svg feComposite>\n"
+#       + "|       <feComposite>\n"
+#       - "|       <svg feConvolveMatrix>\n"
+#       + "|       <feConvolveMatrix>\n"
+#       - "|       <svg feDiffuseLighting>\n"
+#       + "|       <feDiffuseLighting>\n"
+#       - "|       <svg feDisplacementMap>\n"
+#       + "|       <feDisplacementMap>\n"
+#       - "|       <svg feDistantLight>\n"
+#       + "|       <feDistantLight>\n"
+#       - "|       <svg feFlood>\n"
+#       + "|       <feFlood>\n"
+#       - "|       <svg feFuncA>\n"
+#       + "|       <feFuncA>\n"
+#       - "|       <svg feFuncB>\n"
+#       + "|       <feFuncB>\n"
+#       - "|       <svg feFuncG>\n"
+#       + "|       <feFuncG>\n"
+#       - "|       <svg feFuncR>\n"
+#       + "|       <feFuncR>\n"
+#       - "|       <svg feGaussianBlur>\n"
+#       + "|       <feGaussianBlur>\n"
+#       - "|       <svg feImage>\n"
+#       + "|       <feImage>\n"
+#       - "|       <svg feMerge>\n"
+#       + "|       <feMerge>\n"
+#       - "|       <svg feMergeNode>\n"
+#       + "|       <feMergeNode>\n"
+#       - "|       <svg feMorphology>\n"
+#       + "|       <feMorphology>\n"
+#       - "|       <svg feOffset>\n"
+#       + "|       <feOffset>\n"
+#       - "|       <svg fePointLight>\n"
+#       + "|       <fePointLight>\n"
+#       - "|       <svg feSpecularLighting>\n"
+#       + "|       <feSpecularLighting>\n"
+#       - "|       <svg feSpotLight>\n"
+#       + "|       <feSpotLight>\n"
+#       - "|       <svg feTile>\n"
+#       + "|       <feTile>\n"
+#       - "|       <svg feTurbulence>\n"
+#       + "|       <feTurbulence>\n"
+#       - "|       <svg foreignObject>\n"
+#       + "|       <foreignObject>\n"
+#       - "|       <svg glyphRef>\n"
+#       + "|       <glyphRef>\n"
+#       - "|       <svg linearGradient>\n"
+#       + "|       <linearGradient>\n"
+#       - "|       <svg radialGradient>\n"
+#       + "|       <radialGradient>\n"
+#       - "|       <svg textPath>\n"
+#       + "|       <textPath>\n"
 ok 1273
 ok 1274
-ok 1275
+not ok 1275
+# Test 1275 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <altGlyph>\n|       <altGlyphDef>\n|       <altGlyphItem>\n|       <animateColor>\n|       <animateMotion>\n|       <animateTransform>\n|       <clipPath>\n|       <feBlend>\n|       <feColorMatrix>\n|       <feComponentTransfer>\n|       <feComposite>\n|       <feConvolveMatrix>\n|       <feDiffuseLighting>\n|       <feDisplacementMap>\n|       <feDistantLight>\n|       <feFlood>\n|       <feFuncA>\n|       <feFuncB>\n|       <feFuncG>\n|       <feFuncR>\n|       <feGaussianBlur>\n|       <feImage>\n|       <feMerge>\n|       <feMergeNode>\n|       <feMorphology>\n|       <feOffset>\n|       <fePointLight>\n|       <feSpecularLighting>\n|       <feSpotLight>\n|       <feTile>\n|       <feTurbulence>\n|       <foreignObject>\n|       <glyphRef>\n|       <linearGradient>\n|       <radialGradient>\n|       <textPath>\n" (t/HTML-tree.t at line 197 fail #425)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg altGlyph>\n|       <svg altGlyphDef>\n|       <svg altGlyphItem>\n|       <svg animateColor>\n|       <svg animateMotion>\n|       <svg animateTransform>\n|       <svg clipPath>\n|       <svg feBlend>\n|       <svg feColorMatrix>\n|       <svg feComponentTransfer>\n|       <svg feComposite>\n|       <svg feConvolveMatrix>\n|       <svg feDiffuseLighting>\n|       <svg feDisplacementMap>\n|       <svg feDistantLight>\n|       <svg feFlood>\n|       <svg feFuncA>\n|       <svg feFuncB>\n|       <svg feFuncG>\n|       <svg feFuncR>\n|       <svg feGaussianBlur>\n|       <svg feImage>\n|       <svg feMerge>\n|       <svg feMergeNode>\n|       <svg feMorphology>\n|       <svg feOffset>\n|       <svg fePointLight>\n|       <svg feSpecularLighting>\n|       <svg feSpotLight>\n|       <svg feTile>\n|       <svg feTurbulence>\n|       <svg foreignObject>\n|       <svg glyphRef>\n|       <svg linearGradient>\n|       <svg radialGradient>\n|       <svg textPath>\n" (Document tree: qq'<!DOCTYPE html><body><svg><altglyph /><altglyphdef /><altglyphitem /><animatecolor /><animatemotion /><animatetransform /><clippath /><feblend /><fecolormatrix /><fecomponenttransfer /><fecomposite /><feconvolvematrix /><fediffuselighting /><fedisplacementmap /><fedistantlight /><feflood /><fefunca /><fefuncb /><fefuncg /><fefuncr /><fegaussianblur /><feimage /><femerge /><femergenode /><femorphology /><feoffset /><fepointlight /><fespecularlighting /><fespotlight /><fetile /><feturbulence /><foreignobject /><glyphref /><lineargradient /><radialgradient /><textpath /></svg>')
+#      Lines 5-41 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg altGlyph>\n"
+#       + "|       <altGlyph>\n"
+#       - "|       <svg altGlyphDef>\n"
+#       + "|       <altGlyphDef>\n"
+#       - "|       <svg altGlyphItem>\n"
+#       + "|       <altGlyphItem>\n"
+#       - "|       <svg animateColor>\n"
+#       + "|       <animateColor>\n"
+#       - "|       <svg animateMotion>\n"
+#       + "|       <animateMotion>\n"
+#       - "|       <svg animateTransform>\n"
+#       + "|       <animateTransform>\n"
+#       - "|       <svg clipPath>\n"
+#       + "|       <clipPath>\n"
+#       - "|       <svg feBlend>\n"
+#       + "|       <feBlend>\n"
+#       - "|       <svg feColorMatrix>\n"
+#       + "|       <feColorMatrix>\n"
+#       - "|       <svg feComponentTransfer>\n"
+#       + "|       <feComponentTransfer>\n"
+#       - "|       <svg feComposite>\n"
+#       + "|       <feComposite>\n"
+#       - "|       <svg feConvolveMatrix>\n"
+#       + "|       <feConvolveMatrix>\n"
+#       - "|       <svg feDiffuseLighting>\n"
+#       + "|       <feDiffuseLighting>\n"
+#       - "|       <svg feDisplacementMap>\n"
+#       + "|       <feDisplacementMap>\n"
+#       - "|       <svg feDistantLight>\n"
+#       + "|       <feDistantLight>\n"
+#       - "|       <svg feFlood>\n"
+#       + "|       <feFlood>\n"
+#       - "|       <svg feFuncA>\n"
+#       + "|       <feFuncA>\n"
+#       - "|       <svg feFuncB>\n"
+#       + "|       <feFuncB>\n"
+#       - "|       <svg feFuncG>\n"
+#       + "|       <feFuncG>\n"
+#       - "|       <svg feFuncR>\n"
+#       + "|       <feFuncR>\n"
+#       - "|       <svg feGaussianBlur>\n"
+#       + "|       <feGaussianBlur>\n"
+#       - "|       <svg feImage>\n"
+#       + "|       <feImage>\n"
+#       - "|       <svg feMerge>\n"
+#       + "|       <feMerge>\n"
+#       - "|       <svg feMergeNode>\n"
+#       + "|       <feMergeNode>\n"
+#       - "|       <svg feMorphology>\n"
+#       + "|       <feMorphology>\n"
+#       - "|       <svg feOffset>\n"
+#       + "|       <feOffset>\n"
+#       - "|       <svg fePointLight>\n"
+#       + "|       <fePointLight>\n"
+#       - "|       <svg feSpecularLighting>\n"
+#       + "|       <feSpecularLighting>\n"
+#       - "|       <svg feSpotLight>\n"
+#       + "|       <feSpotLight>\n"
+#       - "|       <svg feTile>\n"
+#       + "|       <feTile>\n"
+#       - "|       <svg feTurbulence>\n"
+#       + "|       <feTurbulence>\n"
+#       - "|       <svg foreignObject>\n"
+#       + "|       <foreignObject>\n"
+#       - "|       <svg glyphRef>\n"
+#       + "|       <glyphRef>\n"
+#       - "|       <svg linearGradient>\n"
+#       + "|       <linearGradient>\n"
+#       - "|       <svg radialGradient>\n"
+#       + "|       <radialGradient>\n"
+#       - "|       <svg textPath>\n"
+#       + "|       <textPath>\n"
 ok 1276
 ok 1277
-ok 1278
+not ok 1278
+# Test 1278 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <altGlyph>\n|       <altGlyphDef>\n|       <altGlyphItem>\n|       <animateColor>\n|       <animateMotion>\n|       <animateTransform>\n|       <clipPath>\n|       <feBlend>\n|       <feColorMatrix>\n|       <feComponentTransfer>\n|       <feComposite>\n|       <feConvolveMatrix>\n|       <feDiffuseLighting>\n|       <feDisplacementMap>\n|       <feDistantLight>\n|       <feFlood>\n|       <feFuncA>\n|       <feFuncB>\n|       <feFuncG>\n|       <feFuncR>\n|       <feGaussianBlur>\n|       <feImage>\n|       <feMerge>\n|       <feMergeNode>\n|       <feMorphology>\n|       <feOffset>\n|       <fePointLight>\n|       <feSpecularLighting>\n|       <feSpotLight>\n|       <feTile>\n|       <feTurbulence>\n|       <foreignObject>\n|       <glyphRef>\n|       <linearGradient>\n|       <radialGradient>\n|       <textPath>\n" (t/HTML-tree.t at line 197 fail #426)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg altGlyph>\n|       <svg altGlyphDef>\n|       <svg altGlyphItem>\n|       <svg animateColor>\n|       <svg animateMotion>\n|       <svg animateTransform>\n|       <svg clipPath>\n|       <svg feBlend>\n|       <svg feColorMatrix>\n|       <svg feComponentTransfer>\n|       <svg feComposite>\n|       <svg feConvolveMatrix>\n|       <svg feDiffuseLighting>\n|       <svg feDisplacementMap>\n|       <svg feDistantLight>\n|       <svg feFlood>\n|       <svg feFuncA>\n|       <svg feFuncB>\n|       <svg feFuncG>\n|       <svg feFuncR>\n|       <svg feGaussianBlur>\n|       <svg feImage>\n|       <svg feMerge>\n|       <svg feMergeNode>\n|       <svg feMorphology>\n|       <svg feOffset>\n|       <svg fePointLight>\n|       <svg feSpecularLighting>\n|       <svg feSpotLight>\n|       <svg feTile>\n|       <svg feTurbulence>\n|       <svg foreignObject>\n|       <svg glyphRef>\n|       <svg linearGradient>\n|       <svg radialGradient>\n|       <svg textPath>\n" (Document tree: qq'<!DOCTYPE html><BODY><SVG><ALTGLYPH /><ALTGLYPHDEF /><ALTGLYPHITEM /><ANIMATECOLOR /><ANIMATEMOTION /><ANIMATETRANSFORM /><CLIPPATH /><FEBLEND /><FECOLORMATRIX /><FECOMPONENTTRANSFER /><FECOMPOSITE /><FECONVOLVEMATRIX /><FEDIFFUSELIGHTING /><FEDISPLACEMENTMAP /><FEDISTANTLIGHT /><FEFLOOD /><FEFUNCA /><FEFUNCB /><FEFUNCG /><FEFUNCR /><FEGAUSSIANBLUR /><FEIMAGE /><FEMERGE /><FEMERGENODE /><FEMORPHOLOGY /><FEOFFSET /><FEPOINTLIGHT /><FESPECULARLIGHTING /><FESPOTLIGHT /><FETILE /><FETURBULENCE /><FOREIGNOBJECT /><GLYPHREF /><LINEARGRADIENT /><RADIALGRADIENT /><TEXTPATH /></SVG>')
+#      Lines 5-41 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg altGlyph>\n"
+#       + "|       <altGlyph>\n"
+#       - "|       <svg altGlyphDef>\n"
+#       + "|       <altGlyphDef>\n"
+#       - "|       <svg altGlyphItem>\n"
+#       + "|       <altGlyphItem>\n"
+#       - "|       <svg animateColor>\n"
+#       + "|       <animateColor>\n"
+#       - "|       <svg animateMotion>\n"
+#       + "|       <animateMotion>\n"
+#       - "|       <svg animateTransform>\n"
+#       + "|       <animateTransform>\n"
+#       - "|       <svg clipPath>\n"
+#       + "|       <clipPath>\n"
+#       - "|       <svg feBlend>\n"
+#       + "|       <feBlend>\n"
+#       - "|       <svg feColorMatrix>\n"
+#       + "|       <feColorMatrix>\n"
+#       - "|       <svg feComponentTransfer>\n"
+#       + "|       <feComponentTransfer>\n"
+#       - "|       <svg feComposite>\n"
+#       + "|       <feComposite>\n"
+#       - "|       <svg feConvolveMatrix>\n"
+#       + "|       <feConvolveMatrix>\n"
+#       - "|       <svg feDiffuseLighting>\n"
+#       + "|       <feDiffuseLighting>\n"
+#       - "|       <svg feDisplacementMap>\n"
+#       + "|       <feDisplacementMap>\n"
+#       - "|       <svg feDistantLight>\n"
+#       + "|       <feDistantLight>\n"
+#       - "|       <svg feFlood>\n"
+#       + "|       <feFlood>\n"
+#       - "|       <svg feFuncA>\n"
+#       + "|       <feFuncA>\n"
+#       - "|       <svg feFuncB>\n"
+#       + "|       <feFuncB>\n"
+#       - "|       <svg feFuncG>\n"
+#       + "|       <feFuncG>\n"
+#       - "|       <svg feFuncR>\n"
+#       + "|       <feFuncR>\n"
+#       - "|       <svg feGaussianBlur>\n"
+#       + "|       <feGaussianBlur>\n"
+#       - "|       <svg feImage>\n"
+#       + "|       <feImage>\n"
+#       - "|       <svg feMerge>\n"
+#       + "|       <feMerge>\n"
+#       - "|       <svg feMergeNode>\n"
+#       + "|       <feMergeNode>\n"
+#       - "|       <svg feMorphology>\n"
+#       + "|       <feMorphology>\n"
+#       - "|       <svg feOffset>\n"
+#       + "|       <feOffset>\n"
+#       - "|       <svg fePointLight>\n"
+#       + "|       <fePointLight>\n"
+#       - "|       <svg feSpecularLighting>\n"
+#       + "|       <feSpecularLighting>\n"
+#       - "|       <svg feSpotLight>\n"
+#       + "|       <feSpotLight>\n"
+#       - "|       <svg feTile>\n"
+#       + "|       <feTile>\n"
+#       - "|       <svg feTurbulence>\n"
+#       + "|       <feTurbulence>\n"
+#       - "|       <svg foreignObject>\n"
+#       + "|       <foreignObject>\n"
+#       - "|       <svg glyphRef>\n"
+#       + "|       <glyphRef>\n"
+#       - "|       <svg linearGradient>\n"
+#       + "|       <linearGradient>\n"
+#       - "|       <svg radialGradient>\n"
+#       + "|       <radialGradient>\n"
+#       - "|       <svg textPath>\n"
+#       + "|       <textPath>\n"
 ok 1279
 ok 1280
-ok 1281
+not ok 1281
+# Test 1281 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math>\n|       <altglyph>\n|       <altglyphdef>\n|       <altglyphitem>\n|       <animatecolor>\n|       <animatemotion>\n|       <animatetransform>\n|       <clippath>\n|       <feblend>\n|       <fecolormatrix>\n|       <fecomponenttransfer>\n|       <fecomposite>\n|       <feconvolvematrix>\n|       <fediffuselighting>\n|       <fedisplacementmap>\n|       <fedistantlight>\n|       <feflood>\n|       <fefunca>\n|       <fefuncb>\n|       <fefuncg>\n|       <fefuncr>\n|       <fegaussianblur>\n|       <feimage>\n|       <femerge>\n|       <femergenode>\n|       <femorphology>\n|       <feoffset>\n|       <fepointlight>\n|       <fespecularlighting>\n|       <fespotlight>\n|       <fetile>\n|       <feturbulence>\n|       <foreignobject>\n|       <glyphref>\n|       <lineargradient>\n|       <radialgradient>\n|       <textpath>\n" (t/HTML-tree.t at line 197 fail #427)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math altglyph>\n|       <math altglyphdef>\n|       <math altglyphitem>\n|       <math animatecolor>\n|       <math animatemotion>\n|       <math animatetransform>\n|       <math clippath>\n|       <math feblend>\n|       <math fecolormatrix>\n|       <math fecomponenttransfer>\n|       <math fecomposite>\n|       <math feconvolvematrix>\n|       <math fediffuselighting>\n|       <math fedisplacementmap>\n|       <math fedistantlight>\n|       <math feflood>\n|       <math fefunca>\n|       <math fefuncb>\n|       <math fefuncg>\n|       <math fefuncr>\n|       <math fegaussianblur>\n|       <math feimage>\n|       <math femerge>\n|       <math femergenode>\n|       <math femorphology>\n|       <math feoffset>\n|       <math fepointlight>\n|       <math fespecularlighting>\n|       <math fespotlight>\n|       <math fetile>\n|       <math feturbulence>\n|       <math foreignobject>\n|       <math glyphref>\n|       <math lineargradient>\n|       <math radialgradient>\n|       <math textpath>\n" (Document tree: qq'<!DOCTYPE html><body><math><altGlyph /><altGlyphDef /><altGlyphItem /><animateColor /><animateMotion /><animateTransform /><clipPath /><feBlend /><feColorMatrix /><feComponentTransfer /><feComposite /><feConvolveMatrix /><feDiffuseLighting /><feDisplacementMap /><feDistantLight /><feFlood /><feFuncA /><feFuncB /><feFuncG /><feFuncR /><feGaussianBlur /><feImage /><feMerge /><feMergeNode /><feMorphology /><feOffset /><fePointLight /><feSpecularLighting /><feSpotLight /><feTile /><feTurbulence /><foreignObject /><glyphRef /><linearGradient /><radialGradient /><textPath /></math>')
+#      Lines 5-41 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math altglyph>\n"
+#       + "|       <altglyph>\n"
+#       - "|       <math altglyphdef>\n"
+#       + "|       <altglyphdef>\n"
+#       - "|       <math altglyphitem>\n"
+#       + "|       <altglyphitem>\n"
+#       - "|       <math animatecolor>\n"
+#       + "|       <animatecolor>\n"
+#       - "|       <math animatemotion>\n"
+#       + "|       <animatemotion>\n"
+#       - "|       <math animatetransform>\n"
+#       + "|       <animatetransform>\n"
+#       - "|       <math clippath>\n"
+#       + "|       <clippath>\n"
+#       - "|       <math feblend>\n"
+#       + "|       <feblend>\n"
+#       - "|       <math fecolormatrix>\n"
+#       + "|       <fecolormatrix>\n"
+#       - "|       <math fecomponenttransfer>\n"
+#       + "|       <fecomponenttransfer>\n"
+#       - "|       <math fecomposite>\n"
+#       + "|       <fecomposite>\n"
+#       - "|       <math feconvolvematrix>\n"
+#       + "|       <feconvolvematrix>\n"
+#       - "|       <math fediffuselighting>\n"
+#       + "|       <fediffuselighting>\n"
+#       - "|       <math fedisplacementmap>\n"
+#       + "|       <fedisplacementmap>\n"
+#       - "|       <math fedistantlight>\n"
+#       + "|       <fedistantlight>\n"
+#       - "|       <math feflood>\n"
+#       + "|       <feflood>\n"
+#       - "|       <math fefunca>\n"
+#       + "|       <fefunca>\n"
+#       - "|       <math fefuncb>\n"
+#       + "|       <fefuncb>\n"
+#       - "|       <math fefuncg>\n"
+#       + "|       <fefuncg>\n"
+#       - "|       <math fefuncr>\n"
+#       + "|       <fefuncr>\n"
+#       - "|       <math fegaussianblur>\n"
+#       + "|       <fegaussianblur>\n"
+#       - "|       <math feimage>\n"
+#       + "|       <feimage>\n"
+#       - "|       <math femerge>\n"
+#       + "|       <femerge>\n"
+#       - "|       <math femergenode>\n"
+#       + "|       <femergenode>\n"
+#       - "|       <math femorphology>\n"
+#       + "|       <femorphology>\n"
+#       - "|       <math feoffset>\n"
+#       + "|       <feoffset>\n"
+#       - "|       <math fepointlight>\n"
+#       + "|       <fepointlight>\n"
+#       - "|       <math fespecularlighting>\n"
+#       + "|       <fespecularlighting>\n"
+#       - "|       <math fespotlight>\n"
+#       + "|       <fespotlight>\n"
+#       - "|       <math fetile>\n"
+#       + "|       <fetile>\n"
+#       - "|       <math feturbulence>\n"
+#       + "|       <feturbulence>\n"
+#       - "|       <math foreignobject>\n"
+#       + "|       <foreignobject>\n"
+#       - "|       <math glyphref>\n"
+#       + "|       <glyphref>\n"
+#       - "|       <math lineargradient>\n"
+#       + "|       <lineargradient>\n"
+#       - "|       <math radialgradient>\n"
+#       + "|       <radialgradient>\n"
+#       - "|       <math textpath>\n"
+#       + "|       <textpath>\n"
 ok 1282
 ok 1283
-ok 1284
+not ok 1284
+# Test 1284 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg>\n|       <solidcolor>\n" (t/HTML-tree.t at line 197 fail #428)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg solidcolor>\n" (Document tree: qq'<!DOCTYPE html><body><svg><solidColor /></svg>')
+#      Lines 5-6 are changed:
+#       - "|     <svg svg>\n"
+#       + "|     <svg>\n"
+#       - "|       <svg solidcolor>\n"
+#       + "|       <solidcolor>\n"
+# t/tree-construction/tests12.dat
 ok 1285
 ok 1286
-ok 1287
+not ok 1287
+# Test 1287 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       \"foo\"\n|       <math>\n|         <mtext>\n|           <i>\n|             \"baz\"\n|         <annotation-xml>\n|           <svg>\n|             <desc>\n|               <b>\n|                 \"eggs\"\n|             <g>\n|               <foreignObject>\n|                 <p>\n|                   \"spam\"\n|                 <table>\n|                   <tbody>\n|                     <tr>\n|                       <td>\n|                         <img>\n|             <g>\n|               \"quux\"\n|       \"bar\"\n" (t/HTML-tree.t at line 197 fail #429)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       \"foo\"\n|       <math math>\n|         <math mtext>\n|           <i>\n|             \"baz\"\n|         <math annotation-xml>\n|           <svg svg>\n|             <svg desc>\n|               <b>\n|                 \"eggs\"\n|             <svg g>\n|               <svg foreignObject>\n|                 <p>\n|                   \"spam\"\n|                 <table>\n|                   <tbody>\n|                     <tr>\n|                       <td>\n|                         <img>\n|             <svg g>\n|               \"quux\"\n|       \"bar\"\n" (Document tree: qq'<!DOCTYPE html><body><p>foo<math><mtext><i>baz</i></mtext><annotation-xml><svg><desc><b>eggs</b></desc><g><foreignObject><P>spam<TABLE><tr><td><img></td></table></foreignObject></g><g>quux</g></svg></annotation-xml></math>bar')
+#      Lines 7-8 are changed:
+#       - "|       <math math>\n"
+#       + "|       <math>\n"
+#       - "|         <math mtext>\n"
+#       + "|         <mtext>\n"
+#      Lines 11-13 are changed:
+#       - "|         <math annotation-xml>\n"
+#       + "|         <annotation-xml>\n"
+#       - "|           <svg svg>\n"
+#       + "|           <svg>\n"
+#       - "|             <svg desc>\n"
+#       + "|             <desc>\n"
+#      Lines 16-17 are changed:
+#       - "|             <svg g>\n"
+#       + "|             <g>\n"
+#       - "|               <svg foreignObject>\n"
+#       + "|               <foreignObject>\n"
+#      Line 25 is changed:
+#       - "|             <svg g>\n"
+#       + "|             <g>\n"
 ok 1288
 ok 1289
-ok 1290
+not ok 1290
+# Test 1290 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     \"foo\"\n|     <math>\n|       <mtext>\n|         <i>\n|           \"baz\"\n|       <annotation-xml>\n|         <svg>\n|           <desc>\n|             <b>\n|               \"eggs\"\n|           <g>\n|             <foreignObject>\n|               <p>\n|                 \"spam\"\n|               <table>\n|                 <tbody>\n|                   <tr>\n|                     <td>\n|                       <img>\n|           <g>\n|             \"quux\"\n|     \"bar\"\n" (t/HTML-tree.t at line 197 fail #430)
+#      Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     \"foo\"\n|     <math math>\n|       <math mtext>\n|         <i>\n|           \"baz\"\n|       <math annotation-xml>\n|         <svg svg>\n|           <svg desc>\n|             <b>\n|               \"eggs\"\n|           <svg g>\n|             <svg foreignObject>\n|               <p>\n|                 \"spam\"\n|               <table>\n|                 <tbody>\n|                   <tr>\n|                     <td>\n|                       <img>\n|           <svg g>\n|             \"quux\"\n|     \"bar\"\n" (Document tree: qq'<!DOCTYPE html><body>foo<math><mtext><i>baz</i></mtext><annotation-xml><svg><desc><b>eggs</b></desc><g><foreignObject><P>spam<TABLE><tr><td><img></td></table></foreignObject></g><g>quux</g></svg></annotation-xml></math>bar')
+#      Lines 6-7 are changed:
+#       - "|     <math math>\n"
+#       + "|     <math>\n"
+#       - "|       <math mtext>\n"
+#       + "|       <mtext>\n"
+#      Lines 10-12 are changed:
+#       - "|       <math annotation-xml>\n"
+#       + "|       <annotation-xml>\n"
+#       - "|         <svg svg>\n"
+#       + "|         <svg>\n"
+#       - "|           <svg desc>\n"
+#       + "|           <desc>\n"
+#      Lines 15-16 are changed:
+#       - "|           <svg g>\n"
+#       + "|           <g>\n"
+#       - "|             <svg foreignObject>\n"
+#       + "|             <foreignObject>\n"
+#      Line 24 is changed:
+#       - "|           <svg g>\n"
+#       + "|           <g>\n"
+# t/tree-test-1.dat
 ok 1291
 ok 1292
 ok 1293
@@ -1707,27 +2421,19 @@ ok 1518
 ok 1519
 ok 1520
 ok 1521
-not ok 1522
-# Test 1522 got: "1" (t/HTML-tree.t at line 187 fail #508)
-#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table>  a b</table>'; 1:28:in table:#text;char in <table>, x, 3)
+ok 1522
 ok 1523
 ok 1524
-not ok 1525
-# Test 1525 got: "1" (t/HTML-tree.t at line 187 fail #509)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table>a b </table>'; 1:27:in table:#text;char in <table>, x, x, 4)
+ok 1525
 ok 1526
 ok 1527
 ok 1528
 ok 1529
 ok 1530
-not ok 1531
-# Test 1531 got: "1" (t/HTML-tree.t at line 187 fail #511)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table><tbody>a </table>'; 1:32:in table:#text;char in <tbody>, x2)
+ok 1531
 ok 1532
 ok 1533
-not ok 1534
-# Test 1534 got: "1" (t/HTML-tree.t at line 187 fail #512)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table><tr>a </table>'; 1:29:in table:#text;char in <tr>, x2)
+ok 1534
 ok 1535
 ok 1536
 ok 1537
@@ -1748,9 +2454,7 @@ ok 1551
 ok 1552
 ok 1553
 ok 1554
-not ok 1555
-# Test 1555 got: "4" (t/HTML-tree.t at line 187 fail #519)
-#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table><tr><td></td>x<table>  </table></table>'; 1:37:in table:#text, 1:44:not closed, 1:44:not closed, 1:61:unmatched end tag;char in <tr>, no </table> before <table>, unmatched </table>)
+ok 1555
 ok 1556
 ok 1557
 ok 1558
@@ -1933,19 +2637,27 @@ ok 1734
 ok 1735
 ok 1736
 ok 1737
-ok 1738
+not ok 1738
+# Test 1738 got: "1" (t/HTML-tree.t at line 192 fail #580)
+#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table>  a b</table>'; 1:28:in table:#text;char in <table>, x, 3)
 ok 1739
 ok 1740
-ok 1741
+not ok 1741
+# Test 1741 got: "1" (t/HTML-tree.t at line 192 fail #581)
+#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table>a b </table>'; 1:27:in table:#text;char in <table>, x, x, 4)
 ok 1742
 ok 1743
 ok 1744
 ok 1745
 ok 1746
-ok 1747
+not ok 1747
+# Test 1747 got: "1" (t/HTML-tree.t at line 192 fail #583)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table><tbody>a </table>'; 1:32:in table:#text;char in <tbody>, x2)
 ok 1748
 ok 1749
-ok 1750
+not ok 1750
+# Test 1750 got: "1" (t/HTML-tree.t at line 192 fail #584)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table><tr>a </table>'; 1:29:in table:#text;char in <tr>, x2)
 ok 1751
 ok 1752
 ok 1753
@@ -1966,7 +2678,9 @@ ok 1767
 ok 1768
 ok 1769
 ok 1770
-ok 1771
+not ok 1771
+# Test 1771 got: "4" (t/HTML-tree.t at line 192 fail #591)
+#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table><tr><td></td>x<table>  </table></table>'; 1:37:in table:#text, 1:44:not closed, 1:44:not closed, 1:61:unmatched end tag;char in <tr>, no </table> before <table>, unmatched </table>)
 ok 1772
 ok 1773
 ok 1774
@@ -2254,14 +2968,10 @@ ok 2055
 ok 2056
 ok 2057
 ok 2058
-not ok 2059
-# Test 2059 got: "1" (t/HTML-tree.t at line 187 fail #687)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<option>b'; 1:25:in body:#eof;)
+ok 2059
 ok 2060
 ok 2061
-not ok 2062
-# Test 2062 got: "1" (t/HTML-tree.t at line 187 fail #688)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<optgroup>b'; 1:27:in body:#eof;)
+ok 2062
 ok 2063
 ok 2064
 ok 2065
@@ -2387,24 +3097,16 @@ ok 2184
 ok 2185
 ok 2186
 ok 2187
-not ok 2188
-# Test 2188 got: "3" (t/HTML-tree.t at line 187 fail #730)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><thead><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
+ok 2188
 ok 2189
 ok 2190
-not ok 2191
-# Test 2191 got: "3" (t/HTML-tree.t at line 187 fail #731)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tbody><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
+ok 2191
 ok 2192
 ok 2193
-not ok 2194
-# Test 2194 got: "3" (t/HTML-tree.t at line 187 fail #732)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tfoot><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
+ok 2194
 ok 2195
 ok 2196
-not ok 2197
-# Test 2197 got: "3" (t/HTML-tree.t at line 187 fail #733)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tr><table b>'; 1:37:not closed, 1:37:not closed, 1:37:in body:#eof;<table> in table row, unexpected end of file)
+ok 2197
 ok 2198
 ok 2199
 ok 2200
@@ -2458,9 +3160,7 @@ ok 2247
 ok 2248
 ok 2249
 ok 2250
-not ok 2251
-# Test 2251 got: "3" (t/HTML-tree.t at line 187 fail #751)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table><tr><form><td></td></form></table>'; 1:33:in table, 1:49:in table:/, 1:49:unmatched end tag;<form> in table, form not closed, </form> in table, ubmatched </form>)
+ok 2251
 ok 2252
 ok 2253
 ok 2254
@@ -2484,18 +3184,20 @@ ok 2271
 ok 2272
 ok 2273
 ok 2274
-ok 2275
+not ok 2275
+# Test 2275 got: "1" (t/HTML-tree.t at line 192 fail #759)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<option>b'; 1:25:in body:#eof;)
 ok 2276
 ok 2277
-ok 2278
+not ok 2278
+# Test 2278 got: "1" (t/HTML-tree.t at line 192 fail #760)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<optgroup>b'; 1:27:in body:#eof;)
 ok 2279
 ok 2280
 ok 2281
 ok 2282
 ok 2283
-not ok 2284
-# Test 2284 got: "4" (t/HTML-tree.t at line 187 fail #762)
-#      Expected: "3" (Parse error: qq'<table a><tr><table b>'; 1:10:no DOCTYPE, 1:22:not closed, 1:22:not closed, 1:22:in body:#eof;1,10,no DOCTYPE, 1,22,not closed:tr, 1,22,not closed:table)
+ok 2284
 ok 2285
 ok 2286
 ok 2287
@@ -2615,16 +3317,24 @@ ok 2400
 ok 2401
 ok 2402
 ok 2403
-ok 2404
+not ok 2404
+# Test 2404 got: "3" (t/HTML-tree.t at line 192 fail #802)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><thead><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
 ok 2405
 ok 2406
-ok 2407
+not ok 2407
+# Test 2407 got: "3" (t/HTML-tree.t at line 192 fail #803)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tbody><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
 ok 2408
 ok 2409
-ok 2410
+not ok 2410
+# Test 2410 got: "3" (t/HTML-tree.t at line 192 fail #804)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tfoot><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
 ok 2411
 ok 2412
-ok 2413
+not ok 2413
+# Test 2413 got: "3" (t/HTML-tree.t at line 192 fail #805)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tr><table b>'; 1:37:not closed, 1:37:not closed, 1:37:in body:#eof;<table> in table row, unexpected end of file)
 ok 2414
 ok 2415
 ok 2416
@@ -2678,7 +3388,9 @@ ok 2463
 ok 2464
 ok 2465
 ok 2466
-ok 2467
+not ok 2467
+# Test 2467 got: "3" (t/HTML-tree.t at line 192 fail #823)
+#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table><tr><form><td></td></form></table>'; 1:33:in table, 1:49:in table:/, 1:49:unmatched end tag;<form> in table, form not closed, </form> in table, ubmatched </form>)
 ok 2468
 ok 2469
 ok 2470
@@ -2711,7 +3423,9 @@ ok 2496
 ok 2497
 ok 2498
 ok 2499
-ok 2500
+not ok 2500
+# Test 2500 got: "4" (t/HTML-tree.t at line 192 fail #834)
+#      Expected: "3" (Parse error: qq'<table a><tr><table b>'; 1:10:no DOCTYPE, 1:22:not closed, 1:22:not closed, 1:22:in body:#eof;1,10,no DOCTYPE, 1,22,not closed:tr, 1,22,not closed:table)
 ok 2501
 ok 2502
 ok 2503
@@ -2876,9 +3590,7 @@ ok 2661
 ok 2662
 ok 2663
 ok 2664
-not ok 2665
-# Test 2665 got: "1" (t/HTML-tree.t at line 187 fail #889)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; 1:42:not closed;)
+ok 2665
 ok 2666
 ok 2667
 ok 2668
@@ -2887,29 +3599,19 @@ ok 2670
 ok 2671
 ok 2672
 ok 2673
-not ok 2674
-# Test 2674 got: "1" (t/HTML-tree.t at line 187 fail #892)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'; 1:33:not closed;)
+ok 2674
 ok 2675
 ok 2676
-not ok 2677
-# Test 2677 got: "3" (t/HTML-tree.t at line 187 fail #893)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:33:not closed, 1:43:not closed, 1:53:not closed;)
+ok 2677
 ok 2678
 ok 2679
-not ok 2680
-# Test 2680 got: "3" (t/HTML-tree.t at line 187 fail #894)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:42:not closed, 1:52:not closed, 1:62:not closed;)
+ok 2680
 ok 2681
 ok 2682
-not ok 2683
-# Test 2683 got: "8" (t/HTML-tree.t at line 187 fail #895)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed, 1:68:not closed, 1:78:not closed, 1:84:unmatched end tag, 1:93:not closed, 1:99:not closed, 1:109:not closed, 1:115:unmatched end tag;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>)
+ok 2683
 ok 2684
 ok 2685
-not ok 2686
-# Test 2686 got: "4" (t/HTML-tree.t at line 187 fail #896)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; 4:0:not closed, 5:0:not closed, 6:0:not closed, 7:0:not closed;)
+ok 2686
 ok 2687
 ok 2688
 ok 2689
@@ -3104,7 +3806,9 @@ ok 2877
 ok 2878
 ok 2879
 ok 2880
-ok 2881
+not ok 2881
+# Test 2881 got: "1" (t/HTML-tree.t at line 192 fail #961)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; 1:42:not closed;)
 ok 2882
 ok 2883
 ok 2884
@@ -3113,19 +3817,29 @@ ok 2886
 ok 2887
 ok 2888
 ok 2889
-ok 2890
+not ok 2890
+# Test 2890 got: "1" (t/HTML-tree.t at line 192 fail #964)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'; 1:33:not closed;)
 ok 2891
 ok 2892
-ok 2893
+not ok 2893
+# Test 2893 got: "3" (t/HTML-tree.t at line 192 fail #965)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:33:not closed, 1:43:not closed, 1:53:not closed;)
 ok 2894
 ok 2895
-ok 2896
+not ok 2896
+# Test 2896 got: "3" (t/HTML-tree.t at line 192 fail #966)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:42:not closed, 1:52:not closed, 1:62:not closed;)
 ok 2897
 ok 2898
-ok 2899
+not ok 2899
+# Test 2899 got: "8" (t/HTML-tree.t at line 192 fail #967)
+#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed, 1:68:not closed, 1:78:not closed, 1:84:unmatched end tag, 1:93:not closed, 1:99:not closed, 1:109:not closed, 1:115:unmatched end tag;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>)
 ok 2900
 ok 2901
-ok 2902
+not ok 2902
+# Test 2902 got: "4" (t/HTML-tree.t at line 192 fail #968)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; 4:0:not closed, 5:0:not closed, 6:0:not closed, 7:0:not closed;)
 ok 2903
 ok 2904
 ok 2905
@@ -3938,7 +4652,6 @@ ok 3711
 ok 3712
 ok 3713
 ok 3714
-# t/tree-test-2.dat
 ok 3715
 ok 3716
 ok 3717
@@ -4047,9 +4760,7 @@ ok 3819
 ok 3820
 ok 3821
 ok 3822
-not ok 3823
-# Test 3823 got: "3" (t/HTML-tree.t at line 187 fail #1275)
-#      Expected: "2" (Parse error: qq'<table><tr>'; 1:8:not closed, 1:8:unmatched end tag, 1:11:in body:#eof;no </table> before <table>, </table> but no opening <table>)
+ok 3823
 ok 3824
 ok 3825
 ok 3826
@@ -4061,17 +4772,13 @@ ok 3831
 ok 3832
 ok 3833
 ok 3834
-not ok 3835
-# Test 3835 got: "2" (t/HTML-tree.t at line 187 fail #1279)
-#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag, 1:17:in body:#eof;</select> in <select>.innerHTML)
+ok 3835
 ok 3836
 ok 3837
 ok 3838
 ok 3839
 ok 3840
-not ok 3841
-# Test 3841 got: "3" (t/HTML-tree.t at line 187 fail #1281)
-#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed, 1:9:unmatched end tag, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
+ok 3841
 ok 3842
 ok 3843
 ok 3844
@@ -4079,17 +4786,13 @@ ok 3845
 ok 3846
 ok 3847
 ok 3848
-not ok 3849
-# Test 3849 got: "| <option>\n" (t/HTML-tree.t at line 192 fail #1283)
-#      Expected: "" (Document tree: qq'</optgroup><option>')
+ok 3849
 ok 3850
 ok 3851
 ok 3852
 ok 3853
 ok 3854
-not ok 3855
-# Test 3855 got: "| <option>\n" (t/HTML-tree.t at line 192 fail #1285)
-#      Expected: "" (Document tree: qq'</optgroup><option>')
+ok 3855
 ok 3856
 ok 3857
 ok 3858
@@ -4117,19 +4820,13 @@ ok 3879
 ok 3880
 ok 3881
 ok 3882
-not ok 3883
-# Test 3883 got: "1" (t/HTML-tree.t at line 187 fail #1295)
-#      Expected: "0" (Parse error: qq'<option>'; 1:8:in body:#eof;)
+ok 3883
 ok 3884
 ok 3885
-not ok 3886
-# Test 3886 got: "1" (t/HTML-tree.t at line 187 fail #1296)
-#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:in body:#eof;)
+ok 3886
 ok 3887
 ok 3888
-not ok 3889
-# Test 3889 got: "2" (t/HTML-tree.t at line 187 fail #1297)
-#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/, 1:14:in body:#eof;</tr> in <select>)
+ok 3889
 ok 3890
 ok 3891
 ok 3892
@@ -4171,6 +4868,7 @@ ok 3927
 ok 3928
 ok 3929
 ok 3930
+# t/tree-test-2.dat
 ok 3931
 ok 3932
 ok 3933
@@ -4204,14 +4902,10 @@ ok 3960
 ok 3961
 ok 3962
 ok 3963
-not ok 3964
-# Test 3964 got: "1" (t/HTML-tree.t at line 187 fail #1322)
-#      Expected: "2" (Parse error: qq'</html>a'; 1:8:unmatched end tag;unmatched </html>, char after </body> implied by </html>)
+ok 3964
 ok 3965
 ok 3966
-not ok 3967
-# Test 3967 got: "2" (t/HTML-tree.t at line 187 fail #1323)
-#      Expected: "3" (Parse error: qq'<span></html>'; 1:13:not closed, 1:13:unmatched end tag;<span> not closed at </body> implied by </html>, unmatched </html>, unexpected end of file (no </span>))
+ok 3967
 ok 3968
 ok 3969
 ok 3970
@@ -4232,9 +4926,7 @@ ok 3984
 ok 3985
 ok 3986
 ok 3987
-not ok 3988
-# Test 3988 got: "1" (t/HTML-tree.t at line 187 fail #1330)
-#      Expected: "0" (Parse error: qq'a\x{12345678}b'; 1:1:non unicode;)
+ok 3988
 ok 3989
 ok 3990
 ok 3991
@@ -4285,7 +4977,9 @@ ok 4035
 ok 4036
 ok 4037
 ok 4038
-ok 4039
+not ok 4039
+# Test 4039 got: "3" (t/HTML-tree.t at line 192 fail #1347)
+#      Expected: "2" (Parse error: qq'<table><tr>'; 1:8:not closed, 1:8:unmatched end tag, 1:11:in body:#eof;no </table> before <table>, </table> but no opening <table>)
 ok 4040
 ok 4041
 ok 4042
@@ -4297,37 +4991,35 @@ ok 4047
 ok 4048
 ok 4049
 ok 4050
-ok 4051
+not ok 4051
+# Test 4051 got: "2" (t/HTML-tree.t at line 192 fail #1351)
+#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag, 1:17:in body:#eof;</select> in <select>.innerHTML)
 ok 4052
 ok 4053
 ok 4054
 ok 4055
 ok 4056
 not ok 4057
-# Test 4057 got: "1" (t/HTML-tree.t at line 187 fail #1353)
-#      Expected: "0" (Parse error: qq'<thead>'; 1:7:in body:#eof;)
+# Test 4057 got: "3" (t/HTML-tree.t at line 192 fail #1353)
+#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed, 1:9:unmatched end tag, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
 ok 4058
 ok 4059
-not ok 4060
-# Test 4060 got: "1" (t/HTML-tree.t at line 187 fail #1354)
-#      Expected: "0" (Parse error: qq'<tbody>'; 1:7:in body:#eof;)
+ok 4060
 ok 4061
 ok 4062
-not ok 4063
-# Test 4063 got: "1" (t/HTML-tree.t at line 187 fail #1355)
-#      Expected: "0" (Parse error: qq'<tfoot>'; 1:7:in body:#eof;)
+ok 4063
 ok 4064
-ok 4065
-not ok 4066
-# Test 4066 got: "1" (t/HTML-tree.t at line 187 fail #1356)
-#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
+not ok 4065
+# Test 4065 got: "| <option>\n" (t/HTML-tree.t at line 197 fail #1355)
+#      Expected: "" (Document tree: qq'</optgroup><option>')
+ok 4066
 ok 4067
 ok 4068
-not ok 4069
-# Test 4069 got: "1" (t/HTML-tree.t at line 187 fail #1357)
-#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
+ok 4069
 ok 4070
-ok 4071
+not ok 4071
+# Test 4071 got: "| <option>\n" (t/HTML-tree.t at line 197 fail #1357)
+#      Expected: "" (Document tree: qq'</optgroup><option>')
 ok 4072
 ok 4073
 ok 4074
@@ -4355,14 +5047,19 @@ ok 4095
 ok 4096
 ok 4097
 ok 4098
-ok 4099
+not ok 4099
+# Test 4099 got: "1" (t/HTML-tree.t at line 192 fail #1367)
+#      Expected: "0" (Parse error: qq'<option>'; 1:8:in body:#eof;)
 ok 4100
 ok 4101
-# t/tree-test-3.dat
-ok 4102
+not ok 4102
+# Test 4102 got: "1" (t/HTML-tree.t at line 192 fail #1368)
+#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:in body:#eof;)
 ok 4103
 ok 4104
-ok 4105
+not ok 4105
+# Test 4105 got: "2" (t/HTML-tree.t at line 192 fail #1369)
+#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/, 1:14:in body:#eof;</tr> in <select>)
 ok 4106
 ok 4107
 ok 4108
@@ -4371,7 +5068,6 @@ ok 4110
 ok 4111
 ok 4112
 ok 4113
-# t/tree-test-void.dat
 ok 4114
 ok 4115
 ok 4116
@@ -4438,10 +5134,14 @@ ok 4176
 ok 4177
 ok 4178
 ok 4179
-ok 4180
+not ok 4180
+# Test 4180 got: "1" (t/HTML-tree.t at line 192 fail #1394)
+#      Expected: "2" (Parse error: qq'</html>a'; 1:8:unmatched end tag;unmatched </html>, char after </body> implied by </html>)
 ok 4181
 ok 4182
-ok 4183
+not ok 4183
+# Test 4183 got: "2" (t/HTML-tree.t at line 192 fail #1395)
+#      Expected: "3" (Parse error: qq'<span></html>'; 1:13:not closed, 1:13:unmatched end tag;<span> not closed at </body> implied by </html>, unmatched </html>, unexpected end of file (no </span>))
 ok 4184
 ok 4185
 ok 4186
@@ -4462,7 +5162,9 @@ ok 4200
 ok 4201
 ok 4202
 ok 4203
-ok 4204
+not ok 4204
+# Test 4204 got: "1" (t/HTML-tree.t at line 192 fail #1402)
+#      Expected: "0" (Parse error: qq'a\x{12345678}b'; 1:1:non unicode;)
 ok 4205
 ok 4206
 ok 4207
@@ -4522,7 +5224,6 @@ ok 4260
 ok 4261
 ok 4262
 ok 4263
-# t/tree-test-flow.dat
 ok 4264
 ok 4265
 ok 4266
@@ -4532,19 +5233,29 @@ ok 4269
 ok 4270
 ok 4271
 ok 4272
-ok 4273
+not ok 4273
+# Test 4273 got: "1" (t/HTML-tree.t at line 192 fail #1425)
+#      Expected: "0" (Parse error: qq'<thead>'; 1:7:in body:#eof;)
 ok 4274
 ok 4275
-ok 4276
+not ok 4276
+# Test 4276 got: "1" (t/HTML-tree.t at line 192 fail #1426)
+#      Expected: "0" (Parse error: qq'<tbody>'; 1:7:in body:#eof;)
 ok 4277
 ok 4278
-ok 4279
+not ok 4279
+# Test 4279 got: "1" (t/HTML-tree.t at line 192 fail #1427)
+#      Expected: "0" (Parse error: qq'<tfoot>'; 1:7:in body:#eof;)
 ok 4280
 ok 4281
-ok 4282
+not ok 4282
+# Test 4282 got: "1" (t/HTML-tree.t at line 192 fail #1428)
+#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
 ok 4283
 ok 4284
-ok 4285
+not ok 4285
+# Test 4285 got: "1" (t/HTML-tree.t at line 192 fail #1429)
+#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
 ok 4286
 ok 4287
 ok 4288
@@ -4577,6 +5288,7 @@ ok 4314
 ok 4315
 ok 4316
 ok 4317
+# t/tree-test-3.dat
 ok 4318
 ok 4319
 ok 4320
@@ -4589,6 +5301,7 @@ ok 4326
 ok 4327
 ok 4328
 ok 4329
+# t/tree-test-void.dat
 ok 4330
 ok 4331
 ok 4332
@@ -4733,51 +5446,32 @@ ok 4470
 ok 4471
 ok 4472
 ok 4473
-# t/tree-test-phrasing.dat
-# t/tree-test-form.dat
-not ok 4474
-# Test 4474 got: "2" (t/HTML-tree.t at line 187 fail #1492)
-#      Expected: "1" (Parse error: qq'<option>x'; 1:9:no DOCTYPE, 1:9:in body:#eof;no DOCTYPE)
+ok 4474
 ok 4475
 ok 4476
-not ok 4477
-# Test 4477 got: "2" (t/HTML-tree.t at line 187 fail #1493)
-#      Expected: "1" (Parse error: qq'<option></option>x'; 1:9:no DOCTYPE, 1:18:not closed;no DOCTYPE)
+ok 4477
 ok 4478
 ok 4479
-not ok 4480
-# Test 4480 got: "2" (t/HTML-tree.t at line 187 fail #1494)
-#      Expected: "1" (Parse error: qq'<optgroup>x'; 1:11:no DOCTYPE, 1:11:in body:#eof;no DOCTYPE)
+# t/tree-test-flow.dat
+ok 4480
 ok 4481
 ok 4482
-not ok 4483
-# Test 4483 got: "2" (t/HTML-tree.t at line 187 fail #1495)
-#      Expected: "1" (Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE, 1:22:not closed;no DOCTYPE)
+ok 4483
 ok 4484
 ok 4485
-not ok 4486
-# Test 4486 got: "2" (t/HTML-tree.t at line 187 fail #1496)
-#      Expected: "1" (Parse error: qq'<optgroup><option>x'; 1:11:no DOCTYPE, 1:19:in body:#eof;no DOCTYPE)
+ok 4486
 ok 4487
 ok 4488
-not ok 4489
-# Test 4489 got: "2" (t/HTML-tree.t at line 187 fail #1497)
-#      Expected: "1" (Parse error: qq'<optgroup><optgroup>'; 1:11:no DOCTYPE, 1:20:in body:#eof;no DOCTYPE)
+ok 4489
 ok 4490
 ok 4491
-not ok 4492
-# Test 4492 got: "3" (t/HTML-tree.t at line 187 fail #1498)
-#      Expected: "1" (Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:not closed, 1:16:in body:#eof;no DOCTYPE)
+ok 4492
 ok 4493
 ok 4494
-not ok 4495
-# Test 4495 got: "3" (t/HTML-tree.t at line 187 fail #1499)
-#      Expected: "1" (Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:not closed, 1:18:in body:#eof;no DOCTYPE)
+ok 4495
 ok 4496
 ok 4497
-not ok 4498
-# Test 4498 got: "3" (t/HTML-tree.t at line 187 fail #1500)
-#      Expected: "2" (Parse error: qq'<option><span><optgroup>'; 1:9:no DOCTYPE, 1:24:not closed, 1:24:in body:#eof;no DOCTYPE, no </span>)
+ok 4498
 ok 4499
 ok 4500
 ok 4501
@@ -4795,7 +5489,6 @@ ok 4512
 ok 4513
 ok 4514
 ok 4515
-# t/tree-test-foreign.dat
 ok 4516
 ok 4517
 ok 4518
@@ -4970,25 +5663,262 @@ ok 4686
 ok 4687
 ok 4688
 ok 4689
-ok 4690
+# t/tree-test-phrasing.dat
+# t/tree-test-form.dat
+not ok 4690
+# Test 4690 got: "2" (t/HTML-tree.t at line 192 fail #1564)
+#      Expected: "1" (Parse error: qq'<option>x'; 1:9:no DOCTYPE, 1:9:in body:#eof;no DOCTYPE)
 ok 4691
 ok 4692
-ok 4693
+not ok 4693
+# Test 4693 got: "2" (t/HTML-tree.t at line 192 fail #1565)
+#      Expected: "1" (Parse error: qq'<option></option>x'; 1:9:no DOCTYPE, 1:18:not closed;no DOCTYPE)
 ok 4694
 ok 4695
 not ok 4696
-# Test 4696 got: "4" (t/HTML-tree.t at line 187 fail #1566)
-#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+# Test 4696 got: "2" (t/HTML-tree.t at line 192 fail #1566)
+#      Expected: "1" (Parse error: qq'<optgroup>x'; 1:11:no DOCTYPE, 1:11:in body:#eof;no DOCTYPE)
 ok 4697
 ok 4698
 not ok 4699
-# Test 4699 got: "4" (t/HTML-tree.t at line 187 fail #1567)
-#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+# Test 4699 got: "2" (t/HTML-tree.t at line 192 fail #1567)
+#      Expected: "1" (Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE, 1:22:not closed;no DOCTYPE)
 ok 4700
 ok 4701
-ok 4702
+not ok 4702
+# Test 4702 got: "2" (t/HTML-tree.t at line 192 fail #1568)
+#      Expected: "1" (Parse error: qq'<optgroup><option>x'; 1:11:no DOCTYPE, 1:19:in body:#eof;no DOCTYPE)
 ok 4703
 ok 4704
-ok 4705
+not ok 4705
+# Test 4705 got: "2" (t/HTML-tree.t at line 192 fail #1569)
+#      Expected: "1" (Parse error: qq'<optgroup><optgroup>'; 1:11:no DOCTYPE, 1:20:in body:#eof;no DOCTYPE)
 ok 4706
 ok 4707
+not ok 4708
+# Test 4708 got: "3" (t/HTML-tree.t at line 192 fail #1570)
+#      Expected: "1" (Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:not closed, 1:16:in body:#eof;no DOCTYPE)
+ok 4709
+ok 4710
+not ok 4711
+# Test 4711 got: "3" (t/HTML-tree.t at line 192 fail #1571)
+#      Expected: "1" (Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:not closed, 1:18:in body:#eof;no DOCTYPE)
+ok 4712
+ok 4713
+not ok 4714
+# Test 4714 got: "3" (t/HTML-tree.t at line 192 fail #1572)
+#      Expected: "2" (Parse error: qq'<option><span><optgroup>'; 1:9:no DOCTYPE, 1:24:not closed, 1:24:in body:#eof;no DOCTYPE, no </span>)
+ok 4715
+ok 4716
+ok 4717
+ok 4718
+ok 4719
+ok 4720
+ok 4721
+ok 4722
+ok 4723
+ok 4724
+ok 4725
+ok 4726
+ok 4727
+ok 4728
+ok 4729
+ok 4730
+ok 4731
+# t/tree-test-foreign.dat
+ok 4732
+ok 4733
+ok 4734
+ok 4735
+ok 4736
+ok 4737
+ok 4738
+ok 4739
+ok 4740
+ok 4741
+ok 4742
+ok 4743
+ok 4744
+ok 4745
+ok 4746
+ok 4747
+ok 4748
+ok 4749
+ok 4750
+ok 4751
+ok 4752
+ok 4753
+ok 4754
+ok 4755
+ok 4756
+ok 4757
+ok 4758
+ok 4759
+ok 4760
+ok 4761
+ok 4762
+ok 4763
+ok 4764
+ok 4765
+ok 4766
+ok 4767
+ok 4768
+ok 4769
+ok 4770
+ok 4771
+ok 4772
+ok 4773
+ok 4774
+ok 4775
+ok 4776
+ok 4777
+ok 4778
+ok 4779
+ok 4780
+ok 4781
+ok 4782
+ok 4783
+ok 4784
+ok 4785
+ok 4786
+ok 4787
+ok 4788
+ok 4789
+ok 4790
+ok 4791
+ok 4792
+ok 4793
+ok 4794
+ok 4795
+ok 4796
+ok 4797
+ok 4798
+ok 4799
+ok 4800
+ok 4801
+ok 4802
+ok 4803
+ok 4804
+ok 4805
+ok 4806
+ok 4807
+ok 4808
+ok 4809
+ok 4810
+ok 4811
+ok 4812
+ok 4813
+ok 4814
+ok 4815
+ok 4816
+ok 4817
+ok 4818
+ok 4819
+ok 4820
+ok 4821
+ok 4822
+ok 4823
+ok 4824
+ok 4825
+ok 4826
+ok 4827
+ok 4828
+ok 4829
+ok 4830
+ok 4831
+ok 4832
+ok 4833
+ok 4834
+ok 4835
+ok 4836
+ok 4837
+ok 4838
+ok 4839
+ok 4840
+ok 4841
+ok 4842
+ok 4843
+ok 4844
+ok 4845
+ok 4846
+ok 4847
+ok 4848
+ok 4849
+ok 4850
+ok 4851
+ok 4852
+ok 4853
+ok 4854
+ok 4855
+ok 4856
+ok 4857
+ok 4858
+ok 4859
+ok 4860
+ok 4861
+ok 4862
+ok 4863
+ok 4864
+ok 4865
+ok 4866
+ok 4867
+ok 4868
+ok 4869
+ok 4870
+ok 4871
+ok 4872
+ok 4873
+ok 4874
+ok 4875
+ok 4876
+ok 4877
+ok 4878
+ok 4879
+ok 4880
+ok 4881
+ok 4882
+ok 4883
+ok 4884
+ok 4885
+ok 4886
+ok 4887
+ok 4888
+ok 4889
+ok 4890
+ok 4891
+ok 4892
+ok 4893
+ok 4894
+ok 4895
+ok 4896
+ok 4897
+ok 4898
+ok 4899
+ok 4900
+ok 4901
+ok 4902
+ok 4903
+ok 4904
+ok 4905
+ok 4906
+ok 4907
+ok 4908
+ok 4909
+ok 4910
+ok 4911
+not ok 4912
+# Test 4912 got: "4" (t/HTML-tree.t at line 192 fail #1638)
+#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 4913
+ok 4914
+not ok 4915
+# Test 4915 got: "4" (t/HTML-tree.t at line 192 fail #1639)
+#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 4916
+ok 4917
+ok 4918
+ok 4919
+ok 4920
+ok 4921
+ok 4922
+ok 4923

@@ -454,8 +454,8 @@ Line: 1 Col: 41 Expected closing tag. Unexpected end of file.
 #data
 <!DOCTYPE html><select><optgroup><option></optgroup><option><select><option>
 #errors
-Line: 1 Col: 68 Unexpected select start tag in the select phase implies select start tag.
-Line: 1 Col: 76 Unexpected start tag option. Ignored.
+68: “select” start tag where end tag expected.
+76: End of file seen and there were open elements.
 #document
 | <!DOCTYPE html>
 | <html>
@@ -465,6 +465,7 @@ Line: 1 Col: 76 Unexpected start tag option. Ignored.
 |       <optgroup>
 |         <option>
 |       <option>
+|     <option>
 
 #data
 <!DOCTYPE html><select><optgroup><option><optgroup>
@@ -692,7 +693,6 @@ Line: 1 Col: 32 html needs to be the first start tag.
 #data
 <!DOCTYPE html>X</html>X
 #errors
-Line: 1 Col: 24 Unexpected non-space characters. Expected end of file.
 Line: 1 Col: 24 Unexpected non-space characters in the after body phase.
 #document
 | <!DOCTYPE html>
@@ -714,8 +714,7 @@ Line: 1 Col: 24 Unexpected non-space characters in the after body phase.
 #data
 <!DOCTYPE html>X</html><p>X
 #errors
-Line: 1 Col: 26 Unexpected start tag (p). Expected end of file.
-Line: 1 Col: 26 Unexpected start tag token (p) in the after body phase.
+Line: 1 Col: 26 Unexpected start tag ().
 #document
 | <!DOCTYPE html>
 | <html>
@@ -728,7 +727,7 @@ Line: 1 Col: 26 Unexpected start tag token (p) in the after body phase.
 #data
 <!DOCTYPE html>X<p/x/y/z>
 #errors
-Line: 1 Col: 19 Solidus (/) incorrectly placed in tag.
+Line: 1 Col: 19 Expected a > after the /.
 Line: 1 Col: 21 Solidus (/) incorrectly placed in tag.
 Line: 1 Col: 23 Solidus (/) incorrectly placed in tag.
 #document
@@ -767,3 +766,18 @@ Line: 1 Col: 34 Unexpected end tag (p). Ignored.
 |         <tr>
 |           <td>
 |             <p>
+
+#data
+<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->
+#errors
+Line: 1 Col: 20 Expected space or '>'. Got ''
+Line: 1 Col: 25 Erroneous DOCTYPE.
+Line: 1 Col: 35 Unexpected character in comment found.
+#document
+| <!DOCTYPE <!DOCTYPE>
+| <html>
+|   <head>
+|   <body>
+|     ">"
+|     <!-- <!--x -->
+|     "-->"

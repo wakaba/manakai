@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.197 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.198 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -4267,7 +4267,6 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## reconsume
 
@@ -5708,6 +5707,7 @@ sub _tree_construction_main ($) {
           
           $furthest_block = $node;
           $furthest_block_i_in_open = $_;
+	  ## NOTE: The topmost (eldest) node.
         } elsif ($node->[0] eq $formatting_element->[0]) {
           
           last OE;
@@ -5854,7 +5854,7 @@ sub _tree_construction_main ($) {
           $i = $_;
         }
       } # OE
-      splice @{$self->{open_elements}}, $i + 1, 1, $clone;
+      splice @{$self->{open_elements}}, $i + 1, 0, $clone;
       
       ## Step 14
       redo FET;
@@ -6823,7 +6823,8 @@ sub _tree_construction_main ($) {
             } elsif ({
                       body => 1, html => 1,
                      }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} == BEFORE_HEAD_IM or
+              ## TODO: This branch is entirely redundant.
+	      if ($self->{insertion_mode} == BEFORE_HEAD_IM or
                   $self->{insertion_mode} == IN_HEAD_IM or
                   $self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 
@@ -10809,4 +10810,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 14:31:27 $
+# $Date: 2008/10/04 17:16:01 $

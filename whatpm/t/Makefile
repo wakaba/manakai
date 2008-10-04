@@ -53,6 +53,11 @@ tree-construction-remote-files: tree-construction \
   tree-construction/tests5.dat \
   tree-construction/tests6.dat \
   tree-construction/tests7.dat \
+  tree-construction/tests8.dat \
+  tree-construction/tests9.dat \
+  tree-construction/tests10.dat \
+  tree-construction/tests11.dat \
+  tree-construction/tests12.dat \
   tree-construction/LICENSE
 
 tree-construction:
@@ -88,4 +93,4 @@ clean-remote-files:
 always:
 
 ## License: Public Domain.
-## $Date: 2008/09/18 05:49:13 $
+## $Date: 2008/10/04 17:16:02 $

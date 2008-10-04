@@ -26,7 +26,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 1127 }
+BEGIN { plan tests => 1129 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -209,4 +209,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/09/22 06:04:29 $
+## $Date: 2008/10/04 17:16:02 $

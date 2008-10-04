@@ -44,6 +44,14 @@
 "input":"<z z='&\"'>",
 "output":["ParseError", ["StartTag", "z", {"z": "&\""}]]},
 
+{"description":"Text after bogus character reference",
+"input":"<z z='&xlink_xmlns;'>bar<z>",
+"output":["ParseError",["StartTag","z",{"z":"&xlink_xmlns;"}],["Character","bar"],["StartTag","z",{}]]},
+
+{"description":"Text after hex character reference",
+"input":"<z z='&#x0020; foo'>bar<z>",
+"output":[["StartTag","z",{"z":"  foo"}],["Character","bar"],["StartTag","z",{}]]},
+
 {"description":"Attribute name starting with \"",
 "input":"<foo \"='bar'>",
 "output":["ParseError", ["StartTag", "foo", {"\"": "bar"}]]},
@@ -122,7 +130,7 @@
 
 {"description":"Maximum non-BMP numeric entity",
 "input":"&#X10FFFF;",
-"output":[["Character", "\uDBFF\uDFFF"]]},
+"output":["ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"Above maximum numeric entity",
 "input":"&#x110000;",
@@ -276,7 +284,7 @@
 
 {"description":"Doctype publi",
 "input":"<!DOCTYPE html PUBLI",
-"output":["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output":["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description":"Doctype sistem",
 "input":"<!DOCTYPE html SISTEM \"AbC\">",
@@ -284,6 +292,6 @@
 
 {"description":"Doctype sys",
 "input":"<!DOCTYPE html SYS",
-"output":["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]}
+"output":["ParseError", ["DOCTYPE", "html", null, null, false]]}
 
 ]}
