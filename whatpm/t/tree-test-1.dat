@@ -1865,7 +1865,8 @@ char in <tr>
 | <html>
 |   <head>
 |   <body>
-|     "a "
+|     "a"
+|     " "
 |     <table>
 |       <tbody>
 |         <tr>
@@ -11114,4 +11115,676 @@ unmatched end tag
 #document
 | <html>
 |   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML>a<table>b<thead>c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <thead>
+
+#data
+<!DOCTYPE HTML>a<table>b<tbody>c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML>a<table>b<tfoot>c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <tfoot>
+
+#data
+<!DOCTYPE HTML>a<table>b<tr>c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML>a<table>b<thead>c<tr>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <thead>
+|         <tr>
+
+#data
+<!DOCTYPE HTML>a<table>b<td></td>c</table>
+#errors
+text in table
+x2
+no <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+
+#data
+<!DOCTYPE HTML>a<table>b<th></th>c</table>
+#errors
+text in table
+x2
+no <tr>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+
+#data
+<!DOCTYPE HTML>a<table>b<tr>c<td></td>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+
+#data
+<!DOCTYPE HTML>a<table>b<tr>c<th></th>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+
+#data
+<!DOCTYPE HTML>a<table>b<col>c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <colgroup>
+|         <col>
+
+#data
+<!DOCTYPE HTML>a<table>b<colgroup>c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <colgroup>
+
+#data
+<!DOCTYPE HTML>a<table>b<caption></caption>c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <caption>
+
+#data
+<!DOCTYPE HTML>a<table>b<thead>c<caption></caption>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <thead>
+|       <caption>
+
+#data
+<!DOCTYPE HTML>a<table>b<thead>c<col>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <thead>
+|       <colgroup>
+|         <col>
+
+#data
+<!DOCTYPE HTML>a<table>b<thead>c<colgroup>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <thead>
+|       <colgroup>
+
+#data
+<!DOCTYPE HTML>a<table>b<tr>c<col>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <tbody>
+|         <tr>
+|       <colgroup>
+|         <col>
+
+#data
+<!DOCTYPE HTML>a<table>b<tr>c<colgroup>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <tbody>
+|         <tr>
+|       <colgroup>
+
+#data
+<!DOCTYPE HTML>a<table>b<tr>c<caption></caption>d</table>
+#errors
+text in table
+x
+3
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     "d"
+|     <table>
+|       <tbody>
+|         <tr>
+|       <caption>
+
+#data
+<!DOCTYPE HTML>a<table>b<!---->c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <!--  -->
+
+#data
+<!DOCTYPE HTML>a<table>b<style></style>c</table>
+#errors
+text in table
+start tag in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <style>
+|     "c"
+|     <table>
+
+#data
+<!DOCTYPE HTML>a<table>b<script></script>c</table>
+#errors
+text in table
+start tag in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <script>
+|     "c"
+|     <table>
+
+#data
+<!DOCTYPE HTML>a<table>b<input type=hidden>c</table>
+#errors
+text in table
+start tag in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <input>
+|       type="hidden"
+|     "c"
+|     <table>
+
+#data
+<!DOCTYPE HTML>a<table><tbody>b<!---->c</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     "c"
+|     <table>
+|       <tbody>
+|         <!--  -->
+
+#data
+<!DOCTYPE HTML>a<table><tbody>b<style></style>c</table>
+#errors
+text in table
+start tag in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <style>
+|     "c"
+|     <table>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML>a<table><tbody>b<script></script>c</table>
+#errors
+text in table
+start tag in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <script>
+|     "c"
+|     <table>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML>a<table><tbody>b<input type=hidden>c</table>
+#errors
+text in table
+start tag in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <input>
+|       type="hidden"
+|     "c"
+|     <table>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML>a<table>b&lt;</table>
+#errors
+text in table
+x2
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b<"
+|     <table>
+
+#data
+<!DOCTYPE HTML>a<table>b<span>c&lt;</span>d</table>
+#errors
+text in table
+<span> in table
+text in table
+x2
+</span> in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <span>
+|       "c<"
+|     "d"
+|     <table>
+
+#data
+<!DOCTYPE HTML>a<table>b<plaintext>c&lt;</plaintext>d</table>
+#errors
+text in table
+<plaintext> in table
+text in table
+:
+:
+:
+:
+x6
+unexpected EOF
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <plaintext>
+|       "c&lt;</plaintext>d</table>"
+|     <table>
+
+#data
+<!DOCTYPE HTML>a<table>b<xmp>c&lt;<p></xmp>d</table>
+#errors
+text in table
+<xmp> in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <xmp>
+|       "c&lt;<p>"
+|     "d"
+|     <table>
+
+#data
+<!DOCTYPE HTML>a<table>b<title>c&lt;<p></title>d</table>
+#errors
+text in table
+<title> in table
+text in table
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <title>
+|       "c<<p>"
+|     "d"
+|     <table>
+
+#data
+<!DOCTYPE HTML></head> <base> a
+#errors
+metadata element after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <base>
+|   " "
+|   " "
+|   <body>
+|     "a"
+
+#data
+<!DOCTYPE HTML></head> <link> a
+#errors
+metadata element after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <link>
+|   " "
+|   " "
+|   <body>
+|     "a"
+
+#data
+<!DOCTYPE HTML></head> <meta> a
+#errors
+metadata element after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <meta>
+|   " "
+|   " "
+|   <body>
+|     "a"
+
+#data
+<!DOCTYPE HTML></head> <noframes></noframes> a
+#errors
+metadata element after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noframes>
+|   " "
+|   " "
+|   <body>
+|     "a"
+
+#data
+<!DOCTYPE HTML></head> <script></script> a
+#errors
+metadata element after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <script>
+|   " "
+|   " "
+|   <body>
+|     "a"
+
+#data
+<!DOCTYPE HTML></head> <style></style> a
+#errors
+metadata element after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <style>
+|   " "
+|   " "
+|   <body>
+|     "a"
+
+#data
+<!DOCTYPE HTML></head> <title></title> a
+#errors
+metadata element after </head>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   " "
+|   " "
+|   <body>
+|     "a"
+
+#data
+<!DOCTYPE HTML></head> &#x20;
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   "  "
 |   <body>
