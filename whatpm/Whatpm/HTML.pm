@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.188 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.189 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -66,13 +66,15 @@ sub TABLE_ROWS_EL () {
 }
 
 ## NOTE: Used in "generate implied end tags" algorithm.
-## NOTE: There is a code where a modified version of END_TAG_OPTIONAL_EL
-## is used in "generate implied end tags" implementation (search for the
-## function mae).
+## NOTE: There is a code where a modified version of
+## END_TAG_OPTIONAL_EL is used in "generate implied end tags"
+## implementation (search for the algorithm name).
 sub END_TAG_OPTIONAL_EL () {
   DD_EL |
   DT_EL |
   LI_EL |
+  OPTION_EL |
+  OPTGROUP_EL |
   P_EL |
   RUBY_COMPONENT_EL
 }
@@ -6306,24 +6308,24 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-              pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              pop @{$self->{open_elements}};
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               
               $token = $self->_get_next_token;
               next B;
-            } elsif ($token->{tag_name} eq 'link') {
-              ## NOTE: There is a "as if in head" code clone.
-              if ($self->{insertion_mode} == AFTER_HEAD_IM) {
-                
-                $self->{parse_error}->(level => $self->{level}->{must}, type => 'after head',
-                                text => $token->{tag_name}, token => $token);
-                push @{$self->{open_elements}},
-                    [$self->{head_element}, $el_category->{head}];
-              } else {
-                
-              }
-              
+        } elsif ($token->{tag_name} eq 'link') {
+          ## NOTE: There is a "as if in head" code clone.
+          if ($self->{insertion_mode} == AFTER_HEAD_IM) {
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'after head',
+                            text => $token->{tag_name}, token => $token);
+            push @{$self->{open_elements}},
+                [$self->{head_element}, $el_category->{head}];
+          } else {
+            
+          }
+          
     {
       my $el;
       
@@ -6348,12 +6350,58 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-              pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
-              pop @{$self->{open_elements}} # <head>
-                  if $self->{insertion_mode} == AFTER_HEAD_IM;
-              delete $self->{self_closing};
-              $token = $self->_get_next_token;
-              next B;
+          pop @{$self->{open_elements}};
+          pop @{$self->{open_elements}} # <head>
+              if $self->{insertion_mode} == AFTER_HEAD_IM;
+          delete $self->{self_closing};
+          $token = $self->_get_next_token;
+          next B;
+        } elsif ($token->{tag_name} eq 'command' or
+                 $token->{tag_name} eq 'eventsource') {
+          if ($self->{insertion_mode} == IN_HEAD_IM) {
+            ## NOTE: If the insertion mode at the time of the emission
+            ## of the token was "before head", $self->{insertion_mode}
+            ## is already changed to |IN_HEAD_IM|.
+
+            ## NOTE: There is a "as if in head" code clone.
+            
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
+            pop @{$self->{open_elements}};
+            pop @{$self->{open_elements}} # <head>
+                if $self->{insertion_mode} == AFTER_HEAD_IM;
+            delete $self->{self_closing};
+            $token = $self->_get_next_token;
+            next B;
+          } else {
+            ## NOTE: "in head noscript" or "after head" insertion mode
+            ## - in these cases, these tags are treated as same as
+            ## normal in-body tags.
+            
+            #
+          }
             } elsif ($token->{tag_name} eq 'meta') {
               ## NOTE: There is a "as if in head" code clone.
               if ($self->{insertion_mode} == AFTER_HEAD_IM) {
@@ -8881,7 +8929,7 @@ sub _tree_construction_main ($) {
         $parse_rcdata->(CDATA_CONTENT_MODEL);
         next B;
       } elsif ({
-                base => 1, link => 1,
+                base => 1, command => 1, eventsource => 1, link => 1,
                }->{$token->{tag_name}}) {
         
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
@@ -8910,7 +8958,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-        pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+        pop @{$self->{open_elements}};
         delete $self->{self_closing};
         $token = $self->_get_next_token;
         next B;
@@ -8941,7 +8989,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-        my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+        my $meta_el = pop @{$self->{open_elements}};
 
         unless ($self->{confident}) {
           if ($token->{attributes}->{charset}) {
@@ -9908,6 +9956,8 @@ sub _tree_construction_main ($) {
                   dd => ($token->{tag_name} ne 'dd'),
                   dt => ($token->{tag_name} ne 'dt'),
                   li => ($token->{tag_name} ne 'li'),
+                  option => 1,
+                  optgroup => 1,
                   p => 1,
                   rt => 1,
                   rp => 1,
@@ -10482,4 +10532,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 04:06:32 $
+# $Date: 2008/10/04 05:53:45 $

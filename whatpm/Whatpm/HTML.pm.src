@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.193 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.194 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -66,13 +66,15 @@ sub TABLE_ROWS_EL () {
 }
 
 ## NOTE: Used in "generate implied end tags" algorithm.
-## NOTE: There is a code where a modified version of END_TAG_OPTIONAL_EL
-## is used in "generate implied end tags" implementation (search for the
-## function mae).
+## NOTE: There is a code where a modified version of
+## END_TAG_OPTIONAL_EL is used in "generate implied end tags"
+## implementation (search for the algorithm name).
 sub END_TAG_OPTIONAL_EL () {
   DD_EL |
   DT_EL |
   LI_EL |
+  OPTION_EL |
+  OPTGROUP_EL |
   P_EL |
   RUBY_COMPONENT_EL
 }
@@ -4655,30 +4657,52 @@ sub _tree_construction_main ($) {
                 !!!cp ('t101');
               }
               !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
-              pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              pop @{$self->{open_elements}};
               pop @{$self->{open_elements}} # <head>
                   if $self->{insertion_mode} == AFTER_HEAD_IM;
               !!!nack ('t101.1');
               !!!next-token;
               next B;
-            } elsif ($token->{tag_name} eq 'link') {
-              ## NOTE: There is a "as if in head" code clone.
-              if ($self->{insertion_mode} == AFTER_HEAD_IM) {
-                !!!cp ('t102');
-                !!!parse-error (type => 'after head',
-                                text => $token->{tag_name}, token => $token);
-                push @{$self->{open_elements}},
-                    [$self->{head_element}, $el_category->{head}];
-              } else {
-                !!!cp ('t103');
-              }
-              !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
-              pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
-              pop @{$self->{open_elements}} # <head>
-                  if $self->{insertion_mode} == AFTER_HEAD_IM;
-              !!!ack ('t103.1');
-              !!!next-token;
-              next B;
+        } elsif ($token->{tag_name} eq 'link') {
+          ## NOTE: There is a "as if in head" code clone.
+          if ($self->{insertion_mode} == AFTER_HEAD_IM) {
+            !!!cp ('t102');
+            !!!parse-error (type => 'after head',
+                            text => $token->{tag_name}, token => $token);
+            push @{$self->{open_elements}},
+                [$self->{head_element}, $el_category->{head}];
+          } else {
+            !!!cp ('t103');
+          }
+          !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
+          pop @{$self->{open_elements}};
+          pop @{$self->{open_elements}} # <head>
+              if $self->{insertion_mode} == AFTER_HEAD_IM;
+          !!!ack ('t103.1');
+          !!!next-token;
+          next B;
+        } elsif ($token->{tag_name} eq 'command' or
+                 $token->{tag_name} eq 'eventsource') {
+          if ($self->{insertion_mode} == IN_HEAD_IM) {
+            ## NOTE: If the insertion mode at the time of the emission
+            ## of the token was "before head", $self->{insertion_mode}
+            ## is already changed to |IN_HEAD_IM|.
+
+            ## NOTE: There is a "as if in head" code clone.
+            !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
+            pop @{$self->{open_elements}};
+            pop @{$self->{open_elements}} # <head>
+                if $self->{insertion_mode} == AFTER_HEAD_IM;
+            !!!ack ('t103.2');
+            !!!next-token;
+            next B;
+          } else {
+            ## NOTE: "in head noscript" or "after head" insertion mode
+            ## - in these cases, these tags are treated as same as
+            ## normal in-body tags.
+            !!!cp ('t103.3');
+            #
+          }
             } elsif ($token->{tag_name} eq 'meta') {
               ## NOTE: There is a "as if in head" code clone.
               if ($self->{insertion_mode} == AFTER_HEAD_IM) {
@@ -6796,19 +6820,19 @@ sub _tree_construction_main ($) {
         $parse_rcdata->(CDATA_CONTENT_MODEL);
         next B;
       } elsif ({
-                base => 1, link => 1,
+                base => 1, command => 1, eventsource => 1, link => 1,
                }->{$token->{tag_name}}) {
         !!!cp ('t334');
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
         !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
-        pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+        pop @{$self->{open_elements}};
         !!!ack ('t334.1');
         !!!next-token;
         next B;
       } elsif ($token->{tag_name} eq 'meta') {
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
         !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
-        my $meta_el = pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+        my $meta_el = pop @{$self->{open_elements}};
 
         unless ($self->{confident}) {
           if ($token->{attributes}->{charset}) {
@@ -7502,6 +7526,8 @@ sub _tree_construction_main ($) {
                   dd => ($token->{tag_name} ne 'dd'),
                   dt => ($token->{tag_name} ne 'dt'),
                   li => ($token->{tag_name} ne 'li'),
+                  option => 1,
+                  optgroup => 1,
                   p => 1,
                   rt => 1,
                   rp => 1,
@@ -8060,4 +8086,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 04:06:33 $
+# $Date: 2008/10/04 05:53:45 $

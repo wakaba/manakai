@@ -1,0 +1,176 @@
+#data
+<command>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <command>
+|   <body>
+|     "a"
+
+#data
+<eventsource>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <eventsource>
+|   <body>
+|     "a"
+
+#data
+<event-source>a
+#errors
+no DOCTYPE
+unexpected EOF
+#document
+| <html>
+|   <head>
+|   <body>
+|     <event-source>
+|       "a"
+
+#data
+<head><command>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <command>
+|   <body>
+|     "a"
+
+#data
+<head><eventsource>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <eventsource>
+|   <body>
+|     "a"
+
+#data
+<head><event-source>a
+#errors
+no DOCTYPE
+unexpected EOF
+#document
+| <html>
+|   <head>
+|   <body>
+|     <event-source>
+|       "a"
+
+#data
+</head><command>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <command>
+|     "a"
+
+#data
+</head><eventsource>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <eventsource>
+|     "a"
+
+#data
+</head><event-source>x
+#errors
+no DOCTYPE
+unexpected EOF
+#document
+| <html>
+|   <head>
+|   <body>
+|     <event-source>
+|       "x"
+
+#data
+<body><command>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <command>
+|     "a"
+
+#data
+<body><eventsource>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <eventsource>
+|     "x"
+
+#data
+<body><event-source>x
+#errors
+no DOCTYPE
+unexpected EOF
+#document
+| <html>
+|   <head>
+|   <body>
+|     <event-source>
+|       "x"
+
+#data
+<head><noscript><command>x
+#errors
+no DOCTYPE
+no </noscript>
+#document
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     <command>
+|     "x"
+
+#data
+<head><noscript><eventsource>x
+#errors
+no DOCTYPE
+no </noscript>
+#document
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     <eventsource>
+|     "x"
+
+#data
+<head><noscript><event-source>x
+#errors
+no DOCTYPE
+no </noscript>
+unexpected EOF
+#document
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     <event-source>
+|       "x"
+

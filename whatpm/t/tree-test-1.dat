@@ -8093,6 +8093,20 @@ eof in body
 |           <li>
 
 #data
+<!DOCTYPE HTML><ul><li><listing><li>
+#errors
+eof in body
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <listing>
+|           <li>
+
+#data
 <!DOCTYPE HTML><ul><li><ul><li>
 #errors
 eof in body
@@ -8818,6 +8832,20 @@ eof in body
 |           <dt>
 
 #data
+<!DOCTYPE HTML><dl><dt><listing><dt>
+#errors
+eof in body
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         <listing>
+|           <dt>
+
+#data
 <!DOCTYPE HTML><dl><dt><dl><dt>
 #errors
 eof in body
@@ -9393,6 +9421,20 @@ unexpected EOF
 |         "a"
 
 #data
+<span><listing></span>a
+#errors
+no DOCTYPE
+unmatched end tag
+unexpected EOF
+#document
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <listing>
+|         "a"
+
+#data
 <span><section></span>a
 #errors
 no DOCTYPE
@@ -9722,3 +9764,920 @@ element not closed before ancestor's end tag
 |     <span>
 |       <event-source>
 |     "a"
+
+#data
+<address><option></address>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <address>
+|       <option>
+|     "x"
+
+#data
+<article><option></article>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <article>
+|       <option>
+|     "x"
+
+#data
+<aside><option></aside>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <aside>
+|       <option>
+|     "x"
+
+#data
+<blockquote><option></blockquote>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <blockquote>
+|       <option>
+|     "x"
+
+#data
+<center><option></center>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <center>
+|       <option>
+|     "x"
+
+#data
+<datagrid><option></datagrid>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <datagrid>
+|       <option>
+|     "x"
+
+#data
+<details><option></details>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <details>
+|       <option>
+|     "x"
+
+#data
+<dialog><option></dialog>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dialog>
+|       <option>
+|     "x"
+
+#data
+<dir><option></dir>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dir>
+|       <option>
+|     "x"
+
+#data
+<div><option></div>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <option>
+|     "x"
+
+#data
+<dl><option></dl>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <option>
+|     "x"
+
+#data
+<fieldset><option></fieldset>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <fieldset>
+|       <option>
+|     "x"
+
+#data
+<figure><option></figure>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <figure>
+|       <option>
+|     "x"
+
+#data
+<footer><option></footer>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <footer>
+|       <option>
+|     "x"
+
+#data
+<header><option></header>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <header>
+|       <option>
+|     "x"
+
+#data
+<listing><option></listing>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <listing>
+|       <option>
+|     "x"
+
+#data
+<menu><option></menu>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <menu>
+|       <option>
+|     "x"
+
+#data
+<nav><option></nav>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <nav>
+|       <option>
+|     "x"
+
+#data
+<ol><option></ol>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <ol>
+|       <option>
+|     "x"
+
+#data
+<pre><option></pre>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <pre>
+|       <option>
+|     "x"
+
+#data
+<section><option></section>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <section>
+|       <option>
+|     "x"
+
+#data
+<ul><option></ul>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <option>
+|     "x"
+
+#data
+<form><option></form>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <option>
+|     "x"
+
+#data
+<p><option></p>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <option>
+|     "x"
+
+#data
+<dd><option></dd>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dd>
+|       <option>
+|     "x"
+
+#data
+<dt><option></dt>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dt>
+|       <option>
+|     "x"
+
+#data
+<li><option></li>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <li>
+|       <option>
+|     "x"
+
+#data
+<h3><option></h3>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <h3>
+|       <option>
+|     "x"
+
+#data
+<address><optgroup></address>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <address>
+|       <optgroup>
+|     "x"
+
+#data
+<article><optgroup></article>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <article>
+|       <optgroup>
+|     "x"
+
+#data
+<aside><optgroup></aside>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <aside>
+|       <optgroup>
+|     "x"
+
+#data
+<blockquote><optgroup></blockquote>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <blockquote>
+|       <optgroup>
+|     "x"
+
+#data
+<center><optgroup></center>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <center>
+|       <optgroup>
+|     "x"
+
+#data
+<datagrid><optgroup></datagrid>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <datagrid>
+|       <optgroup>
+|     "x"
+
+#data
+<details><optgroup></details>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <details>
+|       <optgroup>
+|     "x"
+
+#data
+<dialog><optgroup></dialog>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dialog>
+|       <optgroup>
+|     "x"
+
+#data
+<dir><optgroup></dir>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dir>
+|       <optgroup>
+|     "x"
+
+#data
+<div><optgroup></div>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <optgroup>
+|     "x"
+
+#data
+<dl><optgroup></dl>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <optgroup>
+|     "x"
+
+#data
+<fieldset><optgroup></fieldset>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <fieldset>
+|       <optgroup>
+|     "x"
+
+#data
+<figure><optgroup></figure>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <figure>
+|       <optgroup>
+|     "x"
+
+#data
+<footer><optgroup></footer>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <footer>
+|       <optgroup>
+|     "x"
+
+#data
+<header><optgroup></header>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <header>
+|       <optgroup>
+|     "x"
+
+#data
+<listing><optgroup></listing>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <listing>
+|       <optgroup>
+|     "x"
+
+#data
+<menu><optgroup></menu>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <menu>
+|       <optgroup>
+|     "x"
+
+#data
+<nav><optgroup></nav>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <nav>
+|       <optgroup>
+|     "x"
+
+#data
+<ol><optgroup></ol>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <ol>
+|       <optgroup>
+|     "x"
+
+#data
+<pre><optgroup></pre>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <pre>
+|       <optgroup>
+|     "x"
+
+#data
+<section><optgroup></section>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <section>
+|       <optgroup>
+|     "x"
+
+#data
+<ul><optgroup></ul>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <optgroup>
+|     "x"
+
+#data
+<form><optgroup></form>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <optgroup>
+|     "x"
+
+#data
+<p><optgroup></p>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <optgroup>
+|     "x"
+
+#data
+<dt><optgroup></dt>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dt>
+|       <optgroup>
+|     "x"
+
+#data
+<dd><optgroup></dd>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dd>
+|       <optgroup>
+|     "x"
+
+#data
+<h3><optgroup></h3>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <h3>
+|       <optgroup>
+|     "x"
+
+#data
+<applet><option></applet>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <applet>
+|       <option>
+|     "x"
+
+#data
+<applet><optgroup></applet>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <applet>
+|       <optgroup>
+|     "x"
+
+#data
+<button><option></button>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <button>
+|       <option>
+|     "x"
+
+#data
+<button><optgroup></button>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <button>
+|       <optgroup>
+|     "x"
+
+#data
+<marquee><option></marquee>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <marquee>
+|       <option>
+|     "x"
+
+#data
+<marquee><optgroup></marquee>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <marquee>
+|       <optgroup>
+|     "x"
+
+#data
+<applet><option></applet>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <applet>
+|       <option>
+|     "x"
+
+#data
+<object><optgroup></object>x
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <object>
+|       <optgroup>
+|     "x"
+
+#data
+<ruby><option><rp></ruby>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <option>
+|       <rp>
+
+#data
+<ruby><option><rt></ruby>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <option>
+|       <rt>
+
+#data
+<ruby><optgroup><rp></ruby>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <optgroup>
+|       <rp>
+
+#data
+<ruby><optgroup><rt></ruby>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <optgroup>
+|       <rt>
+
+#data
+<span><option></span>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <option>
+|     "a"
+
+#data
+<span><optgroup></span>a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <optgroup>
+|     "a"
+
+#data
+<table><caption><option></caption></table>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <option>
+
+#data
+<table><caption><optgroup></caption></table>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <optgroup>
+
+#data
+<table><caption><optgroup><option></caption></table>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <optgroup>
+|           <option>
+
+#data
+<table><tr><td><option></td></table>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tr>
+|         <td>
+|           <option>
+
+#data
+<table><tr><td><optgroup></td></table>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tr>
+|         <td>
+|           <optgroup>
+
+#data
+<table><tr><th><option></th></table>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tr>
+|         <th>
+|           <option>
+
+#data
+<table><tr><th><optgroup></th></table>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tr>
+|         <th>
+|           <optgroup>
