@@ -30,6 +30,11 @@ href="#modules-html">HTML, XHTML</a>, <a href="#modules-xml">XML</a>,
 <div class=section id=modules>
 <h2>Modules</h2>
 
+  <p>Note that all of these modules are <em>work in progress</em>
+  and have <a href="#todo">a number of unresolved problems</a>.</p>
+
+  <p>Note also that some modules have no documentation for now.</p>
+
 <div class=section id=modules-html-xml>
 <h3>Modules for HTML and XML</h3>
 
@@ -59,25 +64,30 @@ href="#modules-html">HTML, XHTML</a>, <a href="#modules-xml">XML</a>,
 <p><i>Real</i> XML parser and serializer are currently not available yet.
 
 <p id=modules-cc>The module for conformance checking of a DOM tree (i.e.
-a in-memory representation of a HTML or XML document) is as follows:
+a in-memory representation of an HTML or XML document) is as follows:
 <dl>
+
 <dt><a href="Whatpm/ContentChecker.html"><code>Whatpm::ContentChecker</code></a></dt>
+
   <dd>A DOM5 HTML (in-memory representation of a document) conformance
-  checker with a partial support for Atom 1.0.  (See also
-  <a href="#demo-html-parser">demo</a>.)</dd>
+checker with a partial support for Atom 1.0.  (See also <a
+href="#demo-html-parser">demo</a> and <a
+href="#app-webhacc">application</a>.)
+
 </dl>
 
 <p>Currently, conformance checking of HTML/XHTML and Atom documents
 is supported.
 
 <p>For these modules, a DOM implementation that supports the manakai's
-Perl binding<!-- @@ TODO: ref --> is necessary to represent a document
-in memory.  The <a
+Perl binding<!-- @@ TODO: ref --> of DOM is necessary to represent a
+document in memory.  The <a
 href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>
 package contains such an implementation,
 <code>Message::DOM::Implementation</code><!-- @@ TODO: ref -->, but it
 should also be possible to use any other implementation that supports
 the binding.
+
 </div>
 
 <div class=section id=modules-css>
@@ -87,11 +97,18 @@ the binding.
 <dl>
 <dt><a href="Whatpm/CSS/Cascade.html"><code>Whatpm::CSS::Cascade</code></a>
   <dd>A media-independent implementation of CSS cascading and value
-  computation.  (See also <a href="#demo-css-parser">demo</a>.)
+  computations.  (See also <a href="#demo-css-parser">demo</a>.)
+
 <dt><a href="Whatpm/CSS/MediaQueryParser.pm"><code>Whatpm::CSS::MediaQueryParser</code></a>
-  <dd>A media query parser.
+
+  <dd>A media query parser.  Note that only CSS 2.1 media types are
+supported at the moment.
+
 <dt><a href="Whatpm/CSS/MediaQuerySerializer.pm"><code>Whatpm::CSS::MediaQuerySerializer</code></a>
-  <dd>A media query serializer.
+
+  <dd>A media query serializer.  Note that only CSS 2.1 media types
+are supported at the moment.
+
 <dt><a href="Whatpm/CSS/Parser.html"><code>Whatpm::CSS::Parser</code></a>
   <dd>A CSS parser that constructs CSSOM trees from style sheets.  (See
   also <a href="#demo-css-parser">demo</a>.)
@@ -106,11 +123,13 @@ the binding.
   <dd>A CSS tokenizer.  (See also <a href="#demo-css-parser">demo</a>.)</dd>
 </dl>
 
-<p>For the <code>Whatpm::CSS::Parser</code> module reresents a CSSOM
+<p>For the <code>Whatpm::CSS::Parser</code> module reresenting a CSSOM
 tree, modules in the <a
 href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>
 package are used.  Those modules also provide the serializer for the
-CSSOM tree, as the standard <code>css_text</code> attribute.
+CSSOM tree, in the form of the standard <code>css_text</code> CSSOM
+attribute.
+
 </div>
 
 <div class=section id=modules-http>
@@ -162,6 +181,11 @@ yet available.
     <dd>A language tag parser and conformance checker, supporting both
     older RFC 3066 definition and latest RFC 4646 definition.  (See also
     <a href="#demo-langtag">demo</a>.)
+
+<dt><a href="Whatpm/RDFXML.html"><code>Whatpm::RDFXML</code></a>
+  <dd>An implementation of RDF/XML by which RDF triples can be extracted
+  from RDF/XML documents.
+
 <dt><a href="Whatpm/WebIDL.html"><code>Whatpm::WebIDL</code></a></dt>
   <dd>A WebIDL fragment parser.  It parses an IDL fragment, whether conforming
   or not, and constructs a DOM-like object model for further processing.
@@ -170,11 +194,6 @@ yet available.
   <code>;</code> character.
 </dl>
 </div>
-
-  <p>Note that all of these modules are <em>work in progress</em>
-  and have <a href="#todo">a number of unresolved problems</a>.</p>
-
-  <p>Note also that some modules have no documentation for now.</p>
 
 <!-- Whatpm::ContentChecker::*, Whatpm::H2H, Whatpm::NanoDOM, and
      Whatpm::XMLParser are intentionally omitted from the list. -->
@@ -190,6 +209,16 @@ href="#modules">list of modules above</a>.
 
 <p>In addition, there are additional documents for some topics:
 <dl>
+
+<dt><a href="http://suika.fam.cx/gate/2007/html/standards">Standards
+supported by WebHACC</a>
+
+  <dd>List and description of Web standards supported by the WebHACC
+conformance checker.  Although it is a documentation for the WebHACC,
+it is also applicable to Whatpm in general (note that WebHACC is an
+interactive user interface for the conformance checking feature
+provided by Whatpm).
+
 <dt><a href="http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types">List of error types</a></dt>
 <!-- @@ TODO: Need to update the link - the document above is out of date -->
   <dd>Description of errors to be notified to callback functions by Whatpm
@@ -219,7 +248,7 @@ Specification</a></dt>
 
 <dt><a href="http://suika.fam.cx/gate/2005/sw/manakai/CSS%20Extensions">manakai's
 CSS extensions</a>
-  <dd>The specification for <code>-manakai<var>*</var></code> properties
+  <dd>The specification for <code>-manakai-<var>*</var></code> properties
   and property values implemented by CSS-related modules.
 <dt id=spec-manakai-selectors"><a href="http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions">manakai's
 Selectors extensions</a>
@@ -231,7 +260,7 @@ Selectors extensions</a>
 <div class="section" id="demo">
 <h2>Demo</h2>
 
-<ul>
+<ul id=demo-html-parser>
 <li id=demo-html-parser-nanodom><a href="http://suika.fam.cx/gate/2007/html/parser-interface">HTML5 parser 
 and checker demo</a>
 (<a href="http://suika.fam.cx/gate/cvs/*checkout*/webroot/gate/2007/html/parser.cgi">source</a>, 
@@ -258,8 +287,13 @@ tag parsing and conformance checking demo</a>
 <h2>Application</h2>
 
 <ul>
-<li><a href="http://suika.fam.cx/gate/2007/html/cc/"><abbr>WebHACC</abbr> 
-(Web hypertext application conformance checker)</a>
+
+<li id=app-webhacc><a
+href="http://suika.fam.cx/gate/2007/html/cc/"><abbr>WebHACC</abbr>
+(Web hypertext application conformance checker)</a> (See also <a
+href="http://suika.fam.cx/gate/2007/html/cc-about"><cite>about
+WebHACC</cite></a>)
+
 </ul>
 </div>
 
@@ -304,7 +338,7 @@ tag parsing and conformance checking demo</a>
   <dd><em>Testing</em> for module <code>Whatpm::ContentChecker</code>
   depends on <code>Message::DOM::DOMImplementation</code> and related modules
   in <a href="http://suika.fam.cx/www/2006/manakai/">manakai-core</a>.
-  They are not required in practice.</dd>
+  They are not required for any practical use of those modules.
     </dl>
   </dd>
 <dt><a href="http://suika.fam.cx/www/manakai-charlib/readme">manakai 
@@ -327,7 +361,7 @@ Detector</a></dt>
   <dd><em>Testing</em> for modules <code>Whatpm::HTML</code> and
   <code>Whatpm::CSS::Tokenizer</code>
   depends on <a href="http://search.cpan.org/~makamaka/JSON-1.14/"><code>JSON</code> and related modules</a>.
-  They are not required in practice.</dd>
+  They are not required for any practical use of those modules.
 </dl>
 </div>
 
@@ -357,7 +391,7 @@ tarball.
       code tree.
   <li>Charset detection.</li>
   <li>Validation for <code>meta</code>.</li>
-  <li>Validation for media queries, IRIs (against URI schemes), language tags,
+  <li>Validation for media queries (level 3), IRIs (against URI schemes),
     and so on.</li>
   <li>Documentations are missing for some features.</li>
   <li>XML parser<!-- with application cache selection algorithm hook-->.</li>

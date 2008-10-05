@@ -84,21 +84,21 @@ The C<Whatpm::Charset::UniversalCharDet> module does not raise
 error even when it fails to load the universalchardet library;
 it simply C<warn>s the error message.
 
-This behavior can be changed by setting a true value to the 
-flag C<$Whatpm::Charset::UniversalCharDet> - it will make any
-error C<die> rather than C<warn>.
+This behavior can be changed by setting a true value to the flag
+C<$Whatpm::Charset::UniversalCharDet::DEBUG> - it will make any error
+invoke C<die> instead of C<warn>.
 
-Common error messages are following:
+Common error messages are as follows:
 
 =over 4
 
-=item Can't locate Inlinea.pm in @INC
+=item Can't locate Inline.pm in @INC
 
-L<Inline> is not installed.
+Module L<Inline> is not installed.
 
 =item Error. You have specified 'Python' as an Inline programming language.
 
-L<Inline::Python> is not installed.
+Module L<Inline::Python> is not installed.
 
 =item Couldn't find an appropriate DIRECTORY for Inline to use.
 
@@ -129,11 +129,11 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/11/19 12:18:27 $
+## $Date: 2008/10/05 06:42:04 $

@@ -1,16 +1,20 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet
 Character Encoding Detection</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:wakaba@suika.fam.cx" />
 </head>
 
 <body>
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -24,9 +28,11 @@ Character Encoding Detection</title>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
@@ -58,43 +64,44 @@ port of the universalchardet.</p>
 <hr />
 <h1><a name="method">METHOD</a></h1>
 <dl>
-<dt><strong><a name="item_detect_byte_string"><em>$charset</em> = Whatpm::Charset::UniversalCharDet-&gt;detect_byte_string (<em>$s</em>)</a></strong><br />
-</dt>
+<dt><strong><a name="detect_byte_string" class="item"><em>$charset</em> = Whatpm::Charset::UniversalCharDet-&gt;detect_byte_string (<em>$s</em>)</a></strong>
+
 <dd>
-Detect the character encoding of the specified byte string.
+<p>Detect the character encoding of the specified byte string.</p>
 </dd>
 <dl>
-<dt><strong><a name="item__24s"><em>$s</em></a></strong><br />
-</dt>
+<dt><strong><a name="_s" class="item"><em>$s</em></a></strong>
+
 <dd>
-The byte string.
+<p>The byte string.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item__24charset"><em>$charset</em></a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="_charset" class="item"><em>$charset</em></a></strong>
+
 <dd>
-The name of the character encoding, detected by universalchardet,
+<p>The name of the character encoding, detected by universalchardet,
 in lowercase.
 If no character encoding can be detected, because, e.g., no implementation
-for universalchardet is found, <code>undef</code> is returned.
+for universalchardet is found, <code>undef</code> is returned.</p>
 </dd>
 <dd>
 <p>For the list of supported encodings, see documentation for
 Universal Encoding Detector
 &lt;http://chardet.feedparser.org/docs/supported-encodings.html&gt;.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 </dl>
 <p>
 </p>
 <hr />
 <h1><a name="dependency">DEPENDENCY</a></h1>
 <dl>
-<dt><strong><a name="item_inline_3a_3apython"><a href="../../Inline/Python.html">the Inline::Python manpage</a></a></strong><br />
-</dt>
+<dt><strong><a name="inline_python" class="item"><a href="../../Inline/Python.html">the Inline::Python manpage</a></a></strong>
+
 <dd>
-A Perl module available at CPAN
-&lt;http://search.cpan.org/~neilw/Inline-Python-0.22/&gt;.
+<p>A Perl module available at CPAN
+&lt;http://search.cpan.org/~neilw/Inline-Python-0.22/&gt;.</p>
 </dd>
 <dd>
 <p>To install the module using <em>CPAN.pm</em>:</p>
@@ -104,23 +111,24 @@ A Perl module available at CPAN
   root# perl -MCPAN -eshell
   cpan&gt; install Inline::Python</pre>
 </dd>
-<p></p>
-<dt><strong><a name="item_python">Python</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="python" class="item">Python</a></strong>
+
 <dd>
-Available at &lt;http://www.python.org/download/&gt;.
+<p>Available at &lt;http://www.python.org/download/&gt;.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_universal_encoding_detector">Universal Encoding Detector</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="universal_encoding_detector" class="item">Universal Encoding Detector</a></strong>
+
 <dd>
-Available at &lt;http://chardet.feedparser.org/download/&gt;.
+<p>Available at &lt;http://chardet.feedparser.org/download/&gt;.</p>
 </dd>
 <dd>
 <p>Expand the archive and then execute <code>python setup.py install</code>
 in the expanded directory.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
@@ -128,37 +136,38 @@ in the expanded directory.</p>
 <p>The <code>Whatpm::Charset::UniversalCharDet</code> module does not raise
 error even when it fails to load the universalchardet library;
 it simply <code>warn</code>s the error message.</p>
-<p>This behavior can be changed by setting a true value to the 
-flag <code>$Whatpm::Charset::UniversalCharDet</code> - it will make any
-error <code>die</code> rather than <code>warn</code>.</p>
-<p>Common error messages are following:</p>
+<p>This behavior can be changed by setting a true value to the flag
+<code>$Whatpm::Charset::UniversalCharDet::DEBUG</code> - it will make any error
+invoke <code>die</code> instead of <code>warn</code>.</p>
+<p>Common error messages are as follows:</p>
 <dl>
-<dt><strong><a name="item_can_27t_locate_inlinea_2epm_in__40inc">Can't locate Inlinea.pm in @INC</a></strong><br />
-</dt>
+<dt><strong><a name="can_t_locate_inline_pm_in_inc" class="item">Can't locate Inline.pm in @INC</a></strong>
+
 <dd>
-<em>Inline</em> is not installed.
+<p>Module <em>Inline</em> is not installed.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_error_2e_you_have_specified__27python_27_as_an_inl">Error. You have specified 'Python' as an Inline programming language.</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="error_you_have_specified_python_as_an_inline_programming_language" class="item">Error. You have specified 'Python' as an Inline programming language.</a></strong>
+
 <dd>
-<a href="../../Inline/Python.html">the Inline::Python manpage</a> is not installed.
+<p>Module <a href="../../Inline/Python.html">the Inline::Python manpage</a> is not installed.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_couldn_27t_find_an_appropriate_directory_for_inlin">Couldn't find an appropriate DIRECTORY for Inline to use.</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="couldn_t_find_an_appropriate_directory_for_inline_to_use" class="item">Couldn't find an appropriate DIRECTORY for Inline to use.</a></strong>
+
 <dd>
-The temporary directory for the <em>Inline</em> module is not available.
+<p>The temporary directory for the <em>Inline</em> module is not available.
 See <a href="../../Inline/Python.html#the_inline_directory">The Inline DIRECTORY in the Inline::Python manpage</a> or
-&lt;http://search.cpan.org/~ingy/Inline-0.44/Inline.pod#The_Inline_DIRECTORY&gt;.
+&lt;http://search.cpan.org/~ingy/Inline-0.44/Inline.pod#The_Inline_DIRECTORY&gt;.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_error__2d_2d_py_eval_raised_an_exception">Error -- py_eval raised an exception</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="error_py_eval_raised_an_exception" class="item">Error -- py_eval raised an exception</a></strong>
+
 <dd>
-Universal Encoding Detector is not installed.
+<p>Universal Encoding Detector is not installed.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 <p>
 </p>
 <hr />
@@ -178,7 +187,7 @@ Universal Encoding Detector is not installed.
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>Copyright 2007-2008 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
 <p>This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.</p>
 
