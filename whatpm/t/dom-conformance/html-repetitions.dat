@@ -1,0 +1,343 @@
+
+#data
+<p repeat="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<p repeat="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="00001" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="-1" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="-00001" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="-1255" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template  " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<p repeat="templatE" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<p repeat="  template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<p repeat="0.000" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<p repeat=".12" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<p repeat="120 " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<p repeat="+21434" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<p repeat="template-text" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat;repeat:syntax error;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p repeat="1" repeat-template="t">x</p>
+<p id="t" repeat="template">x</p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p id="t" repeat="template">x</p>
+<p repeat="1" repeat-template="t">x</p>
+</div>
+#errors
+
+#data
+<p repeate="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeate;attribute not defined;m
+
+#data
+<p repet="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repet;attribute not defined;m
+
+#data
+<p repea="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repea;attribute not defined;m
+
+#data
+<input type="add" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<button type="add" xmlns="http://www.w3.org/1999/xhtml">x</button>
+#errors
+
+#data
+<input type="remove" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<input type="delete" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@type;enumerated:invalid;m
+
+#data
+<button type="remove" xmlns="http://www.w3.org/1999/xhtml">x</button>
+#errors
+
+#data
+<button type="delete" xmlns="http://www.w3.org/1999/xhtml">x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<input type="move-up" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<button type="move-up" xmlns="http://www.w3.org/1999/xhtml">x</button>
+#errors
+
+#data
+<input type="move-down" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<button type="move-down" xmlns="http://www.w3.org/1999/xhtml">x</button>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="add" template="t"/>
+<p repeat="template" id="t">x</p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<button type="add" template="t">x</button>
+<p repeat="template" id="t">x</p>
+</div>
+#errors
+
+#data
+<p repeat="template" repeat-min="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-min;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-min="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-min="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-min="01" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-min="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-min;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-min="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-min;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-min="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-min;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-min="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-min;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-min="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-min;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-max="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-max="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-max="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-max="01" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-max="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-max="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-max="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-max="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-max="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-max;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-start="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-start="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-start="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-start="01" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<p repeat="template" repeat-start="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-start="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-start="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-start="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error;m
+
+#data
+<p repeat="template" repeat-start="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@repeat-start;nninteger:syntax error;m
+
+#data
+<x html:repeat="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/x;unknown element;u
+/x/@repeat;repeat:syntax error;m
+
+#data
+<x html:repeat-start="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/x;unknown element;u
+/x/@repeat-start;nninteger:syntax error;m
+
+#data
+<x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/x;unknown element;u
+/x/@repeat-min;nninteger:syntax error;m
+
+#data
+<x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/x;unknown element;u
+/x/@repeat-max;nninteger:syntax error;m
+
+#data
+<x html:repeat-template="x" xmlns:html="http://www.w3.org/1999/xhtml"><p repeat="template" id="x" xmlns="http://www.w3.org/1999/xhtml">x</p></x>
+#errors
+/x;unknown element;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat="template">x</p>
+#errors
+/p/@repeat;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat-min="1" repeat="template">x</p>
+#errors
+/p/@repeat-min;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat-max="5" repeat="template">x</p>
+#errors
+/p/@repeat-max;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat-start="0" repeat="template">x</p>
+#errors
+/p/@repeat-start;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+    html:repeat-template="t"><q repeat="template" id="t">x</q></p>
+#errors
+/p/@repeat-template;attribute not allowed;m

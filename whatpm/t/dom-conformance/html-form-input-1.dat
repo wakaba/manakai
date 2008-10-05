@@ -1,0 +1,68 @@
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"></input>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml">  </input>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"><!-- --></input>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml">xx</input>
+#errors
+/input/"xx";character not allowed:empty;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"><p/></input>
+#errors
+/input/p;element not allowed:empty;m
+/input/p;no significant content;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"><div>x</div></input>
+#errors
+/input/div;element not allowed:empty;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"><input/></input>
+#errors
+/input/input;element not allowed:empty;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"><nest/></input>
+#errors
+/input/nest;element not allowed:empty;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><input/></em>
+#errors
+/em;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><input/></div>
+#errors
+/div;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><input/></p>
+#errors
+/p;no significant content;s
+
+#data
+<title xmlns="http://www.w3.org/1999/xhtml"><input/></title>
+#errors
+/title/input;element not allowed:text;m
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><input/></br>
+#errors
+/br/input;element not allowed:empty;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"><input/></ins>
+#errors
+/ins;no significant content;s

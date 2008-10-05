@@ -1,0 +1,1134 @@
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"></form>
+#errors
+/form;no significant content;s
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml">   </form>
+#errors
+/form;no significant content;s
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><p></p></form>
+#errors
+/form;no significant content;s
+/form/p;no significant content;s
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><em></em></form>
+#errors
+/form;no significant content;s
+/form/em;no significant content;s
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><img src="" alt="x"/></form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><br/></form>
+#errors
+/form;no significant content;s
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><p>xx</p>yy</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml">yyy<em>ccc</em></form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><ins>xx</ins></form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><ins>xx</ins></form>
+#errors
+/form/style;SUBDOC
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml">xx<style scoped=""/>yy</form>
+#errors
+/form/style;SUBDOC
+/form/style;element not allowed:flow style;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><style scoped=""/>xx</form>
+#errors
+/form/style;SUBDOC
+/form/style;SUBDOC
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><style/><style scoped=""/>xx</form>
+#errors
+/form/style;SUBDOC
+/form/style;SUBDOC
+/form/style;element not allowed:flow style;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><nest/></form>
+#errors
+/form/nest;element not allowed:flow;m
+/form;no significant content;s
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>
+#errors
+/form;no significant content;s
+/form/meta;element not allowed:flow;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><form/></form>
+#errors
+/form;no significant content;s
+/form/form;element not allowed:minus;m
+/form/form;no significant content;s
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><div><form/></div></form>
+#errors
+/form;no significant content;s
+/form/div/form;element not allowed:minus;m
+/form/div;no significant content;s
+/form/div/form;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><form/></div>
+#errors
+/div;no significant content;s
+/div/form;no significant content;s
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><form/></em>
+#errors
+/em;no significant content;s
+/em/form;no significant content;s
+/em/form;element not allowed:phrasing;m
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><form/></br>
+#errors
+/br/form;no significant content;s
+/br/form;element not allowed:empty;m
+
+#data
+<title xmlns="http://www.w3.org/1999/xhtml"><form/></title>
+#errors
+/title/form;element not allowed:text;m
+/title/form;no significant content;s
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"></fieldset>
+#errors
+/fieldset;no significant content;s
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">  </fieldset>
+#errors
+/fieldset;no significant content;s
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">x</fieldset>
+#errors
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><p>x</p></fieldset>
+#errors
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><em>x</em></fieldset>
+#errors
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><ins>x</ins></fieldset>
+#errors
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</fieldset>
+#errors
+/fieldset;child element missing;legend;m
+/fieldset/style;SUBDOC
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend>x</fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend></fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend></legend></fieldset>
+#errors
+/fieldset;no significant content;s
+/fieldset/legend;no significant content;s
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend><p>x</p></fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend><span>x</span></fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><ins><legend>y</legend>x</ins></fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><del><legend>y</legend></del><ins><legend>z</legend></ins>x</fieldset>
+#errors
+/fieldset/ins/legend;element not allowed:details legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><lengend>y</lengend>x</fieldset>
+#errors
+/fieldset/lengend;element not allowed:flow;m
+/fieldset/lengend;element not defined;m
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><legned>y</legned>x</fieldset>
+#errors
+/fieldset/legned;element not allowed:flow;m
+/fieldset/legned;element not defined;m
+/fieldset;child element missing;legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">x<legend>y</legend></fieldset>
+#errors
+/fieldset/legend;element not allowed:details legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">x<legend>y</legend>z</fieldset>
+#errors
+/fieldset/legend;element not allowed:details legend;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style><legend>y</legend>x</fieldset>
+#errors
+/fieldset/legend;element not allowed:details legend;m
+/fieldset/style;SUBDOC
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"></button>
+#errors
+/button;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">  </button>
+#errors
+/button;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">xx</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><br/></button>
+#errors
+/button;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><ins/></button>
+#errors
+/button;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><em/></button>
+#errors
+/button;no significant content;s
+/button/em;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">aa<span>bb</span></button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><p/></button>
+#errors
+/button;no significant content;s
+/button/p;no significant content;s
+/button/p;element not allowed:phrasing;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><video src=""/></button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>x</button>
+#errors
+/button/style;element not allowed:phrasing;m
+/button/style;SUBDOC
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><button>x</button></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><button></button></em>
+#errors
+/em/button;no significant content;s
+/em;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><button>x</button></div>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"><button>x</button></ins>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><ins><button>x</button></ins></em>
+#errors
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><button>x</button></br>
+#errors
+/br/button;element not allowed:empty;m
+
+#data
+<title xmlns="http://www.w3.org/1999/xhtml"><button>x</button></title>
+#errors
+/title/button;element not allowed:text;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><button>x<nest/></button></em>
+#errors
+/em/button/nest;element not allowed:phrasing;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"></select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">  </select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">xx</select>
+#errors
+/select/"xx";character not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><p>x</p></select>
+#errors
+/select/p;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><ins>x</ins></select>
+#errors
+/select/ins;element not allowed;m
+/select/ins/"x";character not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><a>aa</a></select>
+#errors
+/select/a;element not allowed;m
+/select/a/"aa";character not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><img src="" alt="x"/></select>
+#errors
+/select/img;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option>x</option></select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option>x</option>y</select>
+#errors
+/select/"y";character not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option>x</option><em>y</em></select>
+#errors
+/select/em;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><nest/></select>
+#errors
+/select/nest;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option/><optgroup/></select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><optgroup/></select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><optgroup/>
+<option/><optgroup/></select>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">  </datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">xxx</datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><p>x</p></datalist>
+#errors
+/datalist/p;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><p>x</p><option/></datalist>
+#errors
+/datalist/p;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><p>x</p>y<option/></datalist>
+#errors
+/datalist/p;element not allowed;m
+/datalist/option;element not allowed:phrasing;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">xx<p>x</p></datalist>
+#errors
+/datalist/p;element not allowed:phrasing;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/><option/></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><optgroup/></datalist>
+#errors
+/datalist/optgroup;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/><optgroup/></datalist>
+#errors
+/datalist/optgroup;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/>xx</datalist>
+#errors
+/datalist/"xx";character not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">  <option/></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">  <option/>xx</datalist>
+#errors
+/datalist/"xx";character not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/><em>?</em></datalist>
+#errors
+/datalist/em;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">aa<option/></datalist>
+#errors
+/datalist/option;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><datalist/></em>
+#errors
+/em;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><datalist/></p>
+#errors
+/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><datalist/></div>
+#errors
+/div;no significant content;s
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"><datalist/></video>
+#errors
+/video;no significant content;s
+
+#data
+<img src="" alt="x" xmlns="http://www.w3.org/1999/xhtml"><datalist/></img>
+#errors
+/img/datalist;element not allowed:empty;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><datalist/></datalist>
+#errors
+/datalist;no significant content;s
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"></optgroup>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml">  </optgroup>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml">xxx</optgroup>
+#errors
+/optgroup/"xxx";character not allowed;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/></optgroup>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/><option/></optgroup>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/>
+<option/></optgroup>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/>x</optgroup>
+#errors
+/optgroup/"x";character not allowed;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/><p/></optgroup>
+#errors
+/optgroup/p;element not allowed;m
+/optgroup/p;no significant content;s
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/><span>x</span></optgroup>
+#errors
+/optgroup/span;element not allowed;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><optgroup/></optgroup>
+#errors
+/optgroup/optgroup;element not allowed;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/><optgroup/></optgroup>
+#errors
+/optgroup/optgroup;element not allowed;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><optgroup/></em>
+#errors
+/em;no significant content;s
+/em/optgroup;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><optgroup/></div>
+#errors
+/div;no significant content;s
+/div/optgroup;element not allowed:flow;m
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><optgroup/></br>
+#errors
+/br/optgroup;element not allowed:empty;m
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"></option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml">  </option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml">xxx</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"><span>xx</span></option>
+#errors
+/option/span;element not allowed:text;m
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml">aa<em>bb</em></option>
+#errors
+/option/em;element not allowed:text;m
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"><option/></option>
+#errors
+/option/option;element not allowed:text;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><option/></em>
+#errors
+/em/option;element not allowed:phrasing;m
+/em;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><option/></div>
+#errors
+/div/option;element not allowed:flow;m
+/div;no significant content;s
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><select/></em>
+#errors
+/em;no significant content;s
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><select><option>x</option></select></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><select>x</select></em>
+#errors
+/em/select/"x";character not allowed;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><select/></div>
+#errors
+/div;no significant content;s
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"><select/></ins>
+#errors
+/ins;no significant content;s
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"></textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml">  </textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml">xxxx</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"><em>a</em></textarea>
+#errors
+/textarea/em;element not allowed:text;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"><title>x</title></textarea>
+#errors
+/textarea/title;element not allowed:text;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml">aa<br/>bb</textarea>
+#errors
+/textarea/br;element not allowed:text;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"><nest/></textarea>
+#errors
+/textarea/nest;element not allowed:text;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><textarea/></em>
+#errors
+/em;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><textarea/></p>
+#errors
+/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><textarea/></div>
+#errors
+/div;no significant content;s
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"></output>
+#errors
+/output;no significant content;s
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml">  </output>
+#errors
+/output;no significant content;s
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml">xx</output>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"><span></span></output>
+#errors
+/output;no significant content;s
+/output/span;no significant content;s
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"><code>x</code>y</output>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"><p>x</p></output>
+#errors
+/output/p;element not allowed:phrasing;m
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"><title>x</title></output>
+#errors
+/output/title;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><output>x</output></em>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"><output>x</output></output>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><output>x</output></div>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"><output>x</output></input>
+#errors
+/input/output;element not allowed:empty;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="   ">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp us-ascii">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x09;us-ascii">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x0a;us-ascii">x</form>
+#errors
+
+#data
+<?xml version="1.1"?>
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x0c;us-ascii">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x0d;us-ascii">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp, us-ascii">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset=" euc-JP ">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset=" eucjp ">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="x-euc-jp">x</form>
+#errors
+/form/@accept-charset;charset:private;w
+/form/@accept-charset;charset:not preferred;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="us-ascii x-euc-jp">x</form>
+#errors
+/form/@accept-charset;charset:private;w
+/form/@accept-charset;charset:not preferred;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="ascii">x</form>
+#errors
+/form/@accept-charset;charset:not preferred;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="iso-2022-jp">x</form>
+#errors
+/form/@accept-charset;charset:not ascii compat;m
+
+#data
+<?xml version="1.1"?>
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x000b;">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+/form/@accept-charset;charset:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="&#x000b;euc-jp">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+/form/@accept-charset;charset:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<form xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="euc-jp&#x000b;us-ascii">x</form>
+#errors
+/form/@accept-charset;charset:not registered;w
+/form/@accept-charset;charset:syntax error;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="">x</form>
+#errors
+/form/@name;empty form name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="">x</form>
+<form name="">y</form>
+</div>
+#errors
+/div/form/@name;empty form name;m
+/div/form/@name;empty form name;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="xxx">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="abc def">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name=" a ">x</form>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="abc">x</form>
+<form name="def">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a">x</form>
+<form name="a ">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a">x</form>
+<form name=" a">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a b">x</form>
+<form name="b">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="abc">x</form>
+<form name="ABC">y</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a">x</form>
+<form name="a">y</form>
+</div>
+#errors
+/div/form/@name;duplicate form name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form name="a">x
+<form name="a">y</form>
+</form>
+</div>
+#errors
+/div/form/form;element not allowed:minus;m
+/div/form/form/@name;duplicate form name;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="a" id="b">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="a" id="a">x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    name="a">x<a name="a">u</a></form>
+#errors
+/form/a/@name;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml" form="a" id="a">x</form>
+#errors
+/form/@form;attribute not defined;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml" form="a">
+<legend>y</legend>
+<form id="a">x</form>
+</fieldset>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">x</form>
+<fieldset form="a"><legend>y</legend>x</fieldset>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<fieldset form="a"><legend>y</legend>x</fieldset>
+<form id="a">x</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<fieldset form="a"><legend>ty</legend>x</fieldset>
+<form xml:id="a">x</form>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="x">
+<fieldset form="x"><legend>y</legend>x</fieldset>
+</form>
+</div>
+#errors
+
+#data
+<fieldset form="x" xmlns="http://www.w3.org/1999/xhtml">
+<legend>y</legend>y</fieldset>
+#errors
+/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">x</form>
+<form id="b">y</form>
+<fieldset form="a b"><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">x</form>
+<fieldset form="a "><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<div id="a">x</div>
+<fieldset form="a"><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<div id="a">b</div>
+<form id="a">x</form>
+<fieldset form="a"><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/form/@id;duplicate ID;m
+/div/fieldset/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">x</form>
+<div id="a">y</div>
+<fieldset form="a"><legend>y</legend>z</fieldset>
+</div>
+#errors
+/div/div/@id;duplicate ID;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset=""/>
+#errors
+/input/@accept-charset;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="x-euc-jp"/>
+#errors
+/input/@accept-charset;attribute not defined;m
+/input/@accept-charset;charset:private;w
+/input/@accept-charset;charset:not preferred;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    accept-charset="us-ascii iso-2022-jp"/>
+#errors
+/input/@accept-charset;attribute not defined;m
+/input/@accept-charset;charset:not ascii compat;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><input form="a"/>x</div>
+#errors
+/div/input/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input form="b"/>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml" form="a">x</button>
+#errors
+/button/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<button form="b">y</button>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" form="a"></select>
+#errors
+/select/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<select form="b"></select>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml" form="a">x</datalist>
+#errors
+/datalist/@form;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<datalist form="b">y</datalist>
+<form id="b">x</form>
+</div>
+#errors
+/div/datalist/@form;attribute not defined;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><optgroup form="a"/></select>
+#errors
+/select/optgroup/@form;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<select><optgroup form="b"/></select>
+<form id="b">x</form>
+</div>
+#errors
+/div/select/optgroup/@form;attribute not defined;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option form="a">x</option></select>
+#errors
+/select/option/@form;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<select><option form="b">y</option></select>
+<form id="b">x</form>
+</div>
+#errors
+/div/select/option/@form;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml" form="a">x</textarea>
+#errors
+/textarea/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<textarea form="b">y</textarea>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml" form="a">x</output>
+#errors
+/output/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<output form="b">y</output>
+<form id="b">x</form>
+</div>
+#errors

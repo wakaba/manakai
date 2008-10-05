@@ -1,0 +1,2312 @@
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"></html>
+#errors
+/html;child element missing;head;m
+/html;child element missing;body;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head></html>
+#errors
+/html;child element missing;body;m
+/html/head;child element missing;title;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><body></body></html>
+#errors
+/html/body;ps element missing;head;m
+/html/body;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><p></p></html>
+#errors
+/html/p;element not allowed;m
+/html;child element missing;head;m
+/html;child element missing;body;m
+/html/p;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">a</html>
+#errors
+/html/"a";character not allowed;m
+/html;child element missing;head;m
+/html;child element missing;body;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"> </html>
+#errors
+/html;child element missing;head;m
+/html;child element missing;body;m
+
+#data
+<?xml version="1.1"?>
+<html xmlns="http://www.w3.org/1999/xhtml"> &#x000b;</html>
+#errors escaped
+/html;child element missing;head;m
+/html;child element missing;body;m
+/html/" \u000b";character not allowed;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>
+#errors
+/html/head;child element missing;title;m
+/html/body;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head>a<body></body></html>
+#errors
+/html/head;child element missing;title;m
+/html/"a";character not allowed;m
+/html/body;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">a<head></head><body></body></html>
+#errors
+/html/"a";character not allowed;m
+/html/head;child element missing;title;m
+/html/body;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body>a</html>
+#errors
+/html/head;child element missing;title;m
+/html/"a";character not allowed;m
+/html/body;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"> <head></head> <body></body> </html>
+#errors
+/html/head;child element missing;title;m
+/html/body;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body><p></p></html>
+#errors
+/html/head;child element missing;title;m
+/html/p;element not allowed;m
+/html/body;no significant content;s
+/html/p;no significant content;s
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+</head>
+#errors
+/head;child element missing;title;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<command/>
+</head>
+#errors
+/head;child element missing;title;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<event-source/>
+</head>
+#errors
+/head;child element missing;title;m
+/head/event-source;element not defined;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<eventsource/>
+</head>
+#errors
+/head;child element missing;title;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="author" href="mailto:a@example.com"/>
+</head>
+#errors
+/head;child element missing;title;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="us-ascii"/>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head;child element missing;title;m
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta name="keywords" content="html5"/>
+</head>
+#errors
+/head;child element missing;title;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<script type="text/javascript"/>
+</head>
+#errors
+/head;child element missing;title;m
+/head/script/@type;IMT:obsolete subtype;w
+/head/script;SUBDOC
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+</head>
+#errors
+/head;child element missing;title;m
+/head/style;SUBDOC
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title></title></head><body></body></html>
+#errors
+/html/body;no significant content;s
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<base href="http://www.w3.org/"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<command/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<command/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<event-source/>
+<title/>
+</head>
+#errors
+/head/event-source;element not defined;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<eventsource/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<event-source/>
+</head>
+#errors
+/head/event-source;element not defined;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<eventsource/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="author" href="mailto:a@example.com"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<link rel="author" href="mailto:a@example.com"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta/>
+<title/>
+</head>
+#errors
+/head/meta;attribute missing:name|http-equiv|charset;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="us-ascii"/>
+<title>x</title>
+</head>
+<body>t</body>
+</html>
+#errors
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>x</title>
+<meta charset="us-ascii"/>
+</head>
+<body>y</body>
+</html>
+#errors
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta name="keywords" content="html5"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<meta name="keywords" content="html5"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<script type="text/javascript"/>
+<title/>
+</head>
+#errors
+/head/script/@type;IMT:obsolete subtype;w
+/head/script;SUBDOC
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<script type="text/javascript"/>
+</head>
+#errors
+/head/script/@type;IMT:obsolete subtype;w
+/head/script;SUBDOC
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+<title/>
+</head>
+#errors
+/head/style;SUBDOC
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<style type="text/css"/>
+</head>
+#errors
+/head/style;SUBDOC
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title></title><title></title></head><body></body></html>
+#errors
+/html/head/title;element not allowed:head title;m
+/html/body;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title></title><p></p></head><body></body></html>
+#errors
+/html/head/p;element not allowed:metadata;m
+/html/head/p;no significant content;s
+/html/body;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="us-ascii"/><base/><title>x</title></head>
+<body>ty</body>
+</html>
+#errors
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/base;attribute missing:href|target;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="us-ascii"/><title>x</title><base/></head>
+<body>y</body></html>
+#errors
+/html/head/base;attribute missing:href|target;m
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>y</title><base/></head><body>ty</body></html>
+#errors
+/html/head/base;attribute missing:href|target;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>x</title><base/><meta charset="us-ascii"/></head><body>x</body></html>
+#errors
+/html/head/base;attribute missing:href|target;m
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="us-ascii"/>
+<title>x</title>
+<base href="http://www.w3.org/"/>
+</head>
+<body>y</body>
+</html>
+#errors
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<base href="http://www.w3.org/"/>
+<meta charset="us-ascii"/>
+<title>x</title>
+</head>
+<body>ty</body>
+</html>
+#errors
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<base href="http://www.w3.org/"/>
+<title>x</title>
+<meta charset="us-ascii"/>
+</head>
+<body>xx</body>
+</html>
+#errors
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+<meta name="keywords" content="html5"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+<title/>
+<meta name="keywords" content="html5"/>
+</head>
+#errors
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="keywords" content="html5"/>
+<meta charset="us-ascii"/>
+<title>xx</title>
+</head>
+<body>xx</body>
+</html>
+#errors
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="us-ascii"/>
+<meta name="keywords" content="html5"/>
+<title>x</title>
+</head>
+<body>xx</body>
+</html>
+#errors
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>a</title>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+</head>
+#errors
+
+#data
+<base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"></base>
+#errors
+
+#data
+<base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"> </base>
+#errors
+
+#data
+<base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml">a</base>
+#errors
+/base/"a";character not allowed:empty;m
+
+#data
+<base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"><p/></base>
+#errors
+/base/p;element not allowed:empty;m
+/base/p;no significant content;s
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href=""/>
+<base href=""/>
+<title>x</title>
+</head>
+#errors
+/head/base;element not allowed:base;m
+/head/base;basehref after URL attribute;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href=""/>
+<base target=""/>
+<title>x</title>
+</head>
+#errors
+/head/base;element not allowed:base;m
+/head/base/@target;window name:empty;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target=""/>
+<base href=""/>
+<title>x</title>
+</head>
+#errors
+/head/base;element not allowed:base;m
+/head/base/@target;window name:empty;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>a</title>
+</head>
+<head>
+<title>b</title>
+<base href=""/>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head;element not allowed;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<base href=""/>
+<title>a</title>
+</head>
+<head>
+<title>b</title>
+<base href=""/>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head;element not allowed;m
+/html/head/base;element not allowed:base;m
+/html/head/base;basehref after URL attribute;m
+
+#data
+<link rel="author" href="mailto:a@example.com"
+    xmlns="http://www.w3.org/1999/xhtml"></link>
+#errors
+
+#data
+<link rel="author" href="mailto:a@example.com"
+    xmlns="http://www.w3.org/1999/xhtml"> </link>
+#errors
+
+#data
+<link rel="author" href="mailto:a@example.com"
+    xmlns="http://www.w3.org/1999/xhtml">a</link>
+#errors
+/link/"a";character not allowed:empty;m
+
+#data
+<link rel="author" href="mailto:a@example.com"
+    xmlns="http://www.w3.org/1999/xhtml"><p/></link>
+#errors
+/link/p;element not allowed:empty;m
+/link/p;no significant content;s
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"></meta>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"> </meta>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">a</meta>
+#errors
+/meta;element not allowed:meta charset;m
+/meta/"a";character not allowed:empty;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"><p/></meta>
+#errors
+/meta;element not allowed:meta charset;m
+/meta/p;element not allowed:empty;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+/meta/p;no significant content;s
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="us-ascii"/>
+<title>x</title>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="us-ascii"/>
+<meta charset="iso-8859-1"/>
+<title>x</title>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head/meta;in XML:charset;m
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>x</title>
+<meta charset="us-ascii"/>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head/meta;in XML:charset;m
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>x</title>
+</head>
+<head>
+<meta charset="us-ascii"/>
+<title>y</title>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head;element not allowed;m
+/html/head/meta;in XML:charset;m
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>x</body>
+<head>
+<meta charset="us-ascii"/>
+<title>y</title>
+</head>
+</html>
+#errors
+/html/body;ps element missing;head;m
+/html/head;element not allowed;m
+/html/head/meta;in XML:charset;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<svg xmlns="http://www.w3.org/2000/svg">
+<foreignObject>
+  <html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="us-ascii"/>
+    <title>xx</title>
+  </head>
+  <body>yy</body>
+  </html>
+</foreignObject>
+</svg>
+#errors
+/svg/foreignObject/html/head/meta;element not allowed:meta charset;m
+/svg/foreignObject/html/head/meta;in XML:charset;m
+/svg/foreignObject/html/head/meta/@charset;mismatched charset name not checked;u
+/svg;unknown element;u
+/svg/foreignObject;unknown element;u
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<link rel="stylesheet" href=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<link rel="alternate" type="text/html" href=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta charset="us-ascii"/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+/head/noscript/meta;element not allowed:head noscript;m
+/head/noscript/meta;element not allowed:meta charset;m
+/head/noscript/meta;in XML:charset;m
+/head/noscript/meta/@charset;mismatched charset name not checked;u
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name not checked;u
+
+#data html
+<!DOCTYPE HTML>
+<title>x</title>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta;element not allowed:meta charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta charset=us-ascii>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta;element not allowed:meta charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<meta charset=us-ascii>
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta;element not allowed:meta charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<meta http-equiv=content-type content="text/html; charset=us-ascii">
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta;element not allowed:meta charset;m
+/html/head/meta/@http-equiv;duplicate http-equiv;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+/head/noscript/meta;element not allowed:head noscript;m
+/head/noscript/meta;attribute missing:name|http-equiv|charset;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta http-equiv="content-style-type" content="text/css"/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+/head/noscript/meta/@http-equiv;enumerated:invalid;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta name="keywords" content=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+/head/noscript/meta;element not allowed:head noscript;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta name="keywords" content="" http-equiv="keywords"/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+/head/noscript/meta/@http-equiv;attribute not allowed;m
+/head/noscript/meta/@http-equiv;enumerated:invalid;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<meta http-equiv="content-type" content="text/html; charset=us-ascii"/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript;m
+/head/noscript/meta;element not allowed:head noscript;m
+/head/noscript/meta;element not allowed:meta charset;m
+/head/noscript/meta;in XML:charset;m
+/head/noscript/meta/@content;mismatched charset name not checked;u
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<style/>
+</noscript>
+</head>
+#errors
+/head/noscript/style;SUBDOC
+/head/noscript;in XML:noscript;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<style scoped=""/>
+</noscript>
+</head>
+#errors
+/head/noscript/style;element not allowed:head noscript;m
+/head/noscript/style;SUBDOC
+/head/noscript;in XML:noscript;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<base href=""/>
+</noscript>
+</head>
+#errors
+/head/noscript/base;element not allowed:head noscript;m
+/head/noscript;in XML:noscript;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<noscript>
+<unknown:unknown xmlns:unknown="about:"/>
+</noscript>
+</head>
+#errors
+/head/noscript/unknown;unknown element;u
+/head/noscript/unknown;element not allowed:head noscript;m
+/head/noscript;in XML:noscript;m
+
+#data
+<style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>
+#errors
+/style;SUBDOC
+
+#data
+<style type="text/css" xmlns="http://www.w3.org/1999/xhtml">
+p {color: green}
+</style>
+#errors
+/style;SUBDOC
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml" version="">
+<head><title>x</title></head>
+<body>y</body>
+</html>
+#errors
+/html/@version;attribute not defined;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml" version="-//W3C//DTD HTML 4.01//EN">
+<head><title>x</title></head>
+<body>y</body>
+</html>
+#errors
+/html/@version;attribute not defined;m
+
+#data
+<head profile="" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+
+#data
+<head profile="http://www.test/" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+
+#data
+<head profile="http://www.test/ http://www.test/2" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+
+#data
+<head profile="[]" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+/head/@profile;syntax error:iriref3987;m
+
+#data
+<base xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base;attribute missing:href|target;m
+
+#data
+<base title="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base;attribute missing:href|target;m
+
+#data
+<base href="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@href;syntax error:iriref3987;m
+
+#data
+<base href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base href="test" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base href="http://test/#a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base href="http://test/" target="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:empty;m
+
+#data
+<base target="_" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:reserved;m
+
+#data
+<base target="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_Self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_parent" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_main" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:reserved;m
+
+#data
+<base target="_content" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:reserved;m
+
+#data
+<base target="_unknown" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;window name:reserved;m
+
+#data
+<base target="blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" href=""/>
+<base href=""/>
+<title/>
+</head>
+#errors
+/head/base;basehref after URL attribute;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href=""/>
+<link rel="stylesheet" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target="_self"/>
+<link rel="stylesheet" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" href=""/>
+<base target="_self" href=""/>
+<title/>
+</head>
+#errors
+/head/base;basehref after URL attribute;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target="_self" href=""/>
+<link rel="stylesheet" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="up" href=""/>
+<base href=""/>
+<title/>
+</head>
+#errors
+/head/base;basehref after URL attribute;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href=""/>
+<link rel="up" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="up" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;basetarget after hyperlink;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target="_self"/>
+<link rel="up" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="up" href=""/>
+<base target="_self" href=""/>
+<title/>
+</head>
+#errors
+/head/base;basehref after URL attribute;m
+/head/base;basetarget after hyperlink;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target="_self" href=""/>
+<link rel="up" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="alternate stylesheet" href="" title="x"/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet alternate" href="" title="x"/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="alternate stylesheet stylesheet" href="" title="x"/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/link/@rel;duplicate token;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="alternate" type="application/atom+xml" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;basetarget after hyperlink;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="alternate up stylesheet" href="" title="x"/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;basetarget after hyperlink;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="up stylesheet" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;basetarget after hyperlink;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<a href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/a;element not allowed:metadata;m
+/head/base;basetarget after hyperlink;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/area;element not allowed:metadata;m
+/head/base;basetarget after hyperlink;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt=""/>
+<base href=""/>
+<title/>
+</head>
+#errors
+/head/area;element not allowed:metadata;m
+/head/base;basehref after URL attribute;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<video src=""/>
+<base href=""/>
+<title/>
+</head>
+#errors
+/head/video;element not allowed:metadata;m
+/head/base;basehref after URL attribute;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<base href=""/>
+<title/>
+</head>
+<body>
+<p><a href="">x</a></p>
+</body>
+</html>
+#errors
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;href;m
+/link;attribute missing;rel;m
+
+#data
+<link href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;rel;m
+
+#data
+<link rel="author" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;href;m
+
+#data
+<link rel="stylesheet" href="http://www.test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet" href="://www.test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@href;syntax error:iriref3987;m
+
+#data
+<link rel="stylesheet" href="http://www.test/" type=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@type;IMT:syntax error;m
+
+#data
+<link rel="stylesheet" href="http://www.test/" type="text"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@type;IMT:syntax error;m
+
+#data
+<link rel="stylesheet" href="http://www.test/" type="text/css"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet" href="http://www.test/" type="TexT/CsS"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet" href="http://www.test/" type="TEXT/CSS"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet" href="http://www.test/" type="text/css; charset=utf-8"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="author" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="author author" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;duplicate token;m
+
+#data
+<link rel="bookmark" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:bad context;m
+
+#data
+<link rel="previous" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:non-conforming;m
+
+#data
+<link rel="edit" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:proposed;s
+
+#data
+<link rel="contact" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:proposed;s
+
+#data
+<link rel="script" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:non-conforming;m
+
+#data
+<link rel="example-link-type" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<link rel="stylesheet&#x000b;" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<link rel="&#x000b;stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<link rel="alternate&#x000b;stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<link rel="alternate" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="alternate" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="alternate stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;title;m
+
+#data
+<link rel="alternate stylesheet" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@title;empty style sheet title;m
+
+#data
+<link rel="alternate stylesheet" href="http://test/" title="xxxxx"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="stylesheet alternate" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;title;m
+
+#data
+<link rel="stylesheet alternate" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@title;empty style sheet title;m
+
+#data
+<link rel="stylesheet alternate" href="http://test/" title="x"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="alternate up stylesheet" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;title;m
+
+#data
+<link rel="alternate up stylesheet" href="http://test/" title=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@title;empty style sheet title;m
+
+#data
+<link rel="alternate up stylesheet" href="http://test/" title="xxxxx"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="author" href="http://test/" hreflang=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@hreflang;langtag:language:nosemantics;m
+
+#data
+<link rel="author" href="http://test/" hreflang="en"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link media="all"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing;href;m
+/link;attribute missing;rel;m
+/link/@media;media query;u
+
+#data
+<link rel="author" href="http://test/" media="all"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@media;media query;u
+
+#data
+<link href="http://test/" rel="author" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <link rel="pingback" href="a"/>
+  <link rel="pingback" href="b"/>
+  <title>x</title>
+</head>
+#errors
+/head/link/@rel;link type:duplicate;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <link rel="pingback" href="a"/>
+  <link rel="pingback feed" href="b"/>
+  <title>x</title>
+</head>
+#errors
+/head/link/@rel;link type:duplicate;m
+
+#data
+<link rel="alternate" href="" target="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+/link/@target;window name:empty;m
+
+#data
+<link rel="alternate" href="" target="_" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+/link/@target;window name:reserved;m
+
+#data
+<link rel="alternate" href="" target="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+
+#data
+<link rel="alternate" href="" target="_blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+
+#data
+<link rel="alternate" href="" target="_b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not defined;m
+/link/@target;window name:reserved;m
+
+#data
+<link href="" rev=" " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rev;attribute not defined;m
+/link;attribute missing;rel;m
+
+#data
+<link href="" rev="made" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rev;attribute not defined;m
+/link;attribute missing;rel;m
+
+#data
+<link href="" rev="made made" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rev;attribute not defined;m
+/link/@rev;duplicate token;m
+/link;attribute missing;rel;m
+
+#data
+<link href="" rel="alternate"
+    charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+
+#data
+<link href="" rel="alternate"
+    charset="x-sjis" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:not preferred;m
+/link/@charset;charset:private;w
+
+#data
+<link href="" rel="alternate"
+    charset="not-registered" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:not registered;w
+
+#data
+<link href="" rel="alternate"
+    charset="Shift JIS" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:not registered;w
+
+#data
+<link href="" rel="alternate"
+    charset="Shift&#x4e00;JIS" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:syntax error;m
+/link/@charset;charset:not registered;w
+
+#data
+<link href="" rel="alternate"
+    charset="ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@charset;attribute not defined;m
+/link/@charset;charset:not preferred;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes=""/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="    "/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="any"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="1x1"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="100x100 32x31"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="any 100x200"/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="   16x16 "/>
+#errors
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="ANY"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="32X32"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="any any"/>
+#errors
+/link/@sizes;duplicate token;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="16x16 16x16"/>
+#errors
+/link/@sizes;duplicate token;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="032x032"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="32x32&#x0b;"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="&#x0b;32x32"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="32x32&#x0b;44x44"/>
+#errors
+/link/@sizes;sizes:syntax error;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    size=""/>
+#errors
+/link/@size;attribute not defined;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    height="16" width="16"/>
+#errors
+/link/@height;attribute not defined;m
+/link/@width;attribute not defined;m
+
+#data
+<link rel="shortcut icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes=""/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<link rel="alternate" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes=""/>
+#errors
+/link/@sizes;attribute not allowed;m
+
+#data
+<a rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="">x</a>
+#errors
+/a/@rel;link type:bad context;m
+/a/@sizes;attribute not defined;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml">
+  <!-- TODO: <meta> tests are not complete -->
+</meta>
+#errors
+/meta;attribute missing:name|http-equiv|charset;m
+
+#data
+<meta name="dns" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;attribute missing;content;m
+
+#data
+<meta name="dns" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta charset="us-ascii" name="dns" content="example.net"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta/@charset;attribute not allowed;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+
+#data
+<meta http-equiv="refresh" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;attribute missing;content;m
+
+#data
+<meta http-equiv="refresh" content="10; url=a.html"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta http-equiv="refresh" content="10; url=a.html" name="dns"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@http-equiv;attribute not allowed;m
+
+#data
+<meta http-equiv="refresh" content="10; url=a.html" charset="us-ascii"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;attribute not allowed;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+/meta;element not allowed:meta charset;m
+
+#data
+<meta http-equiv="" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@http-equiv;enumerated:invalid;m
+
+#data
+<meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;attribute not allowed;m
+/meta;attribute missing:name|http-equiv;m
+
+#data
+<meta charset="us-ascii" content="example.net"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta/@content;attribute not allowed;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+
+#data
+<meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;attribute not allowed;m
+/meta;attribute missing:name|http-equiv;m
+
+#data html
+<!DOCTYPE HTML><html><head><meta charset="us-ascii"><title>x</title></head><body><p>x
+#errors
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<meta charset="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:syntax error;m
+/meta/@charset;charset:not registered;w
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+
+#data
+<meta charset="US-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+
+#data
+<meta charset="csiso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+
+#data
+<meta charset="iso2022jp" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+/meta/@charset;charset:not registered;w
+
+#data
+<meta charset="x-utf-8" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+/meta/@charset;charset:private;w
+
+#data
+<meta charset="utf-8n" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+/meta/@charset;charset:not registered;w
+
+#data
+<meta charset="x-sjis" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@charset;mismatched charset name not checked;u
+/meta/@charset;charset:not preferred;m
+/meta/@charset;charset:private;w
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-ascii">
+<title>x</title>
+<body><p>b</p></body>
+#errors
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&#x41;scii">
+<title>x</title>
+<body><p>x</p></body>
+#errors
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charref in charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&#x61;scii">
+<title>x</title>
+<body><p>x</p></body>
+#errors
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charref in charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&#97;scii">
+<title>x</title>
+<body><p>x</p></body>
+#errors
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charref in charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&scii">
+<title>x</title>
+<body><p>x</p></body>
+#errors
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charset:not registered;w
+
+#data html
+<!DOCTYPE HTML>
+<meta charset="us-&amp;scii">
+<title>x</title>
+<body><p>x</p></body>
+#errors
+/html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@charset;charset:not registered;w
+/html/head/meta/@charset;charref in charset;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    />
+#errors
+/meta;element not allowed:meta charset;m
+/meta;attribute missing;content;m
+/meta;in XML:charset;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content=""/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="html"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html;charset"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/HTML; charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;mismatched charset name not checked;u
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html;  charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;mismatched charset name not checked;u
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html ; charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html;&#x09;charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;mismatched charset name not checked;u
+
+#data
+<?xml version="1.1"?>
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html;&#x0b;charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content=" text/html; charset=us-ascii"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;meta content-type syntax error;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html; charset=&quot;us-ascii&quot;"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;charset:not registered;w
+/meta/@content;mismatched charset name not checked;u
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html; charset=x-sjis"/>
+#errors
+/meta;element not allowed:meta charset;m
+/meta;in XML:charset;m
+/meta/@content;mismatched charset name not checked;u
+/meta/@content;charset:not preferred;m
+/meta/@content;charset:private;w
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=Content-Type content=text/html;charset=us-&#x61;scii>
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@content;charref in charset;m
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=Content-Type content=text/html; charset=us-ascii>
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@charset;attribute not allowed;m
+/html/head/meta/@content;meta content-type syntax error;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data html
+<!DOCTYPE HTML>
+<meta http-equiv=Content-Type content="text/html;charset=us-ascii">
+<meta http-equiv=Content-Type content="text/html;charset=us-ascii">
+<title>x</title>
+<body>y</body>
+#errors
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@content;mismatched charset name not checked;u
+/html/head/meta/@http-equiv;duplicate http-equiv;m
+/html/head/meta;element not allowed:meta charset;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<link rel="stylesheet" href="" title="style1"/>		
+<link rel="stylesheet" href="" title="style2"/>		
+<meta http-equiv="Default-Style" content="style1"/>
+<meta http-equiv="default-style" content="style2"/>
+</head>
+#errors
+/head/meta/@http-equiv;duplicate http-equiv;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="13"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="0"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="000000013"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="+12"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="12.0"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="12 "/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="  12"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="44;url=http://www.example.com/"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="44;&#x0b;url=http://www.example.com/"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content=" 45; url=aaa"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="0 ; url=bb"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url = aa"/>
+</head>
+#errors
+/head/meta/@content;refresh:syntax error;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="5; url=http://www.example.com/"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url= http://test/"/>
+</head>
+#errors
+/head/meta/@content;syntax error:iriref3987;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url=[a]"/>
+</head>
+#errors
+/head/meta/@content;syntax error:iriref3987;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url=&quot;http://&quot;"/>
+</head>
+#errors
+/head/meta/@content;syntax error:iriref3987;m
+/head/meta/@content;URL:empty path;w
+/head/meta/@content;URL:non-DNS host;w
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url=http://www.example.com/"/>
+<meta http-equiv="Refresh" content="4; url=http://www.example.com/"/>
+</head>
+#errors
+/head/meta/@http-equiv;duplicate http-equiv;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<meta http-equiv="Refresh" content="4; url=http://www.example.com/"/>
+<base href=""/>
+</head>
+#errors
+/head/base;basehref after URL attribute;m
+
+#data
+<style type="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/style/@type;IMT:syntax error;m
+
+#data
+<style type="text" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/style/@type;IMT:syntax error;m
+
+#data
+<style type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/style;SUBDOC
+
+#data
+<style type="Text/CSS" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/style;SUBDOC
+
+#data
+<style type="TEXT/CSS" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/style;SUBDOC
+
+#data
+<style type="text/css; charset=us-ascii" xmlns="http://www.w3.org/1999/xhtml">
+  <!-- NOTE: |charset| parameter here is meaningless (or harmful?),
+       but syntactically correct. -->
+</style>
+#errors
+
+#data
+<style media="all" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/style;SUBDOC
+/style/@media;media query;u
+
+#data
+<style media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/style;SUBDOC
+/style/@media;media query;u
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<style scoped=""/>
+</head>
+#errors
+/head/style;SUBDOC
+/head/style;element not allowed:head style;m
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</article>
+#errors
+/article/style;element not allowed:flow style;m
+/article/style;SUBDOC
+/article;no significant content;s
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml">
+<style scoped=""/>
+</article>
+#errors
+/article/style;SUBDOC
+/article;no significant content;s
+
+#data
+<aside xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</aside>
+#errors
+/aside/style;element not allowed:flow style;m
+/aside/style;SUBDOC
+/aside;no significant content;s
+
+#data
+<aside xmlns="http://www.w3.org/1999/xhtml">
+<style scoped=""/>
+</aside>
+#errors
+/aside/style;SUBDOC
+/aside;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</div>
+#errors
+/div/style;element not allowed:flow style;m
+/div/style;SUBDOC
+/div;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<style scoped=""/>
+</div>
+#errors
+/div/style;SUBDOC
+/div;no significant content;s
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</section>
+#errors
+/section/style;element not allowed:flow style;m
+/section/style;SUBDOC
+/section;no significant content;s
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style scoped=""/>
+</section>
+#errors
+/section/style;SUBDOC
+/section;no significant content;s
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style scope=""/>
+</section>
+#errors
+/section/style/@scope;attribute not defined;m
+/section/style;element not allowed:flow style;m
+/section/style;SUBDOC
+/section;no significant content;s

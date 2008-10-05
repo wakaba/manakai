@@ -1,12 +1,78 @@
+
 #data
 <label xmlns="http://www.w3.org/1999/xhtml"></label>
 #errors
 /label;no significant content;s
 
 #data
-<label xmlns="http://www.w3.org/1999/xhtml">  </label>
+<label xmlns="http://www.w3.org/1999/xhtml">   </label>
 #errors
 /label;no significant content;s
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">xx</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><em/></label>
+#errors
+/label;no significant content;s
+/label/em;no significant content;s
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><div/></label>
+#errors
+/label;no significant content;s
+/label/div;no significant content;s
+/label/div;element not allowed:phrasing;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">xxx<em>xx</em></label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">bb<label>xx</label></label>
+#errors
+/label/label;element not allowed:minus;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><br/></label>
+#errors
+/label;no significant content;s
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><video src=""/></label>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><label>x</label></em>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><label>x</label></div>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><label>x</label></p>
+#errors
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><label>x</label></br>
+#errors
+/br/label;element not allowed:empty;m
+
+#data
+<title xmlns="http://www.w3.org/1999/xhtml"><label>x</label></title>
+#errors
+/title/label;element not allowed:text;m
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"><label>x</label></del>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><label>x</label></form>
+#errors
 
 #data
 <label xmlns="http://www.w3.org/1999/xhtml">xxx</label>
@@ -244,4 +310,129 @@ x<datagrid/><input/>
 <label xmlns="http://www.w3.org/1999/xhtml">
 x<datalist>x</datalist><input/>
 </label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml" for="a">x</label>
+#errors
+/label/@for;no referenced control;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x</label><input id="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input id="a"/><label for="a">x</label>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a"><input id="a"/>x</label>
+</div>
+#errors
+/div/label/input;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">y</label><input id="a"/><label for="a">x</label>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input id="a"/><label for="a ">x</label>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input id="a"/><label for="A">x</label>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input id="a"/><label for="a b">x</label>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<span id="a">x</span><label for="a">x</label>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<span id="a">x</span><input id="a"/><label for="a">x</label>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+/div/input/@id;duplicate ID;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input id="a"/><input id="a"/><label for="a">x</label>
+</div>
+#errors
+/div/input/@id;duplicate ID;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input id="a"/><label for="a">x</label><span id="a">x</span>
+</div>
+#errors
+/div/span/@id;duplicate ID;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input xml:id="a"/><label for="a">x</label>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input xml:id=" a"/><label for="a">x</label>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a id="a">x</a><label for="a">x</label>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label id="a">y</label><label for="a">x</label>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<datalist id="a">x</datalist><label for="a">x</label>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml" form="a">x<input/></label>
+#errors
+/label/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label form="b">y<input/></label>
+<form id="b">x</form>
+</div>
 #errors

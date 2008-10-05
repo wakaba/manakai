@@ -1,0 +1,1950 @@
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml"><rule/></datatemplate>
+#errors
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml">
+  <rule/>
+</datatemplate>
+#errors
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml">
+  <rule/><!-- -->
+</datatemplate>
+#errors
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml"><rule/>aa</datatemplate>
+#errors
+/datatemplate/"aa";character not allowed;m
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml">aa<rule/></datatemplate>
+#errors
+/datatemplate/"aa";character not allowed;m
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml"><p/></datatemplate>
+#errors
+/datatemplate/p;element not allowed:datatemplate;m
+/datatemplate/p;no significant content;s
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<datatemplate/>
+</head>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate/>
+</body>
+#errors
+/body;no significant content;s
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate/>
+</section>
+#errors
+/section;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate/>
+</p>
+#errors
+/p/datatemplate;element not allowed:phrasing;m
+/p;no significant content;s
+
+#data
+<datetemplate xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/datetemplate;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><p/></rule>
+#errors
+/rule/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">aa</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><!----><?a?></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><unknownelement/></rule>
+#errors
+/rule/unknownelement;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><unknown xmlns=""/></rule>
+#errors
+/rule/unknown;unknown element;u
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<unknown xmlns="http://www.example.org/"/>
+</rule>
+#errors
+/rule/unknown;unknown element;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><rule/></p>
+#errors
+/p/rule;element not allowed:phrasing;m
+/p;no significant content;s
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"><rule/></body>
+#errors
+/body/rule;element not allowed:flow;m
+/body;no significant content;s
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml"><title/><rule/></head>
+#errors
+/head/rule;element not allowed:metadata;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml">  </nest>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml">aa</nest>
+#errors
+/nest/"aa";character not allowed:empty;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml"><p/></nest>
+#errors
+/nest/p;element not allowed:empty;m
+/nest/p;no significant content;s
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml"><!----></nest>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml"><nest/></nest>
+#errors
+/nest/nest;element not allowed:empty;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><nest/></p>
+#errors
+/p/nest;element not allowed:phrasing;m
+/p;no significant content;s
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml"><title/><nest/></head>
+#errors
+/head/nest;element not allowed:metadata;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><nest/></div>
+#errors
+/div/nest;element not allowed:flow;m
+/div;no significant content;s
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml"><nest/></datatemplate>
+#errors
+/datatemplate/nest;element not allowed:datatemplate;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><nest/></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><br><nest/></br></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><br><nest/>a</br></rule>
+#errors
+/rule/br/"a";character not allowed:empty;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><title><nest/></title></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><title><nest/>aa</title></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<plaintext><nest/></plaintext>
+</rule>
+#errors
+/rule/plaintext;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><section><nest/></section></rule>
+#errors
+/rule/section;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<section><style scoped=""/><nest/></section>
+</rule>
+#errors
+/rule/section/style;SUBDOC
+/rule/section;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<section><nest/><style scoped=""/></section>
+</rule>
+#errors
+/rule/section/style;SUBDOC
+/rule/section;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<section><nest/><style scoped=""/><p/></section>
+</rule>
+#errors
+/rule/section/style;SUBDOC
+/rule/section;no significant content;s
+/rule/section/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<section><p/><style scoped=""/><nest/></section>
+</rule>
+#errors
+/rule/section/style;element not allowed:flow style;m
+/rule/section/style;SUBDOC
+/rule/section;no significant content;s
+/rule/section/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><p><nest/></p></rule>
+#errors
+/rule/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><p><nest/>aaa</p></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><p><!----><nest/></p></rule>
+#errors
+/rule/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><body><nest/></body></rule>
+#errors
+/rule/body;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><em><nest/></em></rule>
+#errors
+/rule/em;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><em>aa<nest/></em></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><em><nest/><i/></em></rule>
+#errors
+/rule/em;no significant content;s
+/rule/em/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><sub><nest/></sub></rule>
+#errors
+/rule/sub;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><sup><nest/><sub/></sup></rule>
+#errors
+/rule/sup;no significant content;s
+/rule/sup/sub;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><sub><em><nest/></em></sub></rule>
+#errors
+/rule/sub;no significant content;s
+/rule/sub/em;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/></div></rule>
+#errors
+/rule/div;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><p/></div></rule>
+#errors
+/rule/div;no significant content;s
+/rule/div/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><i/></div></rule>
+#errors
+/rule/div;no significant content;s
+/rule/div/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/>aa</div></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><p/><i/></div></rule>
+#errors
+/rule/div;no significant content;s
+/rule/div/p;no significant content;s
+/rule/div/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div><p/><nest/></div></rule>
+#errors
+/rule/div;no significant content;s
+/rule/div/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div><i/><nest/></div></rule>
+#errors
+/rule/div;no significant content;s
+/rule/div/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div>aa<nest/></div></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><div>aa<nest/><p/></div></rule>
+#errors
+/rule/div/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/></aside></rule>
+#errors
+/rule/aside;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/>aa</aside></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/><i/></aside></rule>
+#errors
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/><p/></aside></rule>
+#errors
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><aside>aa<nest/></aside></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><aside><i/><nest/></aside></rule>
+#errors
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><aside><p/><nest/></aside></rule>
+#errors
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><style scoped=""/></aside>
+</rule>
+#errors
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><style scoped=""/>aa</aside>
+</rule>
+#errors
+/rule/aside/style;SUBDOC
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><style scoped=""/><i/></aside>
+</rule>
+#errors
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><style scoped=""/><blockquote/></aside>
+</rule>
+#errors
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><style scoped=""/><blockquote/><p/></aside>
+</rule>
+#errors
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
+/rule/aside/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><style scoped=""/><blockquote/><i/></aside>
+</rule>
+#errors
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
+/rule/aside/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><style scoped=""/><p/></aside>
+</rule>
+#errors
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/>aa<style scoped=""/></aside>
+</rule>
+#errors
+/rule/aside/style;element not allowed:flow style;m
+/rule/aside/style;SUBDOC
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><i/><style scoped=""/></aside>
+</rule>
+#errors
+/rule/aside/style;element not allowed:flow style;m
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><nest/><p/><style scoped=""/></aside>
+</rule>
+#errors
+/rule/aside/style;element not allowed:flow style;m
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside>aa<nest/></aside>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><i/><nest/></aside>
+</rule>
+#errors
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><blockquote/><nest/></aside>
+</rule>
+#errors
+/rule/aside;no significant content;s
+/rule/aside/blockquote;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><p/><nest/></aside>
+</rule>
+#errors
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside>aa<nest/><style scoped=""/></aside>
+</rule>
+#errors
+/rule/aside/style;element not allowed:flow style;m
+/rule/aside/style;SUBDOC
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><i/><nest/><style scoped=""/></aside>
+</rule>
+#errors
+/rule/aside/style;element not allowed:flow style;m
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><blockquote/><nest/><style scoped=""/></aside>
+</rule>
+#errors
+/rule/aside/style;element not allowed:flow style;m
+/rule/aside/style;SUBDOC
+/rule/aside/blockquote;no significant content;s
+/rule/aside;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<aside><p/><nest/><style scoped=""/></aside>
+</rule>
+#errors
+/rule/aside/style;element not allowed:flow style;m
+/rule/aside/style;SUBDOC
+/rule/aside;no significant content;s
+/rule/aside/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/></ruby></rule>
+#errors
+/rule/ruby;no significant content;s
+/rule/ruby;element missing;rt;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/><rt>x</rt></ruby></rule>
+#errors
+/rule/ruby/rt;no significant content before;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/>x<rt>y</rt></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<nest/><rt>y</rt></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rt>y</rt><nest/></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rt><nest/></rt></ruby></rule>
+#errors
+/rule/ruby/rt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp><nest/>(</rp><rt>y</rt><rp>)</rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp><nest/></rp><rt>y</rt><rp>)</rp></ruby></rule>
+#errors
+/rule/ruby/rp;rp:syntax error;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>(<nest/>(</rp><rt>y</rt><rp>]</rp></ruby></rule>
+#errors
+/rule/ruby/rp;rp:syntax error;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt><nest/></rt><rp>]</rp></ruby></rule>
+#errors
+/rule/ruby/rt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><rp>]<nest/></rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><rp>]<nest/></rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><nest/><rt>y</rt><rp>]</rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><nest/><rp>]</rp></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>c</rt><rp>]</rp><nest/></ruby></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>c</rt><nest/></ruby></rule>
+#errors
+/rule/ruby;element missing;rp;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rt><nest/></rt></rule>
+#errors
+/rule/rt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rt>x<nest/></rt></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rp><nest/></rp></rule>
+#errors
+/rule/rp;rp:syntax error;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rp>(<nest/></rp></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rp><nest/>)</rp></rule>
+#errors
+/rule/rp;rp:syntax error;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><rb><nest/></rb></rule>
+#errors
+/rule/rb;element not defined;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ins><nest/></ins></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><p><ins><nest/></ins></p></rule>
+#errors
+/rule/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><html><nest/></html></rule>
+#errors
+/rule/html;child element missing;head;m
+/rule/html;child element missing;body;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><html>
+<head><title/></head><body/><nest/>
+</html></rule>
+#errors
+/rule/html/body;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><html>
+<head><title/></head><nest/><body/>
+</html></rule>
+#errors
+/rule/html/body;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><html>
+<nest/><head><title/></head><body/>
+</html></rule>
+#errors
+/rule/html/body;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><html>
+<head><title/></head><body/><nest/><body/>
+</html></rule>
+#errors
+/rule/html/body;element not allowed;m
+/rule/html/body;no significant content;s
+/rule/html/body;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><html>
+<head><title/></head><nest/>
+</html></rule>
+#errors
+/rule/html;child element missing;body;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><html>
+<nest/><body/>
+</html></rule>
+#errors
+/rule/html/body;ps element missing;head;m
+/rule/html/body;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><html>
+<head><title/></head><body/><nest/>
+</html></rule>
+#errors
+/rule/html/body;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<head><nest/></head>
+</rule>
+#errors
+/rule/head;child element missing;title;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<head><title/><nest/></head>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<head><nest/><title/></head>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<head><nest/><base href="http://www.example.com/"/><title/></head>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<head><base href="http://www.example.com/"/><nest/><title/></head>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="us-ascii"/><nest/><title/></head>
+</rule>
+#errors
+/rule/head/meta;element not allowed:meta charset;m
+/rule/head/meta;in XML:charset;m
+/rule/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<head><nest/><meta charset="us-ascii"/><title/></head>
+</rule>
+#errors
+/rule/head/meta;element not allowed:meta charset;m
+/rule/head/meta;in XML:charset;m
+/rule/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><style><nest/></style></rule>
+#errors
+/rule/style;SUBDOC
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><script><nest/></script></rule>
+#errors
+/rule/script;SUBDOC
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/></footer></rule>
+#errors
+/rule/footer;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/>a</footer></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><i/></footer></rule>
+#errors
+/rule/footer;no significant content;s
+/rule/footer/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><ul/></footer></rule>
+#errors
+/rule/footer;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><p/></footer></rule>
+#errors
+/rule/footer;no significant content;s
+/rule/footer/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer>a<nest/></footer></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><i/><nest/></footer></rule>
+#errors
+/rule/footer;no significant content;s
+/rule/footer/i;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><ol/><nest/></footer></rule>
+#errors
+/rule/footer;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><p/><nest/></footer></rule>
+#errors
+/rule/footer;no significant content;s
+/rule/footer/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer>a<nest/><p/></footer></rule>
+#errors
+/rule/footer/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><p/><nest/>a</footer></rule>
+#errors
+/rule/footer/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>
+#errors
+/rule/footer/h1;element not allowed:minus;m
+/rule/footer;no significant content;s
+/rule/footer/h1;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><dialog><nest/></dialog></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dialog><dt/><nest/></dialog>
+</rule>
+#errors
+/rule/dialog;child element missing;dd;m
+/rule/dialog/dt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dialog><dt/><dd/><nest/></dialog>
+</rule>
+#errors
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dialog><dt/><dd/><dt/><nest/></dialog>
+</rule>
+#errors
+/rule/dialog;child element missing;dd;m
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+/rule/dialog/dt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dialog><dt/><dd/><dt/><dd/><nest/></dialog>
+</rule>
+#errors
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dialog><dt/><nest/><dd/></dialog>
+</rule>
+#errors
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dialog><dt/><nest/><dt/><dd/></dialog>
+</rule>
+#errors
+/rule/dialog/dt;ps element missing;dd;m
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dialog><nest/><dt/></dialog>
+</rule>
+#errors
+/rule/dialog;child element missing;dd;m
+/rule/dialog/dt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dialog><nest/><dt/><dd/></dialog>
+</rule>
+#errors
+/rule/dialog/dt;no significant content;s
+/rule/dialog/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ul><nest/></ul></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ul><li/><nest/></ul></rule>
+#errors
+/rule/ul/li;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ul><nest/><li/></ul></rule>
+#errors
+/rule/ul/li;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ol><nest/></ol></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/></dl></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/><dt/></dl></rule>
+#errors
+/rule/dl;child element missing;dd;m
+/rule/dl/dt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><nest/></dl></rule>
+#errors
+/rule/dl;child element missing;dd;m
+/rule/dl/dt;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><nest/><dd/></dl></rule>
+#errors
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><dd/><nest/></dl></rule>
+#errors
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/><dt/><dd/></dl></rule>
+#errors
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dl><dt/><dd/><nest/><dt/><dd/></dl>
+</rule>
+#errors
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dl><dt/><nest/><dt/><dd/></dl>
+</rule>
+#errors
+/rule/dl/dt;no significant content;s
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<dl><dt/><dd/><nest/><dd/></dl>
+</rule>
+#errors
+/rule/dl/dt;no significant content;s
+/rule/dl/dd;no significant content;s
+/rule/dl/dd;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/></del></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/>aa</del></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/><p/></del></rule>
+#errors
+/rule/del/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<video src="/"><nest/></video>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<video><nest/><source src="/"/></video>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<video><source src="/"/><nest/><source src="/"/></video>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<video><source src="/"/><nest/></video>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<table><nest/></table>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<table><nest/><tr><td/></tr></table>
+</rule>
+#errors
+/rule/table/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<table><nest/><tbody><tr><td/></tr></tbody></table>
+</rule>
+#errors
+/rule/table/tbody/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<table><tbody><tr><td/></tr></tbody><nest/></table>
+</rule>
+#errors
+/rule/table/tbody/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<table><caption/><nest/><caption/><tr><td/></tr></table>
+</rule>
+#errors
+/rule/table/caption;element not allowed;m
+/rule/table/caption;no significant content;s
+/rule/table/caption;no significant content;s
+/rule/table/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<colgroup><nest/></colgroup>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<colgroup><col/><nest/></colgroup>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<colgroup><nest/><col/></colgroup>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<colgroup><col/><nest/><col/></colgroup>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<tbody><nest/></tbody>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<tbody><nest/><tr><td/></tr></tbody>
+</rule>
+#errors
+/rule/tbody/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<tbody><tr><td/></tr><nest/></tbody>
+</rule>
+#errors
+/rule/tbody/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<tr><nest/></tr>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<tr><td/><nest/></tr>
+</rule>
+#errors
+/rule/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<tr><nest/><td/></tr>
+</rule>
+#errors
+/rule/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<tr><th/><nest/></tr>
+</rule>
+#errors
+/rule/tr/th;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<tr><th/><nest/><td/></tr>
+</rule>
+#errors
+/rule/tr/th;no significant content;s
+/rule/tr/td;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><form/></rule>
+#errors
+/rule/form;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><form><nest/></form></rule>
+#errors
+/rule/form;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><form><style scoped=""></style><nest/></form></rule>
+#errors
+/rule/form;no significant content;s
+/rule/form/style;SUBDOC
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><input/></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><input><nest/></input></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><input>
+<nest/>
+</input></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<head><title/><noscript><nest/></noscript></head>
+</rule>
+#errors
+/rule/head/noscript;in XML:noscript;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><button>x</button></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><button><nest/></button></rule>
+#errors
+/rule/button;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><button>x<nest/></button></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><label>x</label></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><label><nest/></label></rule>
+#errors
+/rule/label;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><label>x<nest/></label></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><select/></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><select><nest/></select></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><select><option><nest/></option></select></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><select><option>x</option><nest/><option>u</option></select></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><datalist/></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><datalist><nest/></datalist></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><datalist><nest/><option/></datalist></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><datalist><nest/><option/>x</datalist></rule>
+#errors
+/rule/datalist/"x";character not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><datalist><nest/>x<option/></datalist></rule>
+#errors
+/rule/datalist/option;element not allowed:phrasing;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><datalist>x<nest/><option/></datalist></rule>
+#errors
+/rule/datalist/option;element not allowed:phrasing;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><datalist><option/><nest/><option/></datalist></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><optgroup/></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><optgroup><nest/></optgroup></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><option/></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><option><nest/></option></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><textarea/></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><textarea>xx</textarea></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><textarea><nest/></textarea></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><textarea>aa<nest/>bb</textarea></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><output>x</output></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><output>x<nest/></output></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><head><title/>
+<noscript><link rel="alternate" href=""/><nest/></noscript>
+</head></rule>
+#errors
+/rule/head/noscript;in XML:noscript;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<datagrid><nest/></datagrid>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<datagrid><nest/><table/></datagrid>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<datagrid><nest/><table/><p/></datagrid>
+</rule>
+#errors
+/rule/datagrid/p;element not allowed;m
+/rule/datagrid/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<datagrid><p/><nest/><table/></datagrid>
+</rule>
+#errors
+/rule/datagrid;no significant content;s
+/rule/datagrid/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<datagrid><table/><nest/><p/></datagrid>
+</rule>
+#errors
+/rule/datagrid/p;element not allowed;m
+/rule/datagrid/p;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><bb>x<nest/></bb></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"><ins><bb>x</bb></ins></rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu><nest/></menu>
+</rule>
+#errors
+/rule/menu;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu><li/><nest/></menu>
+</rule>
+#errors
+/rule/menu/li;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu><nest/><li/></menu>
+</rule>
+#errors
+/rule/menu/li;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu><li/><nest/><li/></menu>
+</rule>
+#errors
+/rule/menu/li;no significant content;s
+/rule/menu/li;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu>aa<nest/></menu>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu><nest/>aa</menu>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu>aa<nest/>bb</menu>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu>aa<nest/><li/></menu>
+</rule>
+#errors
+/rule/menu/li;element not allowed;m
+/rule/menu/li;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<menu><li/><nest/>aa</menu>
+</rule>
+#errors
+/rule/menu/"aa";character not allowed;m
+/rule/menu/li;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate><nest/></datatemplate>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate><nest/><rule/></datatemplate>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate><rule/><nest/></datatemplate>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<rule><nest/></rule>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name><nest/></a:name></a:author>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name><nest/>aa</a:name></a:author>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name>aa<nest/></a:name></a:author>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:uri><nest/>http://www.example.org/</a:uri><a:name/></a:author>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:author xmlns:a="http://www.w3.org/2005/Atom"><a:email><nest/>a@example.com</a:email><a:name/></a:author>
+</rule>
+#errors
+/rule/author/email;addr-spec not supported;u
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:published xmlns:a="http://www.w3.org/2005/Atom">2006-12-31T00:00:00Z<nest/></a:published>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:entry xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:content/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/></a:entry>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:entry xmlns:a="http://www.w3.org/2005/Atom"><nest/><a:id>http://www.example.org/</a:id><a:title/><a:content/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated></a:entry>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:feed xmlns:a="http://www.w3.org/2005/Atom"><nest/><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated></a:feed>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/></a:feed>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/><a:entry><a:id>http://www.example.org/1/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry></a:feed>
+</rule>
+#errors
+/rule/feed/entry;child element missing:atom;author;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+<a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><a:entry><a:id>http://www.example.org/1/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry><nest/><a:entry><a:id>http://www.example.org/2/</a:id><a:title/><a:content/><a:updated>2007-01-01T00:00:00Z</a:updated></a:entry></a:feed>
+</rule>
+#errors
+/rule/feed/entry;child element missing:atom;author;m
+/rule/feed/entry;child element missing:atom;author;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate><rule></rule><nest></nest></datatemplate>
+<nest></nest>
+</div>
+#errors
+/div/datatemplate/nest;element not allowed:datatemplate;m
+/div/nest;element not allowed:flow;m
+/div;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<datatemplate><rule></rule><nest></nest></datatemplate>
+</div>
+#errors
+/div/datatemplate/nest;element not allowed:datatemplate;m
+/div;no significant content;s
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode=""/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="  "/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a  b"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a A"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a a"/>
+#errors
+/rule/@mode;duplicate token;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
+#errors
+/rule/@mode;duplicate token;m
+
+#data
+<?xml version="1.1"?>
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;a"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="a a&#x0b;"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<rule xmlns="http://www.w3.org/1999/xhtml" mode="&#x0b;a a"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition=""/>
+#errors
+/rule/@condition;no sss;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="  "/>
+#errors
+/rule/@condition;no sss;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a b "/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a, b"/>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
+#errors
+/rule/@condition;namespace prefix:not declared;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="a["/>
+#errors
+/rule/@condition;no attr name;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" condition="*/**/*"/>
+#errors
+/rule/@condition;no combinator;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml" filter=""/>
+#errors
+/rule/@filter;attribute not defined;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode=""/>
+#errors
+/nest/@mode;mode:syntax error;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode=" "/>
+#errors
+/nest/@mode;mode:syntax error;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a "/>
+#errors
+/nest/@mode;mode:syntax error;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
+#errors
+/nest/@mode;mode:syntax error;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
+#errors
+/nest/@mode;mode:syntax error;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="&#x3000;"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="&#x0b;a"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;a"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter=""/>
+#errors
+/nest/@filter;no sss;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="  "/>
+#errors
+/nest/@filter;no sss;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="a b"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="a + b"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="a.b#c[d]"/>
+#errors
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" filter="a|b"/>
+#errors
+/nest/@filter;namespace prefix:not declared;m
+
+#data
+<nest xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
+#errors
+/nest/@condition;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    template="#a">x
+  <datatemplate id="a">
+  </datatemplate>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <datatemplate id="a"></datatemplate>
+  <p template="#a">x</p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#a">x</p>
+  <datatemplate id="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#a">x<datatemplate id="a"></datatemplate></div>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#a">x</p>
+  <p id="a">y</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#">x</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="">x</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#no-such-template">x</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p template="#">x</p>
+  <datatemplate id=""/>
+</div>
+#errors
+/div/p/@template;template:not template;m
+/div/datatemplate/@id;empty attribute value;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    template="external-template">x</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    template="external-inline-template#temlate">x</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p id="itself" template="#itself">x</p>
+</div>
+#errors
+/div/p/@template;template:not template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <datatemplate id="itself" template="#itself"/>x
+</div>
+#errors
+/div/datatemplate/@template;fragment points itself;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div id="a">x</div>
+  <div template="#t" ref="#a">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="#a">y</div>
+  <div id="a">x</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="#">y</div>
+  <div id="">x</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+/div/div/@id;empty attribute value;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="#">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="#no-such-element">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+/div/div/@ref;fragment points nothing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="external-html">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="external-html#element">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" ref="">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <div template="#t" id="itself" ref="#itself">y</div>
+  <datatemplate id="t"/>
+</div>
+#errors
+/div/div/@ref;fragment points itself;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
+#errors
+/div/@ref;attribute not allowed;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    registrationmark="">x</div>
+#errors
+/div/@registrationmark;attribute not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml"
+    registrationmark="">x</rule>
+#errors
+/rule/@registrationmark;attribute not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registrationmark="">x</div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registrationmark="xxxx">x</div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registrationmark="a b c">x</div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registrationmark="a">x</div>
+  <div registrationmark="a">x</div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <rule>
+    <div registrationmark="a">x</div>
+  </rule>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <rule>
+  </rule>
+  <div registrationmark="a">x</div>
+</rule>
+#errors
+
+#data
+<datatemplate xmlns="http://www.w3.org/1999/xhtml">
+  <rule>
+  </rule>
+  <div registrationmark="a">x</div>
+</datatemplate>
+#errors
+/datatemplate/div;element not allowed:datatemplate;m
+/datatemplate/div/@registrationmark;attribute not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div>
+    <div registrationmark="a">x</div>
+  </div>
+</rule>
+#errors
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div>x
+    <nest registrationmark="a"/>
+  </div>
+</rule>
+#errors
+/rule/div/nest/@registrationmark;attribute not allowed;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div>
+    <rule registrationmark="">
+      x
+    </rule>
+  </div>
+</rule>
+#errors
+/rule/div/rule;element not allowed:flow;m
+
+#data
+<rule xmlns="http://www.w3.org/1999/xhtml">
+  <div registartionmark="a">x</div>
+</rule>
+#errors
+/rule/div/@registartionmark;attribute not defined;m
