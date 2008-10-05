@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.198 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.199 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -4946,10 +4946,6 @@ sub _construct_tree ($) {
   ## When an interactive UA render the $self->{document} available
   ## to the user, or when it begin accepting user input, are
   ## not defined.
-
-  ## Append a character: collect it and all subsequent consecutive
-  ## characters and insert one Text node whose data is concatenation
-  ## of all those characters. # MUST
   
   $token = $self->_get_next_token;
 
@@ -5897,19 +5893,24 @@ sub _tree_construction_main ($) {
     }
   }; # $insert_to_foster
 
-  ## NOTE: When a character is inserted, if the last node that was
-  ## inserted by the parser is a Text node and the character has to be
-  ## inserted after that node, then the character is appended to the
-  ## Text node.  However, if any other node is inserted by the parser,
-  ## then a new Text node is created and the character is appended as
-  ## that Text node.  If I'm not wrong, there are only two cases where
-  ## this occurs.  One is the case where an element node is inserted
-  ## to the |head| element.  This is covered by using the
+  ## NOTE: Insert a character (MUST): When a character is inserted, if
+  ## the last node that was inserted by the parser is a Text node and
+  ## the character has to be inserted after that node, then the
+  ## character is appended to the Text node.  However, if any other
+  ## node is inserted by the parser, then a new Text node is created
+  ## and the character is appended as that Text node.  If I'm not
+  ## wrong, for a parser with scripting disabled, there are only two
+  ## cases where this occurs.  One is the case where an element node
+  ## is inserted to the |head| element.  This is covered by using the
   ## |$self->{head_element_inserted}| flag.  Another is the case where
   ## an element or comment is inserted into the |table| subtree while
   ## foster parenting happens.  This is covered by using the [2] flag
   ## of the |$open_tables| structure.  All other cases are handled
   ## simply by calling |manakai_append_text| method.
+
+  ## TODO: |<body><script>document.write("a<br>");
+  ## document.body.removeChild (document.body.lastChild);
+  ## document.write ("b")</script>|
 
   B: while (1) {
     if ($token->{type} == DOCTYPE_TOKEN) {
@@ -10810,4 +10811,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/04 17:16:01 $
+# $Date: 2008/10/05 05:59:35 $

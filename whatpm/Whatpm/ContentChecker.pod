@@ -77,6 +77,59 @@ This conformance checker is work in progress; it I<might> not be
 able to detect all the errors in the DOM tree, and it I<might> 
 detect an error for a node that is conforming in fact.
 
+=head1 NOTES ON IMPLEMENTATION DETAILS
+
+I<This section is not complete.>
+
+This section describes various internal constructions used in
+L<Whatpm::ContentChecker> and relevant modules.  These data structures
+are not public interfaces -- they should not be accessed or modified
+by applications.  They are documented here for the convenience of
+development only.
+
+=head2 The C<< $self->{flag} >> Structure
+
+=over 4
+
+=item C<< $self->{flag}->{has_label} >>
+
+This flag is set to a true value if and only if there is a C<label>
+element ancestor of the current node.
+
+=item C<< $self->{flag}->{has_labelable} >>
+
+This flag is set to C<1> if and only if a nearest ancestor C<label>
+element has the C<for> attribute and there is no labelable
+form-associated element that is a descendant of the C<label> element
+and precedes the current node in tree order.  This flag is set to C<2>
+if and only if there is a labelable form-associated element that is a
+descendant of the nearest ancestor C<label> element of the current
+node and precedes the current node in tree order.  This flag is
+otherwise set to a false value.  B<However>, when there is no ancestor
+C<label> element of the current node, i.e. when 
+C<< $self->{flag}->{has_label} >> is false, the value of the
+C<< $self->{flag}->{has_labelable} >> flag is I<undefined>.
+
+=back
+
+=head2 The C<$element_state> Structure
+
+=over 4
+
+=item C<< $element_state->{has_label_original} >>
+
+Used to preserve the value of C<< $self->{flag}->{has_label} >> at the
+time of invocation of the method C<element_start> for the element
+being checked.
+
+=item C<< $element_state->{has_labelable_original} >>
+
+Used to preserve the value of C<< $self->{flag}->{has_labelable} >> at
+the time of invocation of the method C<element_start> for the element
+being checked.
+
+=back
+
 =head1 SEE ALSO
 
 L<Whatpm::ContentChecker::Atom>
@@ -91,11 +144,11 @@ Wakaba <w@suika.fam.cx>
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/08/06 10:56:50 $
+# $Date: 2008/10/05 05:59:35 $

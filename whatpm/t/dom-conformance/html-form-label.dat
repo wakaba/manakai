@@ -1,0 +1,247 @@
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"></label>
+#errors
+/label;no significant content;s
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">  </label>
+#errors
+/label;no significant content;s
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">xxx</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><em>x</em></label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">y<em>x</em></label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><div>x</div></label>
+#errors
+/label/div;element not allowed:phrasing;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>x</label>
+#errors
+/label/style;element not allowed:phrasing;m
+/label/style;SUBDOC
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><ins>x</ins></label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><del>x</del></label>
+#errors
+/label;no significant content;s
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><input/>x</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><button>x</button></label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><select/>x</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><datalist/>x</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><textarea>x</textarea></label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><input type="hidden"/>x</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><input/><input/>x</label>
+#errors
+/label/input;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><input/><textarea>x</textarea></label>
+#errors
+/label/textarea;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><button>x</button><input/></label>
+#errors
+/label/input;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><select/><select/>x</label>
+#errors
+/label/select;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><input/><select/><button>x</button></label>
+#errors
+/label/select;multiple labelable fae;m
+/label/button;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><select/><span><input/>x</span></label>
+#errors
+/label/span/input;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><span><button>x</button></span><select/></label>
+#errors
+/label/select;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml"><span><span><input/>x</span></span>
+<em><i><select/>x</i></em></label>
+#errors
+/label/em/i/select;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x</label>
+<input id="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x<input/></label>
+<input id="a"/>
+</div>
+#errors
+/div/label/input;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x<span><input/>a</span></label>
+<input id="a"/>
+</div>
+#errors
+/div/label/span/input;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a"><textarea>x</textarea></label>
+<input id="a"/>
+</div>
+#errors
+/div/label/textarea;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x<label>y</label></label>
+<input id="a"/>
+</div>
+#errors
+/div/label/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label>x<label>y</label></label>
+</div>
+#errors
+/div/label/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x<span><label>y</label></span></label>
+<input id="a"/>
+</div>
+#errors
+/div/label/span/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x<label><label>b</label></label></label>
+<input id="a"/>
+</div>
+#errors
+/div/label/label;element not allowed:minus;m
+/div/label/label/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x<label for="a">y</label></label>
+<input id="a"/>
+</div>
+#errors
+/div/label/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label>x<label><input/>y</label></label>
+</div>
+#errors
+/div/label/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label><label>x</label><input/></label>
+</div>
+#errors
+/div/label/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label><label>x<input/></label><input/></label>
+</div>
+#errors
+/div/label/label;element not allowed:minus;m
+/div/label/input;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label>x<select/></label>
+<label>y<select/></label>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label><input/>y</label>
+<label for="a">x</label>
+<input id="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a">x</label>
+<input id="a" type="hidden" name="_charset_"/>
+</div>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+x<input type="hidden"/><button>x</button>
+</label>
+#errors
+/label/button;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+x<a>y</a><input/>
+</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+x<datagrid/><input/>
+</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+x<datalist>x</datalist><input/>
+</label>
+#errors

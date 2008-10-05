@@ -1,15 +1,19 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Whatpm::ContentChecker - DOM Conformance Checker</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:wakaba@suika.fam.cx" />
 </head>
 
 <body>
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -18,13 +22,22 @@
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#methods">METHODS</a></li>
 	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#notes_on_implementation_details">NOTES ON IMPLEMENTATION DETAILS</a></li>
+	<ul>
+
+		<li><a href="#the__self___flag__structure">The <code>$self-&gt;{flag}</code> Structure</a></li>
+		<li><a href="#the__element_state_structure">The <code>$element_state</code> Structure</a></li>
+	</ul>
+
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
@@ -65,45 +78,46 @@ of manakai.</p>
 <h1><a name="methods">METHODS</a></h1>
 <p>This module contains two static methods:</p>
 <dl>
-<dt><strong><a name="item_check_document">Whatpm::ContentChecker-&gt;check_document (<em>$document</em>, <em>$onerror</em>);</a></strong><br />
-</dt>
+<dt><strong><a name="check_document" class="item">Whatpm::ContentChecker-&gt;check_document (<em>$document</em>, <em>$onerror</em>);</a></strong>
+
 <dd>
-Checks a document, <em>$document</em>, and its descendant for their
+<p>Checks a document, <em>$document</em>, and its descendant for their
 conformance.  If there is an error or a warnign, then the
 <em>$onerror</em> <code>CODE</code> is invoked with named arguments same
-as ones for the method <a href="#item_check_element"><code>check_element</code></a>.
+as ones for the method <a href="#check_element"><code>check_element</code></a>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_check_element">Whatpm::ContentChecker-&gt;check_element (<em>$element</em>, <em>$onerror</em>);</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="check_element" class="item">Whatpm::ContentChecker-&gt;check_element (<em>$element</em>, <em>$onerror</em>);</a></strong>
+
 <dd>
-Checks an element, <em>$element</em>, and its descendant for their conformance.
+<p>Checks an element, <em>$element</em>, and its descendant for their conformance.
 If there is an error or a warning, then the <em>$onerror</em> <code>CODE</code>
-is invoked with named arguments:
+is invoked with named arguments:</p>
 </dd>
 <dl>
-<dt><strong><a name="item_level">level (Might be <code>undef</code>)</a></strong><br />
-</dt>
+<dt><strong><a name="level" class="item">level (Might be <code>undef</code>)</a></strong>
+
 <dd>
-A string which describes the severity of the error or warning.
+<p>A string which describes the severity of the error or warning.
 For the list of the severities, see
-&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.
+&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_node">node (Always specified)</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="node" class="item">node (Always specified)</a></strong>
+
 <dd>
-The node with which the error is detected.
+<p>The node with which the error is detected.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_type">type (Always specified)</a></strong><br />
-</dt>
+</li>
+<dt><strong><a name="type" class="item">type (Always specified)</a></strong>
+
 <dd>
-A string which describes the type of the error or warning.
+<p>A string which describes the type of the error or warning.
 For the list of the errors and warnings, see
-&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.
+&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
 </dd>
-<p></p></dl>
+</li>
+</dl>
 </dl>
 <p>
 </p>
@@ -112,6 +126,65 @@ For the list of the errors and warnings, see
 <p>This conformance checker is work in progress; it <em>might</em> not be
 able to detect all the errors in the DOM tree, and it <em>might</em> 
 detect an error for a node that is conforming in fact.</p>
+<p>
+</p>
+<hr />
+<h1><a name="notes_on_implementation_details">NOTES ON IMPLEMENTATION DETAILS</a></h1>
+<p><em>This section is not complete.</em></p>
+<p>This section describes various internal constructions used in
+<a href="../Whatpm/ContentChecker.html">the Whatpm::ContentChecker manpage</a> and relevant modules.  These data structures
+are not public interfaces -- they should not be accessed or modified
+by applications.  They are documented here for the convenience of
+development only.</p>
+<p>
+</p>
+<h2><a name="the__self___flag__structure">The <code>$self-&gt;{flag}</code> Structure</a></h2>
+<dl>
+<dt><strong><a name="_self___flag____has_label_" class="item"><code>$self-&gt;{flag}-&gt;{has_label}</code></a></strong>
+
+<dd>
+<p>This flag is set to a true value if and only if there is a <code>label</code>
+element ancestor of the current node.</p>
+</dd>
+</li>
+<dt><strong><a name="_self___flag____has_labelable_" class="item"><code>$self-&gt;{flag}-&gt;{has_labelable}</code></a></strong>
+
+<dd>
+<p>This flag is set to <code>1</code> if and only if a nearest ancestor <code>label</code>
+element has the <code>for</code> attribute and there is no labelable
+form-associated element that is a descendant of the <code>label</code> element
+and precedes the current node in tree order.  This flag is set to <code>2</code>
+if and only if there is a labelable form-associated element that is a
+descendant of the nearest ancestor <code>label</code> element of the current
+node and precedes the current node in tree order.  This flag is
+otherwise set to a false value.  <strong>However</strong>, when there is no ancestor
+<code>label</code> element of the current node, i.e. when 
+<a href="#_self___flag____has_label_"><code>$self-&gt;{flag}-&gt;{has_label}</code></a> is false, the value of the
+<a href="#_self___flag____has_labelable_"><code>$self-&gt;{flag}-&gt;{has_labelable}</code></a> flag is <em>undefined</em>.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="the__element_state_structure">The <code>$element_state</code> Structure</a></h2>
+<dl>
+<dt><strong><a name="_element_state___has_label_original_" class="item"><code>$element_state-&gt;{has_label_original}</code></a></strong>
+
+<dd>
+<p>Used to preserve the value of <a href="#_self___flag____has_label_"><code>$self-&gt;{flag}-&gt;{has_label}</code></a> at the
+time of invocation of the method <code>element_start</code> for the element
+being checked.</p>
+</dd>
+</li>
+<dt><strong><a name="_element_state___has_labelable_original_" class="item"><code>$element_state-&gt;{has_labelable_original}</code></a></strong>
+
+<dd>
+<p>Used to preserve the value of <a href="#_self___flag____has_labelable_"><code>$self-&gt;{flag}-&gt;{has_labelable}</code></a> at
+the time of invocation of the method <code>element_start</code> for the element
+being checked.</p>
+</dd>
+</li>
+</dl>
 <p>
 </p>
 <hr />
@@ -128,7 +201,7 @@ detect an error for a node that is conforming in fact.</p>
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>Copyright 2007-2008 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
 <p>This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.</p>
 

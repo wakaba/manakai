@@ -293,6 +293,13 @@ my $HTMLInteractiveContent = {
   },
 };
 
+## NOTE: Labelable form-associated element.
+my $LabelableFAE = {
+  $HTML_NS => {
+    input => 1, button => 1, select => 1, textarea => 1, 
+  },
+};
+
 our $IsInHTMLInteractiveContent; # See Whatpm::ContentChecker.
 
 ## NOTE: $HTMLTransparentElements: See Whatpm::ContentChecker.
@@ -5520,7 +5527,14 @@ $Element->{$HTML_NS}->{input} = {
   ## TODO: Tests for <nest/> in <input>
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-
+    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'multiple labelable fae',
+                         level => $self->{level}->{must});
+    } else {
+      $self->{flag}->{has_labelable} = 2;
+    }
+    
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
@@ -5594,7 +5608,14 @@ $Element->{$HTML_NS}->{button} = {
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-
+    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'multiple labelable fae',
+                         level => $self->{level}->{must});
+    } else {
+      $self->{flag}->{has_labelable} = 2;
+    }
+    
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
@@ -5605,7 +5626,7 @@ $Element->{$HTML_NS}->{button} = {
 };
 
 $Element->{$HTML_NS}->{label} = {
-  %HTMLPhrasingContentChecker, ## ISSUE: -label? -interactive? At most one form control [WF2]?
+  %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC
       | FEATURE_XHTML2_ED, 
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5628,7 +5649,34 @@ $Element->{$HTML_NS}->{label} = {
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
-  ## TODO: Tests
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {label => 1}});
+
+    $element_state->{has_label_original} = $self->{flag}->{has_label};
+    $self->{flag}->{has_label} = 1;
+    $element_state->{has_labelable_original} = $self->{flag}->{has_labelable};
+    $self->{flag}->{has_labelable} = $item->{node}->has_attribute ('for')?1:0;
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+    
+    if ($self->{flag}->{has_labelable} == 1) { # has for="" but no labelable
+      $self->{flag}->{has_labelable}
+          = $element_state->{has_labelable_original};
+    }
+    delete $self->{flag}->{has_label}
+        unless $element_state->{has_label_original};
+    ## TODO: Warn if no labelable descendant?  <input type=hidden>?
+
+    ## NOTE: |<label for=a><input id=a></label>| is non-conforming.
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  },
   ## TODO: Tests for <nest/> in <label>
 };
 
@@ -5679,6 +5727,13 @@ $Element->{$HTML_NS}->{select} = {
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'multiple labelable fae',
+                         level => $self->{level}->{must});
+    } else {
+      $self->{flag}->{has_labelable} = 2;
+    }
 
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
@@ -5934,6 +5989,13 @@ $Element->{$HTML_NS}->{textarea} = {
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'multiple labelable fae',
+                         level => $self->{level}->{must});
+    } else {
+      $self->{flag}->{has_labelable} = 2;
+    }
 
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;

@@ -15,7 +15,8 @@ test_files (qw[
   t/content-model-6.dat
   t/content-model-7.dat
   t/table-1.dat
+  t/dom-conformance/html-form-label.dat
 ]);
 
 ## License: Public Domain.
-## $Date: 2008/09/18 05:49:13 $
+## $Date: 2008/10/05 05:59:37 $
