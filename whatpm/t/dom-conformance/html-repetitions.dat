@@ -102,21 +102,8 @@
 /p/@repea;attribute not defined;m
 
 #data
-<input type="add" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-
-#data
 <button type="add" xmlns="http://www.w3.org/1999/xhtml">x</button>
 #errors
-
-#data
-<input type="remove" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-
-#data
-<input type="delete" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-/input/@type;enumerated:invalid;m
 
 #data
 <button type="remove" xmlns="http://www.w3.org/1999/xhtml">x</button>
@@ -128,15 +115,7 @@
 /button/@type;enumerated:invalid;m
 
 #data
-<input type="move-up" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-
-#data
 <button type="move-up" xmlns="http://www.w3.org/1999/xhtml">x</button>
-#errors
-
-#data
-<input type="move-down" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
 #data
@@ -149,6 +128,7 @@
 <p repeat="template" id="t">x</p>
 </div>
 #errors
+/div/input/@type;enumerated:invalid;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">

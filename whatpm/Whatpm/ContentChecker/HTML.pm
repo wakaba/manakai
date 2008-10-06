@@ -5474,7 +5474,7 @@ $Element->{$HTML_NS}->{input} = {
          step => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-         template => FEATURE_WF2,
+         template => FEATURE_HTML5_AT_RISK | FEATURE_WF2,
          type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
          value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5482,68 +5482,100 @@ $Element->{$HTML_NS}->{input} = {
 
         $checker =
         {
-         accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
-         'accept-charset' => $HTMLCharsetsAttrChecker,
-         accesskey => $HTMLAccesskeyAttrChecker,
-         action => $HTMLURIAttrChecker,
-         align => $GetHTMLEnumeratedAttrChecker->({
-           top => 1, middle => 1, bottom => 1, left => 1, right => 1,
-         }),
-         alt => sub {}, ## NOTE: Text [M12N] ## TODO: |alt| should be provided for |type=image| [HTML4]
-         ## NOTE: HTML4 has a "should" for accessibility, which cannot be tested
-         ## here.
-         autocomplete => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
-         autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
-         checked => $GetHTMLBooleanAttrChecker->('checked'),
-         disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-         enctype => $HTMLIMTAttrChecker,
-         form => $HTMLFormAttrChecker,
-         ## TODO: inputmode [WF2]
-         ismap => $GetHTMLBooleanAttrChecker->('ismap'),
-         ## TODO: list [WF2]
-         ## TODO: max [WF2]
-         maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-         method => $GetHTMLEnumeratedAttrChecker->({
-           get => 1, post => 1, put => 1, delete => 1,
-         }),
-         ## TODO: min [WF2]
-         name => sub {}, ## NOTE: CDATA [M12N]
-         onformchange => $HTMLEventHandlerAttrChecker,
-         onforminput => $HTMLEventHandlerAttrChecker,
-         oninput => $HTMLEventHandlerAttrChecker,
-         oninvalid => $HTMLEventHandlerAttrChecker,
-         ## TODO: pattern
-         readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-         replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
-         required => $GetHTMLBooleanAttrChecker->('required'),
-         size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-         src => $HTMLURIAttrChecker,
-         ## TODO: step [WF2]
-         target => $HTMLTargetAttrChecker,
-         ## NOTE: According to Web Forms 2.0, |input| attribute has
-         ## |template| attribute to support the |add| button type (as
-         ## part of repetition template feature).  It conflicts with
-         ## the |template| global attribute introduced as part of the
-         ## data template feature.  NOTE: |template| attribute as
-         ## defined in Web Forms 2.0 has no author requirement.
+         ## NOTE: Value of an empty string means that the attribute is only
+         ## applicable for a specific set of states.
+         alt => '',
          type => $GetHTMLEnumeratedAttrChecker->({
-           text => 1, password => 1, checkbox => 1, radio => 1, submit => 1,
-           reset => 1, file => 1, hidden => 1, image => 1, button => 1,
-           ## [WF2]
-           datatime => 1, 'datetime-local' => 1, date => 1, month => 1, week => 1,
-           time => 1, number => 1, range => 1, email => 1, url => 1,
-           add => 1, remove => 1, 'move-up' => 1, 'move-down' => 1,
+           hidden => 1, text => 1, email => 1, url => 1, password => 1,
+           datetime => 1, date => 1, month => 1, week => 1, time => 1,
+           'datetime-local' => 1, number => 1, range => 1, checkbox => 1,
+           radio => 1, file => 1, submit => 1, image => 1, reset => 1,
+           button => 1,
          }),
-         usemap => $HTMLUsemapAttrChecker,
-         value => sub {}, ## NOTE: CDATA [M12N] ## TODO: "optional
-                          ## except when the type attribute has the
-                          ## value "radio" or "checkbox"" [HTML4]
-                          ## TODO: constraints [WF2] TODO: "authors
-                          ## should ensure that in each set of radio
-                          ## buttons that one is initially "on"."
-                          ## [HTML4] [WF2]
         }->{$attr_ln};
-        if ($checker) {
+
+        ## State-dependent checkers
+        my $state;
+        unless ($checker) {
+          $state = $item->{node}->get_attribute ('type');
+          $state = 'text' unless defined $state;
+          $state =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+          if ($state eq 'hidden') {
+            $checker =
+            {
+             
+            }->{$attr_ln} || $checker;
+          } else { # Text state
+            $checker =
+            {
+             accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
+             'accept-charset' => $HTMLCharsetsAttrChecker,
+             accesskey => $HTMLAccesskeyAttrChecker,
+             action => $HTMLURIAttrChecker,
+             align => $GetHTMLEnumeratedAttrChecker->({
+               top => 1, middle => 1, bottom => 1, left => 1, right => 1,
+             }),
+             alt => sub {}, ## NOTE: Text [M12N] ## TODO: |alt| should be provided for |type=image| [HTML4]
+             ## NOTE: HTML4 has a "should" for accessibility, which
+             ## cannot be tested here.
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
+             autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
+             checked => $GetHTMLBooleanAttrChecker->('checked'),
+             disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+             enctype => $HTMLIMTAttrChecker,
+             form => $HTMLFormAttrChecker,
+             ## TODO: inputmode [WF2]
+             ismap => $GetHTMLBooleanAttrChecker->('ismap'),
+             ## TODO: list [WF2]
+             ## TODO: max [WF2]
+             maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+             method => $GetHTMLEnumeratedAttrChecker->({
+               get => 1, post => 1, put => 1, delete => 1,
+             }),
+             ## TODO: min [WF2]
+             name => sub {}, ## NOTE: CDATA [M12N]
+             onformchange => $HTMLEventHandlerAttrChecker,
+             onforminput => $HTMLEventHandlerAttrChecker,
+             oninput => $HTMLEventHandlerAttrChecker,
+             oninvalid => $HTMLEventHandlerAttrChecker,
+             ## TODO: pattern
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
+             replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
+             required => $GetHTMLBooleanAttrChecker->('required'),
+             size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+             src => $HTMLURIAttrChecker,
+             ## TODO: step [WF2]
+             target => $HTMLTargetAttrChecker,
+             ## NOTE: According to Web Forms 2.0, |input| attribute
+             ## has |template| attribute to support the |add| button
+             ## type (as part of the repetition template feature).  It
+             ## conflicts with the |template| global attribute
+             ## introduced as part of the data template feature.
+             ## NOTE: |template| attribute as defined in Web Forms 2.0
+             ## has no author requirement.
+             usemap => $HTMLUsemapAttrChecker,
+             value => sub {}, ## NOTE: CDATA [M12N] ## TODO: "optional
+                              ## except when the type attribute has
+                              ## the value "radio" or "checkbox""
+                              ## [HTML4] TODO: constraints [WF2] TODO:
+                              ## "authors should ensure that in each
+                              ## set of radio buttons that one is
+                              ## initially "on"."  [HTML4] [WF2]
+            }->{$attr_ln} || $checker;
+            $state = 'text';
+          }
+        }
+
+        if (defined $checker) {
+          if ($checker eq '') {
+            $checker = sub {
+              my ($self, $attr) = @_;
+              $self->{onerror}->(node => $attr,
+                                 type => 'input attr not applicable',
+                                 text => $state,
+                                 level => $self->{level}->{must});
+            };
+          }
           $attr{$attr_ln} = $attr;
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
