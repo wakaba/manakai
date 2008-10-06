@@ -5419,8 +5419,11 @@ $Element->{$HTML_NS}->{input} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
-    my %attr;
-    my $coords;
+        
+    my $state = $item->{node}->get_attribute ('type');
+    $state = 'text' unless defined $state;
+    $state =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+
     for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
@@ -5484,7 +5487,33 @@ $Element->{$HTML_NS}->{input} = {
         {
          ## NOTE: Value of an empty string means that the attribute is only
          ## applicable for a specific set of states.
+         accept => '',
+         action => '',
          alt => '',
+         autocomplete => '',
+         autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
+             ## ISSUE: No HTML5 definition yet.  ## TODO: Tests
+         checked => '',
+         disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+             ## ISSUE: No HTML5 definition yet.  ## TODO: Tests
+         enctype => '',
+         form => $HTMLFormAttrChecker,
+         list => '',
+         max => '',
+         maxlength => '',
+         method => '',
+         min => '',
+         name => sub {
+           ## ISSUE: No HTML5 definition yet.
+           ## TODO: tests
+         },
+         pattern => '',
+         readonly => '',
+         required => '',
+         size => '',
+         src => '',
+         step => '',
+         target => '',
          type => $GetHTMLEnumeratedAttrChecker->({
            hidden => 1, text => 1, email => 1, url => 1, password => 1,
            datetime => 1, date => 1, month => 1, week => 1, time => 1,
@@ -5492,19 +5521,26 @@ $Element->{$HTML_NS}->{input} = {
            radio => 1, file => 1, submit => 1, image => 1, reset => 1,
            button => 1,
          }),
+         value => '',
         }->{$attr_ln};
 
         ## State-dependent checkers
-        my $state;
         unless ($checker) {
-          $state = $item->{node}->get_attribute ('type');
-          $state = 'text' unless defined $state;
-          $state =~ tr/A-Z/a-z/; ## ASCII case-insensitive
           if ($state eq 'hidden') {
             $checker =
             {
-             
+             value => sub {
+               my ($self, $attr, $item, $element_state) = @_;
+               my $name = $item->{node}->get_attribute ('name');
+               if (defined $name and $name eq '_charset_') { ## case-sensitive
+                 $self->{onerror}->(node => $attr,
+                                    type => '_charset_ value',
+                                    level => $self->{level}->{must});
+               }
+             },
             }->{$attr_ln} || $checker;
+            ## TODO: Warn if no name attribute?
+            ## TODO: Warn if name!=_charset_ and no value attribute?
           } else { # Text state
             $checker =
             {
@@ -5519,11 +5555,8 @@ $Element->{$HTML_NS}->{input} = {
              ## NOTE: HTML4 has a "should" for accessibility, which
              ## cannot be tested here.
              autocomplete => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
-             autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
              checked => $GetHTMLBooleanAttrChecker->('checked'),
-             disabled => $GetHTMLBooleanAttrChecker->('disabled'),
              enctype => $HTMLIMTAttrChecker,
-             form => $HTMLFormAttrChecker,
              ## TODO: inputmode [WF2]
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
              ## TODO: list [WF2]
@@ -5533,7 +5566,6 @@ $Element->{$HTML_NS}->{input} = {
                get => 1, post => 1, put => 1, delete => 1,
              }),
              ## TODO: min [WF2]
-             name => sub {}, ## NOTE: CDATA [M12N]
              onformchange => $HTMLEventHandlerAttrChecker,
              onforminput => $HTMLEventHandlerAttrChecker,
              oninput => $HTMLEventHandlerAttrChecker,
@@ -5576,7 +5608,6 @@ $Element->{$HTML_NS}->{input} = {
                                  level => $self->{level}->{must});
             };
           }
-          $attr{$attr_ln} = $attr;
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
           $checker = $HTMLDatasetAttrChecker;

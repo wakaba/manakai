@@ -329,6 +329,12 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"/>
+#errors
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type=""/>
 #errors
 /input/@type;enumerated:invalid;m
@@ -344,3 +350,352 @@
     type="h\u0131dden"/>
 #errors
 /input/@type;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="hidden" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="text" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="email" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="url" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="password" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="datetime" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="date" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="month" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="week" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="datetime-local" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="number" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="range" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="checkbox" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="radio" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="file" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="submit" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="image" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="reset" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="button" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="add" form="a"/>
+</div>
+#errors
+/div/input/@type;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="remove" form="a"/>
+</div>
+#errors
+/div/input/@type;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="move-up" form="a"/>
+</div>
+#errors
+/div/input/@type;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="move-down" form="a"/>
+</div>
+#errors
+/div/input/@type;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="search" form="a"/>
+</div>
+#errors
+/div/input/@type;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="unknown" form="a"/>
+</div>
+#errors
+/div/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="_charset_"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="_charset_" value=""/>
+#errors
+/input/@value;_charset_ value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="_CHARSET_" value=""/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="charset"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="charset" value="utf-8"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text" name="_charset_" value="utf-8"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password" name="_charset_" value="us-ascii"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    accept=""/>
+#errors
+/input/@accept;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    action=""/>
+#errors
+/input/@action;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    alt=""/>
+#errors
+/input/@alt;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    autocomplete=""/>
+#errors
+/input/@autocomplete;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    checked=""/>
+#errors
+/input/@checked;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    enctype=""/>
+#errors
+/input/@enctype;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    list=""/>
+#errors
+/input/@list;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    max=""/>
+#errors
+/input/@max;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    maxlength=""/>
+#errors
+/input/@maxlength;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    method=""/>
+#errors
+/input/@method;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    min=""/>
+#errors
+/input/@min;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    pattern=""/>
+#errors
+/input/@pattern;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    readonly=""/>
+#errors
+/input/@readonly;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    required=""/>
+#errors
+/input/@required;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    size=""/>
+#errors
+/input/@size;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    src=""/>
+#errors
+/input/@src;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    step=""/>
+#errors
+/input/@step;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="a"
+    target=""/>
+#errors
+/input/@target;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" accpet="" name="a"/>
+#errors
+/input/@accpet;attribute not defined;m
