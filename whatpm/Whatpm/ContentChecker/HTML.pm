@@ -618,6 +618,8 @@ my $GetHTMLFloatingPointNumberAttrChecker = sub {
                          level => $self->{level}->{must});
     }
   };
+
+  ## TODO: scientific notation
 }; # $GetHTMLFloatingPointNumberAttrChecker
 
 ## HTML4 %Length;
@@ -5570,6 +5572,175 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: Warn if not a valid UTC date and time string.
              },
             }->{$attr_ln} || $checker;
+          } elsif ($state eq 'date') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: list
+             ## TODO: max
+             ## TODO: min
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: step
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if not a valid date string.
+             },
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'month') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: list
+             ## TODO: max
+             ## TODO: min
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: step
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if not a valid month string.
+             },
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'week') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: list
+             ## TODO: max
+             ## TODO: min
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: step
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if not a valid week string.
+             },
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'time') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: list
+             ## TODO: max
+             ## TODO: min
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: step
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if not a valid time string.
+             },
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'datetime-local') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: list
+             ## TODO: max
+             ## TODO: min
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: step
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if not a valid local date and time string.
+             },
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'number') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: list
+             max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+             min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+               ## TODO: min & max tests
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: step
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if not a valid floating point number.
+             },
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'range') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: list
+             max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+             min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+               ## TODO: min & max tests
+             ## TODO: step
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if not a valid floating point number.
+             },
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'checkbox' or $state eq 'radio') {
+            $checker = 
+            {
+             ## TDDO: checked
+             ## TODO: required
+             value => sub { }, ## NOTE: No restriction.
+            }->{$attr_ln} || $checker;
+            ## TODO: There MUST be another input type=radio with same
+            ## name (Radio state).
+            ## ISSUE: There should be exactly one type=radio with checked?
+          } elsif ($state eq 'file') {
+            $checker =
+            {
+             ## TODO: accept
+             ## TODO: required
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'submit') {
+            $checker =
+            {
+             ## TODO: action
+             ## TODO: enctype
+             ## TODO: method
+             ## TODO: target
+             value => sub { }, ## NOTE: No restriction.
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'image') {
+            $checker =
+            {
+             ## TODO: action
+             alt => sub {
+               my ($self, $attr) = @_;
+               my $value = $attr->value;
+               unless (length $value) {
+                 $self->{onerror}->(node => $attr,
+                                    type => 'empty anchor image alt',
+                                    level => $self->{level}->{must});
+               }
+             },
+             ## TODO: enctype
+             ## TODO: method
+             src => $HTMLURIAttrChecker,
+               ## TODO: There is requirements on the referenced resource.
+               ## TODO: tests
+             ## TODO: target
+            }->{$attr_ln} || $checker;
+            ## TODO: alt & src are required.
+          } elsif ({
+                    reset => 1, button => 1,
+                    ## NOTE: From Web Forms 2.0:
+                    remove => 1, 'move-up' => 1, 'move-down' => 1,
+                    add => 1,
+                   }->{$state}) {
+            $checker = 
+            {
+             ## NOTE: According to Web Forms 2.0, |input| attribute
+             ## has |template| attribute to support the |add| button
+             ## type (as part of the repetition template feature).  It
+             ## conflicts with the |template| global attribute
+             ## introduced as part of the data template feature.
+             ## NOTE: |template| attribute as defined in Web Forms 2.0
+             ## has no author requirement.
+               ## TODO: template tests
+             value => sub { }, ## NOTE: No restriction.
+            }->{$attr_ln} || $checker;
           } else { # Text, E-mail, URL
             $checker =
             {
@@ -5580,7 +5751,6 @@ $Element->{$HTML_NS}->{input} = {
              align => $GetHTMLEnumeratedAttrChecker->({
                top => 1, middle => 1, bottom => 1, left => 1, right => 1,
              }),
-             alt => sub {}, ## NOTE: Text [M12N] ## TODO: |alt| should be provided for |type=image| [HTML4]
              ## NOTE: HTML4 has a "should" for accessibility, which
              ## cannot be tested here.
              autocomplete => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
@@ -5604,16 +5774,8 @@ $Element->{$HTML_NS}->{input} = {
              replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
              required => $GetHTMLBooleanAttrChecker->('required'),
              size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-             src => $HTMLURIAttrChecker,
              ## TODO: step [WF2]
              target => $HTMLTargetAttrChecker,
-             ## NOTE: According to Web Forms 2.0, |input| attribute
-             ## has |template| attribute to support the |add| button
-             ## type (as part of the repetition template feature).  It
-             ## conflicts with the |template| global attribute
-             ## introduced as part of the data template feature.
-             ## NOTE: |template| attribute as defined in Web Forms 2.0
-             ## has no author requirement.
              usemap => $HTMLUsemapAttrChecker,
              value => sub {}, ## NOTE: CDATA [M12N] ## TODO: "optional
                               ## except when the type attribute has

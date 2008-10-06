@@ -1,7 +1,7 @@
 1..3201
 # Running under perl version 5.010000 for linux
-# Current time local: Mon Oct  6 15:35:16 2008
-# Current time GMT:   Mon Oct  6 06:35:16 2008
+# Current time local: Mon Oct  6 16:47:21 2008
+# Current time GMT:   Mon Oct  6 07:47:21 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2973,10 +2973,7 @@ not ok 2833
 # Test 2833 got: "" (t/content-checker.pl at line 68 fail #2833)
 #      Expected: "/input/@action;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
 #    action=""/>)
-not ok 2834
-# Test 2834 got: "" (t/content-checker.pl at line 68 fail #2834)
-#      Expected: "/input/@alt;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    alt=""/>)
+ok 2834
 not ok 2835
 # Test 2835 got: "" (t/content-checker.pl at line 68 fail #2835)
 #      Expected: "/input/@checked;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
@@ -2991,10 +2988,7 @@ not ok 2838
 #      Expected: "/input/@method;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
 #    method=""/>)
 ok 2839
-not ok 2840
-# Test 2840 got: "" (t/content-checker.pl at line 68 fail #2840)
-#      Expected: "/input/@src;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    src=""/>)
+ok 2840
 ok 2841
 not ok 2842
 # Test 2842 got: "/input/@target;window name:empty;m" (t/content-checker.pl at line 68 fail #2842)
@@ -3008,10 +3002,7 @@ not ok 2844
 # Test 2844 got: "" (t/content-checker.pl at line 68 fail #2844)
 #      Expected: "/input/@action;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
 #    type="email" action=""/>)
-not ok 2845
-# Test 2845 got: "" (t/content-checker.pl at line 68 fail #2845)
-#      Expected: "/input/@alt;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="email" alt=""/>)
+ok 2845
 not ok 2846
 # Test 2846 got: "" (t/content-checker.pl at line 68 fail #2846)
 #      Expected: "/input/@checked;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
@@ -3026,10 +3017,7 @@ not ok 2849
 #      Expected: "/input/@method;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
 #    type="email" method=""/>)
 ok 2850
-not ok 2851
-# Test 2851 got: "" (t/content-checker.pl at line 68 fail #2851)
-#      Expected: "/input/@src;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="email" src=""/>)
+ok 2851
 ok 2852
 not ok 2853
 # Test 2853 got: "/input/@target;window name:empty;m" (t/content-checker.pl at line 68 fail #2853)
@@ -3043,10 +3031,7 @@ not ok 2855
 # Test 2855 got: "" (t/content-checker.pl at line 68 fail #2855)
 #      Expected: "/input/@action;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
 #    type="url" action=""/>)
-not ok 2856
-# Test 2856 got: "" (t/content-checker.pl at line 68 fail #2856)
-#      Expected: "/input/@alt;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="url" alt=""/>)
+ok 2856
 not ok 2857
 # Test 2857 got: "" (t/content-checker.pl at line 68 fail #2857)
 #      Expected: "/input/@checked;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
@@ -3061,10 +3046,7 @@ not ok 2860
 #      Expected: "/input/@method;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
 #    type="url" method=""/>)
 ok 2861
-not ok 2862
-# Test 2862 got: "" (t/content-checker.pl at line 68 fail #2862)
-#      Expected: "/input/@src;input attr not applicable;text;m" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="url" src=""/>)
+ok 2862
 ok 2863
 not ok 2864
 # Test 2864 got: "/input/@target;window name:empty;m" (t/content-checker.pl at line 68 fail #2864)
@@ -3129,7 +3111,6 @@ ok 2884
 ok 2885
 ok 2886
 ok 2887
-# t/dom-conformance/html-form-label.dat
 ok 2888
 ok 2889
 ok 2890
@@ -3205,67 +3186,24 @@ ok 2959
 ok 2960
 ok 2961
 ok 2962
-# t/dom-conformance/html-repetitions.dat
-not ok 2963
-# Test 2963 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2963)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2964
-# Test 2964 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2964)
-#      Expected: "" (<p repeat="template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2965
-# Test 2965 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2965)
-#      Expected: "" (<p repeat="0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2966
-# Test 2966 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2966)
-#      Expected: "" (<p repeat="1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2967
-# Test 2967 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2967)
-#      Expected: "" (<p repeat="00001" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2968
-# Test 2968 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2968)
-#      Expected: "" (<p repeat="-1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2969
-# Test 2969 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2969)
-#      Expected: "" (<p repeat="-00001" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2970
-# Test 2970 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2970)
-#      Expected: "" (<p repeat="-1255" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2971
-# Test 2971 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2971)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="template  " xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2972
-# Test 2972 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2972)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="templatE" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2973
-# Test 2973 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2973)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="  template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2974
-# Test 2974 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2974)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="0.000" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2975
-# Test 2975 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2975)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat=".12" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2976
-# Test 2976 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2976)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="120 " xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2977
-# Test 2977 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2977)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="+21434" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2978
-# Test 2978 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #2978)
-#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="template-text" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2979
-# Test 2979 got: "/div/p/@repeat-template;attribute not defined;m\n/div/p/@repeat;attribute not defined;m\n/div/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2979)
-#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p repeat="1" repeat-template="t">x</p>
-#<p id="t" repeat="template">x</p>
-#</div>)
-not ok 2980
-# Test 2980 got: "/div/p/@repeat-template;attribute not defined;m\n/div/p/@repeat;attribute not defined;m\n/div/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2980)
-#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p id="t" repeat="template">x</p>
-#<p repeat="1" repeat-template="t">x</p>
-#</div>)
+ok 2963
+ok 2964
+ok 2965
+ok 2966
+ok 2967
+ok 2968
+ok 2969
+ok 2970
+ok 2971
+ok 2972
+ok 2973
+ok 2974
+ok 2975
+ok 2976
+ok 2977
+ok 2978
+ok 2979
+ok 2980
 ok 2981
 ok 2982
 ok 2983
@@ -3274,135 +3212,45 @@ ok 2985
 ok 2986
 ok 2987
 ok 2988
-not ok 2989
-# Test 2989 got: "/div/input/@type;enumerated:invalid;m\n/div/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2989)
-#      Expected: "/div/input/@type;enumerated:invalid;m" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<input type="add" template="t"/>
-#<p repeat="template" id="t">x</p>
-#</div>)
-not ok 2990
-# Test 2990 got: "/div/button/@template;attribute not defined;m\n/div/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2990)
-#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<button type="add" template="t">x</button>
-#<p repeat="template" id="t">x</p>
-#</div>)
-not ok 2991
-# Test 2991 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2991)
-#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2992
-# Test 2992 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2992)
-#      Expected: "" (<p repeat="template" repeat-min="0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2993
-# Test 2993 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2993)
-#      Expected: "" (<p repeat="template" repeat-min="1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2994
-# Test 2994 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2994)
-#      Expected: "" (<p repeat="template" repeat-min="01" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2995
-# Test 2995 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2995)
-#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2996
-# Test 2996 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2996)
-#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2997
-# Test 2997 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2997)
-#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2998
-# Test 2998 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2998)
-#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 2999
-# Test 2999 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #2999)
-#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3000
-# Test 3000 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3000)
-#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3001
-# Test 3001 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3001)
-#      Expected: "" (<p repeat="template" repeat-max="0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3002
-# Test 3002 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3002)
-#      Expected: "" (<p repeat="template" repeat-max="1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3003
-# Test 3003 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3003)
-#      Expected: "" (<p repeat="template" repeat-max="01" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3004
-# Test 3004 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3004)
-#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3005
-# Test 3005 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3005)
-#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3006
-# Test 3006 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3006)
-#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3007
-# Test 3007 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3007)
-#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3008
-# Test 3008 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3008)
-#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3009
-# Test 3009 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3009)
-#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3010
-# Test 3010 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3010)
-#      Expected: "" (<p repeat="template" repeat-start="0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3011
-# Test 3011 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3011)
-#      Expected: "" (<p repeat="template" repeat-start="1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3012
-# Test 3012 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3012)
-#      Expected: "" (<p repeat="template" repeat-start="01" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3013
-# Test 3013 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3013)
-#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3014
-# Test 3014 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3014)
-#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3015
-# Test 3015 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3015)
-#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3016
-# Test 3016 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3016)
-#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3017
-# Test 3017 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3017)
-#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>)
-not ok 3018
-# Test 3018 got: "/x/@repeat;attribute not defined;m\n/x/@repeat;repeat:syntax error;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3018)
-#      Expected: "/x/@repeat;repeat:syntax error;m\n/x;unknown element;u" (<x html:repeat="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
-not ok 3019
-# Test 3019 got: "/x/@repeat-start;attribute not defined;m\n/x/@repeat-start;nninteger:syntax error;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3019)
-#      Expected: "/x/@repeat-start;nninteger:syntax error;m\n/x;unknown element;u" (<x html:repeat-start="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
-not ok 3020
-# Test 3020 got: "/x/@repeat-min;attribute not defined;m\n/x/@repeat-min;nninteger:syntax error;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3020)
-#      Expected: "/x/@repeat-min;nninteger:syntax error;m\n/x;unknown element;u" (<x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
-not ok 3021
-# Test 3021 got: "/x/@repeat-max;attribute not defined;m\n/x/@repeat-max;nninteger:syntax error;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3021)
-#      Expected: "/x/@repeat-max;nninteger:syntax error;m\n/x;unknown element;u" (<x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
-not ok 3022
-# Test 3022 got: "/x/@repeat-template;attribute not defined;m\n/x/p/@repeat;attribute not defined;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3022)
-#      Expected: "/x;unknown element;u" (<x html:repeat-template="x" xmlns:html="http://www.w3.org/1999/xhtml"><p repeat="template" id="x" xmlns="http://www.w3.org/1999/xhtml">x</p></x>)
-not ok 3023
-# Test 3023 got: "/p/@repeat;attribute not allowed;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3023)
-#      Expected: "/p/@repeat;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
-#    html:repeat="template">x</p>)
-not ok 3024
-# Test 3024 got: "/p/@repeat-min;attribute not allowed;m\n/p/@repeat-min;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3024)
-#      Expected: "/p/@repeat-min;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
-#    html:repeat-min="1" repeat="template">x</p>)
-not ok 3025
-# Test 3025 got: "/p/@repeat-max;attribute not allowed;m\n/p/@repeat-max;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3025)
-#      Expected: "/p/@repeat-max;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
-#    html:repeat-max="5" repeat="template">x</p>)
-not ok 3026
-# Test 3026 got: "/p/@repeat-start;attribute not allowed;m\n/p/@repeat-start;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3026)
-#      Expected: "/p/@repeat-start;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
-#    html:repeat-start="0" repeat="template">x</p>)
-not ok 3027
-# Test 3027 got: "/p/@repeat-template;attribute not allowed;m\n/p/@repeat-template;attribute not defined;m\n/p/q/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3027)
-#      Expected: "/p/@repeat-template;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
-#    html:repeat-template="t"><q repeat="template" id="t">x</q></p>)
-# t/dom-conformance/html-datatemplate.dat
+ok 2989
+ok 2990
+ok 2991
+ok 2992
+ok 2993
+ok 2994
+ok 2995
+ok 2996
+ok 2997
+ok 2998
+ok 2999
+ok 3000
+ok 3001
+ok 3002
+ok 3003
+ok 3004
+ok 3005
+ok 3006
+ok 3007
+ok 3008
+ok 3009
+ok 3010
+ok 3011
+ok 3012
+ok 3013
+ok 3014
+ok 3015
+ok 3016
+ok 3017
+ok 3018
+ok 3019
+ok 3020
+ok 3021
+ok 3022
+ok 3023
+ok 3024
+ok 3025
+ok 3026
+ok 3027
 ok 3028
 ok 3029
 ok 3030
@@ -3548,6 +3396,7 @@ ok 3169
 ok 3170
 ok 3171
 ok 3172
+# t/dom-conformance/html-form-label.dat
 ok 3173
 ok 3174
 ok 3175
@@ -3623,24 +3472,67 @@ ok 3244
 ok 3245
 ok 3246
 ok 3247
-ok 3248
-ok 3249
-ok 3250
-ok 3251
-ok 3252
-ok 3253
-ok 3254
-ok 3255
-ok 3256
-ok 3257
-ok 3258
-ok 3259
-ok 3260
-ok 3261
-ok 3262
-ok 3263
-ok 3264
-ok 3265
+# t/dom-conformance/html-repetitions.dat
+not ok 3248
+# Test 3248 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3248)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3249
+# Test 3249 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3249)
+#      Expected: "" (<p repeat="template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3250
+# Test 3250 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3250)
+#      Expected: "" (<p repeat="0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3251
+# Test 3251 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3251)
+#      Expected: "" (<p repeat="1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3252
+# Test 3252 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3252)
+#      Expected: "" (<p repeat="00001" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3253
+# Test 3253 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3253)
+#      Expected: "" (<p repeat="-1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3254
+# Test 3254 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3254)
+#      Expected: "" (<p repeat="-00001" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3255
+# Test 3255 got: "/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3255)
+#      Expected: "" (<p repeat="-1255" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3256
+# Test 3256 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3256)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="template  " xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3257
+# Test 3257 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3257)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="templatE" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3258
+# Test 3258 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3258)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="  template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3259
+# Test 3259 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3259)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="0.000" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3260
+# Test 3260 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3260)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat=".12" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3261
+# Test 3261 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3261)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="120 " xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3262
+# Test 3262 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3262)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="+21434" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3263
+# Test 3263 got: "/p/@repeat;attribute not defined;m\n/p/@repeat;repeat:syntax error;m" (t/content-checker.pl at line 68 fail #3263)
+#      Expected: "/p/@repeat;repeat:syntax error;m" (<p repeat="template-text" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3264
+# Test 3264 got: "/div/p/@repeat-template;attribute not defined;m\n/div/p/@repeat;attribute not defined;m\n/div/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3264)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p repeat="1" repeat-template="t">x</p>
+#<p id="t" repeat="template">x</p>
+#</div>)
+not ok 3265
+# Test 3265 got: "/div/p/@repeat-template;attribute not defined;m\n/div/p/@repeat;attribute not defined;m\n/div/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3265)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p id="t" repeat="template">x</p>
+#<p repeat="1" repeat-template="t">x</p>
+#</div>)
 ok 3266
 ok 3267
 ok 3268
@@ -3649,45 +3541,135 @@ ok 3270
 ok 3271
 ok 3272
 ok 3273
-ok 3274
-ok 3275
-ok 3276
-ok 3277
-ok 3278
-ok 3279
-ok 3280
-ok 3281
-ok 3282
-ok 3283
-ok 3284
-ok 3285
-ok 3286
-ok 3287
-ok 3288
-ok 3289
-ok 3290
-ok 3291
-ok 3292
-ok 3293
-ok 3294
-ok 3295
-ok 3296
-ok 3297
-ok 3298
-ok 3299
-ok 3300
-ok 3301
-ok 3302
-ok 3303
-ok 3304
-ok 3305
-ok 3306
-ok 3307
-ok 3308
-ok 3309
-ok 3310
-ok 3311
-ok 3312
+not ok 3274
+# Test 3274 got: "/div/input/@type;enumerated:invalid;m\n/div/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3274)
+#      Expected: "/div/input/@type;enumerated:invalid;m" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<input type="add" template="t"/>
+#<p repeat="template" id="t">x</p>
+#</div>)
+not ok 3275
+# Test 3275 got: "/div/button/@template;attribute not defined;m\n/div/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3275)
+#      Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<button type="add" template="t">x</button>
+#<p repeat="template" id="t">x</p>
+#</div>)
+not ok 3276
+# Test 3276 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3276)
+#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3277
+# Test 3277 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3277)
+#      Expected: "" (<p repeat="template" repeat-min="0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3278
+# Test 3278 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3278)
+#      Expected: "" (<p repeat="template" repeat-min="1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3279
+# Test 3279 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3279)
+#      Expected: "" (<p repeat="template" repeat-min="01" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3280
+# Test 3280 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3280)
+#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3281
+# Test 3281 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3281)
+#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3282
+# Test 3282 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3282)
+#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3283
+# Test 3283 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3283)
+#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3284
+# Test 3284 got: "/p/@repeat-min;attribute not defined;m\n/p/@repeat-min;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3284)
+#      Expected: "/p/@repeat-min;nninteger:syntax error;m" (<p repeat="template" repeat-min="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3285
+# Test 3285 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3285)
+#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3286
+# Test 3286 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3286)
+#      Expected: "" (<p repeat="template" repeat-max="0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3287
+# Test 3287 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3287)
+#      Expected: "" (<p repeat="template" repeat-max="1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3288
+# Test 3288 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3288)
+#      Expected: "" (<p repeat="template" repeat-max="01" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3289
+# Test 3289 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3289)
+#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3290
+# Test 3290 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3290)
+#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3291
+# Test 3291 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3291)
+#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3292
+# Test 3292 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3292)
+#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3293
+# Test 3293 got: "/p/@repeat-max;attribute not defined;m\n/p/@repeat-max;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3293)
+#      Expected: "/p/@repeat-max;nninteger:syntax error;m" (<p repeat="template" repeat-max="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3294
+# Test 3294 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3294)
+#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3295
+# Test 3295 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3295)
+#      Expected: "" (<p repeat="template" repeat-start="0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3296
+# Test 3296 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3296)
+#      Expected: "" (<p repeat="template" repeat-start="1" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3297
+# Test 3297 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3297)
+#      Expected: "" (<p repeat="template" repeat-start="01" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3298
+# Test 3298 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3298)
+#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="template" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3299
+# Test 3299 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3299)
+#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3300
+# Test 3300 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3300)
+#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3301
+# Test 3301 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3301)
+#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3302
+# Test 3302 got: "/p/@repeat-start;attribute not defined;m\n/p/@repeat-start;nninteger:syntax error;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3302)
+#      Expected: "/p/@repeat-start;nninteger:syntax error;m" (<p repeat="template" repeat-start="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>)
+not ok 3303
+# Test 3303 got: "/x/@repeat;attribute not defined;m\n/x/@repeat;repeat:syntax error;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3303)
+#      Expected: "/x/@repeat;repeat:syntax error;m\n/x;unknown element;u" (<x html:repeat="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
+not ok 3304
+# Test 3304 got: "/x/@repeat-start;attribute not defined;m\n/x/@repeat-start;nninteger:syntax error;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3304)
+#      Expected: "/x/@repeat-start;nninteger:syntax error;m\n/x;unknown element;u" (<x html:repeat-start="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
+not ok 3305
+# Test 3305 got: "/x/@repeat-min;attribute not defined;m\n/x/@repeat-min;nninteger:syntax error;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3305)
+#      Expected: "/x/@repeat-min;nninteger:syntax error;m\n/x;unknown element;u" (<x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
+not ok 3306
+# Test 3306 got: "/x/@repeat-max;attribute not defined;m\n/x/@repeat-max;nninteger:syntax error;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3306)
+#      Expected: "/x/@repeat-max;nninteger:syntax error;m\n/x;unknown element;u" (<x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>)
+not ok 3307
+# Test 3307 got: "/x/@repeat-template;attribute not defined;m\n/x/p/@repeat;attribute not defined;m\n/x;unknown element;u" (t/content-checker.pl at line 68 fail #3307)
+#      Expected: "/x;unknown element;u" (<x html:repeat-template="x" xmlns:html="http://www.w3.org/1999/xhtml"><p repeat="template" id="x" xmlns="http://www.w3.org/1999/xhtml">x</p></x>)
+not ok 3308
+# Test 3308 got: "/p/@repeat;attribute not allowed;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3308)
+#      Expected: "/p/@repeat;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+#    html:repeat="template">x</p>)
+not ok 3309
+# Test 3309 got: "/p/@repeat-min;attribute not allowed;m\n/p/@repeat-min;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3309)
+#      Expected: "/p/@repeat-min;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+#    html:repeat-min="1" repeat="template">x</p>)
+not ok 3310
+# Test 3310 got: "/p/@repeat-max;attribute not allowed;m\n/p/@repeat-max;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3310)
+#      Expected: "/p/@repeat-max;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+#    html:repeat-max="5" repeat="template">x</p>)
+not ok 3311
+# Test 3311 got: "/p/@repeat-start;attribute not allowed;m\n/p/@repeat-start;attribute not defined;m\n/p/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3311)
+#      Expected: "/p/@repeat-start;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+#    html:repeat-start="0" repeat="template">x</p>)
+not ok 3312
+# Test 3312 got: "/p/@repeat-template;attribute not allowed;m\n/p/@repeat-template;attribute not defined;m\n/p/q/@repeat;attribute not defined;m" (t/content-checker.pl at line 68 fail #3312)
+#      Expected: "/p/@repeat-template;attribute not allowed;m" (<p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
+#    html:repeat-template="t"><q repeat="template" id="t">x</q></p>)
+# t/dom-conformance/html-datatemplate.dat
 ok 3313
 ok 3314
 ok 3315
@@ -3732,3 +3714,288 @@ ok 3353
 ok 3354
 ok 3355
 ok 3356
+ok 3357
+ok 3358
+ok 3359
+ok 3360
+ok 3361
+ok 3362
+ok 3363
+ok 3364
+ok 3365
+ok 3366
+ok 3367
+ok 3368
+ok 3369
+ok 3370
+ok 3371
+ok 3372
+ok 3373
+ok 3374
+ok 3375
+ok 3376
+ok 3377
+ok 3378
+ok 3379
+ok 3380
+ok 3381
+ok 3382
+ok 3383
+ok 3384
+ok 3385
+ok 3386
+ok 3387
+ok 3388
+ok 3389
+ok 3390
+ok 3391
+ok 3392
+ok 3393
+ok 3394
+ok 3395
+ok 3396
+ok 3397
+ok 3398
+ok 3399
+ok 3400
+ok 3401
+ok 3402
+ok 3403
+ok 3404
+ok 3405
+ok 3406
+ok 3407
+ok 3408
+ok 3409
+ok 3410
+ok 3411
+ok 3412
+ok 3413
+ok 3414
+ok 3415
+ok 3416
+ok 3417
+ok 3418
+ok 3419
+ok 3420
+ok 3421
+ok 3422
+ok 3423
+ok 3424
+ok 3425
+ok 3426
+ok 3427
+ok 3428
+ok 3429
+ok 3430
+ok 3431
+ok 3432
+ok 3433
+ok 3434
+ok 3435
+ok 3436
+ok 3437
+ok 3438
+ok 3439
+ok 3440
+ok 3441
+ok 3442
+ok 3443
+ok 3444
+ok 3445
+ok 3446
+ok 3447
+ok 3448
+ok 3449
+ok 3450
+ok 3451
+ok 3452
+ok 3453
+ok 3454
+ok 3455
+ok 3456
+ok 3457
+ok 3458
+ok 3459
+ok 3460
+ok 3461
+ok 3462
+ok 3463
+ok 3464
+ok 3465
+ok 3466
+ok 3467
+ok 3468
+ok 3469
+ok 3470
+ok 3471
+ok 3472
+ok 3473
+ok 3474
+ok 3475
+ok 3476
+ok 3477
+ok 3478
+ok 3479
+ok 3480
+ok 3481
+ok 3482
+ok 3483
+ok 3484
+ok 3485
+ok 3486
+ok 3487
+ok 3488
+ok 3489
+ok 3490
+ok 3491
+ok 3492
+ok 3493
+ok 3494
+ok 3495
+ok 3496
+ok 3497
+ok 3498
+ok 3499
+ok 3500
+ok 3501
+ok 3502
+ok 3503
+ok 3504
+ok 3505
+ok 3506
+ok 3507
+ok 3508
+ok 3509
+ok 3510
+ok 3511
+ok 3512
+ok 3513
+ok 3514
+ok 3515
+ok 3516
+ok 3517
+ok 3518
+ok 3519
+ok 3520
+ok 3521
+ok 3522
+ok 3523
+ok 3524
+ok 3525
+ok 3526
+ok 3527
+ok 3528
+ok 3529
+ok 3530
+ok 3531
+ok 3532
+ok 3533
+ok 3534
+ok 3535
+ok 3536
+ok 3537
+ok 3538
+ok 3539
+ok 3540
+ok 3541
+ok 3542
+ok 3543
+ok 3544
+ok 3545
+ok 3546
+ok 3547
+ok 3548
+ok 3549
+ok 3550
+ok 3551
+ok 3552
+ok 3553
+ok 3554
+ok 3555
+ok 3556
+ok 3557
+ok 3558
+ok 3559
+ok 3560
+ok 3561
+ok 3562
+ok 3563
+ok 3564
+ok 3565
+ok 3566
+ok 3567
+ok 3568
+ok 3569
+ok 3570
+ok 3571
+ok 3572
+ok 3573
+ok 3574
+ok 3575
+ok 3576
+ok 3577
+ok 3578
+ok 3579
+ok 3580
+ok 3581
+ok 3582
+ok 3583
+ok 3584
+ok 3585
+ok 3586
+ok 3587
+ok 3588
+ok 3589
+ok 3590
+ok 3591
+ok 3592
+ok 3593
+ok 3594
+ok 3595
+ok 3596
+ok 3597
+ok 3598
+ok 3599
+ok 3600
+ok 3601
+ok 3602
+ok 3603
+ok 3604
+ok 3605
+ok 3606
+ok 3607
+ok 3608
+ok 3609
+ok 3610
+ok 3611
+ok 3612
+ok 3613
+ok 3614
+ok 3615
+ok 3616
+ok 3617
+ok 3618
+ok 3619
+ok 3620
+ok 3621
+ok 3622
+ok 3623
+ok 3624
+ok 3625
+ok 3626
+ok 3627
+ok 3628
+ok 3629
+ok 3630
+ok 3631
+ok 3632
+ok 3633
+ok 3634
+ok 3635
+ok 3636
+ok 3637
+ok 3638
+ok 3639
+ok 3640
+ok 3641
