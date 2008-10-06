@@ -5916,3 +5916,1387 @@
     maxlength="3"/>
 #errors
 /input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="0000001"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="32"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="-1.4142135623730950488016887242097e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="3.17e4"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="0.4500"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="0042.000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="42e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="4.2e1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="420e-1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="0e+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="+1e+3"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step=".42e2"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="65000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="66000.0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="Any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="ANY"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="any "/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step=" Any"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="anything"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="0"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    step="0.00"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="0000001"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="32"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="-1.4142135623730950488016887242097e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="3.17e4"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="0.4500"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="0042.000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="42e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="4.2e1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="420e-1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="0e+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="+1e+3"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step=".42e2"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="65000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="66000.0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="Any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="ANY"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="any "/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step=" Any"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="anything"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="0"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    step="0.00"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="0000001"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="32"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="-1.4142135623730950488016887242097e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="3.17e4"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="0.4500"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="0042.000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="42e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="4.2e1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="420e-1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="0e+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="+1e+3"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step=".42e2"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="65000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="66000.0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="Any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="ANY"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="any "/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step=" Any"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="anything"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="0"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    step="0.00"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="0000001"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="32"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="-1.4142135623730950488016887242097e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="3.17e4"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="0.4500"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="0042.000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="42e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="4.2e1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="420e-1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="0e+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="+1e+3"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step=".42e2"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="65000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="66000.0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="Any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="ANY"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="any "/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step=" Any"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="anything"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="0"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    step="0.00"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="0000001"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="32"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="-1.4142135623730950488016887242097e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="3.17e4"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="0.4500"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="0042.000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="42e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="4.2e1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="420e-1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="0e+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="+1e+3"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step=".42e2"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="65000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="66000.0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="Any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="ANY"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="any "/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step=" Any"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="anything"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="0"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    step="0.00"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="0000001"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="32"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="-1.4142135623730950488016887242097e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="3.17e4"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="0.4500"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="0042.000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="42e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="4.2e1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="420e-1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="0e+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="+1e+3"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step=".42e2"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="65000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="66000.0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="Any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="ANY"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="any "/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step=" Any"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="anything"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="0"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    step="0.00"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="0000001"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="32"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="-1.4142135623730950488016887242097e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="3.17e4"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="0.4500"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="0042.000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="42e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="4.2e1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="420e-1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="0e+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="+1e+3"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step=".42e2"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="65000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="66000.0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="Any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="ANY"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="any "/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step=" Any"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="anything"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="0"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    step="0.00"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="0000001"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="32"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="-1.4142135623730950488016887242097e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="3.17e4"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="0.4500"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="0042.000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="42e0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="4.2e1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="420e-1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="0e+0"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="+1e+3"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step=".42e2"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="65000"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="66000.0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="Any"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="ANY"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="any "/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step=" Any"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="anything"/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step=""/>
+#errors
+/input/@step;float:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="0"/>
+#errors
+/input/@step;float:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    step="0.00"/>
+#errors
+/input/@step;float:out of range;m

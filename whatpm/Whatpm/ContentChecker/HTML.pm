@@ -622,6 +622,29 @@ my $GetHTMLFloatingPointNumberAttrChecker = sub {
   ## TODO: scientific notation
 }; # $GetHTMLFloatingPointNumberAttrChecker
 
+my $StepAttrChecker = sub {
+  ## NOTE: A valid floating point number (> 0), or ASCII
+  ## case-insensitive "any".
+  
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  if ($value =~ /\A-?[0-9]+(?>\.[0-9]*)?\z/ or
+      $value =~ /\A-?\.[0-9]+\z/) {
+    unless ($value > 0) {
+      $self->{onerror}->(node => $attr, type => 'float:out of range',
+                         level => $self->{level}->{must});
+    }
+  } elsif ($value =~ /\A[Aa][Nn][Yy]\z/) {
+    #
+  } else {
+    $self->{onerror}->(node => $attr,
+                       type => 'float:syntax error',
+                       level => $self->{level}->{must});
+  }
+  
+  ## TODO: scientific
+}; # $StepAttrChecker
+
 ## HTML4 %Length;
 my $HTMLLengthAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -5554,7 +5577,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             ## TODO: step
+             step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid UTC date and time string.
@@ -5571,7 +5594,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             ## TODO: step
+             step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid date string.
@@ -5588,7 +5611,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             ## TODO: step
+             step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid month string.
@@ -5605,7 +5628,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             ## TODO: step
+             step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid week string.
@@ -5622,7 +5645,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             ## TODO: step
+             step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid time string.
@@ -5639,7 +5662,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             ## TODO: step
+             step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid local date and time string.
@@ -5657,7 +5680,7 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: min & max tests
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             ## TODO: step
+             step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid floating point number.
@@ -5673,7 +5696,7 @@ $Element->{$HTML_NS}->{input} = {
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
                ## TODO: min & max tests
-             ## TODO: step
+             step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid floating point number.
