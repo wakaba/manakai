@@ -5552,7 +5552,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: maxlength
              ## TODO: pattern
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              value => sub {
                ## NOTE: No restriction.
@@ -5569,7 +5569,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: max
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              ## TODO: step
              value => sub {
                ## NOTE: No restriction.
@@ -5586,7 +5586,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: max
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              ## TODO: step
              value => sub {
                ## NOTE: No restriction.
@@ -5603,7 +5603,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: max
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              ## TODO: step
              value => sub {
                ## NOTE: No restriction.
@@ -5620,7 +5620,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: max
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              ## TODO: step
              value => sub {
                ## NOTE: No restriction.
@@ -5637,7 +5637,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: max
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              ## TODO: step
              value => sub {
                ## NOTE: No restriction.
@@ -5654,7 +5654,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: max
              ## TODO: min
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              ## TODO: step
              value => sub {
                ## NOTE: No restriction.
@@ -5672,7 +5672,7 @@ $Element->{$HTML_NS}->{input} = {
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
                ## TODO: min & max tests
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              ## TODO: step
              value => sub {
                ## NOTE: No restriction.
@@ -5699,7 +5699,7 @@ $Element->{$HTML_NS}->{input} = {
             $checker = 
             {
              ## TDDO: checked
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
             ## TODO: There MUST be another input type=radio with same
@@ -5709,7 +5709,7 @@ $Element->{$HTML_NS}->{input} = {
             $checker =
             {
              ## TODO: accept
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'submit') {
             $checker =
@@ -5782,7 +5782,6 @@ $Element->{$HTML_NS}->{input} = {
              oninput => $HTMLEventHandlerAttrChecker,
              oninvalid => $HTMLEventHandlerAttrChecker,
              replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
-             required => $GetHTMLBooleanAttrChecker->('required'),
              target => $HTMLTargetAttrChecker,
              usemap => $HTMLUsemapAttrChecker,
 
@@ -5794,7 +5793,7 @@ $Element->{$HTML_NS}->{input} = {
              ## TODO: maxlength
              ## TODO: pattern
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             ## TODO: required
+             required => $GetHTMLBooleanAttrChecker->('required'),
              size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              value => sub {
                ## NOTE: No restriction.
