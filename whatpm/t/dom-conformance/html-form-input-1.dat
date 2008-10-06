@@ -4103,6 +4103,7 @@
     type="text"
     size="0"/>
 #errors
+/input/@size;nninteger:out of range;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -4204,6 +4205,7 @@
     type="email"
     size="0"/>
 #errors
+/input/@size;nninteger:out of range;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -4305,6 +4307,7 @@
     type="url"
     size="0"/>
 #errors
+/input/@size;nninteger:out of range;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -4406,6 +4409,7 @@
     type="password"
     size="0"/>
 #errors
+/input/@size;nninteger:out of range;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -5320,3 +5324,595 @@
     required="off"/>
 #errors
 /input/@required;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength=""/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="000000010"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="-0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="-12"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="0.00"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="100.0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="  4"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="55 "/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="+43"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="4e5"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="4px"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    maxlength="5em"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength=""/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="000000010"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="-0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="-12"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="0.00"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="100.0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="  4"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="55 "/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="+43"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="4e5"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="4px"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    maxlength="5em"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength=""/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="000000010"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="-0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="-12"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="0.00"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="100.0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="  4"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="55 "/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="+43"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="4e5"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="4px"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    maxlength="5em"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength=""/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="000000010"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="-0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="-12"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="0.00"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="100.0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="  4"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="55 "/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="+43"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="4e5"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="4px"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    maxlength="5em"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value=""
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value="ab"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value=""
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value="1234567890"
+    maxlength="10"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value="12345678901"
+    maxlength="10"/>
+#errors
+/input/@value;value too long;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value="\U00010000"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value=""
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="ab"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value=""
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="1234567890"
+    maxlength="10"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="12345678901"
+    maxlength="10"/>
+#errors
+/input/@value;value too long;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="\U00010000"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value=""
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value="ab"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value=""
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value="1234567890"
+    maxlength="10"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value="12345678901"
+    maxlength="10"/>
+#errors
+/input/@value;value too long;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value="\U00010000"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value=""
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value="ab"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value=""
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value="1234567890"
+    maxlength="10"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value="12345678901"
+    maxlength="10"/>
+#errors
+/input/@value;value too long;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value="\U00010000"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value="\U00010000\U00010000"
+    maxlength="3"/>
+#errors
+/input/@value;value too long;m

@@ -5543,22 +5543,6 @@ $Element->{$HTML_NS}->{input} = {
             }->{$attr_ln} || $checker;
             ## TODO: Warn if no name attribute?
             ## TODO: Warn if name!=_charset_ and no value attribute?
-          } elsif ($state eq 'password') {
-            $checker =
-            {
-             autocomplete => $GetHTMLEnumeratedAttrChecker->({
-               on => 1, off => 1,
-             }),
-             ## TODO: maxlength
-             ## TODO: pattern
-             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             required => $GetHTMLBooleanAttrChecker->('required'),
-             size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-             value => sub {
-               ## NOTE: No restriction.
-               ## TODO: Warn if it contains CR or LF?
-             },
-            }->{$attr_ln};
           } elsif ($state eq 'datetime') {
             $checker =
             {
@@ -5759,7 +5743,7 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: template tests
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
-          } else { # Text, E-mail, URL
+          } else { # Text, E-mail, URL, Password
             $checker =
             {
              accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
@@ -5790,11 +5774,36 @@ $Element->{$HTML_NS}->{input} = {
                on => 1, off => 1,
              }),
              ## TODO: list
-             ## TODO: maxlength
+             maxlength => sub {
+               my ($self, $attr, $item, $element_state) = @_;
+
+               $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_);
+
+               if ($attr->value =~ /^[\x09\x0A\x0D\x20]*([0-9]+)/) {
+                 ## NOTE: Applying the rules for parsing non-negative
+                 ## integers results in a number.
+                 my $max_allowed_value_length = 0+$1;
+
+                 my $value = $item->{node}->get_attribute_ns (undef, 'value');
+                 if (defined $value) {
+                   my $codepoint_length = length $value;
+                   $codepoint_length++
+                       while $value =~ /[\x{10000}-\x{10FFFF}]/g;
+
+                   if ($codepoint_length > $max_allowed_value_length) {
+                     $self->{onerror}
+                         ->(node => $item->{node}
+                              ->get_attribute_node_ns (undef, 'value'),
+                            type => 'value too long',
+                            level => $self->{level}->{must});
+                   }
+                 }
+               }
+             },
              ## TODO: pattern
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+             size => $GetHTMLNonNegativeIntegerAttrChecker->(sub {shift > 0}),
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if it contains CR or LF?
@@ -5802,6 +5811,7 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: Warn if not a URL (URL state)?
              },
             }->{$attr_ln} || $checker;
+            $checker = '' if $state eq 'password' and $attr_ln eq 'list';
             $state = 'text';
           }
         }
