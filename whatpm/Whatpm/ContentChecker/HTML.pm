@@ -5541,7 +5541,36 @@ $Element->{$HTML_NS}->{input} = {
             }->{$attr_ln} || $checker;
             ## TODO: Warn if no name attribute?
             ## TODO: Warn if name!=_charset_ and no value attribute?
-          } else { # Text state
+          } elsif ($state eq 'password') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: maxlength
+             ## TODO: pattern
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: size
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if it contains CR or LF?
+             },
+            }->{$attr_ln};
+          } elsif ($state eq 'datetime') {
+            $checker =
+            {
+             ## TODO: autocomplete
+             ## TODO: list
+             ## TODO: max
+             ## TODO: min
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: step
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if not a valid UTC date and time string.
+             },
+            }->{$attr_ln} || $checker;
+          } else { # Text, E-mail, URL
             $checker =
             {
              accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
@@ -5593,6 +5622,20 @@ $Element->{$HTML_NS}->{input} = {
                               ## "authors should ensure that in each
                               ## set of radio buttons that one is
                               ## initially "on"."  [HTML4] [WF2]
+
+             ## TODO: autocomplete
+             ## TODO: list
+             ## TODO: maxlength
+             ## TODO: pattern
+             ## TODO: readonly
+             ## TODO: required
+             ## TODO: size
+             value => sub {
+               ## NOTE: No restriction.
+               ## TODO: Warn if it contains CR or LF?
+               ## TODO: Warn if not addr-spec (E-Mail state)?
+               ## TODO: Warn if not a URL (URL state)?
+             },
             }->{$attr_ln} || $checker;
             $state = 'text';
           }
