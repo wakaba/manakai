@@ -5513,6 +5513,12 @@ $Element->{$HTML_NS}->{input} = {
          ## NOTE: Value of an empty string means that the attribute is only
          ## applicable for a specific set of states.
          accept => '',
+         'accept-charset' => $HTMLCharsetsAttrChecker,
+             ## NOTE: To which states it applies is not defined in RFC 2070.
+             ## TODO: tests
+         accesskey => $HTMLAccesskeyAttrChecker,
+             ## NOTE: Not applied to |hidden| [WF2].
+             ## TODO: tests
          action => '',
          alt => '',
          autocomplete => '',
@@ -5523,6 +5529,7 @@ $Element->{$HTML_NS}->{input} = {
              ## ISSUE: No HTML5 definition yet.  ## TODO: Tests
          enctype => '',
          form => $HTMLFormAttrChecker,
+         ismap => '', ## NOTE: "MUST" [HTML4]
          list => '',
          max => '',
          maxlength => '',
@@ -5532,6 +5539,11 @@ $Element->{$HTML_NS}->{input} = {
            ## ISSUE: No HTML5 definition yet.
            ## TODO: tests
          },
+         onformchange => $HTMLEventHandlerAttrChecker, # [WF2]
+         onforminput => $HTMLEventHandlerAttrChecker, # [WF2]
+         oninput => $HTMLEventHandlerAttrChecker, # [WF2]
+         oninvalid => $HTMLEventHandlerAttrChecker, # [WF2]
+         ## TODO: tests for four attributes above
          pattern => '',
          readonly => '',
          required => '',
@@ -5564,6 +5576,7 @@ $Element->{$HTML_NS}->{input} = {
                }
              },
             }->{$attr_ln} || $checker;
+            $checker = '' if $attr_ln eq 'accesskey';
             ## TODO: Warn if no name attribute?
             ## TODO: Warn if name!=_charset_ and no value attribute?
           } elsif ($state eq 'datetime') {
@@ -5705,7 +5718,9 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'checkbox' or $state eq 'radio') {
             $checker = 
             {
-             ## TDDO: checked
+             checked => $GetHTMLBooleanAttrChecker->('checked'),
+                 ## ISSUE: checked value not (yet?) defined.
+                 ## TODO: tests
              required => $GetHTMLBooleanAttrChecker->('required'),
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
@@ -5721,16 +5736,36 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'submit') {
             $checker =
             {
-             ## TODO: action
-             ## TODO: enctype
-             ## TODO: method
-             ## TODO: target
+             action => $HTMLURIAttrChecker,
+                 ## ISSUE: Not yet defined.
+                 ## TODO: tests
+             enctype => $HTMLIMTAttrChecker,
+                 ## ISSUE: Not yet defined.
+                 ## TODO: tests
+             method => $GetHTMLEnumeratedAttrChecker->({
+               get => 1, post => 1, put => 1, delete => 1,
+             }),
+                 ## ISSUE: Not yet defined.
+                 ## TODO: tests
+             replace => $GetHTMLEnumeratedAttrChecker->({
+               document => 1, values => 1,
+             }),
+                 ## TODO: tests
+             target => $HTMLTargetAttrChecker,
+                 ## ISSUE: Not yet defined.
+                 ## TODO: tests
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'image') {
             $checker =
             {
-             ## TODO: action
+             action => $HTMLURIAttrChecker,
+                 ## ISSUE: Not yet defined.
+                 ## TODO: tests
+             align => $GetHTMLEnumeratedAttrChecker->({
+               top => 1, middle => 1, bottom => 1, left => 1, right => 1,
+             }),
+                 ## TODO: tests
              alt => sub {
                my ($self, $attr) = @_;
                my $value = $attr->value;
@@ -5740,12 +5775,28 @@ $Element->{$HTML_NS}->{input} = {
                                     level => $self->{level}->{must});
                }
              },
-             ## TODO: enctype
-             ## TODO: method
+             enctype => $HTMLIMTAttrChecker,
+                 ## ISSUE: Not yet defined.
+                 ## TODO: tests
+             ismap => $GetHTMLBooleanAttrChecker->('ismap'),
+                 ## TODO: tests
+             method => $GetHTMLEnumeratedAttrChecker->({
+               get => 1, post => 1, put => 1, delete => 1,
+             }),
+                 ## ISSUE: Not yet defined.
+                 ## TODO: tests
+             replace => $GetHTMLEnumeratedAttrChecker->({
+               document => 1, values => 1,
+             }),
+                 ## TODO: tests
              src => $HTMLURIAttrChecker,
                ## TODO: There is requirements on the referenced resource.
                ## TODO: tests
-             ## TODO: target
+             target => $HTMLTargetAttrChecker,
+                 ## ISSUE: Not yet defined.
+                 ## TODO: tests
+             usemap => $HTMLUsemapAttrChecker,
+                 ## TODO: tests
             }->{$attr_ln} || $checker;
             ## TODO: alt & src are required.
           } elsif ({
@@ -5769,33 +5820,10 @@ $Element->{$HTML_NS}->{input} = {
           } else { # Text, E-mail, URL, Password
             $checker =
             {
-             accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
-             'accept-charset' => $HTMLCharsetsAttrChecker,
-             accesskey => $HTMLAccesskeyAttrChecker,
-             action => $HTMLURIAttrChecker,
-             align => $GetHTMLEnumeratedAttrChecker->({
-               top => 1, middle => 1, bottom => 1, left => 1, right => 1,
-             }),
-             checked => $GetHTMLBooleanAttrChecker->('checked'),
-             enctype => $HTMLIMTAttrChecker,
-             ## TODO: inputmode [WF2]
-             ismap => $GetHTMLBooleanAttrChecker->('ismap'),
-             maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-             method => $GetHTMLEnumeratedAttrChecker->({
-               get => 1, post => 1, put => 1, delete => 1,
-             }),
-             onformchange => $HTMLEventHandlerAttrChecker,
-             onforminput => $HTMLEventHandlerAttrChecker,
-             oninput => $HTMLEventHandlerAttrChecker,
-             oninvalid => $HTMLEventHandlerAttrChecker,
-             replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
-             target => $HTMLTargetAttrChecker,
-             usemap => $HTMLUsemapAttrChecker,
-
-
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
+             ## TODO: inputmode [WF2]
              ## TODO: list
              maxlength => sub {
                my ($self, $attr, $item, $element_state) = @_;
