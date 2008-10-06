@@ -5417,112 +5417,162 @@ $Element->{$HTML_NS}->{fieldset} = {
 $Element->{$HTML_NS}->{input} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
-    'accept-charset' => $HTMLCharsetsAttrChecker,
-    accesskey => $HTMLAccesskeyAttrChecker,
-    action => $HTMLURIAttrChecker,
-    align => $GetHTMLEnumeratedAttrChecker->({
-      top => 1, middle => 1, bottom => 1, left => 1, right => 1,
-    }),
-    alt => sub {}, ## NOTE: Text [M12N] ## TODO: |alt| should be provided for |type=image| [HTML4]
-        ## NOTE: HTML4 has a "should" for accessibility, which cannot be tested
-        ## here.
-    autocomplete => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
-    autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
-    checked => $GetHTMLBooleanAttrChecker->('checked'),
-    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    enctype => $HTMLIMTAttrChecker,
-    form => $HTMLFormAttrChecker,
-    ## TODO: inputmode [WF2]
-    ismap => $GetHTMLBooleanAttrChecker->('ismap'),
-    ## TODO: list [WF2]
-    ## TODO: max [WF2]
-    maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    method => $GetHTMLEnumeratedAttrChecker->({
-      get => 1, post => 1, put => 1, delete => 1,
-    }),
-    ## TODO: min [WF2]
-    name => sub {}, ## NOTE: CDATA [M12N]
-    onformchange => $HTMLEventHandlerAttrChecker,
-    onforminput => $HTMLEventHandlerAttrChecker,
-    oninput => $HTMLEventHandlerAttrChecker,
-    oninvalid => $HTMLEventHandlerAttrChecker,
-    ## TODO: pattern
-    readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-    replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
-    required => $GetHTMLBooleanAttrChecker->('required'),
-    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    src => $HTMLURIAttrChecker,
-    ## TODO: step [WF2]
-    target => $HTMLTargetAttrChecker,
-    ## NOTE: According to Web Forms 2.0, |input| attribute has |template|
-    ## attribute to support the |add| button type (as part of repetition
-    ## template feature).  It conflicts with the |template| global attribute
-    ## introduced as part of the data template feature.
-    ## NOTE: |template| attribute as defined in Web Forms 2.0 has no
-    ## author requirement.
-    type => $GetHTMLEnumeratedAttrChecker->({
-      text => 1, password => 1, checkbox => 1, radio => 1, submit => 1,
-      reset => 1, file => 1, hidden => 1, image => 1, button => 1,
-      ## [WF2]
-      datatime => 1, 'datetime-local' => 1, date => 1, month => 1, week => 1,
-      time => 1, number => 1, range => 1, email => 1, url => 1,
-      add => 1, remove => 1, 'move-up' => 1, 'move-down' => 1,
-    }),
-    usemap => $HTMLUsemapAttrChecker,
-    value => sub {}, ## NOTE: CDATA [M12N] ## TODO: "optional except when the type attribute has the value "radio" or "checkbox"" [HTML4] ## TODO: constraints [WF2]
-    ## TODO: "authors should ensure that in each set of radio buttons that one is initially "on"." [HTML4] [WF2]
-  }, {
-    %HTMLAttrStatus,
-    %HTMLM12NCommonAttrStatus,
-    accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
-    'accept-charset' => FEATURE_HTML2X_RFC,
-    accesskey => FEATURE_M12N10_REC,
-    action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    align => FEATURE_M12N10_REC_DEPRECATED,
-    alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    autocomplete => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    checked => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
-    disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
-    enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    inputmode => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
-    ismap => FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
-    list => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    max => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
-    method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    min => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onformchange => FEATURE_WF2_INFORMATIVE,
-    onforminput => FEATURE_WF2_INFORMATIVE,
-    oninput => FEATURE_WF2,
-    oninvalid => FEATURE_WF2,
-    onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    pattern => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    readonly => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
-    replace => FEATURE_WF2,
-    required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    sdapref => FEATURE_HTML20_RFC,
-    size => FEATURE_HTML5_DEFAULT | FEATURE_WF2X_DEPRECATED | FEATURE_M12N10_REC,
-    src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    step => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    template => FEATURE_WF2,
-    type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
-    value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  }),
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
+    my %attr;
+    my $coords;
+    for my $attr (@{$item->{node}->attributes}) {
+      my $attr_ns = $attr->namespace_uri;
+      $attr_ns = '' unless defined $attr_ns;
+      my $attr_ln = $attr->manakai_local_name;
+      my $checker;
+      my $status;
+      if ($attr_ns eq '') {
+        $status =
+        {
+         %HTMLAttrStatus,
+         %HTMLM12NCommonAttrStatus,
+         accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+         'accept-charset' => FEATURE_HTML2X_RFC,
+         accesskey => FEATURE_M12N10_REC,
+         action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         align => FEATURE_M12N10_REC_DEPRECATED,
+         alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         autocomplete => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         checked => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         datafld => FEATURE_HTML4_REC_RESERVED,
+         dataformatas => FEATURE_HTML4_REC_RESERVED,
+         datasrc => FEATURE_HTML4_REC_RESERVED,
+         disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+         enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         inputmode => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
+         ismap => FEATURE_M12N10_REC,
+         lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
+         list => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         max => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+         method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         min => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         onformchange => FEATURE_WF2_INFORMATIVE,
+         onforminput => FEATURE_WF2_INFORMATIVE,
+         oninput => FEATURE_WF2,
+         oninvalid => FEATURE_WF2,
+         onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         pattern => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         readonly => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+         replace => FEATURE_WF2,
+         required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         sdapref => FEATURE_HTML20_RFC,
+         size => FEATURE_HTML5_DEFAULT | FEATURE_WF2X_DEPRECATED | FEATURE_M12N10_REC,
+         src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         step => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         template => FEATURE_WF2,
+         type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
+         value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+        }->{$attr_ln};
+
+        $checker =
+        {
+         accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
+         'accept-charset' => $HTMLCharsetsAttrChecker,
+         accesskey => $HTMLAccesskeyAttrChecker,
+         action => $HTMLURIAttrChecker,
+         align => $GetHTMLEnumeratedAttrChecker->({
+           top => 1, middle => 1, bottom => 1, left => 1, right => 1,
+         }),
+         alt => sub {}, ## NOTE: Text [M12N] ## TODO: |alt| should be provided for |type=image| [HTML4]
+         ## NOTE: HTML4 has a "should" for accessibility, which cannot be tested
+         ## here.
+         autocomplete => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
+         autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
+         checked => $GetHTMLBooleanAttrChecker->('checked'),
+         disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+         enctype => $HTMLIMTAttrChecker,
+         form => $HTMLFormAttrChecker,
+         ## TODO: inputmode [WF2]
+         ismap => $GetHTMLBooleanAttrChecker->('ismap'),
+         ## TODO: list [WF2]
+         ## TODO: max [WF2]
+         maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+         method => $GetHTMLEnumeratedAttrChecker->({
+           get => 1, post => 1, put => 1, delete => 1,
+         }),
+         ## TODO: min [WF2]
+         name => sub {}, ## NOTE: CDATA [M12N]
+         onformchange => $HTMLEventHandlerAttrChecker,
+         onforminput => $HTMLEventHandlerAttrChecker,
+         oninput => $HTMLEventHandlerAttrChecker,
+         oninvalid => $HTMLEventHandlerAttrChecker,
+         ## TODO: pattern
+         readonly => $GetHTMLBooleanAttrChecker->('readonly'),
+         replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
+         required => $GetHTMLBooleanAttrChecker->('required'),
+         size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+         src => $HTMLURIAttrChecker,
+         ## TODO: step [WF2]
+         target => $HTMLTargetAttrChecker,
+         ## NOTE: According to Web Forms 2.0, |input| attribute has
+         ## |template| attribute to support the |add| button type (as
+         ## part of repetition template feature).  It conflicts with
+         ## the |template| global attribute introduced as part of the
+         ## data template feature.  NOTE: |template| attribute as
+         ## defined in Web Forms 2.0 has no author requirement.
+         type => $GetHTMLEnumeratedAttrChecker->({
+           text => 1, password => 1, checkbox => 1, radio => 1, submit => 1,
+           reset => 1, file => 1, hidden => 1, image => 1, button => 1,
+           ## [WF2]
+           datatime => 1, 'datetime-local' => 1, date => 1, month => 1, week => 1,
+           time => 1, number => 1, range => 1, email => 1, url => 1,
+           add => 1, remove => 1, 'move-up' => 1, 'move-down' => 1,
+         }),
+         usemap => $HTMLUsemapAttrChecker,
+         value => sub {}, ## NOTE: CDATA [M12N] ## TODO: "optional
+                          ## except when the type attribute has the
+                          ## value "radio" or "checkbox"" [HTML4]
+                          ## TODO: constraints [WF2] TODO: "authors
+                          ## should ensure that in each set of radio
+                          ## buttons that one is initially "on"."
+                          ## [HTML4] [WF2]
+        }->{$attr_ln};
+        if ($checker) {
+          $attr{$attr_ln} = $attr;
+        } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
+                 $attr_ln !~ /[A-Z]/) {
+          $checker = $HTMLDatasetAttrChecker;
+          $status = $HTMLDatasetAttrStatus;
+        } else {
+          $checker = $HTMLAttrChecker->{$attr_ln};
+        }
+      }
+      $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
+          || $AttrChecker->{$attr_ns}->{''};
+      $status ||= $AttrStatus->{$attr_ns}->{$attr_ln}
+          || $AttrStatus->{$attr_ns}->{''};
+      $status = FEATURE_ALLOWED if not defined $status and length $attr_ns;
+
+      if ($checker) {
+        $checker->($self, $attr, $item, $element_state) if ref $checker;
+      } elsif ($attr_ns eq '' and not $status) {
+        #
+      } else {
+        $self->{onerror}->(node => $attr,
+                           type => 'unknown attribute',
+                           level => $self->{level}->{uncertain});
+        ## ISSUE: No comformance createria for unknown attributes in the spec
+      }
+
+      $self->_attr_status_info ($attr, $status);
+    }
+  },
   ## TODO: Tests
   ## TODO: Tests for <nest/> in <input>
   check_start => sub {
