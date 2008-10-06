@@ -2674,7 +2674,7 @@ $Element->{$HTML_NS}->{pre} = {
     my ($self, $item, $element_state) = @_;
   
     ## TODO: Flag to enable/disable IDL checking?
-    my $class = $item->{node}->get_attribute ('class');
+    my $class = $item->{node}->get_attribute_ns (undef, 'class');
     if ($class =~ /\bidl(?>-code)?\b/) { ## TODO: use classList.has
       ## NOTE: pre.idl: WHATWG, XHR, Selectors API, CSSOM specs
       ## NOTE: pre.code > code.idl-code: WebIDL spec
@@ -4546,7 +4546,7 @@ $Element->{$HTML_NS}->{map} = {
     })->(@_);
 
     if ($has_name) {
-      my $id = $item->{node}->get_attribute ('id');
+      my $id = $item->{node}->get_attribute_ns (undef, 'id');
       if (defined $id and $has_name->[0] ne $id) {
         $self->{onerror}->(node => $item->{node}->get_attribute_node ('id'),
                            type => 'id ne name',
@@ -5422,7 +5422,7 @@ $Element->{$HTML_NS}->{input} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
         
-    my $state = $item->{node}->get_attribute ('type');
+    my $state = $item->{node}->get_attribute_ns (undef, 'type');
     $state = 'text' unless defined $state;
     $state =~ tr/A-Z/a-z/; ## ASCII case-insensitive
 
@@ -5533,7 +5533,7 @@ $Element->{$HTML_NS}->{input} = {
             {
              value => sub {
                my ($self, $attr, $item, $element_state) = @_;
-               my $name = $item->{node}->get_attribute ('name');
+               my $name = $item->{node}->get_attribute_ns (undef, 'name');
                if (defined $name and $name eq '_charset_') { ## case-sensitive
                  $self->{onerror}->(node => $attr,
                                     type => '_charset_ value',
@@ -5546,12 +5546,14 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'password') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: maxlength
              ## TODO: pattern
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
-             ## TODO: size
+             size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if it contains CR or LF?
@@ -5560,11 +5562,13 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'datetime') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
              ## TODO: step
              value => sub {
@@ -5575,11 +5579,13 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'date') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
              ## TODO: step
              value => sub {
@@ -5590,11 +5596,13 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'month') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
              ## TODO: step
              value => sub {
@@ -5605,11 +5613,13 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'week') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
              ## TODO: step
              value => sub {
@@ -5620,11 +5630,13 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'time') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
              ## TODO: step
              value => sub {
@@ -5635,11 +5647,13 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'datetime-local') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
              ## TODO: step
              value => sub {
@@ -5650,12 +5664,14 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'number') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
                ## TODO: min & max tests
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
              ## TODO: step
              value => sub {
@@ -5666,7 +5682,9 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'range') {
             $checker =
             {
-             ## TODO: autocomplete
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
@@ -5751,47 +5769,33 @@ $Element->{$HTML_NS}->{input} = {
              align => $GetHTMLEnumeratedAttrChecker->({
                top => 1, middle => 1, bottom => 1, left => 1, right => 1,
              }),
-             ## NOTE: HTML4 has a "should" for accessibility, which
-             ## cannot be tested here.
-             autocomplete => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
              checked => $GetHTMLBooleanAttrChecker->('checked'),
              enctype => $HTMLIMTAttrChecker,
              ## TODO: inputmode [WF2]
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
-             ## TODO: list [WF2]
-             ## TODO: max [WF2]
              maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
-             ## TODO: min [WF2]
              onformchange => $HTMLEventHandlerAttrChecker,
              onforminput => $HTMLEventHandlerAttrChecker,
              oninput => $HTMLEventHandlerAttrChecker,
              oninvalid => $HTMLEventHandlerAttrChecker,
-             ## TODO: pattern
-             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
              required => $GetHTMLBooleanAttrChecker->('required'),
-             size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-             ## TODO: step [WF2]
              target => $HTMLTargetAttrChecker,
              usemap => $HTMLUsemapAttrChecker,
-             value => sub {}, ## NOTE: CDATA [M12N] ## TODO: "optional
-                              ## except when the type attribute has
-                              ## the value "radio" or "checkbox""
-                              ## [HTML4] TODO: constraints [WF2] TODO:
-                              ## "authors should ensure that in each
-                              ## set of radio buttons that one is
-                              ## initially "on"."  [HTML4] [WF2]
 
-             ## TODO: autocomplete
+
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              ## TODO: list
              ## TODO: maxlength
              ## TODO: pattern
-             ## TODO: readonly
+             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              ## TODO: required
-             ## TODO: size
+             size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if it contains CR or LF?
