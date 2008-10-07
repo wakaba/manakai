@@ -33,7 +33,6 @@ id="&#xA;">a</p>
 <p xmlns="http://www.w3.org/1999/xhtml"
 id="&#xB;">a</p>
 #errors
-/p/@id;space in ID;m
 
 #data
 <?xml version="1.1"?>
@@ -995,19 +994,23 @@ id=""><span id="">x</span></p>
 <label accesskey="" xmlns="http://www.w3.org/1999/xhtml"><input/>x</label>
 #errors
 /label/@accesskey;char:syntax error;m
+/label/@accesskey;attribute not defined;m
 
 #data
 <label accesskey="x" xmlns="http://www.w3.org/1999/xhtml"><input/>x</label>
 #errors
+/label/@accesskey;attribute not defined;m
 
 #data
 <select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /select/@accesskey;char:syntax error;m
+/select/@accesskey;attribute not defined;m
 
 #data
 <select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/select/@accesskey;attribute not defined;m
 
 #data
 <textarea accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1019,7 +1022,6 @@ id=""><span id="">x</span></p>
 <textarea accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /textarea/@accesskey;attribute not defined;m
-
 
 #data
 <legend accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</legend>

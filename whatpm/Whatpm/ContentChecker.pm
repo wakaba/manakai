@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.100 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.101 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -405,6 +405,7 @@ my $default_error_level = {
 
   html4_fact => 'm',
   html5_no_may => 'm',
+  html5_fact => 'm',
 
   xml_error => 'm', ## TODO: correct?
   xml_id_error => 'm', ## TODO: ?
@@ -1065,4 +1066,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/22 06:48:03 $
+# $Date: 2008/10/07 11:41:41 $

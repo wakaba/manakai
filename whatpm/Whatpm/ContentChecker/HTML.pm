@@ -679,9 +679,9 @@ my $HTMLIMTAttrChecker = sub {
         push @type, $1 => $2;
       } else {
         my $n = $1;
-        my $v = $2;
+        my $v = $3;
         $v =~ s/\\(.)/$1/gs;
-        push @type, $n => $v;
+        push @type, $n => substr ($v, 1, length ($v) - 2);
       }
     }
     require Whatpm::IMTChecker;
@@ -2802,18 +2802,23 @@ $Element->{$HTML_NS}->{li} = {
     ## TODO: HTML4 |type|
     value => sub {
       my ($self, $attr) = @_;
+
+      my $parent_is_ol;
       my $parent = $attr->owner_element->manakai_parent_element;
       if (defined $parent) {
         my $parent_ns = $parent->namespace_uri;
         $parent_ns = '' unless defined $parent_ns;
         my $parent_ln = $parent->manakai_local_name;
-        unless ($parent_ns eq $HTML_NS and $parent_ln eq 'ol') {
-          ## ISSUE: ...
-          $self->{onerror}->(node => $attr,
-                             type => 'unknown attribute',
-                             level => $self->{level}->{uncertain});
-        }
+        $parent_is_ol = ($parent_ns eq $HTML_NS and $parent_ln eq 'ol');
       }
+
+      unless ($parent_is_ol) {
+        ## ISSUE: No "MUST" in the spec.
+        $self->{onerror}->(node => $attr,
+                           type => 'non-ol li value',
+                           level => $self->{level}->{html5_fact});
+      }
+      
       $HTMLIntegerAttrChecker->($self, $attr);
     },
   }, {
@@ -2832,6 +2837,7 @@ $Element->{$HTML_NS}->{li} = {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
     if ($self->{flag}->{in_menu}) {
+      ## TODO: In <dir> element, then ...
       $HTMLPhrasingContentChecker{check_child_element}->(@_);
     } else {
       $HTMLFlowContentChecker{check_child_element}->(@_);
@@ -2840,6 +2846,7 @@ $Element->{$HTML_NS}->{li} = {
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($self->{flag}->{in_menu}) {
+      ## TODO: In <dir> element, then ...
       $HTMLPhrasingContentChecker{check_child_text}->(@_);
     } else {
       $HTMLFlowContentChecker{check_child_text}->(@_);

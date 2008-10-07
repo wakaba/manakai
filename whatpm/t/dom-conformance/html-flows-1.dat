@@ -2882,6 +2882,7 @@ aaa
 </ol>
 #errors
 /ol/li;no significant content;s
+/ol/li/@value;integer:syntax error;m
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
@@ -2896,7 +2897,7 @@ aaa
 <li value=""/>
 </ul>
 #errors
-/ul/li/@value;attribute not defined;m
+/ul/li/@value;non-ol li value;m
 /ul/li/@value;integer:syntax error;m
 /ul/li;no significant content;s
 
@@ -2905,7 +2906,7 @@ aaa
 <li value="1"/>
 </ul>
 #errors
-/ul/li/@value;attribute not defined;m
+/ul/li/@value;non-ol li value;m
 /ul/li;no significant content;s
 
 #data
@@ -2913,7 +2914,7 @@ aaa
 <li value="0"/>
 </ul>
 #errors
-/ul/li/@value;attribute not defined;m
+/ul/li/@value;non-ol li value;m
 /ul/li;no significant content;s
 
 #data
@@ -2921,7 +2922,7 @@ aaa
 <li value="-1"/>
 </ul>
 #errors
-/ul/li/@value;attribute not defined;m
+/ul/li/@value;non-ol li value;m
 /ul/li;no significant content;s
 
 #data
@@ -2929,7 +2930,8 @@ aaa
 <li value="+1"/>
 </ul>
 #errors
-/ul/li/@value;attribute not defined;m
+/ul/li/@value;integer:syntax error;m
+/ul/li/@value;non-ol li value;m
 /ul/li;no significant content;s
 
 #data
@@ -2937,46 +2939,64 @@ aaa
 <li value="xxx"/>
 </ul>
 #errors
-/ul/li/@value;attribute not defined;m
 /ul/li/@value;integer:syntax error;m
+/ul/li/@value;non-ol li value;m
 /ul/li;no significant content;s
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml">
+<li value="1"/>
+</menu>
+#errors
+/menu/li/@value;non-ol li value;m
+/menu/li;no significant content;s
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml">
+<li value="1"/>
+</dir>
+#errors
+/dir/li/@value;non-ol li value;m
+/dir/li;no significant content;s
+/dir;element not defined;m
 
 #data
 <li value="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/li/@value;attribute not defined;m
 /li/@value;integer:syntax error;m
+/li/@value;non-ol li value;m
 /li;no significant content;s
 
 #data
 <li value="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/li/@value;attribute not defined;m
+/li/@value;non-ol li value;m
 /li;no significant content;s
 
 #data
 <li value="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/li/@value;attribute not defined;m
+/li/@value;non-ol li value;m
 /li;no significant content;s
 
 #data
 <li value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/li/@value;attribute not defined;m
+/li/@value;non-ol li value;m
 /li;no significant content;s
 
 #data
 <li value="+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/li/@value;attribute not defined;m
+/li/@value;non-ol li value;m
+/li/@value;integer:syntax error;m
 /li;no significant content;s
 
 #data
 <li value="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/li/@value;attribute not defined;m
 /li/@value;integer:syntax error;m
+/li/@value;non-ol li value;m
 /li;no significant content;s
 
 #data

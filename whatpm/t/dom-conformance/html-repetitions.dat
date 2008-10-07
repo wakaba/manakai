@@ -1,76 +1,91 @@
-
 #data
 <p repeat="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat;repeat:syntax error;m
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="00001" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="-1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="-00001" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="-1255" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="template  " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 /p/@repeat;repeat:syntax error;m
 
 #data
 <p repeat="templatE" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 /p/@repeat;repeat:syntax error;m
 
 #data
 <p repeat="  template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 /p/@repeat;repeat:syntax error;m
 
 #data
 <p repeat="0.000" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 /p/@repeat;repeat:syntax error;m
 
 #data
 <p repeat=".12" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 /p/@repeat;repeat:syntax error;m
 
 #data
 <p repeat="120 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
 /p/@repeat;repeat:syntax error;m
 
 #data
 <p repeat="+21434" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat;repeat:syntax error;m
+/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="template-text" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat;repeat:syntax error;m
+/p/@repeat;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -78,6 +93,9 @@
 <p id="t" repeat="template">x</p>
 </div>
 #errors
+/div/p/@repeat;attribute not defined;m
+/div/p/@repeat-template;attribute not defined;m
+/div/p/@repeat;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -85,6 +103,9 @@
 <p repeat="1" repeat-template="t">x</p>
 </div>
 #errors
+/div/p/@repeat;attribute not defined;m
+/div/p/@repeat;attribute not defined;m
+/div/p/@repeat-template;attribute not defined;m
 
 #data
 <p repeate="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
@@ -129,6 +150,7 @@
 </div>
 #errors
 /div/input/@type;enumerated:invalid;m
+/div/p/@repeat;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -136,188 +158,269 @@
 <p repeat="template" id="t">x</p>
 </div>
 #errors
+/div/p/@repeat;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-min;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="01" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-min;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-min;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-min;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-min;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-min="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-min;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-max;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="01" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-max;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-max;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-max;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-max;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-max="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-max;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-start;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="1" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="01" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-start;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="-12" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-start;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="+0" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-start;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="1 " xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-start;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <p repeat="template" repeat-start="infinite" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeat-start;nninteger:syntax error;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
 
 #data
 <x html:repeat="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
 /x;unknown element;u
 /x/@repeat;repeat:syntax error;m
+/x/@repeat;attribute not defined;m
 
 #data
 <x html:repeat-start="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
 /x;unknown element;u
 /x/@repeat-start;nninteger:syntax error;m
+/x/@repeat-start;attribute not defined;m
 
 #data
 <x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
 /x;unknown element;u
 /x/@repeat-min;nninteger:syntax error;m
+/x/@repeat-min;attribute not defined;m
 
 #data
 <x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
 /x;unknown element;u
 /x/@repeat-max;nninteger:syntax error;m
+/x/@repeat-max;attribute not defined;m
 
 #data
 <x html:repeat-template="x" xmlns:html="http://www.w3.org/1999/xhtml"><p repeat="template" id="x" xmlns="http://www.w3.org/1999/xhtml">x</p></x>
 #errors
 /x;unknown element;u
+/x/@repeat-template;attribute not defined;m
+/x/p/@repeat;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
     html:repeat="template">x</p>
 #errors
 /p/@repeat;attribute not allowed;m
+/p/@repeat;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
     html:repeat-min="1" repeat="template">x</p>
 #errors
 /p/@repeat-min;attribute not allowed;m
+/p/@repeat-min;attribute not defined;m
+/p/@repeat;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
     html:repeat-max="5" repeat="template">x</p>
 #errors
 /p/@repeat-max;attribute not allowed;m
+/p/@repeat-max;attribute not defined;m
+/p/@repeat;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
     html:repeat-start="0" repeat="template">x</p>
 #errors
 /p/@repeat-start;attribute not allowed;m
+/p/@repeat-start;attribute not defined;m
+/p/@repeat;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml"
     html:repeat-template="t"><q repeat="template" id="t">x</q></p>
 #errors
 /p/@repeat-template;attribute not allowed;m
+/p/@repeat-template;attribute not defined;m
+/p/q/@repeat;attribute not defined;m
+
+#data
+<a html:repeat="" html:b=""
+c="" xmlns:d="http://" d:e="" xmlns:html="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;unknown element;u
+/a/@c;unknown attribute;u
+/a/@e;unknown attribute;u
+/a/@b;attribute not defined;m
+/a/@repeat;repeat:syntax error;m
+/a/@repeat;attribute not defined;m

@@ -81,16 +81,6 @@
 /p/@b;unknown attribute;u
 
 #data
-<a html:repeat="" html:b=""
-c="" xmlns:d="http://" d:e="" xmlns:html="http://www.w3.org/1999/xhtml"/>
-#errors
-/a;unknown element;u
-/a/@c;unknown attribute;u
-/a/@e;unknown attribute;u
-/a/@b;attribute not defined;m
-/a/@repeat;repeat:syntax error;m
-
-#data
 <p xmlns="http://www.w3.org/1999/xhtml"
     xmlns:html="http://www.w3.org/1999/xhtml"
     html:a="">x</p>
@@ -179,6 +169,7 @@ c="" xmlns:d="http://" d:e="" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a;no significant content;s
 
 #data
 <a href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1920,7 +1911,6 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /object/@declare;attribute not defined;m
 /object;no significant content;s
 
-/object;no significant content;s
 #data
 <object data="" declare="yes" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -3232,6 +3222,7 @@ x</map>
 <area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@rev;attribute not defined;m
+/area/@rev;unknown attribute;u
 
 #data
 <area shape="default" nohref="" xmlns="http://www.w3.org/1999/xhtml"/>
