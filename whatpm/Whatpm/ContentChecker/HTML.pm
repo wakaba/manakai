@@ -5561,6 +5561,7 @@ $Element->{$HTML_NS}->{input} = {
            radio => 1, file => 1, submit => 1, image => 1, reset => 1,
            button => 1,
          }),
+         usemap => '',
          value => '',
         }->{$attr_ln};
 
@@ -5807,7 +5808,6 @@ $Element->{$HTML_NS}->{input} = {
                  ## ISSUE: Not yet defined.
                  ## TODO: tests
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
-                 ## TODO: tests
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
@@ -5818,12 +5818,10 @@ $Element->{$HTML_NS}->{input} = {
              }),
              src => $HTMLURIAttrChecker,
                ## TODO: There is requirements on the referenced resource.
-               ## TODO: tests
              target => $HTMLTargetAttrChecker,
                  ## ISSUE: Not yet defined.
                  ## TODO: tests
              usemap => $HTMLUsemapAttrChecker,
-                 ## TODO: tests
             }->{$attr_ln} || $checker;
             ## TODO: alt & src are required.
           } elsif ({
@@ -5842,7 +5840,6 @@ $Element->{$HTML_NS}->{input} = {
              ## introduced as part of the data template feature.
              ## NOTE: |template| attribute as defined in Web Forms 2.0
              ## has no author requirement.
-               ## TODO: template tests
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
           } else { # Text, E-mail, URL, Password
@@ -5939,7 +5936,6 @@ $Element->{$HTML_NS}->{input} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
-  ## TODO: Tests for <nest/> in <input>
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
