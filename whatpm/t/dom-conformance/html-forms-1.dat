@@ -1014,27 +1014,6 @@
 /div/div/@id;duplicate ID;m
 
 #data
-<input xmlns="http://www.w3.org/1999/xhtml"
-    accept-charset=""/>
-#errors
-/input/@accept-charset;attribute not defined;m
-
-#data
-<input xmlns="http://www.w3.org/1999/xhtml"
-    accept-charset="x-euc-jp"/>
-#errors
-/input/@accept-charset;attribute not defined;m
-/input/@accept-charset;charset:private;w
-/input/@accept-charset;charset:not preferred;m
-
-#data
-<input xmlns="http://www.w3.org/1999/xhtml"
-    accept-charset="us-ascii iso-2022-jp"/>
-#errors
-/input/@accept-charset;attribute not defined;m
-/input/@accept-charset;charset:not ascii compat;m
-
-#data
 <div xmlns="http://www.w3.org/1999/xhtml"><input form="a"/>x</div>
 #errors
 /div/input/@form;no referenced form;m

@@ -5475,12 +5475,14 @@ $Element->{$HTML_NS}->{input} = {
          disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
          enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-         inputmode => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
+         inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X |
+             FEATURE_XHTMLBASIC11_CR,
          ismap => FEATURE_M12N10_REC,
          lang => FEATURE_HTML5_DEFAULT | FEATURE_XHTML10_REC,
          list => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          max => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-         maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+         maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X |
+             FEATURE_M12N10_REC,
          method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          min => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5497,7 +5499,8 @@ $Element->{$HTML_NS}->{input} = {
          replace => FEATURE_WF2,
          required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          sdapref => FEATURE_HTML20_RFC,
-         size => FEATURE_HTML5_DEFAULT | FEATURE_WF2X_DEPRECATED | FEATURE_M12N10_REC,
+         size => FEATURE_HTML5_DEFAULT | FEATURE_WF2X_DEPRECATED |
+             FEATURE_M12N10_REC,
          src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          step => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5515,11 +5518,9 @@ $Element->{$HTML_NS}->{input} = {
          accept => '',
          'accept-charset' => $HTMLCharsetsAttrChecker,
              ## NOTE: To which states it applies is not defined in RFC 2070.
-             ## TODO: tests
-         accesskey => $HTMLAccesskeyAttrChecker,
-             ## NOTE: Not applied to |hidden| [WF2].
-             ## TODO: tests
+         accesskey => '', ## NOTE: Not applied to |hidden| [WF2].
          action => '',
+         align => '',
          alt => '',
          autocomplete => '',
          autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
@@ -5529,7 +5530,8 @@ $Element->{$HTML_NS}->{input} = {
              ## ISSUE: No HTML5 definition yet.  ## TODO: Tests
          enctype => '',
          form => $HTMLFormAttrChecker,
-         ismap => '', ## NOTE: "MUST" [HTML4]
+         inputmode => '',
+         ismap => '', ## NOTE: "MUST" be type=image [HTML4]
          list => '',
          max => '',
          maxlength => '',
@@ -5546,6 +5548,7 @@ $Element->{$HTML_NS}->{input} = {
          ## TODO: tests for four attributes above
          pattern => '',
          readonly => '',
+         replace => '',
          required => '',
          size => '',
          src => '',
@@ -5576,114 +5579,132 @@ $Element->{$HTML_NS}->{input} = {
                }
              },
             }->{$attr_ln} || $checker;
-            $checker = '' if $attr_ln eq 'accesskey';
             ## TODO: Warn if no name attribute?
             ## TODO: Warn if name!=_charset_ and no value attribute?
           } elsif ($state eq 'datetime') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
+               ## TODO: min <= max
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid UTC date and time string.
+               ## TODO: Warn unless min <= value <= max
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'date') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
+               ## TODO: min <= max
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid date string.
+               ## TODO: Warn unless min <= value <= max
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'month') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
+               ## TODO: min <= max
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid month string.
+               ## TODO: Warn unless min <= value <= max
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'week') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
+               ## TODO: min <= max
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid week string.
+               ## TODO: Warn unless min <= value <= max
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'time') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
+               ## TODO: min <= max
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid time string.
+               ## TODO: Warn unless min <= value <= max
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'datetime-local') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
              ## TODO: list
              ## TODO: max
              ## TODO: min
+               ## TODO: min <= max
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid local date and time string.
+               ## TODO: Warn unless min <= value <= max
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'number') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
@@ -5691,17 +5712,20 @@ $Element->{$HTML_NS}->{input} = {
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
                ## TODO: min & max tests
+               ## TODO: min <= max
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid floating point number.
+               ## TODO: Warn unless min <= value <= max
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'range') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
@@ -5709,15 +5733,18 @@ $Element->{$HTML_NS}->{input} = {
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
                ## TODO: min & max tests
+               ## TODO: min <= max
              step => $StepAttrChecker,
              value => sub {
                ## NOTE: No restriction.
                ## TODO: Warn if not a valid floating point number.
+               ## TODO: Warn unless min <= value <= max
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'checkbox' or $state eq 'radio') {
             $checker = 
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              checked => $GetHTMLBooleanAttrChecker->('checked'),
                  ## ISSUE: checked value not (yet?) defined.
                  ## TODO: tests
@@ -5731,11 +5758,13 @@ $Element->{$HTML_NS}->{input} = {
             $checker =
             {
              ## TODO: accept
+             accesskey => $HTMLAccesskeyAttrChecker,
              required => $GetHTMLBooleanAttrChecker->('required'),
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'submit') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              action => $HTMLURIAttrChecker,
                  ## ISSUE: Not yet defined.
                  ## TODO: tests
@@ -5750,7 +5779,6 @@ $Element->{$HTML_NS}->{input} = {
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
              }),
-                 ## TODO: tests
              target => $HTMLTargetAttrChecker,
                  ## ISSUE: Not yet defined.
                  ## TODO: tests
@@ -5759,13 +5787,13 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'image') {
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              action => $HTMLURIAttrChecker,
                  ## ISSUE: Not yet defined.
                  ## TODO: tests
              align => $GetHTMLEnumeratedAttrChecker->({
                top => 1, middle => 1, bottom => 1, left => 1, right => 1,
              }),
-                 ## TODO: tests
              alt => sub {
                my ($self, $attr) = @_;
                my $value = $attr->value;
@@ -5788,7 +5816,6 @@ $Element->{$HTML_NS}->{input} = {
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
              }),
-                 ## TODO: tests
              src => $HTMLURIAttrChecker,
                ## TODO: There is requirements on the referenced resource.
                ## TODO: tests
@@ -5807,6 +5834,7 @@ $Element->{$HTML_NS}->{input} = {
                    }->{$state}) {
             $checker = 
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              ## NOTE: According to Web Forms 2.0, |input| attribute
              ## has |template| attribute to support the |add| button
              ## type (as part of the repetition template feature).  It
@@ -5820,6 +5848,7 @@ $Element->{$HTML_NS}->{input} = {
           } else { # Text, E-mail, URL, Password
             $checker =
             {
+             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
@@ -5863,7 +5892,6 @@ $Element->{$HTML_NS}->{input} = {
              },
             }->{$attr_ln} || $checker;
             $checker = '' if $state eq 'password' and $attr_ln eq 'list';
-            $state = 'text';
           }
         }
 
@@ -5904,8 +5932,13 @@ $Element->{$HTML_NS}->{input} = {
 
       $self->_attr_status_info ($attr, $status);
     }
+    
+    $element_state->{uri_info}->{action}->{type}->{action} = 1;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
-  ## TODO: Tests
   ## TODO: Tests for <nest/> in <input>
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -5916,12 +5949,6 @@ $Element->{$HTML_NS}->{input} = {
     } else {
       $self->{flag}->{has_labelable} = 2;
     }
-    
-    $element_state->{uri_info}->{action}->{type}->{action} = 1;
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
 
     $element_state->{id_type} = 'labelable';
   },
@@ -5931,7 +5958,7 @@ $Element->{$HTML_NS}->{input} = {
 
 ## NOTE: "authors who are nesting repetition blocks should position such
 ## [repetition-block-related] buttons carefully to make clear which block a
-## button applies to.": I have no idea how this can be tested.
+## button applies to." [WF2]: I have no idea how this can be tested.
 
 $Element->{$HTML_NS}->{button} = {
   %HTMLPhrasingContentChecker, ## ISSUE: -interactive?
@@ -5984,7 +6011,7 @@ $Element->{$HTML_NS}->{button} = {
     replace => FEATURE_WF2,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    template => FEATURE_WF2,
+    template => FEATURE_HTML5_AT_RISK | FEATURE_WF2,
     type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
