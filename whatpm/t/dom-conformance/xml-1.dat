@@ -1,0 +1,55 @@
+#data
+<unknown u1=""></unknown>
+#errors
+/unknown;unknown element;u
+/unknown/@u1;unknown attribute;u
+
+#data
+<unknown u1="" u2=""></unknown>
+#errors
+/unknown;unknown element;u
+/unknown/@u1;unknown attribute;u
+/unknown/@u2;unknown attribute;u
+
+#data
+<unknown u1="" xmlns=""></unknown>
+#errors
+/unknown;unknown element;u
+/unknown/@u1;unknown attribute;u
+
+#data
+<unknown xml:lang="!" xmlns=""></unknown>
+#errors
+/unknown;unknown element;u
+/unknown/@lang;langtag:language:nosemantics;m
+/unknown/@lang;langtag:illegal;m
+
+#data
+<unknown u1="" xml:lang="!" xmlns=""></unknown>
+#errors
+/unknown;unknown element;u
+/unknown/@lang;langtag:language:nosemantics;m
+/unknown/@lang;langtag:illegal;m
+/unknown/@u1;unknown attribute;u
+
+#data
+<unknown u1="" xmlns="http://www.w3.org/1999/xhtml"></unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@u1;attribute not defined;m
+
+#data
+<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@lang;langtag:language:nosemantics;m
+/unknown/@lang;langtag:illegal;m
+/unknown/@u1;attribute not defined;m
+
+#data
+<unknown class="" u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@lang;langtag:language:nosemantics;m
+/unknown/@lang;langtag:illegal;m
+/unknown/@u1;attribute not defined;m

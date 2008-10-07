@@ -73,13 +73,17 @@ tree-construction-result.txt: always
 	cd .. && perl t/HTML-tree.t &> t/$@
 
 content-checker-files: content-checker-result.txt \
-  content-checker-atom-result.txt
+  content-checker-atom-result.txt \
+  content-checker-xml-result.txt
 
 content-checker-result.txt: always
 	cd .. && perl t/ContentChecker.t &> t/$@
 
 content-checker-atom-result.txt: always
 	cd .. && perl t/ContentChecker-Atom.t &> t/$@
+
+content-checker-xml-result.txt: always
+	cd .. && perl t/ContentChecker-XML.t &> t/$@
 
 langtag-files: langtag-result.txt
 
@@ -93,4 +97,4 @@ clean-remote-files:
 always:
 
 ## License: Public Domain.
-## $Date: 2008/10/04 17:16:02 $
+## $Date: 2008/10/07 12:18:39 $

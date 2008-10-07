@@ -1,0 +1,945 @@
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"></a>
+#errors
+/a;no significant content;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"> </a>
+#errors
+/a;no significant content;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">XXX</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><em>XXX</em></a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">XXX<em>YYY</em>ZZZ</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><blockquote/></a>
+#errors
+/a;no significant content;s
+/a/blockquote;no significant content;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">XXX<blockquote/></a>
+#errors
+/a/blockquote;no significant content;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><a>XXX</a></a>
+#errors
+/a/a;element not allowed:minus;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a>xxx</a>
+</span>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a><em>xxx</em></a>
+</span>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a><p>xxx</p></a>
+</span>
+#errors
+/span/a/p;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a>x<ins>x</ins>x</a>
+</span>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<del><a>xxx</a></del>yyy
+</span>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<del><a>x<p>x</p>x</a></del>yyy
+</span>
+#errors
+/span/del/a/p;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a>xxx</a>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a>x<em>x</em>x</a>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a>x<div>x</div>x</a>
+</p>
+#errors
+/p/a/div;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a>x<p>x</p>x</a>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><h1>xxx</h1></a>
+</div>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a></a>
+x</span>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a></a>
+x</div>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">XXX<a>YYY</a></a>
+#errors
+/a/a;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><em><a>XXX</a></em></a>
+#errors
+/a/em/a;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><a></a></p><ul><li><a></a></li></ul>
+</div>
+#errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/ul/li;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><a></a></p><ol><li><a></a></li></ol>
+</div>
+#errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/ol/li;no significant content;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<video src="">x</video>
+</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><video src="">x</video></span>
+</a>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><video src="">x</video></a>
+<video src="">y</video>
+</div>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<video src="" controls="">x</video>
+</a>
+#errors
+/a/video;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><video src="" controls="">x</video></span>
+</a>
+#errors
+/a/span/video;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><video src="" controls="">x</video></a>
+<video src="" controls="">y</video>
+</div>
+#errors
+/div/a/video;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<audio src="">x</audio>
+</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><audio src="">x</audio></span>
+</a>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><audio src="">x</audio></a>
+<audio src="">y</audio>
+</div>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<audio src="" controls="">x</audio>
+</a>
+#errors
+/a/audio;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><audio src="" controls="">x</audio></span>
+</a>
+#errors
+/a/span/audio;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><audio src="" controls="">x</audio></a>
+<audio src="" controls="">y</audio>
+</div>
+#errors
+/div/a/audio;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<label>x</label>
+</a>
+#errors
+/a/label;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><label>x</label></span>
+</a>
+#errors
+/a/span/label;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><label>x</label></a>
+<label>y</label>
+</div>
+#errors
+/div/a/label;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<input/>x
+</a>
+#errors
+/a/input;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><input/>x</span>
+</a>
+#errors
+/a/span/input;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><input/>x</a>
+<input/>
+</div>
+#errors
+/div/a/input;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<button>x</button>
+</a>
+#errors
+/a/button;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><button><input/>x</button></a>
+#errors
+/a/button;element not allowed:minus;m
+/a/button/input;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><button>x</button></span>
+</a>
+#errors
+/a/span/button;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><button>x</button></a>
+<button>y</button>
+</div>
+#errors
+/div/a/button;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<select><option>x</option></select>
+</a>
+#errors
+/a/select;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><select><option>x</option></select></span>
+</a>
+#errors
+/a/span/select;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><select><option>x</option></select></a>
+<select><option>y</option></select>
+</div>
+#errors
+/div/a/select;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<textarea>x</textarea>
+</a>
+#errors
+/a/textarea;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><textarea>x</textarea></span>
+</a>
+#errors
+/a/span/textarea;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><textarea>x</textarea></a>
+<textarea>y</textarea>
+</div>
+#errors
+/div/a/textarea;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<details><legend>y</legend>x</details>
+</a>
+#errors
+/a/details;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><details><legend>y</legend>x</details></span>
+</a>
+#errors
+/a/span/details;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><details><legend>y</legend>x</details></a>
+<details><legend>y</legend>y</details>
+</div>
+#errors
+/div/a/details;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<datagrid>x</datagrid>
+</a>
+#errors
+/a/datagrid;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><datagrid>x</datagrid></span>
+</a>
+#errors
+/a/span/datagrid;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><datagrid>x</datagrid></a>
+<datagrid>y</datagrid>
+</div>
+#errors
+/div/a/datagrid;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<bb>x</bb>
+</a>
+#errors
+/a/bb;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><bb>x</bb></span>
+</a>
+#errors
+/a/span/bb;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><bb>x</bb></a>
+<bb>y</bb>
+</div>
+#errors
+/div/a/bb;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<menu>x</menu>
+</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><menu>x</menu></span>
+</a>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><menu>x</menu></a>
+<menu>y</menu>
+</div>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<menu type="toolbar">x</menu>
+</a>
+#errors
+/a/menu;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><menu type="toolbar">x</menu></span>
+</a>
+#errors
+/a/span/menu;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a><menu type="toolbar">x</menu></a>
+<menu type="toolbar">y</menu>
+</div>
+#errors
+/div/a/menu;element not allowed:minus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><a></a></p><ol><li><datagrid/></li></ol>
+</div>
+#errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/ol/li;no significant content;s
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+<legend/>
+<p><a/></p>
+</details>
+#errors
+/details;no significant content;s
+/details/legend;no significant content;s
+/details/p;no significant content;s
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+<legend><a/></legend>
+</details>
+#errors
+/details;no significant content;s
+/details/legend;no significant content;s
+
+#data
+<a href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/[44::]/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+/a/@href;syntax error:iriref3987;m
+
+#data
+<a href="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+/a/@type;IMT:syntax error;m
+
+#data
+<a href="http://test/" type="text/html" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="author contact"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+/a/@rel;link type:proposed;s
+
+#data
+<a href="http://test/" rel="author author" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;duplicate token;m
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="bookmark" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="previous" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;link type:non-conforming;m
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="edit" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;link type:proposed;s
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="script" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;link type:non-conforming;m
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;link type:bad context;m
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="test-type" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;unknown link type;u
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" rel="author&#x0b;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;unknown link type;u
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" rel="&#x0b;author" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;unknown link type;u
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" rel="author&#x0b;license" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;unknown link type;u
+/a;no significant content;s
+
+#data
+<a href="http://test/" ping="http://a.test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" ping="http://a.test/ http://b.test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" ping="http://a.test/ [b.test]"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@ping;syntax error:iriref3987;m
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" ping="http://a.test/&#x0b;http://b.test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@ping;syntax error:iriref3987;m
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" ping="http://a.test/&#x0b;"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@ping;syntax error:iriref3987;m
+/a;no significant content;s
+
+#data
+<?xml version="1.1"?>
+<a href="http://test/" ping="&#x0b;http://a.test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@ping;syntax error:iriref3987;m
+/a;no significant content;s
+
+#data
+<a href="http://test/" hreflang=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@hreflang;langtag:language:nosemantics;m
+/a;no significant content;s
+
+#data
+<a href="http://test/" hreflang="en"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" media="all"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@media;media query;u
+/a;no significant content;s
+
+#data
+<a href="http://test/" target=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+/a/@target;window name:empty;m
+
+#data
+<a href="http://test/" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" target="_parent"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" target="_top"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" target="_Top"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" target="_TOP"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" target="_blank"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" target="_main"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@target;window name:reserved;m
+/a;no significant content;s
+
+#data
+<a href="http://test/" target="abcde"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" target="_"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@target;window name:reserved;m
+/a;no significant content;s
+
+#data
+<a type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@type;attribute not allowed;m
+/a;no significant content;s
+
+#data
+<a rel="author" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;attribute not allowed;m
+/a;no significant content;s
+
+#data
+<a rev="" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+
+#data
+<a rev="made" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+
+#data
+<a rev="  made" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+
+#data
+<a rev="made made" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+/a/@rev;duplicate token;m
+
+#data
+<a ping="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@ping;attribute not allowed;m
+/a;no significant content;s
+
+#data
+<a hreflang="en" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@hreflang;attribute not allowed;m
+/a;no significant content;s
+
+#data
+<a media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@media;attribute not allowed;m
+/a/@media;media query;u
+/a;no significant content;s
+
+#data
+<a target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@target;attribute not allowed;m
+/a;no significant content;s
+
+#data
+<a charset="" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@charset;attribute not defined;m
+/a/@charset;charset:syntax error;m
+/a/@charset;charset:not registered;w
+
+#data
+<a charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@charset;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <b><a href="">a</a></b>
+  <i><a type="text/plain">x</a></i>
+</p>
+#errors
+/p/i/a/@type;attribute not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a href="../../.." rel="up up up up">d</a>
+<a href="../.." rel="up up up">c</a>
+<a href=".." rel="up up">b</a>
+<a href="." rel="up">a</a>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a href="../../../.." rel="up up up up index">d</a>
+<a href="../../.." rel="up up up">c</a>
+<a href="../.." rel="up up">b</a>
+<a href="." rel="up">a</a>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a href="../../.." rel="up up up up index">d</a>
+<a href="../.." rel="up up up">c</a>
+<a href=".." rel="up up index">b</a>
+<a href="." rel="up">a</a>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a href="../../.." rel="up up up up">d</a>
+<a href="../.." rel="up up up index">c</a>
+<a href=".." rel="up up">b</a>
+<a href="." rel="up">a</a>
+</p>
+#errors
+
+#data
+<nav xmlns="http://www.w3.org/1999/xhtml">
+<p>
+<a href="../../../a" rel="up up up up">d</a>
+<a href="../../a" rel="up up up">c</a>
+<a href="../a" rel="up up">b</a>
+<a href="." rel="up">a</a>
+</p>
+<p>
+<a href="../../../.." rel="up up up up up">E</a>
+<a href="../../.." rel="up up up up">D</a>
+<a href="../.." rel="up up up">C</a>
+<a href=".." rel="up up">B</a>
+<a href="." rel="up">A</a>
+</p>
+</nav>
+#errors
+
+#data
+<nav xmlns="http://www.w3.org/1999/xhtml">
+<p>
+<a href="../../../a" rel="up up up up index">d</a>
+<a href="../../a" rel="up up up">c</a>
+<a href="../a" rel="up up">b</a>
+<a href="." rel="up">a</a>
+</p>
+<p>
+<a href="../../../.." rel="up up up up up index">E</a>
+<a href="../../.." rel="up up up up">D</a>
+<a href="../.." rel="up up up">C</a>
+<a href=".." rel="up up">B</a>
+<a href="." rel="up">A</a>
+</p>
+</nav>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title>x</title>
+<link href="../../../a" rel="up up up up index" title="d"/>
+<link href="../../a" rel="up up up" title="c"/>
+<link href="../a" rel="up up" title="b"/>
+<link href="." rel="up" title="a"/>
+</head>
+#errors
+
+#data
+<!-- from spec -->
+<nav xmlns="http://www.w3.org/1999/xhtml">
+ <p>
+  <a href="/" rel="index up up up">Main</a> >
+  <a href="/products/" rel="up up">Products</a> >
+  <a href="/products/dishwashers/" rel="up">Dishwashers</a> >
+  <a>Second hand</a>
+ </p>
+ <p>
+  <a href="/" rel="index up up">Main</a> >
+  <a href="/second-hand/" rel="up">Second hand</a> >
+  <a>Dishwashers</a>
+ </p>
+</nav>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer">.</a>
+#errors
+/a/@rel;unknown link type;u
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer">.</a>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer" alt="X"
+    coords="1,2,3,4"/>
+#errors
+/area/@rel;unknown link type;u
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer" alt="X"
+    coords="1,2,3,4"/>
+#errors
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferer"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rel="noreferrer"/>
+#errors
+/link/@rel;link type:bad context;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rel="openid.server"/>
+#errors
+/link/@rel;link type:proposed;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="openid.server">a</a>
+#errors
+/a/@rel;link type:proposed;s
+/a/@rel;link type:bad context;m
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" href="" shape="default"
+    alt="" rel="openid.server"/>
+#errors
+/area/@rel;link type:proposed;s
+/area/@rel;link type:bad context;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rel="service"/>
+#errors
+/link/@rel;link type:proposed;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="" rel="service">a</a>
+#errors
+/a/@rel;link type:proposed;s
+/a/@rel;link type:bad context;m
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" href="" shape="default"
+    alt="" rel="service"/>
+#errors
+/area/@rel;link type:proposed;s
+/area/@rel;link type:bad context;m
+

@@ -3111,3 +3111,579 @@ aaa
 #errors
 /dl/@compact;attribute not defined;m
 /dl/@compact;boolean:invalid;m
+
+#data
+<h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/h1/@align;attribute not defined;m
+/h1;no significant content;s
+
+#data
+<h1 align="nonleft" xmlns="http://www.w3.org/1999/xhtml">x</h1>
+#errors
+/h1/@align;attribute not defined;m
+/h1/@align;enumerated:invalid;m
+
+#data
+<h2 align="justify" xmlns="http://www.w3.org/1999/xhtml">x</h2>
+#errors
+/h2/@align;attribute not defined;m
+
+#data
+<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/address/@align;attribute not defined;m
+/address;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn></dfn>
+</p>
+#errors
+/p;no significant content;s
+/p/dfn;no significant content;s
+
+#data
+<p align="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@align;attribute not defined;m
+/p/@align;enumerated:invalid;m
+/p;no significant content;s
+
+#data
+<p align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@align;attribute not defined;m
+/p;no significant content;s
+
+#data
+<p align="justifY" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@align;attribute not defined;m
+/p;no significant content;s
+
+#data
+<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+
+#data
+<div align="" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+/div/@align;enumerated:invalid;m
+
+#data
+<div align="Left" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+
+#data
+<div align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/div/@align;attribute not defined;m
+/div;no significant content;s
+
+#data
+<div align="right" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+
+#data
+<div align="justify" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+
+#data
+<div align="xxx" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+/div/@align;enumerated:invalid;m
+
+#data
+<div align=" left" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+/div/@align;enumerated:invalid;m
+
+#data
+<ins cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</ins>
+#errors
+
+#data
+<ins cite="http://test/100%/" xmlns="http://www.w3.org/1999/xhtml">x</ins>
+#errors
+/ins/@cite;syntax error:iriref3987;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-05">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-06">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-08-09">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-09-10T00:12">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-09-23T33:34:23">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-04-31T33:11:00+09">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13 00:00 Z">x</ins>
+#errors
+
+#data
+<?xml version="1.1"?>
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13&#x000b;00:00 Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13T&#x000b;00:00 Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13&#x000b;T00:00 Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<?xml version="1.1"?>
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13 00:00&#x000b;Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="1979-10-14T12:00:00.001-04:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="8592-01-01 T 02:09 +02:09">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-04-12T00:00Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="10000-10-31T00:44Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="-3333-03-14T14:33Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="1999-06-23  T04:44Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="4444-06-22  T  11:22Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="98-02-12T11:22Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-29T00:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad day;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2008-02-29T00:00Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-02-29T00:00Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="1900-02-29T00:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad day;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-30T00:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad day;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-02-30T00:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad day;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-01-32T00:00Z">xM</ins>
+#errors
+/ins/@datetime;datetime:bad day;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-01-00T00:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad day;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-00-29T00:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad month;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-13-29T00:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad month;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T24:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad hour;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:59Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:60Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad minute;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00:60Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad second;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00:61Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad second;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00:00.123Z">xM</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00.124444Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00.Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+09:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00-09:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00 +09:00">xm</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+0900">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00A">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21t23:00Z">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+23:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+24:00">x</ins>
+#errors
+/ins/@datetime;datetime:bad timezone hour;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00-23:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00-24:00">x</ins>
+#errors
+/ins/@datetime;datetime:bad timezone hour;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00-00:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+00:14.5">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+00:59">xM</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00+00:60">x</ins>
+#errors
+/ins/@datetime;datetime:bad timezone minute;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00-00:60">x</ins>
+#errors
+/ins/@datetime;datetime:bad timezone minute;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00 00:00">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00Z ">x</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime=" 2007-02-21T23:00Z">s</ins>
+#errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</del>
+#errors
+
+#data
+<del cite='"about:"' xmlns="http://www.w3.org/1999/xhtml">x</del>
+#errors
+/del/@cite;syntax error:iriref3987;m
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00Z">x</del>
+#errors
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-31T23:00Z">x</del>
+#errors
+/del/@datetime;datetime:bad day;m
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"></p>
+#errors
+/p;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"> </p>
+#errors
+/p;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">&#x09;</p>
+#errors
+/p;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><![CDATA[]]></p>
+#errors
+/p;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><![CDATA[ ]]></p>
+#errors
+/p;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"> a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">bb</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><!---->a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><i>a</i></p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><?a?>b</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><img src="" alt="a"/></p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><del>a</del></p>
+#errors
+/p;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">b<del>a</del></p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><del>a</del>a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><ins>a</ins></p>
+#errors
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"></del>
+#errors
+/del;no significant content;s
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml">a</del>
+#errors
+
+#data
+<title xmlns="http://www.w3.org/1999/xhtml"></title>
+#errors
+
+#data
+<title xmlns="http://www.w3.org/1999/xhtml">a</title>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"></body>
+#errors
+/body;no significant content;s
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">a</body>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><p>a</p></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">a<p></p></div>
+#errors
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><p></p>a</div>
+#errors
+/div/p;no significant content;s
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"><p>a</p></li>
+#errors
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml">a<p></p></li>
+#errors
+/li/p;no significant content;s
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"><p></p>a</li>
+#errors
+/li/p;no significant content;s
+

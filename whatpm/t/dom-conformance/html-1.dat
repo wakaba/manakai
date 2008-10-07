@@ -1,0 +1,81 @@
+#data
+<html></html>
+#errors
+/html;unknown element;u
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"></unknown>
+#errors
+/unknown;element not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><unknown/></p>
+#errors
+/p/unknown;element not allowed:phrasing;m
+/p/unknown;element not defined;m
+/p;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" unknown="">x</p>
+#errors
+/p/@unknown;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" unknown="">x</a>
+#errors
+/a/@unknown;attribute not defined;m
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" unknown="" alt="x" href="" shape="default"></area>
+#errors
+/area/@unknown;attribute not defined;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml" name="keywords" content="a" unknown=""/>
+#errors
+/meta/@unknown;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    a:b="" xmlns:a="http://www.example.test/">a</p>
+#errors
+/p/@b;unknown attribute;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a="">x</p>
+#errors
+/p/@a;attribute not defined;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a=""
+    name="keywords" content="x"/>
+#errors
+/meta/@a;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a=""
+    href="">y</a>
+#errors
+/a/@a;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a=""
+    src=""/>
+#errors
+/embed/@a;attribute not defined;m
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    html:a=""
+    href="" shape="default" alt="x"/>
+#errors
+/area/@a;attribute not defined;m
