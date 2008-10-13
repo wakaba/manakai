@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.199 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.200 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -918,6 +918,10 @@ sub IN_FOREIGN_CONTENT_IM () { 0b100000000000 }
     ## NOTE: "in foreign content" insertion mode is special; it is combined
     ## with the secondary insertion mode.  In this parser, they are stored
     ## together in the bit-or'ed form.
+sub IN_CDATA_RCDATA_IM () { 0b1000000000000 }
+    ## NOTE: "in CDATA/RCDATA" insertion mode is also special; it is
+    ## combined with the original insertion mode.  In thie parser,
+    ## they are stored together in the bit-or'ed form.
 
 ## NOTE: "initial" and "before html" insertion modes have no constants.
 
@@ -5480,13 +5484,15 @@ sub _tree_construction_main ($) {
 
     ## Step 1
     my $start_tag_name = $token->{tag_name};
-    my $el;
     
+    {
+      my $el;
+      
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $start_tag_name]);
+        ($HTML_NS, [undef,  $token->{tag_name}]);
     
-        for my $attr_name (keys %{ $token->{attributes}}) {
-          my $attr_t =  $token->{attributes}->{$attr_name};
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
           my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
@@ -5499,55 +5505,24 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
 
     ## Step 2
-    $insert->($el);
-
-    ## Step 3
     $self->{content_model} = $content_model_flag; # CDATA or RCDATA
     delete $self->{escape}; # MUST
 
-    ## Step 4
-    my $text = '';
+    ## Step 3, 4
+    $self->{insertion_mode} |= IN_CDATA_RCDATA_IM;
+
     
-    $token = $self->_get_next_token;
-    while ($token->{type} == CHARACTER_TOKEN) { # or until stop tokenizing
-      
-      $text .= $token->{data};
-      $token = $self->_get_next_token;
-    }
-
-    ## Step 5
-    if (length $text) {
-      
-      my $text = $self->{document}->create_text_node ($text);
-      $el->append_child ($text);
-    }
-
-    ## Step 6
-    $self->{content_model} = PCDATA_CONTENT_MODEL;
-
-    ## Step 7
-    if ($token->{type} == END_TAG_TOKEN and
-        $token->{tag_name} eq $start_tag_name) {
-      
-      ## Ignore the token
-    } else {
-      ## NOTE: An end-of-file token.
-      if ($content_model_flag == CDATA_CONTENT_MODEL) {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'in CDATA:#eof', token => $token);
-      } elsif ($content_model_flag == RCDATA_CONTENT_MODEL) {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'in RCDATA:#eof', token => $token);
-      } else {
-        die "$0: $content_model_flag in parse_rcdata";
-      }
-    }
     $token = $self->_get_next_token;
   }; # $parse_rcdata
 
   my $script_start_tag = sub () {
+    ## Step 1
     my $script_el;
     
       $script_el = $self->{document}->create_element_ns
@@ -5567,51 +5542,26 @@ sub _tree_construction_main ($) {
         $script_el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
+
+    ## Step 2
     ## TODO: mark as "parser-inserted"
 
+    ## Step 3
+    ## TODO: Mark as "already executed", if ...
+
+    ## Step 4
+    $insert->($script_el);
+
+    ## ISSUE: $script_el is not put into the stack
+    push @{$self->{open_elements}}, [$script_el, $el_category->{script}];
+
+    ## Step 5
     $self->{content_model} = CDATA_CONTENT_MODEL;
     delete $self->{escape}; # MUST
-    
-    my $text = '';
-    
-    $token = $self->_get_next_token;
-    while ($token->{type} == CHARACTER_TOKEN) {
-      
-      $text .= $token->{data};
-      $token = $self->_get_next_token;
-    } # stop if non-character token or tokenizer stops tokenising
-    if (length $text) {
-      
-      $script_el->manakai_append_text ($text);
-    }
-              
-    $self->{content_model} = PCDATA_CONTENT_MODEL;
 
-    if ($token->{type} == END_TAG_TOKEN and
-        $token->{tag_name} eq 'script') {
-      
-      ## Ignore the token
-    } else {
-      
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'in CDATA:#eof', token => $token);
-      ## ISSUE: And ignore?
-      ## TODO: mark as "already executed"
-    }
-    
-    if (defined $self->{inner_html_node}) {
-      
-      ## TODO: mark as "already executed"
-    } else {
-      
-      ## TODO: $old_insertion_point = current insertion point
-      ## TODO: insertion point = just before the next input character
+    ## Step 6-7
+    $self->{insertion_mode} |= IN_CDATA_RCDATA_IM;
 
-      $insert->($script_el);
-      
-      ## TODO: insertion point = $old_insertion_point (might be "undefined")
-      
-      ## TODO: if there is a script that will execute as soon as the parser resume, then...
-    }
     
     $token = $self->_get_next_token;
   }; # $script_start_tag
@@ -5963,6 +5913,79 @@ sub _tree_construction_main ($) {
       }
       $token = $self->_get_next_token;
       next B;
+    } elsif ($self->{insertion_mode} & IN_CDATA_RCDATA_IM) {
+      if ($token->{type} == CHARACTER_TOKEN) {
+        $token->{data} =~ s/^\x0A// if $self->{ignore_newline};
+        delete $self->{ignore_newline};
+
+        if (length $token->{data}) {
+          
+          $self->{open_elements}->[-1]->[0]->manakai_append_text
+              ($token->{data});
+        } else {
+          
+        }
+        $token = $self->_get_next_token;
+        next B;
+      } elsif ($token->{type} == END_TAG_TOKEN) {
+        delete $self->{ignore_newline};
+
+        if ($token->{tag_name} eq 'script') {
+          
+          
+          ## Para 1-2
+          my $script = pop @{$self->{open_elements}};
+          
+          ## Para 3
+          $self->{insertion_mode} &= ~ IN_CDATA_RCDATA_IM;
+
+          ## Para 4
+          ## TODO: $old_insertion_point = $current_insertion_point;
+          ## TODO: $current_insertion_point = just before $self->{nc};
+
+          ## Para 5
+          ## TODO: Run the $script->[0].
+
+          ## Para 6
+          ## TODO: $current_insertion_point = $old_insertion_point;
+
+          ## Para 7
+          ## TODO: if ($pending_external_script) {
+            ## TODO: ...
+          ## TODO: }
+
+          $token = $self->_get_next_token;
+          next B;
+        } else {
+          
+ 
+          pop @{$self->{open_elements}};
+
+          $self->{insertion_mode} &= ~ IN_CDATA_RCDATA_IM;
+          $token = $self->_get_next_token;
+          next B;
+        }
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        delete $self->{ignore_newline};
+
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
+                        text => $self->{open_elements}->[-1]->[0]
+                            ->manakai_local_name,
+                        token => $token);
+
+        #if ($self->{open_elements}->[-1]->[1] & SCRIPT_EL) {
+        #  ## TODO: Mark as "already executed"
+        #}
+
+        pop @{$self->{open_elements}};
+
+        $self->{insertion_mode} &= ~ IN_CDATA_RCDATA_IM;
+        ## Reprocess.
+        next B;
+      } else {
+        die "$0: $token->{type}: In CDATA/RCDATA: Unknown token type";        
+      }
     } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
       if ($token->{type} == CHARACTER_TOKEN) {
         
@@ -6548,8 +6571,9 @@ sub _tree_construction_main ($) {
 
           ## NOTE: There is a "as if in head" code clone.
           $parse_rcdata->(RCDATA_CONTENT_MODEL);
-          pop @{$self->{open_elements}} # <head>
-              if $self->{insertion_mode} == AFTER_HEAD_IM;
+          ## ISSUE: A spec bug.
+          splice @{$self->{open_elements}}, -2, 1, () # <head>
+              if ($self->{insertion_mode} & AFTER_HEAD_IM) == AFTER_HEAD_IM;
           next B;
         } elsif ($token->{tag_name} eq 'style' or
                  $token->{tag_name} eq 'noframes') {
@@ -6567,10 +6591,11 @@ sub _tree_construction_main ($) {
             
           }
           $parse_rcdata->(CDATA_CONTENT_MODEL);
-          pop @{$self->{open_elements}} # <head>
-              if $self->{insertion_mode} == AFTER_HEAD_IM;
+          ## ISSUE: A spec bug.
+          splice @{$self->{open_elements}}, -2, 1, () # <head>
+              if ($self->{insertion_mode} & AFTER_HEAD_IM) == AFTER_HEAD_IM;
           next B;
-            } elsif ($token->{tag_name} eq 'noscript') {
+        } elsif ($token->{tag_name} eq 'noscript') {
               if ($self->{insertion_mode} == IN_HEAD_IM) {
                 
                 ## NOTE: and scripting is disalbed
@@ -6638,8 +6663,9 @@ sub _tree_construction_main ($) {
 
           ## NOTE: There is a "as if in head" code clone.
           $script_start_tag->();
-          pop @{$self->{open_elements}} # <head>
-              if $self->{insertion_mode} == AFTER_HEAD_IM;
+          ## ISSUE: A spec bug.
+          splice @{$self->{open_elements}}, -2, 1 # <head>
+              if ($self->{insertion_mode} & AFTER_HEAD_IM) == AFTER_HEAD_IM;
           next B;
         } elsif ($token->{tag_name} eq 'body' or
                  $token->{tag_name} eq 'frameset') {
@@ -9753,14 +9779,16 @@ sub _tree_construction_main ($) {
           next B;
         }
       } elsif ($token->{tag_name} eq 'textarea') {
-        my $tag_name = $token->{tag_name};
-        my $el;
+        ## Step 1
         
+    {
+      my $el;
+      
       $el = $self->{document}->create_element_ns
         ($HTML_NS, [undef,  $token->{tag_name}]);
     
-        for my $attr_name (keys %{ $token->{attributes}}) {
-          my $attr_t =  $token->{attributes}->{$attr_name};
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
           my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
           $attr->value ($attr_t->{value});
           $attr->set_user_data (manakai_source_line => $attr_t->{line});
@@ -9773,47 +9801,28 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
         
+        ## Step 2
         ## TODO: $self->{form_element} if defined
+
+        ## Step 3
+        $self->{ignore_newline} = 1;
+
+        ## Step 4
+        ## ISSUE: This step is wrong. (r2302 enbugged)
+
+        ## Step 5
         $self->{content_model} = RCDATA_CONTENT_MODEL;
         delete $self->{escape}; # MUST
+
+        ## Step 6-7
+        $self->{insertion_mode} |= IN_CDATA_RCDATA_IM;
+
         
-        $insert->($el);
-        
-        my $text = '';
-        
-        $token = $self->_get_next_token;
-        if ($token->{type} == CHARACTER_TOKEN) {
-          $token->{data} =~ s/^\x0A//;
-          unless (length $token->{data}) {
-            
-            $token = $self->_get_next_token;
-          } else {
-            
-          }
-        } else {
-          
-        }
-        while ($token->{type} == CHARACTER_TOKEN) {
-          
-          $text .= $token->{data};
-          $token = $self->_get_next_token;
-        }
-        if (length $text) {
-          
-          $el->manakai_append_text ($text);
-        }
-        
-        $self->{content_model} = PCDATA_CONTENT_MODEL;
-        
-        if ($token->{type} == END_TAG_TOKEN and
-            $token->{tag_name} eq $tag_name) {
-          
-          ## Ignore the token
-        } else {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'in RCDATA:#eof', token => $token);
-        }
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{tag_name} eq 'optgroup' or
@@ -10811,4 +10820,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/05 05:59:35 $
+# $Date: 2008/10/13 06:18:30 $

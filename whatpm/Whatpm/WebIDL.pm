@@ -1,6 +1,6 @@
 package Whatpm::WebIDL;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Whatpm::WebIDL::Parser;
 
@@ -1288,6 +1288,31 @@ sub set_user_data ($$$) {
   }
 } # set_user_data
 
+sub has_extended_attribute ($$) {
+  my $self = shift;
+  my $name = shift;
+  $name = '' unless defined $name;
+  for (@{$self->{xattrs} or []}) {
+    if ($_->node_name eq $name) {
+      return 1;
+    }
+  }
+  return 0;
+} # has_extended_attribute
+
+sub get_extended_attribute_nodes ($$) {
+  my $self = shift;
+  my $name = shift;
+  $name = '' unless defined $name;
+  my $r = [];
+  for (@{$self->{xattrs} or []}) {
+    if ($_->node_name eq $name) {
+      push @$r, $_;
+    }
+  }
+  return $r;
+} # get_extended_attribute_nodes
+
 package Whatpm::WebIDL::Definitions;
 push our @ISA, 'Whatpm::WebIDL::Node';
 
@@ -2253,6 +2278,11 @@ sub append_inheritance ($$) {
   push @{$self->{inheritances}}, $scoped_name;
 } # append_inheritance
 
+sub inheritances ($) {
+  ## NOTE: Returns a dead list of scoped names of inheriting interfaces.
+  return [@{$_[0]->{inheritances}}];
+} # inheritances
+
 sub idl_text ($) {
   my $self = shift;
   my $r = $self->_xattrs_text;
@@ -2588,4 +2618,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/09/16 14:41:38 $
+# $Date: 2008/10/13 06:18:32 $
