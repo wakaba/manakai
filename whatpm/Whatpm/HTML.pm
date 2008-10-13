@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.200 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.201 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -28,119 +28,129 @@ my $XLINK_NS = q<http://www.w3.org/1999/xlink>;
 my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
 my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
 
-sub A_EL () { 0b1 }
-sub ADDRESS_EL () { 0b10 }
-sub BODY_EL () { 0b100 }
-sub BUTTON_EL () { 0b1000 }
-sub CAPTION_EL () { 0b10000 }
-sub DD_EL () { 0b100000 }
-sub DIV_EL () { 0b1000000 }
-sub DT_EL () { 0b10000000 }
-sub FORM_EL () { 0b100000000 }
-sub FORMATTING_EL () { 0b1000000000 }
-sub FRAMESET_EL () { 0b10000000000 }
-sub HEADING_EL () { 0b100000000000 }
-sub HTML_EL () { 0b1000000000000 }
-sub LI_EL () { 0b10000000000000 }
-sub NOBR_EL () { 0b100000000000000 }
-sub OPTION_EL () { 0b1000000000000000 }
-sub OPTGROUP_EL () { 0b10000000000000000 }
-sub P_EL () { 0b100000000000000000 }
-sub SELECT_EL () { 0b1000000000000000000 }
-sub TABLE_EL () { 0b10000000000000000000 }
-sub TABLE_CELL_EL () { 0b100000000000000000000 }
-sub TABLE_ROW_EL () { 0b1000000000000000000000 }
-sub TABLE_ROW_GROUP_EL () { 0b10000000000000000000000 }
-sub MISC_SCOPING_EL () { 0b100000000000000000000000 }
-sub MISC_SPECIAL_EL () { 0b1000000000000000000000000 }
-sub FOREIGN_EL () { 0b10000000000000000000000000 }
-sub FOREIGN_FLOW_CONTENT_EL () { 0b100000000000000000000000000 }
-sub MML_AXML_EL () { 0b1000000000000000000000000000 }
-sub RUBY_EL () { 0b10000000000000000000000000000 }
-sub RUBY_COMPONENT_EL () { 0b100000000000000000000000000000 }
+## Bits 12-15
+sub SPECIAL_EL () { 0b1_000000000000000 }
+sub SCOPING_EL () { 0b1_00000000000000 }
+sub FORMATTING_EL () { 0b1_0000000000000 }
+sub PHRASING_EL () { 0b1_000000000000 }
 
-sub TABLE_ROWS_EL () {
-  TABLE_EL |
-  TABLE_ROW_EL |
-  TABLE_ROW_GROUP_EL
-}
+## Bits 10-11
+sub FOREIGN_EL () { 0b1_00000000000 }
+sub FOREIGN_FLOW_CONTENT_EL () { 0b1_0000000000 }
+
+## Bits 6-9
+sub TABLE_SCOPING_EL () { 0b1_000000000 }
+sub TABLE_ROWS_SCOPING_EL () { 0b1_00000000 }
+sub TABLE_ROW_SCOPING_EL () { 0b1_0000000 }
+sub TABLE_ROWS_EL () { 0b1_000000 }
+
+## Bit 5
+sub ADDRESS_DIV_P_EL () { 0b1_00000 }
+
+## NOTE: Used in </body> and EOF algorithms.
+## Bit 4
+sub ALL_END_TAG_OPTIONAL_EL () { 0b1_0000 }
 
 ## NOTE: Used in "generate implied end tags" algorithm.
 ## NOTE: There is a code where a modified version of
 ## END_TAG_OPTIONAL_EL is used in "generate implied end tags"
 ## implementation (search for the algorithm name).
-sub END_TAG_OPTIONAL_EL () {
-  DD_EL |
-  DT_EL |
-  LI_EL |
-  OPTION_EL |
-  OPTGROUP_EL |
-  P_EL |
-  RUBY_COMPONENT_EL
+## Bit 3
+sub END_TAG_OPTIONAL_EL () { 0b1_000 }
+
+## Bits 0-2
+
+sub MISC_SPECIAL_EL () { SPECIAL_EL | 0b000 }
+sub FORM_EL () { SPECIAL_EL | 0b001 }
+sub FRAMESET_EL () { SPECIAL_EL | 0b010 }
+sub HEADING_EL () { SPECIAL_EL | 0b011 }
+sub SELECT_EL () { SPECIAL_EL | 0b100 }
+sub SCRIPT_EL () { SPECIAL_EL | 0b101 }
+
+sub ADDRESS_DIV_EL () { SPECIAL_EL | ADDRESS_DIV_P_EL | 0b001 }
+sub BODY_EL () { SPECIAL_EL | ALL_END_TAG_OPTIONAL_EL | 0b001 }
+
+sub DD_EL () {
+  SPECIAL_EL |
+  END_TAG_OPTIONAL_EL |
+  ALL_END_TAG_OPTIONAL_EL |
+  0b001
+}
+sub DT_EL () {
+  SPECIAL_EL |
+  END_TAG_OPTIONAL_EL |
+  ALL_END_TAG_OPTIONAL_EL |
+  0b010
+}
+sub LI_EL () {
+  SPECIAL_EL |
+  END_TAG_OPTIONAL_EL |
+  ALL_END_TAG_OPTIONAL_EL |
+  0b100
+}
+sub P_EL () {
+  SPECIAL_EL |
+  ADDRESS_DIV_P_EL |
+  END_TAG_OPTIONAL_EL |
+  ALL_END_TAG_OPTIONAL_EL |
+  0b001
 }
 
-## NOTE: Used in </body> and EOF algorithms.
-sub ALL_END_TAG_OPTIONAL_EL () {
-  DD_EL |
-  DT_EL |
-  LI_EL |
-  P_EL |
-
-  ## ISSUE: option, optgroup, rt, rp?
-
-  BODY_EL |
-  HTML_EL |
-  TABLE_CELL_EL |
-  TABLE_ROW_EL |
-  TABLE_ROW_GROUP_EL
+sub TABLE_ROW_EL () {
+  SPECIAL_EL |
+  TABLE_ROWS_EL |
+  TABLE_ROW_SCOPING_EL |
+  ALL_END_TAG_OPTIONAL_EL |
+  0b001
+}
+sub TABLE_ROW_GROUP_EL () {
+  SPECIAL_EL |
+  TABLE_ROWS_EL |
+  TABLE_ROWS_SCOPING_EL |
+  ALL_END_TAG_OPTIONAL_EL |
+  0b001
 }
 
-sub SCOPING_EL () {
-  BUTTON_EL |
-  CAPTION_EL |
-  HTML_EL |
-  TABLE_EL |
-  TABLE_CELL_EL |
-  MISC_SCOPING_EL
+sub MISC_SCOPING_EL () { SCOPING_EL | 0b000 }
+sub BUTTON_EL () { SCOPING_EL | 0b001 }
+sub CAPTION_EL () { SCOPING_EL | 0b010 }
+sub HTML_EL () {
+  SCOPING_EL |
+  TABLE_SCOPING_EL |
+  TABLE_ROWS_SCOPING_EL |
+  TABLE_ROW_SCOPING_EL |
+  ALL_END_TAG_OPTIONAL_EL |
+  0b001
+}
+sub TABLE_EL () {
+  SCOPING_EL |
+  TABLE_ROWS_EL |
+  TABLE_SCOPING_EL |
+  0b001
+}
+sub TABLE_CELL_EL () {
+  SCOPING_EL |
+  TABLE_ROW_SCOPING_EL |
+  ALL_END_TAG_OPTIONAL_EL |
+  0b001
 }
 
-sub TABLE_SCOPING_EL () {
-  HTML_EL |
-  TABLE_EL
-}
+sub MISC_FORMATTING_EL () { FORMATTING_EL | 0b000 }
+sub A_EL () { FORMATTING_EL | 0b001 }
+sub NOBR_EL () { FORMATTING_EL | 0b010 }
 
-sub TABLE_ROWS_SCOPING_EL () {
-  HTML_EL |
-  TABLE_ROW_GROUP_EL
-}
+sub RUBY_EL () { PHRASING_EL | 0b001 }
 
-sub TABLE_ROW_SCOPING_EL () {
-  HTML_EL |
-  TABLE_ROW_EL
-}
+## ISSUE: ALL_END_TAG_OPTIONAL_EL?
+sub OPTGROUP_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b001 }
+sub OPTION_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b010 }
+sub RUBY_COMPONENT_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b100 }
 
-sub SPECIAL_EL () {
-  ADDRESS_EL |
-  BODY_EL |
-  DIV_EL |
-
-  DD_EL |
-  DT_EL |
-  LI_EL |
-  P_EL |
-
-  FORM_EL |
-  FRAMESET_EL |
-  HEADING_EL |
-  SELECT_EL |
-  TABLE_ROW_EL |
-  TABLE_ROW_GROUP_EL |
-  MISC_SPECIAL_EL
-}
+sub MML_AXML_EL () { PHRASING_EL | FOREIGN_EL | 0b001 }
 
 my $el_category = {
-  a => A_EL | FORMATTING_EL,
-  address => ADDRESS_EL,
+  a => A_EL,
+  address => ADDRESS_DIV_EL,
   applet => MISC_SCOPING_EL,
   area => MISC_SPECIAL_EL,
   article => MISC_SPECIAL_EL,
@@ -164,7 +174,7 @@ my $el_category = {
   details => MISC_SPECIAL_EL,
   dialog => MISC_SPECIAL_EL,
   dir => MISC_SPECIAL_EL,
-  div => DIV_EL,
+  div => ADDRESS_DIV_EL,
   dl => MISC_SPECIAL_EL,
   dt => DT_EL,
   em => FORMATTING_EL,
@@ -200,7 +210,7 @@ my $el_category = {
   menu => MISC_SPECIAL_EL,
   meta => MISC_SPECIAL_EL,
   nav => MISC_SPECIAL_EL,
-  nobr => NOBR_EL | FORMATTING_EL,
+  nobr => NOBR_EL,
   noembed => MISC_SPECIAL_EL,
   noframes => MISC_SPECIAL_EL,
   noscript => MISC_SPECIAL_EL,
@@ -242,16 +252,16 @@ my $el_category = {
 my $el_category_f = {
   $MML_NS => {
     'annotation-xml' => MML_AXML_EL,
-    mi => FOREIGN_FLOW_CONTENT_EL,
-    mo => FOREIGN_FLOW_CONTENT_EL,
-    mn => FOREIGN_FLOW_CONTENT_EL,
-    ms => FOREIGN_FLOW_CONTENT_EL,
-    mtext => FOREIGN_FLOW_CONTENT_EL,
+    mi => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    mo => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    mn => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    ms => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    mtext => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
   },
   $SVG_NS => {
-    foreignObject => FOREIGN_FLOW_CONTENT_EL | MISC_SCOPING_EL,
-    desc => FOREIGN_FLOW_CONTENT_EL,
-    title => FOREIGN_FLOW_CONTENT_EL,
+    foreignObject => SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    desc => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    title => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
   },
   ## NOTE: In addition, FOREIGN_EL is set to non-HTML elements.
 };
@@ -4958,6 +4968,7 @@ sub _construct_tree ($) {
   undef $self->{head_element_inserted};
   $self->{open_elements} = [];
   undef $self->{inner_html_node};
+  undef $self->{ignore_newline};
 
   ## NOTE: The "initial" insertion mode.
   $self->_tree_construction_initial; # MUST
@@ -5323,7 +5334,7 @@ sub _reset_insertion_mode ($) {
         ## SVG elements.  Currently the HTML syntax supports only MathML and
         ## SVG elements as foreigners.
         $new_mode = IN_BODY_IM | IN_FOREIGN_CONTENT_IM;
-      } elsif ($node->[1] & TABLE_CELL_EL) {
+      } elsif ($node->[1] == TABLE_CELL_EL) {
         if ($last) {
           
           #
@@ -5352,7 +5363,7 @@ sub _reset_insertion_mode ($) {
       $self->{insertion_mode} = $new_mode and return if defined $new_mode;
       
       ## Step 15
-      if ($node->[1] & HTML_EL) {
+      if ($node->[1] == HTML_EL) {
         unless (defined $self->{head_element}) {
           
           $self->{insertion_mode} = BEFORE_HEAD_IM;
@@ -5740,7 +5751,7 @@ sub _tree_construction_main ($) {
         my $foster_parent_element;
         my $next_sibling;
         OE: for (reverse 0..$#{$self->{open_elements}}) {
-          if ($self->{open_elements}->[$_]->[1] & TABLE_EL) {
+          if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
                              my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
                              if (defined $parent and $parent->node_type == 1) {
                                
@@ -5818,7 +5829,7 @@ sub _tree_construction_main ($) {
       my $foster_parent_element;
       my $next_sibling;
       OE: for (reverse 0..$#{$self->{open_elements}}) {
-        if ($self->{open_elements}->[$_]->[1] & TABLE_EL) {
+        if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
                              my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
                              if (defined $parent and $parent->node_type == 1) {
                                
@@ -5974,7 +5985,7 @@ sub _tree_construction_main ($) {
                             ->manakai_local_name,
                         token => $token);
 
-        #if ($self->{open_elements}->[-1]->[1] & SCRIPT_EL) {
+        #if ($self->{open_elements}->[-1]->[1] == SCRIPT_EL) {
         #  ## TODO: Mark as "already executed"
         #}
 
@@ -5997,7 +6008,7 @@ sub _tree_construction_main ($) {
              $self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL) or
             not ($self->{open_elements}->[-1]->[1] & FOREIGN_EL) or
             ($token->{tag_name} eq 'svg' and
-             $self->{open_elements}->[-1]->[1] & MML_AXML_EL)) {
+             $self->{open_elements}->[-1]->[1] == MML_AXML_EL)) {
           ## NOTE: "using the rules for secondary insertion mode"then"continue"
           
           #
@@ -6571,7 +6582,7 @@ sub _tree_construction_main ($) {
 
           ## NOTE: There is a "as if in head" code clone.
           $parse_rcdata->(RCDATA_CONTENT_MODEL);
-          ## ISSUE: A spec bug.
+          ## ISSUE: A spec bug [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1, () # <head>
               if ($self->{insertion_mode} & AFTER_HEAD_IM) == AFTER_HEAD_IM;
           next B;
@@ -6591,7 +6602,7 @@ sub _tree_construction_main ($) {
             
           }
           $parse_rcdata->(CDATA_CONTENT_MODEL);
-          ## ISSUE: A spec bug.
+          ## ISSUE: A spec bug [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1, () # <head>
               if ($self->{insertion_mode} & AFTER_HEAD_IM) == AFTER_HEAD_IM;
           next B;
@@ -6663,7 +6674,7 @@ sub _tree_construction_main ($) {
 
           ## NOTE: There is a "as if in head" code clone.
           $script_start_tag->();
-          ## ISSUE: A spec bug.
+          ## ISSUE: A spec bug  [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1 # <head>
               if ($self->{insertion_mode} & AFTER_HEAD_IM) == AFTER_HEAD_IM;
           next B;
@@ -7088,7 +7099,7 @@ sub _tree_construction_main ($) {
                 ## have an element in table scope
                 for (reverse 0..$#{$self->{open_elements}}) {
                   my $node = $self->{open_elements}->[$_];
-                  if ($node->[1] & TABLE_CELL_EL) {
+                  if ($node->[1] == TABLE_CELL_EL) {
                     
 
                     ## Close the cell
@@ -7126,7 +7137,7 @@ sub _tree_construction_main ($) {
                 INSCOPE: {
                   for (reverse 0..$#{$self->{open_elements}}) {
                     my $node = $self->{open_elements}->[$_];
-                    if ($node->[1] & CAPTION_EL) {
+                    if ($node->[1] == CAPTION_EL) {
                       
                       $i = $_;
                       last INSCOPE;
@@ -7152,7 +7163,7 @@ sub _tree_construction_main ($) {
                   pop @{$self->{open_elements}};
                 }
 
-                unless ($self->{open_elements}->[-1]->[1] & CAPTION_EL) {
+                unless ($self->{open_elements}->[-1]->[1] == CAPTION_EL) {
                   
                   $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
                                   text => $self->{open_elements}->[-1]->[0]
@@ -7249,7 +7260,7 @@ sub _tree_construction_main ($) {
                 INSCOPE: {
                   for (reverse 0..$#{$self->{open_elements}}) {
                     my $node = $self->{open_elements}->[$_];
-                    if ($node->[1] & CAPTION_EL) {
+                    if ($node->[1] == CAPTION_EL) {
                       
                       $i = $_;
                       last INSCOPE;
@@ -7274,7 +7285,7 @@ sub _tree_construction_main ($) {
                   pop @{$self->{open_elements}};
                 }
                 
-                unless ($self->{open_elements}->[-1]->[1] & CAPTION_EL) {
+                unless ($self->{open_elements}->[-1]->[1] == CAPTION_EL) {
                   
                   $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
                                   text => $self->{open_elements}->[-1]->[0]
@@ -7328,7 +7339,7 @@ sub _tree_construction_main ($) {
                               line => $token->{line},
                               column => $token->{column}};
                     next B;
-                  } elsif ($node->[1] & TABLE_CELL_EL) {
+                  } elsif ($node->[1] == TABLE_CELL_EL) {
                     
                     $tn = $node->[0]->manakai_local_name;
                     ## NOTE: There is exactly one |td| or |th| element
@@ -7357,7 +7368,7 @@ sub _tree_construction_main ($) {
               my $i;
               INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                 my $node = $self->{open_elements}->[$_];
-                if ($node->[1] & CAPTION_EL) {
+                if ($node->[1] == CAPTION_EL) {
                   
                   $i = $_;
                   last INSCOPE;
@@ -7381,7 +7392,7 @@ sub _tree_construction_main ($) {
                 pop @{$self->{open_elements}};
               }
 
-              unless ($self->{open_elements}->[-1]->[1] & CAPTION_EL) {
+              unless ($self->{open_elements}->[-1]->[1] == CAPTION_EL) {
                 
                 $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
                                 text => $self->{open_elements}->[-1]->[0]
@@ -7471,7 +7482,7 @@ sub _tree_construction_main ($) {
           my $next_sibling;
           my $prev_sibling;
           OE: for (reverse 0..$#{$self->{open_elements}}) {
-            if ($self->{open_elements}->[$_]->[1] & TABLE_EL) {
+            if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
               my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
               if (defined $parent and $parent->node_type == 1) {
                 $foster_parent_element = $parent;
@@ -7672,7 +7683,7 @@ sub _tree_construction_main ($) {
             my $i;
             INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
               my $node = $self->{open_elements}->[$_];
-              if ($node->[1] & TABLE_ROW_EL) {
+              if ($node->[1] == TABLE_ROW_EL) {
                 
                 $i = $_;
                 last INSCOPE;
@@ -7718,7 +7729,7 @@ sub _tree_construction_main ($) {
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                   my $node = $self->{open_elements}->[$_];
-                  if ($node->[1] & TABLE_ROW_GROUP_EL) {
+                  if ($node->[1] == TABLE_ROW_GROUP_EL) {
                     
                     $i = $_;
                     last INSCOPE;
@@ -7856,7 +7867,7 @@ sub _tree_construction_main ($) {
               my $i;
               INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                 my $node = $self->{open_elements}->[$_];
-                if ($node->[1] & TABLE_EL) {
+                if ($node->[1] == TABLE_EL) {
                   
                   $i = $_;
                   last INSCOPE;
@@ -7883,7 +7894,7 @@ sub _tree_construction_main ($) {
                 pop @{$self->{open_elements}};
               }
 
-              unless ($self->{open_elements}->[-1]->[1] & TABLE_EL) {
+              unless ($self->{open_elements}->[-1]->[1] == TABLE_EL) {
                 
                 ## NOTE: |<table><tr><table>|
                 $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
@@ -7996,7 +8007,7 @@ sub _tree_construction_main ($) {
               my $i;
               INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                 my $node = $self->{open_elements}->[$_];
-                if ($node->[1] & TABLE_ROW_EL) {
+                if ($node->[1] == TABLE_ROW_EL) {
                   
                   $i = $_;
                   last INSCOPE;
@@ -8037,7 +8048,7 @@ sub _tree_construction_main ($) {
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                   my $node = $self->{open_elements}->[$_];
-                  if ($node->[1] & TABLE_ROW_EL) {
+                  if ($node->[1] == TABLE_ROW_EL) {
                     
                     $i = $_;
                     last INSCOPE;
@@ -8075,7 +8086,7 @@ sub _tree_construction_main ($) {
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                   my $node = $self->{open_elements}->[$_];
-                  if ($node->[1] & TABLE_ROW_GROUP_EL) {
+                  if ($node->[1] == TABLE_ROW_GROUP_EL) {
                     
                     $i = $_;
                     last INSCOPE;
@@ -8122,7 +8133,7 @@ sub _tree_construction_main ($) {
               my $i;
               INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                 my $node = $self->{open_elements}->[$_];
-                if ($node->[1] & TABLE_EL) {
+                if ($node->[1] == TABLE_EL) {
                   
                   $i = $_;
                   last INSCOPE;
@@ -8181,7 +8192,7 @@ sub _tree_construction_main ($) {
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                   my $node = $self->{open_elements}->[$_];
-                  if ($node->[1] & TABLE_ROW_EL) {
+                  if ($node->[1] == TABLE_ROW_EL) {
                     
                     $i = $_;
                     last INSCOPE;
@@ -8271,7 +8282,7 @@ sub _tree_construction_main ($) {
           #
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
-        unless ($self->{open_elements}->[-1]->[1] & HTML_EL and
+        unless ($self->{open_elements}->[-1]->[1] == HTML_EL and
                 @{$self->{open_elements}} == 1) { # redundant, maybe
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body:#eof', token => $token);
           
@@ -8337,7 +8348,7 @@ sub _tree_construction_main ($) {
             }
           } elsif ($token->{type} == END_TAG_TOKEN) {
             if ($token->{tag_name} eq 'colgroup') {
-              if ($self->{open_elements}->[-1]->[1] & HTML_EL) {
+              if ($self->{open_elements}->[-1]->[1] == HTML_EL) {
                 
                 $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                                 text => 'colgroup', token => $token);
@@ -8363,7 +8374,7 @@ sub _tree_construction_main ($) {
               # 
             }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
-        if ($self->{open_elements}->[-1]->[1] & HTML_EL and
+        if ($self->{open_elements}->[-1]->[1] == HTML_EL and
             @{$self->{open_elements}} == 1) { # redundant, maybe
           
           ## Stop parsing.
@@ -8381,7 +8392,7 @@ sub _tree_construction_main ($) {
       }
 
           ## As if </colgroup>
-          if ($self->{open_elements}->[-1]->[1] & HTML_EL) {
+          if ($self->{open_elements}->[-1]->[1] == HTML_EL) {
             
 ## TODO: Wrong error type?
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
@@ -8406,7 +8417,7 @@ sub _tree_construction_main ($) {
         next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
         if ($token->{tag_name} eq 'option') {
-          if ($self->{open_elements}->[-1]->[1] & OPTION_EL) {
+          if ($self->{open_elements}->[-1]->[1] == OPTION_EL) {
             
             ## As if </option>
             pop @{$self->{open_elements}};
@@ -8443,7 +8454,7 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           next B;
         } elsif ($token->{tag_name} eq 'optgroup') {
-          if ($self->{open_elements}->[-1]->[1] & OPTION_EL) {
+          if ($self->{open_elements}->[-1]->[1] == OPTION_EL) {
             
             ## As if </option>
             pop @{$self->{open_elements}};
@@ -8451,7 +8462,7 @@ sub _tree_construction_main ($) {
             
           }
 
-          if ($self->{open_elements}->[-1]->[1] & OPTGROUP_EL) {
+          if ($self->{open_elements}->[-1]->[1] == OPTGROUP_EL) {
             
             ## As if </optgroup>
             pop @{$self->{open_elements}};
@@ -8505,7 +8516,7 @@ sub _tree_construction_main ($) {
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
-            if ($node->[1] & SELECT_EL) {
+            if ($node->[1] == SELECT_EL) {
               
               $i = $_;
               last INSCOPE;
@@ -8550,12 +8561,12 @@ sub _tree_construction_main ($) {
         }
       } elsif ($token->{type} == END_TAG_TOKEN) {
         if ($token->{tag_name} eq 'optgroup') {
-          if ($self->{open_elements}->[-1]->[1] & OPTION_EL and
-              $self->{open_elements}->[-2]->[1] & OPTGROUP_EL) {
+          if ($self->{open_elements}->[-1]->[1] == OPTION_EL and
+              $self->{open_elements}->[-2]->[1] == OPTGROUP_EL) {
             
             ## As if </option>
             splice @{$self->{open_elements}}, -2;
-          } elsif ($self->{open_elements}->[-1]->[1] & OPTGROUP_EL) {
+          } elsif ($self->{open_elements}->[-1]->[1] == OPTGROUP_EL) {
             
             pop @{$self->{open_elements}};
           } else {
@@ -8568,7 +8579,7 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           next B;
         } elsif ($token->{tag_name} eq 'option') {
-          if ($self->{open_elements}->[-1]->[1] & OPTION_EL) {
+          if ($self->{open_elements}->[-1]->[1] == OPTION_EL) {
             
             pop @{$self->{open_elements}};
           } else {
@@ -8585,7 +8596,7 @@ sub _tree_construction_main ($) {
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
-            if ($node->[1] & SELECT_EL) {
+            if ($node->[1] == SELECT_EL) {
               
               $i = $_;
               last INSCOPE;
@@ -8647,7 +8658,7 @@ sub _tree_construction_main ($) {
           undef $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
-            if ($node->[1] & SELECT_EL) {
+            if ($node->[1] == SELECT_EL) {
               
               $i = $_;
               last INSCOPE;
@@ -8686,7 +8697,7 @@ sub _tree_construction_main ($) {
           next B;
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
-        unless ($self->{open_elements}->[-1]->[1] & HTML_EL and
+        unless ($self->{open_elements}->[-1]->[1] == HTML_EL and
                 @{$self->{open_elements}} == 1) { # redundant, maybe
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body:#eof', token => $token);
@@ -8921,7 +8932,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{type} == END_TAG_TOKEN) {
         if ($token->{tag_name} eq 'frameset' and
             $self->{insertion_mode} == IN_FRAMESET_IM) {
-          if ($self->{open_elements}->[-1]->[1] & HTML_EL and
+          if ($self->{open_elements}->[-1]->[1] == HTML_EL and
               @{$self->{open_elements}} == 1) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
@@ -8935,7 +8946,7 @@ sub _tree_construction_main ($) {
           }
 
           if (not defined $self->{inner_html_node} and
-              not ($self->{open_elements}->[-1]->[1] & FRAMESET_EL)) {
+              not ($self->{open_elements}->[-1]->[1] == FRAMESET_EL)) {
             
             $self->{insertion_mode} = AFTER_FRAMESET_IM;
           } else {
@@ -8967,7 +8978,7 @@ sub _tree_construction_main ($) {
           next B;
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
-        unless ($self->{open_elements}->[-1]->[1] & HTML_EL and
+        unless ($self->{open_elements}->[-1]->[1] == HTML_EL and
                 @{$self->{open_elements}} == 1) { # redundant, maybe
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body:#eof', token => $token);
@@ -9118,7 +9129,7 @@ sub _tree_construction_main ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body', text => 'body', token => $token);
               
         if (@{$self->{open_elements}} == 1 or
-            not ($self->{open_elements}->[1]->[1] & BODY_EL)) {
+            not ($self->{open_elements}->[1]->[1] == BODY_EL)) {
           
           ## Ignore the token
         } else {
@@ -9164,7 +9175,7 @@ sub _tree_construction_main ($) {
 
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] & P_EL) {
+          if ($_->[1] == P_EL) {
             
             
       $token->{self_closing} = $self->{self_closing};
@@ -9265,7 +9276,7 @@ sub _tree_construction_main ($) {
 
         ## 1.
         for my $node (reverse @{$self->{open_elements}}) {
-          if ($node->[1] & LI_EL) {
+          if ($node->[1] == LI_EL) {
             ## 2. (a) As if </li>
             {
               ## If no </li> - not applied
@@ -9296,10 +9307,8 @@ sub _tree_construction_main ($) {
                    ($node->[1] & SPECIAL_EL or
                     $node->[1] & SCOPING_EL) and
                    ## NOTE: "li", "dt", and "dd" are in |SPECIAL_EL|.
-
-                   (not $node->[1] & ADDRESS_EL) &
-                   (not $node->[1] & DIV_EL) &
-                   (not $node->[1] & P_EL)) {
+                   (not $node->[1] & ADDRESS_DIV_P_EL)
+                  ) {
             ## 3.
             
             last; ## goto 5.
@@ -9318,7 +9327,7 @@ sub _tree_construction_main ($) {
 
         ## 5. (a) has a |p| element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] & P_EL) {
+          if ($_->[1] == P_EL) {
             
 
             ## NOTE: |<p><li>|, for example.
@@ -9375,7 +9384,7 @@ sub _tree_construction_main ($) {
 
         ## 1.
         for my $node (reverse @{$self->{open_elements}}) {
-          if ($node->[1] & DT_EL or $node->[1] & DD_EL) {
+          if ($node->[1] == DT_EL or $node->[1] == DD_EL) {
             ## 2. (a) As if </li>
             {
               ## If no </li> - not applied
@@ -9407,9 +9416,8 @@ sub _tree_construction_main ($) {
                     $node->[1] & SCOPING_EL) and
                    ## NOTE: "li", "dt", and "dd" are in |SPECIAL_EL|.
 
-                   (not $node->[1] & ADDRESS_EL) &
-                   (not $node->[1] & DIV_EL) &
-                   (not $node->[1] & P_EL)) {
+                   (not $node->[1] & ADDRESS_DIV_P_EL)
+                  ) {
             ## 3.
             
             last; ## goto 5.
@@ -9428,7 +9436,7 @@ sub _tree_construction_main ($) {
 
         ## 5. (a) has a |p| element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] & P_EL) {
+          if ($_->[1] == P_EL) {
             
             
       $token->{self_closing} = $self->{self_closing};
@@ -9478,7 +9486,7 @@ sub _tree_construction_main ($) {
 
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] & P_EL) {
+          if ($_->[1] == P_EL) {
             
             
       $token->{self_closing} = $self->{self_closing};
@@ -9528,7 +9536,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'a') {
         AFE: for my $i (reverse 0..$#$active_formatting_elements) {
           my $node = $active_formatting_elements->[$i];
-          if ($node->[1] & A_EL) {
+          if ($node->[1] == A_EL) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'in a:a', token => $token);
             
@@ -9600,7 +9608,7 @@ sub _tree_construction_main ($) {
         ## has a |nobr| element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
-          if ($node->[1] & NOBR_EL) {
+          if ($node->[1] == NOBR_EL) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'in nobr:nobr', token => $token);
             
@@ -9651,7 +9659,7 @@ sub _tree_construction_main ($) {
         ## has a button element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
-          if ($node->[1] & BUTTON_EL) {
+          if ($node->[1] == BUTTON_EL) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'in button:button', token => $token);
             
@@ -9830,7 +9838,7 @@ sub _tree_construction_main ($) {
         ## has an |option| element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
-          if ($node->[1] & OPTION_EL) {
+          if ($node->[1] == OPTION_EL) {
             
             ## NOTE: As if </option>
             
@@ -9883,21 +9891,21 @@ sub _tree_construction_main ($) {
         ## has a |ruby| element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
-          if ($node->[1] & RUBY_EL) {
+          if ($node->[1] == RUBY_EL) {
             
             ## generate implied end tags
             while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
               
               pop @{$self->{open_elements}};
             }
-            unless ($self->{open_elements}->[-1]->[1] & RUBY_EL) {
+            unless ($self->{open_elements}->[-1]->[1] == RUBY_EL) {
               
               $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
                               text => $self->{open_elements}->[-1]->[0]
                                   ->manakai_local_name,
                               token => $token);
               pop @{$self->{open_elements}}
-                  while not $self->{open_elements}->[-1]->[1] & RUBY_EL;
+                  while not $self->{open_elements}->[-1]->[1] == RUBY_EL;
             }
             last INSCOPE;
           } elsif ($node->[1] & SCOPING_EL) {
@@ -10135,7 +10143,7 @@ sub _tree_construction_main ($) {
         my $i;
         INSCOPE: {
           for (reverse @{$self->{open_elements}}) {
-            if ($_->[1] & BODY_EL) {
+            if ($_->[1] == BODY_EL) {
               
               $i = $_;
               last INSCOPE;
@@ -10173,8 +10181,8 @@ sub _tree_construction_main ($) {
         ## TODO: Update this code.  It seems that the code below is not
         ## up-to-date, though it has same effect as speced.
         if (@{$self->{open_elements}} > 1 and
-            $self->{open_elements}->[1]->[1] & BODY_EL) {
-          unless ($self->{open_elements}->[-1]->[1] & BODY_EL) {
+            $self->{open_elements}->[1]->[1] == BODY_EL) {
+          unless ($self->{open_elements}->[-1]->[1] == BODY_EL) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
                             text => $self->{open_elements}->[1]->[0]
@@ -10281,7 +10289,7 @@ sub _tree_construction_main ($) {
         my $i;
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
-          if ($node->[1] & FORM_EL) {
+          if ($node->[1] == FORM_EL) {
             
             $i = $_;
             last INSCOPE;
@@ -10329,7 +10337,7 @@ sub _tree_construction_main ($) {
         my $i;
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
-          if ($node->[1] & HEADING_EL) {
+          if ($node->[1] == HEADING_EL) {
             
             $i = $_;
             last INSCOPE;
@@ -10375,7 +10383,7 @@ sub _tree_construction_main ($) {
         my $i;
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
-          if ($node->[1] & P_EL) {
+          if ($node->[1] == P_EL) {
             
             $i = $_;
             last INSCOPE;
@@ -10820,4 +10828,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/13 06:18:30 $
+# $Date: 2008/10/13 08:22:29 $
