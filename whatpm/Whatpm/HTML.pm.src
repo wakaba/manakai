@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.206 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.207 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -70,13 +70,7 @@ sub SCRIPT_EL () { SPECIAL_EL | 0b101 }
 sub ADDRESS_DIV_EL () { SPECIAL_EL | ADDRESS_DIV_P_EL | 0b001 }
 sub BODY_EL () { SPECIAL_EL | ALL_END_TAG_OPTIONAL_EL | 0b001 }
 
-sub DD_EL () {
-  SPECIAL_EL |
-  END_TAG_OPTIONAL_EL |
-  ALL_END_TAG_OPTIONAL_EL |
-  0b001
-}
-sub DT_EL () {
+sub DTDD_EL () {
   SPECIAL_EL |
   END_TAG_OPTIONAL_EL |
   ALL_END_TAG_OPTIONAL_EL |
@@ -170,13 +164,13 @@ my $el_category = {
   colgroup => MISC_SPECIAL_EL,
   command => MISC_SPECIAL_EL,
   datagrid => MISC_SPECIAL_EL,
-  dd => DD_EL,
+  dd => DTDD_EL,
   details => MISC_SPECIAL_EL,
   dialog => MISC_SPECIAL_EL,
   dir => MISC_SPECIAL_EL,
   div => ADDRESS_DIV_EL,
   dl => MISC_SPECIAL_EL,
-  dt => DT_EL,
+  dt => DTDD_EL,
   em => FORMATTING_EL,
   embed => MISC_SPECIAL_EL,
   eventsource => MISC_SPECIAL_EL,
@@ -7164,7 +7158,7 @@ sub _tree_construction_main ($) {
 
         ## 1.
         for my $node (reverse @{$self->{open_elements}}) {
-          if ($node->[1] == DT_EL or $node->[1] == DD_EL) {
+          if ($node->[1] == DTDD_EL) {
             ## 2. (a) As if </li>
             {
               ## If no </li> - not applied
@@ -8288,4 +8282,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/13 08:22:30 $
+# $Date: 2008/10/13 08:27:44 $
