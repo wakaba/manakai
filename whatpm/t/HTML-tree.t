@@ -174,10 +174,11 @@ sub serialize ($) {
     } elsif ($nt == $child->[0]->DOCUMENT_TYPE_NODE) {
       $r .= $child->[1] . '<!DOCTYPE ' . $child->[0]->name;
       my $pubid = $child->[0]->public_id;
-      $r .= ' PUBLIC "' . $pubid . '"' if length $pubid;
       my $sysid = $child->[0]->system_id;
-      $r .= ' SYSTEM' if not length $pubid and length $sysid;
-      $r .= ' "' . $sysid . '"' if length $sysid;
+      if (length $pubid or length $sysid) {
+        $r .= ' "' . $pubid . '"';
+        $r .= ' "' . $sysid . '"';
+      }
       $r .= ">\x0A";
     } else {
       $r .= $child->[1] . $child->[0]->node_type . "\x0A"; # error
@@ -188,4 +189,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/10/14 05:58:26 $
+## $Date: 2008/10/14 06:08:26 $

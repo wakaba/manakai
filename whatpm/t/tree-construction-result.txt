@@ -1,7 +1,7 @@
 1..3105
 # Running under perl version 5.010000 for linux
-# Current time local: Tue Oct 14 14:53:09 2008
-# Current time GMT:   Tue Oct 14 05:53:09 2008
+# Current time local: Tue Oct 14 15:06:23 2008
+# Current time GMT:   Tue Oct 14 06:06:23 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -1134,12 +1134,7 @@ not ok 988
 # Test 988 got: "2" (t/HTML-tree.t at line 141 fail #330)
 #     Expected: "1" (Parse error: qq'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html></html>'; 1:51:not HTML5, 1:63:unmatched end tag;doctype-error)
 ok 989
-not ok 990
-# Test 990 got: "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 146 fail #330)
-#     Expected: "<!DOCTYPE html \"-//W3C//DTD HTML 4.01//EN\" \"\">\n<html>\n  <head>\n  <body>\n" (Document tree: qq'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html></html>')
-#     Line 1 is changed:
-#      - "<!DOCTYPE html \"-//W3C//DTD HTML 4.01//EN\" \"\">\n"
-#      + "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n"
+ok 990
 # t/tree-construction/tests7.dat
 ok 991
 ok 992

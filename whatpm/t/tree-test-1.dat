@@ -45,7 +45,7 @@ not HTML5
 #errors
 not HTML5 (quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+| <!DOCTYPE HTML "-//IETF//DTD HTML 2.0//EN" "">
 | <html>
 |   <head>
 |     <title>
@@ -56,7 +56,7 @@ not HTML5 (quirks doctype)
 #errors
 not HTML5 (quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "HTML">
+| <!DOCTYPE HTML "HTML" "">
 | <html>
 |   <head>
 |     <title>
@@ -67,7 +67,7 @@ not HTML5 (quirks doctype)
 #errors
 not HTML5 (quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+| <!DOCTYPE HTML "-//W3C//DTD HTML 4.01 Transitional//EN" "">
 | <html>
 |   <head>
 |     <title>
@@ -79,7 +79,7 @@ not HTML5 (quirks doctype)
 #errors
 not HTML5 (limited quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+| <!DOCTYPE HTML "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 | <html>
 |   <head>
 |     <title>
@@ -90,7 +90,7 @@ not HTML5 (limited quirks doctype)
 #errors
 not HTML5 (quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+| <!DOCTYPE HTML "-//W3C//DTD HTML 4.01 Frameset//EN" "">
 | <html>
 |   <head>
 |     <title>
@@ -102,7 +102,7 @@ not HTML5 (quirks doctype)
 #errors
 not HTML5 (limited quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+| <!DOCTYPE HTML "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 | <html>
 |   <head>
 |     <title>
@@ -113,7 +113,7 @@ not HTML5 (limited quirks doctype)
 #errors
 not HTML5 (limited quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+| <!DOCTYPE HTML "-//W3C//DTD XHTML 1.0 Transitional//EN" "">
 | <html>
 |   <head>
 |     <title>
@@ -125,7 +125,7 @@ not HTML5 (limited quirks doctype)
 #errors
 not HTML5 (limited quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+| <!DOCTYPE HTML "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 | <html>
 |   <head>
 |     <title>
@@ -136,7 +136,7 @@ not HTML5 (limited quirks doctype)
 #errors
 not HTML5 (limited quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN">
+| <!DOCTYPE HTML "-//W3C//DTD XHTML 1.0 Frameset//EN" "">
 | <html>
 |   <head>
 |     <title>
@@ -148,7 +148,7 @@ not HTML5 (limited quirks doctype)
 #errors
 not HTML5 (limited quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/html4/loose.dtd">
+| <!DOCTYPE HTML "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/html4/loose.dtd">
 | <html>
 |   <head>
 |     <title>
@@ -160,7 +160,7 @@ not HTML5 (limited quirks doctype)
 #errors
 not HTML5 (no quirks doctype)
 #document
-| <!DOCTYPE HTML PUBLIC "HTML5" "http://www.w3.org/TR/html4/loose.dtd">
+| <!DOCTYPE HTML "HTML5" "http://www.w3.org/TR/html4/loose.dtd">
 | <html>
 |   <head>
 |     <title>
@@ -171,7 +171,7 @@ not HTML5 (no quirks doctype)
 #errors
 not HTML5 (quirks doctype)
 #document
-| <!DOCTYPE HTML SYSTEM "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd">
+| <!DOCTYPE HTML "" "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd">
 | <html>
 |   <head>
 |     <title>
@@ -205,7 +205,7 @@ duplicate DOCTYPE
 not HTML5
 duplicate DOCTYPE
 #document
-| <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+| <!DOCTYPE HTML "-//W3C//DTD HTML 4.01 Transitional//EN" "">
 | <html>
 |   <head>
 |     <title>
@@ -217,7 +217,7 @@ duplicate DOCTYPE
 #shoulds
 XSLT-compat
 #document
-| <!DOCTYPE HTML PUBLIC "XSLT-compat">
+| <!DOCTYPE HTML "XSLT-compat" "">
 | <html>
 |   <head>
 |     <title>
@@ -229,7 +229,7 @@ XSLT-compat
 not HTML5
 #shoulds
 #document
-| <!DOCTYPE HTML PUBLIC "xslt-compat">
+| <!DOCTYPE HTML "xslt-compat" "">
 | <html>
 |   <head>
 |     <title>
@@ -241,7 +241,7 @@ not HTML5
 not HTML5
 #shoulds
 #document
-| <!DOCTYPE HTML PUBLIC " XSLT-compat">
+| <!DOCTYPE HTML " XSLT-compat" "">
 | <html>
 |   <head>
 |     <title>
@@ -253,7 +253,7 @@ not HTML5
 not HTML5
 #shoulds
 #document
-| <!DOCTYPE HTML PUBLIC "XSLT-compat  ">
+| <!DOCTYPE HTML "XSLT-compat  " "">
 | <html>
 |   <head>
 |     <title>
@@ -264,7 +264,7 @@ not HTML5
 #errors
 not HTML5
 #document
-| <!DOCTYPE HTML PUBLIC "XSLT-generated">
+| <!DOCTYPE HTML "XSLT-generated" "">
 | <html>
 |   <head>
 |     <title>
@@ -275,7 +275,7 @@ not HTML5
 #errors
 not HTML5
 #document
-| <!DOCTYPE HTML PUBLIC "xslt-compat">
+| <!DOCTYPE HTML "xslt-compat" "">
 | <html>
 |   <head>
 |     <title>
@@ -286,7 +286,7 @@ not HTML5
 #errors
 not HTML5
 #document
-| <!DOCTYPE HTML PUBLIC "XSLT-compat" "http://example.com/">
+| <!DOCTYPE HTML "XSLT-compat" "http://example.com/">
 | <html>
 |   <head>
 |     <title>
@@ -297,7 +297,7 @@ not HTML5
 #errors
 not HTML5
 #document
-| <!DOCTYPE NONHTML PUBLIC "XSLT-compat">
+| <!DOCTYPE NONHTML "XSLT-compat" "">
 | <html>
 |   <head>
 |     <title>
