@@ -1,8 +1,50 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+
+BEGIN {
+  require Exporter;
+  push our @ISA, 'Exporter';
+
+  our @EXPORT_OK = qw(
+    DOCTYPE_TOKEN
+    COMMENT_TOKEN
+    START_TAG_TOKEN
+    END_TAG_TOKEN
+    END_OF_FILE_TOKEN
+    CHARACTER_TOKEN
+    PI_TOKEN
+    ABORT_TOKEN
+  );
+  
+  our %EXPORT_TAGS = (
+    token => [qw(
+      DOCTYPE_TOKEN
+      COMMENT_TOKEN
+      START_TAG_TOKEN
+      END_TAG_TOKEN
+      END_OF_FILE_TOKEN
+      CHARACTER_TOKEN
+      PI_TOKEN
+      ABORT_TOKEN
+    )],
+  );
+}
+
+## Token types
+
+sub DOCTYPE_TOKEN () { 1 }
+sub COMMENT_TOKEN () { 2 }
+sub START_TAG_TOKEN () { 3 }
+sub END_TAG_TOKEN () { 4 }
+sub END_OF_FILE_TOKEN () { 5 }
+sub CHARACTER_TOKEN () { 6 }
+sub PI_TOKEN () { 7 } # XML5
+sub ABORT_TOKEN () { 8 } # Not a token actually
 
 package Whatpm::HTML;
+
+BEGIN { Whatpm::HTML::Tokenizer->import (':token') }
 
 ## Content model flags
 
@@ -71,15 +113,6 @@ sub HEXREF_X_STATE () { 47 }
 sub HEXREF_HEX_STATE () { 48 }
 sub ENTITY_NAME_STATE () { 49 }
 sub PCDATA_STATE () { 50 } # "data state" in the spec
-
-## Token types
-
-sub DOCTYPE_TOKEN () { 1 }
-sub COMMENT_TOKEN () { 2 }
-sub START_TAG_TOKEN () { 3 }
-sub END_TAG_TOKEN () { 4 }
-sub END_OF_FILE_TOKEN () { 5 }
-sub CHARACTER_TOKEN () { 6 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -2634,4 +2667,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/14 02:27:58 $
+## $Date: 2008/10/14 04:32:49 $
