@@ -1,0 +1,26 @@
+#data
+<a b="" c=""/>
+#errors
+#document
+| <{} a>
+|   b=""
+|   c=""
+
+#data
+<a><b c="" d=""/></a>
+#errors
+#document
+| <{} a>
+|   <{} b>
+|     c=""
+|     d=""
+
+#data
+<a/><b c="" d=""/>
+#errors
+1;5;second root element;;;m
+#document
+| <{} a>
+| <{} b>
+|   c=""
+|   d=""

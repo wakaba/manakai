@@ -351,6 +351,21 @@ sub _tree_before_root_element ($) {
       ($prefix, $ln) = (undef, $prefix) unless defined $ln;
       my $ns; ## TODO:
       my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
+      $el->set_user_data (manakai_source_line => $token->{line});
+      $el->set_user_data (manakai_source_column => $token->{column});
+
+      for my $attr_name (keys %{$token->{attributes}}) {
+        my $ns; ## TODO
+        my ($p, $l) = split /:/, $attr_name, 2;
+        ($p, $l) = (undef, $p) unless defined $l;
+        my $attr_t = $token->{attributes}->{$attr_name};
+        my $attr = $self->{document}->create_attribute_ns ($ns, [$p, $l]);
+        $attr->value ($attr_t->{value});
+        $attr->set_user_data (manakai_source_line => $attr_t->{line});
+        $attr->set_user_data (manakai_source_column => $attr_t->{column});
+        $el->set_attribute_node_ns ($attr);
+      }
+
       $self->{document}->append_child ($el);
 
       if ($self->{self_closing}) {
@@ -448,6 +463,21 @@ sub _tree_in_element ($) {
       ($prefix, $ln) = (undef, $prefix) unless defined $ln;
       my $ns; ## TODO:
       my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
+      $el->set_user_data (manakai_source_line => $token->{line});
+      $el->set_user_data (manakai_source_column => $token->{column});
+
+      for my $attr_name (keys %{$token->{attributes}}) {
+        my $ns; ## TODO
+        my ($p, $l) = split /:/, $attr_name, 2;
+        ($p, $l) = (undef, $p) unless defined $l;
+        my $attr_t = $token->{attributes}->{$attr_name};
+        my $attr = $self->{document}->create_attribute_ns ($ns, [$p, $l]);
+        $attr->value ($attr_t->{value});
+        $attr->set_user_data (manakai_source_line => $attr_t->{line});
+        $attr->set_user_data (manakai_source_column => $attr_t->{column});
+        $el->set_attribute_node_ns ($attr);
+      }
+
       $self->{open_elements}->[-1]->[0]->append_child ($el);
 
       if ($self->{self_closing}) {
@@ -540,6 +570,21 @@ sub _tree_after_root_element ($) {
       ($prefix, $ln) = (undef, $prefix) unless defined $ln;
       my $ns; ## TODO:
       my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
+      $el->set_user_data (manakai_source_line => $token->{line});
+      $el->set_user_data (manakai_source_column => $token->{column});
+
+      for my $attr_name (keys %{$token->{attributes}}) {
+        my $ns; ## TODO
+        my ($p, $l) = split /:/, $attr_name, 2;
+        ($p, $l) = (undef, $p) unless defined $l;
+        my $attr_t = $token->{attributes}->{$attr_name};
+        my $attr = $self->{document}->create_attribute_ns ($ns, [$p, $l]);
+        $attr->value ($attr_t->{value});
+        $attr->set_user_data (manakai_source_line => $attr_t->{line});
+        $attr->set_user_data (manakai_source_column => $attr_t->{column});
+        $el->set_attribute_node_ns ($attr);
+      }
+
       $self->{document}->append_child ($el);
       
       if ($self->{self_closing}) {
