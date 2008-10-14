@@ -1,7 +1,7 @@
 1..4935
 # Running under perl version 5.010000 for linux
-# Current time local: Tue Oct 14 23:37:41 2008
-# Current time GMT:   Tue Oct 14 14:37:41 2008
+# Current time local: Tue Oct 14 23:56:05 2008
+# Current time GMT:   Tue Oct 14 14:56:05 2008
 # Using Test.pm version 1.25
 # t/xml/elements-1.dat
 ok 1
@@ -53,7 +53,6 @@ ok 44
 # t/xml/cdata-1.dat
 ok 45
 ok 46
-# t/xml/tree-1.dat
 ok 47
 ok 48
 ok 49
@@ -64,7 +63,6 @@ ok 53
 ok 54
 ok 55
 ok 56
-# t/xml/ns-attrs-1.dat
 ok 57
 ok 58
 ok 59
@@ -79,6 +77,7 @@ ok 67
 ok 68
 ok 69
 ok 70
+# t/xml/tree-1.dat
 ok 71
 ok 72
 ok 73
@@ -89,6 +88,7 @@ ok 77
 ok 78
 ok 79
 ok 80
+# t/xml/ns-attrs-1.dat
 ok 81
 ok 82
 ok 83
@@ -145,7 +145,6 @@ ok 133
 ok 134
 ok 135
 ok 136
-# t/xml/doctypes-1.dat
 ok 137
 ok 138
 ok 139
@@ -153,11 +152,31 @@ ok 140
 ok 141
 ok 142
 ok 143
-not ok 144
-# Test 144 got: "<!DOCTYPE HtML>\n<{} HtML>\n" (t/XML-Parser.t at line 100 fail #72)
-#     Expected: "<!DOCTYPE HtML>\n<HtML>\n" (Document tree: qq'<!DOCTYPE HtML>\x{0A}<HtML/>')
-#  t/XML-Parser.t line 100 is:   ok $result, $test->{document}->[0],
+ok 144
 ok 145
-not ok 146
-# Test 146 got: "<!DOCTYPE html>\n<{} HTML>\n" (t/XML-Parser.t at line 100 fail #73)
-#     Expected: "<!DOCTYPE html>\n<HTML>\n" (Document tree: qq'<!DOCTYPE html>\x{0A}<HTML/>')
+ok 146
+ok 147
+ok 148
+ok 149
+ok 150
+ok 151
+ok 152
+ok 153
+ok 154
+ok 155
+ok 156
+ok 157
+ok 158
+ok 159
+ok 160
+# t/xml/doctypes-1.dat
+ok 161
+ok 162
+ok 163
+ok 164
+ok 165
+ok 166
+ok 167
+ok 168
+ok 169
+ok 170

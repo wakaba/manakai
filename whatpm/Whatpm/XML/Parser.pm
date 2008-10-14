@@ -237,11 +237,11 @@ my $token; ## TODO: change to $self->{t}
 sub _construct_tree ($) {
   my ($self) = @_;
 
-  $token = $self->_get_next_token;
-
   delete $self->{tainted};
   $self->{open_elements} = [];
   $self->{insertion_mode} = INITIAL_IM;
+
+  $token = $self->_get_next_token;
   
   while (1) {
     if ($self->{insertion_mode} == IN_ELEMENT_IM) {

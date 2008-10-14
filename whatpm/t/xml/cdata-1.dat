@@ -1,7 +1,104 @@
 #data
+<![CDATA[]]>
+#errors
+1;1;cdata outside of root element;;;m
+1;12;no root element;;;m
+#document
+
+#data
+<![CDATA[  ]]>
+#errors
+1;1;cdata outside of root element;;;m
+1;14;no root element;;;m
+#document
+| "  "
+
+#data
+<![CDATA[ab]]>
+#errors
+1;1;cdata outside of root element;;;m
+1;14;no root element;;;m
+#document
+| "ab"
+
+#data
 a<![CDATA[bb]]>ccc
 #errors
 1;1;text outside of root element;;;m
 1;18;no root element;;;m
 #document
 | "abbccc"
+
+#data
+<a/><![CDATA[]]>
+#errors
+1;5;cdata outside of root element;;;m
+#document
+| <{} a>
+
+#data
+<a/><![CDATA[  ]]>
+#errors
+1;5;cdata outside of root element;;;m
+#document
+| <{} a>
+| "  "
+
+#data
+<a/><![CDATA[aa]]>
+#errors
+1;5;cdata outside of root element;;;m
+#document
+| <{} a>
+| "aa"
+
+#data
+<a/><![CDATA[]]>  a
+#errors
+1;5;cdata outside of root element;;;m
+#document
+| <{} a>
+| "  a"
+
+#data
+<![CDATA[
+#errors
+1;1;cdata outside of root element;;;m
+1;9;no mse;;;m
+1;9;no root element;;;m
+#document
+
+#data
+<![CDATA[a
+#errors
+1;10;no mse;;;m
+1;1;cdata outside of root element;;;m
+1;10;no root element;;;m
+#document
+| "a"
+
+#data
+<![CDATA[a]
+#errors
+1;11;no mse;;;m
+1;1;cdata outside of root element;;;m
+1;11;no root element;;;m
+#document
+| "a]"
+
+#data
+<![CDATA[a]]
+#errors
+1;12;no mse;;;m
+1;1;cdata outside of root element;;;m
+1;12;no root element;;;m
+#document
+| "a]]"
+
+#data
+<![CDATA[a]]><![CDATA[b]]><a/>
+#errors
+1;1;cdata outside of root element;;;m
+#document
+| "ab"
+| <{} a>

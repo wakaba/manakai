@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -2228,6 +2228,16 @@ sub _get_next_token ($) {
       } elsif ($self->{s_kwd} eq '[CDATA' and
                $self->{nc} == 0x005B) { # [
         
+
+        if ($self->{is_xml} and 
+            not $self->{tainted} and
+            @{$self->{open_elements} or []} == 0) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'cdata outside of root element',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 7);
+          $self->{tainted} = 1;
+        }
+
         $self->{ct} = {type => CHARACTER_TOKEN,
                                   data => '',
                                   line => $self->{line_prev},
@@ -3631,6 +3641,10 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == -1) {
+        if ($self->{is_xml}) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no mse'); ## TODO: type
+        }
+
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
         
@@ -4251,4 +4265,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/14 14:38:59 $
+## $Date: 2008/10/14 14:57:52 $
