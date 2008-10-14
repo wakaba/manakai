@@ -49,7 +49,7 @@ if ($DEBUG) {
   }
 }
 
-for my $file_name (grep {$_} split /\s+/, qq[
+my @FILES = grep {$_} split /\s+/, qq[
                       ${test_dir_name}tokenizer-test-2.dat
                       ${test_dir_name}tokenizer-test-3.dat
                       ${dir_name}tests1.dat
@@ -72,80 +72,15 @@ for my $file_name (grep {$_} split /\s+/, qq[
                       ${test_dir_name}tree-test-phrasing.dat
                       ${test_dir_name}tree-test-form.dat
                       ${test_dir_name}tree-test-foreign.dat
-                     ]) {
-  open my $file, '<', $file_name
-    or die "$0: $file_name: $!";
-  print "# $file_name\n";
+                     ];
 
-  my $test;
-  my $mode = 'data';
-  my $escaped;
-  while (<$file>) {
-    s/\x0D\x0A/\x0A/;
-    if (/^#data$/) {
-      undef $test;
-      $test->{data} = '';
-      $mode = 'data';
-      undef $escaped;
-    } elsif (/^#data escaped$/) {
-      undef $test;
-      $test->{data} = '';
-      $mode = 'data';
-      $escaped = 1;
-    } elsif (/^#errors$/) {
-      $test->{errors} = [];
-      $mode = 'errors';
-      $test->{data} =~ s/\x0D?\x0A\z//;       
-      $test->{data} =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
-      $test->{data} =~ s/\\U([0-9A-Fa-f]{8})/chr hex $1/ge if $escaped;
-      undef $escaped;
-    } elsif (/^#shoulds$/) {
-      $test->{shoulds} = [];
-      $mode = 'shoulds';
-    } elsif (/^#document$/) {
-      $test->{document} = '';
-      $mode = 'document';
-      undef $escaped;
-    } elsif (/^#document escaped$/) {
-      $test->{document} = '';
-      $mode = 'document';
-      $escaped = 1;
-    } elsif (/^#document-fragment$/) {
-      $test->{element} = '';
-      $mode = 'element';
-      undef $escaped;
-    } elsif (/^#document-fragment (\S+)$/) {
-      $test->{document} = '';
-      $mode = 'document';
-      $test->{element} = $1;
-      undef $escaped;
-    } elsif (/^#document-fragment (\S+) escaped$/) {
-      $test->{document} = '';
-      $mode = 'document';
-      $test->{element} = $1;
-      $escaped = 1;
-    } elsif (defined $test->{document} and /^$/) {
-      $test->{document} =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
-      $test->{document} =~ s/\\U([0-9A-Fa-f]{8})/chr hex $1/ge if $escaped;
-      test ($test);
-      undef $test;
-    } else {
-      if ($mode eq 'data' or $mode eq 'document') {
-        $test->{$mode} .= $_;
-      } elsif ($mode eq 'element') {
-        tr/\x0D\x0A//d;
-        $test->{$mode} .= $_;
-      } elsif ($mode eq 'errors') {
-        tr/\x0D\x0A//d;
-        push @{$test->{errors}}, $_;
-      } elsif ($mode eq 'shoulds') {
-        tr/\x0D\x0A//d;
-        push @{$test->{shoulds}}, $_;
-      }
-    }
-  }
-  test ($test) if $test->{errors};
-}
+require 't/testfiles.pl';
+execute_test ($_, {
+  errors => {is_list => 1},
+  shoulds => {is_list => 1},
+  document => {is_prefixed => 1},
+  'document-fragment' => {is_prefixed => 1},
+}, \&test) for @FILES;
 
 use Whatpm::HTML;
 use Whatpm::NanoDOM;
@@ -153,6 +88,17 @@ use Whatpm::Charset::UnicodeChecker;
 
 sub test ($) {
   my $test = shift;
+
+  if ($test->{'document-fragment'}) {
+    if (@{$test->{'document-fragment'}->[1]}) {
+      ## NOTE: Old format.
+      $test->{element} = $test->{'document-fragment'}->[1]->[0];
+      $test->{document} ||= $test->{'document-fragment'};
+    } else {
+      ## NOTE: New format.
+      $test->{element} = $test->{'document-fragment'}->[0];
+    }
+  }
 
   my $doc = Whatpm::NanoDOM::Document->new;
   my @errors;
@@ -178,26 +124,30 @@ sub test ($) {
 
   my $result;
   unless (defined $test->{element}) {
-    Whatpm::HTML->parse_char_string ($test->{data} => $doc, $onerror, $chk);
+    Whatpm::HTML->parse_char_string
+        ($test->{data}->[0] => $doc, $onerror, $chk);
     $result = serialize ($doc);
   } else {
     my $el = $doc->create_element_ns
       ('http://www.w3.org/1999/xhtml', [undef, $test->{element}]);
-    Whatpm::HTML->set_inner_html ($el, $test->{data}, $onerror, $chk);
+    Whatpm::HTML->set_inner_html ($el, $test->{data}->[0], $onerror, $chk);
     $result = serialize ($el);
   }
+  
+  warn "No #errors section" unless $test->{errors};
     
-  ok scalar @errors, scalar @{$test->{errors}},
-    'Parse error: ' . Data::Dumper::qquote ($test->{data}) . '; ' . 
-    join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
-  ok scalar @shoulds, scalar @{$test->{shoulds} or []},
-    'SHOULD-level error: ' . Data::Dumper::qquote ($test->{data}) . '; ' . 
-    join (', ', @shoulds) . ';' . join (', ', @{$test->{shoulds} or []});
+  ok scalar @errors, scalar @{$test->{errors}->[0] or []},
+    'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' . 
+    join (', ', @errors) . ';' . join (', ', @{$test->{errors}->[0] or []});
+  ok scalar @shoulds, scalar @{$test->{shoulds}->[0] or []},
+    'SHOULD-level error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' .
+    join (', ', @shoulds) . ';' . join (', ', @{$test->{shoulds}->[0] or []});
 
-  ok $result, $test->{document},
-      'Document tree: ' . Data::Dumper::qquote ($test->{data});
+  ok $result, $test->{document}->[0] . "\x0A",
+      'Document tree: ' . Data::Dumper::qquote ($test->{data}->[0]);
 } # test
 
+## NOTE: Spec: <http://wiki.whatwg.org/wiki/Parser_tests>.
 sub serialize ($) {
   my $node = shift;
   my $r = '';
@@ -207,22 +157,22 @@ sub serialize ($) {
     my $child = shift @node;
     my $nt = $child->[0]->node_type;
     if ($nt == $child->[0]->ELEMENT_NODE) {
-      $r .= '| ' . $child->[1] . '<' . $child->[0]->tag_name . ">\x0A"; ## ISSUE: case?
+      $r .= $child->[1] . '<' . $child->[0]->tag_name . ">\x0A"; ## ISSUE: case?
 
       for my $attr (sort {$a->[0] cmp $b->[0]} map { [$_->name, $_->value] }
                     @{$child->[0]->attributes}) {
-        $r .= '| ' . $child->[1] . '  ' . $attr->[0] . '="'; ## ISSUE: case?
+        $r .= $child->[1] . '  ' . $attr->[0] . '="'; ## ISSUE: case?
         $r .= $attr->[1] . '"' . "\x0A";
       }
       
       unshift @node,
         map { [$_, $child->[1] . '  '] } @{$child->[0]->child_nodes};
     } elsif ($nt == $child->[0]->TEXT_NODE) {
-      $r .= '| ' . $child->[1] . '"' . $child->[0]->data . '"' . "\x0A";
+      $r .= $child->[1] . '"' . $child->[0]->data . '"' . "\x0A";
     } elsif ($nt == $child->[0]->COMMENT_NODE) {
-      $r .= '| ' . $child->[1] . '<!-- ' . $child->[0]->data . " -->\x0A";
+      $r .= $child->[1] . '<!-- ' . $child->[0]->data . " -->\x0A";
     } elsif ($nt == $child->[0]->DOCUMENT_TYPE_NODE) {
-      $r .= '| ' . $child->[1] . '<!DOCTYPE ' . $child->[0]->name;
+      $r .= $child->[1] . '<!DOCTYPE ' . $child->[0]->name;
       my $pubid = $child->[0]->public_id;
       $r .= ' PUBLIC "' . $pubid . '"' if length $pubid;
       my $sysid = $child->[0]->system_id;
@@ -230,7 +180,7 @@ sub serialize ($) {
       $r .= ' "' . $sysid . '"' if length $sysid;
       $r .= ">\x0A";
     } else {
-      $r .= '| ' . $child->[1] . $child->[0]->node_type . "\x0A"; # error
+      $r .= $child->[1] . $child->[0]->node_type . "\x0A"; # error
     }
   }
   
@@ -238,4 +188,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/10/04 17:16:02 $
+## $Date: 2008/10/14 05:58:26 $
