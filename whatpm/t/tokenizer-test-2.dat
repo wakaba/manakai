@@ -487,3 +487,22 @@ not HTML5
 |   <head>
 |   <body>
 
+#data
+aa]]>bb
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     "aa]]>bb"
+
+#data
+aa]]]]>bb
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     "aa]]]]>bb"
