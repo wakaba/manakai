@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -541,7 +541,7 @@ sub _get_next_token ($) {
           
           $self->{ct}
             = {type => START_TAG_TOKEN,
-               tag_name => chr ($self->{nc} + 0x0020),
+               tag_name => chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020)),
                line => $self->{line_prev},
                column => $self->{column_prev}};
           $self->{state} = TAG_NAME_STATE;
@@ -660,7 +660,7 @@ sub _get_next_token ($) {
         
         $self->{ct}
             = {type => END_TAG_TOKEN,
-               tag_name => chr ($self->{nc} + 0x0020),
+               tag_name => chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020)),
                line => $l, column => $c};
         $self->{state} = TAG_NAME_STATE;
         
@@ -851,7 +851,8 @@ sub _get_next_token ($) {
       } elsif (0x0041 <= $self->{nc} and
                $self->{nc} <= 0x005A) { # A..Z
         
-        $self->{ct}->{tag_name} .= chr ($self->{nc} + 0x0020);
+        $self->{ct}->{tag_name}
+            .= chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020));
           # start tag or end tag
         ## Stay in this state
         
@@ -973,7 +974,7 @@ sub _get_next_token ($) {
                $self->{nc} <= 0x005A) { # A..Z
         
         $self->{ca}
-            = {name => chr ($self->{nc} + 0x0020),
+            = {name => chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020)),
                value => '',
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -1134,7 +1135,8 @@ sub _get_next_token ($) {
       } elsif (0x0041 <= $self->{nc} and
                $self->{nc} <= 0x005A) { # A..Z
         
-        $self->{ca}->{name} .= chr ($self->{nc} + 0x0020);
+        $self->{ca}->{name}
+            .= chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020));
         ## Stay in the state
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -1278,7 +1280,7 @@ sub _get_next_token ($) {
                $self->{nc} <= 0x005A) { # A..Z
         
         $self->{ca}
-            = {name => chr ($self->{nc} + 0x0020),
+            = {name => chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020)),
                value => '',
                line => $self->{line}, column => $self->{column}};
         $self->{state} = ATTRIBUTE_NAME_STATE;
@@ -4149,4 +4151,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/14 05:34:05 $
+## $Date: 2008/10/14 11:46:57 $
