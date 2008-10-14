@@ -179,6 +179,9 @@ sub new ($) {
   $self->{application_cache_selection} = sub {
     #
   };
+
+  $self->{is_xml} = 1;
+
   return $self;
 } # new
 
@@ -453,7 +456,7 @@ sub _tree_in_element ($) {
       $token = $self->_get_next_token;
       next B;
     } elsif ($token->{type} == END_TAG_TOKEN) {
-      if ($self->{tag_name} eq '') {
+      if ($token->{tag_name} eq '') {
         ## Short end tag token.
         pop @{$self->{open_elements}};
       } elsif ($self->{open_elements}->[-1]->[1] eq $token->{tag_name}) {
@@ -464,7 +467,7 @@ sub _tree_in_element ($) {
                         token => $token);
         
         ## Has an element in scope
-        INSCOPE: for my $i (reverse $#{$self->{open_elements}}..0) {
+        INSCOPE: for my $i (reverse 0..$#{$self->{open_elements}}) {
           if ($self->{open_elements}->[$i]->[1] eq $token->{tag_name}) {
             splice @{$self->{open_elements}}, $i;
             last INSCOPE;

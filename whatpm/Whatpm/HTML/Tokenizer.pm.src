@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -175,6 +175,7 @@ sub _initialize_tokenizer ($) {
   #$self->{level}
   #$self->{set_nc}
   #$self->{parse_error}
+  #$self->{is_xml} (if XML)
 
   $self->{state} = DATA_STATE; # MUST
   #$self->{s_kwd}; # state keyword - initialized when used
@@ -1390,8 +1391,9 @@ sub _get_next_token ($) {
         $self->{s_kwd} = chr $self->{nc};
         !!!next-input-character;
         redo A;
-      } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
-               $self->{open_elements}->[-1]->[1] & FOREIGN_EL and
+      } elsif ((($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
+                 $self->{open_elements}->[-1]->[1] & FOREIGN_EL) or
+                $self->{is_xml}) and
                $self->{nc} == 0x005B) { # [
         !!!cp (135.4);                
         $self->{state} = MD_CDATA_STATE;
@@ -2667,4 +2669,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/14 04:32:49 $
+## $Date: 2008/10/14 05:34:05 $
