@@ -1089,3 +1089,560 @@ table not closed
 |         <svg svg>
 |           <svg td>
 |             "a"
+
+#data
+<table><tr><td><svg><g>a</td>b
+#errors
+no DOCTYPE
+not closed
+char in table
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg g>
+|                 "a"
+
+#data
+<table><tr><th><svg><g>a</th>b
+#errors
+no DOCTYPE
+not closed
+char in table
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+|             <svg svg>
+|               <svg g>
+|                 "a"
+
+#data
+<table><caption><svg><g>a</td>b
+#errors
+no DOCTYPE
+unmatched end tag
+eof in foreign
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg g>
+|             "ab"
+
+#data
+<table><caption><svg><g>a</th>b
+#errors
+no DOCTYPE
+unmatched end tag
+eof in foreign
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg g>
+|             "ab"
+
+#data
+<table><caption><svg><g>a</caption>b
+#errors
+no DOCTYPE
+unmatched end tag
+char in table
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg g>
+|             "a"
+
+#data
+<table><tr><td><svg><g>a</caption>b
+#errors
+no DOCTYPE
+unmatched end tag
+eof in foreign
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg g>
+|                 "ab"
+
+#data
+<table><tr><th><svg><g>a</caption>b
+#errors
+no DOCTYPE
+unmatched end tag
+eof in foreign
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+|             <svg svg>
+|               <svg g>
+|                 "ab"
+
+#data
+<table><tr><td><svg><g>a</table>b
+#errors
+no DOCTYPE
+unmatched end tag
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg g>
+|                 "a"
+|     "b"
+
+#data
+<table><tr><td><svg><g>a</tbody>b
+#errors
+no DOCTYPE
+unmatched end tag
+char in table
+no </table>
+#document
+| <html>
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg g>
+|                 "a"
+
+#data
+<table><tr><td><svg><g>a</tr>b
+#errors
+no DOCTYPE
+unmatched end tag
+char in table
+no </table>
+#document
+| <html>
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg g>
+|                 "a"
+
+#data
+<table><thead><tr><td><svg><g>a</thead>b
+#errors
+no DOCTYPE
+unmatched end tag
+char in table
+no </table>
+#document
+| <html>
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       <thead>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg g>
+|                 "a"
+
+#data
+<table><tfoot><tr><td><svg><g>a</tfoot>b
+#errors
+no DOCTYPE
+unmatched end tag
+char in table
+no </table>
+#document
+| <html>
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       <tfoot>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg g>
+|                 "a"
+
+#data
+<table><caption><svg><g>a</table>b
+#errors
+no DOCTYPE
+unmatched end tag (implied </caption>)
+unmatched end tag </table>
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg g>
+|             "a"
+|     "b"
+
+#data
+<table><caption><svg><g>a</tbody>b
+#errors
+no DOCTYPE
+unmatched end tag
+eof in foreign
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg g>
+|             "ab"
+
+#data
+<table><caption><svg><g>a</thead>b
+#errors
+no DOCTYPE
+unmatched end tag
+eof in foreign
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg g>
+|             "ab"
+
+#data
+<table><caption><svg><g>a</tfoot>b
+#errors
+no DOCTYPE
+unmatched end tag
+eof in foreign
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg g>
+|             "ab"
+
+#data
+<table><caption><svg><g>a</tr>b
+#errors
+no DOCTYPE
+unmatched end tag
+eof in foreign
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg g>
+|             "ab"
+
+#data
+<table><tr><svg><g>a</tr>b<!---->
+#errors
+no DOCTYPE
+element in <tr>
+unmatched end tag
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <tbody>
+|         <tr>
+|         <!--  -->
+
+#data
+<table><tbody><svg><g>a</tbody>b<!---->
+#errors
+no DOCTYPE
+element in table
+unmatched end tag
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <tbody>
+|       <!--  -->
+
+#data
+<table><thead><svg><g>a</thead>b<!---->
+#errors
+no DOCTYPE
+element in table
+unmatched end tag
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <thead>
+|       <!--  -->
+
+#data
+<table><tfoot><svg><g>a</tfoot>b<!---->
+#errors
+no DOCTYPE
+element in table
+unmatched end tag
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <tfoot>
+|       <!--  -->
+
+#data
+<table><svg><g>a</table>b
+#errors
+no DOCTYPE
+element in table
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     <table>
+|     "b"
+
+#data
+<table><tbody><tr><svg><g>a</tbody>b<!---->
+#errors
+no DOCTYPE
+element in table
+unmatched end tag
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <tbody>
+|         <tr>
+|       <!--  -->
+
+#data
+<table><thead><tr><svg><g>a</thead>b<!---->
+#errors
+no DOCTYPE
+element in table
+unmatched end tag
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <thead>
+|         <tr>
+|       <!--  -->
+
+#data
+<table><tfoot><tr><svg><g>a</tfoot>b<!---->
+#errors
+no DOCTYPE
+element in table
+unmatched end tag
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <tfoot>
+|         <tr>
+|       <!--  -->
+
+#data
+<table><tbody><tr><svg><g>a</table>b
+#errors
+no DOCTYPE
+element in table
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     <table>
+|       <tbody>
+|         <tr>
+|     "b"
+
+#data
+<table><tbody><tr><svg><g>a</tbody>b<!---->
+#errors
+no DOCTYPE
+element in table
+char in table
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <tbody>
+|         <tr>
+|       <!--  -->
+
+#data
+<table><thead><tr><svg><g>a</thead>b<!---->
+#errors
+no DOCTYPE
+element in table
+char in table
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <thead>
+|         <tr>
+|       <!--  -->
+
+#data
+<table><tfoot><tr><svg><g>a</tfoot>b<!---->
+#errors
+no DOCTYPE
+element in table
+char in table
+eof
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         "a"
+|     "b"
+|     <table>
+|       <tfoot>
+|         <tr>
+|       <!--  -->
+
+#data
+<table><colgroup><svg></colgroup><!----></table>
+#errors
+no DOCTYPE
+element in table
+unmatched end tag
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <!--  -->
+|     <table>
+|       <colgroup>

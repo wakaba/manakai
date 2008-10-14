@@ -1,7 +1,7 @@
-1..4935
+1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Tue Oct 14 20:41:20 2008
-# Current time GMT:   Tue Oct 14 11:41:20 2008
+# Current time local: Tue Oct 14 22:18:34 2008
+# Current time GMT:   Tue Oct 14 13:18:34 2008
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -604,14 +604,10 @@ ok 510
 ok 511
 ok 512
 ok 513
-not ok 514
-# Test 514 got: "4" (t/HTML-tree.t at line 92 fail #172)
-#     Expected: "3" (Parse error: qq'<table><col><tbody><col><tr><col><td><col></table><col>'; 1:8:no DOCTYPE, 1:38:missing start tag:tr, 1:55:not closed, 1:55:start tag not allowed;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 37 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 55 Unexpected start tag col. Ignored.)
+ok 514
 ok 515
 ok 516
-not ok 517
-# Test 517 got: "4" (t/HTML-tree.t at line 92 fail #173)
-#     Expected: "3" (Parse error: qq'<table><colgroup><tbody><colgroup><tr><colgroup><td><colgroup></table><colgroup>'; 1:8:no DOCTYPE, 1:53:missing start tag:tr, 1:80:not closed, 1:80:start tag not allowed;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 52 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 80 Unexpected start tag colgroup. Ignored.)
+ok 517
 ok 518
 ok 519
 ok 520
@@ -1352,19 +1348,9 @@ ok 1149
 ok 1150
 ok 1151
 ok 1152
-not ok 1153
-# Test 1153 got: "3" (t/HTML-tree.t at line 92 fail #385)
-#      Expected: "2"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'; 1:79:unmatched end tag, 1:82:not closed, 1:85:in body:#eof;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.)
+ok 1153
 ok 1154
-not ok 1155
-# Test 1155 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <table>\n      <caption>\n        <math math>\n          <math mi>\n            \"foo\"\n          <math mi>\n            \"bar\"\n          \"baz\"\n        <p>\n          \"quux\"\n" (t/HTML-tree.t at line 98 fail #385)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <table>\n      <caption>\n        <math math>\n          <math mi>\n            \"foo\"\n          <math mi>\n            \"bar\"\n          \"baz\"\n    <p>\n      \"quux\"\n" (Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux')
-#      Lines 13-14 are changed:
-#       - "    <p>\n"
-#       + "        <p>\n"
-#       - "      \"quux\"\n"
-#       + "          \"quux\"\n"
+ok 1155
 not ok 1156
 # Test 1156 got: "6" (t/HTML-tree.t at line 92 fail #386)
 #      Expected: "5"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
@@ -1441,19 +1427,9 @@ ok 1224
 ok 1225
 ok 1226
 ok 1227
-not ok 1228
-# Test 1228 got: "3" (t/HTML-tree.t at line 92 fail #410)
-#      Expected: "2"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; 1:74:unmatched end tag, 1:77:not closed, 1:80:in body:#eof;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.)
+ok 1228
 ok 1229
-not ok 1230
-# Test 1230 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <table>\n      <caption>\n        <svg svg>\n          <svg g>\n            \"foo\"\n          <svg g>\n            \"bar\"\n          \"baz\"\n        <p>\n          \"quux\"\n" (t/HTML-tree.t at line 98 fail #410)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <table>\n      <caption>\n        <svg svg>\n          <svg g>\n            \"foo\"\n          <svg g>\n            \"bar\"\n          \"baz\"\n    <p>\n      \"quux\"\n" (Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux')
-#      Lines 13-14 are changed:
-#       - "    <p>\n"
-#       + "        <p>\n"
-#       - "      \"quux\"\n"
-#       + "          \"quux\"\n"
+ok 1230
 not ok 1231
 # Test 1231 got: "6" (t/HTML-tree.t at line 92 fail #411)
 #      Expected: "5"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
@@ -2481,9 +2457,7 @@ ok 2238
 ok 2239
 ok 2240
 ok 2241
-not ok 2242
-# Test 2242 got: "2" (t/HTML-tree.t at line 92 fail #748)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<caption>b'; 1:26:not closed, 1:26:start tag not allowed;<caption> in body)
+ok 2242
 ok 2243
 ok 2244
 ok 2245
@@ -2501,14 +2475,10 @@ ok 2256
 ok 2257
 ok 2258
 ok 2259
-not ok 2260
-# Test 2260 got: "2" (t/HTML-tree.t at line 92 fail #754)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<col>b'; 1:22:not closed, 1:22:start tag not allowed;<col> in body)
+ok 2260
 ok 2261
 ok 2262
-not ok 2263
-# Test 2263 got: "2" (t/HTML-tree.t at line 92 fail #755)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<colgroup>b'; 1:27:not closed, 1:27:start tag not allowed;<colgroup> in body)
+ok 2263
 ok 2264
 ok 2265
 ok 2266
@@ -2536,39 +2506,25 @@ not ok 2284
 #      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<optgroup>b'; 1:27:in body:#eof;)
 ok 2285
 ok 2286
-not ok 2287
-# Test 2287 got: "2" (t/HTML-tree.t at line 92 fail #763)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<tbody>b'; 1:24:not closed, 1:24:start tag not allowed;<tbody> in body)
+ok 2287
 ok 2288
 ok 2289
-not ok 2290
-# Test 2290 got: "4" (t/HTML-tree.t at line 92 fail #764)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML>a<tbody><tr>b'; 1:24:not closed, 1:24:start tag not allowed, 1:28:not closed, 1:28:start tag not allowed;<tbody> in body, <tr> in body)
+ok 2290
 ok 2291
 ok 2292
-not ok 2293
-# Test 2293 got: "2" (t/HTML-tree.t at line 92 fail #765)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<thead>b'; 1:24:not closed, 1:24:start tag not allowed;<thead> in body)
+ok 2293
 ok 2294
 ok 2295
-not ok 2296
-# Test 2296 got: "2" (t/HTML-tree.t at line 92 fail #766)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<tfoot>b'; 1:24:not closed, 1:24:start tag not allowed;<tfoot> in body)
+ok 2296
 ok 2297
 ok 2298
-not ok 2299
-# Test 2299 got: "2" (t/HTML-tree.t at line 92 fail #767)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<tr>b'; 1:21:not closed, 1:21:start tag not allowed;<tr> in body)
+ok 2299
 ok 2300
 ok 2301
-not ok 2302
-# Test 2302 got: "2" (t/HTML-tree.t at line 92 fail #768)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<td>b'; 1:21:not closed, 1:21:start tag not allowed;<td> in body)
+ok 2302
 ok 2303
 ok 2304
-not ok 2305
-# Test 2305 got: "2" (t/HTML-tree.t at line 92 fail #769)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<th>b'; 1:21:not closed, 1:21:start tag not allowed;<th> in body)
+ok 2305
 ok 2306
 ok 2307
 ok 2308
@@ -5317,3 +5273,93 @@ ok 4965
 ok 4966
 ok 4967
 ok 4968
+ok 4969
+ok 4970
+ok 4971
+ok 4972
+ok 4973
+ok 4974
+ok 4975
+ok 4976
+ok 4977
+ok 4978
+ok 4979
+ok 4980
+ok 4981
+ok 4982
+ok 4983
+ok 4984
+ok 4985
+ok 4986
+ok 4987
+ok 4988
+ok 4989
+ok 4990
+ok 4991
+ok 4992
+ok 4993
+ok 4994
+ok 4995
+ok 4996
+ok 4997
+ok 4998
+ok 4999
+ok 5000
+ok 5001
+ok 5002
+ok 5003
+ok 5004
+ok 5005
+ok 5006
+ok 5007
+ok 5008
+ok 5009
+ok 5010
+ok 5011
+ok 5012
+ok 5013
+ok 5014
+ok 5015
+ok 5016
+ok 5017
+ok 5018
+ok 5019
+ok 5020
+ok 5021
+ok 5022
+ok 5023
+ok 5024
+ok 5025
+ok 5026
+ok 5027
+ok 5028
+ok 5029
+ok 5030
+ok 5031
+ok 5032
+ok 5033
+ok 5034
+ok 5035
+ok 5036
+ok 5037
+ok 5038
+ok 5039
+ok 5040
+ok 5041
+ok 5042
+ok 5043
+ok 5044
+ok 5045
+ok 5046
+ok 5047
+ok 5048
+ok 5049
+ok 5050
+ok 5051
+ok 5052
+ok 5053
+ok 5054
+ok 5055
+ok 5056
+ok 5057
+ok 5058

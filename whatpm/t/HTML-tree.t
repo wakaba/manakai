@@ -8,7 +8,7 @@ my $test_dir_name = 't/';
 my $dir_name = 't/tree-construction/';
 
 use Test;
-BEGIN { plan tests => 4935 }
+BEGIN { plan tests => 5058 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -133,4 +133,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/14 09:00:57 $
+## $Date: 2008/10/14 13:24:53 $
