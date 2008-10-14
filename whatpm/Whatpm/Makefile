@@ -11,6 +11,7 @@ LANGUAGE_SUBTAG_REGISTRY_PM = _LangTagReg.pm
 all: \
   _update \
   Charset-all CSS-all HTML-all XML-all \
+  HTML/Tokenizer.pm \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
   CacheManifest.html WebIDL.html
@@ -38,7 +39,11 @@ update-remove-old: update-_NamedEntityList.pm \
 
 HTML.pm: HTML.pm.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
-	perl -c $@
+	perl -I.. -c $@
+
+HTML/Tokenizer.pm: HTML/Tokenizer.pm.src mkhtmlparser.pl
+	perl mkhtmlparser.pl $< > $@
+	perl -I.. -c $@
 
 %.html: %.pm
 	$(POD2HTML) $< > $@
@@ -94,4 +99,4 @@ XML-clean:
 	cd XML && make clean
 
 ## License: Public Domain.
-## $Date: 2008/09/18 02:39:16 $
+## $Date: 2008/10/14 02:27:58 $
