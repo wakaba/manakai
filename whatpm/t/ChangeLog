@@ -1,5 +1,15 @@
 2008-10-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML-tree.t: Test result format for oreign element/attribute
+	names are updated to the latest one for html5lib tests.  Append a
+	newline to the expected result only when it is not an empty
+	string, for comparablity with the actual result.
+
+	* tokenizer-test-3.dat, tree-test-foreign.dat, tree-test-1.dat,
+	tree-test-3.dat: Test results for foreign elements are updated.
+
+2008-10-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML-tree.t: <!DOCTYPE> test result format changed to the latest
 	format for html5lib tests.
 

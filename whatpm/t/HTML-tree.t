@@ -4,27 +4,11 @@ use strict;
 my $DEBUG = $ENV{DEBUG};
 
 use lib qw[/home/wakaba/work/manakai2/lib];
-
-my $dir_name;
-my $test_dir_name;
-BEGIN {
-  $test_dir_name = 't/';
-  $dir_name = 't/tree-construction/';
-  my $skip = "You don't have make command";
-  eval q{
-         system ("cd $test_dir_name; make tree-construction-files") == 0 or die
-           unless -f $dir_name.'tests1.dat';
-         $skip = '';
-        };
-  if ($skip) {
-    print "1..1\n";
-    print "ok 1 # $skip\n";
-    exit;
-  }
-}
+my $test_dir_name = 't/';
+my $dir_name = 't/tree-construction/';
 
 use Test;
-BEGIN { plan tests => 3105 }
+BEGIN { plan tests => 4935 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -33,7 +17,6 @@ sub Data::Dumper::qquote {
   $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
   return q<qq'> . $s . q<'>;
 } # Data::Dumper::qquote
-
 
 if ($DEBUG) {
   my $not_found = {%{$Whatpm::HTML::Debug::cp or {}}};
@@ -143,7 +126,8 @@ sub test ($) {
     'SHOULD-level error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' .
     join (', ', @shoulds) . ';' . join (', ', @{$test->{shoulds}->[0] or []});
 
-  ok $result, $test->{document}->[0] . "\x0A",
+  $test->{document}->[0] .= "\x0A" if length $test->{document}->[0];
+  ok $result, $test->{document}->[0],
       'Document tree: ' . Data::Dumper::qquote ($test->{data}->[0]);
 } # test
 
@@ -152,14 +136,43 @@ sub serialize ($) {
   my $node = shift;
   my $r = '';
 
+  my $ns_id = {
+    q<http://www.w3.org/1999/xhtml> => 'html',
+    q<http://www.w3.org/2000/svg> => 'svg',
+    q<http://www.w3.org/1998/Math/MathML> => 'math',
+    q<http://www.w3.org/1999/xlink> => 'xlink',
+    q<http://www.w3.org/XML/1998/namespace> => 'xml',
+    q<http://www.w3.org/2002/xmlns/> => 'xmlns',
+  };
+
   my @node = map { [$_, ''] } @{$node->child_nodes};
   while (@node) {
     my $child = shift @node;
     my $nt = $child->[0]->node_type;
     if ($nt == $child->[0]->ELEMENT_NODE) {
-      $r .= $child->[1] . '<' . $child->[0]->tag_name . ">\x0A"; ## ISSUE: case?
+      my $ns = $child->[0]->namespace_uri;
+      unless (defined $ns) {
+        $ns = '{} ';
+      } elsif ($ns eq q<http://www.w3.org/1999/xhtml>) {
+        $ns = '';
+      } elsif ($ns_id->{$ns}) {
+        $ns = $ns_id->{$ns} . ' ';
+      } else {
+        $ns = '{' . $ns . '} ';
+      }
+      $r .= $child->[1] . '<' . $ns . $child->[0]->manakai_local_name . ">\x0A";
 
-      for my $attr (sort {$a->[0] cmp $b->[0]} map { [$_->name, $_->value] }
+      for my $attr (sort {$a->[0] cmp $b->[0]} map { [do {
+                      my $ns = $_->namespace_uri;
+                      unless (defined $ns) {
+                        $ns = '';
+                      } elsif ($ns_id->{$ns}) {
+                        $ns = $ns_id->{$ns} . ' ';
+                      } else {
+                        $ns = '{' . $ns . '} ';
+                      }
+                      $ns . $_->manakai_local_name;
+                    }, $_->value] }
                     @{$child->[0]->attributes}) {
         $r .= $child->[1] . '  ' . $attr->[0] . '="'; ## ISSUE: case?
         $r .= $attr->[1] . '"' . "\x0A";
@@ -189,4 +202,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/10/14 06:08:26 $
+## $Date: 2008/10/14 06:48:05 $
