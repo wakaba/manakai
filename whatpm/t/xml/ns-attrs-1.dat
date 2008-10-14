@@ -1,0 +1,123 @@
+#data
+<a xmlns=""/>
+#errors
+#document
+| <{} a>
+|   xmlns xmlns=""
+
+#data
+<a xmlns="b"/>
+#errors
+#document
+| <{b} a>
+|   xmlns xmlns="b"
+
+#data
+<a xmlns="b" xmlns:c="d"/>
+#errors
+#document
+| <{b} a>
+|   xmlns c="d"
+|   xmlns xmlns="b"
+
+#data
+<a xmlns:xml="http://www.w3.org/XML/1998/namespace"/>
+#errors
+#document
+| <{} a>
+|   xmlns xml="http://www.w3.org/XML/1998/namespace"
+
+#data
+<a xmlns="http://www.w3.org/XML/1998/namespace"/>
+#errors
+#document
+| <{} a>
+|   xmlns xmlns="http://www.w3.org/XML/1998/namespace"
+
+#data
+<a xmlns="http://www.w3.org/2000/xmlns/"/>
+#errors
+#document
+| <{} a>
+|   xmlns xmlns="http://www.w3.org/2000/xmlns/"
+
+#data
+<a xmlns:xmlns="http://www.w3.org/2000/xmlns/"/>
+#errors
+#document
+| <{} a>
+|   xmlns:xmlns="http://www.w3.org/2000/xmlns/"
+
+#data
+<a xmlns:xml="http://www.w3.org/2000/xmlns/" xml:lang="en"/>
+#errors
+#document
+| <{} a>
+|   xml lang="en"
+|   xmlns xml="http://www.w3.org/2000/xmlns/"
+
+#data
+<x xmlns:a="http://www.w3.org/XML/1998/namespace" a:b="c"/>
+#errors
+#document
+| <{} x>
+|   a:b="c"
+|   xmlns a="http://www.w3.org/XML/1998/namespace"
+
+#data
+<x xmlns:a="http://www.w3.org/2000/xmlns/" a:b="c"/>
+#errors
+#document
+| <{} x>
+|   a:b="c"
+|   xmlns a="http://www.w3.org/2000/xmlns/"
+
+#data
+<a:b/>
+#errors
+#document
+| <{} a:b>
+
+#data
+<a:b xmlns:a="c"/>
+#errors
+#document
+| <{c} b>
+|   xmlns a="c"
+
+#data
+<a xmlns="b"/><b xmlns="c"/><c/>
+#errors
+1;15;second root element;;;m
+1;29;second root element;;;m
+#document
+| <{b} a>
+|   xmlns xmlns="b"
+| <{c} b>
+|   xmlns xmlns="c"
+| <{} c>
+
+#data
+<a xmlns:a=""/>
+#errors
+#document
+| <{} a>
+|   xmlns a=""
+
+#data
+<x xmlns:a="" a:b=""/>
+#errors
+#document
+| <{} x>
+|   a:b=""
+|   xmlns a=""
+
+#data
+<x xmlns:a="a" xmlns:b="a" a:m="1" b:m="2"/>
+#errors
+1;1;duplicate ns attr;;b:m;m
+#document
+| <{} x>
+|   xmlns a="a"
+|   xmlns b="a"
+|   {a} m="1"

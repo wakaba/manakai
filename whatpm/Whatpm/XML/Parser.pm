@@ -347,17 +347,93 @@ sub _tree_before_root_element ($) {
 
   B: while (1) {
     if ($token->{type} == START_TAG_TOKEN) {
+      my $nsmap = {
+        xml => q<http://www.w3.org/XML/1998/namespace>,
+        xmlns => q<http://www.w3.org/2000/xmlns/>,
+      };
+      
+      for (keys %{$token->{attributes}}) {
+        if (/^xmlns:./s) {
+          my $prefix = substr $_, 6;
+          my $value = $token->{attributes}->{$_}->{value};
+          if ($prefix eq 'xml' or $prefix eq 'xmlns' or
+              $value eq q<http://www.w3.org/XML/1998/namespace> or
+              $value eq q<http://www.w3.org/2000/xmlns/>) {
+            ## NOTE: Error should be detected at the DOM layer.
+            #
+          } elsif (length $value) {
+            $nsmap->{$prefix} = $value;
+          } else {
+            delete $nsmap->{$prefix};
+            ## TODO: Error unless XML1.1
+          }
+        } elsif ($_ eq 'xmlns') {
+          my $value = $token->{attributes}->{$_}->{value};
+          if ($value eq q<http://www.w3.org/XML/1998/namespace> or
+              $value eq q<http://www.w3.org/2000/xmlns/>) {
+            ## NOTE: Error should be detected at the DOM layer.
+            #
+          } elsif (length $value) {
+            $nsmap->{''} = $value;
+          } else {
+            delete $nsmap->{''};
+          }
+        }
+      }
+      
+      my $ns;
       my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
-      ($prefix, $ln) = (undef, $prefix) unless defined $ln;
-      my $ns; ## TODO:
+      
+      if (defined $ln) { # prefixed
+        if (defined $nsmap->{$prefix}) {
+          $ns = $nsmap->{$prefix};
+        } else {
+          ## NOTE: Error should be detected at the DOM layer.
+          ($prefix, $ln) = (undef, $token->{tag_name});
+        }
+      } else {
+        ($prefix, $ln) = (undef, $prefix);
+        $ns = $nsmap->{''};
+      }
+
       my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
       $el->set_user_data (manakai_source_line => $token->{line});
       $el->set_user_data (manakai_source_column => $token->{column});
 
-      for my $attr_name (keys %{$token->{attributes}}) {
-        my $ns; ## TODO
+      my $has_attr;
+      for my $attr_name (sort {$a cmp $b} keys %{$token->{attributes}}) {
+        my $ns;
         my ($p, $l) = split /:/, $attr_name, 2;
-        ($p, $l) = (undef, $p) unless defined $l;
+
+        if ($attr_name eq 'xmlns:xmlns') {
+          ($p, $l) = (undef, $attr_name);
+        } elsif (defined $l) { # prefixed
+          if (defined $nsmap->{$p}) {
+            $ns = $nsmap->{$p};
+          } else {
+            ## NOTE: Error should be detected at the DOM-layer.
+            ($p, $l) = (undef, $attr_name);
+          }
+        } else {
+          if ($p eq 'xmlns') {
+            $ns = $nsmap->{xmlns};
+          }
+          ($p, $l) = (undef, $p);
+        }
+        
+        if ($has_attr->{defined $ns ? $ns : ''}->{$l}) {
+          ## NOTE: Attributes are sorted as Unicode characters (not
+          ## code units) of their names, for stable output.
+
+          ## TODO: Should be sorted by source order?
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate ns attr',
+                          token => $token,
+                          value => $attr_name);
+          next;
+        } else {
+          $has_attr->{defined $ns ? $ns : ''}->{$l} = 1;
+        }
+        
         my $attr_t = $token->{attributes}->{$attr_name};
         my $attr = $self->{document}->create_attribute_ns ($ns, [$p, $l]);
         $attr->value ($attr_t->{value});
@@ -372,7 +448,7 @@ sub _tree_before_root_element ($) {
         delete $self->{self_closing};
         $self->{insertion_mode} = AFTER_ROOT_ELEMENT_IM;
       } else {
-        push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+        push @{$self->{open_elements}}, [$el, $token->{tag_name}, $nsmap];
         $self->{insertion_mode} = IN_ELEMENT_IM;
       }
 

@@ -1,6 +1,6 @@
 package Whatpm::HTML::Dumper;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -17,7 +17,7 @@ sub dumptree ($) {
     q<http://www.w3.org/1998/Math/MathML> => 'math',
     q<http://www.w3.org/1999/xlink> => 'xlink',
     q<http://www.w3.org/XML/1998/namespace> => 'xml',
-    q<http://www.w3.org/2002/xmlns/> => 'xmlns',
+    q<http://www.w3.org/2000/xmlns/> => 'xmlns',
   };
 
   my @node = map { [$_, ''] } @{$node->child_nodes};
@@ -85,4 +85,4 @@ sub dumptree ($) {
 ## TDOO: Document
 
 1;
-## $Date: 2008/10/14 07:49:55 $
+## $Date: 2008/10/14 10:36:33 $
