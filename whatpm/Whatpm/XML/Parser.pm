@@ -565,39 +565,9 @@ sub _tree_after_root_element ($) {
                       token => $token);
 
       ## XML5: Ignore the token.
-      
-      my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
-      ($prefix, $ln) = (undef, $prefix) unless defined $ln;
-      my $ns; ## TODO:
-      my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
-      $el->set_user_data (manakai_source_line => $token->{line});
-      $el->set_user_data (manakai_source_column => $token->{column});
 
-      for my $attr_name (keys %{$token->{attributes}}) {
-        my $ns; ## TODO
-        my ($p, $l) = split /:/, $attr_name, 2;
-        ($p, $l) = (undef, $p) unless defined $l;
-        my $attr_t = $token->{attributes}->{$attr_name};
-        my $attr = $self->{document}->create_attribute_ns ($ns, [$p, $l]);
-        $attr->value ($attr_t->{value});
-        $attr->set_user_data (manakai_source_line => $attr_t->{line});
-        $attr->set_user_data (manakai_source_column => $attr_t->{column});
-        $el->set_attribute_node_ns ($attr);
-      }
-
-      $self->{document}->append_child ($el);
-      
-      if ($self->{self_closing}) {
-        delete $self->{self_closing};
-        ## Stay in the mode.
-      } else {
-        push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-        $self->{insertion_mode} = IN_ELEMENT_IM;
-      }
-      
-      #delete $self->{tainted};
-
-      $token = $self->_get_next_token;
+      $self->{insertion_mode} = BEFORE_ROOT_ELEMENT_IM;
+      ## Reprocess.
       return;
     } elsif ($token->{type} == COMMENT_TOKEN) {
       my $comment = $self->{document}->create_comment ($token->{data});
