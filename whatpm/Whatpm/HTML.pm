@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.203 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.204 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -3040,7 +3040,7 @@ sub _tree_construction_main ($) {
                 
                 $token = $self->_get_next_token;
                 next B;
-              } elsif ($self->{insertion_mode} == IN_CAPTION_IM) {
+              } elsif ($self->{insertion_mode} & IN_CAPTION_IM) {
                 $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed', text => 'caption',
                                 token => $token);
                 
@@ -3292,6 +3292,7 @@ sub _tree_construction_main ($) {
               } # INSCOPE
               unless (defined $i) {
                 
+	## TODO: Wrong error type?
                 $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                                 text => 'caption', token => $token);
                 ## Ignore the token
@@ -6741,4 +6742,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/14 02:27:55 $
+# $Date: 2008/10/14 07:40:51 $

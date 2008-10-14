@@ -117,7 +117,7 @@ sub test ($) {
     $result = serialize ($el);
   }
   
-  warn "No #errors section" unless $test->{errors};
+  warn "No #errors section ($test->{data}->[0])" unless $test->{errors};
     
   ok scalar @errors, scalar @{$test->{errors}->[0] or []},
     'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' . 
@@ -202,4 +202,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2008/10/14 06:48:05 $
+## $Date: 2008/10/14 07:40:52 $

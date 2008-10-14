@@ -27,7 +27,7 @@ sub execute_test ($$$) {
       if ($v =~ s/^([A-Za-z0-9-]+)//) {
         $field_name = $1;
       }
-      if ($v =~ s/^([^\x0A]*)\x0A//) {
+      if ($v =~ s/^([^\x0A]*)(?:\x0A|$)//) {
         push @field_opt, grep {length $_} split /[\x09\x20]+/, $1;
       }
 

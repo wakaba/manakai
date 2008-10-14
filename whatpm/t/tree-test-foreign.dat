@@ -921,3 +921,171 @@ unexpected EOF
 |         <svg svg>
 |           <svg foreignObject>
 |             <rt>
+
+#data
+<table><tr><td><svg><caption>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg caption>
+|                 "a"
+
+#data
+<table><tr><td><svg><col>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg col>
+|                 "a"
+
+#data
+<table><tr><td><svg><colgroup>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg colgroup>
+|                 "a"
+
+#data
+<table><tr><td><svg><tr>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg tr>
+|                 "a"
+
+#data
+<table><caption><svg><caption>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg caption>
+|             "a"
+
+#data
+<table><caption><svg><col>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg col>
+|             "a"
+
+#data
+<table><caption><svg><colgroup>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg colgroup>
+|             "a"
+
+#data
+<table><caption><svg><thead>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg thead>
+|             "a"
+
+#data
+<table><caption><svg><tr>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg tr>
+|             "a"
+
+#data
+<table><caption><svg><td>a
+#errors
+no DOCTYPE
+eof in foreign
+table not closed
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         <svg svg>
+|           <svg td>
+|             "a"
