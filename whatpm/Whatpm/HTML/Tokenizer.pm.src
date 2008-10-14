@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -209,6 +209,7 @@ sub _initialize_tokenizer ($) {
 ##        ->{value}
 ##        ->{has_reference} == 1 or 0
 ##   ->{data} (COMMENT_TOKEN, CHARACTER_TOKEN)
+##   ->{has_reference} == 1 or 0 (CHARACTER_TOKEN)
 ## NOTE: The "self-closing flag" is hold as |$self->{self_closing}|.
 ##     |->{self_closing}| is used to save the value of |$self->{self_closing}|
 ##     while the token is pushed back to the stack.
@@ -2556,6 +2557,7 @@ sub _get_next_token ($) {
         $self->{s_kwd} = '';
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN, data => chr $code,
+                  has_reference => 1,
                   line => $l, column => $c,
                  });
         redo A;
@@ -2668,6 +2670,7 @@ sub _get_next_token ($) {
         $self->{s_kwd} = '';
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN, data => chr $code,
+                  has_reference => 1,
                   line => $l, column => $c,
                  });
         redo A;
@@ -2763,6 +2766,7 @@ sub _get_next_token ($) {
         ## Reconsume.
         !!!emit ({type => CHARACTER_TOKEN,
                   data => $data,
+                  has_reference => $has_ref,
                   line => $self->{line_prev},
                   column => $self->{column_prev} + 1 - length $self->{s_kwd},
                  });
@@ -2785,4 +2789,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/14 14:57:52 $
+## $Date: 2008/10/14 15:25:50 $

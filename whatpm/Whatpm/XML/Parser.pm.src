@@ -306,6 +306,7 @@ sub _tree_initial ($) {
       next B;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
       if (not $self->{tainted} and
+          not $token->{has_reference} and
           $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
         #
       }
@@ -473,6 +474,7 @@ sub _tree_before_root_element ($) {
       next B;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
       if (not $self->{tainted} and
+          not $token->{has_reference} and
           $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
         #
       }
@@ -735,6 +737,7 @@ sub _tree_after_root_element ($) {
       next B;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
       if (not $self->{tainted} and
+          not $token->{has_reference} and
           $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
         #
       }

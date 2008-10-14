@@ -1,0 +1,76 @@
+
+#data
+&#x20;<a/>
+#errors
+1;6;text outside of root element;;;m
+#document
+| " "
+| <{} a>
+
+#data
+&#32;<a/>
+#errors
+1;5;text outside of root element;;;m
+#document
+| " "
+| <{} a>
+
+#data
+ &#x20;<a/>
+#errors
+1;7;text outside of root element;;;m
+#document
+| " "
+| <{} a>
+
+#data
+&#x20; <a/>
+#errors
+1;6;text outside of root element;;;m
+#document
+| "  "
+| <{} a>
+
+#data
+<a/>
+&#x20;
+#errors
+2;5;text outside of root element;;;m
+#document
+| <{} a>
+| " "
+
+#data
+<a/>&#32;
+#errors
+1;8;text outside of root element;;;m
+#document
+| <{} a>
+| " "
+
+#data
+<!DOCTYPE a>&#x20;<a/>
+#errors
+1;18;text outside of root element;;;m
+#document
+| <!DOCTYPE a>
+| " "
+| <{} a>
+
+#data
+<!DOCTYPE a> &#x20;<a/>
+#errors
+1;19;text outside of root element;;;m
+#document
+| <!DOCTYPE a>
+| " "
+| <{} a>
+
+#data
+<!DOCTYPE a>&#x20; <a/>
+#errors
+1;18;text outside of root element;;;m
+#document
+| <!DOCTYPE a>
+| "  "
+| <{} a>
