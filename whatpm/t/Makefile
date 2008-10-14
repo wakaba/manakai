@@ -7,6 +7,7 @@ all: \
   content-type-files \
   tokenizer-files \
   tree-construction-files \
+  xml-result.txt \
   content-checker-files \
   langtag-files
 
@@ -72,6 +73,9 @@ tree-construction/LICENSE:
 tree-construction-result.txt: always
 	cd .. && perl t/HTML-tree.t &> t/$@
 
+xml-result.txt: always
+	cd .. && perl t/XML-Parser.t &> t/$@
+
 content-checker-files: content-checker-result.txt \
   content-checker-atom-result.txt \
   content-checker-xml-result.txt
@@ -97,4 +101,4 @@ clean-remote-files:
 always:
 
 ## License: Public Domain.
-## $Date: 2008/10/07 12:18:39 $
+## $Date: 2008/10/14 09:00:57 $

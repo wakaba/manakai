@@ -215,7 +215,7 @@ sub _terminate_tree_constructor ($) {
 ## XML5: No namespace support.
 
 ## XML5: XML5 has "empty tag token".  In this implementation, it is
-## represented as a start tag token with $token->{self_closing} flag
+## represented as a start tag token with $self->{self_closing} flag
 ## set to true.
 
 ## XML5: XML5 has "short end tag token".  In this implementation, it
@@ -347,11 +347,13 @@ sub _tree_before_root_element ($) {
 
   B: while (1) {
     if ($token->{type} == START_TAG_TOKEN) {
+      my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
+      ($prefix, $ln) = (undef, $prefix) unless defined $ln;
       my $ns; ## TODO:
-      my $el = $self->{document}->create_element_ns ($ns, $token->{tag_name});
+      my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
       $self->{document}->append_child ($el);
 
-      if ($token->{self_closing}) {
+      if ($self->{self_closing}) {
         delete $self->{self_closing};
         $self->{insertion_mode} = AFTER_ROOT_ELEMENT_IM;
       } else {
@@ -442,11 +444,13 @@ sub _tree_in_element ($) {
       $token = $self->_get_next_token;
       next B;
     } elsif ($token->{type} == START_TAG_TOKEN) {
+      my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
+      ($prefix, $ln) = (undef, $prefix) unless defined $ln;
       my $ns; ## TODO:
-      my $el = $self->{document}->create_element_ns ($ns, $token->{tag_name});
+      my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
       $self->{open_elements}->[-1]->[0]->append_child ($el);
 
-      if ($token->{self_closing}) {
+      if ($self->{self_closing}) {
         delete $self->{self_closing};
       } else {
         push @{$self->{open_elements}}, [$el, $token->{tag_name}];
@@ -532,11 +536,13 @@ sub _tree_after_root_element ($) {
 
       ## XML5: Ignore the token.
       
+      my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
+      ($prefix, $ln) = (undef, $prefix) unless defined $ln;
       my $ns; ## TODO:
-      my $el = $self->{document}->create_element_ns ($ns, $token->{tag_name});
+      my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
       $self->{document}->append_child ($el);
       
-      if ($token->{self_closing}) {
+      if ($self->{self_closing}) {
         delete $self->{self_closing};
         ## Stay in the mode.
       } else {

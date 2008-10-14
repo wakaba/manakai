@@ -1,0 +1,37 @@
+#data
+<a/>
+#errors
+#document
+| <{} a>
+
+#data
+<a></a>
+#errors
+#document
+| <{} a>
+
+#data
+<a><b></a>
+#errors
+1;7;unmatched end tag;a;;m
+#document
+| <{} a>
+|   <{} b>
+
+#data
+<a><b></a>a
+#errors
+1;7;unmatched end tag;a;;m
+1;11;text outside of root element;;;m
+#document
+| <{} a>
+|   <{} b>
+| "a"
+
+#data
+<a/><b/>
+#errors
+1;5;second root element;;;m
+#document
+| <{} a>
+| <{} b>

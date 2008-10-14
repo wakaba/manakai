@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -245,6 +245,10 @@ sub document_element ($) {
   }
   return undef;
 } # document_element
+
+sub dom_config ($) {
+  return {};
+} # dom_config
 
 sub adopt_node ($$) {
   my @node = ($_[1]);
@@ -608,4 +612,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/03/20 03:37:19 $
+# $Date: 2008/10/14 09:00:57 $

@@ -4,8 +4,7 @@ use strict;
 my $DEBUG = $ENV{DEBUG};
 
 use lib qw[/home/wakaba/work/manakai2/lib];
-my $test_dir_name = 't/';
-my $dir_name = 't/tree-construction/';
+my $test_dir_name = 't/xml/';
 
 use Test;
 BEGIN { plan tests => 4935 }
@@ -32,7 +31,7 @@ if ($DEBUG) {
   }
 }
 
-use Whatpm::HTML;
+use Whatpm::XML::Parser;
 use Whatpm::NanoDOM;
 use Whatpm::Charset::UnicodeChecker;
 use Whatpm::HTML::Dumper qw/dumptree/;
@@ -53,7 +52,6 @@ sub test ($) {
 
   my $doc = Whatpm::NanoDOM::Document->new;
   my @errors;
-  my @shoulds;
   
   $SIG{INT} = sub {
     print scalar dumptree ($doc);
@@ -62,23 +60,27 @@ sub test ($) {
 
   my $onerror = sub {
     my %opt = @_;
-    if ($opt{level} eq 's') {
-      push @shoulds, join ':', $opt{line}, $opt{column}, $opt{type};
-    } else {
-      push @errors, join ':', $opt{line}, $opt{column}, $opt{type};
-    }
+    push @errors, join ';',
+        $opt{token}->{line} || $opt{line},
+        $opt{token}->{column} || $opt{column},
+        $opt{type},
+        defined $opt{text} ? $opt{text} : '',
+        defined $opt{value} ? $opt{value} : '',
+        $opt{level};
   };
 
   my $chk = sub {
-    return Whatpm::Charset::UnicodeChecker->new_handle ($_[0], 'html5');
+    return $_[0];
+    #return Whatpm::Charset::UnicodeChecker->new_handle ($_[0], 'html5');
   }; # $chk
 
   my $result;
   unless (defined $test->{element}) {
-    Whatpm::HTML->parse_char_string
+    Whatpm::XML::Parser->parse_char_string
         ($test->{data}->[0] => $doc, $onerror, $chk);
     $result = dumptree ($doc);
   } else {
+    ## TODO: ...
     my $el = $doc->create_element_ns
       ('http://www.w3.org/1999/xhtml', [undef, $test->{element}]);
     Whatpm::HTML->set_inner_html ($el, $test->{data}->[0], $onerror, $chk);
@@ -86,48 +88,23 @@ sub test ($) {
   }
   
   warn "No #errors section ($test->{data}->[0])" unless $test->{errors};
-    
-  ok scalar @errors, scalar @{$test->{errors}->[0] or []},
+  
+  ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
     'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' . 
     join (', ', @errors) . ';' . join (', ', @{$test->{errors}->[0] or []});
-  ok scalar @shoulds, scalar @{$test->{shoulds}->[0] or []},
-    'SHOULD-level error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' .
-    join (', ', @shoulds) . ';' . join (', ', @{$test->{shoulds}->[0] or []});
-
+  
   $test->{document}->[0] .= "\x0A" if length $test->{document}->[0];
   ok $result, $test->{document}->[0],
       'Document tree: ' . Data::Dumper::qquote ($test->{data}->[0]);
 } # test
 
 my @FILES = grep {$_} split /\s+/, qq[
-                      ${test_dir_name}tokenizer-test-2.dat
-                      ${test_dir_name}tokenizer-test-3.dat
-                      ${dir_name}tests1.dat
-                      ${dir_name}tests2.dat
-                      ${dir_name}tests3.dat
-                      ${dir_name}tests4.dat
-                      ${dir_name}tests5.dat
-                      ${dir_name}tests6.dat
-                      ${dir_name}tests7.dat
-                      ${dir_name}tests8.dat
-                      ${dir_name}tests9.dat
-                      ${dir_name}tests10.dat
-                      ${dir_name}tests11.dat
-                      ${dir_name}tests12.dat
-                      ${test_dir_name}tree-test-1.dat
-                      ${test_dir_name}tree-test-2.dat
-                      ${test_dir_name}tree-test-3.dat
-                      ${test_dir_name}tree-test-void.dat
-                      ${test_dir_name}tree-test-flow.dat
-                      ${test_dir_name}tree-test-phrasing.dat
-                      ${test_dir_name}tree-test-form.dat
-                      ${test_dir_name}tree-test-foreign.dat
+                      ${test_dir_name}tree-1.dat
                      ];
 
 require 't/testfiles.pl';
 execute_test ($_, {
   errors => {is_list => 1},
-  shoulds => {is_list => 1},
   document => {is_prefixed => 1},
   'document-fragment' => {is_prefixed => 1},
 }, \&test) for @FILES;
