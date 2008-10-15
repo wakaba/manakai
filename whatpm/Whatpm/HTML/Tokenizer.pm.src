@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -526,7 +526,7 @@ sub _get_next_token ($) {
             ## $self->{nc} is intentionally left as is
             redo A;
           }
-        } else {
+        } elsif (not $self->{is_xml} or $is_space->{$self->{nc}}) {
           !!!cp (23);
           !!!parse-error (type => 'bare stago',
                           line => $self->{line_prev},
@@ -540,6 +540,16 @@ sub _get_next_token ($) {
                     column => $self->{column_prev},
                    });
 
+          redo A;
+        } else {
+          ## XML5: "<:" is a parse error.
+          !!!cp (23.1);
+          $self->{ct} = {type => START_TAG_TOKEN,
+                                    tag_name => chr ($self->{nc}),
+                                    line => $self->{line_prev},
+                                    column => $self->{column_prev}};
+          $self->{state} = TAG_NAME_STATE;
+          !!!next-input-character;
           redo A;
         }
       } else {
@@ -2937,4 +2947,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/15 04:38:22 $
+## $Date: 2008/10/15 08:05:47 $

@@ -1,0 +1,90 @@
+#data
+<a/>
+#errors
+#document
+| <{} a>
+
+#data
+<A/>
+#errors
+#document
+| <{} A>
+
+#data
+<ab/>
+#errors
+#document
+| <{} ab>
+
+#data
+<aB/>
+#errors
+#document
+| <{} aB>
+
+#data
+<ABCDEFG/>
+#errors
+#document
+| <{} ABCDEFG>
+
+#data
+<a></a>
+#errors
+#document
+| <{} a>
+
+#data
+<A></A>
+#errors
+#document
+| <{} A>
+
+#data
+<ABC></ABC>
+#errors
+#document
+| <{} ABC>
+
+#data
+<camelCase></camelCase>
+#errors
+#document
+| <{} camelCase>
+
+#data
+<abc></ABC>x
+#errors
+1;6;unmatched end tag;ABC;;m
+1;12;in body:#eof;;;m
+#document
+| <{} abc>
+|   "x"
+
+#data
+<ABC></abc>x
+#errors
+1;6;unmatched end tag;abc;;m
+1;12;in body:#eof;;;m
+#document
+| <{} ABC>
+|   "x"
+
+#data
+<[]abc/>
+#errors
+#document
+| <{} []abc>
+
+#data
+<{} abc/>
+#errors
+#document
+| <{} {}>
+|   abc=""
+
+#data escaped
+<\u4e00\u4e01/>
+#errors
+#document escaped
+| <{} \u4e00\u4e01>

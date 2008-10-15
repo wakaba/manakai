@@ -335,3 +335,195 @@
 |       xmlns b=""
 |       <{} h>
 |         b:i=""
+
+#data
+<p :="x"/>
+#errors
+#document
+| <{} p>
+|   :="x"
+
+#data
+<p a:b="x"/>
+#errors
+#document
+| <{} p>
+|   a:b="x"
+
+#data
+<p a:b="x" xmlns:a=""/>
+#errors
+#document
+| <{} p>
+|   a:b="x"
+|   xmlns a=""
+
+#data
+<p a:="x"/>
+#errors
+#document
+| <{} p>
+|   a:="x"
+
+#data
+<p a:="x" xmlns:a="y"/>
+#errors
+#document
+| <{} p>
+|   a:="x"
+|   xmlns a="y"
+
+#data
+<p :a="x"/>
+#errors
+#document
+| <{} p>
+|   :a="x"
+
+#data
+<p :a="x" xmlns:="y"/>
+#errors
+#document
+| <{} p>
+|   :a="x"
+|   xmlns:="y"
+
+#data
+<p a:b:c="x"/>
+#errors
+#document
+| <{} p>
+|   a:b:c="x"
+
+#data
+<p a:b:c="x" xmlns:a="y"/>
+#errors
+#document
+| <{} p>
+|   xmlns a="y"
+|   {y} b:c="x"
+
+#data
+<p a:b:c="x" xmlns:a:b="y"/>
+#errors
+#document
+| <{} p>
+|   a:b:c="x"
+|   xmlns a:b="y"
+
+#data
+<p xmlns::="x"/>
+#errors
+#document
+| <{} p>
+|   xmlns :="x"
+
+#data
+<p xmlns::="x" ::a="y"/>
+#errors
+#document
+| <{} p>
+|   ::a="y"
+|   xmlns :="x"
+
+#data
+<z><p :="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     :="x"
+
+#data
+<z><p a:b="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     a:b="x"
+
+#data
+<z><p a:b="x" xmlns:a=""/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     a:b="x"
+|     xmlns a=""
+
+#data
+<z><p a:="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     a:="x"
+
+#data
+<z><p a:="x" xmlns:a="y"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     a:="x"
+|     xmlns a="y"
+
+#data
+<z><p :a="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     :a="x"
+
+#data
+<z><p :a="x" xmlns:="y"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     :a="x"
+|     xmlns:="y"
+
+#data
+<z><p a:b:c="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     a:b:c="x"
+
+#data
+<z><p a:b:c="x" xmlns:a="y"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     xmlns a="y"
+|     {y} b:c="x"
+
+#data
+<z><p a:b:c="x" xmlns:a:b="y"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     a:b:c="x"
+|     xmlns a:b="y"
+
+#data
+<z><p xmlns::="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     xmlns :="x"
+
+#data
+<z><p xmlns::="x" ::a="y"/></z>
+#errors
+#document
+| <{} z>
+|   <{} p>
+|     ::a="y"
+|     xmlns :="x"

@@ -389,7 +389,6 @@ sub _tree_before_root_element ($) {
             $nsmap->{$prefix} = $value;
           } else {
             delete $nsmap->{$prefix};
-            ## TODO: Error unless XML1.1
           }
         } elsif ($_ eq 'xmlns') {
           my $value = $token->{attributes}->{$_}->{value};
@@ -408,16 +407,15 @@ sub _tree_before_root_element ($) {
       my $ns;
       my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
       
-      if (defined $ln) { # prefixed
+      if (defined $ln and $prefix ne '' and $ln ne '') { # prefixed
         if (defined $nsmap->{$prefix}) {
           $ns = $nsmap->{$prefix};
         } else {
-          ## NOTE: Error should be detected at the DOM layer.
           ($prefix, $ln) = (undef, $token->{tag_name});
         }
       } else {
-        ($prefix, $ln) = (undef, $prefix);
-        $ns = $nsmap->{''};
+        $ns = $nsmap->{''} if $prefix ne '' and not defined $ln;
+        ($prefix, $ln) = (undef, $token->{tag_name});
       }
 
       my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
@@ -431,7 +429,7 @@ sub _tree_before_root_element ($) {
 
         if ($attr_name eq 'xmlns:xmlns') {
           ($p, $l) = (undef, $attr_name);
-        } elsif (defined $l) { # prefixed
+        } elsif (defined $l and $p ne '' and $l ne '') { # prefixed
           if (defined $nsmap->{$p}) {
             $ns = $nsmap->{$p};
           } else {
@@ -439,10 +437,10 @@ sub _tree_before_root_element ($) {
             ($p, $l) = (undef, $attr_name);
           }
         } else {
-          if ($p eq 'xmlns') {
+          if ($attr_name eq 'xmlns') {
             $ns = $nsmap->{xmlns};
           }
-          ($p, $l) = (undef, $p);
+          ($p, $l) = (undef, $attr_name);
         }
         
         if ($has_attr->{defined $ns ? $ns : ''}->{$l}) {
@@ -575,7 +573,6 @@ sub _tree_in_element ($) {
             $nsmap->{$prefix} = $value;
           } else {
             delete $nsmap->{$prefix};
-            ## TODO: Error unless XML1.1
           }
         } elsif ($_ eq 'xmlns') {
           my $value = $token->{attributes}->{$_}->{value};
@@ -594,7 +591,7 @@ sub _tree_in_element ($) {
       my $ns;
       my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
       
-      if (defined $ln) { # prefixed
+      if (defined $ln and $prefix ne '' and $ln ne '') { # prefixed
         if (defined $nsmap->{$prefix}) {
           $ns = $nsmap->{$prefix};
         } else {
@@ -602,8 +599,8 @@ sub _tree_in_element ($) {
           ($prefix, $ln) = (undef, $token->{tag_name});
         }
       } else {
-        ($prefix, $ln) = (undef, $prefix);
-        $ns = $nsmap->{''};
+        $ns = $nsmap->{''} if $prefix ne '' and not defined $ln;
+        ($prefix, $ln) = (undef, $token->{tag_name});
       }
 
       my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
@@ -617,7 +614,7 @@ sub _tree_in_element ($) {
 
         if ($attr_name eq 'xmlns:xmlns') {
           ($p, $l) = (undef, $attr_name);
-        } elsif (defined $l) { # prefixed
+        } elsif (defined $l and $p ne '' and $l ne '') { # prefixed
           if (defined $nsmap->{$p}) {
             $ns = $nsmap->{$p};
           } else {
@@ -625,10 +622,10 @@ sub _tree_in_element ($) {
             ($p, $l) = (undef, $attr_name);
           }
         } else {
-          if ($p eq 'xmlns') {
+          if ($attr_name eq 'xmlns') {
             $ns = $nsmap->{xmlns};
           }
-          ($p, $l) = (undef, $p);
+          ($p, $l) = (undef, $attr_name);
         }
         
         if ($has_attr->{defined $ns ? $ns : ''}->{$l}) {

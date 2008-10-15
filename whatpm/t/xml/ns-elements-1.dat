@@ -1,0 +1,175 @@
+#data
+<:abc/>
+#errors
+#document
+| <{} :abc>
+
+#data
+<:abc xmlns:="a"/>
+#errors
+#document
+| <{} :abc>
+|   xmlns:="a"
+
+#data
+<:abc xmlns="a"/>
+#errors
+#document
+| <{} :abc>
+|   xmlns xmlns="a"
+
+#data
+<a: xmlns="a" xmlns:a="b"/>
+#errors
+#document
+| <{} a:>
+|   xmlns a="b"
+|   xmlns xmlns="a"
+
+#data
+<a:/>
+#errors
+#document
+| <{} a:>
+
+#data
+<a:b xmlns="c"/>
+#errors
+#document
+| <{} a:b>
+|   xmlns xmlns="c"
+
+#data
+<: xmlns="a"/>
+#errors
+#document
+| <{} :>
+|   xmlns xmlns="a"
+
+#data
+<: xmlns:="a"/>
+#errors
+#document
+| <{} :>
+|   xmlns:="a"
+
+#data
+<z><:abc/></z>
+#errors
+#document
+| <{} z>
+|   <{} :abc>
+
+#data
+<z><:abc xmlns:="a"/></z>
+#errors
+#document
+| <{} z>
+|   <{} :abc>
+|     xmlns:="a"
+
+#data
+<z><:abc xmlns="a"/></z>
+#errors
+#document
+| <{} z>
+|   <{} :abc>
+|     xmlns xmlns="a"
+
+#data
+<z><a: xmlns="a" xmlns:a="b"/></z>
+#errors
+#document
+| <{} z>
+|   <{} a:>
+|     xmlns a="b"
+|     xmlns xmlns="a"
+
+#data
+<z><a:/></z>
+#errors
+#document
+| <{} z>
+|   <{} a:>
+
+#data
+<z><a:b xmlns="c"/></z>
+#errors
+#document
+| <{} z>
+|   <{} a:b>
+|     xmlns xmlns="c"
+
+#data
+<z><: xmlns="a"/></z>
+#errors
+#document
+| <{} z>
+|   <{} :>
+|     xmlns xmlns="a"
+
+#data
+<z><: xmlns:="a"/></z>
+#errors
+#document
+| <{} z>
+|   <{} :>
+|     xmlns:="a"
+
+#data
+<a:b:c/>
+#errors
+#document
+| <{} a:b:c>
+
+#data
+<a:b:c xmlns:a="x"/>
+#errors
+#document
+| <{x} b:c>
+|   xmlns a="x"
+
+#data
+<a:b:c xmlns:a:b="x"/>
+#errors
+#document
+| <{} a:b:c>
+|   xmlns a:b="x"
+
+#data
+<::a xmlns::="x"/>
+#errors
+#document
+| <{} ::a>
+|   xmlns :="x"
+
+#data
+<z><a:b:c/></z>
+#errors
+#document
+| <{} z>
+|   <{} a:b:c>
+
+#data
+<z><a:b:c xmlns:a="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{x} b:c>
+|     xmlns a="x"
+
+#data
+<z><a:b:c xmlns:a:b="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{} a:b:c>
+|     xmlns a:b="x"
+
+#data
+<z><::a xmlns::="x"/></z>
+#errors
+#document
+| <{} z>
+|   <{} ::a>
+|     xmlns :="x"

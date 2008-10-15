@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -666,7 +666,7 @@ sub _get_next_token ($) {
             ## $self->{nc} is intentionally left as is
             redo A;
           }
-        } else {
+        } elsif (not $self->{is_xml} or $is_space->{$self->{nc}}) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare stago',
                           line => $self->{line_prev},
@@ -680,6 +680,26 @@ sub _get_next_token ($) {
                     column => $self->{column_prev},
                    });
 
+          redo A;
+        } else {
+          ## XML5: "<:" is a parse error.
+          
+          $self->{ct} = {type => START_TAG_TOKEN,
+                                    tag_name => chr ($self->{nc}),
+                                    line => $self->{line_prev},
+                                    column => $self->{column_prev}};
+          $self->{state} = TAG_NAME_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
           redo A;
         }
       } else {
@@ -4537,4 +4557,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/15 04:38:22 $
+## $Date: 2008/10/15 08:05:47 $
