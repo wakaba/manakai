@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -232,6 +232,10 @@ sub create_document_type_definition ($$) {
   return Whatpm::NanoDOM::DocumentType->new (shift);
 } # create_document_type_definition
 
+sub create_processing_instruction ($$$) {
+  return Whatpm::NanoDOM::ProcessingInstruction->new (@_);
+} # creat_processing_instruction
+
 sub implementation ($) {
   return 'Whatpm::NanoDOM::DOMImplementation';
 } # implementation
@@ -333,6 +337,21 @@ sub manakai_charset ($;$) {
 sub manakai_has_bom ($;$) {
   $_[0]->{manakai_has_bom} = $_[1] if @_ > 1;
   return $_[0]->{manakai_has_bom};
+}
+
+sub xml_version ($;$) {
+  $_[0]->{xml_version} = $_[1] if @_ > 1;
+  return $_[0]->{xml_version};
+}
+
+sub xml_encoding ($;$) {
+  $_[0]->{xml_encoding} = $_[1] if @_ > 1;
+  return $_[0]->{xml_encoding};
+}
+
+sub xml_standalone ($;$) {
+  $_[0]->{xml_standalone} = $_[1] if @_ > 1;
+  return $_[0]->{xml_standalone};
 }
 
 package Whatpm::NanoDOM::Element;
@@ -594,9 +613,37 @@ sub system_id ($;$) {
   return $_[0]->{system_id};
 } # system_id
 
+package Whatpm::NanoDOM::ProcessingInstruction;
+push our @ISA, 'Whatpm::NanoDOM::Node';
+
+sub new ($$$$) {
+  my $self = shift->SUPER::new;
+  shift;
+#  $self->{owner_document} = shift;
+#  Scalar::Util::weaken ($self->{owner_document});
+  $self->{target} = shift;
+  $self->{data} = shift;
+  return $self;
+} # new
+
+sub node_type () { 7 }
+
+sub target ($) {
+  return $_[0]->{target};
+} # target
+
+sub data ($;$) {
+  $_[0]->{data} = $_[1] if @_ > 1;
+  return $_[0]->{data};
+} # data
+
 =head1 SEE ALSO
 
-L<Whatpm::HTML>
+L<Whatpm::HTML|Whatpm::HTML>
+
+L<Whatpm::XML::Parser|Whatpm::XML::Parser>
+
+L<Whatpm::ContentChecker|Whatpm::ContentChecker>
 
 =head1 AUTHOR
 
@@ -604,7 +651,7 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -612,4 +659,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/14 09:00:57 $
+# $Date: 2008/10/15 04:38:22 $

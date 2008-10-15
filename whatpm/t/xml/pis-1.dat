@@ -1,0 +1,226 @@
+#data
+<?a?><b/>
+#errors
+#document
+| <?a ?>
+| <{} b>
+
+#data
+<?aBcDefG?><b/>
+#errors
+#document
+| <?aBcDefG ?>
+| <{} b>
+
+#data
+<!DOCTYPE b><?a?><b/>
+#errors
+#document
+| <!DOCTYPE b>
+| <?a ?>
+| <{} b>
+
+#data
+<b/><?a?>
+#errors
+#document
+| <{} b>
+| <?a ?>
+
+#data
+<b><?a?></b>
+#errors
+#document
+| <{} b>
+|   <?a ?>
+
+#data
+<?
+#errors
+1;1;bare pio;;;m
+1;2;no root element;;;m
+#document
+| <!-- ? -->
+
+#data
+<!DOCTYPE a><?
+#errors
+1;13;bare pio;;;m
+1;14;no root element;;;m
+#document
+| <!DOCTYPE a>
+| <!-- ? -->
+
+#data
+<p><?
+#errors
+1;4;bare pio;;;m
+1;5;in body:#eof;;;m
+#document
+| <{} p>
+|   <!-- ? -->
+
+#data
+<a/><?
+#errors
+1;5;bare pio;;;m
+#document
+| <{} a>
+| <!-- ? -->
+
+#data escaped
+<?\u0020
+#errors
+1;1;bare pio;;;m
+1;3;no root element;;;m
+#document
+| <!-- ?  -->
+
+#data
+<?<a>
+#errors
+1;5;no pic;;;m
+1;5;no root element;;;m
+#document
+| <?<a> ?>
+
+#data
+<?>
+#errors
+1;3;no pic;;;m
+1;3;no root element;;;m
+#document
+| <?> ?>
+
+#data
+<??>
+#errors
+1;1;bare pio;;;m
+1;4;no root element;;;m
+#document
+| <!-- ?? -->
+
+#data
+<??a?>
+#errors
+1;1;bare pio;;;m
+1;6;no root element;;;m
+#document
+| <!-- ??a? -->
+
+#data
+<?a?b?>
+#errors
+1;4;no s after target;;;m
+1;7;no root element;;;m
+#document
+| <?a ?b?>
+
+#data
+<?abc def?>
+#errors
+1;11;no root element;;;m
+#document
+| <?abc def?>
+
+#data
+<?abc   def?>
+#errors
+1;13;no root element;;;m
+#document
+| <?abc def?>
+
+#data
+<?abc "?>"?>
+#errors
+1;10;text outside of root element;;;m
+1;12;no root element;;;m
+#document
+| <?abc "?>
+| ""?>"
+
+#data
+<?abc??>
+#errors
+1;6;no s after target;;;m
+1;8;no root element;;;m
+#document
+| <?abc ??>
+
+#data
+<?abc???>
+#errors
+1;6;no s after target;;;m
+1;9;no root element;;;m
+#document
+| <?abc ???>
+
+#data
+<?abc ???><a/>
+#errors
+#document
+| <?abc ???>
+| <{} a>
+
+#data
+<?abc ?a?b?c?><a/>
+#errors
+#document
+| <?abc ?a?b?c?>
+| <{} a>
+
+#data
+<?a
+#errors
+1;3;no pic;;;m
+1;3;no root element;;;m
+#document
+| <?a ?>
+
+#data
+<?abc
+#errors
+1;5;no pic;;;m
+1;5;no root element;;;m
+#document
+| <?abc ?>
+
+#data escaped
+<?abc\u0020
+#errors
+1;6;no pic;;;m
+1;6;no root element;;;m
+#document
+| <?abc ?>
+
+#data
+<?abc?
+#errors
+1;6;no s after target;;;m
+1;6;no pic;;;m
+1;6;no root element;;;m
+#document
+| <?abc ??>
+
+#data
+<?abc ?
+#errors
+1;7;no pic;;;m
+1;7;no root element;;;m
+#document
+| <?abc ??>
+
+#data
+<?abc def
+#errors
+1;9;no pic;;;m
+1;9;no root element;;;m
+#document
+| <?abc def?>
+
+#data escaped
+<?abc def\u0009  g  ?><a/>
+#errors
+#document escaped
+| <?abc def\u0009  g  ?>
+| <{} a>

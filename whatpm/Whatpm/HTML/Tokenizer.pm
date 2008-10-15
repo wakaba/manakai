@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -113,6 +113,14 @@ sub HEXREF_X_STATE () { 47 }
 sub HEXREF_HEX_STATE () { 48 }
 sub ENTITY_NAME_STATE () { 49 }
 sub PCDATA_STATE () { 50 } # "data state" in the spec
+
+## XML states
+sub PI_STATE () { 51 }
+sub PI_TARGET_STATE () { 52 }
+sub PI_TARGET_AFTER_STATE () { 53 }
+sub PI_DATA_STATE () { 54 }
+sub PI_AFTER_STATE () { 55 }
+sub PI_DATA_AFTER_STATE () { 56 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -630,17 +638,34 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{nc} == 0x003F) { # ?
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'pio',
-                          line => $self->{line_prev},
-                          column => $self->{column_prev});
-          $self->{state} = BOGUS_COMMENT_STATE;
-          $self->{ct} = {type => COMMENT_TOKEN, data => '',
-                                    line => $self->{line_prev},
-                                    column => $self->{column_prev},
-                                   };
-          ## $self->{nc} is intentionally left as is
-          redo A;
+          if ($self->{is_xml}) {
+            
+            $self->{state} = PI_STATE;
+            
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+            redo A;
+          } else {
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'pio',
+                            line => $self->{line_prev},
+                            column => $self->{column_prev});
+            $self->{state} = BOGUS_COMMENT_STATE;
+            $self->{ct} = {type => COMMENT_TOKEN, data => '',
+                           line => $self->{line_prev},
+                           column => $self->{column_prev},
+                          };
+            ## $self->{nc} is intentionally left as is
+            redo A;
+          }
         } else {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare stago',
@@ -2228,15 +2253,16 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{s_kwd} eq '[CDATA' and
                $self->{nc} == 0x005B) { # [
-        
-
         if ($self->{is_xml} and 
             not $self->{tainted} and
             @{$self->{open_elements} or []} == 0) {
+          
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'cdata outside of root element',
                           line => $self->{line_prev},
                           column => $self->{column_prev} - 7);
           $self->{tainted} = 1;
+        } else {
+          
         }
 
         $self->{ct} = {type => CHARACTER_TOKEN,
@@ -3643,7 +3669,10 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         if ($self->{is_xml}) {
+          
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'no mse'); ## TODO: type
+        } else {
+          
         }
 
         $self->{state} = DATA_STATE;
@@ -4260,6 +4289,245 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
+
+    ## XML-only states
+
+    } elsif ($self->{state} == PI_STATE) {
+      if ($is_space->{$self->{nc}} or
+          $self->{nc} == 0x003F or # ? ## XML5: Same as "Anything else"
+          $self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare pio', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev}
+                            - 1 * ($self->{nc} != -1));
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{ct} = {type => COMMENT_TOKEN,
+                       data => '?',
+                       line => $self->{line_prev},
+                       column => $self->{column_prev}
+                           - 1 * ($self->{nc} != -1),
+                      };
+        redo A;
+      } else {
+        $self->{ct} = {type => PI_TOKEN,
+                       target => chr $self->{nc},
+                       data => '',
+                       line => $self->{line_prev},
+                       column => $self->{column_prev} - 1,
+                      };
+        $self->{state} = PI_TARGET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == PI_TARGET_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = PI_TARGET_AFTER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no pic'); ## TODO: type
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        ## Reconsume.
+        return  ($self->{ct}); # pi
+        redo A;
+      } elsif ($self->{nc} == 0x003F) { # ?
+        $self->{state} = PI_AFTER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } else {
+        ## XML5: typo ("tag name" -> "target")
+        $self->{ct}->{target} .= chr $self->{nc}; # pi
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == PI_TARGET_AFTER_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } else {
+        $self->{state} = PI_DATA_STATE;
+        ## Reprocess.
+        redo A;
+      }
+    } elsif ($self->{state} == PI_DATA_STATE) {
+      if ($self->{nc} == 0x003F) { # ?
+        $self->{state} = PI_DATA_AFTER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no pic'); ## TODO: type
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        ## Reprocess.
+        return  ($self->{ct}); # pi
+        redo A;
+      } else {
+        $self->{ct}->{data} .= chr $self->{nc}; # pi
+        $self->{read_until}->($self->{ct}->{data}, q[?],
+                              length $self->{ct}->{data});
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        ## Reprocess.
+        redo A;
+      }
+    } elsif ($self->{state} == PI_AFTER_STATE) {
+      if ($self->{nc} == 0x003E) { # >
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # pi
+        redo A;
+      } elsif ($self->{nc} == 0x003F) { # ?
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no s after target', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev}); ## XML5: no error
+        $self->{ct}->{data} .= '?';
+        $self->{state} = PI_DATA_AFTER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no s after target', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev}
+                            + 1 * ($self->{nc} == -1)); ## XML5: no error
+        $self->{ct}->{data} .= '?'; ## XML5: not appended
+        $self->{state} = PI_DATA_STATE;
+        ## Reprocess.
+        redo A;
+      }
+    } elsif ($self->{state} == PI_DATA_AFTER_STATE) {
+      ## XML5: Same as "pi after state" in XML5
+      if ($self->{nc} == 0x003E) { # >
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # pi
+        redo A;
+      } elsif ($self->{nc} == 0x003F) { # ?
+        $self->{ct}->{data} .= '?';
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } else {
+        $self->{ct}->{data} .= '?'; ## XML5: not appended
+        $self->{state} = PI_DATA_STATE;
+        ## Reprocess.
+        redo A;
+      }
+        
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -4269,4 +4537,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/14 15:25:50 $
+## $Date: 2008/10/15 04:38:22 $

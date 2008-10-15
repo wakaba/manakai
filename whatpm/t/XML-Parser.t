@@ -93,8 +93,28 @@ sub test ($) {
   @{$test->{errors}->[0]} = sort {$a cmp $b} @{$test->{errors}->[0] ||= []};
   
   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
-    'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' . 
-    join (', ', @errors) . ';' . join (', ', @{$test->{errors}->[0] or []});
+    'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]);
+
+  if ($test->{'xml-version'}) {
+    ok $doc->xml_version, $test->{'xml-version'}->[0],
+        'XML version: ' . Data::Dumper::qquote ($test->{data}->[0]);
+  }
+
+  if ($test->{'xml-encoding'}) {
+    if ($test->{'xml-encoding'}->[1]->[0] eq 'null') {
+      ok $doc->xml_encoding, undef, 
+        'XML encoding: ' . Data::Dumper::qquote ($test->{data}->[0]);
+    } else {
+      ok $doc->xml_encoding, $test->{'xml-encoding'}->[0],
+          'XML encoding: ' . Data::Dumper::qquote ($test->{data}->[0]);
+    }
+  }
+
+  if ($test->{'xml-standalone'}) {
+    ok $doc->xml_standalone ? 1 : 0,
+        $test->{'xml-standalone'}->[1]->[0] eq 'true' ? 1 : 0,
+        'XML standalone: ' . Data::Dumper::qquote ($test->{data}->[0]);
+  }
   
   $test->{document}->[0] .= "\x0A" if length $test->{document}->[0];
   ok $result, $test->{document}->[0],
@@ -107,6 +127,8 @@ my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}texts-1.dat
   ${test_dir_name}cdata-1.dat
   ${test_dir_name}charref-1.dat
+  ${test_dir_name}pis-1.dat
+  ${test_dir_name}xmldecls-1.dat
   ${test_dir_name}tree-1.dat
   ${test_dir_name}ns-attrs-1.dat
   ${test_dir_name}doctypes-1.dat
@@ -120,4 +142,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/14 15:25:50 $
+## $Date: 2008/10/15 04:38:22 $

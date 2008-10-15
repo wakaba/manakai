@@ -1,0 +1,539 @@
+#data
+<?xml?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <?xml ?>
+| <{} a>
+
+#data
+<?xml ?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <?xml ?>
+| <{} a>
+
+#data
+<?xml version="1.0"?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <{} a>
+
+#data
+<?xml version   =  "1.0"?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <{} a>
+
+#data
+<?xml Version="1.0"?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <?xml Version="1.0"?>
+| <{} a>
+
+#data
+<?xml version=1.0?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <?xml version=1.0?>
+| <{} a>
+
+#data
+<?xml version="1.0"  ?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <{} a>
+
+#data
+<?xml version='1.0'?> <a/>
+#errors
+#xml-version
+1.0
+#document
+| <{} a>
+
+#data
+<?xml version="1.0'?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <?xml version="1.0'?>
+| <{} a>
+
+#data
+<?xml version="1.1"?><a/>
+#errors
+#xml-version
+1.1
+#document
+| <{} a>
+
+#data
+<?xml version="1.2"?><a/>
+#errors
+#xml-version
+1.2
+#document
+| <{} a>
+
+#data
+<?xml version="'1.0'"?><a/>
+#errors
+#xml-version
+'1.0'
+#document
+| <{} a>
+
+#data
+<?xml version="unknown"?><a/>
+#errors
+#xml-version
+unknown
+#document
+| <{} a>
+
+#data
+<?xml version="1.1" unknown?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <?xml version="1.1" unknown?>
+| <{} a>
+
+#data
+<?xml version?><a/>
+#errors
+#xml-version
+1.0
+#document
+| <?xml version?>
+| <{} a>
+
+#data
+<?xml version=""?><a/>
+#errors
+#xml-version
+#document
+| <{} a>
+
+#data
+<?xml encoding=""?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#document
+| <?xml encoding=""?>
+| <{} a>
+
+#data
+<?xml version="1.0"encoding="a"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#document
+| <?xml version="1.0"encoding="a"?>
+| <{} a>
+
+#data
+<?xml version="1.0" encoding=""?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="us-ascii"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+us-ascii
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="UtF-8"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+UtF-8
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding='shift_Jis'?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+shift_Jis
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="utf-16'?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#document
+| <?xml version="1.0" encoding="utf-16'?>
+| <{} a>
+
+#data
+<?xml version="1.0" encoding  =   "UTF-32BE"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+UTF-32BE
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="hz"     ?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+hz
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding=iso-8859-1?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#document
+| <?xml version="1.0" encoding=iso-8859-1?>
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="windows-1252" a?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#document
+| <?xml version="1.0" encoding="windows-1252" a?>
+| <{} a>
+
+#data escaped
+<?xml version="1.0" encoding="\u4e00"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding escaped
+\u4e00
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding=" windows-31j "?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding escaped
+ windows-31j\u0020
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+utf-8
+#xml-standalone true
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="utf-8" standalone='yes'?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+utf-8
+#xml-standalone true
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="utf-8" standalone  =   "yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+utf-8
+#xml-standalone true
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="utf-8" standalone  =  "no"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+utf-8
+#xml-standalone false
+#document
+| <{} a>
+
+#data
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding
+utf-8
+#xml-standalone true
+#document
+| <{} a>
+
+#data
+<?xml version="1.0"  standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone true
+#document
+| <{} a>
+
+#data
+<?xml version="1.0"  standalone="no"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <{} a>
+
+#data
+<?xml  standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml standalone="yes"?>
+| <{} a>
+
+#data
+<?xml  standalone="no"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml standalone="no"?>
+| <{} a>
+
+#data
+<?xml version="1.0"standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0"standalone="yes"?>
+| <{} a>
+
+#data
+<?xml version="1.0" standalone="yes'?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standalone="yes'?>
+| <{} a>
+
+#data
+<?xml version="1.0" standalone="yes" encoding="utf-8"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standalone="yes" encoding="utf-8"?>
+| <{} a>
+
+#data
+<?xml version="1.0" standalone="yes" unknown=""?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standalone="yes" unknown=""?>
+| <{} a>
+
+#data
+<?xml version="1.0" standalone="true"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standalone="true"?>
+| <{} a>
+
+#data
+<?xml version="1.0" standAlone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standAlone="yes"?>
+| <{} a>
+
+#data
+<?xml version="1.0" standalone="YES"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standalone="YES"?>
+| <{} a>
+
+#data
+<?xml version="1.0"?>
+<?xml version="1.0" standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standalone="yes"?>
+| <{} a>
+
+#data
+<?xml version="1.1" encoding="utf-16"?>
+<?xml version="1.0" encoding="utf-8"?><a/>
+#errors
+#xml-version
+1.1
+#xml-encoding
+utf-16
+#xml-standalone false
+#document
+| <?xml version="1.0" encoding="utf-8"?>
+| <{} a>
+
+#data
+<!DOCTYPE HTML><?xml version="1.0" standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <!DOCTYPE HTML>
+| <?xml version="1.0" standalone="yes"?>
+| <{} a>
+
+#data
+ <?xml version="1.0" standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standalone="yes"?>
+| <{} a>
+
+#data escaped
+\u000a<?xml version="1.0" standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml version="1.0" standalone="yes"?>
+| <{} a>
+
+#data
+<?XML version="1.0" standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?XML version="1.0" standalone="yes"?>
+| <{} a>
+
+#data
+<?xml1 version="1.0" standalone="yes"?><a/>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <?xml1 version="1.0" standalone="yes"?>
+| <{} a>
+
+#data
+<a><?xml version="1.0" standalone="yes"?></a>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <{} a>
+|   <?xml version="1.0" standalone="yes"?>
+
+#data
+<a/><?xml version="1.0" standalone="yes"?>
+#errors
+#xml-version
+1.0
+#xml-encoding null
+#xml-standalone false
+#document
+| <{} a>
+| <?xml version="1.0" standalone="yes"?>

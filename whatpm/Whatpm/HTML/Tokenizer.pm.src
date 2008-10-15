@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -113,6 +113,14 @@ sub HEXREF_X_STATE () { 47 }
 sub HEXREF_HEX_STATE () { 48 }
 sub ENTITY_NAME_STATE () { 49 }
 sub PCDATA_STATE () { 50 } # "data state" in the spec
+
+## XML states
+sub PI_STATE () { 51 }
+sub PI_TARGET_STATE () { 52 }
+sub PI_TARGET_AFTER_STATE () { 53 }
+sub PI_DATA_STATE () { 54 }
+sub PI_AFTER_STATE () { 55 }
+sub PI_DATA_AFTER_STATE () { 56 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -500,17 +508,24 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{nc} == 0x003F) { # ?
-          !!!cp (22);
-          !!!parse-error (type => 'pio',
-                          line => $self->{line_prev},
-                          column => $self->{column_prev});
-          $self->{state} = BOGUS_COMMENT_STATE;
-          $self->{ct} = {type => COMMENT_TOKEN, data => '',
-                                    line => $self->{line_prev},
-                                    column => $self->{column_prev},
-                                   };
-          ## $self->{nc} is intentionally left as is
-          redo A;
+          if ($self->{is_xml}) {
+            !!!cp (22.1);
+            $self->{state} = PI_STATE;
+            !!!next-input-character;
+            redo A;
+          } else {
+            !!!cp (22);
+            !!!parse-error (type => 'pio',
+                            line => $self->{line_prev},
+                            column => $self->{column_prev});
+            $self->{state} = BOGUS_COMMENT_STATE;
+            $self->{ct} = {type => COMMENT_TOKEN, data => '',
+                           line => $self->{line_prev},
+                           column => $self->{column_prev},
+                          };
+            ## $self->{nc} is intentionally left as is
+            redo A;
+          }
         } else {
           !!!cp (23);
           !!!parse-error (type => 'bare stago',
@@ -1558,15 +1573,16 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{s_kwd} eq '[CDATA' and
                $self->{nc} == 0x005B) { # [
-        !!!cp (135.2);
-
         if ($self->{is_xml} and 
             not $self->{tainted} and
             @{$self->{open_elements} or []} == 0) {
+          !!!cp (135.2);
           !!!parse-error (type => 'cdata outside of root element',
                           line => $self->{line_prev},
                           column => $self->{column_prev} - 7);
           $self->{tainted} = 1;
+        } else {
+          !!!cp (135.21);
         }
 
         $self->{ct} = {type => CHARACTER_TOKEN,
@@ -2343,7 +2359,10 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         if ($self->{is_xml}) {
+          !!!cp (221.11);
           !!!parse-error (type => 'no mse'); ## TODO: type
+        } else {
+          !!!cp (221.12);
         }
 
         $self->{state} = DATA_STATE;
@@ -2780,6 +2799,135 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
+
+    ## XML-only states
+
+    } elsif ($self->{state} == PI_STATE) {
+      if ($is_space->{$self->{nc}} or
+          $self->{nc} == 0x003F or # ? ## XML5: Same as "Anything else"
+          $self->{nc} == -1) {
+        !!!parse-error (type => 'bare pio', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev}
+                            - 1 * ($self->{nc} != -1));
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{ct} = {type => COMMENT_TOKEN,
+                       data => '?',
+                       line => $self->{line_prev},
+                       column => $self->{column_prev}
+                           - 1 * ($self->{nc} != -1),
+                      };
+        redo A;
+      } else {
+        $self->{ct} = {type => PI_TOKEN,
+                       target => chr $self->{nc},
+                       data => '',
+                       line => $self->{line_prev},
+                       column => $self->{column_prev} - 1,
+                      };
+        $self->{state} = PI_TARGET_STATE;
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} == PI_TARGET_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = PI_TARGET_AFTER_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'no pic'); ## TODO: type
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        ## Reconsume.
+        !!!emit ($self->{ct}); # pi
+        redo A;
+      } elsif ($self->{nc} == 0x003F) { # ?
+        $self->{state} = PI_AFTER_STATE;
+        !!!next-input-character;
+        redo A;
+      } else {
+        ## XML5: typo ("tag name" -> "target")
+        $self->{ct}->{target} .= chr $self->{nc}; # pi
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} == PI_TARGET_AFTER_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
+      } else {
+        $self->{state} = PI_DATA_STATE;
+        ## Reprocess.
+        redo A;
+      }
+    } elsif ($self->{state} == PI_DATA_STATE) {
+      if ($self->{nc} == 0x003F) { # ?
+        $self->{state} = PI_DATA_AFTER_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'no pic'); ## TODO: type
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        ## Reprocess.
+        !!!emit ($self->{ct}); # pi
+        redo A;
+      } else {
+        $self->{ct}->{data} .= chr $self->{nc}; # pi
+        $self->{read_until}->($self->{ct}->{data}, q[?],
+                              length $self->{ct}->{data});
+        ## Stay in the state.
+        !!!next-input-character;
+        ## Reprocess.
+        redo A;
+      }
+    } elsif ($self->{state} == PI_AFTER_STATE) {
+      if ($self->{nc} == 0x003E) { # >
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        !!!next-input-character;
+        !!!emit ($self->{ct}); # pi
+        redo A;
+      } elsif ($self->{nc} == 0x003F) { # ?
+        !!!parse-error (type => 'no s after target', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev}); ## XML5: no error
+        $self->{ct}->{data} .= '?';
+        $self->{state} = PI_DATA_AFTER_STATE;
+        !!!next-input-character;
+        redo A;
+      } else {
+        !!!parse-error (type => 'no s after target', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev}
+                            + 1 * ($self->{nc} == -1)); ## XML5: no error
+        $self->{ct}->{data} .= '?'; ## XML5: not appended
+        $self->{state} = PI_DATA_STATE;
+        ## Reprocess.
+        redo A;
+      }
+    } elsif ($self->{state} == PI_DATA_AFTER_STATE) {
+      ## XML5: Same as "pi after state" in XML5
+      if ($self->{nc} == 0x003E) { # >
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        !!!next-input-character;
+        !!!emit ($self->{ct}); # pi
+        redo A;
+      } elsif ($self->{nc} == 0x003F) { # ?
+        $self->{ct}->{data} .= '?';
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
+      } else {
+        $self->{ct}->{data} .= '?'; ## XML5: not appended
+        $self->{state} = PI_DATA_STATE;
+        ## Reprocess.
+        redo A;
+      }
+        
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -2789,4 +2937,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/14 15:25:50 $
+## $Date: 2008/10/15 04:38:22 $

@@ -242,6 +242,29 @@ sub _construct_tree ($) {
   $self->{insertion_mode} = INITIAL_IM;
 
   $token = $self->_get_next_token;
+
+  ## XML5: No support for the XML declaration
+  if ($token->{type} == PI_TOKEN and
+      $token->{target} eq 'xml' and
+      $token->{data} =~ /\Aversion[\x09\x0A\x20]*=[\x09\x0A\x20]*
+                         (?>"([^"]*)"|'([^']*)')
+                         (?:[\x09\x0A\x20]+
+                            encoding[\x09\x0A\x20]*=[\x09\x0A\x20]*
+                            (?>"([^"]*)"|'([^']*)')[\x09\x0A\x20]*)?
+                         (?:[\x09\x0A\x20]+
+                            standalone[\x09\x0A\x20]*=[\x09\x0A\x20]*
+                            (?>"(yes|no)"|'(yes|no)'))?
+                         [\x09\x0A\x20]*\z/x) {
+    $self->{document}->xml_version (defined $1 ? $1 : $2);
+    $self->{document}->xml_encoding (defined $3 ? $3 : $4); # possibly undef
+    $self->{document}->xml_standalone (($5 || $6 || 'no') ne 'no');
+
+    $token = $self->_get_next_token;
+  } else {
+    $self->{document}->xml_version ('1.0');
+    $self->{document}->xml_encoding (undef);
+    $self->{document}->xml_standalone (0);
+  }
   
   while (1) {
     if ($self->{insertion_mode} == IN_ELEMENT_IM) {
