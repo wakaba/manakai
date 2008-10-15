@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -216,9 +216,10 @@ sub _initialize_tokenizer ($) {
 
 ## A token has:
 ##   ->{type} == DOCTYPE_TOKEN, START_TAG_TOKEN, END_TAG_TOKEN, COMMENT_TOKEN,
-##       CHARACTER_TOKEN, or END_OF_FILE_TOKEN
+##       CHARACTER_TOKEN, END_OF_FILE_TOKEN, PI_TOKEN, or ABORT_TOKEN
 ##   ->{name} (DOCTYPE_TOKEN)
 ##   ->{tag_name} (START_TAG_TOKEN, END_TAG_TOKEN)
+##   ->{target} (PI_TOKEN)
 ##   ->{pubid} (DOCTYPE_TOKEN)
 ##   ->{sysid} (DOCTYPE_TOKEN)
 ##   ->{quirks} == 1 or 0 (DOCTYPE_TOKEN): "force-quirks" flag
@@ -226,8 +227,10 @@ sub _initialize_tokenizer ($) {
 ##        ->{name}
 ##        ->{value}
 ##        ->{has_reference} == 1 or 0
-##   ->{data} (COMMENT_TOKEN, CHARACTER_TOKEN)
+##        ->{index}: Index of the attribute in a tag.
+##   ->{data} (COMMENT_TOKEN, CHARACTER_TOKEN, PI_TOKEN)
 ##   ->{has_reference} == 1 or 0 (CHARACTER_TOKEN)
+##   ->{last_index} (ELEMENT_TOKEN): Next attribute's index - 1.
 ## NOTE: The "self-closing flag" is hold as |$self->{self_closing}|.
 ##     |->{self_closing}| is used to save the value of |$self->{self_closing}|
 ##     while the token is pushed back to the stack.
@@ -1058,6 +1061,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == BEFORE_ATTRIBUTE_NAME_STATE) {
+      ## XML5: "Tag attribute name before state".
+
       if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
@@ -1170,9 +1175,11 @@ sub _get_next_token ($) {
              0x003D => 1, # =
             }->{$self->{nc}}) {
           
+          ## XML5: Not a parse error.
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
         } else {
           
+          ## XML5: ":" raises a parse error and is ignored.
         }
         $self->{ca}
             = {name => chr ($self->{nc}),
@@ -1193,6 +1200,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_NAME_STATE) {
+      ## XML5: "Tag attribute name state".
+
       my $before_leave = sub {
         if (exists $self->{ct}->{attributes} # start tag or end tag
             ->{$self->{ca}->{name}}) { # MUST
@@ -1203,6 +1212,7 @@ sub _get_next_token ($) {
           
           $self->{ct}->{attributes}->{$self->{ca}->{name}}
             = $self->{ca};
+          $self->{ca}->{index} = ++$self->{ct}->{last_index};
         }
       }; # $before_leave
 
@@ -1239,6 +1249,14 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{is_xml}) {
+          
+          ## XML5: Not a parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr value'); ## TODO: type
+        } else {
+          
+        }
+
         $before_leave->();
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
@@ -1288,6 +1306,13 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x002F) { # /
+        if ($self->{is_xml}) {
+          
+          ## XML5: Not a parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr value'); ## TODO: type
+        } else {
+          
+        }
         
         $before_leave->();
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
@@ -1332,6 +1357,7 @@ sub _get_next_token ($) {
         if ($self->{nc} == 0x0022 or # "
             $self->{nc} == 0x0027) { # '
           
+          ## XML5: Not a parse error.
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
         } else {
           
@@ -1352,6 +1378,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == AFTER_ATTRIBUTE_NAME_STATE) {
+      ## XML5: "Tag attribute name after state".
+      
       if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
@@ -1383,6 +1411,14 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{is_xml}) {
+          
+          ## XML5: Not a parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr value'); ## TODO: type
+        } else {
+          
+        }
+
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
@@ -1436,6 +1472,13 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x002F) { # /
+        if ($self->{is_xml}) {
+          
+          ## XML5: Not a parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr value'); ## TODO: type
+        } else {
+          
+        }
         
         $self->{state} = SELF_CLOSING_START_TAG_STATE;
         
@@ -1475,9 +1518,18 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
+        if ($self->{is_xml}) {
+          
+          ## XML5: Not a parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr value'); ## TODO: type
+        } else {
+          
+        }
+
         if ($self->{nc} == 0x0022 or # "
             $self->{nc} == 0x0027) { # '
           
+          ## XML5: Not a parse error.
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
         } else {
           
@@ -1501,6 +1553,8 @@ sub _get_next_token ($) {
         redo A;        
       }
     } elsif ($self->{state} == BEFORE_ATTRIBUTE_VALUE_STATE) {
+      ## XML5: "Tag attribute value before state".
+
       if ($is_space->{$self->{nc}}) {
         
         ## Stay in the state
@@ -1612,7 +1666,12 @@ sub _get_next_token ($) {
       } else {
         if ($self->{nc} == 0x003D) { # =
           
+          ## XML5: Not a parse error.
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute value');
+        } elsif ($self->{is_xml}) {
+          
+          ## XML5: No parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unquoted attr value'); ## TODO
         } else {
           
         }
@@ -1632,8 +1691,11 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
+      ## XML5: "Tag attribute value double quoted state".
+      
       if ($self->{nc} == 0x0022) { # "
         
+        ## XML5: "Tag attribute name before state".
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -1649,6 +1711,8 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == 0x0026) { # &
         
+        ## XML5: Not defined yet.
+
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
@@ -1693,10 +1757,16 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        
+        if ($self->{is_xml} and $self->{nc} == 0x003C) { # <
+          
+          ## XML5: Not a parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'lt in attr value'); ## TODO: type
+        } else {
+          
+        }
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{read_until}->($self->{ca}->{value},
-                              q["&],
+                              q["&<],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -1714,8 +1784,11 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
+      ## XML5: "Tag attribute value single quoted state".
+
       if ($self->{nc} == 0x0027) { # '
         
+        ## XML5: "Before attribute name state" (sic).
         $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -1731,6 +1804,8 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == 0x0026) { # &
         
+        ## XML5: Not defined yet.
+
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
@@ -1775,10 +1850,16 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        
+        if ($self->{is_xml} and $self->{nc} == 0x003C) { # <
+          
+          ## XML5: Not a parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'lt in attr value'); ## TODO: type
+        } else {
+          
+        }
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{read_until}->($self->{ca}->{value},
-                              q['&],
+                              q['&<],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -1796,8 +1877,11 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_UNQUOTED_STATE) {
+      ## XML5: "Tag attribute value unquoted state".
+
       if ($is_space->{$self->{nc}}) {
         
+        ## XML5: "Tag attribute name before state".
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -1813,6 +1897,9 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == 0x0026) { # &
         
+
+        ## XML5: Not defined yet.
+
         ## NOTE: In the spec, the tokenizer is switched to the 
         ## "entity in attribute value state".  In this implementation, the
         ## tokenizer is switched to the |ENTITY_STATE|, which is an
@@ -1896,6 +1983,7 @@ sub _get_next_token ($) {
              0x003D => 1, # =
             }->{$self->{nc}}) {
           
+          ## XML5: Not a parse error.
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute value');
         } else {
           
@@ -2012,6 +2100,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == SELF_CLOSING_START_TAG_STATE) {
+      ## XML5: "Empty tag state".
+
       if ($self->{nc} == 0x003E) { # >
         if ($self->{ct}->{type} == END_TAG_TOKEN) {
           
@@ -2063,6 +2153,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
+        ## XML5: "Tag attribute name before state".
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
         ## Reconsume.
@@ -4620,4 +4711,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/15 08:51:02 $
+## $Date: 2008/10/15 10:50:38 $

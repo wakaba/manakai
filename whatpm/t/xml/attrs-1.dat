@@ -39,3 +39,191 @@
 | <{} b>
 |   c=""
 |   d=""
+
+#data
+<a b=c />
+#errors
+1;6;unquoted attr value;;;m
+#document
+| <{} a>
+|   b="c"
+
+#data
+<a b=cdefg />
+#errors
+1;6;unquoted attr value;;;m
+#document
+| <{} a>
+|   b="cdefg"
+
+#data
+<a bcdef=g />
+#errors
+1;10;unquoted attr value;;;m
+#document
+| <{} a>
+|   bcdef="g"
+
+#data
+<a bcdef = ghi />
+#errors
+1;12;unquoted attr value;;;m
+#document
+| <{} a>
+|   bcdef="ghi"
+
+#data
+<a bcd== />
+#errors
+1;8;bad attribute value;;;m
+#document
+| <{} a>
+|   bcd="="
+
+#data
+<a b="<"/>
+#errors
+1;7;lt in attr value;;;m
+#document
+| <{} a>
+|   b="<"
+
+#data
+<a b='<'/>
+#errors
+1;7;lt in attr value;;;m
+#document
+| <{} a>
+|   b="<"
+
+#data
+<a b="xxx<"/>
+#errors
+1;10;lt in attr value;;;m
+#document
+| <{} a>
+|   b="xxx<"
+
+#data
+<a b='xxx<'/>
+#errors
+1;10;lt in attr value;;;m
+#document
+| <{} a>
+|   b="xxx<"
+
+#data
+<a b="&lt;"/>
+#errors
+#document
+| <{} a>
+|   b="<"
+
+#data
+<a b="xxxxx&lt;"/>
+#errors
+#document
+| <{} a>
+|   b="xxxxx<"
+
+#data
+<a b="<<<"/>
+#errors
+1;7;lt in attr value;;;m
+1;8;lt in attr value;;;m
+1;9;lt in attr value;;;m
+#document
+| <{} a>
+|   b="<<<"
+
+#data
+<a b='<<<'/>
+#errors
+1;7;lt in attr value;;;m
+1;8;lt in attr value;;;m
+1;9;lt in attr value;;;m
+#document
+| <{} a>
+|   b="<<<"
+
+#data
+<a b=< />
+#errors
+1;6;unquoted attr value;;;m
+#document
+| <{} a>
+|   b="<"
+
+#data
+<a b=xxxx< />
+#errors
+1;6;unquoted attr value;;;m
+#document
+| <{} a>
+|   b="xxxx<"
+
+#data
+<a b/>
+#errors
+1;5;no attr value;;;m
+#document
+| <{} a>
+|   b=""
+
+#data
+<a bcd/>
+#errors
+1;7;no attr value;;;m
+#document
+| <{} a>
+|   bcd=""
+
+#data
+<a b />
+#errors
+1;6;no attr value;;;m
+#document
+| <{} a>
+|   b=""
+
+#data
+<a bcd />
+#errors
+1;8;no attr value;;;m
+#document
+| <{} a>
+|   bcd=""
+
+#data
+<a b></a>
+#errors
+1;5;no attr value;;;m
+#document
+| <{} a>
+|   b=""
+
+#data
+<a bcd></a>
+#errors
+1;7;no attr value;;;m
+#document
+| <{} a>
+|   bcd=""
+
+#data
+<a bcd ></a>
+#errors
+1;8;no attr value;;;m
+#document
+| <{} a>
+|   bcd=""
+
+#data
+<a b="" c d=""></a>
+#errors
+1;11;no attr value;;;m
+#document
+| <{} a>
+|   b=""
+|   c=""
+|   d=""

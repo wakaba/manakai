@@ -1,5 +1,14 @@
 2008-10-15  Wakaba  <wakaba@suika.fam.cx>
 
+	* Tokenizer.pm.src: Set index attribute to each attribute token,
+	for ignoring namespaced duplicate attribute at the XML namespace
+	parser layer.  Raise a parse error if the attribute value is
+	omitted, in XML mode.  Raise a parse error if the attribute value
+	is not quoted, in XML mode.  Raise a parse error if "<" character
+	is found in a quoted attribute value, in XML mode.
+
+2008-10-15  Wakaba  <wakaba@suika.fam.cx>
+
 	* Tokenizer.pm.src: XML tag name start character support for end
 	tags.  Support for the short end tag syntax of XML5.  Raise a
 	parse erorr for a lowercase <!doctype> in XML.

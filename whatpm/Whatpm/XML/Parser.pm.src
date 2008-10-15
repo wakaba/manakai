@@ -423,7 +423,9 @@ sub _tree_before_root_element ($) {
       $el->set_user_data (manakai_source_column => $token->{column});
 
       my $has_attr;
-      for my $attr_name (sort {$a cmp $b} keys %{$token->{attributes}}) {
+      for my $attr_name (sort {$token->{attributes}->{$a}->{index} <=>
+                               $token->{attributes}->{$b}->{index}}
+                         keys %{$token->{attributes}}) {
         my $ns;
         my ($p, $l) = split /:/, $attr_name, 2;
 
@@ -444,14 +446,8 @@ sub _tree_before_root_element ($) {
         }
         
         if ($has_attr->{defined $ns ? $ns : ''}->{$l}) {
-          ## NOTE: Attributes are sorted as Unicode characters (not
-          ## code units) of their names, for stable output.
-
-          ## TODO: Should be sorted by source order?
-          !!!parse-error (type => 'duplicate ns attr',
-                          token => $token,
-                          value => $attr_name);
-          next;
+          $ns = undef;
+          ($p, $l) = (undef, $attr_name);
         } else {
           $has_attr->{defined $ns ? $ns : ''}->{$l} = 1;
         }
@@ -608,7 +604,9 @@ sub _tree_in_element ($) {
       $el->set_user_data (manakai_source_column => $token->{column});
 
       my $has_attr;
-      for my $attr_name (sort {$a cmp $b} keys %{$token->{attributes}}) {
+      for my $attr_name (sort {$token->{attributes}->{$a}->{index} <=>
+                               $token->{attributes}->{$b}->{index}}
+                         keys %{$token->{attributes}}) {
         my $ns;
         my ($p, $l) = split /:/, $attr_name, 2;
 
@@ -629,14 +627,8 @@ sub _tree_in_element ($) {
         }
         
         if ($has_attr->{defined $ns ? $ns : ''}->{$l}) {
-          ## NOTE: Attributes are sorted as Unicode characters (not
-          ## code units) of their names, for stable output.
-
-          ## TODO: Should be sorted by source order?
-          !!!parse-error (type => 'duplicate ns attr',
-                          token => $token,
-                          value => $attr_name);
-          next;
+          $ns = undef;
+          ($p, $l) = (undef, $attr_name);
         } else {
           $has_attr->{defined $ns ? $ns : ''}->{$l} = 1;
         }
