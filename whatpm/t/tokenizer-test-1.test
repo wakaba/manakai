@@ -181,6 +181,18 @@
 "input": "<!DOCTYPE html PUBLIC 'c' 'a'b>",
 "output": ["ParseError", ["DOCTYPE", "html", "c", "a", true]]},
 
+{"description": "DOCTYPe",
+"input": "<!DOCTYPe html>",
+"output": [["DOCTYPE", "html", null, null, true]]},
+
+{"description": "PUBLIc",
+"input": "<!DOCTYPE html PUBLIc 'a' 'b'>",
+"output": [["DOCTYPE", "html", "a", "b", true]]},
+
+{"description": "SYSTEm",
+"input": "<!DOCTYPE html SYSTEm 'a'>",
+"output": [["DOCTYPE", "html", null, "a", true]]},
+
 {"description": "<!D>",
 "input": "<!D>",
 "output": ["ParseError", ["Comment", "D"]]},

@@ -133,6 +133,7 @@ my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}ns-elements-1.dat
   ${test_dir_name}ns-attrs-1.dat
   ${test_dir_name}doctypes-1.dat
+  ${test_dir_name}doctypes-2.dat
 ];
 
 require 't/testfiles.pl';
@@ -143,4 +144,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/15 08:05:48 $
+## $Date: 2008/10/15 12:49:49 $

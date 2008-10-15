@@ -1,5 +1,18 @@
 2008-10-15  Wakaba  <wakaba@suika.fam.cx>
 
+	* Tokenizer.pm.src: $self->{s_kwd} for non-DATA_STATE states are
+	renamed as $self->{kwd} to avoid confliction.  Don't raise
+	case-sensitivity error for the keyword "DOCTYPE" in HTML mode.
+	Support for internal subsets (internal subset itself only; no
+	declaration in them is supported yet).  Raise a parse error for
+	non-uppercase keywords "PUBLIC" and "SYSTEM" in XML mode.  Raise a
+	parse error if no system identifier is specified for a DOCTYPE
+	declaration with a public identifier.  Don't close the DOCTYPE
+	declaration by a ">" character in the system declaration in XML
+	mode.
+	
+2008-10-15  Wakaba  <wakaba@suika.fam.cx>
+
 	* Tokenizer.pm.src: Set index attribute to each attribute token,
 	for ignoring namespaced duplicate attribute at the XML namespace
 	parser layer.  Raise a parse error if the attribute value is

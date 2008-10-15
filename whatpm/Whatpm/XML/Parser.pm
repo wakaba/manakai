@@ -214,14 +214,6 @@ sub _terminate_tree_constructor ($) {
 
 ## XML5: No namespace support.
 
-## XML5: XML5 has "empty tag token".  In this implementation, it is
-## represented as a start tag token with $self->{self_closing} flag
-## set to true.
-
-## XML5: XML5 has "short end tag token".  In this implementation, it
-## is represented as an end tag token with $token->{tag_name} flag set
-## to an empty string.
-
 ## XML5: Start, main, end phases.  In this implementation, they are
 ## represented by insertion modes.
 
@@ -295,10 +287,8 @@ sub _tree_initial ($) {
       
       ## NOTE: Default value for both |public_id| and |system_id| attributes
       ## are empty strings, so that we don't set any value in missing cases.
-      $doctype->public_id ($token->{public_identifier})
-          if defined $token->{public_identifier};
-      $doctype->system_id ($token->{system_identifier})
-          if defined $token->{system_identifier};
+      $doctype->public_id ($token->{pubid}) if defined $token->{pubid};
+      $doctype->system_id ($token->{sysid}) if defined $token->{sysid};
       
       ## TODO: internal_subset
       

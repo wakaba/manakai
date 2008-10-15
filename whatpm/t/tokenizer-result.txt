@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Tue Oct 14 20:40:43 2008
-# Current time GMT:   Tue Oct 14 11:40:43 2008
+# Current time local: Wed Oct 15 21:40:49 2008
+# Current time GMT:   Wed Oct 15 12:40:49 2008
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -1021,8 +1021,11 @@ ok 961
 ok 962
 ok 963
 ok 964
-not ok 965
-# Test 965 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{DFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #965)
+ok 965
+ok 966
+ok 967
+not ok 968
+# Test 968 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{DFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #968)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{DFFF}'\n          ]\n        ];\n" (surrogate character reference: qq'&#xD800;\x{DFFF}')
 #     Lines 3-3 are missing:
 #      - "          [\n"
@@ -1032,9 +1035,6 @@ not ok 965
 #     Line 6 is changed:
 #      - "            qq'\\x{DFFF}'\n"
 #      + "            qq'\\x{FFFD}\\x{DFFF}'\n"
-ok 966
-ok 967
-ok 968
 ok 969
 ok 970
 ok 971
@@ -1196,3 +1196,6 @@ ok 1126
 ok 1127
 ok 1128
 ok 1129
+ok 1130
+ok 1131
+ok 1132

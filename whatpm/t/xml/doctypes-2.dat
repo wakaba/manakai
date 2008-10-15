@@ -1,0 +1,341 @@
+#data
+<!DOCTYPE a PUBLIC "b" "c"><a/>
+#errors
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b"><a/>
+#errors
+1;23;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "b" "">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" ><a/>
+#errors
+1;24;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "b" "">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b>c"><a/>
+#errors
+1;22;unclosed PUBLIC literal;;;m
+1;23;text outside of root element;;;m
+#document
+| <!DOCTYPE a "b" "">
+| "c">"
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" "c>d"><a/>
+#errors
+#document
+| <!DOCTYPE a "b" "c>d">
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM "b"><a/>
+#errors
+#document
+| <!DOCTYPE a "" "b">
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM "b>c"><a/>
+#errors
+#document
+| <!DOCTYPE a "" "b>c">
+| <{} a>
+
+#data
+<!DOCTYPE a public "b" "c"><a/>
+#errors
+1;13;lowercase keyword;PUBLIC;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIc "b" "c"><a/>
+#errors
+1;13;lowercase keyword;PUBLIC;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a system "b"><a/>
+#errors
+1;13;lowercase keyword;SYSTEM;;m
+#document
+| <!DOCTYPE a "" "b">
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEm "b"><a/>
+#errors
+1;13;lowercase keyword;SYSTEM;;m
+#document
+| <!DOCTYPE a "" "b">
+| <{} a>
+
+#data
+<!DOCTYPEabc><abc/>
+#errors
+1;10;no space before DOCTYPE name;;;m
+#document
+| <!DOCTYPE abc>
+| <{} abc>
+
+#data
+<!DOCTYPE[]><a/>
+#errors
+1;10;no space before DOCTYPE name;;;m
+1;10;no DOCTYPE name;;;m
+#document
+| <!DOCTYPE >
+| <{} a>
+
+#data
+<!DOCTYPE []><a/>
+#errors
+1;11;no DOCTYPE name;;;m
+#document
+| <!DOCTYPE >
+| <{} a>
+
+#data
+<!DOCTYPE a[]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a []><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC[]><a/>
+#errors
+1;19;no PUBLIC literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC []><a/>
+#errors
+1;20;no PUBLIC literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "[]"><a/>
+#errors
+1;24;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "[]" "">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b"[]><a/>
+#errors
+1;23;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "b" "">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" []><a/>
+#errors
+1;24;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "b" "">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" "[]"><a/>
+#errors
+#document
+| <!DOCTYPE a "b" "[]">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" "c"[]><a/>
+#errors
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" "c" []><a/>
+#errors
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" "c" d[]><a/>
+#errors
+1;28;string after SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" "c" de[]><a/>
+#errors
+1;28;string after SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" c[]><a/>
+#errors
+1;24;string after PUBLIC literal;;;m
+#document
+| <!DOCTYPE a "b" "">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" "c" d[]e><a/>
+#errors
+1;28;string after SYSTEM literal;;;m
+1;31;string after internal subset;;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b" "c" d[]e[]f><a/>
+#errors
+1;28;string after SYSTEM literal;;;m
+1;31;string after internal subset;;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b"[]"c"><a/>
+#errors
+1;23;no SYSTEM literal;;;m
+1;25;string after internal subset;;;m
+#document
+| <!DOCTYPE a "b" "">
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM[]><a/>
+#errors
+1;19;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM []><a/>
+#errors
+1;20;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM "b"[]><a/>
+#errors
+#document
+| <!DOCTYPE a "" "b">
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM "b" []><a/>
+#errors
+#document
+| <!DOCTYPE a "" "b">
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM "b" c[]><a/>
+#errors
+1;24;string after SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "" "b">
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM "b" cdefg[]><a/>
+#errors
+1;24;string after SYSTEM literal;;;m
+#document
+| <!DOCTYPE a "" "b">
+| <{} a>
+
+#data
+<!DOCTYPE a SYSTEM "b" c[]d><a/>
+#errors
+1;24;string after SYSTEM literal;;;m
+1;27;string after internal subset;;;m
+#document
+| <!DOCTYPE a "" "b">
+| <{} a>
+
+#data
+<!DOCTYPE a [
+#errors
+1;13;unclosed internal subset;;;m
+1;13;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[]
+#errors
+1;13;unclosed DOCTYPE;;;m
+1;13;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[?]><a/>
+#errors
+1;13;string in internal subset;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a [][]><a/>
+#errors
+1;15;string after internal subset;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a [][>]><a/>
+#errors
+1;15;string after internal subset;;;m
+1;17;text outside of root element;;;m
+#document
+| <!DOCTYPE a>
+| "]>"
+| <{} a>
+
+#data
+<!DOCTYPE a []a[]><a/>
+#errors
+1;15;string after internal subset;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
