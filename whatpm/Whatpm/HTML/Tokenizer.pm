@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -507,6 +507,8 @@ sub _get_next_token ($) {
       return  ($token);
       redo A;
     } elsif ($self->{state} == TAG_OPEN_STATE) {
+      ## XML5: "tag state".
+
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if ($self->{nc} == 0x002F) { # /
           
@@ -709,6 +711,8 @@ sub _get_next_token ($) {
       ## NOTE: The "close tag open state" in the spec is implemented as
       ## |CLOSE_TAG_OPEN_STATE| and |CDATA_RCDATA_CLOSE_TAG_STATE|.
 
+      ## XML5: "end tag state".
+
       my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1); # "<"of"</"
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if (defined $self->{last_stag_name}) {
@@ -770,13 +774,25 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty end tag',
                         line => $self->{line_prev}, ## "<" in "</>"
                         column => $self->{column_prev} - 1);
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
-        
+        if ($self->{is_xml}) {
+          
+          ## XML5: No parse error.
+          
+          ## NOTE: This parser raises a parse error, since it supports
+          ## XML1, not XML5.
+
+          ## NOTE: A short end tag token.
+          my $ct = {type => END_TAG_TOKEN,
+                    tag_name => '',
+                    line => $self->{line_prev},
+                    column => $self->{column_prev} - 1,
+                   };
+          
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -787,6 +803,21 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+          return  ($ct);
+        } else {
+          
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        }
         redo A;
       } elsif ($self->{nc} == -1) {
         
@@ -800,9 +831,12 @@ sub _get_next_token ($) {
                  });
 
         redo A;
-      } else {
+      } elsif (not $self->{is_xml} or
+               $is_space->{$self->{nc}}) {
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus end tag');
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bogus end tag',
+                        line => $self->{line_prev}, # "<" of "</"
+                        column => $self->{column_prev} - 1);
         $self->{state} = BOGUS_COMMENT_STATE;
         $self->{ct} = {type => COMMENT_TOKEN, data => '',
                                   line => $self->{line_prev}, # "<" of "</"
@@ -814,6 +848,25 @@ sub _get_next_token ($) {
         ## it will be included to the |data| of the comment token
         ## generated from the bogus end tag, as defined in the
         ## "bogus comment state" entry.
+        redo A;
+      } else {
+        ## XML5: "</:" is a parse error.
+        
+        $self->{ct} = {type => END_TAG_TOKEN,
+                       tag_name => chr ($self->{nc}),
+                       line => $l, column => $c};
+        $self->{state} = TAG_NAME_STATE; ## XML5: "end tag name state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
         redo A;
       }
     } elsif ($self->{state} == CDATA_RCDATA_CLOSE_TAG_STATE) {
@@ -2152,7 +2205,7 @@ sub _get_next_token ($) {
                                   line => $self->{line_prev},
                                   column => $self->{column_prev} - 2,
                                  };
-        $self->{state} = COMMENT_START_STATE;
+        $self->{state} = COMMENT_START_STATE; ## XML5: "comment state".
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -2215,7 +2268,16 @@ sub _get_next_token ($) {
       } elsif ((length $self->{s_kwd}) == 6 and
                ($self->{nc} == 0x0045 or # E
                 $self->{nc} == 0x0065)) { # e
-        
+        if ($self->{s_kwd} ne 'DOCTYP') {
+          
+          ## XML5: case-sensitive.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'lowercase keyword', ## TODO
+                          text => 'DOCTYPE',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 5);
+        } else {
+          
+        }
         $self->{state} = DOCTYPE_STATE;
         $self->{ct} = {type => DOCTYPE_TOKEN,
                                   quirks => 1,
@@ -2492,6 +2554,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == COMMENT_END_DASH_STATE) {
+      ## XML5: "comment dash state".
+
       if ($self->{nc} == 0x002D) { # -
         
         $self->{state} = COMMENT_END_STATE;
@@ -2557,6 +2621,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == 0x002D) { # -
         
+        ## XML5: Not a parse error.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'dash in comment',
                         line => $self->{line_prev},
                         column => $self->{column_prev});
@@ -2586,6 +2651,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
+        ## XML5: Not a parse error.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'dash in comment',
                         line => $self->{line_prev},
                         column => $self->{column_prev});
@@ -3671,6 +3737,8 @@ sub _get_next_token ($) {
       ## NOTE: "CDATA section state" in the state is jointly implemented
       ## by three states, |CDATA_SECTION_STATE|, |CDATA_SECTION_MSE1_STATE|,
       ## and |CDATA_SECTION_MSE2_STATE|.
+
+      ## XML5: "CDATA state".
       
       if ($self->{nc} == 0x005D) { # ]
         
@@ -3697,17 +3765,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
+        ## Reconsume.
         if (length $self->{ct}->{data}) { # character
           
           return  ($self->{ct}); # character
@@ -3740,6 +3798,8 @@ sub _get_next_token ($) {
 
       ## ISSUE: "text tokens" in spec.
     } elsif ($self->{state} == CDATA_SECTION_MSE1_STATE) {
+      ## XML5: "CDATA bracket state".
+
       if ($self->{nc} == 0x005D) { # ]
         
         $self->{state} = CDATA_SECTION_MSE2_STATE;
@@ -3757,12 +3817,15 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
+        ## XML5: If EOF, "]" is not appended and changed to the data state.
         $self->{ct}->{data} .= ']';
-        $self->{state} = CDATA_SECTION_STATE;
+        $self->{state} = CDATA_SECTION_STATE; ## XML5: Stay in the state.
         ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == CDATA_SECTION_MSE2_STATE) {
+      ## XML5: "CDATA end state".
+
       if ($self->{nc} == 0x003E) { # >
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
@@ -3805,7 +3868,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{data} .= ']]'; # character
         $self->{state} = CDATA_SECTION_STATE;
-        ## Reconsume.
+        ## Reconsume. ## XML5: Emit.
         redo A;
       }
     } elsif ($self->{state} == ENTITY_STATE) {
@@ -4557,4 +4620,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/15 08:05:47 $
+## $Date: 2008/10/15 08:51:02 $

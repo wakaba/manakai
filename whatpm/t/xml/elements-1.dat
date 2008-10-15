@@ -88,3 +88,62 @@
 #errors
 #document escaped
 | <{} \u4e00\u4e01>
+
+#data
+<[]a></[]a>
+#errors
+#document
+| <{} []a>
+
+#data escaped
+<\u4e00\u4e01></\u4e00\u4e01>
+#errors
+#document escaped
+| <{} \u4e00\u4e01>
+
+#data
+<:></:>
+#errors
+#document
+| <{} :>
+
+#data
+<:a:></:a:>
+#errors
+#document
+| <{} :a:>
+
+#data
+<a></><!---->
+#errors
+1;4;empty end tag;;;m
+#document
+| <{} a>
+| <!--  -->
+
+#data
+<a><b><c></></></a>
+#errors
+1;10;empty end tag;;;m
+1;13;empty end tag;;;m
+#document
+| <{} a>
+|   <{} b>
+|     <{} c>
+
+#data
+<a></ >
+#errors
+1;4;bogus end tag;;;m
+1;7;in body:#eof;;;m
+#document
+| <{} a>
+|   <!--   -->
+
+#data escaped
+<\u4e00\u4e01>a</\u3000\u3001>b</\u4e00\u4e01>
+#errors escaped
+1;6;unmatched end tag;\u3000\u3001;;m
+#document escaped
+| <{} \u4e00\u4e01>
+|   "ab"

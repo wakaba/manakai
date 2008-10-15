@@ -1,0 +1,54 @@
+#data
+]]>
+#errors
+1;1;unmatched mse;;;m
+1;1;text outside of root element;;;m
+1;3;no root element;;;m
+#document
+| "]]>"
+
+#data
+]]]]>
+#errors
+1;3;unmatched mse;;;m
+1;1;text outside of root element;;;m
+1;5;no root element;;;m
+#document
+| "]]]]>"
+
+#data
+aa]]>bb
+#errors
+1;3;unmatched mse;;;m
+1;1;text outside of root element;;;m
+1;7;no root element;;;m
+#document
+| "aa]]>bb"
+
+#data
+<![CDATA[]]>]]>
+#errors
+1;13;unmatched mse;;;m
+1;1;cdata outside of root element;;;m
+1;15;no root element;;;m
+#document
+| "]]>"
+
+#data
+<a/>]]>
+#errors
+1;5;unmatched mse;;;m
+1;5;text outside of root element;;;m
+#document
+| <{} a>
+| "]]>"
+
+#data
+<!---->]]>
+#errors
+1;8;unmatched mse;;;m
+1;8;text outside of root element;;;m
+1;10;no root element;;;m
+#document
+| <!--  -->
+| "]]>"
