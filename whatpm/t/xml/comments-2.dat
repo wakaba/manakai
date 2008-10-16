@@ -1,0 +1,170 @@
+#data
+<!DOCTYPE a[
+<!---->
+<?x?>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!--<?y?>-->
+<?x?>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!---->
+<?x?>
+<!--]><b/>-->
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+< >
+<?x?>
+]><a/>
+#errors
+2;1;bare stago;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!  >
+<?x?>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<b>bbb</b>ccc
+<?x?>
+]><a/>
+#errors
+2;1;bare stago;;;m
+2;4;string in internal subset;;;m
+2;7;bare stago;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<[[xxxx]]>
+<?x?>
+]><a/>
+#errors
+2;1;bare stago;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!--><?y?>
+]><a/>
+#errors
+2;5;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <?y ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x?><!--
+#errors
+2;9;unclosed comment;;;m
+2;9;unclosed internal subset;;;m
+2;9;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+
+#data
+<!DOCTYPE a[
+<!---><?y?>
+]><a/>
+#errors
+2;6;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <?y ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x?><!---
+#errors
+2;10;unclosed comment;;;m
+2;10;unclosed internal subset;;;m
+2;10;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+
+#data
+<!DOCTYPE a[
+<?x?><!--z
+#errors
+2;10;unclosed comment;;;m
+2;10;unclosed internal subset;;;m
+2;10;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+
+#data
+<!DOCTYPE a[
+<?x?><!--z-
+#errors
+2;11;unclosed comment;;;m
+2;11;unclosed internal subset;;;m
+2;11;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+
+#data
+<!DOCTYPE a[
+<!--z--><?y?>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?y ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x?><!--z--
+#errors
+2;12;unclosed comment;;;m
+2;12;unclosed internal subset;;;m
+2;12;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>

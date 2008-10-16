@@ -1,0 +1,153 @@
+#data
+<!DOCTYPE a[
+<?x?>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x y?>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x y?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x?>
+<?y?>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+|   <?y ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x?>
+]>
+<?y?>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <?y ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x ?>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x ??y?>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <?x ??y?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<?x
+#errors
+2;3;no pic;;;m
+2;3;unclosed internal subset;;;m
+2;3;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+
+#data escaped
+<!DOCTYPE a[
+<?x\u0020
+#errors
+2;4;no pic;;;m
+2;4;unclosed internal subset;;;m
+2;4;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+
+#data
+<!DOCTYPE a[
+<?x y
+#errors
+2;5;no pic;;;m
+2;5;unclosed internal subset;;;m
+2;5;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x y?>
+
+#data
+<!DOCTYPE a[
+<?x ?
+#errors
+2;5;no pic;;;m
+2;5;unclosed internal subset;;;m
+2;5;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ??>
+
+#data
+<!DOCTYPE a[
+<?
+#errors
+2;1;bare pio;;;m
+2;2;unclosed internal subset;;;m
+2;2;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<?>
+#errors
+2;3;no pic;;;m
+2;3;unclosed internal subset;;;m
+2;3;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?> ?>
+
+#data
+<!DOCTYPE a[
+<?>
+]><a/>
+#errors
+3;6;no pic;;;m
+3;6;unclosed internal subset;;;m
+3;6;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <?> ]><a/>?>
+
+#data
+<!DOCTYPE a[
+<??>
+<?x?>
+]><a/>
+#errors
+2;1;bare pio;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+| <{} a>

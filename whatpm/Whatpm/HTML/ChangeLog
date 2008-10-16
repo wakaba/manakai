@@ -1,3 +1,16 @@
+2008-10-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* Tokenizer.pm.src: New token type END_OF_DOCTYPE_TOKEN added.
+	New states DOCTYPE_TAG_STATE and
+	BOGUS_DOCTYPE_INTERNAL_SUBSET_AFTER_STATE are added.  (Bogus
+	string after the internal subset, which was handled by the state
+	BOGUS_DOCTYPE_STATE, are now handled by the new state.)  Support
+	for comments, bogus comments, and processing instructions in the
+	internal subset.  If there is the internal subset, then emit the
+	doctype token before the internal subset (with its
+	$token->{has_internal_subset} flag set) and an
+	END_OF_DOCTYPE_TOKEN after the internal subset.
+
 2008-10-15  Wakaba  <wakaba@suika.fam.cx>
 
 	* Tokenizer.pm.src: $self->{s_kwd} for non-DATA_STATE states are

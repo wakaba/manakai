@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -15,6 +15,7 @@ BEGIN {
     CHARACTER_TOKEN
     PI_TOKEN
     ABORT_TOKEN
+    END_OF_DOCTYPE_TOKEN
   );
   
   our %EXPORT_TAGS = (
@@ -27,6 +28,7 @@ BEGIN {
       CHARACTER_TOKEN
       PI_TOKEN
       ABORT_TOKEN
+      END_OF_DOCTYPE_TOKEN
     )],
   );
 }
@@ -43,6 +45,7 @@ sub END_OF_FILE_TOKEN () { 5 }
 sub CHARACTER_TOKEN () { 6 }
 sub PI_TOKEN () { 7 } ## NOTE: XML only.
 sub ABORT_TOKEN () { 8 } ## NOTE: For internal processing.
+sub END_OF_DOCTYPE_TOKEN () { 9 } ## NOTE: XML only
 
 ## XML5: XML5 has "empty tag token".  In this implementation, it is
 ## represented as a start tag token with $self->{self_closing} flag
@@ -133,6 +136,8 @@ sub PI_AFTER_STATE () { 55 }
 sub PI_DATA_AFTER_STATE () { 56 }
 sub DOCTYPE_INTERNAL_SUBSET_STATE () { 57 }
 sub DOCTYPE_INTERNAL_SUBSET_AFTER_STATE () { 58 }
+sub DOCTYPE_TAG_STATE () { 59 }
+sub BOGUS_DOCTYPE_INTERNAL_SUBSET_AFTER_STATE () { 60 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -1563,23 +1568,31 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
-      ## (only happen if PCDATA state)
-
       ## NOTE: Unlike spec's "bogus comment state", this implementation
       ## consumes characters one-by-one basis.
       
       if ($self->{nc} == 0x003E) { # >
-        !!!cp (124);
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (123);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (124);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         !!!next-input-character;
 
         !!!emit ($self->{ct}); # comment
         redo A;
       } elsif ($self->{nc} == -1) { 
-        !!!cp (125);
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (125.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (125);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         ## reconsume
 
         !!!emit ($self->{ct}); # comment
@@ -1596,7 +1609,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
-      ## (only happen if PCDATA state)
+      ## XML5: "Markup declaration state" and "DOCTYPE markup
+      ## declaration state".
       
       if ($self->{nc} == 0x002D) { # -
         !!!cp (133);
@@ -1772,20 +1786,30 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
-        !!!cp (138);
         !!!parse-error (type => 'bogus comment');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (138.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (138);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         !!!next-input-character;
 
         !!!emit ($self->{ct}); # comment
 
         redo A;
       } elsif ($self->{nc} == -1) {
-        !!!cp (139);
         !!!parse-error (type => 'unclosed comment');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (139.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (139);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         ## reconsume
 
         !!!emit ($self->{ct}); # comment
@@ -1806,20 +1830,30 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
-        !!!cp (142);
         !!!parse-error (type => 'bogus comment');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (142.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (142);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         !!!next-input-character;
 
         !!!emit ($self->{ct}); # comment
 
         redo A;
       } elsif ($self->{nc} == -1) {
-        !!!cp (143);
         !!!parse-error (type => 'unclosed comment');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (143.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (143);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         ## reconsume
 
         !!!emit ($self->{ct}); # comment
@@ -1840,10 +1874,15 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == -1) {
-        !!!cp (146);
         !!!parse-error (type => 'unclosed comment');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (146.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (146);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         ## reconsume
 
         !!!emit ($self->{ct}); # comment
@@ -1869,10 +1908,15 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == -1) {
-        !!!cp (149);
         !!!parse-error (type => 'unclosed comment');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (149.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (149);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         ## reconsume
 
         !!!emit ($self->{ct}); # comment
@@ -1887,9 +1931,14 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == COMMENT_END_STATE) {
       if ($self->{nc} == 0x003E) { # >
-        !!!cp (151);
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (151.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (151);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         !!!next-input-character;
 
         !!!emit ($self->{ct}); # comment
@@ -1906,10 +1955,15 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == -1) {
-        !!!cp (153);
         !!!parse-error (type => 'unclosed comment');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          !!!cp (153.1);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (153);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         ## reconsume
 
         !!!emit ($self->{ct}); # comment
@@ -1973,7 +2027,10 @@ sub _get_next_token ($) {
         !!!cp (159.1);
         !!!parse-error (type => 'no DOCTYPE name');
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
         !!!next-input-character;
+        !!!emit ($self->{ct}); # DOCTYPE
         redo A;
       } else {
         !!!cp (160);
@@ -2016,7 +2073,10 @@ sub _get_next_token ($) {
       } elsif ($self->{is_xml} and $self->{nc} == 0x005B) { # [
         !!!cp (163.1);
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
         !!!next-input-character;
+        !!!emit ($self->{ct}); # DOCTYPE
         redo A;
       } else {
         !!!cp (164);
@@ -2073,7 +2133,9 @@ sub _get_next_token ($) {
         !!!cp (167.3);
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
         !!!next-input-character;
+        !!!emit ($self->{ct}); # DOCTYPE
         redo A;
       } else {
         !!!cp (180);
@@ -2227,7 +2289,9 @@ sub _get_next_token ($) {
         !!!parse-error (type => 'no PUBLIC literal');
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
         !!!next-input-character;
+        !!!emit ($self->{ct}); # DOCTYPE
         redo A;
       } else {
         !!!cp (186);
@@ -2369,7 +2433,9 @@ sub _get_next_token ($) {
         !!!parse-error (type => 'no SYSTEM literal');
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
         !!!next-input-character;
+        !!!emit ($self->{ct}); # DOCTYPE
         redo A;
       } else {
         !!!cp (200);
@@ -2427,7 +2493,9 @@ sub _get_next_token ($) {
 
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
         !!!next-input-character;
+        !!!emit ($self->{ct}); # DOCTYPE
         redo A;
       } else {
         !!!cp (206);
@@ -2550,7 +2618,9 @@ sub _get_next_token ($) {
         !!!cp (218.1);
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
         !!!next-input-character;
+        !!!emit ($self->{ct}); # DOCTYPE
         redo A;
       } else {
         !!!cp (218);
@@ -2572,18 +2642,13 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{is_xml} and $self->{nc} == 0x005B) { # [
-        if ($self->{ct}->{has_internal_subset}) { # DOCTYPE
-          !!!cp (220.2);
-          ## Stay in the state.
-          !!!next-input-character;
-          redo A;
-        } else {
-          !!!cp (220.1);
-          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-          $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
-          !!!next-input-character;
-          redo A;
-        }
+        !!!cp (220.1);
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
+        !!!next-input-character;
+        !!!emit ($self->{ct}); # DOCTYPE
+        redo A;
       } elsif ($self->{nc} == -1) {
         !!!cp (220);
         $self->{state} = DATA_STATE;
@@ -3099,8 +3164,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         !!!parse-error (type => 'no pic'); ## TODO: type
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         ## Reconsume.
         !!!emit ($self->{ct}); # pi
         redo A;
@@ -3131,8 +3200,12 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         !!!parse-error (type => 'no pic'); ## TODO: type
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         ## Reprocess.
         !!!emit ($self->{ct}); # pi
         redo A;
@@ -3147,8 +3220,12 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == PI_AFTER_STATE) {
       if ($self->{nc} == 0x003E) { # >
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         !!!next-input-character;
         !!!emit ($self->{ct}); # pi
         redo A;
@@ -3173,8 +3250,12 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == PI_DATA_AFTER_STATE) {
       ## XML5: Same as "pi after state" in XML5
       if ($self->{nc} == 0x003E) { # >
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{in_subset}) {
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
         !!!next-input-character;
         !!!emit ($self->{ct}); # pi
         redo A;
@@ -3192,7 +3273,7 @@ sub _get_next_token ($) {
 
     } elsif ($self->{state} == DOCTYPE_INTERNAL_SUBSET_STATE) {
       if ($self->{nc} == 0x003C) { # <
-        ## TODO:
+        $self->{state} = DOCTYPE_TAG_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x0025) { # %
@@ -3202,6 +3283,7 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x005D) { # ]
+        delete $self->{in_subset};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_AFTER_STATE;
         !!!next-input-character;
         redo A;
@@ -3211,10 +3293,11 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         !!!parse-error (type => 'unclosed internal subset'); ## TODO: type
+        delete $self->{in_subset};
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
         ## Reconsume.
-        !!!emit ($self->{ct}); # DOCTYPE
+        !!!emit ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
       } else {
         unless ($self->{internal_subset_tainted}) {
@@ -3231,20 +3314,64 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
         !!!next-input-character;
-        !!!emit ($self->{ct}); # DOCTYPE
+        !!!emit ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
       } elsif ($self->{nc} == -1) {
         !!!parse-error (type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
         ## Reconsume.
-        !!!emit ($self->{ct}); # DOCTYPE
+        !!!emit ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
       } else {
         ## XML5: No parse error and stay in the state.
         !!!parse-error (type => 'string after internal subset'); ## TODO: type
 
-        $self->{state} = BOGUS_DOCTYPE_STATE;
+        $self->{state} = BOGUS_DOCTYPE_INTERNAL_SUBSET_AFTER_STATE;
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} == BOGUS_DOCTYPE_INTERNAL_SUBSET_AFTER_STATE) {
+      if ($self->{nc} == 0x003E) { # >
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        !!!next-input-character;
+        !!!emit ({type => END_OF_DOCTYPE_TOKEN});
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        ## Reconsume.
+        !!!emit ({type => END_OF_DOCTYPE_TOKEN});
+        redo A;
+      } else {
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_TAG_STATE) {
+      if ($self->{nc} == 0x0021) { # !
+        $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x003F) { # ?
+        $self->{state} = PI_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'bare stago');
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        ## Reconsume.
+        redo A;
+      } else {
+        !!!parse-error (type => 'bare stago', ## XML5: Not a parse error.
+                        line => $self->{line_prev},
+                        column => $self->{column_prev});
+        $self->{state} = BOGUS_COMMENT_STATE;
+        $self->{ct} = {type => COMMENT_TOKEN,
+                       data => '',
+                      }; ## NOTE: Will be discarded.
         !!!next-input-character;
         redo A;
       }
@@ -3258,4 +3385,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/15 12:49:49 $
+## $Date: 2008/10/16 03:39:57 $

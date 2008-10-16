@@ -127,7 +127,9 @@ my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}texts-1.dat
   ${test_dir_name}cdata-1.dat
   ${test_dir_name}charref-1.dat
+  ${test_dir_name}comments-2.dat
   ${test_dir_name}pis-1.dat
+  ${test_dir_name}pis-2.dat
   ${test_dir_name}xmldecls-1.dat
   ${test_dir_name}tree-1.dat
   ${test_dir_name}ns-elements-1.dat
@@ -144,4 +146,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/15 12:49:49 $
+## $Date: 2008/10/16 03:39:57 $

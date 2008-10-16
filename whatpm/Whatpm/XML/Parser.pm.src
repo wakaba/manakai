@@ -222,6 +222,7 @@ sub INITIAL_IM () { 0 }
 sub BEFORE_ROOT_ELEMENT_IM () { 1 }
 sub IN_ELEMENT_IM () { 2 }
 sub AFTER_ROOT_ELEMENT_IM () { 3 }
+sub IN_SUBSET_IM () { 4 }
 
 {
 my $token; ## TODO: change to $self->{t}
@@ -261,6 +262,8 @@ sub _construct_tree ($) {
   while (1) {
     if ($self->{insertion_mode} == IN_ELEMENT_IM) {
       $self->_tree_in_element;
+    } elsif ($self->{insertion_mode} == IN_SUBSET_IM) {
+      $self->_tree_in_subset;
     } elsif ($self->{insertion_mode} == AFTER_ROOT_ELEMENT_IM) {
       $self->_tree_after_root_element;
     } elsif ($self->{insertion_mode} == BEFORE_ROOT_ELEMENT_IM) {
@@ -293,8 +296,14 @@ sub _tree_initial ($) {
       ## TODO: internal_subset
       
       $self->{document}->append_child ($doctype);
-      
-      $self->{insertion_mode} = BEFORE_ROOT_ELEMENT_IM;
+
+      ## XML5: No "has internal subset" flag.
+      if ($token->{has_internal_subset}) {
+        $self->{doctype} = $doctype;
+        $self->{insertion_mode} = IN_SUBSET_IM;
+      } else {
+        $self->{insertion_mode} = BEFORE_ROOT_ELEMENT_IM;
+      }
       !!!next-token;
       return;
     } elsif ($token->{type} == START_TAG_TOKEN or
@@ -790,6 +799,38 @@ sub _tree_after_root_element ($) {
     }
   } # B
 } # _tree_after_root_element
+
+sub _tree_in_subset ($) {
+  my $self = shift;
+
+  B: while (1) {
+    if ($token->{type} == COMMENT_TOKEN) {
+      ## Ignore the token.
+
+      ## Stay in the state.
+      !!!next-token;
+      next B;
+    } elsif ($token->{type} == PI_TOKEN) {
+      my $pi = $self->{document}->create_processing_instruction
+          ($token->{target}, $token->{data});
+      $self->{doctype}->append_child ($pi);
+      ## TODO: line/col
+      
+      ## Stay in the mode.
+      !!!next-token;
+      next B;
+    } elsif ($token->{type} == END_OF_DOCTYPE_TOKEN) {
+      $self->{insertion_mode} = BEFORE_ROOT_ELEMENT_IM;
+      !!!next-token;
+      return;
+    } elsif ($token->{type} == ABORT_TOKEN) {
+      return;
+    } else {
+      die "$0: XML parser subset im: Unknown token type $token->{type}";
+    }
+  } # B
+
+} # _tree_in_subset
 
 }
 
