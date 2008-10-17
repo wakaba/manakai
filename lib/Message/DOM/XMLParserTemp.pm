@@ -1,7 +1,7 @@
 # -*- mode: fundamental -*- # cperl-mode takes very long time to parse
 package Message::DOM::XMLParserTemp;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::DOM::DOMCore::ManakaiDOMError;
 push our @ISA, 'Message::DOM::DOMError';
@@ -381,7 +381,7 @@ sub parse_byte_stream ($$$$%) {
 
   $self->{onerror} = $onerror || sub { warn $_[0] };
 
-  require Whatpm::Charset::DecodeHandle;
+  require Whatpm::Charset::DecodeHandleOld;
   my $encode_uri = defined $opt{charset}
       ? Whatpm::Charset::DecodeHandle->name_to_uri (xml => $opt{charset})
       : 'http://suika.fam.cx/www/2006/03/xml-entity/';
@@ -48373,4 +48373,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 12:54:06 $
+## $Date: 2008/10/17 07:15:22 $

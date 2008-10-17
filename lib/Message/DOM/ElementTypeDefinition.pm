@@ -1,12 +1,13 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
   $$self->{node_name} = $_[0];
+  $$self->{content_model} = '';
   return $self;
 } # ____new
              
@@ -79,6 +80,15 @@ sub attribute_definitions ($) {
 } # attribute_definitions
 
 sub owner_document_type_definition ($);
+
+## TODO: documentation
+sub content_model_text ($) {
+  if (@_ > 1) {
+    ## TODO: normalization
+    ${$_[0]}->{content_model} = ''.$_[1];
+  }
+  return ${$_[0]}->{content_model};
+} # content_model_text
 
 ## |ElementTypeDefinition| methods
 
@@ -168,4 +178,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/12/22 06:29:32 $
+## $Date: 2008/10/17 07:15:22 $
