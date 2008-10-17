@@ -347,3 +347,65 @@
 1;17;no root element;;;m
 #document
 | <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!>
+<!ATTLIST b>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!UNKNOWN>
+<!ATTLIST b>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!E>
+<!ATTLIST b>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!EXT>
+<!ATTLIST b>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+<!E
+#errors
+3;1;bogus comment;;;m
+3;3;unclosed internal subset;;;m
+3;3;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+

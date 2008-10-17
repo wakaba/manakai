@@ -1,3 +1,25 @@
+2008-10-17  Wakaba  <wakaba@suika.fam.cx>
+
+	* NanoDOM.pm (node_name): New attribute.
+	(ELEMENT_TYPE_DEFINITION_NODE, ATTRIBUTE_DEFINITION_NODE): New
+	constants.
+	(create_element_type_definition_node, create_attribute_definition,
+	create_notation, create_general_entity,
+	get_element_type_definition_node,
+	set_element_type_definition_node, get_general_entity_node,
+	set_general_entity_node, get_notation_node, set_notation_node,
+	get_attribute_definition_node, set_attribute_definition_node): New
+	methods.
+	(element_types, entities, notations, attribute_definitions): New
+	attributes.
+	(DocumentType): Support for child nodes, entities, notations, and
+	element types.
+	(Entity, Notation, ElementTypeDefinition, AttributeDefinition):
+	New classes.
+
+	* Dumper.pm: Support for general entities, notations, element type
+	definitions, and attribute definitions.
+
 2008-10-15  Wakaba  <wakaba@suika.fam.cx>
 
 	* NanoDOM.pm (create_processing_instruction): New method.

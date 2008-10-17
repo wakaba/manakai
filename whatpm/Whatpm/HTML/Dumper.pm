@@ -1,6 +1,6 @@
 package Whatpm::HTML::Dumper;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -69,10 +69,65 @@ sub dumptree ($) {
       }
       $r .= ">\x0A";
       unshift @node,
-        map { [$_, $child->[1] . '  '] } @{$child->[0]->child_nodes};
+          map { [$_, $child->[1] . '  '] }
+          sort { $a->node_name cmp $b->node_name }
+          values %{$child->[0]->element_types};
+      unshift @node,
+          map { [$_, $child->[1] . '  '] }
+          sort { $a->node_name cmp $b->node_name }
+          values %{$child->[0]->entities};
+      unshift @node,
+          map { [$_, $child->[1] . '  '] }
+          sort { $a->node_name cmp $b->node_name }
+          values %{$child->[0]->notations};
+      unshift @node,
+          map { [$_, $child->[1] . '  '] } @{$child->[0]->child_nodes};
     } elsif ($nt == $child->[0]->PROCESSING_INSTRUCTION_NODE) {
       $r .= $child->[1] . '<?' . $child->[0]->target . ' ';
       $r .= $child->[0]->data . "?>\x0A";
+    } elsif ($nt == $child->[0]->ENTITY_NODE) {
+      $r .= $child->[1] . '<!ENTITY ' . $child->[0]->node_name . ' "';
+      $r .= $child->[0]->public_id if defined $child->[0]->public_id;
+      $r .= '" "';
+      $r .= $child->[0]->system_id if defined $child->[0]->system_id;
+      $r .= '" ';
+      $r .= $child->[0]->notation_name if defined $child->[0]->notation_name;
+      $r .= ">\x0A";
+      unshift @node,
+          map { [$_, $child->[1] . '  '] } @{$child->[0]->child_nodes};
+    } elsif ($nt == $child->[0]->NOTATION_NODE) {
+      $r .= $child->[1] . '<!NOTATION ' . $child->[0]->node_name . ' "';
+      $r .= $child->[0]->public_id if defined $child->[0]->public_id;
+      $r .= '" "';
+      $r .= $child->[0]->system_id if defined $child->[0]->system_id;
+      $r .= qq[">\x0A];
+    } elsif ($nt == $child->[0]->ELEMENT_TYPE_DEFINITION_NODE) {
+      $r .= $child->[1] . '<!ELEMENT ' . $child->[0]->node_name . ' ';
+      $r .= $child->[0]->content_model_text;
+      $r .= ">\x0A";
+      unshift @node,
+          map { [$_, $child->[1] . '  '] }
+          sort { $a->node_name cmp $b->node_name }
+          values %{$child->[0]->attribute_definitions};
+    } elsif ($nt == $child->[0]->ATTRIBUTE_DEFINITION_NODE) {
+      $r .= $child->[1] . $child->[0]->node_name . ' ';
+      $r .= [
+        0, 'CDATA', 'ID', 'IDREF', 'IDREFS', 'ENTITY', 'ENTITIES',
+        'NMTOKEN', 'NMTOKENS', 'NOTATION', 'ENUMERATION', 11,
+      ]->[$child->[0]->declared_type] || $child->[0]->declared_type;
+      if ($child->[0]->declared_type == 9 or
+          $child->[0]->declared_type == 10) {
+        $r .= '(' . join ('|', @{$child->[0]->allowed_tokens}) . ')';
+      }
+      $r .= ' ';
+      $r .= [
+        0, 'FIXED', 'REQUIRED', 'IMPLIED', 'EXPLICIT',
+      ]->[$child->[0]->default_type] || $child->[0]->default_type;
+      if ($child->[0]->default_type == 1 or
+          $child->[0]->default_type == 4) {
+        $r .= ' "' . $child->[0]->text_content . '"';
+      }
+      $r .= "\x0A";
     } else {
       $r .= $child->[1] . $child->[0]->node_type . "\x0A"; # error
     }
@@ -85,4 +140,4 @@ sub dumptree ($) {
 ## TDOO: Document
 
 1;
-## $Date: 2008/10/14 10:36:33 $
+## $Date: 2008/10/17 07:14:29 $

@@ -810,6 +810,101 @@ sub _tree_in_subset ($) {
       ## Stay in the state.
       $token = $self->_get_next_token;
       next B;
+    } elsif ($token->{type} == ELEMENT_TOKEN) {
+      unless ($self->{doctype}->get_element_type_definition_node
+                ($token->{name})) {
+        my $node = $self->{document}->create_element_type_definition
+            ($token->{name});
+        $node->set_user_data (manakai_source_line => $token->{line});
+        $node->set_user_data (manakai_source_column => $token->{column});
+        
+        ## TODO: ...
+        
+        $self->{doctype}->set_element_type_definition_node ($node);
+      } else {
+        ## TODO: ...
+        
+      }
+
+      ## Stay in the mode.
+      $token = $self->_get_next_token;
+      next B;
+    } elsif ($token->{type} == ATTLIST_TOKEN) {
+      my $ed = $self->{doctype}->get_element_type_definition_node
+          ($token->{name});
+      unless ($ed) {
+        $ed = $self->{document}->create_element_type_definition
+            ($token->{name});
+        $ed->set_user_data (manakai_source_line => $token->{line});
+        $ed->set_user_data (manakai_source_column => $token->{column});
+        $self->{doctype}->set_element_type_definition_node ($ed);
+      }
+
+=pod
+
+      unless ($ed->get_attribute_definition_node ($token->{name})) {
+        my $node = $self->{document}->create_attribute_definition
+            ($token->{name});
+        $node->set_user_data (manakai_source_line => $token->{line});
+        $node->set_user_data (manakai_source_column => $token->{column});
+
+        ## TODO: ...
+        
+        $ed->set_attribute_definition_node ($node);
+      } else {
+        ## TODO: ...
+        
+      }
+
+=cut
+
+      ## Stay in the mode.
+      $token = $self->_get_next_token;
+      next B;
+    } elsif ($token->{type} == GENERAL_ENTITY_TOKEN) {
+      ## TODO: Creates a node only if the token is an external entity.
+
+      unless ($self->{doctype}->get_general_entity_node
+                ($token->{name})) {
+        my $node = $self->{document}->create_general_entity ($token->{name});
+        $node->set_user_data (manakai_source_line => $token->{line});
+        $node->set_user_data (manakai_source_column => $token->{column});
+        
+        ## TODO: ...
+        
+        $self->{doctype}->set_general_entity_node ($node);
+      } else {
+        ## TODO: ...
+        
+      }
+
+      ## Stay in the mode.
+      $token = $self->_get_next_token;
+      next B;
+    } elsif ($token->{type} == PARAMETER_ENTITY_TOKEN) {
+      ## TODO: ...
+
+      ## Stay in the mode.
+      $token = $self->_get_next_token;
+      next B;
+    } elsif ($token->{type} == NOTATION_TOKEN) {
+      unless ($self->{doctype}->get_notation_node
+                ($token->{name})) {
+        my $node = $self->{document}->create_notation ($token->{name});
+        $node->set_user_data (manakai_source_line => $token->{line});
+        $node->set_user_data (manakai_source_column => $token->{column});
+        
+        ## TODO: ...
+        
+        $self->{doctype}->set_notation_node ($node);
+      } else {
+        ## TODO: ...
+        
+      }
+
+      ## Stay in the mode.
+      $token = $self->_get_next_token;
+      next B;
     } elsif ($token->{type} == PI_TOKEN) {
       my $pi = $self->{document}->create_processing_instruction
           ($token->{target}, $token->{data});

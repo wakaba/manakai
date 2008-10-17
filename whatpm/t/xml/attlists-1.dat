@@ -1,0 +1,210 @@
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+<!ATTLIST c>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|   <!ELEMENT c >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST bcd>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT bcd >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b >
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST bcd >
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT bcd >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLISTb>
+]><a/>
+#errors
+2;10;no space before md name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+#errors
+2;11;unclosed md;;;m
+2;11;unclosed internal subset;;;m
+2;11;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST >
+<!ATTLIST b>
+]><a/>
+#errors
+2;11;no md name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST>
+<!ATTLIST b>
+]><a/>
+#errors
+2;10;no md name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b>
+<!ATTLIST\u0020
+#errors
+3;10;unclosed md;;;m
+3;10;unclosed internal subset;;;m
+3;10;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+<!ATTLIST
+#errors
+3;9;unclosed md;;;m
+3;9;unclosed internal subset;;;m
+3;9;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIS>
+<!ATTLIST b>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATT c>
+<!ATTLIST b>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!attlist c>
+<!ATTLIST b>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+<!ATTLIS
+#errors
+3;1;bogus comment;;;m
+3;8;unclosed internal subset;;;m
+3;8;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+<!ATTL
+#errors
+3;1;bogus comment;;;m
+3;6;unclosed internal subset;;;m
+3;6;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST% c>
+<!ATTLIST b>
+]><a/>
+#errors
+2;10;no space before md name;;;m
+2;14;no attr type;;;m
+TODO: ...
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT % >
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+<!ATTLIST % c>
+]><a/>
+#errors
+2;15;no attr type;;;m
+TODO: ...
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT % >
+|   <!ELEMENT b >
+| <{} a>

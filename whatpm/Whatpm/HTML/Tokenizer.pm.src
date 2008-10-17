@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -16,6 +16,11 @@ BEGIN {
     PI_TOKEN
     ABORT_TOKEN
     END_OF_DOCTYPE_TOKEN
+    ATTLIST_TOKEN
+    ELEMENT_TOKEN
+    GENERAL_ENTITY_TOKEN
+    PARAMETER_ENTITY_TOKEN
+    NOTATION_TOKEN
   );
   
   our %EXPORT_TAGS = (
@@ -29,6 +34,11 @@ BEGIN {
       PI_TOKEN
       ABORT_TOKEN
       END_OF_DOCTYPE_TOKEN
+      ATTLIST_TOKEN
+      ELEMENT_TOKEN
+      GENERAL_ENTITY_TOKEN
+      PARAMETER_ENTITY_TOKEN
+      NOTATION_TOKEN
     )],
   );
 }
@@ -45,7 +55,12 @@ sub END_OF_FILE_TOKEN () { 5 }
 sub CHARACTER_TOKEN () { 6 }
 sub PI_TOKEN () { 7 } ## NOTE: XML only.
 sub ABORT_TOKEN () { 8 } ## NOTE: For internal processing.
-sub END_OF_DOCTYPE_TOKEN () { 9 } ## NOTE: XML only
+sub END_OF_DOCTYPE_TOKEN () { 9 } ## NOTE: XML only.
+sub ATTLIST_TOKEN () { 10 } ## NOTE: XML only.
+sub ELEMENT_TOKEN () { 11 } ## NOTE: XML only.
+sub GENERAL_ENTITY_TOKEN () { 12 } ## NOTE: XML only.
+sub PARAMETER_ENTITY_TOKEN () { 13 } ## NOTE: XML only.
+sub NOTATION_TOKEN () { 14 } ## NOTE: XML only.
 
 ## XML5: XML5 has "empty tag token".  In this implementation, it is
 ## represented as a start tag token with $self->{self_closing} flag
@@ -136,8 +151,19 @@ sub PI_AFTER_STATE () { 55 }
 sub PI_DATA_AFTER_STATE () { 56 }
 sub DOCTYPE_INTERNAL_SUBSET_STATE () { 57 }
 sub DOCTYPE_INTERNAL_SUBSET_AFTER_STATE () { 58 }
-sub DOCTYPE_TAG_STATE () { 59 }
-sub BOGUS_DOCTYPE_INTERNAL_SUBSET_AFTER_STATE () { 60 }
+sub BOGUS_DOCTYPE_INTERNAL_SUBSET_AFTER_STATE () { 59 }
+sub DOCTYPE_TAG_STATE () { 60 }
+sub DOCTYPE_MARKUP_DECLARATION_OPEN_STATE () { 61 }
+sub MD_ATTLIST_STATE () { 62 }
+sub MD_E_STATE () { 63 }
+sub MD_ELEMENT_STATE () { 64 }
+sub MD_ENTITY_STATE () { 65 }
+sub MD_NOTATION_STATE () { 66 }
+sub DOCTYPE_MD_STATE () { 67 }
+sub BEFORE_MD_NAME_STATE () { 68 }
+sub MD_NAME_STATE () { 69 }
+sub DOCTYPE_ENTITY_PARAMETER_BEFORE_STATE () { 70 }
+sub DOCTYPE_ATTLIST_NAME_AFTER_STATE () { 71 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -1568,6 +1594,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
+      ## XML5: "Bogus comment state" and "DOCTYPE bogus comment state".
+
       ## NOTE: Unlike spec's "bogus comment state", this implementation
       ## consumes characters one-by-one basis.
       
@@ -1609,8 +1637,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
-      ## XML5: "Markup declaration state" and "DOCTYPE markup
-      ## declaration state".
+      ## XML5: "Markup declaration state".
       
       if ($self->{nc} == 0x002D) { # -
         !!!cp (133);
@@ -1868,6 +1895,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == COMMENT_STATE) {
+      ## XML5: "Comment state" and "DOCTYPE comment state".
+
       if ($self->{nc} == 0x002D) { # -
         !!!cp (145);
         $self->{state} = COMMENT_END_DASH_STATE;
@@ -1900,7 +1929,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == COMMENT_END_DASH_STATE) {
-      ## XML5: "comment dash state".
+      ## XML5: "Comment dash state" and "DOCTYPE comment dash state".
 
       if ($self->{nc} == 0x002D) { # -
         !!!cp (148);
@@ -1930,6 +1959,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == COMMENT_END_STATE) {
+      ## XML5: "Comment end state" and "DOCTYPE comment end state".
+
       if ($self->{nc} == 0x003E) { # >
         if ($self->{in_subset}) {
           !!!cp (151.1);
@@ -3130,9 +3161,15 @@ sub _get_next_token ($) {
     ## XML-only states
 
     } elsif ($self->{state} == PI_STATE) {
+      ## XML5: "Pi state" and "DOCTYPE pi state".
+
       if ($is_space->{$self->{nc}} or
-          $self->{nc} == 0x003F or # ? ## XML5: Same as "Anything else"
+          $self->{nc} == 0x003F or # ?
           $self->{nc} == -1) {
+        ## XML5: U+003F: "pi state": Same as "Anything else"; "DOCTYPE
+        ## pi state": Switch to the "DOCTYPE pi after state".  EOF:
+        ## "DOCTYPE pi state": Parse error, switch to the "data
+        ## state".
         !!!parse-error (type => 'bare pio', ## TODO: type
                         line => $self->{line_prev},
                         column => $self->{column_prev}
@@ -3147,6 +3184,7 @@ sub _get_next_token ($) {
                       };
         redo A;
       } else {
+        ## XML5: "DOCTYPE pi state": Stay in the state.
         $self->{ct} = {type => PI_TOKEN,
                        target => chr $self->{nc},
                        data => '',
@@ -3201,7 +3239,7 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == -1) {
         !!!parse-error (type => 'no pic'); ## TODO: type
         if ($self->{in_subset}) {
-          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state"
         } else {
           $self->{state} = DATA_STATE;
           $self->{s_kwd} = '';
@@ -3219,6 +3257,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == PI_AFTER_STATE) {
+      ## XML5: Part of "Pi after state".
+
       if ($self->{nc} == 0x003E) { # >
         if ($self->{in_subset}) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -3248,7 +3288,8 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == PI_DATA_AFTER_STATE) {
-      ## XML5: Same as "pi after state" in XML5
+      ## XML5: Same as "pi after state" and "DOCTYPE pi after state".
+
       if ($self->{nc} == 0x003E) { # >
         if ($self->{in_subset}) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -3351,7 +3392,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_TAG_STATE) {
       if ($self->{nc} == 0x0021) { # !
-        $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
+        $self->{state} = DOCTYPE_MARKUP_DECLARATION_OPEN_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x003F) { # ?
@@ -3375,7 +3416,333 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       }
-        
+    } elsif ($self->{state} == DOCTYPE_MARKUP_DECLARATION_OPEN_STATE) {
+      ## XML5: "DOCTYPE markup declaration state".
+      
+      if ($self->{nc} == 0x002D) { # -
+        $self->{state} = MD_HYPHEN_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x0045) { # E
+        $self->{state} = MD_E_STATE;
+        $self->{kwd} = chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x0041) { # A
+        $self->{state} = MD_ATTLIST_STATE;
+        $self->{kwd} = chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x004E) { # N
+        $self->{state} = MD_NOTATION_STATE;
+        $self->{kwd} = chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } else {
+        #
+      }
+      
+      ## XML5: No parse error.
+      !!!parse-error (type => 'bogus comment',
+                      line => $self->{line_prev},
+                      column => $self->{column_prev} - 1);
+      ## Reconsume.
+      $self->{state} = BOGUS_COMMENT_STATE;
+      $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded.
+      redo A;
+    } elsif ($self->{state} == MD_E_STATE) {
+      if ($self->{nc} == 0x004E) { # N
+        $self->{state} = MD_ENTITY_STATE;
+        $self->{kwd} .= chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x004C) { # L
+        ## XML5: <!ELEMENT> not supported.
+        $self->{state} = MD_ELEMENT_STATE;
+        $self->{kwd} .= chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } else {
+        ## XML5: No parse error.
+        !!!parse-error (type => 'bogus comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 2
+                            + 1 * ($self->{nc} == -1));
+        ## Reconsume.
+        $self->{state} = BOGUS_COMMENT_STATE;
+        $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
+        redo A;
+      }
+    } elsif ($self->{state} == MD_ENTITY_STATE) {
+      if ($self->{nc} == {
+            'EN' => 0x0054, # T
+            'ENT' => 0x0049, # I
+            'ENTI' => 0x0054, # T
+          }->{$self->{kwd}}) {
+        ## Stay in the state.
+        $self->{kwd} .= chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{kwd} eq 'ENTIT' and
+               $self->{nc} == 0x0059) { # Y
+        $self->{ct} = {type => GENERAL_ENTITY_TOKEN, name => '', text => '',
+                       line => $self->{line_prev},
+                       column => $self->{column_prev} - 6};
+        $self->{state} = DOCTYPE_MD_STATE;
+        !!!next-input-character;
+        redo A;
+      } else {
+        !!!parse-error (type => 'bogus comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 1
+                            - (length $self->{kwd})
+                            + 1 * ($self->{nc} == -1));
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
+        redo A;
+      }
+    } elsif ($self->{state} == MD_ELEMENT_STATE) {
+      if ($self->{nc} == {
+            'EL' => 0x0045, # E
+            'ELE' => 0x004D, # M
+            'ELEM' => 0x0045, # E
+            'ELEME' => 0x004E, # N
+          }->{$self->{kwd}}) {
+        ## Stay in the state.
+        $self->{kwd} .= chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{kwd} eq 'ELEMEN' and
+               $self->{nc} == 0x0054) { # T
+        $self->{ct} = {type => ELEMENT_TOKEN, name => '',
+                       line => $self->{line_prev},
+                       column => $self->{column_prev} - 6};
+        $self->{state} = DOCTYPE_MD_STATE;
+        !!!next-input-character;
+        redo A;
+      } else {
+        !!!parse-error (type => 'bogus comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 1
+                            - (length $self->{kwd})
+                            + 1 * ($self->{nc} == -1));
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
+        redo A;
+      }
+    } elsif ($self->{state} == MD_ATTLIST_STATE) {
+      if ($self->{nc} == {
+            'A' => 0x0054, # T
+            'AT' => 0x0054, # T
+            'ATT' => 0x004C, # L
+            'ATTL' => 0x0049, # I
+            'ATTLI' => 0x0053, # S
+          }->{$self->{kwd}}) {
+        ## Stay in the state.
+        $self->{kwd} .= chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{kwd} eq 'ATTLIS' and
+               $self->{nc} == 0x0054) { # T
+        $self->{ct} = {type => ATTLIST_TOKEN, name => '',
+                       line => $self->{line_prev},
+                       column => $self->{column_prev} - 6};
+        $self->{state} = DOCTYPE_MD_STATE;
+        !!!next-input-character;
+        redo A;
+      } else {
+        !!!parse-error (type => 'bogus comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 1
+                             - (length $self->{kwd})
+                             + 1 * ($self->{nc} == -1));
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
+        redo A;
+      }
+    } elsif ($self->{state} == MD_NOTATION_STATE) {
+      if ($self->{nc} == {
+            'N' => 0x004F, # O
+            'NO' => 0x0054, # T
+            'NOT' => 0x0041, # A
+            'NOTA' => 0x0054, # T
+            'NOTAT' => 0x0049, # I
+            'NOTATI' => 0x004F, # O
+          }->{$self->{kwd}}) {
+        ## Stay in the state.
+        $self->{kwd} .= chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{kwd} eq 'NOTATIO' and
+               $self->{nc} == 0x004E) { # N
+        $self->{ct} = {type => NOTATION_TOKEN, name => '',
+                       line => $self->{line_prev},
+                       column => $self->{column_prev} - 6};
+        $self->{state} = DOCTYPE_MD_STATE;
+        !!!next-input-character;
+        redo A;
+      } else {
+        !!!parse-error (type => 'bogus comment',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 1
+                            - (length $self->{kwd})
+                            + 1 * ($self->{nc} == -1));
+        $self->{state} = BOGUS_COMMENT_STATE;
+        ## Reconsume.
+        $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_MD_STATE) {
+      ## XML5: "DOCTYPE ENTITY state", "DOCTYPE ATTLIST state", and
+      ## "DOCTYPE NOTATION state".
+
+      if ($is_space->{$self->{nc}}) {
+        ## XML5: [NOTATION] Switch to the "DOCTYPE NOTATION identifier state".
+        $self->{state} = BEFORE_MD_NAME_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{ct}->{type} == GENERAL_ENTITY_TOKEN and 
+               $self->{nc} == 0x0025) { # %
+        ## XML5: Switch to the "DOCTYPE bogus comment state".
+        !!!parse-error (type => 'no space before md name'); ## TODO: type
+        $self->{state} = DOCTYPE_ENTITY_PARAMETER_BEFORE_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        ## Reconsume.
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Switch to the "DOCTYPE bogus comment state".
+        !!!parse-error (type => 'no md name'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        !!!next-input-character;
+        redo A;
+      } else {
+        ## XML5: Switch to the "DOCTYPE bogus comment state".
+        !!!parse-error (type => 'no space before md name'); ## TODO: type
+        $self->{state} = BEFORE_MD_NAME_STATE;
+        redo A;
+      }
+    } elsif ($self->{state} == BEFORE_MD_NAME_STATE) {
+      ## XML5: "DOCTYPE ENTITY parameter state", "DOCTYPE ENTITY type
+      ## before state", "DOCTYPE ATTLIST name before state".
+
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{ct}->{type} == GENERAL_ENTITY_TOKEN and 
+               $self->{nc} == 0x0025) { # %
+        $self->{state} = DOCTYPE_ENTITY_PARAMETER_BEFORE_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Same as "Anything else".
+        !!!parse-error (type => 'no md name'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        ## Reconsume.
+        redo A;
+      } else {
+        ## XML5: [ATTLIST] Not defined yet.
+        $self->{ct}->{name} .= chr $self->{nc};
+        $self->{state} = MD_NAME_STATE;
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ENTITY_PARAMETER_BEFORE_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## XML5: Switch to the "DOCTYPE ENTITY parameter state".
+        $self->{ct}->{type} = PARAMETER_ENTITY_TOKEN;
+        $self->{state} = BEFORE_MD_NAME_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Same as "Anything else".
+        !!!parse-error (type => 'no md name'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'unclosed md');
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        ## Reconsume.
+        redo A;
+      } else {
+        ## XML5: No parse error.
+        !!!parse-error (type => 'no space after ENTITY percent'); ## TODO: type
+        $self->{state} = BOGUS_COMMENT_STATE;
+        $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == MD_NAME_STATE) {
+      ## XML5: "DOCTYPE ENTITY name state" and "DOCTYPE ATTLIST name state".
+      
+      if ($is_space->{$self->{nc}}) {
+        ## TODO:
+        $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          #
+        } else {
+          !!!parse-error (type => 'no md body'); ## TODO: type
+        }
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        !!!next-input-character;
+        !!!emit ($self->{ct}); # ELEMENT/ENTITY/ATTLIST/NOTATION
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: [ATTLIST] No parse error.
+        !!!parse-error (type => 'unclosed md');
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        ## Reconsume.
+        !!!emit ($self->{ct}); # ELEMENT/ENTITY/ATTLIST/NOTATION
+        redo A;
+      } else {
+        ## XML5: [ATTLIST] Not defined yet.
+        $self->{ct}->{name} .= chr $self->{nc};
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ATTLIST_NAME_AFTER_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        !!!next-input-character;
+        !!!emit ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        !!!parse-error (type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        redo A;
+      } else {
+        ## XML5: Not defined yet.
+
+        ## TODO: ...
+
+        $self->{state} = BOGUS_COMMENT_STATE;
+        $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
+        ## Reconsume.
+        redo A;
+      }
+
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -3385,4 +3752,4 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/16 03:39:57 $
+## $Date: 2008/10/17 07:14:29 $

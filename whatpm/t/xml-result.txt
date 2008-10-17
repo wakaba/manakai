@@ -1,7 +1,7 @@
 1..4935
 # Running under perl version 5.010000 for linux
-# Current time local: Thu Oct 16 12:31:35 2008
-# Current time GMT:   Thu Oct 16 03:31:35 2008
+# Current time local: Fri Oct 17 16:07:16 2008
+# Current time GMT:   Fri Oct 17 07:07:16 2008
 # Using Test.pm version 1.25
 # t/xml/elements-1.dat
 ok 1
@@ -806,3 +806,64 @@ ok 786
 ok 787
 ok 788
 ok 789
+ok 790
+ok 791
+ok 792
+ok 793
+ok 794
+ok 795
+ok 796
+ok 797
+ok 798
+ok 799
+# t/xml/attlists-1.dat
+ok 800
+ok 801
+ok 802
+ok 803
+ok 804
+ok 805
+ok 806
+ok 807
+ok 808
+ok 809
+ok 810
+ok 811
+ok 812
+ok 813
+ok 814
+ok 815
+ok 816
+ok 817
+ok 818
+ok 819
+ok 820
+ok 821
+ok 822
+ok 823
+ok 824
+ok 825
+ok 826
+ok 827
+ok 828
+ok 829
+ok 830
+ok 831
+not ok 832
+# Test 832 got: "2;10;no space before md name;;;m" (t/XML-Parser.t at line 95 fail #358)
+#     Expected: "2;10;no space before md name;;;m\n2;14;no attr type;;;m\nTODO: ..." (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST% c>\x{0A}<!ATTLIST b>\x{0A}]><a/>')
+#  t/XML-Parser.t line 95 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
+not ok 833
+# Test 833 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 120 fail #358)
+#     Expected: "<!DOCTYPE a>\n  <!ELEMENT % >\n  <!ELEMENT b >\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST% c>\x{0A}<!ATTLIST b>\x{0A}]><a/>')
+#     Line 2 is missing:
+#      - "  <!ELEMENT % >\n"
+#  t/XML-Parser.t line 120 is:   ok $result, $test->{document}->[0],
+not ok 834
+# Test 834 got: "" (t/XML-Parser.t at line 95 fail #359)
+#     Expected: "2;15;no attr type;;;m\nTODO: ..." (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b>\x{0A}<!ATTLIST % c>\x{0A}]><a/>')
+not ok 835
+# Test 835 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 120 fail #359)
+#     Expected: "<!DOCTYPE a>\n  <!ELEMENT % >\n  <!ELEMENT b >\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b>\x{0A}<!ATTLIST % c>\x{0A}]><a/>')
+#     Line 2 is missing:
+#      - "  <!ELEMENT % >\n"

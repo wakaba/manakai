@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -52,6 +52,8 @@ sub manakai_parent_element ($) {
 sub child_nodes ($) {
   return shift->{child_nodes} || [];
 } # child_nodes
+
+sub node_name ($) { return $_[0]->{node_name} }
 
 ## NOTE: Only applied to Elements and Documents
 sub append_child ($$) {
@@ -170,6 +172,8 @@ sub DOCUMENT_NODE () { 9 }
 sub DOCUMENT_TYPE_NODE () { 10 }
 sub DOCUMENT_FRAGMENT_NODE () { 11 }
 sub NOTATION_NODE () { 12 }
+sub ELEMENT_TYPE_DEFINITION_NODE () { 81001 }
+sub ATTRIBUTE_DEFINITION_NODE () { 81002 }
 
 package Whatpm::NanoDOM::Document;
 push our @ISA, 'Whatpm::NanoDOM::Node';
@@ -231,6 +235,30 @@ sub create_document_type_definition ($$) {
   shift;
   return Whatpm::NanoDOM::DocumentType->new (shift);
 } # create_document_type_definition
+
+## A manakai extension.
+sub create_element_type_definition ($$) {
+  shift;
+  return Whatpm::NanoDOM::ElementTypeDefinition->new (shift);
+} # create_element_type_definition
+
+## A manakai extension.
+sub create_general_entity ($$) {
+  shift;
+  return Whatpm::NanoDOM::Entity->new (shift);
+} # create_general_entity
+
+## A manakai extension.
+sub create_notation ($$) {
+  shift;
+  return Whatpm::NanoDOM::Notation->new (shift);
+} # create_notation
+
+## A manakai extension.
+sub create_attribute_definition ($$) {
+  shift;
+  return Whatpm::NanoDOM::AttributeDefinition->new (shift);
+} # create_attribute_definition
 
 sub create_processing_instruction ($$$) {
   return Whatpm::NanoDOM::ProcessingInstruction->new (@_);
@@ -594,6 +622,10 @@ push our @ISA, 'Whatpm::NanoDOM::Node';
 sub new ($$) {
   my $self = shift->SUPER::new;
   $self->{name} = shift;
+  $self->{element_types} = {};
+  $self->{entities} = {};
+  $self->{notations} = {};
+  $self->{child_nodes} = [];
   return $self;
 } # new
 
@@ -612,6 +644,42 @@ sub system_id ($;$) {
   $_[0]->{system_id} = $_[1] if @_ > 1;
   return $_[0]->{system_id};
 } # system_id
+
+sub element_types ($) {
+  return $_[0]->{element_types};
+} # element_types
+
+sub entities ($) {
+  return $_[0]->{entities};
+} # entities
+
+sub notations ($) {
+  return $_[0]->{notations};
+} # notations
+
+sub get_element_type_definition_node ($$) {
+  return $_[0]->{element_types}->{$_[1]};
+} # get_element_type_definition_node
+
+sub set_element_type_definition_node ($$) {
+  $_[0]->{element_types}->{$_[1]->node_name} = $_[1];
+} # set_element_type_definition_node
+
+sub get_general_entity_node ($$) {
+  return $_[0]->{entities}->{$_[1]};
+} # get_general_entity_node
+
+sub set_general_entity_node ($$) {
+  $_[0]->{entities}->{$_[1]->node_name} = $_[1];
+} # set_general_entity_node
+
+sub get_notation_node ($$) {
+  return $_[0]->{notations}->{$_[1]};
+} # get_notation_node
+
+sub set_notation_node ($$) {
+  $_[0]->{notations}->{$_[1]->node_name} = $_[1];
+} # set_notation_node
 
 package Whatpm::NanoDOM::ProcessingInstruction;
 push our @ISA, 'Whatpm::NanoDOM::Node';
@@ -637,6 +705,67 @@ sub data ($;$) {
   return $_[0]->{data};
 } # data
 
+package Whatpm::NanoDOM::Entity;
+push our @ISA, 'Whatpm::NanoDOM::Node';
+
+sub new ($$) {
+  my $self = shift->SUPER::new;
+  $self->{node_name} = shift;
+  return $self;
+} # new
+
+sub node_type () { 6 }
+
+package Whatpm::NanoDOM::Notation;
+push our @ISA, 'Whatpm::NanoDOM::Node';
+
+sub new ($$) {
+  my $self = shift->SUPER::new;
+  $self->{node_name} = shift;
+  return $self;
+} # new
+
+sub node_type () { 12 }
+
+package Whatpm::NanoDOM::ElementTypeDefinition;
+push our @ISA, 'Whatpm::NanoDOM::Node';
+
+sub new ($$) {
+  my $self = shift->SUPER::new;
+  $self->{node_name} = shift;
+  $self->{content_model} = '';
+  $self->{attribute_definitions} = {};
+  return $self;
+} # new
+
+sub node_type () { 81001 }
+
+sub content_model_text ($;$) {
+  $_[0]->{content_model} = $_[1] if @_ > 1;
+  return $_[0]->{content_model};
+} # content_model_text
+
+sub attribute_definitions ($) { return $_[0]->{attribute_definitions} }
+
+sub get_attribute_definition_node ($$) {
+  return $_[0]->{attribute_definitions}->{$_[1]};
+} # get_attribute_definition_node
+
+sub set_attribute_definition_node ($$) {
+  $_[0]->{attribute_definitions}->{$_[1]->node_name} = $_[1];
+} # set_attribute_definition_node
+
+package Whatpm::NanoDOM::AttributeDefinition;
+push our @ISA, 'Whatpm::NanoDOM::Node';
+
+sub new ($$) {
+  my $self = shift->SUPER::new;
+  $self->{node_name} = shift;
+  return $self;
+} # new
+
+sub node_type () { 81002 }
+
 =head1 SEE ALSO
 
 L<Whatpm::HTML|Whatpm::HTML>
@@ -659,4 +788,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/15 04:38:22 $
+# $Date: 2008/10/17 07:14:29 $
