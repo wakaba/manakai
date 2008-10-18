@@ -905,6 +905,9 @@ sub _tree_in_subset ($) {
         $node->set_user_data (manakai_source_line => $token->{line});
         $node->set_user_data (manakai_source_column => $token->{column});
         
+        $node->public_id ($token->{pubid}); # may be undef
+        $node->system_id ($token->{sysid}); # may be undef
+
         ## TODO: ...
         
         $self->{doctype}->set_general_entity_node ($node);
@@ -929,7 +932,8 @@ sub _tree_in_subset ($) {
         $node->set_user_data (manakai_source_line => $token->{line});
         $node->set_user_data (manakai_source_column => $token->{column});
         
-        ## TODO: ...
+        $node->public_id ($token->{pubid}); # may be undef
+        $node->system_id ($token->{sysid}); # may be undef
         
         $self->{doctype}->set_notation_node ($node);
       } else {

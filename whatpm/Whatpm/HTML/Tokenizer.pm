@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -177,6 +177,7 @@ sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE () { 81 }
 sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_STATE () { 82 }
 sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_AFTER_STATE () { 83 }
 sub AFTER_ATTLIST_ATTR_VALUE_QUOTED_STATE () { 84 }
+sub BOGUS_MD_STATE () { 85 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -3182,9 +3183,16 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md def'); ## TODO: type
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
         
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3196,20 +3204,23 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{nc} == -1) {
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
-        ## reconsume
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        ## Reconsume.
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{nc} == 0x0050 or # P
                $self->{nc} == 0x0070) { # p
@@ -3245,7 +3256,10 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{is_xml} and $self->{nc} == 0x005B) { # [
+## TODO: " and ' for ENTITY
+      } elsif ($self->{is_xml} and
+               $self->{ct}->{type} == DOCTYPE_TOKEN and
+               $self->{nc} == 0x005B) { # [
         
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
@@ -3264,11 +3278,17 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } else {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name');
-        $self->{ct}->{quirks} = 1;
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name'); ## TODO: type
 
-        $self->{state} = BOGUS_DOCTYPE_STATE;
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{ct}->{quirks} = 1;
+          $self->{state} = BOGUS_DOCTYPE_STATE;
+        } else {
+          
+          $self->{state} = BOGUS_MD_STATE;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3340,13 +3360,17 @@ sub _get_next_token ($) {
   
         redo A;
       } else {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name',
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name', ## TODO: type
                         line => $self->{line_prev},
                         column => $self->{column_prev} + 1 - length $self->{kwd});
-        $self->{ct}->{quirks} = 1;
-
-        $self->{state} = BOGUS_DOCTYPE_STATE;
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{ct}->{quirks} = 1;
+          $self->{state} = BOGUS_DOCTYPE_STATE;
+        } else {
+          
+          $self->{state} = BOGUS_MD_STATE;
+        }
         ## Reconsume.
         redo A;
       }
@@ -3408,13 +3432,17 @@ sub _get_next_token ($) {
   
         redo A;
       } else {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name',
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after DOCTYPE name', ## TODO: type
                         line => $self->{line_prev},
                         column => $self->{column_prev} + 1 - length $self->{kwd});
-        $self->{ct}->{quirks} = 1;
-
-        $self->{state} = BOGUS_DOCTYPE_STATE;
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{ct}->{quirks} = 1;
+          $self->{state} = BOGUS_DOCTYPE_STATE;
+        } else {
+          
+          $self->{state} = BOGUS_MD_STATE;
+        }
         ## Reconsume.
         redo A;
       }
@@ -3467,11 +3495,18 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} eq 0x003E) { # >
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no PUBLIC literal');
-
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+        
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3483,24 +3518,27 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{nc} == -1) {
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
-
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## reconsume
-
-        $self->{ct}->{quirks} = 1;
         return  ($self->{ct}); # DOCTYPE
-
         redo A;
-      } elsif ($self->{is_xml} and $self->{nc} == 0x005B) { # [
+      } elsif ($self->{is_xml} and
+               $self->{ct}->{type} == DOCTYPE_TOKEN and
+               $self->{nc} == 0x005B) { # [
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no PUBLIC literal');
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -3520,11 +3558,17 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } else {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after PUBLIC');
-        $self->{ct}->{quirks} = 1;
 
-        $self->{state} = BOGUS_DOCTYPE_STATE;
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{ct}->{quirks} = 1;
+          $self->{state} = BOGUS_DOCTYPE_STATE;
+        } else {
+          
+          $self->{state} = BOGUS_MD_STATE;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3555,11 +3599,18 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed PUBLIC literal');
 
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3571,27 +3622,27 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{nc} == -1) {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed PUBLIC literal');
 
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
-        ## reconsume
-
-        $self->{ct}->{quirks} = 1;
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+        
+        ## Reconsume.
         return  ($self->{ct}); # DOCTYPE
-
         redo A;
       } else {
         
-        $self->{ct}->{pubid} # DOCTYPE
-            .= chr $self->{nc};
+        $self->{ct}->{pubid} .= chr $self->{nc}; # DOCTYPE/ENTITY/NOTATION
         $self->{read_until}->($self->{ct}->{pubid}, q[">],
                               length $self->{ct}->{pubid});
 
@@ -3626,11 +3677,18 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed PUBLIC literal');
 
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3642,27 +3700,27 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{nc} == -1) {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed PUBLIC literal');
 
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+      
         ## reconsume
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } else {
         
-        $self->{ct}->{pubid} # DOCTYPE
-            .= chr $self->{nc};
+        $self->{ct}->{pubid} .= chr $self->{nc}; # DOCTYPE/ENTITY/NOTATION
         $self->{read_until}->($self->{ct}->{pubid}, q['>],
                               length $self->{ct}->{pubid});
 
@@ -3698,7 +3756,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == 0x0022) { # "
         
-        $self->{ct}->{sysid} = ''; # DOCTYPE
+        $self->{ct}->{sysid} = ''; # DOCTYPE/ENTITY/NOTATION
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -3714,7 +3772,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == 0x0027) { # '
         
-        $self->{ct}->{sysid} = ''; # DOCTYPE
+        $self->{ct}->{sysid} = ''; # DOCTYPE/ENTITY/NOTATION
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -3729,14 +3787,25 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
-        if ($self->{is_xml}) {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          if ($self->{is_xml}) {
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
+          } else {
+            
+          }
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
         } else {
-          
+          if ($self->{ct}->{type} == NOTATION_TOKEN) {
+            
+          } else {
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');            
+          }
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         }
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3748,23 +3817,27 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{nc} == -1) {
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
-
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## reconsume
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
-      } elsif ($self->{is_xml} and $self->{nc} == 0x005B) { # [
+      } elsif ($self->{is_xml} and
+               $self->{ct}->{type} == DOCTYPE_TOKEN and
+               $self->{nc} == 0x005B) { # [
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -3784,11 +3857,17 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } else {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after PUBLIC literal');
-        $self->{ct}->{quirks} = 1;
 
-        $self->{state} = BOGUS_DOCTYPE_STATE;
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{ct}->{quirks} = 1;
+          $self->{state} = BOGUS_DOCTYPE_STATE;
+        } else {
+          
+          $self->{state} = BOGUS_MD_STATE;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3851,10 +3930,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3867,23 +3943,37 @@ sub _get_next_token ($) {
     }
   
 
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
 
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{nc} == -1) {
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
-
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## reconsume
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
-      } elsif ($self->{is_xml} and $self->{nc} == 0x005B) { # [
+      } elsif ($self->{is_xml} and
+               $self->{ct}->{type} == DOCTYPE_TOKEN and
+               $self->{nc} == 0x005B) { # [
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
 
@@ -3904,11 +3994,17 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } else {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after SYSTEM');
-        $self->{ct}->{quirks} = 1;
 
-        $self->{state} = BOGUS_DOCTYPE_STATE;
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+                    
+          $self->{ct}->{quirks} = 1;
+          $self->{state} = BOGUS_DOCTYPE_STATE;
+        } else {
+          
+          $self->{state} = BOGUS_MD_STATE;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3939,11 +4035,18 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif (not $self->{is_xml} and $self->{nc} == 0x003E) { # >
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed SYSTEM literal');
 
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+        
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3955,27 +4058,27 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{nc} == -1) {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed SYSTEM literal');
 
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+        
         ## reconsume
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } else {
         
-        $self->{ct}->{sysid} # DOCTYPE
-            .= chr $self->{nc};
+        $self->{ct}->{sysid} .= chr $self->{nc}; # DOCTYPE/ENTITY/NOTATION
         $self->{read_until}->($self->{ct}->{sysid}, q[">],
                               length $self->{ct}->{sysid});
 
@@ -4032,21 +4135,24 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{nc} == -1) {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed SYSTEM literal');
 
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+
         ## reconsume
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } else {
         
-        $self->{ct}->{sysid} # DOCTYPE
-            .= chr $self->{nc};
+        $self->{ct}->{sysid} .= chr $self->{nc}; # DOCTYPE/ENTITY/NOTATION
         $self->{read_until}->($self->{ct}->{sysid}, q['>],
                               length $self->{ct}->{sysid});
 
@@ -4081,9 +4187,15 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
-        
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        } else {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -4095,22 +4207,28 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
+## TODO: "NDATA"
       } elsif ($self->{nc} == -1) {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+
         ## reconsume
-
-        $self->{ct}->{quirks} = 1;
-        return  ($self->{ct}); # DOCTYPE
-
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
-      } elsif ($self->{is_xml} and $self->{nc} == 0x005B) { # [
+      } elsif ($self->{is_xml} and
+               $self->{ct}->{type} == DOCTYPE_TOKEN and
+               $self->{nc} == 0x005B) { # [
         
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
@@ -4129,11 +4247,17 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } else {
-        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after SYSTEM literal');
-        #$self->{ct}->{quirks} = 1;
 
-        $self->{state} = BOGUS_DOCTYPE_STATE;
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          #$self->{ct}->{quirks} = 1;
+          $self->{state} = BOGUS_DOCTYPE_STATE;
+        } else {
+          
+          $self->{state} = BOGUS_MD_STATE;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -5845,8 +5969,14 @@ sub _get_next_token ($) {
       ## XML5: "DOCTYPE ENTITY name state" and "DOCTYPE ATTLIST name state".
       
       if ($is_space->{$self->{nc}}) {
-        ## TODO:
-        $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+        if ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+        } elsif ($self->{ct}->{type} == ELEMENT_TOKEN) {
+          ## TODO: ...
+          $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+        } else { # ENTITY/NOTATION
+          $self->{state} = AFTER_DOCTYPE_NAME_STATE;
+        }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -5863,7 +5993,7 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == ATTLIST_TOKEN) {
           #
         } else {
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md body'); ## TODO: type
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md def'); ## TODO: type
         }
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
@@ -6853,8 +6983,7 @@ sub _get_next_token ($) {
       if ($is_space->{$self->{nc}}) {
         ## XML5: No parse error.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no default type'); ## TODO: type
-        $self->{state} = BOGUS_COMMENT_STATE;
-        $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
+        $self->{state} = BOGUS_MD_STATE;
         ## Reconsume.
         redo A;
       } elsif ($self->{nc} == 0x0022) { # "
@@ -7141,7 +7270,44 @@ sub _get_next_token ($) {
         $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
         ## Reconsume.
         redo A;
-      }      
+      }
+
+    } elsif ($self->{state} == BOGUS_MD_STATE) {
+      if ($self->{nc} == 0x003E) { # >
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST/ENTITY/NOTATION
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        ## Reconsume.
+        return  ($self->{ct}); # ATTLIST/ENTITY/NOTATION
+        redo A;
+      } else {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -7151,5 +7317,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/18 08:05:29 $
+## $Date: 2008/10/18 11:34:49 $
                                 

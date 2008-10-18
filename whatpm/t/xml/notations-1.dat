@@ -1,0 +1,340 @@
+#data
+<!DOCTYPE a[
+<!N>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!N
+#errors
+2;1;bogus comment;;;m
+2;3;unclosed internal subset;;;m
+2;3;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NO>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NO
+#errors
+2;1;bogus comment;;;m
+2;4;unclosed internal subset;;;m
+2;4;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOT>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOT
+#errors
+2;1;bogus comment;;;m
+2;5;unclosed internal subset;;;m
+2;5;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATIO>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATIO
+#errors
+2;1;bogus comment;;;m
+2;9;unclosed internal subset;;;m
+2;9;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION>
+]><a/>
+#errors
+2;11;no md name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION
+#errors
+2;10;unclosed md;;;m
+2;10;unclosed internal subset;;;m
+2;10;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATIONS>
+]><a/>
+#errors
+2;11;no space before md name;;;m
+2;12;no md def;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION S "" "">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATIONS
+#errors
+2;11;no space before md name;;;m
+2;11;unclosed md;;;m
+2;11;unclosed internal subset;;;m
+2;11;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION S "" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION b>
+]><a/>
+#errors
+2;13;no md def;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION b "" "">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION b
+#errors
+2;12;unclosed md;;;m
+2;12;unclosed internal subset;;;m
+2;12;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION b "" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION b >
+]><a/>
+#errors
+2;14;no md def;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION b "" "">
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!NOTATION b\u0020
+#errors
+2;13;unclosed md;;;m
+2;13;unclosed internal subset;;;m
+2;13;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION b "" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd>
+]><a/>
+#errors
+2;15;no md def;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd
+#errors
+2;14;unclosed md;;;m
+2;14;unclosed internal subset;;;m
+2;14;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC>
+]><a/>
+#errors
+2;22;no PUBLIC literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC
+#errors
+2;21;unclosed md;;;m
+2;21;unclosed internal subset;;;m
+2;21;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC "efg">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC "efg"
+#errors
+2;27;unclosed md;;;m
+2;27;unclosed internal subset;;;m
+2;27;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC "efg" "hij">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "hij">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC "efg" "hij"
+#errors
+2;33;unclosed md;;;m
+2;33;unclosed internal subset;;;m
+2;33;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "hij">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM>
+]><a/>
+#errors
+2;22;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM
+#errors
+2;21;unclosed md;;;m
+2;21;unclosed internal subset;;;m
+2;21;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM "efg">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "efg">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM "efg"
+#errors
+2;27;unclosed md;;;m
+2;27;unclosed internal subset;;;m
+2;27;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "efg">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC "efg"x>
+]><a/>
+#errors
+2;28;string after PUBLIC literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC "efg"x
+#errors
+2;28;string after PUBLIC literal;;;m
+2;28;unclosed internal subset;;;m
+2;28;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM "efg"x>
+]><a/>
+#errors
+2;28;string after SYSTEM literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "efg">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM "efg"x
+#errors
+2;28;string after SYSTEM literal;;;m
+2;28;unclosed internal subset;;;m
+2;28;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "efg">

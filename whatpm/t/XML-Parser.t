@@ -137,6 +137,7 @@ my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}doctypes-1.dat
   ${test_dir_name}doctypes-2.dat
   ${test_dir_name}attlists-1.dat
+  ${test_dir_name}notations-1.dat
 ];
 
 require 't/testfiles.pl';
@@ -147,4 +148,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/17 07:14:29 $
+## $Date: 2008/10/18 11:34:49 $
