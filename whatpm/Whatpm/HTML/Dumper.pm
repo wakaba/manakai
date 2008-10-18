@@ -1,6 +1,6 @@
 package Whatpm::HTML::Dumper;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -115,18 +115,11 @@ sub dumptree ($) {
         0, 'CDATA', 'ID', 'IDREF', 'IDREFS', 'ENTITY', 'ENTITIES',
         'NMTOKEN', 'NMTOKENS', 'NOTATION', 'ENUMERATION', 11,
       ]->[$child->[0]->declared_type] || $child->[0]->declared_type;
-      if ($child->[0]->declared_type == 9 or
-          $child->[0]->declared_type == 10) {
-        $r .= '(' . join ('|', @{$child->[0]->allowed_tokens}) . ')';
-      }
-      $r .= ' ';
+      $r .= ' (' . join ('|', @{$child->[0]->allowed_tokens}) . ') ';
       $r .= [
         0, 'FIXED', 'REQUIRED', 'IMPLIED', 'EXPLICIT',
       ]->[$child->[0]->default_type] || $child->[0]->default_type;
-      if ($child->[0]->default_type == 1 or
-          $child->[0]->default_type == 4) {
-        $r .= ' "' . $child->[0]->text_content . '"';
-      }
+      $r .= ' "' . $child->[0]->text_content . '"';
       $r .= "\x0A";
     } else {
       $r .= $child->[1] . $child->[0]->node_type . "\x0A"; # error
@@ -140,4 +133,4 @@ sub dumptree ($) {
 ## TDOO: Document
 
 1;
-## $Date: 2008/10/17 07:14:29 $
+## $Date: 2008/10/18 08:05:29 $

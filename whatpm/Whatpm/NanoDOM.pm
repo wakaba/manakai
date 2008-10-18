@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -151,6 +151,24 @@ sub prefix ($;$) {
   }
   return $self->{prefix};
 } # prefix
+
+sub text_content ($;$) {
+  my $self = shift;
+  if (@_) {
+    @{$self->{child_nodes}} = (); ## NOTE: parent_node not unset.
+    $self->append_child (Whatpm::NanoDOM::Text->new ($_[0]));
+    return unless wantarray;
+  }
+  my $r = '';
+  for my $child (@{$self->child_nodes}) {
+    if ($child->can ('data')) {
+      $r .= $child->data;
+    } else {
+      $r .= $child->text_content;
+    }
+  }
+  return $r;
+} # text_content
 
 sub get_user_data ($$) {
   return $_[0]->{$_[1]};
@@ -434,19 +452,6 @@ sub manakai_append_text ($$) {
     $self->append_child ($text);
   }
 } # manakai_append_text
-
-sub text_content ($) {
-  my $self = shift;
-  my $r = '';
-  for my $child (@{$self->child_nodes}) {
-    if ($child->can ('data')) {
-      $r .= $child->data;
-    } else {
-      $r .= $child->text_content;
-    }
-  }
-  return $r;
-} # text_content
 
 sub attributes ($) {
   my $self = shift;
@@ -761,10 +766,23 @@ push our @ISA, 'Whatpm::NanoDOM::Node';
 sub new ($$) {
   my $self = shift->SUPER::new;
   $self->{node_name} = shift;
+  $self->{allowed_tokens} = [];
   return $self;
 } # new
 
 sub node_type () { 81002 }
+
+sub allowed_tokens ($) { return $_[0]->{allowed_tokens} }
+
+sub default_type ($;$) {
+  $_[0]->{default_type} = $_[1] if @_ > 1;
+  return $_[0]->{default_type} || 0;
+} # default_type
+
+sub declared_type ($;$) {
+  $_[0]->{declared_type} = $_[1] if @_ > 1;
+  return $_[0]->{declared_type} || 0;
+} # declared_type
 
 =head1 SEE ALSO
 
@@ -788,4 +806,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/17 07:14:29 $
+# $Date: 2008/10/18 08:05:29 $

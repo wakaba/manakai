@@ -840,23 +840,58 @@ sub _tree_in_subset ($) {
         $self->{doctype}->set_element_type_definition_node ($ed);
       }
 
-=pod
+      for my $at (@{$token->{attrdefs}}) {
+        unless ($ed->get_attribute_definition_node ($at->{name})) {
+          my $node = $self->{document}->create_attribute_definition
+              ($at->{name});
+          $node->set_user_data (manakai_source_line => $at->{line});
+          $node->set_user_data (manakai_source_column => $at->{column});
 
-      unless ($ed->get_attribute_definition_node ($token->{name})) {
-        my $node = $self->{document}->create_attribute_definition
-            ($token->{name});
-        $node->set_user_data (manakai_source_line => $token->{line});
-        $node->set_user_data (manakai_source_column => $token->{column});
+          my $type = defined $at->{type} ? {
+            CDATA => 1, ID => 2, IDREF => 3, IDREFS => 4, ENTITY => 5,
+            ENTITIES => 6, NMTOKEN => 7, NMTOKENS => 8, NOTATION => 9,
+          }->{$at->{type}} : 10;
+          if (defined $type) {
+            $node->declared_type ($type);
+          } else {
+            !!!parse-error (type => 'unknown declared type', ## TODO: type
+                            value => $at->{type},
+                            token => $at);
+          }
+          
+          push @{$node->allowed_tokens}, @{$at->{tokens}};
+          
+          my $default = defined $at->{default} ? {
+            FIXED => 1, REQUIRED => 2, IMPLIED => 3,
+          }->{$at->{default}} : 4;
+          if (defined $default) {
+            $node->default_type ($default);
+            if (defined $at->{value}) {
+              if ($default == 1 or $default == 4) {
+                #
+              } elsif (length $at->{value}) {
+                !!!parse-error (type => 'default value not allowed', ## TODO: type
+                                token => $at);
+              }
+            } else {
+              if ($default == 1 or $default == 4) {
+                !!!parse-error (type => 'default value not provided', ## TODO: type
+                                token => $at);
+              }
+            }
+          } else {
+            !!!parse-error (type => 'unknown default type', ## TODO: type
+                            value => $at->{default},
+                            token => $at);
+          }
 
-        ## TODO: ...
-        
-        $ed->set_attribute_definition_node ($node);
-      } else {
-        ## TODO: ...
-        
-      }
-
-=cut
+          $node->text_content ($at->{value}) if defined $at->{value};
+ 
+          $ed->set_attribute_definition_node ($node);
+        } else {
+          ## TODO: ...
+        }
+      } # $at
 
       ## Stay in the mode.
       !!!next-token;

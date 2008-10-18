@@ -40,6 +40,17 @@
 |   <!ELEMENT b >
 | <{} a>
 
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b\u0020
+#errors
+2;12;unclosed md;;;m
+2;12;unclosed internal subset;;;m
+2;12;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
 #data
 <!DOCTYPE a[
 <!ATTLIST bcd >
@@ -187,8 +198,7 @@
 ]><a/>
 #errors
 2;10;no space before md name;;;m
-2;14;no attr type;;;m
-TODO: ...
+2;13;no attr type;;;m
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT % >
@@ -201,10 +211,1243 @@ TODO: ...
 <!ATTLIST % c>
 ]><a/>
 #errors
-2;15;no attr type;;;m
-TODO: ...
+3;14;no attr type;;;m
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT % >
 |   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c>
+]><a/>
+#errors
+2;14;no attr type;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c
+#errors
+2;13;unclosed md;;;m
+2;13;unclosed internal subset;;;m
+2;13;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b cd>
+]><a/>
+#errors
+2;15;no attr type;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b cd
+#errors
+2;14;unclosed md;;;m
+2;14;unclosed internal subset;;;m
+2;14;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c >
+]><a/>
+#errors
+2;15;no attr type;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b c\u0020
+#errors
+2;14;unclosed md;;;m
+2;14;unclosed internal subset;;;m
+2;14;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b cd >
+]><a/>
+#errors
+2;16;no attr type;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b cd\u0020
+#errors
+2;15;unclosed md;;;m
+2;15;unclosed internal subset;;;m
+2;15;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c t>
+]><a/>
+#errors
+2;16;no attr default;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c t
+#errors
+2;15;unclosed md;;;m
+2;15;unclosed internal subset;;;m
+2;15;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c tu>
+]><a/>
+#errors
+2;17;no attr default;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c tu
+#errors
+2;16;unclosed md;;;m
+2;16;unclosed internal subset;;;m
+2;16;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c t >
+]><a/>
+#errors
+2;17;no attr default;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b c t\u0020
+#errors
+2;16;unclosed md;;;m
+2;16;unclosed internal subset;;;m
+2;16;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c CDATA>
+]><a/>
+#errors
+2;20;no attr default;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c CDATA
+#errors
+2;19;unclosed md;;;m
+2;19;unclosed internal subset;;;m
+2;19;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c t d>
+]><a/>
+#errors
+2;13;unknown declared type;;t;m
+2;17;unquoted attr value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c 0 () EXPLICIT "d"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c t d
+#errors
+2;13;unknown declared type;;t;m
+2;17;unquoted attr value;;;m
+2;17;unclosed md;;;m
+2;17;unclosed internal subset;;;m
+2;17;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c 0 () EXPLICIT "d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID d>
+]><a/>
+#errors
+2;18;unquoted attr value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID d
+#errors
+2;18;unquoted attr value;;;m
+2;18;unclosed md;;;m
+2;18;unclosed internal subset;;;m
+2;18;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID "d>
+]><a/>
+#errors
+3;3;lt in attr value;;;m
+3;6;unclosed attribute value;;;m
+3;6;unclosed internal subset;;;m
+3;6;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d>
+| ]><a/>"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID "d
+#errors
+2;19;unclosed attribute value;;;m
+2;19;unclosed internal subset;;;m
+2;19;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID "d">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID "d"
+#errors
+2;20;unclosed md;;;m
+2;20;unclosed internal subset;;;m
+2;20;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID "d&amp;">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d&"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID 'd>
+]><a/>
+#errors
+3;3;lt in attr value;;;m
+3;6;unclosed attribute value;;;m
+3;6;unclosed internal subset;;;m
+3;6;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d>
+| ]><a/>"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID 'd
+#errors
+2;19;unclosed attribute value;;;m
+2;19;unclosed internal subset;;;m
+2;19;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID 'd'>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID 'd'
+#errors
+2;20;unclosed md;;;m
+2;20;unclosed internal subset;;;m
+2;20;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID 'd&amp;'>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d&"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c ID d&amp;>
+]><a/>
+#errors
+2;18;unquoted attr value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ID () EXPLICIT "d&"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA "d"
+e CDATA "f">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "d"
+|     e CDATA () EXPLICIT "f"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA "d"e CDATA "f">
+]><a/>
+#errors
+3;12;no space before attr name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "d"
+|     e CDATA () EXPLICIT "f"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA 'd'
+e CDATA "f"
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "d"
+|     e CDATA () EXPLICIT "f"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA 'd'e CDATA "f"
+>]><a/>
+#errors
+3;12;no space before attr name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "d"
+|     e CDATA () EXPLICIT "f"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA d
+e CDATA "f"
+>]><a/>
+#errors
+3;9;unquoted attr value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "d"
+|     e CDATA () EXPLICIT "f"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA"d"
+>]><a/>
+#errors
+3;8;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "d"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA'd'
+>]><a/>
+#errors
+3;8;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "d"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA#REQUIRED
+>]><a/>
+#errors
+3;8;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () REQUIRED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA#IMPLIED
+>]><a/>
+#errors
+3;8;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA#FIXED "d"
+>]><a/>
+#errors
+3;8;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () FIXED "d"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #FIXED"d"
+>]><a/>
+#errors
+3;15;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () FIXED "d"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #IMPLIED
+d CDATA #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () IMPLIED ""
+|     d CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #REQUIRED
+d CDATA #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () REQUIRED ""
+|     d CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #FIXED "x"
+d CDATA #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () FIXED "x"
+|     d CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #UNKNOWN
+d CDATA #IMPLIED
+>]><a/>
+#errors
+3;1;unknown default type;;UNKNOWN;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () 0 ""
+|     d CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c IDREF #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c IDREF () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c IDREFS #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c IDREFS () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c NMTOKEN #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c NMTOKEN () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c NMTOKENS #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c NMTOKENS () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c ENTITY #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENTITY () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c ENTITIES #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENTITIES () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c NOTATION #IMPLIED
+>]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c NOTATION () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c ENUMERATION #IMPLIED
+>]><a/>
+#errors
+3;1;unknown declared type;;ENUMERATION;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c 0 () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c cdata #IMPLIED
+>]><a/>
+#errors
+3;1;unknown declared type;;cdata;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c 0 () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #FIXED 'd'
+e CDATA #IMPLIED
+>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () FIXED "d"
+|     e CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #FIXED'd'
+e CDATA #IMPLIED
+>
+]><a/>
+#errors
+3;15;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () FIXED "d"
+|     e CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #FIXED 'd'e CDATA #IMPLIED
+>
+]><a/>
+#errors
+3;19;no space before attr name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () FIXED "d"
+|     e CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #x 'd'
+e CDATA #IMPLIED
+>
+]><a/>
+#errors
+3;1;unknown default type;;x;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () 0 "d"
+|     e CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA # 'd'
+e CDATA #IMPLIED
+>
+]><a/>
+#errors
+3;10;no default type;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c () #IMPLIED
+>
+]><a/>
+#errors
+3;4;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c NOTATION () #IMPLIED
+>
+]><a/>
+#errors
+3;13;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c NOTATION () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c ()#IMPLIED
+>
+]><a/>
+#errors
+3;4;empty allowed token;;;m
+3;5;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c NOTATION ()#IMPLIED
+>
+]><a/>
+#errors
+3;13;empty allowed token;;;m
+3;14;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c NOTATION () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c() #IMPLIED
+>
+]><a/>
+#errors
+3;2;no space before paren;;;m
+3;3;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c NOTATION() #IMPLIED
+>
+]><a/>
+#errors
+3;11;no space before paren;;;m
+3;12;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c NOTATION () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c () "x"
+>
+]><a/>
+#errors
+3;4;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION () EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c NOTATION () "x"
+>
+]><a/>
+#errors
+3;13;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c NOTATION () EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c ()"x"
+>
+]><a/>
+#errors
+3;4;empty allowed token;;;m
+3;5;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION () EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c NOTATION ()"x"
+>
+]><a/>
+#errors
+3;13;empty allowed token;;;m
+3;14;no space before default value;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c NOTATION () EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (y) "x"
+>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (y) EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (yz) "x"
+>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (yz) EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (y|z) "x"
+>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (y|z) EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (y | z | abc) "x"
+>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (y|z|abc) EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (   ABC  |DEF|G  ) "x"
+>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (ABC|DEF|G) EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (|) "x"
+>
+]><a/>
+#errors
+3;4;empty allowed token;;;m
+3;5;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION () EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (|y) "x"
+>
+]><a/>
+#errors
+3;4;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (y) EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (y|) "x"
+>
+]><a/>
+#errors
+3;6;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (y) EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (y||z) "x"
+>
+]><a/>
+#errors
+3;6;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (y|z) EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (||) "x"
+>
+]><a/>
+#errors
+3;4;empty allowed token;;;m
+3;5;empty allowed token;;;m
+3;6;empty allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION () EXPLICIT "x"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (
+#errors
+3;3;unclosed md;;;m
+3;3;unclosed internal subset;;;m
+3;3;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c (\u0020
+#errors
+3;4;unclosed md;;;m
+3;4;unclosed internal subset;;;m
+3;4;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (x
+#errors
+3;4;unclosed md;;;m
+3;4;unclosed internal subset;;;m
+3;4;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (xy
+#errors
+3;5;unclosed md;;;m
+3;5;unclosed internal subset;;;m
+3;5;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c (x\u0020
+#errors
+3;5;unclosed md;;;m
+3;5;unclosed internal subset;;;m
+3;5;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (x|
+#errors
+3;5;unclosed md;;;m
+3;5;unclosed internal subset;;;m
+3;5;no root element;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (>
+]><a/>
+#errors
+3;4;unclosed allowed tokens;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c ( >
+]><a/>
+#errors
+3;5;unclosed allowed tokens;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (a>
+]><a/>
+#errors
+3;5;unclosed allowed tokens;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (ab>
+]><a/>
+#errors
+3;6;unclosed allowed tokens;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (x >
+]><a/>
+#errors
+3;6;unclosed allowed tokens;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (x|>
+]><a/>
+#errors
+3;6;unclosed allowed tokens;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (x y) #IMPLIED>
+]><a/>
+#errors
+3;5;space in allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (x y) IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (x y  |z) #IMPLIED>
+]><a/>
+#errors
+3;5;space in allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (x y|z) IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (x y   z) #IMPLIED>
+]><a/>
+#errors
+3;5;space in allowed token;;;m
+3;9;space in allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (x y z) IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c (x     y) #IMPLIED>
+]><a/>
+#errors
+3;9;space in allowed token;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (x y) IMPLIED ""
 | <{} a>

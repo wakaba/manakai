@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -164,6 +164,19 @@ sub BEFORE_MD_NAME_STATE () { 68 }
 sub MD_NAME_STATE () { 69 }
 sub DOCTYPE_ENTITY_PARAMETER_BEFORE_STATE () { 70 }
 sub DOCTYPE_ATTLIST_NAME_AFTER_STATE () { 71 }
+sub DOCTYPE_ATTLIST_ATTRIBUTE_NAME_STATE () { 72 }
+sub DOCTYPE_ATTLIST_ATTRIBUTE_NAME_AFTER_STATE () { 73 }
+sub DOCTYPE_ATTLIST_ATTRIBUTE_TYPE_STATE () { 74 }
+sub DOCTYPE_ATTLIST_ATTRIBUTE_TYPE_AFTER_STATE () { 75 }
+sub BEFORE_ALLOWED_TOKEN_STATE () { 76 }
+sub ALLOWED_TOKEN_STATE () { 77 }
+sub AFTER_ALLOWED_TOKEN_STATE () { 78 }
+sub AFTER_ALLOWED_TOKENS_STATE () { 79 }
+sub BEFORE_ATTR_DEFAULT_STATE () { 80 }
+sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE () { 81 }
+sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_STATE () { 82 }
+sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_AFTER_STATE () { 83 }
+sub AFTER_ATTLIST_ATTR_VALUE_QUOTED_STATE () { 84 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -1737,12 +1750,20 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
-      ## XML5: "Tag attribute value double quoted state".
+      ## XML5: "Tag attribute value double quoted state" and "DOCTYPE
+      ## ATTLIST attribute value double quoted state".
       
       if ($self->{nc} == 0x0022) { # "
-        
-        ## XML5: "Tag attribute name before state".
-        $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
+        if ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          
+          ## XML5: "DOCTYPE ATTLIST name after state".
+          push @{$self->{ct}->{attrdefs}}, $self->{ca};
+          $self->{state} = AFTER_ATTLIST_ATTR_VALUE_QUOTED_STATE;
+        } else {
+          
+          ## XML5: "Tag attribute name before state".
+          $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
+        }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1783,6 +1804,12 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
+
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          ## reconsume
+          return  ($self->{ct}); # start tag
+          redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
@@ -1792,17 +1819,24 @@ sub _get_next_token ($) {
             ## NOTE: This state should never be reached.
             
           }
+
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          ## reconsume
+          return  ($self->{ct}); # end tag
+          redo A;
+        } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          ## XML5: No parse error above; not defined yet.
+          push @{$self->{ct}->{attrdefs}}, $self->{ca};
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+          ## Reconsume.
+          return  ($self->{ct}); # ATTLIST
+          redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
-        ## reconsume
-
-        return  ($self->{ct}); # start tag or end tag
-
-        redo A;
       } else {
+        ## XML5 [ATTLIST]: Not defined yet.
         if ($self->{is_xml} and $self->{nc} == 0x003C) { # <
           
           ## XML5: Not a parse error.
@@ -1830,12 +1864,20 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
-      ## XML5: "Tag attribute value single quoted state".
+      ## XML5: "Tag attribute value single quoted state" and "DOCTYPE
+      ## ATTLIST attribute value single quoted state".
 
       if ($self->{nc} == 0x0027) { # '
-        
-        ## XML5: "Before attribute name state" (sic).
-        $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
+        if ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          
+          ## XML5: "DOCTYPE ATTLIST name after state".
+          push @{$self->{ct}->{attrdefs}}, $self->{ca};
+          $self->{state} = AFTER_ATTLIST_ATTR_VALUE_QUOTED_STATE;
+        } else {
+          
+          ## XML5: "Before attribute name state" (sic).
+          $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
+        }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1876,6 +1918,12 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
+
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          ## reconsume
+          return  ($self->{ct}); # start tag
+          redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
@@ -1885,17 +1933,24 @@ sub _get_next_token ($) {
             ## NOTE: This state should never be reached.
             
           }
+
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          ## reconsume
+          return  ($self->{ct}); # end tag
+          redo A;
+        } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          ## XML5: No parse error above; not defined yet.
+          push @{$self->{ct}->{attrdefs}}, $self->{ca};
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+          ## Reconsume.
+          return  ($self->{ct}); # ATTLIST
+          redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
-        ## reconsume
-
-        return  ($self->{ct}); # start tag or end tag
-
-        redo A;
       } else {
+        ## XML5 [ATTLIST]: Not defined yet.
         if ($self->{is_xml} and $self->{nc} == 0x003C) { # <
           
           ## XML5: Not a parse error.
@@ -1926,9 +1981,15 @@ sub _get_next_token ($) {
       ## XML5: "Tag attribute value unquoted state".
 
       if ($is_space->{$self->{nc}}) {
-        
-        ## XML5: "Tag attribute name before state".
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
+        if ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          
+          push @{$self->{ct}->{attrdefs}}, $self->{ca};
+          $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+        } else {
+          
+          ## XML5: "Tag attribute name before state".
+          $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
+        }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1969,21 +2030,10 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
-          if ($self->{ct}->{attributes}) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            
-          }
-        } else {
-          die "$0: $self->{ct}->{type}: Unknown token type";
-        }
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
-        
+
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1994,15 +2044,8 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-
-        return  ($self->{ct}); # start tag or end tag
-
-        redo A;
-      } elsif ($self->{nc} == -1) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
+          return  ($self->{ct}); # start tag
+          redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
@@ -2012,16 +2055,78 @@ sub _get_next_token ($) {
             ## NOTE: This state should never be reached.
             
           }
+
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          return  ($self->{ct}); # end tag
+          redo A;
+        } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          push @{$self->{ct}->{attrdefs}}, $self->{ca};
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          return  ($self->{ct}); # ATTLIST
+          redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
-        $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
-        ## reconsume
+      } elsif ($self->{nc} == -1) {
+        if ($self->{ct}->{type} == START_TAG_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
+          $self->{last_stag_name} = $self->{ct}->{tag_name};
 
-        return  ($self->{ct}); # start tag or end tag
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          ## reconsume
+          return  ($self->{ct}); # start tag
+          redo A;
+        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
+          if ($self->{ct}->{attributes}) {
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
+          } else {
+            ## NOTE: This state should never be reached.
+            
+          }
 
-        redo A;
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          ## reconsume
+          return  ($self->{ct}); # end tag
+          redo A;
+        } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+          push @{$self->{ct}->{attrdefs}}, $self->{ca};
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+          ## Reconsume.
+          return  ($self->{ct}); # ATTLIST
+          redo A;
+        } else {
+          die "$0: $self->{ct}->{type}: Unknown token type";
+        }
       } else {
         if ({
              0x0022 => 1, # "
@@ -5477,6 +5582,7 @@ sub _get_next_token ($) {
       } elsif ($self->{kwd} eq 'ATTLIS' and
                $self->{nc} == 0x0054) { # T
         $self->{ct} = {type => ATTLIST_TOKEN, name => '',
+                       attrdefs => [],
                        line => $self->{line_prev},
                        column => $self->{column_prev} - 6};
         $self->{state} = DOCTYPE_MD_STATE;
@@ -5831,18 +5937,1211 @@ sub _get_next_token ($) {
         ## XML5: No parse error.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        return  ($self->{ct});
         redo A;
       } else {
         ## XML5: Not defined yet.
-
-        ## TODO: ...
-
+        $self->{ca} = {name => chr ($self->{nc}), # attrdef
+                       tokens => [],
+                       line => $self->{line}, column => $self->{column}};
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ATTLIST_ATTRIBUTE_NAME_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_NAME_AFTER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr type'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == 0x0028) { # (
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before paren'); ## TODO: type
+        $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } else {
+        ## XML5: Not defined yet.
+        $self->{ca}->{name} .= chr $self->{nc};
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ATTLIST_ATTRIBUTE_NAME_AFTER_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr type'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == 0x0028) { # (
+        ## XML5: Same as "anything else".
+        $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        ## XML5: Not defined yet.
+        $self->{ca}->{type} = chr $self->{nc};
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_TYPE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ATTLIST_ATTRIBUTE_TYPE_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_TYPE_AFTER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0023) { # #
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0022) { # "
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0027) { # '
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == 0x0028) { # (
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before paren'); ## TODO: type
+        $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        ## XML5: Not defined yet.
+        $self->{ca}->{type} .= chr $self->{nc};
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ATTLIST_ATTRIBUTE_TYPE_AFTER_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0028) { # (
+        ## XML5: Same as "anything else".
+        $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0023) { # #
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0022) { # "
+        ## XML5: Same as "anything else".
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0027) { # '
+        ## XML5: Same as "anything else".
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        ## XML5: Switch to the "DOCTYPE bogus comment state".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unquoted attr value'); ## TODO: type
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == BEFORE_ALLOWED_TOKEN_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x007C) { # |
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty allowed token'); ## TODO: type
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0029) { # )
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty allowed token'); ## TODO: type
+        $self->{state} = AFTER_ALLOWED_TOKENS_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed allowed tokens'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        push @{$self->{ca}->{tokens}}, chr $self->{nc};
+        $self->{state} = ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == ALLOWED_TOKEN_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = AFTER_ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x007C) { # |
+        $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0029) { # )
+        $self->{state} = AFTER_ALLOWED_TOKENS_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed allowed tokens'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        $self->{ca}->{tokens}->[-1] .= chr $self->{nc};
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_ALLOWED_TOKEN_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x007C) { # |
+        $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0029) { # )
+        $self->{state} = AFTER_ALLOWED_TOKENS_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed allowed tokens'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'space in allowed token', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev});
+        $self->{ca}->{tokens}->[-1] .= ' ' . chr $self->{nc};
+        $self->{state} = ALLOWED_TOKEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_ALLOWED_TOKENS_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = BEFORE_ATTR_DEFAULT_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0023) { # #
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0022) { # "
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0027) { # '
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unquoted attr value'); ## TODO: type
+        $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == BEFORE_ATTR_DEFAULT_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0023) { # #
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0022) { # "
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0027) { # '
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unquoted attr value'); ## TODO: type
+        $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no default type'); ## TODO: type
         $self->{state} = BOGUS_COMMENT_STATE;
         $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
         ## Reconsume.
         redo A;
+      } elsif ($self->{nc} == 0x0022) { # "
+        ## XML5: Same as "anything else".
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0027) { # '
+        ## XML5: Same as "anything else".
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        $self->{ca}->{default} = chr $self->{nc};
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
       }
-
+    } elsif ($self->{state} == DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_AFTER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0022) { # "
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0027) { # '
+        ## XML5: Same as "anything else".
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        ## XML5: Same as "anything else".
+        push @{$self->{ct}->{attrdefs}}, $self->{ca};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        push @{$self->{ct}->{attrdefs}}, $self->{ca};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        $self->{ca}->{default} .= chr $self->{nc};
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_AFTER_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0022) { # "
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0027) { # '
+        $self->{ca}->{value} = '';
+        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        push @{$self->{ct}->{attrdefs}}, $self->{ca};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ATTLIST
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        ## XML5: No parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        push @{$self->{ct}->{attrdefs}}, $self->{ca};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct});
+        redo A;
+      } else {
+        ## XML5: Not defined yet.
+        if ($self->{ca}->{default} eq 'FIXED') {
+          $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
+        } else {
+          push @{$self->{ct}->{attrdefs}}, $self->{ca};
+          $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+        }
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_ATTLIST_ATTR_VALUE_QUOTED_STATE) {
+      if ($is_space->{$self->{nc}} or
+          $self->{nc} == -1 or
+          $self->{nc} == 0x003E) { # >
+        $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+        ## Reconsume.
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before attr name'); ## TODO: type
+        $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+        ## Reconsume.
+        redo A;
+      }      
     } else {
       die "$0: $self->{state}: Unknown state";
     }
@@ -5852,4 +7151,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/17 07:14:29 $
+## $Date: 2008/10/18 08:05:29 $
+                                

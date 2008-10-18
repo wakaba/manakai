@@ -1,7 +1,7 @@
 1..4935
 # Running under perl version 5.010000 for linux
-# Current time local: Fri Oct 17 16:07:16 2008
-# Current time GMT:   Fri Oct 17 07:07:16 2008
+# Current time local: Sat Oct 18 16:58:23 2008
+# Current time GMT:   Sat Oct 18 07:58:23 2008
 # Using Test.pm version 1.25
 # t/xml/elements-1.dat
 ok 1
@@ -849,21 +849,201 @@ ok 828
 ok 829
 ok 830
 ok 831
-not ok 832
-# Test 832 got: "2;10;no space before md name;;;m" (t/XML-Parser.t at line 95 fail #358)
-#     Expected: "2;10;no space before md name;;;m\n2;14;no attr type;;;m\nTODO: ..." (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST% c>\x{0A}<!ATTLIST b>\x{0A}]><a/>')
-#  t/XML-Parser.t line 95 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
-not ok 833
-# Test 833 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 120 fail #358)
-#     Expected: "<!DOCTYPE a>\n  <!ELEMENT % >\n  <!ELEMENT b >\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST% c>\x{0A}<!ATTLIST b>\x{0A}]><a/>')
-#     Line 2 is missing:
-#      - "  <!ELEMENT % >\n"
-#  t/XML-Parser.t line 120 is:   ok $result, $test->{document}->[0],
-not ok 834
-# Test 834 got: "" (t/XML-Parser.t at line 95 fail #359)
-#     Expected: "2;15;no attr type;;;m\nTODO: ..." (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b>\x{0A}<!ATTLIST % c>\x{0A}]><a/>')
-not ok 835
-# Test 835 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 120 fail #359)
-#     Expected: "<!DOCTYPE a>\n  <!ELEMENT % >\n  <!ELEMENT b >\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b>\x{0A}<!ATTLIST % c>\x{0A}]><a/>')
-#     Line 2 is missing:
-#      - "  <!ELEMENT % >\n"
+ok 832
+ok 833
+ok 834
+ok 835
+ok 836
+ok 837
+ok 838
+ok 839
+ok 840
+ok 841
+ok 842
+ok 843
+ok 844
+ok 845
+ok 846
+ok 847
+ok 848
+ok 849
+ok 850
+ok 851
+ok 852
+ok 853
+ok 854
+ok 855
+ok 856
+ok 857
+ok 858
+ok 859
+ok 860
+ok 861
+ok 862
+ok 863
+ok 864
+ok 865
+ok 866
+ok 867
+ok 868
+ok 869
+ok 870
+ok 871
+ok 872
+ok 873
+ok 874
+ok 875
+ok 876
+ok 877
+ok 878
+ok 879
+ok 880
+ok 881
+ok 882
+ok 883
+ok 884
+ok 885
+ok 886
+ok 887
+ok 888
+ok 889
+ok 890
+ok 891
+ok 892
+ok 893
+ok 894
+ok 895
+ok 896
+ok 897
+ok 898
+ok 899
+ok 900
+ok 901
+ok 902
+ok 903
+ok 904
+ok 905
+ok 906
+ok 907
+ok 908
+ok 909
+ok 910
+ok 911
+ok 912
+ok 913
+ok 914
+ok 915
+ok 916
+ok 917
+ok 918
+ok 919
+ok 920
+ok 921
+ok 922
+ok 923
+ok 924
+ok 925
+ok 926
+ok 927
+ok 928
+ok 929
+ok 930
+ok 931
+ok 932
+ok 933
+ok 934
+ok 935
+ok 936
+ok 937
+ok 938
+ok 939
+ok 940
+ok 941
+ok 942
+ok 943
+ok 944
+ok 945
+ok 946
+ok 947
+ok 948
+ok 949
+ok 950
+ok 951
+ok 952
+ok 953
+ok 954
+ok 955
+ok 956
+ok 957
+ok 958
+ok 959
+ok 960
+ok 961
+ok 962
+ok 963
+ok 964
+ok 965
+ok 966
+ok 967
+ok 968
+ok 969
+ok 970
+ok 971
+ok 972
+ok 973
+ok 974
+ok 975
+ok 976
+ok 977
+ok 978
+ok 979
+ok 980
+ok 981
+ok 982
+ok 983
+ok 984
+ok 985
+ok 986
+ok 987
+ok 988
+ok 989
+ok 990
+ok 991
+ok 992
+ok 993
+ok 994
+ok 995
+ok 996
+ok 997
+ok 998
+ok 999
+ok 1000
+ok 1001
+ok 1002
+ok 1003
+ok 1004
+ok 1005
+ok 1006
+ok 1007
+ok 1008
+ok 1009
+ok 1010
+ok 1011
+ok 1012
+ok 1013
+ok 1014
+ok 1015
+ok 1016
+ok 1017
+ok 1018
+ok 1019
+ok 1020
+ok 1021
+ok 1022
+ok 1023
+ok 1024
+ok 1025
+ok 1026
+ok 1027
+ok 1028
+ok 1029
