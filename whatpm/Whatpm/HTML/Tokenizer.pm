@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -177,7 +177,13 @@ sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE () { 81 }
 sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_STATE () { 82 }
 sub DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_AFTER_STATE () { 83 }
 sub AFTER_ATTLIST_ATTR_VALUE_QUOTED_STATE () { 84 }
-sub BOGUS_MD_STATE () { 85 }
+sub BEFORE_NDATA_STATE () { 85 }
+sub NDATA_STATE () { 86 }
+sub AFTER_NDATA_STATE () { 87 }
+sub BEFORE_NOTATION_NAME_STATE () { 88 }
+sub NOTATION_NAME_STATE () { 89 }
+sub AFTER_NOTATION_NAME_STATE () { 90 }
+sub BOGUS_MD_STATE () { 91 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -4172,8 +4178,13 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE) {
       if ($is_space->{$self->{nc}}) {
-        
-        ## Stay in the state
+        if ($self->{ct}->{type} == GENERAL_ENTITY_TOKEN) {
+          
+          $self->{state} = BEFORE_NDATA_STATE;
+        } else {
+          
+          ## Stay in the state
+        }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -4209,7 +4220,25 @@ sub _get_next_token ($) {
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
-## TODO: "NDATA"
+      } elsif ($self->{ct}->{type} == GENERAL_ENTITY_TOKEN and
+               ($self->{nc} == 0x004E or # N
+                $self->{nc} == 0x006E)) { # n
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before NDATA'); ## TODO: type
+        $self->{state} = NDATA_STATE;
+        $self->{kwd} = chr $self->{nc};
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
       } elsif ($self->{nc} == -1) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
@@ -4258,6 +4287,79 @@ sub _get_next_token ($) {
           $self->{state} = BOGUS_MD_STATE;
         }
 
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == BEFORE_NDATA_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } elsif ($self->{nc} == 0x004E or # N
+               $self->{nc} == 0x006E) { # n
+        
+        $self->{state} = NDATA_STATE;
+        $self->{kwd} = chr $self->{nc};
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        ## reconsume
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after SYSTEM literal');
+        $self->{state} = BOGUS_MD_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -7342,6 +7444,304 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
+    } elsif ($self->{state} == NDATA_STATE) {
+      ## ASCII case-insensitive
+      if ($self->{nc} == [
+            undef, 
+            0x0044, # D
+            0x0041, # A
+            0x0054, # T
+          ]->[length $self->{kwd}] or
+          $self->{nc} == [
+            undef, 
+            0x0064, # d
+            0x0061, # a
+            0x0074, # t
+          ]->[length $self->{kwd}]) {
+        
+        ## Stay in the state.
+        $self->{kwd} .= chr $self->{nc};
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ((length $self->{kwd}) == 4 and
+               ($self->{nc} == 0x0041 or # A
+                $self->{nc} == 0x0061)) { # a
+        if ($self->{kwd} ne 'NDAT' or $self->{nc} == 0x0061) { # a
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'lowercase keyword', ## TODO: type
+                          text => 'NDATA',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 4);
+        } else {
+          
+        }
+        $self->{state} = AFTER_NDATA_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after literal', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} + 1
+                            - length $self->{kwd});
+        
+        $self->{state} = BOGUS_MD_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_NDATA_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = BEFORE_NOTATION_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no notation name'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after literal', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} + 1
+                            - length $self->{kwd});
+        $self->{state} = BOGUS_MD_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == BEFORE_NOTATION_NAME_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no notation name'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } else {
+        $self->{ct}->{notation} = chr $self->{nc}; # ENTITY
+        $self->{state} = NOTATION_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == NOTATION_NAME_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = AFTER_NOTATION_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } else {
+        $self->{ct}->{notation} .= chr $self->{nc}; # ENTITY
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_NOTATION_NAME_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ENTITY
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after notation name'); ## TODO: type
+        $self->{state} = BOGUS_MD_STATE;
+        ## Reconsume.
+        redo A;
+      }
+
 
     } elsif ($self->{state} == BOGUS_MD_STATE) {
       if ($self->{nc} == 0x003E) { # >
@@ -7388,5 +7788,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 04:39:25 $
+## $Date: 2008/10/19 06:14:57 $
                                 

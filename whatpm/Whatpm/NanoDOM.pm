@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -731,6 +731,11 @@ sub system_id ($;$) {
   return $_[0]->{system_id};
 } # system_id
 
+sub notation_name ($;$) {
+  $_[0]->{notation_name} = $_[1] if @_ > 1;
+  return $_[0]->{notation_name};
+} # notation_name
+
 package Whatpm::NanoDOM::Notation;
 push our @ISA, 'Whatpm::NanoDOM::Node';
 
@@ -826,4 +831,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/18 11:34:49 $
+# $Date: 2008/10/19 06:14:57 $

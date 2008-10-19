@@ -1,0 +1,264 @@
+#data
+<!DOCTYPE a[
+<!E>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!E
+#errors
+2;1;bogus comment;;;m
+2;3;unclosed internal subset;;;m
+2;3;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!EN>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!EN
+#errors
+2;1;bogus comment;;;m
+2;4;unclosed internal subset;;;m
+2;4;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENT>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENT
+#errors
+2;1;bogus comment;;;m
+2;5;unclosed internal subset;;;m
+2;5;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTIT>
+]><a/>
+#errors
+2;1;bogus comment;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTIT
+#errors
+2;1;bogus comment;;;m
+2;7;unclosed internal subset;;;m
+2;7;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY>
+]><a/>
+#errors
+2;9;no md name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY
+#errors
+2;8;unclosed md;;;m
+2;8;unclosed internal subset;;;m
+2;8;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY >
+]><a/>
+#errors
+2;10;no md name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY\u0020
+#errors
+2;9;unclosed md;;;m
+2;9;unclosed internal subset;;;m
+2;9;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY b>
+]><a/>
+#errors
+2;11;no md def;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY b "" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc>
+]><a/>
+#errors
+2;12;no md def;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY bc "" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc SYSTEM "x" >
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY bc "" "" "x" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA z>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ENTITY bc "" "x" "y" z>
+| <{} a>
+#entities
+| <!ENTITY bc "" "x" "y" z>
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc SYSTEM "x" NDATA zz >
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ENTITY bc "" "" "x" zz>
+| <{} a>
+#entities
+| <!ENTITY bc "" "" "x" zz>
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" ndata zz>
+]><a/>
+#errors
+2;27;lowercase keyword;NDATA;;m
+#document
+| <!DOCTYPE a>
+|   <!ENTITY bc "" "x" "y" zz>
+| <{} a>
+#entities
+| <!ENTITY bc "" "x" "y" zz>
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA>
+]><a/>
+#errors
+2;33;no notation name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA >
+]><a/>
+#errors
+2;34;no notation name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA zz aaa>
+]><a/>
+#errors
+2;37;string after notation name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ENTITY bc "" "x" "y" zz>
+| <{} a>
+#entities
+| <!ENTITY bc "" "x" "y" zz>
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y"NDATA z>
+]><a/>
+#errors
+2;27;no space before NDATA;;;m
+#document
+| <!DOCTYPE a>
+|   <!ENTITY bc "" "x" "y" z>
+| <{} a>
+#entities
+| <!ENTITY bc "" "x" "y" z>

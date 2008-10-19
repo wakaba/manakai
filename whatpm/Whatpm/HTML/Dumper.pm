@@ -1,6 +1,6 @@
 package Whatpm::HTML::Dumper;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -87,6 +87,8 @@ sub dumptree ($) {
       $r .= $child->[0]->data . "?>\x0A";
     } elsif ($nt == $child->[0]->ENTITY_NODE) {
       $r .= $child->[1] . '<!ENTITY ' . $child->[0]->node_name . ' "';
+      $r .= $child->[0]->text_content;
+      $r .= '" "';
       $r .= $child->[0]->public_id if defined $child->[0]->public_id;
       $r .= '" "';
       $r .= $child->[0]->system_id if defined $child->[0]->system_id;
@@ -133,4 +135,4 @@ sub dumptree ($) {
 ## TDOO: Document
 
 1;
-## $Date: 2008/10/18 08:05:29 $
+## $Date: 2008/10/19 06:14:57 $

@@ -74,10 +74,10 @@ sub test ($) {
     #return Whatpm::Charset::UnicodeChecker->new_handle ($_[0], 'html5');
   }; # $chk
 
+  my $p = Whatpm::XML::Parser->new;
   my $result;
   unless (defined $test->{element}) {
-    Whatpm::XML::Parser->parse_char_string
-        ($test->{data}->[0] => $doc, $onerror, $chk);
+    $p->parse_char_string ($test->{data}->[0] => $doc, $onerror, $chk);
     $result = dumptree ($doc);
   } else {
     ## TODO: ...
@@ -115,6 +115,38 @@ sub test ($) {
         $test->{'xml-standalone'}->[1]->[0] eq 'true' ? 1 : 0,
         'XML standalone: ' . Data::Dumper::qquote ($test->{data}->[0]);
   }
+
+  if ($test->{entities}) {
+    my @e;
+    for (keys %{$p->{ge}}) {
+      my $ent = $p->{ge}->{$_};
+      my $v = '<!ENTITY ' . $ent->{name} . ' "';
+      $v .= $ent->{text} if defined $ent->{text};
+      $v .= '" "';
+      $v .= $ent->{pubid} if defined $ent->{pubid};
+      $v .= '" "';
+      $v .= $ent->{sysid} if defined $ent->{sysid};
+      $v .= '" ';
+      $v .= $ent->{notation} if defined $ent->{notation};
+      $v .= '>';
+      push @e, $v;
+    }
+    for (keys %{$p->{pe}}) {
+      my $ent = $p->{pe}->{$_};
+      my $v = '<!ENTITY % ' . $ent->{name} . ' "';
+      $v .= $ent->{text} if defined $ent->{text};
+      $v .= '" "';
+      $v .= $ent->{pubid} if defined $ent->{pubid};
+      $v .= '" "';
+      $v .= $ent->{sysid} if defined $ent->{sysid};
+      $v .= '" ';
+      $v .= $ent->{notation} if defined $ent->{notation};
+      $v .= '>';
+      push @e, $v;
+    }
+    ok join ("\x0A", @e), $test->{entities}->[0],
+        'Entities: ' . Data::Dumper::qquote ($test->{data}->[0]);
+  }
   
   $test->{document}->[0] .= "\x0A" if length $test->{document}->[0];
   ok $result, $test->{document}->[0],
@@ -138,6 +170,8 @@ my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}doctypes-2.dat
   ${test_dir_name}attlists-1.dat
   ${test_dir_name}notations-1.dat
+  ${test_dir_name}entities-1.dat
+  ${test_dir_name}entities-2.dat
 ];
 
 require 't/testfiles.pl';
@@ -145,7 +179,8 @@ execute_test ($_, {
   errors => {is_list => 1},
   document => {is_prefixed => 1},
   'document-fragment' => {is_prefixed => 1},
+  entities => {is_prefixed => 1},
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/18 11:34:49 $
+## $Date: 2008/10/19 06:14:57 $

@@ -897,20 +897,24 @@ sub _tree_in_subset ($) {
       $token = $self->_get_next_token;
       next B;
     } elsif ($token->{type} == GENERAL_ENTITY_TOKEN) {
-      ## TODO: Creates a node only if the token is an external entity.
+      ## TODO: predefined entity names
 
-      unless ($self->{doctype}->get_general_entity_node
-                ($token->{name})) {
-        my $node = $self->{document}->create_general_entity ($token->{name});
-        $node->set_user_data (manakai_source_line => $token->{line});
-        $node->set_user_data (manakai_source_column => $token->{column});
-        
-        $node->public_id ($token->{pubid}); # may be undef
-        $node->system_id ($token->{sysid}); # may be undef
+      unless ($self->{ge}->{$token->{name}}) {
+        ## For parser.
+        $self->{ge}->{$token->{name}} = $token;
 
-        ## TODO: ...
-        
-        $self->{doctype}->set_general_entity_node ($node);
+        ## For DOM.
+        if (defined $token->{notation}) {
+          my $node = $self->{document}->create_general_entity ($token->{name});
+          $node->set_user_data (manakai_source_line => $token->{line});
+          $node->set_user_data (manakai_source_column => $token->{column});
+          
+          $node->public_id ($token->{pubid}); # may be undef
+          $node->system_id ($token->{sysid}); # may be undef
+          $node->notation_name ($token->{notation});
+          
+          $self->{doctype}->set_general_entity_node ($node);
+        }
       } else {
         ## TODO: ...
         
@@ -920,8 +924,13 @@ sub _tree_in_subset ($) {
       $token = $self->_get_next_token;
       next B;
     } elsif ($token->{type} == PARAMETER_ENTITY_TOKEN) {
-      ## TODO: ...
-
+      unless ($self->{pe}->{$token->{name}}) {
+        ## For parser.
+        $self->{pe}->{$token->{name}} = $token;
+      } else {
+        ## TODO: ...
+      }
+      
       ## Stay in the mode.
       $token = $self->_get_next_token;
       next B;

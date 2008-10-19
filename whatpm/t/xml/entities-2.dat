@@ -1,0 +1,68 @@
+#data
+<!DOCTYPE a[
+<!ENTITY%>
+]><a/>
+#errors
+2;9;no space before md name;;;m
+2;10;no md name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY%
+#errors
+2;9;no space before md name;;;m
+2;9;unclosed md;;;m
+2;9;unclosed internal subset;;;m
+2;9;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY %>
+]><a/>
+#errors
+2;11;no md name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY %
+#errors
+2;10;unclosed md;;;m
+2;10;unclosed internal subset;;;m
+2;10;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC "x" "y">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC "x" "y" NDATA z>
+]><a/>
+#errors
+2;30;string after SYSTEM literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "x" "y" >
