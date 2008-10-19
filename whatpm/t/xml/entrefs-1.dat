@@ -1,0 +1,190 @@
+#data
+<p>&lt;</p>
+#errors
+#document
+| <{} p>
+|   "<"
+
+#data
+<p>&amp;</p>
+#errors
+#document
+| <{} p>
+|   "&"
+
+#data
+<p>&gt;</p>
+#errors
+#document
+| <{} p>
+|   ">"
+
+#data
+<p>&quot;</p>
+#errors
+#document
+| <{} p>
+|   """
+
+#data
+<p>&apos;</p>
+#errors
+#document
+| <{} p>
+|   "'"
+
+#data
+<!DOCTYPE p>
+<p>&lt;</p>
+#errors
+2;7;entity not declared;;lt;;w
+#document
+| <!DOCTYPE p>
+| <{} p>
+|   "<"
+
+#data
+<!DOCTYPE p>
+<p>&gt;</p>
+#errors
+2;7;entity not declared;;gt;;w
+#document
+| <!DOCTYPE p>
+| <{} p>
+|   ">"
+
+#data
+<!DOCTYPE p>
+<p>&amp;</p>
+#errors
+2;8;entity not declared;;amp;;w
+#document
+| <!DOCTYPE p>
+| <{} p>
+|   "&"
+
+#data
+<p>&xx;</p>
+#errors
+1;4;bare ero;;;m
+#document
+| <{} p>
+|   "&xx;"
+
+#data
+<!DOCTYPE p>
+<p>&xx;</p>
+#errors
+2;4;bare ero;;;m
+#document
+| <!DOCTYPE p>
+| <{} p>
+|   "&xx;"
+
+#data
+<p>&lt</p>
+#errors
+1;7;no refc;;;m
+#document
+| <{} p>
+|   "<"
+
+#data
+<!DOCTYPE p>
+<p>&lt</p>
+#errors
+2;7;no refc;;;m
+#document
+| <!DOCTYPE p>
+| <{} p>
+|   "<"
+
+#data
+<p>&copy;</p>
+#errors
+1;9;entity not declared;;copy;;m
+#document escaped
+| <{} p>
+|   "\u00a9"
+
+#data
+<!DOCTYPE p>
+<p>&copy;</p>
+#errors
+2;9;entity not declared;;copy;;m
+#document escaped
+| <!DOCTYPE p>
+| <{} p>
+|   "\u00a9"
+
+#data
+<!DOCTYPE p[
+<!ENTITY copy "&#xa9;">
+]>
+<p>&copy;</p>
+#errors
+#document escaped
+| <!DOCTYPE p>
+| <{} p>
+|   "\u00a9"
+
+#data
+<!DOCTYPE p[
+<!ENTITY copy "&#xaa;">
+]>
+<p>&copy;</p>
+#errors
+#document escaped
+| <!DOCTYPE p>
+| <{} p>
+|   "\u00aa"
+
+#data
+<!DOCTYPE p[
+<!ENTITY copy "&#xaa;">
+]>
+<p>&copy</p>
+#errors
+4;9;no refc;;;m
+#document escaped
+| <!DOCTYPE p>
+| <{} p>
+|   "\u00a9"
+
+#data
+<!DOCTYPE p[
+<!ENTITY aa "&#xaa;">
+]>
+<p>&aa;</p>
+#errors
+#document escaped
+| <!DOCTYPE p>
+| <{} p>
+|   "\u00aa"
+
+#data
+<!DOCTYPE p[
+<!ENTITY aa "&#xaa;">
+]>
+<p>&aa</p>
+#errors
+4;4;bare ero;;;m
+#document escaped
+| <!DOCTYPE p>
+| <{} p>
+|   "&aa"
+
+#data
+<!DOCTYPE a[
+<!NOTATION n PUBLIC "n">
+<!ENTITY ent PUBLIC "x" "y" NDATA n>
+]>
+<a>&ent;</a>
+#errors
+5;8;unparsed entity;;ent;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION n "n" "">
+|   <!ENTITY ent "" "x" "y" n>
+| <{} a>
+|   "&ent;"

@@ -1,5 +1,11 @@
 2008-10-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* Tokenizer.pm.src: Raise a parse error for '&' that does not
+	introduce a reference in XML.  Support for non-ASCII entity
+	reference names.
+
+2008-10-19  Wakaba  <wakaba@suika.fam.cx>
+
 	* Tokenizer.pm.src: Make uppercase "&#X" in XML a parse error.
 	Remove the limitation of entity name length.  Enable replacement
 	of text-only general entities.  Raise a parse error for an

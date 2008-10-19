@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -4628,9 +4628,17 @@ sub _get_next_token ($) {
             0x003C => 1, 0x0026 => 1, -1 => 1, # <, &
             $self->{entity_add} => 1,
           }->{$self->{nc}}) {
-        
+        if ($self->{is_xml}) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev}
+                              + ($self->{nc} == -1 ? 1 : 0));
+        } else {
+          
+          ## No error
+        }
         ## Don't consume
-        ## No error
         ## Return nothing.
         #
       } elsif ($self->{nc} == 0x0023) { # #
@@ -4649,7 +4657,8 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ((0x0041 <= $self->{nc} and
+      } elsif ($self->{is_xml} or
+               (0x0041 <= $self->{nc} and
                 $self->{nc} <= 0x005A) or # A..Z
                (0x0061 <= $self->{nc} and
                 $self->{nc} <= 0x007A)) { # a..z
@@ -5021,7 +5030,13 @@ sub _get_next_token ($) {
            $self->{nc} <= 0x007A) or # z
           (0x0030 <= $self->{nc} and # 0
            $self->{nc} <= 0x0039) or # 9
-          $self->{nc} == 0x003B) { # ;
+          $self->{nc} == 0x003B or # ;
+          ($self->{is_xml} and
+           not ($is_space->{$self->{nc}} or
+                {
+                  0x003C => 1, 0x0026 => 1, -1 => 1, # <, &
+                  $self->{entity_add} => 1,
+                }->{$self->{nc}}))) {
         our $EntityChar;
         $self->{kwd} .= chr $self->{nc};
         if (defined $EntityChar->{$self->{kwd}} or
@@ -7887,15 +7902,16 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ENTITY_VALUE_ENTITY_STATE) {
-      ## TODO: XMLize
-
       if ($is_space->{$self->{nc}} or
           {
             0x003C => 1, 0x0026 => 1, -1 => 1, # <, &
             $self->{entity_add} => 1,
           }->{$self->{nc}}) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev}
+                            + ($self->{nc} == -1 ? 1 : 0));
         ## Don't consume
-        ## No error
         ## Return nothing.
         #
       } elsif ($self->{nc} == 0x0023) { # #
@@ -7914,14 +7930,7 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ((0x0041 <= $self->{nc} and
-                $self->{nc} <= 0x005A) or # A..Z
-               (0x0061 <= $self->{nc} and
-                $self->{nc} <= 0x007A)) { # a..z
-        #
       } else {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero');
-        ## Return nothing.
         #
       }
 
@@ -8602,5 +8611,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 09:25:21 $
+## $Date: 2008/10/19 10:12:54 $
                                 
