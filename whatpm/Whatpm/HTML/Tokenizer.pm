@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -5482,7 +5482,8 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{nc} == 0x0045) { # E
+      } elsif ($self->{nc} == 0x0045 or # E
+               $self->{nc} == 0x0065) { # e
         $self->{state} = MD_E_STATE;
         $self->{kwd} = chr $self->{nc};
         
@@ -5497,7 +5498,8 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{nc} == 0x0041) { # A
+      } elsif ($self->{nc} == 0x0041 or # A
+               $self->{nc} == 0x0061) { # a
         $self->{state} = MD_ATTLIST_STATE;
         $self->{kwd} = chr $self->{nc};
         
@@ -5512,7 +5514,8 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{nc} == 0x004E) { # N
+      } elsif ($self->{nc} == 0x004E or # N
+               $self->{nc} == 0x006E) { # n
         $self->{state} = MD_NOTATION_STATE;
         $self->{kwd} = chr $self->{nc};
         
@@ -5540,7 +5543,8 @@ sub _get_next_token ($) {
       $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded.
       redo A;
     } elsif ($self->{state} == MD_E_STATE) {
-      if ($self->{nc} == 0x004E) { # N
+      if ($self->{nc} == 0x004E or # N
+          $self->{nc} == 0x006E) { # n
         $self->{state} = MD_ENTITY_STATE;
         $self->{kwd} .= chr $self->{nc};
         
@@ -5555,7 +5559,8 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{nc} == 0x004C) { # L
+      } elsif ($self->{nc} == 0x004C or # L
+               $self->{nc} == 0x006C) { # l
         ## XML5: <!ELEMENT> not supported.
         $self->{state} = MD_ELEMENT_STATE;
         $self->{kwd} .= chr $self->{nc};
@@ -5583,11 +5588,20 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == MD_ENTITY_STATE) {
-      if ($self->{nc} == {
-            'EN' => 0x0054, # T
-            'ENT' => 0x0049, # I
-            'ENTI' => 0x0054, # T
-          }->{$self->{kwd}}) {
+      if ($self->{nc} == [
+            undef,
+            undef,
+            0x0054, # T
+            0x0049, # I
+            0x0054, # T
+          ]->[length $self->{kwd}] or
+          $self->{nc} == [
+            undef,
+            undef,
+            0x0074, # t
+            0x0069, # i
+            0x0074, # t
+          ]->[length $self->{kwd}]) {
         ## Stay in the state.
         $self->{kwd} .= chr $self->{nc};
         
@@ -5602,9 +5616,16 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{kwd} eq 'ENTIT' and
-               $self->{nc} == 0x0059) { # Y
-        $self->{ct} = {type => GENERAL_ENTITY_TOKEN, name => '', text => '',
+      } elsif ((length $self->{kwd}) == 5 and
+               ($self->{nc} == 0x0059 or # Y
+                $self->{nc} == 0x0079)) { # y
+        if ($self->{kwd} ne 'ENTIT' or $self->{nc} == 0x0079) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'lowercase keyword', ## TODO: type
+                          text => 'ENTITY',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 4);
+        }
+        $self->{ct} = {type => GENERAL_ENTITY_TOKEN, name => '',
                        line => $self->{line_prev},
                        column => $self->{column_prev} - 6};
         $self->{state} = DOCTYPE_MD_STATE;
@@ -5632,12 +5653,22 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == MD_ELEMENT_STATE) {
-      if ($self->{nc} == {
-            'EL' => 0x0045, # E
-            'ELE' => 0x004D, # M
-            'ELEM' => 0x0045, # E
-            'ELEME' => 0x004E, # N
-          }->{$self->{kwd}}) {
+      if ($self->{nc} == [
+           undef,
+           undef,
+           0x0045, # E
+           0x004D, # M
+           0x0045, # E
+           0x004E, # N
+          ]->[length $self->{kwd}] or
+          $self->{nc} == [
+           undef,
+           undef,
+           0x0065, # e
+           0x006D, # m
+           0x0065, # e
+           0x006E, # n
+          ]->[length $self->{kwd}]) {
         ## Stay in the state.
         $self->{kwd} .= chr $self->{nc};
         
@@ -5652,8 +5683,15 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{kwd} eq 'ELEMEN' and
-               $self->{nc} == 0x0054) { # T
+      } elsif ((length $self->{kwd}) == 6 and
+               ($self->{nc} == 0x0054 or # T
+                $self->{nc} == 0x0074)) { # t
+        if ($self->{kwd} ne 'ELEMEN' or $self->{nc} == 0x0074) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'lowercase keyword', ## TODO: type
+                          text => 'ELEMENT',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 5);
+        }
         $self->{ct} = {type => ELEMENT_TOKEN, name => '',
                        line => $self->{line_prev},
                        column => $self->{column_prev} - 6};
@@ -5682,13 +5720,22 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == MD_ATTLIST_STATE) {
-      if ($self->{nc} == {
-            'A' => 0x0054, # T
-            'AT' => 0x0054, # T
-            'ATT' => 0x004C, # L
-            'ATTL' => 0x0049, # I
-            'ATTLI' => 0x0053, # S
-          }->{$self->{kwd}}) {
+      if ($self->{nc} == [
+           undef,
+           0x0054, # T
+           0x0054, # T
+           0x004C, # L
+           0x0049, # I
+           0x0053, # S
+          ]->[length $self->{kwd}] or
+          $self->{nc} == [
+           undef,
+           0x0074, # t
+           0x0074, # t
+           0x006C, # l
+           0x0069, # i
+           0x0073, # s
+          ]->[length $self->{kwd}]) {
         ## Stay in the state.
         $self->{kwd} .= chr $self->{nc};
         
@@ -5703,8 +5750,15 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{kwd} eq 'ATTLIS' and
-               $self->{nc} == 0x0054) { # T
+      } elsif ((length $self->{kwd}) == 6 and
+               ($self->{nc} == 0x0054 or # T
+                $self->{nc} == 0x0074)) { # t
+        if ($self->{kwd} ne 'ATTLIS' or $self->{nc} == 0x0074) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'lowercase keyword', ## TODO: type
+                          text => 'ATTLIST',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 5);
+        }
         $self->{ct} = {type => ATTLIST_TOKEN, name => '',
                        attrdefs => [],
                        line => $self->{line_prev},
@@ -5734,14 +5788,24 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == MD_NOTATION_STATE) {
-      if ($self->{nc} == {
-            'N' => 0x004F, # O
-            'NO' => 0x0054, # T
-            'NOT' => 0x0041, # A
-            'NOTA' => 0x0054, # T
-            'NOTAT' => 0x0049, # I
-            'NOTATI' => 0x004F, # O
-          }->{$self->{kwd}}) {
+      if ($self->{nc} == [
+           undef,
+           0x004F, # O
+           0x0054, # T
+           0x0041, # A
+           0x0054, # T
+           0x0049, # I
+           0x004F, # O
+          ]->[length $self->{kwd}] or
+          $self->{nc} == [
+           undef,
+           0x006F, # o
+           0x0074, # t
+           0x0061, # a
+           0x0074, # t
+           0x0069, # i
+           0x006F, # o
+          ]->[length $self->{kwd}]) {
         ## Stay in the state.
         $self->{kwd} .= chr $self->{nc};
         
@@ -5756,8 +5820,15 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{kwd} eq 'NOTATIO' and
-               $self->{nc} == 0x004E) { # N
+      } elsif ((length $self->{kwd}) == 7 and
+               ($self->{nc} == 0x004E or # N
+                $self->{nc} == 0x006E)) { # n
+        if ($self->{kwd} ne 'NOTATIO' or $self->{nc} == 0x006E) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'lowercase keyword', ## TODO: type
+                          text => 'NOTATION',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 6);
+        }
         $self->{ct} = {type => NOTATION_TOKEN, name => '',
                        line => $self->{line_prev},
                        column => $self->{column_prev} - 6};
@@ -7317,5 +7388,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/18 11:34:49 $
+## $Date: 2008/10/19 04:39:25 $
                                 

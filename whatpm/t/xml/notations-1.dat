@@ -338,3 +338,36 @@
 #document
 | <!DOCTYPE a>
 |   <!NOTATION bcd "" "efg">
+
+#data
+<!DOCTYPE a[
+<!NOTATIOn b SYSTEM "x">
+]><a/>
+#errors
+2;3;lowercase keyword;NOTATION;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION b "" "x">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!notation b SYSTEM "x">
+]><a/>
+#errors
+2;3;lowercase keyword;NOTATION;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION b "" "x">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!nOTATION b SYSTEM "x">
+]><a/>
+#errors
+2;3;lowercase keyword;NOTATION;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION b "" "x">
+| <{} a>

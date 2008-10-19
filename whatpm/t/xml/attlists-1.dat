@@ -161,10 +161,11 @@
 <!ATTLIST b>
 ]><a/>
 #errors
-2;1;bogus comment;;;m
+2;3;lowercase keyword;ATTLIST;;m
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
+|   <!ELEMENT c >
 | <{} a>
 
 #data
@@ -1451,4 +1452,37 @@ c (x     y) #IMPLIED>
 | <!DOCTYPE a>
 |   <!ELEMENT b >
 |     c ENUMERATION (x y) IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!attlist b>
+]><a/>
+#errors
+2;3;lowercase keyword;ATTLIST;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLISt b>
+]><a/>
+#errors
+2;3;lowercase keyword;ATTLIST;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!aTTLIST b>
+]><a/>
+#errors
+2;3;lowercase keyword;ATTLIST;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
 | <{} a>
