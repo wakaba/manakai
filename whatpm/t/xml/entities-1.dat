@@ -361,3 +361,223 @@
 | <{} a>
 #entities
 <!ENTITY b "&amp;abc" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b "c">
+<!ENTITY b "d">
+]><a/>
+#errors
+3;1;duplicate general entity decl;;b;w
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "c" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b "c">
+<!ENTITY b PUBLIC "d" "e" NDATA n>
+]><a/>
+#errors
+3;1;duplicate general entity decl;;b;w
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "c" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY lt "&#x26;#x3C;">
+]>
+<a>&lt;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "<"
+
+#data
+<!DOCTYPE a[
+<!ENTITY lt "&#x26;#60;">
+]>
+<a>&lt;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "<"
+
+#data
+<!DOCTYPE a[
+<!ENTITY lt "&#38;#x3C;">
+]>
+<a>&lt;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "<"
+
+#data
+<!DOCTYPE a[
+<!ENTITY lt "&#38;#60;">
+]>
+<a>&lt;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "<"
+
+#data
+<!DOCTYPE a[
+<!ENTITY lt "&#x0000026;#x00003C;">
+]>
+<a>&lt;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "<"
+
+#data
+<!DOCTYPE a[
+<!ENTITY lt "&#x3C;">
+]>
+<a>&lt;</a>
+#errors
+2;1;bad predefined entity decl;;lt;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "<"
+
+#data
+<!DOCTYPE a[
+<!ENTITY lt "lt">
+]>
+<a>&lt;</a>
+#errors
+2;1;bad predefined entity decl;;lt;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "<"
+
+#data
+<!DOCTYPE a[
+<!ENTITY amp "&#x26;#x26;">
+]>
+<a>&amp;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "&"
+
+#data
+<!DOCTYPE a[
+<!ENTITY quot "&#x26;#x22;">
+]>
+<a>&quot;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   """
+
+#data
+<!DOCTYPE a[
+<!ENTITY quot "&#x22;">
+]>
+<a>&quot;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   """
+
+#data
+<!DOCTYPE a[
+<!ENTITY apos  "&#x26;#x27;">
+]>
+<a>&apos;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "'"
+
+#data
+<!DOCTYPE a[
+<!ENTITY apos "&#x000027;">
+]>
+<a>&apos;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   "'"
+
+#data
+<!DOCTYPE a[
+<!ENTITY gt "&#x26;#x3e;">
+]>
+<a>&gt;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   ">"
+
+#data
+<!DOCTYPE a[
+<!ENTITY gt "&#x0000000000003e;">
+]>
+<a>&gt;</a>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+|   ">"
+
+#data
+<!DOCTYPE a[
+<!ENTITY gt "&#x26;#x3C;">
+]>
+<a/>
+#errors
+2;1;bad predefined entity decl;;gt;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY gt ">" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY gt ">">
+]>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY gt ">" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY gt PUBLIC "x" "y">
+]>
+<a/>
+#errors
+2;1;bad predefined entity decl;;gt;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY gt ">" "" "" >

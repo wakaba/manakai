@@ -371,3 +371,15 @@
 | <!DOCTYPE a>
 |   <!NOTATION b "" "x">
 | <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION b SYSTEM "x">
+<!NOTATION b SYSTEM "y">
+]><a/>
+#errors
+3;1;duplicate notation decl;;b;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION b "" "x">
+| <{} a>

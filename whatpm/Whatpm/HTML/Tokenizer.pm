@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -5903,7 +5903,7 @@ sub _get_next_token ($) {
         }
         $self->{ct} = {type => ELEMENT_TOKEN, name => '',
                        line => $self->{line_prev},
-                       column => $self->{column_prev} - 6};
+                       column => $self->{column_prev} - 7};
         $self->{state} = DOCTYPE_MD_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -5971,7 +5971,7 @@ sub _get_next_token ($) {
         $self->{ct} = {type => ATTLIST_TOKEN, name => '',
                        attrdefs => [],
                        line => $self->{line_prev},
-                       column => $self->{column_prev} - 6};
+                       column => $self->{column_prev} - 7};
         $self->{state} = DOCTYPE_MD_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -6040,7 +6040,7 @@ sub _get_next_token ($) {
         }
         $self->{ct} = {type => NOTATION_TOKEN, name => '',
                        line => $self->{line_prev},
-                       column => $self->{column_prev} - 6};
+                       column => $self->{column_prev} - 8};
         $self->{state} = DOCTYPE_MD_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -8611,5 +8611,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 10:12:54 $
+## $Date: 2008/10/19 13:43:55 $
                                 

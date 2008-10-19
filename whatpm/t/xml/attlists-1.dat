@@ -3,6 +3,7 @@
 <!ATTLIST b>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -14,6 +15,8 @@
 <!ATTLIST c>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
+3;1;empty attlist decl;;c;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -25,6 +28,7 @@
 <!ATTLIST bcd>
 ]><a/>
 #errors
+2;1;empty attlist decl;;bcd;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT bcd >
@@ -35,6 +39,7 @@
 <!ATTLIST b >
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -47,6 +52,7 @@
 2;12;unclosed md;;;m
 2;12;unclosed internal subset;;;m
 2;12;no root element;;;m
+2;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -56,6 +62,7 @@
 <!ATTLIST bcd >
 ]><a/>
 #errors
+2;1;empty attlist decl;;bcd;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT bcd >
@@ -66,6 +73,7 @@
 <!ATTLISTb>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;10;no space before md name;;;m
 #document
 | <!DOCTYPE a>
@@ -79,6 +87,7 @@
 2;11;unclosed md;;;m
 2;11;unclosed internal subset;;;m
 2;11;no root element;;;m
+2;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -90,6 +99,7 @@
 ]><a/>
 #errors
 2;11;no md name;;;m
+3;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -101,6 +111,7 @@
 <!ATTLIST b>
 ]><a/>
 #errors
+3;1;empty attlist decl;;b;w
 2;10;no md name;;;m
 #document
 | <!DOCTYPE a>
@@ -112,6 +123,7 @@
 <!ATTLIST b>
 <!ATTLIST\u0020
 #errors
+2;1;empty attlist decl;;b;w
 3;10;unclosed md;;;m
 3;10;unclosed internal subset;;;m
 3;10;no root element;;;m
@@ -125,6 +137,7 @@
 <!ATTLIST
 #errors
 3;9;unclosed md;;;m
+2;1;empty attlist decl;;b;w
 3;9;unclosed internal subset;;;m
 3;9;no root element;;;m
 #document
@@ -138,6 +151,7 @@
 ]><a/>
 #errors
 2;1;bogus comment;;;m
+3;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -150,6 +164,7 @@
 ]><a/>
 #errors
 2;1;bogus comment;;;m
+3;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -162,6 +177,8 @@
 ]><a/>
 #errors
 2;3;lowercase keyword;ATTLIST;;m
+2;1;empty attlist decl;;c;w
+3;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -173,6 +190,7 @@
 <!ATTLIST b>
 <!ATTLIS
 #errors
+2;1;empty attlist decl;;b;w
 3;1;bogus comment;;;m
 3;8;unclosed internal subset;;;m
 3;8;no root element;;;m
@@ -185,6 +203,7 @@
 <!ATTLIST b>
 <!ATTL
 #errors
+2;1;empty attlist decl;;b;w
 3;1;bogus comment;;;m
 3;6;unclosed internal subset;;;m
 3;6;no root element;;;m
@@ -198,8 +217,10 @@
 <!ATTLIST b>
 ]><a/>
 #errors
+2;1;empty attlist decl;;%;w
 2;10;no space before md name;;;m
 2;13;no attr type;;;m
+3;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT % >
@@ -212,6 +233,8 @@
 <!ATTLIST % c>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
+3;1;empty attlist decl;;%;w
 3;14;no attr type;;;m
 #document
 | <!DOCTYPE a>
@@ -224,6 +247,7 @@
 <!ATTLIST b c>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;14;no attr type;;;m
 #document
 | <!DOCTYPE a>
@@ -234,6 +258,7 @@
 <!DOCTYPE a[
 <!ATTLIST b c
 #errors
+2;1;empty attlist decl;;b;w
 2;13;unclosed md;;;m
 2;13;unclosed internal subset;;;m
 2;13;no root element;;;m
@@ -246,6 +271,7 @@
 <!ATTLIST b cd>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;15;no attr type;;;m
 #document
 | <!DOCTYPE a>
@@ -257,6 +283,7 @@
 <!ATTLIST b cd
 #errors
 2;14;unclosed md;;;m
+2;1;empty attlist decl;;b;w
 2;14;unclosed internal subset;;;m
 2;14;no root element;;;m
 #document
@@ -268,6 +295,7 @@
 <!ATTLIST b c >
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;15;no attr type;;;m
 #document
 | <!DOCTYPE a>
@@ -279,6 +307,7 @@
 <!ATTLIST b c\u0020
 #errors
 2;14;unclosed md;;;m
+2;1;empty attlist decl;;b;w
 2;14;unclosed internal subset;;;m
 2;14;no root element;;;m
 #document
@@ -290,6 +319,7 @@
 <!ATTLIST b cd >
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;16;no attr type;;;m
 #document
 | <!DOCTYPE a>
@@ -300,6 +330,7 @@
 <!DOCTYPE a[
 <!ATTLIST b cd\u0020
 #errors
+2;1;empty attlist decl;;b;w
 2;15;unclosed md;;;m
 2;15;unclosed internal subset;;;m
 2;15;no root element;;;m
@@ -312,6 +343,7 @@
 <!ATTLIST b c t>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;16;no attr default;;;m
 #document
 | <!DOCTYPE a>
@@ -322,6 +354,7 @@
 <!DOCTYPE a[
 <!ATTLIST b c t
 #errors
+2;1;empty attlist decl;;b;w
 2;15;unclosed md;;;m
 2;15;unclosed internal subset;;;m
 2;15;no root element;;;m
@@ -334,6 +367,7 @@
 <!ATTLIST b c tu>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;17;no attr default;;;m
 #document
 | <!DOCTYPE a>
@@ -344,6 +378,7 @@
 <!DOCTYPE a[
 <!ATTLIST b c tu
 #errors
+2;1;empty attlist decl;;b;w
 2;16;unclosed md;;;m
 2;16;unclosed internal subset;;;m
 2;16;no root element;;;m
@@ -356,6 +391,7 @@
 <!ATTLIST b c t >
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;17;no attr default;;;m
 #document
 | <!DOCTYPE a>
@@ -366,6 +402,7 @@
 <!DOCTYPE a[
 <!ATTLIST b c t\u0020
 #errors
+2;1;empty attlist decl;;b;w
 2;16;unclosed md;;;m
 2;16;unclosed internal subset;;;m
 2;16;no root element;;;m
@@ -378,6 +415,7 @@
 <!ATTLIST b c CDATA>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;20;no attr default;;;m
 #document
 | <!DOCTYPE a>
@@ -388,6 +426,7 @@
 <!DOCTYPE a[
 <!ATTLIST b c CDATA
 #errors
+2;1;empty attlist decl;;b;w
 2;19;unclosed md;;;m
 2;19;unclosed internal subset;;;m
 2;19;no root element;;;m
@@ -970,6 +1009,7 @@ e CDATA #IMPLIED
 >
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 3;10;no default type;;;m
 #document
 | <!DOCTYPE a>
@@ -1265,6 +1305,7 @@ c (||) "x"
 <!ATTLIST b
 c (
 #errors
+2;1;empty attlist decl;;b;w
 3;3;unclosed md;;;m
 3;3;unclosed internal subset;;;m
 3;3;no root element;;;m
@@ -1277,6 +1318,7 @@ c (
 <!ATTLIST b
 c (\u0020
 #errors
+2;1;empty attlist decl;;b;w
 3;4;unclosed md;;;m
 3;4;unclosed internal subset;;;m
 3;4;no root element;;;m
@@ -1289,6 +1331,7 @@ c (\u0020
 <!ATTLIST b
 c (x
 #errors
+2;1;empty attlist decl;;b;w
 3;4;unclosed md;;;m
 3;4;unclosed internal subset;;;m
 3;4;no root element;;;m
@@ -1301,6 +1344,7 @@ c (x
 <!ATTLIST b
 c (xy
 #errors
+2;1;empty attlist decl;;b;w
 3;5;unclosed md;;;m
 3;5;unclosed internal subset;;;m
 3;5;no root element;;;m
@@ -1313,6 +1357,7 @@ c (xy
 <!ATTLIST b
 c (x\u0020
 #errors
+2;1;empty attlist decl;;b;w
 3;5;unclosed md;;;m
 3;5;unclosed internal subset;;;m
 3;5;no root element;;;m
@@ -1325,6 +1370,7 @@ c (x\u0020
 <!ATTLIST b
 c (x|
 #errors
+2;1;empty attlist decl;;b;w
 3;5;unclosed md;;;m
 3;5;unclosed internal subset;;;m
 3;5;no root element;;;m
@@ -1338,6 +1384,7 @@ c (x|
 c (>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 3;4;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
@@ -1351,6 +1398,7 @@ c ( >
 ]><a/>
 #errors
 3;5;unclosed allowed tokens;;;m
+2;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
@@ -1362,6 +1410,7 @@ c ( >
 c (a>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 3;5;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
@@ -1374,6 +1423,7 @@ c (a>
 c (ab>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 3;6;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
@@ -1386,6 +1436,7 @@ c (ab>
 c (x >
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 3;6;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
@@ -1398,6 +1449,7 @@ c (x >
 c (x|>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 3;6;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
@@ -1462,6 +1514,7 @@ c (x     y) #IMPLIED>
 <!attlist b>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;3;lowercase keyword;ATTLIST;;m
 #document
 | <!DOCTYPE a>
@@ -1473,6 +1526,7 @@ c (x     y) #IMPLIED>
 <!ATTLISt b>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;3;lowercase keyword;ATTLIST;;m
 #document
 | <!DOCTYPE a>
@@ -1484,8 +1538,77 @@ c (x     y) #IMPLIED>
 <!aTTLIST b>
 ]><a/>
 #errors
+2;1;empty attlist decl;;b;w
 2;3;lowercase keyword;ATTLIST;;m
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+<!ATTLIST b>
+]><a/>
+#errors
+2;1;empty attlist decl;;b;w
+3;1;duplicate attlist decl;;b;w
+3;1;empty attlist decl;;b;w
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ANY>
+<!ATTLIST b>
+]><a/>
+#errors
+3;1;empty attlist decl;;b;w
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ANY>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b>
+<!ELEMENT b ANY>
+]><a/>
+#errors
+2;1;empty attlist decl;;b;w
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ANY>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #IMPLIED
+c CDATA #REQUIRED>
+]><a/>
+#errors
+4;1;duplicate attrdef;;c;w
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #IMPLIED>
+<!ATTLIST b
+c CDATA #REQUIRED>
+]><a/>
+#errors
+4;1;duplicate attlist decl;;b;w
+5;1;duplicate attrdef;;c;w
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () IMPLIED ""
 | <{} a>

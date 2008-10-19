@@ -819,21 +819,28 @@ sub _tree_in_subset ($) {
       !!!next-token;
       next B;
     } elsif ($token->{type} == ELEMENT_TOKEN) {
-      unless ($self->{doctype}->get_element_type_definition_node
-                ($token->{name})) {
-        my $node = $self->{document}->create_element_type_definition
+      unless ($self->{has_element_decl}->{$token->{name}}) {
+        my $node = $self->{doctype}->get_element_type_definition_node
             ($token->{name});
+        unless ($node) {
+          $node = $self->{document}->create_element_type_definition
+              ($token->{name});
+          $self->{doctype}->set_element_type_definition_node ($node);
+        }
+        
         $node->set_user_data (manakai_source_line => $token->{line});
         $node->set_user_data (manakai_source_column => $token->{column});
         
         $node->content_model_text (join '', @{$token->{content}})
             if $token->{content};
-        
-        $self->{doctype}->set_element_type_definition_node ($node);
       } else {
-        ## TODO: ...
+        !!!parse-error (type => 'duplicate element decl', ## TODO: type
+                        value => $token->{name},
+                        token => $token);
         
+        ## TODO: $token->{content} syntax check.
       }
+      $self->{has_element_decl}->{$token->{name}} = 1;
 
       ## Stay in the mode.
       !!!next-token;
@@ -847,6 +854,19 @@ sub _tree_in_subset ($) {
         $ed->set_user_data (manakai_source_line => $token->{line});
         $ed->set_user_data (manakai_source_column => $token->{column});
         $self->{doctype}->set_element_type_definition_node ($ed);
+      } elsif ($self->{has_attlist}->{$token->{name}}) {
+        !!!parse-error (type => 'duplicate attlist decl', ## TODO: type
+                        value => $token->{name},
+                        token => $token,
+                        level => $self->{level}->{warn});
+      }
+      $self->{has_attlist}->{$token->{name}} = 1;
+
+      unless (@{$token->{attrdefs}}) {
+        !!!parse-error (type => 'empty attlist decl', ## TODO: type
+                        value => $token->{name},
+                        token => $token,
+                        level => $self->{level}->{warn});
       }
 
       for my $at (@{$token->{attrdefs}}) {
@@ -898,7 +918,12 @@ sub _tree_in_subset ($) {
  
           $ed->set_attribute_definition_node ($node);
         } else {
-          ## TODO: ...
+          !!!parse-error (type => 'duplicate attrdef', ## TODO: type
+                          value => $at->{name},
+                          token => $at,
+                          level => $self->{level}->{warn});
+
+          ## TODO: syntax validation
         }
       } # $at
 
@@ -906,9 +931,33 @@ sub _tree_in_subset ($) {
       !!!next-token;
       next B;
     } elsif ($token->{type} == GENERAL_ENTITY_TOKEN) {
-      ## TODO: predefined entity names
+      if ({
+           amp => 1, apos => 1, quot => 1, lt => 1, gt => 1,
+          }->{$token->{name}}) {
+        if (not defined $token->{value} or
+            $token->{value} !~
+            {
+             amp => qr/\A&#(?:x0*26|0*38);\z/,
+             lt => qr/\A&#(?:x0*3[Cc]|0*60);\z/,
+             gt => qr/\A(?>&#(?:x0*3[Ee]|0*62);|>)\z/,
+             quot => qr/\A(?>&#(?:x0*22|0*34);|")\z/,
+             apos => qr/\A(?>&#(?:x0*27|0*39);|')\z/,
+            }->{$token->{name}}) {
+          !!!parse-error (type => 'bad predefined entity decl', ## TODO: type
+                          value => $token->{name},
+                          token => $token);
+        }
 
-      unless ($self->{ge}->{$token->{name}.';'}) {
+        $self->{ge}->{$token->{name}.';'} = {name => $token->{name},
+                                             value => {
+                                                       amp => '&',
+                                                       lt => '<',
+                                                       gt => '>',
+                                                       quot => '"',
+                                                       apos => "'",
+                                                      }->{$token->{name}},
+                                             only_text => 1};
+      } elsif (not $self->{ge}->{$token->{name}.';'}) {
         ## For parser.
         $self->{ge}->{$token->{name}.';'} = $token;
         if (defined $token->{value} and
@@ -927,10 +976,16 @@ sub _tree_in_subset ($) {
           $node->notation_name ($token->{notation});
           
           $self->{doctype}->set_general_entity_node ($node);
+        } else {
+          ## TODO: syntax validation
         }
       } else {
-        ## TODO: ...
-        
+        !!!parse-error (type => 'duplicate general entity decl', ## TODO: type
+                        value => $token->{name},
+                        token => $token,
+                        level => $self->{level}->{warn});
+
+        ## TODO: syntax validation        
       }
 
       ## Stay in the mode.
@@ -940,8 +995,15 @@ sub _tree_in_subset ($) {
       unless ($self->{pe}->{$token->{name}}) {
         ## For parser.
         $self->{pe}->{$token->{name}} = $token;
+
+        ## TODO: syntax validation
       } else {
-        ## TODO: ...
+        !!!parse-error (type => 'duplicate para entity decl', ## TODO: type
+                        value => $token->{name},
+                        token => $token,
+                        level => $self->{level}->{warn});
+
+        ## TODO: syntax validation        
       }
       
       ## Stay in the mode.
@@ -959,8 +1021,11 @@ sub _tree_in_subset ($) {
         
         $self->{doctype}->set_notation_node ($node);
       } else {
-        ## TODO: ...
-        
+        !!!parse-error (type => 'duplicate notation decl', ## TODO: type
+                        value => $token->{name},
+                        token => $token);
+
+        ## TODO: syntax validation
       }
 
       ## Stay in the mode.

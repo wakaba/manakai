@@ -1,5 +1,12 @@
 2008-10-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm.src: Raise a parse error or warning for
+	declaration/definition duplications.  Raise a warning for an empty
+	attlist declaration.  Raise a error for an ill-declared predefined
+	entity.
+
+2008-10-19  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm.src: Define predefined general entities for the
 	control of "undeclared entity" error raised by the tokenizer.  Set
 	text-only flag to general entities appropriately.
