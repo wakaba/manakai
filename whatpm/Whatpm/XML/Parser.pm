@@ -818,7 +818,8 @@ sub _tree_in_subset ($) {
         $node->set_user_data (manakai_source_line => $token->{line});
         $node->set_user_data (manakai_source_column => $token->{column});
         
-        ## TODO: ...
+        $node->content_model_text (join '', @{$token->{content}})
+            if $token->{content};
         
         $self->{doctype}->set_element_type_definition_node ($node);
       } else {

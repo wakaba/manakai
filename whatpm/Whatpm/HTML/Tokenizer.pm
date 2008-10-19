@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -182,11 +182,18 @@ sub NDATA_STATE () { 86 }
 sub AFTER_NDATA_STATE () { 87 }
 sub BEFORE_NOTATION_NAME_STATE () { 88 }
 sub NOTATION_NAME_STATE () { 89 }
-sub AFTER_NOTATION_NAME_STATE () { 90 }
-sub DOCTYPE_ENTITY_VALUE_DOUBLE_QUOTED_STATE () { 91 }
-sub DOCTYPE_ENTITY_VALUE_SINGLE_QUOTED_STATE () { 92 }
-sub ENTITY_VALUE_ENTITY_STATE () { 93 }
-sub BOGUS_MD_STATE () { 94 }
+sub DOCTYPE_ENTITY_VALUE_DOUBLE_QUOTED_STATE () { 90 }
+sub DOCTYPE_ENTITY_VALUE_SINGLE_QUOTED_STATE () { 91 }
+sub ENTITY_VALUE_ENTITY_STATE () { 92 }
+sub AFTER_ELEMENT_NAME_STATE () { 93 }
+sub BEFORE_ELEMENT_CONTENT_STATE () { 94 }
+sub CONTENT_KEYWORD_STATE () { 95 }
+sub AFTER_CM_GROUP_OPEN_STATE () { 96 }
+sub CM_ELEMENT_NAME_STATE () { 97 }
+sub AFTER_CM_ELEMENT_NAME_STATE () { 98 }
+sub AFTER_CM_GROUP_CLOSE_STATE () { 99 }
+sub AFTER_MD_DEF_STATE () { 100 }
+sub BOGUS_MD_STATE () { 101 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -6183,8 +6190,7 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == ATTLIST_TOKEN) {
           $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
         } elsif ($self->{ct}->{type} == ELEMENT_TOKEN) {
-          ## TODO: ...
-          $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
+          $self->{state} = AFTER_ELEMENT_NAME_STATE;
         } else { # ENTITY/NOTATION
           $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         }
@@ -7667,7 +7673,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == NOTATION_NAME_STATE) {
       if ($is_space->{$self->{nc}}) {
-        $self->{state} = AFTER_NOTATION_NAME_STATE;
+        $self->{state} = AFTER_MD_DEF_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -7729,7 +7735,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_ENTITY_VALUE_DOUBLE_QUOTED_STATE) {
       if ($self->{nc} == 0x0022) { # "
-        $self->{state} = AFTER_NOTATION_NAME_STATE;
+        $self->{state} = AFTER_MD_DEF_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -7782,7 +7788,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == DOCTYPE_ENTITY_VALUE_SINGLE_QUOTED_STATE) {
       if ($self->{nc} == 0x0027) { # '
-        $self->{state} = AFTER_NOTATION_NAME_STATE;
+        $self->{state} = AFTER_MD_DEF_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -7876,7 +7882,583 @@ sub _get_next_token ($) {
       $self->{state} = $self->{prev_state};
       ## Reconsume.
       redo A;
-    } elsif ($self->{state} == AFTER_NOTATION_NAME_STATE) {
+    } elsif ($self->{state} == AFTER_ELEMENT_NAME_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = BEFORE_ELEMENT_CONTENT_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0028) { # (
+        $self->{state} = AFTER_CM_GROUP_OPEN_STATE;
+        $self->{ct}->{content} = ['('];
+        $self->{group_depth} = 1;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md def'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } else {
+        $self->{ct}->{content} = [chr $self->{nc}];
+        $self->{state} = CONTENT_KEYWORD_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == CONTENT_KEYWORD_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = AFTER_MD_DEF_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } else {
+        $self->{ct}->{content}->[-1] .= chr $self->{nc}; # ELEMENT
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_CM_GROUP_OPEN_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0028) { # (
+        $self->{group_depth}++;
+        push @{$self->{ct}->{content}}, chr $self->{nc};
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x007C or # |
+               $self->{nc} == 0x002C) { # ,
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty element name'); ## TODO: type
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0029) { # )
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty element name'); ## TODO: type
+        push @{$self->{ct}->{content}}, chr $self->{nc};
+        $self->{group_depth}--;
+        $self->{state} = AFTER_CM_GROUP_CLOSE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed cm group'); ## TODO: type
+        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } else {
+        push @{$self->{ct}->{content}}, chr $self->{nc};
+        $self->{state} = CM_ELEMENT_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == CM_ELEMENT_NAME_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        $self->{state} = AFTER_CM_ELEMENT_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x002A or # *
+               $self->{nc} == 0x002B or # +
+               $self->{nc} == 0x003F) { # ?
+        push @{$self->{ct}->{content}}, chr $self->{nc};
+        $self->{state} = AFTER_CM_ELEMENT_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x007C or # |
+               $self->{nc} == 0x002C) { # ,
+        push @{$self->{ct}->{content}}, $self->{nc} == 0x007C ? ' | ' : ', ';
+        $self->{state} = AFTER_CM_GROUP_OPEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0029) { # )
+        $self->{group_depth}--;
+        push @{$self->{ct}->{content}}, chr $self->{nc};
+        $self->{state} = AFTER_CM_GROUP_CLOSE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed cm group'); ## TODO: type
+        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } else {
+        $self->{ct}->{content}->[-1] .= chr $self->{nc};
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_CM_ELEMENT_NAME_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x007C or # |
+               $self->{nc} == 0x002C) { # ,
+        push @{$self->{ct}->{content}}, $self->{nc} == 0x007C ? ' | ' : ', ';
+        $self->{state} = AFTER_CM_GROUP_OPEN_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0029) { # )
+        $self->{group_depth}--;
+        push @{$self->{ct}->{content}}, chr $self->{nc};
+        $self->{state} = AFTER_CM_GROUP_CLOSE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003E) { # >
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed cm group'); ## TODO: type
+        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } else {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'after element name'); ## TODO: type
+        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        $self->{state} = BOGUS_MD_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_CM_GROUP_CLOSE_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        if ($self->{group_depth}) {
+          $self->{state} = AFTER_CM_ELEMENT_NAME_STATE;
+        } else {
+          $self->{state} = AFTER_MD_DEF_STATE;
+        }
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x002A or # *
+               $self->{nc} == 0x002B or # +
+               $self->{nc} == 0x003F) { # ?
+        push @{$self->{ct}->{content}}, chr $self->{nc};
+        if ($self->{group_depth}) {
+          $self->{state} = AFTER_CM_ELEMENT_NAME_STATE;
+        } else {
+          $self->{state} = AFTER_MD_DEF_STATE;
+        }
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0029) { # )
+        if ($self->{group_depth}) {
+          $self->{group_depth}--;
+          push @{$self->{ct}->{content}}, chr $self->{nc};
+          ## Stay in the state.
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after md def'); ## TODO: type
+          $self->{state} = BOGUS_MD_STATE;
+          ## Reconsume.
+          redo A;
+        }
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{group_depth}) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed cm group'); ## TODO: type
+          push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        }
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # ELEMENT
+        redo A;
+      } else {
+        if ($self->{group_depth}) {
+          $self->{state} = AFTER_CM_ELEMENT_NAME_STATE;
+        } else {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after md def'); ## TODO: type
+          $self->{state} = BOGUS_MD_STATE;
+        }
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_MD_DEF_STATE) {
       if ($is_space->{$self->{nc}}) {
         ## Stay in the state.
         
@@ -7904,7 +8486,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-        return  ($self->{ct}); # ENTITY
+        return  ($self->{ct}); # ENTITY/ELEMENT
         redo A;
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
@@ -7920,10 +8502,10 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-        return  ($self->{ct}); # ENTITY
+        return  ($self->{ct}); # ENTITY/ELEMENT
         redo A;
       } else {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after notation name'); ## TODO: type
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after md def'); ## TODO: type
         $self->{state} = BOGUS_MD_STATE;
         ## Reconsume.
         redo A;
@@ -7973,5 +8555,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 07:19:00 $
+## $Date: 2008/10/19 08:20:29 $
                                 

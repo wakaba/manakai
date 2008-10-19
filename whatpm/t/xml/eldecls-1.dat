@@ -1,0 +1,279 @@
+#data
+<!DOCTYPE a[
+<!ELEMENT b ANY>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ANY>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b EMPTY>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b EMPTY>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b amny>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b amny>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b em>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b em>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ANY >
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ANY>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ANY*>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ANY*>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ()>
+]><a/>
+#errors
+2;14;empty element name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ()>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ()+>
+]><a/>
+#errors
+2;14;empty element name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ()+>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ()*>
+]><a/>
+#errors
+2;14;empty element name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ()*>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ()?>
+]><a/>
+#errors
+2;14;empty element name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ()?>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x)>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x,y ) >
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x, y)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ( zzz |  rrr )>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (zzz | rrr)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x)y>
+]><a/>
+#errors
+2;16;string after md def;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x))>
+]><a/>
+#errors
+2;16;string after md def;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x) )>
+]><a/>
+#errors
+2;17;string after md def;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x)+y>
+]><a/>
+#errors
+2;17;string after md def;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x)+>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ((x))>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ((x))>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (   (x)  )>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ((x))>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x+)>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x+)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x?,x*)>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x?, x*)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x, (y)*)>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x, (y)*)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (#PCDATA | zz | aa)>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (#PCDATA | zz | aa)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (#PCDATA | #PCDATA , a)>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (#PCDATA | #PCDATA, a)>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (#PCDATA)*>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (#PCDATA)*>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ((((a,b>
+]><a/>
+#errors
+2;20;unclosed cm group;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ((((a, b))))>
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x y)*>
+]><a/>
+#errors
+2;16;after element name;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b (x)>
+| <{} a>
