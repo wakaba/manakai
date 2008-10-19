@@ -1,5 +1,11 @@
 2008-10-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* Tokenizer.pm.src: Normalize white space characters in attribute
+	value literals in XML documents.  Don't apply character reference
+	mapping table for non-NULL non-surrogate code points.
+
+2008-10-19  Wakaba  <wakaba@suika.fam.cx>
+
 	* Tokenizer.pm.src: Set the "stop_processing" flag true when a
 	parameter entity occurs in a standalone="no" document.
 

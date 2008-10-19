@@ -498,8 +498,7 @@
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
-|     c ID () EXPLICIT "d>
-| ]><a/>"
+|     c ID () EXPLICIT "d> ]><a/>"
 
 #data
 <!DOCTYPE a[
@@ -560,8 +559,7 @@
 #document
 | <!DOCTYPE a>
 |   <!ELEMENT b >
-|     c ID () EXPLICIT "d>
-| ]><a/>"
+|     c ID () EXPLICIT "d> ]><a/>"
 
 #data
 <!DOCTYPE a[
@@ -1643,4 +1641,27 @@ c CDATA #REQUIRED>
 |     c CDATA () IMPLIED ""
 |   <!ELEMENT d >
 |     e CDATA () IMPLIED ""
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b c CDATA "ab\u0020\u0009\u000C\u000D\u000Acd">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "ab    cd"
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c CDATA "ab&#xd;&#xa;&#x9;&#x20;&#xc;">
+]>
+<a/>
+#errors
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "ab\u000d\u000a\u0009\u0020\u000c"
 | <{} a>

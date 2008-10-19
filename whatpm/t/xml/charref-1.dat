@@ -97,3 +97,65 @@
 #document
 | <{} a>
 |   "&abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz;"
+
+#data
+<a>&#x0;</a>
+#errors
+1;8;invalid character reference;U+0000;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<a>&#0;</a>
+#errors
+1;7;invalid character reference;U+0000;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<a>&#xd800;</a>
+#errors
+1;11;invalid character reference;U+D800;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<a>&#55296;</a>
+#errors
+1;11;invalid character reference;U+D800;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<a>&#xdfff;</a>
+#errors
+1;11;invalid character reference;U+DFFF;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<a>&#57343;</a>
+#errors
+1;11;invalid character reference;U+DFFF;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<a>&#x1;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u0001"
+
+#data
+<a>&#01;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u0001"

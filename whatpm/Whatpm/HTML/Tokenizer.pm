@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -1816,6 +1816,23 @@ sub _get_next_token ($) {
     }
   
         redo A;
+      } elsif ($self->{is_xml} and 
+               $is_space->{$self->{nc}}) {
+        
+        $self->{ca}->{value} .= ' ';
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed attribute value');
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
@@ -1863,7 +1880,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{read_until}->($self->{ca}->{value},
-                              q["&<],
+                              qq["&<\x09\x0C\x20],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -1930,6 +1947,23 @@ sub _get_next_token ($) {
     }
   
         redo A;
+      } elsif ($self->{is_xml} and 
+               $is_space->{$self->{nc}}) {
+        
+        $self->{ca}->{value} .= ' ';
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed attribute value');
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
@@ -1977,7 +2011,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{read_until}->($self->{ca}->{value},
-                              q['&<],
+                              qq['&<\x09\x0C\x20],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -2158,7 +2192,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{read_until}->($self->{ca}->{value},
-                              q["'=& >],
+                              qq["'=& \x09\x0C>],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -4837,7 +4871,9 @@ sub _get_next_token ($) {
       my $code = $self->{kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
-      if ($charref_map->{$code}) {
+      if ((not $self->{is_xml} and $charref_map->{$code}) or
+          ($self->{is_xml} and 0xD800 <= $code and $code <= 0xDFFF) or
+          ($self->{is_xml} and $code == 0x0000)) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
@@ -4990,7 +5026,9 @@ sub _get_next_token ($) {
       my $code = $self->{kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
-      if ($charref_map->{$code}) {
+      if ((not $self->{is_xml} and $charref_map->{$code}) or
+          ($self->{is_xml} and 0xD800 <= $code and $code <= 0xDFFF) or
+          ($self->{is_xml} and $code == 0x0000)) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
@@ -8619,5 +8657,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 14:05:20 $
+## $Date: 2008/10/19 15:17:01 $
                                 

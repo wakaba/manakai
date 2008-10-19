@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -1316,6 +1316,13 @@ sub _get_next_token ($) {
         $self->{state} = ENTITY_STATE;
         !!!next-input-character;
         redo A;
+      } elsif ($self->{is_xml} and 
+               $is_space->{$self->{nc}}) {
+        !!!cp (97.1);
+        $self->{ca}->{value} .= ' ';
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
       } elsif ($self->{nc} == -1) {
         !!!parse-error (type => 'unclosed attribute value');
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
@@ -1363,7 +1370,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{read_until}->($self->{ca}->{value},
-                              q["&<],
+                              qq["&<\x09\x0C\x20],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -1398,6 +1405,13 @@ sub _get_next_token ($) {
         $self->{entity_add} = 0x0027; # '
         $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{is_xml} and 
+               $is_space->{$self->{nc}}) {
+        !!!cp (103.1);
+        $self->{ca}->{value} .= ' ';
+        ## Stay in the state.
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == -1) {
@@ -1447,7 +1461,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{read_until}->($self->{ca}->{value},
-                              q['&<],
+                              qq['&<\x09\x0C\x20],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -1568,7 +1582,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($self->{nc});
         $self->{read_until}->($self->{ca}->{value},
-                              q["'=& >],
+                              qq["'=& \x09\x0C>],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -3217,7 +3231,9 @@ sub _get_next_token ($) {
       my $code = $self->{kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
-      if ($charref_map->{$code}) {
+      if ((not $self->{is_xml} and $charref_map->{$code}) or
+          ($self->{is_xml} and 0xD800 <= $code and $code <= 0xDFFF) or
+          ($self->{is_xml} and $code == 0x0000)) {
         !!!cp (1015);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
@@ -3330,7 +3346,9 @@ sub _get_next_token ($) {
       my $code = $self->{kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
-      if ($charref_map->{$code}) {
+      if ((not $self->{is_xml} and $charref_map->{$code}) or
+          ($self->{is_xml} and 0xD800 <= $code and $code <= 0xDFFF) or
+          ($self->{is_xml} and $code == 0x0000)) {
         !!!cp (1008);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
@@ -5109,5 +5127,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 14:05:20 $
+## $Date: 2008/10/19 15:17:01 $
                                 

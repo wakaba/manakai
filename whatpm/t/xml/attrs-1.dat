@@ -227,3 +227,17 @@
 |   b=""
 |   c=""
 |   d=""
+
+#data escaped
+<a b="ab\u0020\u0009\u000C\u000D\u000Acd"/>
+#errors
+#document
+| <{} a>
+|   b="ab    cd"
+
+#data
+<a b="ab&#xd;&#xa;&#x9;&#x20;&#xc;"/>
+#errors
+#document escaped
+| <{} a>
+|   b="ab\u000d\u000a\u0009\u0020\u000c"
