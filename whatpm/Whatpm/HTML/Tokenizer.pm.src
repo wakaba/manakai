@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -183,7 +183,10 @@ sub AFTER_NDATA_STATE () { 87 }
 sub BEFORE_NOTATION_NAME_STATE () { 88 }
 sub NOTATION_NAME_STATE () { 89 }
 sub AFTER_NOTATION_NAME_STATE () { 90 }
-sub BOGUS_MD_STATE () { 91 }
+sub DOCTYPE_ENTITY_VALUE_DOUBLE_QUOTED_STATE () { 91 }
+sub DOCTYPE_ENTITY_VALUE_SINGLE_QUOTED_STATE () { 92 }
+sub ENTITY_VALUE_ENTITY_STATE () { 93 }
+sub BOGUS_MD_STATE () { 94 }
 
 ## Tree constructor state constants (see Whatpm::HTML for the full
 ## list and descriptions)
@@ -2262,7 +2265,22 @@ sub _get_next_token ($) {
         $self->{kwd} = chr $self->{nc};
         !!!next-input-character;
         redo A;
-## TODO: " and ' for ENTITY
+      } elsif ($self->{nc} == 0x0022 and # "
+               ($self->{ct}->{type} == GENERAL_ENTITY_TOKEN or
+                $self->{ct}->{type} == PARAMETER_ENTITY_TOKEN)) {
+        !!!cp (167.21);
+        $self->{state} = DOCTYPE_ENTITY_VALUE_DOUBLE_QUOTED_STATE;
+        $self->{ct}->{value} = ''; # ENTITY
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x0027 and # '
+               ($self->{ct}->{type} == GENERAL_ENTITY_TOKEN or
+                $self->{ct}->{type} == PARAMETER_ENTITY_TOKEN)) {
+        !!!cp (167.22);
+        $self->{state} = DOCTYPE_ENTITY_VALUE_SINGLE_QUOTED_STATE;
+        $self->{ct}->{value} = ''; # ENTITY
+        !!!next-input-character;
+        redo A;
       } elsif ($self->{is_xml} and
                $self->{ct}->{type} == DOCTYPE_TOKEN and
                $self->{nc} == 0x005B) { # [
@@ -4669,6 +4687,85 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       }
+    } elsif ($self->{state} == DOCTYPE_ENTITY_VALUE_DOUBLE_QUOTED_STATE) {
+      if ($self->{nc} == 0x0022) { # "
+        $self->{state} = AFTER_NOTATION_NAME_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x0026) { # &
+        $self->{prev_state} = $self->{state};
+        $self->{state} = ENTITY_VALUE_ENTITY_STATE;
+        $self->{entity_add} = 0x0022; # "
+        !!!next-input-character;
+        redo A;
+## TODO: %
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'unclosed entity value'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        ## Reconsume.
+        !!!emit ($self->{ct}); # ENTITY
+        redo A;
+      } else {
+        $self->{ct}->{value} .= chr $self->{nc}; # ENTITY
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} == DOCTYPE_ENTITY_VALUE_SINGLE_QUOTED_STATE) {
+      if ($self->{nc} == 0x0027) { # '
+        $self->{state} = AFTER_NOTATION_NAME_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x0026) { # &
+        $self->{prev_state} = $self->{state};
+        $self->{state} = ENTITY_VALUE_ENTITY_STATE;
+        $self->{entity_add} = 0x0027; # '
+        !!!next-input-character;
+        redo A;
+## TODO: %
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'unclosed entity value'); ## TODO: type
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        ## Reconsume.
+        !!!emit ($self->{ct}); # ENTITY
+        redo A;
+      } else {
+        $self->{ct}->{value} .= chr $self->{nc}; # ENTITY
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} == ENTITY_VALUE_ENTITY_STATE) {
+      ## TODO: XMLize
+
+      if ($is_space->{$self->{nc}} or
+          {
+            0x003C => 1, 0x0026 => 1, -1 => 1, # <, &
+            $self->{entity_add} => 1,
+          }->{$self->{nc}}) {
+        ## Don't consume
+        ## No error
+        ## Return nothing.
+        #
+      } elsif ($self->{nc} == 0x0023) { # #
+        $self->{ca} = $self->{ct};
+        $self->{state} = ENTITY_HASH_STATE;
+        $self->{kwd} = '#';
+        !!!next-input-character;
+        redo A;
+      } elsif ((0x0041 <= $self->{nc} and
+                $self->{nc} <= 0x005A) or # A..Z
+               (0x0061 <= $self->{nc} and
+                $self->{nc} <= 0x007A)) { # a..z
+        #
+      } else {
+        !!!parse-error (type => 'bare ero');
+        ## Return nothing.
+        #
+      }
+
+      $self->{ct}->{value} .= '&';
+      $self->{state} = $self->{prev_state};
+      ## Reconsume.
+      redo A;
     } elsif ($self->{state} == AFTER_NOTATION_NAME_STATE) {
       if ($is_space->{$self->{nc}}) {
         ## Stay in the state.
@@ -4691,8 +4788,6 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
-
-
     } elsif ($self->{state} == BOGUS_MD_STATE) {
       if ($self->{nc} == 0x003E) { # >
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -4718,5 +4813,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 06:14:57 $
+## $Date: 2008/10/19 07:19:00 $
                                 

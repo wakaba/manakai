@@ -121,7 +121,7 @@ sub test ($) {
     for (keys %{$p->{ge}}) {
       my $ent = $p->{ge}->{$_};
       my $v = '<!ENTITY ' . $ent->{name} . ' "';
-      $v .= $ent->{text} if defined $ent->{text};
+      $v .= $ent->{value} if defined $ent->{value};
       $v .= '" "';
       $v .= $ent->{pubid} if defined $ent->{pubid};
       $v .= '" "';
@@ -133,8 +133,8 @@ sub test ($) {
     }
     for (keys %{$p->{pe}}) {
       my $ent = $p->{pe}->{$_};
-      my $v = '<!ENTITY % ' . $ent->{name} . ' "';
-      $v .= $ent->{text} if defined $ent->{text};
+      my $v = '<!ENTITY % ' . $ent->{name} . ' "'; 
+      $v .= $ent->{value} if defined $ent->{value};
       $v .= '" "';
       $v .= $ent->{pubid} if defined $ent->{pubid};
       $v .= '" "';
@@ -183,4 +183,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/19 06:14:57 $
+## $Date: 2008/10/19 07:19:00 $

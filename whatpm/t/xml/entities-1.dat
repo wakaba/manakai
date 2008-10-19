@@ -262,3 +262,102 @@
 | <{} a>
 #entities
 | <!ENTITY bc "" "x" "y" z>
+
+#data
+<!DOCTYPE a[
+<!ENTITY b "">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b ''>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b "xxxxx">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "xxxxx" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b 'xxxxx'>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "xxxxx" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b "yyy" >
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "yyy" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b 'yyy' >
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "yyy" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b "a&#x24;b">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "a$b" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b '&#32;'>
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b " " "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY b "&amp;abc">
+]><a/>
+#errors
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+<!ENTITY b "&amp;abc" "" "" >

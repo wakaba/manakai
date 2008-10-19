@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -716,6 +716,7 @@ push our @ISA, 'Whatpm::NanoDOM::Node';
 sub new ($$) {
   my $self = shift->SUPER::new;
   $self->{node_name} = shift;
+  $self->{child_nodes} = [];
   return $self;
 } # new
 
@@ -831,4 +832,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/19 06:14:57 $
+# $Date: 2008/10/19 07:19:00 $
