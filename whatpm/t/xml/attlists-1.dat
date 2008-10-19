@@ -1612,3 +1612,35 @@ c CDATA #REQUIRED>
 |   <!ELEMENT b >
 |     c CDATA () IMPLIED ""
 | <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b c CDATA #IMPLIED>
+%x;
+<!ATTLIST d e CDATA #IMPLIED>
+]><a/>
+#errors
+3;1;stop processing;;;i
+3;2;string in internal subset;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () IMPLIED ""
+| <{} a>
+
+#data
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE a[
+<!ATTLIST b c CDATA #IMPLIED>
+%x;
+<!ATTLIST d e CDATA #IMPLIED>
+]><a/>
+#errors
+4;2;string in internal subset;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () IMPLIED ""
+|   <!ELEMENT d >
+|     e CDATA () IMPLIED ""
+| <{} a>

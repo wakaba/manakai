@@ -289,3 +289,18 @@
 | <!DOCTYPE a>
 |   <!ELEMENT b EMPTY>
 | <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b ANY>
+%x;
+<!ELEMENT c ANY>
+]><a/>
+#errors
+3;1;stop processing;;;i
+3;2;string in internal subset;;;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b ANY>
+|   <!ELEMENT c ANY>
+| <{} a>

@@ -151,3 +151,33 @@
 | <!DOCTYPE a>
 |   <?x ?>
 | <{} a>
+
+#data
+<!DOCTYPE a[
+<?x?>
+%b;
+<?y?>
+]><a/>
+#errors
+3;1;stop processing;;;i
+3;2;string in internal subset;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+|   <?y ?>
+| <{} a>
+
+#data
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE a[
+<?x?>
+%b;
+<?y?>
+]><a/>
+#errors
+4;2;string in internal subset;;;m
+#document
+| <!DOCTYPE a>
+|   <?x ?>
+|   <?y ?>
+| <{} a>

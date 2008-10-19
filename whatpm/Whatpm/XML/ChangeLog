@@ -1,5 +1,10 @@
 2008-10-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* Parser.pm.src: Don't process ATTLIST_TOKEN and ENTITY_TOKEN if
+	the "stop_processing" flag is set.
+
+2008-10-19  Wakaba  <wakaba@suika.fam.cx>
+
 	* Parser.pm.src: Raise a parse error or warning for
 	declaration/definition duplications.  Raise a warning for an empty
 	attlist declaration.  Raise a error for an ill-declared predefined

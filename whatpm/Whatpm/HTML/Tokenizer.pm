@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -5469,6 +5469,14 @@ sub _get_next_token ($) {
         ## XML5: Not defined yet.
 
         ## TODO:
+
+        if (not $self->{stop_processing} and
+            not $self->{document}->xml_standalone) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'stop processing', ## TODO: type
+                          level => $self->{level}->{info});
+          $self->{stop_processing} = 1;
+        }
+
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -8611,5 +8619,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 13:43:55 $
+## $Date: 2008/10/19 14:05:20 $
                                 

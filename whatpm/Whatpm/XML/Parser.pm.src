@@ -846,94 +846,100 @@ sub _tree_in_subset ($) {
       !!!next-token;
       next B;
     } elsif ($token->{type} == ATTLIST_TOKEN) {
-      my $ed = $self->{doctype}->get_element_type_definition_node
-          ($token->{name});
-      unless ($ed) {
-        $ed = $self->{document}->create_element_type_definition
+      if ($self->{stop_processing}) {
+        ## TODO: syntax validation
+      } else {
+        my $ed = $self->{doctype}->get_element_type_definition_node
             ($token->{name});
-        $ed->set_user_data (manakai_source_line => $token->{line});
-        $ed->set_user_data (manakai_source_column => $token->{column});
-        $self->{doctype}->set_element_type_definition_node ($ed);
-      } elsif ($self->{has_attlist}->{$token->{name}}) {
-        !!!parse-error (type => 'duplicate attlist decl', ## TODO: type
-                        value => $token->{name},
-                        token => $token,
-                        level => $self->{level}->{warn});
-      }
-      $self->{has_attlist}->{$token->{name}} = 1;
-
-      unless (@{$token->{attrdefs}}) {
-        !!!parse-error (type => 'empty attlist decl', ## TODO: type
-                        value => $token->{name},
-                        token => $token,
-                        level => $self->{level}->{warn});
-      }
-
-      for my $at (@{$token->{attrdefs}}) {
-        unless ($ed->get_attribute_definition_node ($at->{name})) {
-          my $node = $self->{document}->create_attribute_definition
-              ($at->{name});
-          $node->set_user_data (manakai_source_line => $at->{line});
-          $node->set_user_data (manakai_source_column => $at->{column});
-
-          my $type = defined $at->{type} ? {
-            CDATA => 1, ID => 2, IDREF => 3, IDREFS => 4, ENTITY => 5,
-            ENTITIES => 6, NMTOKEN => 7, NMTOKENS => 8, NOTATION => 9,
-          }->{$at->{type}} : 10;
-          if (defined $type) {
-            $node->declared_type ($type);
-          } else {
-            !!!parse-error (type => 'unknown declared type', ## TODO: type
-                            value => $at->{type},
-                            token => $at);
-          }
-          
-          push @{$node->allowed_tokens}, @{$at->{tokens}};
-          
-          my $default = defined $at->{default} ? {
-            FIXED => 1, REQUIRED => 2, IMPLIED => 3,
-          }->{$at->{default}} : 4;
-          if (defined $default) {
-            $node->default_type ($default);
-            if (defined $at->{value}) {
-              if ($default == 1 or $default == 4) {
-                #
-              } elsif (length $at->{value}) {
-                !!!parse-error (type => 'default value not allowed', ## TODO: type
-                                token => $at);
+        unless ($ed) {
+          $ed = $self->{document}->create_element_type_definition
+              ($token->{name});
+          $ed->set_user_data (manakai_source_line => $token->{line});
+          $ed->set_user_data (manakai_source_column => $token->{column});
+          $self->{doctype}->set_element_type_definition_node ($ed);
+        } elsif ($self->{has_attlist}->{$token->{name}}) {
+          !!!parse-error (type => 'duplicate attlist decl', ## TODO: type
+                          value => $token->{name},
+                          token => $token,
+                          level => $self->{level}->{warn});
+        }
+        $self->{has_attlist}->{$token->{name}} = 1;
+        
+        unless (@{$token->{attrdefs}}) {
+          !!!parse-error (type => 'empty attlist decl', ## TODO: type
+                          value => $token->{name},
+                          token => $token,
+                          level => $self->{level}->{warn});
+        }
+        
+        for my $at (@{$token->{attrdefs}}) {
+          unless ($ed->get_attribute_definition_node ($at->{name})) {
+            my $node = $self->{document}->create_attribute_definition
+                ($at->{name});
+            $node->set_user_data (manakai_source_line => $at->{line});
+            $node->set_user_data (manakai_source_column => $at->{column});
+            
+            my $type = defined $at->{type} ? {
+              CDATA => 1, ID => 2, IDREF => 3, IDREFS => 4, ENTITY => 5,
+              ENTITIES => 6, NMTOKEN => 7, NMTOKENS => 8, NOTATION => 9,
+            }->{$at->{type}} : 10;
+            if (defined $type) {
+              $node->declared_type ($type);
+            } else {
+              !!!parse-error (type => 'unknown declared type', ## TODO: type
+                              value => $at->{type},
+                              token => $at);
+            }
+            
+            push @{$node->allowed_tokens}, @{$at->{tokens}};
+            
+            my $default = defined $at->{default} ? {
+              FIXED => 1, REQUIRED => 2, IMPLIED => 3,
+            }->{$at->{default}} : 4;
+            if (defined $default) {
+              $node->default_type ($default);
+              if (defined $at->{value}) {
+                if ($default == 1 or $default == 4) {
+                  #
+                } elsif (length $at->{value}) {
+                  !!!parse-error (type => 'default value not allowed', ## TODO: type
+                                  token => $at);
+                }
+              } else {
+                if ($default == 1 or $default == 4) {
+                  !!!parse-error (type => 'default value not provided', ## TODO: type
+                                  token => $at);
+                }
               }
             } else {
-              if ($default == 1 or $default == 4) {
-                !!!parse-error (type => 'default value not provided', ## TODO: type
-                                token => $at);
-              }
+              !!!parse-error (type => 'unknown default type', ## TODO: type
+                              value => $at->{default},
+                              token => $at);
             }
+            
+            $node->text_content ($at->{value}) if defined $at->{value};
+            
+            $ed->set_attribute_definition_node ($node);
           } else {
-            !!!parse-error (type => 'unknown default type', ## TODO: type
-                            value => $at->{default},
-                            token => $at);
+            !!!parse-error (type => 'duplicate attrdef', ## TODO: type
+                            value => $at->{name},
+                            token => $at,
+                            level => $self->{level}->{warn});
+            
+            ## TODO: syntax validation
           }
-
-          $node->text_content ($at->{value}) if defined $at->{value};
- 
-          $ed->set_attribute_definition_node ($node);
-        } else {
-          !!!parse-error (type => 'duplicate attrdef', ## TODO: type
-                          value => $at->{name},
-                          token => $at,
-                          level => $self->{level}->{warn});
-
-          ## TODO: syntax validation
-        }
-      } # $at
+        } # $at
+      }
 
       ## Stay in the mode.
       !!!next-token;
       next B;
     } elsif ($token->{type} == GENERAL_ENTITY_TOKEN) {
-      if ({
-           amp => 1, apos => 1, quot => 1, lt => 1, gt => 1,
-          }->{$token->{name}}) {
+      if ($self->{stop_processing}) {
+        ## TODO: syntax validation
+      } elsif ({
+                amp => 1, apos => 1, quot => 1, lt => 1, gt => 1,
+               }->{$token->{name}}) {
         if (not defined $token->{value} or
             $token->{value} !~
             {
@@ -992,7 +998,9 @@ sub _tree_in_subset ($) {
       !!!next-token;
       next B;
     } elsif ($token->{type} == PARAMETER_ENTITY_TOKEN) {
-      unless ($self->{pe}->{$token->{name}}) {
+      if ($self->{stop_processing}) {
+        ## TODO: syntax validation
+      } elsif (not $self->{pe}->{$token->{name}}) {
         ## For parser.
         $self->{pe}->{$token->{name}} = $token;
 
