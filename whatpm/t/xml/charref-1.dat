@@ -74,3 +74,26 @@
 | <!DOCTYPE a>
 | "  "
 | <{} a>
+
+#data
+<a>&#x20;</a>
+#errors
+#document
+| <{} a>
+|   " "
+
+#data
+<a>&#X20;</a>
+#errors
+1;6;uppercase hcro;;;m
+#document
+| <{} a>
+|   " "
+
+#data
+<a>&abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz;</a>
+#errors
+1;4;bare ero;;;m
+#document
+| <{} a>
+|   "&abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz;"

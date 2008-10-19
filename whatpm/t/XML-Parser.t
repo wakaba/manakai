@@ -120,7 +120,7 @@ sub test ($) {
     my @e;
     for (keys %{$p->{ge}}) {
       my $ent = $p->{ge}->{$_};
-      my $v = '<!ENTITY ' . $ent->{name} . ' "';
+      my $v = '<!ENTITY ' . $ent->{name} . ' "'; 
       $v .= $ent->{value} if defined $ent->{value};
       $v .= '" "';
       $v .= $ent->{pubid} if defined $ent->{pubid};
@@ -173,6 +173,7 @@ my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}entities-1.dat
   ${test_dir_name}entities-2.dat
   ${test_dir_name}notations-1.dat
+  ${test_dir_name}entrefs-1.dat
 ];
 
 require 't/testfiles.pl';
@@ -184,4 +185,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/19 08:20:30 $
+## $Date: 2008/10/19 09:25:21 $

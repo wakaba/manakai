@@ -1,5 +1,13 @@
 2008-10-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* Tokenizer.pm.src: Make uppercase "&#X" in XML a parse error.
+	Remove the limitation of entity name length.  Enable replacement
+	of text-only general entities.  Raise a parse error for an
+	unparsed entity reference.  Raise a parse error for a general
+	entity reference to an undefined entity.
+
+2008-10-19  Wakaba  <wakaba@suika.fam.cx>
+
 	* Tokenizer.pm.src: Support for <!ELEMENT>.
 	(AFTER_NOTATION_NAME_STATE): Renamed as |AFTER_MD_DEF_STATE| (i.e.
 	after markup declaration definition state).

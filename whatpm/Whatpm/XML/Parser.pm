@@ -196,6 +196,12 @@ sub _initialize_tree_constructor ($) {
   $self->{document}->manakai_is_html (0);
   $self->{document}->set_user_data (manakai_source_line => 1);
   $self->{document}->set_user_data (manakai_source_column => 1);
+
+  $self->{ge}->{'amp;'} = {value => '&', only_text => 1};
+  $self->{ge}->{'apos;'} = {value => "'", only_text => 1};
+  $self->{ge}->{'gt;'} = {value => '>', only_text => 1};
+  $self->{ge}->{'lt;'} = {value => '<', only_text => 1};
+  $self->{ge}->{'quot;'} = {value => '"', only_text => 1};
 } # _initialize_tree_constructor
 
 sub _terminate_tree_constructor ($) {
@@ -296,6 +302,8 @@ sub _tree_initial ($) {
       ## TODO: internal_subset
       
       $self->{document}->append_child ($doctype);
+
+      $self->{ge} = {};
 
       ## XML5: No "has internal subset" flag.
       if ($token->{has_internal_subset}) {
@@ -900,10 +908,14 @@ sub _tree_in_subset ($) {
     } elsif ($token->{type} == GENERAL_ENTITY_TOKEN) {
       ## TODO: predefined entity names
 
-      unless ($self->{ge}->{$token->{name}}) {
+      unless ($self->{ge}->{$token->{name}.';'}) {
         ## For parser.
-        $self->{ge}->{$token->{name}} = $token;
-
+        $self->{ge}->{$token->{name}.';'} = $token;
+        if (defined $token->{value} and
+            $token->{value} !~ /[&<]/) {
+          $token->{only_text} = 1;
+        }
+        
         ## For DOM.
         if (defined $token->{notation}) {
           my $node = $self->{document}->create_general_entity ($token->{name});

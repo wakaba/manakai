@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -4703,9 +4703,27 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ENTITY_HASH_STATE) {
-      if ($self->{nc} == 0x0078 or # x
-          $self->{nc} == 0x0058) { # X
+      if ($self->{nc} == 0x0078) { # x
         
+        $self->{state} = HEXREF_X_STATE;
+        $self->{kwd} .= chr $self->{nc};
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0058) { # X
+        
+        if ($self->{is_xml}) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'uppercase hcro'); ## TODO: type
+        }
         $self->{state} = HEXREF_X_STATE;
         $self->{kwd} .= chr $self->{nc};
         
@@ -4997,21 +5015,50 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ENTITY_NAME_STATE) {
-      if (length $self->{kwd} < 30 and
-          ## NOTE: Some number greater than the maximum length of entity name
-          ((0x0041 <= $self->{nc} and # a
-            $self->{nc} <= 0x005A) or # x
-           (0x0061 <= $self->{nc} and # a
-            $self->{nc} <= 0x007A) or # z
-           (0x0030 <= $self->{nc} and # 0
-            $self->{nc} <= 0x0039) or # 9
-           $self->{nc} == 0x003B)) { # ;
+      if ((0x0041 <= $self->{nc} and # a
+           $self->{nc} <= 0x005A) or # x
+          (0x0061 <= $self->{nc} and # a
+           $self->{nc} <= 0x007A) or # z
+          (0x0030 <= $self->{nc} and # 0
+           $self->{nc} <= 0x0039) or # 9
+          $self->{nc} == 0x003B) { # ;
         our $EntityChar;
         $self->{kwd} .= chr $self->{nc};
-        if (defined $EntityChar->{$self->{kwd}}) {
+        if (defined $EntityChar->{$self->{kwd}} or
+            $self->{ge}->{$self->{kwd}}) {
           if ($self->{nc} == 0x003B) { # ;
-            
-            $self->{entity__value} = $EntityChar->{$self->{kwd}};
+            if (defined $self->{ge}->{$self->{kwd}}) {
+              if ($self->{ge}->{$self->{kwd}}->{only_text}) {
+                
+                $self->{entity__value} = $self->{ge}->{$self->{kwd}}->{value};
+              } else {
+                if (defined $self->{ge}->{$self->{kwd}}->{notation}) {
+                  
+                  $self->{parse_error}->(level => $self->{level}->{must}, type => 'unparsed entity', ## TODO: type
+                                  value => $self->{kwd});
+                } else {
+                  
+                }
+                $self->{entity__value} = '&' . $self->{kwd}; ## TODO: expand
+              }
+            } else {
+              if ($self->{is_xml}) {
+                
+                $self->{parse_error}->(level => $self->{level}->{must}, type => 'entity not declared', ## TODO: type
+                                value => $self->{kwd},
+                                level => {
+                                          'amp;' => $self->{level}->{warn},
+                                          'quot;' => $self->{level}->{warn},
+                                          'lt;' => $self->{level}->{warn},
+                                          'gt;' => $self->{level}->{warn},
+                                          'apos;' => $self->{level}->{warn},
+                                         }->{$self->{kwd}} ||
+                                         $self->{level}->{must});
+              } else {
+                
+              }
+              $self->{entity__value} = $EntityChar->{$self->{kwd}};
+            }
             $self->{entity__match} = 1;
             
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -8555,5 +8602,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 08:20:29 $
+## $Date: 2008/10/19 09:25:21 $
                                 

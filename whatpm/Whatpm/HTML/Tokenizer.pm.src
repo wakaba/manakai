@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -3133,9 +3133,17 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ENTITY_HASH_STATE) {
-      if ($self->{nc} == 0x0078 or # x
-          $self->{nc} == 0x0058) { # X
+      if ($self->{nc} == 0x0078) { # x
         !!!cp (995);
+        $self->{state} = HEXREF_X_STATE;
+        $self->{kwd} .= chr $self->{nc};
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == 0x0058) { # X
+        !!!cp (995.1);
+        if ($self->{is_xml}) {
+          !!!parse-error (type => 'uppercase hcro'); ## TODO: type
+        }
         $self->{state} = HEXREF_X_STATE;
         $self->{kwd} .= chr $self->{nc};
         !!!next-input-character;
@@ -3347,21 +3355,50 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == ENTITY_NAME_STATE) {
-      if (length $self->{kwd} < 30 and
-          ## NOTE: Some number greater than the maximum length of entity name
-          ((0x0041 <= $self->{nc} and # a
-            $self->{nc} <= 0x005A) or # x
-           (0x0061 <= $self->{nc} and # a
-            $self->{nc} <= 0x007A) or # z
-           (0x0030 <= $self->{nc} and # 0
-            $self->{nc} <= 0x0039) or # 9
-           $self->{nc} == 0x003B)) { # ;
+      if ((0x0041 <= $self->{nc} and # a
+           $self->{nc} <= 0x005A) or # x
+          (0x0061 <= $self->{nc} and # a
+           $self->{nc} <= 0x007A) or # z
+          (0x0030 <= $self->{nc} and # 0
+           $self->{nc} <= 0x0039) or # 9
+          $self->{nc} == 0x003B) { # ;
         our $EntityChar;
         $self->{kwd} .= chr $self->{nc};
-        if (defined $EntityChar->{$self->{kwd}}) {
+        if (defined $EntityChar->{$self->{kwd}} or
+            $self->{ge}->{$self->{kwd}}) {
           if ($self->{nc} == 0x003B) { # ;
-            !!!cp (1020);
-            $self->{entity__value} = $EntityChar->{$self->{kwd}};
+            if (defined $self->{ge}->{$self->{kwd}}) {
+              if ($self->{ge}->{$self->{kwd}}->{only_text}) {
+                !!!cp (1020.1);
+                $self->{entity__value} = $self->{ge}->{$self->{kwd}}->{value};
+              } else {
+                if (defined $self->{ge}->{$self->{kwd}}->{notation}) {
+                  !!!cp (1020.2);
+                  !!!parse-error (type => 'unparsed entity', ## TODO: type
+                                  value => $self->{kwd});
+                } else {
+                  !!!cp (1020.3);
+                }
+                $self->{entity__value} = '&' . $self->{kwd}; ## TODO: expand
+              }
+            } else {
+              if ($self->{is_xml}) {
+                !!!cp (1020.4);
+                !!!parse-error (type => 'entity not declared', ## TODO: type
+                                value => $self->{kwd},
+                                level => {
+                                          'amp;' => $self->{level}->{warn},
+                                          'quot;' => $self->{level}->{warn},
+                                          'lt;' => $self->{level}->{warn},
+                                          'gt;' => $self->{level}->{warn},
+                                          'apos;' => $self->{level}->{warn},
+                                         }->{$self->{kwd}} ||
+                                         $self->{level}->{must});
+              } else {
+                !!!cp (1020);
+              }
+              $self->{entity__value} = $EntityChar->{$self->{kwd}};
+            }
             $self->{entity__match} = 1;
             !!!next-input-character;
             #
@@ -5055,5 +5092,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2008/10/19 08:20:29 $
+## $Date: 2008/10/19 09:25:21 $
                                 
