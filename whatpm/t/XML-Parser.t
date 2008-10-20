@@ -7,7 +7,7 @@ use lib qw[/home/wakaba/work/manakai2/lib];
 my $test_dir_name = 't/xml/';
 
 use Test;
-BEGIN { plan tests => 4935 }
+BEGIN { plan tests => 1573 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -156,6 +156,7 @@ sub test ($) {
 my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}elements-1.dat
   ${test_dir_name}attrs-1.dat
+  ${test_dir_name}attrs-2.dat
   ${test_dir_name}texts-1.dat
   ${test_dir_name}cdata-1.dat
   ${test_dir_name}charref-1.dat
@@ -186,4 +187,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/19 10:12:54 $
+## $Date: 2008/10/20 04:21:19 $

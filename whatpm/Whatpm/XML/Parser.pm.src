@@ -382,11 +382,33 @@ sub _tree_before_root_element ($) {
         xml => q<http://www.w3.org/XML/1998/namespace>,
         xmlns => q<http://www.w3.org/2000/xmlns/>,
       };
+
+      my $attrs = $token->{attributes};
+      my $attrdefs = $self->{attrdef}->{$token->{tag_name}};
+      for my $attr_name (keys %{$attrdefs}) {
+        if ($attrs->{$attr_name}) {
+          $attrs->{$attr_name}->{type} = $attrdefs->{$attr_name}->{type} || 0;
+          if ($attrdefs->{$attr_name}->{tokenize}) {
+            $attrs->{$attr_name}->{value} =~ s/  +/ /g;
+            $attrs->{$attr_name}->{value} =~ s/\A //;
+            $attrs->{$attr_name}->{value} =~ s/ \z//;
+          }
+        } elsif (defined $attrdefs->{$attr_name}->{default}) {
+          $attrs->{$attr_name} = {
+                                  value => $attrdefs->{$attr_name}->{default},
+                                  type => $attrdefs->{$attr_name}->{type} || 0,
+                                  not_specified => 1,
+                                  line => $attrdefs->{$attr_name}->{line},
+                                  column => $attrdefs->{$attr_name}->{column},
+                                  index => 1 + keys %{$attrs},
+                                 };
+        }
+      }
       
-      for (keys %{$token->{attributes}}) {
+      for (keys %{$attrs}) {
         if (/^xmlns:./s) {
           my $prefix = substr $_, 6;
-          my $value = $token->{attributes}->{$_}->{value};
+          my $value = $attrs->{$_}->{value};
           if ($prefix eq 'xml' or $prefix eq 'xmlns' or
               $value eq q<http://www.w3.org/XML/1998/namespace> or
               $value eq q<http://www.w3.org/2000/xmlns/>) {
@@ -398,7 +420,7 @@ sub _tree_before_root_element ($) {
             delete $nsmap->{$prefix};
           }
         } elsif ($_ eq 'xmlns') {
-          my $value = $token->{attributes}->{$_}->{value};
+          my $value = $attrs->{$_}->{value};
           if ($value eq q<http://www.w3.org/XML/1998/namespace> or
               $value eq q<http://www.w3.org/2000/xmlns/>) {
             ## NOTE: Error should be detected at the DOM layer.
@@ -430,9 +452,8 @@ sub _tree_before_root_element ($) {
       $el->set_user_data (manakai_source_column => $token->{column});
 
       my $has_attr;
-      for my $attr_name (sort {$token->{attributes}->{$a}->{index} <=>
-                               $token->{attributes}->{$b}->{index}}
-                         keys %{$token->{attributes}}) {
+      for my $attr_name (sort {$attrs->{$a}->{index} <=> $attrs->{$b}->{index}}
+                         keys %{$attrs}) {
         my $ns;
         my ($p, $l) = split /:/, $attr_name, 2;
 
@@ -459,12 +480,20 @@ sub _tree_before_root_element ($) {
           $has_attr->{defined $ns ? $ns : ''}->{$l} = 1;
         }
         
-        my $attr_t = $token->{attributes}->{$attr_name};
+        my $attr_t = $attrs->{$attr_name};
         my $attr = $self->{document}->create_attribute_ns ($ns, [$p, $l]);
         $attr->value ($attr_t->{value});
+        if (defined $attr_t->{type}) {
+          $attr->manakai_attribute_type ($attr_t->{type});
+        } elsif ($self->{document}->all_declarations_processed) {
+          $attr->manakai_attribute_type (0); # no value
+        } else {
+          $attr->manakai_attribute_type (11); # unknown
+        }
         $attr->set_user_data (manakai_source_line => $attr_t->{line});
         $attr->set_user_data (manakai_source_column => $attr_t->{column});
         $el->set_attribute_node_ns ($attr);
+        $attr->specified (0) if $attr_t->{not_specified};
       }
 
       $self->{document}->append_child ($el);
@@ -562,11 +591,33 @@ sub _tree_in_element ($) {
       next B;
     } elsif ($token->{type} == START_TAG_TOKEN) {
       my $nsmap = {%{$self->{open_elements}->[-1]->[2]}};
+
+      my $attrs = $token->{attributes};
+      my $attrdefs = $self->{attrdef}->{$token->{tag_name}};
+      for my $attr_name (keys %{$attrdefs}) {
+        if ($attrs->{$attr_name}) {
+          $attrs->{$attr_name}->{type} = $attrdefs->{$attr_name}->{type} || 0;
+          if ($attrdefs->{$attr_name}->{tokenize}) {
+            $attrs->{$attr_name}->{value} =~ s/  +/ /g;
+            $attrs->{$attr_name}->{value} =~ s/\A //;
+            $attrs->{$attr_name}->{value} =~ s/ \z//;
+          }
+        } elsif (defined $attrdefs->{$attr_name}->{default}) {
+          $attrs->{$attr_name} = {
+                                  value => $attrdefs->{$attr_name}->{default},
+                                  type => $attrdefs->{$attr_name}->{type} || 0,
+                                  not_specified => 1,
+                                  line => $attrdefs->{$attr_name}->{line},
+                                  column => $attrdefs->{$attr_name}->{column},
+                                  index => 1 + keys %{$attrs},
+                                 };
+        }
+      }
       
-      for (keys %{$token->{attributes}}) {
+      for (keys %{$attrs}) {
         if (/^xmlns:./s) {
           my $prefix = substr $_, 6;
-          my $value = $token->{attributes}->{$_}->{value};
+          my $value = $attrs->{$_}->{value};
           if ($prefix eq 'xml' or $prefix eq 'xmlns' or
               $value eq q<http://www.w3.org/XML/1998/namespace> or
               $value eq q<http://www.w3.org/2000/xmlns/>) {
@@ -578,7 +629,7 @@ sub _tree_in_element ($) {
             delete $nsmap->{$prefix};
           }
         } elsif ($_ eq 'xmlns') {
-          my $value = $token->{attributes}->{$_}->{value};
+          my $value = $attrs->{$_}->{value};
           if ($value eq q<http://www.w3.org/XML/1998/namespace> or
               $value eq q<http://www.w3.org/2000/xmlns/>) {
             ## NOTE: Error should be detected at the DOM layer.
@@ -611,9 +662,8 @@ sub _tree_in_element ($) {
       $el->set_user_data (manakai_source_column => $token->{column});
 
       my $has_attr;
-      for my $attr_name (sort {$token->{attributes}->{$a}->{index} <=>
-                               $token->{attributes}->{$b}->{index}}
-                         keys %{$token->{attributes}}) {
+      for my $attr_name (sort {$attrs->{$a}->{index} <=> $attrs->{$b}->{index}}
+                         keys %{$attrs}) {
         my $ns;
         my ($p, $l) = split /:/, $attr_name, 2;
 
@@ -640,12 +690,20 @@ sub _tree_in_element ($) {
           $has_attr->{defined $ns ? $ns : ''}->{$l} = 1;
         }
 
-        my $attr_t = $token->{attributes}->{$attr_name};
+        my $attr_t = $attrs->{$attr_name};
         my $attr = $self->{document}->create_attribute_ns ($ns, [$p, $l]);
         $attr->value ($attr_t->{value});
+        if (defined $attr_t->{type}) {
+          $attr->manakai_attribute_type ($attr_t->{type});
+        } elsif ($self->{document}->all_declarations_processed) {
+          $attr->manakai_attribute_type (0); # no value
+        } else {
+          $attr->manakai_attribute_type (11); # unknown
+        }
         $attr->set_user_data (manakai_source_line => $attr_t->{line});
         $attr->set_user_data (manakai_source_column => $attr_t->{column});
         $el->set_attribute_node_ns ($attr);
+        $attr->specified (0) if $attr_t->{not_specified};
       }
 
       $self->{open_elements}->[-1]->[0]->append_child ($el);
@@ -916,10 +974,30 @@ sub _tree_in_subset ($) {
                               value => $at->{default},
                               token => $at);
             }
-            
-            $node->text_content ($at->{value}) if defined $at->{value};
+
+            $type ||= 0;
+            my $tokenize = (2 <= $type and $type <= 10);
+
+            if (defined $at->{value}) {
+              if ($tokenize) {
+                $at->{value} =~ s/  +/ /g;
+                $at->{value} =~ s/\A //;
+                $at->{value} =~ s/ \z//;
+              }
+              $node->text_content ($at->{value});
+            }
             
             $ed->set_attribute_definition_node ($node);
+
+            ## For tree construction
+            $self->{attrdef}->{$token->{name}}->{$at->{name}}
+                = {
+                   type => $type,
+                   tokenize => $tokenize,
+                   default => (($default == 1 or $default == 4)
+                                 ? defined $at->{value} ? $at->{value} : ''
+                                 : undef),
+                  };
           } else {
             !!!parse-error (type => 'duplicate attrdef', ## TODO: type
                             value => $at->{name},

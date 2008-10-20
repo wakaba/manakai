@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -370,6 +370,12 @@ sub manakai_html ($) {
   }
 } # manakai_html
 
+## NOTE: Manakai extension.
+sub all_declarations_processed ($;$) {
+  $_[0]->{all_declarations_processed} = $_[1] if @_ > 1;
+  return $_[0]->{all_declarations_processed};
+} # all_declarations_processed
+
 sub input_encoding ($;$) {
   $_[0]->{input_encoding} = $_[1] if @_ > 1;
   return $_[0]->{input_encoding};
@@ -554,6 +560,7 @@ sub new ($$$$$$) {
   $self->{prefix} = shift;
   $self->{local_name} = shift;
   $self->{value} = shift;
+  $self->{specified} = 1;
   return $self;
 } # new
 
@@ -591,6 +598,16 @@ sub value ($;$) {
 sub owner_element ($) {
   return shift->{owner_element};
 } # owner_element
+
+sub specified ($;$) {
+  $_[0]->{specified} = $_[1] if @_ > 1;
+  return $_[0]->{specified} || 0;
+}
+
+sub manakai_attribute_type ($;$) {
+  $_[0]->{manakai_attribute_type} = $_[1] if @_ > 1;
+  return $_[0]->{manakai_attribute_type} || 0;
+}
 
 package Whatpm::NanoDOM::CharacterData;
 push our @ISA, 'Whatpm::NanoDOM::Node';
@@ -832,4 +849,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/19 07:19:00 $
+# $Date: 2008/10/20 04:21:18 $

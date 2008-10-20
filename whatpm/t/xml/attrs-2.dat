@@ -1,0 +1,422 @@
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA "c"
+>
+]>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () EXPLICIT "c"
+| <{} a>
+|   b="c"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA "c"
+d ENTITIES "e"
+>
+]>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () EXPLICIT "c"
+|     d ENTITIES () EXPLICIT "e"
+| <{} a>
+|   b="c"
+|   d="e"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA #FIXED "c"
+>
+]>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () FIXED "c"
+| <{} a>
+|   b="c"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA "c"
+>
+]>
+<a b="d"/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () EXPLICIT "c"
+| <{} a>
+|   b="d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+xmlns CDATA "c"
+>
+]>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     xmlns CDATA () EXPLICIT "c"
+| <{c} a>
+|   xmlns xmlns="c"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+xmlns:b CDATA "c"
+>
+]>
+<a b:e="f"/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     xmlns:b CDATA () EXPLICIT "c"
+| <{} a>
+|   xmlns b="c"
+|   {c} e="f"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+xmlns:b CDATA "c"
+>
+]>
+<a xmlns:b="d" b:e="f"/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     xmlns:b CDATA () EXPLICIT "c"
+| <{} a>
+|   xmlns b="d"
+|   {d} e="f"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b:c CDATA "d"
+xmlns:b CDATA "x"
+>
+]>
+<a e:c="f" xmlns:e="x"/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b:c CDATA () EXPLICIT "d"
+|     xmlns:b CDATA () EXPLICIT "x"
+| <{} a>
+|   b:c="d"
+|   xmlns b="x"
+|   xmlns e="x"
+|   {x} c="f"
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA " c\u0009d\u000a"
+>
+]>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () EXPLICIT " c d "
+| <{} a>
+|   b=" c d "
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a
+b NMTOKEN " c  \u0009d\u000a "
+>
+]>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b NMTOKEN () EXPLICIT "c d"
+| <{} a>
+|   b="c d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b IDREF "c &#x9;d &#xa; "
+>
+]>
+<a/>
+#errors
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b IDREF () EXPLICIT "c \u0009d \u000a"
+| <{} a>
+|   b="c \u0009d \u000a"
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a
+b NMTOKENS #IMPLIED
+>
+]>
+<a b="c &#x9;d  e\u000a"/>
+#errors
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b NMTOKENS () IMPLIED ""
+| <{} a>
+|   b="c \u0009d e"
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a
+xmlns NMTOKEN " x  y \u0009"
+>
+]>
+<a/>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     xmlns NMTOKEN () EXPLICIT "x y"
+| <{x y} a>
+|   xmlns xmlns="x y"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA "c"
+>
+]>
+<z><a/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () EXPLICIT "c"
+| <{} z>
+|   <{} a>
+|     b="c"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA "c"
+d ENTITIES "e"
+>
+]>
+<z><a/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () EXPLICIT "c"
+|     d ENTITIES () EXPLICIT "e"
+| <{} z>
+|   <{} a>
+|     b="c"
+|     d="e"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA #FIXED "c"
+>
+]>
+<z><a/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () FIXED "c"
+| <{} z>
+|   <{} a>
+|     b="c"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA "c"
+>
+]>
+<z><a b="d"/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () EXPLICIT "c"
+| <{} z>
+|   <{} a>
+|     b="d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+xmlns CDATA "c"
+>
+]>
+<z><a/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     xmlns CDATA () EXPLICIT "c"
+| <{} z>
+|   <{c} a>
+|     xmlns xmlns="c"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+xmlns:b CDATA "c"
+>
+]>
+<z><a b:e="f"/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     xmlns:b CDATA () EXPLICIT "c"
+| <{} z>
+|   <{} a>
+|     xmlns b="c"
+|     {c} e="f"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+xmlns:b CDATA "c"
+>
+]>
+<z><a xmlns:b="d" b:e="f"/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     xmlns:b CDATA () EXPLICIT "c"
+| <{} z>
+|   <{} a>
+|     xmlns b="d"
+|     {d} e="f"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b:c CDATA "d"
+xmlns:b CDATA "x"
+>
+]>
+<z><a e:c="f" xmlns:e="x"/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b:c CDATA () EXPLICIT "d"
+|     xmlns:b CDATA () EXPLICIT "x"
+| <{} z>
+|   <{} a>
+|     b:c="d"
+|     xmlns b="x"
+|     xmlns e="x"
+|     {x} c="f"
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a
+b CDATA " c\u0009d\u000a"
+>
+]>
+<z><a/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b CDATA () EXPLICIT " c d "
+| <{} z>
+|   <{} a>
+|     b=" c d "
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a
+b NMTOKEN " c  \u0009d\u000a "
+>
+]>
+<z><a/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b NMTOKEN () EXPLICIT "c d"
+| <{} z>
+|   <{} a>
+|     b="c d"
+
+#data
+<!DOCTYPE a[
+<!ATTLIST a
+b IDREF "c &#x9;d &#xa; "
+>
+]>
+<z><a/></z>
+#errors
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b IDREF () EXPLICIT "c \u0009d \u000a"
+| <{} z>
+|   <{} a>
+|     b="c \u0009d \u000a"
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a
+b NMTOKENS #IMPLIED
+>
+]>
+<z><a b="c &#x9;d  e\u000a"/></z>
+#errors
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     b NMTOKENS () IMPLIED ""
+| <{} z>
+|   <{} a>
+|     b="c \u0009d e"
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a
+xmlns NMTOKEN " x  y \u0009"
+>
+]>
+<z><a/></z>
+#errors
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT a >
+|     xmlns NMTOKEN () EXPLICIT "x y"
+| <{} z>
+|   <{x y} a>
+|     xmlns xmlns="x y"
