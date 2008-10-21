@@ -93,7 +93,8 @@ unless ($feed) {
   $feed = $doc->create_element_ns ('http://www.w3.org/2005/Atom', 'feed');
   $doc->append_child ($feed);
 }
-$feed->set_attribute_ns ('xmlns', $feed->namespace_uri);
+$feed->set_attribute_ns ('http://www.w3.org/2000/xmlns/',
+                         'xmlns', $feed->namespace_uri);
 
 unless (@{$feed->author_elements}) {
   if (defined $feed_author_name) {
@@ -152,4 +153,4 @@ $content->text_content ($entry_content);
   print $file $doc->inner_html;
 }
 
-## $Date: 2008/10/21 06:17:52 $
+## $Date: 2008/10/21 06:18:59 $
