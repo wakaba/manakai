@@ -12,7 +12,7 @@ my $feed_author_name;
 my $feed_author_mail;
 my $feed_author_url;
 my $feed_lang = 'i-default';
-my $feed_realated_url;
+my $feed_related_url;
 my $feed_license_url;
 my $feed_rights;
 my $entry_content;
@@ -151,4 +151,4 @@ $content->text_content ($entry_content);
   print $file $doc->inner_html;
 }
 
-## $Date: 2008/10/21 05:17:48 $
+## $Date: 2008/10/21 05:18:22 $
