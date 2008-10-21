@@ -6,6 +6,8 @@ Technologies (beta)</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
 <link rel="license" href="#license">
 <link rel="author" href="#author">
+<link rel=feed href="whatpm-commit" type="application/atom+xml"
+    title="ChangeLog diffs">
 </head>
 <body>
 <h1>Whatpm &mdash; Perl modules for Web hypertext application technologies
@@ -25,6 +27,22 @@ project.</p>
 href="#modules-html">HTML, XHTML</a>, <a href="#modules-xml">XML</a>,
 <a hreF="#modules-css">CSS</a>, <a href="#modules-http">HTTP</a>, and
 <a href="#modules-url">URL</a>.
+</div>
+
+<div class=section id=news>
+<h2>What's new?</h2>
+
+<p><a href="whatpm-commit" rel=feed type="application/atom+xml">An
+Atom feed for ChangeLog diffs</a> is available.
+
+<ul>
+
+<li><time>2008-10-21</time>: <a href="#module-whatpm-xml-parser">An
+XML parser with non-draconian error handling</a> released.
+(Documentation is not available yet.)
+
+</ul>
+
 </div>
 
 <div class=section id=modules>
@@ -55,13 +73,37 @@ href="#modules-html">HTML, XHTML</a>, <a href="#modules-xml">XML</a>,
   element node.  (See also <a href="#demo-html-table">demo</a>.)</dd>
 </dl>
 
-<p id=modules-xml>The module for <i>tentative</i> XML support is as follow:
-<dl>
-<dt><a href="Whatpm/XMLSerializer.html"><code>Whatpm::XMLSerializer</code></a></dt>
-  <dd>A simple XML serializer.</dd>
-</dl>
+<p id=modules-xml>Modules for the XML support is as follow:
 
-<p><i>Real</i> XML parser and serializer are currently not available yet.
+<dl>
+
+<dt id=module-whatpm-xml-parser><a
+href="Whatpm/XML/Parser.html"><code>Whatpm::XML::Parser</code></a>
+
+<dd><p>An XML parser with non-draconian error handling.  It can
+construct a DOM tree from XML 1.0/1.1 documents that does <em>not</em>
+rely on external entities (including the external subset entity) and
+that does <em>not</em> contain general entity reference that
+references an entity whose replacement text contains character
+<code>&</code> or <code>&lt;</code>.  It also supports XML namespaces.
+
+<p>It does not stop the process to construct a DOM tree even if it
+detects a well-formedness or a namespace well-formedness error.  It
+recovers from errors in a manner similar to HTML5's tokenization
+algorithm.  It is expected that the combination of this module and a
+future extension to the <code>Whatpm::ContentChecker</code> framework
+will provide a mean to detect all well-formedness and validity errors,
+if desired.
+
+<p>(See also <a href="#demo-html-parser-manakai">demo</a>.)
+
+<dt><a href="Whatpm/XMLSerializer.html"><code>Whatpm::XMLSerializer</code></a></dt>
+
+<dd>A simple XML serializer.  It does namespace prefix fixups and
+suitable for the serialization of a carefully build XML DOM tree.  It
+does not assure that the output is well-formed.
+
+</dl>
 
 <p id=modules-cc>The module for conformance checking of a DOM tree (i.e.
 a in-memory representation of an HTML or XML document) is as follows:
@@ -127,8 +169,8 @@ are supported at the moment.
 tree, modules in the <a
 href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>
 package are used.  Those modules also provide the serializer for the
-CSSOM tree, in the form of the standard <code>css_text</code> CSSOM
-attribute.
+CSSOM tree, in the form of <a href="#howtouse">the standard
+<code>css_text</code> CSSOM attribute</a>.
 
 </div>
 
@@ -197,6 +239,65 @@ yet available.
 
 <!-- Whatpm::ContentChecker::*, Whatpm::H2H, Whatpm::NanoDOM, and
      Whatpm::XMLParser are intentionally omitted from the list. -->
+
+<div class=section id=howtouse>
+<h3>How to use modules</h3>
+
+<p><a href="#modules">Modules</a> listed above, which are included in
+the Whatpm package, can be used by directly <code>use</code>ing or
+<code>require</code>ing these modules and then invoking their native
+interface.  For more information on those native interfaces, see the
+document of those modules and the source code of them.
+
+<p>In addition, some of functionality provided by those modules can be
+accessed via standardized DOM interfaces implemented by modules
+included in the <a
+href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>
+package.  See the document of the module <a
+href="http://suika.fam.cx/www/manakai-core/lib/Message/DOM/DOMImplementation.html"><code>Message::DOM::DOMImplementation</code></a>
+for the way to access to the DOM interfaces.
+
+<p>The table below summarizes the relationship between Whatpm modules
+and DOM methods/attributes implemented by manakai-core modules:
+
+<table>
+<thead>
+<tr><th scope=col>Whatpm module
+<th scope=col>DOM methods/attributes
+
+<tbody>
+
+<tr><td><code>Whatpm::CSS::Cascade</code>
+<td><code>get_computed_style</code> (<code>ViewCSS</code>),
+<code>current_style</code> (<code>ElementCSS</code>)
+
+<tr><td><code>Whatpm::CSS::Parser</code>
+<td rowspan=2><code>CSSStyleDeclaration</code>'s attributes and methods,
+<code>css_text</code> (CSSOM interfaces)
+
+<tr><td><code>Whatpm::CSS::Serializer</code>
+
+<tr><td rowspan=2><code>Whatpm::CSS::SelectorsParser</code>
+<td><code>query_selector</code>, <code>query_selector_all</code>
+(<code>DocumentSelector</code>, <code>ElementSelector</code>)
+<tr><td rowspan=2><code>selector_text</code> (<code>CSSStyleRule</code>)
+
+<tr><td><code>Whatpm::CSS::SelectorsSerializer</code>
+
+<tr><td><code>Whatpm::HTML</code>
+<td rowspan=4><code>inner_html</code> (<code>HTMLDocument</code>,
+<code>Element</code>)
+
+<tr><td><code>Whatpm::HTML::Serializer</code>
+
+<tr><td><code>Whatpm::XML::Parser</code>
+
+<tr><td><code>Whatpm::XMLSerializer</code>
+
+</table>
+
+</div>
+
 </div>
 
 <div class=section id=documents>
@@ -250,7 +351,7 @@ Specification</a></dt>
 CSS extensions</a>
   <dd>The specification for <code>-manakai-<var>*</var></code> properties
   and property values implemented by CSS-related modules.
-<dt id=spec-manakai-selectors"><a href="http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions">manakai's
+<dt id=spec-manakai-selectors><a href="http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions">manakai's
 Selectors extensions</a>
   <dd>The specification for <code>:-manakai-<var>*</var></code>
   pseudo-classes implemented by Selectors-related modules.</dd>
@@ -397,7 +498,6 @@ tarball.
   <li>Validation for media queries (level 3), IRIs (against URI schemes),
     and so on.</li>
   <li>Documentations are missing for some features.</li>
-  <li>XML parser<!-- with application cache selection algorithm hook-->.</li>
   <li>In addition, each module has its own TO DO items.
     (Search for <q>## TODO</q> and <q>## ISSUE</q> in each module.)</li>
 </ul>
