@@ -12,6 +12,9 @@ my $feed_author_name;
 my $feed_author_mail;
 my $feed_author_url;
 my $feed_lang = 'i-default';
+my $feed_realated_url;
+my $feed_license_url;
+my $feed_rights;
 my $entry_content;
 my $entry_author_name;
 my $entry_author_mail;
@@ -27,6 +30,9 @@ GetOptions (
   'feed-author-name=s' => \$feed_author_name,
   'feed-author-url=s' => \$feed_author_url,
   'feed-lang=s' => \$feed_lang,
+  'feed-license-url=s' => \$feed_license_url,
+  'feed-related-url=s' => \$feed_related_url,
+  'feed-rights=s' => \$feed_rights,
   'feed-title=s' => \$feed_title,
   'feed-url=s' => \$feed_url,
   'file-name=s' => \$file_name,
@@ -104,6 +110,24 @@ unless (@{$feed->link_elements}) {
   $link_self->hreflang ($feed_lang);
   $link_self->href ($feed_url);
   $feed->append_child ($link_self);
+
+  if (defined $feed_related_url) {
+    my $link = $doc->create_element_ns ($feed->namespace_uri, 'link');
+    $link->rel ('related');
+    $link->href ($feed_related_url);
+    $feed->append_child ($link);
+  }
+
+  if (defined $feed_license_url) {
+    my $link = $doc->create_element_ns ($feed->namespace_uri, 'link');
+    $link->rel ('license');
+    $link->href ($feed_license_url);
+    $feed->append_child ($link);
+  }
+}
+
+if (defined $feed_rights) {
+  $feed->rights_element->text_content ($feed_rights);
 }
 
 my $entry_id = 'entry-' . time;
@@ -127,4 +151,4 @@ $content->text_content ($entry_content);
   print $file $doc->inner_html;
 }
 
-## $Date: 2008/10/21 05:03:24 $
+## $Date: 2008/10/21 05:17:48 $
