@@ -1,6 +1,6 @@
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -1171,14 +1171,14 @@ sub inner_html ($;$) {
   } else {
     if (@_ > 1) {
       ## Step 1
-      require Whatpm::XMLParser; # MUST
+      require Whatpm::XML::Parser; # MUST
       my $doc = $self->implementation->create_document;
       
       ## Step 2
       #
 
       ## Step 3
-      $doc = Whatpm::XMLParser->parse_string ($_[1] => $doc); # MUST
+      $doc = Whatpm::XML::Parser->parse_char_string ($_[1] => $doc); # MUST
 
       ## Step 4
       #
@@ -1191,6 +1191,7 @@ sub inner_html ($;$) {
       for (@cn) {
         $self->remove_child ($_);
       }
+      ## TODO: strict-document-children option?
 
       ## Step 7, 8, 9, 10
       for my $node (@{$doc->child_nodes}) {
@@ -1272,4 +1273,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/04/12 15:58:41 $
+## $Date: 2008/10/21 07:51:59 $

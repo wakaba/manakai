@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node',
     'Message::IF::NSResolver';
 require Scalar::Util;
@@ -210,6 +210,69 @@ sub manakai_language ($;$) {
   ## Step 5
   return '';
 } # manakai_language
+
+## TODO: document
+sub manakai_html_language ($;$) {
+  my $self = $_[0];
+  local $Error::Depth = $Error::Depth + 1;
+
+  if (@_ > 1) {
+    if ($self->node_type == 1) { # ELEMENT_NODE
+      if (defined $_[1]) {
+## TODO: non HTML
+        if ($self->has_attribute_ns (undef, 'xml:lang')) {
+          $self->set_attribute_ns (undef, [undef, 'xml:lang'] => $_[1]);
+              # or exception
+        } else {
+          $self->set_attribute (lang => $_[1]);
+        }
+      } else {
+## TODO: html lang
+        $self->remove_attribute_ns
+            (q<http://www.w3.org/XML/1998/namespace>, 'lang');
+        $self->remove_attribute_ns (undef, 'xml:lang');
+      }
+    }
+    
+    return undef unless defined wantarray;
+  }
+
+  my $target = $self;
+  while (defined $target) {
+    if ($target->node_type == 1) { # ELEMENT_NODE
+
+## TODO: non-html
+      my $r = $target->get_attribute ('lang');
+      return $r if defined $r;
+
+      ## Step 1
+
+      ## Step 1.1
+      $r = $target->get_attribute_ns
+          (q<http://www.w3.org/XML/1998/namespace>, 'lang');
+      return $r if defined $r;
+
+      ## Step 1.2
+      $r = $target->get_attribute_ns (undef, 'xml:lang');
+      return $r if defined $r;
+    }
+
+    ## Step 2
+    $target = $target->parent_node;
+  }
+
+  ## Step 3
+  my $od = $self->owner_document;
+  if (defined $od) {
+    return $od->manakai_language;
+  }
+
+  ## Step 4
+  ## TODO: from upper-level protocol, if $self isa Document
+
+  ## Step 5
+  return '';
+} # manakai_html_language
 
 sub last_child ($) {
   my $self = shift;
@@ -1398,4 +1461,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/12/22 06:29:32 $
+## $Date: 2008/10/21 07:51:59 $
