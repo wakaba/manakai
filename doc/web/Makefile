@@ -13,7 +13,7 @@ PERL_ = perl
 PERL_LIB_OPTIONS = -I$(MANAKAI_LIB_DIR) -I$(WHATPM_LIB_DIR)
 PERL = $(PERL_) $(PERL_LIB_OPTIONS)
 
-all: cover.ja.html cover.en.html
+all: cover.ja.html cover.en.html features.en.html features.ja.html
 
 %.en.html: %.html.src
 	$(PERL) $(HARUSAME) --lang=en < $< > $@

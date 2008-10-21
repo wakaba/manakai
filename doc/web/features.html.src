@@ -1,8 +1,10 @@
-<!DOCTYPE html><html lang="ja"><head>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
 <title>manakai 0.4.1 が実装している機能</title>
-<link href="http://suika.fam.cx/www/style/html/xhtml" rel="stylesheet">
-<link href="http://suika.fam.cx/c/pd" rel="license" title="Public Domain">
-<link href="./" rel="contents">
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
+<link rel="license" href="http://suika.fam.cx/c/pd" title="Public Domain">
+<link rel="contents" href="./">
 <style type="text/css">
 .not-implemented {
   margin: 0.1em;
@@ -28,7 +30,7 @@
 </thead>
 <tbody>
 <tr>
-<th rowspan="2" scope="row">中核</th>
+<th scope="row" rowspan=2>中核</th>
 <td>水準 1, 2, 3</td>
 <td>
   <p>ほぼ実装済</p>
@@ -42,9 +44,9 @@
   <code class="DOM">normalize-character</code> は未実装</li>
   <li>一部の操作は <code class="DOMa">specified</code>
   を自動的に真にしない</li>
-  <li>設定引数のうち <code class="DOM" lang="en">error-handler</code> と
-  <code class="DOM" lang="en">schema-type</code> <em>以外</em> は未実装</li>
-  <li><code class="DOMi" lang="en">NameList</code> は未実装</li>
+  <li>設定引数のうち <code lang="en" class="DOM">error-handler</code> と
+  <code lang="en" class="DOM">schema-type</code> <em>以外</em> は未実装</li>
+  <li><code lang="en" class="DOMi">NameList</code> は未実装</li>
   </ul>
 
   <div class="note memo">
@@ -62,10 +64,11 @@
 <td></td>
 </tr>
 <tr>
-<th lang="en" rowspan="2" scope="row">XML</th>
+<th scope="row" lang="en" rowspan=2>XML</th>
 <td>
   水準 1,
-  <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/core.html" title="DOM 水準 2 XML">2</a>, 3</td>
+  <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/core.html"
+      title="DOM 水準 2 XML">2</a>, 3</td>
 <td>実装済</td>
 </tr>
 <tr>
@@ -80,9 +83,9 @@
 <td>実装済</td>
 </tr>
 <tr>
-<th rowspan="2" scope="row">事象</th>
+<th scope=row rowspan=2>事象</th>
 <td><a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/DOM-Level-3-Events/html/DOM3-Events.html?rev=1.8&amp;content-type=text/html;%20charset=utf-8">水準
-3 編集者案</a></td>
+3 編集者案</td>
 <td>
   <a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/DOM-Level-3-Events/html/DOM3-Events.html?rev=1.8&amp;content-type=text/html;%20charset=iso-8859-1#events-Events-flow"><abbr>DOM</abbr>
   事象フロー</a>と<a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/DOM-Level-3-Events/html/DOM3-Events.html?rev=1.8&amp;content-type=text/html;%20charset=iso-8859-1#events-Events-interface">基本界面</a>を実装。
@@ -187,15 +190,18 @@
 </td>
 </tr>
 <tr>
-<th rowspan="2" scope="row">探索</th>
+<th scope="row" rowspan="2">探索</th>
 <td>
-  <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html" title="DOM 水準 2 探索">水準 2</a></td>
+  <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html"
+    title="DOM 水準 2 探索">水準 2</a></td>
 <td>
-  <p><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-TreeWalker"><code class="DOMi" lang="en">TreeWalker</code></a>
+  <p><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-TreeWalker"
+      ><code class="DOMi" lang="en">TreeWalker</code></a>
   は実装済</p>
   <div class="not-implemented">
     <ul>
-    <li><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-NodeIterator"><code class="DOMi" lang="en">NodeIterator</code></a> 
+    <li><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-NodeIterator"
+        ><code class="DOMi" lang="en">NodeIterator</code></a> 
     は未実装</li>
     </ul>
   </div>
@@ -203,10 +209,11 @@
 </tr>
 <tr>
 <td>manakai 拡張</td>
-<td><a href="http://suika.fam.cx/gate/2005/sw/SerialWalker%20specification"><code class="DOMi" lang="en">SerialWalker</code></a>。</td>
+<td><a href="http://suika.fam.cx/gate/2005/sw/SerialWalker%20specification"
+    ><code class="DOMi" lang="en">SerialWalker</code></a>。</td>
 </tr>
 <tr>
-<th lang="en" rowspan="2" scope="row">HTML</th>
+<th scope=row lang=en rowspan=2>HTML</th>
 <td><a href="http://whatwg.org/html5"><abbr>HTML</abbr>5</a></td>
 <td><code>compat_mode</code> を実装。
 <code>inner_html</code> を一部実装。</td>
@@ -217,8 +224,9 @@
 <td></td>
 </tr>
 <tr>
-<th lang="en" scope="row">Atom</th>
-<td><a href="http://suika.fam.cx/gate/2005/sw/Atom%20DOM" title="SuikaWiki : Atom DOM">第 1.0 版案</a> (manakai 独自)</td>
+<th scope="row" lang="en">Atom</th>
+<td><a href="http://suika.fam.cx/gate/2005/sw/Atom%20DOM"
+    title="SuikaWiki : Atom DOM">第 1.0 版案</a> (manakai 独自)</td>
 <td></td>
 </tr>
 <!--
@@ -235,24 +243,24 @@
 </tr>
 -->
 <tr>
-<th scope="row">選択子 <abbr>API</abbr></th>
+<th scope=row>選択子 <abbr>API</abbr></th>
 <td><a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/selectors-api/Overview.html">編集者案</a></td>
 <td>普遍選択子、型選択子、属性選択子に対応 (名前空間を含みます)。
 <a href="http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions">manakai
 拡張</a>を含みます。</td>
-</tr></tbody>
+</tbody>
 <tbody>
 <tr>
-<th colspan="2" scope="row"><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Perl%20Binding">manakai
+<th scope=row colspan=2><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Perl%20Binding">manakai
 の <abbr>DOM</abbr> Perl 束縛</a></th>
 </tr>
 </tbody>
 </table>
 
 <div class="note memo">
-<p><a href="http://suika.fam.cx/gate/2005/sw/manakai/roadmap">今後実装する予定の機能の一覧</a>もご覧ください。</p>
+<p><a href="http://suika.fam.cx/gate/2005/sw/manakai/roadmap"
+    >今後実装する予定の機能の一覧</a>もご覧ください。</p>
 </div>
 
-
-
-</body></html>
+</body>
+</html>
