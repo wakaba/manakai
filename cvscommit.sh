@@ -4,7 +4,7 @@ cvs commit -F .cvslog.tmp $1 $2 $3 $4 $5 $6 $7 $8 $9
 ## TODO: Don't use -I here
 perl \
     -Ilib/ \
-    -I/home/html/httpd/www/markup/html/whatpm/ \
+    -I/home/httpd/html/www/markup/html/whatpm/ \
     mkcommitfeed.pl --file-name doc/web/manakai-commit.en.atom.u8 \
     --feed-url http://suika.fam.cx/www/manakai-core/doc/web/manakai-commit \
     --feed-title "manakai ChangeLog diffs" \
@@ -15,5 +15,5 @@ perl \
     < .cvslog.tmp
 rm .cvslog.tmp
 
-## $Date: 2008/10/21 07:51:59 $
+## $Date: 2008/10/21 07:52:49 $
 ## License: Public Domain
