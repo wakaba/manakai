@@ -1,34 +1,73 @@
-<!DOCTYPE html><html lang="ja"><head>
-<title data-lang-content="title" lang="ja">manakai ―― インターネット・メッセージと XML のための
-Perl モジュール群</title>
-<link href="http://suika.fam.cx/www/style/html/xhtml" rel="stylesheet">
-<link href="#license" rel="license">
-<link href="#author" rel="author">
-<link href="manakai-commit" rel="feed" type="application/atom+xml">
+<!DOCTYPE html>
+<html lang="mul">
+<head>
+<title data-lang-content=title>manakai ―― インターネット・メッセージと XML
+のための Perl モジュール群</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
+<link rel=license href="#license">
+<link rel=author href="#author">
+<link rel=feed href=manakai-commit type="application/atom+xml">
 </head>
 <body>
 
+<div data-lang-declaration id=title>
 
+<span lang=en>manakai &mdash; Perl modules for Internet messages and
+XML</span>
 
-<div class="header">
-<h1><img alt="manakai (beta)" src="manakai-logo"></h1>
-
-<h2 data-lang-container=""><span lang="ja">インターネット・メッセージと XML
-のための Perl モジュール群</span></h2>
+<span lang=ja>manakai ―― インターネット・メッセージと XML のための
+Perl モジュール群</span>
 
 </div>
 
-<div class="section" id="introduction">
+<div class="header">
+<h1><img src=manakai-logo alt="manakai (beta)"></h1>
 
-<h2 data-lang-container=""><span lang="ja">これは何?</span></h2>
+<h2 data-lang-container>
 
-<p data-lang-container=""><span lang="ja"><dfn>manakai</dfn> は、 RFC 2822 系インターネット・メッセージと
+<span lang=en>Perl Modules for Internet Messages and XML</span>
+
+<span lang=ja>インターネット・メッセージと XML
+のための Perl モジュール群</span>
+
+</h2>
+
+</div>
+
+<div class=section id=introduction>
+
+<h2 data-lang-container>
+<span lang=en>What's this?</span>
+<span lang=ja>これは何?</span>
+</h2>
+
+<p data-lang-container>
+
+<span lang=en><dfn>manakai</dfn> is a set of object-oriented Perl
+modules for processing RFC 2822 Internet messages, HTML and XML
+documents, and CSS style sheets.</span>
+
+<span lang=ja><dfn>manakai</dfn> は、 RFC 2822 系インターネット・メッセージと
 HTML 文書、XML 文書、 CSS スタイル・シートを処理するための 
-Perl 用オブジェクト指向モジュール群です。</span></p><p data-lang-container=""><span lang="ja">manakai は、標準規格に沿った DOM 界面を使って HTML 文書、
-XML 文書、CSS スタイル・シートを操作することができます。manakai の DOM 
-対応状況は次の表をご覧下さい。</span></p><ul>
+Perl 用オブジェクト指向モジュール群です。</span>
 
-<li><a data-lang-container="" href="features"><span lang="ja">manakai が実装する DOM モジュール</span></a></li>
+<p data-lang-container>
+
+<span lang=en>manakai enables Perl scripts to access HTML and XML
+documents and CSS style sheets using the standard-compliant DOM
+interface.  For more information on the standards supported by manakai
+modules, see the following table:</span>
+
+<span lang=ja>manakai は、標準規格に沿った DOM 界面を使って HTML 文書、
+XML 文書、CSS スタイル・シートを操作することができます。manakai の DOM 
+対応状況は次の表をご覧下さい。</span>
+
+<ul>
+
+<li><a href="features" data-lang-container>
+<span lang=en>DOM modules implemented by manakai</span>
+<span lang=ja>manakai が実装する DOM モジュール</span>
+</a></li>
 
 </ul>
 
@@ -38,15 +77,33 @@ XML 文書、CSS スタイル・シートを操作することができます。
 </div>
 
 
-<div class="section" id="news">
-<h2 data-lang-container=""><span lang="ja">最新情報</span></h2>
+<div class=section id=news>
+<h2 data-lang-container>
+<span lang=en>What's new?</span>
+<span lang=ja>最新情報</span>
+</h2>
 
-<p data-lang-container=""><span lang="ja"><a href="manakai-commit" rel="feed" type="application/atom+xml">An Atom feed for ChangeLog diffs</a> is
-available.</span></p><ul>
+<p data-lang-container>
 
-<li><a data-lang-container="" href="news-0-4" hreflang="en"><span lang="ja">manakai 0.4 の変更点 (英語)</span></a></li>
+<span lang=en><a href="manakai-commit" rel=feed
+type="application/atom+xml">An Atom feed for ChangeLog diffs</a> is
+available.</span>
 
-<li><a data-lang-container="" href="news-0-3" hreflang="ja"><span lang="ja">manakai 0.3.<var>*</var> の変更点</span></a></li>
+<span lang=ja><a href="manakai-commit" rel=feed
+type="application/atom+xml">An Atom feed for ChangeLog diffs</a> is
+available.</span>
+
+<ul>
+
+<li><a href="news-0-4" data-lang-container hreflang=en>
+<span lang=en>Changes in manakai 0.4</span>
+<span lang=ja>manakai 0.4 の変更点 (英語)</span>
+</a></li>
+
+<li><a href="news-0-3" data-lang-container hreflang=ja>
+<span lang=en>Changes in manakai 0.3 (in Japanese)</span>
+<span lang=ja>manakai 0.3.<var>*</var> の変更点</span>
+</a></li>
 
 </ul>
 
@@ -65,7 +122,7 @@ available.</span></p><ul>
 <div class="section" id="modules">
 <h2>モジュール</h2>
 
-<ul lang="en">
+<ul lang=en>
 <li><a href="../../lib/Error.html"><code>Error</code></a>
 (Strictly speaking, this module is not part of manakai, though 
 it is contained in the <a href="#download-manakai-core">manakai-core</a> 
@@ -112,7 +169,7 @@ parser (<em>beta</em>) Web interface (manakai version)</a></li>
   <li><a href="http://suika.fam.cx/gate/cvs/*checkout*/messaging/manakai/lib/Message/Markup/Atom.dis?rev=HEAD&amp;content-type=text/plain">Atom DOM 1.0</a> (案)</li>
   <li><a href="http://suika.fam.cx/gate/2005/sw/SerialWalker%20specification"><code>SerialWalker</code></a> (案)</li>
   <li><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Extensions">manakai の DOM 拡張</a></li>
-  <li id="spec-domdtdef" lang="en"><a href="http://suika.fam.cx/www/markup/xml/domdtdef/domdtdef"><abbr>DOM</abbr>
+  <li id=spec-domdtdef lang=en><a href="http://suika.fam.cx/www/markup/xml/domdtdef/domdtdef"><abbr>DOM</abbr>
   Document Type Definition module</a></li>
   <li><a href="http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions">manakai
   の Selectors 拡張</a></li>
@@ -135,13 +192,13 @@ parser (<em>beta</em>) Web interface (manakai version)</a></li>
 </dl>
 </div>
 
-<div class="section" id="install">
-<h2 lang="en">インストール</h2>
+<div class=section id=install>
+<h2 lang=en>インストール</h2>
 
 <ol>
 <li><a href="#download">配布ファイルを入手します</a>。</li>
 <li>配布ファイルを適切な場所で展開します。
-<code class="file">lib/</code> 以下の Perl モジュール・ファイルを Perl
+<code class=file>lib/</code> 以下の Perl モジュール・ファイルを Perl
 が見つけられる場所 (<code class="perl">@LIB</code> で指定されたディレクトリ)
 に置くだけで構いません。</li>
 </ol>
@@ -151,38 +208,46 @@ parser (<em>beta</em>) Web interface (manakai version)</a></li>
 <h2 lang="en">ダウンロード</h2>
 
 <ul>
-<li><a href="#download-manakai-core" lang="en">manakai-core</a>
+<li><a href="#download-manakai-core" lang=en>manakai-core</a>
 (<abbr>DOM</abbr> 実装)</li>
-<li><a href="http://suika.fam.cx/www/markup/html/whatpm/readme#download" lang="en">Whatpm</a>
+<li><a href="http://suika.fam.cx/www/markup/html/whatpm/readme#download" lang=en>Whatpm</a>
 (<abbr>HTML</abbr>, <abbr>XML</abbr>, <abbr>CSS</abbr> 実装)</li>
-<li><a href="http://suika.fam.cx/www/manakai-charlib/readme#modules" lang="en">manakai
+<li><a href="http://suika.fam.cx/www/manakai-charlib/readme#modules" lang=en>manakai
 charlib</a> (日本語文字符号化対応)</li>
 </ul>
 
-<dl id="download-manakai-core">
+<dl id=download-manakai-core>
 <dt>開発版スナップ写真</dt>
 	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-dev-latest">manakai
 	開発版スナップ写真 (最新版)</a></dd>
-	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.4.0">manakai 0.4.0 (2007年9月29日)</a></dd>
-	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.2">manakai 0.3.2 (2006年6月18日)</a></dd>
-	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.1">manakai 0.3.1 (2006年4月22日)</a></dd>
+	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.4.0"
+	>manakai 0.4.0 (2007年9月29日)</a></dd>
+	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.2"
+	>manakai 0.3.2 (2006年6月18日)</a></dd>
+	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.1"
+	>manakai 0.3.1 (2006年4月22日)</a></dd>
 <dt>開発版</dt>
-	<dd><a href="http://suika.fam.cx/gate/cvs/messaging/manakai/" lang="en">CVS repository</a> (<a href="http://suika.fam.cx/admin/cvs/">suika.fam.cx</a>)</dd>
+	<dd><a href="http://suika.fam.cx/gate/cvs/messaging/manakai/"
+	lang="en">CVS repository</a> (<a
+	href="http://suika.fam.cx/admin/cvs/">suika.fam.cx</a>)</dd>
 </dl>
 
 </div>
 
 
-<div class="section" id="author" lang="en">
+<div class="section" id="author" lang=en>
 <h2>Author</h2>
 
 <p><a href="http://suika.fam.cx/~wakaba/who?" rel="author">Wakaba</a>.</p>
 </div>
 
-<div class="section" id="license" lang="en">
+<div class="section" id="license" lang=en>
 <h2>License</h2>
 
-<p>Copyright 2002‐2008 <span href="http://suika.fam.cx/~wakaba/who?">Wakaba</span> <code class="mail">&lt;<a href="mailto:w@suika.fam.cx" rel="author">w@suika.fam.cx</a>&gt;</code>.</p>
+<p>Copyright 2002‐2008 <span
+href="http://suika.fam.cx/~wakaba/who?">Wakaba</span> <code
+class="mail">&lt;<a href="mailto:w@suika.fam.cx"
+rel="author">w@suika.fam.cx</a>></code>.</p>
 
 <p>This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.</p>
@@ -190,10 +255,9 @@ modify it under the same terms as Perl itself.</p>
 </div>
 
 <footer>
-[<a href="cover.en" hreflang="en" rel="alternate">English</a>]
-[<a href="cover.ja" hreflang="ja" rel="alternate">日本語</a>]
+[<a href=cover.en hreflang=en rel=alternate>English</a>]
+[<a href=cover.ja hreflang=ja rel=alternate>日本語</a>]
 </footer>
 
-
-
-</body></html>
+</body>
+</html>

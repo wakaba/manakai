@@ -13,7 +13,8 @@ perl \
     --feed-license-url "http://suika.fam.cx/www/manakai-core/doc/web/#license" \
     --feed-rights "This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself." \
     < .cvslog.tmp
+cvs commit -m "" doc/web/manakai-commit.en.atom.u8
 rm .cvslog.tmp
 
-## $Date: 2008/10/21 07:52:49 $
+## $Date: 2008/10/21 08:24:17 $
 ## License: Public Domain
