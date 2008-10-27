@@ -6,75 +6,76 @@ use Char::Class::XML qw/InXML_NCNameStartChar10 InXMLNCNameChar10/;
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 
-sub FEATURE_HTML5_ROLE () {
-  Whatpm::ContentChecker::FEATURE_STATUS_WD
-      ## TODO: svg:*/@role
-}
-
 sub FEATURE_HTML5_COMPLETE () {
+  ## NOTE: Part of HTML5, the implemented status.
   Whatpm::ContentChecker::FEATURE_STATUS_REC |
   Whatpm::ContentChecker::FEATURE_ALLOWED
 }
-
+sub FEATURE_HTML5_CR () {
+  ## NOTE: Part of HTML5, the awaiting implementation feedback status.
+  Whatpm::ContentChecker::FEATURE_STATUS_CR |
+  Whatpm::ContentChecker::FEATURE_ALLOWED
+}
 sub FEATURE_HTML5_LC () {
+  ## NOTE: Part of HTML5, the last call of comments status.
   Whatpm::ContentChecker::FEATURE_STATUS_LC |
   Whatpm::ContentChecker::FEATURE_ALLOWED
 }
 sub FEATURE_HTML5_AT_RISK () {
+  ## NOTE: Part of HTML5, but in the being considered for removal
+  ## status.
   Whatpm::ContentChecker::FEATURE_STATUS_WD |
   Whatpm::ContentChecker::FEATURE_ALLOWED
 }
 sub FEATURE_HTML5_WD () {
+  ## NOTE: Part of HTML5, the working draft status.
   Whatpm::ContentChecker::FEATURE_STATUS_WD |
   Whatpm::ContentChecker::FEATURE_ALLOWED
 }
 sub FEATURE_HTML5_FD () {
+  ## NOTE: Part of HTML5, the first draft status.
   Whatpm::ContentChecker::FEATURE_STATUS_WD |
   Whatpm::ContentChecker::FEATURE_ALLOWED
 }
 sub FEATURE_HTML5_DEFAULT () {
+  ## NOTE: Part of HTML5, but not annotated.
   Whatpm::ContentChecker::FEATURE_STATUS_WD |
   Whatpm::ContentChecker::FEATURE_ALLOWED
 }
 sub FEATURE_HTML5_DROPPED () {
-  ## NOTE: Was part of HTML5, but was dropped.
+  ## NOTE: Was part of HTML5, in a status before the last call of
+  ## comments, but then dropped.
   Whatpm::ContentChecker::FEATURE_STATUS_WD
 }
 sub FEATURE_HTML5_LC_DROPPED () {
-  ## NOTE: Was part of HTML5, but was dropped.
+  ## NOTE: Was part of HTML5, in the last call of comments status, but
+  ## then dropped.
   Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
+
 sub FEATURE_WF2X () {
-  ## NOTE: Defined in WF2 and then incorporated into the HTML5 spec.
+  ## NOTE: Defined in WF2 (whether deprecated or not) and then
+  ## incorporated into the HTML5 spec.
   Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
 sub FEATURE_WF2 () {
-  ## NOTE: Part of WF2, still not added to the HTML5 spec.
+  ## NOTE: Features introduced or modified in WF2, which were not
+  ## merged into HTML5.
   Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
 sub FEATURE_WF2_INFORMATIVE () {
-  ## NOTE: Part of WF2 Appendix A, still not added to the HTML5 spec.
-  Whatpm::ContentChecker::FEATURE_STATUS_LC
-}
-sub FEATURE_WF2X_DEPRECATED () {
-  Whatpm::ContentChecker::FEATURE_STATUS_LC
-  ## NOTE: MUST NOT be used according to WF2.
-}
-
-## NOTE: Metainformation Attributes Module by W3C XHTML2 WG.
-sub FEATURE_RDFA_PR () {
-  Whatpm::ContentChecker::FEATURE_STATUS_CR
-  ## NOTE: Diff from FEATURE_RDFA_CR
-}
-sub FEATURE_RDFA_CR () {
-  Whatpm::ContentChecker::FEATURE_STATUS_CR
-}
-sub FEATURE_RDFA_LC () {
+  ## NOTE: Features mentioned in WF2's informative appendix A, which
+  ## were not merged into HTML5.
   Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
 
-sub FEATURE_RDFA_ED () {
-  Whatpm::ContentChecker::FEATURE_STATUS_WD
+sub FEATURE_RDFA_REC () {
+  Whatpm::ContentChecker::FEATURE_STATUS_REC
+}
+sub FEATURE_RDFA_LC_DROPPED () {
+  ## NOTE: The feature that was defined in a RDFa last call working
+  ## draft, but then dropped.
+  Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
 
 ## NOTE: XHTML Role LCWD has almost no information on how the |role|
@@ -86,38 +87,42 @@ sub FEATURE_ROLE_LC () {
 }
 
 sub FEATURE_XHTML2_ED () {
+  ## NOTE: XHTML 2.0 Editor's Draft, in which the namespace URI is
+  ## "http://www.w3.org/1999/xhtml".
   Whatpm::ContentChecker::FEATURE_STATUS_WD
 }
 
 sub FEATURE_XHTMLBASIC11_CR () {
-  ## NOTE: Only additions to M12N10_REC are marked.
-  Whatpm::ContentChecker::FEATURE_STATUS_CR
+  ## NOTE: XHTML Basic 1.1 Recommendation, new features (not in XHTML
+  ## M12N).
+  Whatpm::ContentChecker::FEATURE_STATUS_REC
 }
 sub FEATURE_XHTMLBASIC11_CR_DEPRECATED () {
-  Whatpm::ContentChecker::FEATURE_STATUS_CR |
+  ## NOTE: XHTML Basic 1.1 Recommendation, new but deprecated
+  ## features.
+  Whatpm::ContentChecker::FEATURE_STATUS_REC |
   Whatpm::ContentChecker::FEATURE_DEPRECATED_INFO
-}
-
-sub FEATURE_M12N11_LC () {
-  Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
 
 sub FEATURE_RUBY_REC () {
   Whatpm::ContentChecker::FEATURE_STATUS_CR
 }
 
+sub FEATURE_M12N11_LC () {
+  ## NOTE: XHTML M12N 1.1 Recommendation, new features (not in 1.0).
+  Whatpm::ContentChecker::FEATURE_STATUS_REC;
+}
+
 ## NOTE: M12N10 status is based on its abstract module definition.
 ## It contains a number of problems.  (However, again, it's a REC!)
 sub FEATURE_M12N10_REC () {
-  ## NOTE: Oh, XHTML m12n 1.0 passed the CR phase!  W3C Process suck!
+  ## NOTE: Oh, XHTML m12n 1.0 passed the CR phase!  W3C Process sucks!
   Whatpm::ContentChecker::FEATURE_STATUS_REC
 }
 sub FEATURE_M12N10_REC_DEPRECATED () {
   Whatpm::ContentChecker::FEATURE_STATUS_REC |
   Whatpm::ContentChecker::FEATURE_DEPRECATED_INFO
 }
-## NOTE: XHTML M12N 1.1 is in the PR status at the time of writing and no
-## addition from 1.0.
 
 ## NOTE: XHTML10 status is based on its transitional and frameset DTDs
 ## (second edition).  Only missing attributes from M12N10 abstract
@@ -1269,23 +1274,23 @@ my %HTMLAttrStatus = (
   'repeat-min' => FEATURE_WF2,
   'repeat-start' => FEATURE_WF2,
   'repeat-template' => FEATURE_WF2,
-  role => FEATURE_HTML5_ROLE,
+  role => 0,
   style => FEATURE_HTML5_WD,
   tabindex => FEATURE_HTML5_DEFAULT,
   template => FEATURE_HTML5_AT_RISK,
   title => FEATURE_HTML5_WD,  
-  xmlns => FEATURE_HTML5_DEFAULT,
+  xmlns => FEATURE_HTML5_WD,
 );
 
 my %HTMLM12NCommonAttrStatus = (
-  about => FEATURE_RDFA_CR,
+  about => FEATURE_RDFA_REC,
   class => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-  content => FEATURE_RDFA_CR,
-  datatype => FEATURE_RDFA_CR,
+  content => FEATURE_RDFA_REC,
+  datatype => FEATURE_RDFA_REC,
   dir => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-  href => FEATURE_RDFA_CR,
+  href => FEATURE_RDFA_REC,
   id => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-  instanceof => FEATURE_RDFA_LC,
+  instanceof => FEATURE_RDFA_LC_DROPPED,
   onclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   ondblclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onmousedown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -1296,16 +1301,16 @@ my %HTMLM12NCommonAttrStatus = (
   onkeypress => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeydown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  property => FEATURE_RDFA_CR,
-  rel => FEATURE_RDFA_CR,
-  resource => FEATURE_RDFA_CR,
-  rev => FEATURE_RDFA_CR,
+  property => FEATURE_RDFA_REC,
+  rel => FEATURE_RDFA_REC,
+  resource => FEATURE_RDFA_REC,
+  rev => FEATURE_RDFA_REC,
   #style => FEATURE_HTML5_WD | FEATURE_XHTMLBASIC11_CR_DEPRECATED |
   #    FEATURE_M12N10_REC,
   style => FEATURE_HTML5_WD | FEATURE_XHTMLBASIC11_CR |
       FEATURE_M12N10_REC,
   title => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-  typeof => FEATURE_RDFA_CR,
+  typeof => FEATURE_RDFA_REC,
 );
 
 my %XHTML2CommonAttrStatus = (
@@ -1362,7 +1367,7 @@ my %XHTML2CommonAttrStatus = (
   rev => FEATURE_XHTML2_ED,
 
   ## Role
-  role => FEATURE_HTML5_ROLE | FEATURE_XHTML2_ED,
+  role => FEATURE_XHTML2_ED,
 
   ## Style
   style => FEATURE_HTML5_WD | FEATURE_XHTML2_ED, # "strongly discouraged"
@@ -1372,24 +1377,24 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   %HTMLM12NCommonAttrStatus,
   %XHTML2CommonAttrStatus,
 
-  about => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
+  about => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   class => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  content => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
-  datatype => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
+  content => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
+  datatype => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   dir => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  href => FEATURE_RDFA_CR,
+  href => FEATURE_RDFA_REC,
   id => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  instanceof => FEATURE_RDFA_LC | FEATURE_XHTML2_ED,
-  property => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
-  rel => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
-  resource => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
-  rev => FEATURE_RDFA_CR | FEATURE_XHTML2_ED,
+  instanceof => FEATURE_RDFA_LC_DROPPED | FEATURE_XHTML2_ED,
+  property => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
+  rel => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
+  resource => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
+  rev => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   #style => FEATURE_HTML5_WD | FEATURE_XHTMLBASIC11_CR_DEPRECATED |
   #    FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   style => FEATURE_HTML5_WD | FEATURE_XHTMLBASIC11_CR |
       FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   title => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  typeof => FEATURE_RDFA_CR,
+  typeof => FEATURE_RDFA_REC,
 );
 
 for (qw/
@@ -1415,10 +1420,10 @@ for (qw/repeat repeat-max repeat-min repeat-start repeat-template/) {
 }
 
 for (qw/about content datatype property rel resource rev/) {
-  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_RDFA_CR | FEATURE_XHTML2_ED;
+  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_RDFA_REC | FEATURE_XHTML2_ED;
 }
-$AttrStatus->{$HTML_NS}->{instanceof} = FEATURE_RDFA_LC | FEATURE_XHTML2_ED;
-$AttrStatus->{$HTML_NS}->{typeof} = FEATURE_RDFA_CR;
+$AttrStatus->{$HTML_NS}->{instanceof} = FEATURE_RDFA_LC_DROPPED | FEATURE_XHTML2_ED;
+$AttrStatus->{$HTML_NS}->{typeof} = FEATURE_RDFA_REC;
 $AttrStatus->{$HTML_NS}->{role} = FEATURE_ROLE_LC;
 for (qw/cite coords datetime edit encoding href hreflang hrefmedia hreftype
         ismap layout media nextfocus prevfocus shape src srctype style
@@ -1935,15 +1940,15 @@ $Element->{$HTML_NS}->{link} = {
       charset => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
           ## NOTE: |charset| attribute had been part of HTML5 spec though
           ## it had been commented out.
-      href => FEATURE_HTML5_LC | FEATURE_RDFA_CR | FEATURE_XHTML2_ED |
+      href => FEATURE_HTML5_LC | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
       hreflang => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
       media => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       methods => FEATURE_HTML20_RFC,
-      rel => FEATURE_HTML5_LC | FEATURE_RDFA_CR | FEATURE_XHTML2_ED |
+      rel => FEATURE_HTML5_LC | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
-      rev => FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      rev => FEATURE_RDFA_REC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       sdapref => FEATURE_HTML20_RFC,
       sizes => FEATURE_HTML5_LC,
       target => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -2267,7 +2272,7 @@ $Element->{$HTML_NS}->{style} = {
     %XHTML2CommonAttrStatus,
     dir => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     disabled => FEATURE_XHTML2_ED,
-    href => FEATURE_RDFA_PR | FEATURE_XHTML2_ED,
+    href => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
     id => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_XHTML10_REC,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
     media => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -2413,7 +2418,7 @@ $Element->{$HTML_NS}->{article} = {
 };
 
 $Element->{$HTML_NS}->{blockquote} = {
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLFlowContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
@@ -2421,7 +2426,7 @@ $Element->{$HTML_NS}->{blockquote} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML2X_RFC,
-    cite => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+    cite => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
     sdaform => FEATURE_HTML20_RFC,
   }),
@@ -2575,7 +2580,7 @@ $Element->{$HTML_NS}->{p} = {
 
 $Element->{$HTML_NS}->{hr} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     ## TODO: HTML4 |align|, |noshade|, |size|, |width|
   }, {
@@ -2592,7 +2597,7 @@ $Element->{$HTML_NS}->{hr} = {
 
 $Element->{$HTML_NS}->{br} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     clear => $GetHTMLEnumeratedAttrChecker->({
       left => 1, all => 1, right => 1, none => 1,
@@ -2682,7 +2687,7 @@ $Element->{$HTML_NS}->{dialog} = {
 
 $Element->{$HTML_NS}->{pre} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
@@ -2761,7 +2766,7 @@ $Element->{$HTML_NS}->{ol} = {
 
 $Element->{$HTML_NS}->{ul} = {
   %{$Element->{$HTML_NS}->{ol}},
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     compact => $GetHTMLBooleanAttrChecker->('compact'),
     ## TODO: HTML4 |type|
@@ -2796,7 +2801,7 @@ $Element->{$HTML_NS}->{dir} = {
 
 $Element->{$HTML_NS}->{li} = {
   %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     ## TODO: HTML4 |type|
     value => sub {
@@ -2827,9 +2832,9 @@ $Element->{$HTML_NS}->{li} = {
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
     sdaform => FEATURE_HTML20_RFC,
     type => FEATURE_M12N10_REC_DEPRECATED,
-    #value => FEATURE_HTML5_DEFAULT | FEATURE_XHTMLBASIC11_CR | 
+    #value => FEATURE_HTML5_LC | FEATURE_XHTMLBASIC11_CR | 
     #    FEATURE_M12N10_REC_DEPRECATED,
-    value => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED |
+    value => FEATURE_HTML5_LC | FEATURE_XHTML2_ED |
         FEATURE_XHTMLBASIC11_CR | FEATURE_M12N10_REC,
   }),
   check_child_element => sub {
@@ -2855,7 +2860,7 @@ $Element->{$HTML_NS}->{li} = {
 
 $Element->{$HTML_NS}->{dl} = {
   %HTMLChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     compact => $GetHTMLBooleanAttrChecker->('compact'),
   }, {
@@ -2941,7 +2946,7 @@ $Element->{$HTML_NS}->{dl} = {
 
 $Element->{$HTML_NS}->{dt} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -2952,7 +2957,7 @@ $Element->{$HTML_NS}->{dt} = {
 
 $Element->{$HTML_NS}->{dd} = {
   %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_DEFAULT | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -2982,7 +2987,7 @@ $Element->{$HTML_NS}->{a} = {
           coords => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           cryptopts => FEATURE_RFC2659,
           dn => FEATURE_RFC2659,
-          href => FEATURE_HTML5_WD | FEATURE_RDFA_CR | FEATURE_XHTML2_ED |
+          href => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
               FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_WD | FEATURE_XHTML2_ED |
               FEATURE_M12N10_REC,
@@ -2994,8 +2999,8 @@ $Element->{$HTML_NS}->{a} = {
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
-          rel => FEATURE_HTML5_WD | FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-          rev => FEATURE_RDFA_CR | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          rel => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          rev => FEATURE_RDFA_REC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           sdapref => FEATURE_HTML20_RFC,
           shape => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -4365,7 +4370,7 @@ $Element->{$HTML_NS}->{param} = {
       }),
     }, {
       %HTMLAttrStatus,
-      href => FEATURE_RDFA_PR,
+      href => FEATURE_RDFA_REC,
       id => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
       name => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       type => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -4651,15 +4656,15 @@ $Element->{$HTML_NS}->{area} = {
           accesskey => FEATURE_M12N10_REC,
           alt => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
           coords => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-          href => FEATURE_HTML5_WD | FEATURE_RDFA_CR | FEATURE_M12N10_REC,
+          href => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_WD,
           lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
-          media => FEATURE_HTML5_DEFAULT,
+          media => FEATURE_HTML5_WD,
           nohref => FEATURE_M12N10_REC,
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
-          rel => FEATURE_HTML5_WD | FEATURE_RDFA_CR,
+          rel => FEATURE_HTML5_WD | FEATURE_RDFA_REC,
           shape => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           target => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
@@ -5508,8 +5513,7 @@ $Element->{$HTML_NS}->{input} = {
          replace => FEATURE_WF2,
          required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          sdapref => FEATURE_HTML20_RFC,
-         size => FEATURE_HTML5_DEFAULT | FEATURE_WF2X_DEPRECATED |
-             FEATURE_M12N10_REC,
+         size => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
          src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          step => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -6495,7 +6499,7 @@ $Element->{$HTML_NS}->{script} = {
     defer => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     event => FEATURE_HTML4_REC_RESERVED,
     for => FEATURE_HTML4_REC_RESERVED,
-    href => FEATURE_RDFA_PR,
+    href => FEATURE_RDFA_REC,
     id => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
     language => FEATURE_M12N10_REC_DEPRECATED,
     src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
@@ -7195,9 +7199,6 @@ $Element->{$HTML_NS}->{basefont} = {
 ## xmp, listing sdapref[HTML2,0]
 
 =pod
-
-WF2: Documents MUST comply to [CHARMOD].
-                     WF2: Vencor extensions MUST NOT be used.
 
 HTML 2.0 nextid @n
 
