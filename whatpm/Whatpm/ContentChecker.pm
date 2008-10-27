@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.101 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.102 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -503,7 +503,8 @@ sub check_document ($$$;$) {
     if ($doc->manakai_is_html) {
       if (not $doc->manakai_has_bom and
           not defined $doc->manakai_charset) {
-        unless ($charset->{is_html_ascii_superset}) {
+        unless ($charset->{category}
+                  & Message::Charset::Info::CHARSET_CATEGORY_ASCII_COMPAT ()) {
           $onerror->(node => $doc,
                      level => $self->{level}->{must},
                      type => 'non ascii superset',
@@ -531,7 +532,7 @@ sub check_document ($$$;$) {
                    level => $self->{level}->{should},
                    layer => 'encode');
       } elsif ($charset->{iana_names}->{'cesu-8'} or
-               $charset->{iana_names}->{'utf-8'} or ## ISSUE: UNICODE-1-1-UTF-7?
+               $charset->{iana_names}->{'utf-7'} or ## ISSUE: UNICODE-1-1-UTF-7?
                $charset->{iana_names}->{'bocu-1'} or
                $charset->{iana_names}->{'scsu'}) {
         $onerror->(node => $doc,
@@ -1066,4 +1067,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/07 11:41:41 $
+# $Date: 2008/10/27 05:44:47 $
