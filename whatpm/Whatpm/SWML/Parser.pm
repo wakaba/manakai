@@ -1,6 +1,43 @@
 package Whatpm::SWML::Parser;
 use strict;
 
+sub AA_NS () { q<http://pc5.2ch.net/test/read.cgi/hp/1096723178/aavocab#> }
+sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
+sub SW09_NS () { q<urn:x-suika-fam-cx:markup:suikawiki:0:9:> }
+sub SW10_NS () { q<urn:x-suika-fam-cx:markup:suikawiki:0:10:> }
+sub XML_NS () { q<http://www.w3.org/XML/1998/namespace> }
+
+sub IN_SECTION_IM () { 0 }
+sub IN_TABLE_ROW_IM () { 1 }
+sub IN_PARAGRAPH_IM () { 2 }
+
+sub BLOCK_START_TAG_TOKEN () { 1 }
+sub BLOCK_END_TAG_TOKEN () { 2 }
+sub CHARACTER_TOKEN () { 3 }
+sub COMMENT_PARAGRAPH_START_TOKEN () { 4 }
+sub EDITORIAL_NOTE_START_TOKEN () { 5 }
+sub ELEMENT_TOKEN () { 6 }
+sub EMPHASIS_TOKEN () { 7 }
+sub EMPTY_LINE_TOKEN () { 8 }
+sub END_OF_FILE_TOKEN () { 9 }
+sub FORM_TOKEN () { 10 }
+sub HEADING_START_TOKEN () { 11 }
+sub HEADING_END_TOKEN () { 12 }
+sub INLINE_START_TAG_TOKEN () { 13 }
+sub INLINE_MIDDLE_TAG_TOKEN () { 14 }
+sub INLINE_END_TAG_TOKEN () { 15 }
+sub LABELED_LIST_START_TOKEN () { 16 }
+sub LABELED_LIST_MIDDLE_TOKEN () { 17 }
+sub LIST_START_TOKEN () { 18 }
+sub PREFORMATTED_START_TOKEN () { 19 }
+sub PREFORMATTED_END_TOKEN () { 20 }
+sub QUOTATION_START_TOKEN () { 21 }
+sub STRONG_TOKEN () { 22 }
+sub TABLE_ROW_START_TOKEN () { 23 }
+sub TABLE_ROW_END_TOKEN () { 24 }
+sub TABLE_CELL_START_TOKEN () { 25 }
+sub TABLE_CELL_END_TOKEN () { 26 }
+sub TABLE_COLSPAN_CELL_TOKEN () { 27 }
 
 sub new ($) {
   my $self = bless {
@@ -22,10 +59,6 @@ sub parse_char_string ($$$;$) {
     $_->set_user_data (manakai_source_line => 1);
     $_->set_user_data (manakai_source_column => 1);
   }
-  $self->{oe} = {node => $doc->document_element->last_child,
-                 section_depth => 0,
-                 quotation_depth => 0,
-                 list_depth => 0};
   
   my $_onerror = $_[2] || sub {
     my %opt = @_;
@@ -57,13 +90,13 @@ sub parse_char_string ($$$;$) {
 
     if ($$s =~ s/^\[([0-9]+)\]//) {
       push @nt, {type => ELEMENT_TOKEN,
-                 local_name => 'anchor-end', namespace => $SW09_NS,
+                 local_name => 'anchor-end', namespace => SW09_NS,
                  anchor => $1, content => '[' . $1 . ']'};
       $column += $+[0] - $-[0];
     }
     
     while (length $$s) {
-      if ($$s =~ s/^\[\[#([a-z-}+)//) {
+      if ($$s =~ s/^\[\[#([a-z-]+)//) {
         $column = $+[0] - $-[0];
         my $t = {type => FORM_TOKEN, name => $1,
                  line => $line, column => $column};
@@ -72,7 +105,7 @@ sub parse_char_string ($$$;$) {
           $column += $+[0] - $-[0];
         }
         my @param;
-        while ($$s =~ s/^:/) {
+        while ($$s =~ s/^://) {
           if ($$s =~ s/^'((?>[^'\\]|\\.)*)//) {
             $column += 1 + $+[0] - $-[0];
             my $n = $1;
@@ -132,7 +165,7 @@ sub parse_char_string ($$$;$) {
           $column++ if $$s =~ s/^\]//;
         } else {
           $t->{local_name} = 'anchor-external';
-          $t->{namespace} = $SW09_NS;
+          $t->{namespace} = SW09_NS;
         }
         push @nt, $t;
       } elsif ($$s =~ s/^\]>>([0-9]+)\]//) {
@@ -151,14 +184,14 @@ sub parse_char_string ($$$;$) {
         $column += $+[0] - $-[0];
       } elsif ($$s =~ s/^>>([0-9]+)//) {
         push @nt, {type => ELEMENT_TOKEN,
-                   local_name => 'anchor-internal', namespace => $SW09_NS,
+                   local_name => 'anchor-internal', namespace => SW09_NS,
                    anchor => $1,
                    line => $line, column => $column};
         $column += $+[0] - $-[0];
       } elsif ($$s =~ s/^__&&//) {
         if ($$s =~ s/^(.+?)&&__//) {
           push @nt, {type => ELEMENT_TOKEN,
-                     local_name => 'replace', namespace => $SW09_NS,
+                     local_name => 'replace', namespace => SW09_NS,
                      by => $1,
                      line => $line, column => $column};
           $column += 4 + $+[0] - $-[0];
@@ -255,7 +288,7 @@ sub parse_char_string ($$$;$) {
         $column = $real_column;
         push @nt, {type => LABELED_LIST_MIDDLE_TOKEN,
                    line => $line, column => $column};
-        $column += $+[0] - $-[0] if $data =~ s/^:[\x09\x20]*//;
+        $column += $+[0] - $-[0] if $s =~ s/^:[\x09\x20]*//;
         $tokenize_text->(\$s);
       }
       $continuous_line = 1;
@@ -303,7 +336,7 @@ sub parse_char_string ($$$;$) {
           push @nt, {type => BLOCK_END_TAG_TOKEN, tag_name => 'PRE',
                      line => $line, column => $column};
           undef $continuous_line;
-          break;
+          last;
         } else {
           push @nt, {type => CHARACTER_TOKEN, data => "\x0A",
                      line => $line, column => $column}
@@ -379,9 +412,9 @@ sub parse_char_string ($$$;$) {
       undef $continuous_line;
       return shift @nt;
     } elsif ($s eq '__IMAGE__') {
-      my $image = $doc->create_element_ns ($NS_SW09, 'image');
-      $_->set_user_data (manakai_source_line => $line);
-      $_->set_user_data (manakai_source_column => 1);
+      my $image = $doc->create_element_ns (SW09_NS, 'image');
+      $image->set_user_data (manakai_source_line => $line);
+      $image->set_user_data (manakai_source_column => 1);
       $image->text_content (join "\x0A", $s, @s);
       ($line, $column) = ($line + @s, 1);
       @s = ();
@@ -402,16 +435,600 @@ sub parse_char_string ($$$;$) {
     ## NOTE: "Parse a magic line".
 
     my $s = shift @s;
+    if ($s =~ s/^([^\x09\x20]+)//) {
+      $column += $+[0] - $-[0];
+      my ($name, $version) = split m#/#, $1, 2;
+      my $el = $doc->document_element;
+      $el->set_attribute_ns (SW09_NS, 'sw:Name' => $name);
+      $el->set_attribute_ns (SW09_NS, 'sw:Version' => $version)
+          if defined $version;
+    }
 
-    ## TODO:...
+    my $head = $doc->first_child;
+    while (length $s) {
+      $column += $+[0] - $-[0] if $s =~ s/^[\x09\x20]+//;
+      my $name = '';
+      if ($s =~ s/^([^=]*)=//) {
+        $name = $1;
+        $column += length $name + 1;
+      }
+      my $param = $doc->create_element_ns (SW09_NS, 'parameter');
+      $param->set_attribute (name => $name);
+      $param->set_user_data (manakai_source_line => $line);
+      $param->set_user_data (manakai_source_column => $column);
+      $head->append_child ($param);
+
+      $column++ if $s =~ s/^"//;
+      if ($s =~ s/^([^"]+)//) {
+        my $values = $1;
+        $column += length $values;
+        $values =~ tr/\\//d;
+        for (split /,/, $values, -1) {
+          my $value = $doc->create_element_ns (SW09_NS, 'value');
+          $value->text_content ($_);
+          $value->set_user_data (manakai_source_line => $line);
+          $value->set_user_data (manakai_source_column => $column);
+          $param->append_child ($value);
+        }
+      }
+      $column++ if $s =~ s/^"//;
+    }
 
     $line = 2;
-    $column = 0;
+    $column = 1;
   }
 
   ## NOTE: Switched to the "body" mode.
+
+  my $oe = [{node => $doc->document_element->last_child,
+             section_depth => 0,
+             quotation_depth => 0,
+             list_depth => 0}];
+  my $structural_elements = {
+    body => 1, section => 1, insert => 1, delete => 1, blockquote => 1,
+    h1 => 1, ul => 1, ol => 1, dl => 1, li => 1, dt => 1, dd => 1,
+    table => 1, tbody => 1, tr => 1, td => 1, p => 1, 'comment-p' => 1,
+    ed => 1, pre => 1,
+  };
+
+  my $im = IN_SECTION_IM;
   $get_next_token->();
 
+  A: {
+    if ($im == IN_PARAGRAPH_IM) {
+      if ($token->{type} == CHARACTER_TOKEN) {
+        $oe->[-1]->{node}->manakai_append_text ($token->{data});
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == INLINE_START_TAG_TOKEN) {
+        if (not defined $token->{tag_name}) {
+          my $el = $doc->create_element_ns (SW09_NS, 'anchor');
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+          
+          $get_next_token->();
+          redo A;
+        } else {
+          my $type = {
+                      AA => [AA_NS, 'aa'],
+                      ABBR => [HTML_NS, 'abbr'],
+                      CITE => [HTML_NS, 'cite'],
+                      CODE => [HTML_NS, 'code'],
+                      CSECTION => [SW10_NS, 'csection'],
+                      DEL => [HTML_NS, 'del'],
+                      DFN => [HTML_NS, 'dfn'],
+                      INS => [HTML_NS, 'ins'],
+                      KBD => [HTML_NS, 'kbd'],
+                      KEY => [SW10_NS, 'key'],
+                      Q => [HTML_NS, 'q'],
+                      QN => [SW10_NS, 'qn'],
+                      RUBY => [HTML_NS, 'ruby'],
+                      RUBYB => [HTML_NS, 'rubyb'],
+                      SAMP => [HTML_NS, 'samp'],
+                      SPAN => [HTML_NS, 'span'],
+                      SRC => [SW10_NS, 'src'],
+                      SUB => [HTML_NS, 'sub'],
+                      SUP => [HTML_NS, 'sup'],
+                      TIME => [HTML_NS, 'time'],
+                      VAR => [HTML_NS, 'var'],
+                      WEAK => [SW09_NS, 'weak'],
+                     }->{$token->{tag_name}} || [SW10_NS, $token->{tag_name}];
+          my $el = $doc->create_element_ns (SW10_NS, 'td');
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+
+          $el->set_attribute (class => $token->{classes})
+              if defined $token->{classes};
+          $el->set_attribute_ns (XML_NS, 'xml:lang' => $token->{language})
+              if defined $token->{language};
+          
+          $get_next_token->();
+          redo A;
+        } 
+      } elsif ($token->{type} == INLINE_MIDDLE_TAG_TOKEN) {
+        my ($ns, $ln, $pop) = @{{
+          rt => [SW10_NS, 'attrvalue', 1],
+          title => [SW10_NS, 'attrvalue', 1],
+          nsuri => [SW10_NS, 'attrvalue', 1],
+          qn => [SW10_NS, 'nsuri'],
+          ruby => [HTML_NS, 'rt'],
+          rubyb => [HTML_NS, 'rt'],
+        }->{$oe->[-1]->{node}->manakai_local_name} || [SW10_NS, 'title']};
+        pop @$oe if $pop;
+
+        my $el = $doc->create_element_ns ($ns, $ln);
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        $el->set_user_data (manakai_source_line => $token->{line});
+        $el->set_user_data (manakai_source_column => $token->{column});
+
+        $el->set_attribute_ns (XML_NS, 'xml:lang' => $token->{language})
+            if defined $token->{language};
+
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == INLINE_END_TAG_TOKEN) {
+        pop @$oe if {
+          rt => 1, title => 1, nsuri => 1, attrvalue => 1,
+        }->{$oe->[-1]->{node}->manakai_local_name};
+        
+        if ({%$structural_elements,
+             strong => 1, em => 1}->{$oe->[-1]->{node}->manakai_local_name}) {
+          my $el = $doc->create_element_ns
+              (SW09_NS,
+               defined $token->{res_scheme}
+                   ? 'anchor-external' : 'anchor-internal');
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+          $el->text_content (']]');
+        }
+        
+        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, 'sw:anchor',
+                                             $token->{anchor})
+            if defined $token->{anchor};
+        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, 'sw:resScheme',
+                                             $token->{res_scheme})
+            if defined $token->{res_scheme};
+        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, 'sw:resParameter',
+                                             $token->{res_parameter})
+            if defined $token->{res_parameter};
+        
+        pop @$oe;
+        
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == STRONG_TOKEN) {
+        my $el = $doc->create_element_ns (HTML_NS, 'strong');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        $el->set_user_data (manakai_source_line => $token->{line});
+        $el->set_user_data (manakai_source_column => $token->{column});
+
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == EMPHASIS_TOKEN) {
+        my $el = $doc->create_element_ns (HTML_NS, 'em');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        $el->set_user_data (manakai_source_line => $token->{line});
+        $el->set_user_data (manakai_source_column => $token->{column});
+
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == FORM_TOKEN) {
+        ## There is an exact code clone.
+        if ($token->{name} eq 'form') {
+          my $el = $doc->create_element_ns (SW09_NS, 'form');
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+
+          $el->set_attribute (id => $token->{id}) if defined $token->{id};
+          $el->set_attribute (input => shift @{$token->{parameters}})
+              if @{$token->{parameter}};
+          $el->set_attribute (template => shift @{$token->{parameters}})
+              if @{$token->{parameter}};
+          $el->set_attribute (option => shift @{$token->{parameters}})
+              if @{$token->{parameter}};
+          $el->set_attribute (parameter => join ':', @{$token->{parameters}})
+              if @{$token->{parameter}};
+          
+          $get_next_token->();
+          redo A;
+        } else {
+          my $el = $doc->create_element_ns (SW09_NS, 'form');
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+
+          $el->set_attribute (ref => $token->{name});
+          $el->set_attribute (id => $token->{id}) if defined $token->{id};
+          $el->set_attribute (parameter => join ':', @{$token->{parameters}})
+              if @{$token->{parameter}};
+          
+          $get_next_token->();
+          redo A;
+        }
+      } elsif ($token->{type} == ELEMENT_TOKEN) {
+        ## NOTE: There is an exact code clone.
+        my $el = $doc->create_element_ns
+            ($token->{namespace}, $token->{local_name});
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        $el->set_user_data (manakai_source_line => $token->{line});
+        $el->set_user_data (manakai_source_column => $token->{column});
+
+        $el->set_attribute_ns (SW09_NS, 'sw:anchor', $token->{anchor})
+            if defined $token->{anchor};
+        $el->set_attribute (by => $token->{by}) if defined $token->{by};
+        $el->set_attribute_ns (SW09_NS, 'sw:resScheme', $token->{res_scheme})
+            if defined $token->{res_scheme};
+        $el->set_attribute_ns (SW09_NS, 'sw:resParameter',
+                               $token->{res_parameter})
+            if defined $token->{res_parameter};
+        $el->text_content ($token->{content}) if defined $token->{content};
+
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == LABELED_LIST_MIDDLE_TOKEN) {
+        pop @$oe while not $structural_elements
+            ->{$oe->[-1]->{node}->manakai_local_name};
+        pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'dt';
+        
+        my $el = $doc->create_element_ns (HTML_NS, 'dt');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        $el->set_user_data (manakai_source_line => $token->{line});
+        $el->set_user_data (manakai_source_column => $token->{column});
+
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == HEADING_END_TOKEN) {
+        pop @$oe while not $structural_elements
+            ->{$oe->[-1]->{node}->manakai_local_name};
+        pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'h1';
+        
+        $im = IN_SECTION_IM;
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == TABLE_CELL_END_TOKEN) {
+        pop @$oe while not $structural_elements
+            ->{$oe->[-1]->{node}->manakai_local_name};
+        pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'td';
+        
+        $im = IN_TABLE_ROW_IM;
+        $get_next_token->();
+        redo A;
+      } elsif (($token->{type} == BLOCK_END_TAG_TOKEN and
+                $token->{tag_name} eq 'PRE') or
+               $token->{type} == PREFORMATTED_END_TOKEN) {
+        pop @$oe while not $structural_elements
+            ->{$oe->[-1]->{node}->manakai_local_name};
+        pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'pre';
+
+        $im = IN_SECTION_IM;
+        $get_next_token->();
+        redo A;
+      } else {
+        pop @$oe while not $structural_elements
+            ->{$oe->[-1]->{node}->manakai_local_name};
+        
+        $im = IN_SECTION_IM;
+        $get_next_token->();
+        redo A;
+      }
+    } elsif ($im == IN_SECTION_IM) {
+      if ($token->{type} == HEADING_START_TOKEN) {
+        B: {
+          pop @$oe and redo B
+              if {body => 1, section => 1, insert => 1, delete => 1}
+                  ->{$oe->[-1]->{node}->manakai_local_name} or
+                 $token->{depth} <= $oe->[-1]->{section_depth};
+          if ($token->{depth} > $oe->[-1]->{section_depth} + 1) {
+            my $el = $doc->create_element_ns (HTML_NS, 'section');
+            $oe->[-1]->{node}->append_child ($el);
+            push @$oe, {node => $el,
+                        section_depth => $oe->[-1]->{section_depth} + 1,
+                        quotation_depth => 0, list_depth => 0};
+            redo B;
+          }
+        } # B
+
+        my $el = $doc->create_element_ns (HTML_NS, 'section');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {node => $el,
+                    section_depth => $oe->[-1]->{section_depth} + 1,
+                    quotation_depth => 0, list_depth => 0};
+
+        my $el2 = $doc->create_element_ns (HTML_NS, 'h1');
+        $oe->[-1]->{node}->append_child ($el2);
+        push @$oe, {%{$oe->[-1]}, node => $el2};
+
+        $im = IN_PARAGRAPH_IM;
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == BLOCK_START_TAG_TOKEN and
+               ($token->{tag_name} eq 'INS' or
+                $token->{tag_name} eq 'DEL')) {
+        my $el = $doc->create_element_ns
+            (SW09_NS, ($token->{tag_name} eq 'INS' ? 'insert' : 'delete'));
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {node => $el, section_depth => 0,
+                    quotation_depth => 0, list_depth => 0};
+        $el->set_attribute (class => $token->{classes})
+            if defined $token->{classes};
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == QUOTATION_START_TOKEN) {
+        B: {
+          pop @$oe and redo B
+              if {body => 1, section => 1, insert => 1, delete => 1,
+                  blockquote => 1}
+                  ->{$oe->[-1]->{node}->manakai_local_name} or
+                 $token->{depth} <= $oe->[-1]->{quotation_depth};
+          if ($token->{depth} > $oe->[-1]->{quotation_depth} + 1) {
+            my $el = $doc->create_element_ns (HTML_NS, 'blockquote');
+            $oe->[-1]->{node}->append_child ($el);
+            push @$oe, {node => $el, section_depth => 0,
+                        quotation_depth => $oe->[-1]->{quotation_depth} + 1,
+                        list_depth => 0};
+            redo B;
+          }
+        } # B
+
+        my $el = $doc->create_element_ns (HTML_NS, 'blockquote');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {node => $el, section_depth => 0,
+                    quotation_depth => $oe->[-1]->{quotation_depth} + 1,
+                    list_depth => 0};
+
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == LIST_START_TOKEN) {
+        my $depth = length $token->{depth};
+        B: {
+          pop @$oe and redo B if $oe->[-1]->{list_depth} > $depth;
+          if ($oe->[-1]->{list_depth} < $depth) {
+            my $type = substr $token->{depth}, $oe->[-1]->{list_depth};
+            my $el = $doc->create_element_ns
+                (HTML_NS, $type eq '-' ? 'ul' : 'ol');
+            $oe->[-1]->{node}->append_child ($el);
+            push @$oe, {%{$oe->[-1]}, node => $el,
+                        list_depth => $oe->[-1]->{list_depth} + 1};
+            if ($oe->[-1]->{list_depth} < $depth) {
+              my $el = $doc->create_element_ns (HTML_NS, 'li');
+              $oe->[-1]->{node}->append_child ($el);
+              push @$oe, {%{$oe->[-1]}, node => $el};
+            }
+            redo B;
+          }
+        } # B
+
+        pop @$oe if $oe->[-1]->{list_depth} == $depth and
+            not {ul => 1, ol => 1}->{$oe->[-1]->{node}->manakai_local_name};
+        
+        my $el = $doc->create_element_ns (HTML_NS, 'li');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+
+        $im = IN_PARAGRAPH_IM;
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == LABELED_LIST_START_TOKEN) {
+        pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'dd';
+        if ($oe->[-1]->{node}->manakai_local_name ne 'dl') {
+          my $el = $doc->create_element_ns (HTML_NS, 'dl');
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+        }
+        
+        my $el = $doc->create_element_ns (HTML_NS, 'dt');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        
+        $im = IN_PARAGRAPH_IM;
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == TABLE_ROW_START_TOKEN) {
+        my $el = $doc->create_element_ns (HTML_NS, 'table');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+
+        $el = $doc->create_element_ns (HTML_NS, 'tbody');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+
+        $el = $doc->create_element_ns (HTML_NS, 'tr');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        
+        $im = IN_TABLE_ROW_IM;
+        $get_next_token->();
+        redo A;
+      } elsif (($token->{type} == BLOCK_START_TAG_TOKEN and
+                $token->{tag_name} eq 'PRE') or
+               $token->{type} == PREFORMATTED_START_TOKEN) {
+        my $el = $doc->create_element_ns (HTML_NS, 'pre');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+
+        $el->set_attribute (class => $token->{classes})
+            if defined $token->{classes};
+
+        $im = IN_PARAGRAPH_IM;
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == COMMENT_PARAGRAPH_START_TOKEN) {
+        my $el = $doc->create_element_ns (SW10_NS, 'comment-p');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        
+        $im = IN_PARAGRAPH_IM;
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == EDITORIAL_NOTE_START_TOKEN) {
+        my $el = $doc->create_element_ns (SW10_NS, 'ed');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+
+        $im = IN_PARAGRAPH_IM;
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == EMPTY_LINE_TOKEN) {
+        pop @$oe while {body => 1, section => 1, insert => 1, delete => 1}
+            ->{$oe->[-1]->{node}->manakai_local_name};
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == BLOCK_END_TAG_TOKEN) {
+        if ($token->{type} eq 'INS') {
+          for (reverse 1..$#$oe) {
+            if ($oe->[$_]->{node}->manakai_local_name eq 'insert') {
+              splice @$oe, $_;
+              last;
+            }
+          }
+        } elsif ($token->{type} eq 'DEL') {
+          for (reverse 1..$#$oe) {
+            if ($oe->[$_]->{node}->manakai_local_name eq 'delete') {
+              splice @$oe, $_;
+              last;
+            }
+          }
+        } else {
+          ## NOTE: Ignore the token.
+        }
+      } elsif ($token->{type} == FORM_TOKEN) {
+        ## There is an exact code clone.
+        if ($token->{name} eq 'form') {
+          my $el = $doc->create_element_ns (SW09_NS, 'form');
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+
+          $el->set_attribute (id => $token->{id}) if defined $token->{id};
+          $el->set_attribute (input => shift @{$token->{parameters}})
+              if @{$token->{parameter}};
+          $el->set_attribute (template => shift @{$token->{parameters}})
+              if @{$token->{parameter}};
+          $el->set_attribute (option => shift @{$token->{parameters}})
+              if @{$token->{parameter}};
+          $el->set_attribute (parameter => join ':', @{$token->{parameters}})
+              if @{$token->{parameter}};
+          
+          $get_next_token->();
+          redo A;
+        } else {
+          my $el = $doc->create_element_ns (SW09_NS, 'form');
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+
+          $el->set_attribute (ref => $token->{name});
+          $el->set_attribute (id => $token->{id}) if defined $token->{id};
+          $el->set_attribute (parameter => join ':', @{$token->{parameters}})
+              if @{$token->{parameter}};
+          
+          $get_next_token->();
+          redo A;
+        }
+      } elsif ($token->{type} == ELEMENT_TOKEN and 
+               $token->{local_name} eq 'replace') {
+        ## NOTE: There is an exact code clone.
+        my $el = $doc->create_element_ns
+            ($token->{namespace}, $token->{local_name});
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        $el->set_user_data (manakai_source_line => $token->{line});
+        $el->set_user_data (manakai_source_column => $token->{column});
+
+        $el->set_attribute_ns (SW09_NS, 'sw:anchor', $token->{anchor})
+            if defined $token->{anchor};
+        $el->set_attribute (by => $token->{by}) if defined $token->{by};
+        $el->set_attribute_ns (SW09_NS, 'sw:resScheme', $token->{res_scheme})
+            if defined $token->{res_scheme};
+        $el->set_attribute_ns (SW09_NS, 'sw:resParameter',
+                               $token->{res_parameter})
+            if defined $token->{res_parameter};
+        $el->text_content ($token->{content}) if defined $token->{content};
+
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        return;
+      } elsif ({LABELED_LIST_MIDDLE_TOKEN => 1,
+                HEADING_END_TOKEN => 1,
+                PREFORMATTED_END_TOKEN => 1,
+                TABLE_ROW_END_TOKEN => 1,
+                TABLE_CELL_START_TOKEN => 1,
+                TABLE_CELL_END_TOKEN => 1,
+                TABLE_COLSPAN_CELL_TOKEN => 1}->{$token->{type}}) {
+        ## NOTE: Ignore the token.
+      } else {
+        my $el = $doc->create_element_ns (HTML_NS, 'p');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+
+        $im = IN_PARAGRAPH_IM;
+        ## Reprocess.
+        redo A;
+      }
+    } elsif ($im == IN_TABLE_ROW_IM) {
+      if ($token->{type} == TABLE_CELL_START_TOKEN) {
+        my $el = $doc->create_element_ns (HTML_NS, 'td');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        $el->set_user_data (manakai_source_line => $token->{line});
+        $el->set_user_data (manakai_source_column => $token->{column});
+
+        $im = IN_PARAGRAPH_IM;
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == TABLE_COLSPAN_CELL_TOKEN) {
+        my $lc = $oe->[-1]->{node}->last_child;
+        if ($lc and $lc->manakai_local_name eq 'td') {
+          $lc->set_attribute
+              (colspan => ($lc->get_attribute ('colspan') || 0) + 1);
+        } else {
+          my $el = $doc->create_element_ns (SW10_NS, 'td');
+          $oe->[-1]->{node}->append_child ($el);
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+        }
+
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == TABLE_ROW_END_TOKEN) {
+        pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'tr';
+        $get_next_token->();
+        redo A;
+      } elsif ($token->{type} == TABLE_ROW_START_TOKEN) {
+        my $el = $doc->create_element_ns (HTML_NS, 'tr');
+        $oe->[-1]->{node}->append_child ($el);
+        push @$oe, {%{$oe->[-1]}, node => $el};
+        $el->set_user_data (manakai_source_line => $token->{line});
+        $el->set_user_data (manakai_source_column => $token->{column});
+
+        $get_next_token->();
+        redo A;
+      } else {
+        $im = IN_SECTION_IM;
+        ## Reprocess.
+        redo A;
+      }
+    } else {
+      die "$0: Unknown insertion mode: $im";
+    }
+  } # A
 } # parse_char_string
 
 1;
