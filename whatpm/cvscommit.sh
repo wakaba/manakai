@@ -1,6 +1,5 @@
 #!/bin/sh
 find -name ChangeLog | xargs cvs diff | grep "^\+" | sed -e "s/^\+//; s/^\+\+ .\//++ whatpm\//" > .cvslog.tmp
-cvs commit -F .cvslog.tmp $1 $2 $3 $4 $5 $6 $7 $8 $9 
 ## TODO: Don't use -I here
 perl \
     -I/home/wakaba/work/manakai2/lib/ \
@@ -12,7 +11,8 @@ perl \
     --feed-license-url "http://suika.fam.cx/www/markup/html/whatpm/readme#license" \
     --feed-rights "This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself." \
     < .cvslog.tmp
+cvs commit -F .cvslog.tmp $1 $2 $3 $4 $5 $6 $7 $8 $9 
 rm .cvslog.tmp
 
-## $Date: 2008/10/21 05:17:48 $
+## $Date: 2008/11/06 06:59:12 $
 ## License: Public Domain
