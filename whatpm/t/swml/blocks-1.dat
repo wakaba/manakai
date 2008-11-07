@@ -1296,3 +1296,22 @@
 |       <sw10 comment-p>
 |         "
 | b"
+
+#data
+| -a
+| [PRE[
+| b
+| c
+| ]PRE]
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         "a"
+|         <pre>
+|           "b
+| c"
