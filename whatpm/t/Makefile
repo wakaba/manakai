@@ -8,6 +8,7 @@ all: \
   tokenizer-files \
   tree-construction-files \
   xml-result.txt \
+  swml-result.txt \
   content-checker-files \
   langtag-files
 
@@ -76,6 +77,9 @@ tree-construction-result.txt: always
 xml-result.txt: always
 	cd .. && perl t/XML-Parser.t &> t/$@
 
+swml-result.txt: always
+	cd .. && perl t/SWML-Parser.t &> t/$@
+
 content-checker-files: content-checker-result.txt \
   content-checker-atom-result.txt \
   content-checker-xml-result.txt
@@ -101,4 +105,4 @@ clean-remote-files:
 always:
 
 ## License: Public Domain.
-## $Date: 2008/10/14 09:00:57 $
+## $Date: 2008/11/07 04:03:16 $

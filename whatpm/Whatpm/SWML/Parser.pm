@@ -50,12 +50,16 @@ sub parse_char_string ($$$;$) {
   my @s = split /\x0D\x0A?|\x0A/, ref $_[0] ? ${$_[0]} : $_[0], -1;
 
   my $doc = $_[1];
-  $doc->inner_html
-      ('<html xmlns="http://www.w3.org/1999/xhtml"><head/><body/></html>');
-  for ($doc,
-       $doc->document_element,
-       $doc->document_element->first_child,
-       $doc->document_element->last_child) {
+  @{$doc->child_nodes} = ();
+  my $html_el = $doc->create_element_ns (HTML_NS, [undef, 'html']);
+  $doc->append_child ($html_el);
+  $html_el->set_attribute_ns
+      ('http://www.w3.org/2000/xmlns/', [undef, 'xmlns'] => HTML_NS);
+  my $head_el = $doc->create_element_ns (HTML_NS, [undef, 'head']);
+  $html_el->append_child ($head_el);
+  my $body_el = $doc->create_element_ns (HTML_NS, [undef, 'body']);
+  $html_el->append_child ($body_el);
+  for ($doc, $html_el, $head_el, $body_el) {
     $_->set_user_data (manakai_source_line => 1);
     $_->set_user_data (manakai_source_column => 1);
   }
@@ -412,7 +416,7 @@ sub parse_char_string ($$$;$) {
       undef $continuous_line;
       return shift @nt;
     } elsif ($s eq '__IMAGE__') {
-      my $image = $doc->create_element_ns (SW09_NS, 'image');
+      my $image = $doc->create_element_ns (SW09_NS, [undef, 'image']);
       $image->set_user_data (manakai_source_line => $line);
       $image->set_user_data (manakai_source_column => 1);
       $image->text_content (join "\x0A", $s, @s);
@@ -439,12 +443,11 @@ sub parse_char_string ($$$;$) {
       $column += $+[0] - $-[0];
       my ($name, $version) = split m#/#, $1, 2;
       my $el = $doc->document_element;
-      $el->set_attribute_ns (SW09_NS, 'sw:Name' => $name);
-      $el->set_attribute_ns (SW09_NS, 'sw:Version' => $version)
+      $el->set_attribute_ns (SW09_NS, ['sw', 'Name'] => $name);
+      $el->set_attribute_ns (SW09_NS, ['sw', 'Version'] => $version)
           if defined $version;
     }
 
-    my $head = $doc->first_child->first_child;
     while (length $s) {
       $column += $+[0] - $-[0] if $s =~ s/^[\x09\x20]+//;
       my $name = '';
@@ -452,11 +455,11 @@ sub parse_char_string ($$$;$) {
         $name = $1;
         $column += length $name + 1;
       }
-      my $param = $doc->create_element_ns (SW09_NS, 'parameter');
-      $param->set_attribute (name => $name);
+      my $param = $doc->create_element_ns (SW09_NS, [undef, 'parameter']);
+      $param->set_attribute_ns (undef, [undef, 'name'] => $name);
       $param->set_user_data (manakai_source_line => $line);
       $param->set_user_data (manakai_source_column => $column);
-      $head->append_child ($param);
+      $head_el->append_child ($param);
 
       $column++ if $s =~ s/^"//;
       if ($s =~ s/^([^"]+)//) {
@@ -464,7 +467,7 @@ sub parse_char_string ($$$;$) {
         $column += length $values;
         $values =~ tr/\\//d;
         for (split /,/, $values, -1) {
-          my $value = $doc->create_element_ns (SW09_NS, 'value');
+          my $value = $doc->create_element_ns (SW09_NS, [undef, 'value']);
           $value->text_content ($_);
           $value->set_user_data (manakai_source_line => $line);
           $value->set_user_data (manakai_source_column => $column);
@@ -480,7 +483,7 @@ sub parse_char_string ($$$;$) {
 
   ## NOTE: Switched to the "body" mode.
 
-  my $oe = [{node => $doc->document_element->last_child,
+  my $oe = [{node => $body_el,
              section_depth => 0,
              quotation_depth => 0,
              list_depth => 0}];
@@ -502,7 +505,7 @@ sub parse_char_string ($$$;$) {
         redo A;
       } elsif ($token->{type} == INLINE_START_TAG_TOKEN) {
         if (not defined $token->{tag_name}) {
-          my $el = $doc->create_element_ns (SW09_NS, 'anchor');
+          my $el = $doc->create_element_ns (SW09_NS, [undef, 'anchor']);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
@@ -535,15 +538,15 @@ sub parse_char_string ($$$;$) {
                       VAR => [HTML_NS, 'var'],
                       WEAK => [SW09_NS, 'weak'],
                      }->{$token->{tag_name}} || [SW10_NS, $token->{tag_name}];
-          my $el = $doc->create_element_ns (SW10_NS, 'td');
+          my $el = $doc->create_element_ns (SW10_NS, [undef, 'td']);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
-          $el->set_attribute (class => $token->{classes})
+          $el->set_attribute_ns (undef, [undef, 'class'] => $token->{classes})
               if defined $token->{classes};
-          $el->set_attribute_ns (XML_NS, 'xml:lang' => $token->{language})
+          $el->set_attribute_ns (XML_NS, ['xml', 'lang'] => $token->{language})
               if defined $token->{language};
           
           $token = $get_next_token->();
@@ -560,13 +563,13 @@ sub parse_char_string ($$$;$) {
         }->{$oe->[-1]->{node}->manakai_local_name} || [SW10_NS, 'title']};
         pop @$oe if $pop;
 
-        my $el = $doc->create_element_ns ($ns, $ln);
+        my $el = $doc->create_element_ns ($ns, [undef, $ln]);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
         $el->set_user_data (manakai_source_column => $token->{column});
 
-        $el->set_attribute_ns (XML_NS, 'xml:lang' => $token->{language})
+        $el->set_attribute_ns (XML_NS, ['xml', 'lang'] => $token->{language})
             if defined $token->{language};
 
         $token = $get_next_token->();
@@ -580,8 +583,8 @@ sub parse_char_string ($$$;$) {
              strong => 1, em => 1}->{$oe->[-1]->{node}->manakai_local_name}) {
           my $el = $doc->create_element_ns
               (SW09_NS,
-               defined $token->{res_scheme}
-                   ? 'anchor-external' : 'anchor-internal');
+               [undef, defined $token->{res_scheme}
+                    ? 'anchor-external' : 'anchor-internal']);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
@@ -589,13 +592,13 @@ sub parse_char_string ($$$;$) {
           $el->text_content (']]');
         }
         
-        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, 'sw:anchor',
+        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, ['sw', 'anchor'],
                                              $token->{anchor})
             if defined $token->{anchor};
-        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, 'sw:resScheme',
+        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, ['sw', 'resScheme'],
                                              $token->{res_scheme})
             if defined $token->{res_scheme};
-        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, 'sw:resParameter',
+        $oe->[-1]->{node}->set_attribute_ns (SW09_NS, ['sw', 'resParameter'],
                                              $token->{res_parameter})
             if defined $token->{res_parameter};
         
@@ -604,7 +607,7 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == STRONG_TOKEN) {
-        my $el = $doc->create_element_ns (HTML_NS, 'strong');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'strong']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
@@ -613,7 +616,7 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == EMPHASIS_TOKEN) {
-        my $el = $doc->create_element_ns (HTML_NS, 'em');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'em']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
@@ -624,34 +627,42 @@ sub parse_char_string ($$$;$) {
       } elsif ($token->{type} == FORM_TOKEN) {
         ## There is an exact code clone.
         if ($token->{name} eq 'form') {
-          my $el = $doc->create_element_ns (SW09_NS, 'form');
+          my $el = $doc->create_element_ns (SW09_NS, [undef, 'form']);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
-          $el->set_attribute (id => $token->{id}) if defined $token->{id};
-          $el->set_attribute (input => shift @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'id']
+                                     => $token->{id}) if defined $token->{id};
+          $el->set_attribute_ns (undef, [undef, 'input']
+                                     => shift @{$token->{parameters}})
               if @{$token->{parameter}};
-          $el->set_attribute (template => shift @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'template']
+                                     => shift @{$token->{parameters}})
               if @{$token->{parameter}};
-          $el->set_attribute (option => shift @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'option']
+                                     => shift @{$token->{parameters}})
               if @{$token->{parameter}};
-          $el->set_attribute (parameter => join ':', @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'parameter']
+                                     => join ':', @{$token->{parameters}})
               if @{$token->{parameter}};
           
           $token = $get_next_token->();
           redo A;
         } else {
-          my $el = $doc->create_element_ns (SW09_NS, 'form');
+          my $el = $doc->create_element_ns (SW09_NS, [undef, 'form']);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
-          $el->set_attribute (ref => $token->{name});
-          $el->set_attribute (id => $token->{id}) if defined $token->{id};
-          $el->set_attribute (parameter => join ':', @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'ref']
+                                     => $token->{name});
+          $el->set_attribute_ns (undef, [undef, 'id']
+                                     => $token->{id}) if defined $token->{id};
+          $el->set_attribute_ns (undef, [undef, 'parameter']
+                                     => join ':', @{$token->{parameters}})
               if @{$token->{parameter}};
           
           $token = $get_next_token->();
@@ -660,18 +671,20 @@ sub parse_char_string ($$$;$) {
       } elsif ($token->{type} == ELEMENT_TOKEN) {
         ## NOTE: There is an exact code clone.
         my $el = $doc->create_element_ns
-            ($token->{namespace}, $token->{local_name});
+            ($token->{namespace}, [undef, $token->{local_name}]);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
         $el->set_user_data (manakai_source_column => $token->{column});
 
-        $el->set_attribute_ns (SW09_NS, 'sw:anchor', $token->{anchor})
+        $el->set_attribute_ns (SW09_NS, ['sw', 'anchor'], $token->{anchor})
             if defined $token->{anchor};
-        $el->set_attribute (by => $token->{by}) if defined $token->{by};
-        $el->set_attribute_ns (SW09_NS, 'sw:resScheme', $token->{res_scheme})
+        $el->set_attribute_ns (undef, [undef, 'by']
+                                   => $token->{by}) if defined $token->{by};
+        $el->set_attribute_ns (SW09_NS, ['sw', 'resScheme'],
+                                   $token->{res_scheme})
             if defined $token->{res_scheme};
-        $el->set_attribute_ns (SW09_NS, 'sw:resParameter',
+        $el->set_attribute_ns (SW09_NS, ['sw', 'resParameter'],
                                $token->{res_parameter})
             if defined $token->{res_parameter};
         $el->text_content ($token->{content}) if defined $token->{content};
@@ -683,7 +696,7 @@ sub parse_char_string ($$$;$) {
             ->{$oe->[-1]->{node}->manakai_local_name};
         pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'dt';
         
-        my $el = $doc->create_element_ns (HTML_NS, 'dt');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'dt']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
@@ -733,7 +746,7 @@ sub parse_char_string ($$$;$) {
                   ->{$oe->[-1]->{node}->manakai_local_name} or
                  $token->{depth} <= $oe->[-1]->{section_depth};
           if ($token->{depth} > $oe->[-1]->{section_depth} + 1) {
-            my $el = $doc->create_element_ns (HTML_NS, 'section');
+            my $el = $doc->create_element_ns (HTML_NS, [undef, 'section']);
             $oe->[-1]->{node}->append_child ($el);
             push @$oe, {node => $el,
                         section_depth => $oe->[-1]->{section_depth} + 1,
@@ -742,13 +755,13 @@ sub parse_char_string ($$$;$) {
           }
         } # B
 
-        my $el = $doc->create_element_ns (HTML_NS, 'section');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'section']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {node => $el,
                     section_depth => $oe->[-1]->{section_depth} + 1,
                     quotation_depth => 0, list_depth => 0};
 
-        my $el2 = $doc->create_element_ns (HTML_NS, 'h1');
+        my $el2 = $doc->create_element_ns (HTML_NS, [undef, 'h1']);
         $oe->[-1]->{node}->append_child ($el2);
         push @$oe, {%{$oe->[-1]}, node => $el2};
 
@@ -759,11 +772,12 @@ sub parse_char_string ($$$;$) {
                ($token->{tag_name} eq 'INS' or
                 $token->{tag_name} eq 'DEL')) {
         my $el = $doc->create_element_ns
-            (SW09_NS, ($token->{tag_name} eq 'INS' ? 'insert' : 'delete'));
+            (SW09_NS,
+             [undef, $token->{tag_name} eq 'INS' ? 'insert' : 'delete']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {node => $el, section_depth => 0,
                     quotation_depth => 0, list_depth => 0};
-        $el->set_attribute (class => $token->{classes})
+        $el->set_attribute_ns (undef, [undef, 'class'] => $token->{classes})
             if defined $token->{classes};
         $token = $get_next_token->();
         redo A;
@@ -775,7 +789,7 @@ sub parse_char_string ($$$;$) {
                   ->{$oe->[-1]->{node}->manakai_local_name} or
                  $token->{depth} <= $oe->[-1]->{quotation_depth};
           if ($token->{depth} > $oe->[-1]->{quotation_depth} + 1) {
-            my $el = $doc->create_element_ns (HTML_NS, 'blockquote');
+            my $el = $doc->create_element_ns (HTML_NS, [undef, 'blockquote']);
             $oe->[-1]->{node}->append_child ($el);
             push @$oe, {node => $el, section_depth => 0,
                         quotation_depth => $oe->[-1]->{quotation_depth} + 1,
@@ -784,7 +798,7 @@ sub parse_char_string ($$$;$) {
           }
         } # B
 
-        my $el = $doc->create_element_ns (HTML_NS, 'blockquote');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'blockquote']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {node => $el, section_depth => 0,
                     quotation_depth => $oe->[-1]->{quotation_depth} + 1,
@@ -802,12 +816,12 @@ sub parse_char_string ($$$;$) {
           if ($oe->[-1]->{list_depth} < $depth) {
             my $type = substr $token->{depth}, $oe->[-1]->{list_depth}, 1;
             my $el = $doc->create_element_ns
-                (HTML_NS, $type eq '-' ? 'ul' : 'ol');
+                (HTML_NS, [undef, $type eq '-' ? 'ul' : 'ol']);
             $oe->[-1]->{node}->append_child ($el);
             push @$oe, {%{$oe->[-1]}, node => $el,
                         list_depth => $oe->[-1]->{list_depth} + 1};
             if ($oe->[-1]->{list_depth} < $depth) {
-              my $el = $doc->create_element_ns (HTML_NS, 'li');
+              my $el = $doc->create_element_ns (HTML_NS, [undef, 'li']);
               $oe->[-1]->{node}->append_child ($el);
               push @$oe, {%{$oe->[-1]}, node => $el};
             }
@@ -815,7 +829,7 @@ sub parse_char_string ($$$;$) {
           }
         } # B
         
-        my $el = $doc->create_element_ns (HTML_NS, 'li');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'li']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
 
@@ -825,12 +839,12 @@ sub parse_char_string ($$$;$) {
       } elsif ($token->{type} == LABELED_LIST_START_TOKEN) {
         pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'dd';
         if ($oe->[-1]->{node}->manakai_local_name ne 'dl') {
-          my $el = $doc->create_element_ns (HTML_NS, 'dl');
+          my $el = $doc->create_element_ns (HTML_NS, [undef, 'dl']);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
         }
         
-        my $el = $doc->create_element_ns (HTML_NS, 'dt');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'dt']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         
@@ -838,15 +852,15 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == TABLE_ROW_START_TOKEN) {
-        my $el = $doc->create_element_ns (HTML_NS, 'table');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'table']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
 
-        $el = $doc->create_element_ns (HTML_NS, 'tbody');
+        $el = $doc->create_element_ns (HTML_NS, [undef, 'tbody']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
 
-        $el = $doc->create_element_ns (HTML_NS, 'tr');
+        $el = $doc->create_element_ns (HTML_NS, [undef, 'tr']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         
@@ -856,18 +870,18 @@ sub parse_char_string ($$$;$) {
       } elsif (($token->{type} == BLOCK_START_TAG_TOKEN and
                 $token->{tag_name} eq 'PRE') or
                $token->{type} == PREFORMATTED_START_TOKEN) {
-        my $el = $doc->create_element_ns (HTML_NS, 'pre');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'pre']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
 
-        $el->set_attribute (class => $token->{classes})
+        $el->set_attribute_ns (undef, [undef, 'class'] => $token->{classes})
             if defined $token->{classes};
 
         $im = IN_PARAGRAPH_IM;
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == COMMENT_PARAGRAPH_START_TOKEN) {
-        my $el = $doc->create_element_ns (SW10_NS, 'comment-p');
+        my $el = $doc->create_element_ns (SW10_NS, [undef, 'comment-p']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         
@@ -875,7 +889,7 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == EDITORIAL_NOTE_START_TOKEN) {
-        my $el = $doc->create_element_ns (SW10_NS, 'ed');
+        my $el = $doc->create_element_ns (SW10_NS, [undef, 'ed']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
 
@@ -910,34 +924,41 @@ sub parse_char_string ($$$;$) {
       } elsif ($token->{type} == FORM_TOKEN) {
         ## There is an exact code clone.
         if ($token->{name} eq 'form') {
-          my $el = $doc->create_element_ns (SW09_NS, 'form');
+          my $el = $doc->create_element_ns (SW09_NS, [undef, 'form']);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
-          $el->set_attribute (id => $token->{id}) if defined $token->{id};
-          $el->set_attribute (input => shift @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'id']
+                                     => $token->{id}) if defined $token->{id};
+          $el->set_attribute_ns (undef, [undef, 'input']
+                                     => shift @{$token->{parameters}})
               if @{$token->{parameter}};
-          $el->set_attribute (template => shift @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'template']
+                                     => shift @{$token->{parameters}})
               if @{$token->{parameter}};
-          $el->set_attribute (option => shift @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'option']
+                                     => shift @{$token->{parameters}})
               if @{$token->{parameter}};
-          $el->set_attribute (parameter => join ':', @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'parameter']
+                                     => join ':', @{$token->{parameters}})
               if @{$token->{parameter}};
           
           $token = $get_next_token->();
           redo A;
         } else {
-          my $el = $doc->create_element_ns (SW09_NS, 'form');
+          my $el = $doc->create_element_ns (SW09_NS, [undef, 'form']);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
-          $el->set_attribute (ref => $token->{name});
-          $el->set_attribute (id => $token->{id}) if defined $token->{id};
-          $el->set_attribute (parameter => join ':', @{$token->{parameters}})
+          $el->set_attribute_ns (undef, [undef, 'ref'] => $token->{name});
+          $el->set_attribute_ns (undef, [undef, 'id']
+                                     => $token->{id}) if defined $token->{id};
+          $el->set_attribute_ns (undef, [undef, 'parameter']
+                                     => join ':', @{$token->{parameters}})
               if @{$token->{parameter}};
           
           $token = $get_next_token->();
@@ -947,18 +968,20 @@ sub parse_char_string ($$$;$) {
                $token->{local_name} eq 'replace') {
         ## NOTE: There is an exact code clone.
         my $el = $doc->create_element_ns
-            ($token->{namespace}, $token->{local_name});
+            ($token->{namespace}, [undef, $token->{local_name}]);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
         $el->set_user_data (manakai_source_column => $token->{column});
 
-        $el->set_attribute_ns (SW09_NS, 'sw:anchor', $token->{anchor})
+        $el->set_attribute_ns (SW09_NS, ['sw', 'anchor'], $token->{anchor})
             if defined $token->{anchor};
-        $el->set_attribute (by => $token->{by}) if defined $token->{by};
-        $el->set_attribute_ns (SW09_NS, 'sw:resScheme', $token->{res_scheme})
+        $el->set_attribute_ns (undef, [undef, 'by']
+                                   => $token->{by}) if defined $token->{by};
+        $el->set_attribute_ns (SW09_NS, ['sw', 'resScheme'],
+                               $token->{res_scheme})
             if defined $token->{res_scheme};
-        $el->set_attribute_ns (SW09_NS, 'sw:resParameter',
+        $el->set_attribute_ns (SW09_NS, ['sw', 'resParameter'],
                                $token->{res_parameter})
             if defined $token->{res_parameter};
         $el->text_content ($token->{content}) if defined $token->{content};
@@ -976,7 +999,7 @@ sub parse_char_string ($$$;$) {
                 TABLE_COLSPAN_CELL_TOKEN => 1}->{$token->{type}}) {
         ## NOTE: Ignore the token.
       } else {
-        my $el = $doc->create_element_ns (HTML_NS, 'p');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'p']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
 
@@ -986,7 +1009,7 @@ sub parse_char_string ($$$;$) {
       }
     } elsif ($im == IN_TABLE_ROW_IM) {
       if ($token->{type} == TABLE_CELL_START_TOKEN) {
-        my $el = $doc->create_element_ns (HTML_NS, 'td');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'td']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
@@ -998,10 +1021,11 @@ sub parse_char_string ($$$;$) {
       } elsif ($token->{type} == TABLE_COLSPAN_CELL_TOKEN) {
         my $lc = $oe->[-1]->{node}->last_child;
         if ($lc and $lc->manakai_local_name eq 'td') {
-          $lc->set_attribute
-              (colspan => ($lc->get_attribute ('colspan') || 0) + 1);
+          $lc->set_attribute_ns
+              (undef, [undef, 'colspan'],
+               ($lc->get_attribute_ns (undef, 'colspan') || 0) + 1);
         } else {
-          my $el = $doc->create_element_ns (SW10_NS, 'td');
+          my $el = $doc->create_element_ns (SW10_NS, [undef, 'td']);
           $oe->[-1]->{node}->append_child ($el);
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
@@ -1014,7 +1038,7 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == TABLE_ROW_START_TOKEN) {
-        my $el = $doc->create_element_ns (HTML_NS, 'tr');
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'tr']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
