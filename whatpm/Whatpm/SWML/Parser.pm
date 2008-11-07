@@ -92,6 +92,8 @@ sub parse_char_string ($$$;$) {
   my $tokenize_text = sub {
     my $s = shift; # ref
 
+    my $nest_level = 0;
+
     if ($$s =~ s/^\[([0-9]+)\]//) {
       push @nt, {type => ELEMENT_TOKEN,
                  local_name => 'anchor-end', namespace => SW09_NS,
@@ -117,7 +119,7 @@ sub parse_char_string ($$$;$) {
             push @param, $n;
             $column++ if $$s =~ s/\A\\\z//;
             $column++ if $$s =~ s/^'//;
-          } elsif ($$s =~ s/^([^':][^:]*)//) {
+          } elsif ($$s =~ s/^([^':\]][^:\]]*)//) {
             $column += 1 + $+[0] - $-[0];
             push @param, $1;
           }
@@ -128,15 +130,18 @@ sub parse_char_string ($$$;$) {
       } elsif ($$s =~ s/^\[\[//) {
         push @nt, {type => INLINE_START_TAG_TOKEN};
         $column += 2;
-      } elsif ($$s =~ s/^\[([A-Z]+)(?>\(([^()\\]*)\))?(?>\@[0-9A-Za-z-]*)?\[//) {
+        $nest_level++;
+      } elsif ($$s =~ s/^\[([A-Z]+)(?>\(([^()\\]*)\))?(?>\@([0-9A-Za-z-]*))?\[//) {
         push @nt, {type => INLINE_START_TAG_TOKEN,
                    tag_name => $1, classes => $2, language => $3,
                    line => $line, column => $column};
         $column += $+[0] - $-[0];
+        $nest_level++;
       } elsif ($$s =~ s/^\]\]//) {
         push @nt, {type => INLINE_END_TAG_TOKEN,
                    line => $line, column => $column};
         $column += 2;
+        $nest_level-- if $nest_level > 0;
       } elsif ($$s =~ s/^(\]?)<([0-9A-Za-z%+._-]+)://) {
         my $t = {type => $1 ? INLINE_END_TAG_TOKEN : ELEMENT_TOKEN,
                  res_scheme => $2, res_parameter => '',
@@ -151,7 +156,7 @@ sub parse_char_string ($$$;$) {
             $t->{res_parameter} .= $1;
             $column += $+[0] - $-[0];
             $column++ if $$s =~ s/\A\\\z//;
-            $column++ if $$s =~ s/^"//;
+            $t->{res_parameter} .= '"' and $column++ if $$s =~ s/^"//;
           } else {
             last;
           }
@@ -167,6 +172,7 @@ sub parse_char_string ($$$;$) {
         
         if ($t->{type} == INLINE_END_TAG_TOKEN) {
           $column++ if $$s =~ s/^\]//;
+          $nest_level-- if $nest_level > 0;
         } else {
           $t->{local_name} = 'anchor-external';
           $t->{namespace} = SW09_NS;
@@ -177,19 +183,21 @@ sub parse_char_string ($$$;$) {
                    anchor => $1,
                  line => $line, column => $column};
         $column += $+[0] - $-[0];
-      } elsif ($$s =~ s/^\][\x09\x20]*(?>\@([0-9a-zA-Z-]*))?\[//) {
+        $nest_level-- if $nest_level > 0;
+      } elsif ($nest_level > 0 and
+               $$s =~ s/^\][\x09\x20]*(?>\@([0-9a-zA-Z-]*))?\[//) {
         push @nt, {type => INLINE_MIDDLE_TAG_TOKEN,
                    language => $1,
                    line => $line, column => $column};
         $column += $+[0] - $-[0];
-      } elsif ($$s =~ s/\^''('?)//) {
+      } elsif ($$s =~ s/^''('?)//) {
         push @nt, {type => $1 ? STRONG_TOKEN : EMPHASIS_TOKEN,
                    line => $line, column => $column};
         $column += $+[0] - $-[0];
       } elsif ($$s =~ s/^>>([0-9]+)//) {
         push @nt, {type => ELEMENT_TOKEN,
                    local_name => 'anchor-internal', namespace => SW09_NS,
-                   anchor => $1,
+                   anchor => $1, content => '>>' . $1,
                    line => $line, column => $column};
         $column += $+[0] - $-[0];
       } elsif ($$s =~ s/^__&&//) {
@@ -589,15 +597,20 @@ sub parse_char_string ($$$;$) {
         
         if ({%$structural_elements,
              strong => 1, em => 1}->{$oe->[-1]->{node}->manakai_local_name}) {
-          my $el = $doc->create_element_ns
-              (SW09_NS,
-               [undef, defined $token->{res_scheme}
-                    ? 'anchor-external' : 'anchor-internal']);
-          $oe->[-1]->{node}->append_child ($el);
-          push @$oe, {%{$oe->[-1]}, node => $el};
-          $el->set_user_data (manakai_source_line => $token->{line});
-          $el->set_user_data (manakai_source_column => $token->{column});
-          $el->text_content (']]');
+          unless (defined $token->{res_scheme} or defined $token->{anchor}) {
+            $oe->[-1]->{node}->manakai_append_text (']]');
+            push @$oe, $oe->[-1];
+          } else {
+            my $el = $doc->create_element_ns
+                (SW09_NS,
+                 [undef, defined $token->{res_scheme}
+                      ? 'anchor-external' : 'anchor-internal']);
+            $oe->[-1]->{node}->append_child ($el);
+            push @$oe, {%{$oe->[-1]}, node => $el};
+            $el->set_user_data (manakai_source_line => $token->{line});
+            $el->set_user_data (manakai_source_column => $token->{column});
+            $el->text_content (']]');
+          }
         }
         
         $oe->[-1]->{node}->set_attribute_ns (SW09_NS, ['sw', 'anchor'],
@@ -615,21 +628,27 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == STRONG_TOKEN) {
-        my $el = $doc->create_element_ns (HTML_NS, [undef, 'strong']);
-        $oe->[-1]->{node}->append_child ($el);
-        push @$oe, {%{$oe->[-1]}, node => $el};
-        $el->set_user_data (manakai_source_line => $token->{line});
-        $el->set_user_data (manakai_source_column => $token->{column});
-
+        if ($oe->[-1]->{node}->manakai_local_name eq 'strong') {
+          pop @$oe;
+        } else {
+          my $el = $doc->create_element_ns (HTML_NS, [undef, 'strong']);
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+        }
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == EMPHASIS_TOKEN) {
-        my $el = $doc->create_element_ns (HTML_NS, [undef, 'em']);
-        $oe->[-1]->{node}->append_child ($el);
-        push @$oe, {%{$oe->[-1]}, node => $el};
-        $el->set_user_data (manakai_source_line => $token->{line});
-        $el->set_user_data (manakai_source_column => $token->{column});
-
+        if ($oe->[-1]->{node}->manakai_local_name eq 'em') {
+          pop @$oe;
+        } else {
+          my $el = $doc->create_element_ns (HTML_NS, [undef, 'em']);
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+          $el->set_user_data (manakai_source_line => $token->{line});
+          $el->set_user_data (manakai_source_column => $token->{column});
+        }
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == FORM_TOKEN) {
@@ -637,7 +656,6 @@ sub parse_char_string ($$$;$) {
         if ($token->{name} eq 'form') {
           my $el = $doc->create_element_ns (SW09_NS, [undef, 'form']);
           $oe->[-1]->{node}->append_child ($el);
-          push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
@@ -645,23 +663,22 @@ sub parse_char_string ($$$;$) {
                                      => $token->{id}) if defined $token->{id};
           $el->set_attribute_ns (undef, [undef, 'input']
                                      => shift @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           $el->set_attribute_ns (undef, [undef, 'template']
                                      => shift @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           $el->set_attribute_ns (undef, [undef, 'option']
                                      => shift @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           $el->set_attribute_ns (undef, [undef, 'parameter']
                                      => join ':', @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           
           $token = $get_next_token->();
           redo A;
         } else {
           my $el = $doc->create_element_ns (SW09_NS, [undef, 'form']);
           $oe->[-1]->{node}->append_child ($el);
-          push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
@@ -928,7 +945,6 @@ sub parse_char_string ($$$;$) {
         if ($token->{name} eq 'form') {
           my $el = $doc->create_element_ns (SW09_NS, [undef, 'form']);
           $oe->[-1]->{node}->append_child ($el);
-          push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
@@ -936,23 +952,22 @@ sub parse_char_string ($$$;$) {
                                      => $token->{id}) if defined $token->{id};
           $el->set_attribute_ns (undef, [undef, 'input']
                                      => shift @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           $el->set_attribute_ns (undef, [undef, 'template']
                                      => shift @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           $el->set_attribute_ns (undef, [undef, 'option']
                                      => shift @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           $el->set_attribute_ns (undef, [undef, 'parameter']
                                      => join ':', @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           
           $token = $get_next_token->();
           redo A;
         } else {
           my $el = $doc->create_element_ns (SW09_NS, [undef, 'form']);
           $oe->[-1]->{node}->append_child ($el);
-          push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});
 
@@ -961,7 +976,7 @@ sub parse_char_string ($$$;$) {
                                      => $token->{id}) if defined $token->{id};
           $el->set_attribute_ns (undef, [undef, 'parameter']
                                      => join ':', @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           
           $token = $get_next_token->();
           redo A;
@@ -972,7 +987,6 @@ sub parse_char_string ($$$;$) {
         my $el = $doc->create_element_ns
             ($token->{namespace}, [undef, $token->{local_name}]);
         $oe->[-1]->{node}->append_child ($el);
-        push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
         $el->set_user_data (manakai_source_column => $token->{column});
 
@@ -1030,7 +1044,7 @@ sub parse_char_string ($$$;$) {
         if ($lc and $lc->manakai_local_name eq 'td') {
           $lc->set_attribute_ns
               (undef, [undef, 'colspan'],
-               ($lc->get_attribute_ns (undef, 'colspan') || 0) + 1);
+               ($lc->get_attribute_ns (undef, 'colspan') || 1) + 1);
         } else {
           my $el = $doc->create_element_ns (HTML_NS, [undef, 'td']);
           $oe->[-1]->{node}->append_child ($el);

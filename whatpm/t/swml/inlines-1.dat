@@ -1,0 +1,336 @@
+#data
+]]
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "]]"
+
+#data
+]]
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "]]"
+
+#data
+]>>1]
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <sw anchor-internal>
+|         sw anchor="1"
+|         "]]"
+
+#data
+]<http://>]
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <sw anchor-external>
+|         sw resParameter="http://"
+|         sw resScheme="URI"
+|         "]]"
+
+#data
+[CODE@en[x]]
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <code>
+|         xml lang="en"
+|         "x"
+
+#data
+a]]b
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "a]]b"
+
+#data
+a][b
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "a][b"
+
+#data
+a]  [b
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "a]  [b"
+
+#data
+[[c]] a]  [b
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <sw anchor>
+|         "c"
+|       " a]  [b"
+
+#data
+[CODE[[INS[[DEL[]]]]]]a]  [b
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <code>
+|         <ins>
+|           <del>
+|       "a]  [b"
+
+#data
+[RUBY[a]  [b]]
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <ruby>
+|         "a"
+|         <rt>
+|           "b"
+
+#data
+[ABBR[a]  [b]]c][d
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <abbr>
+|         "a"
+|         <sw10 title>
+|           "b"
+|       "c][d"
+
+#data
+[[WEAK[abcde]]fg
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <sw anchor>
+|         "WEAK[abcde"
+|       "fg"
+
+#data
+'''
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <strong>
+
+#data
+''
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <em>
+
+#data
+'''''
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <strong>
+|         <em>
+
+#data
+''''''
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <strong>
+
+#data
+''''''''
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <strong>
+|       <em>
+
+#data
+''''
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <strong>
+|         "'"
+
+#data
+'
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "'"
+
+#data
+''aa''
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <em>
+|         "aa"
+
+#data
+a''bb'''cc'''dd''ee
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <em>
+|         "bb"
+|         <strong>
+|           "cc"
+|         "dd"
+|       "ee"
+
+#data
+aa'''bb''cc'''dd''ee
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "aa"
+|       <strong>
+|         "bb"
+|         <em>
+|           "cc"
+|           <strong>
+|             "dd"
+|             <em>
+|               "ee"
+
+#data
+<IW:SuikaCVS:"messaging/manakai/">
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       <sw anchor-external>
+|         sw resParameter="SuikaCVS:"messaging/manakai/""
+|         sw resScheme="IW"
+|         "IW:SuikaCVS:"messaging/manakai/""
+
+#data
+a >>1
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "a "
+|       <sw anchor-internal>
+|         sw anchor="1"
+|         ">>1"
+
+#data
+aa[CODE@en[[[bbb]]]ccc
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <p>
+|       "aa"
+|       <code>
+|         xml lang="en"
+|         <sw anchor>
+|           "bbb"
+|         "]ccc"
+
