@@ -205,7 +205,7 @@ sub parse_char_string ($$$;$) {
                      line => $line, column => $column};
           $column += 4;
         }
-      } elsif ($$s =~ s/^([^<>\['_]+)//) {
+      } elsif ($$s =~ s/^([^<>\[\]'_]+)//) {
         push @nt, {type => CHARACTER_TOKEN, data => $1,
                    line => $line, column => $column};
         $column += $+[0] - $-[0];
@@ -288,7 +288,7 @@ sub parse_char_string ($$$;$) {
         $name =~ s/\A[\x09\x20]*//;
         $column += 1 + $+[0] - $-[0];
         $name =~ s/[\x09\x20]+\z//;
-        $tokenize_text->(\$s);
+        $tokenize_text->(\$name);
         $column = $real_column;
         push @nt, {type => LABELED_LIST_MIDDLE_TOKEN,
                    line => $line, column => $column};
@@ -305,6 +305,7 @@ sub parse_char_string ($$$;$) {
             if $continuous_line;
         $s = '>>' . $s;
         $tokenize_text->(\$s);
+        $continuous_line = 1;
       } else {
         push @nt, {type => QUOTATION_START_TOKEN, depth => $depth,
                    line => $line, column => $column};
@@ -314,14 +315,19 @@ sub parse_char_string ($$$;$) {
           push @nt, {type => EDITORIAL_NOTE_START_TOKEN,
                      line => $line, column => $column};
           $column += $+[0] - $-[0];
+          $continuous_line = 1;
         } elsif ($s =~ s/^;;[\x09\x20]*//) {
           push @nt, {type => COMMENT_PARAGRAPH_START_TOKEN,
                      line => $line, column => $column};
           $column += $+[0] - $-[0];
+          $continuous_line = 1;
+        } elsif (length $s) {
+          $continuous_line = 1;
+        } else {
+          $continuous_line = 0;
         }
         $tokenize_text->(\$s);
       }
-      $continuous_line = 1;
       return shift @nt;
     } elsif ($s =~ /\A\[(INS|DEL)(?>\(([^()\\]*)\))?\[[\x09\x20]*\z/) {
       undef $continuous_line;
@@ -362,7 +368,7 @@ sub parse_char_string ($$$;$) {
                  line => $line, column => $column};
       $column += $+[0] - $-[0];
       $tokenize_text->(\$s);
-      undef $continuous_line;
+      $continuous_line = 1;
       return shift @nt;
     } elsif ($s =~ /\A\](INS|DEL)\][\x09\x20]*\z/) {
       $continuous_line = 1;
@@ -435,7 +441,7 @@ sub parse_char_string ($$$;$) {
   }; # $get_next_token
 
   ## NOTE: The "initial" mode.
-  if (@s and $s[0] =~ /^#\?/) {
+  if (@s and $s[0] =~ s/^#\?//) {
     ## NOTE: "Parse a magic line".
 
     my $s = shift @s;
@@ -449,7 +455,7 @@ sub parse_char_string ($$$;$) {
     }
 
     while (length $s) {
-      $column += $+[0] - $-[0] if $s =~ s/^[\x09\x20]+//;
+      $column += $+[0] - $-[0] and next if $s =~ s/^[\x09\x20]+//;
       my $name = '';
       if ($s =~ s/^([^=]*)=//) {
         $name = $1;
@@ -462,11 +468,13 @@ sub parse_char_string ($$$;$) {
       $head_el->append_child ($param);
 
       $column++ if $s =~ s/^"//;
-      if ($s =~ s/^([^"]+)//) {
+      if ($s =~ s/^([^"]*)//) {
         my $values = $1;
         $column += length $values;
         $values =~ tr/\\//d;
-        for (split /,/, $values, -1) {
+        my @values = split /,/, $values, -1;
+        push @values, '' unless length $values;
+        for (@values) {
           my $value = $doc->create_element_ns (SW09_NS, [undef, 'value']);
           $value->text_content ($_);
           $value->set_user_data (manakai_source_line => $line);
@@ -538,7 +546,7 @@ sub parse_char_string ($$$;$) {
                       VAR => [HTML_NS, 'var'],
                       WEAK => [SW09_NS, 'weak'],
                      }->{$token->{tag_name}} || [SW10_NS, $token->{tag_name}];
-          my $el = $doc->create_element_ns (SW10_NS, [undef, 'td']);
+          my $el = $doc->create_element_ns ($type->[0], [undef, $type->[1]]);
           $oe->[-1]->{node}->append_child ($el);
           push @$oe, {%{$oe->[-1]}, node => $el};
           $el->set_user_data (manakai_source_line => $token->{line});
@@ -663,7 +671,7 @@ sub parse_char_string ($$$;$) {
                                      => $token->{id}) if defined $token->{id};
           $el->set_attribute_ns (undef, [undef, 'parameter']
                                      => join ':', @{$token->{parameters}})
-              if @{$token->{parameter}};
+              if @{$token->{parameters}};
           
           $token = $get_next_token->();
           redo A;
@@ -673,7 +681,6 @@ sub parse_char_string ($$$;$) {
         my $el = $doc->create_element_ns
             ($token->{namespace}, [undef, $token->{local_name}]);
         $oe->[-1]->{node}->append_child ($el);
-        push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
         $el->set_user_data (manakai_source_column => $token->{column});
 
@@ -696,7 +703,7 @@ sub parse_char_string ($$$;$) {
             ->{$oe->[-1]->{node}->manakai_local_name};
         pop @$oe if $oe->[-1]->{node}->manakai_local_name eq 'dt';
         
-        my $el = $doc->create_element_ns (HTML_NS, [undef, 'dt']);
+        my $el = $doc->create_element_ns (HTML_NS, [undef, 'dd']);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {%{$oe->[-1]}, node => $el};
         $el->set_user_data (manakai_source_line => $token->{line});
@@ -787,8 +794,8 @@ sub parse_char_string ($$$;$) {
               if not {body => 1, section => 1, insert => 1, delete => 1,
                   blockquote => 1}
                   ->{$oe->[-1]->{node}->manakai_local_name} or
-                 $token->{depth} <= $oe->[-1]->{quotation_depth};
-          if ($token->{depth} > $oe->[-1]->{quotation_depth} + 1) {
+                 $token->{depth} < $oe->[-1]->{quotation_depth};
+          if ($token->{depth} > $oe->[-1]->{quotation_depth}) {
             my $el = $doc->create_element_ns (HTML_NS, [undef, 'blockquote']);
             $oe->[-1]->{node}->append_child ($el);
             push @$oe, {node => $el, section_depth => 0,
@@ -797,12 +804,6 @@ sub parse_char_string ($$$;$) {
             redo B;
           }
         } # B
-
-        my $el = $doc->create_element_ns (HTML_NS, [undef, 'blockquote']);
-        $oe->[-1]->{node}->append_child ($el);
-        push @$oe, {node => $el, section_depth => 0,
-                    quotation_depth => $oe->[-1]->{quotation_depth} + 1,
-                    list_depth => 0};
 
         $token = $get_next_token->();
         redo A;
@@ -919,6 +920,7 @@ sub parse_char_string ($$$;$) {
         } else {
           ## NOTE: Ignore the token.
         }
+        undef $continuous_line;
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == FORM_TOKEN) {
@@ -999,10 +1001,15 @@ sub parse_char_string ($$$;$) {
                 TABLE_COLSPAN_CELL_TOKEN => 1}->{$token->{type}}) {
         ## NOTE: Ignore the token.
       } else {
-        my $el = $doc->create_element_ns (HTML_NS, [undef, 'p']);
-        $oe->[-1]->{node}->append_child ($el);
-        push @$oe, {%{$oe->[-1]}, node => $el};
-
+        unless ({dd => 1,
+                li => 1,
+                 'comment-p' => 1,
+                 ed => 1}->{$oe->[-1]->{node}->manakai_local_name}) {
+          my $el = $doc->create_element_ns (HTML_NS, [undef, 'p']);
+          $oe->[-1]->{node}->append_child ($el);
+          push @$oe, {%{$oe->[-1]}, node => $el};
+        }
+        
         $im = IN_PARAGRAPH_IM;
         ## Reprocess.
         redo A;
@@ -1025,7 +1032,7 @@ sub parse_char_string ($$$;$) {
               (undef, [undef, 'colspan'],
                ($lc->get_attribute_ns (undef, 'colspan') || 0) + 1);
         } else {
-          my $el = $doc->create_element_ns (SW10_NS, [undef, 'td']);
+          my $el = $doc->create_element_ns (HTML_NS, [undef, 'td']);
           $oe->[-1]->{node}->append_child ($el);
           $el->set_user_data (manakai_source_line => $token->{line});
           $el->set_user_data (manakai_source_column => $token->{column});

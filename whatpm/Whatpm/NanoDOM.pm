@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -156,7 +156,7 @@ sub text_content ($;$) {
   my $self = shift;
   if (@_) {
     @{$self->{child_nodes}} = (); ## NOTE: parent_node not unset.
-    $self->append_child (Whatpm::NanoDOM::Text->new ($_[0]));
+    $self->append_child (Whatpm::NanoDOM::Text->new ($_[0])) if length $_[0];
     return unless wantarray;
   }
   my $r = '';
@@ -849,4 +849,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/20 04:21:18 $
+# $Date: 2008/11/07 08:45:28 $

@@ -5,3 +5,231 @@
 |   xmlns xmlns="http://www.w3.org/1999/xhtml"
 |   <head>
 |   <body>
+
+#data
+| #?SuikaWiki/0.9
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+
+#data
+| #?SuikaWikiImage/0.9
+#errors
+#document
+| <html>
+|   sw Name="SuikaWikiImage"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+
+#data
+| #?SuikaWiki_0.9
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki_0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+
+#data
+| #?SuikaWiki/
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version=""
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+
+#data
+| #?/0.9
+#errors
+#document
+| <html>
+|   sw Name=""
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+
+#data
+| #?/
+#errors
+#document
+| <html>
+|   sw Name=""
+|   sw Version=""
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+
+#data
+| #?A/B/C/D/E
+#errors
+#document
+| <html>
+|   sw Name="A"
+|   sw Version="B/C/D/E"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+
+#data escaped
+| #?SuikaWiki/0.9    \u0020
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+
+#data
+| #? SuikaWiki/0.9
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|     <sw parameter>
+|       name=""
+|       <sw value>
+|         "SuikaWiki/0.9"
+|   <body>
+
+#data
+| #?SuikaWiki/0.9   abc
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|     <sw parameter>
+|       name=""
+|       <sw value>
+|         "abc"
+|   <body>
+
+#data
+|  #?SuikaWiki/0.9
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <pre>
+|       " #?SuikaWiki/0.9"
+
+#data
+| #?SuikaWiki/0.9 page-icon=""
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|     <sw parameter>
+|       name="page-icon"
+|       <sw value>
+|   <body>
+
+#data
+| #?SuikaWiki/0.9 page-icon="xxx"
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|     <sw parameter>
+|       name="page-icon"
+|       <sw value>
+|         "xxx"
+|   <body>
+
+#data
+| #?SuikaWiki/0.9 page-icon=",xx,,yy,"
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|     <sw parameter>
+|       name="page-icon"
+|       <sw value>
+|       <sw value>
+|         "xx"
+|       <sw value>
+|       <sw value>
+|         "yy"
+|       <sw value>
+|   <body>
+
+#data
+| #?SuikaWiki/0.9 page-icon="a" obsoleted="yes"
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|     <sw parameter>
+|       name="page-icon"
+|       <sw value>
+|         "a"
+|     <sw parameter>
+|       name="obsoleted"
+|       <sw value>
+|         "yes"
+|   <body>
+
+#data
+| #?SuikaWiki/0.9 page-icon=abc
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|     <sw parameter>
+|       name="page-icon"
+|       <sw value>
+|         "abc"
+|   <body>
+
+#data
+| #?SuikaWiki/0.9 import="abc\,def\g,hij"
+#errors
+#document
+| <html>
+|   sw Name="SuikaWiki"
+|   sw Version="0.9"
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|     <sw parameter>
+|       name="import"
+|       <sw value>
+|         "abc"
+|       <sw value>
+|         "defg"
+|       <sw value>
+|         "hij"
+|   <body>

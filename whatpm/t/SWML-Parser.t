@@ -59,6 +59,7 @@ sub test ($) {
 
 my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}structs-1.dat
+  ${test_dir_name}blocks-1.dat
 ];
 
 require 't/testfiles.pl';
@@ -69,4 +70,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/11/07 04:03:16 $
+## $Date: 2008/11/07 08:45:28 $
