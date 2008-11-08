@@ -544,7 +544,7 @@ sub parse_char_string ($$$;$) {
                       Q => [HTML_NS, 'q'],
                       QN => [SW10_NS, 'qn'],
                       RUBY => [HTML_NS, 'ruby'],
-                      RUBYB => [HTML_NS, 'rubyb'],
+                      RUBYB => [SW09_NS, 'rubyb'],
                       SAMP => [HTML_NS, 'samp'],
                       SPAN => [HTML_NS, 'span'],
                       SRC => [SW10_NS, 'src'],
