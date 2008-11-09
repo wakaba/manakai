@@ -433,7 +433,7 @@ sub parse_char_string ($$$;$) {
       my $image = $doc->create_element_ns (SW09_NS, [undef, 'image']);
       $image->set_user_data (manakai_source_line => $line);
       $image->set_user_data (manakai_source_column => 1);
-      $image->text_content (join "\x0A", $s, @s);
+      $image->text_content (join "\x0A", @s);
       ($line, $column) = ($line + @s, 1);
       @s = ();
       $doc->document_element->append_child ($image);
