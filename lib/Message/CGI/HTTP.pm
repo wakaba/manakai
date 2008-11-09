@@ -13,7 +13,7 @@ This module is part of manakai.
 
 package Message::CGI::HTTP;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CGIRequest', 'Message::IF::HTTPCGIRequest';
 
 =head1 METHODS
@@ -132,6 +132,7 @@ sub __get_parameter ($) {
   ## Entity-body
   if ($self->get_meta_variable ('REQUEST_METHOD') eq 'POST') {
     my $mt = $self->get_meta_variable ('CONTENT_TYPE');
+    ## TODO: Uppercase
     if ($mt =~ m<^application/(?:x-www|sgml)-form-urlencoded\b>) {
       push @src, $self->entity_body;
     }
@@ -252,13 +253,17 @@ sub __uri_encode ($$;$) {
 
 =item I<$value> = I<$cgi>->path_info ([I<$new_value>]);
 
-This method reflects the meta-variable with the same name (in uppercase).
+=item I<$value> = I<$cgi>->remote_user ([I<$new_value>]);
+
+These methods reflect meta-variables with the same name (in
+uppercase).
 
 =cut
 
 for (
   [path_info => 'PATH_INFO'],
   [query_string => 'QUERY_STRING'],
+  [remote_user => 'REMOTE_USER'],
   [request_method => 'REQUEST_METHOD'],
   [script_name => 'SCRIPT_NAME'],
 ) {
@@ -312,4 +317,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/22 10:59:43 $
+# $Date: 2008/11/09 14:06:23 $

@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
     'Message::IF::ElementSelector', # MUST in Selectors API spec.
     'Message::IF::ElementCSSInlineStyle';
@@ -170,8 +170,12 @@ sub manakai_base_uri ($;$);
 sub inner_html ($;$) {
   my $self = $_[0];
 
-  ## TODO: Setter
-
+  if (@_ > 1) {
+    ## TODO: Setter ...
+    Whatpm::HTML->set_inner_html ($self, $_[1]);
+    return unless defined wantarray;
+  }
+  
   if (${$$self->{owner_document}}->{manakai_is_html}) {
     require Whatpm::HTML::Serializer;
     return ${ Whatpm::HTML::Serializer->get_inner_html ($self) };
@@ -1295,4 +1299,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/04/12 15:58:41 $
+## $Date: 2008/11/09 14:06:24 $
