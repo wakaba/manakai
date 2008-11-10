@@ -41,4 +41,17 @@
 	* Element.pm (inner_html): Setter for HTML element nodes
 	implemented.
 
+</content></entry><entry xml:id="entry-1226295067"><id>http://suika.fam.cx/www/manakai-core/doc/web/manakai-commit#entry-1226295067</id><title>2008-11-10 Wakaba</title><updated>2008-11-10T05:31:02Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ manakai/lib/Message/CGI/ChangeLog	10 Nov 2008 05:30:33 -0000
+2008-11-10  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* HTTP.pm (request_uri): Percent-escape non-ASCII octets in
+	REQUEST_URI to avoid they become unclear whether they are bytes or
+	characters in later processing.
+
+++ manakai/lib/Message/URI/ChangeLog	10 Nov 2008 05:30:51 -0000
+2008-11-10  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* URIReference.pm (is_relative_iri_reference_3987): Escapes in
+	$ucschar was not expanded.
+
 </content></entry></feed>
