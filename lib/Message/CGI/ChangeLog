@@ -1,3 +1,9 @@
+2008-11-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTTP.pm (request_uri): Percent-escape non-ASCII octets in
+	REQUEST_URI to avoid they become unclear whether they are bytes or
+	characters in later processing.
+
 2008-10-29  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTTP.pm (remote_user): New method.

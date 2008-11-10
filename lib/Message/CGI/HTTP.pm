@@ -13,7 +13,7 @@ This module is part of manakai.
 
 package Message::CGI::HTTP;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CGIRequest', 'Message::IF::HTTPCGIRequest';
 
 =head1 METHODS
@@ -202,6 +202,7 @@ sub request_uri ($;%) {
   if ($uri) {
     $uri =~ s/\#[^#]*$//;  ## Fragment identifier not allowed here
     $uri =~ s/\?[^?]*$// if $opt{no_query};
+    $uri = $self->__uri_encode ($uri, qr([^\x00-\x7F]));
     if ($uri =~ /^[0-9A-Za-z.%+-]+:/) {    ## REQUEST_URI is an absolute URI
       return Message::DOM::DOMImplementation->create_uri_reference ($uri);
     }
@@ -317,4 +318,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/11/09 14:06:23 $
+# $Date: 2008/11/10 05:30:59 $

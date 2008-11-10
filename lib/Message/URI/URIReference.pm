@@ -1,6 +1,6 @@
 package Message::URI::URIReference;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::IF::URIImplementation;
 package Message::DOM::DOMImplementation;
@@ -1056,7 +1056,7 @@ $v = $$self;
 V: {
   ## LRM, RLM, LRE, RLE, LRO, RLO, PDF
   ## U+200E, U+200F, U+202A - U+202E
-  my $ucschar = q{\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}};
+  my $ucschar = qq{\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}};
 
   ## -- Scheme
   unless ($v =~ s/^[A-Za-z][A-Za-z0-9+.-]*://s) {
@@ -1163,7 +1163,7 @@ $v = $$self;
 V: {
   ## LRM, RLM, LRE, RLE, LRO, RLO, PDF
   ## U+200E, U+200F, U+202A - U+202E
-  my $ucschar = q{\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}};
+  my $ucschar = qq{\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}};
 
   ## -- No scheme
   if ($v =~ s!^[^/?#]*:!!s) {
@@ -2258,4 +2258,4 @@ fallback => 1;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/08/11 13:06:39 $
+## $Date: 2008/11/10 05:30:59 $
