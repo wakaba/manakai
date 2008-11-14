@@ -84,3 +84,19 @@
 |           <td>
 |             colspan="2"
 |             "a"
+
+#data
+,"a\"b","c\\d"
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             "a"b"
+|           <td>
+|             "c\d"

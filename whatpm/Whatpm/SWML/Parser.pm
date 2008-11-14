@@ -395,7 +395,7 @@ sub parse_char_string ($$$;$) {
           $s =~ s/^((?>[^"\\]|\\.)*)//;
           $cell_quoted = $1;
           $column += 1 + length $cell_quoted;
-          $cell_quoted =~ tr/\\//d;
+          $cell_quoted =~ s/\\(.)/$1/s;
           $column++ if $s =~ s/\A\\\z//;
           $column++ if $s =~ s/^"//;
         }
