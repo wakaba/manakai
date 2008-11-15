@@ -100,3 +100,19 @@
 |             "a"b"
 |           <td>
 |             "c\d"
+
+#data
+,"a\"b\"cd\E\f","c\\\\d"
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             "a"b"cdEf"
+|           <td>
+|             "c\\d"
