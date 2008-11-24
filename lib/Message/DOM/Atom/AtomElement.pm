@@ -1,6 +1,6 @@
 package Message::DOM::Atom::AtomElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
 require Message::DOM::Element;
 
@@ -397,7 +397,7 @@ sub add_new_entry ($$;$$) {
   my $first_entry;
   for (@{$_[0]->child_nodes}) {
     next unless $_->node_type == 1; # ELEMENT_NODE;
-    next unless $_->manakai_node_type eq 'entry';
+    next unless $_->manakai_local_name eq 'entry';
     my $nsurl = $_->namespace_uri;
     next unless defined $nsurl;
     next unless $nsurl eq $ATOM_NS;
@@ -775,4 +775,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/11/24 06:41:23 $
+## $Date: 2008/11/24 06:45:24 $
