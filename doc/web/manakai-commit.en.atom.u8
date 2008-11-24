@@ -54,4 +54,18 @@
 	* URIReference.pm (is_relative_iri_reference_3987): Escapes in
 	$ucschar was not expanded.
 
-</content></entry></feed>
+</content></entry><entry xml:id="entry-1227508889"><id>http://suika.fam.cx/www/manakai-core/doc/web/manakai-commit#entry-1227508889</id><title>2008-11-24 Wakaba</title><updated>2008-11-24T06:41:24Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ ChangeLog	24 Nov 2008 06:41:08 -0000
+2008-11-24  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* cvscommit.sh: Use |mkcommitfeed| command instead of
+	|mkcommitfeed.pl| in the same directory.
+
+	* mkcommitfeed.pl: Removed.
+
+++ manakai/lib/Message/DOM/Atom/ChangeLog	24 Nov 2008 06:38:16 -0000
+2008-11-24  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* AtomElement.pm (add_new_entry): Insert a new entry BEFORE any
+	existing entry for consistency with existing practice.
+
+</content></entry><updated>2008-11-24T06:41:24Z</updated></feed>
