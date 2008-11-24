@@ -1,9 +1,7 @@
 #!/bin/sh
 find -name ChangeLog | xargs cvs diff | grep "^\+" | sed -e "s/^\+//; s/^\+\+ .\//++ whatpm\//" > .cvslog.tmp
-## TODO: Don't use -I here
-perl \
-    -I/home/wakaba/work/manakai2/lib/ \
-    mkcommitfeed.pl --file-name whatpm-commit.en.atom.u8 \
+mkcommitfeed \
+    --file-name whatpm-commit.en.atom.u8 \
     --feed-url http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit \
     --feed-title "Whatpm ChangeLog diffs" \
     --feed-lang en \
@@ -14,5 +12,5 @@ perl \
 cvs commit -F .cvslog.tmp $1 $2 $3 $4 $5 $6 $7 $8 $9 
 rm .cvslog.tmp
 
-## $Date: 2008/11/06 06:59:12 $
+## $Date: 2008/11/24 07:04:41 $
 ## License: Public Domain
