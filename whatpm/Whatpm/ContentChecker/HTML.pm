@@ -5816,6 +5816,7 @@ $Element->{$HTML_NS}->{input} = {
             {
              ## TODO: accept
              accesskey => $HTMLAccesskeyAttrChecker,
+             multiple => $GetHTMLBooleanAttrChecker->('multiple'),
              required => $GetHTMLBooleanAttrChecker->('required'),
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'submit') {
@@ -5934,6 +5935,14 @@ $Element->{$HTML_NS}->{input} = {
                }
              },
              ## TODO: pattern
+             placeholder => sub {
+               my ($self, $attr) = @_;
+               if ($attr->value =~ /[\x0D\x0A]/) {
+                 $self->{onerror}->(node => $attr,
+                                    type => 'newline in value', ## TODOC: type
+                                    level => $self->{level}->{must});
+               }
+             },
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              size => $GetHTMLNonNegativeIntegerAttrChecker->(sub {shift > 0}),
