@@ -4,11 +4,15 @@ use strict;
 use lib qw[/home/wakaba/work/manakai2/lib];
 
 use Test;
+
 require Whatpm::ContentChecker;
-require Message::DOM::DOMImplementation;
-require Message::DOM::XMLParserTemp;
+require Whatpm::XML::Parser;
 require Whatpm::HTML;
 require Whatpm::NanoDOM;
+require Message::URI::URIReference;
+require Message::DOM::Atom::AtomElement;
+*Whatpm::NanoDOM::Element::rel
+    = \&Message::DOM::Atom::AtomElement::AtomLinkElement::rel;
 
 sub test_files (@) {
   my @FILES = @_;
@@ -19,7 +23,6 @@ sub test_files (@) {
   }, \&test) for @FILES;
 } # test_files
 
-my $dom = Message::DOM::DOMImplementation->new;
 sub test ($) {
   my $test = shift;
 
@@ -35,18 +38,15 @@ sub test ($) {
 
   my $doc;
   if ($test->{parse_as} eq 'xml') {
-    open my $fh, '<', \($test->{data}->[0]);
-    $doc = Message::DOM::XMLParserTemp->parse_byte_stream
-      ($fh => $dom, sub {
-        warn "Document: " . $test->{data}->[0];
-      }, charset => 'utf-8');
-    $doc->input_encoding (undef);
+    $doc = Whatpm::NanoDOM::Document->new;
+    Whatpm::XML::Parser->parse_char_string ($test->{data}->[0] => $doc);
     ## NOTE: There should be no well-formedness error; if there is,
     ## then it is an error of the test case itself.
   } else {
     $doc = Whatpm::NanoDOM::Document->new;
     Whatpm::HTML->parse_char_string ($test->{data}->[0] => $doc);
   }
+  $doc->document_uri (q<thismessage:/>);
 
   my @error;
   Whatpm::ContentChecker->check_element
@@ -117,4 +117,4 @@ Public Domain.
 
 =cut
 
-1; ## $Date: 2008/09/20 07:00:53 $
+1; ## $Date: 2008/12/06 10:00:58 $

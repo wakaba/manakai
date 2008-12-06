@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.102 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.103 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -327,9 +327,9 @@ our $IsInHTMLInteractiveContent = sub {
   ## or permanently) interactive content.
 
   if ($nsuri eq $HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
-    return $el->has_attribute ('controls');
+    return $el->has_attribute_ns (undef, 'controls');
   } elsif ($nsuri eq $HTML_NS and $ln eq 'menu') {
-    my $value = $el->get_attribute ('type');
+    my $value = $el->get_attribute_ns (undef, 'type');
     $value =~ tr/A-Z/a-z/; # ASCII case-insensitive
     return ($value eq 'toolbar');
   } else {
@@ -1067,4 +1067,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/10/27 05:44:47 $
+# $Date: 2008/12/06 10:00:53 $

@@ -14,7 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -404,6 +404,11 @@ sub xml_encoding ($;$) {
 sub xml_standalone ($;$) {
   $_[0]->{xml_standalone} = $_[1] if @_ > 1;
   return $_[0]->{xml_standalone};
+}
+
+sub document_uri ($;$) {
+  $_[0]->{document_uri} = $_[1] if @_ > 1;
+  return $_[0]->{document_uri};
 }
 
 package Whatpm::NanoDOM::Element;
@@ -849,4 +854,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/11/07 08:45:28 $
+# $Date: 2008/12/06 10:00:53 $

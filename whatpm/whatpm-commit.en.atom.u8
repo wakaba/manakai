@@ -1,4 +1,23 @@
-<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2008-11-24T07:12:13Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1227510735"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1227510735</id><title>2008-11-24 Wakaba</title><updated>2008-11-24T07:12:13Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ ChangeLog	24 Nov 2008 07:12:09 -0000
+<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2008-12-06T10:00:48Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1228557652"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1228557652</id><title>2008-12-06 Wakaba</title><updated>2008-12-06T10:00:48Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/ChangeLog	6 Dec 2008 10:00:34 -0000
+2008-12-06  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* content-checker.pl: Use new XML parser for parsing test data.
+	Use NanoDOM instead of manakai DOM implementation.
+
+++ whatpm/Whatpm/ChangeLog	6 Dec 2008 09:58:56 -0000
+2008-12-06  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* NanoDOM.pm (document_uri): New attribute.
+
+	* ContentChecker.pm: Don't use methods not implemented by NanoDOM.
+
+++ whatpm/Whatpm/ContentChecker/ChangeLog	6 Dec 2008 09:59:53 -0000
+2008-12-06  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* HTML.pm: Use |Message::URL| for relative URL resolution.  Don't
+	use attributes not supported by NanoDOM.
+
+</content></entry><entry xml:id="entry-1227510735"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1227510735</id><title>2008-11-24 Wakaba</title><updated>2008-11-24T07:12:13Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ ChangeLog	24 Nov 2008 07:12:09 -0000
 	* readme.en.html: Added a link to application list in manakai-core
 	page.
 

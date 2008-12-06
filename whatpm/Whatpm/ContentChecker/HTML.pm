@@ -984,12 +984,11 @@ my $HTMLRefOrTemplateAttrChecker = sub {
                          level => $self->{level}->{must});
     }
   }
-  
+
+  require Message::URL;
   my $doc = $attr->owner_document;
   my $doc_uri = $doc->document_uri;
-  my $uri = $doc->implementation
-      ->create_uri_reference ($attr->value)
-      ->get_absolute_reference ($doc_uri);
+  my $uri = Message::URL->new_abs ($attr->value, $doc_uri);
   my $no_frag_uri = $uri->clone;
   $no_frag_uri->uri_fragment (undef);
   if ((defined $doc_uri and $doc_uri eq $no_frag_uri) or
@@ -4584,9 +4583,10 @@ $Element->{$HTML_NS}->{map} = {
     if ($has_name) {
       my $id = $item->{node}->get_attribute_ns (undef, 'id');
       if (defined $id and $has_name->[0] ne $id) {
-        $self->{onerror}->(node => $item->{node}->get_attribute_node ('id'),
-                           type => 'id ne name',
-                           level => $self->{level}->{must});
+        $self->{onerror}
+            ->(node => $item->{node}->get_attribute_node_ns (undef, 'id'),
+               type => 'id ne name',
+               level => $self->{level}->{must});
       }
     } else {
       $self->{onerror}->(node => $item->{node},
@@ -6074,7 +6074,8 @@ $Element->{$HTML_NS}->{label} = {
     $element_state->{has_label_original} = $self->{flag}->{has_label};
     $self->{flag}->{has_label} = 1;
     $element_state->{has_labelable_original} = $self->{flag}->{has_labelable};
-    $self->{flag}->{has_labelable} = $item->{node}->has_attribute ('for')?1:0;
+    $self->{flag}->{has_labelable}
+        = $item->{node}->has_attribute_ns (undef, 'for') ? 1 : 0;
 
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
