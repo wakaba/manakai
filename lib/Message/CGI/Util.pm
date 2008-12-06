@@ -9,6 +9,7 @@ our @EXPORT_OK = qw/
   percent_encode percent_encode_na
   percent_decode
   get_absolute_url
+  datetime_in_content
 /;
 
 require Encode;
@@ -46,5 +47,12 @@ sub get_absolute_url ($$) {
       ->get_uri_reference 
       ->uri_reference;
 } # get_absolute_url
+
+## Returns the specified time in the "date or time strings in content" format.
+sub datetime_in_content ($) {
+  my @time = gmtime shift;
+  return sprintf '%04d-%02d-%02d %02d:%02d:%02d+00:00',
+      $time[5] + 1900, $time[4] + 1, $time[3], $time[2], $time[1], $time[0];
+} # datetime_in_content
 
 1;
