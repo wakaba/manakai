@@ -21,7 +21,7 @@ my $default_error_levels = {
 
 sub check_iri ($$$;$) {
   require Message::URI::URIReference;
-  my $dom = Message::DOM::DOMImplementation->new;
+  my $dom = 'Message::DOM::DOMImplementation';
   my $uri_o = $dom->create_uri_reference ($_[1]);
   my $uri_s = $uri_o->uri_reference;
 
@@ -40,7 +40,7 @@ sub check_iri_reference ($$$;$) {
   my $levels = $_[3] || $default_error_levels;
 
   require Message::DOM::DOMImplementation;
-  my $dom = Message::DOM::DOMImplementation->new;
+  my $dom = 'Message::DOM::DOMImplementation';
   my $uri_o = $dom->create_uri_reference ($_[1]);
   my $uri_s = $uri_o->uri_reference;
 
@@ -292,7 +292,7 @@ sub check_iri_reference ($$$;$) {
 
 sub check_rdf_uri_reference ($$$;$) {
   require Message::URI::URIReference;
-  my $dom = Message::DOM::DOMImplementation->new;
+  my $dom = 'Message::DOM::DOMImplementation';
   my $uri_o = $dom->create_uri_reference ($_[1]);
   my $uri_s = $uri_o->uri_reference;
 
@@ -318,4 +318,4 @@ sub check_rdf_uri_reference ($$$;$) {
 } # check_rdf_uri_reference
 
 1;
-## $Date: 2008/08/30 10:26:39 $
+## $Date: 2008/12/06 10:05:23 $

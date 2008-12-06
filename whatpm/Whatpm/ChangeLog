@@ -1,5 +1,10 @@
 2008-12-06  Wakaba  <wakaba@suika.fam.cx>
 
+	* URIChecker.pm: Bug fix: It did not work unless
+	Message::DOM::DOMImplementation has been |require|d.
+
+2008-12-06  Wakaba  <wakaba@suika.fam.cx>
+
 	* NanoDOM.pm (document_uri): New attribute.
 
 	* ContentChecker.pm: Don't use methods not implemented by NanoDOM.
