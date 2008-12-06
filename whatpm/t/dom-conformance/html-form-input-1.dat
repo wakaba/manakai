@@ -99,6 +99,11 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="url"/>
 #errors
 
@@ -335,12 +340,6 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
-    type="search"/>
-#errors
-/input/@type;enumerated:invalid;m
-
-#data
-<input xmlns="http://www.w3.org/1999/xhtml"
     type=""/>
 #errors
 /input/@type;enumerated:invalid;m
@@ -375,6 +374,13 @@
 <div xmlns="http://www.w3.org/1999/xhtml">
   <form id="a">x</form>
   <input type="email" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="search" form="a"/>
 </div>
 #errors
 
@@ -518,14 +524,6 @@
 <div xmlns="http://www.w3.org/1999/xhtml">
   <form id="a">x</form>
   <input type="move-down" form="a"/>
-</div>
-#errors
-/div/input/@type;enumerated:invalid;m
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml">
-  <form id="a">x</form>
-  <input type="search" form="a"/>
 </div>
 #errors
 /div/input/@type;enumerated:invalid;m
@@ -903,6 +901,72 @@
     type="url" target=""/>
 #errors
 /input/@target;input attr not applicable;url;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" accept=""/>
+#errors
+/input/@accept;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" action=""/>
+#errors
+/input/@action;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" alt=""/>
+#errors
+/input/@alt;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" checked=""/>
+#errors
+/input/@checked;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" enctype=""/>
+#errors
+/input/@enctype;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" max=""/>
+#errors
+/input/@max;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" method=""/>
+#errors
+/input/@method;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" min=""/>
+#errors
+/input/@min;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" src=""/>
+#errors
+/input/@src;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" step=""/>
+#errors
+/input/@step;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" target=""/>
+#errors
+/input/@target;input attr not applicable;search;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3002,6 +3066,60 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value="abc&#xa;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value="abc&#xd;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    value="abc&#xd;&#xa;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value=""/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value="abc xyz"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value="abc&#xa;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value="abc&#xd;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value="abc&#xd;&#xa;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="password"
     value=""/>
 #errors
@@ -3011,6 +3129,230 @@
     type="password"
     value="abc xyz"/>
 #errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value="abc&#xa;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value="abc&#xd;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    value="abc&#xd;&#xa;xyz"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value=""/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value="http://www.example.com/"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value="[]"/>
+#errors
+/input/@value;syntax error:iriref3987;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    value="http://test/&#xa;"/>
+#errors
+/input/@value;syntax error:iriref3987;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value=""/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="@"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="a@b"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="foo@bar.example"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value='"foo"@[bar.test]'/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value='""@example.net'/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value='"a."@example.jp'/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="a.@example.jp"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value=".b@example.net"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="a.b@c.d"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="a..b@c"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="a@b..c"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="a@example.org."/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="a@.bbb"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value=" a@b "/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value=""/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value="  "/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value="a@b"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value="a@b,c@d"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value="a@b.example, c@d.test"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value=","/>
+#errors
+/input/@value;email:syntax error;m
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value="a@b,"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value=",a@b"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value="a@b,,c@d"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value="a@b.,c@d"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" multiple=""
+    value="<a@b>,c@d"/>
+#errors
+/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3621,6 +3963,65 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly=""/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly="readonly"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly="Readonly"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly="ReadOnly"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly="readonly "/>
+#errors
+/input/@readonly;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly=" readonly"/>
+#errors
+/input/@readonly;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly="yes"/>
+#errors
+/input/@readonly;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly="true"/>
+#errors
+/input/@readonly;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    readonly="off"/>
+#errors
+/input/@readonly;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="password"
     readonly=""/>
 #errors
@@ -4393,6 +4794,108 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="url"
+    size="5em"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size=""/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="0"/>
+#errors
+/input/@size;nninteger:out of range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="000000010"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="-0"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="-12"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="0.00"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="100.0"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="  4"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="55 "/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="+43"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="4e5"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    size="4px"/>
+#errors
+/input/@size;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
     size="5em"/>
 #errors
 /input/@size;nninteger:syntax error;m
@@ -4672,6 +5175,65 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="url"
+    required="off"/>
+#errors
+/input/@required;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    required=""/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    required="required"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    required="Required"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    required="RequireD"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    required="required "/>
+#errors
+/input/@required;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    required=" required"/>
+#errors
+/input/@required;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    required="yes"/>
+#errors
+/input/@required;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    required="true"/>
+#errors
+/input/@required;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
     required="off"/>
 #errors
 /input/@required;boolean:invalid;m
@@ -5624,6 +6186,107 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="url"
+    maxlength="5em"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength=""/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="100"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="000000010"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="-0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="-12"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="0.00"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="100.0"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="  4"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="55 "/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="+43"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="4e5"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    maxlength="4px"/>
+#errors
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
     maxlength="5em"/>
 #errors
 /input/@maxlength;nninteger:syntax error;m
@@ -5859,6 +6522,51 @@
 #data escaped
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="url"
+    value="\U00010000"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value=""
+    maxlength="1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value="ab"
+    maxlength="1"/>
+#errors
+/input/@value;value too long;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value=""
+    maxlength="0"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value="1234567890"
+    maxlength="10"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    value="12345678901"
+    maxlength="10"/>
+#errors
+/input/@value;value too long;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
     value="\U00010000"
     maxlength="1"/>
 #errors
@@ -7345,7 +8053,6 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="url"
@@ -7353,6 +8060,12 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    accept-charset="us-ascii"/>
+#errors
+/input/@accept-charset;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -7553,6 +8266,13 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    accesskey="a"/>
+#errors
+/input/@accesskey;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="password"
     accesskey="a"/>
 #errors
@@ -7726,6 +8446,14 @@
 #errors
 /input/@replace;attribute not defined;m
 /input/@replace;input attr not applicable;url;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    replace=""/>
+#errors
+/input/@replace;attribute not defined;m
+/input/@replace;input attr not applicable;search;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -7999,6 +8727,14 @@
 #errors
 /input/@align;attribute not defined;m
 /input/@align;input attr not applicable;url;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    align=""/>
+#errors
+/input/@align;attribute not defined;m
+/input/@align;input attr not applicable;search;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -8326,6 +9062,14 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    ismap=""/>
+#errors
+/input/@ismap;attribute not defined;m
+/input/@ismap;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="password"
     ismap=""/>
 #errors
@@ -8607,6 +9351,14 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    usemap=""/>
+#errors
+/input/@usemap;attribute not defined;m
+/input/@usemap;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="password"
     usemap=""/>
 #errors
@@ -8833,6 +9585,12 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="url"
+    template="a"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
     template="a"/>
 #errors
 

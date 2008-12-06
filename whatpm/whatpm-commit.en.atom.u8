@@ -1,4 +1,19 @@
-<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2008-12-06T10:05:19Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1228557923"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1228557923</id><title>2008-12-06 Wakaba</title><updated>2008-12-06T10:05:19Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/Whatpm/ChangeLog	6 Dec 2008 10:05:14 -0000
+<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2008-12-06T11:31:32Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1228563094"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1228563094</id><title>2008-12-06 Wakaba</title><updated>2008-12-06T11:31:32Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/dom-conformance/ChangeLog	6 Dec 2008 11:31:29 -0000
+2008-12-06  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* html-form-input-1.dat: Added test data for &lt;input type=search&gt;
+	and &lt;input type=text|password|url|email value&gt;.
+
+	* html-interactive-1.dat: Fixed a typo error.
+
+++ whatpm/Whatpm/ContentChecker/ChangeLog	6 Dec 2008 11:29:26 -0000
+	* HTML.pm: Implemented &lt;input multiple&gt;, &lt;input type=search&gt;.
+	Implemented &lt;input value&gt; validation for |type|s |text|, |search|,
+	|email|, |url|, and |password|.
+
+2008-12-06  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+</content></entry><entry xml:id="entry-1228557923"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1228557923</id><title>2008-12-06 Wakaba</title><updated>2008-12-06T10:05:19Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/Whatpm/ChangeLog	6 Dec 2008 10:05:14 -0000
 	* URIChecker.pm: Bug fix: It did not work unless
 	Message::DOM::DOMImplementation has been |require|d.
 

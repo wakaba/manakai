@@ -535,6 +535,13 @@ my $HTMLSpaceURIsAttrChecker = sub {
   $self->{has_uri_attr} = 1;
 }; # $HTMLSpaceURIsAttrChecker
 
+my $ValidEmailAddress;
+{
+  my $atext = qr[[A-Za-z0-9!#\$%&'*+/=?^_`{|}~-]];
+  my $dot_atom = qr/$atext+(?>\.$atext+)*/;
+  $ValidEmailAddress = qr/$dot_atom\@$dot_atom/;
+}
+
 ## NOTE: "Valid datetime".
 my $HTMLDatetimeAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -5499,6 +5506,7 @@ $Element->{$HTML_NS}->{input} = {
              FEATURE_M12N10_REC,
          method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          min => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         multiple => FEATURE_HTML5_DEFAULT,
          name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5509,6 +5517,7 @@ $Element->{$HTML_NS}->{input} = {
          oninvalid => FEATURE_WF2,
          onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          pattern => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         placeholder => FEATURE_HTML5_DEFAULT,
          readonly => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
          replace => FEATURE_WF2,
          required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
@@ -5550,6 +5559,7 @@ $Element->{$HTML_NS}->{input} = {
          maxlength => '',
          method => '',
          min => '',
+         multiple => '',
          name => sub {
            ## ISSUE: No HTML5 definition yet.
            ## TODO: tests
@@ -5560,6 +5570,7 @@ $Element->{$HTML_NS}->{input} = {
          oninvalid => $HTMLEventHandlerAttrChecker, # [WF2]
          ## TODO: tests for four attributes above
          pattern => '',
+         placeholder => '',
          readonly => '',
          replace => '',
          required => '',
@@ -5568,7 +5579,8 @@ $Element->{$HTML_NS}->{input} = {
          step => '',
          target => '',
          type => $GetHTMLEnumeratedAttrChecker->({
-           hidden => 1, text => 1, email => 1, url => 1, password => 1,
+           hidden => 1, text => 1, search => 1, url => 1,
+           email => 1, password => 1,
            datetime => 1, date => 1, month => 1, week => 1, time => 1,
            'datetime-local' => 1, number => 1, range => 1, checkbox => 1,
            radio => 1, file => 1, submit => 1, image => 1, reset => 1,
@@ -5610,7 +5622,7 @@ $Element->{$HTML_NS}->{input} = {
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
-               ## NOTE: No restriction.
+               ## TODO: syntax
                ## TODO: Warn if not a valid UTC date and time string.
                ## TODO: Warn unless min <= value <= max
              },
@@ -5630,7 +5642,7 @@ $Element->{$HTML_NS}->{input} = {
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
-               ## NOTE: No restriction.
+               ## TODO: syntax
                ## TODO: Warn if not a valid date string.
                ## TODO: Warn unless min <= value <= max
              },
@@ -5650,7 +5662,7 @@ $Element->{$HTML_NS}->{input} = {
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
-               ## NOTE: No restriction.
+               ## TODO: syntax
                ## TODO: Warn if not a valid month string.
                ## TODO: Warn unless min <= value <= max
              },
@@ -5670,7 +5682,7 @@ $Element->{$HTML_NS}->{input} = {
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
-               ## NOTE: No restriction.
+               ## TODO: syntax
                ## TODO: Warn if not a valid week string.
                ## TODO: Warn unless min <= value <= max
              },
@@ -5690,7 +5702,7 @@ $Element->{$HTML_NS}->{input} = {
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
-               ## NOTE: No restriction.
+               ## TODO: syntax
                ## TODO: Warn if not a valid time string.
                ## TODO: Warn unless min <= value <= max
              },
@@ -5710,7 +5722,7 @@ $Element->{$HTML_NS}->{input} = {
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
-               ## NOTE: No restriction.
+               ## TODO: syntax
                ## TODO: Warn if not a valid local date and time string.
                ## TODO: Warn unless min <= value <= max
              },
@@ -5731,7 +5743,7 @@ $Element->{$HTML_NS}->{input} = {
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
              value => sub {
-               ## NOTE: No restriction.
+               ## TODO: syntax
                ## TODO: Warn if not a valid floating point number.
                ## TODO: Warn unless min <= value <= max
              },
@@ -5750,7 +5762,7 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: min <= max
              step => $StepAttrChecker,
              value => sub {
-               ## NOTE: No restriction.
+               ## TODO: syntax
                ## TODO: Warn if not a valid floating point number.
                ## TODO: Warn unless min <= value <= max
              },
@@ -5855,7 +5867,7 @@ $Element->{$HTML_NS}->{input} = {
              ## has no author requirement.
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
-          } else { # Text, E-mail, URL, Password
+          } else { # Text, Search, E-mail, URL, Password
             $checker =
             {
              accesskey => $HTMLAccesskeyAttrChecker,
@@ -5895,13 +5907,42 @@ $Element->{$HTML_NS}->{input} = {
              required => $GetHTMLBooleanAttrChecker->('required'),
              size => $GetHTMLNonNegativeIntegerAttrChecker->(sub {shift > 0}),
              value => sub {
-               ## NOTE: No restriction.
-               ## TODO: Warn if it contains CR or LF?
-               ## TODO: Warn if not addr-spec (E-Mail state)?
-               ## TODO: Warn if not a URL (URL state)?
+               my ($self, $attr, $item, $element_state) = @_;
+               if ($state eq 'url') {
+                 $HTMLURIAttrChecker->(@_);
+               } elsif ($state eq 'email') {
+                 if ($item->{node}->has_attribute_ns (undef, 'multiple')) {
+                   my @addr = split /,/, $attr->value, -1;
+                   @addr = ('') unless @addr;
+                   for (@addr) {
+                     s/\A[\x09\x0A\x0D\x20]+//;
+                     s/[\x09\x0A\x0D\x20]\z//;
+                     unless (/\A$ValidEmailAddress\z/) {
+                       $self->{onerror}->(node => $attr,
+                                          type => 'email:syntax error', ## TODO: type
+                                          value => $_,
+                                          level => $self->{level}->{must});
+                     } 
+                   }
+                 } else {
+                   unless ($attr->value =~ /\A$ValidEmailAddress\z/) {
+                     $self->{onerror}->(node => $attr,
+                                        type => 'email:syntax error', ## TODO: type
+                                        level => $self->{level}->{must});
+                   }
+                 }
+               } else {
+                 if ($attr->value =~ /[\x0D\x0A]/) {
+                   $self->{onerror}->(node => $attr,
+                                      type => 'newline in value', ## TODO: type
+                                      level => $self->{level}->{must});
+                 }
+               }
              },
             }->{$attr_ln} || $checker;
             $checker = '' if $state eq 'password' and $attr_ln eq 'list';
+            $checker = $GetHTMLBooleanAttrChecker->('multiple')
+                if $state eq 'email' and $attr_ln eq 'multiple';
           }
         }
 
