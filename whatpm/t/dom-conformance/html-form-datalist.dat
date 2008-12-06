@@ -1,0 +1,226 @@
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="text" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<datalist id="a">
+</datalist>
+<input type="text" list="a"/>x
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="text" list="a"/>x
+</div>
+#errors
+/div/input/@list;no referenced datalist;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="text" list=" a"/>x
+<datalist id="a"/>
+</div>
+#errors
+/div/input/@list;no referenced datalist;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="text" list="a b"/>x
+<datalist id="a"/>
+<datalist id="b"/>
+</div>
+#errors
+/div/input/@list;no referenced datalist;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="text" list="a "/>x
+<datalist id="a "/>
+</div>
+#errors
+/div/datalist/@id;space in ID;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml" id="a">
+<input type="text" list="a"/>x
+</div>
+#errors
+/div/input/@list;no referenced datalist;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="text" list="a" id="a"/>x
+</div>
+#errors
+/div/input/@list;no referenced datalist;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="url" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="email" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="search" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="datetime" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="date" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="month" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="week" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="time" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="datetime-local" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="number" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="range" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="color" list="a"/>x
+<datalist id="a">
+</datalist>
+</div>
+#errors
+
+#data
+<input type="hidden" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;hidden;m
+
+#data
+<input type="password" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;password;m
+
+#data
+<input type="checkbox" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;checkbox;m
+
+#data
+<input type="radio" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;radio;m
+
+#data
+<input type="file" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;file;m
+
+#data
+<input type="submit" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;submit;m
+
+#data
+<input type="image" src="" alt="b" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;image;m
+
+#data
+<input type="button" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;button;m
+
+#data
+<input type="reset" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;reset;m
+
+#data
+<input type="add" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;add;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input type="remove" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;remove;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input type="move-up" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;move-up;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input type="move-down" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@list;input attr not applicable;move-down;m
+/input/@type;enumerated:invalid;m

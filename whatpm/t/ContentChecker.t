@@ -22,10 +22,11 @@ test_files (qw[
   t/dom-conformance/html-forms-1.dat
   t/dom-conformance/html-form-input-1.dat
   t/dom-conformance/html-form-label.dat
+  t/dom-conformance/html-form-datalist.dat
   t/dom-conformance/html-interactive-1.dat
   t/dom-conformance/html-repetitions.dat
   t/dom-conformance/html-datatemplate.dat
 ]);
 
 ## License: Public Domain.
-## $Date: 2008/10/07 12:18:39 $
+## $Date: 2008/12/06 12:20:08 $

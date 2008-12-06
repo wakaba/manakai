@@ -754,6 +754,19 @@ my $HTMLFormAttrChecker = sub {
   ## ISSUE: <form id=""><input form=""> (empty ID)?
 }; # $HTMLFormAttrChecker
 
+my $ListAttrChecker = sub {
+  my ($self, $attr) = @_;
+  
+  ## NOTE: MUST be the ID of a |datalist| element.
+  
+  push @{$self->{idref}}, ['datalist', $attr->value, $attr];
+
+  ## TODO: Warn violation to control-dependent restrictions.  For
+  ## example, |<input type=url maxlength=10 list=a> <datalist
+  ## id=a><option value=nonurlandtoolong></datalist>| should be
+  ## warned.
+}; # $ListAttrChecker
+
 my $HTMLUsemapAttrChecker = sub {
   my ($self, $attr) = @_;
   ## MUST be a valid hash-name reference to a |map| element.
@@ -5615,7 +5628,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              ## TODO: max
              ## TODO: min
                ## TODO: min <= max
@@ -5635,7 +5648,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              ## TODO: max
              ## TODO: min
                ## TODO: min <= max
@@ -5655,7 +5668,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              ## TODO: max
              ## TODO: min
                ## TODO: min <= max
@@ -5675,7 +5688,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              ## TODO: max
              ## TODO: min
                ## TODO: min <= max
@@ -5695,7 +5708,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              ## TODO: max
              ## TODO: min
                ## TODO: min <= max
@@ -5715,7 +5728,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              ## TODO: max
              ## TODO: min
                ## TODO: min <= max
@@ -5735,7 +5748,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
                ## TODO: min & max tests
@@ -5756,7 +5769,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
                ## TODO: min & max tests
@@ -5775,7 +5788,7 @@ $Element->{$HTML_NS}->{input} = {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
-             ## TODO: list
+             list => $ListAttrChecker,
              value => sub {
                my ($self, $attr) = @_;
                unless ($attr->value =~ /\A#[0-9A-Fa-f]{6}\z/) {
@@ -5893,7 +5906,7 @@ $Element->{$HTML_NS}->{input} = {
                on => 1, off => 1,
              }),
              ## TODO: inputmode [WF2]
-             ## TODO: list
+             list => $ListAttrChecker,
              maxlength => sub {
                my ($self, $attr, $item, $element_state) = @_;
 
@@ -6269,6 +6282,8 @@ $Element->{$HTML_NS}->{datalist} = {
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{id_type} = 'datalist';
   },
   ## NOTE: phrasing | option*
   check_child_element => sub {

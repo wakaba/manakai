@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.103 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.104 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -804,6 +804,7 @@ next unless $code;## TODO: temp.
                                   form => 'no referenced form',
                                   labelable => 'no referenced control',
                                   menu => 'no referenced menu',
+                                  datalist => 'no referenced datalist', ## TODOC: type
                                  }->{$_->[0]},
                          level => $self->{level}->{must});
     }
@@ -1067,4 +1068,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/12/06 10:00:53 $
+# $Date: 2008/12/06 12:20:08 $
