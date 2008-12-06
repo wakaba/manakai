@@ -5582,7 +5582,8 @@ $Element->{$HTML_NS}->{input} = {
            hidden => 1, text => 1, search => 1, url => 1,
            email => 1, password => 1,
            datetime => 1, date => 1, month => 1, week => 1, time => 1,
-           'datetime-local' => 1, number => 1, range => 1, checkbox => 1,
+           'datetime-local' => 1, number => 1, range => 1, color => 1,
+           checkbox => 1,
            radio => 1, file => 1, submit => 1, image => 1, reset => 1,
            button => 1,
          }),
@@ -5765,6 +5766,23 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: syntax
                ## TODO: Warn if not a valid floating point number.
                ## TODO: Warn unless min <= value <= max
+             },
+            }->{$attr_ln} || $checker;
+          } elsif ($state eq 'color') {
+            $checker =
+            {
+             accesskey => $HTMLAccesskeyAttrChecker,
+             autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
+             ## TODO: list
+             value => sub {
+               my ($self, $attr) = @_;
+               unless ($attr->value =~ /\A#[0-9A-Fa-f]{6}\z/) {
+                 $self->{onerror}->(node => $attr,
+                                    type => 'scolor:syntax error', ## TODOC: type
+                                    level => $self->{level}->{must});
+               }
              },
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'checkbox' or $state eq 'radio') {
@@ -5969,6 +5987,8 @@ $Element->{$HTML_NS}->{input} = {
       $status ||= $AttrStatus->{$attr_ns}->{$attr_ln}
           || $AttrStatus->{$attr_ns}->{''};
       $status = FEATURE_ALLOWED if not defined $status and length $attr_ns;
+
+      ## TODOC: accesskey="" is also applied to type=search and type=color
 
       if ($checker) {
         $checker->($self, $attr, $item, $element_state) if ref $checker;

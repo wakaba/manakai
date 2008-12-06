@@ -221,6 +221,11 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="checkbox"/>
 #errors
 
@@ -444,6 +449,13 @@
 <div xmlns="http://www.w3.org/1999/xhtml">
   <form id="a">x</form>
   <input type="range" form="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <form id="a">x</form>
+  <input type="color" form="a"/>
 </div>
 #errors
 
@@ -1669,6 +1681,118 @@
     required=""/>
 #errors
 /input/@required;input attr not applicable;range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    accept=""/>
+#errors
+/input/@accept;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    action=""/>
+#errors
+/input/@action;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    alt=""/>
+#errors
+/input/@alt;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    checked=""/>
+#errors
+/input/@checked;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    enctype=""/>
+#errors
+/input/@enctype;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    maxlength=""/>
+#errors
+/input/@maxlength;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    method=""/>
+#errors
+/input/@method;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    pattern=""/>
+#errors
+/input/@pattern;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    size=""/>
+#errors
+/input/@size;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    src=""/>
+#errors
+/input/@src;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    target=""/>
+#errors
+/input/@target;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    readonly=""/>
+#errors
+/input/@readonly;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    required=""/>
+#errors
+/input/@required;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    max=""/>
+#errors
+/input/@max;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    min=""/>
+#errors
+/input/@min;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    step=""/>
+#errors
+/input/@step;input attr not applicable;color;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3356,6 +3480,115 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value=""/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#a"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#12"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#124"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#1234"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#12345"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#123456"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#abcdef"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#xyxxsa"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="aaaaaa"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="red"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value=" #111111"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#AAAAAA"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#aaaaaf#"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    value="#aaaaaa,#bbbbbb"/>
+#errors
+/input/@value;scolor:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="submit"
     value=""/>
 #errors
@@ -3780,6 +4013,100 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="range"
+    autocomplete="inherit"/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete=""/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="on"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="off"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="ON"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="OFF"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="OfF"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="on "/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete=" off"/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="yes"/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="no"/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="true"/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="false"/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    autocomplete="autocomplete"/>
+#errors
+/input/@autocomplete;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
     autocomplete="inherit"/>
 #errors
 /input/@autocomplete;enumerated:invalid;m
@@ -6443,6 +6770,7 @@
     value=""
     maxlength="1"/>
 #errors
+/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -6451,6 +6779,7 @@
     maxlength="1"/>
 #errors
 /input/@value;value too long;m
+/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -6458,6 +6787,7 @@
     value=""
     maxlength="0"/>
 #errors
+/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -6465,6 +6795,7 @@
     value="1234567890"
     maxlength="10"/>
 #errors
+/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -6473,6 +6804,7 @@
     maxlength="10"/>
 #errors
 /input/@value;value too long;m
+/input/@value;email:syntax error;m
 
 #data escaped
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -6481,6 +6813,7 @@
     maxlength="1"/>
 #errors
 /input/@value;value too long;m
+/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -8130,7 +8463,6 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="range"
@@ -8138,6 +8470,12 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    accept-charset="us-ascii"/>
+#errors
+/input/@accept-charset;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -8336,6 +8674,13 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    accesskey="a"/>
+#errors
+/input/@accesskey;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="checkbox"
     accesskey="a"/>
 #errors
@@ -8526,6 +8871,14 @@
 #errors
 /input/@replace;attribute not defined;m
 /input/@replace;input attr not applicable;range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    replace=""/>
+#errors
+/input/@replace;attribute not defined;m
+/input/@replace;input attr not applicable;color;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -8807,6 +9160,14 @@
 #errors
 /input/@align;attribute not defined;m
 /input/@align;input attr not applicable;range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    align=""/>
+#errors
+/input/@align;attribute not defined;m
+/input/@align;input attr not applicable;color;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9142,6 +9503,14 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    ismap=""/>
+#errors
+/input/@ismap;attribute not defined;m
+/input/@ismap;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="checkbox"
     ismap=""/>
 #errors
@@ -9431,6 +9800,14 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    usemap=""/>
+#errors
+/input/@usemap;attribute not defined;m
+/input/@usemap;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="checkbox"
     usemap=""/>
 #errors
@@ -9645,6 +10022,12 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="range"
+    template="a"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
     template="a"/>
 #errors
 
