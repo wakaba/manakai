@@ -81,8 +81,65 @@ if (@mode == 3 and $mode[0] eq 'html' and
     $time{serialize_xml} = $time2 - $time1;
     $doc->manakai_is_html (1);
   } else { # test
+    require Whatpm::HTML::Dumper;
     $time1 = time;
-    $out = test_serialize ($el || $doc);
+    $out = \Whatpm::HTML::Dumper::dumptree ($el || $doc);
+    $time2 = time;
+    $time{serialize_test} = $time2 - $time1;
+  }
+  print STDOUT Encode::encode ('utf-8', $$out);
+  print STDOUT "\n";
+} elsif (@mode == 3 and $mode[0] eq 'xml1' and
+    ($mode[2] eq 'html' or $mode[2] eq 'test' or $mode[2] eq 'xml')) {
+  print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
+
+  require Encode;
+  require Whatpm::XML::Parser;
+
+  $time1 = time;
+  $s = Encode::decode ('utf-8', $s);
+  $time2 = time;
+  $time{decode} = $time2 - $time1;
+  
+  print STDOUT "#errors\n";
+
+  my $onerror = sub {
+    my (%opt) = @_;
+    print STDOUT "$opt{line},$opt{column},$opt{type};$opt{level};$opt{value}\n";
+  };
+
+  $doc = $dom->create_document;
+  $time1 = time;
+## TODO:
+  #if (length $mode[1]) {
+  #  $el = $doc->create_element_ns
+  #      ('http://www.w3.org/1999/xhtml', [undef, $mode[1]]);
+  #  #Whatpm::HTML->set_inner_html ($el, $s, $onerror);
+  #} else {
+    Whatpm::XML::Parser->parse_char_string ($s => $doc, $onerror);
+  #}
+  $time2 = time;
+  $time{parse_xml1} = $time2 - $time1;
+
+  print "#document\n";
+
+  my $out;
+  if ($mode[2] eq 'html') {
+    $doc->manakai_is_html (1);
+    $time1 = time;
+    $out = \( ($el or $doc)->inner_html );
+    $time2 = time;
+    $time{serialize_html} = $time2 - $time1;
+    $doc->manakai_is_html (0);
+  } elsif ($mode[2] eq 'xml') {
+    $time1 = time;
+    $out = \( ($el or $doc)->inner_html );
+    $time2 = time;
+    $time{serialize_xml} = $time2 - $time1;
+  } else { # test
+    require Whatpm::HTML::Dumper;
+    $time1 = time;
+    $out = \Whatpm::HTML::Dumper::dumptree ($el || $doc);
     $time2 = time;
     $time{serialize_test} = $time2 - $time1;
   }
@@ -126,8 +183,48 @@ if (@mode == 3 and $mode[0] eq 'html' and
     $time2 = time;
     $time{serialize_xml} = $time2 - $time1;
   } else { # test
+    require Whatpm::HTML::Dumper;
     $time1 = time;
-    $out = test_serialize ($doc);
+    $out = \Whatpm::HTML::Dumper::dumptree ($el || $doc);
+    $time2 = time;
+    $time{serialize_test} = $time2 - $time1;
+  }
+  print STDOUT Encode::encode ('utf-8', $$out);
+  print STDOUT "\n";
+} elsif (@mode == 3 and $mode[0] eq 'swml' and $mode[1] eq '' and
+         ($mode[2] eq 'html' or $mode[2] eq 'test' or $mode[2] eq 'xml')) {
+  print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
+
+  require Encode;
+  $time1 = time;
+  $s = Encode::decode ('utf-8', $s);
+  $time2 = time;
+  $time{decode} = $time2 - $time1;
+
+  require Whatpm::SWML::Parser;
+  $doc = $dom->create_document;
+  my $p = Whatpm::SWML::Parser->new;
+  $p->parse_char_string ($s => $doc);
+
+  print "#document\n";
+
+  my $out;
+  if ($mode[2] eq 'html') {
+    $doc->manakai_is_html (0);
+    $time1 = time;
+    $out = \( $doc->inner_html );
+    $time2 = time;
+    $time{serialize_html} = $time2 - $time1;
+    $doc->manakai_is_html (1);
+  } elsif ($mode[2] eq 'xml') {
+    $time1 = time;
+    $out = \( $doc->inner_html );
+    $time2 = time;
+    $time{serialize_xml} = $time2 - $time1;
+  } else { # test
+    require Whatpm::HTML::Dumper;
+    $time1 = time;
+    $out = \Whatpm::HTML::Dumper::dumptree ($el || $doc);
     $time2 = time;
     $time{serialize_test} = $time2 - $time1;
   }
@@ -163,8 +260,9 @@ if (@mode == 3 and $mode[0] eq 'html' and
     $time2 = time;
     $time{serialize_xml} = $time2 - $time1;
   } else { # test
+    require Whatpm::HTML::Dumper;
     $time1 = time;
-    $out = test_serialize ($doc);
+    $out = \Whatpm::HTML::Dumper::dumptree ($el || $doc);
     $time2 = time;
     $time{serialize_test} = $time2 - $time1;
   }
@@ -193,13 +291,15 @@ if (@mode == 3 and $mode[0] eq 'html' and
   }
 
   print STDOUT "#log\n";
-  for (qw/decode parse parse_xml serialize_html serialize_xml serialize_test
+  for (qw/decode parse parse_xml parse_xml1
+          serialize_html serialize_xml serialize_test
           check/) {
     next unless defined $time{$_};
     print STDOUT {
       decode => 'bytes->chars',
       parse => 'html5(chars)->dom5',
-      parse_xml => 'xml1(chars)->dom5',
+      parse_xml => 'xml(chars)->dom5',
+      parse_xml1 => 'xml1(chars)->dom5',
       serialize_html => 'dom5->html5(char)',
       serialize_xml => 'dom5->xml1(char)',
       serialize_test => 'dom5->test(char)',
@@ -211,44 +311,6 @@ if (@mode == 3 and $mode[0] eq 'html' and
   }
 
 exit;
-
-sub test_serialize ($) {
-  my $node = shift;
-  my $r = '';
-
-  my @node = map { [$_, ''] } @{$node->child_nodes};
-  while (@node) {
-    my $child = shift @node;
-    my $nt = $child->[0]->node_type;
-    if ($nt == $child->[0]->ELEMENT_NODE) {
-      $r .= '| ' . $child->[1] . '<' . $child->[0]->tag_name . ">\x0A"; ## ISSUE: case?
-
-      for my $attr (sort {$a->[0] cmp $b->[0]} map { [$_->name, $_->value] }
-                    @{$child->[0]->attributes}) {
-        $r .= '| ' . $child->[1] . '  ' . $attr->[0] . '="'; ## ISSUE: case?
-        $r .= $attr->[1] . '"' . "\x0A";
-      }
-      
-      unshift @node,
-        map { [$_, $child->[1] . '  '] } @{$child->[0]->child_nodes};
-    } elsif ($nt == $child->[0]->TEXT_NODE) {
-      $r .= '| ' . $child->[1] . '"' . $child->[0]->data . '"' . "\x0A";
-    } elsif ($nt == $child->[0]->CDATA_SECTION_NODE) {
-      $r .= '| ' . $child->[1] . '<![CDATA[' . $child->[0]->data . "]]>\x0A";
-    } elsif ($nt == $child->[0]->COMMENT_NODE) {
-      $r .= '| ' . $child->[1] . '<!-- ' . $child->[0]->data . " -->\x0A";
-    } elsif ($nt == $child->[0]->DOCUMENT_TYPE_NODE) {
-      $r .= '| ' . $child->[1] . '<!DOCTYPE ' . $child->[0]->name . ">\x0A";
-    } elsif ($nt == $child->[0]->PROCESSING_INSTRUCTION_NODE) {
-      $r .= '| ' . $child->[1] . '<?' . $child->[0]->target . ' ' .
-          $child->[0]->data . "?>\x0A";
-    } else {
-      $r .= '| ' . $child->[1] . $child->[0]->node_type . "\x0A"; # error
-    }
-  }
-  
-  return \$r;
-} # test_serialize
 
 sub get_node_path ($) {
   my $node = shift;
@@ -282,11 +344,11 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2008/07/18 14:44:17 $
+## $Date: 2008/12/11 03:22:57 $
