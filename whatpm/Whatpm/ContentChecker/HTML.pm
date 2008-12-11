@@ -767,6 +767,14 @@ my $ListAttrChecker = sub {
   ## warned.
 }; # $ListAttrChecker
 
+my $PatternAttrChecker = sub {
+  my ($self, $attr) = @_;
+  $self->{onsubdoc}->({s => $attr->value,
+                       container_node => $attr,
+                       media_type => 'text/x-regexp-js',
+                       is_char_string => 1});
+}; # $PatternAttrChecker
+
 my $HTMLUsemapAttrChecker = sub {
   my ($self, $attr) = @_;
   ## MUST be a valid hash-name reference to a |map| element.
@@ -5934,7 +5942,7 @@ $Element->{$HTML_NS}->{input} = {
                  }
                }
              },
-             ## TODO: pattern
+             pattern => $PatternAttrChecker,
              placeholder => sub {
                my ($self, $attr) = @_;
                if ($attr->value =~ /[\x0D\x0A]/) {
@@ -6450,7 +6458,7 @@ $Element->{$HTML_NS}->{textarea} = {
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,
     oninput => $HTMLEventHandlerAttrChecker,
-    ## TODO: pattern [WF2] ## TODO: |title| special semantics
+    pattern => $PatternAttrChecker, ## TODO: |title| special semantics
     readonly => $GetHTMLBooleanAttrChecker->('readonly'),
     required => $GetHTMLBooleanAttrChecker->('required'),
     rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),

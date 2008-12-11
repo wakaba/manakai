@@ -57,7 +57,7 @@ sub check_iri_reference ($$$;$) {
     $onerror->(type => 'URL:lowercase hexadecimal digit',
                level => $levels->{uri_lc_should},
                value => $uri_s,
-               pos_start => $-[0], pos_end => $+[0] - 1);
+               pos_start => $-[0], pos_end => $+[0]);
     ## shoult not
   }
 
@@ -71,7 +71,7 @@ sub check_iri_reference ($$$;$) {
     $onerror->(type => 'URL:percent-encoded unreserved',
                level => $levels->{uri_lc_should},
                value => $uri_s,
-               pos_start => $-[0], pos_end => $+[0] - 1);
+               pos_start => $-[0], pos_end => $+[0]);
     ## should
     ## should
   }
@@ -112,7 +112,7 @@ sub check_iri_reference ($$$;$) {
       $onerror->(type => 'URL:address format',
                  level => $levels->{warn},
                  text => $1,
-                 value => $host, pos_start => $-[1], pos_end => $+[1] - 1);
+                 value => $host, pos_start => $-[1], pos_end => $+[1]);
       ## NOTE: No conformance creteria is defined for new address format,
       ## nor is any standardization process.
    }
@@ -318,4 +318,4 @@ sub check_rdf_uri_reference ($$$;$) {
 } # check_rdf_uri_reference
 
 1;
-## $Date: 2008/12/06 10:05:23 $
+## $Date: 2008/12/11 03:18:17 $
