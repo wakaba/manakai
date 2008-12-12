@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.104 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.105 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -224,8 +224,10 @@ our %AnyChecker = (
   ## NOTE: |check_start| is invoked before anything on the element's
   ## attributes and contents is checked.
   check_start => sub { },
-  ## NOTE: |check_attrs| is invoked after |check_start| and before
-  ## anything on the element's contents is checked.
+  ## NOTE: |check_attrs| and |check_attrs2| are invoked after
+  ## |check_start| and before anything on the element's contents is
+  ## checked.  |check_attrs| is invoked immediately before
+  ## |check_attrs2|.
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     for my $attr (@{$item->{node}->attributes}) {
@@ -260,6 +262,7 @@ our %AnyChecker = (
       $self->_attr_status_info ($attr, $status);
     }
   },
+  check_attrs2 => sub { },
   ## NOTE: |check_child_element| is invoked for each occurence of
   ## child elements.  It is invoked after |check_attrs| and before
   ## |check_end|.  |check_child_element| and |check_child_text| are
@@ -652,6 +655,7 @@ next unless $code;## TODO: temp.
       my @new_item;
       push @new_item, [$eldef->{check_start}, $self, $item, $element_state];
       push @new_item, [$eldef->{check_attrs}, $self, $item, $element_state];
+      push @new_item, [$eldef->{check_attrs2}, $self, $item, $element_state];
       
       my @child = @{$item->{node}->child_nodes};
       while (@child) {
@@ -1068,4 +1072,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/12/06 12:20:08 $
+# $Date: 2008/12/12 11:50:47 $

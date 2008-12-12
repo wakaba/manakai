@@ -6344,7 +6344,6 @@ $Element->{$HTML_NS}->{select} = {
 
 $Element->{$HTML_NS}->{datalist} = {
   %HTMLPhrasingContentChecker,
-    ## TODO: |option| child MUST be empty [WF2]
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
@@ -6448,7 +6447,7 @@ $Element->{$HTML_NS}->{optgroup} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    label => sub {}, ## NOTE: Text [M12N] ## TODO: required
+    label => sub {},
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -6456,6 +6455,16 @@ $Element->{$HTML_NS}->{optgroup} = {
     label => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
   }),
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    
+    unless ($item->{node}->has_attribute_ns (undef, 'label')) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'label',
+                         level => $self->{level}->{must});
+    }
+  },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -6487,9 +6496,9 @@ $Element->{$HTML_NS}->{option} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    label => sub {}, ## NOTE: Text [M12N]
-    selected => $GetHTMLBooleanAttrChecker->('selected'),
-    value => sub {}, ## NOTE: CDATA [M12N]
+    label => sub {}, ## NOTE: No restriction.
+    selected => $GetHTMLBooleanAttrChecker->('selected'), ## ISSUE: Not a "boolean attribute"
+    value => sub {}, ## NOTE: No restriction.
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -6507,30 +6516,56 @@ $Element->{$HTML_NS}->{textarea} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    accept => $HTMLIMTAttrChecker, ## TODO: MUST be a text-based type
+    accept => $HTMLIMTAttrChecker, ## TODO: MUST be a text-based type [WF2]
     accesskey => $HTMLAccesskeyAttrChecker,
     autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
-    cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## TODO: SHOULD if wrap=hard [WF2]
+    cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     form => $HTMLFormAttrChecker,
     ## TODO: inputmode [WF2]
-    maxlength => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    name => sub {}, ## NOTE: CDATA [M12N]
-    onformchange => $HTMLEventHandlerAttrChecker,
-    onforminput => $HTMLEventHandlerAttrChecker,
-    oninput => $HTMLEventHandlerAttrChecker,
+    maxlength => sub {
+      my ($self, $attr, $item, $element_state) = @_;
+      
+      $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_);
+      
+      if ($attr->value =~ /^[\x09\x0A\x0D\x20]*([0-9]+)/) {
+        ## NOTE: Applying the rules for parsing non-negative integers
+        ## results in a number.
+        my $max_allowed_value_length = 0+$1;
+
+        ## ISSUE: "The the purposes of this requirement," (typo)
+        
+        ## ISSUE: This constraint is applied w/o CRLF normalization to
+        ## |value| attribute, but w/ CRLF normalization to
+        ## concept-value.
+        my $value = $item->{node}->text_content;
+        if (defined $value) {
+          my $codepoint_length = length $value;
+          
+          if ($codepoint_length > $max_allowed_value_length) {
+            $self->{onerror}->(node => $item->{node},
+                               type => 'value too long',
+                               level => $self->{level}->{must});
+          }
+        }
+      }
+    },
+    name => sub {}, ## TODO: HTML5 name=""
+    onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
+    onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
+    oninput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     pattern => $PatternAttrChecker,
     readonly => $GetHTMLBooleanAttrChecker->('readonly'),
     required => $GetHTMLBooleanAttrChecker->('required'),
-    rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    oninput => $HTMLEventHandlerAttrChecker,
-    oninvalid => $HTMLEventHandlerAttrChecker,
+    rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    oninput => $HTMLEventHandlerAttrChecker, ## TODO: tests
+    oninvalid => $HTMLEventHandlerAttrChecker, ## TODO: tests
     ## NOTE: |title| had special semantics if |pattern| was specified [WF2].
     wrap => $GetHTMLEnumeratedAttrChecker->({soft => 1, hard => 1}),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    accept => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     'accept-charset' => FEATURE_HTML2X_RFC,
     accesskey => FEATURE_M12N10_REC,
     autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
@@ -6540,17 +6575,17 @@ $Element->{$HTML_NS}->{textarea} = {
     datasrc => FEATURE_HTML4_REC_RESERVED,
     disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    inputmode => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
+    inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
     maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onformchange => FEATURE_WF2_INFORMATIVE,
-    onforminput => FEATURE_WF2_INFORMATIVE,
-    oninput => FEATURE_WF2,
-    oninvalid => FEATURE_WF2,
+    onformchange => FEATURE_WF2_INFORMATIVE, ## TODO: tests
+    onforminput => FEATURE_WF2_INFORMATIVE, ## TODO: tests
+    oninput => FEATURE_WF2, ## TODO: tests
+    oninvalid => FEATURE_WF2, ## TODO: tests
     onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     pattern => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     readonly => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
@@ -6570,6 +6605,15 @@ $Element->{$HTML_NS}->{textarea} = {
     } else {
       $self->{flag}->{has_labelable} = 2;
     }
+    
+    $element_state->{uri_info}->{data}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{id_type} = 'labelable';
+  },
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
 
     if ($item->{node}->has_attribute_ns (undef, 'pattern') and
         not $item->{node}->has_attribute_ns (undef, 'title')) {
@@ -6580,11 +6624,18 @@ $Element->{$HTML_NS}->{textarea} = {
                          level => $self->{level}->{should});
     }
     
-    $element_state->{uri_info}->{data}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-
-    $element_state->{id_type} = 'labelable';
+    unless ($item->{node}->has_attribute_ns (undef, 'cols')) {
+      my $wrap = $item->{node}->get_attribute_ns (undef, 'wrap');
+      if (defined $wrap) {
+        $wrap =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+        if ($wrap eq 'hard') {
+          $self->{onerror}->(node => $item->{node},
+                             type => 'attribute missing',
+                             text => 'cols',
+                             level => $self->{level}->{must});
+        }
+      }
+    }
   },
 };
 

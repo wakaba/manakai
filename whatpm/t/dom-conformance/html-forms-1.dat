@@ -222,53 +222,6 @@
 /fieldset/style;SUBDOC
 
 #data
-<textarea xmlns="http://www.w3.org/1999/xhtml"></textarea>
-#errors
-
-#data
-<textarea xmlns="http://www.w3.org/1999/xhtml">  </textarea>
-#errors
-
-#data
-<textarea xmlns="http://www.w3.org/1999/xhtml">xxxx</textarea>
-#errors
-
-#data
-<textarea xmlns="http://www.w3.org/1999/xhtml"><em>a</em></textarea>
-#errors
-/textarea/em;element not allowed:text;m
-
-#data
-<textarea xmlns="http://www.w3.org/1999/xhtml"><title>x</title></textarea>
-#errors
-/textarea/title;element not allowed:text;m
-
-#data
-<textarea xmlns="http://www.w3.org/1999/xhtml">aa<br/>bb</textarea>
-#errors
-/textarea/br;element not allowed:text;m
-
-#data
-<textarea xmlns="http://www.w3.org/1999/xhtml"><nest/></textarea>
-#errors
-/textarea/nest;element not allowed:text;m
-
-#data
-<em xmlns="http://www.w3.org/1999/xhtml"><textarea/></em>
-#errors
-/em;no significant content;s
-
-#data
-<p xmlns="http://www.w3.org/1999/xhtml"><textarea/></p>
-#errors
-/p;no significant content;s
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml"><textarea/></div>
-#errors
-/div;no significant content;s
-
-#data
 <output xmlns="http://www.w3.org/1999/xhtml"></output>
 #errors
 /output;no significant content;s
@@ -671,6 +624,7 @@
 <select xmlns="http://www.w3.org/1999/xhtml"><optgroup form="a"/></select>
 #errors
 /select/optgroup/@form;attribute not defined;m
+/select/optgroup;attribute missing;label;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -679,6 +633,7 @@
 </div>
 #errors
 /div/select/optgroup/@form;attribute not defined;m
+/div/select/optgroup;attribute missing;label;m
 
 #data
 <select xmlns="http://www.w3.org/1999/xhtml"><option form="a">x</option></select>

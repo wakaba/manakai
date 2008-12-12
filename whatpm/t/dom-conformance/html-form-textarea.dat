@@ -1,4 +1,51 @@
 #data
+<textarea xmlns="http://www.w3.org/1999/xhtml"></textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml">  </textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml">xxxx</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"><em>a</em></textarea>
+#errors
+/textarea/em;element not allowed:text;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"><title>x</title></textarea>
+#errors
+/textarea/title;element not allowed:text;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml">aa<br/>bb</textarea>
+#errors
+/textarea/br;element not allowed:text;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"><nest/></textarea>
+#errors
+/textarea/nest;element not allowed:text;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><textarea/></em>
+#errors
+/em;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><textarea/></p>
+#errors
+/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><textarea/></div>
+#errors
+/div;no significant content;s
+
+#data
 <textarea xmlns="http://www.w3.org/1999/xhtml"
     pattern="">x</textarea>
 #errors
@@ -12,3 +59,364 @@
 #errors
 /textarea/@pattern;SUBDOC
 /textarea/@pattern;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    autofocus=""
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="autofocus"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="AUTOfocus"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="auto"
+>a</textarea>
+#errors
+/textarea/@autofocus;boolean:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="no"
+>a</textarea>
+#errors
+/textarea/@autofocus;boolean:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    readonly=""
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    readonly="ReadOnly"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    readonly="readonly"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    readonly="yes"
+>a</textarea>
+#errors
+/textarea/@readonly;boolean:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    cols=""
+>a</textarea>
+#errors
+/textarea/@cols;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    cols="0"
+>a</textarea>
+#errors
+/textarea/@cols;nninteger:out of range;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    cols="1"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    cols="000020"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    cols="10.0"
+>a</textarea>
+#errors
+/textarea/@cols;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    cols="+10"
+>a</textarea>
+#errors
+/textarea/@cols;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    cols="-100"
+>a</textarea>
+#errors
+/textarea/@cols;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    cols="auto"
+>a</textarea>
+#errors
+/textarea/@cols;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    rows=""
+>a</textarea>
+#errors
+/textarea/@rows;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    rows="0"
+>a</textarea>
+#errors
+/textarea/@rows;nninteger:out of range;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    rows="1"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    rows="000020"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    rows="10.0"
+>a</textarea>
+#errors
+/textarea/@rows;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    rows="+10"
+>a</textarea>
+#errors
+/textarea/@rows;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    rows="-100"
+>a</textarea>
+#errors
+/textarea/@rows;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    rows="auto"
+>a</textarea>
+#errors
+/textarea/@rows;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap=""
+>a</textarea>
+#errors
+/textarea/@wrap;enumerated:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="soft"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="hard"
+>a</textarea>
+#errors
+/textarea;attribute missing;cols;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="Soft"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="Hard"
+>a</textarea>
+#errors
+/textarea;attribute missing;cols;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="SOFT"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="HARD"
+>a</textarea>
+#errors
+/textarea;attribute missing;cols;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="on"
+>a</textarea>
+#errors
+/textarea/@wrap;enumerated:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="off"
+>a</textarea>
+#errors
+/textarea/@wrap;enumerated:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="physical"
+>a</textarea>
+#errors
+/textarea/@wrap;enumerated:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="logical"
+>a</textarea>
+#errors
+/textarea/@wrap;enumerated:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="software"
+>a</textarea>
+#errors
+/textarea/@wrap;enumerated:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="wrap"
+>a</textarea>
+#errors
+/textarea/@wrap;enumerated:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="hard" cols="1"
+>a</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength=""
+></textarea>
+#errors
+/textarea/@maxlength;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="0"
+></textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="1"
+></textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="+0"
+></textarea>
+#errors
+/textarea/@maxlength;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="-0"
+></textarea>
+#errors
+/textarea/@maxlength;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="-100"
+></textarea>
+#errors
+/textarea/@maxlength;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="10.0"
+></textarea>
+#errors
+/textarea/@maxlength;nninteger:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="10"
+>1234567890</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="6"
+>1234567890</textarea>
+#errors
+/textarea;value too long;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    required=""
+>1234567890</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    required="required"
+>1234567890</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    required="RequiRED"
+>1234567890</textarea>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    required="yes"
+>1234567890</textarea>
+#errors
+/textarea/@required;boolean:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    pattern=""
+>1234567890</textarea>
+#errors
+/textarea/@pattern;attribute not defined;m
+/textarea/@pattern;SUBDOC
+/textarea;attribute missing;title;s
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    pattern="(?!x)" title="x"
+>1234567890</textarea>
+#errors
+/textarea/@pattern;attribute not defined;m
+/textarea/@pattern;SUBDOC
