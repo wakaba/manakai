@@ -1,4 +1,30 @@
-<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2008-12-12T11:50:44Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1229082646"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1229082646</id><title>2008-12-12 Wakaba</title><updated>2008-12-12T11:50:44Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/dom-conformance/ChangeLog	12 Dec 2008 11:50:40 -0000
+<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2008-12-12T12:59:13Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1229086757"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1229086757</id><title>2008-12-12 Wakaba</title><updated>2008-12-12T12:59:13Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/dom-conformance/ChangeLog	12 Dec 2008 12:59:07 -0000
+	* html-form-input.dat: Added test data for &lt;input disabled&gt; and
+	&lt;input autofocus&gt;.
+
+	* html-forms-1.dat: Added test data for &lt;fieldset disabled&gt;,
+	&lt;output for&gt;, and &lt;{formcontrol} name&gt;.  Added test data for
+	&lt;{formcontrol} autofocus=&quot;&quot;&gt;'s uniqueness.
+
+2008-12-12  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+++ whatpm/Whatpm/ChangeLog	12 Dec 2008 12:54:19 -0000
+	* ContentChecker.pm: Introduced new flag |has_autofocus|.  Added
+	support for new |id_type| value of |any|, which means any kind of
+	element is allowed as a referenced element.
+
+2008-12-12  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+++ whatpm/Whatpm/ContentChecker/ChangeLog	12 Dec 2008 12:56:56 -0000
+	* HTML.pm: Added checking for the uniqueness of |autofocus=&quot;&quot;|
+	attribute.  Implemented |name=&quot;&quot;| attribute for form controls.
+	Added U+000C into character class of space characters (it should
+	have been, but was not in some of regular expressions).  Updated
+	definitions for |output| elements.
+	
+2008-12-12  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+</content></entry><entry xml:id="entry-1229082646"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1229082646</id><title>2008-12-12 Wakaba</title><updated>2008-12-12T11:50:44Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/dom-conformance/ChangeLog	12 Dec 2008 11:50:40 -0000
 	* html-datatemplate.dat, html-form-datalist.dat: Updated test
 	results related to |optgroup| elements.
 

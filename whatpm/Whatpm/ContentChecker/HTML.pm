@@ -822,6 +822,31 @@ my $AcceptAttrChecker = sub {
   }
 }; # $AcceptAttrChecker
 
+my $FormControlNameAttrChecker = sub {
+  my ($self, $attr) = @_;
+  
+  unless (length $attr->value) {
+    $self->{onerror}->(node => $attr,
+                       type => 'empty control name', ## TODOC: type
+                       level => $self->{level}->{must});
+  }
+  
+  ## NOTE: No uniqueness constraint.
+}; # $FormControlNameAttrChecker
+
+my $AutofocusAttrChecker = sub {
+  my ($self, $attr) = @_;
+  
+  $GetHTMLBooleanAttrChecker->('autofocus')->(@_);
+  
+  if ($self->{has_autofocus}) {
+    $self->{onerror}->(node => $attr,
+                       type => 'duplicate autofocus', ## TODOC: type
+                       level => $self->{level}->{must});
+  }
+  $self->{has_autofocus} = 1;
+}; # $AutofocusAttrChekcer
+
 my $HTMLUsemapAttrChecker = sub {
   my ($self, $attr) = @_;
   ## MUST be a valid hash-name reference to a |map| element.
@@ -5466,7 +5491,7 @@ $Element->{$HTML_NS}->{fieldset} = {
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     form => $HTMLFormAttrChecker,
-    ## TODO: name [HTML5]
+    name => $FormControlNameAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -5614,11 +5639,11 @@ $Element->{$HTML_NS}->{input} = {
          align => '',
          alt => '',
          autocomplete => '',
-         autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
-             ## ISSUE: No HTML5 definition yet.  ## TODO: Tests
+         autofocus => $AutofocusAttrChecker,
+             ## NOTE: <input type=hidden disabled> is not disallowed.
          checked => '',
          disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-             ## ISSUE: No HTML5 definition yet.  ## TODO: Tests
+             ## NOTE: <input type=hidden disabled> is not disallowed.
          enctype => '',
          form => $HTMLFormAttrChecker,
          inputmode => '',
@@ -5629,10 +5654,7 @@ $Element->{$HTML_NS}->{input} = {
          method => '',
          min => '',
          multiple => '',
-         name => sub {
-           ## ISSUE: No HTML5 definition yet.
-           ## TODO: tests
-         },
+         name => $FormControlNameAttrChecker,
          onformchange => $HTMLEventHandlerAttrChecker, # [WF2]
          onforminput => $HTMLEventHandlerAttrChecker, # [WF2]
          oninput => $HTMLEventHandlerAttrChecker, # [WF2]
@@ -5969,7 +5991,7 @@ $Element->{$HTML_NS}->{input} = {
 
                $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_);
 
-               if ($attr->value =~ /^[\x09\x0A\x0D\x20]*([0-9]+)/) {
+               if ($attr->value =~ /^[\x09\x0A\x0C\x0D\x20]*([0-9]+)/) {
                  ## NOTE: Applying the rules for parsing non-negative
                  ## integers results in a number.
                  my $max_allowed_value_length = 0+$1;
@@ -6009,8 +6031,8 @@ $Element->{$HTML_NS}->{input} = {
                    my @addr = split /,/, $attr->value, -1;
                    @addr = ('') unless @addr;
                    for (@addr) {
-                     s/\A[\x09\x0A\x0D\x20]+//;
-                     s/[\x09\x0A\x0D\x20]\z//;
+                     s/\A[\x09\x0A\x0C\x0D\x20]+//;
+                     s/[\x09\x0A\x0C\x0D\x20]\z//;
                      unless (/\A$ValidEmailAddress\z/) {
                        $self->{onerror}->(node => $attr,
                                           type => 'email:syntax error', ## TODO: type
@@ -6119,14 +6141,17 @@ $Element->{$HTML_NS}->{button} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accesskey => $HTMLAccesskeyAttrChecker,
+    ## ISSUE: In HTML5, no "MUST NOT" for using |action|, |method|,
+    ## |enctype|, |target|, and |novalidate| with non-|submit|-|type|
+    ## |button| elements.
     action => $HTMLURIAttrChecker,
-    autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
+    autofocus => $AutofocusAttrChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     form => $HTMLFormAttrChecker,
     method => $GetHTMLEnumeratedAttrChecker->({
       get => 1, post => 1, put => 1, delete => 1,
     }),
-    name => sub {}, ## NOTE: CDATA [M12N] ## TODO: HTML5 def
+    name => $FormControlNameAttrChecker,
     novalidate => $GetHTMLBooleanAttrChecker->('novalidate'), ## TODO: tests
     onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
     onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
@@ -6256,12 +6281,12 @@ $Element->{$HTML_NS}->{select} = {
   is_root => 1, ## TODO: SHOULD NOT in application/xhtml+xml [WF2]
   check_attrs => $GetHTMLAttrsChecker->({
     accesskey => $HTMLAccesskeyAttrChecker,
-    autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
+    autofocus => $AutofocusAttrChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
     form => $HTMLFormAttrChecker,
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
-    name => sub {}, ## TODO: HTML5 name=""
+    name => $FormControlNameAttrChecker,
     ## TODO: tests for on*
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,
@@ -6518,7 +6543,7 @@ $Element->{$HTML_NS}->{textarea} = {
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $HTMLIMTAttrChecker, ## TODO: MUST be a text-based type [WF2]
     accesskey => $HTMLAccesskeyAttrChecker,
-    autofocus => $GetHTMLBooleanAttrChecker->('autofocus'),
+    autofocus => $AutofocusAttrChecker,
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     form => $HTMLFormAttrChecker,
@@ -6528,7 +6553,7 @@ $Element->{$HTML_NS}->{textarea} = {
       
       $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_);
       
-      if ($attr->value =~ /^[\x09\x0A\x0D\x20]*([0-9]+)/) {
+      if ($attr->value =~ /^[\x09\x0A\x0C\x0D\x20]*([0-9]+)/) {
         ## NOTE: Applying the rules for parsing non-negative integers
         ## results in a number.
         my $max_allowed_value_length = 0+$1;
@@ -6550,7 +6575,7 @@ $Element->{$HTML_NS}->{textarea} = {
         }
       }
     },
-    name => sub {}, ## TODO: HTML5 name=""
+    name => $FormControlNameAttrChecker,
     onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
     onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     oninput => $HTMLEventHandlerAttrChecker, ## TODO: tests
@@ -6643,11 +6668,28 @@ $Element->{$HTML_NS}->{output} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: for [WF2]
+    for => sub {
+      my ($self, $attr) = @_;
+      
+      ## NOTE: "Unordered set of unique space-separated tokens".
+      
+      my %word;
+      for my $word (grep {length $_}
+                    split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+        unless ($word{$word}) {
+          $word{$word} = 1;
+          push @{$self->{idref}}, ['any', $word, $attr];
+        } else {
+          $self->{onerror}->(node => $attr, type => 'duplicate token',
+                             value => $word,
+                             level => $self->{level}->{must});
+        }
+      }
+    },
     form => $HTMLFormAttrChecker,
-    ## TODO: name [WF2]
-    onformchange => $HTMLEventHandlerAttrChecker,
-    onforminput => $HTMLEventHandlerAttrChecker,
+    name => $FormControlNameAttrChecker,
+    onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
+    onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
   }, {
     %HTMLAttrStatus,
     for => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
@@ -6657,7 +6699,6 @@ $Element->{$HTML_NS}->{output} = {
     onformchange => FEATURE_WF2,
     onforminput => FEATURE_WF2,
   }),
-  ## NOTE: "The output  element should be used when ..." [WF2]
 };
 
 $Element->{$HTML_NS}->{isindex} = {

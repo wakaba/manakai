@@ -222,6 +222,35 @@
 /fieldset/style;SUBDOC
 
 #data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"
+disabled="">
+<legend>x</legend>
+</fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"
+disabled="disabled">
+<legend>x</legend>
+</fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"
+disabled="DisableD">
+<legend>x</legend>
+</fieldset>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"
+disabled="no">
+<legend>x</legend>
+</fieldset>
+#errors
+/fieldset/@disabled;boolean:invalid;m
+
+#data
 <output xmlns="http://www.w3.org/1999/xhtml"></output>
 #errors
 /output;no significant content;s
@@ -271,6 +300,167 @@
 <input xmlns="http://www.w3.org/1999/xhtml"><output>x</output></input>
 #errors
 /input/output;element not allowed:empty;m
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"
+    for="">
+  x
+</output>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"
+    for="    ">
+  x
+</output>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"
+    for="x">
+  <span id="x">x</span>
+</output>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"
+    for=" x ">
+  <span id="x">x</span>
+</output>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"
+    for="x y">
+  <span id="x">x</span> <span id="y">X</span>
+</output>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml" id="x">
+<output for="x">
+  x
+</output>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<img id="x" src="" alt="y"/>
+<output for="x">
+  x
+</output>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<output for="x">
+  x
+</output>
+<br id="x"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<output for="x">
+  x
+</output>
+</div>
+#errors
+/div/output/@for;no referenced element;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<output for="x">
+  <span id="x">x</span>
+  <br id="x"/>
+</output>
+</div>
+#errors
+/div/output/br/@id;duplicate ID;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml" id="X">
+<output for="x">
+  x
+</output>
+</div>
+#errors
+/div/output/@for;no referenced element;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml" id="x y">
+<output for="x y">
+  x
+</output>
+</div>
+#errors
+/div/@id;space in ID;m
+/div/output/@for;no referenced element;m
+/div/output/@for;no referenced element;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<output for="x y">
+  x
+</output>
+</div>
+#errors
+/div/output/@for;no referenced element;m
+/div/output/@for;no referenced element;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml" id="x">
+<output for="x x">
+  x
+</output>
+</div>
+#errors
+/div/output/@for;duplicate token;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml" id="x">
+<output for="x x x">
+  x
+</output>
+</div>
+#errors
+/div/output/@for;duplicate token;m
+/div/output/@for;duplicate token;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<output for="x">
+  x
+</output>
+<menu id="x">x</menu>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<output for="x">
+  x
+</output>
+<input id="x"/>
+</div>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml" id="x">
+<output for="x">
+  x
+</output>
+</form>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"
+disabled="">z</output>
+#errors
+/output/@disabled;attribute not defined;m
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"
@@ -950,3 +1140,484 @@
 /form/@accept;IMTnp:syntax error;m
 /form/@accept;IMTnp:syntax error;m
 /form/@accept;duplicate token;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"
+    name=""
+><legend>x</legend>y</fieldset>
+#errors
+/fieldset/@name;empty control name;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml"
+    name="x"
+><legend>x</legend>y</fieldset>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="checkbox" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="checkbox" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="radio" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="radio" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="submit" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="submit" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="reset" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="reset" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="button" name=""/>
+#errors
+/input/@name;empty control name;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="button" name="x"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="add" name=""/>
+#errors
+/input/@name;empty control name;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="add" name="x"/>
+#errors
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="remove" name=""/>
+#errors
+/input/@name;empty control name;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="remove" name="x"/>
+#errors
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-up" name=""/>
+#errors
+/input/@name;empty control name;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-up" name="x"/>
+#errors
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down" name=""/>
+#errors
+/input/@name;empty control name;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down" name="x"/>
+#errors
+/input/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="button" name="">x</button>
+#errors
+/button/@name;empty control name;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="button" name="x">x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="submit" name="">x</button>
+#errors
+/button/@name;empty control name;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="submit" name="x">x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="reset" name="">x</button>
+#errors
+/button/@name;empty control name;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="reset" name="x">x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="add" name="">x</button>
+#errors
+/button/@name;empty control name;m
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="add" name="x">x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="remove" name="">x</button>
+#errors
+/button/@name;empty control name;m
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="remove" name="x">x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="move-up" name="">x</button>
+#errors
+/button/@name;empty control name;m
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="move-up" name="x">x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down" name="">x</button>
+#errors
+/button/@name;empty control name;m
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down" name="x">x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    name=""/>
+#errors
+/select/@name;empty control name;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    name="x"/>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    name=""/>
+#errors
+/textarea/@name;empty control name;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    name="x"/>
+#errors
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"
+    name="">x</output>
+#errors
+/output/@name;empty control name;m
+
+#data
+<output xmlns="http://www.w3.org/1999/xhtml"
+    name="x">x</output>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+x<input autofocus=""/>
+<input autofocus=""/>
+</div>
+#errors
+/div/input/@autofocus;duplicate autofocus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+x<input autofocus=""/>
+<textarea autofocus=""/>
+</div>
+#errors
+/div/textarea/@autofocus;duplicate autofocus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+x<input autofocus=""/>
+<select autofocus=""/>
+</div>
+#errors
+/div/select/@autofocus;duplicate autofocus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+x<input autofocus=""/>
+<button autofocus="">x</button>
+</div>
+#errors
+/div/button/@autofocus;duplicate autofocus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+x<input autofocus=""/>
+<output autofocus="">x</output>
+</div>
+#errors
+/div/output/@autofocus;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+x<select autofocus=""/>
+<input autofocus=""/>
+</div>
+#errors
+/div/input/@autofocus;duplicate autofocus;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+x<br autofocus=""/>
+<input autofocus=""/>
+</div>
+#errors
+/div/br/@autofocus;attribute not defined;m

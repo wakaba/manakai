@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.105 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.106 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -580,6 +580,7 @@ sub check_element ($$$;$) {
   $self->{id} = {};
   $self->{id_type} = {}; # 'form' / 'labelable' / 'menu'
   $self->{form} = {}; # form/@name
+  #$self->{has_autofocus};
   $self->{idref} = []; # @form, @for, @contextmenu
   $self->{term} = {};
   $self->{usemap} = [];
@@ -799,17 +800,20 @@ next unless $code;## TODO: temp.
   }
 
   for (@{$self->{idref}}) {
-    if ($self->{id}->{$_->[1]} and
-        $self->{id_type}->{$_->[1]} eq $_->[0]) {
+    if ($self->{id}->{$_->[1]} and $self->{id_type}->{$_->[1]} eq $_->[0]) {
+      #
+    } elsif ($_->[0] eq 'any' and $self->{id}->{$_->[1]}) {
       #
     } else {
       $self->{onerror}->(node => $_->[2],
                          type => {
+                                  any => 'no referenced element', ## TODOC: type
                                   form => 'no referenced form',
                                   labelable => 'no referenced control',
                                   menu => 'no referenced menu',
                                   datalist => 'no referenced datalist', ## TODOC: type
                                  }->{$_->[0]},
+                         value => $_->[1],
                          level => $self->{level}->{must});
     }
   }
@@ -820,6 +824,7 @@ next unless $code;## TODO: temp.
   delete $self->{id};
   delete $self->{id_type};
   delete $self->{form};
+  delete $self->{has_autofocus};
   delete $self->{idref};
   delete $self->{usemap};
   delete $self->{ref};
@@ -1072,4 +1077,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/12/12 11:50:47 $
+# $Date: 2008/12/12 12:59:17 $

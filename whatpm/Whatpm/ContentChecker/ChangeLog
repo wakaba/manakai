@@ -1,5 +1,13 @@
 2008-12-12  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm: Added checking for the uniqueness of |autofocus=""|
+	attribute.  Implemented |name=""| attribute for form controls.
+	Added U+000C into character class of space characters (it should
+	have been, but was not in some of regular expressions).  Updated
+	definitions for |output| elements.
+	
+2008-12-12  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm: Updated definitions for |datalist|, |optgroup|,
 	|option|, and |textarea| elements.
 
