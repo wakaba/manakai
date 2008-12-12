@@ -5977,9 +5977,7 @@ $Element->{$HTML_NS}->{input} = {
                  my $value = $item->{node}->get_attribute_ns (undef, 'value');
                  if (defined $value) {
                    my $codepoint_length = length $value;
-                   $codepoint_length++
-                       while $value =~ /[\x{10000}-\x{10FFFF}]/g;
-
+                   
                    if ($codepoint_length > $max_allowed_value_length) {
                      $self->{onerror}
                          ->(node => $item->{node}
@@ -6128,9 +6126,10 @@ $Element->{$HTML_NS}->{button} = {
     method => $GetHTMLEnumeratedAttrChecker->({
       get => 1, post => 1, put => 1, delete => 1,
     }),
-    name => sub {}, ## NOTE: CDATA [M12N]
-    onformchange => $HTMLEventHandlerAttrChecker,
-    onforminput => $HTMLEventHandlerAttrChecker,
+    name => sub {}, ## NOTE: CDATA [M12N] ## TODO: HTML5 def
+    novalidate => $GetHTMLBooleanAttrChecker->('novalidate'), ## TODO: tests
+    onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
+    onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
     ## NOTE: According to Web Forms 2.0, |button| attribute has |template|
@@ -6141,10 +6140,8 @@ $Element->{$HTML_NS}->{button} = {
     ## author requirement.
     type => $GetHTMLEnumeratedAttrChecker->({
       button => 1, submit => 1, reset => 1,
-      ## [WF2]
-      add => 1, remove => 1, 'move-up' => 1, 'move-down' => 1,
     }),
-    value => sub {}, ## NOTE: CDATA [M12N]
+    value => sub {}, ## NOTE: No restriction.
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -6160,6 +6157,7 @@ $Element->{$HTML_NS}->{button} = {
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
     method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    novalidate => FEATURE_HTML5_DEFAULT,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onformchange => FEATURE_WF2_INFORMATIVE,
@@ -6167,7 +6165,7 @@ $Element->{$HTML_NS}->{button} = {
     replace => FEATURE_WF2,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-    template => FEATURE_HTML5_AT_RISK | FEATURE_WF2,
+    template => FEATURE_HTML5_AT_RISK | FEATURE_WF2, ## TODO: dropped
     type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }),
@@ -6180,6 +6178,9 @@ $Element->{$HTML_NS}->{button} = {
     } else {
       $self->{flag}->{has_labelable} = 2;
     }
+
+    ## ISSUE: "The value attribute must not be present unless the form
+    ## [content] attribute is present.": Wrong?
     
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;

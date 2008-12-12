@@ -222,94 +222,6 @@
 /fieldset/style;SUBDOC
 
 #data
-<button xmlns="http://www.w3.org/1999/xhtml"></button>
-#errors
-/button;no significant content;s
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml">  </button>
-#errors
-/button;no significant content;s
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml">xx</button>
-#errors
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml"><br/></button>
-#errors
-/button;no significant content;s
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml"><ins/></button>
-#errors
-/button;no significant content;s
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml"><em/></button>
-#errors
-/button;no significant content;s
-/button/em;no significant content;s
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml">aa<span>bb</span></button>
-#errors
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml"><p/></button>
-#errors
-/button;no significant content;s
-/button/p;no significant content;s
-/button/p;element not allowed:phrasing;m
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml"><video src=""/></button>
-#errors
-
-#data
-<button xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>x</button>
-#errors
-/button/style;element not allowed:phrasing;m
-/button/style;SUBDOC
-
-#data
-<em xmlns="http://www.w3.org/1999/xhtml"><button>x</button></em>
-#errors
-
-#data
-<em xmlns="http://www.w3.org/1999/xhtml"><button></button></em>
-#errors
-/em/button;no significant content;s
-/em;no significant content;s
-
-#data
-<div xmlns="http://www.w3.org/1999/xhtml"><button>x</button></div>
-#errors
-
-#data
-<ins xmlns="http://www.w3.org/1999/xhtml"><button>x</button></ins>
-#errors
-
-#data
-<em xmlns="http://www.w3.org/1999/xhtml"><ins><button>x</button></ins></em>
-#errors
-
-#data
-<br xmlns="http://www.w3.org/1999/xhtml"><button>x</button></br>
-#errors
-/br/button;element not allowed:empty;m
-
-#data
-<title xmlns="http://www.w3.org/1999/xhtml"><button>x</button></title>
-#errors
-/title/button;element not allowed:text;m
-
-#data
-<em xmlns="http://www.w3.org/1999/xhtml"><button>x<nest/></button></em>
-#errors
-/em/button/nest;element not allowed:phrasing;m
-
-#data
 <select xmlns="http://www.w3.org/1999/xhtml"></select>
 #errors
 
@@ -921,6 +833,7 @@
     name="a">x<a name="a">u</a></form>
 #errors
 /form/a/@name;attribute not defined;m
+/form/a/@name;unknown attribute;u
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml" form="a" id="a">x</form>

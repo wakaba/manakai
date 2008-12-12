@@ -1,0 +1,276 @@
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"></button>
+#errors
+/button;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">  </button>
+#errors
+/button;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">xx</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><br/></button>
+#errors
+/button;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><ins/></button>
+#errors
+/button;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><em/></button>
+#errors
+/button;no significant content;s
+/button/em;no significant content;s
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">aa<span>bb</span></button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><p/></button>
+#errors
+/button;no significant content;s
+/button/p;no significant content;s
+/button/p;element not allowed:phrasing;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><video src=""/></button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>x</button>
+#errors
+/button/style;element not allowed:phrasing;m
+/button/style;SUBDOC
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><button>x</button></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><button></button></em>
+#errors
+/em/button;no significant content;s
+/em;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><button>x</button></div>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"><button>x</button></ins>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><ins><button>x</button></ins></em>
+#errors
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><button>x</button></br>
+#errors
+/br/button;element not allowed:empty;m
+
+#data
+<title xmlns="http://www.w3.org/1999/xhtml"><button>x</button></title>
+#errors
+/title/button;element not allowed:text;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><button>x<nest/></button></em>
+#errors
+/em/button/nest;element not allowed:phrasing;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><img src="" alt="x"/></button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><span>x</span></button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"><p>x</p></button>
+#errors
+/button/p;element not allowed:phrasing;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type=""
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="button"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="submit"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="reset"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="add"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="remove"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button type="delete" xmlns="http://www.w3.org/1999/xhtml">x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="move-up"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type=" submit"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="Submit"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    type="RESET"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    disabled=""
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    disabled="disabled"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    disabled="DISABLED"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    disabled="true"
+>x</button>
+#errors
+/button/@disabled;boolean:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    disabled="enabled"
+>x</button>
+#errors
+/button/@disabled;boolean:invalid;m
+
+#data escaped
+<button xmlns="http://www.w3.org/1999/xhtml"
+    disabled="d\u0130sabled"
+>x</button>
+#errors
+/button/@disabled;boolean:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    disabled="d\u0131sabled"
+>x</button>
+#errors
+/button/@disabled;boolean:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    autofocus=""
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="autofocus"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="AutoFocus"
+>x</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    autofocus=" autofocus"
+>x</button>
+#errors
+/button/@autofocus;boolean:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="yes"
+>x</button>
+#errors
+/button/@autofocus;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"><button
+    value=""
+>x</button></form>
+#errors

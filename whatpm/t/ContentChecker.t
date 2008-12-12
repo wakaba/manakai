@@ -20,8 +20,9 @@ test_files (qw[
   t/dom-conformance/html-objects-1.dat
   t/dom-conformance/html-tables-1.dat
   t/dom-conformance/html-forms-1.dat
-  t/dom-conformance/html-form-input-1.dat
   t/dom-conformance/html-form-label.dat
+  t/dom-conformance/html-form-input-1.dat
+  t/dom-conformance/html-form-button.dat
   t/dom-conformance/html-form-datalist.dat
   t/dom-conformance/html-form-textarea.dat
   t/dom-conformance/html-interactive-1.dat
@@ -30,4 +31,4 @@ test_files (qw[
 ]);
 
 ## License: Public Domain.
-## $Date: 2008/12/12 05:05:20 $
+## $Date: 2008/12/12 05:51:41 $
