@@ -1,3 +1,113 @@
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">  </datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">xxx</datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><p>x</p></datalist>
+#errors
+/datalist/p;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><p>x</p><option/></datalist>
+#errors
+/datalist/p;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><p>x</p>y<option/></datalist>
+#errors
+/datalist/p;element not allowed;m
+/datalist/option;element not allowed:phrasing;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">xx<p>x</p></datalist>
+#errors
+/datalist/p;element not allowed:phrasing;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/><option/></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><optgroup/></datalist>
+#errors
+/datalist/optgroup;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/><optgroup/></datalist>
+#errors
+/datalist/optgroup;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/>xx</datalist>
+#errors
+/datalist/"xx";character not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">  <option/></datalist>
+#errors
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">  <option/>xx</datalist>
+#errors
+/datalist/"xx";character not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><option/><em>?</em></datalist>
+#errors
+/datalist/em;element not allowed;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml">aa<option/></datalist>
+#errors
+/datalist/option;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><datalist/></em>
+#errors
+/em;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><datalist/></p>
+#errors
+/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><datalist/></div>
+#errors
+/div;no significant content;s
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"><datalist/></video>
+#errors
+/video;no significant content;s
+
+#data
+<img src="" alt="x" xmlns="http://www.w3.org/1999/xhtml"><datalist/></img>
+#errors
+/img/datalist;element not allowed:empty;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"><datalist/></datalist>
+#errors
+/datalist;no significant content;s
+
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <input type="text" list="a"/>x

@@ -6249,6 +6249,7 @@ $Element->{$HTML_NS}->{label} = {
 
 $Element->{$HTML_NS}->{select} = {
   %HTMLChecker,
+  ## ISSUE: HTML5 has no requirement like these:
     ## TODO: author should SELECTED at least one OPTION in non-MULTIPLE case [HTML4].
     ## TODO: more than one OPTION with SELECTED in non-MULTIPLE case is "error" [HTML4]
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
@@ -6260,12 +6261,13 @@ $Element->{$HTML_NS}->{select} = {
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
     form => $HTMLFormAttrChecker,
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
-    name => sub {}, ## NOTE: CDATA [M12N]
+    name => sub {}, ## TODO: HTML5 name=""
+    ## TODO: tests for on*
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,
     oninput => $HTMLEventHandlerAttrChecker,
     oninvalid => $HTMLEventHandlerAttrChecker,
-    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -6310,6 +6312,8 @@ $Element->{$HTML_NS}->{select} = {
     $element_state->{id_type} = 'labelable';
   },
   check_child_element => sub {
+    ## NOTE: (option | optgroup)*
+
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
