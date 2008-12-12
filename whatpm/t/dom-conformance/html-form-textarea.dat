@@ -1,0 +1,14 @@
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    pattern="">x</textarea>
+#errors
+/textarea/@pattern;SUBDOC
+/textarea/@pattern;attribute not defined;m
+/textarea;attribute missing;title;s
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    pattern="" title="empty">x</textarea>
+#errors
+/textarea/@pattern;SUBDOC
+/textarea/@pattern;attribute not defined;m

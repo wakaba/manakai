@@ -54,9 +54,33 @@ $Type->{application}->{subtype}->{'rss+xml'} = {
   ## NOTE: Not registered
 };
 
+$Type->{application}->{subtype}->{xml} = { ## TODO: check IANAREG
+  registered => 1,
+};
+
 $Type->{audio}->{registered} = 1;
 
+$Type->{audio}->{subtype}->{basic} = { ## TODO: check IANAREG
+  registered => 1,
+};
+
+$Type->{audio}->{subtype}->{mpeg} = { ## TODO: check IANAREG
+  registered => 1,
+};
+
 $Type->{image}->{registered} = 1;
+
+$Type->{image}->{subtype}->{jpeg} = { ## TODO: check IANAREG
+  registered => 1,
+};
+
+$Type->{image}->{subtype}->{png} = { ## TODO: check IANAREG
+  registered => 1,
+};
+
+$Type->{image}->{subtype}->{'svg+xml'} = { ## TODO: check IANAREG
+  registered => 1,
+};
 
 $Type->{message}->{registered} = 1;
 
@@ -390,4 +414,4 @@ sub check_imt ($$$$@) {
 } # check_imt
 
 1;
-## $Date: 2008/08/29 13:34:36 $
+## $Date: 2008/12/12 05:05:20 $

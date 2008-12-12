@@ -1111,3 +1111,282 @@
 <form id="b">x</form>
 </div>
 #errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept=",">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;duplicate token;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="text/plain">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="text/plain,text/html">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="text/plain, text/html">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="text/plain,">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="image/png">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept=",image/png">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="image/png,,image/jpeg">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept=" image/png ">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="image/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="audio/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="video/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="text/*">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="multipart/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+/form/@accept;IMTnp:syntax error;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="model/*">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="application/*">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="message/*">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="font/*">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="*/*">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="*/*+xml">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="*/xml">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="image/png,video/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="audio/*,audio/mpeg">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="audio/*,video/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="AUDIO/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="imagE/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="Image/*,TEXT/plain">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="application/XML">x</form>
+#errors
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="text/plain,text/plain">x</form>
+#errors
+/form/@accept;duplicate token;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="image/*,image/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+/form/@accept;duplicate token;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="image/png,image/PNG">x</form>
+#errors
+/form/@accept;attribute not defined;m
+/form/@accept;duplicate token;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="Audio/*,audio/*">x</form>
+#errors
+/form/@accept;duplicate token;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="text/javascript; version=1.1">x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept='text/plain;x-param="image/png,image/jpeg,image/svg+xml"'>x</form>
+#errors
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+/form/@accept;IMTnp:syntax error;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept='text/plain;x-param="image/png,image/JPEG,image/svg+xml",image/jpeg'>x</form>
+#errors
+/form/@accept;attribute not defined;m
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMTnp:syntax error;m
+/form/@accept;duplicate token;m

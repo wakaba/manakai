@@ -670,6 +670,10 @@ my $HTMLLengthAttrChecker = sub {
   ## of percentage value at all (!).
 }; # $HTMLLengthAttrChecker
 
+my $MIMEToken = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
+my $TypeOrSubtype = qr/[A-Za-z0-9!#\$&.+^_-]{1,127}/; # RFC 4288
+my $IMTNoParameter = qr[($TypeOrSubtype)/($TypeOrSubtype)];
+
 ## "A valid MIME type, optionally with parameters. [RFC 2046]"
 ## ISSUE: RFC 2046 does not define syntax of media types.
 ## ISSUE: The definition of "a valid MIME type" is unknown.
@@ -681,12 +685,11 @@ my $HTMLIMTAttrChecker = sub {
   ## of LWS/comments between tokens.  Is it allowed in HTML?  Maybe no.
   ## ISSUE: RFC 2231 extension?  Maybe no.
   my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
-  my $token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
   my $qs = qr/"(?>[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
-  if ($value =~ m#\A$lws0($token)$lws0/$lws0($token)$lws0((?>;$lws0$token$lws0=$lws0(?>$token|$qs)$lws0)*)\z#) {
+  if ($value =~ m#\A$lws0($MIMEToken)$lws0/$lws0($MIMEToken)$lws0((?>;$lws0$MIMEToken$lws0=$lws0(?>$MIMEToken|$qs)$lws0)*)\z#) {
     my @type = ($1, $2);
     my $param = $3;
-    while ($param =~ s/^;$lws0($token)$lws0=$lws0(?>($token)|($qs))$lws0//) {
+    while ($param =~ s/^;$lws0($MIMEToken)$lws0=$lws0(?>($MIMEToken)|($qs))$lws0//) {
       if (defined $2) {
         push @type, $1 => $2;
       } else {
@@ -773,7 +776,51 @@ my $PatternAttrChecker = sub {
                        container_node => $attr,
                        media_type => 'text/x-regexp-js',
                        is_char_string => 1});
+
+  ## ISSUE: "value must match the Pattern production of ECMA 262's
+  ## grammar" - no additional constraints (e.g. {n,m} then n>=m).
+
+  ## TODO: Warn if @value does not match @pattern.
 }; # $PatternAttrChecker
+
+my $AcceptAttrChecker = sub {
+  my ($self, $attr) = @_;
+  
+  my $value = $attr->value;
+  $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+  my @value = length $value ? split /,/, $value, -1 : ('');
+  my %has_value;
+  for my $v (@value) {
+    if ($has_value{$v}) {
+      $self->{onerror}->(node => $attr,
+                         type => 'duplicate token',
+                         value => $v,
+                         level => $self->{level}->{must});
+      next;
+    } 
+    $has_value{$v} = 1;
+    
+    if ($v eq 'audio/*' or $v eq 'video/*' or $v eq 'image/*') {
+      #
+    } elsif ($v =~ m[\A$IMTNoParameter\z]) {
+      ## ISSUE: HTML5 references RFC 2046, but maybe HTML5 should
+      ## define its own syntax citing RFC 4288.
+      
+      ## NOTE: Parameters not allowed.
+      require Whatpm::IMTChecker;
+      my $ic = Whatpm::IMTChecker->new;
+      $ic->{level} = $self->{level};
+      $ic->check_imt (sub {
+        $self->{onerror}->(@_, node => $attr);
+      }, $1, $2);
+    } else {
+      $self->{onerror}->(node => $attr,
+                         type => 'IMTnp:syntax error', ## TODOC: type
+                         value => $v,
+                         level => $self->{level}->{must});
+    }
+  }
+}; # $AcceptAttrChecker
 
 my $HTMLUsemapAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -5338,7 +5385,7 @@ $Element->{$HTML_NS}->{form} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    accept => $AttrCheckerNotImplemented, ## TODO: ContentTypes [WF2]
+    accept => $AcceptAttrChecker,
     'accept-charset' => $HTMLCharsetsAttrChecker,
     action => $HTMLURIAttrChecker, ## TODO: "User agent behavior for a value other than HTTP URI is undefined" [HTML4]
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
@@ -5376,7 +5423,7 @@ $Element->{$HTML_NS}->{form} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accept => FEATURE_WF2X | FEATURE_M12N10_REC,
+    accept => FEATURE_HTML5_DROPPED | FEATURE_WF2X | FEATURE_M12N10_REC,
     'accept-charset' => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     data => FEATURE_WF2,
@@ -5529,6 +5576,7 @@ $Element->{$HTML_NS}->{input} = {
          min => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          multiple => FEATURE_HTML5_DEFAULT,
          name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         novalidate => FEATURE_HTML5_DEFAULT,
          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5548,7 +5596,7 @@ $Element->{$HTML_NS}->{input} = {
          step => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
-         template => FEATURE_HTML5_AT_RISK | FEATURE_WF2,
+         template => FEATURE_HTML5_AT_RISK | FEATURE_WF2, ## TODO:dropped
          type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
          value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5822,7 +5870,7 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'file') {
             $checker =
             {
-             ## TODO: accept
+             accept => $AcceptAttrChecker,
              accesskey => $HTMLAccesskeyAttrChecker,
              multiple => $GetHTMLBooleanAttrChecker->('multiple'),
              required => $GetHTMLBooleanAttrChecker->('required'),
@@ -5991,6 +6039,14 @@ $Element->{$HTML_NS}->{input} = {
             $checker = '' if $state eq 'password' and $attr_ln eq 'list';
             $checker = $GetHTMLBooleanAttrChecker->('multiple')
                 if $state eq 'email' and $attr_ln eq 'multiple';
+
+            if ($item->{node}->has_attribute_ns (undef, 'pattern') and
+                not $item->{node}->has_attribute_ns (undef, 'title')) {
+              $self->{onerror}->(node => $item->{node},
+                                 type => 'attribute missing',
+                                 text => 'title',
+                                 level => $self->{level}->{should});
+            }
           }
         }
 
@@ -6458,12 +6514,13 @@ $Element->{$HTML_NS}->{textarea} = {
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,
     oninput => $HTMLEventHandlerAttrChecker,
-    pattern => $PatternAttrChecker, ## TODO: |title| special semantics
+    pattern => $PatternAttrChecker,
     readonly => $GetHTMLBooleanAttrChecker->('readonly'),
     required => $GetHTMLBooleanAttrChecker->('required'),
     rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     oninput => $HTMLEventHandlerAttrChecker,
     oninvalid => $HTMLEventHandlerAttrChecker,
+    ## NOTE: |title| had special semantics if |pattern| was specified [WF2].
     wrap => $GetHTMLEnumeratedAttrChecker->({soft => 1, hard => 1}),
   }, {
     %HTMLAttrStatus,
@@ -6490,7 +6547,7 @@ $Element->{$HTML_NS}->{textarea} = {
     oninput => FEATURE_WF2,
     oninvalid => FEATURE_WF2,
     onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    pattern => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    pattern => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     readonly => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     rows => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC, 
@@ -6509,6 +6566,15 @@ $Element->{$HTML_NS}->{textarea} = {
       $self->{flag}->{has_labelable} = 2;
     }
 
+    if ($item->{node}->has_attribute_ns (undef, 'pattern') and
+        not $item->{node}->has_attribute_ns (undef, 'title')) {
+      ## NOTE: WF2 (dropped by HTML5)
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'title',
+                         level => $self->{level}->{should});
+    }
+    
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;

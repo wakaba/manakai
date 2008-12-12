@@ -3178,6 +3178,249 @@
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept=""/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept=","/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+/input/@accept;duplicate token;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/plain"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/plain,text/html"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/plain, text/html"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/plain,"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="image/png"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept=",image/png"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="image/png,,image/jpeg"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept=" image/png "/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="image/*"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="audio/*"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="video/*"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/*"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="multipart/*"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="model/*"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="application/*"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="message/*"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="font/*"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="*/*"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="*/*+xml"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="*/xml"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="image/png,video/*"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="audio/*,audio/mpeg"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="audio/*,video/*"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="AUDIO/*"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="imagE/*"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="Image/*,TEXT/plain"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="application/XML"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/plain,text/plain"/>
+#errors
+/input/@accept;duplicate token;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="image/*,image/*"/>
+#errors
+/input/@accept;duplicate token;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="image/png,image/PNG"/>
+#errors
+/input/@accept;duplicate token;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="Audio/*,audio/*"/>
+#errors
+/input/@accept;duplicate token;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/javascript; version=1.1"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept='text/plain;x-param="image/png,image/jpeg,image/svg+xml"'/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept='text/plain;x-param="image/png,image/JPEG,image/svg+xml",image/jpeg'/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMTnp:syntax error;m
+/input/@accept;duplicate token;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
     type="text"
     value=""/>
 #errors
@@ -8578,6 +8821,81 @@
     multiple="yes"/>
 #errors
 /input/@multiple;boolean:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    pattern=""/>
+#errors
+/input/@pattern;SUBDOC
+/input;attribute missing;title;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    pattern="" title="empty"/>
+#errors
+/input/@pattern;SUBDOC
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    pattern=""/>
+#errors
+/input/@pattern;SUBDOC
+/input;attribute missing;title;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    pattern="" title="empty"/>
+#errors
+/input/@pattern;SUBDOC
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    pattern=""/>
+#errors
+/input/@pattern;SUBDOC
+/input;attribute missing;title;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    pattern="" title="empty"/>
+#errors
+/input/@pattern;SUBDOC
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    pattern=""/>
+#errors
+/input/@pattern;SUBDOC
+/input;attribute missing;title;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    pattern="" title="empty"/>
+#errors
+/input/@pattern;SUBDOC
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    pattern=""/>
+#errors
+/input/@pattern;SUBDOC
+/input;attribute missing;title;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    pattern="" title="empty"/>
+#errors
+/input/@pattern;SUBDOC
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"

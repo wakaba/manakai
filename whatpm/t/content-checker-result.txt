@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Dec  6 21:29:40 2008
-# Current time GMT:   Sat Dec  6 12:29:40 2008
+# Current time local: Fri Dec 12 13:56:15 2008
+# Current time GMT:   Fri Dec 12 04:56:15 2008
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2471,7 +2471,6 @@ ok 2428
 ok 2429
 ok 2430
 ok 2431
-# t/dom-conformance/html-form-input-1.dat
 ok 2432
 ok 2433
 ok 2434
@@ -2508,6 +2507,7 @@ ok 2464
 ok 2465
 ok 2466
 ok 2467
+# t/dom-conformance/html-form-input-1.dat
 ok 2468
 ok 2469
 ok 2470
@@ -2986,7 +2986,6 @@ ok 2942
 ok 2943
 ok 2944
 ok 2945
-Parse error (lt in attr value) at line 3 column 12
 ok 2946
 ok 2947
 ok 2948
@@ -3059,6 +3058,7 @@ ok 3014
 ok 3015
 ok 3016
 ok 3017
+Parse error (lt in attr value) at line 3 column 12
 ok 3018
 ok 3019
 ok 3020
@@ -3512,33 +3512,13 @@ ok 3467
 ok 3468
 ok 3469
 ok 3470
-not ok 3471
-# Test 3471 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3471)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime"
-#    step="-1.4142135623730950488016887242097e0"/>)
-not ok 3472
-# Test 3472 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3472)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime"
-#    step="3.17e4"/>)
+ok 3471
+ok 3472
 ok 3473
 ok 3474
-not ok 3475
-# Test 3475 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3475)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime"
-#    step="42e0"/>)
-not ok 3476
-# Test 3476 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3476)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime"
-#    step="4.2e1"/>)
-not ok 3477
-# Test 3477 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3477)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime"
-#    step="420e-1"/>)
+ok 3475
+ok 3476
+ok 3477
 ok 3478
 ok 3479
 ok 3480
@@ -3559,33 +3539,13 @@ ok 3494
 ok 3495
 ok 3496
 ok 3497
-not ok 3498
-# Test 3498 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3498)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="date"
-#    step="-1.4142135623730950488016887242097e0"/>)
-not ok 3499
-# Test 3499 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3499)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="date"
-#    step="3.17e4"/>)
+ok 3498
+ok 3499
 ok 3500
 ok 3501
-not ok 3502
-# Test 3502 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3502)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="date"
-#    step="42e0"/>)
-not ok 3503
-# Test 3503 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3503)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="date"
-#    step="4.2e1"/>)
-not ok 3504
-# Test 3504 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3504)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="date"
-#    step="420e-1"/>)
+ok 3502
+ok 3503
+ok 3504
 ok 3505
 ok 3506
 ok 3507
@@ -3606,33 +3566,13 @@ ok 3521
 ok 3522
 ok 3523
 ok 3524
-not ok 3525
-# Test 3525 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3525)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="month"
-#    step="-1.4142135623730950488016887242097e0"/>)
-not ok 3526
-# Test 3526 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3526)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="month"
-#    step="3.17e4"/>)
+ok 3525
+ok 3526
 ok 3527
 ok 3528
-not ok 3529
-# Test 3529 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3529)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="month"
-#    step="42e0"/>)
-not ok 3530
-# Test 3530 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3530)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="month"
-#    step="4.2e1"/>)
-not ok 3531
-# Test 3531 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3531)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="month"
-#    step="420e-1"/>)
+ok 3529
+ok 3530
+ok 3531
 ok 3532
 ok 3533
 ok 3534
@@ -3644,42 +3584,42 @@ ok 3539
 ok 3540
 ok 3541
 ok 3542
-ok 3543
-ok 3544
+not ok 3543
+# Test 3543 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3543)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime"
+#    step="-1.4142135623730950488016887242097e0"/>)
+not ok 3544
+# Test 3544 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3544)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime"
+#    step="3.17e4"/>)
 ok 3545
 ok 3546
-ok 3547
-ok 3548
-ok 3549
+not ok 3547
+# Test 3547 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3547)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime"
+#    step="42e0"/>)
+not ok 3548
+# Test 3548 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3548)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime"
+#    step="4.2e1"/>)
+not ok 3549
+# Test 3549 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3549)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime"
+#    step="420e-1"/>)
 ok 3550
 ok 3551
-not ok 3552
-# Test 3552 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3552)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="week"
-#    step="-1.4142135623730950488016887242097e0"/>)
-not ok 3553
-# Test 3553 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3553)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="week"
-#    step="3.17e4"/>)
+ok 3552
+ok 3553
 ok 3554
 ok 3555
-not ok 3556
-# Test 3556 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3556)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="week"
-#    step="42e0"/>)
-not ok 3557
-# Test 3557 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3557)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="week"
-#    step="4.2e1"/>)
-not ok 3558
-# Test 3558 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3558)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="week"
-#    step="420e-1"/>)
+ok 3556
+ok 3557
+ok 3558
 ok 3559
 ok 3560
 ok 3561
@@ -3691,42 +3631,42 @@ ok 3566
 ok 3567
 ok 3568
 ok 3569
-ok 3570
-ok 3571
+not ok 3570
+# Test 3570 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3570)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="date"
+#    step="-1.4142135623730950488016887242097e0"/>)
+not ok 3571
+# Test 3571 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3571)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="date"
+#    step="3.17e4"/>)
 ok 3572
 ok 3573
-ok 3574
-ok 3575
-ok 3576
+not ok 3574
+# Test 3574 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3574)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="date"
+#    step="42e0"/>)
+not ok 3575
+# Test 3575 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3575)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="date"
+#    step="4.2e1"/>)
+not ok 3576
+# Test 3576 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3576)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="date"
+#    step="420e-1"/>)
 ok 3577
 ok 3578
-not ok 3579
-# Test 3579 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3579)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="time"
-#    step="-1.4142135623730950488016887242097e0"/>)
-not ok 3580
-# Test 3580 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3580)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="time"
-#    step="3.17e4"/>)
+ok 3579
+ok 3580
 ok 3581
 ok 3582
-not ok 3583
-# Test 3583 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3583)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="time"
-#    step="42e0"/>)
-not ok 3584
-# Test 3584 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3584)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="time"
-#    step="4.2e1"/>)
-not ok 3585
-# Test 3585 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3585)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="time"
-#    step="420e-1"/>)
+ok 3583
+ok 3584
+ok 3585
 ok 3586
 ok 3587
 ok 3588
@@ -3738,42 +3678,42 @@ ok 3593
 ok 3594
 ok 3595
 ok 3596
-ok 3597
-ok 3598
+not ok 3597
+# Test 3597 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3597)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="month"
+#    step="-1.4142135623730950488016887242097e0"/>)
+not ok 3598
+# Test 3598 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3598)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="month"
+#    step="3.17e4"/>)
 ok 3599
 ok 3600
-ok 3601
-ok 3602
-ok 3603
+not ok 3601
+# Test 3601 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3601)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="month"
+#    step="42e0"/>)
+not ok 3602
+# Test 3602 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3602)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="month"
+#    step="4.2e1"/>)
+not ok 3603
+# Test 3603 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3603)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="month"
+#    step="420e-1"/>)
 ok 3604
 ok 3605
-not ok 3606
-# Test 3606 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3606)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime-local"
-#    step="-1.4142135623730950488016887242097e0"/>)
-not ok 3607
-# Test 3607 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3607)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime-local"
-#    step="3.17e4"/>)
+ok 3606
+ok 3607
 ok 3608
 ok 3609
-not ok 3610
-# Test 3610 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3610)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime-local"
-#    step="42e0"/>)
-not ok 3611
-# Test 3611 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3611)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime-local"
-#    step="4.2e1"/>)
-not ok 3612
-# Test 3612 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3612)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="datetime-local"
-#    step="420e-1"/>)
+ok 3610
+ok 3611
+ok 3612
 ok 3613
 ok 3614
 ok 3615
@@ -3785,42 +3725,42 @@ ok 3620
 ok 3621
 ok 3622
 ok 3623
-ok 3624
-ok 3625
+not ok 3624
+# Test 3624 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3624)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="week"
+#    step="-1.4142135623730950488016887242097e0"/>)
+not ok 3625
+# Test 3625 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3625)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="week"
+#    step="3.17e4"/>)
 ok 3626
 ok 3627
-ok 3628
-ok 3629
-ok 3630
+not ok 3628
+# Test 3628 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3628)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="week"
+#    step="42e0"/>)
+not ok 3629
+# Test 3629 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3629)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="week"
+#    step="4.2e1"/>)
+not ok 3630
+# Test 3630 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3630)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="week"
+#    step="420e-1"/>)
 ok 3631
 ok 3632
-not ok 3633
-# Test 3633 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3633)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="number"
-#    step="-1.4142135623730950488016887242097e0"/>)
-not ok 3634
-# Test 3634 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3634)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="number"
-#    step="3.17e4"/>)
+ok 3633
+ok 3634
 ok 3635
 ok 3636
-not ok 3637
-# Test 3637 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3637)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="number"
-#    step="42e0"/>)
-not ok 3638
-# Test 3638 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3638)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="number"
-#    step="4.2e1"/>)
-not ok 3639
-# Test 3639 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3639)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="number"
-#    step="420e-1"/>)
+ok 3637
+ok 3638
+ok 3639
 ok 3640
 ok 3641
 ok 3642
@@ -3832,42 +3772,42 @@ ok 3647
 ok 3648
 ok 3649
 ok 3650
-ok 3651
-ok 3652
+not ok 3651
+# Test 3651 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3651)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="time"
+#    step="-1.4142135623730950488016887242097e0"/>)
+not ok 3652
+# Test 3652 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3652)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="time"
+#    step="3.17e4"/>)
 ok 3653
 ok 3654
-ok 3655
-ok 3656
-ok 3657
+not ok 3655
+# Test 3655 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3655)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="time"
+#    step="42e0"/>)
+not ok 3656
+# Test 3656 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3656)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="time"
+#    step="4.2e1"/>)
+not ok 3657
+# Test 3657 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3657)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="time"
+#    step="420e-1"/>)
 ok 3658
 ok 3659
-not ok 3660
-# Test 3660 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3660)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="range"
-#    step="-1.4142135623730950488016887242097e0"/>)
-not ok 3661
-# Test 3661 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3661)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="range"
-#    step="3.17e4"/>)
+ok 3660
+ok 3661
 ok 3662
 ok 3663
-not ok 3664
-# Test 3664 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3664)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="range"
-#    step="42e0"/>)
-not ok 3665
-# Test 3665 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3665)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="range"
-#    step="4.2e1"/>)
-not ok 3666
-# Test 3666 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3666)
-#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
-#    type="range"
-#    step="420e-1"/>)
+ok 3664
+ok 3665
+ok 3666
 ok 3667
 ok 3668
 ok 3669
@@ -3879,13 +3819,33 @@ ok 3674
 ok 3675
 ok 3676
 ok 3677
-ok 3678
-ok 3679
+not ok 3678
+# Test 3678 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3678)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime-local"
+#    step="-1.4142135623730950488016887242097e0"/>)
+not ok 3679
+# Test 3679 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3679)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime-local"
+#    step="3.17e4"/>)
 ok 3680
 ok 3681
-ok 3682
-ok 3683
-ok 3684
+not ok 3682
+# Test 3682 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3682)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime-local"
+#    step="42e0"/>)
+not ok 3683
+# Test 3683 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3683)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime-local"
+#    step="4.2e1"/>)
+not ok 3684
+# Test 3684 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3684)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="datetime-local"
+#    step="420e-1"/>)
 ok 3685
 ok 3686
 ok 3687
@@ -3906,13 +3866,33 @@ ok 3701
 ok 3702
 ok 3703
 ok 3704
-ok 3705
-ok 3706
+not ok 3705
+# Test 3705 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3705)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="number"
+#    step="-1.4142135623730950488016887242097e0"/>)
+not ok 3706
+# Test 3706 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3706)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="number"
+#    step="3.17e4"/>)
 ok 3707
 ok 3708
-ok 3709
-ok 3710
-ok 3711
+not ok 3709
+# Test 3709 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3709)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="number"
+#    step="42e0"/>)
+not ok 3710
+# Test 3710 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3710)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="number"
+#    step="4.2e1"/>)
+not ok 3711
+# Test 3711 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3711)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="number"
+#    step="420e-1"/>)
 ok 3712
 ok 3713
 ok 3714
@@ -3933,13 +3913,33 @@ ok 3728
 ok 3729
 ok 3730
 ok 3731
-ok 3732
-ok 3733
+not ok 3732
+# Test 3732 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3732)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="range"
+#    step="-1.4142135623730950488016887242097e0"/>)
+not ok 3733
+# Test 3733 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3733)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="range"
+#    step="3.17e4"/>)
 ok 3734
 ok 3735
-ok 3736
-ok 3737
-ok 3738
+not ok 3736
+# Test 3736 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3736)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="range"
+#    step="42e0"/>)
+not ok 3737
+# Test 3737 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3737)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="range"
+#    step="4.2e1"/>)
+not ok 3738
+# Test 3738 got: "/input/@step;float:syntax error;m" (t/content-checker.pl at line 68 fail #3738)
+#      Expected: "" (<input xmlns="http://www.w3.org/1999/xhtml"
+#    type="range"
+#    step="420e-1"/>)
 ok 3739
 ok 3740
 ok 3741
@@ -4190,7 +4190,6 @@ ok 3985
 ok 3986
 ok 3987
 ok 3988
-# t/dom-conformance/html-form-label.dat
 ok 3989
 ok 3990
 ok 3991
@@ -4266,7 +4265,6 @@ ok 4060
 ok 4061
 ok 4062
 ok 4063
-# t/dom-conformance/html-form-datalist.dat
 ok 4064
 ok 4065
 ok 4066
@@ -4274,6 +4272,7 @@ ok 4067
 ok 4068
 ok 4069
 ok 4070
+# t/dom-conformance/html-form-label.dat
 ok 4071
 ok 4072
 ok 4073
@@ -4300,7 +4299,6 @@ ok 4093
 ok 4094
 ok 4095
 ok 4096
-# t/dom-conformance/html-interactive-1.dat
 ok 4097
 ok 4098
 ok 4099
@@ -4350,6 +4348,7 @@ ok 4142
 ok 4143
 ok 4144
 ok 4145
+# t/dom-conformance/html-form-datalist.dat
 ok 4146
 ok 4147
 ok 4148
@@ -4383,8 +4382,10 @@ ok 4175
 ok 4176
 ok 4177
 ok 4178
+# t/dom-conformance/html-form-textarea.dat
 ok 4179
 ok 4180
+# t/dom-conformance/html-interactive-1.dat
 ok 4181
 ok 4182
 ok 4183
@@ -4550,7 +4551,6 @@ ok 4342
 ok 4343
 ok 4344
 ok 4345
-# t/dom-conformance/html-repetitions.dat
 ok 4346
 ok 4347
 ok 4348
@@ -4617,7 +4617,6 @@ ok 4408
 ok 4409
 ok 4410
 ok 4411
-# t/dom-conformance/html-datatemplate.dat
 ok 4412
 ok 4413
 ok 4414
@@ -4636,6 +4635,7 @@ ok 4426
 ok 4427
 ok 4428
 ok 4429
+# t/dom-conformance/html-repetitions.dat
 ok 4430
 ok 4431
 ok 4432
@@ -4702,6 +4702,7 @@ ok 4492
 ok 4493
 ok 4494
 ok 4495
+# t/dom-conformance/html-datatemplate.dat
 ok 4496
 ok 4497
 ok 4498
@@ -4947,3 +4948,87 @@ ok 4737
 ok 4738
 ok 4739
 ok 4740
+ok 4741
+ok 4742
+ok 4743
+ok 4744
+ok 4745
+ok 4746
+ok 4747
+ok 4748
+ok 4749
+ok 4750
+ok 4751
+ok 4752
+ok 4753
+ok 4754
+ok 4755
+ok 4756
+ok 4757
+ok 4758
+ok 4759
+ok 4760
+ok 4761
+ok 4762
+ok 4763
+ok 4764
+ok 4765
+ok 4766
+ok 4767
+ok 4768
+ok 4769
+ok 4770
+ok 4771
+ok 4772
+ok 4773
+ok 4774
+ok 4775
+ok 4776
+ok 4777
+ok 4778
+ok 4779
+ok 4780
+ok 4781
+ok 4782
+ok 4783
+ok 4784
+ok 4785
+ok 4786
+ok 4787
+ok 4788
+ok 4789
+ok 4790
+ok 4791
+ok 4792
+ok 4793
+ok 4794
+ok 4795
+ok 4796
+ok 4797
+ok 4798
+ok 4799
+ok 4800
+ok 4801
+ok 4802
+ok 4803
+ok 4804
+ok 4805
+ok 4806
+ok 4807
+ok 4808
+ok 4809
+ok 4810
+ok 4811
+ok 4812
+ok 4813
+ok 4814
+ok 4815
+ok 4816
+ok 4817
+ok 4818
+ok 4819
+ok 4820
+ok 4821
+ok 4822
+ok 4823
+ok 4824
