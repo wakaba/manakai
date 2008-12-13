@@ -4360,8 +4360,13 @@ $Element->{$HTML_NS}->{object} = {
       declare => $GetHTMLBooleanAttrChecker->('declare'),
           ## NOTE: "The object MUST be instantiated by a subsequent OBJECT ..."
           ## [HTML4] but we don't know how to test this.
+      form => $HTMLFormAttrChecker,
       hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       name => $HTMLBrowsingContextNameAttrChecker,
+          ## NOTE: |name| attribute of the |object| element defines
+          ## the name of the browsing context created by the element,
+          ## if any, but is also used as the form control name of the
+          ## form control provided by the plugin, if any.
       standby => sub {}, ## NOTE: %Text; in HTML4
       type => $HTMLIMTAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
@@ -4383,6 +4388,7 @@ $Element->{$HTML_NS}->{object} = {
       dataformatas => FEATURE_HTML4_REC_RESERVED,
       datasrc => FEATURE_HTML4_REC_RESERVED,
       declare => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      form => FEATURE_HTML5_DEFAULT,
       height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
       hspace => FEATURE_XHTML10_REC,
       lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
@@ -5528,7 +5534,7 @@ $Element->{$HTML_NS}->{fieldset} = {
       $HTMLFlowContentChecker{check_child_element}->(@_);
       $element_state->{has_non_legend} = 1 unless $child_is_transparent;
       ## TODO:
-      ## |<details><object><legend>xx</legend></object>..</details>|
+      ## |<fieldset><object><legend>xx</legend></object>..</fieldset>|
       ## should be an error, since |object| is allowed as flow,
       ## therefore |details| part of the content model does not match.
     }
@@ -5550,11 +5556,10 @@ $Element->{$HTML_NS}->{fieldset} = {
     }
 
     $HTMLFlowContentChecker{check_end}->(@_);
-    ## ISSUE: |<details><legend>aa</legend></details>| error?
+    ## ISSUE: |<fieldset><legend>aa</legend></fieldset>| error?
   },
   ## NOTE: This definition is partially reused by |details| element's
   ## checker.
-  ## TODO: Tests for <nest/> in <fieldset>
 };
 
 $Element->{$HTML_NS}->{input} = {
@@ -7364,11 +7369,13 @@ $Element->{$HTML_NS}->{legend} = {
 #    align => $GetHTMLEnumeratedAttrChecker->({
 #      top => 1, bottom => 1, left => 1, right => 1,
 #    }),
+    form => $HTMLFormAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     accesskey => FEATURE_M12N10_REC,
     align => FEATURE_M12N10_REC_DEPRECATED,
+    form => FEATURE_HTML5_DROPPED,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
   }),
 };

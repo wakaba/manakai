@@ -762,6 +762,30 @@ disabled="">z</output>
 /div/div/@id;duplicate ID;m
 
 #data
+<legend form="a" xmlns="http://www.w3.org/1999/xhtml">a</legend>
+#errors
+/legend/@form;attribute not defined;m
+/legend/@form;no referenced form;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml" id="a">
+<fieldset><legend form="a">a</legend></fieldset></form>
+#errors
+/form/fieldset/legend/@form;attribute not defined;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml" form="a">x<input/></label>
+#errors
+/label/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label form="b">y<input/></label>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
 <div xmlns="http://www.w3.org/1999/xhtml"><input form="a"/>x</div>
 #errors
 /div/input/@form;no referenced form;m
@@ -858,6 +882,18 @@ disabled="">z</output>
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <output form="b">y</output>
+<form id="b">x</form>
+</div>
+#errors
+
+#data
+<object data="" xmlns="http://www.w3.org/1999/xhtml" form="a">x</object>
+#errors
+/object/@form;no referenced form;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<object data="" form="b">y</object>
 <form id="b">x</form>
 </div>
 #errors

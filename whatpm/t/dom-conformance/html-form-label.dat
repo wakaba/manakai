@@ -426,13 +426,16 @@ x<datalist>x</datalist><input/>
 /div/label/@for;no referenced control;m
 
 #data
-<label xmlns="http://www.w3.org/1999/xhtml" form="a">x<input/></label>
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <label for="a">x</label>
+  <object data="" id="a">x</object>
+</div>
 #errors
-/label/@form;no referenced form;m
+/div/label/@for;no referenced control;m
 
 #data
-<div xmlns="http://www.w3.org/1999/xhtml">
-<label form="b">y<input/></label>
-<form id="b">x</form>
-</div>
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <object data="">a</object>
+  <object data="">b</object>
+</label>
 #errors

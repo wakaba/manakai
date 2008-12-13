@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.106 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.107 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -338,6 +338,8 @@ our $IsInHTMLInteractiveContent = sub {
   } else {
     return 1;
   }
+
+  ## TODO: input:not([type=hidden])
 }; # $IsInHTMLInteractiveContent
 
 my $HTMLTransparentElements = {
@@ -1077,4 +1079,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/12/12 12:59:17 $
+# $Date: 2008/12/13 04:49:04 $
