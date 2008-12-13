@@ -1621,3 +1621,397 @@ x<br autofocus=""/>
 </div>
 #errors
 /div/br/@autofocus;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="http://www.w3.org/"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="test"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="#test"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="[]"
+>x</form>
+#errors
+/form/@action;syntax error:iriref3987;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method=""
+>x</form>
+#errors
+/form/@method;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="get"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="GET"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="post"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="POST"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="put"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="PUT"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="delete"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="DELETE"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="GEt"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="deleTE"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="head"
+>x</form>
+#errors
+/form/@method;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="m-get"
+>x</form>
+#errors
+/form/@method;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="get "
+>x</form>
+#errors
+/form/@method;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="getall"
+>x</form>
+#errors
+/form/@method;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="push"
+>x</form>
+#errors
+/form/@method;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    method="method"
+>x</form>
+#errors
+/form/@method;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype=""
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="application/x-www-form-urlencoded"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="APPLICATION/X-WWW-FORM-URLENCODED"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="Application/x-www-form-urlencoded"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="multipart/form-data"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="Multipart/Form-Data"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="text/plain"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="TEXT/plain"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="application/x-url-encoded"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="application/x-sgml-urlencoded"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="application/x-www-form-urlencoded; charset=utf-8"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype=" text/plain "
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="image/png"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="enctype"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="multipart/related"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="application/xml"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="text/xml"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="text/html"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target=""
+>x</form>
+#errors
+/form/@target;window name:empty;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_blank"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_self"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_parent"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_top"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="new"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="result"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_BLANK"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_SElf"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_new"
+>x</form>
+#errors
+/form/@target;window name:reserved;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_blank "
+>x</form>
+#errors
+/form/@target;window name:reserved;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_new window"
+>x</form>
+#errors
+/form/@target;window name:reserved;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="new window"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_content"
+>x</form>
+#errors
+/form/@target;window name:reserved;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_replace"
+>x</form>
+#errors
+/form/@target;window name:reserved;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    target="_search"
+>x</form>
+#errors
+/form/@target;window name:reserved;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    novalidate=""
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    novalidate="novalidate"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    novalidate="NoValidate"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    novalidate="yes"
+>x</form>
+#errors
+/form/@novalidate;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    novalidate="no validate"
+>x</form>
+#errors
+/form/@novalidate;boolean:invalid;m

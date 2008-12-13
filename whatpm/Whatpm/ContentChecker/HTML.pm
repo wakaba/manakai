@@ -5412,14 +5412,16 @@ $Element->{$HTML_NS}->{form} = {
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $AcceptAttrChecker,
     'accept-charset' => $HTMLCharsetsAttrChecker,
-    action => $HTMLURIAttrChecker, ## TODO: "User agent behavior for a value other than HTTP URI is undefined" [HTML4]
+    action => $HTMLURIAttrChecker, ## TODO: Warn if submission is not defined for the scheme
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
-    enctype => $HTMLIMTAttrChecker, ## TODO: "multipart/form-data" should be used when type=file is used [HTML4] ## TODO: MUST NOT parameter [WF2]
+    enctype => $GetHTMLEnumeratedAttrChecker->({
+      'application/x-www-form-urlencoded' => 1,
+      'multipart/form-data' => 1,
+      'text/plain' => 1,
+    }),
     method => $GetHTMLEnumeratedAttrChecker->({
       get => 1, post => 1, put => 1, delete => 1,
     }),
-        ## NOTE: "get" SHOULD be used for idempotent submittion,
-        ## "post" SHOULD be used otherwise [HTML4].  This cannot be tested.
     name => sub {
       my ($self, $attr) = @_;
       
@@ -5439,12 +5441,13 @@ $Element->{$HTML_NS}->{form} = {
         }
       }
     },
+    novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
+    ## TODO: Tests for following attrs:
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,
     onreceived => $HTMLEventHandlerAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
-    ## TODO: Warn for combination whose behavior is not defined in HTML4/WF2.
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -5457,6 +5460,7 @@ $Element->{$HTML_NS}->{form} = {
     method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
     name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    novalidate => FEATURE_HTML5_DEFAULT,
     onformchange => FEATURE_WF2_INFORMATIVE,
     onforminput => FEATURE_WF2_INFORMATIVE,
     onreceived => FEATURE_WF2,
@@ -5655,6 +5659,7 @@ $Element->{$HTML_NS}->{input} = {
          min => '',
          multiple => '',
          name => $FormControlNameAttrChecker,
+         novalidate => '',
          onformchange => $HTMLEventHandlerAttrChecker, # [WF2]
          onforminput => $HTMLEventHandlerAttrChecker, # [WF2]
          oninput => $HTMLEventHandlerAttrChecker, # [WF2]
@@ -5902,22 +5907,19 @@ $Element->{$HTML_NS}->{input} = {
             {
              accesskey => $HTMLAccesskeyAttrChecker,
              action => $HTMLURIAttrChecker,
-                 ## ISSUE: Not yet defined.
-                 ## TODO: tests
-             enctype => $HTMLIMTAttrChecker,
-                 ## ISSUE: Not yet defined.
-                 ## TODO: tests
+             enctype => $GetHTMLEnumeratedAttrChecker->({
+               'application/x-www-form-urlencoded' => 1,
+               'multipart/form-data' => 1,
+               'text/plain' => 1,
+             }),
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
-                 ## ISSUE: Not yet defined.
-                 ## TODO: tests
+             novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
              }),
              target => $HTMLTargetAttrChecker,
-                 ## ISSUE: Not yet defined.
-                 ## TODO: tests
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'image') {
@@ -5925,8 +5927,6 @@ $Element->{$HTML_NS}->{input} = {
             {
              accesskey => $HTMLAccesskeyAttrChecker,
              action => $HTMLURIAttrChecker,
-                 ## ISSUE: Not yet defined.
-                 ## TODO: tests
              align => $GetHTMLEnumeratedAttrChecker->({
                top => 1, middle => 1, bottom => 1, left => 1, right => 1,
              }),
@@ -5939,23 +5939,22 @@ $Element->{$HTML_NS}->{input} = {
                                     level => $self->{level}->{must});
                }
              },
-             enctype => $HTMLIMTAttrChecker,
-                 ## ISSUE: Not yet defined.
-                 ## TODO: tests
+             enctype => $GetHTMLEnumeratedAttrChecker->({
+               'application/x-www-form-urlencoded' => 1,
+               'multipart/form-data' => 1,
+               'text/plain' => 1,
+             }),
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
-                 ## ISSUE: Not yet defined.
-                 ## TODO: tests
+             novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
              }),
              src => $HTMLURIAttrChecker,
                ## TODO: There is requirements on the referenced resource.
              target => $HTMLTargetAttrChecker,
-                 ## ISSUE: Not yet defined.
-                 ## TODO: tests
              usemap => $HTMLUsemapAttrChecker,
             }->{$attr_ln} || $checker;
             ## TODO: alt & src are required.
@@ -6147,12 +6146,17 @@ $Element->{$HTML_NS}->{button} = {
     action => $HTMLURIAttrChecker,
     autofocus => $AutofocusAttrChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    enctype => $GetHTMLEnumeratedAttrChecker->({
+      'application/x-www-form-urlencoded' => 1,
+      'multipart/form-data' => 1,
+      'text/plain' => 1,
+    }),
     form => $HTMLFormAttrChecker,
     method => $GetHTMLEnumeratedAttrChecker->({
       get => 1, post => 1, put => 1, delete => 1,
     }),
     name => $FormControlNameAttrChecker,
-    novalidate => $GetHTMLBooleanAttrChecker->('novalidate'), ## TODO: tests
+    novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
     onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
     onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
