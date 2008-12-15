@@ -12775,3 +12775,33 @@
 />
 #errors
 /input/@novalidate;input attr not applicable;button;m
+
+#data
+<input type="date" xmlns="http://www.w3.org/1999/xhtml"
+    value="0000-11-22"/>
+#errors
+/input/@value;datetime:bad year;m
+
+#data
+<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+    value="0000-11-22T00:11:22Z"/>
+#errors
+/input/@value;datetime:bad year;m
+
+#data
+<input type="month" xmlns="http://www.w3.org/1999/xhtml"
+    value="0000-11"/>
+#errors
+/input/@value;datetime:bad year;m
+
+#data
+<input type="week" xmlns="http://www.w3.org/1999/xhtml"
+    value="0000-W11"/>
+#errors
+/input/@value;datetime:bad year;m
+
+#data
+<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
+    value="0000-11-22T00:11:22"/>
+#errors
+/input/@value;datetime:bad year;m

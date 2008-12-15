@@ -1,4 +1,23 @@
-<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2008-12-13T04:49:00Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1229143743"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1229143743</id><title>2008-12-13 Wakaba</title><updated>2008-12-13T04:49:00Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/ChangeLog	13 Dec 2008 04:48:14 -0000
+<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2008-12-15T06:41:15Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1229323280"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1229323280</id><title>2008-12-15 Wakaba</title><updated>2008-12-15T06:41:15Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/dom-conformance/ChangeLog	15 Dec 2008 06:41:13 -0000
+2008-12-15  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* html-flows-1.dat: Updated test results and added some new tests.
+
+	* html-form-input-1.dat: Added some new tests.
+
+++ whatpm/Whatpm/ContentChecker/ChangeLog	15 Dec 2008 06:40:20 -0000
+2008-12-15  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* HTML.pm ($HTMLDatetimeAttrChecker): Removed.
+	($GetDateTimeAttrChecker): Added.
+	($GetHTMLFloatingPointNumberAttrChecker): Set |number_value| for
+	later use.
+	(ins/@datetime, del/@datetime): Changed to use newer definitin of
+	&quot;global date and time string&quot;.
+	(input's date- and time-related, and type=number and type=range
+	control types): Implemented value=&quot;&quot;, min=&quot;&quot;, and max=&quot;&quot;.
+
+</content></entry><entry xml:id="entry-1229143743"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1229143743</id><title>2008-12-13 Wakaba</title><updated>2008-12-13T04:49:00Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/ChangeLog	13 Dec 2008 04:48:14 -0000
 2008-12-13  Wakaba  &lt;wakaba@suika.fam.cx&gt;
 
 	* content-model-7.dat: Added an example from HTML5 spec.

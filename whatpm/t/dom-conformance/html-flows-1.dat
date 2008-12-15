@@ -3259,8 +3259,14 @@ aaa
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0037-12-13T00:00Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="0037-12-13 00:00 Z">x</ins>
 #errors
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <?xml version="1.1"?>
@@ -3299,6 +3305,12 @@ aaa
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="8592-01-01 T 02:09 +02:09">x</ins>
 #errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="8592-01-01T02:09+02:09">x</ins>
+#errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3309,7 +3321,12 @@ aaa
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="10000-10-31T00:44Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0000-03-14T14:33Z">x</ins>
+#errors
+/ins/@datetime;datetime:bad year;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3321,11 +3338,23 @@ aaa
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="1999-06-23  T04:44Z">x</ins>
 #errors
+/ins/@datetime;datetime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="1999-06-23T04:44Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="4444-06-22T11:22Z">x</ins>
+#errors
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="4444-06-22  T  11:22Z">x</ins>
 #errors
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3432,8 +3461,14 @@ aaa
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-02-21T23:00:00.124444Z">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00.124444Z">x</ins>
 #errors
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3455,6 +3490,7 @@ aaa
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00 +09:00">xm</ins>
 #errors
+/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -3567,6 +3603,7 @@ aaa
     datetime="2007-02-31T23:00Z">x</del>
 #errors
 /del/@datetime;datetime:bad day;m
+
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"></p>
 #errors

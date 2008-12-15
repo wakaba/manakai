@@ -542,49 +542,30 @@ my $ValidEmailAddress;
   $ValidEmailAddress = qr/$dot_atom\@$dot_atom/;
 }
 
-## NOTE: "Valid datetime".
-my $HTMLDatetimeAttrChecker = sub {
-  my ($self, $attr) = @_;
-  my $value = $attr->value;
-  ## ISSUE: "space", not "space character" (in parsing algorihtm, "space character")
-  if ($value =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})
-                 (?>[\x09\x0A\x0C\x0D\x20]+
-                 (?>T[\x09\x0A\x0C\x0D\x20]*)?|T[\x09\x0A\x0C\x0D\x20]*)
-                 ([0-9]{2}):([0-9]{2})(?>:([0-9]{2}))?(?>\.([0-9]+))?
-                 [\x09\x0A\x0C\x0D\x20]*
-                 (?>Z|[+-]([0-9]{2}):([0-9]{2}))\z/x) {
-    my ($y, $M, $d, $h, $m, $s, $f, $zh, $zm)
-        = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
-    if (0 < $M and $M < 13) { ## ISSUE: This is not explicitly specified (though in parsing algorithm)
-      $self->{onerror}->(node => $attr, type => 'datetime:bad day',
-                         level => $self->{level}->{must})
-          if $d < 1 or
-              $d > [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]->[$M];
-      $self->{onerror}->(node => $attr, type => 'datetime:bad day',
-                         level => $self->{level}->{must})
-          if $M == 2 and $d == 29 and
-              not ($y % 400 == 0 or ($y % 4 == 0 and $y % 100 != 0));
-    } else {
-      $self->{onerror}->(node => $attr, type => 'datetime:bad month',
-                         level => $self->{level}->{must});
-    }
-    $self->{onerror}->(node => $attr, type => 'datetime:bad hour',
-                       level => $self->{level}->{must}) if $h > 23;
-    $self->{onerror}->(node => $attr, type => 'datetime:bad minute',
-                       level => $self->{level}->{must}) if $m > 59;
-    $self->{onerror}->(node => $attr, type => 'datetime:bad second',
-                       level => $self->{level}->{must})
-        if defined $s and $s > 59;
-    $self->{onerror}->(node => $attr, type => 'datetime:bad timezone hour',
-                       level => $self->{level}->{must}) if $zh > 23;
-    $self->{onerror}->(node => $attr, type => 'datetime:bad timezone minute',
-                       level => $self->{level}->{must}) if $zm > 59;
-    ## ISSUE: Maybe timezone -00:00 should have same semantics as in RFC 3339.
-  } else {
-    $self->{onerror}->(node => $attr, type => 'datetime:syntax error',
-                       level => $self->{level}->{must});
-  }
-}; # $HTMLDatetimeAttrChecker
+## Valid global date and time.
+my $GetDateTimeAttrChecker = sub ($) {
+  my $type = shift;
+  return sub {
+    my ($self, $attr, $item, $element_state) = @_;
+    
+    my $range_error;
+    
+    require Message::Date;
+    my $dp = Message::Date->new;
+    $dp->{level} = $self->{level};
+    $dp->{onerror} = sub {
+      my %opt = @_;
+      unless ($opt{type} eq 'date value not supported') {
+        $self->{onerror}->(%opt, node => $attr);
+        $range_error = '';
+      }
+    };
+    
+    my $method = 'parse_' . $type;
+    my $d = $dp->$method ($attr->value);
+    $element_state->{date_value}->{$attr->name} = $d || $range_error;
+  };
+}; # $GetDateTimeAttrChecker
 
 my $HTMLIntegerAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -616,11 +597,14 @@ my $GetHTMLNonNegativeIntegerAttrChecker = sub {
 my $GetHTMLFloatingPointNumberAttrChecker = sub {
   my $range_check = shift;
   return sub {
-    my ($self, $attr) = @_;
+    my ($self, $attr, $item, $element_state) = @_;
     my $value = $attr->value;
     if ($value =~ /\A-?[0-9]+(?>\.[0-9]*)?\z/ or
         $value =~ /\A-?\.[0-9]+\z/) {
-      unless ($range_check->($value + 0)) {
+      if ($range_check->($value + 0)) {
+        ## TODO: parse algorithm
+        $element_state->{number_value}->{$attr->name} = $value + 0;
+      } else {
         $self->{onerror}->(node => $attr, type => 'float:out of range',
                            level => $self->{level}->{must});
       }
@@ -3372,6 +3356,7 @@ $Element->{$HTML_NS}->{time} = {
     %HTMLM12NCommonAttrStatus,
     datetime => FEATURE_HTML5_FD,
   }),
+  ## TODO: Update definition
   ## TODO: Write tests
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -4028,7 +4013,7 @@ $Element->{$HTML_NS}->{ins} = {
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
-    datetime => $HTMLDatetimeAttrChecker,
+    datetime => $GetDateTimeAttrChecker->('global_date_and_time_string'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -4050,7 +4035,7 @@ $Element->{$HTML_NS}->{del} = {
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
-    datetime => $HTMLDatetimeAttrChecker,
+    datetime => $GetDateTimeAttrChecker->('global_date_and_time_string'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -5709,7 +5694,18 @@ $Element->{$HTML_NS}->{input} = {
             }->{$attr_ln} || $checker;
             ## TODO: Warn if no name attribute?
             ## TODO: Warn if name!=_charset_ and no value attribute?
-          } elsif ($state eq 'datetime') {
+          } elsif ({
+                    datetime => 1, date => 1, month => 1, time => 1,
+                    week => 1, 'datetime-local' => 1,
+                   }->{$state}) {
+            my $v = {
+              datetime => ['global_date_and_time_string'],
+              date => ['date_string'],
+              month => ['month_string'],
+              week => ['week_string'],
+              time => ['time_string'],
+              'datetime-local' => ['local_date_and_time_string'],
+            }->{$state};
             $checker =
             {
              accesskey => $HTMLAccesskeyAttrChecker,
@@ -5717,117 +5713,12 @@ $Element->{$HTML_NS}->{input} = {
                on => 1, off => 1,
              }),
              list => $ListAttrChecker,
-             ## TODO: max
-             ## TODO: min
-               ## TODO: min <= max
+             min => $GetDateTimeAttrChecker->($v->[0]),
+             max => $GetDateTimeAttrChecker->($v->[0]),
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
-             value => sub {
-               ## TODO: syntax
-               ## TODO: Warn if not a valid UTC date and time string.
-               ## TODO: Warn unless min <= value <= max
-             },
-            }->{$attr_ln} || $checker;
-          } elsif ($state eq 'date') {
-            $checker =
-            {
-             accesskey => $HTMLAccesskeyAttrChecker,
-             autocomplete => $GetHTMLEnumeratedAttrChecker->({
-               on => 1, off => 1,
-             }),
-             list => $ListAttrChecker,
-             ## TODO: max
-             ## TODO: min
-               ## TODO: min <= max
-             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             required => $GetHTMLBooleanAttrChecker->('required'),
-             step => $StepAttrChecker,
-             value => sub {
-               ## TODO: syntax
-               ## TODO: Warn if not a valid date string.
-               ## TODO: Warn unless min <= value <= max
-             },
-            }->{$attr_ln} || $checker;
-          } elsif ($state eq 'month') {
-            $checker =
-            {
-             accesskey => $HTMLAccesskeyAttrChecker,
-             autocomplete => $GetHTMLEnumeratedAttrChecker->({
-               on => 1, off => 1,
-             }),
-             list => $ListAttrChecker,
-             ## TODO: max
-             ## TODO: min
-               ## TODO: min <= max
-             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             required => $GetHTMLBooleanAttrChecker->('required'),
-             step => $StepAttrChecker,
-             value => sub {
-               ## TODO: syntax
-               ## TODO: Warn if not a valid month string.
-               ## TODO: Warn unless min <= value <= max
-             },
-            }->{$attr_ln} || $checker;
-          } elsif ($state eq 'week') {
-            $checker =
-            {
-             accesskey => $HTMLAccesskeyAttrChecker,
-             autocomplete => $GetHTMLEnumeratedAttrChecker->({
-               on => 1, off => 1,
-             }),
-             list => $ListAttrChecker,
-             ## TODO: max
-             ## TODO: min
-               ## TODO: min <= max
-             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             required => $GetHTMLBooleanAttrChecker->('required'),
-             step => $StepAttrChecker,
-             value => sub {
-               ## TODO: syntax
-               ## TODO: Warn if not a valid week string.
-               ## TODO: Warn unless min <= value <= max
-             },
-            }->{$attr_ln} || $checker;
-          } elsif ($state eq 'time') {
-            $checker =
-            {
-             accesskey => $HTMLAccesskeyAttrChecker,
-             autocomplete => $GetHTMLEnumeratedAttrChecker->({
-               on => 1, off => 1,
-             }),
-             list => $ListAttrChecker,
-             ## TODO: max
-             ## TODO: min
-               ## TODO: min <= max
-             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             required => $GetHTMLBooleanAttrChecker->('required'),
-             step => $StepAttrChecker,
-             value => sub {
-               ## TODO: syntax
-               ## TODO: Warn if not a valid time string.
-               ## TODO: Warn unless min <= value <= max
-             },
-            }->{$attr_ln} || $checker;
-          } elsif ($state eq 'datetime-local') {
-            $checker =
-            {
-             accesskey => $HTMLAccesskeyAttrChecker,
-             autocomplete => $GetHTMLEnumeratedAttrChecker->({
-               on => 1, off => 1,
-             }),
-             list => $ListAttrChecker,
-             ## TODO: max
-             ## TODO: min
-               ## TODO: min <= max
-             readonly => $GetHTMLBooleanAttrChecker->('readonly'),
-             required => $GetHTMLBooleanAttrChecker->('required'),
-             step => $StepAttrChecker,
-             value => sub {
-               ## TODO: syntax
-               ## TODO: Warn if not a valid local date and time string.
-               ## TODO: Warn unless min <= value <= max
-             },
+             value => $GetDateTimeAttrChecker->($v->[0]),
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'number') {
             $checker =
@@ -5839,16 +5730,10 @@ $Element->{$HTML_NS}->{input} = {
              list => $ListAttrChecker,
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
-               ## TODO: min & max tests
-               ## TODO: min <= max
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
-             value => sub {
-               ## TODO: syntax
-               ## TODO: Warn if not a valid floating point number.
-               ## TODO: Warn unless min <= value <= max
-             },
+             value => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'range') {
             $checker =
@@ -5860,14 +5745,8 @@ $Element->{$HTML_NS}->{input} = {
              list => $ListAttrChecker,
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
-               ## TODO: min & max tests
-               ## TODO: min <= max
              step => $StepAttrChecker,
-             value => sub {
-               ## TODO: syntax
-               ## TODO: Warn if not a valid floating point number.
-               ## TODO: Warn unless min <= value <= max
-             },
+             value => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'color') {
             $checker =
@@ -5904,6 +5783,7 @@ $Element->{$HTML_NS}->{input} = {
             {
              accept => $AcceptAttrChecker,
              accesskey => $HTMLAccesskeyAttrChecker,
+             ## max (default 1) & min (default 0) [WF2]: Dropped by HTML5.
              multiple => $GetHTMLBooleanAttrChecker->('multiple'),
              required => $GetHTMLBooleanAttrChecker->('required'),
             }->{$attr_ln} || $checker;
@@ -6113,7 +5993,115 @@ $Element->{$HTML_NS}->{input} = {
 
       $self->_attr_status_info ($attr, $status);
     }
+
+    ## ISSUE: -0/+0
+
+    if ($state eq 'range') {
+      $element_state->{number_value}->{min} ||= 0;
+      $element_state->{number_value}->{max} = 100
+          unless defined $element_state->{number_value}->{max};
+    }
+
+    if (defined $element_state->{date_value}->{min} or
+        defined $element_state->{date_value}->{max}) {
+      my $min_value = $element_state->{date_value}->{min};
+      my $max_value = $element_state->{date_value}->{max};
+      my $value_value = $element_state->{date_value}->{value};
+
+      if (defined $min_value and $min_value eq '' and
+          (defined $max_value or defined $value_value)) {
+        my $min = $item->{node}->get_attribute_node_ns (undef, 'min');
+        $self->{onerror}->(node => $min,
+                           type => 'date value not supported', ## TODOC: type
+                           value => $min->value,
+                           level => $self->{level}->{unsupported});
+        undef $min_value;
+      }
+      if (defined $max_value and $max_value eq '' and
+          (defined $max_value or defined $value_value)) {
+        my $max = $item->{node}->get_attribute_node_ns (undef, 'max');
+        $self->{onerror}->(node => $max,
+                           type => 'date value not supported', ## TODOC: type
+                           value => $max->value,
+                           level => $self->{level}->{unsupported});
+        undef $max_value;
+      }
+      if (defined $value_value and $value_value eq '' and
+          (defined $max_value or defined $min_value)) {
+        my $value = $item->{node}->get_attribute_node_ns (undef, 'value');
+        $self->{onerror}->(node => $value,
+                           type => 'date value not supported', ## TODOC: type
+                           value => $value->value,
+                           level => $self->{level}->{unsupported});
+        undef $value_value;
+      }
+
+      if (defined $min_value and defined $max_value) {
+        if ($min_value->to_html5_number > $max_value->to_html5_number) {
+          my $max = $item->{node}->get_attribute_node_ns (undef, 'max');
+          $self->{onerror}->(node => $max,
+                             type => 'max lt min', ## TODOC: type
+                             level => $self->{level}->{must});
+        }
+      }
+      
+      if (defined $min_value and defined $value_value) {
+        if ($min_value->to_html5_number > $value_value->to_html5_number) {
+          my $value = $item->{node}->get_attribute_node_ns (undef, 'value');
+          $self->{onerror}->(node => $value,
+                             type => 'value lt min', ## TODOC: type
+                             level => $self->{level}->{warn});
+          ## NOTE: Not an error.
+        }
+      }
+      
+      if (defined $max_value and defined $value_value) {
+        if ($max_value->to_html5_number < $value_value->to_html5_number) {
+          my $value = $item->{node}->get_attribute_node_ns (undef, 'value');
+          $self->{onerror}->(node => $value,
+                             type => 'value gt max', ## TODOC: type
+                             level => $self->{level}->{warn});
+          ## NOTE: Not an error.
+        }
+      }
+    } elsif (defined $element_state->{number_value}->{min} or
+             defined $element_state->{number_value}->{max}) {
+      my $min_value = $element_state->{number_value}->{min};
+      my $max_value = $element_state->{number_value}->{max};
+      my $value_value = $element_state->{number_value}->{value};
+
+      if (defined $min_value and defined $max_value) {
+        if ($min_value > $max_value) {
+          my $max = $item->{node}->get_attribute_node_ns (undef, 'max');
+          $self->{onerror}->(node => $max,
+                             type => 'max lt min', ## TODOC: type
+                             level => $self->{level}->{must});
+        }
+      }
+      
+      if (defined $min_value and defined $value_value) {
+        if ($min_value > $value_value) {
+          my $value = $item->{node}->get_attribute_node_ns (undef, 'value');
+          $self->{onerror}->(node => $value,
+                             type => 'value lt min', ## TODOC: type
+                             level => $self->{level}->{warn});
+          ## NOTE: Not an error.
+        }
+      }
+      
+      if (defined $max_value and defined $value_value) {
+        if ($max_value < $value_value) {
+          my $value = $item->{node}->get_attribute_node_ns (undef, 'value');
+          $self->{onerror}->(node => $value,
+                             type => 'value gt max', ## TODOC: type
+                             level => $self->{level}->{warn});
+          ## NOTE: Not an error.
+        }
+      }
+    }
     
+    ## TODO: Warn unless value = min * x where x is an integer.
+ 
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;

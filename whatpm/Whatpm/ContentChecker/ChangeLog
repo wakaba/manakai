@@ -1,3 +1,14 @@
+2008-12-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* HTML.pm ($HTMLDatetimeAttrChecker): Removed.
+	($GetDateTimeAttrChecker): Added.
+	($GetHTMLFloatingPointNumberAttrChecker): Set |number_value| for
+	later use.
+	(ins/@datetime, del/@datetime): Changed to use newer definitin of
+	"global date and time string".
+	(input's date- and time-related, and type=number and type=range
+	control types): Implemented value="", min="", and max="".
+
 2008-12-13  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTML.pm: Implemented <object form> and <legend form>.
