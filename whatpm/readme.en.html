@@ -37,6 +37,9 @@ Atom feed for ChangeLog diffs</a> is available.
 
 <ul>
 
+<li><tiem>2009-01-12</time>: <a href="#bts">The bug tacking system</a>
+ia available.
+
 <li><time>2008-10-21</time>: <a href="#module-whatpm-xml-parser">An
 XML parser with non-draconian error handling</a> released.
 (Documentation is not available yet.)
@@ -51,7 +54,7 @@ XML parser with non-draconian error handling</a> released.
   <p>Note that all of these modules are <em>work in progress</em>
   and have <a href="#todo">a number of unresolved problems</a>.</p>
 
-  <p>Note also that some modules have no documentation for now.</p>
+  <p>Note also that some modules have no documentation yet.
 
 <div class=section id=modules-html-xml>
 <h3>Modules for HTML and XML</h3>
@@ -118,12 +121,10 @@ href="#app-webhacc">application</a>.)
 
 </dl>
 
-<p>Currently, conformance checking of HTML/XHTML and Atom documents
-is supported.
-
-<p>For these modules, a DOM implementation that supports the manakai's
-Perl binding<!-- @@ TODO: ref --> of DOM is necessary to represent a
-document in memory.  The <a
+<p>For these modules, a DOM implementation that supports <a
+href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Perl%20Binding">the
+manakai's Perl binding</a> of DOM is necessary to represent a document
+in memory.  The <a
 href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>
 package contains such an implementation,
 <code>Message::DOM::Implementation</code><!-- @@ TODO: ref -->, but it
@@ -403,8 +404,8 @@ WebIDL ECMAScript binding test suite generator.
 <p>See also <a
 href="http://suika.fam.cx/www/manakai-core/doc/web/#applications">a
 list of applications using modules in the manakai-core package</a>;
-some of them indirectly use Whatpm modules from DOM interfaces
-provided by <a
+some of them indirectly use Whatpm modules via DOM interfaces provided
+by <a
 href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>.
 
 </div>
@@ -509,6 +510,10 @@ tarball.
   <li>In addition, each module has its own TO DO items.
     (Search for <q>## TODO</q> and <q>## ISSUE</q> in each module.)</li>
 </ul>
+
+<p id=bts>See also <a href="http://manakai.g.hatena.ne.jp/task/">the
+bug tracking system</a>.
+
 </div>
 
 <div class=section id=acknowledgments>
@@ -529,13 +534,11 @@ parser test data</a>.</p>
 <div class="section" id="license">
 <h2>License</h2>
 
-<p>Copyright 2007‐2008 Wakaba 
-<code class="mail">&lt;<a href="mailto:w@suika.fam.cx"
-    rel="author">w@suika.fam.cx</a>></code>.</p>
+<p>Copyright 2007‐2009 Wakaba <code class="mail">&lt;<a
+href="mailto:w@suika.fam.cx"
+rel="author">w@suika.fam.cx</a>></code>.</p>
 
-<p>This library is free software; you can redistribute it and/or modify 
-it under the same terms as Perl itself.</p>
+<p>This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
 </div>
-
-</body>
-</html>
