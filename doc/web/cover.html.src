@@ -95,6 +95,9 @@ type="application/atom+xml">変更履歴差分の Atom
 
 <ul>
 
+<li><time>2009-01-12</time>: <a href="#bts">A bug tracking system</a>
+is available.
+
 <li><a href="news-0-4" data-lang-container hreflang=en>
 <span lang=en>Changes in manakai 0.4</span>
 <span lang=ja>manakai 0.4 の変更点 (英語)</span>
@@ -111,7 +114,13 @@ type="application/atom+xml">変更履歴差分の Atom
 
 
 <div class="section" id="subprojects">
-<h2>下位プロジェクト</h2>
+<h2 data-lang-container>
+<span lang=en>Subprojects</span>
+<span lang=ja>下位プロジェクト</span>
+</h2>
+
+<p>Some parts of manakai Perl modules are separetely packaged for
+historical reasons.
 
 <ul>
 <li><a href="http://suika.fam.cx/www/markup/html/whatpm/readme" lang="en">Whatpm</a></li>
@@ -120,29 +129,61 @@ type="application/atom+xml">変更履歴差分の Atom
 </div>
 
 <div class="section" id="modules">
-<h2>モジュール</h2>
+<h2 data-lang-container>
+<span lang=en>Modules in the manakai-core package</span>
+<span lang=ja>manakai-core パッケージ内のモジュール</span>
+</h2>
 
-<ul lang=en>
-<li><a href="../../lib/Error.html"><code>Error</code></a>
-(Strictly speaking, this module is not part of manakai, though 
-it is contained in the <a href="#download-manakai-core">manakai-core</a> 
-package.)</li>
-<li><a href="../../lib/Message/CGI/Carp.html"><code>Message::CGI::Carp</code></a></li>
-<li><a href="../../lib/Message/CGI/HTTP.html"><code>Message::CGI::HTTP</code></a></li>
-<li><a href="../../lib/Message/Charset/Info.html"><code>Message::Charset::Info</code></a></li>
-<li><a href="../../lib/Message/DOM/DOMImplementation.html"><code>Message::DOM::DOMImplementation</code></a></li>
-<li><a href="../../lib/Message/URI/URIReference.html"><code>Message::URI::URIReference</code></a></li>
-<li><a href="../../lib/Message/Util/Error.html"><code>Message::Util::Error</code></a></li>
-<li><a href="../../lib/Message/Util/Formatter/Base.html"><code>Message::Util::Formatter::Base</code></a></li>
-<li><a href="../../lib/Message/Util/Formatter/Boolean.html"><code>Message::Util::Formatter::Boolean</code></a></li>
-<li><a href="../../lib/Message/Util/Formatter/Text.html"><code>Message::Util::Formatter::Text</code></a></li>
-<li><a href="../../lib/Message/Util/HostPermit.html"><code>Message::Util::HostPermit</code></a></li>
-<li><a href="../../lib/Message/Util/QName/Filter.html"><code>Message::Util::QName::Filter</code></a></li>
-</ul>
+<p><em>This list is incomplete.</em>
+
+<dl>
+
+<dt id=modules-dom>DOM implementation
+
+<dd><a href="../../lib/Message/DOM/DOMImplementation.html"><code>Message::DOM::DOMImplementation</code></a>
+
+<dt>URLs
+
+<dd><a href="../../lib/Message/URI/URIReference.html"><code>Message::URI::URIReference</code></a>
+
+<dt>CGI and Web applications
+
+<dd><a href="../../lib/Message/CGI/Carp.html"><code>Message::CGI::Carp</code></a>
+<dd><a href="../../lib/Message/CGI/HTTP.html"><code>Message::CGI::HTTP</code></a>
+<dd><a href="../../lib/Message/Util/HostPermit.html"><code>Message::Util::HostPermit</code></a>
+
+<dt>Character encodings
+
+<dd><a href="../../lib/Message/Charset/Info.html"><code>Message::Charset::Info</code></a>
+
+<dt>Error handling
+
+<dd><a href="../../lib/Error.html"><code>Error</code></a> (Though this
+module is not a product of the manakai project, this module is bundled
+in the <a href="#download-manakai-core">manakai-core</a> package for
+convenience.)
+
+<dd><a href="../../lib/Message/Util/Error.html"><code>Message::Util::Error</code></a>
+
+<dt>Formatter (deprecated)
+
+<dd><a href="../../lib/Message/Util/Formatter/Base.html"><code>Message::Util::Formatter::Base</code></a>
+<dd><a href="../../lib/Message/Util/Formatter/Boolean.html"><code>Message::Util::Formatter::Boolean</code></a>
+<dd><a href="../../lib/Message/Util/Formatter/Text.html"><code>Message::Util::Formatter::Text</code></a>
+
+<dt>Qualified names (deprecated)
+
+<dd><a href="../../lib/Message/Util/QName/Filter.html"><code>Message::Util::QName::Filter</code></a>
+
+</dl>
+
 </div>
 
 <div class="section" id="documentation">
-<h2>文書</h2>
+<h2 data-lang-container>
+<span lang=en>Documentations</span>
+<span lang=ja>文書</span>
+</h2>
 
 <ul>
 <li>実装に関するメモ
@@ -168,7 +209,10 @@ package.)</li>
 </div>
 
 <div class="section" id="demo">
-<h2>デモ</h2>
+<h2 data-lang-container>
+<span lang=en>Demo</span>
+<span lang=ja>デモ</span>
+</h2>
 
 <ul>
 <li><a href="http://suika.fam.cx/gate/2007/uri/uri-demo-interface" lang="en">manakai's
@@ -180,7 +224,7 @@ parser (<em>beta</em>) Web interface (manakai version)</a></li>
 
 <div class=section id=applications>
 <h2 data-lang-container>
-<span lang=en>Applications using manakai-core</span>
+<span lang=en>Applications using manakai-core modules</span>
 <span lang=ja>manakai-core を用いた応用</span>
 </h2>
 
@@ -211,16 +255,28 @@ href="http://suika.fam.cx/commitfeed/readme"><code>mkcommitfeed.pl</code></a>
 </div>
 
 <div class="section" id="dependency">
-<h2>他のモジュールへの依存性</h2>
+<h2 data-lang-container>
+<span lang=en>Dependency</span>
+<span lang=ja>他のモジュールへの依存性</span>
+</h2>
 
 <dl>
-<dt>Perl 5.8.7</dt>
+<dt>Perl 5.8.7 or later
     <dd>古い版の Perl では動作しません。 5.8.4 くらいでも動くかもしれませんが、
     未確認です。</dd>
+
 <dt><a href="http://suika.fam.cx/www/charclass/readme">CharClass</a></dt>
-    <dd>XML 構文解析器を使用する場合に 
-    <a href="http://suika.fam.cx/www/charclass/lib/Char/Class/XML.html"><code>Char::Class::XML</code></a>
-    が必要です。</dd>
+
+<dd data-lang-container>
+
+<span lang=en><a href="#modules-dom">DOM implementation</a> requires
+the module <a
+href="http://suika.fam.cx/www/charclass/lib/Char/Class/XML.html"><code>Char::Class::XML</code></a>.</span>
+
+<span lang=ja><a href="#modules-dom">DOM 実装</a>を使用する場合に <a
+href="http://suika.fam.cx/www/charclass/lib/Char/Class/XML.html"><code>Char::Class::XML</code></a> 
+が必要です。</span>
+
 </dl>
 </div>
 
@@ -237,35 +293,69 @@ href="http://suika.fam.cx/commitfeed/readme"><code>mkcommitfeed.pl</code></a>
 </div>
 
 <div class="section" id="download">
-<h2 lang="en">ダウンロード</h2>
+<h2 data-lang-container>
+<span lang=en>Download</span>
+<span lang=ja>ダウンロード</span>
+</h2>
 
 <ul>
-<li><a href="#download-manakai-core" lang=en>manakai-core</a>
-(<abbr>DOM</abbr> 実装)</li>
-<li><a href="http://suika.fam.cx/www/markup/html/whatpm/readme#download" lang=en>Whatpm</a>
-(<abbr>HTML</abbr>, <abbr>XML</abbr>, <abbr>CSS</abbr> 実装)</li>
-<li><a href="http://suika.fam.cx/www/manakai-charlib/readme#modules" lang=en>manakai
-charlib</a> (日本語文字符号化対応)</li>
-</ul>
+<li>manakai-core <span data-lang-container>
+<span lang=en>(<abbr>DOM</abbr> implementation)</span>
+<span lang=ja>(<abbr>DOM</abbr> 実装)</span>
+</span>
 
 <dl id=download-manakai-core>
-<dt>開発版スナップ写真</dt>
-	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-dev-latest">manakai
-	開発版スナップ写真 (最新版)</a></dd>
+
+<dt data-lang-container id=download-snapshot>
+<span lang=en>Snapshots</span>
+<span lang=ja>スナップ写真</span>
+
+<dd data-lang-container>
+<span lang=en><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-dev-latest">manakai-core
+latest snapshot version</a></span>
+<span lang=ja><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-dev-latest">manakai-core
+スナップ写真 (最新版)</a></span>
+
 	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.4.0"
 	>manakai 0.4.0 (2007年9月29日)</a></dd>
 	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.2"
 	>manakai 0.3.2 (2006年6月18日)</a></dd>
 	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.1"
 	>manakai 0.3.1 (2006年4月22日)</a></dd>
-<dt>開発版</dt>
-	<dd><a href="http://suika.fam.cx/gate/cvs/messaging/manakai/"
-	lang="en">CVS repository</a> (<a
-	href="http://suika.fam.cx/admin/cvs/">suika.fam.cx</a>)</dd>
+
+<dt data-lang-container id=download-dev>
+<span lang=en>Development version</span>
+<span lang=ja>開発版</span>
+
+<dd data-lang-container>
+<span lang=en><a href="http://suika.fam.cx/gate/cvs/messaging/manakai/manakai.tar.gz?tarball=1"
+	lang="en">Latest development version tarball</a></span>
+<span lang=ja><a href="http://suika.fam.cx/gate/cvs/messaging/manakai/manakai.tar.gz?tarball=1"
+	lang=ja>最新開発版 tar 玉</a></span>
+
 </dl>
+
+<li><a href="http://suika.fam.cx/www/markup/html/whatpm/readme#download" lang=en>Whatpm</a>
+(<abbr>HTML</abbr>, <abbr>XML</abbr>, <abbr>CSS</abbr> 実装)</li>
+<li><a href="http://suika.fam.cx/www/manakai-charlib/readme#modules" lang=en>manakai
+charlib</a> (日本語文字符号化対応)</li>
+</ul>
 
 </div>
 
+<div class=section id=dev lang=en>
+<h2>Development</h2>
+
+<p data-lang-container id=cvs>
+<span lang=en><a href="http://suika.fam.cx/gate/cvs/messaging/manakai/"
+	lang="en">CVS repository</a> (<a
+	href="http://suika.fam.cx/admin/cvs/">suika.fam.cx</a>)</span>
+<span lang=ja><a href="http://suika.fam.cx/gate/cvs/messaging/manakai/"
+	lang="en">CVS リポジトリ</a> (<a
+	href="http://suika.fam.cx/admin/cvs/">suika.fam.cx</a>)</span>
+
+<p id=bts><a href="http://manakai.g.hatena.ne.jp/task/">Bug tracking system</a>
+</div>
 
 <div class="section" id="author" lang=en>
 <h2>Author</h2>
@@ -276,7 +366,7 @@ charlib</a> (日本語文字符号化対応)</li>
 <div class="section" id="license" lang=en>
 <h2>License</h2>
 
-<p>Copyright 2002‐2008 <span
+<p>Copyright 2002‐2009 <span
 href="http://suika.fam.cx/~wakaba/who?">Wakaba</span> <code
 class="mail">&lt;<a href="mailto:w@suika.fam.cx"
 rel="author">w@suika.fam.cx</a>></code>.</p>
