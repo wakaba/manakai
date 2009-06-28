@@ -676,7 +676,6 @@
 /ruby/rt;ps element missing;rp;m
 /ruby/rt;no significant content before;s
 /ruby/rp;no significant content before;s
-/ruby/rp;rp:syntax error;m
 /ruby;element missing;rt;m
 /ruby;element missing;rp;m
 
@@ -688,22 +687,19 @@
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>(</rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp></rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
+/ruby/rp;no significant content;s
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>))</rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>) </rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)<!----> </rp></ruby>
@@ -712,7 +708,6 @@
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp>)<!---->)</rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt></rt><rp>)</rp></ruby>
@@ -728,12 +723,11 @@
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp></rp><rt>y</rt><rp>)</rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
+/ruby/rp;no significant content;s
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>( </rp><rt>y</rt><rp>)</rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp> <!-- -->(</rp><rt>y</rt><rp>)</rp></ruby>
@@ -742,12 +736,10 @@
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>[(</rp><rt>y</rt><rp>)</rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>)</rp><rt>y</rt><rp>)</rp></ruby>
 #errors
-/ruby/rp;rp:syntax error;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>[</rp><rt>y</rt><rp>]</rp></ruby>
@@ -797,8 +789,6 @@
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp><span>(</span></rp><rt>y</rt><rp>)</rp></ruby>
 #errors
-/ruby/rp/span;element not allowed:text;m
-/ruby/rp;rp:syntax error;m
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt><span>y</span></rt><rp>)</rp></ruby>
@@ -807,8 +797,11 @@
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp><span>)</span></rp></ruby>
 #errors
-/ruby/rp/span;element not allowed:text;m
-/ruby/rp;rp:syntax error;m
+
+#data
+<ruby xmlns="http://www.w3.org/1999/xhtml">x<rp>(</rp><rt>y</rt><rp><p>)</p></rp></ruby>
+#errors
+/ruby/rp/p;element not allowed:phrasing;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>(</rp><rt>y</rt><rp>)</rp></ruby></p>
@@ -867,7 +860,6 @@
 <p xmlns="http://www.w3.org/1999/xhtml"><rp>x</rp></p>
 #errors
 /p/rp;element not allowed:phrasing;m
-/p/rp;rp:syntax error;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><rp>(</rp></p>
@@ -878,7 +870,6 @@
 <p xmlns="http://www.w3.org/1999/xhtml"><rp>)</rp></p>
 #errors
 /p/rp;element not allowed:phrasing;m
-/p/rp;rp:syntax error;m
 
 #data
 <br clear="" xmlns="http://www.w3.org/1999/xhtml"/>

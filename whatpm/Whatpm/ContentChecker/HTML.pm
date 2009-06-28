@@ -3951,46 +3951,14 @@ $Element->{$HTML_NS}->{rt} = {
 };
 
 $Element->{$HTML_NS}->{rp} = {
-  %HTMLTextChecker,
+  %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT | FEATURE_RUBY_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_WD,
   }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $element_state->{text} = '';
-
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-  check_child_text => sub {
-    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($has_significant) {
-      $element_state->{text} .= $child_node->data;
-      ## NOTE: |<rp> <!---->(</rp>| is allowed.
-    }
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-
-    my $p_class = ($item->{parent_state} and
-                   $item->{parent_state}->{phase} and
-                   $item->{parent_state}->{phase} eq 'after-rp2')
-        ? qr/\p{Pe}/ : qr/\p{Ps}/;
-    if ($element_state->{text} =~ /\A$p_class\z/) {
-        #=~ /\A[\x09\x0A\x0C\x0D\x20]*${p_class}[\x09\x0A\x0C\x0D\x20]*\z/) {
-      #
-    } else {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'rp:syntax error',
-                         level => $self->{level}->{must});
-    }
-
-    $HTMLTextChecker{check_end}->(@_);
-  },  
-};
+}; # rp
 
 =pod
 

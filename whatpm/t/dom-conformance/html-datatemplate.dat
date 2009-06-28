@@ -568,12 +568,11 @@
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp><nest/></rp><rt>y</rt><rp>)</rp></ruby></rule>
 #errors
-/rule/ruby/rp;rp:syntax error;m
+/rule/ruby/rp;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>(<nest/>(</rp><rt>y</rt><rp>]</rp></ruby></rule>
 #errors
-/rule/ruby/rp;rp:syntax error;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt><nest/></rt><rp>]</rp></ruby></rule>
@@ -617,7 +616,7 @@
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rp><nest/></rp></rule>
 #errors
-/rule/rp;rp:syntax error;m
+/rule/rp;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rp>(<nest/></rp></rule>
@@ -626,7 +625,6 @@
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rp><nest/>)</rp></rule>
 #errors
-/rule/rp;rp:syntax error;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rb><nest/></rb></rule>
