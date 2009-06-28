@@ -1,0 +1,472 @@
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"></select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">  </select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">xx</select>
+#errors
+/select/"xx";character not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><p>x</p></select>
+#errors
+/select/p;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><ins>x</ins></select>
+#errors
+/select/ins;element not allowed;m
+/select/ins/"x";character not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><a>aa</a></select>
+#errors
+/select/a;element not allowed;m
+/select/a/"aa";character not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><img src="" alt="x"/></select>
+#errors
+/select/img;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option>x</option></select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option>x</option>y</select>
+#errors
+/select/"y";character not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option>x</option><em>y</em></select>
+#errors
+/select/em;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><nest/></select>
+#errors
+/select/nest;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><option/><optgroup/></select>
+#errors
+/select/optgroup;attribute missing;label;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><optgroup/></select>
+#errors
+/select/optgroup;attribute missing;label;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"><optgroup/>
+<option/><optgroup/></select>
+#errors
+/select/optgroup;attribute missing;label;m
+/select/optgroup;attribute missing;label;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><select/></em>
+#errors
+/em;no significant content;s
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><select><option>x</option></select></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><select>x</select></em>
+#errors
+/em/select/"x";character not allowed;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><select/></div>
+#errors
+/div;no significant content;s
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"><select/></ins>
+#errors
+/ins;no significant content;s
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    multiple=""/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    multiple="multiple"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    multiple="Multiple"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    multiple=" multiple"/>
+#errors
+/select/@multiple;boolean:invalid;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    multiple="yes"/>
+#errors
+/select/@multiple;boolean:invalid;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size=""/>
+#errors
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    multiple="" size="10"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="10"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="0"/>
+#errors
+/select/@size;nninteger:out of range;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="1"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="2"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="10000"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="00010"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="1.2"/>
+#errors
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="-0"/>
+#errors
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="10.0"/>
+#errors
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    size="+10"/>
+#errors
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    disabled=""/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    disabled="disabled"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    disabled="Disabled"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    disabled=" disabled"/>
+#errors
+/select/@disabled;boolean:invalid;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    disabled="yes"/>
+#errors
+/select/@disabled;boolean:invalid;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    autofocus=""/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="autofocus"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="AutoFocus"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="no"/>
+#errors
+/select/@autofocus;boolean:invalid;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"></optgroup>
+#errors
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml">  </optgroup>
+#errors
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml">xxx</optgroup>
+#errors
+/optgroup/"xxx";character not allowed;m
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/></optgroup>
+#errors
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/><option/></optgroup>
+#errors
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/>
+<option/></optgroup>
+#errors
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/>x</optgroup>
+#errors
+/optgroup/"x";character not allowed;m
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/><p/></optgroup>
+#errors
+/optgroup/p;element not allowed;m
+/optgroup/p;no significant content;s
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/><span>x</span></optgroup>
+#errors
+/optgroup/span;element not allowed;m
+/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><optgroup/></optgroup>
+#errors
+/optgroup/optgroup;element not allowed;m
+/optgroup;attribute missing;label;m
+/optgroup/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"><option/><optgroup/></optgroup>
+#errors
+/optgroup/optgroup;element not allowed;m
+/optgroup;attribute missing;label;m
+/optgroup/optgroup;attribute missing;label;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><optgroup/></em>
+#errors
+/em;no significant content;s
+/em/optgroup;element not allowed:phrasing;m
+/em/optgroup;attribute missing;label;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><optgroup/></div>
+#errors
+/div;no significant content;s
+/div/optgroup;element not allowed:flow;m
+/div/optgroup;attribute missing;label;m
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><optgroup/></br>
+#errors
+/br/optgroup;element not allowed:empty;m
+/br/optgroup;attribute missing;label;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"
+    label=""/>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"
+    label="xxx"/>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"
+    label="" disabled=""/>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"
+    label="" disabled="disabled"/>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"
+    label="" disabled="DisAbled"/>
+#errors
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"
+    label="" disabled=" dis "/>
+#errors
+/optgroup/@disabled;boolean:invalid;m
+
+#data
+<optgroup xmlns="http://www.w3.org/1999/xhtml"
+    label="" disabled="enabled"/>
+#errors
+/optgroup/@disabled;boolean:invalid;m
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"></option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml">  </option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml">xxx</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"><span>xx</span></option>
+#errors
+/option/span;element not allowed:text;m
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml">aa<em>bb</em></option>
+#errors
+/option/em;element not allowed:text;m
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"><option/></option>
+#errors
+/option/option;element not allowed:text;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><option/></em>
+#errors
+/em/option;element not allowed:phrasing;m
+/em;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><option/></div>
+#errors
+/div/option;element not allowed:flow;m
+/div;no significant content;s
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    disabled=""
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    disabled="disabled"
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    disabled="DisableD"
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    disabled="disabled "
+>x</option>
+#errors
+/option/@disabled;boolean:invalid;m
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    disabled="none"
+>x</option>
+#errors
+/option/@disabled;boolean:invalid;m
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    label=""
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    value=""
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    value="abcdefg"
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    selected=""
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    selected="selected"
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    selected="SeLECTED"
+>x</option>
+#errors
+
+#data
+<option xmlns="http://www.w3.org/1999/xhtml"
+    selected="select"
+>x</option>
+#errors
+/option/@selected;boolean:invalid;m

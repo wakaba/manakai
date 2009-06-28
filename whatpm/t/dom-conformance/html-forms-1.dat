@@ -216,6 +216,30 @@
 /fieldset/legend;element not allowed:details legend;m
 
 #data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">
+<legend><p>xxx</p></legend>
+<p>yyy</p>
+</fieldset>
+#errors
+/fieldset/legend/p;element not allowed:phrasing;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">
+<legend><div><p>xxx</p></div></legend>
+<p>yyy</p>
+</fieldset>
+#errors
+/fieldset/legend/div;element not allowed:phrasing;m
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">
+<legend><ins><p>xxx</p></ins></legend>
+<p>yyy</p>
+</fieldset>
+#errors
+/fieldset/legend/ins/p;element not allowed:phrasing;m
+
+#data
 <fieldset xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style><legend>y</legend>x</fieldset>
 #errors
 /fieldset/legend;element not allowed:details legend;m

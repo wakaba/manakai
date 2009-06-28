@@ -2394,7 +2394,6 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure/legend/p;element not allowed:phrasing;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2402,7 +2401,6 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure/legend/blockquote;element not allowed:phrasing;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2417,7 +2415,6 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure/legend/p;element not allowed:phrasing;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2425,7 +2422,29 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure/legend/blockquote;element not allowed:phrasing;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><ins><blockquote><p>XXX</p></blockquote></ins></legend>
+<img src="" alt="x"/>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><figure><p>XXX</p></figure></legend>
+<img src="" alt="x"/>
+</figure>
+#errors
+/figure/legend/figure;element not allowed:minus;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><div><figure><p>XXX</p></figure></div></legend>
+<img src="" alt="x"/>
+</figure>
+#errors
+/figure/legend/div/figure;element not allowed:minus;m
 
 #data
 <?xml version="1.1"?>
