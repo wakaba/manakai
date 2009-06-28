@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.206 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.207 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -936,7 +936,9 @@ sub _tree_construction_initial ($) {
       $doctype->public_id ($token->{pubid}) if defined $token->{pubid};
       $doctype->system_id ($token->{sysid}) if defined $token->{sysid};
       ## NOTE: Other DocumentType attributes are null or empty lists.
-      ## ISSUE: internalSubset = null??
+      ## In Firefox3, |internalSubset| attribute is set to the empty
+      ## string, while |null| is an allowed value for the attribute
+      ## according to DOM3 Core.
       $self->{document}->append_child ($doctype);
       
       if ($token->{quirks} or $doctype_name ne 'HTML') {
@@ -2829,7 +2831,7 @@ sub _tree_construction_main ($) {
                 ## Reprocess in the "after head" insertion mode...
               } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 
-                ## ISSUE: Two parse errors for <head><noscript></br>
+                ## NOTE: Two parse errors for <head><noscript></br>
                 $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                                 text => 'br', token => $token);
                 ## As if </noscript>
@@ -5670,8 +5672,6 @@ sub _tree_construction_main ($) {
                          line => $token->{line}, column => $token->{column}},
                         {type => START_TAG_TOKEN, tag_name => 'hr',
                          line => $token->{line}, column => $token->{column}},
-                        {type => START_TAG_TOKEN, tag_name => 'p',
-                         line => $token->{line}, column => $token->{column}},
                         {type => START_TAG_TOKEN, tag_name => 'label',
                          line => $token->{line}, column => $token->{column}},
                        );
@@ -5693,8 +5693,6 @@ sub _tree_construction_main ($) {
                          line => $token->{line}, column => $token->{column}},
                         #{type => CHARACTER_TOKEN, data => ''}, # SHOULD
                         {type => END_TAG_TOKEN, tag_name => 'label',
-                         line => $token->{line}, column => $token->{column}},
-                        {type => END_TAG_TOKEN, tag_name => 'p',
                          line => $token->{line}, column => $token->{column}},
                         {type => START_TAG_TOKEN, tag_name => 'hr',
                          line => $token->{line}, column => $token->{column}},
@@ -5831,6 +5829,8 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
+          
+        ## TODO: <non-ruby><rt> is not allowed.
 
         
     {
@@ -6673,7 +6673,6 @@ sub set_inner_html ($$$$;$) {
     }->{$node_ln};
     $p->{content_model} = PCDATA_CONTENT_MODEL
         unless defined $p->{content_model};
-        ## ISSUE: What is "the name of the element"? local name?
 
     $p->{inner_html_node} = [$node, $el_category->{$node_ln}];
       ## TODO: Foreign element OK?
@@ -6746,4 +6745,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/14 13:24:52 $
+# $Date: 2009/06/28 11:03:06 $

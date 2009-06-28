@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.212 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.213 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -4792,8 +4792,6 @@ sub _tree_construction_main ($) {
                          line => $token->{line}, column => $token->{column}},
                         {type => START_TAG_TOKEN, tag_name => 'hr',
                          line => $token->{line}, column => $token->{column}},
-                        {type => START_TAG_TOKEN, tag_name => 'p',
-                         line => $token->{line}, column => $token->{column}},
                         {type => START_TAG_TOKEN, tag_name => 'label',
                          line => $token->{line}, column => $token->{column}},
                        );
@@ -4815,8 +4813,6 @@ sub _tree_construction_main ($) {
                          line => $token->{line}, column => $token->{column}},
                         #{type => CHARACTER_TOKEN, data => ''}, # SHOULD
                         {type => END_TAG_TOKEN, tag_name => 'label',
-                         line => $token->{line}, column => $token->{column}},
-                        {type => END_TAG_TOKEN, tag_name => 'p',
                          line => $token->{line}, column => $token->{column}},
                         {type => START_TAG_TOKEN, tag_name => 'hr',
                          line => $token->{line}, column => $token->{column}},
@@ -5689,4 +5685,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/06/28 10:48:30 $
+# $Date: 2009/06/28 11:03:06 $

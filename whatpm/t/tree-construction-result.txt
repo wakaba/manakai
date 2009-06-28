@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Mon Oct 20 00:12:51 2008
-# Current time GMT:   Sun Oct 19 15:12:51 2008
+# Current time local: Sun Jun 28 20:00:43 2009
+# Current time GMT:   Sun Jun 28 11:00:43 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -758,7 +758,22 @@ ok 659
 ok 660
 ok 661
 ok 662
-ok 663
+not ok 663
+# Test 663 got: "<html>\n  <head>\n  <body>\n    <form>\n      <hr>\n      <label>\n        \"This is a searchable index. Insert your search keywords here: \"\n        <input>\n          name=\"isindex\"\n          test=\"x\"\n      <hr>\n" (t/HTML-tree.t at line 98 fail #221)
+#     Expected: "<html>\n  <head>\n  <body>\n    <form>\n      <hr>\n      <p>\n        <label>\n          \"This is a searchable index. Insert your search keywords here: \"\n          <input>\n            name=\"isindex\"\n            test=\"x\"\n      <hr>\n" (Document tree: qq'<isindex test=x name=x>')
+#     Lines 6-10 are changed:
+#      - "      <p>\n"
+#      + "      <label>\n"
+#      - "        <label>\n"
+#      + "        \"This is a searchable index. Insert your search keywords here: \"\n"
+#      - "          \"This is a searchable index. Insert your search keywords here: \"\n"
+#      + "        <input>\n"
+#      - "          <input>\n"
+#      + "          name=\"isindex\"\n"
+#      - "            name=\"isindex\"\n"
+#      + "          test=\"x\"\n"
+#     Line 11 is missing:
+#      - "            test=\"x\"\n"
 ok 664
 ok 665
 ok 666
