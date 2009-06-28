@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.211 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.212 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -4901,6 +4901,8 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
+          
+        ## TODO: <non-ruby><rt> is not allowed.
 
         !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
 
@@ -5687,4 +5689,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2008/10/27 05:44:47 $
+# $Date: 2009/06/28 10:48:30 $

@@ -1492,6 +1492,13 @@ for (qw/
   $HTMLAttrStatus{$_} = FEATURE_HTML5_DEFAULT;
 }
 
+for (qw/
+         ondataunavailable
+     /) {
+  $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
+  $HTMLAttrStatus{$_} = FEATURE_HTML5_DROPPED;
+}
+
 ## NOTE: Non-standard global attributes in the HTML namespace.
 $AttrChecker->{$HTML_NS}->{''} = sub {}; # no syntactical checks
 $AttrStatus->{$HTML_NS}->{''} = 0; # disallowed and not part of any standard
@@ -4105,6 +4112,8 @@ $Element->{$HTML_NS}->{figure} = {
     if ($has_significant) {
       $element_state->{has_non_legend} = 1;
     }
+
+    $element_state->{in_figure} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -7378,7 +7387,36 @@ $Element->{$HTML_NS}->{legend} = {
     form => FEATURE_HTML5_DROPPED,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
   }),
-};
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($item->{parent_state}->{in_figure}) {
+      $HTMLFlowContentChecker{check_child_element}->(@_);
+    } else {
+      $HTMLPhrasingContentChecker{check_child_element}->(@_);
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($item->{parent_state}->{in_figure}) {
+      $HTMLFlowContentChecker{check_child_text}->(@_);
+    } else {
+      $HTMLPhrasingContentChecker{check_child_text}->(@_);
+    }
+  },
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {figure => 1}});
+
+    $HTMLFlowContentChecker{check_start}->(@_);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+
+    $HTMLFlowContentChecker{check_end}->(@_);
+  },
+}; # legend
 
 $Element->{$HTML_NS}->{div} = {
   %HTMLFlowContentChecker,
