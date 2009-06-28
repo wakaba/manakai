@@ -366,6 +366,32 @@
 /caption/@align;enumerated:invalid;m
 
 #data
+<caption xmlns="http://www.w3.org/1999/xhtml">
+  <p>aaa</p>
+</caption>
+#errors
+
+#data
+<caption xmlns="http://www.w3.org/1999/xhtml">
+  <ul><li>aaa</li></ul>
+</caption>
+#errors
+
+#data
+<caption xmlns="http://www.w3.org/1999/xhtml">
+  <table/>
+</caption>
+#errors
+/caption/table;element not allowed:minus;m
+
+#data
+<caption xmlns="http://www.w3.org/1999/xhtml">
+  <div><table/>x</div>
+</caption>
+#errors
+/caption/div/table;element not allowed:minus;m
+
+#data
 <colgroup xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 

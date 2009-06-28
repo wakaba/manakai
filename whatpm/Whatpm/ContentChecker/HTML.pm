@@ -5127,7 +5127,7 @@ $Element->{$HTML_NS}->{table} = {
 };
 
 $Element->{$HTML_NS}->{caption} = {
-  %HTMLPhrasingContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $GetHTMLEnumeratedAttrChecker->({
@@ -5139,7 +5139,19 @@ $Element->{$HTML_NS}->{caption} = {
     align => FEATURE_M12N10_REC_DEPRECATED,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
   }),
-};
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {table => 1}});
+
+    $HTMLFlowContentChecker{check_start}->(@_);
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+
+    $HTMLFlowContentChecker{check_end}->(@_);
+  },
+}; # caption
 
 my %cellalign = (
   ## HTML4 %cellhalign;
