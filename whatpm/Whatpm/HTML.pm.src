@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.214 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.215 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -525,6 +525,16 @@ sub parse_byte_stream ($$$$;$$) {
     
     if ($char_stream) { # if supported
       ## "Change the encoding" algorithm:
+      
+      ## Step 1
+      if (defined $self->{input_encoding} and
+          $self->{input_encoding} eq $charset_name) {
+        !!!parse-error (type => 'charset label:matching',
+                        text => $charset_name,
+                        level => $self->{level}->{info});
+        $self->{confident} = 1;
+        return;
+      }
 
       ## Step 2 (HTML5 revision 3205)
       if (defined $self->{input_encoding} and
@@ -543,16 +553,6 @@ sub parse_byte_stream ($$$$;$$) {
              byte_buffer => \ $buffer->{buffer});
       }
       $charset_name = $charset->get_iana_name;
-      
-      ## Step 1 XXX
-      if (defined $self->{input_encoding} and
-          $self->{input_encoding} eq $charset_name) {
-        !!!parse-error (type => 'charset label:matching',
-                        text => $charset_name,
-                        level => $self->{level}->{info});
-        $self->{confident} = 1;
-        return;
-      }
 
       !!!parse-error (type => 'charset label detected',
                       text => $self->{input_encoding},
@@ -5693,4 +5693,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/02 22:08:37 $
+# $Date: 2009/07/02 22:11:51 $
