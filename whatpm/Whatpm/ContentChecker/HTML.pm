@@ -5759,7 +5759,6 @@ $Element->{$HTML_NS}->{input} = {
             {
              accesskey => $HTMLAccesskeyAttrChecker,
              checked => $GetHTMLBooleanAttrChecker->('checked'),
-                 ## ISSUE: checked value not (yet?) defined.
                  ## TODO: tests
              required => $GetHTMLBooleanAttrChecker->('required'),
              value => sub { }, ## NOTE: No restriction.

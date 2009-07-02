@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.209 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.210 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -4425,7 +4425,7 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           next B;
         } elsif ({
-                   select => 1, input => 1, textarea => 1,
+                   select => 1, input => 1, textarea => 1, keygen => 1,
                  }->{$token->{tag_name}} or
                  (($self->{insertion_mode} & IM_MASK)
                       == IN_SELECT_IN_TABLE_IM and
@@ -6753,4 +6753,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/02 22:11:51 $
+# $Date: 2009/07/02 23:15:37 $

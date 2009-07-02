@@ -5841,6 +5841,35 @@ no </select> before <input>
 |             <textarea>
 
 #data
+<!DOCTYPE HTML><select><optgroup><keygen></keygen>
+#errors
+<keygen> in <select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <optgroup>
+|     <keygen>
+
+#data
+<!DOCTYPE HTML><table><tr><td><select><keygen></keygen></table>
+#errors
+<keygen> in <select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|             <keygen>
+
+#data
 <!DOCTYPE HTML><select><table></table>
 #errors
 <table> in <select>
