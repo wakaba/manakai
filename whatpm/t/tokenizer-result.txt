@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Fri Jul  3 07:11:09 2009
-# Current time GMT:   Thu Jul  2 22:11:09 2009
+# Current time local: Fri Jul  3 07:20:52 2009
+# Current time GMT:   Thu Jul  2 22:20:52 2009
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -22,7 +22,12 @@ ok 15
 ok 16
 ok 17
 ok 18
-ok 19
+not ok 19
+# Test 19 got: "$VAR1 = [\n          [\n            qq'Comment',\n            qq' --comment '\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #19)
+#    Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq' --comment '\n          ]\n        ];\n" (Comment, two central dashes: qq'<!-- --comment -->')
+#    Line 2 is missing:
+#     - "          qq'ParseError',\n"
+#  t/HTML-tokenizer.t line 205 is:       ok $parser_dump, $expected_dump,
 ok 20
 ok 21
 ok 22
@@ -54,7 +59,6 @@ not ok 44
 #    Line 6 is changed:
 #     - "            qq'',\n"
 #     + "            undef,\n"
-#  t/HTML-tokenizer.t line 205 is:       ok $parser_dump, $expected_dump,
 ok 45
 ok 46
 ok 47
@@ -103,7 +107,11 @@ ok 88
 ok 89
 ok 90
 ok 91
-ok 92
+not ok 92
+# Test 92 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'--.'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #92)
+#    Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'--.'\n          ]\n        ];\n" (<!----.: qq'<!----.')
+#    Line 3 is missing:
+#     - "          qq'ParseError',\n"
 ok 93
 ok 94
 ok 95
@@ -908,9 +916,11 @@ not ok 852
 #      - "            qq'a b'\n"
 #      + "            qq'a\\x{0C}b'\n"
 not ok 853
-# Test 853 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq' foo -- bar '\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #853)
+# Test 853 got: "$VAR1 = [\n          [\n            qq'Comment',\n            qq' foo -- bar '\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #853)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq' foo - - bar '\n          ]\n        ];\n" (Double hyphen in comment: qq'<!-- foo -- bar -->')
-#     Line 5 is changed:
+#     Line 2 is missing:
+#      - "          qq'ParseError',\n"
+#     Line 4 is changed:
 #      - "            qq' foo - - bar '\n"
 #      + "            qq' foo -- bar '\n"
 ok 854
@@ -986,7 +996,11 @@ ok 922
 ok 923
 ok 924
 ok 925
-ok 926
+not ok 926
+# Test 926 got: "$VAR1 = [\n          [\n            qq'Comment',\n            qq'--x'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #926)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'--x'\n          ]\n        ];\n" (<!----x-->: qq'<!----x-->')
+#     Line 2 is missing:
+#      - "          qq'ParseError',\n"
 ok 927
 ok 928
 ok 929

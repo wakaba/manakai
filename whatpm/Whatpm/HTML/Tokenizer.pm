@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -2999,10 +2999,6 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
-        ## XML5: Not a parse error.
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'dash in comment',
-                        line => $self->{line_prev},
-                        column => $self->{column_prev});
         $self->{ct}->{data} .= '--' . chr ($self->{nc}); # comment
         $self->{state} = COMMENT_STATE;
         
@@ -8658,5 +8654,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/07/02 21:42:43 $
+## $Date: 2009/07/02 22:24:28 $
                                 
