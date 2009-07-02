@@ -1292,19 +1292,21 @@
 <datagrid><nest/></datagrid>
 </rule>
 #errors
+/rule/datagrid;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datagrid><nest/><table/></datagrid>
 </rule>
 #errors
+/rule/datagrid;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datagrid><nest/><table/><p/></datagrid>
 </rule>
 #errors
-/rule/datagrid/p;element not allowed;m
+/rule/datagrid;no significant content;s
 /rule/datagrid/p;no significant content;s
 
 #data
@@ -1320,7 +1322,7 @@
 <datagrid><table/><nest/><p/></datagrid>
 </rule>
 #errors
-/rule/datagrid/p;element not allowed;m
+/rule/datagrid;no significant content;s
 /rule/datagrid/p;no significant content;s
 
 #data
