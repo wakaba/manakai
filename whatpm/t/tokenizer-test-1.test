@@ -892,6 +892,14 @@
 "input": "<span a=b=>",
 "output": ["ParseError", ["StartTag", "span", {"a": "b="}]]},
 
+{"description": "<span a=<> (HTML5 revision 3206)",
+"input": "<span a=<>",
+"output": ["ParseError", ["StartTag", "span", {"a": "<"}]]},
+
+{"description": "<span a=b<> (HTML5 revision 3206)",
+"input": "<span a=b<>",
+"output": ["ParseError", ["StartTag", "span", {"a": "b<"}]]},
+
 {"description": "<span =x\"=\"x>",
 "input": "<span =x\"=\"x>",
 "output": ["ParseError", "ParseError", "ParseError",
