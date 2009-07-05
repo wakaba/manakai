@@ -701,6 +701,13 @@ para
 #errors
 
 #data
+<footer xmlns="http://www.w3.org/1999/xhtml">
+  <header>xxx</header>
+</footer>
+#errors
+/footer/header;element not allowed:minus;m
+
+#data
 <address xmlns="http://www.w3.org/1999/xhtml"></address>
 #errors
 /address;no significant content;s
@@ -751,6 +758,13 @@ para
 <address xmlns="http://www.w3.org/1999/xhtml"><h1>aa</h1></address>
 #errors
 /address/h1;element not allowed:minus;m
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml">
+  <header>xxx</header>
+</address>
+#errors
+/address/header;element not allowed:minus;m
 
 #data
 <li xmlns="http://www.w3.org/1999/xhtml"></li>
