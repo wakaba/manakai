@@ -6,6 +6,8 @@ use Char::Class::XML qw/InXML_NCNameStartChar10 InXMLNCNameChar10/;
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 
+## --- Feature Status ---
+
 sub FEATURE_HTML5_COMPLETE () {
   ## NOTE: Part of HTML5, the implemented status.
   Whatpm::ContentChecker::FEATURE_STATUS_REC |
@@ -170,6 +172,8 @@ sub FEATURE_RFC1942 () { ## Experimental RFC, obsolete
 sub FEATURE_HTML20_RFC () { ## Proposed Standard, obsolete
   Whatpm::ContentChecker::FEATURE_STATUS_CR
 }
+
+## --- Content Model ---
 
 ## December 2007 HTML5 Classification
 
@@ -2503,9 +2507,16 @@ $Element->{$HTML_NS}->{nav} = {
 };
 
 $Element->{$HTML_NS}->{article} = {
-  status => FEATURE_HTML5_LC,
   %HTMLFlowContentChecker,
-};
+  status => FEATURE_HTML5_LC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    pubdate => $GetDateTimeAttrChecker->('global_date_and_time_string'),
+  }, {
+    %HTMLAttrStatus,
+    # XXX cite
+    pubdate => FEATURE_HTML5_LC,
+  }),
+}; # article
 
 $Element->{$HTML_NS}->{blockquote} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -2568,6 +2579,8 @@ $Element->{$HTML_NS}->{h5} = {%{$Element->{$HTML_NS}->{h1}}};
 $Element->{$HTML_NS}->{h6} = {%{$Element->{$HTML_NS}->{h1}}};
 
 ## TODO: Explicit sectioning is "encouraged".
+
+# XXX footer in header is disallowed (HTML5 revision 3050)
 
 $Element->{$HTML_NS}->{header} = {
   status => FEATURE_HTML5_LC,

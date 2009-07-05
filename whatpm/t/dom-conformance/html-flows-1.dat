@@ -356,10 +356,55 @@ para
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-@@ TODO: It is expected that tests for NAV and following elements come here.
+@@ TODO: It is expected that tests for the NAV element comes here.
+</p>
+#errors
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml"></article>
+#errors
+/article;no significant content;s
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml">  </article>
+#errors
+/article;no significant content;s
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml">x</article>
+#errors
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml"><p>x</p></article>
+#errors
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="2009-01-01T02:02:02Z">x</article>
+#errors
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="2009-01-01 02:02:02Z">x</article>
+#errors
+/article/@pubdate;datetime:syntax error;m
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="2009-01-01">x</article>
+#errors
+/article/@pubdate;datetime:syntax error;m
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="02:02:03">x</article>
+#errors
+/article/@pubdate;datetime:syntax error;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+@@ TODO: It is expected that tests for the following elements come here.
 <![CDATA[
- @@ <nav>
- @@ <article>
  @@ <blockquote>
  ## <aside>
  ## <h1><h2><h3><h4><h5><h6>
