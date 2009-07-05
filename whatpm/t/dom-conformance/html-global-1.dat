@@ -938,98 +938,108 @@ id=""><span id="">x</span></p>
 #data
 <a accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</a>
 #errors
-/a/@accesskey;char:syntax error;m
-/a/@accesskey;attribute not defined;m
 
 #data
 <a accesskey="a" xmlns="http://www.w3.org/1999/xhtml">x</a>
 #errors
-/a/@accesskey;attribute not defined;m
 
 #data
 <a accesskey=" " xmlns="http://www.w3.org/1999/xhtml">x</a>
 #errors
-/a/@accesskey;attribute not defined;m
 
 #data
 <a accesskey="xx" xmlns="http://www.w3.org/1999/xhtml">x</a>
 #errors
 /a/@accesskey;char:syntax error;m
-/a/@accesskey;attribute not defined;m
 
 #data
 <area href="" shape="default" alt="" accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@accesskey;char:syntax error;m
-/area/@accesskey;attribute not defined;m
 
 #data
 <area href="" shape="default" alt="" accesskey="a" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@accesskey;attribute not defined;m
 
 #data
 <area href="" shape="default" alt="" accesskey=" " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@accesskey;attribute not defined;m
 
 #data
 <area href="" shape="default" alt="" accesskey="xx" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@accesskey;char:syntax error;m
-/area/@accesskey;attribute not defined;m
 
 #data
 <button accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</button>
 #errors
-/button/@accesskey;char:syntax error;m
-/button/@accesskey;attribute not defined;m
 
 #data
 <button accesskey="x" xmlns="http://www.w3.org/1999/xhtml">x</button>
 #errors
-/button/@accesskey;attribute not defined;m
 
 #data
 <label accesskey="" xmlns="http://www.w3.org/1999/xhtml"><input/>x</label>
 #errors
-/label/@accesskey;char:syntax error;m
-/label/@accesskey;attribute not defined;m
 
 #data
 <label accesskey="x" xmlns="http://www.w3.org/1999/xhtml"><input/>x</label>
 #errors
-/label/@accesskey;attribute not defined;m
 
 #data
 <select accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/select/@accesskey;char:syntax error;m
-/select/@accesskey;attribute not defined;m
 
 #data
 <select accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/select/@accesskey;attribute not defined;m
 
 #data
 <textarea accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/textarea/@accesskey;char:syntax error;m
-/textarea/@accesskey;attribute not defined;m
 
 #data
 <textarea accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/textarea/@accesskey;attribute not defined;m
 
 #data
 <legend accesskey="" xmlns="http://www.w3.org/1999/xhtml">x</legend>
 #errors
-/legend/@accesskey;char:syntax error;m
-/legend/@accesskey;attribute not defined;m
 
 #data
 <legend accesskey="x" xmlns="http://www.w3.org/1999/xhtml">x</legend>
 #errors
-/legend/@accesskey;attribute not defined;m
+
+#data
+<p accesskey="x" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+
+#data
+<unknown accesskey="x" xmlns="http://www.w3.org/1999/xhtml">x</unknown>
+#errors
+/unknown;element not defined;m
+
+#data
+<legend accesskey="  x   y" xmlns="http://www.w3.org/1999/xhtml">x</legend>
+#errors
+
+#data
+<legend accesskey="x x" xmlns="http://www.w3.org/1999/xhtml">x</legend>
+#errors
+/legend/@accesskey;duplicate token;m
+
+#data
+<legend accesskey="x X" xmlns="http://www.w3.org/1999/xhtml">x</legend>
+#errors
+
+#data
+<legend accesskey="x @ &#x09;" xmlns="http://www.w3.org/1999/xhtml">x</legend>
+#errors
+
+#data
+<legend accesskey="&#x09; x &#x09;" xmlns="http://www.w3.org/1999/xhtml">x</legend>
+#errors
+
+#data
+<legend accesskey="&amp;x" xmlns="http://www.w3.org/1999/xhtml">x</legend>
+#errors
+/legend/@accesskey;char:syntax error;m

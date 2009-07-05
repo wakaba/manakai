@@ -9396,168 +9396,142 @@
 #data
 <input accesskey="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/input/@accesskey;char:syntax error;m
-/input/@accesskey;attribute not defined;m
 
 #data
 <input accesskey="x" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="hidden"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
-/input/@accesskey;input attr not applicable;hidden;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="text"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="url"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="search"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="password"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="datetime"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="date"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="month"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="week"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="time"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="datetime-local"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="number"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="range"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="color"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="checkbox"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="radio"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="submit"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="image"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="reset"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="button"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9565,7 +9539,6 @@
     accesskey="a"/>
 #errors
 /input/@type;enumerated:invalid;m
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9573,14 +9546,12 @@
     accesskey="a"/>
 #errors
 /input/@type;enumerated:invalid;m
-/input/@accesskey;attribute not defined;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="move-up"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 /input/@type;enumerated:invalid;m
 
 #data
@@ -9588,8 +9559,22 @@
     type="move-down"
     accesskey="a"/>
 #errors
-/input/@accesskey;attribute not defined;m
 /input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down"
+    accesskey="a b"/>
+#errors
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down"
+    accesskey="abc"/>
+#errors
+/input/@type;enumerated:invalid;m
+/input/@accesskey;char:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"

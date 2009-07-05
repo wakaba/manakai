@@ -919,24 +919,6 @@ my $HTMLSelectorsAttrChecker = sub {
   $p->parse_string ($value);
 }; # $HTMLSelectorsAttrChecker
 
-my $HTMLAccesskeyAttrChecker = sub {
-  my ($self, $attr) = @_;
-
-  ## NOTE: "character" or |%Character;| in HTML4.
-
-  my $value = $attr->value;
-  if (length $value != 1) {
-    $self->{onerror}->(node => $attr, type => 'char:syntax error',
-                       level => $self->{level}->{html4_fact});
-  }
-
-  ## NOTE: "Note. Authors should consider the input method of the expected
-  ## reader when specifying an accesskey." [HTML4]  This is hard to implement,
-  ## since it depends on keyboard and so on.
-  ## NOTE: "We recommend that authors include the access key in label text
-  ## or wherever the access key is to apply." [HTML4] (informative)
-}; # $HTMLAccesskeyAttrChecker
-
 my $HTMLCharsetChecker = sub ($$$;$) {
   my ($charset_value, $self, $attr, $ascii_compat) = @_;
 
@@ -1036,6 +1018,7 @@ my $HTMLCharsetsAttrChecker = sub {
 
   my @value = grep {length $_} split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value;
   
+  ## XXX
   ## ISSUE: Uniqueness is not enforced.
 
   for my $charset (@value) {
@@ -1129,6 +1112,30 @@ my $HTMLRepeatIndexAttrChecker = sub {
 }; # $HTMLRepeatIndexAttrChecker
 
 my $HTMLAttrChecker = {
+  accesskey => sub {
+    my ($self, $attr) = @_;
+    
+    ## "Ordered set of unique space-separated tokens"
+    
+    my %keys;
+    my @keys = grep {length} split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value;
+    
+    for my $key (@keys) {
+      unless ($keys{$key}) {
+        $keys{$key} = 1;
+        if (length $key != 1) {
+          $self->{onerror}->(node => $attr, type => 'char:syntax error',
+                             value => $key,
+                             level => $self->{level}->{must});
+        }
+      } else {
+        $self->{onerror}->(node => $attr, type => 'duplicate token',
+                           value => $key,
+                           level => $self->{level}->{must});
+      }
+    }
+  }, # accesskey
+
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
     my ($self, $attr, $item, $element_state) = @_;
@@ -1345,6 +1352,7 @@ my $HTMLAttrChecker = {
 ## ISSUE: Shouldn't the same-origin policy applied to the datatemplate feature?
 
 my %HTMLAttrStatus = (
+  accesskey => FEATURE_HTML5_FD,
   class => FEATURE_HTML5_WD,
   contenteditable => FEATURE_HTML5_DEFAULT,
   contextmenu => FEATURE_HTML5_WD,
@@ -3085,7 +3093,7 @@ $Element->{$HTML_NS}->{a} = {
         $status = {
           %HTMLAttrStatus,
           %HTMLM12NXHTML2CommonAttrStatus,
-          accesskey => FEATURE_M12N10_REC,
+          accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
           charset => FEATURE_M12N10_REC,
           coords => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           cryptopts => FEATURE_RFC2659,
@@ -3113,7 +3121,6 @@ $Element->{$HTML_NS}->{a} = {
         }->{$attr_ln};
 
         $checker = {
-          accesskey => $HTMLAccesskeyAttrChecker,
           charset => sub {
             my ($self, $attr) = @_;
             $HTMLCharsetChecker->($attr->value, @_);
@@ -4734,7 +4741,7 @@ $Element->{$HTML_NS}->{area} = {
         $status = {
           %HTMLAttrStatus,
           %HTMLM12NCommonAttrStatus,
-          accesskey => FEATURE_M12N10_REC,
+          accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
           alt => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
           coords => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
           href => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_M12N10_REC,
@@ -4753,7 +4760,6 @@ $Element->{$HTML_NS}->{area} = {
         }->{$attr_ln};
 
         $checker = {
-          accesskey => $HTMLAccesskeyAttrChecker,
                      alt => sub {
                        ## NOTE: Checked later.
                      },
@@ -5572,7 +5578,7 @@ $Element->{$HTML_NS}->{input} = {
          %HTMLM12NCommonAttrStatus,
          accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
          'accept-charset' => FEATURE_HTML2X_RFC,
-         accesskey => FEATURE_M12N10_REC,
+         accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
          action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          align => FEATURE_M12N10_REC_DEPRECATED,
          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5630,7 +5636,6 @@ $Element->{$HTML_NS}->{input} = {
          accept => '',
          'accept-charset' => $HTMLCharsetsAttrChecker,
              ## NOTE: To which states it applies is not defined in RFC 2070.
-         accesskey => '', ## NOTE: Not applied to |hidden| [WF2].
          action => '',
          align => '',
          alt => '',
@@ -5710,7 +5715,6 @@ $Element->{$HTML_NS}->{input} = {
             }->{$state};
             $checker =
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
@@ -5725,7 +5729,6 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'number') {
             $checker =
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
@@ -5740,7 +5743,6 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'range') {
             $checker =
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
@@ -5753,7 +5755,6 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'color') {
             $checker =
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
@@ -5770,7 +5771,6 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'checkbox' or $state eq 'radio') {
             $checker = 
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              checked => $GetHTMLBooleanAttrChecker->('checked'),
                  ## TODO: tests
              required => $GetHTMLBooleanAttrChecker->('required'),
@@ -5783,7 +5783,6 @@ $Element->{$HTML_NS}->{input} = {
             $checker =
             {
              accept => $AcceptAttrChecker,
-             accesskey => $HTMLAccesskeyAttrChecker,
              ## max (default 1) & min (default 0) [WF2]: Dropped by HTML5.
              multiple => $GetHTMLBooleanAttrChecker->('multiple'),
              required => $GetHTMLBooleanAttrChecker->('required'),
@@ -5791,7 +5790,6 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'submit') {
             $checker =
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              action => $HTMLURIAttrChecker,
              enctype => $GetHTMLEnumeratedAttrChecker->({
                'application/x-www-form-urlencoded' => 1,
@@ -5811,7 +5809,6 @@ $Element->{$HTML_NS}->{input} = {
           } elsif ($state eq 'image') {
             $checker =
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              action => $HTMLURIAttrChecker,
              align => $GetHTMLEnumeratedAttrChecker->({
                top => 1, middle => 1, bottom => 1, left => 1, right => 1,
@@ -5852,7 +5849,6 @@ $Element->{$HTML_NS}->{input} = {
                    }->{$state}) {
             $checker = 
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              ## NOTE: According to Web Forms 2.0, |input| attribute
              ## has |template| attribute to support the |add| button
              ## type (as part of the repetition template feature).  It
@@ -5865,7 +5861,6 @@ $Element->{$HTML_NS}->{input} = {
           } else { # Text, Search, E-mail, URL, Password
             $checker =
             {
-             accesskey => $HTMLAccesskeyAttrChecker,
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
@@ -5978,8 +5973,6 @@ $Element->{$HTML_NS}->{input} = {
       $status ||= $AttrStatus->{$attr_ns}->{$attr_ln}
           || $AttrStatus->{$attr_ns}->{''};
       $status = FEATURE_ALLOWED if not defined $status and length $attr_ns;
-
-      ## TODOC: accesskey="" is also applied to type=search and type=color
 
       if ($checker) {
         $checker->($self, $attr, $item, $element_state) if ref $checker;
@@ -6133,7 +6126,6 @@ $Element->{$HTML_NS}->{button} = {
   %HTMLPhrasingContentChecker, ## ISSUE: -interactive?
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    accesskey => $HTMLAccesskeyAttrChecker,
     ## ISSUE: In HTML5, no "MUST NOT" for using |action|, |method|,
     ## |enctype|, |target|, and |novalidate| with non-|submit|-|type|
     ## |button| elements.
@@ -6168,7 +6160,7 @@ $Element->{$HTML_NS}->{button} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accesskey => FEATURE_M12N10_REC,
+    accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
     action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     datafld => FEATURE_HTML4_REC_RESERVED,
@@ -6219,7 +6211,6 @@ $Element->{$HTML_NS}->{label} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC
       | FEATURE_XHTML2_ED, 
   check_attrs => $GetHTMLAttrsChecker->({
-    accesskey => $HTMLAccesskeyAttrChecker,
     for => sub {
       my ($self, $attr) = @_;
       
@@ -6231,7 +6222,7 @@ $Element->{$HTML_NS}->{label} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    accesskey => FEATURE_WF2 | FEATURE_M12N10_REC,
+    accesskey => FEATURE_HTML5_FD | FEATURE_WF2 | FEATURE_M12N10_REC,
     for => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     form => FEATURE_HTML5_DEFAULT,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
@@ -6278,7 +6269,6 @@ $Element->{$HTML_NS}->{select} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   is_root => 1, ## TODO: SHOULD NOT in application/xhtml+xml [WF2]
   check_attrs => $GetHTMLAttrsChecker->({
-    accesskey => $HTMLAccesskeyAttrChecker,
     autofocus => $AutofocusAttrChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
@@ -6294,7 +6284,7 @@ $Element->{$HTML_NS}->{select} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accesskey => FEATURE_WF2,
+    accesskey => FEATURE_HTML5_FD | FEATURE_WF2,
     autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     data => FEATURE_WF2,
     datafld => FEATURE_HTML4_REC_RESERVED,
@@ -6540,7 +6530,6 @@ $Element->{$HTML_NS}->{textarea} = {
   status => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     accept => $HTMLIMTAttrChecker, ## TODO: MUST be a text-based type [WF2]
-    accesskey => $HTMLAccesskeyAttrChecker,
     autofocus => $AutofocusAttrChecker,
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -6590,7 +6579,7 @@ $Element->{$HTML_NS}->{textarea} = {
     %HTMLM12NCommonAttrStatus,
     accept => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     'accept-charset' => FEATURE_HTML2X_RFC,
-    accesskey => FEATURE_M12N10_REC,
+    accesskey => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
     autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     cols => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     datafld => FEATURE_HTML4_REC_RESERVED,
@@ -7267,7 +7256,6 @@ $Element->{$HTML_NS}->{legend} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    accesskey => $HTMLAccesskeyAttrChecker,
 #    align => $GetHTMLEnumeratedAttrChecker->({
 #      top => 1, bottom => 1, left => 1, right => 1,
 #    }),
@@ -7275,7 +7263,7 @@ $Element->{$HTML_NS}->{legend} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accesskey => FEATURE_M12N10_REC,
+    accesskey => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
     align => FEATURE_M12N10_REC_DEPRECATED,
     form => FEATURE_HTML5_DROPPED,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
