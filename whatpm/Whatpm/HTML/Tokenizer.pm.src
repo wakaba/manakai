@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -2130,9 +2130,19 @@ sub _get_next_token ($) {
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         !!!next-input-character;
         redo A;
+      } elsif ($self->{nc} == -1) {
+        !!!cp (155.1);
+        !!!parse-error (type => 'unclosed DOCTYPE');
+        $self->{ct}->{quirks} = 1;
+
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        !!!emit ($self->{ct}); # DOCTYPE (quirks)
+
+        redo A;
       } else {
         !!!cp (156);
-        ## XML5: Unless EOF, swith to the bogus comment state.
+        ## XML5: Swith to the bogus comment state.
         !!!parse-error (type => 'no space before DOCTYPE name');
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         ## reconsume
@@ -5124,5 +5134,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/07/02 22:24:28 $
+## $Date: 2009/07/05 04:38:45 $
                                 
