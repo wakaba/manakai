@@ -7043,7 +7043,7 @@ $Element->{$HTML_NS}->{command} = {
   }, {
     %HTMLAttrStatus,
     checked => FEATURE_HTML5_WD,
-    default => FEATURE_HTML5_WD,
+    default => FEATURE_HTML5_DROPPED, # HTML5 revision 3067
     disabled => FEATURE_HTML5_WD,
     icon => FEATURE_HTML5_WD,
     label => FEATURE_HTML5_WD,
