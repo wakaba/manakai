@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.210 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.211 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -5101,23 +5101,26 @@ sub _tree_construction_main ($) {
           next B;
         }
 
-        ## has a p element in scope
-        INSCOPE: for (reverse @{$self->{open_elements}}) {
-          if ($_->[1] == P_EL) {
-            
-            
+        if ($token->{tag_name} ne 'table' or # The Hixie Quirk
+            $self->{document}->manakai_compat_mode ne 'quirks') {
+          ## has a p element in scope
+          INSCOPE: for (reverse @{$self->{open_elements}}) {
+            if ($_->[1] == P_EL) {
+              
+              
       $token->{self_closing} = $self->{self_closing};
       unshift @{$self->{token}}, $token;
       delete $self->{self_closing};
      # <form>
-            $token = {type => END_TAG_TOKEN, tag_name => 'p',
-                      line => $token->{line}, column => $token->{column}};
-            next B;
-          } elsif ($_->[1] & SCOPING_EL) {
-            
-            last INSCOPE;
-          }
-        } # INSCOPE
+              $token = {type => END_TAG_TOKEN, tag_name => 'p',
+                        line => $token->{line}, column => $token->{column}};
+              next B;
+            } elsif ($_->[1] & SCOPING_EL) {
+              
+              last INSCOPE;
+            }
+          } # INSCOPE
+        }
           
         
     {
@@ -6753,4 +6756,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/02 23:15:37 $
+# $Date: 2009/07/05 05:13:12 $

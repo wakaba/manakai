@@ -11811,3 +11811,25 @@ metadata element after </head>
 |   <head>
 |   "  "
 |   <body>
+
+#data
+<!DOCTYPE HTML><p><table></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|     <table>
+
+#data
+<p><table></table>
+#errors
+1;1;no DOCTYPE;m
+#document
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <table>
