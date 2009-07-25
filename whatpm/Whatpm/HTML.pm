@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.212 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.213 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -6507,7 +6507,7 @@ sub _tree_construction_main ($) {
 
 sub set_inner_html ($$$$;$) {
   my $class = shift;
-  my $node = shift;
+  my $node = shift; # /context/
   #my $s = \$_[0];
   my $onerror = $_[1];
   my $get_wrapper = $_[2] || sub ($) { return $_[0] };
@@ -6515,7 +6515,7 @@ sub set_inner_html ($$$$;$) {
   ## ISSUE: Should {confident} be true?
 
   my $nt = $node->node_type;
-  if ($nt == 9) {
+  if ($nt == 9) { # Document (invoke the algorithm with no /context/ element)
     # MUST
     
     ## Step 1 # MUST
@@ -6530,17 +6530,23 @@ sub set_inner_html ($$$$;$) {
 
     ## Step 3, 4, 5 # MUST
     $class->parse_char_string ($_[0] => $node, $onerror, $get_wrapper);
-  } elsif ($nt == 1) {
+  } elsif ($nt == 1) { # Element (invoke the algorithm with /context/ element)
     ## TODO: If non-html element
 
     ## NOTE: Most of this code is copied from |parse_string|
 
 ## TODO: Support for $get_wrapper
 
-    ## Step 1 # MUST
+    ## F1. Create an HTML document.
     my $this_doc = $node->owner_document;
     my $doc = $this_doc->implementation->create_document;
     $doc->manakai_is_html (1);
+
+    ## F2. Propagate quirkness flag
+    my $node_doc = $node->owner_document;
+    $doc->manakai_compat_mode ($node_doc->manakai_compat_mode);
+
+    ## F3. Create an HTML parser
     my $p = $class->new;
     $p->{document} = $doc;
 
@@ -6668,7 +6674,9 @@ sub set_inner_html ($$$$;$) {
     $p->_initialize_tokenizer;
     $p->_initialize_tree_constructor;
 
-    ## Step 2
+    ## F4. If /context/ is not undef...
+
+    ## F4.1. content model flag
     my $node_ln = $node->manakai_local_name;
     $p->{content_model} = {
       title => RCDATA_CONTENT_MODEL,
@@ -6688,23 +6696,23 @@ sub set_inner_html ($$$$;$) {
     $p->{inner_html_node} = [$node, $el_category->{$node_ln}];
       ## TODO: Foreign element OK?
 
-    ## Step 3
+    ## F4.2. Root |html| element
     my $root = $doc->create_element_ns
       ('http://www.w3.org/1999/xhtml', [undef, 'html']);
 
-    ## Step 4 # MUST
+    ## F4.3.
     $doc->append_child ($root);
 
-    ## Step 5 # MUST
+    ## F4.4.
     push @{$p->{open_elements}}, [$root, $el_category->{html}];
 
     undef $p->{head_element};
     undef $p->{head_element_inserted};
 
-    ## Step 6 # MUST
+    ## F4.5.
     $p->_reset_insertion_mode;
 
-    ## Step 7 # MUST
+    ## F4.6.
     my $anode = $node;
     AN: while (defined $anode) {
       if ($anode->node_type == 1) {
@@ -6719,15 +6727,15 @@ sub set_inner_html ($$$$;$) {
       }
       $anode = $anode->parent_node;
     } # AN
-    
-    ## Step 9 # MUST
+
+    ## F.6. Start the parser.
     {
       my $self = $p;
       $token = $self->_get_next_token;
     }
     $p->_tree_construction_main;
 
-    ## Step 10 # MUST
+    ## F.7.
     my @cn = @{$node->child_nodes};
     for (@cn) {
       $node->remove_child ($_);
@@ -6756,4 +6764,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/05 06:06:58 $
+# $Date: 2009/07/25 03:38:41 $
