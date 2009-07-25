@@ -100,6 +100,8 @@
 #errors
 /head/noscript;in XML:noscript;m
 /head/noscript/eventsource;element not allowed:head noscript;m
+/head/noscript/eventsource;element not defined;m
+/head/noscript/eventsource/@src;attribute not defined;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -260,21 +262,25 @@
 <em xmlns="http://www.w3.org/1999/xhtml"><eventsource/></em>
 #errors
 /em;no significant content;s
+/em/eventsource;element not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><eventsource/></p>
 #errors
 /p;no significant content;s
+/p/eventsource;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><eventsource/></div>
 #errors
 /div;no significant content;s
+/div/eventsource;element not defined;m
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><eventsource/></section>
 #errors
 /section;no significant content;s
+/section/eventsource;element not defined;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"></details>
@@ -820,15 +826,20 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <eventsource xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/eventsource;element not defined;m
 
 #data
 <eventsource src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/eventsource;element not defined;m
+/eventsource/@src;attribute not defined;m
 
 #data
 <eventsource src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /eventsource/@src;syntax error:iriref3987;m
+/eventsource/@src;attribute not defined;m
+/eventsource;element not defined;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>

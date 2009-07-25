@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Jul 25 12:43:25 2009
-# Current time GMT:   Sat Jul 25 03:43:25 2009
+# Current time local: Sat Jul 25 13:03:50 2009
+# Current time GMT:   Sat Jul 25 04:03:50 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -298,7 +298,11 @@ ok 285
 ok 286
 ok 287
 ok 288
-ok 289
+not ok 289
+# Test 289 got: "/head/eventsource;element not defined;m\n/head;child element missing;title;m" (t/content-checker.pl at line 68 fail #289)
+#     Expected: "/eventsource;element not defined;m\n/head;child element missing;title;m" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<eventsource/>
+#</head>)
 ok 290
 ok 291
 ok 292
@@ -5450,8 +5454,8 @@ ok 5226
 ok 5227
 # t/dom-conformance/html-scripting-1.dat
 ok 5228
-# t/dom-conformance/html-repetitions.dat
 ok 5229
+# t/dom-conformance/html-repetitions.dat
 ok 5230
 ok 5231
 ok 5232
@@ -5512,8 +5516,8 @@ ok 5286
 ok 5287
 ok 5288
 ok 5289
-# t/dom-conformance/html-datatemplate.dat
 ok 5290
+# t/dom-conformance/html-datatemplate.dat
 ok 5291
 ok 5292
 ok 5293
@@ -5842,3 +5846,4 @@ ok 5615
 ok 5616
 ok 5617
 ok 5618
+ok 5619

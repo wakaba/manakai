@@ -1505,7 +1505,7 @@ for (qw/
          onabort onbeforeunload onblur onchange onclick oncontextmenu
          ondblclick ondrag ondragend ondragenter ondragleave ondragover
          ondragstart ondrop onerror onfocus onkeydown onkeypress
-         onkeyup onload onmessage onmousedown onmousemove onmouseout
+         onkeyup onload onmousedown onmousemove onmouseout
          onmouseover onmouseup onmousewheel onresize onscroll onselect
          onstorage onsubmit onunload 
      /) {
@@ -1515,6 +1515,7 @@ for (qw/
 
 for (qw/
          ondataunavailable
+         onmessage
      /) {
   $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
   $HTMLAttrStatus{$_} = FEATURE_HTML5_DROPPED;
@@ -6968,12 +6969,12 @@ $Element->{$HTML_NS}->{'event-source'} = {
 
 $Element->{$HTML_NS}->{eventsource} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_WD,
+  status => FEATURE_HTML5_DROPPED,
   check_attrs => $GetHTMLAttrsChecker->({
     src => $HTMLURIAttrChecker,
   }, {
     %HTMLAttrStatus,
-    src => FEATURE_HTML5_WD,
+    src => FEATURE_HTML5_DROPPED,
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;

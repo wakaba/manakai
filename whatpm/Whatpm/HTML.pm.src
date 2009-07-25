@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.218 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.219 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -1956,8 +1956,14 @@ sub _tree_construction_main ($) {
         }
       } elsif ($token->{type} == END_TAG_TOKEN) {
         ## NOTE: "using the rules for secondary insertion mode" then "continue"
-        !!!cp ('t87.5');
-        #
+        if ($token->{tag_name} eq 'script') {
+          !!!cp ('t87.41');
+          #
+          ## XXXscript: Execute script here.
+        } else {
+          !!!cp ('t87.5');
+          #
+        }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         !!!cp ('t87.6');
         !!!parse-error (type => 'not closed',
@@ -5706,4 +5712,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/25 03:38:42 $
+# $Date: 2009/07/25 04:05:42 $
