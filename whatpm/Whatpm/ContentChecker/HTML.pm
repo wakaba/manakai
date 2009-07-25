@@ -1111,6 +1111,15 @@ my $HTMLRepeatIndexAttrChecker = sub {
   $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_);
 }; # $HTMLRepeatIndexAttrChecker
 
+my $PlaceholderAttrChecker = sub {
+  my ($self, $attr) = @_;
+  if ($attr->value =~ /[\x0D\x0A]/) {
+    $self->{onerror}->(node => $attr,
+                       type => 'newline in value', ## TODOC: type
+                       level => $self->{level}->{must});
+  }
+}; # $PlaceholderAttrChecker
+
 my $HTMLAttrChecker = {
   accesskey => sub {
     my ($self, $attr) = @_;
@@ -5902,14 +5911,7 @@ $Element->{$HTML_NS}->{input} = {
                }
              },
              pattern => $PatternAttrChecker,
-             placeholder => sub {
-               my ($self, $attr) = @_;
-               if ($attr->value =~ /[\x0D\x0A]/) {
-                 $self->{onerror}->(node => $attr,
-                                    type => 'newline in value', ## TODOC: type
-                                    level => $self->{level}->{must});
-               }
-             },
+             placeholder => $PlaceholderAttrChecker,
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              size => $GetHTMLNonNegativeIntegerAttrChecker->(sub {shift > 0}),
@@ -6575,6 +6577,7 @@ $Element->{$HTML_NS}->{textarea} = {
     onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     oninput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     pattern => $PatternAttrChecker,
+    placeholder => $PlaceholderAttrChecker,
     readonly => $GetHTMLBooleanAttrChecker->('readonly'),
     required => $GetHTMLBooleanAttrChecker->('required'),
     rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
@@ -6608,6 +6611,7 @@ $Element->{$HTML_NS}->{textarea} = {
     oninvalid => FEATURE_WF2, ## TODO: tests
     onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     pattern => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+    placeholder => FEATURE_HTML5_LC,
     readonly => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     required => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     rows => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC, 

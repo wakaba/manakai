@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.213 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.214 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -6505,6 +6505,8 @@ sub _tree_construction_main ($) {
   ## TODO: script stuffs
 } # _tree_construct_main
 
+## XXX: How this method is organized is somewhat out of date, although
+## it still does what the current spec documents.
 sub set_inner_html ($$$$;$) {
   my $class = shift;
   my $node = shift; # /context/
@@ -6764,4 +6766,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/25 03:38:41 $
+# $Date: 2009/07/25 03:45:24 $

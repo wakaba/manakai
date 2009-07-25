@@ -420,3 +420,25 @@
 #errors
 /textarea/@pattern;attribute not defined;m
 /textarea/@pattern;SUBDOC
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    placeholder=""/>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    placeholder="xxx"/>
+#errors
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    placeholder="&#xa;"/>
+#errors
+/textarea/@placeholder;newline in value;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    placeholder="&#xd;"/>
+#errors
+/textarea/@placeholder;newline in value;m
