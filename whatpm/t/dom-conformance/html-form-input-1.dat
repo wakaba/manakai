@@ -12790,3 +12790,47 @@
     value="0000-11-22T00:11:22"/>
 #errors
 /input/@value;datetime:bad year;m
+
+#data
+<input type="image" xmlns="http://www.w3.org/1999/xhtml"
+    width="" alt="x"/>
+#errors
+/input/@width;nninteger:syntax error;m
+
+#data
+<input type="image" xmlns="http://www.w3.org/1999/xhtml"
+    width="120" alt="x"/>
+#errors
+
+#data
+<input type="image" xmlns="http://www.w3.org/1999/xhtml"
+    width="0" alt="x"/>
+#errors
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    width="120" alt="x"/>
+#errors
+/input/@width;input attr not applicable;text;m
+
+#data
+<input type="image" xmlns="http://www.w3.org/1999/xhtml"
+    height=""/>
+#errors
+/input/@height;nninteger:syntax error;m
+
+#data
+<input type="image" xmlns="http://www.w3.org/1999/xhtml"
+    height="120" alt="x"/>
+#errors
+
+#data
+<input type="image" xmlns="http://www.w3.org/1999/xhtml"
+    height="0" alt="x"/>
+#errors
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    height="120"/>
+#errors
+/input/@height;input attr not applicable;text;m

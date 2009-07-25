@@ -4155,9 +4155,9 @@ $Element->{$HTML_NS}->{img} = {
       },
       longdesc => $HTMLURIAttrChecker,
       ## TODO: HTML4 |name|
-      height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
+      height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      width => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
+      width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     }, {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
@@ -4204,14 +4204,14 @@ $Element->{$HTML_NS}->{iframe} = {
   status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
       ## NOTE: Not part of M12N10 Strict
   check_attrs => $GetHTMLAttrsChecker->({
-    height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
+    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     name => $HTMLBrowsingContextNameAttrChecker,
     sandbox => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->({
       'allow-same-origin' => 1, 'allow-forms' => 1, 'allow-scripts' => 1,
     }),
     seemless => $GetHTMLBooleanAttrChecker->('seemless'),
     src => $HTMLURIAttrChecker,
-    width => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -4268,7 +4268,7 @@ $Element->{$HTML_NS}->{embed} = {
         } elsif ($attr_ln eq 'type') {
           $checker = $HTMLIMTAttrChecker;
         } elsif ($attr_ln eq 'width' or $attr_ln eq 'height') {
-          $checker = $AttrCheckerNotImplemented; ## TODO: because spec does not define them yet.
+          $checker = $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 });
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
           $checker = $HTMLDatasetAttrChecker;
@@ -4344,6 +4344,7 @@ $Element->{$HTML_NS}->{object} = {
           ## NOTE: "The object MUST be instantiated by a subsequent OBJECT ..."
           ## [HTML4] but we don't know how to test this.
       form => $HTMLFormAttrChecker,
+      height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       name => $HTMLBrowsingContextNameAttrChecker,
           ## NOTE: |name| attribute of the |object| element defines
@@ -4353,9 +4354,8 @@ $Element->{$HTML_NS}->{object} = {
       standby => sub {}, ## NOTE: %Text; in HTML4
       type => $HTMLIMTAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
-      height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
       vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      width => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
+      width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     }, {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
@@ -4491,8 +4491,8 @@ $Element->{$HTML_NS}->{video} = {
     autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
     controls => $GetHTMLBooleanAttrChecker->('controls'),
     poster => $HTMLURIAttrChecker,
-    height => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
-    width => $AttrCheckerNotImplemented, ## TODO: spec does not define yet
+    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
     autoplay => FEATURE_HTML5_LC,
@@ -4624,7 +4624,11 @@ $Element->{$HTML_NS}->{canvas} = {
     height => FEATURE_HTML5_COMPLETE,
     width => FEATURE_HTML5_COMPLETE,
   }),
-};
+
+  # Authors MUST provide alternative content (HTML5 revision 2868) -
+  # This requirement cannot be checked, since the alternative content
+  # might be placed outside of the element.
+}; # canvas
 
 $Element->{$HTML_NS}->{map} = {
   %HTMLFlowContentChecker,
@@ -5592,6 +5596,7 @@ $Element->{$HTML_NS}->{input} = {
          disabled => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
          enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          form => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         height => FEATURE_HTML5_LC,
          inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X |
              FEATURE_XHTMLBASIC11_CR,
          ismap => FEATURE_M12N10_REC,
@@ -5628,6 +5633,7 @@ $Element->{$HTML_NS}->{input} = {
          type => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
          value => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         width => FEATURE_HTML5_LC,
         }->{$attr_ln};
 
         $checker =
@@ -5648,6 +5654,7 @@ $Element->{$HTML_NS}->{input} = {
              ## NOTE: <input type=hidden disabled> is not disallowed.
          enctype => '',
          form => $HTMLFormAttrChecker,
+         height => '',
          inputmode => '',
          ismap => '', ## NOTE: "MUST" be type=image [HTML4]
          list => '',
@@ -5683,6 +5690,7 @@ $Element->{$HTML_NS}->{input} = {
          }),
          usemap => '',
          value => '',
+         width => '',
         }->{$attr_ln};
 
         ## State-dependent checkers
@@ -5828,6 +5836,7 @@ $Element->{$HTML_NS}->{input} = {
                'multipart/form-data' => 1,
                'text/plain' => 1,
              }),
+             height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
@@ -5840,6 +5849,7 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: There is requirements on the referenced resource.
              target => $HTMLTargetAttrChecker,
              usemap => $HTMLUsemapAttrChecker,
+             width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
             }->{$attr_ln} || $checker;
             ## TODO: alt & src are required.
           } elsif ({
@@ -6117,11 +6127,8 @@ $Element->{$HTML_NS}->{input} = {
   },
 };
 
-## TODO: Form |name| attributes: MUST NOT conflict with RFC 3106 [WF2]
-
-## NOTE: "authors who are nesting repetition blocks should position such
-## [repetition-block-related] buttons carefully to make clear which block a
-## button applies to." [WF2]: I have no idea how this can be tested.
+## XXXresource: Dimension attributes have requirements on width and
+## height of referenced resource.
 
 $Element->{$HTML_NS}->{button} = {
   %HTMLPhrasingContentChecker, ## ISSUE: -interactive?

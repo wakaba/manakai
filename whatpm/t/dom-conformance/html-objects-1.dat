@@ -1316,6 +1316,38 @@ xxxx
 /img/@ismap;attribute not allowed:ismap;m
 
 #data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    height=""/>
+#errors
+/img/@height;nninteger:syntax error;m
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="0"/>
+#errors
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="120"/>
+#errors
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    width=""/>
+#errors
+/img/@width;nninteger:syntax error;m
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="0"/>
+#errors
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="120"/>
+#errors
+
+#data
 <span xmlns="http://www.w3.org/1999/xhtml">
 <img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
 </span>
@@ -1924,6 +1956,38 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /iframe/@seemless;boolean:invalid;m
 
 #data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="">x</iframe>
+#errors
+/iframe/@height;nninteger:syntax error;m
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="0">x</iframe>
+#errors
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="120">x</iframe>
+#errors
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="">x</iframe>
+#errors
+/iframe/@width;nninteger:syntax error;m
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="0">x</iframe>
+#errors
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="120">x</iframe>
+#errors
+
+#data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /embed;attribute missing;src;i
@@ -1958,6 +2022,38 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /embed/@id;empty attribute value;m
+
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    height=""/>
+#errors
+/embed/@height;nninteger:syntax error;m
+
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="0"/>
+#errors
+
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="120"/>
+#errors
+
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    width=""/>
+#errors
+/embed/@width;nninteger:syntax error;m
+
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="0"/>
+#errors
+
+#data
+<embed src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="120"/>
+#errors
 
 #data
 <embed src="http://test/" a="b" c="d" checked="checked"
@@ -2108,6 +2204,38 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
+
+#data
+<object data="" xmlns="http://www.w3.org/1999/xhtml"
+    height="">x</iframe>
+#errors
+/object/@height;nninteger:syntax error;m
+
+#data
+<object data="" xmlns="http://www.w3.org/1999/xhtml"
+    height="0">x</object>
+#errors
+
+#data
+<object data="" xmlns="http://www.w3.org/1999/xhtml"
+    height="120">x</object>
+#errors
+
+#data
+<object data="" xmlns="http://www.w3.org/1999/xhtml"
+    width="">x</object>
+#errors
+/object/@width;nninteger:syntax error;m
+
+#data
+<object data="" xmlns="http://www.w3.org/1999/xhtml"
+    width="0">x</object>
+#errors
+
+#data
+<object data="" xmlns="http://www.w3.org/1999/xhtml"
+    width="120">x</object>
+#errors
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2618,6 +2746,38 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /video/@poster;syntax error:iriref3987;m
 /video;no significant content;s
 /video;child element missing;source;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="">x</video>
+#errors
+/video/@height;nninteger:syntax error;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="0">x</video>
+#errors
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="120">x</video>
+#errors
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="">x</video>
+#errors
+/video/@width;nninteger:syntax error;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="0">x</video>
+#errors
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="120">x</video>
+#errors
 
 #data
 <audio xmlns="http://www.w3.org/1999/xhtml"/>
