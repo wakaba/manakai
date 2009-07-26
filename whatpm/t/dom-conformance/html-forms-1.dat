@@ -2075,3 +2075,89 @@ x<br autofocus=""/>
 >x</form>
 #errors
 /form/@novalidate;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete=""
+>x</form>
+#errors
+/form/@autocomplete;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="autocomplete"
+>x</form>
+#errors
+/form/@autocomplete;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="on"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="off"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="ON"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="OFF"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="On"
+>x</form>
+#errors
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete=" on"
+>x</form>
+#errors
+/form/@autocomplete;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="yes"
+>x</form>
+#errors
+/form/@autocomplete;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="true"
+>x</form>
+#errors
+/form/@autocomplete;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="no"
+>x</form>
+#errors
+/form/@autocomplete;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="default"
+>x</form>
+#errors
+/form/@autocomplete;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    autocomplete="inherit"
+>x</form>
+#errors
+/form/@autocomplete;enumerated:invalid;m

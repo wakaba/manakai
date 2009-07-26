@@ -5461,6 +5461,9 @@ $Element->{$HTML_NS}->{form} = {
     accept => $AcceptAttrChecker,
     'accept-charset' => $HTMLCharsetsAttrChecker,
     action => $HTMLURIAttrChecker, ## TODO: Warn if submission is not defined for the scheme
+    autocomplete => $GetHTMLEnumeratedAttrChecker->({
+      on => 1, off => 1,
+    }),
     data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
     enctype => $GetHTMLEnumeratedAttrChecker->({
       'application/x-www-form-urlencoded' => 1,
@@ -5502,6 +5505,7 @@ $Element->{$HTML_NS}->{form} = {
     accept => FEATURE_HTML5_DROPPED | FEATURE_WF2X | FEATURE_M12N10_REC,
     'accept-charset' => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
+    autocomplete => FEATURE_HTML5_WD,
     data => FEATURE_WF2,
     enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
@@ -5535,7 +5539,7 @@ $Element->{$HTML_NS}->{form} = {
 
     $HTMLFlowContentChecker{check_end}->(@_);
   },
-};
+}; # form
 
 $Element->{$HTML_NS}->{fieldset} = {
   %HTMLFlowContentChecker,
@@ -5631,7 +5635,7 @@ $Element->{$HTML_NS}->{input} = {
          action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          align => FEATURE_M12N10_REC_DEPRECATED,
          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-         autocomplete => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         autocomplete => FEATURE_HTML5_LC | FEATURE_WF2X,
          autofocus => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
          checked => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          datafld => FEATURE_HTML4_REC_RESERVED,
