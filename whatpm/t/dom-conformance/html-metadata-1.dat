@@ -137,6 +137,39 @@
 /html/head/meta/@charset;mismatched charset name not checked;u
 
 #data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head;child element missing;title;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8"/>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head;child element missing;title;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="uTf-8"/>
+</head>
+<body>x</body>
+</html>
+#errors
+/html/head;child element missing;title;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <meta name="keywords" content="html5"/>
 </head>
@@ -1997,6 +2030,27 @@ p {color: green}
 /meta/@content;mismatched charset name not checked;u
 /meta/@content;charset:not preferred;m
 /meta/@content;charset:private;w
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html; charset=utf-8"/>
+#errors
+/meta;element not allowed:meta charset;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html; charset=UTF-8"/>
+#errors
+/meta;element not allowed:meta charset;m
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml"
+    http-equiv="content-type"
+    content="text/html; charset=Utf-8"/>
+#errors
+/meta;element not allowed:meta charset;m
 
 #data html
 <!DOCTYPE HTML>

@@ -2256,12 +2256,6 @@ $Element->{$HTML_NS}->{meta} = {
                            type => 'element not allowed:meta charset',
                            level => $self->{level}->{must});
       }
-
-      unless ($item->{node}->owner_document->manakai_is_html) {
-        $self->{onerror}->(node => $item->{node},
-                           type => 'in XML:charset',
-                           level => $self->{level}->{must});
-      }
     }; # $check_charset_decl
 
     my $check_charset = sub ($$) {
@@ -2318,6 +2312,13 @@ $Element->{$HTML_NS}->{meta} = {
         ## TODO: refs in "text/html; charset=" are not disallowed since rev.1275.
 
         $check_charset_decl->();
+
+        unless ($item->{node}->owner_document->manakai_is_html) {
+          $self->{onerror}->(node => $item->{node},
+                             type => 'in XML:charset',
+                             level => $self->{level}->{must});
+        }
+
         if ($content_attr) {
           my $content = $content_attr->value;
           if ($content =~ m!^[Tt][Ee][Xx][Tt]/[Hh][Tt][Mm][Ll];
@@ -2364,8 +2365,17 @@ $Element->{$HTML_NS}->{meta} = {
     }
 
     if (defined $charset_attr) {
+      my $value = $charset_attr->value;
+
       $check_charset_decl->();
-      $check_charset->($charset_attr, $charset_attr->value);
+      $check_charset->($charset_attr, $value);
+
+      if (not $item->{node}->owner_document->manakai_is_html and
+          not $value =~ /\A[Uu][Tt][Ff]-8\z/) {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'in XML:charset',
+                           level => $self->{level}->{must});
+      }
     }
   },
 };
