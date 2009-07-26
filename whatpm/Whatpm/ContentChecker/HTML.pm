@@ -4523,6 +4523,7 @@ $Element->{$HTML_NS}->{video} = {
     ## TODO: start, loopstart, loopend, end
     ## ISSUE: they MUST be "value time offset"s.  Value?
     ## ISSUE: playcount has no conformance creteria
+    autobuffer => $GetHTMLBooleanAttrChecker->('autobuffer'),
     autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
     controls => $GetHTMLBooleanAttrChecker->('controls'),
     poster => $HTMLURIAttrChecker,
@@ -4530,6 +4531,7 @@ $Element->{$HTML_NS}->{video} = {
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
+    autobuffer => FEATURE_HTML5_LC,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
     end => FEATURE_HTML5_AT_RISK,
@@ -4605,10 +4607,12 @@ $Element->{$HTML_NS}->{audio} = {
     ## TODO: start, loopstart, loopend, end
     ## ISSUE: they MUST be "value time offset"s.  Value?
     ## ISSUE: playcount has no conformance creteria
+    autobuffer => $GetHTMLBooleanAttrChecker->('autobuffer'),
     autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
     controls => $GetHTMLBooleanAttrChecker->('controls'),
   }, {
     %HTMLAttrStatus,
+    autobuffer => FEATURE_HTML5_LC,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
     end => FEATURE_HTML5_AT_RISK,

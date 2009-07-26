@@ -2801,6 +2801,37 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /video;child element missing;source;m
 
 #data
+<video autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;m
+
+#data
+<video autobuffer="autobuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;m
+
+#data
+<video autobuffer="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video/@autobuffer;boolean:invalid;m
+/video;child element missing;source;m
+
+#data
+<video autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;m
+
+#data
+<video autoplay="" autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;m
+
+#data
 <video controls="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
@@ -2926,9 +2957,33 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /audio;child element missing;source;m
 
 #data
-<audio autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
+<audio autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/audio/@autoplay;boolean:invalid;m
+/audio;no significant content;s
+/audio;child element missing;source;m
+
+#data
+<audio autobuffer="autobuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;m
+
+#data
+<audio autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;m
+
+#data
+<audio autobuffer="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio/@autobuffer;boolean:invalid;m
+/audio;no significant content;s
+/audio;child element missing;source;m
+
+#data
+<audio autoplay="" autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
 /audio;no significant content;s
 /audio;child element missing;source;m
 
