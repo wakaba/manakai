@@ -38,6 +38,10 @@ while (<>) {
         !!!parse-error (type => 'bad namespace', token => $4);
 ## TODO: Error type documentation
       }
+      if ($3\->{'xmlns:xlink'} and
+          $3\->{'xmlns:xlink'}->{value} ne q<http://www.w3.org/1999/xlink>) {
+        !!!parse-error (type => 'bad namespace', token => $4);
+      }
     }
   }}ge;
   s{!!!insert-element-t\s*\(([^(),]+),([^(),]+),([^(),]+)\)\s*;}{qq{

@@ -1646,3 +1646,54 @@ unmatched end tag
 |       <!--  -->
 |     <table>
 |       <colgroup>
+
+#data
+<!DOCTYPE HTML>
+<p xmlns:xlink="http://www.w3.org/1999/xhtml">x</p>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       xmlns:xlink="http://www.w3.org/1999/xhtml"
+|       "x"
+
+#data
+<!DOCTYPE HTML>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       xmlns xlink="http://www.w3.org/1999/xlink"
+
+#data
+<!DOCTYPE HTML>
+<svg xmlns:xlink="http://www.w3.org/1999/xhtml"></svg>
+#errors
+bad namespace
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       xmlns xlink="http://www.w3.org/1999/xhtml"
+
+#data
+<!DOCTYPE HTML>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink "></svg>
+#errors
+bad namespace
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       xmlns xlink="http://www.w3.org/1999/xlink "

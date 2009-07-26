@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.216 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.217 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -1485,10 +1485,8 @@ sub _tree_construction_main ($) {
     ## Step 3
     ## TODO: Mark as "already executed", if ...
 
-    ## Step 4
+    ## Step 4 (HTML5 revision 2702)
     $insert->($script_el);
-
-    ## ISSUE: $script_el is not put into the stack
     push @{$self->{open_elements}}, [$script_el, $el_category->{script}];
 
     ## Step 5
@@ -2046,6 +2044,10 @@ sub _tree_construction_main ($) {
       if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($nsuri)) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
 ## TODO: Error type documentation
+      }
+      if ( $token->{attributes}->{'xmlns:xlink'} and
+           $token->{attributes}->{'xmlns:xlink'}->{value} ne q<http://www.w3.org/1999/xlink>) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
       }
     }
   
@@ -5927,6 +5929,10 @@ sub _tree_construction_main ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
 ## TODO: Error type documentation
       }
+      if ( $token->{attributes}->{'xmlns:xlink'} and
+           $token->{attributes}->{'xmlns:xlink'}->{value} ne q<http://www.w3.org/1999/xlink>) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
+      }
     }
   
         
@@ -6775,4 +6781,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/26 09:11:18 $
+# $Date: 2009/07/26 10:56:23 $
