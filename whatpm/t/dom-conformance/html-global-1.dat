@@ -1043,3 +1043,68 @@ id=""><span id="">x</span></p>
 <legend accesskey="&amp;x" xmlns="http://www.w3.org/1999/xhtml">x</legend>
 #errors
 /legend/@accesskey;char:syntax error;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck=""
+>a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck="true"
+>a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck="false"
+>a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck="TRuE"
+>a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck="FALSE"
+>a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck=" "
+>a</p>
+#errors
+/p/@spellcheck;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck=" TRUE"
+>a</p>
+#errors
+/p/@spellcheck;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck="default"
+>a</p>
+#errors
+/p/@spellcheck;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck="yes"
+>a</p>
+#errors
+/p/@spellcheck;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+  spellcheck="spellcheck"
+>a</p>
+#errors
+/p/@spellcheck;enumerated:invalid;m

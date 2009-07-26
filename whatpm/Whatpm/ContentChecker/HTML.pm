@@ -1290,6 +1290,9 @@ my $HTMLAttrChecker = {
     ## attribute allowed on an element that is not a repetition block?
   },
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
+  spellcheck => $GetHTMLEnumeratedAttrChecker->({
+    true => 1, false => 1, '' => 1,
+  }),
   style => sub {
     my ($self, $attr) = @_;
 
@@ -1379,6 +1382,7 @@ my %HTMLAttrStatus = (
   'repeat-start' => FEATURE_WF2,
   'repeat-template' => FEATURE_WF2,
   role => 0,
+  spellcheck => FEATURE_HTML5_WD,
   style => FEATURE_HTML5_WD,
   tabindex => FEATURE_HTML5_DEFAULT,
   template => FEATURE_HTML5_AT_RISK,
