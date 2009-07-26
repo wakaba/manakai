@@ -4083,8 +4083,9 @@ $Element->{$HTML_NS}->{figure} = {
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
       $element_state->{has_non_legend} = 1;
+      $element_state->{has_non_table} = 1;
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-      #
+      $element_state->{has_non_table} = 1;
     } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'legend') {
       if ($element_state->{has_legend_at_first}) {
         $self->{onerror}->(node => $child_el,
@@ -4102,6 +4103,11 @@ $Element->{$HTML_NS}->{figure} = {
       }
       delete $element_state->{has_non_legend};
     } else {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'table') {
+        $element_state->{has_table}++;
+      } else {
+        $element_state->{has_non_table}++;
+      }
       $HTMLFlowContentChecker{check_child_element}->(@_);
       $element_state->{has_non_legend} = 1 unless $child_is_transparent;
     }
@@ -4110,6 +4116,7 @@ $Element->{$HTML_NS}->{figure} = {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       $element_state->{has_non_legend} = 1;
+      $element_state->{has_non_table}++;
     }
 
     $element_state->{in_figure} = 1;
@@ -4125,6 +4132,14 @@ $Element->{$HTML_NS}->{figure} = {
                            type => 'element not allowed:figure legend',
                            level => $self->{level}->{must});
       }
+    }
+
+    if (($element_state->{has_table} || 0) == 1 and
+        not $element_state->{has_non_table} and
+        $element_state->{table_caption_element}) {
+      $self->{onerror}->(node => $element_state->{table_caption_element},
+                         type => 'element not allowed',
+                         level => $self->{level}->{should});
     }
 
     $HTMLFlowContentChecker{check_end}->(@_);
@@ -5091,6 +5106,7 @@ $Element->{$HTML_NS}->{table} = {
       }
     } elsif ($element_state->{phase} eq 'before caption') {
       if ($child_nsuri eq $HTML_NS and $child_ln eq 'caption') {
+        $item->{parent_state}->{table_caption_element} = $child_el;
         $element_state->{phase} = 'in colgroup';
       } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'colgroup') {
         $element_state->{phase} = 'in colgroup';

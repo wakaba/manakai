@@ -90,6 +90,117 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 /figure/legend;element not allowed:figure legend;m
 
 #data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<table><tr><td>x</td></tr></table>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<table><tr><td>x</td></tr></table>
+<legend>x</legend>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+<table><tr><td>x</td></tr></table>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+<table><tr><td>x</td></tr></table>
+<table><tr><td>x</td></tr></table>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+<table>
+<caption>y</caption>
+<tr><td>x</td></tr></table>
+</figure>
+#errors
+/figure/table/caption;element not allowed;s
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+<table>
+<tr><td>x</td></tr>
+<caption>y</caption>
+</table>
+</figure>
+#errors
+/figure/table/caption;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+<table>
+<caption>y</caption>
+<tr><td>x</td></tr></table>
+</figure>
+#errors
+/figure/table/caption;element not allowed;s
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+<table>
+<caption>y</caption>
+<caption>y</caption>
+<tr><td>x</td></tr></table>
+</figure>
+#errors
+/figure/table/caption;element not allowed;s
+/figure/table/caption;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+<table>
+<caption>y</caption>
+<tr><td>x</td></tr></table>
+x
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>x</legend>
+<table>
+<caption>y</caption>
+<tr><td>x</td></tr></table>
+<p>x</p>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<table>
+<caption>y</caption>
+<tr><td>x</td></tr></table>
+x
+<legend>x</legend>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<table>
+<caption>y</caption>
+<tr><td>x</td></tr></table>
+<legend>x</legend>
+</figure>
+#errors
+/figure/table/caption;element not allowed;s
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml" data=""></object>
 #errors
 /object;no significant content;s
