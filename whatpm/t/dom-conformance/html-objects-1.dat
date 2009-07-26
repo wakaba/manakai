@@ -201,6 +201,27 @@ x
 /figure/table/caption;element not allowed;s
 
 #data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<ins>
+<table>
+<tr><td>x</td></tr></table>
+</ins>
+<legend>x</legend>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<ins>
+<table>
+<caption>y</caption>
+<tr><td>x</td></tr></table>
+</ins>
+<legend>x</legend>
+</figure>
+#errors
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml" data=""></object>
 #errors
 /object;no significant content;s
