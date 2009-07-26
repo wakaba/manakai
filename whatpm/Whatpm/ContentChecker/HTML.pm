@@ -2499,6 +2499,7 @@ $Element->{$HTML_NS}->{body} = {
     background => $HTMLURIAttrChecker,
     bgcolor => $HTMLColorAttrChecker,
     link => $HTMLColorAttrChecker,
+    onpopstate => $HTMLEventHandlerAttrChecker,
     text => $HTMLColorAttrChecker,
     vlink => $HTMLColorAttrChecker,
   }, {
@@ -2510,6 +2511,7 @@ $Element->{$HTML_NS}->{body} = {
     lang => FEATURE_HTML5_WD | FEATURE_XHTML10_REC,
     link => FEATURE_M12N10_REC_DEPRECATED,
     onload => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onpopstate => FEATURE_HTML5_LC,
     onunload => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     text => FEATURE_M12N10_REC_DEPRECATED,
     vlink => FEATURE_M12N10_REC_DEPRECATED,

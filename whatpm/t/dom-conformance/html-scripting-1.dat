@@ -13,3 +13,24 @@
 #errors
 /p/@onmessage;attribute not defined;m
 /p/@onmessage;event handler;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    onpopstate=""
+>x</p>
+#errors
+/p/@onpopstate;attribute not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onpopstate=""/>
+#errors
+/frameset/@onpopstate;attribute not defined;m
+/frameset;element not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onpopstate=""
+>x</body>
+#errors
+/body/@onpopstate;event handler;u
