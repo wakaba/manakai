@@ -18,3 +18,47 @@ no DOCTYPE
 |   <body>
 |     <sarcasm>
 |       "aaa"
+
+#data
+<!DOCTYPE HTML><rt></body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <rt>
+
+#data
+<!DOCTYPE HTML><rp></body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <rp>
+
+#data
+<!DOCTYPE HTML><span><rp></body>
+#errors
+span not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|       <rp>
+
+#data
+<!DOCTYPE HTML><rp><span></body>
+#errors
+span not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <rp>
+|       <span>

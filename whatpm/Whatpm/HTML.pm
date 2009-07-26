@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.215 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.216 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -6098,7 +6098,10 @@ sub _tree_construction_main ($) {
         } # INSCOPE
 
         for (@{$self->{open_elements}}) {
-          unless ($_->[1] & ALL_END_TAG_OPTIONAL_EL) {
+          unless ($_->[1] & ALL_END_TAG_OPTIONAL_EL ||
+                  $_->[1] == OPTGROUP_EL ||
+                  $_->[1] == OPTION_EL ||
+                  $_->[1] == RUBY_COMPONENT_EL) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
                             text => $_->[0]->manakai_local_name,
@@ -6772,4 +6775,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/25 04:05:42 $
+# $Date: 2009/07/26 09:11:18 $
