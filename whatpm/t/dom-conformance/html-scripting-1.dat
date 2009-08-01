@@ -1,4 +1,48 @@
 #data
+<p onabort="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onabort;event handler;u
+
+#data
+<p onbeforeunload="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onbeforeunload;event handler;u
+/p/@onbeforeunload;attribute not defined;m
+
+#data
+<p onblur="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onblur;event handler;u
+
+#data
+<p onchange="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onchange;event handler;u
+
+#data
+<p onclick="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onclick;event handler;u
+
+#data
+<p onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onstorage;event handler;u
+/p/@onstorage;attribute not defined;m
+
+#data
+<unknown onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@onstorage;event handler;u
+/unknown/@onstorage;attribute not defined;m
+
+#data
+<p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onxxxx;attribute not defined;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml"
     ondataunavailable=""
 >x</p>
@@ -25,7 +69,7 @@
 <frameset xmlns="http://www.w3.org/1999/xhtml"
     onpopstate=""/>
 #errors
-/frameset/@onpopstate;attribute not defined;m
+/frameset/@onpopstate;event handler;u
 /frameset;element not defined;m
 
 #data
@@ -34,3 +78,280 @@
 >x</body>
 #errors
 /body/@onpopstate;event handler;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    onbeforeunload=""
+>x</p>
+#errors
+/p/@onbeforeunload;attribute not defined;m
+/p/@onbeforeunload;event handler;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    onhashchange=""
+>x</p>
+#errors
+/p/@onhashchange;attribute not defined;m
+/p/@onhashchange;event handler;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    onresize=""
+>x</p>
+#errors
+/p/@onresize;attribute not defined;m
+/p/@onresize;event handler;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    onstorage=""
+>x</p>
+#errors
+/p/@onstorage;attribute not defined;m
+/p/@onstorage;event handler;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    onunload=""
+>x</p>
+#errors
+/p/@onunload;attribute not defined;m
+/p/@onunload;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onafterprint=""
+>x</body>
+#errors
+/body/@onafterprint;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onbeforeprint=""
+>x</body>
+#errors
+/body/@onbeforeprint;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onbeforeunload=""
+>x</body>
+#errors
+/body/@onbeforeunload;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onblur=""
+>x</body>
+#errors
+/body/@onblur;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onerror=""
+>x</body>
+#errors
+/body/@onerror;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onfocus=""
+>x</body>
+#errors
+/body/@onfocus;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onhashchange=""
+>x</body>
+#errors
+/body/@onhashchange;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onload=""
+>x</body>
+#errors
+/body/@onload;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onmessage=""
+>x</body>
+#errors
+/body/@onmessage;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onoffline=""
+>x</body>
+#errors
+/body/@onoffline;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    ononline=""
+>x</body>
+#errors
+/body/@ononline;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onredo=""
+>x</body>
+#errors
+/body/@onredo;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onresize=""
+>x</body>
+#errors
+/body/@onresize;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onstorage=""
+>x</body>
+#errors
+/body/@onstorage;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onundo=""
+>x</body>
+#errors
+/body/@onundo;event handler;u
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onunload=""
+>x</body>
+#errors
+/body/@onunload;event handler;u
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onafterprint=""/>
+#errors
+/frameset/@onafterprint;attribute not defined;m
+/frameset/@onafterprint;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onbeforeprint=""/>
+#errors
+/frameset/@onbeforeprint;attribute not defined;m
+/frameset/@onbeforeprint;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onbeforeunload=""/>
+#errors
+/frameset/@onbeforeunload;attribute not defined;m
+/frameset/@onbeforeunload;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onblur=""/>
+#errors
+/frameset/@onblur;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onerror=""/>
+#errors
+/frameset/@onerror;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onfocus=""/>
+#errors
+/frameset/@onfocus;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onhashchange=""/>
+#errors
+/frameset/@onhashchange;attribute not defined;m
+/frameset/@onhashchange;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onload=""/>
+#errors
+/frameset/@onload;attribute not defined;m
+/frameset/@onload;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onmessage=""/>
+#errors
+/frameset/@onmessage;attribute not defined;m
+/frameset/@onmessage;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onoffline=""/>
+#errors
+/frameset/@onoffline;attribute not defined;m
+/frameset/@onoffline;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    ononline=""/>
+#errors
+/frameset/@ononline;attribute not defined;m
+/frameset/@ononline;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onredo=""/>
+#errors
+/frameset/@onredo;attribute not defined;m
+/frameset/@onredo;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onresize=""/>
+#errors
+/frameset/@onresize;attribute not defined;m
+/frameset/@onresize;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onstorage=""/>
+#errors
+/frameset/@onstorage;attribute not defined;m
+/frameset/@onstorage;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onundo=""/>
+#errors
+/frameset/@onundo;attribute not defined;m
+/frameset/@onundo;event handler;u
+/frameset;element not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onunload=""/>
+#errors
+/frameset/@onunload;attribute not defined;m
+/frameset/@onunload;event handler;u
+/frameset;element not defined;m

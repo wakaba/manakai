@@ -685,47 +685,6 @@ id=""><span id="">x</span></p>
 <input type="hidden" tabindex="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
-#data
-<p onabort="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
-#errors
-/p/@onabort;event handler;u
-
-#data
-<p onbeforeunload="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
-#errors
-/p/@onbeforeunload;event handler;u
-
-#data
-<p onblur="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
-#errors
-/p/@onblur;event handler;u
-
-#data
-<p onchange="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
-#errors
-/p/@onchange;event handler;u
-
-#data
-<p onclick="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
-#errors
-/p/@onclick;event handler;u
-
-#data
-<p onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</p>
-#errors
-/p/@onstorage;event handler;u
-
-#data
-<unknown onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</unknown>
-#errors
-/unknown;element not defined;m
-/unknown/@onstorage;event handler;u
-
-#data
-<p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
-#errors
-/p/@onxxxx;attribute not defined;m
-
 #data html
 <!DOCTYPE html>
 <html>

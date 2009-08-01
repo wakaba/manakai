@@ -1512,18 +1512,19 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
 );
 
 for (qw/
-         onabort onbeforeunload onblur onchange onclick oncontextmenu
+         onabort onblur onchange onclick oncontextmenu
          ondblclick ondrag ondragend ondragenter ondragleave ondragover
          ondragstart ondrop onerror onfocus onkeydown onkeypress
          onkeyup onload onmousedown onmousemove onmouseout
-         onmouseover onmouseup onmousewheel onresize onscroll onselect
-         onstorage onsubmit onunload 
+         onmouseover onmouseup onmousewheel onscroll onselect
+         onsubmit
      /) {
   $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
   $HTMLAttrStatus{$_} = FEATURE_HTML5_DEFAULT;
 }
 
 for (qw/
+         onbeforeunload onhashchange onresize onstorage onunload
          ondataunavailable
          onmessage
      /) {
@@ -2505,7 +2506,23 @@ $Element->{$HTML_NS}->{body} = {
     background => $HTMLURIAttrChecker,
     bgcolor => $HTMLColorAttrChecker,
     link => $HTMLColorAttrChecker,
+    onafterprint => $HTMLEventHandlerAttrChecker,
+    onbeforeprint => $HTMLEventHandlerAttrChecker,
+    onbeforeunload => $HTMLEventHandlerAttrChecker,
+    onblur => $HTMLEventHandlerAttrChecker,
+    onerror => $HTMLEventHandlerAttrChecker,
+    onfocus => $HTMLEventHandlerAttrChecker,
+    onhashchange => $HTMLEventHandlerAttrChecker,
+    onload => $HTMLEventHandlerAttrChecker,
+    onmessage => $HTMLEventHandlerAttrChecker,
+    onoffline => $HTMLEventHandlerAttrChecker,
+    ononline => $HTMLEventHandlerAttrChecker,
     onpopstate => $HTMLEventHandlerAttrChecker,
+    onredo => $HTMLEventHandlerAttrChecker,
+    onresize => $HTMLEventHandlerAttrChecker,
+    onstorage => $HTMLEventHandlerAttrChecker,
+    onundo => $HTMLEventHandlerAttrChecker,
+    onunload => $HTMLEventHandlerAttrChecker,
     text => $HTMLColorAttrChecker,
     vlink => $HTMLColorAttrChecker,
   }, {
@@ -2516,9 +2533,23 @@ $Element->{$HTML_NS}->{body} = {
     bgcolor => FEATURE_M12N10_REC_DEPRECATED,
     lang => FEATURE_HTML5_REC,
     link => FEATURE_M12N10_REC_DEPRECATED,
-    onload => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onafterprint => FEATURE_HTML5_LC,
+    onbeforeprint => FEATURE_HTML5_LC,
+    onbeforeunload => FEATURE_HTML5_LC,
+    onblur => FEATURE_HTML5_LC,
+    onerror => FEATURE_HTML5_LC,
+    onfocus => FEATURE_HTML5_LC,
+    onhashchange => FEATURE_HTML5_LC,
+    onload => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    onmessage => FEATURE_HTML5_LC,
+    onoffline => FEATURE_HTML5_LC,
+    ononline => FEATURE_HTML5_LC,
     onpopstate => FEATURE_HTML5_LC,
-    onunload => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onredo => FEATURE_HTML5_LC,
+    onresize => FEATURE_HTML5_LC,
+    onstorage => FEATURE_HTML5_LC,
+    onundo => FEATURE_HTML5_LC,
+    onunload => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     text => FEATURE_M12N10_REC_DEPRECATED,
     vlink => FEATURE_M12N10_REC_DEPRECATED,
   }),
@@ -6786,6 +6817,9 @@ $Element->{$HTML_NS}->{script} = {
                            level => $self->{level}->{must});
       }
 
+      ## XXXresource: MUST match the charset of the referenced
+      ## resource (HTML5 revision 2967).
+
       $HTMLCharsetChecker->($attr->value, @_);
     },
     language => sub {}, ## NOTE: No syntax constraint according to HTML4.
@@ -7428,10 +7462,41 @@ $Element->{$HTML_NS}->{basefont} = {
     id => FEATURE_HTML5_REC,
     size => FEATURE_M12N10_REC_DEPRECATED,
   }),
-};
+}; # basefont
 
 ## TODO: frameset FEATURE_M12N10_REC
-## class title id cols rows onload onunload style(x10)
+## class title id cols rows style(x10)
+
+$Element->{$HTML_NS}->{frameset} = {
+  %HTMLEmptyChecker, # XXX
+  status => FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    ## XXX
+    onafterprint => $HTMLEventHandlerAttrChecker,
+    onbeforeprint => $HTMLEventHandlerAttrChecker,
+    onbeforeunload => $HTMLEventHandlerAttrChecker,
+    onblur => $HTMLEventHandlerAttrChecker,
+    onerror => $HTMLEventHandlerAttrChecker,
+    onfocus => $HTMLEventHandlerAttrChecker,
+    onhashchange => $HTMLEventHandlerAttrChecker,
+    onload => $HTMLEventHandlerAttrChecker,
+    onmessage => $HTMLEventHandlerAttrChecker,
+    onoffline => $HTMLEventHandlerAttrChecker,
+    ononline => $HTMLEventHandlerAttrChecker,
+    onpopstate => $HTMLEventHandlerAttrChecker,
+    onredo => $HTMLEventHandlerAttrChecker,
+    onresize => $HTMLEventHandlerAttrChecker,
+    onstorage => $HTMLEventHandlerAttrChecker,
+    onundo => $HTMLEventHandlerAttrChecker,
+    onunload => $HTMLEventHandlerAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    ## XXX
+    onload => FEATURE_M12N10_REC,
+    onunload => FEATURE_M12N10_REC,
+  }),
+}; # frameset
+
 ## frame frameborder longdesc marginheight marginwidth noresize scrolling src name(deprecated) class,id,title,style(x10)
 ## noframes Common, lang(xhtml10)
 
