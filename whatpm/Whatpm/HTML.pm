@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.221 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.222 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -4506,6 +4506,11 @@ sub _tree_construction_main ($) {
             ## Reprocess the token.
             next B;
           }
+        } elsif ($token->{tag_name} eq 'script') {
+          
+          ## NOTE: This is an "as if in head" code clone
+          $script_start_tag->();
+          next B;
         } else {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'in select',
@@ -6820,4 +6825,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/08/16 05:57:24 $
+# $Date: 2009/08/16 06:26:14 $

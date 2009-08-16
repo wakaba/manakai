@@ -284,3 +284,33 @@ no </select>
 <keygen> in select
 #document-fragment select
 | "a"
+
+#data
+<!DOCTYPE HTML>
+<select><script>a<b>c</script></select>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <script>
+|         "a<b>c"
+
+#data
+<!DOCTYPE HTML>
+<table><tr><td><select><script>a<b>c</script></select></table>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|               <script>
+|                 "a<b>c"

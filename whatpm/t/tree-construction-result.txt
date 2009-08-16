@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 16 14:55:19 2009
-# Current time GMT:   Sun Aug 16 05:55:19 2009
+# Current time local: Sun Aug 16 15:06:58 2009
+# Current time GMT:   Sun Aug 16 06:06:58 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -5187,13 +5187,13 @@ ok 4806
 ok 4807
 ok 4808
 ok 4809
-# t/tree-test-foreign.dat
 ok 4810
 ok 4811
 ok 4812
 ok 4813
 ok 4814
 ok 4815
+# t/tree-test-foreign.dat
 ok 4816
 ok 4817
 ok 4818
@@ -5368,20 +5368,20 @@ ok 4986
 ok 4987
 ok 4988
 ok 4989
-not ok 4990
-# Test 4990 got: "4" (t/HTML-tree.t at line 92 fail #1664)
-#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 4990
 ok 4991
 ok 4992
-not ok 4993
-# Test 4993 got: "4" (t/HTML-tree.t at line 92 fail #1665)
-#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 4993
 ok 4994
 ok 4995
-ok 4996
+not ok 4996
+# Test 4996 got: "4" (t/HTML-tree.t at line 92 fail #1666)
+#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 4997
 ok 4998
-ok 4999
+not ok 4999
+# Test 4999 got: "4" (t/HTML-tree.t at line 92 fail #1667)
+#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5000
 ok 5001
 ok 5002
@@ -5516,22 +5516,28 @@ ok 5130
 ok 5131
 ok 5132
 ok 5133
-not ok 5134
-# Test 5134 got: "2" (t/HTML-tree.t at line 92 fail #1712)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
+ok 5134
 ok 5135
 ok 5136
 ok 5137
 ok 5138
 ok 5139
-ok 5140
+not ok 5140
+# Test 5140 got: "2" (t/HTML-tree.t at line 92 fail #1714)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
 ok 5141
 ok 5142
 ok 5143
 ok 5144
 ok 5145
-not ok 5146
-# Test 5146 got: "2" (t/HTML-tree.t at line 92 fail #1716)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5146
 ok 5147
 ok 5148
+ok 5149
+ok 5150
+ok 5151
+not ok 5152
+# Test 5152 got: "2" (t/HTML-tree.t at line 92 fail #1718)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5153
+ok 5154
