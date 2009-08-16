@@ -188,3 +188,99 @@ no </marquee>
 |   <head>
 |   <body>
 |     <optgroup>
+
+#data
+<!DOCTYPE HTML><select><input>
+#errors
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <input>
+
+#data
+<!DOCTYPE HTML><select><textarea></textarea>
+#errors
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <textarea>
+
+#data
+<!DOCTYPE HTML><select><keygen></keygen>
+#errors
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     <keygen>
+
+#data
+<!DOCTYPE HTML><select><option><input>
+#errors
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|     <input>
+
+#data
+<!DOCTYPE HTML><select><option><textarea></textarea>
+#errors
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|     <textarea>
+
+#data
+<!DOCTYPE HTML><select><option><keygen></keygen>
+#errors
+no </select>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       <option>
+|     <keygen>
+
+#data
+<input>a
+#errors
+<input> in select
+#document-fragment select
+| "a"
+
+#data
+<textarea>a
+#errors
+<textarea> in select
+#document-fragment select
+| "a"
+
+#data
+<keygen>a
+#errors
+<keygen> in select
+#document-fragment select
+| "a"

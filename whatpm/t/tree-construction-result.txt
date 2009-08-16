@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Jul 26 19:49:55 2009
-# Current time GMT:   Sun Jul 26 10:49:55 2009
+# Current time local: Sun Aug 16 12:38:07 2009
+# Current time GMT:   Sun Aug 16 03:38:07 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -4369,7 +4369,7 @@ ok 4082
 ok 4083
 not ok 4084
 # Test 4084 got: "3" (t/HTML-tree.t at line 92 fail #1362)
-#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:not closed, 1:9:unmatched end tag, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
+#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:select in select, 1:9:unmatched end tag, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
 ok 4085
 ok 4086
 ok 4087
@@ -5117,7 +5117,6 @@ ok 4779
 ok 4780
 ok 4781
 ok 4782
-# t/tree-test-foreign.dat
 ok 4783
 ok 4784
 ok 4785
@@ -5145,6 +5144,7 @@ ok 4806
 ok 4807
 ok 4808
 ok 4809
+# t/tree-test-foreign.dat
 ok 4810
 ok 4811
 ok 4812
@@ -5298,14 +5298,10 @@ ok 4959
 ok 4960
 ok 4961
 ok 4962
-not ok 4963
-# Test 4963 got: "4" (t/HTML-tree.t at line 92 fail #1655)
-#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 4963
 ok 4964
 ok 4965
-not ok 4966
-# Test 4966 got: "4" (t/HTML-tree.t at line 92 fail #1656)
-#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 4966
 ok 4967
 ok 4968
 ok 4969
@@ -5329,10 +5325,14 @@ ok 4986
 ok 4987
 ok 4988
 ok 4989
-ok 4990
+not ok 4990
+# Test 4990 got: "4" (t/HTML-tree.t at line 92 fail #1664)
+#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 4991
 ok 4992
-ok 4993
+not ok 4993
+# Test 4993 got: "4" (t/HTML-tree.t at line 92 fail #1665)
+#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 4994
 ok 4995
 ok 4996
@@ -5446,3 +5446,30 @@ ok 5103
 ok 5104
 ok 5105
 ok 5106
+ok 5107
+ok 5108
+ok 5109
+ok 5110
+ok 5111
+ok 5112
+ok 5113
+ok 5114
+ok 5115
+ok 5116
+ok 5117
+ok 5118
+ok 5119
+ok 5120
+ok 5121
+ok 5122
+ok 5123
+ok 5124
+ok 5125
+ok 5126
+ok 5127
+ok 5128
+ok 5129
+ok 5130
+ok 5131
+ok 5132
+ok 5133

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.221 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.222 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -3850,12 +3850,17 @@ sub _tree_construction_main ($) {
                    tbody => 1, tfoot => 1, thead => 1,
                    tr => 1, td => 1, th => 1,
                   }->{$token->{tag_name}})) {
-          ## TODO: The type below is not good - <select> is replaced by </select>
-          !!!parse-error (type => 'not closed', text => 'select',
-                          token => $token);
-          ## NOTE: As if the token were </select> (<select> case) or
-          ## as if there were </select> (otherwise).
-          ## have an element in table scope
+
+          ## 1. Parse error.
+          if ($token->{tag_name} eq 'select') {
+              !!!parse-error (type => 'select in select', ## XXX: documentation
+                              token => $token);
+          } else {
+            !!!parse-error (type => 'not closed', text => 'select',
+                            token => $token);
+          }
+
+          ## 2./<select>-1. Unless "have an element in table scope" (select):
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
@@ -3870,13 +3875,23 @@ sub _tree_construction_main ($) {
           } # INSCOPE
           unless (defined $i) {
             !!!cp ('t280');
-            !!!parse-error (type => 'unmatched end tag',
-                            text => 'select', token => $token);
-            ## Ignore the token
+            if ($token->{tag_name} eq 'select') {
+              ## NOTE: This error would be raised when
+              ## |select.innerHTML = '<select>'| is executed; in this
+              ## case two errors, "select in select" and "unmatched
+              ## end tags" are reported to the user, the latter might
+              ## be confusing but this is what the spec requires.
+              !!!parse-error (type => 'unmatched end tag',
+                              text => 'select',
+                              token => $token);
+            }
+            ## Ignore the token.
             !!!nack ('t280.1');
             !!!next-token;
             next B;
           }
+
+          ## 3. Otherwise, as if there were <select>:
               
           !!!cp ('t281');
           splice @{$self->{open_elements}}, $i;
@@ -5713,4 +5728,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/07/26 10:56:23 $
+# $Date: 2009/08/16 03:41:52 $
