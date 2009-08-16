@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 16 13:02:11 2009
-# Current time GMT:   Sun Aug 16 04:02:11 2009
+# Current time local: Sun Aug 16 13:57:01 2009
+# Current time GMT:   Sun Aug 16 04:57:01 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -5488,3 +5488,22 @@ ok 5130
 ok 5131
 ok 5132
 ok 5133
+not ok 5134
+# Test 5134 got: "2" (t/HTML-tree.t at line 92 fail #1712)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
+ok 5135
+ok 5136
+ok 5137
+ok 5138
+ok 5139
+ok 5140
+ok 5141
+ok 5142
+ok 5143
+ok 5144
+ok 5145
+not ok 5146
+# Test 5146 got: "2" (t/HTML-tree.t at line 92 fail #1716)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5147
+ok 5148

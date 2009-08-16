@@ -1697,3 +1697,70 @@ bad namespace
 |   <body>
 |     <svg svg>
 |       xmlns xlink="http://www.w3.org/1999/xlink "
+
+#data
+<!DOCTYPE html>
+<svg><font></font></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg font>
+
+#data
+<!DOCTYPE html>
+<svg><font color=red></font>
+#errors
+no </svg>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|     <font>
+|       color="red"
+
+#data
+<!DOCTYPE html>
+<svg><font size=1></font>
+#errors
+no </svg>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|     <font>
+|       size="1"
+
+#data
+<!DOCTYPE html>
+<svg><font face="Arial"></font>
+#errors
+no </svg>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|     <font>
+|       face="Arial"
+
+#data
+<!DOCTYPE html>
+<svg><font point-size=14></font></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg font>
+|         point-size="14"

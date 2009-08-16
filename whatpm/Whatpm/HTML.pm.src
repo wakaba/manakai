@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.222 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.223 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -1872,13 +1872,17 @@ sub _tree_construction_main ($) {
         } elsif ({
                   b => 1, big => 1, blockquote => 1, body => 1, br => 1,
                   center => 1, code => 1, dd => 1, div => 1, dl => 1, dt => 1,
-                  em => 1, embed => 1, font => 1, h1 => 1, h2 => 1, h3 => 1,
+                  em => 1, embed => 1, h1 => 1, h2 => 1, h3 => 1,
                   h4 => 1, h5 => 1, h6 => 1, head => 1, hr => 1, i => 1,
                   img => 1, li => 1, listing => 1, menu => 1, meta => 1,
                   nobr => 1, ol => 1, p => 1, pre => 1, ruby => 1, s => 1,
                   small => 1, span => 1, strong => 1, strike => 1, sub => 1,
                   sup => 1, table => 1, tt => 1, u => 1, ul => 1, var => 1,
-                 }->{$token->{tag_name}}) {
+                 }->{$token->{tag_name}} or
+                 ($token->{tag_name} eq 'font' and
+                  ($token->{attributes}->{color} or
+                   $token->{attributes}->{face} or
+                   $token->{attributes}->{size}))) {
           !!!cp ('t87.2');
           !!!parse-error (type => 'not closed',
                           text => $self->{open_elements}->[-1]->[0]
@@ -5728,4 +5732,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/08/16 03:41:52 $
+# $Date: 2009/08/16 04:59:53 $
