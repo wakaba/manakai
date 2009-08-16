@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 16 14:14:14 2009
-# Current time GMT:   Sun Aug 16 05:14:14 2009
+# Current time local: Sun Aug 16 14:55:19 2009
+# Current time GMT:   Sun Aug 16 05:55:19 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -267,9 +267,19 @@ ok 249
 ok 250
 ok 251
 ok 252
-ok 253
+not ok 253
+# Test 253 got: "3" (t/HTML-tree.t at line 92 fail #85)
+#     Expected: "2" (Parse error: qq'<h1>Hello<h2>World'; 1:5:no DOCTYPE, 1:14:not closed, 1:18:in body:#eof;Line: 1 Col: 4 Unexpected start tag (h1). Expected DOCTYPE., Line: 1 Col: 18 Expected closing tag. Unexpected end of file.)
 ok 254
-ok 255
+not ok 255
+# Test 255 got: "<html>\n  <head>\n  <body>\n    <h1>\n      \"Hello\"\n    <h2>\n      \"World\"\n" (t/HTML-tree.t at line 98 fail #85)
+#     Expected: "<html>\n  <head>\n  <body>\n    <h1>\n      \"Hello\"\n      <h2>\n        \"World\"\n" (Document tree: qq'<h1>Hello<h2>World')
+#     Lines 6-7 are changed:
+#      - "      <h2>\n"
+#      + "    <h2>\n"
+#      - "        \"World\"\n"
+#      + "      \"World\"\n"
+#  t/HTML-tree.t line 98 is:   ok $result, $test->{document}->[0],
 ok 256
 ok 257
 ok 258
@@ -311,7 +321,6 @@ not ok 285
 #      + "        \"hello\"\n"
 #     Got 1 extra line at line 8:
 #      + "        \"excite!\"\n"
-#  t/HTML-tree.t line 98 is:   ok $result, $test->{document}->[0],
 not ok 286
 # Test 286 got: "0" (t/HTML-tree.t at line 92 fail #96)
 #     Expected: "1" (Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).)
@@ -566,9 +575,16 @@ ok 474
 ok 475
 ok 476
 ok 477
-ok 478
+not ok 478
+# Test 478 got: "3" (t/HTML-tree.t at line 92 fail #160)
+#     Expected: "2" (Parse error: qq'<h1><h2>'; 1:5:no DOCTYPE, 1:8:not closed, 1:8:in body:#eof;Line: 1 Col: 4 Unexpected start tag (h1). Expected DOCTYPE., Line: 1 Col: 8 Expected closing tag. Unexpected end of file.)
 ok 479
-ok 480
+not ok 480
+# Test 480 got: "<html>\n  <head>\n  <body>\n    <h1>\n    <h2>\n" (t/HTML-tree.t at line 98 fail #160)
+#     Expected: "<html>\n  <head>\n  <body>\n    <h1>\n      <h2>\n" (Document tree: qq'<h1><h2>')
+#     Line 5 is changed:
+#      - "      <h2>\n"
+#      + "    <h2>\n"
 ok 481
 ok 482
 ok 483
@@ -606,7 +622,12 @@ ok 512
 ok 513
 ok 514
 ok 515
-ok 516
+not ok 516
+# Test 516 got: "<html>\n  <head>\n  <body>\n    <h1>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <h3>\n    <h3>\n" (t/HTML-tree.t at line 98 fail #172)
+#     Expected: "<html>\n  <head>\n  <body>\n    <h1>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <h3>\n      <h3>\n" (Document tree: qq'<h1><table><td><h3></table><h3></h1>')
+#     Line 10 is changed:
+#      - "      <h3>\n"
+#      + "    <h3>\n"
 ok 517
 ok 518
 ok 519
@@ -680,7 +701,9 @@ ok 576
 ok 577
 ok 578
 ok 579
-ok 580
+not ok 580
+# Test 580 got: "4" (t/HTML-tree.t at line 92 fail #194)
+#     Expected: "3" (Parse error: qq'<!DOCTYPE html></b test<b &=&amp>X'; 1:24:bad attribute name, 1:33:no refc, 1:33:end tag attribute, 1:34:unmatched end tag;Line: 1 Col: 32 Named entity didn't end with ';'., Line: 1 Col: 33 End tag contains unexpected attributes., Line: 1 Col: 33 Unexpected end tag (b) after the (implied) root element.)
 ok 581
 ok 582
 ok 583

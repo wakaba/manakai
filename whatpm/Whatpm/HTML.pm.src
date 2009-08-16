@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.224 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.225 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -2265,7 +2265,14 @@ sub _tree_construction_main ($) {
 
           ## NOTE: There is a "as if in head" code clone.
           $parse_rcdata->(RCDATA_CONTENT_MODEL);
-          ## ISSUE: A spec bug [Bug 6038]
+
+          ## NOTE: At this point the stack of open elements contain
+          ## the |head| element (index == -2) and the |script| element
+          ## (index == -1).  In the "after head" insertion mode the
+          ## |head| element is inserted only for the purpose of
+          ## providing the context for the |script| element, and
+          ## therefore we can now and have to remove the element from
+          ## the stack.
           splice @{$self->{open_elements}}, -2, 1, () # <head>
               if ($self->{insertion_mode} & IM_MASK) == AFTER_HEAD_IM;
           next B;
@@ -4426,6 +4433,8 @@ sub _tree_construction_main ($) {
                 table => 1,
                 hr => 1,
                }->{$token->{tag_name}}) {
+
+        ## 1. When there is an opening |form| element:
         if ($token->{tag_name} eq 'form' and defined $self->{form_element}) {
           !!!cp ('t350');
           !!!parse-error (type => 'in form:form', token => $token);
@@ -4435,6 +4444,7 @@ sub _tree_construction_main ($) {
           next B;
         }
 
+        ## 2. Close the |p| element, if any.
         if ($token->{tag_name} ne 'table' or # The Hixie Quirk
             $self->{document}->manakai_compat_mode ne 'quirks') {
           ## has a p element in scope
@@ -4451,7 +4461,19 @@ sub _tree_construction_main ($) {
             }
           } # INSCOPE
         }
-          
+
+        ## 3. Close the opening <hn> element, if any.
+        if ({h1 => 1, h2 => 1, h3 => 1,
+             h4 => 1, h5 => 1, h6 => 1}->{$token->{tag_name}}) {
+          if ($self->{open_elements}->[-1]->[1] == HEADING_EL) {
+            !!!parse-error (type => 'not closed',
+                            text => $self->{open_elements}->[-1]->[0]->manakai_local_name,
+                            token => $token);
+            pop @{$self->{open_elements}};
+          }
+        }
+
+        ## 4. Insertion.
         !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
         if ($token->{tag_name} eq 'pre' or $token->{tag_name} eq 'listing') {
           !!!nack ('t346.1');
@@ -4495,17 +4517,17 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'li') {
         ## NOTE: As normal, but imply </li> when there's another <li> ...
 
-        ## NOTE: Special, Scope (<li><foo><li> == <li><foo><li/></foo></li>)
-          ## Interpreted as <li><foo/></li><li/> (non-conforming)
+        ## NOTE: Special, Scope (<li><foo><li> == <li><foo><li/></foo></li>)::
+          ## Interpreted as <li><foo/></li><li/> (non-conforming):
           ## blockquote (O9.27), center (O), dd (Fx3, O, S3.1.2, IE7),
           ## dt (Fx, O, S, IE), dl (O), fieldset (O, S, IE), form (Fx, O, S),
           ## hn (O), pre (O), applet (O, S), button (O, S), marquee (Fx, O, S),
           ## object (Fx)
-          ## Generate non-tree (non-conforming)
+          ## Generate non-tree (non-conforming):
           ## basefont (IE7 (where basefont is non-void)), center (IE),
           ## form (IE), hn (IE)
-        ## address, div, p (<li><foo><li> == <li><foo/></li><li/>)
-          ## Interpreted as <li><foo><li/></foo></li> (non-conforming)
+        ## address, div, p (<li><foo><li> == <li><foo/></li><li/>)::
+          ## Interpreted as <li><foo><li/></foo></li> (non-conforming):
           ## div (Fx, S)
 
         my $non_optional;
@@ -5041,7 +5063,9 @@ sub _tree_construction_main ($) {
       }
     } elsif ($token->{type} == END_TAG_TOKEN) {
       if ($token->{tag_name} eq 'body') {
-        ## has a |body| element in scope
+
+        ## 1. If not "have an element in scope":
+        ## "has a |body| element in scope"
         my $i;
         INSCOPE: {
           for (reverse @{$self->{open_elements}}) {
@@ -5064,6 +5088,7 @@ sub _tree_construction_main ($) {
           next B;
         } # INSCOPE
 
+        ## 2. If unclosed elements:
         for (@{$self->{open_elements}}) {
           unless ($_->[1] & ALL_END_TAG_OPTIONAL_EL ||
                   $_->[1] == OPTGROUP_EL ||
@@ -5079,6 +5104,7 @@ sub _tree_construction_main ($) {
           }
         }
 
+        ## 3. Switch the insertion mode.
         $self->{insertion_mode} = AFTER_BODY_IM;
         !!!next-token;
         next B;
@@ -5726,4 +5752,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/08/16 05:15:09 $
+# $Date: 2009/08/16 05:57:24 $
