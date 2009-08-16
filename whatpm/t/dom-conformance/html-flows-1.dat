@@ -355,6 +355,17 @@ para
 /section/p;no significant content;s
 
 #data
+<section cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">a</section>
+#errors
+/section/@cite;attribute not defined;m
+
+#data
+<section cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml">a</section>
+#errors
+/section/@cite;syntax error:iriref3987;m
+/section/@cite;attribute not defined;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml">
 @@ TODO: It is expected that tests for the NAV element comes here.
 </p>
@@ -400,6 +411,17 @@ para
     pubdate="02:02:03">x</article>
 #errors
 /article/@pubdate;datetime:syntax error;m
+
+#data
+<article cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">a</article>
+#errors
+/article/@cite;attribute not defined;m
+
+#data
+<article cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml">a</article>
+#errors
+/article/@cite;syntax error:iriref3987;m
+/article/@cite;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">

@@ -2566,9 +2566,11 @@ $Element->{$HTML_NS}->{section} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED,
   check_attrs => $GetHTMLAttrsChecker->({
+    cite => $HTMLURIAttrChecker,
   }, {
     %HTMLAttrStatus,
     %XHTML2CommonAttrStatus,
+    cite => FEATURE_HTML5_DROPPED | FEATURE_XHTML2_ED,
   }),
 };
 
@@ -2581,10 +2583,11 @@ $Element->{$HTML_NS}->{article} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
+    cite => $HTMLURIAttrChecker,
     pubdate => $GetDateTimeAttrChecker->('global_date_and_time_string'),
   }, {
     %HTMLAttrStatus,
-    # XXX cite
+    cite => FEATURE_HTML5_DROPPED,
     pubdate => FEATURE_HTML5_LC,
   }),
 }; # article
