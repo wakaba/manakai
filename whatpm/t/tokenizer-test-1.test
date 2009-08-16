@@ -18,7 +18,7 @@
 
 {"description":"<!DOCTYPE H",
 "input":"<!DOCTYPE H",
-"output":["ParseError",["DOCTYPE", "H", null, null, false]]},
+"output":["ParseError",["DOCTYPE", "h", null, null, false]]},
 
 {"description":"<!DOCTYPE h>",
 "input":"<!DOCTYPE h>",
@@ -26,7 +26,7 @@
 
 {"description":"<!DOCTYPE H>",
 "input":"<!DOCTYPE H>",
-"output":[["DOCTYPE", "H", null, null, true]]},
+"output":[["DOCTYPE", "h", null, null, true]]},
 
 {"description":"<!DOCTYPE ht",
 "input":"<!DOCTYPE ht",
@@ -34,11 +34,11 @@
 
 {"description":"<!DOCTYPE Ht",
 "input":"<!DOCTYPE Ht",
-"output":["ParseError",["DOCTYPE", "Ht", null, null, false]]},
+"output":["ParseError",["DOCTYPE", "ht", null, null, false]]},
 
 {"description":"<!DOCTYPE hT",
 "input":"<!DOCTYPE hT",
-"output":["ParseError",["DOCTYPE", "hT", null, null, false]]},
+"output":["ParseError",["DOCTYPE", "ht", null, null, false]]},
 
 {"description":"<!DOCTYPE ht>",
 "input":"<!DOCTYPE ht>",
@@ -46,15 +46,15 @@
 
 {"description":"<!DOCTYPE Ht>",
 "input":"<!DOCTYPE Ht>",
-"output":[["DOCTYPE", "Ht", null, null, true]]},
+"output":[["DOCTYPE", "ht", null, null, true]]},
 
 {"description":"<!DOCTYPE hT>",
 "input":"<!DOCTYPE hT>",
-"output":[["DOCTYPE", "hT", null, null, true]]},
+"output":[["DOCTYPE", "ht", null, null, true]]},
 
 {"description":"<!DOCTYPE hT>",
 "input":"<!DOCTYPE hT>",
-"output":[["DOCTYPE", "hT", null, null, true]]},
+"output":[["DOCTYPE", "ht", null, null, true]]},
 
 {"description":"<!DOCTYPE htm",
 "input":"<!DOCTYPE htm",
@@ -62,11 +62,11 @@
 
 {"description":"<!DOCTYPE Htm",
 "input":"<!DOCTYPE Htm",
-"output":["ParseError",["DOCTYPE", "Htm", null, null, false]]},
+"output":["ParseError",["DOCTYPE", "htm", null, null, false]]},
 
 {"description":"<!DOCTYPE hTM",
 "input":"<!DOCTYPE hTM",
-"output":["ParseError",["DOCTYPE", "hTM", null, null, false]]},
+"output":["ParseError",["DOCTYPE", "htm", null, null, false]]},
 
 {"description":"<!DOCTYPE htm>",
 "input":"<!DOCTYPE htm>",
@@ -74,11 +74,11 @@
 
 {"description":"<!DOCTYPE Htm>",
 "input":"<!DOCTYPE Htm>",
-"output":[["DOCTYPE", "Htm", null, null, true]]},
+"output":[["DOCTYPE", "htm", null, null, true]]},
 
 {"description":"<!DOCTYPE hTM>",
 "input":"<!DOCTYPE hTM>",
-"output":[["DOCTYPE", "hTM", null, null, true]]},
+"output":[["DOCTYPE", "htm", null, null, true]]},
 
 {"description":"<!DOCTYPE html5",
 "input":"<!DOCTYPE html5",
@@ -185,6 +185,14 @@
 "input": "<!DOCTYPe html>",
 "output": [["DOCTYPE", "html", null, null, true]]},
 
+{"description": "DOCTYPE Html",
+"input": "<!DOCTYPE Html>",
+"output": [["DOCTYPE", "html", null, null, true]]},
+
+{"description": "DOCTYPE hTml",
+"input": "<!DOCTYPE Html>",
+"output": [["DOCTYPE", "html", null, null, true]]},
+
 {"description": "PUBLIc",
 "input": "<!DOCTYPE html PUBLIc 'a' 'b'>",
 "output": [["DOCTYPE", "html", "a", "b", true]]},
@@ -227,59 +235,59 @@
 
 {"description": "<!DOCTYPE HTML P>",
 "input": "<!DOCTYPE HTML P>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML Pa>",
 "input": "<!DOCTYPE HTML Pa>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML Pua>",
 "input": "<!DOCTYPE HTML Pua>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML PUB>",
 "input": "<!DOCTYPE HTML PUB>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML pubL>",
 "input": "<!DOCTYPE HTML pubL>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML publication>",
 "input": "<!DOCTYPE HTML publication>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML publi>",
 "input": "<!DOCTYPE HTML publi>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML PULICID>",
 "input": "<!DOCTYPE HTML PUBLICID>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML S ''>",
 "input": "<!DOCTYPE HTML S ''>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML sy>",
 "input": "<!DOCTYPE HTML sy>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML sys ''>",
 "input": "<!DOCTYPE HTML sys ''>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML syst>",
 "input": "<!DOCTYPE HTML syst>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML SySter>",
 "input": "<!DOCTYPE HTML SySter>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML systemid>",
 "input": "<!DOCTYPE HTML systemid>",
-"output": ["ParseError", ["DOCTYPE", "HTML", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description":"<!---x-->",
 "input":"<!---x-->",

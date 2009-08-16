@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 16 12:38:07 2009
-# Current time GMT:   Sun Aug 16 03:38:07 2009
+# Current time local: Sun Aug 16 13:02:11 2009
+# Current time GMT:   Sun Aug 16 04:02:11 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -831,7 +831,12 @@ not ok 715
 # Test 715 got: "2" (t/HTML-tree.t at line 92 fail #239)
 #     Expected: "3" (Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.)
 ok 716
-ok 717
+not ok 717
+# Test 717 got: "<!DOCTYPE <!doctype>\n<html>\n  <head>\n  <body>\n    \">\"\n    <!-- <!--x -->\n    \"-->\"\n" (t/HTML-tree.t at line 98 fail #239)
+#     Expected: "<!DOCTYPE <!DOCTYPE>\n<html>\n  <head>\n  <body>\n    \">\"\n    <!-- <!--x -->\n    \"-->\"\n" (Document tree: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->')
+#     Line 1 is changed:
+#      - "<!DOCTYPE <!DOCTYPE>\n"
+#      + "<!DOCTYPE <!doctype>\n"
 # t/tree-construction/tests3.dat
 ok 718
 ok 719
@@ -1286,12 +1291,22 @@ not ok 1078
 # Test 1078 got: "1" (t/HTML-tree.t at line 92 fail #360)
 #      Expected: "0" (Parse error: qq'<!DOCTYPE hTmL><html></html>'; 1:28:unmatched end tag;)
 ok 1079
-ok 1080
+not ok 1080
+# Test 1080 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #360)
+#      Expected: "<!DOCTYPE hTmL>\n<html>\n  <head>\n  <body>\n" (Document tree: qq'<!DOCTYPE hTmL><html></html>')
+#      Line 1 is changed:
+#       - "<!DOCTYPE hTmL>\n"
+#       + "<!DOCTYPE html>\n"
 not ok 1081
 # Test 1081 got: "1" (t/HTML-tree.t at line 92 fail #361)
 #      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><html></html>'; 1:28:unmatched end tag;)
 ok 1082
-ok 1083
+not ok 1083
+# Test 1083 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #361)
+#      Expected: "<!DOCTYPE HTML>\n<html>\n  <head>\n  <body>\n" (Document tree: qq'<!DOCTYPE HTML><html></html>')
+#      Line 1 is changed:
+#       - "<!DOCTYPE HTML>\n"
+#       + "<!DOCTYPE html>\n"
 not ok 1084
 # Test 1084 got: "1" (t/HTML-tree.t at line 92 fail #362)
 #      Expected: "2" (Parse error: qq'<body>X</body></body>'; 1:21:after body:/;Line: 1 Col: 21 Unexpected end tag token (body) in the after body phase., Line: 1 Col: 21 Unexpected EOF in inner html mode.)

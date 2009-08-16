@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -3087,6 +3087,24 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE (quirks)
 
         redo A;
+      } elsif (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A) { # A..Z
+        
+        $self->{ct}->{name} # DOCTYPE
+            = chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020));
+        delete $self->{ct}->{quirks};
+        $self->{state} = DOCTYPE_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
       } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE name');
@@ -3173,6 +3191,24 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
 
         redo A;
+      } elsif (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A) { # A..Z
+        
+        $self->{ct}->{name} # DOCTYPE
+            .= chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020));
+        delete $self->{ct}->{quirks};
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
       } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
@@ -3204,9 +3240,8 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
-        $self->{ct}->{name}
-          .= chr ($self->{nc}); # DOCTYPE
-        ## Stay in the state
+        $self->{ct}->{name} .= chr ($self->{nc}); # DOCTYPE
+        ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -8664,5 +8699,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/07/05 04:38:45 $
+## $Date: 2009/08/16 04:06:34 $
                                 
