@@ -214,8 +214,8 @@ duplicate DOCTYPE
 #data
 <!DOCTYPE HTML PUBLIC "XSLT-compat"><title></title>
 #errors
+not HTML5
 #shoulds
-XSLT-compat
 #document
 | <!DOCTYPE html "XSLT-compat" "">
 | <html>
@@ -301,6 +301,61 @@ not HTML5
 | <html>
 |   <head>
 |     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML SYSTEM "about:legacy-compat">
+#errors
+#shoulds
+legacy-compat
+#document
+| <!DOCTYPE html "" "about:legacy-compat">
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML SYSTEM "about:legacy-compat ">
+#errors
+not HTML5
+#shoulds
+#document
+| <!DOCTYPE html "" "about:legacy-compat ">
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+#errors
+#shoulds
+legacy-compat
+#document
+| <!DOCTYPE html "" "about:legacy-compat">
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML PUBLIC "SYSTEM" "about:legacy-compat">
+#errors
+not HTML5
+#shoulds
+#document
+| <!DOCTYPE html "SYSTEM" "about:legacy-compat">
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE HTML SYSTEM "about:XSLT-compat">
+#errors
+not HTML5
+#shoulds
+#document
+| <!DOCTYPE html "" "about:XSLT-compat">
+| <html>
+|   <head>
 |   <body>
 
 #data

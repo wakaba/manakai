@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.227 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.228 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -920,23 +920,23 @@ sub _tree_construction_initial ($) {
       my $doctype = $self->{document}->create_document_type_definition
           ($doctype_name);
 
-      $doctype_name =~ tr/a-z/A-Z/; # ASCII case-insensitive
-      if (not defined $token->{name} or # <!DOCTYPE>
-          defined $token->{sysid}) {
+      $doctype_name =~ tr/A-Z/a-z/; # ASCII case-insensitive
+      if ($doctype_name ne 'html') {
         !!!cp ('t1');
         !!!parse-error (type => 'not HTML5', token => $token);
-      } elsif ($doctype_name ne 'HTML') {
-        !!!cp ('t2');
-        !!!parse-error (type => 'not HTML5', token => $token);
       } elsif (defined $token->{pubid}) {
-        if ($token->{pubid} eq 'XSLT-compat') {
-          !!!cp ('t1.2');
+        !!!cp ('t2');
+        ## XXX Obsolete permitted DOCTYPEs
+        !!!parse-error (type => 'not HTML5', token => $token);
+      } elsif (defined $token->{sysid}) {
+        if ($token->{sysid} eq 'about:legacy-compat') {
+          !!!cp ('t1.2'); ## <!DOCTYPE HTML SYSTEM "about:legacy-compat">
           !!!parse-error (type => 'XSLT-compat', token => $token,
                           level => $self->{level}->{should});
         } else {
           !!!parse-error (type => 'not HTML5', token => $token);
         }
-      } else {
+      } else { ## <!DOCTYPE HTML>
         !!!cp ('t3');
         #
       }
@@ -952,7 +952,7 @@ sub _tree_construction_initial ($) {
       ## according to DOM3 Core.
       $self->{document}->append_child ($doctype);
       
-      if ($token->{quirks} or $doctype_name ne 'HTML') {
+      if ($token->{quirks} or $doctype_name ne 'html') {
         !!!cp ('t4');
         $self->{document}->manakai_compat_mode ('quirks');
       } elsif (defined $token->{pubid}) {
@@ -5760,4 +5760,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/08/16 06:31:20 $
+# $Date: 2009/08/16 06:47:59 $
