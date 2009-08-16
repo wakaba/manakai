@@ -7144,12 +7144,12 @@ $Element->{$HTML_NS}->{command} = {
 
 $Element->{$HTML_NS}->{bb} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_WD,
+  status => FEATURE_HTML5_DROPPED,
   check_attrs => $GetHTMLAttrsChecker->({
     type => $GetHTMLEnumeratedAttrChecker->({makeapp => 1}),
   }, {
     %HTMLAttrStatus,
-    type => FEATURE_HTML5_WD,
+    type => FEATURE_HTML5_DROPPED,
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;

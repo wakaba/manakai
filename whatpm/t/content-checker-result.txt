@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 16 16:05:57 2009
-# Current time GMT:   Sun Aug 16 07:05:57 2009
+# Current time local: Sun Aug 16 16:19:00 2009
+# Current time GMT:   Sun Aug 16 07:19:00 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1510,9 +1510,22 @@ ok 1442
 ok 1443
 ok 1444
 ok 1445
-ok 1446
-ok 1447
-ok 1448
+not ok 1446
+# Test 1446 got: "/a/bb;element not allowed:minus;m\n/a/bb;element not defined;m" (t/content-checker.pl at line 68 fail #1446)
+#      Expected: "/a/bb;element not allowed:minus;m" (<a xmlns="http://www.w3.org/1999/xhtml">
+#<bb>x</bb>
+#</a>)
+not ok 1447
+# Test 1447 got: "/a/span/bb;element not allowed:minus;m\n/a/span/bb;element not defined;m" (t/content-checker.pl at line 68 fail #1447)
+#      Expected: "/a/span/bb;element not allowed:minus;m" (<a xmlns="http://www.w3.org/1999/xhtml">
+#<span><bb>x</bb></span>
+#</a>)
+not ok 1448
+# Test 1448 got: "/div/a/bb;element not allowed:minus;m\n/div/a/bb;element not defined;m\n/div/bb;element not defined;m" (t/content-checker.pl at line 68 fail #1448)
+#      Expected: "/div/a/bb;element not allowed:minus;m" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<a><bb>x</bb></a>
+#<bb>y</bb>
+#</div>)
 ok 1449
 ok 1450
 ok 1451

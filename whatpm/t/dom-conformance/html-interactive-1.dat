@@ -365,84 +365,102 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <bb xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb;no significant content;s
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">   </bb>
 #errors
 /bb;no significant content;s
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">x</bb>
 #errors
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"><em>x</em></bb>
 #errors
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">x<em>y</em>z</bb>
 #errors
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"><p>x</p></bb>
 #errors
 /bb/p;element not allowed:phrasing;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>
 #errors
 /bb/meta;element not allowed:phrasing;m
 /bb;no significant content;s
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">x<script>y</script></bb>
 #errors
 /bb/script;SUBDOC
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"><ins>x</ins></bb>
 #errors
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"><ins><p>x</p></ins></bb>
 #errors
 /bb/ins/p;element not allowed:phrasing;m
+/bb;element not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></p>
 #errors
+/p/bb;element not defined;m
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></em>
 #errors
+/em/bb;element not defined;m
 
 #data
 <br xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></br>
 #errors
 /br/bb;element not allowed:empty;m
+/br/bb;element not defined;m
 
 #data
 <title xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></title>
 #errors
 /title/bb;element not allowed:text;m
+/title/bb;element not defined;m
 
 #data
 <td xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></td>
 #errors
+/td/bb;element not defined;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></ins>
 #errors
+/ins/bb;element not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><del><bb>x</bb></del>y</p>
 #errors
+/p/del/bb;element not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><bb><style></style>x</bb></p>
 #errors
 /p/bb/style;element not allowed:phrasing;m
 /p/bb/style;SUBDOC
+/p/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -450,12 +468,14 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/a;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
 <video src="">a</video>
 </bb>
 #errors
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -463,12 +483,14 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/video;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
 <audio src="">a</audio>
 </bb>
 #errors
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -476,6 +498,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/audio;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -483,6 +506,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/label;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -490,6 +514,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/input;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -497,6 +522,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/button;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -504,6 +530,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/select;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -511,6 +538,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/textarea;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -518,6 +546,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/details;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -525,6 +554,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/datagrid;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -532,12 +562,15 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/bb;element not allowed:minus;m
+/bb;element not defined;m
+/bb/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
 <menu>a</menu>
 </bb>
 #errors
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -545,6 +578,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </bb>
 #errors
 /bb/menu;element not allowed:minus;m
+/bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -561,6 +595,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /bb/datatemplate/rule/content/div/a;element not allowed:minus;m
 /bb/datatemplate;element not allowed:phrasing;m
+/bb;element not defined;m
 
 #data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1321,46 +1356,62 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /bb;no significant content;s
 /bb/@type;enumerated:invalid;m
+/bb;element not defined;m
+/bb/@type;attribute not defined;m
 
 #data
 <bb type="type" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb;no significant content;s
 /bb/@type;enumerated:invalid;m
+/bb;element not defined;m
+/bb/@type;attribute not defined;m
 
 #data
 <bb type="null" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb;no significant content;s
 /bb/@type;enumerated:invalid;m
+/bb;element not defined;m
+/bb/@type;attribute not defined;m
 
 #data
 <bb type="makeapp" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb;no significant content;s
+/bb;element not defined;m
+/bb/@type;attribute not defined;m
 
 #data
 <bb type="make application" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb/@type;enumerated:invalid;m
 /bb;no significant content;s
+/bb;element not defined;m
+/bb/@type;attribute not defined;m
 
 #data
 <bb type="MakeApp" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb;no significant content;s
+/bb;element not defined;m
+/bb/@type;attribute not defined;m
 
 #data
 <bb type=" makeapp " xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb/@type;enumerated:invalid;m
 /bb;no significant content;s
+/bb;element not defined;m
+/bb/@type;attribute not defined;m
 
 #data
 <bb type="button" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb/@type;enumerated:invalid;m
 /bb;no significant content;s
+/bb;element not defined;m
+/bb/@type;attribute not defined;m
 
 #data
 <menu xmlns="http://www.w3.org/1999/xhtml"/>
