@@ -836,13 +836,14 @@ unmatched </p>
 <!DOCTYPE HTML><head><noscript></br>
 #errors
 </br> in <noscript> in <head>
-</br> after </head>
+</br>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |     <noscript>
 |   <body>
+|     <br>
 
 ## When scripting is disabled
 #data
@@ -971,12 +972,13 @@ unexpected end of file (no </noscript>)
 #data
 <!DOCTYPE HTML></br>
 #errors
-</br> after </head>
+</br>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
+|     <br>
 
 #data
 <!DOCTYPE HTML></head></p>
@@ -1118,13 +1120,13 @@ no <!DOCTYPE>
 <head></br><link>
 #errors
 no <!DOCTYPE>
-</br> in </head>
-<link> in </head>
+</br>
 #document
 | <html>
 |   <head>
-|     <link>
 |   <body>
+|     <br>
+|     <link>
 
 #data
 <!DOCTYPE HTML><head></head></img>

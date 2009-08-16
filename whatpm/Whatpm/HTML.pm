@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.219 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.220 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -2825,11 +2825,11 @@ sub _tree_construction_main ($) {
               ## Ignore the token
               $token = $self->_get_next_token;
               next B;
-            } elsif ($token->{tag_name} eq 'br') {
-              if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
-                
-                ## (before head) as if <head>, (in head) as if </head>
-                
+        } elsif ($token->{tag_name} eq 'br') {
+          if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
+            
+            ## (before head) as if <head>, (in head) as if </head>
+            
       $self->{head_element} = $self->{document}->create_element_ns
         ($HTML_NS, [undef,  'head']);
     
@@ -2838,46 +2838,41 @@ sub _tree_construction_main ($) {
         $self->{head_element}->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-                $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
-                $self->{insertion_mode} = AFTER_HEAD_IM;
+            $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
+            $self->{insertion_mode} = AFTER_HEAD_IM;
   
-                ## Reprocess in the "after head" insertion mode...
-              } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
-                
-                ## As if </head>
-                pop @{$self->{open_elements}};
-                $self->{insertion_mode} = AFTER_HEAD_IM;
+            ## Reprocess in the "after head" insertion mode...
+          } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
+            
+            ## As if </head>
+            pop @{$self->{open_elements}};
+            $self->{insertion_mode} = AFTER_HEAD_IM;
   
-                ## Reprocess in the "after head" insertion mode...
-              } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
-                
-                ## NOTE: Two parse errors for <head><noscript></br>
-                $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                                text => 'br', token => $token);
-                ## As if </noscript>
-                pop @{$self->{open_elements}};
-                $self->{insertion_mode} = IN_HEAD_IM;
+            ## Reprocess in the "after head" insertion mode...
+          } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
+            
+            ## NOTE: Two parse errors for <head><noscript></br>
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
+                            text => 'br', token => $token);
+            ## As if </noscript>
+            pop @{$self->{open_elements}};
+            $self->{insertion_mode} = IN_HEAD_IM;
 
-                ## Reprocess in the "in head" insertion mode...
-                ## As if </head>
-                pop @{$self->{open_elements}};
-                $self->{insertion_mode} = AFTER_HEAD_IM;
+            ## Reprocess in the "in head" insertion mode...
+            ## As if </head>
+            pop @{$self->{open_elements}};
+            $self->{insertion_mode} = AFTER_HEAD_IM;
 
-                ## Reprocess in the "after head" insertion mode...
-              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
-                
-                #
-              } else {
-                die "$0: $self->{insertion_mode}: Unknown insertion mode";
-              }
+            ## Reprocess in the "after head" insertion mode...
+          } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
+            
+            #
+          } else {
+            die "$0: $self->{insertion_mode}: Unknown insertion mode";
+          }
 
-              ## ISSUE: does not agree with IE7 - it doesn't ignore </br>.
-              $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                              text => 'br', token => $token);
-              ## Ignore the token
-              $token = $self->_get_next_token;
-              next B;
-            } else {
+          #
+        } else { ## Other end tags
               
               $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                               text => $token->{tag_name}, token => $token);
@@ -2936,7 +2931,7 @@ sub _tree_construction_main ($) {
   
             $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
-            next B;
+        next B;
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
           
@@ -5741,7 +5736,7 @@ sub _tree_construction_main ($) {
           next B;
         }
       } elsif ($token->{tag_name} eq 'textarea') {
-        ## Step 1
+        ## 1. Insert
         
     {
       my $el;
@@ -5768,21 +5763,20 @@ sub _tree_construction_main ($) {
     }
   
         
-        ## Step 2
+        ## Step 2 # XXX
         ## TODO: $self->{form_element} if defined
 
-        ## Step 3
+        ## 2. Drop U+000A LINE FEED
         $self->{ignore_newline} = 1;
 
-        ## Step 4
-        ## ISSUE: This step is wrong. (r2302 enbugged)
-
-        ## Step 5
+        ## 3. RCDATA
         $self->{content_model} = RCDATA_CONTENT_MODEL;
         delete $self->{escape}; # MUST
 
-        ## Step 6-7
+        ## 4., 6. Insertion mode
         $self->{insertion_mode} |= IN_CDATA_RCDATA_IM;
+
+        ## XXX: 5. frameset-ok flag
 
         
         $token = $self->_get_next_token;
@@ -6800,4 +6794,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/08/16 04:59:53 $
+# $Date: 2009/08/16 05:15:09 $

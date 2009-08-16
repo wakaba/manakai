@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 16 13:57:01 2009
-# Current time GMT:   Sun Aug 16 04:57:01 2009
+# Current time local: Sun Aug 16 14:14:14 2009
+# Current time GMT:   Sun Aug 16 05:14:14 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -618,7 +618,12 @@ ok 524
 ok 525
 ok 526
 ok 527
-ok 528
+not ok 528
+# Test 528 got: "<html>\n  <head>\n  <body>\n    <br>\n    <p>\n" (t/HTML-tree.t at line 98 fail #176)
+#     Expected: "<html>\n  <head>\n  <body>\n" (Document tree: qq'</strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>')
+#     Got 2 extra lines at line 4:
+#      + "    <br>\n"
+#      + "    <p>\n"
 ok 529
 ok 530
 ok 531
