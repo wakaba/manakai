@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.226 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.227 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -911,11 +911,15 @@ sub _tree_construction_initial ($) {
 
   INITIAL: {
     if ($token->{type} == DOCTYPE_TOKEN) {
-      ## NOTE: Conformance checkers MAY, instead of reporting "not HTML5"
-      ## error, switch to a conformance checking mode for another 
-      ## language.
+      ## NOTE: Conformance checkers MAY, instead of reporting "not
+      ## HTML5" error, switch to a conformance checking mode for
+      ## another language.  (We don't support such mode switchings; it
+      ## is nonsense to do anything different from what browsers do.)
       my $doctype_name = $token->{name};
       $doctype_name = '' unless defined $doctype_name;
+      my $doctype = $self->{document}->create_document_type_definition
+          ($doctype_name);
+
       $doctype_name =~ tr/a-z/A-Z/; # ASCII case-insensitive
       if (not defined $token->{name} or # <!DOCTYPE>
           defined $token->{sysid}) {
@@ -937,12 +941,11 @@ sub _tree_construction_initial ($) {
         #
       }
       
-      my $doctype = $self->{document}->create_document_type_definition
-        ($token->{name}); ## ISSUE: If name is missing (e.g. <!DOCTYPE>)?
       ## NOTE: Default value for both |public_id| and |system_id| attributes
       ## are empty strings, so that we don't set any value in missing cases.
       $doctype->public_id ($token->{pubid}) if defined $token->{pubid};
       $doctype->system_id ($token->{sysid}) if defined $token->{sysid};
+
       ## NOTE: Other DocumentType attributes are null or empty lists.
       ## In Firefox3, |internalSubset| attribute is set to the empty
       ## string, while |null| is an allowed value for the attribute
@@ -5757,4 +5760,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/08/16 06:26:14 $
+# $Date: 2009/08/16 06:31:20 $
