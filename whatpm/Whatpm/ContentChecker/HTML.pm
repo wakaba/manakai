@@ -6843,6 +6843,18 @@ $Element->{$HTML_NS}->{script} = {
     src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
   }),
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my $el = $item->{node};
+    if ($el->has_attribute_ns (undef, 'defer') and
+        not $el->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $el,
+                         type => 'attribute missing',
+                         text => 'src',
+                         level => $self->{level}->{must});
+    }
+  },
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 

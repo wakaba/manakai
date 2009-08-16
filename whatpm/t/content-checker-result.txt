@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 16 16:19:00 2009
-# Current time GMT:   Sun Aug 16 07:19:00 2009
+# Current time local: Sun Aug 16 16:38:14 2009
+# Current time GMT:   Sun Aug 16 07:38:14 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1510,22 +1510,9 @@ ok 1442
 ok 1443
 ok 1444
 ok 1445
-not ok 1446
-# Test 1446 got: "/a/bb;element not allowed:minus;m\n/a/bb;element not defined;m" (t/content-checker.pl at line 68 fail #1446)
-#      Expected: "/a/bb;element not allowed:minus;m" (<a xmlns="http://www.w3.org/1999/xhtml">
-#<bb>x</bb>
-#</a>)
-not ok 1447
-# Test 1447 got: "/a/span/bb;element not allowed:minus;m\n/a/span/bb;element not defined;m" (t/content-checker.pl at line 68 fail #1447)
-#      Expected: "/a/span/bb;element not allowed:minus;m" (<a xmlns="http://www.w3.org/1999/xhtml">
-#<span><bb>x</bb></span>
-#</a>)
-not ok 1448
-# Test 1448 got: "/div/a/bb;element not allowed:minus;m\n/div/a/bb;element not defined;m\n/div/bb;element not defined;m" (t/content-checker.pl at line 68 fail #1448)
-#      Expected: "/div/a/bb;element not allowed:minus;m" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<a><bb>x</bb></a>
-#<bb>y</bb>
-#</div>)
+ok 1446
+ok 1447
+ok 1448
 ok 1449
 ok 1450
 ok 1451
@@ -5385,7 +5372,10 @@ ok 5115
 ok 5116
 ok 5117
 ok 5118
-ok 5119
+not ok 5119
+# Test 5119 got: "/script/@defer;boolean:invalid;m" (t/content-checker.pl at line 68 fail #5119)
+#      Expected: "/script/@defer;boolean:invalid;m\n/script;attribute missing;src;m" (<script src="http://test/" defer="true"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 5120
 ok 5121
 ok 5122
@@ -5596,9 +5586,12 @@ ok 5322
 ok 5323
 ok 5324
 ok 5325
-# t/dom-conformance/html-repetitions.dat
+# t/dom-conformance/html-scripting-2.dat
 ok 5326
-ok 5327
+not ok 5327
+# Test 5327 got: "" (t/content-checker.pl at line 68 fail #5327)
+#      Expected: "/script;SUBDOC" (<script src="" defer="" xmlns="http://www.w3.org/1999/xhtml"></script>)
+# t/dom-conformance/html-repetitions.dat
 ok 5328
 ok 5329
 ok 5330
@@ -5658,9 +5651,9 @@ ok 5383
 ok 5384
 ok 5385
 ok 5386
-# t/dom-conformance/html-datatemplate.dat
 ok 5387
 ok 5388
+# t/dom-conformance/html-datatemplate.dat
 ok 5389
 ok 5390
 ok 5391
@@ -5988,3 +5981,5 @@ ok 5712
 ok 5713
 ok 5714
 ok 5715
+ok 5716
+ok 5717

@@ -28,9 +28,10 @@ test_files (qw[
   t/dom-conformance/html-form-textarea.dat
   t/dom-conformance/html-interactive-1.dat
   t/dom-conformance/html-scripting-1.dat
+  t/dom-conformance/html-scripting-2.dat
   t/dom-conformance/html-repetitions.dat
   t/dom-conformance/html-datatemplate.dat
 ]);
 
 ## License: Public Domain.
-## $Date: 2009/06/28 10:48:30 $
+## $Date: 2009/08/16 07:42:07 $

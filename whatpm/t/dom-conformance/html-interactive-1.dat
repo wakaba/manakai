@@ -686,6 +686,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <script defer="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script;SUBDOC
+/script;attribute missing;src;m
 
 #data
 <script src="http://test/" defer=""
@@ -696,6 +697,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <script defer="defer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script;SUBDOC
+/script;attribute missing;src;m
 
 #data
 <script src="http://test/" defer="defer"
@@ -706,12 +708,14 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <script defer="DEFER" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script;SUBDOC
+/script;attribute missing;src;m
 
 #data
 <script defer="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@defer;boolean:invalid;m
 /script;SUBDOC
+/script;attribute missing;src;m
 
 #data
 <script src="http://test/" defer="true"
@@ -760,11 +764,13 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <script defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script;SUBDOC
+/script;attribute missing;src;m
 
 #data
 <script defer="defer" async="async" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script;SUBDOC
+/script;attribute missing;src;m
 
 #data
 <script src="" defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
