@@ -783,7 +783,7 @@
 
 {"description":"< in before attribute name state",
 "input":"<p <div>",
-"output":[["StartTag", "p", {"<div":""}]]},
+"output":["ParseError", ["StartTag", "p", {"<div":""}]]},
 
 {"description":"VT in before attribute name state",
 "input":"<p \u000bx>",
@@ -791,7 +791,7 @@
 
 {"description":"< in attribute name state",
 "input":"<p align<div>",
-"output":[["StartTag", "p", {"align<div":""}]]},
+"output":["ParseError", ["StartTag", "p", {"align<div":""}]]},
 
 {"description":"VT in attribute name state",
 "input":"<p a\u000bc>",
@@ -799,7 +799,7 @@
 
 {"description":"< in after attribute name state",
 "input":"<p align <div>",
-"output":[["StartTag", "p", {"align":"","<div":""}]]},
+"output":["ParseError", ["StartTag", "p", {"align":"","<div":""}]]},
 
 {"description":"VT in after attribute name state",
 "input":"<p a \u000bb>",
@@ -807,7 +807,7 @@
 
 {"description":"< in before attribute value state",
 "input":"<p align=<div>",
-"output":[["StartTag", "p", {"align":"<div"}]]},
+"output":["ParseError", ["StartTag", "p", {"align":"<div"}]]},
 
 {"description":"VT in before attribute value state",
 "input":"<p a=\u000bc>",
@@ -815,7 +815,7 @@
 
 {"description":"< in attribute value (unquoted) state",
 "input":"<p align=left<div>",
-"output":[["StartTag", "p", {"align":"left<div"}]]},
+"output":["ParseError", ["StartTag", "p", {"align":"left<div"}]]},
 
 {"description":"VT in attribute value (unquoted) state",
 "input":"<p align=left\u000bc>",

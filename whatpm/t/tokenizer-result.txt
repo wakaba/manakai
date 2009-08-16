@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 16 12:55:33 2009
-# Current time GMT:   Sun Aug 16 03:55:33 2009
+# Current time local: Sun Aug 16 14:24:14 2009
+# Current time GMT:   Sun Aug 16 05:24:14 2009
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -217,7 +217,11 @@ ok 170
 ok 171
 ok 172
 # t/tokenizer/test4.test
-ok 173
+not ok 173
+# Test 173 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              0 => qq'',\n              qq'<' => qq''\n            }\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #173)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              0 => qq'',\n              qq'<' => qq''\n            }\n          ]\n        ];\n" (< in attribute name: qq'<z/0  <')
+#     Got 1 extra line at line 4:
+#      + "          qq'ParseError',\n"
 not ok 174
 # Test 174 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              qq'x' => qq'<'\n            }\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #174)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              qq'x' => qq'<'\n            }\n          ]\n        ];\n" (< in attribute value: qq'<z x=<')
@@ -1156,17 +1160,9 @@ ok 1038
 ok 1039
 ok 1040
 ok 1041
-not ok 1042
-# Test 1042 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'p',\n            {\n              qq'align' => qq'<div'\n            }\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1042)
-#      Expected: "$VAR1 = [\n          [\n            qq'StartTag',\n            qq'p',\n            {\n              qq'align' => qq'<div'\n            }\n          ]\n        ];\n" (< in before attribute value state: qq'<p align=<div>')
-#      Got 1 extra line at line 2:
-#       + "          qq'ParseError',\n"
+ok 1042
 ok 1043
-not ok 1044
-# Test 1044 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'p',\n            {\n              qq'align' => qq'left<div'\n            }\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1044)
-#      Expected: "$VAR1 = [\n          [\n            qq'StartTag',\n            qq'p',\n            {\n              qq'align' => qq'left<div'\n            }\n          ]\n        ];\n" (< in attribute value (unquoted) state: qq'<p align=left<div>')
-#      Got 1 extra line at line 2:
-#       + "          qq'ParseError',\n"
+ok 1044
 ok 1045
 ok 1046
 ok 1047

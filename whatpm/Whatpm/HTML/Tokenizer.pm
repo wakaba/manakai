@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -1248,6 +1248,7 @@ sub _get_next_token ($) {
         if ({
              0x0022 => 1, # "
              0x0027 => 1, # '
+             0x003C => 1, # <
              0x003D => 1, # =
             }->{$self->{nc}}) {
           
@@ -1430,8 +1431,11 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        if ($self->{nc} == 0x0022 or # "
-            $self->{nc} == 0x0027) { # '
+        if ({
+             0x0022 => 1, # "
+             0x0027 => 1, # '
+             0x003C => 1, # <
+            }->{$self->{nc}}) {
           
           ## XML5: Not a parse error.
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
@@ -1602,8 +1606,11 @@ sub _get_next_token ($) {
           
         }
 
-        if ($self->{nc} == 0x0022 or # "
-            $self->{nc} == 0x0027) { # '
+        if ({
+             0x0022 => 1, # "
+             0x0027 => 1, # '
+             0x003C => 1, # <
+            }->{$self->{nc}}) {
           
           ## XML5: Not a parse error.
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
@@ -8699,5 +8706,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/08/16 04:06:34 $
+## $Date: 2009/08/16 05:24:47 $
                                 
