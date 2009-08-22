@@ -1,0 +1,134 @@
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    challenge=""/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    challenge="aaa"/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    keytype="rsa"/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    keytype="RSA"/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    keytype="abc"/>
+#errors
+/keygen/@keytype;enumerated:invalid;m
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    autofocus=""/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="autofocus"/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="AutoFocus"/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    autofocus="true"/>
+#errors
+/keygen/@autofocus;boolean:invalid;m
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    disabled=""/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    disabled="Disabled"/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    disabled="disabled"/>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    disabled="enable"/>
+#errors
+/keygen/@disabled;boolean:invalid;m
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    name=""/>
+#errors
+/keygen/@name;empty control name;m
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    name="abc"/>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<keygen/>a
+</p>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<keygen/>a
+</div>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<keygen/>a
+</em>
+#errors
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml">
+<keygen/>
+</hr>
+#errors
+/hr/keygen;element not allowed:empty;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<ins><keygen/>a</ins>
+</p>
+#errors
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">
+<legend>b</legend>
+<keygen/>a
+</fieldset>
+#errors
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml">
+<option>a</option>
+</keygen>
+#errors
+/keygen/option;element not allowed:empty;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<keygen/>a
+</a>
+#errors
+/a/keygen;element not allowed:minus;m

@@ -923,6 +923,19 @@ disabled="">z</output>
 #errors
 
 #data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    form=""/>
+#errors
+/keygen/@form;no referenced form;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml" id="a">
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    form="a"/>a
+</form>
+#errors
+
+#data
 <form xmlns="http://www.w3.org/1999/xhtml"
     action=""
     accept="">x</form>

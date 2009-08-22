@@ -223,8 +223,8 @@ my $HTMLFlowContent = {
     script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
     command => 1, bb => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
-    textarea => 1, output => 1,
-    datagrid => 1, ## ISSUE: "Interactive element" in the spec.
+    textarea => 1, keygen => 1, output => 1,
+    datagrid => 1,
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
 
@@ -276,8 +276,8 @@ my $HTMLPhrasingContent = {
     script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
     command => 1, bb => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
-    textarea => 1, output => 1,
-    datagrid => 1, ## ISSUE: "Interactive element" in the spec.
+    textarea => 1, keygen => 1, output => 1,
+    datagrid => 1,
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
 
@@ -305,7 +305,7 @@ my $HTMLInteractiveContent = {
   $HTML_NS => {
     a => 1,
     label => 1, input => 1, button => 1, select => 1, textarea => 1,
-    details => 1, datagrid => 1, bb => 1,
+    keygen => 1, details => 1, datagrid => 1, bb => 1,
 
     ## NOTE: When "controls" attribute is specified.
     video => 1, audio => 1,
@@ -318,7 +318,7 @@ my $HTMLInteractiveContent = {
 ## NOTE: Labelable form-associated element.
 my $LabelableFAE = {
   $HTML_NS => {
-    input => 1, button => 1, select => 1, textarea => 1, 
+    input => 1, button => 1, select => 1, textarea => 1, keygen => 1,
   },
 };
 
@@ -6781,7 +6781,39 @@ $Element->{$HTML_NS}->{textarea} = {
     
     $FAECheckAttrs2->($self, $item, $element_state);
   }, # check_attrs2
-};
+}; # textarea
+
+$Element->{$HTML_NS}->{keygen} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_FD,
+  check_attrs => $GetHTMLAttrsChecker->({
+    autofocus => $AutofocusAttrChecker,
+    challenge => sub { }, ## No constraints.
+    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    form => $HTMLFormAttrChecker,
+    keytype => $GetHTMLEnumeratedAttrChecker->({rsa => 1}),
+    name => $FormControlNameAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    autofocus => FEATURE_HTML5_LC,
+    challenge => FEATURE_HTML5_FD,
+    disabled => FEATURE_HTML5_LC,
+    form => FEATURE_HTML5_LC,
+    keytype => FEATURE_HTML5_FD,
+    name => FEATURE_HTML5_LC,
+  }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $FAECheckStart->($self, $item, $element_state);
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  }, # check_start
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    $FAECheckAttrs2->($self, $item, $element_state);
+  }, # check_attrs2
+}; # keygen
 
 $Element->{$HTML_NS}->{output} = {
   %HTMLPhrasingContentChecker,
