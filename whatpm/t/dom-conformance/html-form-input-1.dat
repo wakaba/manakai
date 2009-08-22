@@ -12878,3 +12878,47 @@
     value="http://test/[44::]/"/>
 #errors
 /input/@value;syntax error:iriref3987;m
+
+#data
+<input type="tel" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<input type="tel" xmlns="http://www.w3.org/1999/xhtml"
+    value=""/>
+#errors
+
+#data
+<input type="tel" xmlns="http://www.w3.org/1999/xhtml"
+    value="xxx"/>
+#errors
+
+#data
+<input type="tel" xmlns="http://www.w3.org/1999/xhtml"
+    maxlength="65" value=""/>
+#errors
+
+#data
+<input type="tel" xmlns="http://www.w3.org/1999/xhtml"
+    value="xxx&#xa;"/>
+#errors
+/input/@value;newline in value;m
+
+#data
+<input type="tel" xmlns="http://www.w3.org/1999/xhtml"
+    min="1" max="10"/>
+#errors
+/input/@min;input attr not applicable;tel;m
+/input/@max;input attr not applicable;tel;m
+
+#data
+<input type="tel" xmlns="http://www.w3.org/1999/xhtml"
+    alt="x"/>
+#errors
+/input/@alt;input attr not applicable;tel;m
+
+#data
+<input type="tel" xmlns="http://www.w3.org/1999/xhtml"
+    multiple=""/>
+#errors
+/input/@multiple;input attr not applicable;tel;m

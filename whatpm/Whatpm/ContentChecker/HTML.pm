@@ -215,6 +215,7 @@ my $HTMLFlowContent = {
     ## non-inter-element-whitespace text node.
     style => 1,  
 
+    ## These phrasing content are also categorized as flow content.
     br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
@@ -226,21 +227,24 @@ my $HTMLFlowContent = {
     datagrid => 1, ## ISSUE: "Interactive element" in the spec.
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
-    
-    ## NOTE: Transparent.
+
+    ## Flow/phrasing content whose content model is transparent.
     a => 1, ins => 1, del => 1, font => 1,
 
     ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
     menu => 1,
 
+    ## These embeded content are also categorized as flow content.
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
     canvas => 1,
   },
 
-  ## NOTE: Embedded
+  ## These embedded content are also categorized as flow content.
   q<http://www.w3.org/1998/Math/MathML> => {math => 1},
   q<http://www.w3.org/2000/svg> => {svg => 1},
-};
+
+  ## And, non-inter-element-whitespace text nodes.
+}; # $HTMLFlowContent
 
 my $HTMLSectioningContent = {
   $HTML_NS => {
@@ -283,16 +287,17 @@ my $HTMLPhrasingContent = {
     ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
     menu => 1,
 
+    ## These embedded content is also categorized as phrasing content.
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
     canvas => 1,
   },
 
-  ## NOTE: Embedded
+  ## These embedded content is also categorized as phrasing content.
   q<http://www.w3.org/1998/Math/MathML> => {math => 1},
   q<http://www.w3.org/2000/svg> => {svg => 1},
 
-  ## NOTE: And non-inter-element-whitespace text nodes.
-};
+  ## And, non-inter-element-whitespace text nodes.
+}; # $HTMLPhrasingContent
 
 ## $HTMLEmbeddedContent: See Whatpm::ContentChecker.
 
@@ -5810,7 +5815,7 @@ $Element->{$HTML_NS}->{input} = {
          target => '',
          type => $GetHTMLEnumeratedAttrChecker->({
            hidden => 1, text => 1, search => 1, url => 1,
-           email => 1, password => 1,
+           tel => 1, email => 1, password => 1,
            datetime => 1, date => 1, month => 1, week => 1, time => 1,
            'datetime-local' => 1, number => 1, range => 1, color => 1,
            checkbox => 1,
@@ -5998,7 +6003,7 @@ $Element->{$HTML_NS}->{input} = {
              ## has no author requirement.
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
-          } else { # Text, Search, E-mail, URL, Password
+          } else { # Text, Search, E-mail, URL, Telephone, Password
             $checker =
             {
              autocomplete => $GetHTMLEnumeratedAttrChecker->({

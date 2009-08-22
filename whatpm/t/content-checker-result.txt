@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Aug 22 14:11:16 2009
-# Current time GMT:   Sat Aug 22 05:11:16 2009
+# Current time local: Sat Aug 22 14:34:22 2009
+# Current time GMT:   Sat Aug 22 05:34:22 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -4951,10 +4951,7 @@ ok 4702
 ok 4703
 ok 4704
 ok 4705
-not ok 4706
-# Test 4706 got: "/input/@alt;input attr not applicable;text;m\n/input/@width;input attr not applicable;text;m" (t/content-checker.pl at line 68 fail #4706)
-#      Expected: "/input/@width;input attr not applicable;text;m" (<input type="text" xmlns="http://www.w3.org/1999/xhtml"
-#    width="120" alt="x"/>)
+ok 4706
 ok 4707
 ok 4708
 ok 4709
@@ -4965,12 +4962,8 @@ ok 4713
 ok 4714
 ok 4715
 ok 4716
-not ok 4717
-# Test 4717 got: "/input/@value;email:syntax error;m" (t/content-checker.pl at line 68 fail #4717)
-#      Expected: "" (<input type="email" xmlns="http://www.w3.org/1999/xhtml"
-#    value="http://test/[44::]/"/>)
+ok 4717
 ok 4718
-# t/dom-conformance/html-form-button.dat
 ok 4719
 ok 4720
 ok 4721
@@ -4979,6 +4972,7 @@ ok 4723
 ok 4724
 ok 4725
 ok 4726
+# t/dom-conformance/html-form-button.dat
 ok 4727
 ok 4728
 ok 4729
@@ -5080,7 +5074,6 @@ ok 4824
 ok 4825
 ok 4826
 ok 4827
-# t/dom-conformance/html-form-select.dat
 ok 4828
 ok 4829
 ok 4830
@@ -5089,6 +5082,7 @@ ok 4832
 ok 4833
 ok 4834
 ok 4835
+# t/dom-conformance/html-form-select.dat
 ok 4836
 ok 4837
 ok 4838
@@ -5167,7 +5161,6 @@ ok 4910
 ok 4911
 ok 4912
 ok 4913
-# t/dom-conformance/html-form-datalist.dat
 ok 4914
 ok 4915
 ok 4916
@@ -5176,6 +5169,7 @@ ok 4918
 ok 4919
 ok 4920
 ok 4921
+# t/dom-conformance/html-form-datalist.dat
 ok 4922
 ok 4923
 ok 4924
@@ -5224,7 +5218,6 @@ ok 4966
 ok 4967
 ok 4968
 ok 4969
-# t/dom-conformance/html-form-textarea.dat
 ok 4970
 ok 4971
 ok 4972
@@ -5233,6 +5226,7 @@ ok 4974
 ok 4975
 ok 4976
 ok 4977
+# t/dom-conformance/html-form-textarea.dat
 ok 4978
 ok 4979
 ok 4980
@@ -5295,7 +5289,6 @@ ok 5036
 ok 5037
 ok 5038
 ok 5039
-# t/dom-conformance/html-interactive-1.dat
 ok 5040
 ok 5041
 ok 5042
@@ -5304,6 +5297,7 @@ ok 5044
 ok 5045
 ok 5046
 ok 5047
+# t/dom-conformance/html-interactive-1.dat
 ok 5048
 ok 5049
 ok 5050
@@ -5545,7 +5539,6 @@ ok 5285
 ok 5286
 ok 5287
 ok 5288
-# t/dom-conformance/html-scripting-1.dat
 ok 5289
 ok 5290
 ok 5291
@@ -5554,13 +5547,11 @@ ok 5293
 ok 5294
 ok 5295
 ok 5296
+# t/dom-conformance/html-scripting-1.dat
 ok 5297
 ok 5298
 ok 5299
-not ok 5300
-# Test 5300 got: "/frameset/@onpopstate;attribute not defined;m\n/frameset/@onpopstate;event handler;u\n/frameset;element not defined;m" (t/content-checker.pl at line 68 fail #5300)
-#      Expected: "/frameset/@onpopstate;event handler;u\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml"
-#    onpopstate=""/>)
+ok 5300
 ok 5301
 ok 5302
 ok 5303
@@ -5599,18 +5590,18 @@ ok 5335
 ok 5336
 ok 5337
 ok 5338
-# t/dom-conformance/html-scripting-2.dat
 ok 5339
 ok 5340
-# t/dom-conformance/html-repetitions.dat
 ok 5341
 ok 5342
 ok 5343
 ok 5344
 ok 5345
 ok 5346
+# t/dom-conformance/html-scripting-2.dat
 ok 5347
 ok 5348
+# t/dom-conformance/html-repetitions.dat
 ok 5349
 ok 5350
 ok 5351
@@ -5664,7 +5655,6 @@ ok 5398
 ok 5399
 ok 5400
 ok 5401
-# t/dom-conformance/html-datatemplate.dat
 ok 5402
 ok 5403
 ok 5404
@@ -5673,6 +5663,7 @@ ok 5406
 ok 5407
 ok 5408
 ok 5409
+# t/dom-conformance/html-datatemplate.dat
 ok 5410
 ok 5411
 ok 5412
@@ -5994,3 +5985,11 @@ ok 5727
 ok 5728
 ok 5729
 ok 5730
+ok 5731
+ok 5732
+ok 5733
+ok 5734
+ok 5735
+ok 5736
+ok 5737
+ok 5738
