@@ -971,7 +971,6 @@ disabled="">z</output>
     action=""
     accept="text/plain, text/html">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1010,7 +1009,6 @@ disabled="">z</output>
     action=""
     accept=" image/png ">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1112,6 +1110,14 @@ disabled="">z</output>
     accept="image/png,video/*">x</form>
 #errors
 /form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept="image/ png,video/*">x</form>
+#errors
+/form/@accept;attribute not defined;m
+/form/@accept;IMTnp:syntax error;m
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"

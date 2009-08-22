@@ -3282,7 +3282,22 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
+    accept="  "/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
     accept=","/>
+#errors
+/input/@accept;IMTnp:syntax error;m
+/input/@accept;duplicate token;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="  , "/>
 #errors
 /input/@accept;IMTnp:syntax error;m
 /input/@accept;duplicate token;m
@@ -3304,7 +3319,6 @@
     type="file"
     accept="text/plain, text/html"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3338,7 +3352,6 @@
     type="file"
     accept=" image/png "/>
 #errors
-/input/@accept;IMTnp:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3462,6 +3475,19 @@
     type="file"
     accept="application/XML"/>
 #errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="  application/XML, text/html "/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="application/XML, ,image/png"/>
+#errors
+/input/@accept;IMTnp:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"

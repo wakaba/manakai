@@ -596,8 +596,8 @@ my $HTMLSpaceURIsAttrChecker = sub {
 my $ValidEmailAddress;
 {
   my $atext = qr[[A-Za-z0-9!#\$%&'*+/=?^_`{|}~-]];
-  my $dot_atom = qr/$atext+(?>\.$atext+)*/;
-  $ValidEmailAddress = qr/$dot_atom\@$dot_atom/;
+  my $dot_atom = qr/$atext+(?>\.$atext+)*/o;
+  $ValidEmailAddress = qr/$dot_atom\@$dot_atom/o;
 }
 
 ## Valid global date and time.
@@ -830,9 +830,15 @@ my $AcceptAttrChecker = sub {
   
   my $value = $attr->value;
   $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+
+  ## A set of comma-separated tokens.
   my @value = length $value ? split /,/, $value, -1 : ('');
+
   my %has_value;
   for my $v (@value) {
+    $v =~ s/^[\x09\x0A\x0C\x0D\x20]+//;
+    $v =~ s/[\x09\x0A\x0C\x0D\x20]+\z//;
+
     if ($has_value{$v}) {
       $self->{onerror}->(node => $attr,
                          type => 'duplicate token',
@@ -6121,12 +6127,14 @@ $Element->{$HTML_NS}->{input} = {
                  $HTMLURIAttrChecker->(@_);
                } elsif ($state eq 'email') {
                  if ($item->{node}->has_attribute_ns (undef, 'multiple')) {
+                   ## A set of comma-separated tokens.
                    my @addr = split /,/, $attr->value, -1;
                    @addr = ('') unless @addr;
                    for (@addr) {
                      s/\A[\x09\x0A\x0C\x0D\x20]+//;
                      s/[\x09\x0A\x0C\x0D\x20]\z//;
-                     unless (/\A$ValidEmailAddress\z/) {
+
+                     unless (/\A$ValidEmailAddress\z/o) {
                        $self->{onerror}->(node => $attr,
                                           type => 'email:syntax error', ## TODO: type
                                           value => $_,
