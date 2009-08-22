@@ -12812,6 +12812,7 @@
     width="120" alt="x"/>
 #errors
 /input/@width;input attr not applicable;text;m
+/input/@alt;input attr not applicable;text;m
 
 #data
 <input type="image" xmlns="http://www.w3.org/1999/xhtml"
@@ -12834,3 +12835,46 @@
     height="120"/>
 #errors
 /input/@height;input attr not applicable;text;m
+
+#data
+<input type="url" xmlns="http://www.w3.org/1999/xhtml"
+    value=""/>
+#errors
+
+#data
+<input type="url" xmlns="http://www.w3.org/1999/xhtml"
+    value="http://www.test.exmaple/"/>
+#errors
+
+#data
+<input type="url" xmlns="http://www.w3.org/1999/xhtml"
+    value="http://test/[44::]/"/>
+#errors
+/input/@value;syntax error:iriref3987;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    value="http://test/[44::]/"/>
+#errors
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    value="http://test/[44::]/"/>
+#errors
+
+#data
+<input type="password" xmlns="http://www.w3.org/1999/xhtml"
+    value="http://test/[44::]/"/>
+#errors
+
+#data
+<input type="email" xmlns="http://www.w3.org/1999/xhtml"
+    value="http://test/[44::]/"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input type="URL" xmlns="http://www.w3.org/1999/xhtml"
+    value="http://test/[44::]/"/>
+#errors
+/input/@value;syntax error:iriref3987;m

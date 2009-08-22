@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Aug 22 14:02:01 2009
-# Current time GMT:   Sat Aug 22 05:02:01 2009
+# Current time local: Sat Aug 22 14:11:16 2009
+# Current time GMT:   Sat Aug 22 05:11:16 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2775,32 +2775,17 @@ ok 2688
 ok 2689
 ok 2690
 ok 2691
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2692
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2693
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2694
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2695
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2696
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2697
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2698
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2699
 ok 2700
-a at Whatpm/ContentChecker/HTML.pm line 338.
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 341.
 ok 2701
-a at Whatpm/ContentChecker/HTML.pm line 338.
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 341.
 ok 2702
-a at Whatpm/ContentChecker/HTML.pm line 338.
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 341.
 ok 2703
 ok 2704
 ok 2705
@@ -2809,12 +2794,10 @@ ok 2707
 ok 2708
 ok 2709
 ok 2710
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2711
 ok 2712
 ok 2713
 ok 2714
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 338.
 ok 2715
 ok 2716
 ok 2717
@@ -2822,39 +2805,11 @@ ok 2718
 ok 2719
 ok 2720
 ok 2721
-a at Whatpm/ContentChecker/HTML.pm line 338.
-ARRAY(0xa8c7670) at Whatpm/ContentChecker/HTML.pm line 341.
-Whatpm::NanoDOM::Element=HASH(0xa8c4b68) at Whatpm/ContentChecker/HTML.pm line 344.
-Whatpm::NanoDOM::Element=HASH(0xa8c4b68) at Whatpm/ContentChecker/HTML.pm line 345.
 ok 2722
-a at Whatpm/ContentChecker/HTML.pm line 338.
-ARRAY(0xa8ca050) at Whatpm/ContentChecker/HTML.pm line 341.
-Whatpm::NanoDOM::Element=HASH(0xa8c76f0) at Whatpm/ContentChecker/HTML.pm line 344.
-Whatpm::NanoDOM::Element=HASH(0xa8c9750) at Whatpm/ContentChecker/HTML.pm line 345.
 ok 2723
-a at Whatpm/ContentChecker/HTML.pm line 338.
-ARRAY(0xa8cfb20) at Whatpm/ContentChecker/HTML.pm line 341.
-Whatpm::NanoDOM::Element=HASH(0xa8cb760) at Whatpm/ContentChecker/HTML.pm line 344.
-Whatpm::NanoDOM::Element=HASH(0xa8cb760) at Whatpm/ContentChecker/HTML.pm line 345.
 ok 2724
-a at Whatpm/ContentChecker/HTML.pm line 338.
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 341.
-a at Whatpm/ContentChecker/HTML.pm line 338.
-ARRAY(0xa8d1e70) at Whatpm/ContentChecker/HTML.pm line 341.
-Whatpm::NanoDOM::Element=HASH(0xa8d00c0) at Whatpm/ContentChecker/HTML.pm line 344.
-Whatpm::NanoDOM::Element=HASH(0xa8d00c0) at Whatpm/ContentChecker/HTML.pm line 345.
 ok 2725
-a at Whatpm/ContentChecker/HTML.pm line 338.
-ARRAY(0xa8d53d0) at Whatpm/ContentChecker/HTML.pm line 341.
-Whatpm::NanoDOM::Element=HASH(0xa8d2070) at Whatpm/ContentChecker/HTML.pm line 344.
-Whatpm::NanoDOM::Element=HASH(0xa8d2070) at Whatpm/ContentChecker/HTML.pm line 345.
-a at Whatpm/ContentChecker/HTML.pm line 338.
-ARRAY(0xa8d53d0) at Whatpm/ContentChecker/HTML.pm line 341.
-Whatpm::NanoDOM::Element=HASH(0xa8d2070) at Whatpm/ContentChecker/HTML.pm line 344.
-Whatpm::NanoDOM::Element=HASH(0xa8d2340) at Whatpm/ContentChecker/HTML.pm line 345.
 ok 2726
-a at Whatpm/ContentChecker/HTML.pm line 338.
-Warning: something's wrong at Whatpm/ContentChecker/HTML.pm line 341.
 ok 2727
 ok 2728
 ok 2729
@@ -5004,15 +4959,18 @@ ok 4707
 ok 4708
 ok 4709
 ok 4710
-# t/dom-conformance/html-form-button.dat
 ok 4711
 ok 4712
 ok 4713
 ok 4714
 ok 4715
 ok 4716
-ok 4717
+not ok 4717
+# Test 4717 got: "/input/@value;email:syntax error;m" (t/content-checker.pl at line 68 fail #4717)
+#      Expected: "" (<input type="email" xmlns="http://www.w3.org/1999/xhtml"
+#    value="http://test/[44::]/"/>)
 ok 4718
+# t/dom-conformance/html-form-button.dat
 ok 4719
 ok 4720
 ok 4721
@@ -5114,7 +5072,6 @@ ok 4816
 ok 4817
 ok 4818
 ok 4819
-# t/dom-conformance/html-form-select.dat
 ok 4820
 ok 4821
 ok 4822
@@ -5123,6 +5080,7 @@ ok 4824
 ok 4825
 ok 4826
 ok 4827
+# t/dom-conformance/html-form-select.dat
 ok 4828
 ok 4829
 ok 4830
@@ -5201,7 +5159,6 @@ ok 4902
 ok 4903
 ok 4904
 ok 4905
-# t/dom-conformance/html-form-datalist.dat
 ok 4906
 ok 4907
 ok 4908
@@ -5210,6 +5167,7 @@ ok 4910
 ok 4911
 ok 4912
 ok 4913
+# t/dom-conformance/html-form-datalist.dat
 ok 4914
 ok 4915
 ok 4916
@@ -5258,7 +5216,6 @@ ok 4958
 ok 4959
 ok 4960
 ok 4961
-# t/dom-conformance/html-form-textarea.dat
 ok 4962
 ok 4963
 ok 4964
@@ -5267,6 +5224,7 @@ ok 4966
 ok 4967
 ok 4968
 ok 4969
+# t/dom-conformance/html-form-textarea.dat
 ok 4970
 ok 4971
 ok 4972
@@ -5329,7 +5287,6 @@ ok 5028
 ok 5029
 ok 5030
 ok 5031
-# t/dom-conformance/html-interactive-1.dat
 ok 5032
 ok 5033
 ok 5034
@@ -5338,6 +5295,7 @@ ok 5036
 ok 5037
 ok 5038
 ok 5039
+# t/dom-conformance/html-interactive-1.dat
 ok 5040
 ok 5041
 ok 5042
@@ -5579,7 +5537,6 @@ ok 5277
 ok 5278
 ok 5279
 ok 5280
-# t/dom-conformance/html-scripting-1.dat
 ok 5281
 ok 5282
 ok 5283
@@ -5588,13 +5545,11 @@ ok 5285
 ok 5286
 ok 5287
 ok 5288
+# t/dom-conformance/html-scripting-1.dat
 ok 5289
 ok 5290
 ok 5291
-not ok 5292
-# Test 5292 got: "/frameset/@onpopstate;attribute not defined;m\n/frameset/@onpopstate;event handler;u\n/frameset;element not defined;m" (t/content-checker.pl at line 68 fail #5292)
-#      Expected: "/frameset/@onpopstate;event handler;u\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml"
-#    onpopstate=""/>)
+ok 5292
 ok 5293
 ok 5294
 ok 5295
@@ -5602,7 +5557,10 @@ ok 5296
 ok 5297
 ok 5298
 ok 5299
-ok 5300
+not ok 5300
+# Test 5300 got: "/frameset/@onpopstate;attribute not defined;m\n/frameset/@onpopstate;event handler;u\n/frameset;element not defined;m" (t/content-checker.pl at line 68 fail #5300)
+#      Expected: "/frameset/@onpopstate;event handler;u\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml"
+#    onpopstate=""/>)
 ok 5301
 ok 5302
 ok 5303
@@ -5633,18 +5591,18 @@ ok 5327
 ok 5328
 ok 5329
 ok 5330
-# t/dom-conformance/html-scripting-2.dat
 ok 5331
 ok 5332
-# t/dom-conformance/html-repetitions.dat
 ok 5333
 ok 5334
 ok 5335
 ok 5336
 ok 5337
 ok 5338
+# t/dom-conformance/html-scripting-2.dat
 ok 5339
 ok 5340
+# t/dom-conformance/html-repetitions.dat
 ok 5341
 ok 5342
 ok 5343
@@ -5698,7 +5656,6 @@ ok 5390
 ok 5391
 ok 5392
 ok 5393
-# t/dom-conformance/html-datatemplate.dat
 ok 5394
 ok 5395
 ok 5396
@@ -5707,6 +5664,7 @@ ok 5398
 ok 5399
 ok 5400
 ok 5401
+# t/dom-conformance/html-datatemplate.dat
 ok 5402
 ok 5403
 ok 5404
@@ -6028,3 +5986,11 @@ ok 5719
 ok 5720
 ok 5721
 ok 5722
+ok 5723
+ok 5724
+ok 5725
+ok 5726
+ok 5727
+ok 5728
+ok 5729
+ok 5730
