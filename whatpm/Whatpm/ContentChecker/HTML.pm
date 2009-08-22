@@ -6333,7 +6333,7 @@ $Element->{$HTML_NS}->{button} = {
   %HTMLPhrasingContentChecker, ## ISSUE: -interactive?
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## ISSUE: In HTML5, no "MUST NOT" for using |action|, |method|,
+    ## XXXISSUE: In HTML5, no "MUST NOT" for using |action|, |method|,
     ## |enctype|, |target|, and |novalidate| with non-|submit|-|type|
     ## |button| elements.
     action => $HTMLURIAttrChecker,
@@ -6345,6 +6345,17 @@ $Element->{$HTML_NS}->{button} = {
       'text/plain' => 1,
     }),
     form => $HTMLFormAttrChecker,
+    formaction => $HTMLURIAttrChecker,
+    formenctype => $GetHTMLEnumeratedAttrChecker->({
+      'application/x-www-form-urlencoded' => 1,
+      'multipart/form-data' => 1,
+      'text/plain' => 1,
+    }),
+    formmethod => $GetHTMLEnumeratedAttrChecker->({
+      get => 1, post => 1, put => 1, delete => 1,
+    }),
+    formnovalidate => $GetHTMLBooleanAttrChecker->('formnovalidate'),
+    formtarget => $HTMLTargetAttrChecker,
     method => $GetHTMLEnumeratedAttrChecker->({
       get => 1, post => 1, put => 1, delete => 1,
     }),
@@ -6368,29 +6379,34 @@ $Element->{$HTML_NS}->{button} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
-    action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    action => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     datafld => FEATURE_HTML4_REC_RESERVED,
     dataformatas => FEATURE_HTML4_REC_RESERVED,
     datasrc => FEATURE_HTML4_REC_RESERVED,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
-    enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
+    formaction => FEATURE_HTML5_LC,
+    formenctype => FEATURE_HTML5_LC,
+    formmethod => FEATURE_HTML5_LC,
+    formnovalidate => FEATURE_HTML5_LC,
+    formtarget => FEATURE_HTML5_LC,
     lang => FEATURE_HTML5_REC,
-    method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    method => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    novalidate => FEATURE_HTML5_DEFAULT,
+    novalidate => FEATURE_HTML5_DROPPED,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onformchange => FEATURE_WF2_INFORMATIVE,
     onforminput => FEATURE_WF2_INFORMATIVE,
     replace => FEATURE_WF2,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     template => FEATURE_HTML5_AT_RISK | FEATURE_WF2, ## TODO: dropped
     type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $FAECheckStart->($self, $item, $element_state);
@@ -6407,7 +6423,7 @@ $Element->{$HTML_NS}->{button} = {
     my ($self, $item, $element_state) = @_;
     $FAECheckAttrs2->($self, $item, $element_state);
   }, # check_attrs2
-};
+}; # button
 
 $Element->{$HTML_NS}->{label} = {
   %HTMLPhrasingContentChecker,
