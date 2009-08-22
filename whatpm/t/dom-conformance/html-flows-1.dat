@@ -435,9 +435,74 @@ para
 #errors
 
 #data
+<hgroup xmlns="http://www.w3.org/1999/xhtml"></hgroup>
+#errors
+/hgroup;element missing:hn;m
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml">   </hgroup>
+#errors
+/hgroup;element missing:hn;m
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml">aa</hgroup>
+#errors
+/hgroup/"aa";character not allowed;m
+/hgroup;element missing:hn;m
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml"><p>a</p></hgroup>
+#errors
+/hgroup/p;element not allowed;m
+/hgroup;element missing:hn;m
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml"><h1>x</h1></hgroup>
+#errors
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml"><h1>x</h1><h2>y</h2></hgroup>
+#errors
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml"><h2>x</h2><h2>x</h2></hgroup>
+#errors
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml"><h2>x</h2><p>y</p></hgroup>
+#errors
+/hgroup/p;element not allowed;m
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml"><ins><h2>a</h2></ins></hgroup>
+#errors
+/hgroup/ins;element not allowed;m
+/hgroup;element missing:hn;m
+
+#data
+<hgroup xmlns="http://www.w3.org/1999/xhtml"><section><h2>a</h2></section></hgroup>
+#errors
+/hgroup/section;element not allowed;m
+/hgroup;element missing:hn;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><hgroup><h1>a</h1></hgroup></em>
+#errors
+/em/hgroup;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><hgroup><h1>a</h1></hgroup></div>
+#errors
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml"><hgroup><h1>a</h1></hgroup></br>
+#errors
+/br/hgroup;element not allowed:empty;m
+
+#data
 <header xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/header;element missing:hn;m
+/header;element missing:hn;w
 /header;no significant content;s
 
 #data
@@ -538,7 +603,7 @@ para
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><header/></header>
 #errors
 /header/header;element not allowed:minus;m
-/header/header;element missing:hn;m
+/header/header;element missing:hn;w
 /header;no significant content;s
 /header/h1;no significant content;s
 /header/header;no significant content;s
@@ -553,7 +618,7 @@ para
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><h1/><header></header></div>
 #errors
-/div/header;element missing:hn;m
+/div/header;element missing:hn;w
 /div;no significant content;s
 /div/h1;no significant content;s
 /div/header;no significant content;s
@@ -561,7 +626,7 @@ para
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><header></header><h1/></div>
 #errors
-/div/header;element missing:hn;m
+/div/header;element missing:hn;w
 /div;no significant content;s
 /div/header;no significant content;s
 /div/h1;no significant content;s
@@ -571,7 +636,7 @@ para
 <header></header></div>
 #errors
 /div;no significant content;s
-/div/header;element missing:hn;m
+/div/header;element missing:hn;w
 /div/header;no significant content;s
 /div/header/h1;no significant content;s
 /div/header;no significant content;s
@@ -580,7 +645,7 @@ para
 <div xmlns="http://www.w3.org/1999/xhtml"><header></header>
 <header><h1/></header></div>
 #errors
-/div/header;element missing:hn;m
+/div/header;element missing:hn;w
 /div;no significant content;s
 /div/header;no significant content;s
 /div/header;no significant content;s
@@ -591,7 +656,7 @@ para
 <header><h1/><header></header></header></div>
 #errors
 /div/header/header;element not allowed:minus;m
-/div/header/header;element missing:hn;m
+/div/header/header;element missing:hn;w
 /div;no significant content;s
 /div/header;no significant content;s
 /div/header/h1;no significant content;s
@@ -602,7 +667,7 @@ para
 <header/><h1/></header></div>
 #errors
 /div/header/header;element not allowed:minus;m
-/div/header/header;element missing:hn;m
+/div/header/header;element missing:hn;w
 /div;no significant content;s
 /div/header;no significant content;s
 /div/header/header;no significant content;s
@@ -612,7 +677,7 @@ para
 <div xmlns="http://www.w3.org/1999/xhtml">
 <header><h1><header></header></h1></header></div>
 #errors
-/div/header/h1/header;element missing:hn;m
+/div/header/h1/header;element missing:hn;w
 /div/header/h1/header;element not allowed:minus;m
 /div;no significant content;s
 /div/header;no significant content;s
@@ -646,7 +711,6 @@ para
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/><section/></header>
 #errors
-/header/section;element not allowed:minus;m
 /header;no significant content;s
 /header/h1;no significant content;s
 /header/p;no significant content;s
@@ -679,7 +743,6 @@ para
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><h1/><section/></header>
 #errors
-/header/section;element not allowed:minus;m
 /header;no significant content;s
 /header/h1;no significant content;s
 /header/section;no significant content;s
@@ -687,7 +750,6 @@ para
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><section><h1/></section></header>
 #errors
-/header/section;element not allowed:minus;m
 /header;no significant content;s
 /header/section;no significant content;s
 /header/section/h1;no significant content;s
@@ -695,15 +757,14 @@ para
 #data
 <header xmlns="http://www.w3.org/1999/xhtml"><aside/></header>
 #errors
-/header/aside;element not allowed:minus;m
-/header;element missing:hn;m
+/header;element missing:hn;w
 /header;no significant content;s
 /header/aside;no significant content;s
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml">xx</header>
 #errors
-/header;element missing:hn;m
+/header;element missing:hn;w
 
 #data
 <header xmlns="http://www.w3.org/1999/xhtml">xx<h1>xx</h1></header>
@@ -728,6 +789,15 @@ para
 </footer>
 #errors
 /footer/header;element not allowed:minus;m
+/footer/header;element missing:hn;w
+
+#data
+<footer xmlns="http://www.w3.org/1999/xhtml">
+  <hgroup><h1>x</h1></hgroup>
+</footer>
+#errors
+/footer/hgroup;element not allowed:minus;m
+/footer/hgroup/h1;element not allowed:minus;m
 
 #data
 <address xmlns="http://www.w3.org/1999/xhtml"></address>
@@ -754,6 +824,12 @@ para
 #data
 <address xmlns="http://www.w3.org/1999/xhtml"><blockquote>aa</blockquote></address>
 #errors
+
+#data
+<address xmlns="http://www.w3.org/1999/xhtml"><hgroup><h1>aa</h1></hgroup></address>
+#errors
+/address/hgroup;element not allowed:minus;m
+/address/hgroup/h1;element not allowed:minus;m
 
 #data
 <address xmlns="http://www.w3.org/1999/xhtml"><header><h1>aa</h1></header></address>
@@ -787,6 +863,7 @@ para
 </address>
 #errors
 /address/header;element not allowed:minus;m
+/address/header;element missing:hn;w
 
 #data
 <li xmlns="http://www.w3.org/1999/xhtml"></li>

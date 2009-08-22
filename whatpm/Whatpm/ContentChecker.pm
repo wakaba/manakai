@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.107 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.108 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -328,6 +328,10 @@ our $IsInHTMLInteractiveContent = sub {
   ## condition or not.  See $HTMLInteractiveContent list defined in
   ## Whatpm::ContentChecler::HTML for the list of all (conditionally
   ## or permanently) interactive content.
+
+  ## The variable name is not good, since this method also returns
+  ## true for non-interactive content as long as the element cannot be
+  ## interactive content.
 
   if ($nsuri eq $HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
     return $el->has_attribute_ns (undef, 'controls');
@@ -1079,4 +1083,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/12/13 04:49:04 $
+# $Date: 2009/08/22 09:05:32 $

@@ -202,7 +202,8 @@ my $HTMLMetadataContent = {
 my $HTMLFlowContent = {
   $HTML_NS => {
     section => 1, nav => 1, article => 1, blockquote => 1, aside => 1,
-    h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, header => 1,
+    h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, hgroup => 1,
+    header => 1,
     footer => 1, address => 1, p => 1, hr => 1, dialog => 1, pre => 1,
     ol => 1, ul => 1, dl => 1, figure => 1, map => 1, table => 1,
     form => 1, fieldset => 1,
@@ -262,7 +263,7 @@ my $HTMLSectioningRoot = {
 
 my $HTMLHeadingContent = {
   $HTML_NS => {
-    h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, header => 1,
+    h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, hgroup => 1,
   },
 };
 
@@ -2699,36 +2700,77 @@ $Element->{$HTML_NS}->{h6} = {%{$Element->{$HTML_NS}->{h1}}};
 
 ## TODO: Explicit sectioning is "encouraged".
 
-# XXX footer in header is disallowed (HTML5 revision 3050)
+$Element->{$HTML_NS}->{hgroup} = {
+  %HTMLChecker,
+  status => FEATURE_HTML5_LC,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state, $element_state2) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+      if ($child_nsuri eq $HTML_NS and $child_ln =~ /\Ah[1-6]\z/) {
+        $element_state2->{has_hn} = 1;
+      }
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln =~ /\Ah[1-6]\z/) {
+      ## NOTE: Use $element_state2 instead of $element_state here so
+      ## that the |h2| element in |<hgroup><ins><h2>| is not counted
+      ## as an |h2| of the |hgroup| element.
+      $element_state2->{has_hn} = 1;
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
+    }
+  }, # check_child_element
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed',
+                         level => $self->{level}->{must});
+    }
+  }, # check_child_text
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    unless ($element_state->{has_hn}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'element missing:hn',
+                         level => $self->{level}->{must});
+    }
+
+    $HTMLChecker{check_end}->(@_);
+  }, # check_end
+}; # hgroup
 
 $Element->{$HTML_NS}->{header} = {
-  status => FEATURE_HTML5_LC,
   %HTMLFlowContentChecker,
+  status => FEATURE_HTML5_LC,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
-                                {$HTML_NS => {qw/header 1 footer 1/}},
-                                $HTMLSectioningContent);
+                                {$HTML_NS => {qw/header 1 footer 1/}});
     $element_state->{has_hn_original} = $self->{flag}->{has_hn};
     $self->{flag}->{has_hn} = 0;
 
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
     unless ($self->{flag}->{has_hn}) {
       $self->{onerror}->(node => $item->{node},
                          type => 'element missing:hn',
-                         level => $self->{level}->{must});
+                         level => $self->{level}->{warn});
     }
     $self->{flag}->{has_hn} ||= $element_state->{has_hn_original};
 
     $HTMLFlowContentChecker{check_end}->(@_);
-  },
-  ## ISSUE: <header><del><h1>...</h1></del></header> is conforming?
-};
+  }, # check_end
+}; # header
 
 $Element->{$HTML_NS}->{footer} = {
   status => FEATURE_HTML5_LC,
@@ -7435,6 +7477,7 @@ $Element->{$HTML_NS}->{legend} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+# XXX
 #    align => $GetHTMLEnumeratedAttrChecker->({
 #      top => 1, bottom => 1, left => 1, right => 1,
 #    }),
@@ -7450,6 +7493,7 @@ $Element->{$HTML_NS}->{legend} = {
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
+    ## XXX This does not work for |<legned><ins><blockquote>|
     if ($item->{parent_state}->{in_figure}) {
       $HTMLFlowContentChecker{check_child_element}->(@_);
     } else {
