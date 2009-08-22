@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Aug 22 18:32:28 2009
-# Current time GMT:   Sat Aug 22 09:32:28 2009
+# Current time local: Sat Aug 22 19:10:00 2009
+# Current time GMT:   Sat Aug 22 10:10:00 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -5494,7 +5494,11 @@ ok 5252
 ok 5253
 ok 5254
 ok 5255
-ok 5256
+not ok 5256
+# Test 5256 got: "/datagrid/div/datagrid;element not defined;m\n/datagrid/div/datagrid;no significant content;s\n/datagrid/div;no significant content;s\n/datagrid;element not defined;m\n/datagrid;no significant content;s" (t/content-checker.pl at line 68 fail #5256)
+#      Expected: "/datagrid/div/datagrid;element not allowed:minus;m\n/datagrid/div/datagrid;element not defined;m\n/datagrid/div/datagrid;no significant content;s\n/datagrid/div;no significant content;s\n/datagrid;element not defined;m\n/datagrid;no significant content;s" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><div><datagrid/></div></datagrid>)
+#      Line 1 is missing:
+#       - "/datagrid/div/datagrid;element not allowed:minus;m\n"
 ok 5257
 ok 5258
 ok 5259

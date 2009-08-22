@@ -555,6 +555,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /bb/datagrid;element not allowed:minus;m
 /bb;element not defined;m
+/bb/datagrid;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -917,31 +918,37 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">  </datagrid>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><!----></datagrid>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">aaa</datagrid>
 #errors
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/></datagrid>
 #errors
 /datagrid;no significant content;s
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><br/></datagrid>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/><p/></datagrid>
@@ -949,6 +956,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 /datagrid;no significant content;s
 /datagrid/p;no significant content;s
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">  <p/>  <p/> </datagrid>
@@ -956,112 +964,132 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 /datagrid;no significant content;s
 /datagrid/p;no significant content;s
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/>&amp;<p/></datagrid>
 #errors
 /datagrid/p;no significant content;s
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><p/><table/></datagrid>
 #errors
 /datagrid;no significant content;s
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><ul/></datagrid>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/></datagrid>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/><table/></datagrid>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/><p/><table/></datagrid>
 #errors
 /datagrid;no significant content;s
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<table/></datagrid>
 #errors
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<select/></datagrid>
 #errors
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<datalist/></datagrid>
 #errors
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<p/><table/></datagrid>
 #errors
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<p/><select/></datagrid>
 #errors
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">xx<p/><datalist/></datagrid>
 #errors
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><table/>aa</datagrid>
 #errors
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><select/>aa</datagrid>
 #errors
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/>aa</datagrid>
 #errors
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datagrid/></datagrid>
 #errors
 /datagrid;no significant content;s
 /datagrid/datagrid;no significant content;s
-/datagrid/datagrid;element not allowed:minus;m
+/datagrid;element not defined;m
+/datagrid/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><div><datagrid/></div></datagrid>
 #errors
-/datagrid/div/datagrid;element not allowed:minus;m
 /datagrid/div/datagrid;no significant content;s
 /datagrid;no significant content;s
 /datagrid/div;no significant content;s
+/datagrid;element not defined;m
+/datagrid/div/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">
 <p><a/></p>
 </datagrid>
 #errors
-/datagrid/p/a;element not allowed:minus;m
 /datagrid;no significant content;s
 /datagrid/p;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">
@@ -1071,6 +1099,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 /datagrid;no significant content;s
 /datagrid/details;no significant content;s
 /datagrid/details/legend;no significant content;s
+/datagrid;element not defined;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -1105,6 +1134,7 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 /a/datagrid;element not allowed:minus;m
 /a/datagrid;no significant content;s
 /a;no significant content;s
+/a/datagrid;element not defined;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -1115,48 +1145,65 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 /a/span/datagrid;no significant content;s
 /a;no significant content;s
 /a/span;no significant content;s
+/a/span/datagrid;element not defined;m
 
 #data
 <datagrid disabled="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
+/datagrid/@disabled;attribute not defined;m
 
 #data
 <datagrid disabled="disabled" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
+/datagrid/@disabled;attribute not defined;m
 
 #data
 <datagrid disabled="Disabled" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
+/datagrid/@disabled;attribute not defined;m
 
 #data
 <datagrid disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid/@disabled;boolean:invalid;m
 /datagrid;no significant content;s
+/datagrid;element not defined;m
+/datagrid/@disabled;attribute not defined;m
 
 #data
 <datagrid multiple="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
+/datagrid/@multiple;attribute not defined;m
 
 #data
 <datagrid multiple="multiple" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
+/datagrid/@multiple;attribute not defined;m
 
 #data
 <datagrid multiple="MULTIPLE" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid;no significant content;s
+/datagrid;element not defined;m
+/datagrid/@multiple;attribute not defined;m
 
 #data
 <datagrid multiple="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid/@multiple;boolean:invalid;m
 /datagrid;no significant content;s
+/datagrid;element not defined;m
+/datagrid/@multiple;attribute not defined;m
 
 #data
 <command xmlns="http://www.w3.org/1999/xhtml"/>

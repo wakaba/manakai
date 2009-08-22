@@ -7207,31 +7207,16 @@ $Element->{$HTML_NS}->{details} = {
 
 $Element->{$HTML_NS}->{datagrid} = {
   %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_WD,
+  status => FEATURE_HTML5_DROPPED,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
   }, {
     %HTMLAttrStatus,
-    disabled => FEATURE_HTML5_WD,
-    multiple => FEATURE_HTML5_WD,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $self->_add_minus_elements ($element_state,
-                                {$HTML_NS => {a => 1, datagrid => 1}});
-
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_remove_minus_elements ($element_state);
-
-    $HTMLFlowContentChecker{check_end}->(@_);
-  },
-};
+    disabled => FEATURE_HTML5_DROPPED,
+    multiple => FEATURE_HTML5_DROPPED,
+  }), # check_attrs
+}; # datagrid
 
 $Element->{$HTML_NS}->{command} = {
   %HTMLEmptyChecker,
