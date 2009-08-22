@@ -317,6 +317,46 @@ my $LabelableFAE = {
   },
 };
 
+## Check whether the labelable form-associated element is allowed to
+## place there or not and mark the element ID, if any, might be used
+## in the |for| attribute of a |label| element.
+my $FAECheckStart = sub {
+  my ($self, $item, $element_state) = @_;
+
+  $element_state->{id_type} = 'labelable';
+}; # $FAECheckStart
+my $FAECheckAttrs2 = sub {
+  my ($self, $item, $element_state) = @_;
+
+  ## This must be done in "check_attrs2" phase since it requires the
+  ## |id| attribute of the element, if any, reflected to the
+  ## |$self->{id}| hash.
+
+  CHK: {
+    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
+      my $for = $self->{flag}->{label_for};
+      if (defined $for) {
+        my $id_attrs = $self->{id}->{$for};
+        if ($id_attrs and $id_attrs->[0]) {
+          my $el = $id_attrs->[0]->owner_element;
+          if ($el and $el eq $item->{node}) {
+            ## Even if there is an ancestor |label| element with its
+            ## |for| attribute specified, the attribute value
+            ## identifies THIS element, then there is no problem.
+            last CHK;
+          }
+        }
+      }
+      
+      $self->{onerror}->(node => $item->{node},
+                         type => 'multiple labelable fae',
+                         level => $self->{level}->{must});
+    } else {
+      $self->{flag}->{has_labelable} = 2;
+    }
+  } # CHK
+}; # $FAECheckAttrs2
+
 our $IsInHTMLInteractiveContent; # See Whatpm::ContentChecker.
 
 ## NOTE: $HTMLTransparentElements: See Whatpm::ContentChecker.
@@ -6194,20 +6234,16 @@ $Element->{$HTML_NS}->{input} = {
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
+  }, # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'multiple labelable fae',
-                         level => $self->{level}->{must});
-    } else {
-      $self->{flag}->{has_labelable} = 2;
-    }
-
-    $element_state->{id_type} = 'labelable';
-  },
-};
+    $FAECheckStart->($self, $item, $element_state);
+  }, # check_start
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    $FAECheckAttrs2->($self, $item, $element_state);
+  }, # check_attrs2
+}; # input
 
 ## XXXresource: Dimension attributes have requirements on width and
 ## height of referenced resource.
@@ -6276,13 +6312,7 @@ $Element->{$HTML_NS}->{button} = {
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'multiple labelable fae',
-                         level => $self->{level}->{must});
-    } else {
-      $self->{flag}->{has_labelable} = 2;
-    }
+    $FAECheckStart->($self, $item, $element_state);
 
     ## ISSUE: "The value attribute must not be present unless the form
     ## [content] attribute is present.": Wrong?
@@ -6291,9 +6321,11 @@ $Element->{$HTML_NS}->{button} = {
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-
-    $element_state->{id_type} = 'labelable';
-  },
+  }, # check_start
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    $FAECheckAttrs2->($self, $item, $element_state);
+  }, # check_attrs2
 };
 
 $Element->{$HTML_NS}->{label} = {
@@ -6322,11 +6354,24 @@ $Element->{$HTML_NS}->{label} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {$HTML_NS => {label => 1}});
 
+    ## If $self->{flag}->{has_label} is true, then there is at least
+    ## an ancestor |label| element.
+
+    ## If $self->{flag}->{has_labelable} is equal to 1, then there is
+    ## an ancestor |label| element with its |for| attribute specified.
+    ## If the value is equal to 2, then there is an ancestor |label|
+    ## element with its |for| attribute unspecified but there is an
+    ## associated form control element.
+
     $element_state->{has_label_original} = $self->{flag}->{has_label};
-    $self->{flag}->{has_label} = 1;
     $element_state->{has_labelable_original} = $self->{flag}->{has_labelable};
+    $element_state->{label_for_original} = $self->{flag}->{label_for};
+
+    $self->{flag}->{has_label} = 1;
     $self->{flag}->{has_labelable}
         = $item->{node}->has_attribute_ns (undef, 'for') ? 1 : 0;
+    $self->{flag}->{label_for}
+        = $item->{node}->get_attribute_ns (undef, 'for');
 
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -6341,14 +6386,15 @@ $Element->{$HTML_NS}->{label} = {
     }
     delete $self->{flag}->{has_label}
         unless $element_state->{has_label_original};
+    $self->{flag}->{label_for} = $element_state->{label_for_original};
+
     ## TODO: Warn if no labelable descendant?  <input type=hidden>?
 
     ## NOTE: |<label for=a><input id=a></label>| is non-conforming.
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
   },
-  ## TODO: Tests for <nest/> in <label>
-};
+}; # label
 
 $Element->{$HTML_NS}->{select} = {
   %HTMLChecker,
@@ -6398,21 +6444,17 @@ $Element->{$HTML_NS}->{select} = {
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'multiple labelable fae',
-                         level => $self->{level}->{must});
-    } else {
-      $self->{flag}->{has_labelable} = 2;
-    }
+    $FAECheckStart->($self, $item, $element_state);
 
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-
-    $element_state->{id_type} = 'labelable';
-  },
+  }, # check_start
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    $FAECheckAttrs2->($self, $item, $element_state);
+  }, # check_attrs2
   check_child_element => sub {
     ## NOTE: (option | optgroup)*
 
@@ -6701,19 +6743,11 @@ $Element->{$HTML_NS}->{textarea} = {
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'multiple labelable fae',
-                         level => $self->{level}->{must});
-    } else {
-      $self->{flag}->{has_labelable} = 2;
-    }
+    $FAECheckStart->($self, $item, $element_state);
     
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-
-    $element_state->{id_type} = 'labelable';
   },
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -6739,7 +6773,9 @@ $Element->{$HTML_NS}->{textarea} = {
         }
       }
     }
-  },
+    
+    $FAECheckAttrs2->($self, $item, $element_state);
+  }, # check_attrs2
 };
 
 $Element->{$HTML_NS}->{output} = {

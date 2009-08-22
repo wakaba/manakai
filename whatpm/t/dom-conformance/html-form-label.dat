@@ -335,6 +335,45 @@ x<datalist>x</datalist><input/>
 <label for="a"><input id="a"/>x</label>
 </div>
 #errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input id="a"/>
+<label for="a"><input id="a"/>x</label>
+</div>
+#errors
+/div/label/input/@id;duplicate ID;m
+/div/label/input;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a"><input id="a"/>x</label>
+<input id="a"/>
+</div>
+#errors
+/div/input/@id;duplicate ID;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a"><input/><input id="a"/>x</label>
+</div>
+#errors
+/div/label/input;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a"><input id="a"/><input id="a"/>x</label>
+</div>
+#errors
+/div/label/input/@id;duplicate ID;m
+/div/label/input;multiple labelable fae;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<label for="a"><input/>x</label>
+<input id="a"/>
+</div>
+#errors
 /div/label/input;multiple labelable fae;m
 
 #data
