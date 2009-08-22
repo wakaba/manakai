@@ -205,7 +205,7 @@ my $HTMLFlowContent = {
     h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, hgroup => 1,
     header => 1,
     footer => 1, address => 1, p => 1, hr => 1, dialog => 1, pre => 1,
-    ol => 1, ul => 1, dl => 1, figure => 1, map => 1, table => 1,
+    ol => 1, ul => 1, dl => 1, figure => 1, table => 1,
     form => 1, fieldset => 1,
     details => 1, ## ISSUE: "Flow element" in spec.
     datagrid => 1, ## ISSUE: "Flow element" in spec.
@@ -230,7 +230,7 @@ my $HTMLFlowContent = {
     area => 1,
 
     ## Flow/phrasing content whose content model is transparent.
-    a => 1, ins => 1, del => 1, font => 1,
+    a => 1, ins => 1, del => 1, font => 1, map => 1,
 
     ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
     menu => 1,
@@ -283,7 +283,7 @@ my $HTMLPhrasingContent = {
     area => 1,
 
     ## NOTE: Transparent.    
-    a => 1, ins => 1, del => 1, font => 1,
+    a => 1, ins => 1, del => 1, font => 1, map => 1,
 
     ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
     menu => 1,
@@ -4813,6 +4813,7 @@ $Element->{$HTML_NS}->{map} = {
         my ($self, $attr) = @_;
         my $value = $attr->value;
         if (length $value) {
+          # XXX
           ## NOTE: Duplication is not non-conforming.
           ## NOTE: Space characters are not non-conforming.
           #

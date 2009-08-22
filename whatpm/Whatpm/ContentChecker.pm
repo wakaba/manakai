@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.108 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.109 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -347,14 +347,23 @@ our $IsInHTMLInteractiveContent = sub {
 }; # $IsInHTMLInteractiveContent
 
 my $HTMLTransparentElements = {
-  $HTML_NS => {qw/ins 1 del 1 font 1 noscript 1 canvas 1 a 1/},
-  ## NOTE: |html:noscript| is transparent if scripting is disabled
-  ## and not in |head|.
-};
+  $HTML_NS => {
+    ins => 1, del => 1,
+    font => 1, ## dropped from the spec
+    noscript => 1,
+      ## NOTE: |html:noscript| is transparent if scripting is disabled
+      ## and not in |head|.
+    canvas => 1,
+    a => 1,
+    map => 1,
+  },
+}; # $HTMLTransparentElements
 
+## NOTE: Now that the term "semi-transparent content model" is dropped
+## from the spec, but the concept is not.
 my $HTMLSemiTransparentElements = {
   $HTML_NS => {object => 1, video => 1, audio => 1},
-};
+}; # $HTMLSemiTransparentElements
 
 our $Element = {};
 
@@ -1083,4 +1092,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2009/08/22 09:05:32 $
+# $Date: 2009/08/22 09:35:35 $
