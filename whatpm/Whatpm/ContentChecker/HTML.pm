@@ -5762,7 +5762,7 @@ $Element->{$HTML_NS}->{input} = {
          accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
          'accept-charset' => FEATURE_HTML2X_RFC,
          accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
-         action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         action => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
          align => FEATURE_M12N10_REC_DEPRECATED,
          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          autocomplete => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -5772,8 +5772,13 @@ $Element->{$HTML_NS}->{input} = {
          dataformatas => FEATURE_HTML4_REC_RESERVED,
          datasrc => FEATURE_HTML4_REC_RESERVED,
          disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
-         enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
          form => FEATURE_HTML5_LC | FEATURE_WF2X,
+         formaction => FEATURE_HTML5_LC,
+         formenctype => FEATURE_HTML5_LC,
+         formmethod => FEATURE_HTML5_LC,
+         formnovalidate => FEATURE_HTML5_LC,
+         formtarget => FEATURE_HTML5_LC,
          height => FEATURE_HTML5_LC,
          inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X |
              FEATURE_XHTMLBASIC11_CR,
@@ -5782,11 +5787,11 @@ $Element->{$HTML_NS}->{input} = {
          list => FEATURE_HTML5_LC | FEATURE_WF2X,
          max => FEATURE_HTML5_LC | FEATURE_WF2X,
          maxlength => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
-         method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         method => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
          min => FEATURE_HTML5_LC | FEATURE_WF2X,
          multiple => FEATURE_HTML5_LC,
          name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-         novalidate => FEATURE_HTML5_DEFAULT,
+         novalidate => FEATURE_HTML5_DROPPED,
          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -5805,7 +5810,7 @@ $Element->{$HTML_NS}->{input} = {
          src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          step => FEATURE_HTML5_LC | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-         target => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+         target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
          template => FEATURE_HTML5_AT_RISK | FEATURE_WF2, ## TODO:dropped
          type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
@@ -5831,6 +5836,11 @@ $Element->{$HTML_NS}->{input} = {
              ## NOTE: <input type=hidden disabled> is not disallowed.
          enctype => '',
          form => $HTMLFormAttrChecker,
+         formaction => '',
+         formenctype => '',
+         formmethod => '',
+         formnovalidate => '',
+         formtarget => '',
          height => '',
          inputmode => '',
          ismap => '', ## NOTE: "MUST" be type=image [HTML4]
@@ -5982,6 +5992,17 @@ $Element->{$HTML_NS}->{input} = {
                'multipart/form-data' => 1,
                'text/plain' => 1,
              }),
+             formaction => $HTMLURIAttrChecker,
+             formenctype => $GetHTMLEnumeratedAttrChecker->({
+               'application/x-www-form-urlencoded' => 1,
+               'multipart/form-data' => 1,
+               'text/plain' => 1,
+             }),
+             formmethod => $GetHTMLEnumeratedAttrChecker->({
+               get => 1, post => 1, put => 1, delete => 1,
+             }),
+             formnovalidate => $GetHTMLBooleanAttrChecker->('formnovalidate'),
+             formtarget => $HTMLTargetAttrChecker,
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
@@ -6013,6 +6034,17 @@ $Element->{$HTML_NS}->{input} = {
                'multipart/form-data' => 1,
                'text/plain' => 1,
              }),
+             formaction => $HTMLURIAttrChecker,
+             formenctype => $GetHTMLEnumeratedAttrChecker->({
+               'application/x-www-form-urlencoded' => 1,
+               'multipart/form-data' => 1,
+               'text/plain' => 1,
+             }),
+             formmethod => $GetHTMLEnumeratedAttrChecker->({
+               get => 1, post => 1, put => 1, delete => 1,
+             }),
+             formnovalidate => $GetHTMLBooleanAttrChecker->('formnovalidate'),
+             formtarget => $HTMLTargetAttrChecker,
              height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
              method => $GetHTMLEnumeratedAttrChecker->({
@@ -6278,6 +6310,7 @@ $Element->{$HTML_NS}->{input} = {
     ## TODO: Warn unless value = min * x where x is an integer.
  
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
+    $element_state->{uri_info}->{action}->{type}->{formaction} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
