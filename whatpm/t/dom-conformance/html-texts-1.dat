@@ -476,46 +476,126 @@
 /p/dfn;no significant content;s
 
 #data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">
+2008-12-23
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">14:44:44</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"> 14:44:44 </time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">14:44:44Z</time>
+#errors
+/time;dateortime:syntax error;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44 +09:00</time>
+#errors
+/time;dateortime:syntax error;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">0000-12-23T14:44:44+09:00</time>
+#errors
+/time;datetime:bad year;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">0000-12-23</time>
+#errors
+/time;datetime:bad year;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44+0900</time>
+#errors
+/time;dateortime:syntax error;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44+09:00</time>
+#errors
+
+#data
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23 14:44:44Z</time>
+#errors
+/time;dateortime:syntax error;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44.Z</time>
+#errors
+/time;dateortime:syntax error;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44.44Z</time>
+#errors
+/time;dateortime:syntax error;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44.00Z</time>
 #errors
 
 #data
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23&#x3000;14:44:44Z</time>
 #errors
+/time;dateortime:syntax error;m
 
 #data
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23&#x0a;14:44:44Z</time>
 #errors
+/time;dateortime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23&#x0b;14:44:44Z</time>
 #errors
+/time;dateortime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23&#x0b;T14:44:44Z</time>
 #errors
+/time;dateortime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T&#x0b;14:44:44Z</time>
 #errors
+/time;dateortime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23 14:44:44&#x0b;Z</time>
 #errors
+/time;dateortime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23 14:44:44Z&#x0b;</time>
 #errors
+/time;dateortime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <time xmlns="http://www.w3.org/1999/xhtml">&#x0b;2008-12-23T14:44:44Z</time>
 #errors
+
+#data
+<?xml version="1.1"?>
+<time xmlns="http://www.w3.org/1999/xhtml">&#x0b;2008-12-23T14:44:44Z&#x0b;</time>
+#errors
+
+#data
+<?xml version="1.1"?>
+<time xmlns="http://www.w3.org/1999/xhtml" datetime="&#x0b;2008-12-23T14:44:44Z">a</time>
+#errors
+/time/@datetime;dateortime:syntax error;m
 
 #data
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-2314:44:44Z</time>

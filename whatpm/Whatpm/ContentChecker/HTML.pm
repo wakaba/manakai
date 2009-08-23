@@ -3542,28 +3542,27 @@ $Element->{$HTML_NS}->{time} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     datetime => FEATURE_HTML5_FD,
-  }),
-  ## TODO: Update definition
-  ## TODO: Write tests
+  }), # check_attrs
   check_end => sub {
     my ($self, $item, $element_state) = @_;
 
+    ## XXX Maybe we should move this code out somewhere (maybe
+    ## Message::Date) such that we can reuse this code in other places
+    ## (e.g. HTMLTimeElement implementation).
+
+    ## "Vaguer moments in time" or "valid date or time string".
     my $attr = $item->{node}->get_attribute_node_ns (undef, 'datetime');
     my $input;
     my $reg_sp;
     my $input_node;
     if ($attr) {
       $input = $attr->value;
-      $reg_sp = qr/[\x09\x0A\x0C\x0D\x20]*/;
+      $reg_sp = qr/[\x09\x0A\x0C\x0D\x20]/;
       $input_node = $attr;
     } else {
       $input = $item->{node}->text_content;
-      $reg_sp = qr/\p{WhiteSpace}*/;
+      $reg_sp = qr/\p{WhiteSpace}/;
       $input_node = $item->{node};
-
-      ## ISSUE: What is the definition for "successfully extracts a date
-      ## or time"?  If the algorithm says the string is invalid but
-      ## return some date or time, is it "successfully"?
     }
 
     my $hour;
@@ -3571,45 +3570,50 @@ $Element->{$HTML_NS}->{time} = {
     my $second;
     if ($input =~ /
       \A
-      $reg_sp
+      $reg_sp*
       ([0-9]+) # 1
       (?>
         -([0-9]+) # 2
         -((?>[0-9]+)) # 3 # Use (?>) such that yyyy-mm-ddhh:mm does not match
-        $reg_sp
+        $reg_sp*
         (?>
-          T
-          $reg_sp
-        )?
-        ([0-9]+) # 4
-        :([0-9]+) # 5
-        (?>
-          :([0-9]+(?>\.[0-9]*)?|\.[0-9]*) # 6
-        )?
-        $reg_sp
-        (?>
-          Z
-          $reg_sp
-        |
-          [+-]([0-9]+):([0-9]+) # 7, 8
-          $reg_sp
+          (?>
+            T
+            $reg_sp*
+          )?
+          ([0-9]+) # 4
+          :([0-9]+) # 5
+          (?>
+            :([0-9]+(?>\.[0-9]+)?) # 6
+          )?
+          $reg_sp*
+          (?>
+            Z
+            $reg_sp*
+          |
+            [+-]([0-9]+):([0-9]+) # 7, 8
+            $reg_sp*
+          )?
         )?
         \z
       |
         :([0-9]+) # 9
-        (?>
-          :([0-9]+(?>\.[0-9]*)?|\.[0-9]*) # 10
+        (?:
+          :([0-9]+(?>\.[0-9]+)?) # 10
         )?
-        $reg_sp
+        $reg_sp*
         \z
       )
     /x) {
+      my $has_syntax_error;
       if (defined $2) { ## YYYY-MM-DD T? hh:mm
         if (length $1 != 4 or length $2 != 2 or length $3 != 2 or
-            length $4 != 2 or length $5 != 2) {
+            (defined $4 and length $4 != 2) or
+            (defined $5 and length $5 != 2)) {
           $self->{onerror}->(node => $input_node,
                              type => 'dateortime:syntax error',
                              level => $self->{level}->{must});
+          $has_syntax_error = 1;
         }
 
         if (1 <= $2 and $2 <= 12) {
@@ -3626,6 +3630,10 @@ $Element->{$HTML_NS}->{time} = {
                              type => 'datetime:bad month',
                              level => $self->{level}->{must});
         }
+        $self->{onerror}->(node => $input_node,
+                           type => 'datetime:bad year',
+                           level => $self->{level}->{must})
+          if $1 == 0;
 
         ($hour, $minute, $second) = ($4, $5, $6);
           
@@ -3634,6 +3642,7 @@ $Element->{$HTML_NS}->{time} = {
             $self->{onerror}->(node => $input_node,
                                type => 'dateortime:syntax error',
                                level => $self->{level}->{must});
+            $has_syntax_error = 1;
           }
 
           $self->{onerror}->(node => $input_node,
@@ -3650,6 +3659,7 @@ $Element->{$HTML_NS}->{time} = {
           $self->{onerror}->(node => $input_node,
                              type => qq'dateortime:syntax error',
                              level => $self->{level}->{must});
+          $has_syntax_error = 1;
         }
 
         ($hour, $minute, $second) = ($1, $9, $10);
@@ -3667,11 +3677,22 @@ $Element->{$HTML_NS}->{time} = {
           $self->{onerror}->(node => $input_node,
                              type => 'dateortime:syntax error',
                              level => $self->{level}->{must});
+          $has_syntax_error = 1;
         }
           
         $self->{onerror}->(node => $input_node, type => 'datetime:bad second',
                            level => $self->{level}->{must}) if $second >= 60;
-      }        
+      }
+
+      unless ($has_syntax_error) {
+        $input =~ s/\A$reg_sp+//;
+        $input =~ s/$reg_sp+\z//;
+        if ($input =~ /$reg_sp+/) {
+          $self->{onerror}->(node => $input_node,
+                             type => 'dateortime:syntax error',
+                             level => $self->{level}->{must});
+        }
+      }
     } else {
       $self->{onerror}->(node => $input_node,
                          type => 'dateortime:syntax error',
@@ -3679,8 +3700,8 @@ $Element->{$HTML_NS}->{time} = {
     }
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
-  },
-};
+  }, # check_end
+}; # time
 
 $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the value is to include it as contents of the element"
 ## TODO: value inequalities (HTML5 revision 1463)
