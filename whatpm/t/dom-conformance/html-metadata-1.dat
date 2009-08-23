@@ -2240,6 +2240,29 @@ p {color: green}
 /head/base;basehref after URL attribute;m
 
 #data
+<meta http-equiv="content-language" content=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;langtag:language:nosemantics;m
+
+#data
+<meta http-equiv="content-language" content="!!"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;langtag:language:nosemantics;m
+
+#data
+<meta http-equiv="content-language" content="ja"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta http-equiv="content-language" content="JA"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;langtag:language:case;w
+
+#data
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /style/@type;IMT:syntax error;m

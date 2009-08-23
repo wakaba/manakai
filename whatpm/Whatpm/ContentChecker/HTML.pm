@@ -2367,9 +2367,10 @@ $Element->{$HTML_NS}->{meta} = {
 
     ## TODO: metadata conformance
 
-    ## TODO: pragma conformance
+    ## -- The |http-equiv| attribute (pragmas)
     if (defined $http_equiv_attr) { ## An enumerated attribute
-      my $keyword = lc $http_equiv_attr->value; ## TODO: ascii case?
+      my $keyword = $http_equiv_attr->value;
+      $keyword =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
 
       if ($self->{has_http_equiv}->{$keyword}) {
         $self->{onerror}->(type => 'duplicate http-equiv', value => $keyword,
@@ -2403,7 +2404,8 @@ $Element->{$HTML_NS}->{meta} = {
           }
         }
       } elsif ($keyword eq 'default-style') {
-        ## ISSUE: Not defined yet in the spec.
+        ## XXX no author requirement in the spec
+        
       } elsif ($keyword eq 'refresh') {
         if ($content_attr) {
           my $content = $content_attr->value;
@@ -2411,15 +2413,15 @@ $Element->{$HTML_NS}->{meta} = {
             ## NOTE: Valid non-negative integer.
             #
           } elsif ($content =~ s/\A[0-9]+;[\x09\x0A\x0C\x0D\x20]+[Uu][Rr][Ll]=//) {
-            ## ISSUE: Relative references are allowed? (RFC 3987 "IRI" is an absolute reference with optional fragment identifier.)
+            ## XXXURL
             Whatpm::URIChecker->check_iri_reference ($content, sub {
               $self->{onerror}->(value => $content, @_, node => $content_attr);
             }, $self->{level});
-            $self->{has_uri_attr} = 1; ## NOTE: One of "attributes with URIs".
+            $self->{has_uri_attr} = 1; ## NOTE: One of "attributes with URLs".
 
             $element_state->{uri_info}->{content}->{node} = $content_attr;
             $element_state->{uri_info}->{content}->{type}->{hyperlink} = 1;
-            ## TODO: absolute
+            ## XXXTODO: absolute
             push @{$self->{return}->{uri}->{$content} ||= []},
                 $element_state->{uri_info}->{content};
           } else {
@@ -2428,7 +2430,27 @@ $Element->{$HTML_NS}->{meta} = {
                                level => $self->{level}->{must});
           }
         }
+      } elsif ($keyword eq 'content-language') {
+        if ($content_attr) {
+          my $content = $content_attr->value;
+          require Whatpm::LangTag;
+          ## XXX In fact what the spec requires is "BCP 47 langauge code".
+          Whatpm::LangTag->check_rfc3066_language_tag ($content, sub {
+            $self->{onerror}->(@_, node => $content_attr);
+          }, $self->{level});
+        }
+
+        ## XXX This is conforming but obsolete.
       } else {
+        ## NOTE: |Content-Style-Type| and |Content-Script-Type|
+        ## pragmas are listed in the table of the spec in the
+        ## commented-out form, but there is no author requirement
+        ## (even commented-out one isn't there).
+
+        ## NOTE: Pragma extensions are listed in
+        ## <http://wiki.whatwg.org/wiki/PragmaExtensions>.  At the
+        ## time of writing, no extension has been registered yet.
+
         $self->{onerror}->(node => $http_equiv_attr,
                            type => 'enumerated:invalid',
                            level => $self->{level}->{must});
