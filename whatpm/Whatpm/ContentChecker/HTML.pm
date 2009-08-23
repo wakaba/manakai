@@ -4720,10 +4720,6 @@ $Element->{$HTML_NS}->{video} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker,
-    ## TODO: start, loopstart, loopend, end
-    ## ISSUE: they MUST be "value time offset"s.  Value?
-    ## ISSUE: playcount has no conformance creteria
     autobuffer => $GetHTMLBooleanAttrChecker->('autobuffer'),
     autoplay => sub {
       my ($self, $attr) = @_;
@@ -4737,24 +4733,36 @@ $Element->{$HTML_NS}->{video} = {
       $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
     },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
-    poster => $HTMLURIAttrChecker,
+    end => sub { },
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    loop => $GetHTMLBooleanAttrChecker->('loop'),
+    loopend => sub { },
+    loopstart => sub { },
+    playcount => sub { },
+    poster => $HTMLURIAttrChecker,
+    src => $HTMLURIAttrChecker,
+    start => sub { },
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+
+    ## NOTE: |start|, |end|, |loopstart|, |loopend|, and |playcount|
+    ## attributes has been deleted from the spec before the exact
+    ## author requirement is defined.
   }, {
     %HTMLAttrStatus,
     autobuffer => FEATURE_HTML5_LC,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
-    end => FEATURE_HTML5_AT_RISK,
+    end => FEATURE_HTML5_DROPPED,
     height => FEATURE_HTML5_LC,
-    loopend => FEATURE_HTML5_AT_RISK,
-    loopstart => FEATURE_HTML5_AT_RISK,
-    playcount => FEATURE_HTML5_AT_RISK,
+    loop => FEATURE_HTML5_LC,
+    loopend => FEATURE_HTML5_DROPPED,
+    loopstart => FEATURE_HTML5_DROPPED,
+    playcount => FEATURE_HTML5_DROPPED,
     poster => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_LC,
-    start => FEATURE_HTML5_AT_RISK,
+    start => FEATURE_HTML5_DROPPED,
     width => FEATURE_HTML5_LC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{allow_source}
@@ -4808,16 +4816,12 @@ $Element->{$HTML_NS}->{video} = {
 
     $Element->{$HTML_NS}->{object}->{check_end}->(@_);
   },
-};
+}; # video
 
 $Element->{$HTML_NS}->{audio} = {
   %{$Element->{$HTML_NS}->{video}},
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker,
-    ## TODO: start, loopstart, loopend, end
-    ## ISSUE: they MUST be "value time offset"s.  Value?
-    ## ISSUE: playcount has no conformance creteria
     autobuffer => $GetHTMLBooleanAttrChecker->('autobuffer'),
     autoplay => sub {
       my ($self, $attr) = @_;
@@ -4831,19 +4835,31 @@ $Element->{$HTML_NS}->{audio} = {
       $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
     },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
+    end => sub { },
+    loop => $GetHTMLBooleanAttrChecker->('loop'),
+    loopend => sub { },
+    loopstart => sub { },
+    playcount => sub { },
+    src => $HTMLURIAttrChecker,
+    start => sub { },
+
+    ## NOTE: |start|, |end|, |loopstart|, |loopend|, and |playcount|
+    ## attributes has been deleted from the spec before the exact
+    ## author requirement is defined.
   }, {
     %HTMLAttrStatus,
     autobuffer => FEATURE_HTML5_LC,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
-    end => FEATURE_HTML5_AT_RISK,
-    loopend => FEATURE_HTML5_AT_RISK,
-    loopstart => FEATURE_HTML5_AT_RISK,
-    playcount => FEATURE_HTML5_AT_RISK,
+    end => FEATURE_HTML5_DROPPED,
+    loop => FEATURE_HTML5_LC,
+    loopend => FEATURE_HTML5_DROPPED,
+    loopstart => FEATURE_HTML5_DROPPED,
+    playcount => FEATURE_HTML5_DROPPED,
     src => FEATURE_HTML5_LC,
-    start => FEATURE_HTML5_AT_RISK,
-  }),
-};
+    start => FEATURE_HTML5_DROPPED,
+  }), # check_attrs
+}; # audio
 
 $Element->{$HTML_NS}->{source} = {
   %HTMLEmptyChecker,

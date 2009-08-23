@@ -269,6 +269,14 @@
 #errors
 
 #data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<input type="color" list="a"/>x
+<select id="a"/>
+</div>
+#errors
+/div/input/@list;no referenced datalist;m
+
+#data
 <input type="hidden" list="a" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /input/@list;input attr not applicable;hidden;m

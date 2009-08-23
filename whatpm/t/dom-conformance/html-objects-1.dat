@@ -3081,6 +3081,90 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /audio;child element missing;source;m
 
 #data
+<video src="" start="" end="" loopstart="" loopend="" playcount=""
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+/video/@end;attribute not defined;m
+/video/@loopstart;attribute not defined;m
+/video/@loopend;attribute not defined;m
+/video/@playcount;attribute not defined;m
+
+#data
+<audio src="" start="" end="" loopstart="" loopend="" playcount=""
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+/audio/@end;attribute not defined;m
+/audio/@loopstart;attribute not defined;m
+/audio/@loopend;attribute not defined;m
+/audio/@playcount;attribute not defined;m
+
+#data
+<video src="" 
+    loop=""
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="" 
+    loop=""
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="" 
+    loop="loop"
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="" 
+    loop="loop"
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="" 
+    loop="Loop"
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="" 
+    loop="Loop"
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="" 
+    loop="true"
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loop;boolean:invalid;m
+
+#data
+<audio src="" 
+    loop="true"
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loop;boolean:invalid;m
+
+#data
+<video src="" 
+    loop="lop"
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loop;boolean:invalid;m
+
+#data
+<audio src="" 
+    loop="loop "
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loop;boolean:invalid;m
+
+#data
 <source xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /source;attribute missing;src;m
