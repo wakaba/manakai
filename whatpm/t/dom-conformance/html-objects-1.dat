@@ -3158,11 +3158,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="1."/>
 #errors
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio=".1"/>
 #errors
+/source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"

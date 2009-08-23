@@ -1156,16 +1156,19 @@
 <meter value=".1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;float:syntax error;m
 
 #data
 <meter value=".0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;float:syntax error;m
 
 #data
 <meter value="1." xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;float:syntax error;m
 
 #data
 <meter value="1.0000" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1176,16 +1179,19 @@
 <meter value="123." xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;float:syntax error;m
 
 #data
 <meter value="-.1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;float:syntax error;m
 
 #data
 <meter value="-1." xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;float:syntax error;m
 
 #data
 <meter value="1aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1364,6 +1370,22 @@
 <progress value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@value;float:syntax error;m
+/progress;no significant content;s
+
+#data
+<progress value="10e+0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/progress;no significant content;s
+
+#data
+<progress value="10e-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/progress;no significant content;s
+
+#data
+<progress value="-10e+0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/progress/@value;float:out of range;m
 /progress;no significant content;s
 
 #data

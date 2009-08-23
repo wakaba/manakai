@@ -660,16 +660,25 @@ my $GetHTMLNonNegativeIntegerAttrChecker = sub {
   };
 }; # $GetHTMLNonNegativeIntegerAttrChecker
 
+## "Valid floating point number".
 my $GetHTMLFloatingPointNumberAttrChecker = sub {
   my $range_check = shift;
   return sub {
     my ($self, $attr, $item, $element_state) = @_;
     my $value = $attr->value;
-    if ($value =~ /\A-?[0-9]+(?>\.[0-9]*)?\z/ or
-        $value =~ /\A-?\.[0-9]+\z/) {
-      if ($range_check->($value + 0)) {
-        ## TODO: parse algorithm
-        $element_state->{number_value}->{$attr->name} = $value + 0;
+    if ($value =~ /
+        \A
+        (-?) # $1
+        ([0-9]+) # $2
+        (?>(\.[0-9]+))? # $3
+        (?>[Ee] ([+-]?[0-9]+) )? # $4
+        \z
+    /x) {
+      my $num = (defined $3 ? $2 . $3 : $2) + 0;
+      $num = -$num if $1;
+      $num *= 10 ** ($4 + 0) if $4; # $4 can be "-0", but no problem.
+      if ($range_check->($num)) {
+        $element_state->{number_value}->{$attr->name} = $num;
       } else {
         $self->{onerror}->(node => $attr, type => 'float:out of range',
                            level => $self->{level}->{must});
@@ -680,9 +689,10 @@ my $GetHTMLFloatingPointNumberAttrChecker = sub {
                          level => $self->{level}->{must});
     }
   };
-
-  ## TODO: scientific notation
 }; # $GetHTMLFloatingPointNumberAttrChecker
+
+my $PositiveFloatingPointNumberAttrChecker
+  = $GetHTMLFloatingPointNumberAttrChecker->(sub { $_[0] > 0 });
 
 my $StepAttrChecker = sub {
   ## NOTE: A valid floating point number (> 0), or ASCII
@@ -690,21 +700,11 @@ my $StepAttrChecker = sub {
   
   my ($self, $attr) = @_;
   my $value = $attr->value;
-  if ($value =~ /\A-?[0-9]+(?>\.[0-9]*)?\z/ or
-      $value =~ /\A-?\.[0-9]+\z/) {
-    unless ($value > 0) {
-      $self->{onerror}->(node => $attr, type => 'float:out of range',
-                         level => $self->{level}->{must});
-    }
-  } elsif ($value =~ /\A[Aa][Nn][Yy]\z/) {
+  if ($value =~ /\A[Aa][Nn][Yy]\z/) {
     #
   } else {
-    $self->{onerror}->(node => $attr,
-                       type => 'float:syntax error',
-                       level => $self->{level}->{must});
+    $PositiveFloatingPointNumberAttrChecker->(@_);
   }
-  
-  ## TODO: scientific
 }; # $StepAttrChecker
 
 ## HTML4 %Length;
@@ -3740,7 +3740,7 @@ $Element->{$HTML_NS}->{progress} = { ## TODO: recommended to use content
   status => FEATURE_HTML5_WD,
   check_attrs => $GetHTMLAttrsChecker->({
     value => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift >= 0 }),
-    max => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift > 0 }),
+    max => $PositiveFloatingPointNumberAttrChecker,
   }, {
     %HTMLAttrStatus,
     max => FEATURE_HTML5_DEFAULT,
