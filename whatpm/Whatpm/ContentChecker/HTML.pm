@@ -205,7 +205,7 @@ my $HTMLFlowContent = {
     h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, hgroup => 1,
     header => 1,
     footer => 1, address => 1, p => 1, hr => 1, dialog => 1, pre => 1,
-    ol => 1, ul => 1, dl => 1, figure => 1, table => 1,
+    ol => 1, ul => 1, dl => 1, menu => 1, figure => 1, table => 1,
     form => 1, fieldset => 1,
     details => 1, ## ISSUE: "Flow element" in spec.
     datagrid => 1, ## ISSUE: "Flow element" in spec.
@@ -231,9 +231,6 @@ my $HTMLFlowContent = {
 
     ## Flow/phrasing content whose content model is transparent.
     a => 1, ins => 1, del => 1, font => 1, map => 1,
-
-    ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
-    menu => 1,
 
     ## These embeded content are also categorized as flow content.
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
@@ -282,9 +279,6 @@ my $HTMLPhrasingContent = {
 
     ## NOTE: Transparent.    
     a => 1, ins => 1, del => 1, font => 1, map => 1,
-
-    ## NOTE: If there is a |menu| ancestor, phrasing.  Otherwise, flow.
-    menu => 1,
 
     ## These embedded content is also categorized as phrasing content.
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
@@ -3135,27 +3129,27 @@ $Element->{$HTML_NS}->{li} = {
     #    FEATURE_M12N10_REC_DEPRECATED,
     value => FEATURE_HTML5_LC | FEATURE_XHTML2_ED |
         FEATURE_XHTMLBASIC11_CR | FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
-    if ($self->{flag}->{in_menu}) {
-      ## TODO: In <dir> element, then ...
+    if (0) {
+      ## XXXTODO: In <dir> element, then ...
       $HTMLPhrasingContentChecker{check_child_element}->(@_);
     } else {
       $HTMLFlowContentChecker{check_child_element}->(@_);
     }
-  },
+  }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($self->{flag}->{in_menu}) {
-      ## TODO: In <dir> element, then ...
+    if (0) {
+      ## XXXTODO: In <dir> element, then ...
       $HTMLPhrasingContentChecker{check_child_text}->(@_);
     } else {
       $HTMLFlowContentChecker{check_child_text}->(@_);
     }
-  },
-};
+  }, # check_child_text
+}; # li
 
 $Element->{$HTML_NS}->{dl} = {
   %HTMLChecker,
@@ -5704,7 +5698,6 @@ $Element->{$HTML_NS}->{form} = {
       }
     },
     novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
-    ## TODO: Tests for following attrs:
     onformchange => $HTMLEventHandlerAttrChecker,
     onforminput => $HTMLEventHandlerAttrChecker,
     onreceived => $HTMLEventHandlerAttrChecker,
@@ -5723,7 +5716,7 @@ $Element->{$HTML_NS}->{form} = {
     method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
     name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    novalidate => FEATURE_HTML5_DEFAULT,
+    novalidate => FEATURE_HTML5_LC,
     onformchange => FEATURE_WF2_INFORMATIVE,
     onforminput => FEATURE_WF2_INFORMATIVE,
     onreceived => FEATURE_WF2,
@@ -7447,17 +7440,15 @@ $Element->{$HTML_NS}->{menu} = {
     sdaform => FEATURE_HTML20_RFC,
     sdapref => FEATURE_HTML20_RFC,
     type => FEATURE_HTML5_WD,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'li or phrasing';
-    $element_state->{in_menu_original} = $self->{flag}->{in_menu};
-    $self->{flag}->{in_menu} = 1;
 
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
     $element_state->{id_type} = 'menu';
-  },
+  }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -7490,7 +7481,7 @@ $Element->{$HTML_NS}->{menu} = {
       $self->{onerror}->(node => $child_el, type => 'element not allowed',
                          level => $self->{level}->{must});
     }
-  },
+  }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
@@ -7504,18 +7495,16 @@ $Element->{$HTML_NS}->{menu} = {
                            level => $self->{level}->{must});
       }
     }
-  },
+  }, # check_child_text
   check_end => sub {
     my ($self, $item, $element_state) = @_;
-    delete $self->{flag}->{in_menu} unless $element_state->{in_menu_original};
-    
     if ($element_state->{phase} eq 'li') {
       $HTMLChecker{check_end}->(@_);
     } else { # 'phrasing' or 'li or phrasing'
       $HTMLPhrasingContentChecker{check_end}->(@_);
     }
-  },
-};
+  }, # check_end
+}; # menu
 
 $Element->{$HTML_NS}->{datatemplate} = {
   %HTMLChecker,
