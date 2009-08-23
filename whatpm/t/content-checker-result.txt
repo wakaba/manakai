@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 23 14:45:01 2009
-# Current time GMT:   Sun Aug 23 05:45:01 2009
+# Current time local: Sun Aug 23 15:32:42 2009
+# Current time GMT:   Sun Aug 23 06:32:42 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -609,14 +609,8 @@ ok 561
 ok 562
 ok 563
 ok 564
-not ok 565
-# Test 565 got: "/meta/@content;langtag:language:nosemantics;m" (t/content-checker.pl at line 68 fail #565)
-#     Expected: "/meta/@content;langtag:illegal;m" (<meta http-equiv="content-language" content=""
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 566
-# Test 566 got: "/meta/@content;langtag:illegal;m\n/meta/@content;langtag:language:nosemantics;m" (t/content-checker.pl at line 68 fail #566)
-#     Expected: "/meta/@content;langtag:illegal;m" (<meta http-equiv="content-language" content="!!"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 565
+ok 566
 ok 567
 ok 568
 ok 569
@@ -2110,14 +2104,22 @@ ok 2037
 ok 2038
 ok 2039
 ok 2040
-ok 2041
-ok 2042
-ok 2043
+not ok 2041
+# Test 2041 got: "/audio/@autoplay;attribute not allowed;w\n/audio;child element missing;source;m\n/audio;no significant content;s" (t/content-checker.pl at line 68 fail #2041)
+#      Expected: "/audio;child element missing;source;m\n/audio;no significant content;s\n/video/@autoplay;attribute not allowed;w" (<audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2042
+# Test 2042 got: "/audio/@autoplay;attribute not allowed;w\n/audio;child element missing;source;m\n/audio;no significant content;s" (t/content-checker.pl at line 68 fail #2042)
+#      Expected: "/audio;child element missing;source;m\n/audio;no significant content;s\n/video/@autoplay;attribute not allowed;w" (<audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2043
+# Test 2043 got: "/audio/@autoplay;attribute not allowed;w\n/audio;child element missing;source;m\n/audio;no significant content;s" (t/content-checker.pl at line 68 fail #2043)
+#      Expected: "/audio;child element missing;source;m\n/audio;no significant content;s\n/video/@autoplay;attribute not allowed;w" (<audio autoplay="AUTOPLAY" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2044
 ok 2045
 ok 2046
 ok 2047
-ok 2048
+not ok 2048
+# Test 2048 got: "/audio/@autoplay;attribute not allowed;w\n/audio;child element missing;source;m\n/audio;no significant content;s" (t/content-checker.pl at line 68 fail #2048)
+#      Expected: "/audio;child element missing;source;m\n/audio;no significant content;s\n/video/@autoplay;attribute not allowed;w" (<audio autoplay="" autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2049
 ok 2050
 ok 2051

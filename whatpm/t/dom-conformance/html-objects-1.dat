@@ -2839,12 +2839,14 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /video;no significant content;s
 /video;child element missing;source;m
+/video/@autoplay;attribute not allowed;w
 
 #data
 <video autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
 /video;child element missing;source;m
+/video/@autoplay;attribute not allowed;w
 
 #data
 <video autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2852,12 +2854,14 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /video;no significant content;s
 /video/@autoplay;boolean:invalid;m
 /video;child element missing;source;m
+/video/@autoplay;attribute not allowed;w
 
 #data
 <video autoplay="AUTOPlay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
 /video;child element missing;source;m
+/video/@autoplay;attribute not allowed;w
 
 #data
 <video autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2889,6 +2893,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /video;no significant content;s
 /video;child element missing;source;m
+/video/@autoplay;attribute not allowed;w
 
 #data
 <video controls="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3002,18 +3007,21 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /audio;no significant content;s
 /audio;child element missing;source;m
+/audio/@autoplay;attribute not allowed;w
 
 #data
 <audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
 /audio;child element missing;source;m
+/audio/@autoplay;attribute not allowed;w
 
 #data
 <audio autoplay="AUTOPLAY" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
 /audio;child element missing;source;m
+/audio/@autoplay;attribute not allowed;w
 
 #data
 <audio autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3045,6 +3053,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /audio;no significant content;s
 /audio;child element missing;source;m
+/audio/@autoplay;attribute not allowed;w
 
 #data
 <audio controls="" xmlns="http://www.w3.org/1999/xhtml"/>

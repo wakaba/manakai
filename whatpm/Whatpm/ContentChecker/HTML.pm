@@ -250,10 +250,8 @@ my $HTMLFlowContent = {
 my $HTMLSectioningContent = {
   $HTML_NS => {
     section => 1, nav => 1, article => 1, aside => 1,
-    ## NOTE: |body| is only allowed in |html| element.
-    body => 1,
   },
-};
+}; # $HTMLSectioningContent
 
 my $HTMLSectioningRoot = {
   $HTML_NS => {
@@ -3841,6 +3839,8 @@ $Element->{$HTML_NS}->{span} = {
   }),
 };
 
+# XXX Warning for "authors are encouraged to consider whether other
+# elements might be more applicable"
 $Element->{$HTML_NS}->{i} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
@@ -4425,7 +4425,7 @@ $Element->{$HTML_NS}->{img} = {
 };
 
 $Element->{$HTML_NS}->{iframe} = {
-  %HTMLTextChecker,
+  %HTMLTextChecker, # XXX content model restriction
   status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
       ## NOTE: Not part of M12N10 Strict
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4714,7 +4714,17 @@ $Element->{$HTML_NS}->{video} = {
     ## ISSUE: they MUST be "value time offset"s.  Value?
     ## ISSUE: playcount has no conformance creteria
     autobuffer => $GetHTMLBooleanAttrChecker->('autobuffer'),
-    autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
+    autoplay => sub {
+      my ($self, $attr) = @_;
+
+      ## "Authors are also encouraged to consider not using the
+      ## automatic playback behavior at all" according to HTML5.
+      $self->{onerror}->(node => $attr,
+                         type => 'attribute not allowed',
+                         level => $self->{level}->{warn});
+
+      $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
+    },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
     poster => $HTMLURIAttrChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -4798,7 +4808,17 @@ $Element->{$HTML_NS}->{audio} = {
     ## ISSUE: they MUST be "value time offset"s.  Value?
     ## ISSUE: playcount has no conformance creteria
     autobuffer => $GetHTMLBooleanAttrChecker->('autobuffer'),
-    autoplay => $GetHTMLBooleanAttrChecker->('autoplay'),
+    autoplay => sub {
+      my ($self, $attr) = @_;
+
+      ## "Authors are also encouraged to consider not using the
+      ## automatic playback behavior at all" according to HTML5.
+      $self->{onerror}->(node => $attr,
+                         type => 'attribute not allowed',
+                         level => $self->{level}->{warn});
+
+      $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
+    },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
   }, {
     %HTMLAttrStatus,
@@ -5979,6 +5999,9 @@ $Element->{$HTML_NS}->{input} = {
              step => $StepAttrChecker,
              value => $GetDateTimeAttrChecker->($v->[0]),
             }->{$attr_ln} || $checker;
+
+            ## XXX Maybe it is better to check min <= value <= max
+            ## relation is hold for convinience?
           } elsif ($state eq 'number') {
             $checker =
             {
@@ -6175,6 +6198,7 @@ $Element->{$HTML_NS}->{input} = {
              value => sub {
                my ($self, $attr, $item, $element_state) = @_;
                if ($state eq 'url') {
+                 ## XXX MUST be absolute IRI.
                  $HTMLURIAttrChecker->(@_);
                } elsif ($state eq 'email') {
                  if ($item->{node}->has_attribute_ns (undef, 'multiple')) {
