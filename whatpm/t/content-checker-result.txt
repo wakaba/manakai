@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 23 15:32:42 2009
-# Current time GMT:   Sun Aug 23 06:32:42 2009
+# Current time local: Sun Aug 23 15:42:22 2009
+# Current time GMT:   Sun Aug 23 06:42:22 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -2104,22 +2104,14 @@ ok 2037
 ok 2038
 ok 2039
 ok 2040
-not ok 2041
-# Test 2041 got: "/audio/@autoplay;attribute not allowed;w\n/audio;child element missing;source;m\n/audio;no significant content;s" (t/content-checker.pl at line 68 fail #2041)
-#      Expected: "/audio;child element missing;source;m\n/audio;no significant content;s\n/video/@autoplay;attribute not allowed;w" (<audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2042
-# Test 2042 got: "/audio/@autoplay;attribute not allowed;w\n/audio;child element missing;source;m\n/audio;no significant content;s" (t/content-checker.pl at line 68 fail #2042)
-#      Expected: "/audio;child element missing;source;m\n/audio;no significant content;s\n/video/@autoplay;attribute not allowed;w" (<audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2043
-# Test 2043 got: "/audio/@autoplay;attribute not allowed;w\n/audio;child element missing;source;m\n/audio;no significant content;s" (t/content-checker.pl at line 68 fail #2043)
-#      Expected: "/audio;child element missing;source;m\n/audio;no significant content;s\n/video/@autoplay;attribute not allowed;w" (<audio autoplay="AUTOPLAY" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2041
+ok 2042
+ok 2043
 ok 2044
 ok 2045
 ok 2046
 ok 2047
-not ok 2048
-# Test 2048 got: "/audio/@autoplay;attribute not allowed;w\n/audio;child element missing;source;m\n/audio;no significant content;s" (t/content-checker.pl at line 68 fail #2048)
-#      Expected: "/audio;child element missing;source;m\n/audio;no significant content;s\n/video/@autoplay;attribute not allowed;w" (<audio autoplay="" autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2048
 ok 2049
 ok 2050
 ok 2051
@@ -2138,8 +2130,14 @@ ok 2063
 ok 2064
 ok 2065
 ok 2066
-ok 2067
-ok 2068
+not ok 2067
+# Test 2067 got: "/source/@pixelratio;attribute not defined;m" (t/content-checker.pl at line 68 fail #2067)
+#      Expected: "/source/@pixelratio;attribute not defined;m\n/source/@pixelratio;float:out of range;m" (<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+#    pixelratio="0.001"/>)
+not ok 2068
+# Test 2068 got: "/source/@pixelratio;attribute not defined;m" (t/content-checker.pl at line 68 fail #2068)
+#      Expected: "/source/@pixelratio;attribute not defined;m\n/source/@pixelratio;float:out of range;m" (<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+#    pixelratio="0.5"/>)
 ok 2069
 ok 2070
 ok 2071
@@ -2273,11 +2271,11 @@ ok 2198
 ok 2199
 ok 2200
 ok 2201
-# t/dom-conformance/html-tables-1.dat
 ok 2202
 ok 2203
 ok 2204
 ok 2205
+# t/dom-conformance/html-tables-1.dat
 ok 2206
 ok 2207
 ok 2208
@@ -2297,16 +2295,16 @@ ok 2221
 ok 2222
 ok 2223
 ok 2224
-not ok 2225
-# Test 2225 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2225)
-#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2226
-# Test 2226 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2226)
-#      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2225
+ok 2226
 ok 2227
 ok 2228
-ok 2229
-ok 2230
+not ok 2229
+# Test 2229 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2229)
+#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2230
+# Test 2230 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2230)
+#      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2231
 ok 2232
 ok 2233
@@ -2459,11 +2457,11 @@ ok 2379
 ok 2380
 ok 2381
 ok 2382
-# t/dom-conformance/html-forms-1.dat
 ok 2383
 ok 2384
 ok 2385
 ok 2386
+# t/dom-conformance/html-forms-1.dat
 ok 2387
 ok 2388
 ok 2389
@@ -2799,11 +2797,11 @@ ok 2718
 ok 2719
 ok 2720
 ok 2721
-# t/dom-conformance/html-form-label.dat
 ok 2722
 ok 2723
 ok 2724
 ok 2725
+# t/dom-conformance/html-form-label.dat
 ok 2726
 ok 2727
 ok 2728
@@ -2881,11 +2879,11 @@ ok 2799
 ok 2800
 ok 2801
 ok 2802
-# t/dom-conformance/html-form-input-1.dat
 ok 2803
 ok 2804
 ok 2805
 ok 2806
+# t/dom-conformance/html-form-input-1.dat
 ok 2807
 ok 2808
 ok 2809
@@ -3436,11 +3434,11 @@ ok 3353
 ok 3354
 ok 3355
 ok 3356
-Parse error (lt in attr value) at line 3 column 12
 ok 3357
 ok 3358
 ok 3359
 ok 3360
+Parse error (lt in attr value) at line 3 column 12
 ok 3361
 ok 3362
 ok 3363
@@ -5019,11 +5017,11 @@ ok 4935
 ok 4936
 ok 4937
 ok 4938
-# t/dom-conformance/html-form-button.dat
 ok 4939
 ok 4940
 ok 4941
 ok 4942
+# t/dom-conformance/html-form-button.dat
 ok 4943
 ok 4944
 ok 4945
@@ -5194,11 +5192,11 @@ ok 5109
 ok 5110
 ok 5111
 ok 5112
-# t/dom-conformance/html-form-select.dat
 ok 5113
 ok 5114
 ok 5115
 ok 5116
+# t/dom-conformance/html-form-select.dat
 ok 5117
 ok 5118
 ok 5119
@@ -5281,11 +5279,11 @@ ok 5195
 ok 5196
 ok 5197
 ok 5198
-# t/dom-conformance/html-form-datalist.dat
 ok 5199
 ok 5200
 ok 5201
 ok 5202
+# t/dom-conformance/html-form-datalist.dat
 ok 5203
 ok 5204
 ok 5205
@@ -5338,11 +5336,11 @@ ok 5251
 ok 5252
 ok 5253
 ok 5254
-# t/dom-conformance/html-form-textarea.dat
 ok 5255
 ok 5256
 ok 5257
 ok 5258
+# t/dom-conformance/html-form-textarea.dat
 ok 5259
 ok 5260
 ok 5261
@@ -5409,11 +5407,11 @@ ok 5321
 ok 5322
 ok 5323
 ok 5324
-# t/dom-conformance/html-form-keygen.dat
 ok 5325
 ok 5326
 ok 5327
 ok 5328
+# t/dom-conformance/html-form-keygen.dat
 ok 5329
 ok 5330
 ok 5331
@@ -5435,11 +5433,11 @@ ok 5346
 ok 5347
 ok 5348
 ok 5349
-# t/dom-conformance/html-interactive-1.dat
 ok 5350
 ok 5351
 ok 5352
 ok 5353
+# t/dom-conformance/html-interactive-1.dat
 ok 5354
 ok 5355
 ok 5356
@@ -5685,11 +5683,11 @@ ok 5595
 ok 5596
 ok 5597
 ok 5598
-# t/dom-conformance/html-scripting-1.dat
 ok 5599
 ok 5600
 ok 5601
 ok 5602
+# t/dom-conformance/html-scripting-1.dat
 ok 5603
 ok 5604
 ok 5605
@@ -5736,14 +5734,14 @@ ok 5645
 ok 5646
 ok 5647
 ok 5648
-# t/dom-conformance/html-scripting-2.dat
 ok 5649
 ok 5650
-# t/dom-conformance/html-repetitions.dat
 ok 5651
 ok 5652
+# t/dom-conformance/html-scripting-2.dat
 ok 5653
 ok 5654
+# t/dom-conformance/html-repetitions.dat
 ok 5655
 ok 5656
 ok 5657
@@ -5801,11 +5799,11 @@ ok 5708
 ok 5709
 ok 5710
 ok 5711
-# t/dom-conformance/html-datatemplate.dat
 ok 5712
 ok 5713
 ok 5714
 ok 5715
+# t/dom-conformance/html-datatemplate.dat
 ok 5716
 ok 5717
 ok 5718
@@ -6131,3 +6129,7 @@ ok 6037
 ok 6038
 ok 6039
 ok 6040
+ok 6041
+ok 6042
+ok 6043
+ok 6044

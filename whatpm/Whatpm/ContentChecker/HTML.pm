@@ -4841,13 +4841,13 @@ $Element->{$HTML_NS}->{source} = {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
       media => $HTMLMQAttrChecker,
-      pixelratio => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
-      src => $HTMLURIAttrChecker, ## ISSUE: Negative or zero pixelratio=""
+      pixelratio => $PositiveFloatingPointNumberAttrChecker,
+      src => $HTMLURIAttrChecker,
       type => $HTMLIMTAttrChecker,
     }, {
       %HTMLAttrStatus,
       media => FEATURE_HTML5_LC,
-      pixelratio => FEATURE_HTML5_LC,
+      pixelratio => FEATURE_HTML5_DROPPED,
       src => FEATURE_HTML5_LC,
       type => FEATURE_HTML5_LC,
     })->(@_);
@@ -4859,8 +4859,12 @@ $Element->{$HTML_NS}->{source} = {
     }
 
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+
+    ## NOTE: The |pixelratio| attribute should have been forbidden
+    ## when the parent of the |source| element is an |audio| element,
+    ## but the attribute itself has been dropped from the spec.
   },
-};
+}; # source
 
 $Element->{$HTML_NS}->{canvas} = {
   %HTMLTransparentChecker,

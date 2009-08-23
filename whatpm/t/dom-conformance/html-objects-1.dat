@@ -3142,79 +3142,119 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     pixelratio=""/>
 #errors
 /source/@pixelratio;float:syntax error;m
+/source/@pixelratio;attribute not defined;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="1"/>
 #errors
+/source/@pixelratio;attribute not defined;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="1.00"/>
 #errors
+/source/@pixelratio;attribute not defined;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="0.001"/>
 #errors
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.5"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.00"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:out of range;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="-20"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:out of range;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.001e-20"/>
+#errors
+/source/@pixelratio;attribute not defined;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="10.4"/>
 #errors
+/source/@pixelratio;attribute not defined;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="1."/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio=".1"/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="+0.2"/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="43 "/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="aaaa"/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="4 + 0.2"/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="0..3"/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="0.4."/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
     pixelratio="."/>
 #errors
+/source/@pixelratio;attribute not defined;m
 /source/@pixelratio;float:syntax error;m
 
 #data
