@@ -1,37 +1,48 @@
-
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/datatemplate;element not defined;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><rule/></datatemplate>
 #errors
+/datatemplate;element not defined;m
+/datatemplate/rule;element not defined;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml">
   <rule/>
 </datatemplate>
 #errors
+/datatemplate;element not defined;m
+/datatemplate/rule;element not defined;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml">
   <rule/><!-- -->
 </datatemplate>
 #errors
+/datatemplate;element not defined;m
+/datatemplate/rule;element not defined;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><rule/>aa</datatemplate>
 #errors
+/datatemplate;element not defined;m
+/datatemplate/rule;element not defined;m
 /datatemplate/"aa";character not allowed;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml">aa<rule/></datatemplate>
 #errors
+/datatemplate;element not defined;m
+/datatemplate/rule;element not defined;m
 /datatemplate/"aa";character not allowed;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><p/></datatemplate>
 #errors
+/datatemplate;element not defined;m
 /datatemplate/p;element not allowed:datatemplate;m
 /datatemplate/p;no significant content;s
 
@@ -41,6 +52,7 @@
 <datatemplate/>
 </head>
 #errors
+/head/datatemplate;element not defined;m
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -48,6 +60,7 @@
 </body>
 #errors
 /body;no significant content;s
+/body/datatemplate;element not defined;m
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -55,12 +68,14 @@
 </section>
 #errors
 /section;no significant content;s
+/section/datatemplate;element not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate/>
 </p>
 #errors
+/p/datatemplate;element not defined;m
 /p/datatemplate;element not allowed:phrasing;m
 /p;no significant content;s
 
@@ -72,28 +87,34 @@
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p/></rule>
 #errors
+/rule;element not defined;m
 /rule/p;no significant content;s
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">aa</rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><!----><?a?></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><unknownelement/></rule>
 #errors
+/rule;element not defined;m
 /rule/unknownelement;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><unknown xmlns=""/></rule>
 #errors
+/rule;element not defined;m
 /rule/unknown;unknown element;u
 
 #data
@@ -101,115 +122,147 @@
 <unknown xmlns="http://www.example.org/"/>
 </rule>
 #errors
+/rule;element not defined;m
 /rule/unknown;unknown element;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><rule/></p>
 #errors
+/p/rule;element not defined;m
 /p/rule;element not allowed:phrasing;m
 /p;no significant content;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><rule/></body>
 #errors
+/body/rule;element not defined;m
 /body/rule;element not allowed:flow;m
 /body;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><rule/></head>
 #errors
+/head/rule;element not defined;m
 /head/rule;element not allowed:metadata;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/nest;element not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml">  </nest>
 #errors
+/nest;element not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml">aa</nest>
 #errors
+/nest;element not defined;m
 /nest/"aa";character not allowed:empty;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml"><p/></nest>
 #errors
+/nest;element not defined;m
 /nest/p;element not allowed:empty;m
 /nest/p;no significant content;s
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml"><!----></nest>
 #errors
+/nest;element not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml"><nest/></nest>
 #errors
+/nest;element not defined;m
+/nest/nest;element not defined;m
 /nest/nest;element not allowed:empty;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><nest/></p>
 #errors
+/p/nest;element not defined;m
 /p/nest;element not allowed:phrasing;m
 /p;no significant content;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"><title/><nest/></head>
 #errors
+/head/nest;element not defined;m
 /head/nest;element not allowed:metadata;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><nest/></div>
 #errors
+/div/nest;element not defined;m
 /div/nest;element not allowed:flow;m
 /div;no significant content;s
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml"><nest/></datatemplate>
 #errors
+/datatemplate;element not defined;m
+/datatemplate/nest;element not defined;m
 /datatemplate/nest;element not allowed:datatemplate;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><nest/></rule>
 #errors
+/rule;element not defined;m
+/rule/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><br><nest/></br></rule>
 #errors
+/rule;element not defined;m
+/rule/br/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><br><nest/>a</br></rule>
 #errors
+/rule;element not defined;m
 /rule/br/"a";character not allowed:empty;m
+/rule/br/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><title><nest/></title></rule>
 #errors
+/rule;element not defined;m
+/rule/title/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><title><nest/>aa</title></rule>
 #errors
+/rule;element not defined;m
+/rule/title/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <plaintext><nest/></plaintext>
 </rule>
 #errors
+/rule;element not defined;m
 /rule/plaintext;element not defined;m
+/rule/plaintext/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><section><nest/></section></rule>
 #errors
+/rule;element not defined;m
 /rule/section;no significant content;s
+/rule/section/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <section><style scoped=""/><nest/></section>
 </rule>
 #errors
+/rule;element not defined;m
 /rule/section/style;SUBDOC
 /rule/section;no significant content;s
+/rule/section/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -218,6 +271,8 @@
 #errors
 /rule/section/style;SUBDOC
 /rule/section;no significant content;s
+/rule;element not defined;m
+/rule/section/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -227,6 +282,8 @@
 /rule/section/style;SUBDOC
 /rule/section;no significant content;s
 /rule/section/p;no significant content;s
+/rule;element not defined;m
+/rule/section/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -237,78 +294,108 @@
 /rule/section/style;SUBDOC
 /rule/section;no significant content;s
 /rule/section/p;no significant content;s
+/rule;element not defined;m
+/rule/section/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p><nest/></p></rule>
 #errors
 /rule/p;no significant content;s
+/rule;element not defined;m
+/rule/p/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p><nest/>aaa</p></rule>
 #errors
+/rule;element not defined;m
+/rule/p/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p><!----><nest/></p></rule>
 #errors
 /rule/p;no significant content;s
+/rule;element not defined;m
+/rule/p/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><body><nest/></body></rule>
 #errors
 /rule/body;no significant content;s
+/rule;element not defined;m
+/rule/body/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><em><nest/></em></rule>
 #errors
 /rule/em;no significant content;s
+/rule;element not defined;m
+/rule/em/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><em>aa<nest/></em></rule>
 #errors
+/rule;element not defined;m
+/rule/em/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><em><nest/><i/></em></rule>
 #errors
 /rule/em;no significant content;s
 /rule/em/i;no significant content;s
+/rule;element not defined;m
+/rule/em/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><sub><nest/></sub></rule>
 #errors
 /rule/sub;no significant content;s
+/rule;element not defined;m
+/rule/sub/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><sup><nest/><sub/></sup></rule>
 #errors
 /rule/sup;no significant content;s
 /rule/sup/sub;no significant content;s
+/rule;element not defined;m
+/rule/sup/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><sub><em><nest/></em></sub></rule>
 #errors
 /rule/sub;no significant content;s
 /rule/sub/em;no significant content;s
+/rule;element not defined;m
+/rule/sub/em/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/></div></rule>
 #errors
 /rule/div;no significant content;s
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><p/></div></rule>
 #errors
 /rule/div;no significant content;s
 /rule/div/p;no significant content;s
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><i/></div></rule>
 #errors
 /rule/div;no significant content;s
 /rule/div/i;no significant content;s
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/>aa</div></rule>
 #errors
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><nest/><p/><i/></div></rule>
@@ -316,64 +403,88 @@
 /rule/div;no significant content;s
 /rule/div/p;no significant content;s
 /rule/div/i;no significant content;s
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><p/><nest/></div></rule>
 #errors
 /rule/div;no significant content;s
 /rule/div/p;no significant content;s
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div><i/><nest/></div></rule>
 #errors
 /rule/div;no significant content;s
 /rule/div/i;no significant content;s
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div>aa<nest/></div></rule>
 #errors
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><div>aa<nest/><p/></div></rule>
 #errors
 /rule/div/p;no significant content;s
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/></aside></rule>
 #errors
 /rule/aside;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/>aa</aside></rule>
 #errors
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/><i/></aside></rule>
 #errors
 /rule/aside;no significant content;s
 /rule/aside/i;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><nest/><p/></aside></rule>
 #errors
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside>aa<nest/></aside></rule>
 #errors
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><i/><nest/></aside></rule>
 #errors
 /rule/aside;no significant content;s
 /rule/aside/i;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><aside><p/><nest/></aside></rule>
 #errors
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -382,6 +493,8 @@
 #errors
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -389,6 +502,8 @@
 </rule>
 #errors
 /rule/aside/style;SUBDOC
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -398,6 +513,8 @@
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/i;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -407,6 +524,8 @@
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/blockquote;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -417,6 +536,8 @@
 /rule/aside;no significant content;s
 /rule/aside/blockquote;no significant content;s
 /rule/aside/p;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -427,6 +548,8 @@
 /rule/aside;no significant content;s
 /rule/aside/blockquote;no significant content;s
 /rule/aside/i;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -436,6 +559,8 @@
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -444,6 +569,8 @@
 #errors
 /rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -454,6 +581,8 @@
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/i;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -464,12 +593,16 @@
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <aside>aa<nest/></aside>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -478,6 +611,8 @@
 #errors
 /rule/aside;no significant content;s
 /rule/aside/i;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -486,6 +621,8 @@
 #errors
 /rule/aside;no significant content;s
 /rule/aside/blockquote;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -494,6 +631,8 @@
 #errors
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -502,6 +641,8 @@
 #errors
 /rule/aside/style;element not allowed:flow style;m
 /rule/aside/style;SUBDOC
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -512,6 +653,8 @@
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/i;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -522,6 +665,8 @@
 /rule/aside/style;SUBDOC
 /rule/aside/blockquote;no significant content;s
 /rule/aside;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -532,119 +677,171 @@
 /rule/aside/style;SUBDOC
 /rule/aside;no significant content;s
 /rule/aside/p;no significant content;s
+/rule;element not defined;m
+/rule/aside/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/></ruby></rule>
 #errors
 /rule/ruby;no significant content;s
 /rule/ruby;element missing;rt;m
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/><rt>x</rt></ruby></rule>
 #errors
 /rule/ruby/rt;no significant content before;s
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby><nest/>x<rt>y</rt></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<nest/><rt>y</rt></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rt>y</rt><nest/></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rt><nest/></rt></ruby></rule>
 #errors
 /rule/ruby/rt;no significant content;s
+/rule;element not defined;m
+/rule/ruby/rt/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp><nest/>(</rp><rt>y</rt><rp>)</rp></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/rp/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp><nest/></rp><rt>y</rt><rp>)</rp></ruby></rule>
 #errors
 /rule/ruby/rp;no significant content;s
+/rule;element not defined;m
+/rule/ruby/rp/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>(<nest/>(</rp><rt>y</rt><rp>]</rp></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/rp/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt><nest/></rt><rp>]</rp></ruby></rule>
 #errors
 /rule/ruby/rt;no significant content;s
+/rule;element not defined;m
+/rule/ruby/rt/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><rp>]<nest/></rp></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/rp/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><rp>]<nest/></rp></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/rp/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><nest/><rt>y</rt><rp>]</rp></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>y</rt><nest/><rp>]</rp></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>c</rt><rp>]</rp><nest/></ruby></rule>
 #errors
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ruby>x<rp>[</rp><rt>c</rt><nest/></ruby></rule>
 #errors
 /rule/ruby;element missing;rp;m
+/rule;element not defined;m
+/rule/ruby/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rt><nest/></rt></rule>
 #errors
 /rule/rt;no significant content;s
+/rule;element not defined;m
+/rule/rt/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rt>x<nest/></rt></rule>
 #errors
+/rule;element not defined;m
+/rule/rt/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rp><nest/></rp></rule>
 #errors
 /rule/rp;no significant content;s
+/rule;element not defined;m
+/rule/rp/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rp>(<nest/></rp></rule>
 #errors
+/rule;element not defined;m
+/rule/rp/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rp><nest/>)</rp></rule>
 #errors
+/rule;element not defined;m
+/rule/rp/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><rb><nest/></rb></rule>
 #errors
 /rule/rb;element not defined;m
+/rule;element not defined;m
+/rule/rb/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ins><nest/></ins></rule>
 #errors
+/rule;element not defined;m
+/rule/ins/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><p><ins><nest/></ins></p></rule>
 #errors
 /rule/p;no significant content;s
+/rule;element not defined;m
+/rule/p/ins/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html><nest/></html></rule>
 #errors
 /rule/html;child element missing;head;m
 /rule/html;child element missing;body;m
+/rule;element not defined;m
+/rule/html/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -652,6 +849,8 @@
 </html></rule>
 #errors
 /rule/html/body;no significant content;s
+/rule;element not defined;m
+/rule/html/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -659,6 +858,8 @@
 </html></rule>
 #errors
 /rule/html/body;no significant content;s
+/rule;element not defined;m
+/rule/html/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -666,6 +867,8 @@
 </html></rule>
 #errors
 /rule/html/body;no significant content;s
+/rule;element not defined;m
+/rule/html/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -675,6 +878,8 @@
 /rule/html/body;element not allowed;m
 /rule/html/body;no significant content;s
 /rule/html/body;no significant content;s
+/rule;element not defined;m
+/rule/html/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -682,6 +887,8 @@
 </html></rule>
 #errors
 /rule/html;child element missing;body;m
+/rule;element not defined;m
+/rule/html/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -690,6 +897,8 @@
 #errors
 /rule/html/body;ps element missing;head;m
 /rule/html/body;no significant content;s
+/rule;element not defined;m
+/rule/html/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><html>
@@ -697,6 +906,8 @@
 </html></rule>
 #errors
 /rule/html/body;no significant content;s
+/rule;element not defined;m
+/rule/html/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -704,30 +915,40 @@
 </rule>
 #errors
 /rule/head;child element missing;title;m
+/rule;element not defined;m
+/rule/head/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <head><title/><nest/></head>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/head/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <head><nest/><title/></head>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/head/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <head><nest/><base href="http://www.example.com/"/><title/></head>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/head/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <head><base href="http://www.example.com/"/><nest/><title/></head>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/head/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -737,6 +958,8 @@
 /rule/head/meta;element not allowed:meta charset;m
 /rule/head/meta;in XML:charset;m
 /rule/head/meta/@charset;mismatched charset name not checked;u
+/rule;element not defined;m
+/rule/head/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -746,73 +969,101 @@
 /rule/head/meta;element not allowed:meta charset;m
 /rule/head/meta;in XML:charset;m
 /rule/head/meta/@charset;mismatched charset name not checked;u
+/rule;element not defined;m
+/rule/head/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><style><nest/></style></rule>
 #errors
 /rule/style;SUBDOC
+/rule;element not defined;m
+/rule/style/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><script><nest/></script></rule>
 #errors
 /rule/script;SUBDOC
+/rule;element not defined;m
+/rule/script/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/></footer></rule>
 #errors
 /rule/footer;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/>a</footer></rule>
 #errors
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><i/></footer></rule>
 #errors
 /rule/footer;no significant content;s
 /rule/footer/i;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><ul/></footer></rule>
 #errors
 /rule/footer;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><p/></footer></rule>
 #errors
 /rule/footer;no significant content;s
 /rule/footer/p;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer>a<nest/></footer></rule>
 #errors
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><i/><nest/></footer></rule>
 #errors
 /rule/footer;no significant content;s
 /rule/footer/i;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><ol/><nest/></footer></rule>
 #errors
 /rule/footer;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><p/><nest/></footer></rule>
 #errors
 /rule/footer;no significant content;s
 /rule/footer/p;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer>a<nest/><p/></footer></rule>
 #errors
 /rule/footer/p;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><p/><nest/>a</footer></rule>
 #errors
 /rule/footer/p;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>
@@ -820,10 +1071,14 @@
 /rule/footer/h1;element not allowed:minus;m
 /rule/footer;no significant content;s
 /rule/footer/h1;no significant content;s
+/rule;element not defined;m
+/rule/footer/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dialog><nest/></dialog></rule>
 #errors
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -832,6 +1087,8 @@
 #errors
 /rule/dialog;child element missing;dd;m
 /rule/dialog/dt;no significant content;s
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -840,6 +1097,8 @@
 #errors
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dd;no significant content;s
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -850,6 +1109,8 @@
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dd;no significant content;s
 /rule/dialog/dt;no significant content;s
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -860,6 +1121,8 @@
 /rule/dialog/dd;no significant content;s
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dd;no significant content;s
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -868,6 +1131,8 @@
 #errors
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dd;no significant content;s
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -878,6 +1143,8 @@
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dd;no significant content;s
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -886,6 +1153,8 @@
 #errors
 /rule/dialog;child element missing;dd;m
 /rule/dialog/dt;no significant content;s
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -894,58 +1163,80 @@
 #errors
 /rule/dialog/dt;no significant content;s
 /rule/dialog/dd;no significant content;s
+/rule;element not defined;m
+/rule/dialog/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ul><nest/></ul></rule>
 #errors
+/rule;element not defined;m
+/rule/ul/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ul><li/><nest/></ul></rule>
 #errors
 /rule/ul/li;no significant content;s
+/rule;element not defined;m
+/rule/ul/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ul><nest/><li/></ul></rule>
 #errors
 /rule/ul/li;no significant content;s
+/rule;element not defined;m
+/rule/ul/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ol><nest/></ol></rule>
 #errors
+/rule;element not defined;m
+/rule/ol/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/></dl></rule>
 #errors
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/><dt/></dl></rule>
 #errors
 /rule/dl;child element missing;dd;m
 /rule/dl/dt;no significant content;s
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><nest/></dl></rule>
 #errors
 /rule/dl;child element missing;dd;m
 /rule/dl/dt;no significant content;s
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><nest/><dd/></dl></rule>
 #errors
 /rule/dl/dt;no significant content;s
 /rule/dl/dd;no significant content;s
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><dt/><dd/><nest/></dl></rule>
 #errors
 /rule/dl/dt;no significant content;s
 /rule/dl/dd;no significant content;s
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><dl><nest/><dt/><dd/></dl></rule>
 #errors
 /rule/dl/dt;no significant content;s
 /rule/dl/dd;no significant content;s
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -956,6 +1247,8 @@
 /rule/dl/dd;no significant content;s
 /rule/dl/dt;no significant content;s
 /rule/dl/dd;no significant content;s
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -965,6 +1258,8 @@
 /rule/dl/dt;no significant content;s
 /rule/dl/dt;no significant content;s
 /rule/dl/dd;no significant content;s
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -974,49 +1269,67 @@
 /rule/dl/dt;no significant content;s
 /rule/dl/dd;no significant content;s
 /rule/dl/dd;no significant content;s
+/rule;element not defined;m
+/rule/dl/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/></del></rule>
 #errors
+/rule;element not defined;m
+/rule/del/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/>aa</del></rule>
 #errors
+/rule;element not defined;m
+/rule/del/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/><p/></del></rule>
 #errors
 /rule/del/p;no significant content;s
+/rule;element not defined;m
+/rule/del/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video src="/"><nest/></video>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/video/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><nest/><source src="/"/></video>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/video/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><source src="/"/><nest/><source src="/"/></video>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/video/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <video><source src="/"/><nest/></video>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/video/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <table><nest/></table>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/table/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1024,6 +1337,8 @@
 </rule>
 #errors
 /rule/table/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/table/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1031,6 +1346,8 @@
 </rule>
 #errors
 /rule/table/tbody/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/table/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1038,6 +1355,8 @@
 </rule>
 #errors
 /rule/table/tbody/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/table/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1048,36 +1367,48 @@
 /rule/table/caption;no significant content;s
 /rule/table/caption;no significant content;s
 /rule/table/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/table/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <colgroup><nest/></colgroup>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/colgroup/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <colgroup><col/><nest/></colgroup>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/colgroup/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <colgroup><nest/><col/></colgroup>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/colgroup/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <colgroup><col/><nest/><col/></colgroup>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/colgroup/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <tbody><nest/></tbody>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/tbody/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1085,6 +1416,8 @@
 </rule>
 #errors
 /rule/tbody/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/tbody/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1092,12 +1425,16 @@
 </rule>
 #errors
 /rule/tbody/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/tbody/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <tr><nest/></tr>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/tr/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1105,6 +1442,8 @@
 </rule>
 #errors
 /rule/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/tr/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1112,6 +1451,8 @@
 </rule>
 #errors
 /rule/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/tr/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1119,6 +1460,8 @@
 </rule>
 #errors
 /rule/tr/th;no significant content;s
+/rule;element not defined;m
+/rule/tr/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1127,36 +1470,48 @@
 #errors
 /rule/tr/th;no significant content;s
 /rule/tr/td;no significant content;s
+/rule;element not defined;m
+/rule/tr/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><form/></rule>
 #errors
 /rule/form;no significant content;s
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><form><nest/></form></rule>
 #errors
 /rule/form;no significant content;s
+/rule;element not defined;m
+/rule/form/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><form><style scoped=""></style><nest/></form></rule>
 #errors
 /rule/form;no significant content;s
 /rule/form/style;SUBDOC
+/rule;element not defined;m
+/rule/form/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><input/></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><input><nest/></input></rule>
 #errors
+/rule;element not defined;m
+/rule/input/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><input>
 <nest/>
 </input></rule>
 #errors
+/rule;element not defined;m
+/rule/input/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1164,121 +1519,168 @@
 </rule>
 #errors
 /rule/head/noscript;in XML:noscript;m
+/rule;element not defined;m
+/rule/head/noscript/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><button>x</button></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><button><nest/></button></rule>
 #errors
 /rule/button;no significant content;s
+/rule;element not defined;m
+/rule/button/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><button>x<nest/></button></rule>
 #errors
+/rule;element not defined;m
+/rule/button/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><label>x</label></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><label><nest/></label></rule>
 #errors
 /rule/label;no significant content;s
+/rule;element not defined;m
+/rule/label/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><label>x<nest/></label></rule>
 #errors
+/rule;element not defined;m
+/rule/label/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><select/></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><select><nest/></select></rule>
 #errors
+/rule;element not defined;m
+/rule/select/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><select><option><nest/></option></select></rule>
 #errors
+/rule;element not defined;m
+/rule/select/option/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><select><option>x</option><nest/><option>u</option></select></rule>
 #errors
+/rule;element not defined;m
+/rule/select/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><datalist/></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><datalist><nest/></datalist></rule>
 #errors
+/rule;element not defined;m
+/rule/datalist/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><datalist><nest/><option/></datalist></rule>
 #errors
+/rule;element not defined;m
+/rule/datalist/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><datalist><nest/><option/>x</datalist></rule>
 #errors
 /rule/datalist/"x";character not allowed;m
+/rule;element not defined;m
+/rule/datalist/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><datalist><nest/>x<option/></datalist></rule>
 #errors
 /rule/datalist/option;element not allowed:phrasing;m
+/rule;element not defined;m
+/rule/datalist/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><datalist>x<nest/><option/></datalist></rule>
 #errors
 /rule/datalist/option;element not allowed:phrasing;m
+/rule;element not defined;m
+/rule/datalist/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><datalist><option/><nest/><option/></datalist></rule>
 #errors
+/rule;element not defined;m
+/rule/datalist/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><optgroup/></rule>
 #errors
 /rule/optgroup;attribute missing;label;m
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><optgroup><nest/></optgroup></rule>
 #errors
 /rule/optgroup;attribute missing;label;m
+/rule;element not defined;m
+/rule/optgroup/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><option/></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><option><nest/></option></rule>
 #errors
+/rule;element not defined;m
+/rule/option/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><textarea/></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><textarea>xx</textarea></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><textarea><nest/></textarea></rule>
 #errors
+/rule;element not defined;m
+/rule/textarea/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><textarea>aa<nest/>bb</textarea></rule>
 #errors
+/rule;element not defined;m
+/rule/textarea/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><output>x</output></rule>
 #errors
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><output>x<nest/></output></rule>
 #errors
+/rule;element not defined;m
+/rule/output/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><head><title/>
@@ -1286,6 +1688,8 @@
 </head></rule>
 #errors
 /rule/head/noscript;in XML:noscript;m
+/rule;element not defined;m
+/rule/head/noscript/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1294,6 +1698,8 @@
 #errors
 /rule/datagrid;no significant content;s
 /rule/datagrid;element not defined;m
+/rule;element not defined;m
+/rule/datagrid/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1302,6 +1708,8 @@
 #errors
 /rule/datagrid;no significant content;s
 /rule/datagrid;element not defined;m
+/rule;element not defined;m
+/rule/datagrid/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1311,6 +1719,8 @@
 /rule/datagrid;no significant content;s
 /rule/datagrid/p;no significant content;s
 /rule/datagrid;element not defined;m
+/rule;element not defined;m
+/rule/datagrid/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1320,6 +1730,8 @@
 /rule/datagrid;no significant content;s
 /rule/datagrid/p;no significant content;s
 /rule/datagrid;element not defined;m
+/rule;element not defined;m
+/rule/datagrid/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1329,20 +1741,26 @@
 /rule/datagrid;no significant content;s
 /rule/datagrid/p;no significant content;s
 /rule/datagrid;element not defined;m
+/rule;element not defined;m
+/rule/datagrid/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></rule>
 #errors
 /rule/bb;element not defined;m
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><bb>x<nest/></bb></rule>
 #errors
 /rule/bb;element not defined;m
+/rule;element not defined;m
+/rule/bb/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><ins><bb>x</bb></ins></rule>
 #errors
+/rule;element not defined;m
 /rule/ins/bb;element not defined;m
 
 #data
@@ -1351,6 +1769,8 @@
 </rule>
 #errors
 /rule/menu;no significant content;s
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1358,6 +1778,8 @@
 </rule>
 #errors
 /rule/menu/li;no significant content;s
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1365,6 +1787,8 @@
 </rule>
 #errors
 /rule/menu/li;no significant content;s
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1373,24 +1797,32 @@
 #errors
 /rule/menu/li;no significant content;s
 /rule/menu/li;no significant content;s
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <menu>aa<nest/></menu>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <menu><nest/>aa</menu>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <menu>aa<nest/>bb</menu>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1399,6 +1831,8 @@
 #errors
 /rule/menu/li;element not allowed;m
 /rule/menu/li;no significant content;s
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1407,54 +1841,78 @@
 #errors
 /rule/menu/"aa";character not allowed;m
 /rule/menu/li;no significant content;s
+/rule;element not defined;m
+/rule/menu/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate><nest/></datatemplate>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/datatemplate;element not defined;m
+/rule/datatemplate/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate><nest/><rule/></datatemplate>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/datatemplate;element not defined;m
+/rule/datatemplate/nest;element not defined;m
+/rule/datatemplate/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <datatemplate><rule/><nest/></datatemplate>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/datatemplate;element not defined;m
+/rule/datatemplate/rule;element not defined;m
+/rule/datatemplate/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <rule><nest/></rule>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/rule;element not defined;m
+/rule/rule/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name><nest/></a:name></a:author>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/author/name/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name><nest/>aa</a:name></a:author>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/author/name/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:author xmlns:a="http://www.w3.org/2005/Atom"><a:name>aa<nest/></a:name></a:author>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/author/name/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:author xmlns:a="http://www.w3.org/2005/Atom"><a:uri><nest/>http://www.example.org/</a:uri><a:name/></a:author>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/author/uri/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1462,36 +1920,48 @@
 </rule>
 #errors
 /rule/author/email;addr-spec not supported;u
+/rule;element not defined;m
+/rule/author/email/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:published xmlns:a="http://www.w3.org/2005/Atom">2006-12-31T00:00:00Z<nest/></a:published>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/published/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:entry xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:content/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/></a:entry>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/entry/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:entry xmlns:a="http://www.w3.org/2005/Atom"><nest/><a:id>http://www.example.org/</a:id><a:title/><a:content/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated></a:entry>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/entry/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:feed xmlns:a="http://www.w3.org/2005/Atom"><nest/><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated></a:feed>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/feed/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
 <a:feed xmlns:a="http://www.w3.org/2005/Atom"><a:id>http://www.example.org/</a:id><a:title/><a:link rel="self" href="/"/><a:author><a:name/></a:author><a:updated>2006-12-31T00:00:00Z</a:updated><nest/></a:feed>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/feed/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1499,6 +1969,8 @@
 </rule>
 #errors
 /rule/feed/entry;child element missing:atom;author;m
+/rule;element not defined;m
+/rule/feed/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1507,6 +1979,8 @@
 #errors
 /rule/feed/entry;child element missing:atom;author;m
 /rule/feed/entry;child element missing:atom;author;m
+/rule;element not defined;m
+/rule/feed/nest;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1517,6 +1991,10 @@
 /div/datatemplate/nest;element not allowed:datatemplate;m
 /div/nest;element not allowed:flow;m
 /div;no significant content;s
+/div/datatemplate;element not defined;m
+/div/datatemplate/rule;element not defined;m
+/div/datatemplate/nest;element not defined;m
+/div/nest;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1525,176 +2003,251 @@
 #errors
 /div/datatemplate/nest;element not allowed:datatemplate;m
 /div;no significant content;s
+/div/datatemplate;element not defined;m
+/div/datatemplate/rule;element not defined;m
+/div/datatemplate/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode=""/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="  "/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a"/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a  b"/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a A"/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a a"/>
 #errors
 /rule/@mode;duplicate token;m
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
 #errors
 /rule/@mode;duplicate token;m
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <?xml version="1.1"?>
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;a"/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <?xml version="1.1"?>
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="a a&#x0b;"/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <?xml version="1.1"?>
 <rule xmlns="http://www.w3.org/1999/xhtml" mode="&#x0b;a a"/>
 #errors
+/rule;element not defined;m
+/rule/@mode;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition=""/>
 #errors
 /rule/@condition;no sss;m
+/rule;element not defined;m
+/rule/@condition;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="  "/>
 #errors
 /rule/@condition;no sss;m
+/rule;element not defined;m
+/rule/@condition;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a"/>
 #errors
+/rule;element not defined;m
+/rule/@condition;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a b "/>
 #errors
+/rule;element not defined;m
+/rule/@condition;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a, b"/>
 #errors
+/rule;element not defined;m
+/rule/@condition;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
 #errors
 /rule/@condition;namespace prefix:not declared;m
+/rule;element not defined;m
+/rule/@condition;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="a["/>
 #errors
 /rule/@condition;no attr name;m
+/rule;element not defined;m
+/rule/@condition;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" condition="*/**/*"/>
 #errors
 /rule/@condition;no combinator;m
+/rule;element not defined;m
+/rule/@condition;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml" filter=""/>
 #errors
+/rule;element not defined;m
 /rule/@filter;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode=""/>
 #errors
 /nest/@mode;mode:syntax error;m
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode=" "/>
 #errors
 /nest/@mode;mode:syntax error;m
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a"/>
 #errors
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a "/>
 #errors
 /nest/@mode;mode:syntax error;m
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a b"/>
 #errors
 /nest/@mode;mode:syntax error;m
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x9;a&#xA;"/>
 #errors
 /nest/@mode;mode:syntax error;m
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="&#x3000;"/>
 #errors
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <?xml version="1.1"?>
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;"/>
 #errors
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <?xml version="1.1"?>
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="&#x0b;a"/>
 #errors
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <?xml version="1.1"?>
 <nest xmlns="http://www.w3.org/1999/xhtml" mode="a&#x0b;a"/>
 #errors
+/nest;element not defined;m
+/nest/@mode;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter=""/>
 #errors
 /nest/@filter;no sss;m
+/nest;element not defined;m
+/nest/@filter;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="  "/>
 #errors
 /nest/@filter;no sss;m
+/nest;element not defined;m
+/nest/@filter;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="a b"/>
 #errors
+/nest;element not defined;m
+/nest/@filter;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="a + b"/>
 #errors
+/nest;element not defined;m
+/nest/@filter;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="a.b#c[d]"/>
 #errors
+/nest;element not defined;m
+/nest/@filter;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" filter="a|b"/>
 #errors
 /nest/@filter;namespace prefix:not declared;m
+/nest;element not defined;m
+/nest/@filter;attribute not defined;m
 
 #data
 <nest xmlns="http://www.w3.org/1999/xhtml" condition="a|b"/>
 #errors
+/nest;element not defined;m
 /nest/@condition;attribute not defined;m
 
 #data
@@ -1704,6 +2257,8 @@
   </datatemplate>
 </div>
 #errors
+/div/@template;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1711,6 +2266,8 @@
   <p template="#a">x</p>
 </div>
 #errors
+/div/p/@template;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1718,12 +2275,16 @@
   <datatemplate id="a"/>
 </div>
 #errors
+/div/p/@template;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
   <div template="#a">x<datatemplate id="a"></datatemplate></div>
 </div>
 #errors
+/div/div/@template;attribute not defined;m
+/div/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1732,6 +2293,7 @@
 </div>
 #errors
 /div/p/@template;template:not template;m
+/div/p/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1739,6 +2301,7 @@
 </div>
 #errors
 /div/p/@template;template:not template;m
+/div/p/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1746,6 +2309,7 @@
 </div>
 #errors
 /div/p/@template;template:not template;m
+/div/p/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1753,6 +2317,7 @@
 </div>
 #errors
 /div/p/@template;template:not template;m
+/div/p/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1762,16 +2327,20 @@
 #errors
 /div/p/@template;template:not template;m
 /div/datatemplate/@id;empty attribute value;m
+/div/p/@template;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"
     template="external-template">x</div>
 #errors
+/div/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"
     template="external-inline-template#temlate">x</div>
 #errors
+/div/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1779,13 +2348,16 @@
 </div>
 #errors
 /div/p/@template;template:not template;m
+/div/p/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
   <datatemplate id="itself" template="#itself"/>x
 </div>
 #errors
+/div/datatemplate;element not defined;m
 /div/datatemplate/@template;fragment points itself;m
+/div/datatemplate/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1794,6 +2366,9 @@
   <datatemplate id="t"/>
 </div>
 #errors
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1802,6 +2377,9 @@
   <datatemplate id="t"/>
 </div>
 #errors
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1811,6 +2389,9 @@
 </div>
 #errors
 /div/div/@id;empty attribute value;m
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1818,6 +2399,9 @@
   <datatemplate id="t"/>
 </div>
 #errors
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1826,6 +2410,9 @@
 </div>
 #errors
 /div/div/@ref;fragment points nothing;m
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1833,6 +2420,9 @@
   <datatemplate id="t"/>
 </div>
 #errors
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1840,6 +2430,9 @@
   <datatemplate id="t"/>
 </div>
 #errors
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1847,6 +2440,9 @@
   <datatemplate id="t"/>
 </div>
 #errors
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1855,41 +2451,54 @@
 </div>
 #errors
 /div/div/@ref;fragment points itself;m
+/div/div/@template;attribute not defined;m
+/div/div/@ref;attribute not defined;m
+/div/datatemplate;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
 #errors
 /div/@ref;attribute not allowed;m
+/div/@ref;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"
     registrationmark="">x</div>
 #errors
 /div/@registrationmark;attribute not allowed;m
+/div/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"
     registrationmark="">x</rule>
 #errors
+/rule;element not defined;m
 /rule/@registrationmark;attribute not allowed;m
+/rule/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
   <div registrationmark="">x</div>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/div/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
   <div registrationmark="xxxx">x</div>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/div/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
   <div registrationmark="a b c">x</div>
 </rule>
 #errors
+/rule/div/@registrationmark;attribute not defined;m
+/rule;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1897,6 +2506,9 @@
   <div registrationmark="a">x</div>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/div/@registrationmark;attribute not defined;m
+/rule/div/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1905,6 +2517,9 @@
   </rule>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/rule;element not defined;m
+/rule/rule/div/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1913,6 +2528,9 @@
   <div registrationmark="a">x</div>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/rule;element not defined;m
+/rule/div/@registrationmark;attribute not defined;m
 
 #data
 <datatemplate xmlns="http://www.w3.org/1999/xhtml">
@@ -1923,6 +2541,9 @@
 #errors
 /datatemplate/div;element not allowed:datatemplate;m
 /datatemplate/div/@registrationmark;attribute not allowed;m
+/datatemplate;element not defined;m
+/datatemplate/rule;element not defined;m
+/datatemplate/div/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1931,6 +2552,8 @@
   </div>
 </rule>
 #errors
+/rule;element not defined;m
+/rule/div/div/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1940,6 +2563,9 @@
 </rule>
 #errors
 /rule/div/nest/@registrationmark;attribute not allowed;m
+/rule;element not defined;m
+/rule/div/nest;element not defined;m
+/rule/div/nest/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
@@ -1951,10 +2577,14 @@
 </rule>
 #errors
 /rule/div/rule;element not allowed:flow;m
+/rule;element not defined;m
+/rule/div/rule;element not defined;m
+/rule/div/rule/@registrationmark;attribute not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml">
-  <div registartionmark="a">x</div>
+  <div registrationmark="a">x</div>
 </rule>
 #errors
-/rule/div/@registartionmark;attribute not defined;m
+/rule;element not defined;m
+/rule/div/@registrationmark;attribute not defined;m

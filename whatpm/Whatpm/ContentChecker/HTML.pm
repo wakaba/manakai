@@ -1146,13 +1146,20 @@ my $HTMLRefOrTemplateAttrChecker = sub {
       } # DOCEL
     }
   } else {
-    ## TODO: An external document is referenced.
-    ## The document MUST be an HTML or XML document.
-    ## If there is a fragment identifier, it MUST point a part of the doc.
-    ## If the attribute is |template|, the pointed part MUST be a
-    ## |datatemplat| element.
-    ## If no fragment identifier is specified, the root element MUST be
-    ## a |datatemplate| element when the attribute is |template|.
+    ## An external document is referenced.
+
+    ## NOTE: Maybe the same-policy restriction should be posed to the
+    ## referenced document, but the spec did not define such
+    ## requirements and the entire feature has already been dropped
+    ## from the spec anyway.
+
+    ## XXXresource:
+    ## - The document MUST be an HTML or XML document.
+    ## - If there is a fragment identifier, it MUST point a part of the doc.
+    ## - If the attribute is |template|, the pointed part MUST be a
+    ##   |datatemplat| element.
+    ## - If no fragment identifier is specified, the root element MUST be
+    ##   a |datatemplate| element when the attribute is |template|.
   }
 }; # $HTMLRefOrTemplateAttrChecker
 
@@ -1325,10 +1332,13 @@ my $HTMLAttrChecker = {
                          level => $self->{level}->{must});
     }
 
-    ## ISSUE: "Repetition templates may occur anywhere."  Does that mean
-    ## that the attribute MAY be specified to any element, or that the
-    ## element with that attribute (i.e. a repetition template) can be
-    ## inserted anywhere in a document tree?
+    ## NOTE: Where this attribute is allowed to set was not clearly
+    ## defined in Web Forms 2.0.  The spec said that "Repetition
+    ## templates may occur anywhere", which might imply the attribute
+    ## can be specified to any element, but its primary implication
+    ## would be that the template can be appear in any hierarchy in
+    ## the document structure.  Anyway, the feature has been removed
+    ## from the HTML5 spec.
   },
   'repeat-min' => $HTMLRepeatIndexAttrChecker,
   'repeat-max' => $HTMLRepeatIndexAttrChecker,
@@ -1339,15 +1349,18 @@ my $HTMLAttrChecker = {
     if (defined $attr->namespace_uri) {
       my $oe = $attr->owner_element;
       my $oe_nsuri = $oe->namespace_uri;
-      if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) { ## TODO: This condition is wrong?
+      if (defined $oe_nsuri and $oe_nsuri eq $HTML_NS) {
         $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                            level => $self->{level}->{must});
       }
     }
-
-    ## ISSUE: This attribute has no conformance requirement.
-    ## ISSUE: Repetition blocks MAY have this attribute.  Then, is the
-    ## attribute allowed on an element that is not a repetition block?
+    
+    ## NOTE: In the Web Forms 2.0 specification, this attribute had no
+    ## author requirement.  In addition, though the spec said that
+    ## repetition blocks MAY have this attribute specified, it did not
+    ## explicitly prohibit the attribute specified on an element that
+    ## is not a repetition block.  In anyway, the repetition template
+    ## feature has been removed from the HTML5 specification.
   },
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
   spellcheck => $GetHTMLEnumeratedAttrChecker->({
@@ -1367,6 +1380,9 @@ my $HTMLAttrChecker = {
   },
   tabindex => $HTMLIntegerAttrChecker,
   template => $HTMLRefOrTemplateAttrChecker,
+
+  ## The |xml:lang| attribute in the null namespace, which is
+  ## different from the |lang| attribute in the XML's namespace.
   'xml:lang' => sub {
     my ($self, $attr) = @_;
     
@@ -1401,6 +1417,9 @@ my $HTMLAttrChecker = {
       ## TODO: We need to add test for <x {xml}:lang {}xml:lang>.
     }
   },
+
+  ## The |xmlns| attribute in the null namespace, which is different
+  ## from the |xmlns| attribute in the XMLNS namespace.
   xmlns => sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
@@ -1421,8 +1440,6 @@ my $HTMLAttrChecker = {
   },
 };
 
-## ISSUE: Shouldn't the same-origin policy applied to the datatemplate feature?
-
 my %HTMLAttrStatus = (
   accesskey => FEATURE_HTML5_FD,
   class => FEATURE_HTML5_LC,
@@ -1434,8 +1451,8 @@ my %HTMLAttrStatus = (
   id => FEATURE_HTML5_REC,
   irrelevant => FEATURE_HTML5_DROPPED,
   lang => FEATURE_HTML5_REC,
-  ref => FEATURE_HTML5_AT_RISK,
-  registrationmark => FEATURE_HTML5_AT_RISK,
+  ref => FEATURE_HTML5_DROPPED,
+  registrationmark => FEATURE_HTML5_DROPPED,
   repeat => FEATURE_WF2,
   'repeat-max' => FEATURE_WF2,
   'repeat-min' => FEATURE_WF2,
@@ -1445,7 +1462,7 @@ my %HTMLAttrStatus = (
   spellcheck => FEATURE_HTML5_WD,
   style => FEATURE_HTML5_REC,
   tabindex => FEATURE_HTML5_DEFAULT,
-  template => FEATURE_HTML5_AT_RISK,
+  template => FEATURE_HTML5_DROPPED,
   title => FEATURE_HTML5_REC,  
   xmlns => FEATURE_HTML5_WD,
 );
@@ -5885,7 +5902,7 @@ $Element->{$HTML_NS}->{input} = {
          step => FEATURE_HTML5_LC | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
-         template => FEATURE_HTML5_AT_RISK | FEATURE_WF2, ## TODO:dropped
+         template => FEATURE_HTML5_DROPPED | FEATURE_WF2,
          type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          usemap => FEATURE_HTML5_DROPPED | FEATURE_M12N10_REC,
          value => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
@@ -6483,7 +6500,7 @@ $Element->{$HTML_NS}->{button} = {
     replace => FEATURE_WF2,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
-    template => FEATURE_HTML5_AT_RISK | FEATURE_WF2, ## TODO: dropped
+    template => FEATURE_HTML5_DROPPED | FEATURE_WF2,
     type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   }), # check_attrs
@@ -7508,7 +7525,7 @@ $Element->{$HTML_NS}->{menu} = {
 
 $Element->{$HTML_NS}->{datatemplate} = {
   %HTMLChecker,
-  status => FEATURE_HTML5_AT_RISK,
+  status => FEATURE_HTML5_DROPPED,
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -7539,14 +7556,14 @@ $Element->{$HTML_NS}->{datatemplate} = {
 
 $Element->{$HTML_NS}->{rule} = {
   %HTMLChecker,
-  status => FEATURE_HTML5_AT_RISK,
+  status => FEATURE_HTML5_DROPPED,
   check_attrs => $GetHTMLAttrsChecker->({
     condition => $HTMLSelectorsAttrChecker,
     mode => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
   }, {
     %HTMLAttrStatus,
-    condition => FEATURE_HTML5_AT_RISK,
-    mode => FEATURE_HTML5_AT_RISK,
+    condition => FEATURE_HTML5_DROPPED,
+    mode => FEATURE_HTML5_DROPPED,
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -7575,7 +7592,7 @@ $Element->{$HTML_NS}->{rule} = {
 
 $Element->{$HTML_NS}->{nest} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_AT_RISK,
+  status => FEATURE_HTML5_DROPPED,
   check_attrs => $GetHTMLAttrsChecker->({
     filter => $HTMLSelectorsAttrChecker,
     mode => sub {
@@ -7588,8 +7605,8 @@ $Element->{$HTML_NS}->{nest} = {
     },
   }, {
     %HTMLAttrStatus,
-    filter => FEATURE_HTML5_AT_RISK,
-    mode => FEATURE_HTML5_AT_RISK,
+    filter => FEATURE_HTML5_DROPPED,
+    mode => FEATURE_HTML5_DROPPED,
   }),
 };
 
