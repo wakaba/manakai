@@ -1,4 +1,29 @@
-<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2009-08-23T02:02:49Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1250992976"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1250992976</id><title>2009-08-23 Wakaba</title><updated>2009-08-23T02:02:49Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/dom-conformance/ChangeLog	23 Aug 2009 02:02:16 -0000
+<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2009-08-23T02:35:25Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1250994932"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1250994932</id><title>2009-08-23 Wakaba</title><updated>2009-08-23T02:35:25Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/dom-conformance/ChangeLog	23 Aug 2009 02:34:37 -0000
+	* html-form-button.dat: Added test data on interactive content in
+	|button| element (HTML5 revision 2392).
+
+	* html-links-1.dat: Added test data on exclusion of interactive
+	content (HTML5 revision 2455, HTML5 revision 3162, HTML5 revision
+	3338).
+	
+2009-08-23  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+++ whatpm/Whatpm/ChangeLog	23 Aug 2009 02:26:52 -0000
+2009-08-23  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* ContentChecker.pm: Allow &lt;input type=hidden&gt; in context where
+	interactive content is disallowed (HTML5 revision 2392).
+
+++ whatpm/Whatpm/ContentChecker/ChangeLog	23 Aug 2009 02:35:21 -0000
+	* HTML.pm: Disallow interactive content in |button| element (HTML5
+	revision 2392).  Marked |img| and |object| (with |usemap|
+	attribute) elements, |iframe| element, and |embed| element as
+	interactive content (HTML5 revision 2455, HTML5 revision 3162,
+	HTML5 revision 3338).
+
+2009-08-23  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+</content></entry><entry xml:id="entry-1250992976"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1250992976</id><title>2009-08-23 Wakaba</title><updated>2009-08-23T02:02:49Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/dom-conformance/ChangeLog	23 Aug 2009 02:02:16 -0000
 2009-08-23  Wakaba  &lt;wakaba@suika.fam.cx&gt;
 
 	* html-texts-1.dat: Revised and added test data on |time| and

@@ -305,8 +305,16 @@ my $HTMLPhrasingContent = {
 my $HTMLInteractiveContent = {
   $HTML_NS => {
     a => 1,
-    label => 1, input => 1, button => 1, select => 1, textarea => 1,
-    keygen => 1, details => 1, datagrid => 1, bb => 1,
+    label => 1, button => 1, select => 1, textarea => 1,
+    keygen => 1, details => 1,
+    datagrid => 1, bb => 1, ## dropped
+    iframe => 1, embed => 1,
+
+    ## NOTE: When the |usemap| attribute is specified.
+    img => 1, object => 1,
+
+    ## NOTE: When "type=hidden" attribute is not specified.
+    input => 1,
 
     ## NOTE: When "controls" attribute is specified.
     video => 1, audio => 1,
@@ -314,7 +322,7 @@ my $HTMLInteractiveContent = {
     ## NOTE: When "type=toolbar" attribute is specified.
     menu => 1,
   },
-};
+}; # $HTMLInteractiveContent
 
 ## NOTE: Labelable form-associated element.
 my $LabelableFAE = {
@@ -6359,7 +6367,7 @@ $Element->{$HTML_NS}->{input} = {
 ## height of referenced resource.
 
 $Element->{$HTML_NS}->{button} = {
-  %HTMLPhrasingContentChecker, ## ISSUE: -interactive?
+  %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     ## XXXISSUE: In HTML5, no "MUST NOT" for using |action|, |method|,
@@ -6438,12 +6446,15 @@ $Element->{$HTML_NS}->{button} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
     $FAECheckStart->($self, $item, $element_state);
 
-    ## ISSUE: "The value attribute must not be present unless the form
-    ## [content] attribute is present.": Wrong?
+    ## XXXISSUE: "The value attribute must not be present unless the
+    ## form [content] attribute is present.": Wrong?  Maybe it should
+    ## also be allowed when there is an ancestor |form| element.
     
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
+    $element_state->{uri_info}->{formaction}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -6452,6 +6463,12 @@ $Element->{$HTML_NS}->{button} = {
     my ($self, $item, $element_state) = @_;
     $FAECheckAttrs2->($self, $item, $element_state);
   }, # check_attrs2
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  }, # check_end
 }; # button
 
 $Element->{$HTML_NS}->{label} = {

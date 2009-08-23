@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.109 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.110 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -333,17 +333,21 @@ our $IsInHTMLInteractiveContent = sub {
   ## true for non-interactive content as long as the element cannot be
   ## interactive content.
 
-  if ($nsuri eq $HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
+  if ($nsuri eq $HTML_NS and $ln eq 'input') {
+    my $value = $el->get_attribute_ns (undef, 'type');
+    $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    return ($value ne 'hidden');
+  } elsif ($nsuri eq $HTML_NS and ($ln eq 'img' or $ln eq 'object')) {
+    return $el->has_attribute_ns (undef, 'usemap');
+  } elsif ($nsuri eq $HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
     return $el->has_attribute_ns (undef, 'controls');
   } elsif ($nsuri eq $HTML_NS and $ln eq 'menu') {
     my $value = $el->get_attribute_ns (undef, 'type');
-    $value =~ tr/A-Z/a-z/; # ASCII case-insensitive
+    $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     return ($value eq 'toolbar');
   } else {
     return 1;
   }
-
-  ## TODO: input:not([type=hidden])
 }; # $IsInHTMLInteractiveContent
 
 my $HTMLTransparentElements = {
@@ -1092,4 +1096,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2009/08/22 09:35:35 $
+# $Date: 2009/08/23 02:35:33 $

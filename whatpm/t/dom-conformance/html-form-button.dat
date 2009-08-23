@@ -1130,3 +1130,26 @@
 >a</button>
 #errors
 /button/@formnovalidate;boolean:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">
+  aaa
+  <input/>
+</button>
+#errors
+/button/input;element not allowed:minus;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">
+  aaa
+  <input type="hidden"/>
+</button>
+#errors
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">
+  aaa
+  <a href="">bbb</a>
+</button>
+#errors
+/button/a;element not allowed:minus;m

@@ -393,6 +393,47 @@ x</div>
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
+<iframe src=""></iframe>
+</a>
+#errors
+/a/iframe;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<embed src=""/>
+</a>
+#errors
+/a/embed;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<object data="">xx</object>
+</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<object data="" usemap="#map"><map name="map">xx</map></object>
+</a>
+#errors
+/a/object;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<img src="" alt="x"/>y
+</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<img src="" usemap="#map" alt="x"/>
+<map name="map">aa</map>
+</a>
+#errors
+/a/img;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
 <bb>x</bb>
 </a>
 #errors
