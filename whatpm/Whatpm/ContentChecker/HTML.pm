@@ -3763,21 +3763,84 @@ $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the va
     min => FEATURE_HTML5_DEFAULT,
     optimum => FEATURE_HTML5_DEFAULT,
     value => FEATURE_HTML5_DEFAULT,
-  }),
-};
+  }), # check_attrs
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
 
-$Element->{$HTML_NS}->{progress} = { ## TODO: recommended to use content
+    ## XXX Work in progress
+
+    my $tc = $item->{node}->text_content;
+    my $n1;
+    my $denominator;
+    my $n2;
+    if ($tc =~ s/^([0-9.]+)//) {
+      $n1 = $1;
+
+      if ($tc =~ s/^[^0-9.]+([0-9.]+)//) {
+        $n2 = $1;
+      } elsif ($tc =~ s/^([\x{0025}\x{066A}\x{FE6A}\x{FF05}\x{2030}\x{2031}])//) {
+        $denominator = $1;
+      }
+    }
+
+    if ($tc =~ /[0-9.]/) {
+      undef $n1;
+      undef $n2;
+    }
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  }, # check_end
+}; # meter
+
+$Element->{$HTML_NS}->{progress} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_WD,
   check_attrs => $GetHTMLAttrsChecker->({
-    value => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift >= 0 }),
-    max => $PositiveFloatingPointNumberAttrChecker,
+    value => sub { }, ## checked in |check_attrs2|
+    max => sub { }, ## checked in |check_attrs2|
   }, {
     %HTMLAttrStatus,
     max => FEATURE_HTML5_DEFAULT,
     value => FEATURE_HTML5_DEFAULT,
-  }),
-};
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my $max = 1;
+    my $max_attr = $item->{node}->get_attribute_node_ns (undef, 'max');
+    if ($max_attr) {
+      $GetHTMLFloatingPointNumberAttrChecker->(sub {
+        my $num = $_[0];
+        $max = $num;
+        return $num > 0; ## >, not >=
+      })->($self, $max_attr);
+    }
+
+    my $value_attr = $item->{node}->get_attribute_node_ns (undef, 'value');
+    if ($value_attr) {
+      $self->{onerror}->(node => $value_attr,
+                         type => 'attribute not allowed',
+                         text => 'value',
+                         level => $self->{level}->{should}); # RECOMMENDED
+
+      $GetHTMLFloatingPointNumberAttrChecker->(sub {
+        my $num = $_[0];
+
+        unless ($num <= $max) {
+          $self->{onerror}->(node => $value_attr,
+                             type => 'progress value out of range',
+                             value => $max, # XXX document error type
+                             level => $self->{level}->{must});
+        }
+        
+        return $num >= 0; ## >=, not >
+      })->($self, $value_attr);
+    }
+  }, # check_attrs2
+  # XXX warn if the value from the content is greater than |max|
+  # attribute value.
+  # XXX warn if the element content does not contain one or two numbers.
+}; # progress
 
 $Element->{$HTML_NS}->{code} = {
   %HTMLPhrasingContentChecker,

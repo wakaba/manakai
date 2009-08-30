@@ -1325,6 +1325,13 @@
 /progress;no significant content;s
 
 #data
+<progress max="0.0001" value="34"
+    xmlns="http://www.w3.org/1999/xhtml">a</progress>
+#errors
+/progress/@value;progress value out of range;m
+/progress/@value;attribute not allowed;value;s
+
+#data
 <progress max="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@max;float:out of range;m
@@ -1346,49 +1353,61 @@
 <progress value="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
+/progress/@value;progress value out of range;m
 
 #data
 <progress value="0.0001" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
 
 #data
 <progress value="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
 
 #data
 <progress value="100" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
+/progress/@value;progress value out of range;m
 
 #data
 <progress value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@value;float:out of range;m
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
 
 #data
 <progress value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@value;float:syntax error;m
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
 
 #data
 <progress value="10e+0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
+/progress/@value;progress value out of range;m
 
 #data
 <progress value="10e-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
 
 #data
 <progress value="-10e+0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@value;float:out of range;m
 /progress;no significant content;s
+/progress/@value;attribute not allowed;value;s
 
 #data
 <bdo xmlns="http://www.w3.org/1999/xhtml">x</bdo>

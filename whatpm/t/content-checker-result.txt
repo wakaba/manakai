@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 30 12:47:29 2009
-# Current time GMT:   Sun Aug 30 03:47:29 2009
+# Current time local: Sun Aug 30 16:17:30 2009
+# Current time GMT:   Sun Aug 30 07:17:30 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1479,8 +1479,8 @@ ok 1420
 ok 1421
 ok 1422
 ok 1423
-# t/dom-conformance/html-links-1.dat
 ok 1424
+# t/dom-conformance/html-links-1.dat
 ok 1425
 ok 1426
 ok 1427
@@ -1625,8 +1625,8 @@ ok 1565
 ok 1566
 ok 1567
 ok 1568
-# t/dom-conformance/html-objects-1.dat
 ok 1569
+# t/dom-conformance/html-objects-1.dat
 ok 1570
 ok 1571
 ok 1572
@@ -1981,12 +1981,12 @@ ok 1920
 ok 1921
 ok 1922
 ok 1923
-not ok 1924
-# Test 1924 got: "" (t/content-checker.pl at line 68 fail #1924)
+ok 1924
+not ok 1925
+# Test 1925 got: "" (t/content-checker.pl at line 68 fail #1925)
 #      Expected: "/html/body/embed/@xml:space;attribute not defined;m" (<!DOCTYPE HTML><title>x</title>
 #<embed src="http://test/"
 #    xml:space=preserve>)
-ok 1925
 ok 1926
 ok 1927
 ok 1928
@@ -2001,9 +2001,9 @@ ok 1936
 ok 1937
 ok 1938
 ok 1939
+ok 1940
 Parse error (unmatched end tag) at line 2 column 16
 Parse error (in body:#eof) at line 2 column 24
-ok 1940
 ok 1941
 ok 1942
 ok 1943
@@ -2283,8 +2283,8 @@ ok 2216
 ok 2217
 ok 2218
 ok 2219
-# t/dom-conformance/html-tables-1.dat
 ok 2220
+# t/dom-conformance/html-tables-1.dat
 ok 2221
 ok 2222
 ok 2223
@@ -2307,13 +2307,13 @@ ok 2239
 ok 2240
 ok 2241
 ok 2242
-not ok 2243
-# Test 2243 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2243)
-#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2243
 not ok 2244
 # Test 2244 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2244)
+#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 2245
+# Test 2245 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2245)
 #      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
-ok 2245
 ok 2246
 ok 2247
 ok 2248
@@ -2469,8 +2469,8 @@ ok 2397
 ok 2398
 ok 2399
 ok 2400
-# t/dom-conformance/html-forms-1.dat
 ok 2401
+# t/dom-conformance/html-forms-1.dat
 ok 2402
 ok 2403
 ok 2404
@@ -2809,8 +2809,8 @@ ok 2736
 ok 2737
 ok 2738
 ok 2739
-# t/dom-conformance/html-form-label.dat
 ok 2740
+# t/dom-conformance/html-form-label.dat
 ok 2741
 ok 2742
 ok 2743
@@ -2891,8 +2891,8 @@ ok 2817
 ok 2818
 ok 2819
 ok 2820
-# t/dom-conformance/html-form-input-1.dat
 ok 2821
+# t/dom-conformance/html-form-input-1.dat
 ok 2822
 ok 2823
 ok 2824
@@ -3446,8 +3446,8 @@ ok 3371
 ok 3372
 ok 3373
 ok 3374
-Parse error (lt in attr value) at line 3 column 12
 ok 3375
+Parse error (lt in attr value) at line 3 column 12
 ok 3376
 ok 3377
 ok 3378
@@ -5029,8 +5029,8 @@ ok 4953
 ok 4954
 ok 4955
 ok 4956
-# t/dom-conformance/html-form-button.dat
 ok 4957
+# t/dom-conformance/html-form-button.dat
 ok 4958
 ok 4959
 ok 4960
@@ -5204,8 +5204,8 @@ ok 5127
 ok 5128
 ok 5129
 ok 5130
-# t/dom-conformance/html-form-select.dat
 ok 5131
+# t/dom-conformance/html-form-select.dat
 ok 5132
 ok 5133
 ok 5134
@@ -5291,8 +5291,8 @@ ok 5213
 ok 5214
 ok 5215
 ok 5216
-# t/dom-conformance/html-form-datalist.dat
 ok 5217
+# t/dom-conformance/html-form-datalist.dat
 ok 5218
 ok 5219
 ok 5220
@@ -5349,8 +5349,8 @@ ok 5270
 ok 5271
 ok 5272
 ok 5273
-# t/dom-conformance/html-form-textarea.dat
 ok 5274
+# t/dom-conformance/html-form-textarea.dat
 ok 5275
 ok 5276
 ok 5277
@@ -5420,8 +5420,8 @@ ok 5340
 ok 5341
 ok 5342
 ok 5343
-# t/dom-conformance/html-form-keygen.dat
 ok 5344
+# t/dom-conformance/html-form-keygen.dat
 ok 5345
 ok 5346
 ok 5347
@@ -5446,8 +5446,8 @@ ok 5365
 ok 5366
 ok 5367
 ok 5368
-# t/dom-conformance/html-interactive-1.dat
 ok 5369
+# t/dom-conformance/html-interactive-1.dat
 ok 5370
 ok 5371
 ok 5372
@@ -5696,8 +5696,8 @@ ok 5614
 ok 5615
 ok 5616
 ok 5617
-# t/dom-conformance/html-scripting-1.dat
 ok 5618
+# t/dom-conformance/html-scripting-1.dat
 ok 5619
 ok 5620
 ok 5621
@@ -5747,11 +5747,11 @@ ok 5664
 ok 5665
 ok 5666
 ok 5667
-# t/dom-conformance/html-scripting-2.dat
 ok 5668
+# t/dom-conformance/html-scripting-2.dat
 ok 5669
-# t/dom-conformance/html-repetitions.dat
 ok 5670
+# t/dom-conformance/html-repetitions.dat
 ok 5671
 ok 5672
 ok 5673
@@ -5812,8 +5812,8 @@ ok 5727
 ok 5728
 ok 5729
 ok 5730
-# t/dom-conformance/html-datatemplate.dat
 ok 5731
+# t/dom-conformance/html-datatemplate.dat
 ok 5732
 ok 5733
 ok 5734
@@ -6142,3 +6142,4 @@ ok 6056
 ok 6057
 ok 6058
 ok 6059
+ok 6060
