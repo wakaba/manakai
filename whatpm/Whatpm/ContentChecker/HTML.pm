@@ -4412,15 +4412,18 @@ $Element->{$HTML_NS}->{figure} = {
       $element_state->{has_non_legend} = 1 unless $child_is_transparent;
     }
   },
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{in_figure} = 1;
+  }, # check_start
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       $element_state->{has_non_legend} = 1;
       $element_state->{has_non_table}++;
     }
-
-    $element_state->{in_figure} = 1;
-  },
+  }, # check_child_text
   check_end => sub {
     my ($self, $item, $element_state) = @_;
 
