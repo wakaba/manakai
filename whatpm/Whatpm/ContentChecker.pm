@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.110 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.111 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -100,12 +100,12 @@ our $AttrChecker = {
                                level => $self->{level}->{must});
           }
         }
-      }
 
-      if ($attr->owner_document->manakai_is_html) { # MUST NOT
-        $self->{onerror}->(node => $attr, type => 'in HTML:xml:lang',
-                           level => $self->{level}->{must});
+        if ($attr->owner_document->manakai_is_html) { # MUST NOT
+          $self->{onerror}->(node => $attr, type => 'in HTML:xml:lang',
+                             level => $self->{level}->{must});
 ## TODO: Test data...
+        }
       }
     },
     base => sub {
@@ -1096,4 +1096,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2009/08/23 02:35:33 $
+# $Date: 2009/08/30 03:40:50 $
