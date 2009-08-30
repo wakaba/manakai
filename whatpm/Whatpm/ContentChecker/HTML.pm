@@ -7462,16 +7462,11 @@ $Element->{$HTML_NS}->{command} = {
     default => $GetHTMLBooleanAttrChecker->('default'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     icon => $HTMLURIAttrChecker,
-    label => sub { }, ## NOTE: No conformance creteria
-    radiogroup => sub { }, ## NOTE: No conformance creteria
-    type => sub {
-      my ($self, $attr) = @_;
-      my $value = $attr->value;
-      unless ({command => 1, checkbox => 1, radio => 1}->{$value}) {
-        $self->{onerror}->(node => $attr, type => 'invalid attribute value',
-                           level => $self->{level}->{must});
-      }
-    },
+    label => sub { }, ## NOTE: No requirement
+    radiogroup => sub { }, ## NOTE: No requirement for the value
+    type => $GetHTMLEnumeratedAttrChecker->({
+      command => 1, checkbox => 1, radio => 1,
+    }),
   }, {
     %HTMLAttrStatus,
     checked => FEATURE_HTML5_WD,
@@ -7481,15 +7476,50 @@ $Element->{$HTML_NS}->{command} = {
     label => FEATURE_HTML5_WD,
     radiogroup => FEATURE_HTML5_WD,
     type => FEATURE_HTML5_WD,
-  }),
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my $type = $item->{node}->get_attribute_ns (undef, 'type') || '';
+    $type =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    $type = 'command' unless $type eq 'radio' or $type eq 'checkbox';
+
+    unless ($type eq 'radio') {
+      my $rg_attr = $item->{node}->get_attribute_node_ns (undef, 'radiogroup');
+      if ($rg_attr) {
+        $self->{onerror}->(node => $rg_attr,
+                           type => 'attribute not allowed:radiogroup',
+                           level => $self->{level}->{must});
+      }
+    }
+
+    unless ($type eq 'checkbox' or $type eq 'radio') {
+      my $cd_attr = $item->{node}->get_attribute_node_ns (undef, 'checked');
+      if ($cd_attr) {
+        $self->{onerror}->(node => $cd_attr,
+                           type => 'attribute not allowed:checked',
+                           level => $self->{level}->{must});
+      }
+    }
+
+    unless ($type eq 'command') {
+      my $def_attr = $item->{node}->get_attribute_node_ns (undef, 'default');
+      if ($def_attr) {
+        ## HTML5 revision 2415
+        $self->{onerror}->(node => $def_attr,
+                           type => 'attribute not allowed:default',
+                           level => $self->{level}->{must});
+      }
+    }
+  }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{icon}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-};
+  }, # check_start
+}; # command
 
 $Element->{$HTML_NS}->{bb} = {
   %HTMLPhrasingContentChecker,
