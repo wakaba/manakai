@@ -570,6 +570,12 @@ x</div>
 /a;no significant content;s
 
 #data
+<a href="http://test/" rel="author Author" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;duplicate token;m
+/a;no significant content;s
+
+#data
 <a href="http://test/" rel="bookmark" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a;no significant content;s
@@ -594,6 +600,12 @@ x</div>
 
 #data
 <a href="http://test/" rel="stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;link type:bad context;m
+/a;no significant content;s
+
+#data
+<a href="http://test/" rel="Stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;link type:bad context;m
 /a;no significant content;s
@@ -833,6 +845,15 @@ x</div>
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
 <a href="../../.." rel="up up up up">d</a>
+<a href="../.." rel="up up up">c</a>
+<a href=".." rel="up up">b</a>
+<a href="." rel="up">a</a>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<a href="../../.." rel="up up up UP">d</a>
 <a href="../.." rel="up up up">c</a>
 <a href=".." rel="up up">b</a>
 <a href="." rel="up">a</a>

@@ -436,6 +436,8 @@ my $HTMLLinkTypesAttrChecker = sub {
   my %word;
   for my $word (grep {length $_}
                 split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+    $word =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+
     unless ($word{$word}) {
       $word{$word} = 1;
     } elsif ($word eq 'up') {
@@ -446,10 +448,7 @@ my $HTMLLinkTypesAttrChecker = sub {
                          level => $self->{level}->{must});
     }
   }
-  ## NOTE: Case sensitive match (since HTML5 spec does not say link
-  ## types are case-insensitive and it says "The value should not 
-  ## be confusingly similar to any other defined value (e.g.
-  ## differing only in case).").
+
   ## NOTE: Though there is no explicit "MUST NOT" for undefined values,
   ## "MAY"s and "only ... MAY" restrict non-standard non-registered
   ## values to be used conformingly.
