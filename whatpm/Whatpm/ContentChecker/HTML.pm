@@ -3582,8 +3582,15 @@ $Element->{$HTML_NS}->{time} = {
     %HTMLM12NCommonAttrStatus,
     datetime => FEATURE_HTML5_FD,
   }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {time => 1}});
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
 
     ## XXX Maybe we should move this code out somewhere (maybe
     ## Message::Date) such that we can reuse this code in other places
@@ -3764,8 +3771,15 @@ $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the va
     optimum => FEATURE_HTML5_DEFAULT,
     value => FEATURE_HTML5_DEFAULT,
   }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {meter => 1}});
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
 
     ## XXX Work in progress
 
@@ -3840,6 +3854,18 @@ $Element->{$HTML_NS}->{progress} = {
   # XXX warn if the value from the content is greater than |max|
   # attribute value.
   # XXX warn if the element content does not contain one or two numbers.
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {progress => 1}});
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
+  }, # check_start
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  }, # check_end
 }; # progress
 
 $Element->{$HTML_NS}->{code} = {

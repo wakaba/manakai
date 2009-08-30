@@ -644,6 +644,13 @@
 /time/@datetime;dateortime:syntax error;m
 
 #data
+<time xmlns="http://www.w3.org/1999/xhtml">
+  <time>2009-12-12T00:00:00Z</time>
+</time>
+#errors
+/time/time;element not allowed:minus;m
+
+#data
 <ruby xmlns="http://www.w3.org/1999/xhtml"></ruby>
 #errors
 /ruby;no significant content;s
@@ -1315,6 +1322,13 @@
 /meter;no significant content;s
 
 #data
+<meter xmlns="http://www.w3.org/1999/xhtml">
+  <meter>0.1</meter>
+</meter>
+#errors
+/meter/meter;element not allowed:minus;m
+
+#data
 <progress max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress;no significant content;s
@@ -1408,6 +1422,13 @@
 /progress/@value;float:out of range;m
 /progress;no significant content;s
 /progress/@value;attribute not allowed;value;s
+
+#data
+<progress xmlns="http://www.w3.org/1999/xhtml">
+  <progress>0.1</progress>
+</progress>
+#errors
+/progress/progress;element not allowed:minus;m
 
 #data
 <bdo xmlns="http://www.w3.org/1999/xhtml">x</bdo>
