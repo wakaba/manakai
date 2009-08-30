@@ -4921,10 +4921,12 @@ $Element->{$HTML_NS}->{map} = {
         my ($self, $attr) = @_;
         my $value = $attr->value;
         if (length $value) {
-          # XXX
-          ## NOTE: Duplication is not non-conforming.
-          ## NOTE: Space characters are not non-conforming.
-          #
+          if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
+            $self->{onerror}->(node => $attr, type => 'space in map name',
+                               level => $self->{level}->{must}); ## XXX documentation
+          }
+          
+          ## XXXNOTE: Duplication is not non-conforming.
         } else {
           $self->{onerror}->(node => $attr,
                              type => 'empty attribute value',

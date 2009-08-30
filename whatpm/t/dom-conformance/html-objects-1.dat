@@ -1691,6 +1691,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#a a"/></p>
 </div>
 #errors
+/div/map/@name;space in map name;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1699,6 +1700,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 </div>
 #errors
 /div/map/@id;space in ID;m
+/div/map/@name;space in map name;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1717,6 +1719,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 </div>
 #errors
 /div/map/@id;space in ID;m
+/div/map/@name;space in map name;m
 /div/p/img/@usemap;no referenced map;m
 
 #data
@@ -3481,6 +3484,18 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 </div>
 #errors
 /div;no significant content;s
+
+#data
+<map xmlns="http://www.w3.org/1999/xhtml"
+    name="ab c">xx</map>
+#errors
+/map/@name;space in map name;m
+
+#data
+<map xmlns="http://www.w3.org/1999/xhtml"
+    name="ab&#xA;">xx</map>
+#errors
+/map/@name;space in map name;m
 
 #data
 <area xmlns="http://www.w3.org/1999/xhtml"/>
