@@ -2989,6 +2989,48 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 
 #data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <video src="">aa</video>
+</video>
+#errors
+/video/video;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <p><video src="">aa</video></p>
+</video>
+#errors
+/video/p/video;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <ins><video src="">aa</video></ins>
+</video>
+#errors
+/video/ins/video;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="">aa</audio>
+</video>
+#errors
+/video/audio;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <p><audio src="">aa</audio></p>
+</video>
+#errors
+/video/p/audio;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <ins><audio src="">aa</audio></ins>
+</video>
+#errors
+/video/ins/audio;element not allowed:minus;m
+
+#data
 <audio xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
@@ -3102,6 +3144,48 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /audio/@loopstart;attribute not defined;m
 /audio/@loopend;attribute not defined;m
 /audio/@playcount;attribute not defined;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <video src="">aa</video>
+</audio>
+#errors
+/audio/video;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <p><video src="">aa</video></p>
+</audio>
+#errors
+/audio/p/video;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <ins><video src="">aa</video></ins>
+</audio>
+#errors
+/audio/ins/video;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="">aa</audio>
+</audio>
+#errors
+/audio/audio;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <p><audio src="">aa</audio></p>
+</audio>
+#errors
+/audio/p/audio;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <ins><audio src="">aa</audio></ins>
+</audio>
+#errors
+/audio/ins/audio;element not allowed:minus;m
 
 #data
 <video src="" 

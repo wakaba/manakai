@@ -4765,7 +4765,6 @@ $Element->{$HTML_NS}->{object} = {
                          type => 'no significant content');
     }
   },
-## TODO: Tests for <nest/> in <object/>
 };
 ## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
 ## What about |<section><object data><style scoped></style>x</object></section>|?
@@ -4856,6 +4855,10 @@ $Element->{$HTML_NS}->{video} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {
+      video => 1, audio => 1,
+    }});
+
     $element_state->{allow_source}
         = not $item->{node}->has_attribute_ns (undef, 'src');
     $element_state->{has_source} ||= $element_state->{allow_source} * -1;
@@ -4865,7 +4868,7 @@ $Element->{$HTML_NS}->{video} = {
     $element_state->{uri_info}->{poster}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
+  }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -4898,6 +4901,8 @@ $Element->{$HTML_NS}->{video} = {
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+    
     if ($element_state->{has_source} == -1) { 
       $self->{onerror}->(node => $item->{node},
                          type => 'child element missing',
