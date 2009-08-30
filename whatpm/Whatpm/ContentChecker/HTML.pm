@@ -4449,7 +4449,6 @@ $Element->{$HTML_NS}->{figure} = {
 ## ISSUE: |<figure><legend>aa</legend></figure>| should be an error?
   },
 };
-## TODO: Test for <nest/> in <figure/>
 
 my $AttrCheckerNotImplemented = sub {
   my ($self, $attr) = @_;
@@ -5662,7 +5661,13 @@ $Element->{$HTML_NS}->{tbody} = {
 
 $Element->{$HTML_NS}->{thead} = {
   %{$Element->{$HTML_NS}->{tbody}},
-};
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{in_thead} = 1;
+
+    $HTMLChecker{check_start}->(@_);
+  }, # check_start
+}; # thead
 
 $Element->{$HTML_NS}->{tfoot} = {
   %{$Element->{$HTML_NS}->{tbody}},
@@ -5694,8 +5699,13 @@ $Element->{$HTML_NS}->{tr} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and
-             ($child_ln eq 'td' or $child_ln eq 'th')) {
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'td') {
+      if ($item->{parent_state}->{in_thead}) {
+        $self->{onerror}->(node => $child_el, # XXX document the error type
+                           type => 'element not allowed:thead td',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'th') {
       #
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed',

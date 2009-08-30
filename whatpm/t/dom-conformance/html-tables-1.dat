@@ -9,6 +9,7 @@
 /table/thead/tr/td;no significant content;s
 /table/tbody/tr/td;no significant content;s
 /table/tfoot/tr/td;no significant content;s
+/table/thead/tr/td;element not allowed:thead td;m
 
 #data
 <th xmlns="http://www.w3.org/1999/xhtml"></th>
@@ -800,6 +801,7 @@
 <thead align="right" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
 #errors
 /thead/@align;attribute not defined;m
+/thead/tr/td;element not allowed:thead td;m
 
 #data
 <tfoot align="center" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
@@ -844,6 +846,7 @@
 <thead valign="top" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
 #errors
 /thead/@valign;attribute not defined;m
+/thead/tr/td;element not allowed:thead td;m
 
 #data
 <tfoot valign="middle" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
@@ -888,6 +891,7 @@
 <thead char=" " xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
 #errors
 /thead/@char;attribute not defined;m
+/thead/tr/td;element not allowed:thead td;m
 
 #data
 <tfoot char="x" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
@@ -985,3 +989,67 @@
 </table>
 #errors
 /table/tr/td/@headers;no referenced header cell;m
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml">
+  <tr>
+    <th>xxx</th>
+  </tr>
+</thead>
+#errors
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml">
+  <tr>
+    <th>xxx</th>
+    <td>yyy</td>
+  </tr>
+</thead>
+#errors
+/thead/tr/td;element not allowed:thead td;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+  <thead>
+    <tr>
+      <th>xxx</th>
+      <td>yyy</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>xxx</th>
+      <td>yyy</td>
+    </tr>
+  </tbody>
+</table>
+#errors
+/table/thead/tr/td;element not allowed:thead td;m
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml">
+  <tr>
+    <th>xxx</th>
+    <ins><td>yyy</td></ins>
+  </tr>
+</thead>
+#errors
+/thead/tr/ins;element not allowed;m
+
+#data
+<tfoot xmlns="http://www.w3.org/1999/xhtml">
+  <tr>
+    <th>xxx</th>
+    <td>yyy</td>
+  </tr>
+</tfoot>
+#errors
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml">
+  <tr>
+    <th>xxx<table><tr><td>zzz</td></tr></table></th>
+  </tr>
+</thead>
+#errors
+/thead/tr/th/table;element not allowed:phrasing;m
