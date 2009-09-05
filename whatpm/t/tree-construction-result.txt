@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 22:21:23 2009
-# Current time GMT:   Sat Sep  5 13:21:23 2009
+# Current time local: Sat Sep  5 22:40:46 2009
+# Current time GMT:   Sat Sep  5 13:40:46 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -4254,18 +4254,9 @@ ok 3900
 ok 3901
 ok 3902
 ok 3903
-not ok 3904
-# Test 3904 got: "1" (t/HTML-tree.t at line 92 fail #1302)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML>a<table>b<!---->c</table>'; 1:40:in table:#text;text "b" in table, text "c" in table)
+ok 3904
 ok 3905
-not ok 3906
-# Test 3906 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"a\"\n    \"bc\"\n    <table>\n      <!--  -->\n" (t/HTML-tree.t at line 98 fail #1302)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"a\"\n    \"b\"\n    \"c\"\n    <table>\n      <!--  -->\n" (Document tree: qq'<!DOCTYPE HTML>a<table>b<!---->c</table>')
-#      Line 6 is changed:
-#       - "    \"b\"\n"
-#       + "    \"bc\"\n"
-#      Line 7 is missing:
-#       - "    \"c\"\n"
+ok 3906
 ok 3907
 ok 3908
 ok 3909
@@ -4275,18 +4266,9 @@ ok 3912
 ok 3913
 ok 3914
 ok 3915
-not ok 3916
-# Test 3916 got: "1" (t/HTML-tree.t at line 92 fail #1306)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML>a<table><tbody>b<!---->c</table>'; 1:47:in table:#text;text in table, x2)
+ok 3916
 ok 3917
-not ok 3918
-# Test 3918 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"a\"\n    \"bc\"\n    <table>\n      <tbody>\n        <!--  -->\n" (t/HTML-tree.t at line 98 fail #1306)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"a\"\n    \"b\"\n    \"c\"\n    <table>\n      <tbody>\n        <!--  -->\n" (Document tree: qq'<!DOCTYPE HTML>a<table><tbody>b<!---->c</table>')
-#      Line 6 is changed:
-#       - "    \"b\"\n"
-#       + "    \"bc\"\n"
-#      Line 7 is missing:
-#       - "    \"c\"\n"
+ok 3918
 ok 3919
 ok 3920
 ok 3921
@@ -4345,90 +4327,30 @@ ok 3969
 ok 3970
 ok 3971
 ok 3972
-not ok 3973
-# Test 3973 got: "2" (t/HTML-tree.t at line 92 fail #1325)
-#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table>a<html a>b</table>'; 1:32:not first start tag, 1:40:in table:#text;text "a", element "html" in table, text "b")
+ok 3973
 ok 3974
-not ok 3975
-# Test 3975 got: "<!DOCTYPE html>\n<html>\n  a=\"\"\n  <head>\n  <body>\n    \"ab\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #1325)
-#      Expected: "<!DOCTYPE html>\n<html>\n  a=\"\"\n  <head>\n  <body>\n    \"a\"\n    \"b\"\n    <table>\n" (Document tree: qq'<!DOCTYPE HTML><table>a<html a>b</table>')
-#      Line 6 is changed:
-#       - "    \"a\"\n"
-#       + "    \"ab\"\n"
-#      Line 7 is missing:
-#       - "    \"b\"\n"
+ok 3975
 ok 3976
 ok 3977
-not ok 3978
-# Test 3978 got: "<!DOCTYPE html>\n<html>\n  a=\"\"\n  <head>\n  <body>\n    \"a \"\n    <table>\n" (t/HTML-tree.t at line 98 fail #1326)
-#      Expected: "<!DOCTYPE html>\n<html>\n  a=\"\"\n  <head>\n  <body>\n    \"a\"\n    <table>\n      \" \"\n" (Document tree: qq'<!DOCTYPE HTML><table>a<html a> </table>')
-#      Line 6 is changed:
-#       - "    \"a\"\n"
-#       + "    \"a \"\n"
-#      Line 8 is missing:
-#       - "      \" \"\n"
+ok 3978
 ok 3979
 ok 3980
-not ok 3981
-# Test 3981 got: "<!DOCTYPE html>\n<html>\n  a=\"\"\n  <head>\n  <body>\n    \" b\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #1327)
-#      Expected: "<!DOCTYPE html>\n<html>\n  a=\"\"\n  <head>\n  <body>\n    \"b\"\n    <table>\n      \" \"\n" (Document tree: qq'<!DOCTYPE HTML><table> <html a>b</table>')
-#      Line 6 is changed:
-#       - "    \"b\"\n"
-#       + "    \" b\"\n"
-#      Line 8 is missing:
-#       - "      \" \"\n"
+ok 3981
 ok 3982
 ok 3983
-not ok 3984
-# Test 3984 got: "<!DOCTYPE html>\n<html>\n  a=\"\"\n  <head>\n  <body>\n    <table>\n      \"  \"\n" (t/HTML-tree.t at line 98 fail #1328)
-#      Expected: "<!DOCTYPE html>\n<html>\n  a=\"\"\n  <head>\n  <body>\n    <table>\n      \" \"\n      \" \"\n" (Document tree: qq'<!DOCTYPE HTML><table> <html a> </table>')
-#      Line 7 is changed:
-#       - "      \" \"\n"
-#       + "      \"  \"\n"
-#      Line 8 is missing:
-#       - "      \" \"\n"
-not ok 3985
-# Test 3985 got: "2" (t/HTML-tree.t at line 92 fail #1329)
-#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table>a<!DOCTYPE html>b</table>'; 1:39:in html:#DOCTYPE, 1:47:in table:#text;text "a", DOCTYPE in table, text "b")
+ok 3984
+ok 3985
 ok 3986
-not ok 3987
-# Test 3987 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"ab\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #1329)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"a\"\n    \"b\"\n    <table>\n" (Document tree: qq'<!DOCTYPE HTML><table>a<!DOCTYPE html>b</table>')
-#      Line 5 is changed:
-#       - "    \"a\"\n"
-#       + "    \"ab\"\n"
-#      Line 6 is missing:
-#       - "    \"b\"\n"
+ok 3987
 ok 3988
 ok 3989
-not ok 3990
-# Test 3990 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"a \"\n    <table>\n" (t/HTML-tree.t at line 98 fail #1330)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"a\"\n    <table>\n      \" \"\n" (Document tree: qq'<!DOCTYPE HTML><table>a<!DOCTYPE html> </table>')
-#      Line 5 is changed:
-#       - "    \"a\"\n"
-#       + "    \"a \"\n"
-#      Line 7 is missing:
-#       - "      \" \"\n"
+ok 3990
 ok 3991
 ok 3992
-not ok 3993
-# Test 3993 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" b\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #1331)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"b\"\n    <table>\n      \" \"\n" (Document tree: qq'<!DOCTYPE HTML><table> <!DOCTYPE html>b</table>')
-#      Line 5 is changed:
-#       - "    \"b\"\n"
-#       + "    \" b\"\n"
-#      Line 7 is missing:
-#       - "      \" \"\n"
+ok 3993
 ok 3994
 ok 3995
-not ok 3996
-# Test 3996 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" b<\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #1332)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"b<\"\n    <table>\n      \" \"\n" (Document tree: qq'<!DOCTYPE HTML><table> <!DOCTYPE html>b&lt;</table>')
-#      Line 5 is changed:
-#       - "    \"b<\"\n"
-#       + "    \" b<\"\n"
-#      Line 7 is missing:
-#       - "      \" \"\n"
+ok 3996
 ok 3997
 ok 3998
 ok 3999

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.225 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.226 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -1800,6 +1800,96 @@ sub _tree_construction_main ($) {
   ## document.write ("b")</script>|
 
   B: while (1) {
+
+    ## The "in table text" insertion mode.
+    if ($self->{insertion_mode} & TABLE_IMS and
+        not $self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
+        not $self->{insertion_mode} & IN_CDATA_RCDATA_IM) {
+      C: {
+        my $s;
+        if ($token->{type} == CHARACTER_TOKEN) {
+          
+          $self->{pending_chars} ||= [];
+          push @{$self->{pending_chars}}, $token;
+          $token = $self->_get_next_token;
+          next B;
+        } else {
+          if ($self->{pending_chars}) {
+            $s = join '', map { $_->{data} } @{$self->{pending_chars}};
+            delete $self->{pending_chars};
+            if ($s =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+              
+              #
+            } else {
+              
+              #$self->{open_elements}->[-1]->[0]->manakai_append_text ($s);
+              $self->{open_elements}->[-1]->[0]->append_child
+                  ($self->{document}->create_text_node ($s));
+              last C;
+            }
+          } else {
+            
+            last C;
+          }
+        }
+
+        ## Foster parenting
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'in table:#text', token => $token);
+
+        ## NOTE: As if in body, but insert into the foster parent element.
+        $reconstruct_active_formatting_elements->($insert_to_foster);
+            
+        if ($self->{open_elements}->[-1]->[1] & TABLE_ROWS_EL) {
+          # MUST
+          my $foster_parent_element;
+          my $next_sibling;
+          #my $prev_sibling;
+          OE: for (reverse 0..$#{$self->{open_elements}}) {
+            if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
+              my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
+              if (defined $parent and $parent->node_type == 1) {
+                $foster_parent_element = $parent;
+                
+                $next_sibling = $self->{open_elements}->[$_]->[0];
+          #      $prev_sibling = $next_sibling->previous_sibling;
+                #
+              } else {
+                
+                $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
+          #      $prev_sibling = $foster_parent_element->last_child;
+                #
+              }
+              last OE;
+            }
+          } # OE
+          $foster_parent_element = $self->{open_elements}->[0]->[0] #and
+          #$prev_sibling = $foster_parent_element->last_child
+              unless defined $foster_parent_element;
+          #undef $prev_sibling unless $open_tables->[-1]->[2]; # ~node inserted
+          #if (defined $prev_sibling and
+          #    $prev_sibling->node_type == 3) {
+          #  !!! cp ('t198');
+          #  $prev_sibling->manakai_append_text ($s);
+          #} else {
+            
+            $foster_parent_element->insert_before
+                ($self->{document}->create_text_node ($s), $next_sibling);
+          #}
+          $open_tables->[-1]->[1] = 1; # tainted
+          $open_tables->[-1]->[2] = 1; # ~node inserted
+        } else {
+          ## NOTE: Fragment case or in a foster parent'ed element
+          ## (e.g. |<table><span>a|).  In fragment case, whether the
+          ## character is appended to existing node or a new node is
+          ## created is irrelevant, since the foster parent'ed nodes
+          ## are discarded and fragment parsing does not invoke any
+          ## script.
+          
+          $self->{open_elements}->[-1]->[0]->manakai_append_text ($s);
+        }
+      } # C
+    } # TABLE_IMS
+
     if ($token->{type} == DOCTYPE_TOKEN) {
       
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#DOCTYPE', token => $token);
@@ -3400,90 +3490,6 @@ sub _tree_construction_main ($) {
       $insert = $insert_to_current;
       #
     } elsif ($self->{insertion_mode} & TABLE_IMS) {
-      C: {
-        my $s;
-        if ($token->{type} == CHARACTER_TOKEN) {
-          
-          $self->{pending_chars} ||= [];
-          push @{$self->{pending_chars}}, $token;
-          $token = $self->_get_next_token;
-          next B;
-        } else {
-          if ($self->{pending_chars}) {
-            $s = join '', map { $_->{data} } @{$self->{pending_chars}};
-            delete $self->{pending_chars};
-            if ($s =~ /[^\x09\x0A\x0C\x0D\x20]/) {
-              
-              #
-            } else {
-              
-              #$self->{open_elements}->[-1]->[0]->manakai_append_text ($s);
-              $self->{open_elements}->[-1]->[0]->append_child
-                  ($self->{document}->create_text_node ($s));
-              last C;
-            }
-          } else {
-            
-            last C;
-          }
-        }
-
-        ## Foster parenting
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'in table:#text', token => $token);
-
-        ## NOTE: As if in body, but insert into the foster parent element.
-        $reconstruct_active_formatting_elements->($insert_to_foster);
-            
-        if ($self->{open_elements}->[-1]->[1] & TABLE_ROWS_EL) {
-          # MUST
-          my $foster_parent_element;
-          my $next_sibling;
-          #my $prev_sibling;
-          OE: for (reverse 0..$#{$self->{open_elements}}) {
-            if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
-              my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
-              if (defined $parent and $parent->node_type == 1) {
-                $foster_parent_element = $parent;
-                
-                $next_sibling = $self->{open_elements}->[$_]->[0];
-          #      $prev_sibling = $next_sibling->previous_sibling;
-                #
-              } else {
-                
-                $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
-          #      $prev_sibling = $foster_parent_element->last_child;
-                #
-              }
-              last OE;
-            }
-          } # OE
-          $foster_parent_element = $self->{open_elements}->[0]->[0] #and
-          #$prev_sibling = $foster_parent_element->last_child
-              unless defined $foster_parent_element;
-          #undef $prev_sibling unless $open_tables->[-1]->[2]; # ~node inserted
-          #if (defined $prev_sibling and
-          #    $prev_sibling->node_type == 3) {
-          #  !!! cp ('t198');
-          #  $prev_sibling->manakai_append_text ($s);
-          #} else {
-            
-            $foster_parent_element->insert_before
-                ($self->{document}->create_text_node ($s), $next_sibling);
-          #}
-          $open_tables->[-1]->[1] = 1; # tainted
-          $open_tables->[-1]->[2] = 1; # ~node inserted
-        } else {
-          ## NOTE: Fragment case or in a foster parent'ed element
-          ## (e.g. |<table><span>a|).  In fragment case, whether the
-          ## character is appended to existing node or a new node is
-          ## created is irrelevant, since the foster parent'ed nodes
-          ## are discarded and fragment parsing does not invoke any
-          ## script.
-          
-          $self->{open_elements}->[-1]->[0]->manakai_append_text ($s);
-        }
-      } # C
-
       if ($token->{type} == START_TAG_TOKEN) {
         if ({
              tr => (($self->{insertion_mode} & IM_MASK) != IN_ROW_IM),
@@ -6840,4 +6846,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/05 13:30:42 $
+# $Date: 2009/09/05 13:42:52 $
