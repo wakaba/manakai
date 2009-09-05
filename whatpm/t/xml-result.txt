@@ -1,7 +1,7 @@
 1..1573
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 19:28:42 2009
-# Current time GMT:   Sat Sep  5 10:28:42 2009
+# Current time local: Sat Sep  5 19:34:25 2009
+# Current time GMT:   Sat Sep  5 10:34:25 2009
 # Using Test.pm version 1.25
 # t/xml/elements-1.dat
 ok 1
@@ -1031,15 +1031,23 @@ ok 1008
 ok 1009
 ok 1010
 ok 1011
-ok 1012
-ok 1013
+not ok 1012
+# Test 1012 got: "2;17;no root element;;;m\n2;17;unclosed internal subset;;;m\n2;17;unclosed md;;;m\n2;17;unquoted attr value;;;m" (t/XML-Parser.t at line 95 fail #448)
+#      Expected: "2;13;unknown declared type;;t;m\n2;17;no root element;;;m\n2;17;unclosed internal subset;;;m\n2;17;unclosed md;;;m\n2;17;unquoted attr value;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c t d')
+#      Line 1 is missing:
+#       - "2;13;unknown declared type;;t;m\n"
+#  t/XML-Parser.t line 95 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
+not ok 1013
+# Test 1013 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 152 fail #448)
+#      Expected: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c 0 () EXPLICIT \"d\"\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c t d')
+#      Lines 2-2 are missing:
+#       - "  <!ELEMENT b >\n"
+#       - "    c 0 () EXPLICIT \"d\"\n"
+#  t/XML-Parser.t line 152 is:   ok $result, $test->{document}->[0],
 ok 1014
 ok 1015
 ok 1016
-not ok 1017
-# Test 1017 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 152 fail #450)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID d')
-#  t/XML-Parser.t line 152 is:   ok $result, $test->{document}->[0],
+ok 1017
 ok 1018
 not ok 1019
 # Test 1019 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 152 fail #451)
