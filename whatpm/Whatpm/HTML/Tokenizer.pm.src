@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -105,7 +105,8 @@ sub COMMENT_START_STATE () { 14 }
 sub COMMENT_START_DASH_STATE () { 15 }
 sub COMMENT_STATE () { 16 }
 sub COMMENT_END_STATE () { 17 }
-sub COMMENT_END_BANG_STATE () { 102 } ## LAST
+sub COMMENT_END_BANG_STATE () { 102 }
+sub COMMENT_END_SPACE_STATE () { 103 } ## LAST
 sub COMMENT_END_DASH_STATE () { 18 }
 sub BOGUS_COMMENT_STATE () { 19 }
 sub DOCTYPE_STATE () { 20 }
@@ -2118,8 +2119,17 @@ sub _get_next_token ($) {
         }
         !!!next-input-character;
         redo A;
-      } elsif ($self->{nc} == 0x0021 and # !
-               $self->{state} != COMMENT_END_BANG_STATE) {
+      } elsif ($self->{state} != COMMENT_END_BANG_STATE and
+               $is_space->{$self->{nc}}) {
+        !!!cp (152.1);
+        !!!parse-error (type => 'comment end space'); # XXX error type
+        $self->{ct}->{data} .= '--' . chr ($self->{nc}); # comment
+        $self->{state} = COMMENT_END_SPACE_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{state} != COMMENT_END_BANG_STATE and
+               $self->{nc} == 0x0021) { # !
+        !!!cp (152.2);
         !!!parse-error (type => 'comment end bang'); # XXX error type
         $self->{state} = COMMENT_END_BANG_STATE;
         !!!next-input-character;
@@ -2150,6 +2160,51 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } 
+    } elsif ($self->{state} == COMMENT_END_SPACE_STATE) {
+      ## XML5: Not exist.
+
+      if ($self->{nc} == 0x003E) { # >
+        if ($self->{in_subset}) {
+          !!!cp (154.4);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (154.5);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
+        !!!next-input-character;
+
+        !!!emit ($self->{ct}); # comment
+
+        redo A;
+      } elsif ($is_space->{$self->{nc}}) {
+        !!!cp (154.6);
+        $self->{ct}->{data} .= chr ($self->{nc}); # comment
+        ## Stay in the state.
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        !!!parse-error (type => 'unclosed comment');
+        if ($self->{in_subset}) {
+          !!!cp (154.7);
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          !!!cp (154.8);
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
+        ## Reconsume.
+
+        !!!emit ($self->{ct}); # comment
+
+        redo A;
+      } else {
+        !!!cp (154.9);
+        $self->{ct}->{data} .= chr ($self->{nc}); # comment
+        $self->{state} = COMMENT_STATE;
+        !!!next-input-character;
+        redo A;
+      }
     } elsif ($self->{state} == DOCTYPE_STATE) {
       if ($is_space->{$self->{nc}}) {
         !!!cp (155);
@@ -5175,5 +5230,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/09/05 09:26:55 $
+## $Date: 2009/09/05 09:57:55 $
                                 

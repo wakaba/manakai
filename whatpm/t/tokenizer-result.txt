@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 18:25:48 2009
-# Current time GMT:   Sat Sep  5 09:25:48 2009
+# Current time local: Sat Sep  5 18:56:43 2009
+# Current time GMT:   Sat Sep  5 09:56:43 2009
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -950,11 +950,9 @@ not ok 852
 #      - "            qq'a b'\n"
 #      + "            qq'a\\x{0C}b'\n"
 not ok 853
-# Test 853 got: "$VAR1 = [\n          [\n            qq'Comment',\n            qq' foo -- bar '\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #853)
+# Test 853 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq' foo -- bar '\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #853)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq' foo - - bar '\n          ]\n        ];\n" (Double hyphen in comment: qq'<!-- foo -- bar -->')
-#     Line 2 is missing:
-#      - "          qq'ParseError',\n"
-#     Line 4 is changed:
+#     Line 5 is changed:
 #      - "            qq' foo - - bar '\n"
 #      + "            qq' foo -- bar '\n"
 ok 854
@@ -1259,3 +1257,13 @@ ok 1137
 ok 1138
 ok 1139
 ok 1140
+ok 1141
+ok 1142
+ok 1143
+ok 1144
+ok 1145
+ok 1146
+ok 1147
+ok 1148
+ok 1149
+ok 1150

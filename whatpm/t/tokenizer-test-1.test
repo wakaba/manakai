@@ -989,9 +989,17 @@
 "input": "<!----!>",
 "output": ["ParseError", ["Comment", ""]]},
 
+{"description": "<!--a--!>",
+"input": "<!--a--!>",
+"output": ["ParseError", ["Comment", "a"]]},
+
 {"description": "<!----!-->",
 "input": "<!----!-->",
 "output": ["ParseError", ["Comment", "--!"]]},
+
+{"description": "<!--a--!-->",
+"input": "<!--a--!-->",
+"output": ["ParseError", ["Comment", "a--!"]]},
 
 {"description": "<!----!",
 "input": "<!----!",
@@ -1000,6 +1008,38 @@
 {"description": "<!----!x-->",
 "input": "<!----!x-->",
 "output": ["ParseError", ["Comment", "--!x"]]},
+
+{"description": "<!---- >",
+"input": "<!---- >",
+"output": ["ParseError", ["Comment", "-- "]]},
+
+{"description": "<!--a-- >",
+"input": "<!--a-- >",
+"output": ["ParseError", ["Comment", "a-- "]]},
+
+{"description": "<!--a--\u000A>",
+"input": "<!--a--\u000A>",
+"output": ["ParseError", ["Comment", "a--\u000A"]]},
+
+{"description": "<!--a-- a>",
+"input": "<!--a-- a>",
+"output": ["ParseError", "ParseError", ["Comment", "a-- a>"]]},
+
+{"description": "<!--a-- ->",
+"input": "<!--a-- ->",
+"output": ["ParseError", "ParseError", ["Comment", "a-- ->"]]},
+
+{"description": "<!--a-- -->",
+"input": "<!--a-- -->",
+"output": ["ParseError", "ParseError", ["Comment", "a-- -->"]]},
+
+{"description": "<!--a-- ",
+"input": "<!--a-- ",
+"output": ["ParseError", "ParseError", ["Comment", "a-- "]]},
+
+{"description": "<!--a-- --b-- >",
+"input": "<!--a-- --b-- >",
+"output": ["ParseError", "ParseError", ["Comment", "a-- --b-- "]]},
 
 {"description": "<a href=''rel=''>",
 "input": "<a href=''rel=''>",

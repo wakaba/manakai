@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -105,7 +105,8 @@ sub COMMENT_START_STATE () { 14 }
 sub COMMENT_START_DASH_STATE () { 15 }
 sub COMMENT_STATE () { 16 }
 sub COMMENT_END_STATE () { 17 }
-sub COMMENT_END_BANG_STATE () { 102 } ## LAST
+sub COMMENT_END_BANG_STATE () { 102 }
+sub COMMENT_END_SPACE_STATE () { 103 } ## LAST
 sub COMMENT_END_DASH_STATE () { 18 }
 sub BOGUS_COMMENT_STATE () { 19 }
 sub DOCTYPE_STATE () { 20 }
@@ -2998,8 +2999,27 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{nc} == 0x0021 and # !
-               $self->{state} != COMMENT_END_BANG_STATE) {
+      } elsif ($self->{state} != COMMENT_END_BANG_STATE and
+               $is_space->{$self->{nc}}) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'comment end space'); # XXX error type
+        $self->{ct}->{data} .= '--' . chr ($self->{nc}); # comment
+        $self->{state} = COMMENT_END_SPACE_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{state} != COMMENT_END_BANG_STATE and
+               $self->{nc} == 0x0021) { # !
+        
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'comment end bang'); # XXX error type
         $self->{state} = COMMENT_END_BANG_STATE;
         
@@ -3050,6 +3070,81 @@ sub _get_next_token ($) {
   
         redo A;
       } 
+    } elsif ($self->{state} == COMMENT_END_SPACE_STATE) {
+      ## XML5: Not exist.
+
+      if ($self->{nc} == 0x003E) { # >
+        if ($self->{in_subset}) {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+
+        return  ($self->{ct}); # comment
+
+        redo A;
+      } elsif ($is_space->{$self->{nc}}) {
+        
+        $self->{ct}->{data} .= chr ($self->{nc}); # comment
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == -1) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed comment');
+        if ($self->{in_subset}) {
+          
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        } else {
+          
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+        }
+        ## Reconsume.
+
+        return  ($self->{ct}); # comment
+
+        redo A;
+      } else {
+        
+        $self->{ct}->{data} .= chr ($self->{nc}); # comment
+        $self->{state} = COMMENT_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      }
     } elsif ($self->{state} == DOCTYPE_STATE) {
       if ($is_space->{$self->{nc}}) {
         
@@ -8735,5 +8830,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/09/05 09:26:55 $
+## $Date: 2009/09/05 09:57:55 $
                                 
