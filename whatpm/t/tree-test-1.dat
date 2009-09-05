@@ -1835,32 +1835,25 @@ char in <table>
 | <html>
 |   <head>
 |   <body>
-|     "a"
+|     "  a"
 |     <table>
-|       "  "
 
 #data
 <!DOCTYPE HTML><table>  a b</table>
 #errors
 char in <table>
-x
-3
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
-|     "a b"
+|     "  a b"
 |     <table>
-|       "  "
 
 #data
 <!DOCTYPE HTML><table>a b </table>
 #errors
 char in <table>
-x
-x
-4
 #document
 | <!DOCTYPE html>
 | <html>
@@ -1873,21 +1866,19 @@ x
 <!DOCTYPE HTML><table><br> </table>
 #errors
 <br> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     <br>
-|     " "
 |     <table>
+|       " "
 
 #data
 <!DOCTYPE HTML><table><tbody>a </table>
 #errors
 char in <tbody>
-x2
 #document
 | <!DOCTYPE html>
 | <html>
@@ -1901,7 +1892,6 @@ x2
 <!DOCTYPE HTML><table><tr>a </table>
 #errors
 char in <tr>
-x2
 #document
 | <!DOCTYPE html>
 | <html>
@@ -1916,48 +1906,45 @@ x2
 <!DOCTYPE HTML><table>a<tr> </table>
 #errors
 char in <table>
-char in <tr>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     "a"
-|     " "
 |     <table>
 |       <tbody>
 |         <tr>
+|           " "
 
 #data
 <!DOCTYPE HTML><table><tbody><br> </table>
 #errors
 <br> in <tbody>
-char in <tbody>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     <br>
-|     " "
 |     <table>
 |       <tbody>
+|         " "
 
 #data
 <!DOCTYPE HTML><table><tr><br> </table>
 #errors
 <br> in <tr>
-char in <tr>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     <br>
-|     " "
 |     <table>
 |       <tbody>
 |         <tr>
+|           " "
 
 #data
 <!DOCTYPE HTML><table a><table b>  </table></table>
@@ -2077,21 +2064,19 @@ char in <table>
 <!DOCTYPE HTML><table><input> </table>
 #errors
 <input> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     <input>
-|     " "
 |     <table>
+|       " "
 
 #data
 <!DOCTYPE HTML><table><input type="text"> </table>
 #errors
 <input> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2099,8 +2084,8 @@ char in <table>
 |   <body>
 |     <input>
 |       type="text"
-|     " "
 |     <table>
+|       " "
 
 #data
 <!DOCTYPE HTML><table><input type=hidden> </table>
@@ -2120,15 +2105,14 @@ char in <table>
 <!DOCTYPE HTML><table> <input> </table>
 #errors
 <input> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     <input>
-|     " "
 |     <table>
+|       " "
 |       " "
 
 #data
@@ -2136,7 +2120,6 @@ char in <table>
 #errors
 char in <table>
 <input> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2144,14 +2127,13 @@ char in <table>
 |   <body>
 |     "a"
 |     <input>
-|     " "
 |     <table>
+|       " "
 
 #data
 <!DOCTYPE HTML><table> <input type="text"> </table>
 #errors
 <input> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2159,8 +2141,8 @@ char in <table>
 |   <body>
 |     <input>
 |       type="text"
-|     " "
 |     <table>
+|       " "
 |       " "
 
 #data
@@ -2168,7 +2150,6 @@ char in <table>
 #errors
 char in <table>
 <input> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2177,8 +2158,8 @@ char in <table>
 |     "a"
 |     <input>
 |       type="text"
-|     " "
 |     <table>
+|       " "
 
 #data
 <!DOCTYPE HTML><table> <input type=hidden> </table>
@@ -2200,7 +2181,6 @@ char in <table>
 #errors
 char in <table>
 <input> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2209,8 +2189,8 @@ char in <table>
 |     "a"
 |     <input>
 |       type="hidden"
-|     " "
 |     <table>
+|       " "
 
 #data
 <!DOCTYPE HTML><table><input type="HiddeN"> </table>
@@ -2317,7 +2297,6 @@ char in <tr>
 #errors
 char in <table>
 <script> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2325,8 +2304,8 @@ char in <table>
 |   <body>
 |     "a"
 |     <script>
-|     " "
 |     <table>
+|       " "
 
 #data
 <!DOCTYPE HTML><table><tfoot><script></script> </table>
@@ -2346,7 +2325,6 @@ char in <table>
 #errors
 char in <tfoot>
 <script> in <tfoot>
-char in <tfoot>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2354,9 +2332,9 @@ char in <tfoot>
 |   <body>
 |     "a"
 |     <script>
-|     " "
 |     <table>
 |       <tfoot>
+|         " "
 
 #data
 <!DOCTYPE HTML><table><tr> <script></script> </table>
@@ -2378,7 +2356,6 @@ char in <tfoot>
 #errors
 char in <tr>
 <script> in <tr>
-char in <tr>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2386,10 +2363,10 @@ char in <tr>
 |   <body>
 |     "a"
 |     <script>
-|     " "
 |     <table>
 |       <tbody>
 |         <tr>
+|           " "
 
 #data
 <!DOCTYPE HTML><table><style></style></table>
@@ -2420,7 +2397,6 @@ char in <tr>
 #errors
 char in <table>
 <style> in <table>
-char in <table>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2428,8 +2404,8 @@ char in <table>
 |   <body>
 |     "a"
 |     <style>
-|     " "
 |     <table>
+|       " "
 
 #data
 <!DOCTYPE HTML><table><tfoot><style></style> </table>
@@ -2449,7 +2425,6 @@ char in <table>
 #errors
 char in <tfoot>
 <style> in <tfoot>
-char in <tfoot>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2457,9 +2432,9 @@ char in <tfoot>
 |   <body>
 |     "a"
 |     <style>
-|     " "
 |     <table>
 |       <tfoot>
+|         " "
 
 #data
 <!DOCTYPE HTML><table><tr> <style></style> </table>
@@ -2481,7 +2456,6 @@ char in <tfoot>
 #errors
 char in <tr>
 <style> in <tr>
-char in <tr>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2489,10 +2463,10 @@ char in <tr>
 |   <body>
 |     "a"
 |     <style>
-|     " "
 |     <table>
 |       <tbody>
 |         <tr>
+|           " "
 
 #data
 <!DOCTYPE HTML><table><b>x<i>y<div>z</b>a</i>b
@@ -11530,8 +11504,8 @@ x
 #data
 <!DOCTYPE HTML>a<table>b<!---->c</table>
 #errors
-text in table
-x2
+text "b" in table
+text "c" in table
 #document
 | <!DOCTYPE html>
 | <html>
@@ -11671,7 +11645,6 @@ text in table
 <!DOCTYPE HTML>a<table>b&lt;</table>
 #errors
 text in table
-x2
 #document
 | <!DOCTYPE html>
 | <html>
@@ -11687,7 +11660,6 @@ x2
 text in table
 <span> in table
 text in table
-x2
 </span> in table
 text in table
 #document
@@ -11705,14 +11677,9 @@ text in table
 #data
 <!DOCTYPE HTML>a<table>b<plaintext>c&lt;</plaintext>d</table>
 #errors
-text in table
+text "b" in table
 <plaintext> in table
-text in table
-:
-:
-:
-:
-x6
+text "c&lt;</plaintext>d</table>" in table
 unexpected EOF
 #document
 | <!DOCTYPE html>
@@ -11731,6 +11698,7 @@ unexpected EOF
 text in table
 <xmp> in table
 text in table
+text "d" in table
 #document
 | <!DOCTYPE html>
 | <html>
@@ -11746,9 +11714,10 @@ text in table
 #data
 <!DOCTYPE HTML>a<table>b<title>c&lt;<p></title>d</table>
 #errors
-text in table
+text "b" in table
 <title> in table
-text in table
+text "c<<p>" in table
+text "d" in table
 #document
 | <!DOCTYPE html>
 | <html>
@@ -11890,3 +11859,146 @@ metadata element after </head>
 |   <body>
 |     <p>
 |       <table>
+
+#data
+<!DOCTYPE HTML><table>a<html a>b</table>
+#errors
+text "a"
+element "html" in table
+text "b"
+#document
+| <!DOCTYPE html>
+| <html>
+|   a=""
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <table>
+
+#data
+<!DOCTYPE HTML><table>a<html a> </table>
+#errors
+text "a"
+element "html" in table
+#document
+| <!DOCTYPE html>
+| <html>
+|   a=""
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+|       " "
+
+#data
+<!DOCTYPE HTML><table> <html a>b</table>
+#errors
+element "html" in table
+text "b"
+#document
+| <!DOCTYPE html>
+| <html>
+|   a=""
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       " "
+
+#data
+<!DOCTYPE HTML><table> <html a> </table>
+#errors
+element "html" in table
+#document
+| <!DOCTYPE html>
+| <html>
+|   a=""
+|   <head>
+|   <body>
+|     <table>
+|       " "
+|       " "
+
+#data
+<!DOCTYPE HTML><table>a<!DOCTYPE html>b</table>
+#errors
+text "a"
+DOCTYPE in table
+text "b"
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     "b"
+|     <table>
+
+#data
+<!DOCTYPE HTML><table>a<!DOCTYPE html> </table>
+#errors
+text "a"
+DOCTYPE in table
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+|       " "
+
+#data
+<!DOCTYPE HTML><table> <!DOCTYPE html>b</table>
+#errors
+DOCTYPE in table
+text "b"
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     "b"
+|     <table>
+|       " "
+
+#data
+<!DOCTYPE HTML><table> <!DOCTYPE html>b&lt;</table>
+#errors
+DOCTYPE in table
+text "b<"
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     "b<"
+|     <table>
+|       " "
+
+#data
+<!DOCTYPE HTML><table>a
+#errors
+text "a"
+EOF in table
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+
+#data
+<!DOCTYPE HTML><table>a&lt;
+#errors
+text "a<"
+EOF in table
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     "a<"
+|     <table>

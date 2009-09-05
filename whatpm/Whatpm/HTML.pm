@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.224 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.225 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -1504,7 +1504,7 @@ sub _tree_construction_main ($) {
   }; # $script_start_tag
 
   ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
-  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag.
+  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
   ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
   my $open_tables = [[$self->{open_elements}->[0]->[0]]];
 
@@ -3400,20 +3400,35 @@ sub _tree_construction_main ($) {
       $insert = $insert_to_current;
       #
     } elsif ($self->{insertion_mode} & TABLE_IMS) {
-      if ($token->{type} == CHARACTER_TOKEN) {
-        if (not $open_tables->[-1]->[1] and # tainted
-            $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
-          $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
+      C: {
+        my $s;
+        if ($token->{type} == CHARACTER_TOKEN) {
+          
+          $self->{pending_chars} ||= [];
+          push @{$self->{pending_chars}}, $token;
+          $token = $self->_get_next_token;
+          next B;
+        } else {
+          if ($self->{pending_chars}) {
+            $s = join '', map { $_->{data} } @{$self->{pending_chars}};
+            delete $self->{pending_chars};
+            if ($s =~ /[^\x09\x0A\x0C\x0D\x20]/) {
               
-          unless (length $token->{data}) {
-            
-            $token = $self->_get_next_token;
-            next B;
+              #
+            } else {
+              
+              #$self->{open_elements}->[-1]->[0]->manakai_append_text ($s);
+              $self->{open_elements}->[-1]->[0]->append_child
+                  ($self->{document}->create_text_node ($s));
+              last C;
+            }
           } else {
             
+            last C;
           }
         }
 
+        ## Foster parenting
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in table:#text', token => $token);
 
         ## NOTE: As if in body, but insert into the foster parent element.
@@ -3423,7 +3438,7 @@ sub _tree_construction_main ($) {
           # MUST
           my $foster_parent_element;
           my $next_sibling;
-          my $prev_sibling;
+          #my $prev_sibling;
           OE: for (reverse 0..$#{$self->{open_elements}}) {
             if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
               my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
@@ -3431,31 +3446,30 @@ sub _tree_construction_main ($) {
                 $foster_parent_element = $parent;
                 
                 $next_sibling = $self->{open_elements}->[$_]->[0];
-                $prev_sibling = $next_sibling->previous_sibling;
+          #      $prev_sibling = $next_sibling->previous_sibling;
                 #
               } else {
                 
                 $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
-                $prev_sibling = $foster_parent_element->last_child;
+          #      $prev_sibling = $foster_parent_element->last_child;
                 #
               }
               last OE;
             }
           } # OE
-          $foster_parent_element = $self->{open_elements}->[0]->[0] and
-          $prev_sibling = $foster_parent_element->last_child
+          $foster_parent_element = $self->{open_elements}->[0]->[0] #and
+          #$prev_sibling = $foster_parent_element->last_child
               unless defined $foster_parent_element;
-          undef $prev_sibling unless $open_tables->[-1]->[2]; # ~node inserted
-          if (defined $prev_sibling and
-              $prev_sibling->node_type == 3) {
-            
-            $prev_sibling->manakai_append_text ($token->{data});
-          } else {
+          #undef $prev_sibling unless $open_tables->[-1]->[2]; # ~node inserted
+          #if (defined $prev_sibling and
+          #    $prev_sibling->node_type == 3) {
+          #  !!! cp ('t198');
+          #  $prev_sibling->manakai_append_text ($s);
+          #} else {
             
             $foster_parent_element->insert_before
-                ($self->{document}->create_text_node ($token->{data}),
-                 $next_sibling);
-          }
+                ($self->{document}->create_text_node ($s), $next_sibling);
+          #}
           $open_tables->[-1]->[1] = 1; # tainted
           $open_tables->[-1]->[2] = 1; # ~node inserted
         } else {
@@ -3466,13 +3480,11 @@ sub _tree_construction_main ($) {
           ## are discarded and fragment parsing does not invoke any
           ## script.
           
-          $self->{open_elements}->[-1]->[0]->manakai_append_text
-              ($token->{data});
+          $self->{open_elements}->[-1]->[0]->manakai_append_text ($s);
         }
-            
-        $token = $self->_get_next_token;
-        next B;
-      } elsif ($token->{type} == START_TAG_TOKEN) {
+      } # C
+
+      if ($token->{type} == START_TAG_TOKEN) {
         if ({
              tr => (($self->{insertion_mode} & IM_MASK) != IN_ROW_IM),
              th => 1, td => 1,
@@ -6828,4 +6840,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/08/16 06:47:59 $
+# $Date: 2009/09/05 13:30:42 $
