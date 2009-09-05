@@ -985,6 +985,22 @@
 "input": "<!!--->-->",
 "output": ["ParseError", ["Comment", "!---"], ["Character", "-->"]]},
 
+{"description": "<!----!>",
+"input": "<!----!>",
+"output": ["ParseError", ["Comment", ""]]},
+
+{"description": "<!----!-->",
+"input": "<!----!-->",
+"output": ["ParseError", ["Comment", "--!"]]},
+
+{"description": "<!----!",
+"input": "<!----!",
+"output": ["ParseError", "ParseError", ["Comment", ""]]},
+
+{"description": "<!----!x-->",
+"input": "<!----!x-->",
+"output": ["ParseError", ["Comment", "--!x"]]},
+
 {"description": "<a href=''rel=''>",
 "input": "<a href=''rel=''>",
 "output": ["ParseError", ["StartTag", "a", {"href": "", "rel": ""}]]},

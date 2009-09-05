@@ -7945,6 +7945,8 @@ Access & XHTML2: access (LC)
 
 XML Events & XForms (for XHTML2 support; very, very low priority)
 
+# XXX marquee onbounce/onfinish/onstart
+
 =cut
 
 ## NOTE: Where RFC 2659 allows additional attributes is unclear.

@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -105,6 +105,7 @@ sub COMMENT_START_STATE () { 14 }
 sub COMMENT_START_DASH_STATE () { 15 }
 sub COMMENT_STATE () { 16 }
 sub COMMENT_END_STATE () { 17 }
+sub COMMENT_END_BANG_STATE () { 102 } ## LAST
 sub COMMENT_END_DASH_STATE () { 18 }
 sub BOGUS_COMMENT_STATE () { 19 }
 sub DOCTYPE_STATE () { 20 }
@@ -2942,8 +2943,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == COMMENT_END_STATE) {
+    } elsif ($self->{state} == COMMENT_END_STATE or
+             $self->{state} == COMMENT_END_BANG_STATE) {
       ## XML5: "Comment end state" and "DOCTYPE comment end state".
+      ## (No comment end bang state.)
 
       if ($self->{nc} == 0x003E) { # >
         if ($self->{in_subset}) {
@@ -2970,13 +2973,35 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{nc} == 0x002D) { # -
+        if ($self->{state} == COMMENT_END_BANG_STATE) {
+          
+          $self->{ct}->{data} .= '--!'; # comment
+          $self->{state} = COMMENT_END_DASH_STATE;
+        } else {
+          
+          ## XML5: Not a parse error.
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'dash in comment',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev});
+          $self->{ct}->{data} .= '-'; # comment
+          ## Stay in the state
+        }
         
-        ## XML5: Not a parse error.
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'dash in comment',
-                        line => $self->{line_prev},
-                        column => $self->{column_prev});
-        $self->{ct}->{data} .= '-'; # comment
-        ## Stay in the state
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x0021 and # !
+               $self->{state} != COMMENT_END_BANG_STATE) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'comment end bang'); # XXX error type
+        $self->{state} = COMMENT_END_BANG_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -2999,14 +3024,18 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           $self->{s_kwd} = '';
         }
-        ## reconsume
+        ## Reconsume.
 
         return  ($self->{ct}); # comment
 
         redo A;
       } else {
         
-        $self->{ct}->{data} .= '--' . chr ($self->{nc}); # comment
+        if ($self->{state} == COMMENT_END_BANG_STATE) {
+          $self->{ct}->{data} .= '--!' . chr ($self->{nc}); # comment
+        } else {
+          $self->{ct}->{data} .= '--' . chr ($self->{nc}); # comment
+        }
         $self->{state} = COMMENT_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -8706,5 +8735,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/08/16 05:24:47 $
+## $Date: 2009/09/05 09:26:55 $
                                 
