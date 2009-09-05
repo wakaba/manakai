@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 19:36:22 2009
-# Current time GMT:   Sat Sep  5 10:36:22 2009
+# Current time local: Sat Sep  5 19:37:32 2009
+# Current time GMT:   Sat Sep  5 10:37:32 2009
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -213,7 +213,18 @@ not ok 141
 #      - "            qq'z',\n"
 #      - "            {}\n"
 #      - "          ]\n"
-ok 142
+not ok 142
+# Test 142 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #142)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {}\n          ]\n        ];\n" (<z//: qq'<z//')
+#     Line 3 is changed:
+#      - "          qq'ParseError',\n"
+#      + "          qq'ParseError'\n"
+#     Lines 4-4 are missing:
+#      - "          [\n"
+#      - "            qq'StartTag',\n"
+#      - "            qq'z',\n"
+#      - "            {}\n"
+#      - "          ]\n"
 not ok 143
 # Test 143 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #143)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {}\n          ]\n        ];\n" (<z: qq'<z')
@@ -399,8 +410,34 @@ not ok 161
 #      - "              0 => qq''\n"
 #      - "            }\n"
 #      - "          ]\n"
-ok 162
-ok 163
+not ok 162
+# Test 162 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #162)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              0 => qq''\n            }\n          ]\n        ];\n" (<z/0 /: qq'<z/0 /')
+#     Line 3 is changed:
+#      - "          qq'ParseError',\n"
+#      + "          qq'ParseError'\n"
+#     Lines 4-4 are missing:
+#      - "          [\n"
+#      - "            qq'StartTag',\n"
+#      - "            qq'z',\n"
+#      - "            {\n"
+#      - "              0 => qq''\n"
+#      - "            }\n"
+#      - "          ]\n"
+not ok 163
+# Test 163 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #163)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              0 => qq''\n            }\n          ]\n        ];\n" (<z/0/: qq'<z/0/')
+#     Line 3 is changed:
+#      - "          qq'ParseError',\n"
+#      + "          qq'ParseError'\n"
+#     Lines 4-4 are missing:
+#      - "          [\n"
+#      - "            qq'StartTag',\n"
+#      - "            qq'z',\n"
+#      - "            {\n"
+#      - "              0 => qq''\n"
+#      - "            }\n"
+#      - "          ]\n"
 not ok 164
 # Test 164 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #164)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              qq'00' => qq''\n            }\n          ]\n        ];\n" (<z/00: qq'<z/00')
@@ -1628,39 +1665,6 @@ ok 1144
 ok 1145
 ok 1146
 ok 1147
-not ok 1148
-# Test 1148 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'p',\n            {\n              qq'class' => qq'a'\n            }\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1148)
-#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (start tag not closed (self-closing start tag): qq'<p class=\x{27}a\x{27}/')
-#      Line 2 is changed:
-#       - "          qq'ParseError'\n"
-#       + "          qq'ParseError',\n"
-#      Got 7 extra lines at line 3:
-#       + "          [\n"
-#       + "            qq'StartTag',\n"
-#       + "            qq'p',\n"
-#       + "            {\n"
-#       + "              qq'class' => qq'a'\n"
-#       + "            }\n"
-#       + "          ]\n"
-not ok 1149
-# Test 1149 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'EndTag',\n            qq'p'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1149)
-#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (self-closing start tag): qq'</p/')
-#      Line 2 is changed:
-#       - "          qq'ParseError'\n"
-#       + "          qq'ParseError',\n"
-#      Got 4 extra lines at line 3:
-#       + "          [\n"
-#       + "            qq'EndTag',\n"
-#       + "            qq'p'\n"
-#       + "          ]\n"
-not ok 1150
-# Test 1150 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'EndTag',\n            qq'p'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1150)
-#      Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/')
-#      Line 3 is changed:
-#       - "          qq'ParseError'\n"
-#       + "          qq'ParseError',\n"
-#      Got 4 extra lines at line 4:
-#       + "          [\n"
-#       + "            qq'EndTag',\n"
-#       + "            qq'p'\n"
-#       + "          ]\n"
+ok 1148
+ok 1149
+ok 1150
