@@ -1,7 +1,7 @@
-1..4935
+1..1573
 # Running under perl version 5.010000 for linux
-# Current time local: Mon Oct 20 13:18:39 2008
-# Current time GMT:   Mon Oct 20 04:18:39 2008
+# Current time local: Sat Sep  5 19:17:30 2009
+# Current time GMT:   Sat Sep  5 10:17:30 2009
 # Using Test.pm version 1.25
 # t/xml/elements-1.dat
 ok 1
@@ -85,7 +85,10 @@ ok 77
 ok 78
 ok 79
 ok 80
-ok 81
+not ok 81
+# Test 81 got: "1;6;bad attribute value;;;m" (t/XML-Parser.t at line 95 fail #41)
+#    Expected: "1;6;unquoted attr value;;;m" (Parse error: qq'<a b=< />')
+#  t/XML-Parser.t line 95 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
 ok 82
 ok 83
 ok 84
@@ -1038,9 +1041,20 @@ ok 1015
 ok 1016
 ok 1017
 ok 1018
-ok 1019
+not ok 1019
+# Test 1019 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 152 fail #451)
+#      Expected: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d> ]><a/>\"\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>')
+#      Lines 2-2 are missing:
+#       - "  <!ELEMENT b >\n"
+#       - "    c ID () EXPLICIT \"d> ]><a/>\"\n"
+#  t/XML-Parser.t line 152 is:   ok $result, $test->{document}->[0],
 ok 1020
-ok 1021
+not ok 1021
+# Test 1021 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 152 fail #452)
+#      Expected: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d')
+#      Lines 2-2 are missing:
+#       - "  <!ELEMENT b >\n"
+#       - "    c ID () EXPLICIT \"d\"\n"
 ok 1022
 ok 1023
 ok 1024

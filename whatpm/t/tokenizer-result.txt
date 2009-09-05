@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 19:15:16 2009
-# Current time GMT:   Sat Sep  5 10:15:16 2009
+# Current time local: Sat Sep  5 19:22:10 2009
+# Current time GMT:   Sat Sep  5 10:22:10 2009
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -285,8 +285,34 @@ not ok 149
 #      - "          ]\n"
 ok 150
 ok 151
-ok 152
-ok 153
+not ok 152
+# Test 152 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #152)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              0 => qq'&'\n            }\n          ]\n        ];\n" (<z/0='&: qq'<z/0=\x{27}&')
+#     Line 3 is changed:
+#      - "          qq'ParseError',\n"
+#      + "          qq'ParseError'\n"
+#     Lines 4-4 are missing:
+#      - "          [\n"
+#      - "            qq'StartTag',\n"
+#      - "            qq'z',\n"
+#      - "            {\n"
+#      - "              0 => qq'&'\n"
+#      - "            }\n"
+#      - "          ]\n"
+not ok 153
+# Test 153 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #153)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              0 => qq'%'\n            }\n          ]\n        ];\n" (<z/0='%: qq'<z/0=\x{27}%')
+#     Line 3 is changed:
+#      - "          qq'ParseError',\n"
+#      + "          qq'ParseError'\n"
+#     Lines 4-4 are missing:
+#      - "          [\n"
+#      - "            qq'StartTag',\n"
+#      - "            qq'z',\n"
+#      - "            {\n"
+#      - "              0 => qq'%'\n"
+#      - "            }\n"
+#      - "          ]\n"
 ok 154
 ok 155
 ok 156
@@ -351,7 +377,20 @@ not ok 165
 #      - "              0 => qq''\n"
 #      - "            }\n"
 #      - "          ]\n"
-ok 166
+not ok 166
+# Test 166 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #166)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              0 => qq'\\x{09}'\n            }\n          ]\n        ];\n" (<z/0='&#9: qq'<z/0=\x{27}&#9')
+#     Line 4 is changed:
+#      - "          qq'ParseError',\n"
+#      + "          qq'ParseError'\n"
+#     Lines 5-5 are missing:
+#      - "          [\n"
+#      - "            qq'StartTag',\n"
+#      - "            qq'z',\n"
+#      - "            {\n"
+#      - "              0 => qq'\\x{09}'\n"
+#      - "            }\n"
+#      - "          ]\n"
 ok 167
 ok 168
 not ok 169
@@ -1350,7 +1389,20 @@ ok 1017
 ok 1018
 ok 1019
 ok 1020
-ok 1021
+not ok 1021
+# Test 1021 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1021)
+#      Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'a',\n            {\n              qq'href' => qq'\\x{A9}'\n            }\n          ]\n        ];\n" (entity w/o refc at the end of unterminated attribute value: qq'<a href=\x{27}&COPY')
+#      Line 3 is changed:
+#       - "          qq'ParseError',\n"
+#       + "          qq'ParseError'\n"
+#      Lines 4-4 are missing:
+#       - "          [\n"
+#       - "            qq'StartTag',\n"
+#       - "            qq'a',\n"
+#       - "            {\n"
+#       - "              qq'href' => qq'\\x{A9}'\n"
+#       - "            }\n"
+#       - "          ]\n"
 ok 1022
 ok 1023
 ok 1024
@@ -1375,7 +1427,20 @@ ok 1042
 ok 1043
 ok 1044
 ok 1045
-ok 1046
+not ok 1046
+# Test 1046 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1046)
+#      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'p',\n            {\n              qq'align' => qq'left<div>'\n            }\n          ]\n        ];\n" (< in attribute value (single-unquoted) state: qq'<p align=\x{27}left<div>')
+#      Line 2 is changed:
+#       - "          qq'ParseError',\n"
+#       + "          qq'ParseError'\n"
+#      Lines 3-3 are missing:
+#       - "          [\n"
+#       - "            qq'StartTag',\n"
+#       - "            qq'p',\n"
+#       - "            {\n"
+#       - "              qq'align' => qq'left<div>'\n"
+#       - "            }\n"
+#       - "          ]\n"
 ok 1047
 ok 1048
 ok 1049
@@ -1453,7 +1518,20 @@ ok 1120
 ok 1121
 ok 1122
 ok 1123
-ok 1124
+not ok 1124
+# Test 1124 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1124)
+#      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'a',\n            {\n              qq'a' => qq'>'\n            }\n          ]\n        ];\n" (<a a='>: qq'<a a=\x{27}>')
+#      Line 2 is changed:
+#       - "          qq'ParseError',\n"
+#       + "          qq'ParseError'\n"
+#      Lines 3-3 are missing:
+#       - "          [\n"
+#       - "            qq'StartTag',\n"
+#       - "            qq'a',\n"
+#       - "            {\n"
+#       - "              qq'a' => qq'>'\n"
+#       - "            }\n"
+#       - "          ]\n"
 ok 1125
 ok 1126
 ok 1127
