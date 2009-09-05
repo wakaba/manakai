@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 19:00:41 2009
-# Current time GMT:   Sat Sep  5 10:00:41 2009
+# Current time local: Sat Sep  5 19:01:52 2009
+# Current time GMT:   Sat Sep  5 10:01:52 2009
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -104,7 +104,19 @@ ok 76
 ok 77
 ok 78
 ok 79
-ok 80
+not ok 80
+# Test 80 got: "$VAR1 = [];\n" (t/HTML-tokenizer.t at line 205 fail #80)
+#    Expected: "$VAR1 = [\n          [\n            qq'StartTag',\n            qq'h',\n            {}\n          ]\n        ];\n" (Start tag with no attributes but space before the greater-than sign: qq'<h >')
+#    Line 1 is changed:
+#     - "$VAR1 = [\n"
+#     + "$VAR1 = [];\n"
+#    Lines 2-2 are missing:
+#     - "          [\n"
+#     - "            qq'StartTag',\n"
+#     - "            qq'h',\n"
+#     - "            {}\n"
+#     - "          ]\n"
+#     - "        ];\n"
 ok 81
 # t/tokenizer/test3.test
 ok 82
@@ -1275,11 +1287,35 @@ ok 1102
 ok 1103
 ok 1104
 ok 1105
-ok 1106
+not ok 1106
+# Test 1106 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1106)
+#      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'br',\n            {}\n          ]\n        ];\n" (slash in tag after a space: qq'<br / >')
+#      Line 2 is changed:
+#       - "          qq'ParseError',\n"
+#       + "          qq'ParseError'\n"
+#      Lines 3-3 are missing:
+#       - "          [\n"
+#       - "            qq'StartTag',\n"
+#       - "            qq'br',\n"
+#       - "            {}\n"
+#       - "          ]\n"
 ok 1107
 ok 1108
 ok 1109
-ok 1110
+not ok 1110
+# Test 1110 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1110)
+#      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'br',\n            {\n              qq'class' => qq''\n            }\n          ]\n        ];\n" (slash in tag after attribute name: qq'<br class/ >')
+#      Line 2 is changed:
+#       - "          qq'ParseError',\n"
+#       + "          qq'ParseError'\n"
+#      Lines 3-3 are missing:
+#       - "          [\n"
+#       - "            qq'StartTag',\n"
+#       - "            qq'br',\n"
+#       - "            {\n"
+#       - "              qq'class' => qq''\n"
+#       - "            }\n"
+#       - "          ]\n"
 ok 1111
 ok 1112
 ok 1113
@@ -1297,9 +1333,30 @@ ok 1124
 ok 1125
 ok 1126
 ok 1127
-ok 1128
+not ok 1128
+# Test 1128 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1128)
+#      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'EndTag',\n            qq'p'\n          ]\n        ];\n" (end tag attribute (before attribute, >): qq'</p class=""  >')
+#      Line 2 is changed:
+#       - "          qq'ParseError',\n"
+#       + "          qq'ParseError'\n"
+#      Lines 3-3 are missing:
+#       - "          [\n"
+#       - "            qq'EndTag',\n"
+#       - "            qq'p'\n"
+#       - "          ]\n"
 ok 1129
-ok 1130
+not ok 1130
+# Test 1130 got: "$VAR1 = [];\n" (t/HTML-tokenizer.t at line 205 fail #1130)
+#      Expected: "$VAR1 = [\n          [\n            qq'EndTag',\n            qq'p'\n          ]\n        ];\n" (end tag not closed (before attribute): qq'</p >')
+#      Line 1 is changed:
+#       - "$VAR1 = [\n"
+#       + "$VAR1 = [];\n"
+#      Lines 2-2 are missing:
+#       - "          [\n"
+#       - "            qq'EndTag',\n"
+#       - "            qq'p'\n"
+#       - "          ]\n"
+#       - "        ];\n"
 ok 1131
 ok 1132
 ok 1133
@@ -1311,8 +1368,28 @@ ok 1138
 ok 1139
 ok 1140
 ok 1141
-ok 1142
-ok 1143
+not ok 1142
+# Test 1142 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1142)
+#      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'EndTag',\n            qq'p'\n          ]\n        ];\n" (end tag attribute (after attribute value double quoted): qq'</p class="a" >')
+#      Line 2 is changed:
+#       - "          qq'ParseError',\n"
+#       + "          qq'ParseError'\n"
+#      Lines 3-3 are missing:
+#       - "          [\n"
+#       - "            qq'EndTag',\n"
+#       - "            qq'p'\n"
+#       - "          ]\n"
+not ok 1143
+# Test 1143 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1143)
+#      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'EndTag',\n            qq'p'\n          ]\n        ];\n" (end tag attribute (after attribute value single quoted): qq'</p class=\x{27}a\x{27} >')
+#      Line 2 is changed:
+#       - "          qq'ParseError',\n"
+#       + "          qq'ParseError'\n"
+#      Lines 3-3 are missing:
+#       - "          [\n"
+#       - "            qq'EndTag',\n"
+#       - "            qq'p'\n"
+#       - "          ]\n"
 ok 1144
 ok 1145
 ok 1146
