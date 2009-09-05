@@ -1,7 +1,7 @@
 1..1573
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 19:17:30 2009
-# Current time GMT:   Sat Sep  5 10:17:30 2009
+# Current time local: Sat Sep  5 19:28:42 2009
+# Current time GMT:   Sat Sep  5 10:28:42 2009
 # Using Test.pm version 1.25
 # t/xml/elements-1.dat
 ok 1
@@ -85,10 +85,7 @@ ok 77
 ok 78
 ok 79
 ok 80
-not ok 81
-# Test 81 got: "1;6;bad attribute value;;;m" (t/XML-Parser.t at line 95 fail #41)
-#    Expected: "1;6;unquoted attr value;;;m" (Parse error: qq'<a b=< />')
-#  t/XML-Parser.t line 95 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
+ok 81
 ok 82
 ok 83
 ok 84
@@ -1039,7 +1036,10 @@ ok 1013
 ok 1014
 ok 1015
 ok 1016
-ok 1017
+not ok 1017
+# Test 1017 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 152 fail #450)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID d')
+#  t/XML-Parser.t line 152 is:   ok $result, $test->{document}->[0],
 ok 1018
 not ok 1019
 # Test 1019 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 152 fail #451)
@@ -1047,18 +1047,14 @@ not ok 1019
 #      Lines 2-2 are missing:
 #       - "  <!ELEMENT b >\n"
 #       - "    c ID () EXPLICIT \"d> ]><a/>\"\n"
-#  t/XML-Parser.t line 152 is:   ok $result, $test->{document}->[0],
 ok 1020
-not ok 1021
-# Test 1021 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 152 fail #452)
-#      Expected: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d')
-#      Lines 2-2 are missing:
-#       - "  <!ELEMENT b >\n"
-#       - "    c ID () EXPLICIT \"d\"\n"
+ok 1021
 ok 1022
 ok 1023
 ok 1024
-ok 1025
+not ok 1025
+# Test 1025 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 152 fail #454)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d"')
 ok 1026
 ok 1027
 ok 1028
@@ -1068,7 +1064,9 @@ ok 1031
 ok 1032
 ok 1033
 ok 1034
-ok 1035
+not ok 1035
+# Test 1035 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 152 fail #459)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID \x{27}d\x{27}')
 ok 1036
 ok 1037
 ok 1038

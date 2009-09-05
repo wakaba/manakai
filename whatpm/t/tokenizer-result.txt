@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 19:22:10 2009
-# Current time GMT:   Sat Sep  5 10:22:10 2009
+# Current time local: Sat Sep  5 19:23:40 2009
+# Current time GMT:   Sat Sep  5 10:23:40 2009
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -1546,17 +1546,7 @@ ok 1135
 ok 1136
 ok 1137
 ok 1138
-not ok 1139
-# Test 1139 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'EndTag',\n            qq'p'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1139)
-#      Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (end tag not closed (attribute value single quote): qq'</p class=\x{27}')
-#      Line 3 is changed:
-#       - "          qq'ParseError'\n"
-#       + "          qq'ParseError',\n"
-#      Got 4 extra lines at line 4:
-#       + "          [\n"
-#       + "            qq'EndTag',\n"
-#       + "            qq'p'\n"
-#       + "          ]\n"
+ok 1139
 ok 1140
 not ok 1141
 # Test 1141 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'EndTag',\n            qq'p'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #1141)
