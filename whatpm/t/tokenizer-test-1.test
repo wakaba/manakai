@@ -1160,7 +1160,7 @@
 
 {"description": "end tag attribute (before attribute, EOF)",
 "input": "</p class=\"\"  ",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "end tag not closed (before attribute)",
 "input": "</p >",
@@ -1168,7 +1168,7 @@
 
 {"description": "end tag not closed (attribute name)",
 "input": "</p class",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "end tag attribute (after attribute name)",
 "input": "</p class >",
@@ -1184,7 +1184,7 @@
 
 {"description": "end tag not closed (after attribute name)",
 "input": "</p class ",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "end tag attribute (before attribute value)",
 "input": "</p class=>",
@@ -1192,15 +1192,15 @@
 
 {"description": "end tag not closed (before attribute value)",
 "input": "</p class=",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "end tag not closed (attribute value double quote)",
 "input": "</p class=\"",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "end tag not closed (attribute value single quote)",
 "input": "</p class='",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "end tag attribute (attribute value unquoted)",
 "input": "</p class=a>",
@@ -1208,7 +1208,7 @@
 
 {"description": "end tag not closed (attribute value unquoted)",
 "input": "</p class=a",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "end tag attribute (after attribute value double quoted)",
 "input": "</p class=\"a\" >",
@@ -1220,32 +1220,30 @@
 
 {"description": "end tag not closed (after attribute value double quoted)",
 "input": "</p class=\"a\" ",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "end tag not closed (after attribute value single quoted)",
 "input": "</p class='a' ",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "start tag not closed (after attribute value (quoted))",
 "input": "<p class='a'",
-"output": ["ParseError", ["StartTag", "p", {"class": "a"}]]},
+"output": ["ParseError"]},
 
 {"description": "end tag not closed (after attribute value (quoted))",
 "input": "</p class='a'",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]},
+"output": ["ParseError", "ParseError"]},
 
 {"description": "start tag not closed (self-closing start tag)",
 "input": "<p class='a'/",
-"output": ["ParseError", ["StartTag", "p", {"class": "a"}]]},
+"output": ["ParseError"]},
 
 {"description": "end tag not closed (self-closing start tag)",
 "input": "</p/",
-"output": ["ParseError", ["EndTag", "p"]]},
+"output": ["ParseError"]},
 
 {"description": "end tag not closed (self-closing start tag)",
 "input": "</p class='a'/",
-"output": ["ParseError", "ParseError", ["EndTag", "p"]]}
-
-
+"output": ["ParseError", "ParseError"]}
 
 ]}

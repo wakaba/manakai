@@ -451,15 +451,12 @@
 <!DOCTYPE a[
 <!ATTLIST b c t d
 #errors
-2;13;unknown declared type;;t;m
 2;17;unquoted attr value;;;m
 2;17;unclosed md;;;m
 2;17;unclosed internal subset;;;m
 2;17;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
-|     c 0 () EXPLICIT "d"
 
 #data
 <!DOCTYPE a[
@@ -483,8 +480,6 @@
 2;18;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
-|     c ID () EXPLICIT "d"
 
 #data
 <!DOCTYPE a[
@@ -509,8 +504,6 @@
 2;19;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
-|     c ID () EXPLICIT "d"
 
 #data
 <!DOCTYPE a[
@@ -532,8 +525,6 @@
 2;20;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
-|     c ID () EXPLICIT "d"
 
 #data
 <!DOCTYPE a[
@@ -558,8 +549,6 @@
 3;6;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
-|     c ID () EXPLICIT "d> ]><a/>"
 
 #data
 <!DOCTYPE a[
@@ -570,8 +559,6 @@
 2;19;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
-|     c ID () EXPLICIT "d"
 
 #data
 <!DOCTYPE a[
@@ -593,8 +580,6 @@
 2;20;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
-|     c ID () EXPLICIT "d"
 
 #data
 <!DOCTYPE a[

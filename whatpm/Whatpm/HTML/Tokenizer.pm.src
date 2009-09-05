@@ -1,6 +1,6 @@
 package Whatpm::HTML::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.33 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 BEGIN {
   require Exporter;
@@ -862,7 +862,8 @@ sub _get_next_token ($) {
         $self->{s_kwd} = '';
         # reconsume
 
-        !!!emit ($self->{ct}); # start tag or end tag
+        ## Discard the token.
+        #!!!emit ($self->{ct}); # start tag or end tag
 
         redo A;
       } elsif ($self->{nc} == 0x002F) { # /
@@ -943,7 +944,8 @@ sub _get_next_token ($) {
         $self->{s_kwd} = '';
         # reconsume
 
-        !!!emit ($self->{ct}); # start tag or end tag
+        ## Discard the token.
+        #!!!emit ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
@@ -1069,7 +1071,8 @@ sub _get_next_token ($) {
         $self->{s_kwd} = '';
         # reconsume
 
-        !!!emit ($self->{ct}); # start tag or end tag
+        ## Discard the token.
+        #!!!emit ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
@@ -1176,7 +1179,8 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         # reconsume
 
-        !!!emit ($self->{ct}); # start tag or end tag
+        ## Discard the token.
+        #!!!emit ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
@@ -1275,7 +1279,8 @@ sub _get_next_token ($) {
         $self->{s_kwd} = '';
         ## reconsume
 
-        !!!emit ($self->{ct}); # start tag or end tag
+        ## Discard the token.
+        #!!!emit ($self->{ct}); # start tag or end tag
 
         redo A;
       } else {
@@ -1356,14 +1361,20 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           $self->{s_kwd} = '';
           ## reconsume
-          !!!emit ($self->{ct}); # end tag
+
+          ## Discard the token.
+          #!!!emit ($self->{ct}); # end tag
+
           redo A;
         } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
           ## XML5: No parse error above; not defined yet.
           push @{$self->{ct}->{attrdefs}}, $self->{ca};
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
           ## Reconsume.
-          !!!emit ($self->{ct}); # ATTLIST
+
+          ## Discard the token.
+          #!!!emit ($self->{ct}); # ATTLIST
+
           redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
@@ -1432,7 +1443,10 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           $self->{s_kwd} = '';
           ## reconsume
-          !!!emit ($self->{ct}); # start tag
+
+          ## Discard the token.
+          #!!!emit ($self->{ct}); # start tag
+
           redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
@@ -1447,14 +1461,20 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           $self->{s_kwd} = '';
           ## reconsume
-          !!!emit ($self->{ct}); # end tag
+
+          ## Discard the token.
+          #!!!emit ($self->{ct}); # end tag
+
           redo A;
         } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
           ## XML5: No parse error above; not defined yet.
           push @{$self->{ct}->{attrdefs}}, $self->{ca};
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
           ## Reconsume.
-          !!!emit ($self->{ct}); # ATTLIST
+
+          ## Discard the token.
+          #!!!emit ($self->{ct}); # ATTLIST
+
           redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
@@ -1549,7 +1569,10 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           $self->{s_kwd} = '';
           ## reconsume
-          !!!emit ($self->{ct}); # start tag
+
+          ## Discard the token.
+          #!!!emit ($self->{ct}); # start tag
+          
           redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           !!!parse-error (type => 'unclosed tag');
@@ -1565,14 +1588,20 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
           $self->{s_kwd} = '';
           ## reconsume
-          !!!emit ($self->{ct}); # end tag
+
+          ## Discard the token.
+          #!!!emit ($self->{ct}); # end tag
+
           redo A;
         } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
           !!!parse-error (type => 'unclosed md'); ## TODO: type
           push @{$self->{ct}->{attrdefs}}, $self->{ca};
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
           ## Reconsume.
-          !!!emit ($self->{ct}); # ATTLIST
+
+          ## Discard the token.
+          #!!!emit ($self->{ct}); # ATTLIST
+
           redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
@@ -1652,7 +1681,10 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
         ## Reconsume.
-        !!!emit ($self->{ct}); # start tag or end tag
+
+        ## Discard the token.
+        #!!!emit ($self->{ct}); # start tag or end tag
+
         redo A;
       } else {
         !!!cp ('124.1');
@@ -1709,7 +1741,10 @@ sub _get_next_token ($) {
         $self->{state} = DATA_STATE;
         $self->{s_kwd} = '';
         ## Reconsume.
-        !!!emit ($self->{ct}); # start tag or end tag
+
+        ## Discard the token.
+        #!!!emit ($self->{ct}); # start tag or end tag
+
         redo A;
       } else {
         !!!cp ('124.4');
@@ -5230,5 +5265,5 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/09/05 09:57:55 $
+## $Date: 2009/09/05 10:41:07 $
                                 
