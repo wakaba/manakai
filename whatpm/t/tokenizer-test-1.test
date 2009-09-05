@@ -318,19 +318,19 @@
 
 {"description": "U+0001 character reference",
 "input": "&#x1;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u0001"]]},
 
 {"description": "U+0002 character reference",
 "input": "&#x2;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u0002"]]},
 
 {"description": "U+0008 character reference",
 "input": "&#x8;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u0008"]]},
 
 {"description": "U+0008 decimal character reference",
 "input": "&#8;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u0008"]]},
 
 {"description": "U+0009 character reference",
 "input": "&#x9;",
@@ -358,11 +358,11 @@
 
 {"description": "U+000B character reference",
 "input": "&#xb;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u000B"]]},
 
 {"description": "U+000B decimal character reference",
 "input": "&#11;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u000B"]]},
 
 {"description": "U+000C character reference",
 "input": "&#xc;",
@@ -370,27 +370,27 @@
 
 {"description": "U+000E character reference",
 "input": "&#xe;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u000E"]]},
 
 {"description": "U+000F character reference",
 "input": "&#xF;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u000F"]]},
 
 {"description": "U+000F decimal character reference",
 "input": "&#15;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u000F"]]},
 
 {"description": "U+0010 character reference",
 "input": "&#x10;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u0010"]]},
 
 {"description": "U+001B character reference",
 "input": "&#x1b;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u001B"]]},
 
 {"description": "U+001F character reference",
 "input": "&#x1F;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u001F"]]},
 
 {"description": "U+0020 character reference",
 "input": "&#x20;",
@@ -398,13 +398,13 @@
 
 {"description": "U+007F character reference",
 "input": "&#x7f;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\u007F"]]},
 
 {"description":"c1 character references",
 "input":"&#128;&#129;&#130;&#131;&#132;&#133;&#134;&#135;",
 "output":[
   "ParseError", ["Character", "\u20AC"],
-  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u0081"],
   "ParseError", ["Character", "\u201A"],
   "ParseError", ["Character", "\u0192"],
   "ParseError", ["Character", "\u201E"],
@@ -420,14 +420,14 @@
   "ParseError", ["Character", "\u0160"],
   "ParseError", ["Character", "\u2039"],
   "ParseError", ["Character", "\u0152"],
-  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u008D"],
   "ParseError", ["Character", "\u017D"],
-  "ParseError", ["Character", "\uFFFD"]
+  "ParseError", ["Character", "\u008F"]
 ]},
 {"description":"c1 character references",
 "input":"&#144;&#145;&#146;&#147;&#148;&#149;&#150;&#151;",
 "output":[
-  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u0090"],
   "ParseError", ["Character", "\u2018"],
   "ParseError", ["Character", "\u2019"],
   "ParseError", ["Character", "\u201C"],
@@ -444,7 +444,7 @@
   "ParseError", ["Character", "\u0161"],
   "ParseError", ["Character", "\u203A"],
   "ParseError", ["Character", "\u0153"],
-  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u009D"],
   "ParseError", ["Character", "\u017E"],
   "ParseError", ["Character", "\u0178"]
 ]},
@@ -453,7 +453,7 @@
 "input":"&#x80;&#x81;&#x82;&#x83;&#x84;&#x85;&#x86;&#x87;",
 "output":[
   "ParseError", ["Character", "\u20AC"],
-  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u0081"],
   "ParseError", ["Character", "\u201A"],
   "ParseError", ["Character", "\u0192"],
   "ParseError", ["Character", "\u201E"],
@@ -469,14 +469,14 @@
   "ParseError", ["Character", "\u0160"],
   "ParseError", ["Character", "\u2039"],
   "ParseError", ["Character", "\u0152"],
-  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u008D"],
   "ParseError", ["Character", "\u017D"],
-  "ParseError", ["Character", "\uFFFD"]
+  "ParseError", ["Character", "\u008F"]
 ]},
 {"description":"c1 character references",
 "input":"&#x90;&#x91;&#x92;&#x93;&#x94;&#x95;&#x96;&#x97;",
 "output":[
-  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u0090"],
   "ParseError", ["Character", "\u2018"],
   "ParseError", ["Character", "\u2019"],
   "ParseError", ["Character", "\u201C"],
@@ -493,7 +493,7 @@
   "ParseError", ["Character", "\u0161"],
   "ParseError", ["Character", "\u203A"],
   "ParseError", ["Character", "\u0153"],
-  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u009D"],
   "ParseError", ["Character", "\u017E"],
   "ParseError", ["Character", "\u0178"]
 ]},
@@ -508,82 +508,82 @@
 
 {"description":"surrogate character reference",
 "input":"&#xD800;",
-"output":["ParseError", ["Character", "\uFFFD"]]},
+"output":["ParseError", ["Character", "\uD800"]]},
 
 {"description":"surrogate character references",
 "input":"&#xD800;&#xDFFF;",
-"output":["ParseError", ["Character", "\uFFFD"],
-          "ParseError", ["Character", "\uFFFD"]]},
+"output":["ParseError", ["Character", "\uD800"],
+          "ParseError", ["Character", "\uDFFF"]]},
 
 {"description":"surrogate character reference",
 "input":"\uD800&#xDFFF;",
 "output":["ParseError", ["Character", "\uD800"],
-          "ParseError", ["Character", "\uFFFD"]]},
+          "ParseError", ["Character", "\uDFFF"]]},
 
 {"description":"surrogate character reference",
 "input":"&#xD800;\uDFFF",
-"output":["ParseError", ["Character", "\uFFFD"],
+"output":["ParseError", ["Character", "\uD800"],
           "ParseError", ["Character", "\uDFFF"]]},
 
 {"description":"surrogate character reference",
 "input":"&#55296;",
-"output":["ParseError", ["Character", "\uFFFD"]]},
+"output":["ParseError", ["Character", "\uD800"]]},
 
 {"description":"surrogate character reference",
 "input":"&#57343;",
-"output":["ParseError", ["Character", "\uFFFD"]]},
+"output":["ParseError", ["Character", "\uDFFF"]]},
 
 {"description": "U+FDD0 character reference",
 "input": "&#xfdd0;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uFDD0"]]},
 
 {"description": "U+FDD0 decimal character reference",
 "input": "&#64976;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uFDD0"]]},
 
 {"description": "U+FDDF character reference",
 "input": "&#xfddf;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uFDDF"]]},
 
 {"description": "U+FFFE character reference",
 "input": "&#xfffe;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uFFFE"]]},
 
 {"description": "U+FFFE decimal character reference",
 "input": "&#65534;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uFFFE"]]},
 
 {"description": "U+FFFF character reference",
 "input": "&#xffff;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uFFFF"]]},
 
 {"description": "U+FFFF decimal character reference",
 "input": "&#65535;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uFFFF"]]},
 
 {"description": "U+1FFFE character reference",
 "input": "&#x1fffe;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uD83F\uDFFE"]]},
 
 {"description": "U+1FFFF character reference",
 "input": "&#x1ffff;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uD83F\uDFFF"]]},
 
 {"description": "U+10FFFE character reference",
 "input": "&#x10fffe;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uDBFF\uDFFE"]]},
 
 {"description": "U+10FFFE decimal character reference",
 "input": "&#1114110;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uDBFF\uDFFE"]]},
 
 {"description": "U+10FFFF character reference",
 "input": "&#x10FFFF;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uDBFF\uDFFF"]]},
 
 {"description": "U+10FFFF decimal character reference",
 "input": "&#1114111;",
-"output": ["ParseError", ["Character", "\uFFFD"]]},
+"output": ["ParseError", ["Character", "\uDBFF\uDFFF"]]},
 
 {"description":"non-Unicode character reference",
 "input":"&#1114112;",

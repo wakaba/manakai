@@ -1,7 +1,7 @@
 1..1129
 # Running under perl version 5.010000 for linux
-# Current time local: Sat Sep  5 19:37:32 2009
-# Current time GMT:   Sat Sep  5 10:37:32 2009
+# Current time local: Sat Sep  5 20:30:33 2009
+# Current time GMT:   Sat Sep  5 11:30:33 2009
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -86,7 +86,15 @@ ok 58
 ok 59
 ok 60
 ok 61
-ok 62
+not ok 62
+# Test 62 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{D869}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{DED6}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #62)
+#    Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Hexadecimal entity pair representing a surrogate pair: qq'&#xD869;&#xDED6;')
+#    Line 5 is changed:
+#     - "            qq'\\x{FFFD}'\n"
+#     + "            qq'\\x{D869}'\n"
+#    Line 10 is changed:
+#     - "            qq'\\x{FFFD}'\n"
+#     + "            qq'\\x{DED6}'\n"
 ok 63
 ok 64
 ok 65
@@ -623,14 +631,33 @@ ok 201
 ok 202
 ok 203
 ok 204
-ok 205
+not ok 205
+# Test 205 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{10FFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #205)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Maximum non-BMP numeric entity: qq'&#X10FFFF;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{10FFFF}'\n"
 ok 206
 ok 207
 ok 208
 ok 209
 ok 210
 ok 211
-ok 212
+not ok 212
+# Test 212 got: "$VAR1 = [\n          [\n            qq'Character',\n            qq'\\x{D7FF}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{D800}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{D801}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{DFFE}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{DFFF}\\x{E000}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #212)
+#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'\\x{D7FF}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{E000}'\n          ]\n        ];\n" (Surrogate code point edge cases: qq'&#xD7FF;&#xD800;&#xD801;&#xDFFE;&#xDFFF;&#xE000;')
+#     Line 9 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{D800}'\n"
+#     Line 14 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{D801}'\n"
+#     Line 19 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{DFFE}'\n"
+#     Line 24 is changed:
+#      - "            qq'\\x{FFFD}\\x{E000}'\n"
+#      + "            qq'\\x{DFFF}\\x{E000}'\n"
 ok 213
 ok 214
 ok 215
@@ -1237,7 +1264,12 @@ ok 786
 ok 787
 ok 788
 ok 789
-ok 790
+not ok 790
+# Test 790 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{81}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #790)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR numeric entity.: qq'&#0129;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{81}'\n"
 ok 791
 ok 792
 ok 793
@@ -1249,10 +1281,25 @@ ok 798
 ok 799
 ok 800
 ok 801
-ok 802
+not ok 802
+# Test 802 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{8D}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #802)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR numeric entity.: qq'&#0141;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{8D}'\n"
 ok 803
-ok 804
-ok 805
+not ok 804
+# Test 804 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{8F}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #804)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR numeric entity.: qq'&#0143;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{8F}'\n"
+not ok 805
+# Test 805 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{90}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #805)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR numeric entity.: qq'&#0144;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{90}'\n"
 ok 806
 ok 807
 ok 808
@@ -1265,9 +1312,19 @@ ok 814
 ok 815
 ok 816
 ok 817
-ok 818
+not ok 818
+# Test 818 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{9D}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #818)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR numeric entity.: qq'&#0157;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{9D}'\n"
 ok 819
-ok 820
+not ok 820
+# Test 820 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{81}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #820)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR hexadecimal numeric entity.: qq'&#x081;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{81}'\n"
 ok 821
 ok 822
 ok 823
@@ -1279,10 +1336,25 @@ ok 828
 ok 829
 ok 830
 ok 831
-ok 832
+not ok 832
+# Test 832 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{8D}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #832)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR hexadecimal numeric entity.: qq'&#x08D;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{8D}'\n"
 ok 833
-ok 834
-ok 835
+not ok 834
+# Test 834 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{8F}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #834)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR hexadecimal numeric entity.: qq'&#x08F;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{8F}'\n"
+not ok 835
+# Test 835 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{90}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #835)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR hexadecimal numeric entity.: qq'&#x090;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{90}'\n"
 ok 836
 ok 837
 ok 838
@@ -1295,7 +1367,12 @@ ok 844
 ok 845
 ok 846
 ok 847
-ok 848
+not ok 848
+# Test 848 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{9D}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #848)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Windows-1252 REPLACEMENT CHAR hexadecimal numeric entity.: qq'&#x09D;')
+#     Line 5 is changed:
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{9D}'\n"
 ok 849
 ok 850
 # t/tokenizer/xmlViolation.test
@@ -1439,16 +1516,16 @@ ok 967
 ok 968
 ok 969
 not ok 970
-# Test 970 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{DFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #970)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{DFFF}'\n          ]\n        ];\n" (surrogate character reference: qq'&#xD800;\x{DFFF}')
+# Test 970 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{D800}\\x{DFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 205 fail #970)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{D800}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{DFFF}'\n          ]\n        ];\n" (surrogate character reference: qq'&#xD800;\x{DFFF}')
 #     Lines 3-3 are missing:
 #      - "          [\n"
 #      - "            qq'Character',\n"
-#      - "            qq'\\x{FFFD}'\n"
+#      - "            qq'\\x{D800}'\n"
 #      - "          ],\n"
 #     Line 6 is changed:
 #      - "            qq'\\x{DFFF}'\n"
-#      + "            qq'\\x{FFFD}\\x{DFFF}'\n"
+#      + "            qq'\\x{D800}\\x{DFFF}'\n"
 ok 971
 ok 972
 ok 973
