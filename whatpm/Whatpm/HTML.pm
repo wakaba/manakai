@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.228 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.229 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -3875,37 +3875,27 @@ sub _tree_construction_main ($) {
           
           next B;
         } elsif ($token->{tag_name} eq 'style') {
-          if (not $open_tables->[-1]->[1]) { # tainted
-            
-            ## NOTE: This is a "as if in head" code clone.
-            $parse_rcdata->(CDATA_CONTENT_MODEL);
-            $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
-            next B;
-          } else {
-            
-            #
-          }
+          
+          ## NOTE: This is a "as if in head" code clone.
+          $parse_rcdata->(CDATA_CONTENT_MODEL);
+          $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
+          next B;
         } elsif ($token->{tag_name} eq 'script') {
-          if (not $open_tables->[-1]->[1]) { # tainted
-            
-            ## NOTE: This is a "as if in head" code clone.
-            $script_start_tag->();
-            $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
-            next B;
-          } else {
-            
-            #
-          }
+          
+          ## NOTE: This is a "as if in head" code clone.
+          $script_start_tag->();
+          $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
+          next B;
         } elsif ($token->{tag_name} eq 'input') {
-          if (not $open_tables->[-1]->[1]) { # tainted
-            if ($token->{attributes}->{type}) { ## TODO: case
-              my $type = lc $token->{attributes}->{type}->{value};
-              if ($type eq 'hidden') {
-                
-                $self->{parse_error}->(level => $self->{level}->{must}, type => 'in table',
-                                text => $token->{tag_name}, token => $token);
+          if ($token->{attributes}->{type}) {
+            my $type = $token->{attributes}->{type}->{value};
+            $type =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+            if ($type eq 'hidden') {
+              
+              $self->{parse_error}->(level => $self->{level}->{must}, type => 'in table',
+                              text => $token->{tag_name}, token => $token);
 
-                
+              
     {
       my $el;
       
@@ -3930,19 +3920,15 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-                $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
+              $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
 
-                ## TODO: form element pointer
+              ## TODO: form element pointer
 
-                pop @{$self->{open_elements}};
+              pop @{$self->{open_elements}};
 
-                $token = $self->_get_next_token;
-                delete $self->{self_closing};
-                next B;
-              } else {
-                
-                #
-              }
+              $token = $self->_get_next_token;
+              delete $self->{self_closing};
+              next B;
             } else {
               
               #
@@ -6847,4 +6833,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 01:30:08 $
+# $Date: 2009/09/06 01:45:58 $

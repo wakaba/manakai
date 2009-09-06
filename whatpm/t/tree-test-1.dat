@@ -2187,9 +2187,9 @@ char in <table>
 |   <head>
 |   <body>
 |     "a"
-|     <input>
-|       type="hidden"
 |     <table>
+|       <input>
+|         type="hidden"
 |       " "
 
 #data
@@ -2231,10 +2231,10 @@ char in <thead>
 |   <head>
 |   <body>
 |     "a"
-|     <input>
-|       type="hidden"
 |     <table>
 |       <thead>
+|         <input>
+|           type="hidden"
 
 #data
 <!DOCTYPE HTML><table><tr><input type=hidden></table>
@@ -2262,11 +2262,11 @@ char in <tr>
 |   <head>
 |   <body>
 |     "a"
-|     <input>
-|       type="hidden"
 |     <table>
 |       <tbody>
 |         <tr>
+|           <input>
+|             type="hidden"
 
 #data
 <!DOCTYPE HTML><table><script></script></table>
@@ -2296,15 +2296,14 @@ char in <tr>
 <!DOCTYPE HTML><table>a<script></script> </table>
 #errors
 char in <table>
-<script> in <table>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     "a"
-|     <script>
 |     <table>
+|       <script>
 |       " "
 
 #data
@@ -2324,16 +2323,15 @@ char in <table>
 <!DOCTYPE HTML><table><tfoot>a<script></script> </table>
 #errors
 char in <tfoot>
-<script> in <tfoot>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     "a"
-|     <script>
 |     <table>
 |       <tfoot>
+|         <script>
 |         " "
 
 #data
@@ -2355,17 +2353,16 @@ char in <tfoot>
 <!DOCTYPE HTML><table><tr>a<script></script> </table>
 #errors
 char in <tr>
-<script> in <tr>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     "a"
-|     <script>
 |     <table>
 |       <tbody>
 |         <tr>
+|           <script>
 |           " "
 
 #data
@@ -2396,15 +2393,14 @@ char in <tr>
 <!DOCTYPE HTML><table>a<style></style> </table>
 #errors
 char in <table>
-<style> in <table>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     "a"
-|     <style>
 |     <table>
+|       <style>
 |       " "
 
 #data
@@ -2424,16 +2420,15 @@ char in <table>
 <!DOCTYPE HTML><table><tfoot>a<style></style> </table>
 #errors
 char in <tfoot>
-<style> in <tfoot>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     "a"
-|     <style>
 |     <table>
 |       <tfoot>
+|         <style>
 |         " "
 
 #data
@@ -2455,17 +2450,16 @@ char in <tfoot>
 <!DOCTYPE HTML><table><tr>a<style></style> </table>
 #errors
 char in <tr>
-<style> in <tr>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     "a"
-|     <style>
 |     <table>
 |       <tbody>
 |         <tr>
+|           <style>
 |           " "
 
 #data
@@ -11523,7 +11517,6 @@ text "c" in table
 <!DOCTYPE HTML>a<table>b<style></style>c</table>
 #errors
 text in table
-start tag in table
 text in table
 #document
 | <!DOCTYPE html>
@@ -11532,15 +11525,14 @@ text in table
 |   <body>
 |     "a"
 |     "b"
-|     <style>
 |     "c"
 |     <table>
+|       <style>
 
 #data
 <!DOCTYPE HTML>a<table>b<script></script>c</table>
 #errors
 text in table
-start tag in table
 text in table
 #document
 | <!DOCTYPE html>
@@ -11549,9 +11541,9 @@ text in table
 |   <body>
 |     "a"
 |     "b"
-|     <script>
 |     "c"
 |     <table>
+|       <script>
 
 #data
 <!DOCTYPE HTML>a<table>b<input type=hidden>c</table>
@@ -11566,10 +11558,10 @@ text in table
 |   <body>
 |     "a"
 |     "b"
-|     <input>
-|       type="hidden"
 |     "c"
 |     <table>
+|       <input>
+|         type="hidden"
 
 #data
 <!DOCTYPE HTML>a<table><tbody>b<!---->c</table>
@@ -11601,16 +11593,15 @@ text in table
 |   <body>
 |     "a"
 |     "b"
-|     <style>
 |     "c"
 |     <table>
 |       <tbody>
+|         <style>
 
 #data
 <!DOCTYPE HTML>a<table><tbody>b<script></script>c</table>
 #errors
 text in table
-start tag in table
 text in table
 #document
 | <!DOCTYPE html>
@@ -11619,10 +11610,10 @@ text in table
 |   <body>
 |     "a"
 |     "b"
-|     <script>
 |     "c"
 |     <table>
 |       <tbody>
+|         <script>
 
 #data
 <!DOCTYPE HTML>a<table><tbody>b<input type=hidden>c</table>
@@ -11637,11 +11628,11 @@ text in table
 |   <body>
 |     "a"
 |     "b"
-|     <input>
-|       type="hidden"
 |     "c"
 |     <table>
 |       <tbody>
+|         <input>
+|           type="hidden"
 
 #data
 <!DOCTYPE HTML>a<table>b&lt;</table>

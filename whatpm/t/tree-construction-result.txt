@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Sep  6 10:29:06 2009
-# Current time GMT:   Sun Sep  6 01:29:06 2009
+# Current time local: Sun Sep  6 10:44:21 2009
+# Current time GMT:   Sun Sep  6 01:44:21 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -1305,14 +1305,20 @@ not ok 1039
 #      Expected: "1" (Parse error: qq'<!doctype html><table><TBODY><script> <tr>x </script> </table>'; ;Line: 1 Col: 53 Unexpected end tag (script) in table context caused voodoo mode.)
 ok 1040
 ok 1041
-ok 1042
+not ok 1042
+# Test 1042 got: "1" (t/HTML-tree.t at line 92 fail #348)
+#      Expected: "2" (Parse error: qq'<!doctype html><table>X<style> <tr>x </style> </table>'; 1:31:in table:#text;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 45 Unexpected end tag (style) in table context caused voodoo mode.)
 ok 1043
 not ok 1044
-# Test 1044 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <style>\n      \" <tr>x \"\n    <table>\n      \" \"\n" (t/HTML-tree.t at line 98 fail #348)
+# Test 1044 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <table>\n      <style>\n        \" <tr>x \"\n      \" \"\n" (t/HTML-tree.t at line 98 fail #348)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <style>\n      \" <tr>x \"\n    \" \"\n    <table>\n" (Document tree: qq'<!doctype html><table>X<style> <tr>x </style> </table>')
-#      Line 8 is missing:
+#      Lines 6-6 are missing:
+#       - "    <style>\n"
+#       - "      \" <tr>x \"\n"
 #       - "    \" \"\n"
-#      Got 1 extra line at line 9:
+#      Got 3 extra lines at line 7:
+#       + "      <style>\n"
+#       + "        \" <tr>x \"\n"
 #       + "      \" \"\n"
 ok 1045
 ok 1046
@@ -1333,7 +1339,15 @@ not ok 1060
 # Test 1060 got: "2" (t/HTML-tree.t at line 92 fail #354)
 #      Expected: "1" (Parse error: qq'<!doctype html><table>X<input type=hidDEN></table>'; 1:43:in table:#text, 1:43:in table;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode.)
 ok 1061
-ok 1062
+not ok 1062
+# Test 1062 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <table>\n      <input>\n        type=\"hidDEN\"\n" (t/HTML-tree.t at line 98 fail #354)
+#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <input>\n      type=\"hidDEN\"\n    <table>\n" (Document tree: qq'<!doctype html><table>X<input type=hidDEN></table>')
+#      Lines 6-6 are missing:
+#       - "    <input>\n"
+#       - "      type=\"hidDEN\"\n"
+#      Got 2 extra lines at line 7:
+#       + "      <input>\n"
+#       + "        type=\"hidDEN\"\n"
 ok 1063
 ok 1064
 ok 1065
@@ -1344,7 +1358,15 @@ not ok 1069
 # Test 1069 got: "2" (t/HTML-tree.t at line 92 fail #357)
 #      Expected: "1" (Parse error: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>'; 1:45:in table, 1:64:in table;Line: 1 Col: 44 Unexpected start tag (input) in table context caused voodoo mode.)
 ok 1070
-ok 1071
+not ok 1071
+# Test 1071 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <input>\n      type=\" hidden\"\n    <table>\n      <input>\n        type=\"hidDEN\"\n" (t/HTML-tree.t at line 98 fail #357)
+#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <input>\n      type=\" hidden\"\n    <input>\n      type=\"hidDEN\"\n    <table>\n" (Document tree: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>')
+#      Lines 7-7 are missing:
+#       - "    <input>\n"
+#       - "      type=\"hidDEN\"\n"
+#      Got 2 extra lines at line 8:
+#       + "      <input>\n"
+#       + "        type=\"hidDEN\"\n"
 ok 1072
 ok 1073
 ok 1074
@@ -4269,7 +4291,9 @@ ok 3915
 ok 3916
 ok 3917
 ok 3918
-ok 3919
+not ok 3919
+# Test 3919 got: "2" (t/HTML-tree.t at line 92 fail #1307)
+#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML>a<table><tbody>b<style></style>c</table>'; 1:39:in table:#text, 1:55:in table:#text;text in table, start tag in table, text in table)
 ok 3920
 ok 3921
 ok 3922
