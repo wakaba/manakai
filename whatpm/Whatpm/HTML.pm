@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.236 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.237 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -5027,12 +5027,12 @@ sub _tree_construction_main ($) {
         
         $token = $self->_get_next_token;
         next B;
-      } elsif ($token->{tag_nane} eq 'frameset') {
+      } elsif ($token->{tag_name} eq 'frameset') {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body', text => $token->{tag_name},
                         token => $token);
 
         if (@{$self->{open_elements}} == 1 or
-            not ($self->{open_elements}->[1]->[1] != BODY_EL)) {
+            not ($self->{open_elements}->[1]->[1] == BODY_EL)) {
           
           ## Ignore the token.
         } elsif (not $self->{frameset_ok}) {
@@ -5967,7 +5967,7 @@ sub _tree_construction_main ($) {
         next B;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
-                frameset => 1, head => 1,
+                head => 1,
                 tbody => 1, td => 1, tfoot => 1, th => 1,
                 thead => 1, tr => 1,
                }->{$token->{tag_name}}) {
@@ -6784,4 +6784,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 12:53:19 $
+# $Date: 2009/09/06 13:02:21 $
