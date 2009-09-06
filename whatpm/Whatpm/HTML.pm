@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.233 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.234 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -6038,7 +6038,7 @@ sub _tree_construction_main ($) {
         next B;
       }
     } elsif ($token->{type} == END_TAG_TOKEN) {
-      if ($token->{tag_name} eq 'body') {
+      if ($token->{tag_name} eq 'body' or $token->{tag_name} eq 'html') {
 
         ## 1. If not "have an element in scope":
         ## "has a |body| element in scope"
@@ -6055,11 +6055,12 @@ sub _tree_construction_main ($) {
             }
           }
 
-          ## NOTE: |<marquee></body>|, |<svg><foreignobject></body>|
+          ## NOTE: |<marquee></body>|, |<svg><foreignobject></body>|,
+          ## and fragment cases.
 
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
-          ## NOTE: Ignore the token.
+          ## Ignore the token.  (</body> or </html>)
           $token = $self->_get_next_token;
           next B;
         } # INSCOPE
@@ -6082,33 +6083,12 @@ sub _tree_construction_main ($) {
 
         ## 3. Switch the insertion mode.
         $self->{insertion_mode} = AFTER_BODY_IM;
-        $token = $self->_get_next_token;
-        next B;
-      } elsif ($token->{tag_name} eq 'html') {
-        ## TODO: Update this code.  It seems that the code below is not
-        ## up-to-date, though it has same effect as speced.
-        if (@{$self->{open_elements}} > 1 and
-            $self->{open_elements}->[1]->[1] == BODY_EL) {
-          unless ($self->{open_elements}->[-1]->[1] == BODY_EL) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
-                            text => $self->{open_elements}->[1]->[0]
-                                ->manakai_local_name,
-                            token => $token);
-          } else {
-            
-          }
-          $self->{insertion_mode} = AFTER_BODY_IM;
-          ## reprocess
-          next B;
-        } else {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                          text => $token->{tag_name}, token => $token);
-          ## Ignore the token
+        if ($token->{tag_name} eq 'body') {
           $token = $self->_get_next_token;
-          next B;
+        } else { # html
+          ## Reprocess.
         }
+        next B;
       } elsif ({
                 ## NOTE: End tags for non-phrasing flow content elements
 
@@ -6746,4 +6726,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 09:53:29 $
+# $Date: 2009/09/06 10:17:38 $

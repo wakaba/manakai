@@ -11991,3 +11991,24 @@ EOF in table
 |   <body>
 |     "a<"
 |     <table>
+
+#data
+<!DOCTYPE HTML>
+<marquee></body>
+#errors
+no </marquee> at </body>
+some elements are not closed at the end-of-file
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <marquee>
+
+#data
+<marquee></body>
+#errors
+no </marquee> at </body>
+some elements are not closed at the end-of-file
+#document-fragment div
+| <marquee>
