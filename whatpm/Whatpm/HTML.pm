@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.227 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.228 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -179,7 +179,6 @@ my $el_category = {
   dt => DTDD_EL,
   em => FORMATTING_EL,
   embed => MISC_SPECIAL_EL,
-  eventsource => MISC_SPECIAL_EL,
   fieldset => MISC_SPECIAL_EL,
   figure => MISC_SPECIAL_EL,
   font => FORMATTING_EL,
@@ -203,6 +202,8 @@ my $el_category = {
   #image => MISC_SPECIAL_EL, ## NOTE: Commented out in the spec.
   input => MISC_SPECIAL_EL,
   isindex => MISC_SPECIAL_EL,
+  ## XXX keygen? (Whether a void element is in Special or not does not
+  ## affect to the processing, however.)
   li => LI_EL,
   link => MISC_SPECIAL_EL,
   listing => MISC_SPECIAL_EL,
@@ -2448,8 +2449,7 @@ sub _tree_construction_main ($) {
           delete $self->{self_closing};
           $token = $self->_get_next_token;
           next B;
-        } elsif ($token->{tag_name} eq 'command' or
-                 $token->{tag_name} eq 'eventsource') {
+        } elsif ($token->{tag_name} eq 'command') {
           if ($self->{insertion_mode} == IN_HEAD_IM) {
             ## NOTE: If the insertion mode at the time of the emission
             ## of the token was "before head", $self->{insertion_mode}
@@ -4991,7 +4991,7 @@ sub _tree_construction_main ($) {
         $parse_rcdata->(CDATA_CONTENT_MODEL);
         next B;
       } elsif ({
-                base => 1, command => 1, eventsource => 1, link => 1,
+                base => 1, command => 1, link => 1,
                }->{$token->{tag_name}}) {
         
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
@@ -6847,4 +6847,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 01:21:44 $
+# $Date: 2009/09/06 01:30:08 $

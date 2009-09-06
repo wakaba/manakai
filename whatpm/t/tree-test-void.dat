@@ -13,12 +13,13 @@ no DOCTYPE
 <eventsource>a
 #errors
 no DOCTYPE
+no </eventsource>
 #document
 | <html>
 |   <head>
-|     <eventsource>
 |   <body>
-|     "a"
+|     <eventsource>
+|       "a"
 
 #data
 <event-source>a
@@ -47,12 +48,13 @@ no DOCTYPE
 <head><eventsource>a
 #errors
 no DOCTYPE
+no </eventsource>
 #document
 | <html>
 |   <head>
-|     <eventsource>
 |   <body>
-|     "a"
+|     <eventsource>
+|       "a"
 
 #data
 <head><event-source>a
@@ -81,12 +83,13 @@ no DOCTYPE
 </head><eventsource>a
 #errors
 no DOCTYPE
+no </eventsource>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <eventsource>
-|     "a"
+|       "a"
 
 #data
 </head><event-source>x
@@ -115,12 +118,13 @@ no DOCTYPE
 <body><eventsource>x
 #errors
 no DOCTYPE
+no </eventsource>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <eventsource>
-|     "x"
+|       "x"
 
 #data
 <body><event-source>x
@@ -152,13 +156,14 @@ no </noscript>
 #errors
 no DOCTYPE
 no </noscript>
+no </eventsource>
 #document
 | <html>
 |   <head>
 |     <noscript>
 |   <body>
 |     <eventsource>
-|     "x"
+|       "x"
 
 #data
 <head><noscript><event-source>x
@@ -350,11 +355,13 @@ no DOCTYPE
 <eventsource/>
 #errors
 no DOCTYPE
+nestc not allowed
+no </eventsource>
 #document
 | <html>
 |   <head>
-|     <eventsource>
 |   <body>
+|     <eventsource>
 
 #data
 <event-source/>
