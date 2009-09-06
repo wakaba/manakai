@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.238 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.239 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -789,11 +789,14 @@ sub parse_char_stream ($$$;$$) {
 sub new ($) {
   my $class = shift;
   my $self = bless {
-    level => {must => 'm',
-              should => 's',
-              warn => 'w',
-              info => 'i',
-              uncertain => 'u'},
+    level => {
+      must => 'm',
+      should => 's',
+      obc => 's', ## Obsolete but conforming, # XXX distinguish from "should"
+      warn => 'w',
+      info => 'i',
+      uncertain => 'u',
+    },
   }, $class;
   $self->{set_nc} = sub {
     $self->{nc} = -1;
@@ -927,14 +930,27 @@ sub _tree_construction_initial ($) {
       my $doctype = $self->{document}->create_document_type_definition
           ($doctype_name);
 
-      $doctype_name =~ tr/A-Z/a-z/; # ASCII case-insensitive
+      $doctype_name =~ tr/A-Z/a-z/; # ASCII case-insensitive.
       if ($doctype_name ne 'html') {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
       } elsif (defined $token->{pubid}) {
-        
-        ## XXX Obsolete permitted DOCTYPEs
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
+        ## Obsolete permitted DOCTYPEs (case-sensitive)
+        my $xsysid = {
+          '-//W3C//DTD HTML 4.0//EN' => 'http://www.w3.org/TR/REC-html40/strict.dtd',
+          '-//W3C//DTD HTML 4.01//EN' => 'http://www.w3.org/TR/html4/strict.dtd',
+          '-//W3C//DTD XHTML 1.0 Strict//EN' => 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd',
+          '-//W3C//DTD XHTML 1.1//EN' => 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd',
+        }->{$token->{pubid}};
+        if (defined $xsysid and
+            (not defined $token->{sysid} or $token->{sysid} eq $xsysid)) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'obs DOCTYPE', token => $token,
+                          level => $self->{level}->{obc}); ## XXX error type
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
+        }
       } elsif (defined $token->{sysid}) {
         if ($token->{sysid} eq 'about:legacy-compat') {
            ## <!DOCTYPE HTML SYSTEM "about:legacy-compat">
@@ -964,7 +980,7 @@ sub _tree_construction_initial ($) {
         $self->{document}->manakai_compat_mode ('quirks');
       } elsif (defined $token->{pubid}) {
         my $pubid = $token->{pubid};
-        $pubid =~ tr/a-z/A-z/;
+        $pubid =~ tr/a-z/A-Z/; ## ASCII case-insensitive.
         my $prefix = [
           "+//SILMARIL//DTD HTML PRO V0R11 19970101//",
           "-//ADVASOFT LTD//DTD HTML 3.0 ASWEDIT + EXTENSIONS//",
@@ -1056,10 +1072,10 @@ sub _tree_construction_initial ($) {
       }
       if (defined $token->{sysid}) {
         my $sysid = $token->{sysid};
-        $sysid =~ tr/A-Z/a-z/;
+        $sysid =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
         if ($sysid eq "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd") {
-          ## NOTE: Ensure that |PUBLIC "(limited quirks)" "(quirks)"| is 
-          ## marked as quirks.
+          ## NOTE: Ensure that |PUBLIC "(limited quirks)" "(quirks)"|
+          ## is signaled as in quirks mode!
           $self->{document}->manakai_compat_mode ('quirks');
           
         } else {
@@ -6829,4 +6845,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 13:52:05 $
+# $Date: 2009/09/06 23:32:06 $
