@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Sep  6 22:00:05 2009
-# Current time GMT:   Sun Sep  6 13:00:05 2009
+# Current time local: Sun Sep  6 22:04:53 2009
+# Current time GMT:   Sun Sep  6 13:04:53 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -636,20 +636,9 @@ ok 510
 ok 511
 ok 512
 ok 513
-not ok 514
-# Test 514 got: "7" (t/HTML-tree.t at line 92 fail #172)
-#     Expected: "10" (Parse error: qq'<body><frame></frame></frame><frameset><frame><frameset><frame></frameset><noframes></frameset><noframes>'; 1:7:no DOCTYPE, 1:14:in body, 1:22:unmatched end tag, 1:30:unmatched end tag, 1:40:in body, 1:105:not closed, 1:105:in body:#eof;Line: 1 Col: 6 Unexpected start tag (body). Expected DOCTYPE., Line: 1 Col: 13 Unexpected start tag frame. Ignored., Line: 1 Col: 21 This element (frame) has no end tag., Line: 1 Col: 29 This element (frame) has no end tag., Line: 1 Col: 39 Unexpected start tag frameset. Ignored., Line: 1 Col: 46 Unexpected start tag frame. Ignored., Line: 1 Col: 56 Unexpected start tag frameset. Ignored., Line: 1 Col: 63 Unexpected start tag frame. Ignored., Line: 1 Col: 74 Unexpected end tag (frameset). Ignored., Line: 1 Col: 105 Expected closing tag. Unexpected end of file.)
+ok 514
 ok 515
-not ok 516
-# Test 516 got: "<html>\n  <head>\n  <frameset>\n    <frame>\n    <frameset>\n      <frame>\n    <noframes>\n      \"</frameset><noframes>\"\n" (t/HTML-tree.t at line 98 fail #172)
-#     Expected: "<html>\n  <head>\n  <body>\n    <noframes>\n      \"</frameset><noframes>\"\n" (Document tree: qq'<body><frame></frame></frame><frameset><frame><frameset><frame></frameset><noframes></frameset><noframes>')
-#     Line 3 is changed:
-#      - "  <body>\n"
-#      + "  <frameset>\n"
-#     Got 3 extra lines at line 4:
-#      + "    <frame>\n"
-#      + "    <frameset>\n"
-#      + "      <frame>\n"
+ok 516
 ok 517
 ok 518
 not ok 519
@@ -5391,18 +5380,9 @@ ok 4888
 ok 4889
 ok 4890
 # t/tree-test-frames.dat
-not ok 4891
-# Test 4891 got: "4" (t/HTML-tree.t at line 92 fail #1631)
-#      Expected: "2" (Parse error: qq'<body>a<frameset>b'; 1:7:no DOCTYPE, 1:18:in body, 1:18:in frameset:#text, 1:18:in body:#eof;no DOCTYPE, <frameset> in body)
+ok 4891
 ok 4892
-not ok 4893
-# Test 4893 got: "<html>\n  <head>\n  <frameset>\n" (t/HTML-tree.t at line 98 fail #1631)
-#      Expected: "<html>\n  <head>\n  <body>\n    \"ab\"\n" (Document tree: qq'<body>a<frameset>b')
-#      Line 3 is changed:
-#       - "  <body>\n"
-#       + "  <frameset>\n"
-#      Line 4 is missing:
-#       - "    \"ab\"\n"
+ok 4893
 ok 4894
 ok 4895
 ok 4896
