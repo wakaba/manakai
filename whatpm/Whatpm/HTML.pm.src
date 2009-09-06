@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.239 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.240 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -4430,7 +4430,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t386');
           pop @{$self->{open_elements}};
         
-          !!!nack ('t386.1');
+          !!!ack ('t386.1');
           !!!next-token;
         } else {
           !!!nack ('t347.1');
@@ -5658,4 +5658,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 10:17:38 $
+# $Date: 2009/09/06 10:21:14 $

@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Sep  6 19:13:36 2009
-# Current time GMT:   Sun Sep  6 10:13:36 2009
+# Current time local: Sun Sep  6 19:18:50 2009
+# Current time GMT:   Sun Sep  6 10:18:50 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -4421,13 +4421,13 @@ ok 3999
 ok 4000
 ok 4001
 ok 4002
-# t/tree-test-2.dat
 ok 4003
 ok 4004
 ok 4005
 ok 4006
 ok 4007
 ok 4008
+# t/tree-test-2.dat
 ok 4009
 ok 4010
 ok 4011
@@ -4530,39 +4530,37 @@ ok 4107
 ok 4108
 ok 4109
 ok 4110
-not ok 4111
-# Test 4111 got: "3" (t/HTML-tree.t at line 92 fail #1371)
-#      Expected: "2" (Parse error: qq'<table><tr>'; 1:8:not closed, 1:8:unmatched end tag, 1:11:in body:#eof;no </table> before <table>, </table> but no opening <table>)
+ok 4111
 ok 4112
 ok 4113
 ok 4114
 ok 4115
 ok 4116
-ok 4117
+not ok 4117
+# Test 4117 got: "3" (t/HTML-tree.t at line 92 fail #1373)
+#      Expected: "2" (Parse error: qq'<table><tr>'; 1:8:not closed, 1:8:unmatched end tag, 1:11:in body:#eof;no </table> before <table>, </table> but no opening <table>)
 ok 4118
 ok 4119
 ok 4120
 ok 4121
 ok 4122
-not ok 4123
-# Test 4123 got: "2" (t/HTML-tree.t at line 92 fail #1375)
-#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag, 1:17:in body:#eof;</select> in <select>.innerHTML)
+ok 4123
 ok 4124
 ok 4125
 ok 4126
 ok 4127
 ok 4128
 not ok 4129
-# Test 4129 got: "3" (t/HTML-tree.t at line 92 fail #1377)
-#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:select in select, 1:9:unmatched end tag, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
+# Test 4129 got: "2" (t/HTML-tree.t at line 92 fail #1377)
+#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag, 1:17:in body:#eof;</select> in <select>.innerHTML)
 ok 4130
 ok 4131
 ok 4132
 ok 4133
 ok 4134
 not ok 4135
-# Test 4135 got: "2" (t/HTML-tree.t at line 92 fail #1379)
-#      Expected: "1" (Parse error: qq'</optgroup><option>'; 1:12:unmatched end tag, 1:19:in body:#eof;unmatched </optgroup>)
+# Test 4135 got: "3" (t/HTML-tree.t at line 92 fail #1379)
+#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:select in select, 1:9:unmatched end tag, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
 ok 4136
 ok 4137
 ok 4138
@@ -4576,7 +4574,9 @@ ok 4143
 ok 4144
 ok 4145
 ok 4146
-ok 4147
+not ok 4147
+# Test 4147 got: "2" (t/HTML-tree.t at line 92 fail #1383)
+#      Expected: "1" (Parse error: qq'</optgroup><option>'; 1:12:unmatched end tag, 1:19:in body:#eof;unmatched </optgroup>)
 ok 4148
 ok 4149
 ok 4150
@@ -4600,25 +4600,25 @@ ok 4167
 ok 4168
 ok 4169
 ok 4170
-not ok 4171
-# Test 4171 got: "1" (t/HTML-tree.t at line 92 fail #1391)
-#      Expected: "0" (Parse error: qq'<option>'; 1:8:in body:#eof;)
+ok 4171
 ok 4172
 ok 4173
-not ok 4174
-# Test 4174 got: "1" (t/HTML-tree.t at line 92 fail #1392)
-#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:in body:#eof;)
+ok 4174
 ok 4175
 ok 4176
 not ok 4177
-# Test 4177 got: "2" (t/HTML-tree.t at line 92 fail #1393)
-#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/, 1:14:in body:#eof;</tr> in <select>)
+# Test 4177 got: "1" (t/HTML-tree.t at line 92 fail #1393)
+#      Expected: "0" (Parse error: qq'<option>'; 1:8:in body:#eof;)
 ok 4178
 ok 4179
-ok 4180
+not ok 4180
+# Test 4180 got: "1" (t/HTML-tree.t at line 92 fail #1394)
+#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:in body:#eof;)
 ok 4181
 ok 4182
-ok 4183
+not ok 4183
+# Test 4183 got: "2" (t/HTML-tree.t at line 92 fail #1395)
+#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/, 1:14:in body:#eof;</tr> in <select>)
 ok 4184
 ok 4185
 ok 4186
@@ -4690,9 +4690,7 @@ ok 4251
 ok 4252
 ok 4253
 ok 4254
-not ok 4255
-# Test 4255 got: "2" (t/HTML-tree.t at line 92 fail #1419)
-#      Expected: "3" (Parse error: qq'<span></html>'; 1:13:not closed, 1:13:unmatched end tag;</span> not closed at </body> implied by </html>, </html> in the fragment parsing algorithm, unclosed </span> at the end-of-file)
+ok 4255
 ok 4256
 ok 4257
 ok 4258
@@ -4713,15 +4711,15 @@ ok 4272
 ok 4273
 ok 4274
 ok 4275
-not ok 4276
-# Test 4276 got: "1" (t/HTML-tree.t at line 92 fail #1426)
-#      Expected: "0" (Parse error: qq'a\x{12345678}b'; 1:1:non unicode;)
+ok 4276
 ok 4277
 ok 4278
 ok 4279
 ok 4280
 ok 4281
-ok 4282
+not ok 4282
+# Test 4282 got: "1" (t/HTML-tree.t at line 92 fail #1428)
+#      Expected: "0" (Parse error: qq'a\x{12345678}b'; 1:1:non unicode;)
 ok 4283
 ok 4284
 ok 4285
@@ -4784,35 +4782,35 @@ ok 4341
 ok 4342
 ok 4343
 ok 4344
-not ok 4345
-# Test 4345 got: "1" (t/HTML-tree.t at line 92 fail #1449)
-#      Expected: "0" (Parse error: qq'<thead>'; 1:7:in body:#eof;)
+ok 4345
 ok 4346
 ok 4347
-not ok 4348
-# Test 4348 got: "1" (t/HTML-tree.t at line 92 fail #1450)
-#      Expected: "0" (Parse error: qq'<tbody>'; 1:7:in body:#eof;)
+ok 4348
 ok 4349
 ok 4350
 not ok 4351
 # Test 4351 got: "1" (t/HTML-tree.t at line 92 fail #1451)
-#      Expected: "0" (Parse error: qq'<tfoot>'; 1:7:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<thead>'; 1:7:in body:#eof;)
 ok 4352
 ok 4353
 not ok 4354
 # Test 4354 got: "1" (t/HTML-tree.t at line 92 fail #1452)
-#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<tbody>'; 1:7:in body:#eof;)
 ok 4355
 ok 4356
 not ok 4357
 # Test 4357 got: "1" (t/HTML-tree.t at line 92 fail #1453)
-#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<tfoot>'; 1:7:in body:#eof;)
 ok 4358
 ok 4359
-ok 4360
+not ok 4360
+# Test 4360 got: "1" (t/HTML-tree.t at line 92 fail #1454)
+#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
 ok 4361
 ok 4362
-ok 4363
+not ok 4363
+# Test 4363 got: "1" (t/HTML-tree.t at line 92 fail #1455)
+#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
 ok 4364
 ok 4365
 ok 4366
@@ -4839,13 +4837,13 @@ ok 4386
 ok 4387
 ok 4388
 ok 4389
-# t/tree-test-3.dat
 ok 4390
 ok 4391
 ok 4392
 ok 4393
 ok 4394
 ok 4395
+# t/tree-test-3.dat
 ok 4396
 ok 4397
 ok 4398
