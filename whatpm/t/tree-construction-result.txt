@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Sep  6 10:44:21 2009
-# Current time GMT:   Sun Sep  6 01:44:21 2009
+# Current time local: Sun Sep  6 11:18:45 2009
+# Current time GMT:   Sun Sep  6 02:18:45 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -305,7 +305,13 @@ not ok 277
 # Test 277 got: "9" (t/HTML-tree.t at line 92 fail #93)
 #     Expected: "10" (Parse error: qq'<a><table><td><a><table></table><a></tr><a></table><b>X</b>C<a>Y'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:36:in a:a, 1:41:not closed, 1:44:in table, 1:44:in a:a, 1:44:unmatched end tag, 1:64:in a:a, 1:64:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 40 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 43 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 43 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 43 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 51 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 63 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 64 Expected closing tag. Unexpected end of file.)
 ok 278
-ok 279
+not ok 279
+# Test 279 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n    <a>\n      <b>\n        \"X\"\n      \"C\"\n    <a>\n      \"Y\"\n" (t/HTML-tree.t at line 98 fail #93)
+#     Expected: "<html>\n  <head>\n  <body>\n    <a>\n      <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n      <b>\n        \"X\"\n      \"C\"\n    <a>\n      \"Y\"\n" (Document tree: qq'<a><table><td><a><table></table><a></tr><a></table><b>X</b>C<a>Y')
+#     Line 5 is missing:
+#      - "      <a>\n"
+#     Got 1 extra line at line 12:
+#      + "    <a>\n"
 ok 280
 ok 281
 ok 282
@@ -483,7 +489,7 @@ ok 423
 ok 424
 ok 425
 not ok 426
-# Test 426 got: "<html>\n  <head>\n  <body>\n    <a>\n      href=\"blah\"\n      \"aba\"\n      <a>\n        href=\"foo\"\n        \"br\"\n      <a>\n        href=\"foo\"\n        \"x\"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n    <a>\n      href=\"foo\"\n      \"aoe\"\n" (t/HTML-tree.t at line 98 fail #142)
+# Test 426 got: "<html>\n  <head>\n  <body>\n    <a>\n      href=\"blah\"\n      \"aba\"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n    <a>\n      href=\"foo\"\n      \"br\"\n    <a>\n      href=\"foo\"\n      \"x\"\n    <a>\n      href=\"foo\"\n      \"aoe\"\n" (t/HTML-tree.t at line 98 fail #142)
 #     Expected: <UNDEF> (Document tree: qq'<a href="blah">aba<table><a href="foo">br<tr><td></td></tr>x</table>aoe')
 No #errors section () at t/HTML-tree.t line 88.
 not ok 427
@@ -556,7 +562,13 @@ not ok 463
 # Test 463 got: "10" (t/HTML-tree.t at line 92 fail #155)
 #     Expected: "11" (Parse error: qq'<a><table><a></table><p><a><div><a>'; 1:4:no DOCTYPE, 1:14:in table, 1:14:in a:a, 1:14:unmatched end tag, 1:28:in a:a, 1:28:unmatched end tag, 1:33:not closed, 1:35:in a:a, 1:35:unmatched end tag, 1:35:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 13 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 13 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 13 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 21 Unexpected end tag (table). Expected end tag (a)., Line: 1 Col: 27 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 27 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 32 Unexpected end tag (p). Ignored., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 35 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 35 Expected closing tag. Unexpected end of file.)
 ok 464
-ok 465
+not ok 465
+# Test 465 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n    <a>\n    <p>\n      <a>\n    <div>\n      <a>\n" (t/HTML-tree.t at line 98 fail #155)
+#     Expected: "<html>\n  <head>\n  <body>\n    <a>\n      <a>\n      <table>\n    <p>\n      <a>\n    <div>\n      <a>\n" (Document tree: qq'<a><table><a></table><p><a><div><a>')
+#     Line 5 is missing:
+#      - "      <a>\n"
+#     Got 1 extra line at line 6:
+#      + "    <a>\n"
 not ok 466
 # Test 466 got: "2" (t/HTML-tree.t at line 92 fail #156)
 #     Expected: "3"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
@@ -610,7 +622,13 @@ not ok 502
 # Test 502 got: "10" (t/HTML-tree.t at line 92 fail #168)
 #     Expected: "11" (Parse error: qq'<a><table><td><a><table></table><a></tr><a></table><a>'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:36:in a:a, 1:41:not closed, 1:44:in table, 1:44:in a:a, 1:44:unmatched end tag, 1:54:in a:a, 1:54:unmatched end tag, 1:54:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 40 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 43 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 43 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 43 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 51 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 54 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 54 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 54 Expected closing tag. Unexpected end of file.)
 ok 503
-ok 504
+not ok 504
+# Test 504 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n    <a>\n" (t/HTML-tree.t at line 98 fail #168)
+#     Expected: "<html>\n  <head>\n  <body>\n    <a>\n      <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n" (Document tree: qq'<a><table><td><a><table></table><a></tr><a></table><a>')
+#     Line 5 is missing:
+#      - "      <a>\n"
+#     Got 1 extra line at line 12:
+#      + "    <a>\n"
 ok 505
 ok 506
 ok 507

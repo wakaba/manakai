@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.233 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.234 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -1609,25 +1609,21 @@ sub _tree_construction_main ($) {
       
       ## Step 8
       if ($common_ancestor_node->[1] & TABLE_ROWS_EL) {
+        ## Foster parenting.
         my $foster_parent_element;
         my $next_sibling;
         OE: for (reverse 0..$#{$self->{open_elements}}) {
           if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
-                             my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
-                             if (defined $parent and $parent->node_type == 1) {
-                               !!!cp ('t65.1');
-                               $foster_parent_element = $parent;
-                               $next_sibling = $self->{open_elements}->[$_]->[0];
-                             } else {
-                               !!!cp ('t65.2');
-                               $foster_parent_element
-                                 = $self->{open_elements}->[$_ - 1]->[0];
-                             }
-                             last OE;
-                           }
-                         } # OE
-                         $foster_parent_element = $self->{open_elements}->[0]->[0]
-                           unless defined $foster_parent_element;
+            !!!cp ('t65.2');
+            $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
+            $next_sibling = $self->{open_elements}->[$_]->[0];
+            undef $next_sibling
+                unless $next_sibling->parent_node eq $foster_parent_element;
+            last OE;
+          }
+        } # OE
+        $foster_parent_element ||= $self->{open_elements}->[0]->[0];
+
         $foster_parent_element->insert_before ($last_node->[0], $next_sibling);
         $open_tables->[-1]->[1] = 1; # tainted
       } else {
@@ -1683,6 +1679,9 @@ sub _tree_construction_main ($) {
     $self->{open_elements}->[-1]->[0]->append_child ($_[0]);
   }; # $insert_to_current
 
+  ## Foster parenting.  Note that there are three "foster parenting"
+  ## code in the parser: for elements (this one), for texts, and for
+  ## elements in the AAA code.
   my $insert_to_foster = sub {
     my $child = shift;
     if ($self->{open_elements}->[-1]->[1] & TABLE_ROWS_EL) {
@@ -1691,23 +1690,17 @@ sub _tree_construction_main ($) {
       my $next_sibling;
       OE: for (reverse 0..$#{$self->{open_elements}}) {
         if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
-                             my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
-                             if (defined $parent and $parent->node_type == 1) {
-                               !!!cp ('t70');
-                               $foster_parent_element = $parent;
-                               $next_sibling = $self->{open_elements}->[$_]->[0];
-                             } else {
-                               !!!cp ('t71');
-                               $foster_parent_element
-                                 = $self->{open_elements}->[$_ - 1]->[0];
-                             }
-                             last OE;
-                           }
-                         } # OE
-                         $foster_parent_element = $self->{open_elements}->[0]->[0]
-                           unless defined $foster_parent_element;
-                         $foster_parent_element->insert_before
-                           ($child, $next_sibling);
+          !!!cp ('t71');
+          $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
+          $next_sibling = $self->{open_elements}->[$_]->[0];
+          undef $next_sibling
+              unless $next_sibling->parent_node eq $foster_parent_element;
+          last OE;
+        }
+      } # OE
+      $foster_parent_element ||= $self->{open_elements}->[0]->[0];
+
+      $foster_parent_element->insert_before ($child, $next_sibling);
       $open_tables->[-1]->[1] = 1; # tainted
     } else {
       !!!cp ('t72');
@@ -1768,7 +1761,7 @@ sub _tree_construction_main ($) {
           }
         }
 
-        ## Foster parenting
+        ## Foster parenting.
         !!!parse-error (type => 'in table:#text', token => $token);
 
         ## NOTE: As if in body, but insert into the foster parent element.
@@ -1778,38 +1771,22 @@ sub _tree_construction_main ($) {
           # MUST
           my $foster_parent_element;
           my $next_sibling;
-          #my $prev_sibling;
           OE: for (reverse 0..$#{$self->{open_elements}}) {
             if ($self->{open_elements}->[$_]->[1] == TABLE_EL) {
-              my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
-              if (defined $parent and $parent->node_type == 1) {
-                $foster_parent_element = $parent;
-                !!!cp ('t196');
-                $next_sibling = $self->{open_elements}->[$_]->[0];
-          #      $prev_sibling = $next_sibling->previous_sibling;
-                #
-              } else {
-                !!!cp ('t197');
-                $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
-          #      $prev_sibling = $foster_parent_element->last_child;
-                #
-              }
+              !!!cp ('t197');
+              $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
+              $next_sibling = $self->{open_elements}->[$_]->[0];
+              undef $next_sibling
+                unless $next_sibling->parent_node eq $foster_parent_element;
               last OE;
             }
           } # OE
-          $foster_parent_element = $self->{open_elements}->[0]->[0] #and
-          #$prev_sibling = $foster_parent_element->last_child
-              unless defined $foster_parent_element;
-          #undef $prev_sibling unless $open_tables->[-1]->[2]; # ~node inserted
-          #if (defined $prev_sibling and
-          #    $prev_sibling->node_type == 3) {
-          #  !!! cp ('t198');
-          #  $prev_sibling->manakai_append_text ($s);
-          #} else {
-            !!!cp ('t199');
-            $foster_parent_element->insert_before
-                ($self->{document}->create_text_node ($s), $next_sibling);
-          #}
+          $foster_parent_element ||= $self->{open_elements}->[0]->[0];
+
+          !!!cp ('t199');
+          $foster_parent_element->insert_before
+              ($self->{document}->create_text_node ($s), $next_sibling);
+
           $open_tables->[-1]->[1] = 1; # tainted
           $open_tables->[-1]->[2] = 1; # ~node inserted
         } else {
@@ -5765,4 +5742,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 01:45:58 $
+# $Date: 2009/09/06 02:20:52 $
