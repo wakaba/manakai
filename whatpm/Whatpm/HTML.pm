@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.230 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.231 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -248,6 +248,7 @@ my $el_category = {
   u => FORMATTING_EL,
   ul => MISC_SPECIAL_EL,
   wbr => MISC_SPECIAL_EL,
+  xmp => MISC_SPECIAL_EL,
 };
 
 my $el_category_f = {
@@ -648,7 +649,9 @@ sub parse_char_stream ($$$;$$) {
 
   ## NOTE: |set_inner_html| copies most of this method's code
 
+  ## Confidence: irrelevant.
   $self->{confident} = 1 unless exists $self->{confident};
+
   $self->{document}->input_encoding ($self->{input_encoding})
       if defined $self->{input_encoding};
 ## TODO: |{input_encoding}| is needless?
@@ -6558,8 +6561,6 @@ sub set_inner_html ($$$$;$) {
   my $onerror = $_[1];
   my $get_wrapper = $_[2] || sub ($) { return $_[0] };
 
-  ## ISSUE: Should {confident} be true?
-
   my $nt = $node->node_type;
   if ($nt == 9) { # Document (invoke the algorithm with no /context/ element)
     # MUST
@@ -6774,6 +6775,9 @@ sub set_inner_html ($$$$;$) {
       $anode = $anode->parent_node;
     } # AN
 
+    ## F.5. Set the input stream.
+    $p->{confident} = 1; ## Confident: irrelevant.
+
     ## F.6. Start the parser.
     {
       my $self = $p;
@@ -6810,4 +6814,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 02:20:52 $
+# $Date: 2009/09/06 08:15:37 $

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.235 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.236 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -248,6 +248,7 @@ my $el_category = {
   u => FORMATTING_EL,
   ul => MISC_SPECIAL_EL,
   wbr => MISC_SPECIAL_EL,
+  xmp => MISC_SPECIAL_EL,
 };
 
 my $el_category_f = {
@@ -5707,7 +5708,7 @@ sub set_inner_html ($$$$;$) {
     } # AN
 
     ## F.5. Set the input stream.
-    $self->{confident} = 1; ## Confident: irrelevant.
+    $p->{confident} = 1; ## Confident: irrelevant.
 
     ## F.6. Start the parser.
     {
@@ -5745,4 +5746,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 08:02:54 $
+# $Date: 2009/09/06 08:15:37 $

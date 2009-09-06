@@ -1,5 +1,12 @@
 2009-09-06  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: Added |xmp| to the list of Special elements (HTML5
+	revision 3689).  It should make no difference since the |xmp|
+	element has the PCDATA content and cannot be the non-bottommost
+	element in the stack of open elements.
+
+2009-09-06  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: Set the |confidence| flag to |irrlevant| when the
 	fragment parsing algorithm is invoked (HTML5 revision 2699).
 
