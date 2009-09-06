@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Sep  6 17:27:13 2009
-# Current time GMT:   Sun Sep  6 08:27:13 2009
+# Current time local: Sun Sep  6 18:48:21 2009
+# Current time GMT:   Sun Sep  6 09:48:21 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -228,10 +228,7 @@ ok 219
 ok 220
 ok 221
 ok 222
-not ok 223
-# Test 223 got: "3" (t/HTML-tree.t at line 92 fail #75)
-#     Expected: "1" (Parse error: qq'<html><head></body></html>'; 1:7:no DOCTYPE, 1:20:unmatched end tag, 1:26:unmatched end tag;Line: 1 Col: 6 Unexpected start tag (html). Expected DOCTYPE.)
-#  t/HTML-tree.t line 92 is:     join (', ', @errors) . ';' . join (', ', @{$test->{errors}->[0] or []});
+ok 223
 ok 224
 ok 225
 ok 226
@@ -243,22 +240,16 @@ ok 231
 ok 232
 ok 233
 ok 234
-not ok 235
-# Test 235 got: "2" (t/HTML-tree.t at line 92 fail #79)
-#     Expected: "1" (Parse error: qq'<head></html>'; 1:7:no DOCTYPE, 1:13:unmatched end tag;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE.)
+ok 235
 ok 236
 ok 237
 ok 238
 ok 239
 ok 240
-not ok 241
-# Test 241 got: "2" (t/HTML-tree.t at line 92 fail #81)
-#     Expected: "1" (Parse error: qq'</body>'; 1:7:no DOCTYPE, 1:7:unmatched end tag;Line: 1 Col: 7 Unexpected end tag (body). Expected DOCTYPE.)
+ok 241
 ok 242
 ok 243
-not ok 244
-# Test 244 got: "2" (t/HTML-tree.t at line 92 fail #82)
-#     Expected: "1" (Parse error: qq'</html>'; 1:7:no DOCTYPE, 1:7:unmatched end tag;Line: 1 Col: 7 Unexpected end tag (html). Expected DOCTYPE.)
+ok 244
 ok 245
 ok 246
 ok 247
@@ -270,6 +261,7 @@ ok 252
 not ok 253
 # Test 253 got: "3" (t/HTML-tree.t at line 92 fail #85)
 #     Expected: "2" (Parse error: qq'<h1>Hello<h2>World'; 1:5:no DOCTYPE, 1:14:not closed, 1:18:in body:#eof;Line: 1 Col: 4 Unexpected start tag (h1). Expected DOCTYPE., Line: 1 Col: 18 Expected closing tag. Unexpected end of file.)
+#  t/HTML-tree.t line 92 is:     join (', ', @errors) . ';' . join (', ', @{$test->{errors}->[0] or []});
 ok 254
 not ok 255
 # Test 255 got: "<html>\n  <head>\n  <body>\n    <h1>\n      \"Hello\"\n    <h2>\n      \"World\"\n" (t/HTML-tree.t at line 98 fail #85)
@@ -578,9 +570,15 @@ ok 468
 not ok 469
 # Test 469 got: "2" (t/HTML-tree.t at line 92 fail #157)
 #     Expected: "3"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<head></html><meta><p>'; 1:7:no DOCTYPE, 1:14:unmatched end tag;6: Start tag seen without seeing a doctype first. Expected ‚Äú<!DOCTYPE html>‚Äù., 13: Stray end tag ‚Äúhtml‚Äù., 19: ‚Äúmeta‚Äù element outside ‚Äúhead‚Äù.)
+ (Parse error: qq'<head></html><meta><p>'; 1:7:no DOCTYPE, 1:20:after html;6: Start tag seen without seeing a doctype first. Expected ‚Äú<!DOCTYPE html>‚Äù., 13: Stray end tag ‚Äúhtml‚Äù., 19: ‚Äúmeta‚Äù element outside ‚Äúhead‚Äù.)
 ok 470
-ok 471
+not ok 471
+# Test 471 got: "<html>\n  <head>\n  <body>\n    <meta>\n    <p>\n" (t/HTML-tree.t at line 98 fail #157)
+#     Expected: "<html>\n  <head>\n    <meta>\n  <body>\n    <p>\n" (Document tree: qq'<head></html><meta><p>')
+#     Got 1 extra line at line 3:
+#      + "  <body>\n"
+#     Line 5 is missing:
+#      - "  <body>\n"
 ok 472
 ok 473
 ok 474
@@ -923,14 +921,10 @@ ok 747
 ok 748
 ok 749
 ok 750
-not ok 751
-# Test 751 got: "2" (t/HTML-tree.t at line 92 fail #251)
-#     Expected: "1" (Parse error: qq'<!DOCTYPE html><HTML><META><HEAD></HEAD></HTML>'; 1:34:in head:head, 1:47:unmatched end tag;Line: 1 Col: 33 Unexpected start tag head in existing head. Ignored.)
+ok 751
 ok 752
 ok 753
-not ok 754
-# Test 754 got: "2" (t/HTML-tree.t at line 92 fail #252)
-#     Expected: "1" (Parse error: qq'<!DOCTYPE html><HTML><HEAD><head></HEAD></HTML>'; 1:34:in head:head, 1:47:unmatched end tag;Line: 1 Col: 33 Unexpected start tag head in existing head. Ignored.)
+ok 754
 ok 755
 ok 756
 ok 757
@@ -1068,18 +1062,25 @@ Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding 
 ok 847
 ok 848
 ok 849
-not ok 850
-# Test 850 got: "1" (t/HTML-tree.t at line 92 fail #284)
-#     Expected: "2"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<!doctype html></html> <head>'; 1:23:unmatched end tag;22: Stray end tag ìhtmlî., 29: Stray start tag ìheadî.)
+ok 850
 ok 851
-ok 852
+not ok 852
+# Test 852 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" \"\n" (t/HTML-tree.t at line 98 fail #284)
+#     Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (Document tree: qq'<!doctype html></html> <head>')
+#     Got 1 extra line at line 5:
+#      + "    \" \"\n"
 not ok 853
 # Test 853 got: "1" (t/HTML-tree.t at line 92 fail #285)
 #     Expected: "2"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<!doctype html></body><meta>'; 1:23:unmatched end tag;22: Stray end tag ìbodyî., 28: ìmetaî element outside ìheadî.)
+ (Parse error: qq'<!doctype html></body><meta>'; 1:28:after body;22: Stray end tag ìbodyî., 28: ìmetaî element outside ìheadî.)
 ok 854
-ok 855
+not ok 855
+# Test 855 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <meta>\n" (t/HTML-tree.t at line 98 fail #285)
+#     Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <meta>\n  <body>\n" (Document tree: qq'<!doctype html></body><meta>')
+#     Got 1 extra line at line 4:
+#      + "  <body>\n"
+#     Line 6 is missing:
+#      - "  <body>\n"
 ok 856
 ok 857
 ok 858
@@ -1213,9 +1214,18 @@ ok 981
 ok 982
 ok 983
 ok 984
-ok 985
+not ok 985
+# Test 985 got: "1" (t/HTML-tree.t at line 92 fail #329)
+#     Expected: "2"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
+ (Parse error: qq'<html></html><!-- foo -->'; 1:7:no DOCTYPE;6: Start tag seen without seeing a doctype first. Expected ì<!DOCTYPE html>î., 13: Stray end tag ìhtmlî.)
 ok 986
-ok 987
+not ok 987
+# Test 987 got: "<html>\n  <head>\n  <body>\n<!--  foo  -->\n" (t/HTML-tree.t at line 98 fail #329)
+#     Expected: "<html>\n  <!--  foo  -->\n  <head>\n  <body>\n" (Document tree: qq'<html></html><!-- foo -->')
+#     Line 2 is missing:
+#      - "  <!--  foo  -->\n"
+#     Got 1 extra line at line 4:
+#      + "<!--  foo  -->\n"
 not ok 988
 # Test 988 got: "1" (t/HTML-tree.t at line 92 fail #330)
 #     Expected: "2" (Parse error: qq'<body></body></html>'; 1:20:unmatched end tag;Line: 1 Col: 20 Unexpected html end tag in inner html mode., Line: 1 Col: 20 Unexpected EOF in inner html mode.)
@@ -1224,9 +1234,7 @@ ok 990
 ok 991
 ok 992
 ok 993
-not ok 994
-# Test 994 got: "2" (t/HTML-tree.t at line 92 fail #332)
-#     Expected: "1" (Parse error: qq'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html></html>'; 1:51:not HTML5, 1:63:unmatched end tag;doctype-error)
+ok 994
 ok 995
 ok 996
 # t/tree-construction/tests7.dat
@@ -1258,7 +1266,13 @@ ok 1007
 ok 1008
 ok 1009
 ok 1010
-ok 1011
+not ok 1011
+# Test 1011 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <title>\n      \"X\"\n" (t/HTML-tree.t at line 98 fail #337)
+#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <title>\n      \"X\"\n  <body>\n" (Document tree: qq'<!doctype html></body><title>X</title>')
+#      Got 1 extra line at line 4:
+#       + "  <body>\n"
+#      Line 7 is missing:
+#       - "  <body>\n"
 ok 1012
 ok 1013
 ok 1014
@@ -1391,9 +1405,7 @@ ok 1074
 ok 1075
 ok 1076
 ok 1077
-not ok 1078
-# Test 1078 got: "1" (t/HTML-tree.t at line 92 fail #360)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE hTmL><html></html>'; 1:28:unmatched end tag;)
+ok 1078
 ok 1079
 not ok 1080
 # Test 1080 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #360)
@@ -1401,9 +1413,7 @@ not ok 1080
 #      Line 1 is changed:
 #       - "<!DOCTYPE hTmL>\n"
 #       + "<!DOCTYPE html>\n"
-not ok 1081
-# Test 1081 got: "1" (t/HTML-tree.t at line 92 fail #361)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><html></html>'; 1:28:unmatched end tag;)
+ok 1081
 ok 1082
 not ok 1083
 # Test 1083 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #361)
@@ -1929,10 +1939,22 @@ ok 1565
 ok 1566
 ok 1567
 ok 1568
-ok 1569
+not ok 1569
+# Test 1569 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <link>\n    \"x\"\n" (t/HTML-tree.t at line 98 fail #523)
+#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <link>\n  <body>\n    \"x\"\n" (Document tree: qq'<!DOCTYPE HTML><head></body><link>x')
+#      Got 1 extra line at line 4:
+#       + "  <body>\n"
+#      Line 6 is missing:
+#       - "  <body>\n"
 ok 1570
 ok 1571
-ok 1572
+not ok 1572
+# Test 1572 got: "<html>\n  <head>\n  <body>\n    <link>\n" (t/HTML-tree.t at line 98 fail #524)
+#      Expected: "<html>\n  <head>\n    <link>\n  <body>\n" (Document tree: qq'<head></html><link>')
+#      Got 1 extra line at line 3:
+#       + "  <body>\n"
+#      Line 5 is missing:
+#       - "  <body>\n"
 ok 1573
 ok 1574
 ok 1575
@@ -4665,17 +4687,15 @@ ok 4248
 ok 4249
 ok 4250
 ok 4251
-not ok 4252
-# Test 4252 got: "1" (t/HTML-tree.t at line 92 fail #1418)
-#      Expected: "2" (Parse error: qq'</html>a'; 1:8:unmatched end tag;unmatched </html>, char after </body> implied by </html>)
+ok 4252
 ok 4253
 ok 4254
-not ok 4255
-# Test 4255 got: "2" (t/HTML-tree.t at line 92 fail #1419)
-#      Expected: "3" (Parse error: qq'<span></html>'; 1:13:not closed, 1:13:unmatched end tag;<span> not closed at </body> implied by </html>, unmatched </html>, unexpected end of file (no </span>))
+ok 4255
 ok 4256
 ok 4257
-ok 4258
+not ok 4258
+# Test 4258 got: "4" (t/HTML-tree.t at line 92 fail #1420)
+#      Expected: "2" (Parse error: qq'<span></html>a'; 1:14:not closed, 1:14:unmatched end tag, 1:14:after body:#text, 1:14:in body:#eof;unmatched </body> (generated by the algorithm to process </html>), unclosed </span> at the end-of-file)
 ok 4259
 ok 4260
 ok 4261
@@ -5043,11 +5063,7 @@ ok 4607
 ok 4608
 ok 4609
 ok 4610
-not ok 4611
-# Test 4611 got: "<html>\n  <head>\n  <body>\n    <hgroup>\n      <p>\n        \"aa\"\n" (t/HTML-tree.t at line 98 fail #1537)
-#      Expected: "<html>\n  <head>\n  <body>\n    <hgroup>\n      <p>\n        \"aa\"\n\n" (Document tree: qq'<hgroup><p>aa</hgroup>')
-#      Line 7 is missing:
-#       - "\n"
+ok 4611
 ok 4612
 ok 4613
 ok 4614

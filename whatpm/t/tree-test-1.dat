@@ -931,13 +931,13 @@ unexpected end of file (no </noscript>)
 <!DOCTYPE HTML><head><noscript></head><link><body>
 #errors
 </head> in <noscript> in <head>
-<link> after <head>
+no </noscript>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |     <noscript>
-|     <link>
+|       <link>
 |   <body>
 
 #data
@@ -966,13 +966,12 @@ unexpected end of file (no </noscript>)
 <!DOCTYPE HTML><head></noscript><link><body>
 #errors
 </noscript> in <head>
-<link> in <body>
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
-|   <body>
 |     <link>
+|   <body>
 
 #data
 <!DOCTYPE HTML><head></head></noscript><link><body>
@@ -1144,7 +1143,8 @@ no <!DOCTYPE>
 <head></head></body><body>y</body>
 #errors
 no <!DOCTYPE>
-</body> after </head>
+<body> after </body>
+<body> in <body>
 #document
 | <html>
 |   <head>
@@ -1206,7 +1206,6 @@ unmatched </div>
 #data
 <!DOCTYPE HTML><head></head></body>
 #errors
-</body> after </head>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -1216,7 +1215,6 @@ unmatched </div>
 #data
 <!DOCTYPE HTML><head></head></html>
 #errors
-</html> after </head>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -3564,9 +3562,8 @@ unexpected end of file
 </body></html><html a>
 #errors
 no <!DOCTYPE>
-</body> before head
-</html> before head
-<html> in body
+tag after </html>
+second <html>
 #document
 | <html>
 |   a=""
@@ -3577,7 +3574,6 @@ no <!DOCTYPE>
 </html>
 #errors
 no <!DOCTYPE>
-</html> before head
 #document
 | <html>
 |   <head>

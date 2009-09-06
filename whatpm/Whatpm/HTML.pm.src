@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.237 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.238 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -2489,99 +2489,59 @@ sub _tree_construction_main ($) {
             ## reprocess
             !!!ack-later;
             next B;
-          } elsif ($token->{type} == END_TAG_TOKEN) {
-            if ($token->{tag_name} eq 'head') {
-              if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
-                !!!cp ('t132');
-                ## As if <head>
-                !!!create-element ($self->{head_element}, $HTML_NS, 'head',, $token);
-                $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
-                push @{$self->{open_elements}},
-                    [$self->{head_element}, $el_category->{head}];
+      } elsif ($token->{type} == END_TAG_TOKEN) {
+        ## "Before head", "in head", and "after head" insertion modes
+        ## ignore most of end tags.  Exceptions are "body", "html",
+        ## and "br" end tags.  "Before head" and "in head" insertion
+        ## modes also recognize "head" end tag.  "In head noscript"
+        ## insertion modes ignore end tags except for "noscript" and
+        ## "br".
 
-                ## Reprocess in the "in head" insertion mode...
-                pop @{$self->{open_elements}};
-                $self->{insertion_mode} = AFTER_HEAD_IM;
-                !!!next-token;
-                next B;
-              } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
-                !!!cp ('t133');
-                ## As if </noscript>
-                pop @{$self->{open_elements}};
-                !!!parse-error (type => 'in noscript:/',
-                                text => 'head', token => $token);
-                
-                ## Reprocess in the "in head" insertion mode...
-                pop @{$self->{open_elements}};
-                $self->{insertion_mode} = AFTER_HEAD_IM;
-                !!!next-token;
-                next B;
-              } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
-                !!!cp ('t134');
-                pop @{$self->{open_elements}};
-                $self->{insertion_mode} = AFTER_HEAD_IM;
-                !!!next-token;
-                next B;
-              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
-                !!!cp ('t134.1');
-                !!!parse-error (type => 'unmatched end tag', text => 'head',
-                                token => $token);
-                ## Ignore the token
-                !!!next-token;
-                next B;
-              } else {
-                die "$0: $self->{insertion_mode}: Unknown insertion mode";
-              }
-            } elsif ($token->{tag_name} eq 'noscript') {
-              if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
-                !!!cp ('t136');
-                pop @{$self->{open_elements}};
-                $self->{insertion_mode} = IN_HEAD_IM;
-                !!!next-token;
-                next B;
-              } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM or
-                       $self->{insertion_mode} == AFTER_HEAD_IM) {
-                !!!cp ('t137');
-                !!!parse-error (type => 'unmatched end tag',
-                                text => 'noscript', token => $token);
-                ## Ignore the token ## ISSUE: An issue in the spec.
-                !!!next-token;
-                next B;
-              } else {
-                !!!cp ('t138');
-                #
-              }
-            } elsif ({
-                      body => 1, html => 1,
-                     }->{$token->{tag_name}}) {
-              ## TODO: This branch is entirely redundant.
-	      if ($self->{insertion_mode} == BEFORE_HEAD_IM or
-                  $self->{insertion_mode} == IN_HEAD_IM or
-                  $self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
-                !!!cp ('t140');
-                !!!parse-error (type => 'unmatched end tag',
-                                text => $token->{tag_name}, token => $token);
-                ## Ignore the token
-                !!!next-token;
-                next B;
-              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
-                !!!cp ('t140.1');
-                !!!parse-error (type => 'unmatched end tag',
-                                text => $token->{tag_name}, token => $token);
-                ## Ignore the token
-                !!!next-token;
-                next B;
-              } else {
-                die "$0: $self->{insertion_mode}: Unknown insertion mode";
-              }
-            } elsif ($token->{tag_name} eq 'p') {
-              !!!cp ('t142');
-              !!!parse-error (type => 'unmatched end tag',
-                              text => $token->{tag_name}, token => $token);
-              ## Ignore the token
-              !!!next-token;
-              next B;
-        } elsif ($token->{tag_name} eq 'br') {
+        if ($token->{tag_name} eq 'head') {
+          if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
+            !!!cp ('t132');
+            ## As if <head>
+            !!!create-element ($self->{head_element}, $HTML_NS, 'head',, $token);
+            $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
+            push @{$self->{open_elements}},
+                [$self->{head_element}, $el_category->{head}];
+
+            ## Reprocess in the "in head" insertion mode...
+            pop @{$self->{open_elements}};
+            $self->{insertion_mode} = AFTER_HEAD_IM;
+            !!!next-token;
+            next B;
+          } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
+            !!!cp ('t133');
+            #
+          } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
+            !!!cp ('t134');
+            pop @{$self->{open_elements}};
+            $self->{insertion_mode} = AFTER_HEAD_IM;
+            !!!next-token;
+            next B;
+          } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
+            !!!cp ('t134.1');
+            #
+          } else {
+            die "$0: $self->{insertion_mode}: Unknown insertion mode";
+          }
+        } elsif ($token->{tag_name} eq 'noscript') {
+          if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
+            !!!cp ('t136');
+            pop @{$self->{open_elements}};
+            $self->{insertion_mode} = IN_HEAD_IM;
+            !!!next-token;
+            next B;
+          } else {
+            !!!cp ('t138');
+            #
+          }
+        } elsif ({
+            body => ($self->{insertion_mode} != IN_HEAD_NOSCRIPT_IM),
+            html => ($self->{insertion_mode} != IN_HEAD_NOSCRIPT_IM),
+            br => 1,
+        }->{$token->{tag_name}}) {
           if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
             !!!cp ('t142.2');
             ## (before head) as if <head>, (in head) as if </head>
@@ -2601,7 +2561,7 @@ sub _tree_construction_main ($) {
             !!!cp ('t143.3');
             ## NOTE: Two parse errors for <head><noscript></br>
             !!!parse-error (type => 'unmatched end tag',
-                            text => 'br', token => $token);
+                            text => $token->{tag_name}, token => $token);
             ## As if </noscript>
             pop @{$self->{open_elements}};
             $self->{insertion_mode} = IN_HEAD_IM;
@@ -2619,51 +2579,20 @@ sub _tree_construction_main ($) {
             die "$0: $self->{insertion_mode}: Unknown insertion mode";
           }
 
-          #
-        } else { ## Other end tags
-              !!!cp ('t145');
-              !!!parse-error (type => 'unmatched end tag',
-                              text => $token->{tag_name}, token => $token);
-              ## Ignore the token
-              !!!next-token;
-              next B;
-            }
+          ## "after head" insertion mode
+          ## As if <body>
+          !!!insert-element ('body',, $token);
+          $self->{insertion_mode} = IN_BODY_IM;
+          ## Reprocess.
+          next B;
+        }
 
-            if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
-              !!!cp ('t146');
-              ## As if </noscript>
-              pop @{$self->{open_elements}};
-              !!!parse-error (type => 'in noscript:/',
-                              text => $token->{tag_name}, token => $token);
-              
-              ## Reprocess in the "in head" insertion mode...
-              ## As if </head>
-              pop @{$self->{open_elements}};
-
-              ## Reprocess in the "after head" insertion mode...
-            } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
-              !!!cp ('t147');
-              ## As if </head>
-              pop @{$self->{open_elements}};
-
-              ## Reprocess in the "after head" insertion mode...
-            } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
-## ISSUE: This case cannot be reached?
-              !!!cp ('t148');
-              !!!parse-error (type => 'unmatched end tag',
-                              text => $token->{tag_name}, token => $token);
-              ## Ignore the token ## ISSUE: An issue in the spec.
-              !!!next-token;
-              next B;
-            } else {
-              !!!cp ('t149');
-            }
-
-            ## "after head" insertion mode
-            ## As if <body>
-            !!!insert-element ('body',, $token);
-            $self->{insertion_mode} = IN_BODY_IM;
-            ## reprocess
+        ## End tags are ignored by default.
+        !!!cp ('t145');
+        !!!parse-error (type => 'unmatched end tag',
+                        text => $token->{tag_name}, token => $token);
+        ## Ignore the token.
+        !!!next-token;
         next B;
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
@@ -5749,4 +5678,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 08:29:32 $
+# $Date: 2009/09/06 09:53:29 $
