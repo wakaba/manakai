@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.237 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.238 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -2000,7 +2000,13 @@ sub _tree_construction_main ($) {
     } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
       if ($token->{type} == CHARACTER_TOKEN) {
         
+
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+
+        if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+          delete $self->{frameset_ok};
+        }
+
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
@@ -2262,7 +2268,8 @@ sub _tree_construction_main ($) {
     }
   
         $self->{insertion_mode} = IN_BODY_IM;
-        ## reprocess
+        ## The "frameset-ok" flag is left unchanged in this case.
+        ## Reporcess the token.
         next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
         if ($token->{tag_name} eq 'head') {
@@ -2700,29 +2707,29 @@ sub _tree_construction_main ($) {
           next B;
         } elsif ($token->{tag_name} eq 'body' or
                  $token->{tag_name} eq 'frameset') {
-              if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
-                
-                ## As if </noscript>
-                pop @{$self->{open_elements}};
-                $self->{parse_error}->(level => $self->{level}->{must}, type => 'in noscript',
-                                text => $token->{tag_name}, token => $token);
-                
-                ## Reprocess in the "in head" insertion mode...
-                ## As if </head>
-                pop @{$self->{open_elements}};
-                
-                ## Reprocess in the "after head" insertion mode...
-              } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
-                
-                pop @{$self->{open_elements}};
-                
-                ## Reprocess in the "after head" insertion mode...
-              } else {
-                
-              }
+          if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
+            
+            ## As if </noscript>
+            pop @{$self->{open_elements}};
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'in noscript',
+                            text => $token->{tag_name}, token => $token);
+            
+            ## Reprocess in the "in head" insertion mode...
+            ## As if </head>
+            pop @{$self->{open_elements}};
+            
+            ## Reprocess in the "after head" insertion mode...
+          } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
+            
+            pop @{$self->{open_elements}};
+            
+            ## Reprocess in the "after head" insertion mode...
+          } else {
+            
+          }
 
-              ## "after head" insertion mode
-              
+          ## "after head" insertion mode
+          
     {
       my $el;
       
@@ -2747,22 +2754,23 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-              if ($token->{tag_name} eq 'body') {
-                
-                $self->{insertion_mode} = IN_BODY_IM;
-              } elsif ($token->{tag_name} eq 'frameset') {
-                
-                $self->{insertion_mode} = IN_FRAMESET_IM;
-              } else {
-                die "$0: tag name: $self->{tag_name}";
-              }
-              
-              $token = $self->_get_next_token;
-              next B;
-            } else {
-              
-              #
-            }
+          if ($token->{tag_name} eq 'body') {
+            
+            delete $self->{frameset_ok};
+            $self->{insertion_mode} = IN_BODY_IM;
+          } elsif ($token->{tag_name} eq 'frameset') {
+            
+            $self->{insertion_mode} = IN_FRAMESET_IM;
+          } else {
+            die "$0: tag name: $self->{tag_name}";
+          }
+          
+          $token = $self->_get_next_token;
+          next B;
+        } else {
+          
+          #
+        }
 
             if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
               
@@ -2786,9 +2794,9 @@ sub _tree_construction_main ($) {
               
             }
 
-            ## "after head" insertion mode
-            ## As if <body>
-            
+        ## "after head" insertion mode
+        ## As if <body>
+        
     {
       my $el;
       
@@ -2804,10 +2812,11 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{'body'} || 0];
     }
   
-            $self->{insertion_mode} = IN_BODY_IM;
-            ## reprocess
-            
-            next B;
+        $self->{insertion_mode} = IN_BODY_IM;
+        ## The "frameset-ok" flag is not changed in this case.
+        ## Reprocess the token.
+        
+        next B;
       } elsif ($token->{type} == END_TAG_TOKEN) {
         ## "Before head", "in head", and "after head" insertion modes
         ## ignore most of end tags.  Exceptions are "body", "html",
@@ -2933,7 +2942,8 @@ sub _tree_construction_main ($) {
     }
   
           $self->{insertion_mode} = IN_BODY_IM;
-          ## Reprocess.
+          ## The "frameset-ok" flag is left unchanged in this case.
+          ## Reprocess the token.
           next B;
         }
 
@@ -3019,22 +3029,26 @@ sub _tree_construction_main ($) {
     }
   
         $self->{insertion_mode} = IN_BODY_IM;
-        ## NOTE: Reprocess.
+        ## The "frameset-ok" flag is left unchanged in this case.
+        ## Reprocess the token.
         next B;
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
     } elsif ($self->{insertion_mode} & BODY_IMS) {
-          if ($token->{type} == CHARACTER_TOKEN) {
-            
-            ## NOTE: There is a code clone of "character in body".
-            $reconstruct_active_formatting_elements->($insert_to_current);
-            
-            $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+      if ($token->{type} == CHARACTER_TOKEN) {
+        
+        $reconstruct_active_formatting_elements->($insert_to_current);
+        
+        $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
-            $token = $self->_get_next_token;
-            next B;
-          } elsif ($token->{type} == START_TAG_TOKEN) {
+        if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+          delete $self->{frameset_ok};
+        }
+
+        $token = $self->_get_next_token;
+        next B;
+      } elsif ($token->{type} == START_TAG_TOKEN) {
             if ({
                  caption => 1, col => 1, colgroup => 1, tbody => 1,
                  td => 1, tfoot => 1, th => 1, thead => 1, tr => 1,
@@ -5186,6 +5200,8 @@ sub _tree_construction_main ($) {
           } else {
             
           }
+
+          delete $self->{frameset_ok};
         } elsif ($token->{tag_name} eq 'form') {
           
           $self->{form_element} = $self->{open_elements}->[-1]->[0];
@@ -5195,6 +5211,8 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'table') {
           
           push @{$open_tables}, [$self->{open_elements}->[-1]->[0]];
+
+          delete $self->{frameset_ok};
           
           $self->{insertion_mode} = IN_TABLE_IM;
 
@@ -5203,8 +5221,11 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'hr') {
           
           pop @{$self->{open_elements}};
-        
+          
           delete $self->{self_closing};
+
+          delete $self->{frameset_ok};
+
           $token = $self->_get_next_token;
         } else {
           
@@ -5227,13 +5248,16 @@ sub _tree_construction_main ($) {
           ## Interpreted as <li><foo><li/></foo></li> (non-conforming):
           ## div (Fx, S)
 
+        ## 1. Frameset-ng
+        delete $self->{frameset_ok};
+
         my $non_optional;
         my $i = -1;
 
-        ## 1.
+        ## 2.
         for my $node (reverse @{$self->{open_elements}}) {
           if ($node->[1] == LI_EL) {
-            ## 2. (a) As if </li>
+            ## 3. (a) As if </li>
             {
               ## If no </li> - not applied
               #
@@ -5257,7 +5281,7 @@ sub _tree_construction_main ($) {
               splice @{$self->{open_elements}}, $i;
             }
 
-            last; ## 2. (b) goto 5.
+            last; ## 3. (b) goto 5.
           } elsif (
                    ## NOTE: not "formatting" and not "phrasing"
                    ($node->[1] & SPECIAL_EL or
@@ -5265,9 +5289,9 @@ sub _tree_construction_main ($) {
                    ## NOTE: "li", "dt", and "dd" are in |SPECIAL_EL|.
                    (not $node->[1] & ADDRESS_DIV_P_EL)
                   ) {
-            ## 3.
+            ## 4.
             
-            last; ## goto 5.
+            last; ## goto 6.
           } elsif ($node->[1] & END_TAG_OPTIONAL_EL) {
             
             #
@@ -5276,12 +5300,12 @@ sub _tree_construction_main ($) {
             $non_optional ||= $node;
             #
           }
-          ## 4.
-          ## goto 2.
+          ## 5.
+          ## goto 3.
           $i--;
         }
 
-        ## 5. (a) has a |p| element in scope
+        ## 6. (a) has a |p| element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] == P_EL) {
             
@@ -5302,7 +5326,7 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
 
-        ## 5. (b) insert
+        ## 6. (b) insert
         
     {
       my $el;
@@ -5335,13 +5359,16 @@ sub _tree_construction_main ($) {
                $token->{tag_name} eq 'dd') {
         ## NOTE: As normal, but imply </dt> or </dd> when ...
 
+        ## 1. Frameset-ng
+        delete $self->{frameset_ok};
+
         my $non_optional;
         my $i = -1;
 
-        ## 1.
+        ## 2.
         for my $node (reverse @{$self->{open_elements}}) {
           if ($node->[1] == DTDD_EL) {
-            ## 2. (a) As if </li>
+            ## 3. (a) As if </li>
             {
               ## If no </li> - not applied
               #
@@ -5365,7 +5392,7 @@ sub _tree_construction_main ($) {
               splice @{$self->{open_elements}}, $i;
             }
 
-            last; ## 2. (b) goto 5.
+            last; ## 3. (b) goto 5.
           } elsif (
                    ## NOTE: not "formatting" and not "phrasing"
                    ($node->[1] & SPECIAL_EL or
@@ -5374,7 +5401,7 @@ sub _tree_construction_main ($) {
 
                    (not $node->[1] & ADDRESS_DIV_P_EL)
                   ) {
-            ## 3.
+            ## 4.
             
             last; ## goto 5.
           } elsif ($node->[1] & END_TAG_OPTIONAL_EL) {
@@ -5385,12 +5412,12 @@ sub _tree_construction_main ($) {
             $non_optional ||= $node;
             #
           }
-          ## 4.
-          ## goto 2.
+          ## 5.
+          ## goto 3.
           $i--;
         }
 
-        ## 5. (a) has a |p| element in scope
+        ## 6. (a) has a |p| element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] == P_EL) {
             
@@ -5408,7 +5435,7 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
 
-        ## 5. (b) insert
+        ## 6. (b) insert
         
     {
       my $el;
@@ -5664,6 +5691,8 @@ sub _tree_construction_main ($) {
 
         push @$active_formatting_elements, ['#marker', ''];
 
+        delete $self->{frameset_ok};
+
         
         $token = $self->_get_next_token;
         next B;
@@ -5677,6 +5706,11 @@ sub _tree_construction_main ($) {
         if ($token->{tag_name} eq 'xmp') {
           
           $reconstruct_active_formatting_elements->($insert_to_current);
+
+          delete $self->{frameset_ok};
+        } elsif ($token->{tag_name} eq 'iframe') {
+          
+          delete $self->{frameset_ok};
         } else {
           
         }
@@ -5779,7 +5813,8 @@ sub _tree_construction_main ($) {
         ## 4., 6. Insertion mode
         $self->{insertion_mode} |= IN_CDATA_RCDATA_IM;
 
-        ## XXX: 5. frameset-ok flag
+        ## 5. Frameset-ng.
+        delete $self->{frameset_ok};
 
         
         $token = $self->_get_next_token;
@@ -6052,7 +6087,11 @@ sub _tree_construction_main ($) {
              applet => 1, marquee => 1, object => 1,
             }->{$token->{tag_name}}) {
           
+
           push @$active_formatting_elements, ['#marker', ''];
+
+          delete $self->{frameset_ok};
+
           
         } elsif ({
                   b => 1, big => 1, em => 1, font => 1, i => 1,
@@ -6073,11 +6112,17 @@ sub _tree_construction_main ($) {
                   keygen => 1,
                  }->{$token->{tag_name}}) {
           
+
           pop @{$self->{open_elements}};
+
+          delete $self->{frameset_ok};
+
           delete $self->{self_closing};
         } elsif ($token->{tag_name} eq 'select') {
           ## TODO: associate with $self->{form_element} if defined
-        
+
+          delete $self->{frameset_ok};
+          
           if ($self->{insertion_mode} & TABLE_IMS or
               $self->{insertion_mode} & BODY_TABLE_IMS or
               ($self->{insertion_mode} & IM_MASK) == IN_COLUMN_GROUP_IM) {
@@ -6784,4 +6829,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 13:02:21 $
+# $Date: 2009/09/06 13:52:05 $
