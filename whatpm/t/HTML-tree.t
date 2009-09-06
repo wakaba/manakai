@@ -121,6 +121,7 @@ my @FILES = grep {$_} split /\s+/, qq[
                       ${test_dir_name}tree-test-flow.dat
                       ${test_dir_name}tree-test-phrasing.dat
                       ${test_dir_name}tree-test-form.dat
+                      ${test_dir_name}tree-test-frames.dat
                       ${test_dir_name}tree-test-foreign.dat
                      ];
 
@@ -133,4 +134,4 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/14 13:24:53 $
+## $Date: 2009/09/06 12:53:19 $

@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Sep  6 19:18:50 2009
-# Current time GMT:   Sun Sep  6 10:18:50 2009
+# Current time local: Sun Sep  6 21:48:11 2009
+# Current time GMT:   Sun Sep  6 12:48:11 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -172,10 +172,10 @@ ok 165
 ok 166
 ok 167
 ok 168
-# t/tokenizer-test-3.dat
 ok 169
 ok 170
 ok 171
+# t/tokenizer-test-3.dat
 ok 172
 ok 173
 ok 174
@@ -194,10 +194,10 @@ ok 186
 ok 187
 ok 188
 ok 189
-# t/tree-construction/tests1.dat
 ok 190
 ok 191
 ok 192
+# t/tree-construction/tests1.dat
 ok 193
 ok 194
 ok 195
@@ -258,13 +258,16 @@ ok 249
 ok 250
 ok 251
 ok 252
-not ok 253
-# Test 253 got: "3" (t/HTML-tree.t at line 92 fail #85)
+ok 253
+ok 254
+ok 255
+not ok 256
+# Test 256 got: "3" (t/HTML-tree.t at line 92 fail #86)
 #     Expected: "2" (Parse error: qq'<h1>Hello<h2>World'; 1:5:no DOCTYPE, 1:14:not closed, 1:18:in body:#eof;Line: 1 Col: 4 Unexpected start tag (h1). Expected DOCTYPE., Line: 1 Col: 18 Expected closing tag. Unexpected end of file.)
 #  t/HTML-tree.t line 92 is:     join (', ', @errors) . ';' . join (', ', @{$test->{errors}->[0] or []});
-ok 254
-not ok 255
-# Test 255 got: "<html>\n  <head>\n  <body>\n    <h1>\n      \"Hello\"\n    <h2>\n      \"World\"\n" (t/HTML-tree.t at line 98 fail #85)
+ok 257
+not ok 258
+# Test 258 got: "<html>\n  <head>\n  <body>\n    <h1>\n      \"Hello\"\n    <h2>\n      \"World\"\n" (t/HTML-tree.t at line 98 fail #86)
 #     Expected: "<html>\n  <head>\n  <body>\n    <h1>\n      \"Hello\"\n      <h2>\n        \"World\"\n" (Document tree: qq'<h1>Hello<h2>World')
 #     Lines 6-7 are changed:
 #      - "      <h2>\n"
@@ -272,9 +275,6 @@ not ok 255
 #      - "        \"World\"\n"
 #      + "      \"World\"\n"
 #  t/HTML-tree.t line 98 is:   ok $result, $test->{document}->[0],
-ok 256
-ok 257
-ok 258
 ok 259
 ok 260
 ok 261
@@ -293,44 +293,47 @@ ok 273
 ok 274
 ok 275
 ok 276
-not ok 277
-# Test 277 got: "9" (t/HTML-tree.t at line 92 fail #93)
-#     Expected: "10" (Parse error: qq'<a><table><td><a><table></table><a></tr><a></table><b>X</b>C<a>Y'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:36:in a:a, 1:41:not closed, 1:44:in table, 1:44:in a:a, 1:44:unmatched end tag, 1:64:in a:a, 1:64:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 40 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 43 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 43 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 43 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 51 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 63 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 64 Expected closing tag. Unexpected end of file.)
+ok 277
 ok 278
-not ok 279
-# Test 279 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n    <a>\n      <b>\n        \"X\"\n      \"C\"\n    <a>\n      \"Y\"\n" (t/HTML-tree.t at line 98 fail #93)
+ok 279
+not ok 280
+# Test 280 got: "9" (t/HTML-tree.t at line 92 fail #94)
+#     Expected: "10" (Parse error: qq'<a><table><td><a><table></table><a></tr><a></table><b>X</b>C<a>Y'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:36:in a:a, 1:41:not closed, 1:44:in table, 1:44:in a:a, 1:44:unmatched end tag, 1:64:in a:a, 1:64:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 40 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 43 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 43 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 43 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 51 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 63 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 64 Expected closing tag. Unexpected end of file.)
+ok 281
+not ok 282
+# Test 282 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n    <a>\n      <b>\n        \"X\"\n      \"C\"\n    <a>\n      \"Y\"\n" (t/HTML-tree.t at line 98 fail #94)
 #     Expected: "<html>\n  <head>\n  <body>\n    <a>\n      <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n      <b>\n        \"X\"\n      \"C\"\n    <a>\n      \"Y\"\n" (Document tree: qq'<a><table><td><a><table></table><a></tr><a></table><b>X</b>C<a>Y')
 #     Line 5 is missing:
 #      - "      <a>\n"
 #     Got 1 extra line at line 12:
 #      + "    <a>\n"
-ok 280
-ok 281
-ok 282
-not ok 283
-# Test 283 got: "8" (t/HTML-tree.t at line 92 fail #95)
-#     Expected: "7" (Parse error: qq'<!-----><font><div>hello<table>excite!<b>me!<th><i>please!</tr><!--X-->'; 1:6:dash in comment, 1:15:no DOCTYPE, 1:42:in table:#text, 1:42:in table, 1:49:in table:#text, 1:49:missing start tag:tr, 1:64:not closed, 1:71:in body:#eof;Line: 1 Col: 7 Unexpected '-' after '--' found in comment., Line: 1 Col: 14 Unexpected start tag (font). Expected DOCTYPE., Line: 1 Col: 38 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 48 Unexpected implied end tag (b) in the table phase., Line: 1 Col: 48 Unexpected table cell start tag (th) in the table body phase., Line: 1 Col: 63 Got table cell end tag (th) while required end tags are missing., Line: 1 Col: 71 Expected closing tag. Unexpected end of file.)
+ok 283
 ok 284
-not ok 285
-# Test 285 got: "<!-- - -->\n<html>\n  <head>\n  <body>\n    <font>\n      <div>\n        \"hello\"\n        \"excite!\"\n        <b>\n          \"me!\"\n        <table>\n          <tbody>\n            <tr>\n              <th>\n                <i>\n                  \"please!\"\n            <!-- X -->\n" (t/HTML-tree.t at line 98 fail #95)
+ok 285
+not ok 286
+# Test 286 got: "8" (t/HTML-tree.t at line 92 fail #96)
+#     Expected: "7" (Parse error: qq'<!-----><font><div>hello<table>excite!<b>me!<th><i>please!</tr><!--X-->'; 1:6:dash in comment, 1:15:no DOCTYPE, 1:42:in table:#text, 1:42:in table, 1:49:in table:#text, 1:49:missing start tag:tr, 1:64:not closed, 1:71:in body:#eof;Line: 1 Col: 7 Unexpected '-' after '--' found in comment., Line: 1 Col: 14 Unexpected start tag (font). Expected DOCTYPE., Line: 1 Col: 38 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 48 Unexpected implied end tag (b) in the table phase., Line: 1 Col: 48 Unexpected table cell start tag (th) in the table body phase., Line: 1 Col: 63 Got table cell end tag (th) while required end tags are missing., Line: 1 Col: 71 Expected closing tag. Unexpected end of file.)
+ok 287
+not ok 288
+# Test 288 got: "<!-- - -->\n<html>\n  <head>\n  <body>\n    <font>\n      <div>\n        \"hello\"\n        \"excite!\"\n        <b>\n          \"me!\"\n        <table>\n          <tbody>\n            <tr>\n              <th>\n                <i>\n                  \"please!\"\n            <!-- X -->\n" (t/HTML-tree.t at line 98 fail #96)
 #     Expected: "<!-- - -->\n<html>\n  <head>\n  <body>\n    <font>\n      <div>\n        \"helloexcite!\"\n        <b>\n          \"me!\"\n        <table>\n          <tbody>\n            <tr>\n              <th>\n                <i>\n                  \"please!\"\n            <!-- X -->\n" (Document tree: qq'<!-----><font><div>hello<table>excite!<b>me!<th><i>please!</tr><!--X-->')
 #     Line 7 is changed:
 #      - "        \"helloexcite!\"\n"
 #      + "        \"hello\"\n"
 #     Got 1 extra line at line 8:
 #      + "        \"excite!\"\n"
-not ok 286
-# Test 286 got: "0" (t/HTML-tree.t at line 92 fail #96)
-#     Expected: "1" (Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).)
-ok 287
-ok 288
 not ok 289
-# Test 289 got: "3" (t/HTML-tree.t at line 92 fail #97)
+# Test 289 got: "0" (t/HTML-tree.t at line 92 fail #97)
+#     Expected: "1" (Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).)
+ok 290
+ok 291
+not ok 292
+# Test 292 got: "3" (t/HTML-tree.t at line 92 fail #98)
 #     Expected: "2"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
  (Parse error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; 1:36:not closed, 1:55:unmatched end tag, 1:55:in body:#eof;54: Stray end tag “option”, 55: End of file seen and there were open elements.)
-ok 290
-not ok 291
-# Test 291 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"A\"\n    <option>\n      \"B\"\n    <optgroup>\n      \"C\"\n      <select>\n        \"DE\"\n" (t/HTML-tree.t at line 98 fail #97)
+ok 293
+not ok 294
+# Test 294 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"A\"\n    <option>\n      \"B\"\n    <optgroup>\n      \"C\"\n      <select>\n        \"DE\"\n" (t/HTML-tree.t at line 98 fail #98)
 #     Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"A\"\n    <option>\n      \"B\"\n      <optgroup>\n        \"C\"\n        <select>\n          \"DE\"\n" (Document tree: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E')
 #     Lines 8-11 are changed:
 #      - "      <optgroup>\n"
@@ -341,9 +344,6 @@ not ok 291
 #      + "      <select>\n"
 #      - "          \"DE\"\n"
 #      + "        \"DE\"\n"
-ok 292
-ok 293
-ok 294
 ok 295
 ok 296
 ok 297
@@ -422,17 +422,17 @@ ok 369
 ok 370
 ok 371
 ok 372
-No #errors section () at t/HTML-tree.t line 88.
-not ok 373
-# Test 373 got: "1" (t/HTML-tree.t at line 92 fail #125)
-#     Expected: "0" (Parse error: qq''; 1:0:no DOCTYPE;)
+ok 373
 ok 374
-not ok 375
-# Test 375 got: "<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #125)
-#     Expected: <UNDEF> (Document tree: qq'')
-ok 376
+ok 375
+No #errors section () at t/HTML-tree.t line 88.
+not ok 376
+# Test 376 got: "1" (t/HTML-tree.t at line 92 fail #126)
+#     Expected: "0" (Parse error: qq''; 1:0:no DOCTYPE;)
 ok 377
-ok 378
+not ok 378
+# Test 378 got: "<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #126)
+#     Expected: <UNDEF> (Document tree: qq'')
 ok 379
 ok 380
 ok 381
@@ -480,16 +480,19 @@ ok 422
 ok 423
 ok 424
 ok 425
-not ok 426
-# Test 426 got: "<html>\n  <head>\n  <body>\n    <a>\n      href=\"blah\"\n      \"aba\"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n    <a>\n      href=\"foo\"\n      \"br\"\n    <a>\n      href=\"foo\"\n      \"x\"\n    <a>\n      href=\"foo\"\n      \"aoe\"\n" (t/HTML-tree.t at line 98 fail #142)
-#     Expected: <UNDEF> (Document tree: qq'<a href="blah">aba<table><a href="foo">br<tr><td></td></tr>x</table>aoe')
-No #errors section () at t/HTML-tree.t line 88.
-not ok 427
-# Test 427 got: "1" (t/HTML-tree.t at line 92 fail #143)
-#     Expected: "0" (Parse error: qq''; 1:0:no DOCTYPE;)
+ok 426
+ok 427
 ok 428
 not ok 429
-# Test 429 got: "<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #143)
+# Test 429 got: "<html>\n  <head>\n  <body>\n    <a>\n      href=\"blah\"\n      \"aba\"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n    <a>\n      href=\"foo\"\n      \"br\"\n    <a>\n      href=\"foo\"\n      \"x\"\n    <a>\n      href=\"foo\"\n      \"aoe\"\n" (t/HTML-tree.t at line 98 fail #143)
+#     Expected: <UNDEF> (Document tree: qq'<a href="blah">aba<table><a href="foo">br<tr><td></td></tr>x</table>aoe')
+No #errors section () at t/HTML-tree.t line 88.
+not ok 430
+# Test 430 got: "1" (t/HTML-tree.t at line 92 fail #144)
+#     Expected: "0" (Parse error: qq''; 1:0:no DOCTYPE;)
+ok 431
+not ok 432
+# Test 432 got: "<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #144)
 #     Expected: "<html>\n  <head>\n  <body>\n    <a>\n      href=\"blah\"\n      \"aba\"\n      <a>\n        href=\"foo\"\n        \"br\"\n      <a>\n        href=\"foo\"\n        \"x\"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n    <a>\n      href=\"foo\"\n      \"aoe\"\n" (Document tree: qq'')
 #     Lines 4-4 are missing:
 #      - "    <a>\n"
@@ -508,19 +511,16 @@ not ok 429
 #      - "    <a>\n"
 #      - "      href=\"foo\"\n"
 #      - "      \"aoe\"\n"
-ok 430
-ok 431
-not ok 432
-# Test 432 got: "<html>\n  <head>\n  <body>\n    <a>\n      href=\"blah\"\n      \"aba\"\n      \"x\"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                href=\"foo\"\n                \"br\"\n      \"aoe\"\n" (t/HTML-tree.t at line 98 fail #144)
+ok 433
+ok 434
+not ok 435
+# Test 435 got: "<html>\n  <head>\n  <body>\n    <a>\n      href=\"blah\"\n      \"aba\"\n      \"x\"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                href=\"foo\"\n                \"br\"\n      \"aoe\"\n" (t/HTML-tree.t at line 98 fail #145)
 #     Expected: "<html>\n  <head>\n  <body>\n    <a>\n      href=\"blah\"\n      \"abax\"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                href=\"foo\"\n                \"br\"\n      \"aoe\"\n" (Document tree: qq'<a href="blah">aba<table><tr><td><a href="foo">br</td></tr>x</table>aoe')
 #     Line 6 is changed:
 #      - "      \"abax\"\n"
 #      + "      \"aba\"\n"
 #     Got 1 extra line at line 7:
 #      + "      \"x\"\n"
-ok 433
-ok 434
-ok 435
 ok 436
 ok 437
 ok 438
@@ -539,65 +539,65 @@ ok 450
 ok 451
 ok 452
 ok 453
-not ok 454
-# Test 454 got: "3" (t/HTML-tree.t at line 92 fail #152)
-#     Expected: "4" (Parse error: qq'<body><body><base><link><meta><title><p></title><body><p></body>'; 1:7:no DOCTYPE, 1:13:in body, 1:55:in body;Line: 1 Col: 6 Unexpected start tag (body). Expected DOCTYPE., Line: 1 Col: 12 Unexpected start tag (body)., Line: 1 Col: 54 Unexpected start tag (body)., Line: 1 Col: 64 Unexpected end tag (p). Missing end tag (body).)
+ok 454
 ok 455
 ok 456
-ok 457
+not ok 457
+# Test 457 got: "3" (t/HTML-tree.t at line 92 fail #153)
+#     Expected: "4" (Parse error: qq'<body><body><base><link><meta><title><p></title><body><p></body>'; 1:7:no DOCTYPE, 1:13:in body, 1:55:in body;Line: 1 Col: 6 Unexpected start tag (body). Expected DOCTYPE., Line: 1 Col: 12 Unexpected start tag (body)., Line: 1 Col: 54 Unexpected start tag (body)., Line: 1 Col: 64 Unexpected end tag (p). Missing end tag (body).)
 ok 458
 ok 459
 ok 460
 ok 461
 ok 462
-not ok 463
-# Test 463 got: "10" (t/HTML-tree.t at line 92 fail #155)
-#     Expected: "11" (Parse error: qq'<a><table><a></table><p><a><div><a>'; 1:4:no DOCTYPE, 1:14:in table, 1:14:in a:a, 1:14:unmatched end tag, 1:28:in a:a, 1:28:unmatched end tag, 1:33:not closed, 1:35:in a:a, 1:35:unmatched end tag, 1:35:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 13 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 13 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 13 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 21 Unexpected end tag (table). Expected end tag (a)., Line: 1 Col: 27 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 27 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 32 Unexpected end tag (p). Ignored., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 35 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 35 Expected closing tag. Unexpected end of file.)
+ok 463
 ok 464
-not ok 465
-# Test 465 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n    <a>\n    <p>\n      <a>\n    <div>\n      <a>\n" (t/HTML-tree.t at line 98 fail #155)
+ok 465
+not ok 466
+# Test 466 got: "10" (t/HTML-tree.t at line 92 fail #156)
+#     Expected: "11" (Parse error: qq'<a><table><a></table><p><a><div><a>'; 1:4:no DOCTYPE, 1:14:in table, 1:14:in a:a, 1:14:unmatched end tag, 1:28:in a:a, 1:28:unmatched end tag, 1:33:not closed, 1:35:in a:a, 1:35:unmatched end tag, 1:35:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 13 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 13 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 13 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 21 Unexpected end tag (table). Expected end tag (a)., Line: 1 Col: 27 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 27 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 32 Unexpected end tag (p). Ignored., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 35 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 35 Expected closing tag. Unexpected end of file.)
+ok 467
+not ok 468
+# Test 468 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n    <a>\n    <p>\n      <a>\n    <div>\n      <a>\n" (t/HTML-tree.t at line 98 fail #156)
 #     Expected: "<html>\n  <head>\n  <body>\n    <a>\n      <a>\n      <table>\n    <p>\n      <a>\n    <div>\n      <a>\n" (Document tree: qq'<a><table><a></table><p><a><div><a>')
 #     Line 5 is missing:
 #      - "      <a>\n"
 #     Got 1 extra line at line 6:
 #      + "    <a>\n"
-not ok 466
-# Test 466 got: "2" (t/HTML-tree.t at line 92 fail #156)
-#     Expected: "3"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<head></p><meta><p>'; 1:7:no DOCTYPE, 1:11:unmatched end tag;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 10: Stray end tag “p”., 16: “meta” element outside “head”.)
-ok 467
-ok 468
 not ok 469
 # Test 469 got: "2" (t/HTML-tree.t at line 92 fail #157)
 #     Expected: "3"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<head></html><meta><p>'; 1:7:no DOCTYPE, 1:20:after html;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 13: Stray end tag “html”., 19: “meta” element outside “head”.)
+ (Parse error: qq'<head></p><meta><p>'; 1:7:no DOCTYPE, 1:11:unmatched end tag;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 10: Stray end tag “p”., 16: “meta” element outside “head”.)
 ok 470
-not ok 471
-# Test 471 got: "<html>\n  <head>\n  <body>\n    <meta>\n    <p>\n" (t/HTML-tree.t at line 98 fail #157)
+ok 471
+not ok 472
+# Test 472 got: "2" (t/HTML-tree.t at line 92 fail #158)
+#     Expected: "3"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
+ (Parse error: qq'<head></html><meta><p>'; 1:7:no DOCTYPE, 1:20:after html;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 13: Stray end tag “html”., 19: “meta” element outside “head”.)
+ok 473
+not ok 474
+# Test 474 got: "<html>\n  <head>\n  <body>\n    <meta>\n    <p>\n" (t/HTML-tree.t at line 98 fail #158)
 #     Expected: "<html>\n  <head>\n    <meta>\n  <body>\n    <p>\n" (Document tree: qq'<head></html><meta><p>')
 #     Got 1 extra line at line 3:
 #      + "  <body>\n"
 #     Line 5 is missing:
 #      - "  <body>\n"
-ok 472
-ok 473
-ok 474
 ok 475
 ok 476
 ok 477
-not ok 478
-# Test 478 got: "3" (t/HTML-tree.t at line 92 fail #160)
-#     Expected: "2" (Parse error: qq'<h1><h2>'; 1:5:no DOCTYPE, 1:8:not closed, 1:8:in body:#eof;Line: 1 Col: 4 Unexpected start tag (h1). Expected DOCTYPE., Line: 1 Col: 8 Expected closing tag. Unexpected end of file.)
+ok 478
 ok 479
-not ok 480
-# Test 480 got: "<html>\n  <head>\n  <body>\n    <h1>\n    <h2>\n" (t/HTML-tree.t at line 98 fail #160)
+ok 480
+not ok 481
+# Test 481 got: "3" (t/HTML-tree.t at line 92 fail #161)
+#     Expected: "2" (Parse error: qq'<h1><h2>'; 1:5:no DOCTYPE, 1:8:not closed, 1:8:in body:#eof;Line: 1 Col: 4 Unexpected start tag (h1). Expected DOCTYPE., Line: 1 Col: 8 Expected closing tag. Unexpected end of file.)
+ok 482
+not ok 483
+# Test 483 got: "<html>\n  <head>\n  <body>\n    <h1>\n    <h2>\n" (t/HTML-tree.t at line 98 fail #161)
 #     Expected: "<html>\n  <head>\n  <body>\n    <h1>\n      <h2>\n" (Document tree: qq'<h1><h2>')
 #     Line 5 is changed:
 #      - "      <h2>\n"
 #      + "    <h2>\n"
-ok 481
-ok 482
-ok 483
 ok 484
 ok 485
 ok 486
@@ -616,20 +616,20 @@ ok 498
 ok 499
 ok 500
 ok 501
-not ok 502
-# Test 502 got: "10" (t/HTML-tree.t at line 92 fail #168)
-#     Expected: "11" (Parse error: qq'<a><table><td><a><table></table><a></tr><a></table><a>'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:36:in a:a, 1:41:not closed, 1:44:in table, 1:44:in a:a, 1:44:unmatched end tag, 1:54:in a:a, 1:54:unmatched end tag, 1:54:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 40 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 43 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 43 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 43 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 51 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 54 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 54 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 54 Expected closing tag. Unexpected end of file.)
+ok 502
 ok 503
-not ok 504
-# Test 504 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n    <a>\n" (t/HTML-tree.t at line 98 fail #168)
+ok 504
+not ok 505
+# Test 505 got: "10" (t/HTML-tree.t at line 92 fail #169)
+#     Expected: "11" (Parse error: qq'<a><table><td><a><table></table><a></tr><a></table><a>'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:36:in a:a, 1:41:not closed, 1:44:in table, 1:44:in a:a, 1:44:unmatched end tag, 1:54:in a:a, 1:54:unmatched end tag, 1:54:in body:#eof;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 35 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 40 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 43 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 43 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 43 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 51 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 54 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 54 End tag (a) violates step 1, paragraph 2 of the adoption agency algorithm., Line: 1 Col: 54 Expected closing tag. Unexpected end of file.)
+ok 506
+not ok 507
+# Test 507 got: "<html>\n  <head>\n  <body>\n    <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n    <a>\n" (t/HTML-tree.t at line 98 fail #169)
 #     Expected: "<html>\n  <head>\n  <body>\n    <a>\n      <a>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <a>\n                <table>\n              <a>\n    <a>\n" (Document tree: qq'<a><table><td><a><table></table><a></tr><a></table><a>')
 #     Line 5 is missing:
 #      - "      <a>\n"
 #     Got 1 extra line at line 12:
 #      + "    <a>\n"
-ok 505
-ok 506
-ok 507
 ok 508
 ok 509
 ok 510
@@ -638,15 +638,15 @@ ok 512
 ok 513
 ok 514
 ok 515
-not ok 516
-# Test 516 got: "<html>\n  <head>\n  <body>\n    <h1>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <h3>\n    <h3>\n" (t/HTML-tree.t at line 98 fail #172)
+ok 516
+ok 517
+ok 518
+not ok 519
+# Test 519 got: "<html>\n  <head>\n  <body>\n    <h1>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <h3>\n    <h3>\n" (t/HTML-tree.t at line 98 fail #173)
 #     Expected: "<html>\n  <head>\n  <body>\n    <h1>\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              <h3>\n      <h3>\n" (Document tree: qq'<h1><table><td><h3></table><h3></h1>')
 #     Line 10 is changed:
 #      - "      <h3>\n"
 #      + "    <h3>\n"
-ok 517
-ok 518
-ok 519
 ok 520
 ok 521
 ok 522
@@ -655,24 +655,24 @@ ok 524
 ok 525
 ok 526
 ok 527
-not ok 528
-# Test 528 got: "<html>\n  <head>\n  <body>\n    <br>\n    <p>\n" (t/HTML-tree.t at line 98 fail #176)
+ok 528
+ok 529
+ok 530
+not ok 531
+# Test 531 got: "<html>\n  <head>\n  <body>\n    <br>\n    <p>\n" (t/HTML-tree.t at line 98 fail #177)
 #     Expected: "<html>\n  <head>\n  <body>\n" (Document tree: qq'</strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>')
 #     Got 2 extra lines at line 4:
 #      + "    <br>\n"
 #      + "    <p>\n"
-ok 529
-ok 530
-ok 531
 ok 532
 ok 533
 ok 534
-# t/tree-construction/tests2.dat
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
 ok 535
 ok 536
 ok 537
+# t/tree-construction/tests2.dat
+Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
+Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
 ok 538
 ok 539
 ok 540
@@ -700,12 +700,12 @@ ok 561
 ok 562
 ok 563
 ok 564
-not ok 565
-# Test 565 got: "4" (t/HTML-tree.t at line 92 fail #189)
-#     Expected: "3" (Parse error: qq'<table><plaintext><td>'; 1:8:no DOCTYPE, 1:19:in table, 1:22:in table:#text, 1:22:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 18 Unexpected start tag (plaintext) in table context caused voodoo mode., Line: 1 Col: 22 Expected closing tag. Unexpected end of file.)
+ok 565
 ok 566
 ok 567
-ok 568
+not ok 568
+# Test 568 got: "4" (t/HTML-tree.t at line 92 fail #190)
+#     Expected: "3" (Parse error: qq'<table><plaintext><td>'; 1:8:no DOCTYPE, 1:19:in table, 1:22:in table:#text, 1:22:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 18 Unexpected start tag (plaintext) in table context caused voodoo mode., Line: 1 Col: 22 Expected closing tag. Unexpected end of file.)
 ok 569
 ok 570
 ok 571
@@ -714,22 +714,22 @@ ok 573
 ok 574
 ok 575
 ok 576
-not ok 577
-# Test 577 got: "3" (t/HTML-tree.t at line 92 fail #193)
-#     Expected: "4" (Parse error: qq'</b test'; 1:8:unclosed tag, 1:8:end tag attribute, 1:8:no DOCTYPE;Line: 1 Col: 8 Unexpected end of file in attribute name., Line: 1 Col: 8 End tag contains unexpected attributes., Line: 1 Col: 8 Unexpected end tag (b). Expected DOCTYPE., Line: 1 Col: 8 Unexpected end tag (b) after the (implied) root element.)
+ok 577
 ok 578
 ok 579
 not ok 580
-# Test 580 got: "4" (t/HTML-tree.t at line 92 fail #194)
-#     Expected: "3" (Parse error: qq'<!DOCTYPE html></b test<b &=&amp>X'; 1:24:bad attribute name, 1:33:no refc, 1:33:end tag attribute, 1:34:unmatched end tag;Line: 1 Col: 32 Named entity didn't end with ';'., Line: 1 Col: 33 End tag contains unexpected attributes., Line: 1 Col: 33 Unexpected end tag (b) after the (implied) root element.)
+# Test 580 got: "3" (t/HTML-tree.t at line 92 fail #194)
+#     Expected: "4" (Parse error: qq'</b test'; 1:8:unclosed tag, 1:8:end tag attribute, 1:8:no DOCTYPE;Line: 1 Col: 8 Unexpected end of file in attribute name., Line: 1 Col: 8 End tag contains unexpected attributes., Line: 1 Col: 8 Unexpected end tag (b). Expected DOCTYPE., Line: 1 Col: 8 Unexpected end tag (b) after the (implied) root element.)
 ok 581
 ok 582
 not ok 583
-# Test 583 got: "3" (t/HTML-tree.t at line 92 fail #195)
-#     Expected: "2" (Parse error: qq'<!doctypehtml><scrIPt type=text/x-foobar;baz>X</SCRipt'; 1:10:no space before DOCTYPE name, 1:54:unclosed tag, 1:54:not closed;Line: 1 Col: 9 No space after literal string 'DOCTYPE'., Line: 1 Col: 54 Unexpected end of file in the tag name.)
+# Test 583 got: "4" (t/HTML-tree.t at line 92 fail #195)
+#     Expected: "3" (Parse error: qq'<!DOCTYPE html></b test<b &=&amp>X'; 1:24:bad attribute name, 1:33:no refc, 1:33:end tag attribute, 1:34:unmatched end tag;Line: 1 Col: 32 Named entity didn't end with ';'., Line: 1 Col: 33 End tag contains unexpected attributes., Line: 1 Col: 33 Unexpected end tag (b) after the (implied) root element.)
 ok 584
 ok 585
-ok 586
+not ok 586
+# Test 586 got: "3" (t/HTML-tree.t at line 92 fail #196)
+#     Expected: "2" (Parse error: qq'<!doctypehtml><scrIPt type=text/x-foobar;baz>X</SCRipt'; 1:10:no space before DOCTYPE name, 1:54:unclosed tag, 1:54:not closed;Line: 1 Col: 9 No space after literal string 'DOCTYPE'., Line: 1 Col: 54 Unexpected end of file in the tag name.)
 ok 587
 ok 588
 ok 589
@@ -806,8 +806,11 @@ ok 659
 ok 660
 ok 661
 ok 662
-not ok 663
-# Test 663 got: "<html>\n  <head>\n  <body>\n    <form>\n      <hr>\n      <label>\n        \"This is a searchable index. Insert your search keywords here: \"\n        <input>\n          name=\"isindex\"\n          test=\"x\"\n      <hr>\n" (t/HTML-tree.t at line 98 fail #221)
+ok 663
+ok 664
+ok 665
+not ok 666
+# Test 666 got: "<html>\n  <head>\n  <body>\n    <form>\n      <hr>\n      <label>\n        \"This is a searchable index. Insert your search keywords here: \"\n        <input>\n          name=\"isindex\"\n          test=\"x\"\n      <hr>\n" (t/HTML-tree.t at line 98 fail #222)
 #     Expected: "<html>\n  <head>\n  <body>\n    <form>\n      <hr>\n      <p>\n        <label>\n          \"This is a searchable index. Insert your search keywords here: \"\n          <input>\n            name=\"isindex\"\n            test=\"x\"\n      <hr>\n" (Document tree: qq'<isindex test=x name=x>')
 #     Lines 6-10 are changed:
 #      - "      <p>\n"
@@ -822,9 +825,6 @@ not ok 663
 #      + "          test=\"x\"\n"
 #     Line 11 is missing:
 #      - "            test=\"x\"\n"
-ok 664
-ok 665
-ok 666
 ok 667
 ok 668
 ok 669
@@ -849,12 +849,12 @@ ok 687
 ok 688
 ok 689
 ok 690
-not ok 691
-# Test 691 got: "1" (t/HTML-tree.t at line 92 fail #231)
-#     Expected: "2" (Parse error: qq'<!DOCTYPE html>X</body><html id="x">'; 1:36:not first start tag;Line: 1 Col: 36 Unexpected start tag token (html) in the after body phase., Line: 1 Col: 36 html needs to be the first start tag.)
+ok 691
 ok 692
 ok 693
-ok 694
+not ok 694
+# Test 694 got: "1" (t/HTML-tree.t at line 92 fail #232)
+#     Expected: "2" (Parse error: qq'<!DOCTYPE html>X</body><html id="x">'; 1:36:not first start tag;Line: 1 Col: 36 Unexpected start tag token (html) in the after body phase., Line: 1 Col: 36 html needs to be the first start tag.)
 ok 695
 ok 696
 ok 697
@@ -875,29 +875,29 @@ ok 711
 ok 712
 ok 713
 ok 714
-not ok 715
-# Test 715 got: "2" (t/HTML-tree.t at line 92 fail #239)
-#     Expected: "3" (Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.)
+ok 715
 ok 716
-not ok 717
-# Test 717 got: "<!DOCTYPE <!doctype>\n<html>\n  <head>\n  <body>\n    \">\"\n    <!-- <!--x -->\n    \"-->\"\n" (t/HTML-tree.t at line 98 fail #239)
+ok 717
+not ok 718
+# Test 718 got: "2" (t/HTML-tree.t at line 92 fail #240)
+#     Expected: "3" (Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.)
+ok 719
+not ok 720
+# Test 720 got: "<!DOCTYPE <!doctype>\n<html>\n  <head>\n  <body>\n    \">\"\n    <!-- <!--x -->\n    \"-->\"\n" (t/HTML-tree.t at line 98 fail #240)
 #     Expected: "<!DOCTYPE <!DOCTYPE>\n<html>\n  <head>\n  <body>\n    \">\"\n    <!-- <!--x -->\n    \"-->\"\n" (Document tree: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->')
 #     Line 1 is changed:
 #      - "<!DOCTYPE <!DOCTYPE>\n"
 #      + "<!DOCTYPE <!doctype>\n"
 # t/tree-construction/tests3.dat
-ok 718
-ok 719
-ok 720
 ok 721
 ok 722
 ok 723
-not ok 724
-# Test 724 got: "3" (t/HTML-tree.t at line 92 fail #242)
-#     Expected: "2" (Parse error: qq'<head></head><!-- --><style></style><!-- --><script></script>'; 1:7:no DOCTYPE, 1:29:after head, 1:53:after head;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE., Line: 1 Col: 28 Unexpected start tag (style) that can be in head. Moved.)
+ok 724
 ok 725
 ok 726
-ok 727
+not ok 727
+# Test 727 got: "3" (t/HTML-tree.t at line 92 fail #243)
+#     Expected: "2" (Parse error: qq'<head></head><!-- --><style></style><!-- --><script></script>'; 1:7:no DOCTYPE, 1:29:after head, 1:53:after head;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE., Line: 1 Col: 28 Unexpected start tag (style) that can be in head. Moved.)
 ok 728
 ok 729
 ok 730
@@ -951,10 +951,10 @@ ok 777
 ok 778
 ok 779
 ok 780
-# t/tree-construction/tests4.dat
 ok 781
 ok 782
 ok 783
+# t/tree-construction/tests4.dat
 ok 784
 ok 785
 ok 786
@@ -967,51 +967,51 @@ ok 792
 ok 793
 ok 794
 ok 795
-not ok 796
-# Test 796 got: "0" (t/HTML-tree.t at line 92 fail #266)
-#     Expected: "1" (Parse error: qq'setting html\x{27}s innerHTML'; ;Line: 1 Col: 24 Unexpected EOF in inner html mode.)
+ok 796
 ok 797
 ok 798
-ok 799
+not ok 799
+# Test 799 got: "0" (t/HTML-tree.t at line 92 fail #267)
+#     Expected: "1" (Parse error: qq'setting html\x{27}s innerHTML'; ;Line: 1 Col: 24 Unexpected EOF in inner html mode.)
 ok 800
 ok 801
-# t/tree-construction/tests5.dat
 ok 802
 ok 803
 ok 804
+# t/tree-construction/tests5.dat
 ok 805
 ok 806
 ok 807
 ok 808
 ok 809
 ok 810
-not ok 811
-# Test 811 got: "2" (t/HTML-tree.t at line 92 fail #271)
-#     Expected: "1" (Parse error: qq'<style> <!---> </style>x'; 1:8:no DOCTYPE, 1:24:not closed;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE.)
+ok 811
 ok 812
-not ok 813
-# Test 813 got: "<html>\n  <head>\n    <style>\n      \" <!---> </style>x\"\n  <body>\n" (t/HTML-tree.t at line 98 fail #271)
+ok 813
+not ok 814
+# Test 814 got: "2" (t/HTML-tree.t at line 92 fail #272)
+#     Expected: "1" (Parse error: qq'<style> <!---> </style>x'; 1:8:no DOCTYPE, 1:24:not closed;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE.)
+ok 815
+not ok 816
+# Test 816 got: "<html>\n  <head>\n    <style>\n      \" <!---> </style>x\"\n  <body>\n" (t/HTML-tree.t at line 98 fail #272)
 #     Expected: "<html>\n  <head>\n    <style>\n      \" <!---> \"\n  <body>\n    \"x\"\n" (Document tree: qq'<style> <!---> </style>x')
 #     Line 4 is changed:
 #      - "      \" <!---> \"\n"
 #      + "      \" <!---> </style>x\"\n"
 #     Line 6 is missing:
 #      - "    \"x\"\n"
-not ok 814
-# Test 814 got: "2" (t/HTML-tree.t at line 92 fail #272)
+not ok 817
+# Test 817 got: "2" (t/HTML-tree.t at line 92 fail #273)
 #     Expected: "1" (Parse error: qq'<iframe> <!---> </iframe>x'; 1:9:no DOCTYPE, 1:26:not closed;Line: 1 Col: 8 Unexpected start tag (iframe). Expected DOCTYPE.)
-ok 815
-not ok 816
-# Test 816 got: "<html>\n  <head>\n  <body>\n    <iframe>\n      \" <!---> </iframe>x\"\n" (t/HTML-tree.t at line 98 fail #272)
+ok 818
+not ok 819
+# Test 819 got: "<html>\n  <head>\n  <body>\n    <iframe>\n      \" <!---> </iframe>x\"\n" (t/HTML-tree.t at line 98 fail #273)
 #     Expected: "<html>\n  <head>\n  <body>\n    <iframe>\n      \" <!---> \"\n    \"x\"\n" (Document tree: qq'<iframe> <!---> </iframe>x')
 #     Line 5 is changed:
 #      - "      \" <!---> \"\n"
 #      + "      \" <!---> </iframe>x\"\n"
 #     Line 6 is missing:
 #      - "    \"x\"\n"
-ok 817
-ok 818
-ok 819
 ok 820
 ok 821
 ok 822
@@ -1038,8 +1038,11 @@ ok 842
 ok 843
 ok 844
 ok 845
-not ok 846
-# Test 846 got: "<html>\n  <head>\n    <noscript>\n      <!-- </noscript> -->\n  <body>\n" (t/HTML-tree.t at line 98 fail #282)
+ok 846
+ok 847
+ok 848
+not ok 849
+# Test 849 got: "<html>\n  <head>\n    <noscript>\n      <!-- </noscript> -->\n  <body>\n" (t/HTML-tree.t at line 98 fail #283)
 #     Expected: "<html>\n  <head>\n    <noscript>\n      \"<!--</noscript>-->\"\n  <body>\n" (Document tree: qq'<noscript><!--</noscript>--></noscript>')
 #     Line 4 is changed:
 #      - "      \"<!--</noscript>-->\"\n"
@@ -1059,31 +1062,28 @@ Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding 
 Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
 Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
 Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-ok 847
-ok 848
-ok 849
 ok 850
 ok 851
-not ok 852
-# Test 852 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" \"\n" (t/HTML-tree.t at line 98 fail #284)
+ok 852
+ok 853
+ok 854
+not ok 855
+# Test 855 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" \"\n" (t/HTML-tree.t at line 98 fail #285)
 #     Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (Document tree: qq'<!doctype html></html> <head>')
 #     Got 1 extra line at line 5:
 #      + "    \" \"\n"
-not ok 853
-# Test 853 got: "1" (t/HTML-tree.t at line 92 fail #285)
+not ok 856
+# Test 856 got: "1" (t/HTML-tree.t at line 92 fail #286)
 #     Expected: "2"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
  (Parse error: qq'<!doctype html></body><meta>'; 1:28:after body;22: Stray end tag �body�., 28: �meta� element outside �head�.)
-ok 854
-not ok 855
-# Test 855 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <meta>\n" (t/HTML-tree.t at line 98 fail #285)
+ok 857
+not ok 858
+# Test 858 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <meta>\n" (t/HTML-tree.t at line 98 fail #286)
 #     Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <meta>\n  <body>\n" (Document tree: qq'<!doctype html></body><meta>')
 #     Got 1 extra line at line 4:
 #      + "  <body>\n"
 #     Line 6 is missing:
 #      - "  <body>\n"
-ok 856
-ok 857
-ok 858
 ok 859
 ok 860
 ok 861
@@ -1183,17 +1183,17 @@ ok 954
 ok 955
 ok 956
 ok 957
-not ok 958
-# Test 958 got: "3" (t/HTML-tree.t at line 92 fail #320)
-#     Expected: "4" (Parse error: qq'<table><tr><div><td>'; 1:8:no DOCTYPE, 1:17:in table, 1:20:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 16 Unexpected start tag (div) in table context caused voodoo mode., Line: 1 Col: 20 Unexpected implied end tag (div) in the table row phase., Line: 1 Col: 20 Expected closing tag. Unexpected end of file.)
+ok 958
 ok 959
 ok 960
 not ok 961
-# Test 961 got: "7" (t/HTML-tree.t at line 92 fail #321)
-#     Expected: "6" (Parse error: qq'<caption><col><colgroup><tbody><tfoot><thead><tr>'; 1:10:unmatched end tag, 1:15:unmatched end tag, 1:25:unmatched end tag, 1:32:unmatched end tag, 1:39:unmatched end tag, 1:46:unmatched end tag, 1:49:in body:#eof;Line: 1 Col: 9 Unexpected start tag (caption)., Line: 1 Col: 14 Unexpected start tag (col)., Line: 1 Col: 24 Unexpected start tag (colgroup)., Line: 1 Col: 31 Unexpected start tag (tbody)., Line: 1 Col: 38 Unexpected start tag (tfoot)., Line: 1 Col: 45 Unexpected start tag (thead).)
+# Test 961 got: "3" (t/HTML-tree.t at line 92 fail #321)
+#     Expected: "4" (Parse error: qq'<table><tr><div><td>'; 1:8:no DOCTYPE, 1:17:in table, 1:20:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 16 Unexpected start tag (div) in table context caused voodoo mode., Line: 1 Col: 20 Unexpected implied end tag (div) in the table row phase., Line: 1 Col: 20 Expected closing tag. Unexpected end of file.)
 ok 962
 ok 963
-ok 964
+not ok 964
+# Test 964 got: "7" (t/HTML-tree.t at line 92 fail #322)
+#     Expected: "6" (Parse error: qq'<caption><col><colgroup><tbody><tfoot><thead><tr>'; 1:10:unmatched end tag, 1:15:unmatched end tag, 1:25:unmatched end tag, 1:32:unmatched end tag, 1:39:unmatched end tag, 1:46:unmatched end tag, 1:49:in body:#eof;Line: 1 Col: 9 Unexpected start tag (caption)., Line: 1 Col: 14 Unexpected start tag (col)., Line: 1 Col: 24 Unexpected start tag (colgroup)., Line: 1 Col: 31 Unexpected start tag (tbody)., Line: 1 Col: 38 Unexpected start tag (tfoot)., Line: 1 Col: 45 Unexpected start tag (thead).)
 ok 965
 ok 966
 ok 967
@@ -1214,83 +1214,83 @@ ok 981
 ok 982
 ok 983
 ok 984
-not ok 985
-# Test 985 got: "1" (t/HTML-tree.t at line 92 fail #329)
+ok 985
+ok 986
+ok 987
+not ok 988
+# Test 988 got: "1" (t/HTML-tree.t at line 92 fail #330)
 #     Expected: "2"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
  (Parse error: qq'<html></html><!-- foo -->'; 1:7:no DOCTYPE;6: Start tag seen without seeing a doctype first. Expected �<!DOCTYPE html>�., 13: Stray end tag �html�.)
-ok 986
-not ok 987
-# Test 987 got: "<html>\n  <head>\n  <body>\n<!--  foo  -->\n" (t/HTML-tree.t at line 98 fail #329)
+ok 989
+not ok 990
+# Test 990 got: "<html>\n  <head>\n  <body>\n<!--  foo  -->\n" (t/HTML-tree.t at line 98 fail #330)
 #     Expected: "<html>\n  <!--  foo  -->\n  <head>\n  <body>\n" (Document tree: qq'<html></html><!-- foo -->')
 #     Line 2 is missing:
 #      - "  <!--  foo  -->\n"
 #     Got 1 extra line at line 4:
 #      + "<!--  foo  -->\n"
-not ok 988
-# Test 988 got: "1" (t/HTML-tree.t at line 92 fail #330)
+not ok 991
+# Test 991 got: "1" (t/HTML-tree.t at line 92 fail #331)
 #     Expected: "2" (Parse error: qq'<body></body></html>'; 1:20:unmatched end tag;Line: 1 Col: 20 Unexpected html end tag in inner html mode., Line: 1 Col: 20 Unexpected EOF in inner html mode.)
-ok 989
-ok 990
-ok 991
 ok 992
 ok 993
 ok 994
 ok 995
 ok 996
-# t/tree-construction/tests7.dat
 ok 997
 ok 998
-not ok 999
-# Test 999 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <title>\n      \"X\"\n" (t/HTML-tree.t at line 98 fail #333)
-#     Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <title>\n      \"X\"\n  <body>\n" (Document tree: qq'<!doctype html><body><title>X</title>')
-#     Got 1 extra line at line 4:
-#      + "  <body>\n"
-#     Line 7 is missing:
-#      - "  <body>\n"
-not ok 1000
-# Test 1000 got: "1" (t/HTML-tree.t at line 92 fail #334)
-#      Expected: "2" (Parse error: qq'<!doctype html><table><title>X</title></table>'; 1:30:in table;Line: 1 Col: 29 Unexpected start tag (title) in table context caused voodoo mode., Line: 1 Col: 38 Unexpected end tag (title) in table context caused voodoo mode.)
+ok 999
+# t/tree-construction/tests7.dat
+ok 1000
 ok 1001
 not ok 1002
-# Test 1002 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <title>\n      \"X\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #334)
+# Test 1002 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <title>\n      \"X\"\n" (t/HTML-tree.t at line 98 fail #334)
+#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <title>\n      \"X\"\n  <body>\n" (Document tree: qq'<!doctype html><body><title>X</title>')
+#      Got 1 extra line at line 4:
+#       + "  <body>\n"
+#      Line 7 is missing:
+#       - "  <body>\n"
+not ok 1003
+# Test 1003 got: "1" (t/HTML-tree.t at line 92 fail #335)
+#      Expected: "2" (Parse error: qq'<!doctype html><table><title>X</title></table>'; 1:30:in table;Line: 1 Col: 29 Unexpected start tag (title) in table context caused voodoo mode., Line: 1 Col: 38 Unexpected end tag (title) in table context caused voodoo mode.)
+ok 1004
+not ok 1005
+# Test 1005 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <title>\n      \"X\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #335)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <title>\n      \"X\"\n  <body>\n    <table>\n" (Document tree: qq'<!doctype html><table><title>X</title></table>')
 #      Got 1 extra line at line 4:
 #       + "  <body>\n"
 #      Line 7 is missing:
 #       - "  <body>\n"
-ok 1003
-ok 1004
-ok 1005
 ok 1006
 ok 1007
 ok 1008
 ok 1009
 ok 1010
-not ok 1011
-# Test 1011 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <title>\n      \"X\"\n" (t/HTML-tree.t at line 98 fail #337)
+ok 1011
+ok 1012
+ok 1013
+not ok 1014
+# Test 1014 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <title>\n      \"X\"\n" (t/HTML-tree.t at line 98 fail #338)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <title>\n      \"X\"\n  <body>\n" (Document tree: qq'<!doctype html></body><title>X</title>')
 #      Got 1 extra line at line 4:
 #       + "  <body>\n"
 #      Line 7 is missing:
 #       - "  <body>\n"
-ok 1012
-ok 1013
-ok 1014
-not ok 1015
-# Test 1015 got: "2" (t/HTML-tree.t at line 92 fail #339)
-#      Expected: "1" (Parse error: qq'<!doctype html><table> X<meta></table>'; 1:31:in table:#text, 1:31:in table;Line: 1 Col: 24 Unexpected non-space characters in table context caused voodoo mode.)
+ok 1015
 ok 1016
-not ok 1017
-# Test 1017 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" X\"\n    <meta>\n    <table>\n" (t/HTML-tree.t at line 98 fail #339)
+ok 1017
+not ok 1018
+# Test 1018 got: "2" (t/HTML-tree.t at line 92 fail #340)
+#      Expected: "1" (Parse error: qq'<!doctype html><table> X<meta></table>'; 1:31:in table:#text, 1:31:in table;Line: 1 Col: 24 Unexpected non-space characters in table context caused voodoo mode.)
+ok 1019
+not ok 1020
+# Test 1020 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" X\"\n    <meta>\n    <table>\n" (t/HTML-tree.t at line 98 fail #340)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <meta>\n    <table>\n      \" \"\n" (Document tree: qq'<!doctype html><table> X<meta></table>')
 #      Line 5 is changed:
 #       - "    \"X\"\n"
 #       + "    \" X\"\n"
 #      Line 8 is missing:
 #       - "      \" \"\n"
-ok 1018
-ok 1019
-ok 1020
 ok 1021
 ok 1022
 ok 1023
@@ -1299,50 +1299,53 @@ ok 1025
 ok 1026
 ok 1027
 ok 1028
-not ok 1029
-# Test 1029 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" x\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #343)
+ok 1029
+ok 1030
+ok 1031
+not ok 1032
+# Test 1032 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" x\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #344)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"x\"\n    <table>\n      \" \"\n" (Document tree: qq'<!doctype html><table> x</table>')
 #      Line 5 is changed:
 #       - "    \"x\"\n"
 #       + "    \" x\"\n"
 #      Line 7 is missing:
 #       - "      \" \"\n"
-ok 1030
-ok 1031
-not ok 1032
-# Test 1032 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" x \"\n    <table>\n" (t/HTML-tree.t at line 98 fail #344)
+ok 1033
+ok 1034
+not ok 1035
+# Test 1035 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" x \"\n    <table>\n" (t/HTML-tree.t at line 98 fail #345)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"x \"\n    <table>\n      \" \"\n" (Document tree: qq'<!doctype html><table> x </table>')
 #      Line 5 is changed:
 #       - "    \"x \"\n"
 #       + "    \" x \"\n"
 #      Line 7 is missing:
 #       - "      \" \"\n"
-ok 1033
-ok 1034
-not ok 1035
-# Test 1035 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" x\"\n    <table>\n      <tbody>\n        <tr>\n" (t/HTML-tree.t at line 98 fail #345)
+ok 1036
+ok 1037
+not ok 1038
+# Test 1038 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \" x\"\n    <table>\n      <tbody>\n        <tr>\n" (t/HTML-tree.t at line 98 fail #346)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"x\"\n    <table>\n      <tbody>\n        <tr>\n          \" \"\n" (Document tree: qq'<!doctype html><table><tr> x</table>')
 #      Line 5 is changed:
 #       - "    \"x\"\n"
 #       + "    \" x\"\n"
 #      Line 9 is missing:
 #       - "          \" \"\n"
-not ok 1036
-# Test 1036 got: "0" (t/HTML-tree.t at line 92 fail #346)
-#      Expected: "1" (Parse error: qq'<!doctype html><table><style> <tr>x </style> </table>'; ;Line: 1 Col: 44 Unexpected end tag (style) in table context caused voodoo mode.)
-ok 1037
-ok 1038
 not ok 1039
 # Test 1039 got: "0" (t/HTML-tree.t at line 92 fail #347)
-#      Expected: "1" (Parse error: qq'<!doctype html><table><TBODY><script> <tr>x </script> </table>'; ;Line: 1 Col: 53 Unexpected end tag (script) in table context caused voodoo mode.)
+#      Expected: "1" (Parse error: qq'<!doctype html><table><style> <tr>x </style> </table>'; ;Line: 1 Col: 44 Unexpected end tag (style) in table context caused voodoo mode.)
 ok 1040
 ok 1041
 not ok 1042
-# Test 1042 got: "1" (t/HTML-tree.t at line 92 fail #348)
-#      Expected: "2" (Parse error: qq'<!doctype html><table>X<style> <tr>x </style> </table>'; 1:31:in table:#text;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 45 Unexpected end tag (style) in table context caused voodoo mode.)
+# Test 1042 got: "0" (t/HTML-tree.t at line 92 fail #348)
+#      Expected: "1" (Parse error: qq'<!doctype html><table><TBODY><script> <tr>x </script> </table>'; ;Line: 1 Col: 53 Unexpected end tag (script) in table context caused voodoo mode.)
 ok 1043
-not ok 1044
-# Test 1044 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <table>\n      <style>\n        \" <tr>x \"\n      \" \"\n" (t/HTML-tree.t at line 98 fail #348)
+ok 1044
+not ok 1045
+# Test 1045 got: "1" (t/HTML-tree.t at line 92 fail #349)
+#      Expected: "2" (Parse error: qq'<!doctype html><table>X<style> <tr>x </style> </table>'; 1:31:in table:#text;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 45 Unexpected end tag (style) in table context caused voodoo mode.)
+ok 1046
+not ok 1047
+# Test 1047 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <table>\n      <style>\n        \" <tr>x \"\n      \" \"\n" (t/HTML-tree.t at line 98 fail #349)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <style>\n      \" <tr>x \"\n    \" \"\n    <table>\n" (Document tree: qq'<!doctype html><table>X<style> <tr>x </style> </table>')
 #      Lines 6-6 are missing:
 #       - "    <style>\n"
@@ -1352,9 +1355,6 @@ not ok 1044
 #       + "      <style>\n"
 #       + "        \" <tr>x \"\n"
 #       + "      \" \"\n"
-ok 1045
-ok 1046
-ok 1047
 ok 1048
 ok 1049
 ok 1050
@@ -1367,12 +1367,15 @@ ok 1056
 ok 1057
 ok 1058
 ok 1059
-not ok 1060
-# Test 1060 got: "2" (t/HTML-tree.t at line 92 fail #354)
-#      Expected: "1" (Parse error: qq'<!doctype html><table>X<input type=hidDEN></table>'; 1:43:in table:#text, 1:43:in table;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode.)
+ok 1060
 ok 1061
-not ok 1062
-# Test 1062 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <table>\n      <input>\n        type=\"hidDEN\"\n" (t/HTML-tree.t at line 98 fail #354)
+ok 1062
+not ok 1063
+# Test 1063 got: "2" (t/HTML-tree.t at line 92 fail #355)
+#      Expected: "1" (Parse error: qq'<!doctype html><table>X<input type=hidDEN></table>'; 1:43:in table:#text, 1:43:in table;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode.)
+ok 1064
+not ok 1065
+# Test 1065 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <table>\n      <input>\n        type=\"hidDEN\"\n" (t/HTML-tree.t at line 98 fail #355)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"X\"\n    <input>\n      type=\"hidDEN\"\n    <table>\n" (Document tree: qq'<!doctype html><table>X<input type=hidDEN></table>')
 #      Lines 6-6 are missing:
 #       - "    <input>\n"
@@ -1380,18 +1383,18 @@ not ok 1062
 #      Got 2 extra lines at line 7:
 #       + "      <input>\n"
 #       + "        type=\"hidDEN\"\n"
-ok 1063
-ok 1064
-ok 1065
 ok 1066
 ok 1067
 ok 1068
-not ok 1069
-# Test 1069 got: "2" (t/HTML-tree.t at line 92 fail #357)
-#      Expected: "1" (Parse error: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>'; 1:45:in table, 1:64:in table;Line: 1 Col: 44 Unexpected start tag (input) in table context caused voodoo mode.)
+ok 1069
 ok 1070
-not ok 1071
-# Test 1071 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <input>\n      type=\" hidden\"\n    <table>\n      <input>\n        type=\"hidDEN\"\n" (t/HTML-tree.t at line 98 fail #357)
+ok 1071
+not ok 1072
+# Test 1072 got: "2" (t/HTML-tree.t at line 92 fail #358)
+#      Expected: "1" (Parse error: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>'; 1:45:in table, 1:64:in table;Line: 1 Col: 44 Unexpected start tag (input) in table context caused voodoo mode.)
+ok 1073
+not ok 1074
+# Test 1074 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <input>\n      type=\" hidden\"\n    <table>\n      <input>\n        type=\"hidDEN\"\n" (t/HTML-tree.t at line 98 fail #358)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <input>\n      type=\" hidden\"\n    <input>\n      type=\"hidDEN\"\n    <table>\n" (Document tree: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>')
 #      Lines 7-7 are missing:
 #       - "    <input>\n"
@@ -1399,39 +1402,39 @@ not ok 1071
 #      Got 2 extra lines at line 8:
 #       + "      <input>\n"
 #       + "        type=\"hidDEN\"\n"
-ok 1072
-ok 1073
-ok 1074
 ok 1075
 ok 1076
 ok 1077
 ok 1078
 ok 1079
-not ok 1080
-# Test 1080 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #360)
-#      Expected: "<!DOCTYPE hTmL>\n<html>\n  <head>\n  <body>\n" (Document tree: qq'<!DOCTYPE hTmL><html></html>')
-#      Line 1 is changed:
-#       - "<!DOCTYPE hTmL>\n"
-#       + "<!DOCTYPE html>\n"
+ok 1080
 ok 1081
 ok 1082
 not ok 1083
 # Test 1083 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #361)
+#      Expected: "<!DOCTYPE hTmL>\n<html>\n  <head>\n  <body>\n" (Document tree: qq'<!DOCTYPE hTmL><html></html>')
+#      Line 1 is changed:
+#       - "<!DOCTYPE hTmL>\n"
+#       + "<!DOCTYPE html>\n"
+ok 1084
+ok 1085
+not ok 1086
+# Test 1086 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n" (t/HTML-tree.t at line 98 fail #362)
 #      Expected: "<!DOCTYPE HTML>\n<html>\n  <head>\n  <body>\n" (Document tree: qq'<!DOCTYPE HTML><html></html>')
 #      Line 1 is changed:
 #       - "<!DOCTYPE HTML>\n"
 #       + "<!DOCTYPE html>\n"
-not ok 1084
-# Test 1084 got: "1" (t/HTML-tree.t at line 92 fail #362)
-#      Expected: "2" (Parse error: qq'<body>X</body></body>'; 1:21:after body:/;Line: 1 Col: 21 Unexpected end tag token (body) in the after body phase., Line: 1 Col: 21 Unexpected EOF in inner html mode.)
-ok 1085
-ok 1086
 not ok 1087
-# Test 1087 got: "3" (t/HTML-tree.t at line 92 fail #363)
-#      Expected: "2" (Parse error: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>'; 1:31:in table, 1:38:in table:#text, 1:38:in table:/;Line: 1 Col: 30 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 37 Unexpected end tag (a) in table context caused voodoo mode.)
+# Test 1087 got: "1" (t/HTML-tree.t at line 92 fail #363)
+#      Expected: "2" (Parse error: qq'<body>X</body></body>'; 1:21:after body:/;Line: 1 Col: 21 Unexpected end tag token (body) in the after body phase., Line: 1 Col: 21 Unexpected EOF in inner html mode.)
 ok 1088
-not ok 1089
-# Test 1089 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <div>\n      <a>\n        \"foo\"\n      <table>\n        \" \"\n        <tbody>\n          <tr>\n            <td>\n              \"bar\"\n            \" \"\n" (t/HTML-tree.t at line 98 fail #363)
+ok 1089
+not ok 1090
+# Test 1090 got: "3" (t/HTML-tree.t at line 92 fail #364)
+#      Expected: "2" (Parse error: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>'; 1:31:in table, 1:38:in table:#text, 1:38:in table:/;Line: 1 Col: 30 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 37 Unexpected end tag (a) in table context caused voodoo mode.)
+ok 1091
+not ok 1092
+# Test 1092 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <div>\n      <a>\n        \"foo\"\n      <table>\n        \" \"\n        <tbody>\n          <tr>\n            <td>\n              \"bar\"\n            \" \"\n" (t/HTML-tree.t at line 98 fail #364)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <div>\n      <a>\n        \"foo\"\n      \"  \"\n      <table>\n        <tbody>\n          <tr>\n            <td>\n              \"bar\"\n" (Document tree: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>')
 #      Line 8 is missing:
 #       - "      \"  \"\n"
@@ -1439,13 +1442,10 @@ not ok 1089
 #       + "        \" \"\n"
 #      Got 1 extra line at line 14:
 #       + "            \" \"\n"
-ok 1090
-ok 1091
-ok 1092
-# t/tree-construction/tests8.dat
 ok 1093
 ok 1094
 ok 1095
+# t/tree-construction/tests8.dat
 ok 1096
 ok 1097
 ok 1098
@@ -1455,34 +1455,34 @@ ok 1101
 ok 1102
 ok 1103
 ok 1104
-not ok 1105
-# Test 1105 got: "10" (t/HTML-tree.t at line 92 fail #369)
-#      Expected: "6" (Parse error: qq'<table><div>x<div></div>x</span>x'; 1:8:no DOCTYPE, 1:13:in table, 1:19:in table:#text, 1:19:in table, 1:25:in table:/, 1:33:in table:#text, 1:33:in table:/, 1:33:unmatched end tag, 1:33:in table:#text, 1:33:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 12 Unexpected start tag (div) in table context caused voodoo mode., Line: 1 Col: 24 Unexpected end tag (div) in table context caused voodoo mode., Line: 1 Col: 32 Unexpected end tag (span) in table context caused voodoo mode., Line: 1 Col: 32 Unexpected end tag (span). Ignored., Line: 1 Col: 33 Expected closing tag. Unexpected end of file.)
+ok 1105
 ok 1106
 ok 1107
-ok 1108
+not ok 1108
+# Test 1108 got: "10" (t/HTML-tree.t at line 92 fail #370)
+#      Expected: "6" (Parse error: qq'<table><div>x<div></div>x</span>x'; 1:8:no DOCTYPE, 1:13:in table, 1:19:in table:#text, 1:19:in table, 1:25:in table:/, 1:33:in table:#text, 1:33:in table:/, 1:33:unmatched end tag, 1:33:in table:#text, 1:33:in body:#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 12 Unexpected start tag (div) in table context caused voodoo mode., Line: 1 Col: 24 Unexpected end tag (div) in table context caused voodoo mode., Line: 1 Col: 32 Unexpected end tag (span) in table context caused voodoo mode., Line: 1 Col: 32 Unexpected end tag (span). Ignored., Line: 1 Col: 33 Expected closing tag. Unexpected end of file.)
 ok 1109
-not ok 1110
-# Test 1110 got: "<html>\n  <head>\n  <body>\n    \"x\"\n    \"x\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #370)
+ok 1110
+ok 1111
+ok 1112
+not ok 1113
+# Test 1113 got: "<html>\n  <head>\n  <body>\n    \"x\"\n    \"x\"\n    <table>\n" (t/HTML-tree.t at line 98 fail #371)
 #      Expected: "<html>\n  <head>\n  <body>\n    \"xx\"\n    <table>\n" (Document tree: qq'x<table>x')
 #      Line 4 is changed:
 #       - "    \"xx\"\n"
 #       + "    \"x\"\n"
 #      Got 1 extra line at line 5:
 #       + "    \"x\"\n"
-ok 1111
-ok 1112
-ok 1113
 ok 1114
 ok 1115
 ok 1116
 ok 1117
 ok 1118
 ok 1119
-# t/tree-construction/tests9.dat
 ok 1120
 ok 1121
 ok 1122
+# t/tree-construction/tests9.dat
 ok 1123
 ok 1124
 ok 1125
@@ -1522,13 +1522,13 @@ ok 1158
 ok 1159
 ok 1160
 ok 1161
-not ok 1162
-# Test 1162 got: "6" (t/HTML-tree.t at line 92 fail #388)
-#      Expected: "5"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; 1:45:in table, 1:57:in table:/, 1:69:in table:/, 1:72:not closed, 1:72:in table, 1:83:in table:#text;44: Start tag “math” seen in “table”., 56: Stray end tag “mi”., 68: Stray end tag “mi”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.)
+ok 1162
 ok 1163
 ok 1164
-ok 1165
+not ok 1165
+# Test 1165 got: "6" (t/HTML-tree.t at line 92 fail #389)
+#      Expected: "5"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
+ (Parse error: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; 1:45:in table, 1:57:in table:/, 1:69:in table:/, 1:72:not closed, 1:72:in table, 1:83:in table:#text;44: Start tag “math” seen in “table”., 56: Stray end tag “mi”., 68: Stray end tag “mi”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.)
 ok 1166
 ok 1167
 ok 1168
@@ -1558,10 +1558,10 @@ ok 1191
 ok 1192
 ok 1193
 ok 1194
-# t/tree-construction/tests10.dat
 ok 1195
 ok 1196
 ok 1197
+# t/tree-construction/tests10.dat
 ok 1198
 ok 1199
 ok 1200
@@ -1601,13 +1601,13 @@ ok 1233
 ok 1234
 ok 1235
 ok 1236
-not ok 1237
-# Test 1237 got: "6" (t/HTML-tree.t at line 92 fail #413)
-#      Expected: "5"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
- (Parse error: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; 1:44:in table, 1:54:in table:/, 1:64:in table:/, 1:67:not closed, 1:67:in table, 1:78:in table:#text;44: Start tag “svg” seen in “table”., 56: Stray end tag “g”., 68: Stray end tag “g”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.)
+ok 1237
 ok 1238
 ok 1239
-ok 1240
+not ok 1240
+# Test 1240 got: "6" (t/HTML-tree.t at line 92 fail #414)
+#      Expected: "5"Wide character in print at /usr/local/lib/perl5/5.10.0/Test.pm line 457.
+ (Parse error: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; 1:44:in table, 1:54:in table:/, 1:64:in table:/, 1:67:not closed, 1:67:in table, 1:78:in table:#text;44: Start tag “svg” seen in “table”., 56: Stray end tag “g”., 68: Stray end tag “g”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.)
 ok 1241
 ok 1242
 ok 1243
@@ -1637,10 +1637,10 @@ ok 1266
 ok 1267
 ok 1268
 ok 1269
-# t/tree-construction/tests11.dat
 ok 1270
 ok 1271
 ok 1272
+# t/tree-construction/tests11.dat
 ok 1273
 ok 1274
 ok 1275
@@ -1665,17 +1665,17 @@ ok 1293
 ok 1294
 ok 1295
 ok 1296
-# t/tree-construction/tests12.dat
 ok 1297
 ok 1298
 ok 1299
+# t/tree-construction/tests12.dat
 ok 1300
 ok 1301
 ok 1302
-# t/tree-test-1.dat
 ok 1303
 ok 1304
 ok 1305
+# t/tree-test-1.dat
 ok 1306
 ok 1307
 ok 1308
@@ -1939,25 +1939,25 @@ ok 1565
 ok 1566
 ok 1567
 ok 1568
-not ok 1569
-# Test 1569 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <link>\n    \"x\"\n" (t/HTML-tree.t at line 98 fail #523)
+ok 1569
+ok 1570
+ok 1571
+not ok 1572
+# Test 1572 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <link>\n    \"x\"\n" (t/HTML-tree.t at line 98 fail #524)
 #      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <link>\n  <body>\n    \"x\"\n" (Document tree: qq'<!DOCTYPE HTML><head></body><link>x')
 #      Got 1 extra line at line 4:
 #       + "  <body>\n"
 #      Line 6 is missing:
 #       - "  <body>\n"
-ok 1570
-ok 1571
-not ok 1572
-# Test 1572 got: "<html>\n  <head>\n  <body>\n    <link>\n" (t/HTML-tree.t at line 98 fail #524)
+ok 1573
+ok 1574
+not ok 1575
+# Test 1575 got: "<html>\n  <head>\n  <body>\n    <link>\n" (t/HTML-tree.t at line 98 fail #525)
 #      Expected: "<html>\n  <head>\n    <link>\n  <body>\n" (Document tree: qq'<head></html><link>')
 #      Got 1 extra line at line 3:
 #       + "  <body>\n"
 #      Line 5 is missing:
 #       - "  <body>\n"
-ok 1573
-ok 1574
-ok 1575
 ok 1576
 ok 1577
 ok 1578
@@ -2180,12 +2180,12 @@ ok 1794
 ok 1795
 ok 1796
 ok 1797
-not ok 1798
-# Test 1798 got: "4" (t/HTML-tree.t at line 92 fail #600)
-#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table><tr><td></td>x<table>  </table></table>'; 1:44:in table:#text, 1:44:not closed, 1:44:not closed, 1:61:unmatched end tag;char in <tr>, no </table> before <table>, unmatched </table>)
+ok 1798
 ok 1799
 ok 1800
-ok 1801
+not ok 1801
+# Test 1801 got: "4" (t/HTML-tree.t at line 92 fail #601)
+#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML><table><tr><td></td>x<table>  </table></table>'; 1:44:in table:#text, 1:44:not closed, 1:44:not closed, 1:61:unmatched end tag;char in <tr>, no </table> before <table>, unmatched </table>)
 ok 1802
 ok 1803
 ok 1804
@@ -2686,17 +2686,17 @@ ok 2298
 ok 2299
 ok 2300
 ok 2301
-not ok 2302
-# Test 2302 got: "1" (t/HTML-tree.t at line 92 fail #768)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<option>b'; 1:25:in body:#eof;)
+ok 2302
 ok 2303
 ok 2304
 not ok 2305
 # Test 2305 got: "1" (t/HTML-tree.t at line 92 fail #769)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<optgroup>b'; 1:27:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<option>b'; 1:25:in body:#eof;)
 ok 2306
 ok 2307
-ok 2308
+not ok 2308
+# Test 2308 got: "1" (t/HTML-tree.t at line 92 fail #770)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>a<optgroup>b'; 1:27:in body:#eof;)
 ok 2309
 ok 2310
 ok 2311
@@ -2819,27 +2819,27 @@ ok 2427
 ok 2428
 ok 2429
 ok 2430
-not ok 2431
-# Test 2431 got: "3" (t/HTML-tree.t at line 92 fail #811)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><thead><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
+ok 2431
 ok 2432
 ok 2433
 not ok 2434
 # Test 2434 got: "3" (t/HTML-tree.t at line 92 fail #812)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tbody><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><thead><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
 ok 2435
 ok 2436
 not ok 2437
 # Test 2437 got: "3" (t/HTML-tree.t at line 92 fail #813)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tfoot><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tbody><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
 ok 2438
 ok 2439
 not ok 2440
 # Test 2440 got: "3" (t/HTML-tree.t at line 92 fail #814)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tr><table b>'; 1:37:not closed, 1:37:not closed, 1:37:in body:#eof;<table> in table row, unexpected end of file)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tfoot><table b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:#eof;<table> in table row group, unexpected end of file)
 ok 2441
 ok 2442
-ok 2443
+not ok 2443
+# Test 2443 got: "3" (t/HTML-tree.t at line 92 fail #815)
+#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML><table a><tr><table b>'; 1:37:not closed, 1:37:not closed, 1:37:in body:#eof;<table> in table row, unexpected end of file)
 ok 2444
 ok 2445
 ok 2446
@@ -2890,12 +2890,12 @@ ok 2490
 ok 2491
 ok 2492
 ok 2493
-not ok 2494
-# Test 2494 got: "3" (t/HTML-tree.t at line 92 fail #832)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table><tr><form><td></td></form></table>'; 1:33:in table, 1:49:in table:/, 1:49:unmatched end tag;<form> in table, form not closed, </form> in table, ubmatched </form>)
+ok 2494
 ok 2495
 ok 2496
-ok 2497
+not ok 2497
+# Test 2497 got: "3" (t/HTML-tree.t at line 92 fail #833)
+#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table><tr><form><td></td></form></table>'; 1:33:in table, 1:49:in table:/, 1:49:unmatched end tag;<form> in table, form not closed, </form> in table, ubmatched </form>)
 ok 2498
 ok 2499
 ok 2500
@@ -2925,12 +2925,12 @@ ok 2523
 ok 2524
 ok 2525
 ok 2526
-not ok 2527
-# Test 2527 got: "4" (t/HTML-tree.t at line 92 fail #843)
-#      Expected: "3" (Parse error: qq'<table a><tr><table b>'; 1:10:no DOCTYPE, 1:22:not closed, 1:22:not closed, 1:22:in body:#eof;1,10,no DOCTYPE, 1,22,not closed:tr, 1,22,not closed:table)
+ok 2527
 ok 2528
 ok 2529
-ok 2530
+not ok 2530
+# Test 2530 got: "4" (t/HTML-tree.t at line 92 fail #844)
+#      Expected: "3" (Parse error: qq'<table a><tr><table b>'; 1:10:no DOCTYPE, 1:22:not closed, 1:22:not closed, 1:22:in body:#eof;1,10,no DOCTYPE, 1,22,not closed:tr, 1,22,not closed:table)
 ok 2531
 ok 2532
 ok 2533
@@ -3314,43 +3314,43 @@ ok 2910
 ok 2911
 ok 2912
 ok 2913
-not ok 2914
-# Test 2914 got: "1" (t/HTML-tree.t at line 92 fail #972)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; 1:42:not closed;)
+ok 2914
 ok 2915
 ok 2916
-ok 2917
+not ok 2917
+# Test 2917 got: "1" (t/HTML-tree.t at line 92 fail #973)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; 1:42:not closed;)
 ok 2918
 ok 2919
 ok 2920
 ok 2921
 ok 2922
-not ok 2923
-# Test 2923 got: "1" (t/HTML-tree.t at line 92 fail #975)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'; 1:33:not closed;)
+ok 2923
 ok 2924
 ok 2925
 not ok 2926
-# Test 2926 got: "3" (t/HTML-tree.t at line 92 fail #976)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:33:not closed, 1:43:not closed, 1:53:not closed;)
+# Test 2926 got: "1" (t/HTML-tree.t at line 92 fail #976)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'; 1:33:not closed;)
 ok 2927
 ok 2928
 not ok 2929
 # Test 2929 got: "3" (t/HTML-tree.t at line 92 fail #977)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:42:not closed, 1:52:not closed, 1:62:not closed;)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:33:not closed, 1:43:not closed, 1:53:not closed;)
 ok 2930
 ok 2931
 not ok 2932
-# Test 2932 got: "8" (t/HTML-tree.t at line 92 fail #978)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed, 1:68:not closed, 1:78:not closed, 1:84:unmatched end tag, 1:93:not closed, 1:99:not closed, 1:109:not closed, 1:115:unmatched end tag;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>)
+# Test 2932 got: "3" (t/HTML-tree.t at line 92 fail #978)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:42:not closed, 1:52:not closed, 1:62:not closed;)
 ok 2933
 ok 2934
 not ok 2935
-# Test 2935 got: "4" (t/HTML-tree.t at line 92 fail #979)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; 4:0:not closed, 5:0:not closed, 6:0:not closed, 7:0:not closed;)
+# Test 2935 got: "8" (t/HTML-tree.t at line 92 fail #979)
+#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed, 1:68:not closed, 1:78:not closed, 1:84:unmatched end tag, 1:93:not closed, 1:99:not closed, 1:109:not closed, 1:115:unmatched end tag;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>)
 ok 2936
 ok 2937
-ok 2938
+not ok 2938
+# Test 2938 got: "4" (t/HTML-tree.t at line 92 fail #980)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; 4:0:not closed, 5:0:not closed, 6:0:not closed, 7:0:not closed;)
 ok 2939
 ok 2940
 ok 2941
@@ -4331,12 +4331,12 @@ ok 3915
 ok 3916
 ok 3917
 ok 3918
-not ok 3919
-# Test 3919 got: "2" (t/HTML-tree.t at line 92 fail #1307)
-#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML>a<table><tbody>b<style></style>c</table>'; 1:39:in table:#text, 1:55:in table:#text;text in table, start tag in table, text in table)
+ok 3919
 ok 3920
 ok 3921
-ok 3922
+not ok 3922
+# Test 3922 got: "2" (t/HTML-tree.t at line 92 fail #1308)
+#      Expected: "3" (Parse error: qq'<!DOCTYPE HTML>a<table><tbody>b<style></style>c</table>'; 1:39:in table:#text, 1:55:in table:#text;text in table, start tag in table, text in table)
 ok 3923
 ok 3924
 ok 3925
@@ -4351,17 +4351,17 @@ ok 3933
 ok 3934
 ok 3935
 ok 3936
-not ok 3937
-# Test 3937 got: "3" (t/HTML-tree.t at line 92 fail #1313)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML>a<table>b<xmp>c&lt;<p></xmp>d</table>'; 1:30:in table:#text, 1:30:in table, 1:52:in table:#text;text in table, <xmp> in table, text in table, text "d" in table)
+ok 3937
 ok 3938
 ok 3939
 not ok 3940
 # Test 3940 got: "3" (t/HTML-tree.t at line 92 fail #1314)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML>a<table>b<title>c&lt;<p></title>d</table>'; 1:32:in table:#text, 1:32:in table, 1:56:in table:#text;text "b" in table, <title> in table, text "c<<p>" in table, text "d" in table)
+#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML>a<table>b<xmp>c&lt;<p></xmp>d</table>'; 1:30:in table:#text, 1:30:in table, 1:52:in table:#text;text in table, <xmp> in table, text in table, text "d" in table)
 ok 3941
 ok 3942
-ok 3943
+not ok 3943
+# Test 3943 got: "3" (t/HTML-tree.t at line 92 fail #1315)
+#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML>a<table>b<title>c&lt;<p></title>d</table>'; 1:32:in table:#text, 1:32:in table, 1:56:in table:#text;text "b" in table, <title> in table, text "c<<p>" in table, text "d" in table)
 ok 3944
 ok 3945
 ok 3946
@@ -4427,10 +4427,10 @@ ok 4005
 ok 4006
 ok 4007
 ok 4008
-# t/tree-test-2.dat
 ok 4009
 ok 4010
 ok 4011
+# t/tree-test-2.dat
 ok 4012
 ok 4013
 ok 4014
@@ -4536,12 +4536,12 @@ ok 4113
 ok 4114
 ok 4115
 ok 4116
-not ok 4117
-# Test 4117 got: "3" (t/HTML-tree.t at line 92 fail #1373)
-#      Expected: "2" (Parse error: qq'<table><tr>'; 1:8:not closed, 1:8:unmatched end tag, 1:11:in body:#eof;no </table> before <table>, </table> but no opening <table>)
+ok 4117
 ok 4118
 ok 4119
-ok 4120
+not ok 4120
+# Test 4120 got: "3" (t/HTML-tree.t at line 92 fail #1374)
+#      Expected: "2" (Parse error: qq'<table><tr>'; 1:8:not closed, 1:8:unmatched end tag, 1:11:in body:#eof;no </table> before <table>, </table> but no opening <table>)
 ok 4121
 ok 4122
 ok 4123
@@ -4550,36 +4550,36 @@ ok 4125
 ok 4126
 ok 4127
 ok 4128
-not ok 4129
-# Test 4129 got: "2" (t/HTML-tree.t at line 92 fail #1377)
-#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag, 1:17:in body:#eof;</select> in <select>.innerHTML)
+ok 4129
 ok 4130
 ok 4131
-ok 4132
+not ok 4132
+# Test 4132 got: "2" (t/HTML-tree.t at line 92 fail #1378)
+#      Expected: "1" (Parse error: qq'</select><option>'; 1:10:unmatched end tag, 1:17:in body:#eof;</select> in <select>.innerHTML)
 ok 4133
 ok 4134
-not ok 4135
-# Test 4135 got: "3" (t/HTML-tree.t at line 92 fail #1379)
-#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:select in select, 1:9:unmatched end tag, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
+ok 4135
 ok 4136
 ok 4137
-ok 4138
+not ok 4138
+# Test 4138 got: "3" (t/HTML-tree.t at line 92 fail #1380)
+#      Expected: "2" (Parse error: qq'<select><option>'; 1:9:select in select, 1:9:unmatched end tag, 1:16:in body:#eof;<select> in <select> - treated as if </select>, </select> in <select>.innerHTML)
 ok 4139
 ok 4140
-not ok 4141
-# Test 4141 got: "2" (t/HTML-tree.t at line 92 fail #1381)
-#      Expected: "1" (Parse error: qq'</optgroup><option>'; 1:12:unmatched end tag, 1:19:in body:#eof;unmatched </optgroup>)
+ok 4141
 ok 4142
 ok 4143
-ok 4144
+not ok 4144
+# Test 4144 got: "2" (t/HTML-tree.t at line 92 fail #1382)
+#      Expected: "1" (Parse error: qq'</optgroup><option>'; 1:12:unmatched end tag, 1:19:in body:#eof;unmatched </optgroup>)
 ok 4145
 ok 4146
-not ok 4147
-# Test 4147 got: "2" (t/HTML-tree.t at line 92 fail #1383)
-#      Expected: "1" (Parse error: qq'</optgroup><option>'; 1:12:unmatched end tag, 1:19:in body:#eof;unmatched </optgroup>)
+ok 4147
 ok 4148
 ok 4149
-ok 4150
+not ok 4150
+# Test 4150 got: "2" (t/HTML-tree.t at line 92 fail #1384)
+#      Expected: "1" (Parse error: qq'</optgroup><option>'; 1:12:unmatched end tag, 1:19:in body:#eof;unmatched </optgroup>)
 ok 4151
 ok 4152
 ok 4153
@@ -4606,22 +4606,22 @@ ok 4173
 ok 4174
 ok 4175
 ok 4176
-not ok 4177
-# Test 4177 got: "1" (t/HTML-tree.t at line 92 fail #1393)
-#      Expected: "0" (Parse error: qq'<option>'; 1:8:in body:#eof;)
+ok 4177
 ok 4178
 ok 4179
 not ok 4180
 # Test 4180 got: "1" (t/HTML-tree.t at line 92 fail #1394)
-#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<option>'; 1:8:in body:#eof;)
 ok 4181
 ok 4182
 not ok 4183
-# Test 4183 got: "2" (t/HTML-tree.t at line 92 fail #1395)
-#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/, 1:14:in body:#eof;</tr> in <select>)
+# Test 4183 got: "1" (t/HTML-tree.t at line 92 fail #1395)
+#      Expected: "0" (Parse error: qq'<optgroup>'; 1:10:in body:#eof;)
 ok 4184
 ok 4185
-ok 4186
+not ok 4186
+# Test 4186 got: "2" (t/HTML-tree.t at line 92 fail #1396)
+#      Expected: "1" (Parse error: qq'</tr><option>a'; 1:6:in select:/, 1:14:in body:#eof;</tr> in <select>)
 ok 4187
 ok 4188
 ok 4189
@@ -4717,12 +4717,12 @@ ok 4278
 ok 4279
 ok 4280
 ok 4281
-not ok 4282
-# Test 4282 got: "1" (t/HTML-tree.t at line 92 fail #1428)
-#      Expected: "0" (Parse error: qq'a\x{12345678}b'; 1:1:non unicode;)
+ok 4282
 ok 4283
 ok 4284
-ok 4285
+not ok 4285
+# Test 4285 got: "1" (t/HTML-tree.t at line 92 fail #1429)
+#      Expected: "0" (Parse error: qq'a\x{12345678}b'; 1:1:non unicode;)
 ok 4286
 ok 4287
 ok 4288
@@ -4788,24 +4788,22 @@ ok 4347
 ok 4348
 ok 4349
 ok 4350
-not ok 4351
-# Test 4351 got: "1" (t/HTML-tree.t at line 92 fail #1451)
-#      Expected: "0" (Parse error: qq'<thead>'; 1:7:in body:#eof;)
+ok 4351
 ok 4352
 ok 4353
 not ok 4354
 # Test 4354 got: "1" (t/HTML-tree.t at line 92 fail #1452)
-#      Expected: "0" (Parse error: qq'<tbody>'; 1:7:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<thead>'; 1:7:in body:#eof;)
 ok 4355
 ok 4356
 not ok 4357
 # Test 4357 got: "1" (t/HTML-tree.t at line 92 fail #1453)
-#      Expected: "0" (Parse error: qq'<tfoot>'; 1:7:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<tbody>'; 1:7:in body:#eof;)
 ok 4358
 ok 4359
 not ok 4360
 # Test 4360 got: "1" (t/HTML-tree.t at line 92 fail #1454)
-#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
+#      Expected: "0" (Parse error: qq'<tfoot>'; 1:7:in body:#eof;)
 ok 4361
 ok 4362
 not ok 4363
@@ -4813,7 +4811,9 @@ not ok 4363
 #      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
 ok 4364
 ok 4365
-ok 4366
+not ok 4366
+# Test 4366 got: "1" (t/HTML-tree.t at line 92 fail #1456)
+#      Expected: "0" (Parse error: qq'<tr>'; 1:4:in body:#eof;)
 ok 4367
 ok 4368
 ok 4369
@@ -4843,10 +4843,10 @@ ok 4392
 ok 4393
 ok 4394
 ok 4395
-# t/tree-test-3.dat
 ok 4396
 ok 4397
 ok 4398
+# t/tree-test-3.dat
 ok 4399
 ok 4400
 ok 4401
@@ -4856,10 +4856,10 @@ ok 4404
 ok 4405
 ok 4406
 ok 4407
-# t/tree-test-void.dat
 ok 4408
 ok 4409
 ok 4410
+# t/tree-test-void.dat
 ok 4411
 ok 4412
 ok 4413
@@ -5019,10 +5019,10 @@ ok 4566
 ok 4567
 ok 4568
 ok 4569
-# t/tree-test-flow.dat
 ok 4570
 ok 4571
 ok 4572
+# t/tree-test-flow.dat
 ok 4573
 ok 4574
 ok 4575
@@ -5239,10 +5239,10 @@ ok 4785
 ok 4786
 ok 4787
 ok 4788
-# t/tree-test-phrasing.dat
 ok 4789
 ok 4790
 ok 4791
+# t/tree-test-phrasing.dat
 ok 4792
 ok 4793
 ok 4794
@@ -5258,53 +5258,53 @@ ok 4803
 ok 4804
 ok 4805
 ok 4806
-# t/tree-test-form.dat
-not ok 4807
-# Test 4807 got: "2" (t/HTML-tree.t at line 92 fail #1603)
-#      Expected: "1" (Parse error: qq'<option>x'; 1:9:no DOCTYPE, 1:9:in body:#eof;no DOCTYPE)
+ok 4807
 ok 4808
 ok 4809
+# t/tree-test-form.dat
 not ok 4810
 # Test 4810 got: "2" (t/HTML-tree.t at line 92 fail #1604)
-#      Expected: "1" (Parse error: qq'<option></option>x'; 1:9:no DOCTYPE, 1:18:not closed;no DOCTYPE)
+#      Expected: "1" (Parse error: qq'<option>x'; 1:9:no DOCTYPE, 1:9:in body:#eof;no DOCTYPE)
 ok 4811
 ok 4812
 not ok 4813
 # Test 4813 got: "2" (t/HTML-tree.t at line 92 fail #1605)
-#      Expected: "1" (Parse error: qq'<optgroup>x'; 1:11:no DOCTYPE, 1:11:in body:#eof;no DOCTYPE)
+#      Expected: "1" (Parse error: qq'<option></option>x'; 1:9:no DOCTYPE, 1:18:not closed;no DOCTYPE)
 ok 4814
 ok 4815
 not ok 4816
 # Test 4816 got: "2" (t/HTML-tree.t at line 92 fail #1606)
-#      Expected: "1" (Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE, 1:22:not closed;no DOCTYPE)
+#      Expected: "1" (Parse error: qq'<optgroup>x'; 1:11:no DOCTYPE, 1:11:in body:#eof;no DOCTYPE)
 ok 4817
 ok 4818
 not ok 4819
 # Test 4819 got: "2" (t/HTML-tree.t at line 92 fail #1607)
-#      Expected: "1" (Parse error: qq'<optgroup><option>x'; 1:11:no DOCTYPE, 1:19:in body:#eof;no DOCTYPE)
+#      Expected: "1" (Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE, 1:22:not closed;no DOCTYPE)
 ok 4820
 ok 4821
 not ok 4822
 # Test 4822 got: "2" (t/HTML-tree.t at line 92 fail #1608)
-#      Expected: "1" (Parse error: qq'<optgroup><optgroup>'; 1:11:no DOCTYPE, 1:20:in body:#eof;no DOCTYPE)
+#      Expected: "1" (Parse error: qq'<optgroup><option>x'; 1:11:no DOCTYPE, 1:19:in body:#eof;no DOCTYPE)
 ok 4823
 ok 4824
 not ok 4825
-# Test 4825 got: "3" (t/HTML-tree.t at line 92 fail #1609)
-#      Expected: "1" (Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:not closed, 1:16:in body:#eof;no DOCTYPE)
+# Test 4825 got: "2" (t/HTML-tree.t at line 92 fail #1609)
+#      Expected: "1" (Parse error: qq'<optgroup><optgroup>'; 1:11:no DOCTYPE, 1:20:in body:#eof;no DOCTYPE)
 ok 4826
 ok 4827
 not ok 4828
 # Test 4828 got: "3" (t/HTML-tree.t at line 92 fail #1610)
-#      Expected: "1" (Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:not closed, 1:18:in body:#eof;no DOCTYPE)
+#      Expected: "1" (Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:not closed, 1:16:in body:#eof;no DOCTYPE)
 ok 4829
 ok 4830
 not ok 4831
 # Test 4831 got: "3" (t/HTML-tree.t at line 92 fail #1611)
-#      Expected: "2" (Parse error: qq'<option><span><optgroup>'; 1:9:no DOCTYPE, 1:24:not closed, 1:24:in body:#eof;no DOCTYPE, no </span>)
+#      Expected: "1" (Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:not closed, 1:18:in body:#eof;no DOCTYPE)
 ok 4832
 ok 4833
-ok 4834
+not ok 4834
+# Test 4834 got: "3" (t/HTML-tree.t at line 92 fail #1612)
+#      Expected: "2" (Parse error: qq'<option><span><optgroup>'; 1:9:no DOCTYPE, 1:24:not closed, 1:24:in body:#eof;no DOCTYPE, no </span>)
 ok 4835
 ok 4836
 ok 4837
@@ -5358,16 +5358,19 @@ ok 4884
 ok 4885
 ok 4886
 ok 4887
-# t/tree-test-foreign.dat
 ok 4888
 ok 4889
 ok 4890
-ok 4891
+# t/tree-test-frames.dat
+not ok 4891
+# Test 4891 got: "2" (t/HTML-tree.t at line 92 fail #1631)
+#      Expected: "1" (Parse error: qq'<body>a<frameset>b'; 1:7:no DOCTYPE, 1:18:in body;<frameset> in body)
 ok 4892
 ok 4893
 ok 4894
 ok 4895
 ok 4896
+# t/tree-test-foreign.dat
 ok 4897
 ok 4898
 ok 4899
@@ -5539,23 +5542,23 @@ ok 5064
 ok 5065
 ok 5066
 ok 5067
-not ok 5068
-# Test 5068 got: "4" (t/HTML-tree.t at line 92 fail #1690)
-#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 5068
 ok 5069
 ok 5070
-not ok 5071
-# Test 5071 got: "4" (t/HTML-tree.t at line 92 fail #1691)
-#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 5071
 ok 5072
 ok 5073
 ok 5074
 ok 5075
 ok 5076
-ok 5077
+not ok 5077
+# Test 5077 got: "4" (t/HTML-tree.t at line 92 fail #1693)
+#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5078
 ok 5079
-ok 5080
+not ok 5080
+# Test 5080 got: "4" (t/HTML-tree.t at line 92 fail #1694)
+#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5081
 ok 5082
 ok 5083
@@ -5687,9 +5690,7 @@ ok 5208
 ok 5209
 ok 5210
 ok 5211
-not ok 5212
-# Test 5212 got: "2" (t/HTML-tree.t at line 92 fail #1738)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
+ok 5212
 ok 5213
 ok 5214
 ok 5215
@@ -5698,11 +5699,22 @@ ok 5217
 ok 5218
 ok 5219
 ok 5220
-ok 5221
+not ok 5221
+# Test 5221 got: "2" (t/HTML-tree.t at line 92 fail #1741)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
 ok 5222
 ok 5223
-not ok 5224
-# Test 5224 got: "2" (t/HTML-tree.t at line 92 fail #1742)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5224
 ok 5225
 ok 5226
+ok 5227
+ok 5228
+ok 5229
+ok 5230
+ok 5231
+ok 5232
+not ok 5233
+# Test 5233 got: "2" (t/HTML-tree.t at line 92 fail #1745)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5234
+ok 5235

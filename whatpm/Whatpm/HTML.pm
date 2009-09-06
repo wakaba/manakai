@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.235 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.236 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -869,6 +869,8 @@ sub _initialize_tree_constructor ($) {
   $self->{document}->manakai_is_html (1); # MUST
   $self->{document}->set_user_data (manakai_source_line => 1);
   $self->{document}->set_user_data (manakai_source_column => 1);
+
+  $self->{frameset_ok} = 1;
 } # _initialize_tree_constructor
 
 sub _terminate_tree_constructor ($) {
@@ -5025,6 +5027,62 @@ sub _tree_construction_main ($) {
         
         $token = $self->_get_next_token;
         next B;
+      } elsif ($token->{tag_nane} eq 'frameset') {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body', text => $token->{tag_name},
+                        token => $token);
+
+        if (@{$self->{open_elements}} == 1 or
+            not ($self->{open_elements}->[1]->[1] != BODY_EL)) {
+          
+          ## Ignore the token.
+        } elsif (not $self->{frameset_ok}) {
+          
+          ## Ignore the token.
+        } else {
+          
+          
+          ## 1. Remove the second element.
+          my $body = $self->{open_elements}->[1]->[0];
+          my $body_parent = $body->parent_node;
+          $body_parent->remove_child ($body) if $body_parent;
+
+          ## 2. Pop nodes.
+          splice @{$self->{open_elements}}, 1;
+
+          ## 3. Insert.
+          
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
+
+          ## 4. Switch.
+          $self->{insertion_mode} = IN_FRAMESET_IM;
+        }
+
+        
+        $token = $self->_get_next_token;
+        next B;
       } elsif ({
                 ## NOTE: Start tags for non-phrasing flow content elements
 
@@ -6726,4 +6784,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 10:21:13 $
+# $Date: 2009/09/06 12:53:19 $
