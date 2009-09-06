@@ -1,7 +1,7 @@
 1..5058
 # Running under perl version 5.010000 for linux
-# Current time local: Sun Sep  6 22:04:53 2009
-# Current time GMT:   Sun Sep  6 13:04:53 2009
+# Current time local: Sun Sep  6 22:20:13 2009
+# Current time GMT:   Sun Sep  6 13:20:13 2009
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -2677,30 +2677,12 @@ ok 2289
 ok 2290
 ok 2291
 ok 2292
-not ok 2293
-# Test 2293 got: "3" (t/HTML-tree.t at line 92 fail #765)
-#      Expected: "1" (Parse error: qq'<!DOCTYPE HTML>a<frameset>b'; 1:27:in body, 1:27:in frameset:#text, 1:27:in body:#eof;<frameset> in body)
+ok 2293
 ok 2294
-not ok 2295
-# Test 2295 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <frameset>\n" (t/HTML-tree.t at line 98 fail #765)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"ab\"\n" (Document tree: qq'<!DOCTYPE HTML>a<frameset>b')
-#      Line 4 is changed:
-#       - "  <body>\n"
-#       + "  <frameset>\n"
-#      Line 5 is missing:
-#       - "    \"ab\"\n"
-not ok 2296
-# Test 2296 got: "3" (t/HTML-tree.t at line 92 fail #766)
-#      Expected: "2" (Parse error: qq'<!DOCTYPE HTML>a<frameset><frame>b'; 1:27:in body, 1:34:in frameset:#text, 1:34:in body:#eof;<frameset> in body, <frame> in body)
+ok 2295
+ok 2296
 ok 2297
-not ok 2298
-# Test 2298 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <frameset>\n    <frame>\n" (t/HTML-tree.t at line 98 fail #766)
-#      Expected: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    \"ab\"\n" (Document tree: qq'<!DOCTYPE HTML>a<frameset><frame>b')
-#      Lines 4-5 are changed:
-#       - "  <body>\n"
-#       + "  <frameset>\n"
-#       - "    \"ab\"\n"
-#       + "    <frame>\n"
+ok 2298
 ok 2299
 ok 2300
 ok 2301
@@ -5391,12 +5373,9 @@ ok 4898
 not ok 4899
 # Test 4899 got: "<span>\n  \"ab\"\n" (t/HTML-tree.t at line 98 fail #1633)
 #      Expected: "\"ab\"\n" (Document tree: qq'<span>a<frameset>b</span>')
-not ok 4900
-# Test 4900 got: "4" (t/HTML-tree.t at line 92 fail #1634)
-#      Expected: "3" (Parse error: qq'a<frameset>b'; 1:2:no DOCTYPE, 1:12:in body, 1:12:in frameset:#text, 1:12:in body:#eof;no DOCTYPE, <frameset> after text "a", text "b" in frameset)
+ok 4900
 ok 4901
 ok 4902
-# t/tree-test-foreign.dat
 ok 4903
 ok 4904
 ok 4905
@@ -5406,6 +5385,7 @@ ok 4908
 ok 4909
 ok 4910
 ok 4911
+# t/tree-test-foreign.dat
 ok 4912
 ok 4913
 ok 4914
@@ -5577,23 +5557,23 @@ ok 5079
 ok 5080
 ok 5081
 ok 5082
-not ok 5083
-# Test 5083 got: "4" (t/HTML-tree.t at line 92 fail #1695)
-#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 5083
 ok 5084
 ok 5085
-not ok 5086
-# Test 5086 got: "4" (t/HTML-tree.t at line 92 fail #1696)
-#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 5086
 ok 5087
 ok 5088
 ok 5089
 ok 5090
 ok 5091
-ok 5092
+not ok 5092
+# Test 5092 got: "4" (t/HTML-tree.t at line 92 fail #1698)
+#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5093
 ok 5094
-ok 5095
+not ok 5095
+# Test 5095 got: "4" (t/HTML-tree.t at line 92 fail #1699)
+#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5096
 ok 5097
 ok 5098
@@ -5725,9 +5705,7 @@ ok 5223
 ok 5224
 ok 5225
 ok 5226
-not ok 5227
-# Test 5227 got: "2" (t/HTML-tree.t at line 92 fail #1743)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
+ok 5227
 ok 5228
 ok 5229
 ok 5230
@@ -5736,11 +5714,22 @@ ok 5232
 ok 5233
 ok 5234
 ok 5235
-ok 5236
+not ok 5236
+# Test 5236 got: "2" (t/HTML-tree.t at line 92 fail #1746)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
 ok 5237
 ok 5238
-not ok 5239
-# Test 5239 got: "2" (t/HTML-tree.t at line 92 fail #1747)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5239
 ok 5240
 ok 5241
+ok 5242
+ok 5243
+ok 5244
+ok 5245
+ok 5246
+ok 5247
+not ok 5248
+# Test 5248 got: "2" (t/HTML-tree.t at line 92 fail #1750)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5249
+ok 5250
