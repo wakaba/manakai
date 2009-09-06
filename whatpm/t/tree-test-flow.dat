@@ -165,6 +165,43 @@ no </marquee>
 |         "x"
 
 #data
+<p><hgroup></hgroup>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|     <hgroup>
+
+#data
+<hgroup><p>aa</hgroup>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <hgroup>
+|       <p>
+|         "aa"
+
+#data
+<hgroup><marquee></hgroup>x
+#errors
+no DOCTYPE
+unexpected end tag
+no </marquee>
+#document
+| <html>
+|   <head>
+|   <body>
+|     <hgroup>
+|       <marquee>
+|         "x"
+
+#data
 <datagrid><span></datagrid>x
 #errors
 no DOCTYPE
