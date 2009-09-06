@@ -577,3 +577,46 @@ unmatched end tag
 | <html>
 |   <head>
 |   <body>
+
+#data
+<body><keygen>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <keygen>
+
+#data
+<body><keygen/>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <keygen>
+
+#data
+<body><keygen><p>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <keygen>
+|     <p>
+
+#data
+<body></body><keygen><!---->
+#errors
+no DOCTYPE
+<keygen> after body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <keygen>
+|     <!--  -->

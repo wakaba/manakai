@@ -1,4 +1,23 @@
-<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2009-09-05T13:42:41Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1252158171"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1252158171</id><title>2009-09-05 Wakaba</title><updated>2009-09-05T13:42:41Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/Whatpm/ChangeLog	5 Sep 2009 13:42:33 -0000
+<Atom:feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:Atom="http://www.w3.org/2005/Atom"><Atom:id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit</Atom:id><Atom:title>Whatpm ChangeLog diffs</Atom:title><Atom:updated>2009-09-06T01:21:34Z</Atom:updated><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit" hreflang="en" rel="self" type="application/atom+xml"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme" rel="related"></Atom:link><Atom:link href="http://suika.fam.cx/www/markup/html/whatpm/readme#license" rel="license"></Atom:link><Atom:rights>This feed is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</Atom:rights><entry xml:id="entry-1252200103"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1252200103</id><title>2009-09-06 Wakaba</title><updated>2009-09-06T01:21:34Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/t/ChangeLog	6 Sep 2009 01:19:59 -0000
+2009-09-06  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* tree-test-1.dat, tree-test-form.dat, tree-test-void.dat: Added
+	and revised test results related to &lt;keygen&gt; parsing (HTML5
+	revision 2960).
+
+++ whatpm/Whatpm/ChangeLog	6 Sep 2009 01:16:22 -0000
+2009-09-06  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* HTML.pm.src (_tree_construction_main): Treate |keygen| as a void
+	element (HTML5 revision 2960).
+
+++ whatpm/Whatpm/HTML/ChangeLog	6 Sep 2009 01:16:06 -0000
+2009-09-06  Wakaba  &lt;wakaba@suika.fam.cx&gt;
+
+	* Serializer.pm (get_inner_html): Added |keygen| to the list of
+	void elements (HTML5 revision 2960).
+
+</content></entry><entry xml:id="entry-1252158171"><id>http://suika.fam.cx/www/markup/html/whatpm/whatpm-commit#entry-1252158171</id><title>2009-09-05 Wakaba</title><updated>2009-09-05T13:42:41Z</updated><author><name>Wakaba</name><email>wakaba@suika.fam.cx</email></author><content type="text">++ whatpm/Whatpm/ChangeLog	5 Sep 2009 13:42:33 -0000
 	* HTML.pm.src: Moved the &quot;in table text&quot; insertion mode code up
 	such that it does also work as specced in HTML5 in the remaining
 	cases (HTML5 revision 3382).

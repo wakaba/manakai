@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.226 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.227 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -6115,6 +6115,7 @@ sub _tree_construction_main ($) {
         } elsif ({
                   area => 1, basefont => 1, bgsound => 1, br => 1,
                   embed => 1, img => 1, spacer => 1, wbr => 1,
+                  keygen => 1,
                  }->{$token->{tag_name}}) {
           
           pop @{$self->{open_elements}};
@@ -6846,4 +6847,4 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/05 13:42:52 $
+# $Date: 2009/09/06 01:21:44 $
