@@ -1,0 +1,319 @@
+#data
+<body>a<frameset>b
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     "ab"
+
+#data
+a<frameset>b
+#errors
+<frameset> in body
+#document-fragment div
+| "ab"
+
+#data
+<span>a<frameset>b</span>
+#errors
+<frameset> in body
+#document-fragment div
+| <span>
+|   "ab"
+
+#data
+a<frameset>b
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     "ab"
+
+#data
+<a></a><frameset>a
+#errors
+no DOCTYPE
+<frameset> after <a></a>
+text "a" in frameset
+unclosed frameset
+#document
+| <html>
+|   <head>
+|   <frameset>
+
+#data
+<a></a><frameset>a
+#errors
+<frameset> after <a></a>
+text "a" in frameset
+unclosed frameset
+#document-fragment html
+| <head>
+| <frameset>
+
+#data
+<a></a><frameset>a
+#errors
+<frameset> in body
+#document-fragment body
+| <a>
+| "a"
+
+#data
+<pre></pre><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <pre>
+|     "a"
+
+#data
+<listing></listing><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <listing>
+|     "a"
+
+#data
+<li><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <li>
+|       "a"
+
+#data
+<dt></dt><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dt>
+|     "a"
+
+#data
+<dd><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <dd>
+|       "a"
+
+#data
+<button></button><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <button>
+|     "a"
+
+#data
+<applet></applet><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <applet>
+|     "a"
+
+#data
+<marquee><frameset>a</marquee>
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <marquee>
+|       "a"
+
+#data
+<object></object><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <object>
+|     "a"
+
+#data
+<table></table><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|     "a"
+
+#data
+<br><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <br>
+|     "a"
+
+#data
+<keygen><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <keygen>
+|     "a"
+
+#data
+<hr><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <hr>
+|     "a"
+
+#data
+<textarea></textarea><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <textarea>
+|     "a"
+
+#data
+<xmp></xmp><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <xmp>
+|     "a"
+
+#data
+<iframe></iframe><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <iframe>
+|     "a"
+
+#data
+<noframes></noframes><frameset>a
+#errors
+no DOCTYPE
+text "a" in frameset
+unclosed frameset
+#document
+| <html>
+|   <head>
+|     <noframes>
+|   <frameset>
+
+#data
+<noembed></noembed><frameset>a
+#errors
+no DOCTYPE
+<frameset> after <noembed>
+text "a" in frameset
+unclosed frameset
+#document
+| <html>
+|   <head>
+|   <frameset>
+
+#data
+<select></select><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|     "a"
+
+#data
+<svg>b</svg><frameset>a
+#errors
+no DOCTYPE
+<frameset> in body
+#document
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       "b"
+|     "a"
+
+#data
+<svg> </svg><frameset>a
+#errors
+no DOCTYPE
+<frameset> after <svg>
+text "a" in frameset
+unclosed frameset
+#document
+| <html>
+|   <head>
+|   <frameset>
