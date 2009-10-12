@@ -39,9 +39,9 @@ DOMTEST2PERL_PL = $(MANAKAI_BIN_DIR)domtest2perl.pl
 
 PT_SUFFIX = .t
 
-all:
+all: whatpm
 
-all-whatpm: \
+whatpm: \
   content-type-files \
   tokenizer-files \
   tree-construction-files \
