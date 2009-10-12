@@ -1,7 +1,7 @@
 1..4464
-# Running under perl version 5.010000 for linux
-# Current time local: Sun Aug 30 17:50:35 2009
-# Current time GMT:   Sun Aug 30 08:50:35 2009
+# Running under perl version 5.008008 for linux
+# Current time local: Mon Oct 12 17:06:19 2009
+# Current time GMT:   Mon Oct 12 08:06:19 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1118,7 +1118,10 @@ ok 1060
 ok 1061
 ok 1062
 ok 1063
-ok 1064
+not ok 1064
+# Test 1064 got: "" (t/content-checker.pl at line 68 fail #1064)
+#      Expected: "/ins/@datetime;datetime:bad year;m" (<ins xmlns="http://www.w3.org/1999/xhtml"
+#    datetime="0000-03-14T14:33Z">x</ins>)
 ok 1065
 ok 1066
 ok 1067
@@ -1155,7 +1158,10 @@ ok 1097
 ok 1098
 ok 1099
 ok 1100
-ok 1101
+not ok 1101
+# Test 1101 got: "" (t/content-checker.pl at line 68 fail #1101)
+#      Expected: "/ins/@datetime;datetime:bad timezone hour;m" (<ins xmlns="http://www.w3.org/1999/xhtml"
+#    datetime="2007-02-21T23:00-24:00">x</ins>)
 ok 1102
 ok 1103
 ok 1104
@@ -1568,12 +1574,8 @@ ok 1508
 ok 1509
 ok 1510
 ok 1511
-not ok 1512
-# Test 1512 got: "/a/@rel;duplicate token;m\n/a;no significant content;s" (t/content-checker.pl at line 68 fail #1512)
-#      Expected: "/a/@rel;duplicate token;author;m\n/a;no significant content;s" (<a href="http://test/" rel="author author" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 1513
-# Test 1513 got: "/a/@rel;duplicate token;m\n/a;no significant content;s" (t/content-checker.pl at line 68 fail #1513)
-#      Expected: "/a/@rel;duplicate token;author;m\n/a;no significant content;s" (<a href="http://test/" rel="author Author" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1512
+ok 1513
 ok 1514
 ok 1515
 ok 1516
@@ -4930,11 +4932,26 @@ ok 4802
 ok 4803
 ok 4804
 ok 4805
-ok 4806
-ok 4807
-ok 4808
-ok 4809
-ok 4810
+not ok 4806
+# Test 4806 got: "" (t/content-checker.pl at line 68 fail #4806)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="date" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11-22"/>)
+not ok 4807
+# Test 4807 got: "" (t/content-checker.pl at line 68 fail #4807)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11-22T00:11:22Z"/>)
+not ok 4808
+# Test 4808 got: "" (t/content-checker.pl at line 68 fail #4808)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="month" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11"/>)
+not ok 4809
+# Test 4809 got: "/input/@value;week:bad year;m" (t/content-checker.pl at line 68 fail #4809)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="week" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-W11"/>)
+not ok 4810
+# Test 4810 got: "" (t/content-checker.pl at line 68 fail #4810)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11-22T00:11:22"/>)
 ok 4811
 ok 4812
 ok 4813

@@ -1,12 +1,16 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->stringify;
+use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 
 BEGIN {
-  require 't/content-checker.pl';
+  require 'content-checker.pl';
   plan (tests => 4464);
 }
 
-test_files (qw[
+test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
   t/content-model-1.dat
   t/content-model-7.dat
   t/table-1.dat

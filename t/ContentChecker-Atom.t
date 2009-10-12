@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 
 BEGIN {
   require 't/content-checker.pl';

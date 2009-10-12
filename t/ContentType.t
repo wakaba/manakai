@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
+use Path::Class;
 use Test;
+use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 
 BEGIN { plan tests => 3752 }
 

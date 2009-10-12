@@ -1,9 +1,11 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 
 my $DEBUG = $ENV{DEBUG};
 
-use lib qw[/home/wakaba/work/manakai2/lib];
 my $test_dir_name = 't/xml/';
 
 use Test;

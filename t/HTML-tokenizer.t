@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 
 my $DEBUG = $ENV{DEBUG};
 
@@ -8,19 +11,19 @@ my $test_dir_name;
 BEGIN {
   $test_dir_name = 't/';
   $dir_name = 't/tokenizer/';
-  my $skip = "You don't have JSON module";
-  eval q{
+  #my $skip = "You don't have JSON module";
+  #eval q{
          use JSON 1.07;
-         $skip = "You don't have make command";
-         system ("cd $test_dir_name; make tokenizer-files") == 0 or die
-           unless -f $dir_name.'test1.test';
-         $skip = '';
-        };
-  if ($skip) {
-    print "1..1\n";
-    print "ok 1 # $skip\n";
-    exit;
-  }
+         #$skip = "You don't have make command";
+         #system ("cd $test_dir_name; make tokenizer-files") == 0 or die
+         #  unless -f $dir_name.'test1.test';
+         #$skip = '';
+  #      };
+  #if ($skip) {
+  #  print "1..1\n";
+  #  print "ok 1 # $skip\n";
+  #  exit;
+  #}
   $JSON::UnMapping = 1;
   $JSON::UTF8 = 1;
 }
@@ -33,7 +36,16 @@ $Data::Dumper::Useqq = 1;
 $Data::Dumper::Sortkeys = 1;
 sub Data::Dumper::qquote {
   my $s = shift;
-  $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
+  eval {
+    ## Perl 5.8.8 in some environment does not handle utf8 string with
+    ## surrogate code points well (it breaks the string when it is
+    ## passed to another subroutine even when it can be accessible
+    ## only via traversing reference chain, very strange...), so
+    ## |eval| this statement.  It would not change the test result as
+    ## long as our parser implementation passes the tests.
+    $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
+    1;
+  } or warn $@;
   return q<qq'> . $s . q<'>;
 } # Data::Dumper::qquote
 
