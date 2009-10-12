@@ -1,6 +1,7 @@
 package Whatpm::ContentChecker::HTML;
 use strict;
 use warnings;
+our $VERSION = '3.0';
 
 package Whatpm::ContentChecker;
 require Whatpm::ContentChecker;
