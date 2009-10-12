@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.008008 for linux
-# Current time local: Mon Oct 12 20:11:16 2009
-# Current time GMT:   Mon Oct 12 11:11:16 2009
+# Current time local: Mon Oct 12 20:43:59 2009
+# Current time GMT:   Mon Oct 12 11:43:59 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -1088,9 +1088,7 @@ ok 1032
 ok 1033
 ok 1034
 ok 1035
-not ok 1036
-# Test 1036 got: "/hr/@align;attribute not defined;m\n/hr/@align;unknown attribute;u" (t/content-checker.pl at line 68 fail #1036)
-#      Expected: "/hr/@align;attribute not defined;m" (<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 1036
 ok 1037
 ok 1038
 ok 1039
@@ -1911,7 +1909,12 @@ ok 1844
 ok 1845
 ok 1846
 ok 1847
-ok 1848
+not ok 1848
+# Test 1848 got: "/div/a/@name;attribute not defined;m\n/div/p/img/@usemap;no referenced map;m" (t/content-checker.pl at line 68 fail #1848)
+#      Expected: "/div/a/@name;attribute not defined;m\n/div/a/@name;unknown attribute;u\n/div/p/img/@usemap;no referenced map;m" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<a name="aa">x</a>
+#<p><img src="http://test/" alt="" usemap="#aa"/></p>
+#</div>)
 ok 1849
 ok 1850
 ok 1851
@@ -2390,11 +2393,9 @@ ok 2262
 ok 2263
 ok 2264
 not ok 2265
-# Test 2265 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2265)
+# Test 2265 got: "/table/@border;attribute not defined;m" (t/content-checker.pl at line 68 fail #2265)
 #      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 2266
-# Test 2266 got: "/table/@border;attribute not defined;m\n/table/@border;unknown attribute;u" (t/content-checker.pl at line 68 fail #2266)
-#      Expected: "/table/@border;attribute not defined;m" (<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2266
 ok 2267
 ok 2268
 ok 2269
@@ -2668,7 +2669,10 @@ ok 2535
 ok 2536
 ok 2537
 ok 2538
-ok 2539
+not ok 2539
+# Test 2539 got: "/form/a/@name;attribute not defined;m" (t/content-checker.pl at line 68 fail #2539)
+#      Expected: "/form/a/@name;attribute not defined;m\n/form/a/@name;unknown attribute;u" (<form xmlns="http://www.w3.org/1999/xhtml"
+#    name="a">x<a name="a">u</a></form>)
 ok 2540
 ok 2541
 ok 2542
