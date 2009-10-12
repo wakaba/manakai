@@ -33,11 +33,16 @@ href="#modules-html">HTML, XHTML</a>, <a href="#modules-xml">XML</a>,
 <h2>What's new?</h2>
 
 <p><a href="whatpm-commit" rel=feed type="application/atom+xml">An
-Atom feed for ChangeLog diffs</a> is available.
+Atom feed for manakai/Whatpm updates</a> is available.
 
 <ul>
 
-<li><tiem>2009-01-12</time>: <a href="#bts">The bug tacking system</a>
+<li><time>2009-10-12</time>: <a href="#git">The common <em>git</em>
+repository</a> for Whatpm and <a
+href="http://suika.fam.cx/www/manakai-core/doc/web/">manakai-core</a>
+is now available; the CVS repository will not be updated anymore.
+
+<li><time>2009-01-12</time>: <a href="#bts">The bug tacking system</a>
 ia available.
 
 <li><time>2008-10-21</time>: <a href="#module-whatpm-xml-parser">An
@@ -481,6 +486,13 @@ Detector</a></dt>
 <div class="section" id="download">
 <h2>Distribution</h2>
 
+<p id=git><a href="http://suika.fam.cx/gate/git/wi/manakai.git/">The
+manakai git repository</a> includes all Whatpm Perl module files.  You
+can clone the repository by:
+
+  <pre>$ <kbd>git clone http://suika.fam.cx/gate/git/bare/manakai.git/</kbd></pre>
+
+<!--
 <p>The development version of Whatpm may be found in the 
 <a href="http://suika.fam.cx/gate/cvs/markup/html/whatpm/">CVS 
 repository</a>.</p>
@@ -488,6 +500,7 @@ repository</a>.</p>
 <p><a href="http://suika.fam.cx/gate/cvs/markup/html/whatpm/whatpm.tar.gz?tarball=1">The
 latest developmenet version of the Whatpm</a> is also available as a
 tarball.
+-->
 
 </div>
 
@@ -500,8 +513,6 @@ tarball.
     <a href="t/tokenizer-result">HTML tokenization</a>,
     <a href="t/tree-construction-result">HTML tree construction</a>,
     <a href="t/content-checker-result"><code>Whatpm::ContentChecker</code></a>).</li>
-  <li>Merge with the <a href="http://suika.fam.cx/www/2006/manakai/">manakai-core</a>
-      code tree.
   <li>Charset detection.</li>
   <li>Validation for <code>meta</code>.</li>
   <li>Validation for media queries (level 3), IRIs (against URI schemes),
