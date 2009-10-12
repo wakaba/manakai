@@ -5901,7 +5901,7 @@ $Element->{$HTML_NS}->{fieldset} = {
     lang => FEATURE_HTML5_REC,
     name => FEATURE_HTML5_LC,
   }),
-  ## NOTE: legend, Flow
+  ## NOTE: legend?, Flow
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -5926,8 +5926,7 @@ $Element->{$HTML_NS}->{fieldset} = {
       $element_state->{has_non_legend} = 1 unless $child_is_transparent;
       ## TODO:
       ## |<fieldset><object><legend>xx</legend></object>..</fieldset>|
-      ## should be an error, since |object| is allowed as flow,
-      ## therefore |details| part of the content model does not match.
+      ## should raise an error.
     }
   },
   check_child_text => sub {
@@ -5939,15 +5938,9 @@ $Element->{$HTML_NS}->{fieldset} = {
   check_end => sub {
     my ($self, $item, $element_state) = @_;
 
-    unless ($element_state->{has_legend}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'child element missing',
-                         text => 'legend',
-                         level => $self->{level}->{must});
-    }
+    ## ISSUE: |<fieldset><legend>aa</legend></fieldset>| error?
 
     $HTMLFlowContentChecker{check_end}->(@_);
-    ## ISSUE: |<fieldset><legend>aa</legend></fieldset>| error?
   },
   ## NOTE: This definition is partially reused by |details| element's
   ## checker.
