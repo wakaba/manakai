@@ -1,5 +1,8 @@
-package Whatpm::ContentChecker;
+package Whatpm::ContentChecker::HTML;
 use strict;
+use warnings;
+
+package Whatpm::ContentChecker;
 require Whatpm::ContentChecker;
 
 use Char::Class::XML qw/InXML_NCNameStartChar10 InXMLNCNameChar10/;
@@ -378,7 +381,7 @@ my $GetHTMLEnumeratedAttrChecker = sub {
   return sub {
     my ($self, $attr) = @_;
     my $value = lc $attr->value; ## TODO: ASCII case insensitibility?
-    if ($states->{$value} > 0) {
+    if ($states->{$value} and $states->{$value} > 0) {
       #
     } elsif ($states->{$value}) {
       $self->{onerror}->(node => $attr, type => 'enumerated:non-conforming',
@@ -553,7 +556,7 @@ my $HTMLURIAttrChecker = sub {
   my $value = $attr->value;
   Whatpm::URIChecker->check_iri_reference ($value, sub {
     $self->{onerror}->(@_, node => $attr);
-  }), $self->{level};
+  }, $self->{level});
   $self->{has_uri_attr} = 1; ## TODO: <html manifest>
 
   my $attr_name = $attr->name;
@@ -1168,7 +1171,7 @@ my $HTMLRepeatIndexAttrChecker = sub {
   if (defined $attr->namespace_uri) {
     my $oe = $attr->owner_element;
     my $oe_nsuri = $oe->namespace_uri;
-    if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) { ## TODO: wrong?
+    if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) { ## TODO: wrong? or -> and ? XXX
       $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                          level => $self->{level}->{must});
     }
@@ -1315,7 +1318,7 @@ my $HTMLAttrChecker = {
     if (defined $attr->namespace_uri) {
       my $oe = $attr->owner_element;
       my $oe_nsuri = $oe->namespace_uri;
-      if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) {
+      if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) { # XXX or -> and ?
         $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                            level => $self->{level}->{must});
       }
@@ -2318,7 +2321,8 @@ $Element->{$HTML_NS}->{meta} = {
 
     my $check_charset_decl = sub () {
       my $parent = $item->{node}->manakai_parent_element;
-      if ($parent and $parent eq $parent->owner_document->manakai_head) {
+      my $head = $parent ? $parent->owner_document->manakai_head : undef;
+      if ($parent and $head and $parent eq $head) {
         for my $el (@{$parent->child_nodes}) {
           next unless $el->node_type == 1; # ELEMENT_NODE
           unless ($el eq $item->{node}) {
@@ -3011,7 +3015,8 @@ $Element->{$HTML_NS}->{pre} = {
   
     ## TODO: Flag to enable/disable IDL checking?
     my $class = $item->{node}->get_attribute_ns (undef, 'class');
-    if ($class =~ /\bidl(?>-code)?\b/) { ## TODO: use classList.has
+    if (defined $class and
+        $class =~ /\bidl(?>-code)?\b/) { ## TODO: use classList.has
       ## NOTE: pre.idl: WHATWG, XHR, Selectors API, CSSOM specs
       ## NOTE: pre.code > code.idl-code: WebIDL spec
       ## NOTE: pre.idl-code: DOM1 spec
@@ -3711,9 +3716,11 @@ $Element->{$HTML_NS}->{time} = {
       }
 
       $self->{onerror}->(node => $input_node, type => 'datetime:bad hour',
-                         level => $self->{level}->{must}) if $hour > 23;
+                         level => $self->{level}->{must})
+          if defined $hour and $hour > 23;
       $self->{onerror}->(node => $input_node, type => 'datetime:bad minute',
-                         level => $self->{level}->{must}) if $minute > 59;
+                         level => $self->{level}->{must})
+          if defined $minute and $minute > 59;
 
       if (defined $second) { ## s
         ## NOTE: Integer part of second don't have to have length of two.
