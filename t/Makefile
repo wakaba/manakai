@@ -7,9 +7,10 @@ CD = cd
 MAKE = make
 MKDIR = mkdir -p
 ECHO = echo
+WGET = wget
 
 RM = rm
-RMALL = $(RM) -fv
+RMALL = $(RM) -frv
 
 TEST_VERBOSE = 0
 INST_ARCHLIB = $(MANAKAI_ROOT_DIR)blib/arch
@@ -40,6 +41,19 @@ PT_SUFFIX = .t
 
 all:
 
+all-whatpm: \
+  content-type-files \
+  tokenizer-files \
+  tree-construction-files \
+  xml-result.txt \
+  swml-result.txt \
+  content-checker-files \
+  langtag-files
+
+update: clean-remote-files \
+  tokenizer-remote-files \
+  tree-construction-remote-files
+
 dom1core-perl: $(DOMTS2PERL_PL)
 	$(MKDIR) $(DOMTEST_PERL_DIR)level1/core/
 	$(DOMTS2PERL) --test-directory="$(DOMTEST_TESTS_DIR)level1/core/" \
@@ -59,12 +73,100 @@ test-module-all: \
 test-module-dom: 
 	$(PERL_TEST_) DOM-*$(PT_SUFFIX)
 
+content-type-files: content-type-result.txt
+
+content-type-result.txt: always
+	cd .. && perl t/ContentType.t &> t/$@
+
+tokenizer-files: tokenizer-remote-files tokenizer-result.txt
+
+tokenizer-remote-files: tokenizer \
+  tokenizer/test1.test tokenizer/test2.test tokenizer/contentModelFlags.test \
+  tokenizer/escapeFlag.test \
+  tokenizer/test3.test \
+  tokenizer/test4.test \
+  tokenizer/xmlViolation.test \
+  tokenizer/entities.test \
+  tokenizer/LICENSE
+
+tokenizer:
+	$(MKDIR) $@
+
+tokenizer/%.test:
+	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/testdata/$@
+
+tokenizer/LICENSE:
+	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/LICENSE
+
+tokenizer-result.txt: always
+	cd .. && perl t/HTML-tokenizer.t &> t/$@
+
+tree-construction-files: tree-construction-remote-files \
+  tree-construction-result.txt
+
+tree-construction-remote-files: tree-construction \
+  tree-construction/tests1.dat \
+  tree-construction/tests2.dat \
+  tree-construction/tests3.dat \
+  tree-construction/tests4.dat \
+  tree-construction/tests5.dat \
+  tree-construction/tests6.dat \
+  tree-construction/tests7.dat \
+  tree-construction/tests8.dat \
+  tree-construction/tests9.dat \
+  tree-construction/tests10.dat \
+  tree-construction/tests11.dat \
+  tree-construction/tests12.dat \
+  tree-construction/LICENSE
+
+tree-construction:
+	$(MKDIR) $@
+
+tree-construction/%.dat:
+	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/testdata/$@
+
+tree-construction/LICENSE:
+	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/LICENSE
+
+tree-construction-result.txt: always
+	cd .. && perl t/HTML-tree.t &> t/$@
+
+xml-result.txt: always
+	cd .. && perl t/XML-Parser.t &> t/$@
+
+swml-result.txt: always
+	cd .. && perl t/SWML-Parser.t &> t/$@
+
+content-checker-files: content-checker-result.txt \
+  content-checker-atom-result.txt \
+  content-checker-xml-result.txt
+
+content-checker-result.txt: always
+	cd .. && perl t/ContentChecker.t &> t/$@
+
+content-checker-atom-result.txt: always
+	cd .. && perl t/ContentChecker-Atom.t &> t/$@
+
+content-checker-xml-result.txt: always
+	cd .. && perl t/ContentChecker-XML.t &> t/$@
+
+langtag-files: langtag-result.txt
+
+langtag-result.txt: always
+	cd .. && perl t/LangTag.t &> t/$@
+
 clean: clean-dom1core-perl
 
 clean-dom1core-perl:
 	$(RMALL) $(DOMTEST_PERL_DIR)level1/core/*
 	$(RMALL) *~ .*~ *.BAK .*.BAK
 
+clean-remote-files:
+	$(RMALL) tokenizer/*.test tokenizer/LICENSE
+	$(RMALL) tree-construction/*.dat tree-construction/LICENSE
+
 distclean: clean
 
 always:
+
+## License: Public Domain.
