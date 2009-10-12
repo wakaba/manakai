@@ -67,6 +67,10 @@ sub FEATURE_HTML5_LC_DROPPED () {
   Whatpm::ContentChecker::FEATURE_STATUS_LC
 }
 
+## NOTE: Features that are listed in the "non-conforming features"
+## section.
+use constant FEATURE_HTML5_OBSOLETE => 0;
+
 sub FEATURE_WF2X () {
   ## NOTE: Defined in WF2 (whether deprecated or not) and then
   ## incorporated into the HTML5 spec.
@@ -4589,7 +4593,9 @@ $Element->{$HTML_NS}->{embed} = {
 
       my $status = {
         %HTMLAttrStatus,
+        align => FEATURE_HTML5_OBSOLETE,
         height => FEATURE_HTML5_LC,
+        name => FEATURE_HTML5_OBSOLETE,
         src => FEATURE_HTML5_WD,
         type => FEATURE_HTML5_WD,
         width => FEATURE_HTML5_LC,
@@ -4619,8 +4625,9 @@ $Element->{$HTML_NS}->{embed} = {
       }
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
           || $AttrChecker->{$attr_ns}->{''};
-      $status ||= $AttrStatus->{$attr_ns}->{$attr_ln}
-          || $AttrStatus->{$attr_ns}->{''};
+      $status = $AttrStatus->{$attr_ns}->{$attr_ln}
+          || $AttrStatus->{$attr_ns}->{''}
+              unless defined $status;
       $status = FEATURE_ALLOWED if not defined $status and length $attr_ns;
 
       if ($checker) {

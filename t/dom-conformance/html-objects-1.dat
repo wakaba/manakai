@@ -2353,6 +2353,18 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /html/body/embed/@data-!;attribute not defined;m
 
 #data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    name="name1"/>
+#errors
+/embed/@name;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="left"/>
+#errors
+/embed/@align;attribute not defined;m
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;attribute missing:data|type;m
