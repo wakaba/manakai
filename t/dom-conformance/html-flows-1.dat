@@ -696,7 +696,6 @@ para
 <header xmlns="http://www.w3.org/1999/xhtml"><footer><h1/></footer></header>
 #errors
 /header/footer;element not allowed:minus;m
-/header/footer/h1;element not allowed:minus;m
 /header;no significant content;s
 /header/footer;no significant content;s
 /header/footer/h1;no significant content;s
@@ -777,7 +776,6 @@ para
 #data
 <footer xmlns="http://www.w3.org/1999/xhtml"><section>a</section></footer>
 #errors
-/footer/section;element not allowed:minus;m
 
 #data
 <footer xmlns="http://www.w3.org/1999/xhtml"><blockquote>a</blockquote></footer>
@@ -796,8 +794,18 @@ para
   <hgroup><h1>x</h1></hgroup>
 </footer>
 #errors
-/footer/hgroup;element not allowed:minus;m
-/footer/hgroup/h1;element not allowed:minus;m
+
+#data
+<footer xmlns="http://www.w3.org/1999/xhtml">
+  <nav>xxx</nav>
+</footer>
+#errors
+
+#data
+<footer xmlns="http://www.w3.org/1999/xhtml">
+  <aside>xxx</aside>
+</footer>
+#errors
 
 #data
 <address xmlns="http://www.w3.org/1999/xhtml"></address>

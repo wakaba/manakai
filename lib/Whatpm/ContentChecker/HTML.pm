@@ -2830,20 +2830,18 @@ $Element->{$HTML_NS}->{footer} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
-                                {$HTML_NS => {header => 1, footer => 1}},
-                                $HTMLSectioningContent,
-                                $HTMLHeadingContent);
+                                {$HTML_NS => {header => 1, footer => 1}});
 
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
 
     $HTMLFlowContentChecker{check_end}->(@_);
-  },
-};
+  }, # check_end
+}; # footer
 
 $Element->{$HTML_NS}->{address} = {
   %HTMLFlowContentChecker,
