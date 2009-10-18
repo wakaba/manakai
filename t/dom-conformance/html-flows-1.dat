@@ -393,24 +393,28 @@ para
 <article xmlns="http://www.w3.org/1999/xhtml"
     pubdate="2009-01-01T02:02:02Z">x</article>
 #errors
+/article/@pubdate;attribute not defined;m
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml"
     pubdate="2009-01-01 02:02:02Z">x</article>
 #errors
 /article/@pubdate;datetime:syntax error;m
+/article/@pubdate;attribute not defined;m
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml"
     pubdate="2009-01-01">x</article>
 #errors
 /article/@pubdate;datetime:syntax error;m
+/article/@pubdate;attribute not defined;m
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml"
     pubdate="02:02:03">x</article>
 #errors
 /article/@pubdate;datetime:syntax error;m
+/article/@pubdate;attribute not defined;m
 
 #data
 <article cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">a</article>

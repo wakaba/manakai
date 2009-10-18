@@ -2686,8 +2686,8 @@ $Element->{$HTML_NS}->{article} = {
   }, {
     %HTMLAttrStatus,
     cite => FEATURE_HTML5_DROPPED,
-    pubdate => FEATURE_HTML5_LC,
-  }),
+    pubdate => FEATURE_HTML5_LC_DROPPED,
+  }), # check_attrs
 }; # article
 
 $Element->{$HTML_NS}->{blockquote} = {
