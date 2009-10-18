@@ -602,9 +602,9 @@ my $HTMLSpaceURIsAttrChecker = sub {
 
 my $ValidEmailAddress;
 {
-  my $atext = qr[[A-Za-z0-9!#\$%&'*+/=?^_`{|}~-]];
-  my $dot_atom = qr/$atext+(?>\.$atext+)*/o;
-  $ValidEmailAddress = qr/$dot_atom\@$dot_atom/o;
+  my $atext_dot = qr[[A-Za-z0-9!#\$%&'*+/=?^_`{|}~.-]];
+  my $ldh_str = qr[[A-Za-z0-9-]+];
+  $ValidEmailAddress = qr/$atext_dot+\@$ldh_str(?>\.$ldh_str)+/o;
 }
 
 ## Valid global date and time.

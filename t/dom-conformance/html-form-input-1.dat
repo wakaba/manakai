@@ -3686,6 +3686,7 @@
     type="email"
     value="a@b"/>
 #errors
+/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3719,14 +3720,12 @@
     type="email"
     value="a.@example.jp"/>
 #errors
-/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email"
     value=".b@example.net"/>
 #errors
-/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3737,9 +3736,8 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email"
-    value="a..b@c"/>
+    value="a..b@c.d"/>
 #errors
-/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3747,6 +3745,37 @@
     value="a@b..c"/>
 #errors
 /input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="ab@10.1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="ab@127.0.0.1"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="ab@100.percent.test"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="ab@foo_bar.test"/>
+#errors
+/input/@value;email:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    value="a_b@foo-bar.test"/>
+#errors
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3788,11 +3817,12 @@
     type="email" multiple=""
     value="a@b"/>
 #errors
+/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email" multiple=""
-    value="a@b,c@d"/>
+    value="a@b.z,c@d.z"/>
 #errors
 
 #data
@@ -3812,35 +3842,35 @@
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email" multiple=""
-    value="a@b,"/>
+    value="a@b.c,"/>
 #errors
 /input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email" multiple=""
-    value=",a@b"/>
+    value=",a@b.c"/>
 #errors
 /input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email" multiple=""
-    value="a@b,,c@d"/>
+    value="a@b.x,,c@d.y"/>
 #errors
 /input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email" multiple=""
-    value="a@b.,c@d"/>
+    value="a@b.x.,c@d.y"/>
 #errors
 /input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email" multiple=""
-    value="<a@b>,c@d"/>
+    value="<a@b>,c@d.z"/>
 #errors
 /input/@value;email:syntax error;m
 
