@@ -759,6 +759,58 @@
 /time/@datetime;dateortime:date missing;m
 
 #data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <article><time pubdate="">2009-12-12</time></article>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <article>
+    <article><time pubdate="">2009-12-12</time></article>
+  </article>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <article><time pubdate="">2009-12-12</time></article>
+  <article><time pubdate="">2009-12-12</time></article>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <article><time pubdate="">2009-12-12</time></article>
+  <article>aaa</article>
+  <article><time pubdate="">2009-12-12</time></article>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <article><time pubdate="">2009-12-12</time>
+  <time pubdate="">2009-12-12</time></article>
+</body>
+#errors
+/body/article/time;element not allowed:pubdate;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <time pubdate="">2009-12-12</time>
+  <time pubdate="">2009-12-12</time>
+</body>
+#errors
+/body/time;element not allowed:pubdate;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <time pubdate="">2009-12-12</time>
+  <article><time pubdate="">2009-12-12</time></article>
+</body>
+#errors
+
+#data
 <ruby xmlns="http://www.w3.org/1999/xhtml"></ruby>
 #errors
 /ruby;no significant content;s

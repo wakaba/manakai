@@ -2688,6 +2688,23 @@ $Element->{$HTML_NS}->{article} = {
     cite => FEATURE_HTML5_DROPPED,
     pubdate => FEATURE_HTML5_LC_DROPPED,
   }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{has_time_pubdate_original}
+        = $self->{flag}->{has_time_pubdate};
+    $self->{flag}->{has_time_pubdate} = 0;
+
+    $HTMLFlowContentChecker{check_start}->(@_);
+  }, # check_start
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    
+    $self->{flag}->{has_time_pubdate}
+        = $element_state->{has_time_pubdate_original};
+
+    $HTMLFlowContentChecker{check_end}->(@_);
+  }, # check_end
 }; # article
 
 $Element->{$HTML_NS}->{blockquote} = {
@@ -3602,7 +3619,27 @@ $Element->{$HTML_NS}->{time} = {
     ## Message::Date) such that we can reuse this code in other places
     ## (e.g. HTMLTimeElement implementation).
 
-    my $need_a_date = $item->{node}->has_attribute_ns (undef, 'pubdate');
+    my $has_pubdate = $item->{node}->has_attribute_ns (undef, 'pubdate');
+    if ($has_pubdate) {
+      if ($self->{flag}->{has_time_pubdate}) {
+        ## NOTE: "for each Document, there must be no more than one
+        ## time element with a pubdate attribute that does not have an
+        ## ancestor article element."  Therefore, strictly speaking,
+        ## an orphan tree might contain more than two |time| elements
+        ## with |pubdate| attribute specified.  We don't always
+        ## inteprete the spec text strictly when a node that belongs
+        ## to an orphan tree is being processed (unless the spec
+        ## explicitly defines handling of such a case).
+        
+        $self->{onerror}->(node => $item->{node},
+                           type => 'element not allowed:pubdate', ## XXX TODOC
+                           level => $self->{level}->{must});
+      } else {
+        $self->{flag}->{has_time_pubdate} = 1;
+      }
+    }
+
+    my $need_a_date = $has_pubdate;
 
     ## "Vaguer moments in time" or "valid date or time string".
     my $attr = $item->{node}->get_attribute_node_ns (undef, 'datetime');
