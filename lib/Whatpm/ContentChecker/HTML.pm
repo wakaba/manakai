@@ -3581,10 +3581,12 @@ $Element->{$HTML_NS}->{time} = {
   %HTMLPhrasingContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
     datetime => sub { 1 }, # checked in |checker|
+    pubdate => $GetHTMLBooleanAttrChecker->('pubdate'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     datetime => FEATURE_HTML5_FD,
+    pubdate => FEATURE_HTML5_WD,
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -3599,6 +3601,8 @@ $Element->{$HTML_NS}->{time} = {
     ## XXX Maybe we should move this code out somewhere (maybe
     ## Message::Date) such that we can reuse this code in other places
     ## (e.g. HTMLTimeElement implementation).
+
+    my $need_a_date = $item->{node}->has_attribute_ns (undef, 'pubdate');
 
     ## "Vaguer moments in time" or "valid date or time string".
     my $attr = $item->{node}->get_attribute_node_ns (undef, 'datetime');
@@ -3713,6 +3717,12 @@ $Element->{$HTML_NS}->{time} = {
         }
 
         ($hour, $minute, $second) = ($1, $9, $10);
+
+        if ($need_a_date) {
+          $self->{onerror}->(node => $input_node,
+                             type => 'dateortime:date missing', ## XXX TODOC
+                             level => $self->{level}->{must});
+        }
       }
 
       $self->{onerror}->(node => $input_node, type => 'datetime:bad hour',

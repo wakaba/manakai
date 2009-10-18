@@ -651,6 +651,114 @@
 /time/time;element not allowed:minus;m
 
 #data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="">
+  2009-10-10
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="pubdate">
+  2009-10-10
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="PubDate">
+  2009-10-10
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="PUBDATE">
+  2009-10-10
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="  ">
+  2009-10-10
+</time>
+#errors
+/time/@pubdate;boolean:invalid;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate=" Pub date">
+  2009-10-10
+</time>
+#errors
+/time/@pubdate;boolean:invalid;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="true">
+  2009-10-10
+</time>
+#errors
+/time/@pubdate;boolean:invalid;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="">
+  00:00:00
+</time>
+#errors
+/time;dateortime:date missing;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="">
+  2009-10-10T00:00:00Z
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate="">
+  2009-10-10T00:00
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate=""
+    datetime="2009-10-10T00:00">
+  00:00:00
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate=""
+    datetime="1000-10-10">
+  00:00:00
+</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate=""
+    datetime="00:00:00">
+  00:00:00
+</time>
+#errors
+/time/@datetime;dateortime:date missing;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml"
+    pubdate=""
+    datetime="00:00">
+  2009-10-10T00:00:00
+</time>
+#errors
+/time/@datetime;dateortime:date missing;m
+
+#data
 <ruby xmlns="http://www.w3.org/1999/xhtml"></ruby>
 #errors
 /ruby;no significant content;s
