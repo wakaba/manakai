@@ -1,10 +1,17 @@
 $Whatpm::ContentChecker::LinkType = {
+          'accessibility' => {
+                               'effect' => [
+                                             'hyperlink',
+                                             'hyperlink'
+                                           ],
+                               'status' => 'proposal'
+                             },
           'acquaintance' => {
                               'effect' => [
                                             'hyperlink',
                                             'hyperlink'
                                           ],
-                              'status' => 'proposal'
+                              'status' => 'accepted'
                             },
           'alternate' => {
                            'effect' => [
@@ -55,6 +62,48 @@ $Whatpm::ContentChecker::LinkType = {
                                       ],
                           'status' => 'accepted'
                         },
+          'canonical' => {
+                           'effect' => [
+                                         'hyperlink',
+                                         undef
+                                       ],
+                           'status' => 'proposal'
+                         },
+          'canonical-domain' => {
+                                  'effect' => [
+                                                'external resource',
+                                                undef
+                                              ],
+                                  'status' => 'proposal'
+                                },
+          'canonical-first' => {
+                                 'effect' => [
+                                               'external resource',
+                                               'hyperlink'
+                                             ],
+                                 'status' => 'proposal'
+                               },
+          'canonical-human' => {
+                                 'effect' => [
+                                               'external resource',
+                                               'hyperlink'
+                                             ],
+                                 'status' => 'proposal'
+                               },
+          'canonical-organization' => {
+                                        'effect' => [
+                                                      'external resource',
+                                                      'hyperlink'
+                                                    ],
+                                        'status' => 'proposal'
+                                      },
+          'canonical-wwwnone' => {
+                                   'effect' => [
+                                                 'external resource',
+                                                 'hyperlink'
+                                               ],
+                                   'status' => 'proposal'
+                                 },
           'chapter' => {
                          'effect' => [
                                        'hyperlink',
@@ -67,35 +116,35 @@ $Whatpm::ContentChecker::LinkType = {
                                      'hyperlink',
                                      'hyperlink'
                                    ],
-                       'status' => 'proposal'
+                       'status' => 'accepted'
                      },
           'co-resident' => {
                              'effect' => [
                                            'hyperlink',
                                            'hyperlink'
                                          ],
-                             'status' => 'proposal'
+                             'status' => 'accepted'
                            },
           'co-worker' => {
                            'effect' => [
                                          'hyperlink',
                                          'hyperlink'
                                        ],
-                           'status' => 'proposal'
+                           'status' => 'accepted'
                          },
           'colleague' => {
                            'effect' => [
                                          'hyperlink',
                                          'hyperlink'
                                        ],
-                           'status' => 'proposal'
+                           'status' => 'accepted'
                          },
           'contact' => {
                          'effect' => [
                                        'hyperlink',
                                        'hyperlink'
                                      ],
-                         'status' => 'proposal'
+                         'status' => 'accepted'
                        },
           'contents' => {
                           'effect' => [
@@ -123,15 +172,29 @@ $Whatpm::ContentChecker::LinkType = {
                                      'hyperlink',
                                      'hyperlink'
                                    ],
-                       'status' => 'proposal'
+                       'status' => 'accepted'
                      },
           'date' => {
                       'effect' => [
                                     'hyperlink',
                                     'hyperlink'
                                   ],
-                      'status' => 'proposal'
+                      'status' => 'accepted'
                     },
+          'details' => {
+                         'effect' => [
+                                       'hyperlink',
+                                       'hyperlink'
+                                     ],
+                         'status' => 'proposal'
+                       },
+          'dns-prefetch' => {
+                              'effect' => [
+                                            'external resource',
+                                            undef
+                                          ],
+                              'status' => 'proposal'
+                            },
           'edit' => {
                       'effect' => [
                                     'hyperlink',
@@ -139,6 +202,20 @@ $Whatpm::ContentChecker::LinkType = {
                                   ],
                       'status' => 'proposal'
                     },
+          'edituri' => {
+                         'effect' => [
+                                       'hyperlink',
+                                       undef
+                                     ],
+                         'status' => 'proposal'
+                       },
+          'enclosure' => {
+                           'effect' => [
+                                         'hyperlink',
+                                         'hyperlink'
+                                       ],
+                           'status' => 'proposal'
+                         },
           'end' => {
                      'effect' => [
                                    'hyperlink',
@@ -172,7 +249,7 @@ $Whatpm::ContentChecker::LinkType = {
                                       'hyperlink',
                                       'hyperlink'
                                     ],
-                        'status' => 'proposal'
+                        'status' => 'accepted'
                       },
           'glossary' => {
                           'effect' => [
@@ -188,6 +265,20 @@ $Whatpm::ContentChecker::LinkType = {
                                   ],
                       'status' => 'accepted'
                     },
+          'hub' => {
+                     'effect' => [
+                                   'hyperlink',
+                                   undef
+                                 ],
+                     'status' => 'proposal'
+                   },
+          'i18nrules' => {
+                           'effect' => [
+                                         'hyperlink',
+                                         undef
+                                       ],
+                           'status' => 'proposal'
+                         },
           'icon' => {
                       'effect' => [
                                     'external resource',
@@ -202,12 +293,19 @@ $Whatpm::ContentChecker::LinkType = {
                                    ],
                        'status' => 'accepted'
                      },
+          'jump' => {
+                      'effect' => [
+                                    undef,
+                                    'hyperlink'
+                                  ],
+                      'status' => 'proposal'
+                    },
           'kin' => {
                      'effect' => [
                                    'hyperlink',
                                    'hyperlink'
                                  ],
-                     'status' => 'proposal'
+                     'status' => 'accepted'
                    },
           'last' => {
                       'effect' => [
@@ -223,6 +321,13 @@ $Whatpm::ContentChecker::LinkType = {
                                      ],
                          'status' => 'accepted'
                        },
+          'logout' => {
+                        'effect' => [
+                                      'external resource',
+                                      undef
+                                    ],
+                        'status' => 'proposal'
+                      },
           'maintainer' => {
                             'effect' => [
                                           'hyperlink',
@@ -235,28 +340,28 @@ $Whatpm::ContentChecker::LinkType = {
                                   'hyperlink',
                                   'hyperlink'
                                 ],
-                    'status' => 'proposal'
+                    'status' => 'accepted'
                   },
           'met' => {
                      'effect' => [
                                    'hyperlink',
                                    'hyperlink'
                                  ],
-                     'status' => 'proposal'
+                     'status' => 'accepted'
                    },
           'muse' => {
                       'effect' => [
                                     'hyperlink',
                                     'hyperlink'
                                   ],
-                      'status' => 'proposal'
+                      'status' => 'accepted'
                     },
           'neighbor' => {
                           'effect' => [
                                         'hyperlink',
                                         'hyperlink'
                                       ],
-                          'status' => 'proposal'
+                          'status' => 'accepted'
                         },
           'next' => {
                       'effect' => [
@@ -265,6 +370,13 @@ $Whatpm::ContentChecker::LinkType = {
                                   ],
                       'status' => 'accepted'
                     },
+          'next-archive' => {
+                              'effect' => [
+                                            'hyperlink',
+                                            'hyperlink'
+                                          ],
+                              'status' => 'proposal'
+                            },
           'nofollow' => {
                           'effect' => [
                                         undef,
@@ -272,6 +384,13 @@ $Whatpm::ContentChecker::LinkType = {
                                       ],
                           'status' => 'accepted'
                         },
+          'noprefetch' => {
+                            'effect' => [
+                                          'external resource',
+                                          'hyperlink'
+                                        ],
+                            'status' => 'proposal'
+                          },
           'noreferrer' => {
                             'effect' => [
                                           undef,
@@ -279,6 +398,13 @@ $Whatpm::ContentChecker::LinkType = {
                                         ],
                             'status' => 'accepted'
                           },
+          'note' => {
+                      'effect' => [
+                                    undef,
+                                    'hyperlink'
+                                  ],
+                      'status' => 'proposal'
+                    },
           'openid.delegate' => {
                                  'effect' => [
                                                'external resource',
@@ -312,6 +438,20 @@ $Whatpm::ContentChecker::LinkType = {
                                       'hyperlink',
                                       'hyperlink'
                                     ],
+                        'status' => 'accepted'
+                      },
+          'payment' => {
+                         'effect' => [
+                                       'hyperlink',
+                                       'hyperlink'
+                                     ],
+                         'status' => 'proposal'
+                       },
+          'pgpkey' => {
+                        'effect' => [
+                                      'hyperlink',
+                                      undef
+                                    ],
                         'status' => 'proposal'
                       },
           'pingback' => {
@@ -336,6 +476,13 @@ $Whatpm::ContentChecker::LinkType = {
                                   ],
                       'status' => 'accepted'
                     },
+          'prev-archive' => {
+                              'effect' => [
+                                            'hyperlink',
+                                            'hyperlink'
+                                          ],
+                              'status' => 'proposal'
+                            },
           'previous' => {
                           'effect' => [
                                         'hyperlink',
@@ -343,13 +490,41 @@ $Whatpm::ContentChecker::LinkType = {
                                       ],
                           'status' => 'synonym'
                         },
+          'print' => {
+                       'effect' => [
+                                     'external resource',
+                                     'hyperlink'
+                                   ],
+                       'status' => 'proposal'
+                     },
           'profile' => {
                          'effect' => [
                                        'hyperlink',
-                                       undef
+                                       'hyperlink'
                                      ],
                          'status' => 'proposal'
                        },
+          'pronunciation' => {
+                               'effect' => [
+                                             'external resource',
+                                             'hyperlink'
+                                           ],
+                               'status' => 'proposal'
+                             },
+          'related' => {
+                         'effect' => [
+                                       'hyperlink',
+                                       'hyperlink'
+                                     ],
+                         'status' => 'proposal'
+                       },
+          'reviewer' => {
+                          'effect' => [
+                                        'hyperlink',
+                                        undef
+                                      ],
+                          'status' => 'proposal'
+                        },
           'script' => {
                         'effect' => [
                                       undef,
@@ -371,6 +546,13 @@ $Whatpm::ContentChecker::LinkType = {
                                      ],
                          'status' => 'synonym'
                        },
+          'self' => {
+                      'effect' => [
+                                    'hyperlink',
+                                    'hyperlink'
+                                  ],
+                      'status' => 'proposal'
+                    },
           'service' => {
                          'effect' => [
                                        'external resource',
@@ -378,12 +560,19 @@ $Whatpm::ContentChecker::LinkType = {
                                      ],
                          'status' => 'proposal'
                        },
+          'shortlink' => {
+                           'effect' => [
+                                         'hyperlink',
+                                         'hyperlink'
+                                       ],
+                           'status' => 'proposal'
+                         },
           'sibling' => {
                          'effect' => [
                                        'hyperlink',
                                        'hyperlink'
                                      ],
-                         'status' => 'proposal'
+                         'status' => 'accepted'
                        },
           'sidebar' => {
                          'effect' => [
@@ -397,7 +586,7 @@ $Whatpm::ContentChecker::LinkType = {
                                       'hyperlink',
                                       'hyperlink'
                                     ],
-                        'status' => 'proposal'
+                        'status' => 'accepted'
                       },
           'start' => {
                        'effect' => [
@@ -425,7 +614,7 @@ $Whatpm::ContentChecker::LinkType = {
                                           'hyperlink',
                                           'hyperlink'
                                         ],
-                            'status' => 'proposal'
+                            'status' => 'accepted'
                           },
           'tag' => {
                      'effect' => [
@@ -434,7 +623,7 @@ $Whatpm::ContentChecker::LinkType = {
                                  ],
                      'status' => 'accepted'
                    },
-          'technicalAuthor' => {
+          'technicalauthor' => {
                                  'effect' => [
                                                'hyperlink',
                                                'hyperlink'
@@ -462,6 +651,13 @@ $Whatpm::ContentChecker::LinkType = {
                                  ],
                      'status' => 'synonym'
                    },
+          'translatedfrom' => {
+                                'effect' => [
+                                              'hyperlink',
+                                              'hyperlink'
+                                            ],
+                                'status' => 'proposal'
+                              },
           'translator' => {
                             'effect' => [
                                           'hyperlink',
@@ -489,7 +685,14 @@ $Whatpm::ContentChecker::LinkType = {
                                       'hyperlink'
                                     ],
                         'status' => 'proposal'
-                      }
+                      },
+          'wlwmanifest' => {
+                             'effect' => [
+                                           'hyperlink',
+                                           undef
+                                         ],
+                             'status' => 'proposal'
+                           }
         };
 1;
 __DATA__

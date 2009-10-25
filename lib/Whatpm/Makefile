@@ -61,7 +61,7 @@ update-_NamedEntityList.pm:
 	$(RMALL) Entities.html
 
 Entities.html:
-	$(WGET) -O $@ http://www.whatwg.org/specs/web-apps/current-work/multipage/named.html
+	$(WGET) -O $@ http://www.whatwg.org/specs/web-apps/current-work/multipage/named-character-references.html
 
 _LinkTypeList.pm: mklinktypelist.pl RelExtensions.html
 	perl $< > $@

@@ -1,4 +1,4 @@
-package Whatpm::HTML::Tokenizer;
+package Whatpm::HTML::Tokenizer; # -*- Perl -*-
 use strict;
 our $VERSION=do{my @r=(q$Revision: 1.34 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
