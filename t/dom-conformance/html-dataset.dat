@@ -57,18 +57,21 @@
     data-1="" data-2="custom data"
     name="keywords" content="a, b"/>
 #errors
+/meta/@name;metadata:proposed;keywords;w
 
 #data
 <meta name="keywords" content="a,b" xmlns="http://www.w3.org/1999/xhtml"
     data-="custom data"/>
 #errors
 /meta/@data-;attribute not defined;m
+/meta/@name;metadata:proposed;keywords;w
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml" data-A=""
     name="keywords" content="x"/>
 #errors
 /meta/@data-A;attribute not defined;m
+/meta/@name;metadata:proposed;keywords;w
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"

@@ -2381,7 +2381,19 @@ $Element->{$HTML_NS}->{meta} = {
       }
     }; # $check_charset
 
-    ## TODO: metadata conformance
+    ## -- The |name| attribute (document metadata)
+    if (defined $name_attr) {
+      my $name = $name_attr->value;
+      $name =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+      
+      require Whatpm::ContentChecker::HTML::Metadata;
+      Whatpm::ContentChecker::HTML::Metadata->check
+          (name => $name,
+           name_attr => $name_attr,
+           content => $content_attr ? $content_attr->value : '',
+           content_attr => $content_attr || $item->{node},
+           checker => $self);
+    }
 
     ## -- The |http-equiv| attribute (pragmas)
     if (defined $http_equiv_attr) { ## An enumerated attribute

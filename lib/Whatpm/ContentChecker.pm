@@ -426,8 +426,8 @@ my $default_error_level = {
   uncertain => 'u',
 
   html4_fact => 'm',
-  html5_no_may => 'm',
-  html5_fact => 'm',
+  html5_no_may => 'm', # XXX
+  html5_fact => 'm', # XXX
 
   xml_error => 'm', ## TODO: correct?
   xml_id_error => 'm', ## TODO: ?

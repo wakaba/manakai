@@ -175,6 +175,7 @@
 </head>
 #errors
 /head;child element missing;title;m
+/head/meta/@name;metadata:proposed;keywords;w
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -311,6 +312,7 @@
 <title/>
 </head>
 #errors
+/head/meta/@name;metadata:proposed;keywords;w
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -318,6 +320,7 @@
 <meta name="keywords" content="html5"/>
 </head>
 #errors
+/head/meta/@name;metadata:proposed;keywords;w
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -445,6 +448,7 @@
 <title/>
 </head>
 #errors
+/head/meta/@name;metadata:proposed;keywords;w
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -453,6 +457,7 @@
 <meta name="keywords" content="html5"/>
 </head>
 #errors
+/head/meta/@name;metadata:proposed;keywords;w
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -467,6 +472,7 @@
 /html/head/meta;element not allowed:meta charset;m
 /html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@name;metadata:proposed;keywords;w
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -480,6 +486,7 @@
 #errors
 /html/head/meta;in XML:charset;m
 /html/head/meta/@charset;mismatched charset name not checked;u
+/html/head/meta/@name;metadata:proposed;keywords;w
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -831,6 +838,7 @@
 #errors
 /head/noscript;in XML:noscript;m
 /head/noscript/meta;element not allowed:head noscript;m
+/head/noscript/meta/@name;metadata:proposed;keywords;w
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -843,6 +851,7 @@
 /head/noscript;in XML:noscript;m
 /head/noscript/meta/@http-equiv;attribute not allowed;m
 /head/noscript/meta/@http-equiv;enumerated:invalid;m
+/head/noscript/meta/@name;metadata:proposed;keywords;w
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -1719,10 +1728,12 @@ p {color: green}
 <meta name="dns" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta;attribute missing;content;m
+/meta/@name;metadata:not registered;dns;m
 
 #data
 <meta name="dns" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/meta/@name;metadata:not registered;dns;m
 
 #data
 <meta charset="us-ascii" name="dns" content="example.net"
@@ -1732,6 +1743,7 @@ p {color: green}
 /meta/@charset;attribute not allowed;m
 /meta;in XML:charset;m
 /meta/@charset;mismatched charset name not checked;u
+/meta/@name;metadata:not registered;dns;m
 
 #data
 <meta http-equiv="refresh" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1748,6 +1760,7 @@ p {color: green}
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@http-equiv;attribute not allowed;m
+/meta/@name;metadata:not registered;dns;m
 
 #data
 <meta http-equiv="refresh" content="10; url=a.html" charset="us-ascii"
