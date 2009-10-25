@@ -1,4 +1,49 @@
 #data
+<meta name="application-name" content="Abc"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta name="applicatioN-name" content="Abc"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta name="application name" content="Abc"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@name;metadata:not registered;application name;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <title>aa</title>
+  <meta name="application-name" content="Abc"/>
+  <meta name="application-name" content="def"/>
+</head>
+#errors
+/head/meta/@name;metadata:duplicate;application-name;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <title>aa</title>
+  <meta name="application-name" content="Abc"/>
+  <meta name="application-NAME" content="def"/>
+</head>
+#errors
+/head/meta/@name;metadata:duplicate;application-name;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <title>aa</title>
+  <meta name="application-name" content="Abc"/>
+  <meta name="application-name" content="def"/>
+  <meta name="application-name" content="gHi"/>
+</head>
+#errors
+/head/meta/@name;metadata:duplicate;application-name;m
+/head/meta/@name;metadata:duplicate;application-name;m
+
+#data
 <meta name="author" content="Abc"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -6,6 +51,72 @@
 #data
 <meta name="aUthor" content="Abc"
     xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <title>aa</title>
+  <meta name="application-name" content="Abc"/>
+  <meta name="author" content="def"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <title>aa</title>
+  <meta name="author" content="Abc"/>
+  <meta name="author" content="def"/>
+  <meta name="author" content=""/>
+</head>
+#errors
+
+#data
+<meta name="description" content="public"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta name="DESCRIPTION" content="public"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta name="desc" content="public"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@name;metadata:not registered;desc;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <title>aa</title>
+  <meta name="description" content="Abc"/>
+  <meta name="description" content="def"/>
+</head>
+#errors
+/head/meta/@name;metadata:duplicate;description;m
+
+#data
+<meta name="generator" content="public"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta name="GeNeRator" content="public"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta name="generater" content="public"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@name;metadata:not registered;generater;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <title>aa</title>
+  <meta name="generator" content="Abc"/>
+  <meta name="generator" content="def"/>
+</head>
 #errors
 
 #data

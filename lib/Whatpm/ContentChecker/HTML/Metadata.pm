@@ -46,6 +46,9 @@ $Defs->{cache} = {
   status => STATUS_DISCONTINUED,
 };
 
+# XXX Implement all values listed in WHATWG Wiki
+# <http://wiki.whatwg.org/wiki/MetaExtensions>
+
 our $DefaultDef = {
   value_method => 'check_text',
   unique => 0,
@@ -56,6 +59,8 @@ sub check ($@) {
   my ($class, %args) = @_;
   
   my $def = $Defs->{$args{name}} || $DefaultDef;
+
+  # --- Name conformance ---
 
   # XXX synonyms
 
@@ -77,7 +82,22 @@ sub check ($@) {
                                 node => $args{name_attr},
                                 level => $args{checker}->{level}->{must});
   }
-  
+
+  # --- Metadata uniqueness ---
+
+  if ($def->{unique}) {
+    unless ($args{checker}->{flag}->{html_metadata}->{$args{name}}) {
+      $args{checker}->{flag}->{html_metadata}->{$args{name}} = 1;
+    } else {
+      $args{checker}->{onerror}->(type => 'metadata:duplicate', # XXX TODOC
+                                  text => $args{name},
+                                  node => $args{name_attr},
+                                  level => $args{checker}->{level}->{must});
+    }
+  }
+
+  # --- Value conformance ---
+
 } # check
 
 1;
