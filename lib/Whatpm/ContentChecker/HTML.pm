@@ -552,8 +552,7 @@ my $HTMLLinkTypesAttrChecker = sub {
   $element_state->{link_rel} = \%word;
 }; # $HTMLLinkTypesAttrChecker
 
-## TODO: "When an author uses a new type not defined by either this specification or the Wiki page, conformance checkers should offer to add the value to the Wiki, with the details described above, with the "proposal" status."
-
+# XXX URL
 ## URI (or IRI)
 my $HTMLURIAttrChecker = sub {
   my ($self, $attr, $item, $element_state) = @_;
@@ -571,32 +570,39 @@ my $HTMLURIAttrChecker = sub {
       $element_state->{uri_info}->{$attr_name};
 }; # $HTMLURIAttrChecker
 
-## A space separated list of one or more URIs (or IRIs)
+## "A set of space-separated tokens, each of which MUST be a valid
+## URL".
 my $HTMLSpaceURIsAttrChecker = sub {
   my ($self, $attr) = @_;
+
+  my %word;
+  for my $word (grep {length $_}
+                split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+    $word =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+
+    unless ($word{$word}) {
+      $word{$word} = 1;
+    } else {
+      $self->{onerror}->(node => $attr, type => 'duplicate token',
+                         value => $word,
+                         level => $self->{level}->{must});
+    }
+  }
 
   my $type = {ping => 'action',
               profile => 'namespace',
               archive => 'resource'}->{$attr->name};
 
-  my $i = 0;
-  for my $value (split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+  for my $value (keys %word) {
     Whatpm::URIChecker->check_iri_reference ($value, sub {
-      $self->{onerror}->(value => $value, @_, node => $attr, index => $i);
+      $self->{onerror}->(value => $value, @_, node => $attr);
     }, $self->{level});
 
     ## TODO: absolute
     push @{$self->{return}->{uri}->{$value} ||= []},
         {node => $attr, type => {$type => 1}};
-
-    $i++;
   }
-  ## ISSUE: Relative references? (especially, in profile="")
-  ## ISSUE: Leading or trailing white spaces are conformant?
-  ## ISSUE: A sequence of white space characters are conformant?
-  ## ISSUE: A zero-length string is conformant? (It does contain a relative reference, i.e. same as base URI.)
-  ## ISSUE: What is "space"?
-  ## NOTE: Duplication seems not an error.
+
   $self->{has_uri_attr} = 1;
 }; # $HTMLSpaceURIsAttrChecker
 
