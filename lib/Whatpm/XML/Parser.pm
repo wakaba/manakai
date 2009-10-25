@@ -1,5 +1,7 @@
-package Whatpm::XML::Parser;
+package Whatpm::XML::Parser; # -*- Perl -*-
 use strict;
+use warnings;
+our $VERSION = '2.0';
 
 push our @ISA, 'Whatpm::HTML';
 use Whatpm::HTML::Tokenizer qw/:token/;

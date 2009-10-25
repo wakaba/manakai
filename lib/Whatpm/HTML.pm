@@ -1,6 +1,6 @@
-package Whatpm::HTML;
+package Whatpm::HTML; # -*- Perl -*-
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.239 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = '2.0';
 use Error qw(:try);
 
 use Whatpm::HTML::Tokenizer;
@@ -1203,12 +1203,11 @@ sub _tree_construction_root_element ($) {
 
           if ($token->{attributes}->{manifest}) {
             
+            ## XXX resolve URL and drop fragment
+            ## <http://html5.org/tools/web-apps-tracker?from=3479&to=3480>
+            ## <http://manakai.g.hatena.ne.jp/task/2/95>
             $self->{application_cache_selection}
                 ->($token->{attributes}->{manifest}->{value});
-            ## ISSUE: Spec is unclear on relative references.
-            ## According to Hixie (#whatwg 2008-03-19), it should be
-            ## resolved against the base URI of the document in HTML
-            ## or xml:base of the element in XHTML.
           } else {
             
             $self->{application_cache_selection}->(undef);
