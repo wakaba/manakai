@@ -356,3 +356,33 @@
 /frameset/@onunload;attribute not defined;m
 /frameset/@onunload;event handler;u
 /frameset;element not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onpageshow=""
+>a</body>
+#errors
+/body/@onpageshow;event handler;u
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onpageshow=""/>
+#errors
+/frameset/@onpageshow;attribute not defined;m
+/frameset/@onpageshow;event handler;u
+/frameset;element not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onpagehide=""
+>a</body>
+#errors
+/body/@onpagehide;event handler;u
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    onpagehide=""/>
+#errors
+/frameset/@onpagehide;attribute not defined;m
+/frameset/@onpagehide;event handler;u
+/frameset;element not defined;m

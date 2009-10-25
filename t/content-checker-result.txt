@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.008008 for linux
-# Current time local: Sun Oct 25 15:30:07 2009
-# Current time GMT:   Sun Oct 25 06:30:07 2009
+# Current time local: Sun Oct 25 15:54:39 2009
+# Current time GMT:   Sun Oct 25 06:54:39 2009
 # Using Test.pm version 1.25
 # t/content-model-1.dat
 ok 1
@@ -5951,14 +5951,14 @@ ok 5753
 ok 5754
 ok 5755
 ok 5756
-# t/dom-conformance/html-scripting-2.dat
 ok 5757
 ok 5758
-# t/dom-conformance/html-repetitions.dat
 ok 5759
 ok 5760
+# t/dom-conformance/html-scripting-2.dat
 ok 5761
 ok 5762
+# t/dom-conformance/html-repetitions.dat
 ok 5763
 ok 5764
 ok 5765
@@ -6005,27 +6005,27 @@ ok 5805
 ok 5806
 ok 5807
 ok 5808
-Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1326.
 ok 5809
-Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1179.
 ok 5810
-Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1179.
 ok 5811
-Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1179.
 ok 5812
+Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1326.
 ok 5813
+Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1179.
 ok 5814
+Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1179.
 ok 5815
+Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1179.
 ok 5816
 ok 5817
 ok 5818
-Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1326.
 ok 5819
-# t/dom-conformance/html-datatemplate.dat
 ok 5820
 ok 5821
 ok 5822
+Use of uninitialized value in string eq at lib/Whatpm/ContentChecker/HTML.pm line 1326.
 ok 5823
+# t/dom-conformance/html-datatemplate.dat
 ok 5824
 ok 5825
 ok 5826
@@ -6161,15 +6161,15 @@ ok 5955
 ok 5956
 ok 5957
 ok 5958
-not ok 5959
-# Test 5959 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (t/content-checker.pl at line 68 fail #5959)
-#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
-#      Line 1 is missing:
-#       - "/rule/footer/h1;element not allowed:minus;m\n"
+ok 5959
 ok 5960
 ok 5961
 ok 5962
-ok 5963
+not ok 5963
+# Test 5963 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (t/content-checker.pl at line 68 fail #5963)
+#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
+#      Line 1 is missing:
+#       - "/rule/footer/h1;element not allowed:minus;m\n"
 ok 5964
 ok 5965
 ok 5966
@@ -6355,3 +6355,7 @@ ok 6145
 ok 6146
 ok 6147
 ok 6148
+ok 6149
+ok 6150
+ok 6151
+ok 6152
