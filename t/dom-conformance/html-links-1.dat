@@ -681,6 +681,12 @@ x</div>
 /a;no significant content;s
 
 #data
+<a href="http://test/" ping="x x"
+    xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@ping;duplicate token;m
+
+#data
 <a href="http://test/" hreflang=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors

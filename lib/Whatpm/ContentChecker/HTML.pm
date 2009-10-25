@@ -5103,7 +5103,12 @@ $Element->{$HTML_NS}->{map} = {
                                level => $self->{level}->{must}); ## XXX documentation
           }
           
-          ## XXXNOTE: Duplication is not non-conforming.
+          if ($self->{map}->{$value}) {
+            $self->{onerror}->(node => $attr,
+                               type => 'duplicate map name', ## XXX TODOC
+                               value => $value,
+                               level => $self->{level}->{must});
+          }
         } else {
           $self->{onerror}->(node => $attr,
                              type => 'empty attribute value',

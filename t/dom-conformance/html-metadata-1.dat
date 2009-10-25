@@ -971,6 +971,21 @@ p {color: green}
 /head/@profile;syntax error:iriref3987;m
 
 #data
+<head profile="a b" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+
+#data
+<head profile="a b a" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not defined;m
+/head/@profile;duplicate token;m
+
+#data
 <base xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /base;attribute missing:href|target;m
