@@ -1,6 +1,7 @@
 package Whatpm::ContentChecker::HTML::Metadata;
 use strict;
 use warnings;
+our $VERSION = '1.0';
 
 use constant STATUS_NOT_REGISTERED => 0;
 use constant STATUS_PROPOSED => 1;
@@ -11,37 +12,31 @@ use constant STATUS_STANDARD => 4;
 our $Defs;
 
 $Defs->{'application-name'} = {
-  value_method => 'check_application_name',
   unique => 1,
   status => STATUS_STANDARD,
 };
 
 $Defs->{author} = {
-  value_method => 'check_text',
   unique => 0,
   status => STATUS_STANDARD,
 };
 
 $Defs->{description} = {
-  value_method => 'check_text',
   unique => 1,
   status => STATUS_STANDARD,
 };
 
 $Defs->{generator} = {
-  value_method => 'check_text',
   unique => 0,
   status => STATUS_STANDARD,
 };
 
 $Defs->{keywords} = {
-  value_method => 'check_text', # XXX
   unique => 0,
   status => STATUS_PROPOSED,
 };
 
 $Defs->{cache} = {
-  value_method => 'check_text', # XXX
   unique => 0,
   status => STATUS_DISCONTINUED,
 };
@@ -50,7 +45,6 @@ $Defs->{cache} = {
 # <http://wiki.whatwg.org/wiki/MetaExtensions>
 
 our $DefaultDef = {
-  value_method => 'check_text',
   unique => 0,
   status => STATUS_NOT_REGISTERED,
 };
@@ -60,9 +54,12 @@ sub check ($@) {
   
   my $def = $Defs->{$args{name}} || $DefaultDef;
 
-  # --- Name conformance ---
+  ## XXX name pattern match (e.g. /^dc\..+/)
 
-  # XXX synonyms
+  ## --- Name conformance ---
+
+  ## XXX synonyms (necessary to support some of wiki-documented
+  ## metadata names
 
   if ($def->{status} == STATUS_STANDARD or $def->{status} == STATUS_RATIFIED) {
     #
@@ -83,7 +80,7 @@ sub check ($@) {
                                 level => $args{checker}->{level}->{must});
   }
 
-  # --- Metadata uniqueness ---
+  ## --- Metadata uniqueness ---
 
   if ($def->{unique}) {
     unless ($args{checker}->{flag}->{html_metadata}->{$args{name}}) {
@@ -96,7 +93,10 @@ sub check ($@) {
     }
   }
 
-  # --- Value conformance ---
+  ## --- Value conformance ---
+
+  ## XXX implement value conformance checking (not necessary for
+  ## standard metadata names)
 
 } # check
 
