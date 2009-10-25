@@ -3336,7 +3336,7 @@ $Element->{$HTML_NS}->{a} = {
               FEATURE_M12N10_REC,
           lang => FEATURE_HTML5_REC,
           media => FEATURE_HTML5_WD | FEATURE_XHTML2_ED,
-          methods => FEATURE_HTML20_RFC,
+          methods => FEATURE_HTML5_OBSOLETE,
           name => FEATURE_HTML5_OBSOLETE, # XXX allowed in some cases
           nonce => FEATURE_RFC2659,
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -3349,7 +3349,7 @@ $Element->{$HTML_NS}->{a} = {
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           target => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
           type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-          urn => FEATURE_HTML20_RFC,
+          urn => FEATURE_HTML5_OBSOLETE,
         }->{$attr_ln};
 
         $checker = {
@@ -4335,6 +4335,8 @@ $Element->{$HTML_NS}->{ruby} = {
     }    
   },
 };
+
+# XXX rb FEATURE_HTML5_OBSOLETE
 
 $Element->{$HTML_NS}->{rt} = {
   %HTMLPhrasingContentChecker,
@@ -7995,7 +7997,7 @@ $Element->{$HTML_NS}->{frameset} = {
 
 =pod
 
-HTML 2.0 nextid @n
+HTML 2.0 nextid @n FEATURE_HTML5_OBSOLETE
 
 RFC 2659: CERTS CRYPTOPTS 
 
