@@ -197,6 +197,7 @@ for my $tr (@row) {
         $_->manakai_local_name eq 'td'
   } @{$tr->child_nodes};
   my $keyword = $n->($td[0]->text_content);
+  $keyword =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
   if ($LinkTypes->{$keyword}) {
     warn "$0: Link type $keyword is already defined\n";
     next;
