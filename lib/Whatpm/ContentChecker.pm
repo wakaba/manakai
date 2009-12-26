@@ -605,7 +605,8 @@ sub check_element ($$$;$) {
   $self->{usemap} = [];
   $self->{ref} = []; # datetemplate data references
   $self->{template} = []; # datatemplate template references
-  $self->{map} = {};
+  $self->{map_exact} = {}; # |map| elements with their original |name|s
+  $self->{map_compat} = {}; # |map| elements with their lowercased |name|s
   $self->{has_link_type} = {};
   $self->{flag} = {};
   #$self->{has_uri_attr};
@@ -811,10 +812,29 @@ next unless $code;## TODO: temp.
 
   ## TODO: Maybe we should have $document->manakai_get_by_fragment or something
 
+  ## |usemap| attribute values MUST be valid hash-name references
+  ## pointing |map| elements.
   for (@{$self->{usemap}}) {
-    unless ($self->{map}->{$_->[0]}) {
-      $self->{onerror}->(node => $_->[1], type => 'no referenced map',
-                         level => $self->{level}->{must});
+    ## $_->[0]: Original |usemap| attribute value without leading '#'.
+    ## $_->[1]: The |usemap| attribute node.
+
+    if ($self->{map_exact}->{$_->[0]}) {
+      ## There is at least one |map| element with the specified name.
+      #
+    } else {
+      my $name_compat = lc $_->[0]; ## XXX compatibility caseless match.
+      if ($self->{map_compat}->{$name_compat}) {
+        ## There is at least one |map| element with the specified name
+        ## in different case combination.
+        $self->{onerror}->(node => $_->[1],
+                           type => 'hashref:wrong case', ## XXX document
+                           level => $self->{level}->{must});
+      } else {
+        ## There is no |map| element with the specified name at all.
+        $self->{onerror}->(node => $_->[1],
+                           type => 'no referenced map',
+                           level => $self->{level}->{must});
+      }
     }
   }
 
@@ -848,7 +868,8 @@ next unless $code;## TODO: temp.
   delete $self->{usemap};
   delete $self->{ref};
   delete $self->{template};
-  delete $self->{map};
+  delete $self->{map_exact};
+  delete $self->{map_compat};
   return $self->{return};
 } # check_element
 

@@ -1789,7 +1789,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#AA"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map;m
+/div/p/img/@usemap;hashref:wrong case;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1806,7 +1806,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map;m
+/div/p/img/@usemap;hashref:wrong case;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1864,6 +1864,50 @@ aa<map name="x">b<map name="y">bb</map></map>
 </div>
 #errors
 /div/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a">x</map>
+<map name="A">x</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="A">x</map>
+<map name="a">x</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a">x
+<map name="a">x</map>
+</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/map/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a">x</map>
+<img src="" alt="" usemap="#A"/>
+</div>
+#errors
+/div/img/@usemap;hashref:wrong case;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="A">x</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/img/@usemap;hashref:wrong case;m
 
 #data
 <img alt="" src="" align="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2511,7 +2555,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p><object data="http://test/" usemap="#AA">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;no referenced map;m
+/div/p/object/@usemap;hashref:wrong case;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2519,7 +2563,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
-/div/p/object/@usemap;no referenced map;m
+/div/p/object/@usemap;hashref:wrong case;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">

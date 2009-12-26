@@ -5093,13 +5093,14 @@ $Element->{$HTML_NS}->{map} = {
       name => sub {
         my ($self, $attr) = @_;
         my $value = $attr->value;
+        my $value_compat = lc $value; ## XXX compatibility caseless match
         if (length $value) {
           if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
             $self->{onerror}->(node => $attr, type => 'space in map name',
                                level => $self->{level}->{must}); ## XXX documentation
           }
           
-          if ($self->{map}->{$value}) {
+          if ($self->{map_compat}->{$value_compat}) {
             $self->{onerror}->(node => $attr,
                                type => 'duplicate map name', ## XXX TODOC
                                value => $value,
@@ -5110,7 +5111,8 @@ $Element->{$HTML_NS}->{map} = {
                              type => 'empty attribute value',
                              level => $self->{level}->{must});
         }
-        $self->{map}->{$value} ||= $attr;
+        $self->{map_exact}->{$value} ||= $attr;
+        $self->{map_compat}->{$value_compat} ||= $attr;
         $has_name = [$value, $attr];
       },
     }, {

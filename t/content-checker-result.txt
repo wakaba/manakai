@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010001 for linux
-# Current time local: Sat Dec 26 15:46:54 2009
-# Current time GMT:   Sat Dec 26 06:46:54 2009
+# Current time local: Sat Dec 26 16:06:51 2009
+# Current time GMT:   Sat Dec 26 07:06:51 2009
 # Using Test.pm version 1.25_02
 # t/content-model-1.dat
 ok 1
@@ -2047,41 +2047,41 @@ ok 1976
 ok 1977
 ok 1978
 ok 1979
-not ok 1980
-# Test 1980 got: "" (t/content-checker.pl at line 68 fail #1980)
-#      Expected: "/html/body/embed/@xml:space;attribute not defined;m" (<!DOCTYPE HTML><title>x</title>
-#<embed src="http://test/"
-#    xml:space=preserve>)
+ok 1980
 ok 1981
 ok 1982
 ok 1983
 ok 1984
-ok 1985
+not ok 1985
+# Test 1985 got: "" (t/content-checker.pl at line 68 fail #1985)
+#      Expected: "/html/body/embed/@xml:space;attribute not defined;m" (<!DOCTYPE HTML><title>x</title>
+#<embed src="http://test/"
+#    xml:space=preserve>)
 ok 1986
 ok 1987
 ok 1988
 ok 1989
-not ok 1990
-# Test 1990 got: "" (t/content-checker.pl at line 68 fail #1990)
-#      Expected: "/embed/@name;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
-#    name="name1"/>)
-not ok 1991
-# Test 1991 got: "" (t/content-checker.pl at line 68 fail #1991)
-#      Expected: "/embed/@align;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
-#    align="left"/>)
+ok 1990
+ok 1991
 ok 1992
 ok 1993
 ok 1994
-ok 1995
-ok 1996
+not ok 1995
+# Test 1995 got: "" (t/content-checker.pl at line 68 fail #1995)
+#      Expected: "/embed/@name;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+#    name="name1"/>)
+not ok 1996
+# Test 1996 got: "" (t/content-checker.pl at line 68 fail #1996)
+#      Expected: "/embed/@align;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+#    align="left"/>)
 ok 1997
-Parse error (unmatched end tag) at line 2 column 16
-Parse error (in body:#eof) at line 2 column 24
 ok 1998
 ok 1999
 ok 2000
 ok 2001
 ok 2002
+Parse error (unmatched end tag) at line 2 column 16
+Parse error (in body:#eof) at line 2 column 24
 ok 2003
 ok 2004
 ok 2005
@@ -2108,14 +2108,14 @@ ok 2025
 ok 2026
 ok 2027
 ok 2028
-not ok 2029
-# Test 2029 got: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m\n/object;no significant content;s" (t/content-checker.pl at line 68 fail #2029)
-#      Expected: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m" (<object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2029
 ok 2030
 ok 2031
 ok 2032
 ok 2033
-ok 2034
+not ok 2034
+# Test 2034 got: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m\n/object;no significant content;s" (t/content-checker.pl at line 68 fail #2034)
+#      Expected: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m" (<object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2035
 ok 2036
 ok 2037
@@ -2178,41 +2178,41 @@ ok 2093
 ok 2094
 ok 2095
 ok 2096
-not ok 2097
-# Test 2097 got: "" (t/content-checker.pl at line 68 fail #2097)
+ok 2097
+ok 2098
+ok 2099
+ok 2100
+ok 2101
+not ok 2102
+# Test 2102 got: "" (t/content-checker.pl at line 68 fail #2102)
 #      Expected: "/video/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <video src="">aa</video>
 #</video>)
-not ok 2098
-# Test 2098 got: "" (t/content-checker.pl at line 68 fail #2098)
+not ok 2103
+# Test 2103 got: "" (t/content-checker.pl at line 68 fail #2103)
 #      Expected: "/video/p/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <p><video src="">aa</video></p>
 #</video>)
-not ok 2099
-# Test 2099 got: "" (t/content-checker.pl at line 68 fail #2099)
+not ok 2104
+# Test 2104 got: "" (t/content-checker.pl at line 68 fail #2104)
 #      Expected: "/video/ins/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><video src="">aa</video></ins>
 #</video>)
-not ok 2100
-# Test 2100 got: "" (t/content-checker.pl at line 68 fail #2100)
+not ok 2105
+# Test 2105 got: "" (t/content-checker.pl at line 68 fail #2105)
 #      Expected: "/video/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <audio src="">aa</audio>
 #</video>)
-not ok 2101
-# Test 2101 got: "" (t/content-checker.pl at line 68 fail #2101)
+not ok 2106
+# Test 2106 got: "" (t/content-checker.pl at line 68 fail #2106)
 #      Expected: "/video/p/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <p><audio src="">aa</audio></p>
 #</video>)
-not ok 2102
-# Test 2102 got: "" (t/content-checker.pl at line 68 fail #2102)
+not ok 2107
+# Test 2107 got: "" (t/content-checker.pl at line 68 fail #2107)
 #      Expected: "/video/ins/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><audio src="">aa</audio></ins>
 #</video>)
-ok 2103
-ok 2104
-ok 2105
-ok 2106
-ok 2107
 ok 2108
 ok 2109
 ok 2110
@@ -2225,41 +2225,41 @@ ok 2116
 ok 2117
 ok 2118
 ok 2119
-not ok 2120
-# Test 2120 got: "" (t/content-checker.pl at line 68 fail #2120)
+ok 2120
+ok 2121
+ok 2122
+ok 2123
+ok 2124
+not ok 2125
+# Test 2125 got: "" (t/content-checker.pl at line 68 fail #2125)
 #      Expected: "/audio/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <video src="">aa</video>
 #</audio>)
-not ok 2121
-# Test 2121 got: "" (t/content-checker.pl at line 68 fail #2121)
+not ok 2126
+# Test 2126 got: "" (t/content-checker.pl at line 68 fail #2126)
 #      Expected: "/audio/p/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <p><video src="">aa</video></p>
 #</audio>)
-not ok 2122
-# Test 2122 got: "" (t/content-checker.pl at line 68 fail #2122)
+not ok 2127
+# Test 2127 got: "" (t/content-checker.pl at line 68 fail #2127)
 #      Expected: "/audio/ins/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><video src="">aa</video></ins>
 #</audio>)
-not ok 2123
-# Test 2123 got: "" (t/content-checker.pl at line 68 fail #2123)
+not ok 2128
+# Test 2128 got: "" (t/content-checker.pl at line 68 fail #2128)
 #      Expected: "/audio/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <audio src="">aa</audio>
 #</audio>)
-not ok 2124
-# Test 2124 got: "" (t/content-checker.pl at line 68 fail #2124)
+not ok 2129
+# Test 2129 got: "" (t/content-checker.pl at line 68 fail #2129)
 #      Expected: "/audio/p/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <p><audio src="">aa</audio></p>
 #</audio>)
-not ok 2125
-# Test 2125 got: "" (t/content-checker.pl at line 68 fail #2125)
+not ok 2130
+# Test 2130 got: "" (t/content-checker.pl at line 68 fail #2130)
 #      Expected: "/audio/ins/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><audio src="">aa</audio></ins>
 #</audio>)
-ok 2126
-ok 2127
-ok 2128
-ok 2129
-ok 2130
 ok 2131
 ok 2132
 ok 2133
@@ -2423,12 +2423,12 @@ ok 2290
 ok 2291
 ok 2292
 ok 2293
-# t/dom-conformance/html-tables-1.dat
 ok 2294
 ok 2295
 ok 2296
 ok 2297
 ok 2298
+# t/dom-conformance/html-tables-1.dat
 ok 2299
 ok 2300
 ok 2301
@@ -2447,14 +2447,14 @@ ok 2313
 ok 2314
 ok 2315
 ok 2316
-not ok 2317
-# Test 2317 got: "/table/@border;attribute not defined;m" (t/content-checker.pl at line 68 fail #2317)
-#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2317
 ok 2318
 ok 2319
 ok 2320
 ok 2321
-ok 2322
+not ok 2322
+# Test 2322 got: "/table/@border;attribute not defined;m" (t/content-checker.pl at line 68 fail #2322)
+#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2323
 ok 2324
 ok 2325
@@ -2613,12 +2613,12 @@ ok 2477
 ok 2478
 ok 2479
 ok 2480
-# t/dom-conformance/html-forms-1.dat
 ok 2481
 ok 2482
 ok 2483
 ok 2484
 ok 2485
+# t/dom-conformance/html-forms-1.dat
 ok 2486
 ok 2487
 ok 2488
@@ -2629,14 +2629,14 @@ ok 2492
 ok 2493
 ok 2494
 ok 2495
-not ok 2496
-# Test 2496 got: "/form/meta/@name;metadata:proposed;keywords;w\n/form/meta;element not allowed:flow;m\n/form;no significant content;s" (t/content-checker.pl at line 68 fail #2496)
-#      Expected: "/form/meta;element not allowed:flow;m\n/form;no significant content;s" (<form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>)
+ok 2496
 ok 2497
 ok 2498
 ok 2499
 ok 2500
-ok 2501
+not ok 2501
+# Test 2501 got: "/form/meta/@name;metadata:proposed;keywords;w\n/form/meta;element not allowed:flow;m\n/form;no significant content;s" (t/content-checker.pl at line 68 fail #2501)
+#      Expected: "/form/meta;element not allowed:flow;m\n/form;no significant content;s" (<form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>)
 ok 2502
 ok 2503
 ok 2504
@@ -2726,15 +2726,15 @@ ok 2587
 ok 2588
 ok 2589
 ok 2590
-not ok 2591
-# Test 2591 got: "/form/a/@name;attribute not defined;m" (t/content-checker.pl at line 68 fail #2591)
-#      Expected: "/form/a/@name;attribute not defined;m\n/form/a/@name;unknown attribute;u" (<form xmlns="http://www.w3.org/1999/xhtml"
-#    name="a">x<a name="a">u</a></form>)
+ok 2591
 ok 2592
 ok 2593
 ok 2594
 ok 2595
-ok 2596
+not ok 2596
+# Test 2596 got: "/form/a/@name;attribute not defined;m" (t/content-checker.pl at line 68 fail #2596)
+#      Expected: "/form/a/@name;attribute not defined;m\n/form/a/@name;unknown attribute;u" (<form xmlns="http://www.w3.org/1999/xhtml"
+#    name="a">x<a name="a">u</a></form>)
 ok 2597
 ok 2598
 ok 2599
@@ -2958,12 +2958,12 @@ ok 2816
 ok 2817
 ok 2818
 ok 2819
-# t/dom-conformance/html-form-label.dat
 ok 2820
 ok 2821
 ok 2822
 ok 2823
 ok 2824
+# t/dom-conformance/html-form-label.dat
 ok 2825
 ok 2826
 ok 2827
@@ -3040,12 +3040,12 @@ ok 2897
 ok 2898
 ok 2899
 ok 2900
-# t/dom-conformance/html-form-input-1.dat
 ok 2901
 ok 2902
 ok 2903
 ok 2904
 ok 2905
+# t/dom-conformance/html-form-input-1.dat
 ok 2906
 ok 2907
 ok 2908
@@ -3600,12 +3600,12 @@ ok 3456
 ok 3457
 ok 3458
 ok 3459
-Parse error (lt in attr value) at line 3 column 12
 ok 3460
 ok 3461
 ok 3462
 ok 3463
 ok 3464
+Parse error (lt in attr value) at line 3 column 12
 ok 3465
 ok 3466
 ok 3467
@@ -4633,7 +4633,12 @@ ok 4488
 ok 4489
 ok 4490
 ok 4491
-ok 4492
+not ok 4492
+# Test 4492 got: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;hashref:wrong case;m" (t/content-checker.pl at line 68 fail #4492)
+#      Expected: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;no referenced map;m" (<map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
+#<input type="image"
+#    usemap="#abc"/>x
+#</map>)
 ok 4493
 ok 4494
 ok 4495
@@ -5006,31 +5011,31 @@ ok 4861
 ok 4862
 ok 4863
 ok 4864
-not ok 4865
-# Test 4865 got: "" (t/content-checker.pl at line 68 fail #4865)
+ok 4865
+ok 4866
+ok 4867
+ok 4868
+ok 4869
+not ok 4870
+# Test 4870 got: "" (t/content-checker.pl at line 68 fail #4870)
 #      Expected: "/input/@value;datetime:bad year;m" (<input type="date" xmlns="http://www.w3.org/1999/xhtml"
 #    value="0000-11-22"/>)
-not ok 4866
-# Test 4866 got: "" (t/content-checker.pl at line 68 fail #4866)
+not ok 4871
+# Test 4871 got: "" (t/content-checker.pl at line 68 fail #4871)
 #      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
 #    value="0000-11-22T00:11:22Z"/>)
-not ok 4867
-# Test 4867 got: "" (t/content-checker.pl at line 68 fail #4867)
+not ok 4872
+# Test 4872 got: "" (t/content-checker.pl at line 68 fail #4872)
 #      Expected: "/input/@value;datetime:bad year;m" (<input type="month" xmlns="http://www.w3.org/1999/xhtml"
 #    value="0000-11"/>)
-not ok 4868
-# Test 4868 got: "/input/@value;week:bad year;m" (t/content-checker.pl at line 68 fail #4868)
+not ok 4873
+# Test 4873 got: "/input/@value;week:bad year;m" (t/content-checker.pl at line 68 fail #4873)
 #      Expected: "/input/@value;datetime:bad year;m" (<input type="week" xmlns="http://www.w3.org/1999/xhtml"
 #    value="0000-W11"/>)
-not ok 4869
-# Test 4869 got: "" (t/content-checker.pl at line 68 fail #4869)
+not ok 4874
+# Test 4874 got: "" (t/content-checker.pl at line 68 fail #4874)
 #      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
 #    value="0000-11-22T00:11:22"/>)
-ok 4870
-ok 4871
-ok 4872
-ok 4873
-ok 4874
 ok 4875
 ok 4876
 ok 4877
@@ -5198,12 +5203,12 @@ ok 5038
 ok 5039
 ok 5040
 ok 5041
-# t/dom-conformance/html-form-button.dat
 ok 5042
 ok 5043
 ok 5044
 ok 5045
 ok 5046
+# t/dom-conformance/html-form-button.dat
 ok 5047
 ok 5048
 ok 5049
@@ -5373,12 +5378,12 @@ ok 5212
 ok 5213
 ok 5214
 ok 5215
-# t/dom-conformance/html-form-select.dat
 ok 5216
 ok 5217
 ok 5218
 ok 5219
 ok 5220
+# t/dom-conformance/html-form-select.dat
 ok 5221
 ok 5222
 ok 5223
@@ -5460,12 +5465,12 @@ ok 5298
 ok 5299
 ok 5300
 ok 5301
-# t/dom-conformance/html-form-datalist.dat
 ok 5302
 ok 5303
 ok 5304
 ok 5305
 ok 5306
+# t/dom-conformance/html-form-datalist.dat
 ok 5307
 ok 5308
 ok 5309
@@ -5518,12 +5523,12 @@ ok 5355
 ok 5356
 ok 5357
 ok 5358
-# t/dom-conformance/html-form-textarea.dat
 ok 5359
 ok 5360
 ok 5361
 ok 5362
 ok 5363
+# t/dom-conformance/html-form-textarea.dat
 ok 5364
 ok 5365
 ok 5366
@@ -5589,12 +5594,12 @@ ok 5425
 ok 5426
 ok 5427
 ok 5428
-# t/dom-conformance/html-form-keygen.dat
 ok 5429
 ok 5430
 ok 5431
 ok 5432
 ok 5433
+# t/dom-conformance/html-form-keygen.dat
 ok 5434
 ok 5435
 ok 5436
@@ -5615,64 +5620,64 @@ ok 5450
 ok 5451
 ok 5452
 ok 5453
-# t/dom-conformance/html-interactive-1.dat
 ok 5454
 ok 5455
 ok 5456
 ok 5457
 ok 5458
-not ok 5459
-# Test 5459 got: "/head/noscript/meta/@name;metadata:proposed;keywords;w\n/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (t/content-checker.pl at line 68 fail #5459)
+# t/dom-conformance/html-interactive-1.dat
+ok 5459
+ok 5460
+ok 5461
+ok 5462
+ok 5463
+not ok 5464
+# Test 5464 got: "/head/noscript/meta/@name;metadata:proposed;keywords;w\n/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (t/content-checker.pl at line 68 fail #5464)
 #      Expected: "/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (<head xmlns="http://www.w3.org/1999/xhtml">
 #<title/>
 #<noscript>
 #<meta name="keywords" content=""/>
 #</noscript>
 #</head>)
-ok 5460
-ok 5461
-ok 5462
-ok 5463
-ok 5464
 ok 5465
 ok 5466
 ok 5467
-not ok 5468
-# Test 5468 got: "/noscript/meta/@name;metadata:proposed;keywords;w\n/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (t/content-checker.pl at line 68 fail #5468)
-#      Expected: "/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
-#<meta name="keywords" content=""/>
-#</noscript>)
+ok 5468
 ok 5469
 ok 5470
 ok 5471
 ok 5472
-ok 5473
+not ok 5473
+# Test 5473 got: "/noscript/meta/@name;metadata:proposed;keywords;w\n/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (t/content-checker.pl at line 68 fail #5473)
+#      Expected: "/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
+#<meta name="keywords" content=""/>
+#</noscript>)
 ok 5474
 ok 5475
 ok 5476
 ok 5477
 ok 5478
 ok 5479
-not ok 5480
-# Test 5480 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5480)
+ok 5480
+ok 5481
+ok 5482
+ok 5483
+ok 5484
+not ok 5485
+# Test 5485 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5485)
 #      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml"></details>)
-not ok 5481
-# Test 5481 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5481)
+not ok 5486
+# Test 5486 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5486)
 #      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml">   </details>)
-not ok 5482
-# Test 5482 got: "" (t/content-checker.pl at line 68 fail #5482)
+not ok 5487
+# Test 5487 got: "" (t/content-checker.pl at line 68 fail #5487)
 #      Expected: "/details;child element missing;legend;m" (<details xmlns="http://www.w3.org/1999/xhtml">xxxx</details>)
-not ok 5483
-# Test 5483 got: "/details/p;no significant content;s\n/details;no significant content;s" (t/content-checker.pl at line 68 fail #5483)
+not ok 5488
+# Test 5488 got: "/details/p;no significant content;s\n/details;no significant content;s" (t/content-checker.pl at line 68 fail #5488)
 #      Expected: "/details/p;no significant content;s\n/details;child element missing;legend;m\n/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml"><p></p></details>)
-not ok 5484
-# Test 5484 got: "" (t/content-checker.pl at line 68 fail #5484)
+not ok 5489
+# Test 5489 got: "" (t/content-checker.pl at line 68 fail #5489)
 #      Expected: "/details;child element missing;legend;m" (<details xmlns="http://www.w3.org/1999/xhtml"><p>xxx</p></details>)
-ok 5485
-ok 5486
-ok 5487
-ok 5488
-ok 5489
 ok 5490
 ok 5491
 ok 5492
@@ -5683,14 +5688,14 @@ ok 5496
 ok 5497
 ok 5498
 ok 5499
-not ok 5500
-# Test 5500 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (t/content-checker.pl at line 68 fail #5500)
-#      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
+ok 5500
 ok 5501
 ok 5502
 ok 5503
 ok 5504
-ok 5505
+not ok 5505
+# Test 5505 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (t/content-checker.pl at line 68 fail #5505)
+#      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
 ok 5506
 ok 5507
 ok 5508
@@ -5760,26 +5765,26 @@ ok 5571
 ok 5572
 ok 5573
 ok 5574
-not ok 5575
-# Test 5575 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5575)
+ok 5575
+ok 5576
+ok 5577
+ok 5578
+ok 5579
+not ok 5580
+# Test 5580 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5580)
 #      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 5576
-# Test 5576 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5576)
+not ok 5581
+# Test 5581 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5581)
 #      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 5577
-# Test 5577 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5577)
+not ok 5582
+# Test 5582 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5582)
 #      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="open" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 5578
-# Test 5578 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5578)
+not ok 5583
+# Test 5583 got: "/details;no significant content;s" (t/content-checker.pl at line 68 fail #5583)
 #      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 5579
-# Test 5579 got: "/details/@open;boolean:invalid;m\n/details;no significant content;s" (t/content-checker.pl at line 68 fail #5579)
+not ok 5584
+# Test 5584 got: "/details/@open;boolean:invalid;m\n/details;no significant content;s" (t/content-checker.pl at line 68 fail #5584)
 #      Expected: "/details/@open;boolean:invalid;m\n/details;child element missing;legend;m\n/details;no significant content;s" (<details open="true" xmlns="http://www.w3.org/1999/xhtml"/>)
-ok 5580
-ok 5581
-ok 5582
-ok 5583
-ok 5584
 ok 5585
 ok 5586
 ok 5587
@@ -5909,12 +5914,12 @@ ok 5710
 ok 5711
 ok 5712
 ok 5713
-# t/dom-conformance/html-scripting-1.dat
 ok 5714
 ok 5715
 ok 5716
 ok 5717
 ok 5718
+# t/dom-conformance/html-scripting-1.dat
 ok 5719
 ok 5720
 ok 5721
@@ -5964,15 +5969,15 @@ ok 5764
 ok 5765
 ok 5766
 ok 5767
-# t/dom-conformance/html-scripting-2.dat
 ok 5768
 ok 5769
-# t/dom-conformance/html-repetitions.dat
 ok 5770
 ok 5771
 ok 5772
+# t/dom-conformance/html-scripting-2.dat
 ok 5773
 ok 5774
+# t/dom-conformance/html-repetitions.dat
 ok 5775
 ok 5776
 ok 5777
@@ -6029,12 +6034,12 @@ ok 5827
 ok 5828
 ok 5829
 ok 5830
-# t/dom-conformance/html-datatemplate.dat
 ok 5831
 ok 5832
 ok 5833
 ok 5834
 ok 5835
+# t/dom-conformance/html-datatemplate.dat
 ok 5836
 ok 5837
 ok 5838
@@ -6169,16 +6174,16 @@ ok 5966
 ok 5967
 ok 5968
 ok 5969
-not ok 5970
-# Test 5970 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (t/content-checker.pl at line 68 fail #5970)
-#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
-#      Line 1 is missing:
-#       - "/rule/footer/h1;element not allowed:minus;m\n"
+ok 5970
 ok 5971
 ok 5972
 ok 5973
 ok 5974
-ok 5975
+not ok 5975
+# Test 5975 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (t/content-checker.pl at line 68 fail #5975)
+#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
+#      Line 1 is missing:
+#       - "/rule/footer/h1;element not allowed:minus;m\n"
 ok 5976
 ok 5977
 ok 5978
@@ -6363,3 +6368,8 @@ ok 6156
 ok 6157
 ok 6158
 ok 6159
+ok 6160
+ok 6161
+ok 6162
+ok 6163
+ok 6164
