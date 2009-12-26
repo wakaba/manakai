@@ -1182,7 +1182,7 @@ my $HTMLRepeatIndexAttrChecker = sub {
   if (defined $attr->namespace_uri) {
     my $oe = $attr->owner_element;
     my $oe_nsuri = $oe->namespace_uri;
-    if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) { ## TODO: wrong? or -> and ? XXX
+    if (defined $oe_nsuri and $oe_nsuri eq $HTML_NS) {
       $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                          level => $self->{level}->{must});
     }
@@ -1325,7 +1325,7 @@ my $HTMLAttrChecker = {
     if (defined $attr->namespace_uri) {
       my $oe = $attr->owner_element;
       my $oe_nsuri = $oe->namespace_uri;
-      if (defined $oe_nsuri or $oe_nsuri eq $HTML_NS) { # XXX or -> and ?
+      if (defined $oe_nsuri and $oe_nsuri eq $HTML_NS) {
         $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                            level => $self->{level}->{must});
       }
