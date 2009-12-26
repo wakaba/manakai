@@ -1272,7 +1272,7 @@ my $HTMLAttrChecker = {
   class => sub {
     my ($self, $attr) = @_;
     
-    ## NOTE: "Unordered set of unique space-separated tokens".
+    ## NOTE: "set of unique space-separated tokens".
 
     my %word;
     for my $word (grep {length $_}
@@ -1280,10 +1280,6 @@ my $HTMLAttrChecker = {
       unless ($word{$word}) {
         $word{$word} = 1;
         push @{$self->{return}->{class}->{$word}||=[]}, $attr;
-      } else {
-        $self->{onerror}->(node => $attr, type => 'duplicate token',
-                           value => $word,
-                           level => $self->{level}->{must});
       }
     }
   },
