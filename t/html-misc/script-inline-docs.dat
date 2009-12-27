@@ -1,0 +1,86 @@
+#data
+#errors
+
+#data
+| 
+| 
+#errors
+
+#data
+| <!-- abc -->
+| 
+#errors
+1;1;m;script:doc:invalid char;<
+
+#data
+| /* abc */
+#errors
+
+#data
+| /* abc */
+| /* def */
+#errors
+
+#data
+| /*abc*//**//*def*//**/
+#errors
+
+#data
+| /**********************/
+#errors
+
+#data escaped
+| \u0009
+| /* abc */   \u0020
+| \u0009
+| 
+| \u0020
+#errors
+
+#data
+| /*
+| 
+| 
+| */
+#errors
+
+#data
+| /*
+| /*
+| */
+| */
+#errors
+4;1;m;script:doc:invalid char;*
+
+#data
+| //
+| 
+#errors
+
+#data
+| // abc
+| //def
+| 
+#errors
+
+#data
+| // abc
+#errors
+1;7;m;script:doc:missing newline;
+
+#data
+| // abc
+| /* abc */
+| // def
+| /* xyz */
+#errors
+
+#data
+| /* abc
+#errors
+1;7;m;script:doc:unclosed comment;
+
+#data
+| // /* abc
+| 
+#errors

@@ -28,6 +28,7 @@ PERL_TEST_ = $(PERL) $(PERL_OPTIONS_ALL) \
              -MExtUtils::Command::MM \
              -e "test_harness ($(TEST_VERBOSE), '$(INST_LIB)', \
                                       '$(INST_ARCHLIB)')"
+PROVE = prove
 
 DOMTEST_TESTS_DIR = $(MANAKAI_ROOT_DIR)../domts/tests/
 DOMTEST_PERL_DIR = $(MANAKAI_TEST_DIR)dom/
@@ -65,7 +66,9 @@ dom1core:
 	  $(PERL_TEST_) $(DOMTEST_PERL_DIR)level1/core/$(DOMTEST_FILE).pl
 
 test: 
-	$(PERL_TEST_) *$(PT_SUFFIX)
+	$(PROVE) Whatpm-HTML-ScriptChecker.t
+
+#	$(PERL_TEST_) *$(PT_SUFFIX)
 
 test-module-all: \
   test-module-dom
