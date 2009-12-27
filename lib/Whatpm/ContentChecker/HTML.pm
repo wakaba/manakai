@@ -2615,7 +2615,7 @@ $Element->{$HTML_NS}->{style} = {
 
     ## |style| element content restrictions
     my $tc = $item->{node}->text_content;
-    $tc =~ s/<!--.*-->//gs;
+    $tc =~ s/.*<!--.*-->//gs;
     if ($tc =~ /<!--/) {
       $self->{onerror}->(node => $item->{node},
                          type => 'style:unclosed cdo', ## XXX documentation
@@ -2624,7 +2624,7 @@ $Element->{$HTML_NS}->{style} = {
 
     $HTMLChecker{check_end}->(@_);
   },
-};
+}; # style
 ## ISSUE: Relationship to significant content check?
 
 $Element->{$HTML_NS}->{body} = {
