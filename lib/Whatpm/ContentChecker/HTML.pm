@@ -7425,6 +7425,14 @@ $Element->{$HTML_NS}->{script} = {
                              is_char_string => 1});
       }
     }
+
+    if (length $element_state->{text}) {
+      $self->{onsubdoc}->({s => $element_state->{text},
+                           container_node => $item->{node},
+                           media_type => 'text/x-script-element-text',
+                           is_char_string => 1});
+    }
+
     $HTMLChecker{check_end}->(@_);
   },
   ## TODO: There MUST be |type| unless the script type is JavaScript. (resource error)
@@ -7432,7 +7440,7 @@ $Element->{$HTML_NS}->{script} = {
   ## inline, the format of the data must be given using the type attribute,
   ## and the src attribute must not be specified." - not testable.
       ## TODO: It would be possible to err <script type=text/plain src=...>
-};
+}; # script
 ## ISSUE: Significant check and text child node
 
 ## NOTE: When script is disabled.
