@@ -19,6 +19,7 @@ sub test_files (@) {
 
   require 't/testfiles.pl';
   execute_test ($_, {
+    data => {is_prefixed => 1},
     errors => {is_list => 1},
   }, \&test) for @FILES;
 } # test_files
