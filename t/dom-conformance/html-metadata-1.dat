@@ -2421,3 +2421,83 @@ p {color: green}
 /section/style;element not allowed:flow style;m
 /section/style;SUBDOC
 /section;no significant content;s
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!----></style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!--
+--></style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">
+&lt;!--
+-->
+</style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!---->
+&lt;!----></style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!-- aewafew ae--></style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!--&lt;!---->--></style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!--&lt;!----></style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!--&lt;/style>--></style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!---->
+<!--</style>
+#errors
+/style;style:unclosed cdo;m
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!--></style>
+#errors
+/style;style:unclosed cdo;m
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!--><!-->--></style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!-</style>
+#errors
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!---<p>-></p></style>
+#errors
+/style/p;element not allowed;m
+/style;SUBDOC
+
+#data
+<style xmlns="http://www.w3.org/1999/xhtml">&lt;!<p>---</p>-></style>
+#errors
+/style/p;element not allowed;m
+/style;SUBDOC

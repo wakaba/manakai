@@ -2613,6 +2613,15 @@ $Element->{$HTML_NS}->{style} = {
                            is_char_string => 1});
     }
 
+    ## |style| element content restrictions
+    my $tc = $item->{node}->text_content;
+    $tc =~ s/<!--.*-->//gs;
+    if ($tc =~ /<!--/) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'style:unclosed cdo', ## XXX documentation
+                         level => $self->{level}->{must});
+    }
+
     $HTMLChecker{check_end}->(@_);
   },
 };
