@@ -2528,18 +2528,25 @@ $Element->{$HTML_NS}->{style} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
-    ## NOTE: |html:style| itself has no conformance creteria on content model.
     my $type = $item->{node}->get_attribute_ns (undef, 'type');
     $type = 'text/css' unless defined $type;
-    if ($type =~ m[\A(?>(?>\x0D\x0A)?[\x09\x20])*([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+)(?>(?>\x0D\x0A)?[\x09\x20])*/(?>(?>\x0D\x0A)?[\x09\x20])*([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+)(?>(?>\x0D\x0A)?[\x09\x20])*\z]) {
+
+    ## NOTE: RFC 2616's definition of "type/subtype".  According to
+    ## the Web Applications 1.0 specification, types with unsupported
+    ## parameters are considered as unknown types.  Since we don't
+    ## support any media type with parameters (except for "text/css;
+    ## charset=...", which is very special case), we can safely ignore
+    ## any type specification with parameters entirely.
+    if ($type =~ m[\A(?>(?>\x0D\x0A)?[\x09\x20])*([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+)/([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+)(?>(?>\x0D\x0A)?[\x09\x20])*\z]) {
       $type = "$1/$2";
       $type =~ tr/A-Z/a-z/; ## NOTE: ASCII case-insensitive
     } else {
-      ## NOTE: We don't know how parameters are handled by UAs.  According to
-      ## HTML5 specification, <style> with unknown parameters in |type=""| 
-      ## must be ignored.
       undef $type;
     }
+
+    ## Conformance of the content depends on the styling language in
+    ## use, which is detected by the |type=""| attribute value
+    ## (i.e. $type).
     if (not defined $type) {
       $element_state->{allow_element} = 1; # invalid type=""
     } elsif ($type eq 'text/css') {
@@ -2588,17 +2595,18 @@ $Element->{$HTML_NS}->{style} = {
                            container_node => $item->{node},
                            media_type => 'text/css', is_char_string => 1});
     } elsif ($element_state->{style_type} =~ m![+/][Xx][Mm][Ll]\z!) {
-      ## NOTE: XML content should be checked by THIS instance of checker
-      ## as part of normal tree validation.  However, we don't know of any
-      ## XML-based styling language that can be used in HTML <style> element,
-      ## such that we throw a "style language not supported" error.
+      ## NOTE: XML content should be checked by THIS instance of
+      ## checker as part of normal tree validation.  However, we don't
+      ## know of any XML-based styling language that can be used in
+      ## HTML <style> element, such that we throw a "style language
+      ## not supported" error here.
       $self->{onerror}->(node => $item->{node},
                          type => 'XML style lang',
                          text => $element_state->{style_type},
                          level => $self->{level}->{uncertain});
     } else {
-      ## NOTE: Should we raise some kind of error for,
-      ## say, <style type="text/plaion">?
+      ## NOTE: Should we raise some kind of error for, say, <style
+      ## type="text/plain">?
       $self->{onsubdoc}->({s => $element_state->{text},
                            container_node => $item->{node},
                            media_type => $element_state->{style_type},
