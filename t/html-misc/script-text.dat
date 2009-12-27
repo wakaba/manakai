@@ -1,0 +1,172 @@
+#data
+#errors
+
+#data
+| 
+| 
+#errors
+
+#data
+| abc
+#errors
+
+#data
+| abc
+| def
+|    hh
+#errors
+
+#data
+| <!--
+| abc
+| -->
+#errors
+
+#data
+| <!--
+|   abc
+| <!-->
+#errors
+
+#data
+| <!->
+#errors
+
+#data
+| abc<!--def-->ghi-->
+#errors
+
+#data
+| <!--
+#errors
+1;5;m;script:content:no cdc;
+
+#data
+| <!--
+| abc
+#errors
+2;1;m;script:content:no cdc;
+
+#data
+| <!--
+| <script>
+#errors
+2;9;m;script:content:no /script;
+
+#data
+| <!--
+| <script>
+| -->
+| </script>
+#errors
+3;1;m;script:content:no /script;
+
+#data
+| <!--
+| <script>
+| </script>
+| -->
+#errors
+
+#data
+| <!--
+| <script>
+| -->
+| </script>
+| -->
+#errors
+3;1;m;script:content:no /script;
+
+#data
+| <!--
+| -->
+| -->
+#errors
+
+#data
+| -->
+#errors
+
+#data
+| -->
+| <!--
+#errors
+2;5;m;script:content:no cdc;
+
+#data
+| <!-->
+#errors
+1;5;m;script:content:no cdc;
+
+#data
+| <script>
+#errors
+
+#data
+| <script>
+| <!--
+#errors
+2;5;m;script:content:no cdc;
+
+#data
+| <!--
+| <script>
+| <!--
+| -->
+| </script>
+| -->
+#errors
+4;1;m;script:content:no /script;
+
+#data
+| <!---->
+| <!---->
+| <script></script>
+| <!---->
+#errors
+
+#data
+| <!--<script>-->
+| <!--<script>-->
+#errors
+1;13;m;script:content:no /script;
+
+#data
+| <!--<script>-->
+| <!--<script>-->
+| <!--</script>-->
+| <!--</script>-->
+#errors
+1;13;m;script:content:no /script;
+
+#data
+| <!--<script></script>-->
+| <!--<script></script>-->
+#errors
+
+#data
+| <!--<script></SCRIPt>-->
+#errors
+
+#data
+| <!--<script/</script>-->
+
+#data
+| <!--<script -->
+#errors
+1;13;m;script:content:no /script;
+
+#data
+| <!--
+| <scriptlike>
+| -->
+#errors
+
+#data
+| <! -- abc
+#errors
+
+#data
+| <!---- >
+#errors
+1;6;m;script:content:no cdc;
