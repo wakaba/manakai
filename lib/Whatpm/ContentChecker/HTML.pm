@@ -7346,7 +7346,7 @@ $Element->{$HTML_NS}->{script} = {
     my ($self, $item, $element_state) = @_;
 
     if ($item->{node}->has_attribute_ns (undef, 'src')) {
-      $element_state->{must_be_empty} = 1;
+      $element_state->{inline_documentation_only} = 1;
     } else {
       ## NOTE: No content model conformance in HTML5 spec.
       my $type = $item->{node}->get_attribute_ns (undef, 'type');
@@ -7387,7 +7387,7 @@ $Element->{$HTML_NS}->{script} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } else {
-      if ($element_state->{must_be_empty}) {
+      if ($element_state->{inline_documentation_only}) {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed:empty',
                            level => $self->{level}->{must});
@@ -7396,17 +7396,18 @@ $Element->{$HTML_NS}->{script} = {
   },
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($has_significant and
-        $element_state->{must_be_empty}) {
-      $self->{onerror}->(node => $child_node,
-                         type => 'character not allowed:empty',
-                         level => $self->{level}->{must});
-    }
     $element_state->{text} .= $child_node->data;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
-    unless ($element_state->{must_be_empty}) {
+    if ($element_state->{inline_documentation_only}) {
+      if (length $element_state->{text}) {
+        $self->{onsubdoc}->({s => $element_state->{text},
+                             container_node => $item->{node},
+                             media_type => 'text/x-script-inline-documentation',
+                             is_char_string => 1});
+      }
+    } else {
       if ($element_state->{script_type} =~ m![+/][Xx][Mm][Ll]\z!) {
         ## NOTE: XML content should be checked by THIS instance of checker
         ## as part of normal tree validation.
@@ -7423,9 +7424,8 @@ $Element->{$HTML_NS}->{script} = {
                              media_type => $element_state->{script_type},
                              is_char_string => 1});
       }
-      
-      $HTMLChecker{check_end}->(@_);
     }
+    $HTMLChecker{check_end}->(@_);
   },
   ## TODO: There MUST be |type| unless the script type is JavaScript. (resource error)
   ## NOTE: "When used to include script data, the script data must be embedded
