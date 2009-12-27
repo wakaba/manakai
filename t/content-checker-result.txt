@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Dec 27 18:30:44 2009
-# Current time GMT:   Sun Dec 27 09:30:44 2009
+# Current time local: Sun Dec 27 18:32:42 2009
+# Current time GMT:   Sun Dec 27 09:32:42 2009
 # Using Test.pm version 1.25_02
 # t/content-model-1.dat
 ok 1
@@ -5746,11 +5746,21 @@ ok 5552
 ok 5553
 ok 5554
 ok 5555
-ok 5556
-ok 5557
-ok 5558
-ok 5559
-ok 5560
+not ok 5556
+# Test 5556 got: "/details;no significant content;s" (t/content-checker.pl at line 69 fail #5556)
+#      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 5557
+# Test 5557 got: "/details;no significant content;s" (t/content-checker.pl at line 69 fail #5557)
+#      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 5558
+# Test 5558 got: "/details;no significant content;s" (t/content-checker.pl at line 69 fail #5558)
+#      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="open" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 5559
+# Test 5559 got: "/details;no significant content;s" (t/content-checker.pl at line 69 fail #5559)
+#      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 5560
+# Test 5560 got: "/details/@open;boolean:invalid;m\n/details;no significant content;s" (t/content-checker.pl at line 69 fail #5560)
+#      Expected: "/details/@open;boolean:invalid;m\n/details;child element missing;legend;m\n/details;no significant content;s" (<details open="true" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 5561
 ok 5562
 ok 5563
@@ -5787,21 +5797,11 @@ ok 5593
 ok 5594
 ok 5595
 ok 5596
-not ok 5597
-# Test 5597 got: "/details;no significant content;s" (t/content-checker.pl at line 69 fail #5597)
-#      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 5598
-# Test 5598 got: "/details;no significant content;s" (t/content-checker.pl at line 69 fail #5598)
-#      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 5599
-# Test 5599 got: "/details;no significant content;s" (t/content-checker.pl at line 69 fail #5599)
-#      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="open" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 5600
-# Test 5600 got: "/details;no significant content;s" (t/content-checker.pl at line 69 fail #5600)
-#      Expected: "/details;child element missing;legend;m\n/details;no significant content;s" (<details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 5601
-# Test 5601 got: "/details/@open;boolean:invalid;m\n/details;no significant content;s" (t/content-checker.pl at line 69 fail #5601)
-#      Expected: "/details/@open;boolean:invalid;m\n/details;child element missing;legend;m\n/details;no significant content;s" (<details open="true" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 5597
+ok 5598
+ok 5599
+ok 5600
+ok 5601
 ok 5602
 ok 5603
 ok 5604
@@ -5895,6 +5895,7 @@ ok 5691
 ok 5692
 ok 5693
 ok 5694
+# t/dom-conformance/html-scripting-1.dat
 ok 5695
 ok 5696
 ok 5697
@@ -5936,7 +5937,6 @@ ok 5732
 ok 5733
 ok 5734
 ok 5735
-# t/dom-conformance/html-scripting-1.dat
 ok 5736
 ok 5737
 ok 5738
@@ -5950,6 +5950,7 @@ ok 5745
 ok 5746
 ok 5747
 ok 5748
+# t/dom-conformance/html-scripting-2.dat
 ok 5749
 ok 5750
 ok 5751
@@ -5991,7 +5992,6 @@ ok 5786
 ok 5787
 ok 5788
 ok 5789
-# t/dom-conformance/html-scripting-2.dat
 ok 5790
 ok 5791
 ok 5792
