@@ -74,20 +74,20 @@
     onsubmit="
       var uri = 'parser-manakai/';
       if (document.getElementById ('html5').checked) {
-        uri += 'html/';
-        uri += document.getElementById ('element').value + '/';
+        uri += 'html+';
+        uri += encodeURIComponent (document.getElementById ('element').value) + '+';
       } else if (document.getElementById ('xml1').checked) {
-        uri += 'xml1/';
-        uri += document.getElementById ('element').value + '/';
+        uri += 'xml1+';
+        uri += encodeURIComponent (document.getElementById ('element').value) + '+';
       } else if (document.getElementById ('swml').checked) {
-        uri += 'swml/';
-        uri += document.getElementById ('element').value + '/';
+        uri += 'swml+';
+        uri += encodeURIComponent (document.getElementById ('element').value) + '+';
       } else if (document.getElementById ('h2h').checked) {
-        uri += 'h2h/';
-        uri += document.getElementById ('element').value + '/';
+        uri += 'h2h+';
+        uri += encodeURIComponent (document.getElementById ('element').value) + '+';
       } else {
-        uri += 'xhtml/';
-        uri += '/';
+        uri += 'xhtml+';
+        uri += '+';
       }
       if (document.getElementById ('format-test').checked) {
         this.action = uri + 'test';

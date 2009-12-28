@@ -11,7 +11,7 @@ my $http = Message::CGI::HTTP->new;
 
 ## TODO: _charset_
 
-my @mode = split m#/#, scalar $http->get_meta_variable ('PATH_INFO'), -1;
+my @mode = split m#[/+]#, scalar $http->get_meta_variable ('PATH_INFO'), -1;
 shift @mode if @mode and $mode[0] == '';
 ## TODO: decode unreserved characters
 
