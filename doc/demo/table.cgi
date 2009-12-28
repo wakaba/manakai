@@ -1,17 +1,17 @@
 #!/usr/bin/perl
 use strict;
-
-use lib qw[/home/httpd/html/www/markup/html/whatpm
-           /home/wakaba/public_html/-temp/wiki/lib];
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->parent->subdir ('lib')->stringify;
 use CGI::Carp qw[fatalsToBrowser];
 
-use SuikaWiki::Input::HTTP; ## TODO: Use some better CGI module
+use Message::CGI::HTTP;
 
-my $http = SuikaWiki::Input::HTTP->new;
+my $http = Message::CGI::HTTP->new;
 
 ## TODO: _charset_
 
-my $mode = $http->meta_variable ('PATH_INFO');
+my $mode = $http->get_meta_variable ('PATH_INFO');
 ## TODO: decode unreserved characters
 
 if ($mode eq '/table') {
