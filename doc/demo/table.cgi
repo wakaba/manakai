@@ -19,7 +19,7 @@ if ($mode eq '/table') {
   require Whatpm::HTML;
   require Whatpm::NanoDOM;
 
-  my $s = $http->parameter ('s');
+  my $s = $http->get_parameter ('s');
   if (length $s > 1000_000) {
     print STDOUT "Status: 400 Document Too Long\nContent-Type: text/plain; charset=us-ascii\n\nToo long";
     exit;
