@@ -2105,6 +2105,29 @@ for my $node (create_leaf_nodes) {
 
 } # _classic
 
+sub _gc : Test(6) {
+  my $doc_destroy = 0;
+  my $el_destroy = 0;
+  local *Message::DOM::Document::DESTROY = sub { $doc_destroy++ };
+  local *Message::DOM::Element::DESTROY = sub { $el_destroy++ };
+
+  my $doc = $dom->create_document;
+  my $el1 = $doc->create_element ('a');
+  my $el2 = $doc->create_element ('b');
+
+  undef $el1;
+  is $doc_destroy, 0;
+  is $el_destroy, 1;
+
+  undef $doc;
+  is $doc_destroy, 1;
+  is $el_destroy, 1;
+
+  undef $el2;
+  is $doc_destroy, 1;
+  is $el_destroy, 2;
+}
+
 __PACKAGE__->runtests;
 1;
 
