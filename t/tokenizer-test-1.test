@@ -977,6 +977,10 @@
 "input": "<a href=&'>",
 "output": ["ParseError", "ParseError", ["StartTag", "a", {"href": "&'"}]]},
 
+{"description":"<a href=&>",
+"input": "<a href=&>",
+"output": [["StartTag", "a", {"href": "&"}]]},
+
 {"description": "<!->-->",
 "input": "<!->-->",
 "output": ["ParseError", ["Comment", "-"], ["Character", "-->"]]},

@@ -2088,11 +2088,12 @@ sub _get_next_token ($) {
 
         ## XML5: Not defined yet.
 
-        ## NOTE: In the spec, the tokenizer is switched to the 
-        ## "entity in attribute value state".  In this implementation, the
-        ## tokenizer is switched to the |ENTITY_STATE|, which is an
-        ## implementation of the "consume a character reference" algorithm.
-        $self->{entity_add} = -1;
+        ## NOTE: In the spec, the tokenizer is switched to the
+        ## "character reference in attribute value state".  In this
+        ## implementation, the tokenizer is switched to the
+        ## |ENTITY_STATE|, which is an implementation of the "consume
+        ## a character reference" algorithm.
+        $self->{entity_add} = 0x003E; # >
         $self->{prev_state} = $self->{state};
         $self->{state} = ENTITY_STATE;
         

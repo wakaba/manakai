@@ -1,8 +1,8 @@
 1..1129
-# Running under perl version 5.008008 for linux
-# Current time local: Mon Oct 12 17:06:15 2009
-# Current time GMT:   Mon Oct 12 08:06:15 2009
-# Using Test.pm version 1.25
+# Running under perl version 5.010001 for linux
+# Current time local: Thu Dec 31 19:52:29 2009
+# Current time GMT:   Thu Dec 31 10:52:29 2009
+# Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tokenizer.t line 37.
 Found = in conditional, should be == at t/HTML-tokenizer.t line 128.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tokenizer.t line 55.
@@ -1392,7 +1392,7 @@ Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 not ok 851
 # Test 851 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'a\x{FFFF}b'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 217 fail #851)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'a\\x{FFFD}b'\n          ]\n        ];\n"Wide character in print at /usr/lib/perl5/5.8.8/Test.pm line 457.
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'a\\x{FFFD}b'\n          ]\n        ];\n"Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test.pm line 456.
  (Non-XML character: qq'aï¿¿b')
 #     Line 5 is changed:
 #      - "            qq'a\\x{FFFD}b'\n"
@@ -1553,10 +1553,8 @@ Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 not ok 970
 # Test 970 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{D800}\x{DFFF}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 217 fail #970)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{D800}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{DFFF}'\n          ]\n        ];\n"Wide character in print at /usr/lib/perl5/5.8.8/Test.pm line 457.
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{D800}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{DFFF}'\n          ]\n        ];\n"Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test.pm line 456.
  (surrogate character reference: qq'&#xD800;í¿¿')
-Malformed UTF-8 character (UTF-16 surrogate 0xd800) in transliteration (tr///) at /usr/lib/perl5/5.8.8/Test.pm line 460.
-Malformed UTF-8 character (UTF-16 surrogate 0xdfff) in transliteration (tr///) at /usr/lib/perl5/5.8.8/Test.pm line 460.
 #     Lines 3-3 are missing:
 #      - "          [\n"
 #      - "            qq'Character',\n"
@@ -1752,8 +1750,9 @@ ok 1120
 ok 1121
 ok 1122
 ok 1123
-not ok 1124
-# Test 1124 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 217 fail #1124)
+ok 1124
+not ok 1125
+# Test 1125 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 217 fail #1125)
 #      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'a',\n            {\n              qq'a' => qq'>'\n            }\n          ]\n        ];\n" (<a a='>: qq'<a a=\x{27}>')
 #      Line 2 is changed:
 #       - "          qq'ParseError',\n"
@@ -1766,7 +1765,6 @@ not ok 1124
 #       - "              qq'a' => qq'>'\n"
 #       - "            }\n"
 #       - "          ]\n"
-ok 1125
 ok 1126
 ok 1127
 ok 1128
@@ -1792,3 +1790,4 @@ ok 1147
 ok 1148
 ok 1149
 ok 1150
+ok 1151
