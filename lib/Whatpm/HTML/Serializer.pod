@@ -8,11 +8,11 @@ Whatpm::HTML::Serializer - HTML DOM Serializer
   
   ## Serialize an HTML document
   my $html = Whatpm::HTML::Serializer->get_inner_html ($doc);
-  ## NOTE: $html = $doc->inner_html is preferred.
+      ## NOTE: $html = $doc->inner_html is preferred.
   
   ## Serialize an HTML element
   my $html = Whatpm::HTML::Serializer->get_inner_html ($el);
-  ## NOTE: $html = $el->inner_html is preferred.
+      ## NOTE: $html = $el->inner_html is preferred.
   
   ## Serialize an HTML document fragment
   my $html = Whatpm::HTML::Serializer->get_inner_html ($df);
@@ -94,7 +94,8 @@ algorithm.
 
 Whatpm <http://suika.fam.cx/www/markup/html/whatpm/readme>.
 
-HTML5 <http://whatwg.org/html5>.
+Web Applications 1.0 - HTML fragment serialization algorithm
+<http://www.whatwg.org/specs/web-apps/current-work/complete.html#html-fragment-serialization-algorithm>.
 
 manakai's L<Message::DOM::Document> and L<Message::DOM::Element>
 modules are implementing the C<inner_html> attribute.
@@ -105,11 +106,9 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007, 2009 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
-
-## $Date: 2007/11/11 04:59:36 $
