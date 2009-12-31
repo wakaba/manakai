@@ -1,9 +1,10 @@
 package Whatpm::HTML::Serializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.7';
 
 sub get_inner_html ($$$) {
-  my (undef, $node, $on_error) = @_;
+  my (undef, $node, $onerror) = @_;
 
   ## Step 1
   my $s = '';
@@ -97,7 +98,7 @@ sub get_inner_html ($$$) {
     } elsif ($nt == 7) { # PIs
       $s .= '<?' . $child->target . ' ' . $child->data . '>';
     } else {
-      $on_error->($child) if defined $on_error;
+      $onerror->($child) if defined $onerror;
     }
   } # C
   
@@ -107,7 +108,7 @@ sub get_inner_html ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2009 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
