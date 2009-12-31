@@ -38,13 +38,14 @@ sub _document_inner_html : Test(4) {
   }
 } # _document_inner_html
 
-sub _element_inner_html : Test(5) {
+sub _element_inner_html : Test(6) {
   for (
     [q<>],
     [q<xy z>],
     [q<<p>abc</p>>],
     [q<<p>abc</p><!---->>],
     [q<<img alt="b" src="x">>],
+    [q<<spacer>abc</spacer>>],
   ) {
     my ($doc, $el) = create_el_from_html $_->[0];
     is $el->inner_html, $_->[1] // $_->[0];

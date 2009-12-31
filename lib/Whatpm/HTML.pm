@@ -232,7 +232,6 @@ my $el_category = {
   select => SELECT_EL,
   section => MISC_SPECIAL_EL,
   small => FORMATTING_EL,
-  spacer => MISC_SPECIAL_EL,
   strike => FORMATTING_EL,
   strong => FORMATTING_EL,
   style => MISC_SPECIAL_EL,
@@ -6146,7 +6145,7 @@ sub _tree_construction_main ($) {
           delete $self->{self_closing};
         } elsif ({
                   area => 1, basefont => 1, bgsound => 1, br => 1,
-                  embed => 1, img => 1, spacer => 1, wbr => 1,
+                  embed => 1, img => 1, wbr => 1,
                   keygen => 1,
                  }->{$token->{tag_name}}) {
           
