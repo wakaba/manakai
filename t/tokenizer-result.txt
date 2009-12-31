@@ -1,7 +1,7 @@
-1..1129
+1..1154
 # Running under perl version 5.010001 for linux
-# Current time local: Thu Dec 31 19:52:29 2009
-# Current time GMT:   Thu Dec 31 10:52:29 2009
+# Current time local: Thu Dec 31 19:58:50 2009
+# Current time GMT:   Thu Dec 31 10:58:50 2009
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tokenizer.t line 37.
 Found = in conditional, should be == at t/HTML-tokenizer.t line 128.
@@ -1751,8 +1751,11 @@ ok 1121
 ok 1122
 ok 1123
 ok 1124
-not ok 1125
-# Test 1125 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 217 fail #1125)
+ok 1125
+ok 1126
+ok 1127
+not ok 1128
+# Test 1128 got: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (t/HTML-tokenizer.t at line 217 fail #1128)
 #      Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'a',\n            {\n              qq'a' => qq'>'\n            }\n          ]\n        ];\n" (<a a='>: qq'<a a=\x{27}>')
 #      Line 2 is changed:
 #       - "          qq'ParseError',\n"
@@ -1765,9 +1768,6 @@ not ok 1125
 #       - "              qq'a' => qq'>'\n"
 #       - "            }\n"
 #       - "          ]\n"
-ok 1126
-ok 1127
-ok 1128
 ok 1129
 ok 1130
 ok 1131
@@ -1791,3 +1791,6 @@ ok 1148
 ok 1149
 ok 1150
 ok 1151
+ok 1152
+ok 1153
+ok 1154

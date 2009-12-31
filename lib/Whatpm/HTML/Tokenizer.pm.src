@@ -1285,7 +1285,11 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        if ($self->{nc} == 0x003D or $self->{nc} == 0x003C) { # =, <
+        if ({
+            0x003C => 1, # <
+            0x003D => 1, # =
+            0x0060 => 1, # `
+        }->{$self->{nc}}) {
           !!!cp (93);
           ## XML5: Not a parse error.
           !!!parse-error (type => 'bad attribute value');
@@ -1614,6 +1618,7 @@ sub _get_next_token ($) {
              0x0027 => 1, # '
              0x003D => 1, # =
              0x003C => 1, # <
+             0x0060 => 1, # `
             }->{$self->{nc}}) {
           !!!cp (115);
           ## XML5: Not a parse error.

@@ -29,7 +29,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 1129 }
+BEGIN { plan tests => 1154 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;

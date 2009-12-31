@@ -981,6 +981,18 @@
 "input": "<a href=&>",
 "output": [["StartTag", "a", {"href": "&"}]]},
 
+{"description":"<a href=`abc>",
+"input": "<a href=`abc>",
+"output": ["ParseError", ["StartTag", "a", {"href": "`abc"}]]},
+
+{"description":"<a href=x`abc>",
+"input": "<a href=x`abc>",
+"output": ["ParseError", ["StartTag", "a", {"href": "x`abc"}]]},
+
+{"description":"<a href=``>",
+"input": "<a href=``>",
+"output": ["ParseError", "ParseError", ["StartTag", "a", {"href": "``"}]]},
+
 {"description": "<!->-->",
 "input": "<!->-->",
 "output": ["ParseError", ["Comment", "-"], ["Character", "-->"]]},
