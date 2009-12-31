@@ -5486,7 +5486,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'plaintext') {
         ## NOTE: As normal, but effectively ends parsing
 
-        ## has a p element in scope
+        ## "has a |p| element in scope".
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] == P_EL) {
             
@@ -5724,6 +5724,25 @@ sub _tree_construction_main ($) {
                }->{$token->{tag_name}}) {
         if ($token->{tag_name} eq 'xmp') {
           
+
+          ## "has a |p| element in scope".
+          INSCOPE: for (reverse @{$self->{open_elements}}) {
+            if ($_->[1] == P_EL) {
+              
+              
+      $token->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $token;
+      delete $self->{self_closing};
+     # <xmp>
+              $token = {type => END_TAG_TOKEN, tag_name => 'p',
+                        line => $token->{line}, column => $token->{column}};
+              next B;
+            } elsif ($_->[1] & SCOPING_EL) {
+              
+              last INSCOPE;
+            }
+          } # INSCOPE
+
           $reconstruct_active_formatting_elements->($insert_to_current);
 
           delete $self->{frameset_ok};

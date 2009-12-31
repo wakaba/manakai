@@ -10,7 +10,7 @@ my $test_dir_name = 't/';
 my $dir_name = 't/tree-construction/';
 
 use Test;
-BEGIN { plan tests => 5058 }
+BEGIN { plan tests => 5376 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;

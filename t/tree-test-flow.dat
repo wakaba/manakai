@@ -902,3 +902,75 @@ isindex
 |           name="isindex"
 |       <hr>
 
+#data
+<!DOCTYPE html><p><xmp>b</xmp>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|     <xmp>
+|       "b"
+|     "a"
+
+#data
+<!DOCTYPE html><p><x><xmp>b</xmp>a
+#errors
+no </x>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <x>
+|     <xmp>
+|       "b"
+|     "a"
+
+#data
+<!DOCTYPE html><x><xmp>b</xmp>a
+#errors
+no </x>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <x>
+|       <xmp>
+|         "b"
+|       "a"
+
+#data
+<!DOCTYPE html><p><a>x<xmp>b</xmp>a
+#errors
+no </a> before <xmp>
+no </a> at the end of file
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <a>
+|         "x"
+|     <a>
+|       <xmp>
+|         "b"
+|       "a"
+
+#data
+<!DOCTYPE html><p><object><xmp>a</xmp></object>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <object>
+|         <xmp>
+|           "a"
