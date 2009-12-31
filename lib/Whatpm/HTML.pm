@@ -6836,7 +6836,10 @@ sub set_inner_html ($$$$;$) {
 
     $p->_terminate_tree_constructor;
 
-    delete $p->{parse_error}; # delete loop
+    ## Remove self references.
+    delete $p->{set_nc};
+    delete $p->{read_until};
+    delete $p->{parse_error};
   } else {
     die "$0: |set_inner_html| is not defined for node of type $nt";
   }
