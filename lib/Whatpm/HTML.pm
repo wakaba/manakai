@@ -645,7 +645,7 @@ sub parse_char_string ($$$;$$) {
 sub parse_char_stream ($$$;$$) {
   my $self = ref $_[0] ? shift : shift->new;
   my $input = $_[0];
-  $self->{document} = $_[1];
+  my $doc = $self->{document} = $_[1];
   @{$self->{document}->child_nodes} = ();
 
   ## NOTE: |set_inner_html| copies most of this method's code
@@ -781,9 +781,13 @@ sub parse_char_stream ($$$;$$) {
   $self->_construct_tree;
   $self->_terminate_tree_constructor;
 
-  delete $self->{parse_error}; # remove loop
+  ## Remove self references.
+  delete $self->{set_nc};
+  delete $self->{read_until};
+  delete $self->{parse_error};
+  delete $self->{document};
 
-  return $self->{document};
+  return $doc;
 } # parse_char_stream
 
 sub new ($) {
