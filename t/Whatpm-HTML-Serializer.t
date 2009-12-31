@@ -120,6 +120,18 @@ sub _df : Test(1) {
     q<<p>a&amp;b</p>ab&lt;&gt;cd>;
 } # _df
 
+sub _svg : Test(1) {
+  ## See
+  ## <http://permalink.gmane.org/gmane.org.w3c.whatwg.discuss/11191>.
+
+  my $doc = create_doc_from_html ('<!DOCTYPE HTML>');
+  my $div = $doc->create_element ('div');
+  my $svg = $doc->create_element_ns (q<http://www.w3.org/2000/svg>, 'svg:svg');
+  $div->append_child ($svg);
+  
+  is $div->inner_html, q<<svg:svg></svg:svg>>;
+} # _svg
+
 __PACKAGE__->runtests;
 
 1;
