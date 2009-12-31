@@ -66,7 +66,9 @@ dom1core:
 	  $(PERL_TEST_) $(DOMTEST_PERL_DIR)level1/core/$(DOMTEST_FILE).pl
 
 test: 
-	$(PROVE) Whatpm-HTML-ScriptChecker.t
+	$(PROVE) \
+	  DOM-Node.t \
+	  Whatpm-*.t
 
 #	$(PERL_TEST_) *$(PT_SUFFIX)
 
