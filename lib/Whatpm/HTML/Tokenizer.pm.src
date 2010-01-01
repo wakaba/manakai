@@ -1,6 +1,20 @@
 package Whatpm::HTML::Tokenizer; # -*- Perl -*-
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.34 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.34';
+
+## This module implements the tokenization phase of both HTML5 and
+## XML5.  Notes like this are usually based on the latest HTML
+## specification.  Since XML is different from HTML, and since XML5
+## specification has not been maintained any more, there is a few
+## differences from HTML's tokenization.  Such differences are marked
+## by prefix "XML5:".
+
+## Warnings that depend on the HTML/XML input stream, such as ones
+## related to surrogate code positions, are not useful.
+no warnings 'utf8';
+
+## ------ Token types ------
 
 BEGIN {
   require Exporter;
@@ -43,10 +57,6 @@ BEGIN {
   );
 }
 
-## NOTE: Differences from the XML5 draft are marked as "XML5:".
-
-## Token types
-
 sub DOCTYPE_TOKEN () { 1 } ## XML5: No DOCTYPE token.
 sub COMMENT_TOKEN () { 2 }
 sub START_TAG_TOKEN () { 3 }
@@ -74,7 +84,10 @@ package Whatpm::HTML;
 
 BEGIN { Whatpm::HTML::Tokenizer->import (':token') }
 
-## Content model flags
+## ------ Content model flags ------
+
+## Old versions of HTML5 specification has concept of "content model
+## flags", which is now specified as tokenizer states.
 
 sub CM_ENTITY () { 0b001 } # & markup in data
 sub CM_LIMITED_MARKUP () { 0b010 } # < markup in data (limited)
@@ -85,7 +98,7 @@ sub CDATA_CONTENT_MODEL () { CM_LIMITED_MARKUP }
 sub RCDATA_CONTENT_MODEL () { CM_ENTITY | CM_LIMITED_MARKUP }
 sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
 
-## Tokenizer states
+## ------ Tokenizer states ------
 
 sub DATA_STATE () { 0 }
 #sub ENTITY_DATA_STATE () { 1 }
@@ -133,17 +146,19 @@ sub CDATA_SECTION_MSE1_STATE () { 40 } # "CDATA section state" in the spec
 sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 sub PUBLIC_STATE () { 42 } # "after DOCTYPE name state" in the spec
 sub SYSTEM_STATE () { 43 } # "after DOCTYPE name state" in the spec
+##
 ## NOTE: "Entity data state", "entity in attribute value state", and
-## "consume a character reference" algorithm are jointly implemented
-## using the following six states:
+## the "consume a character reference" algorithm, are jointly
+## implemented as the following six states:
 sub ENTITY_STATE () { 44 }
 sub ENTITY_HASH_STATE () { 45 }
 sub NCR_NUM_STATE () { 46 }
 sub HEXREF_X_STATE () { 47 }
 sub HEXREF_HEX_STATE () { 48 }
 sub ENTITY_NAME_STATE () { 49 }
+##
 sub PCDATA_STATE () { 50 } # "data state" in the spec
-
+##
 ## XML-only states
 sub PI_STATE () { 51 }
 sub PI_TARGET_STATE () { 52 }
@@ -197,13 +212,17 @@ sub AFTER_CM_GROUP_CLOSE_STATE () { 99 }
 sub AFTER_MD_DEF_STATE () { 100 }
 sub BOGUS_MD_STATE () { 101 }
 
-## Tree constructor state constants (see Whatpm::HTML for the full
-## list and descriptions)
+## ------ Tree constructor state constants ------
+
+## Whether the parsed string is in the foreign island or not affect
+## how tokenization is done, unfortunately.  These are a copy of some
+## of tokenization state constants.  See Whatpm::HTML for the full
+## list and the descriptions for constants.
 
 sub IN_FOREIGN_CONTENT_IM () { 0b100000000000 }
 sub FOREIGN_EL () { 0b1_00000000000 }
 
-## Character reference mappings
+## ------ Character reference mappings ------
 
 my $charref_map = {
   0x00 => 0xFFFD, # REPLACEMENT CHARACTER
@@ -249,6 +268,16 @@ $charref_map->{$_} = $_
         0x7FFFF, 0x8FFFE, 0x8FFFF, 0x9FFFE, 0x9FFFF, 0xAFFFE, 0xAFFFF,
         0xBFFFE, 0xBFFFF, 0xCFFFE, 0xCFFFF, 0xDFFFE, 0xDFFFF, 0xEFFFE,
         0xEFFFF, 0xFFFFE, 0xFFFFF, 0x10FFFE, 0x10FFFF;
+
+## ------ Special character-like constants ------
+
+## The "EOF" pseudo-character in the HTML parsing algorithm.
+sub EOF_CHAR () { -1 }
+
+## A pseudo-character code that can never appear in the input stream.
+sub NEVER_CHAR () { -2 }
+
+## ------ The tokenizer ------
 
 ## Implementations MUST act as if state machine in the spec
 
@@ -1876,6 +1905,7 @@ sub _get_next_token ($) {
             0x0054, # T
             0x0059, # Y
             0x0050, # P
+            NEVER_CHAR, # (E)
           ]->[length $self->{kwd}] or
           $self->{nc} == [
             undef,
@@ -1884,6 +1914,7 @@ sub _get_next_token ($) {
             0x0074, # t
             0x0079, # y
             0x0070, # p
+            NEVER_CHAR, # (e)
           ]->[length $self->{kwd}]) {
         !!!cp (131);
         ## Stay in the state.
@@ -1933,6 +1964,7 @@ sub _get_next_token ($) {
             '[CD' => 0x0041, # A
             '[CDA' => 0x0054, # T
             '[CDAT' => 0x0041, # A
+            '[CDATA' => NEVER_CHAR, # ([)
           }->{$self->{kwd}}) {
         !!!cp (135.1);
         ## Stay in the state.
@@ -2480,6 +2512,7 @@ sub _get_next_token ($) {
             0x0042, # B
             0x004C, # L
             0x0049, # I
+            NEVER_CHAR, # (C)
           ]->[length $self->{kwd}] or
           $self->{nc} == [
             undef, 
@@ -2487,6 +2520,7 @@ sub _get_next_token ($) {
             0x0062, # b
             0x006C, # l
             0x0069, # i
+            NEVER_CHAR, # (c)
           ]->[length $self->{kwd}]) {
         !!!cp (175);
         ## Stay in the state.
@@ -2532,6 +2566,7 @@ sub _get_next_token ($) {
             0x0053, # S
             0x0054, # T
             0x0045, # E
+            NEVER_CHAR, # (M)
           ]->[length $self->{kwd}] or
           $self->{nc} == [
             undef, 
@@ -2539,6 +2574,7 @@ sub _get_next_token ($) {
             0x0073, # s
             0x0074, # t
             0x0065, # e
+            NEVER_CHAR, # (m)
           ]->[length $self->{kwd}]) {
         !!!cp (170);
         ## Stay in the state.
@@ -5272,5 +5308,3 @@ sub _get_next_token ($) {
 } # _get_next_token
 
 1;
-## $Date: 2009/09/05 11:31:58 $
-                                

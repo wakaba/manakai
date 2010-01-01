@@ -128,6 +128,10 @@ for my $file_name (grep {$_} split /\s+/, qq[
         $self->{nc} = -1 and return if $i >= length $s;
         $self->{nc} = ord substr $s, $i++, 1;
 
+        # Dummy.
+        $self->{line_prev} = 1;
+        $self->{column_prev} = 1;
+
         if ($self->{nc} == 0x000D) { # CR
           $i++ if substr ($s, $i, 1) eq "\x0A";
           $self->{nc} = 0x000A; # LF # MUST
@@ -161,7 +165,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
         }
       };
 
-
+      $p->{insertion_mode} = Whatpm::HTML::BEFORE_HEAD_IM (); # dummy
 
       $p->{read_until} = sub { return 0 };
       
@@ -221,4 +225,3 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 ## License: Public Domain.
-## $Date: 2008/10/04 17:16:02 $

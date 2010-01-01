@@ -897,6 +897,7 @@ sub _construct_tree ($) {
   ## to the user, or when it begin accepting user input, are
   ## not defined.
   
+  $self->{insertion_mode} = 0; # dummy
   $token = $self->_get_next_token;
 
   undef $self->{form_element};

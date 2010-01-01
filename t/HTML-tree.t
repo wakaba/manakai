@@ -146,4 +146,3 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2009/09/06 12:53:19 $
