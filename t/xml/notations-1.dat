@@ -193,6 +193,7 @@
 <!NOTATION bcd PUBLIC>
 ]><a/>
 #errors
+2;22;no space before pubid literal;;;m
 2;22;no PUBLIC literal;;;m
 #document
 | <!DOCTYPE a>
@@ -243,6 +244,50 @@
 
 #data
 <!DOCTYPE a[
+<!NOTATION bcd PUBLIC "efg""hij">
+]><a/>
+#errors
+2;28;no space before system literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "hij">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC 'efg'"hij">
+]><a/>
+#errors
+2;28;no space before system literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "hij">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC "efg"'hij'>
+]><a/>
+#errors
+2;28;no space before system literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "hij">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC 'efg''hij'>
+]><a/>
+#errors
+2;28;no space before system literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "efg" "hij">
+| <{} a>
+
+#data
+<!DOCTYPE a[
 <!NOTATION bcd PUBLIC "efg" "hij"
 #errors
 2;33;unclosed md;;;m
@@ -257,7 +302,19 @@
 <!NOTATION bcd SYSTEM>
 ]><a/>
 #errors
+2;22;no space before system literal;;;m
 2;22;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a>
+|   <!NOTATION bcd "" "">
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM >
+]><a/>
+#errors
+2;23;no SYSTEM literal;;;m
 #document
 | <!DOCTYPE a>
 |   <!NOTATION bcd "" "">

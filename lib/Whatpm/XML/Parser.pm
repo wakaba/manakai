@@ -1000,7 +1000,7 @@ sub _tree_in_subset ($) {
                 = {
                    type => $type,
                    tokenize => $tokenize,
-                   default => (($default == 1 or $default == 4)
+                   default => (($default and ($default == 1 or $default == 4))
                                  ? defined $at->{value} ? $at->{value} : ''
                                  : undef),
                   };

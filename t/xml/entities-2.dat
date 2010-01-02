@@ -57,6 +57,54 @@
 
 #data
 <!DOCTYPE a[
+<!ENTITY % bc PUBLIC "x""y">
+]><a/>
+#errors
+2;25;no space before system literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC "x"'y'>
+]><a/>
+#errors
+2;25;no space before system literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC 'x'"y">
+]><a/>
+#errors
+2;25;no space before system literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC 'x''y'>
+]><a/>
+#errors
+2;25;no space before system literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
 <!ENTITY % bc PUBLIC "x" "y" NDATA z>
 ]><a/>
 #errors

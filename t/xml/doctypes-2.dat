@@ -39,6 +39,38 @@
 | <{} a>
 
 #data
+<!DOCTYPE a PUBLIC "b""c"><a/>
+#errors
+1;23;no space before system literal;;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC "b"'c'><a/>
+#errors
+1;23;no space before system literal;;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC 'b'"c"><a/>
+#errors
+1;23;no space before system literal;;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
+<!DOCTYPE a PUBLIC 'b''c'><a/>
+#errors
+1;23;no space before system literal;;;m
+#document
+| <!DOCTYPE a "b" "c">
+| <{} a>
+
+#data
 <!DOCTYPE a SYSTEM "b"><a/>
 #errors
 #document
@@ -126,6 +158,7 @@
 #data
 <!DOCTYPE a PUBLIC[]><a/>
 #errors
+1;19;no space before pubid literal;;;m
 1;19;no PUBLIC literal;;;m
 #document
 | <!DOCTYPE a>

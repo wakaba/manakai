@@ -9,7 +9,7 @@ my $DEBUG = $ENV{DEBUG};
 my $test_dir_name = 't/xml/';
 
 use Test;
-BEGIN { plan tests => 1573 }
+BEGIN { plan tests => 1603 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -189,4 +189,3 @@ execute_test ($_, {
 }, \&test) for @FILES;
 
 ## License: Public Domain.
-## $Date: 2008/10/20 04:21:19 $

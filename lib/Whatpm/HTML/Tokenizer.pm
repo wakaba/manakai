@@ -119,13 +119,14 @@ sub COMMENT_START_DASH_STATE () { 15 }
 sub COMMENT_STATE () { 16 }
 sub COMMENT_END_STATE () { 17 }
 sub COMMENT_END_BANG_STATE () { 102 }
-sub COMMENT_END_SPACE_STATE () { 103 } ## LAST
+sub COMMENT_END_SPACE_STATE () { 103 }
 sub COMMENT_END_DASH_STATE () { 18 }
 sub BOGUS_COMMENT_STATE () { 19 }
 sub DOCTYPE_STATE () { 20 }
 sub BEFORE_DOCTYPE_NAME_STATE () { 21 }
 sub DOCTYPE_NAME_STATE () { 22 }
 sub AFTER_DOCTYPE_NAME_STATE () { 23 }
+sub AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE () { 104 }
 sub BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE () { 24 }
 sub DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE () { 25 }
 sub DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE () { 26 }
@@ -133,6 +134,8 @@ sub AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE () { 27 }
 sub BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 28 }
 sub DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE () { 29 }
 sub DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE () { 30 }
+sub BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDS_STATE () { 105 }
+sub AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE () { 106 } ## LAST
 sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
 sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
@@ -367,10 +370,10 @@ sub _get_next_token ($) {
   my $self = shift;
 
   if ($self->{self_closing}) {
+    ## NOTE: The |$self->{self_closing}| flag will never set to tokens
+    ## except for start tag tokens.  A start tag token is always set
+    ## to |$self->{ct}| before it is emitted.
     $self->{parse_error}->(level => $self->{level}->{must}, type => 'nestc', token => $self->{ct});
-    ## NOTE: The |self_closing| flag is only set by start tag token.
-    ## In addition, when a start tag token is emitted, it is always set to
-    ## |ct|.
     delete $self->{self_closing};
   }
 
@@ -3680,7 +3683,7 @@ sub _get_next_token ($) {
         } else {
           
         }
-        $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
+        $self->{state} = AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3754,7 +3757,7 @@ sub _get_next_token ($) {
         } else {
           
         }
-        $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
+        $self->{state} = AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3782,6 +3785,45 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
+    } elsif ($self->{state} == AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        
+        $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == EOF_CHAR) {
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+        
+        ## Reconsume.
+        return  ($self->{ct}); # DOCTYPE
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before pubid literal'); # XXX documentation
+        $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
+        ## Reconsume.
+        redo A;
+      }
     } elsif ($self->{state} == BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
       if ($is_space->{$self->{nc}}) {
         
@@ -3798,7 +3840,7 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{nc} eq 0x0022) { # "
+      } elsif ($self->{nc} == 0x0022) { # "
         
         $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
@@ -3814,7 +3856,7 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{nc} eq 0x0027) { # '
+      } elsif ($self->{nc} == 0x0027) { # '
         
         $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
@@ -3830,7 +3872,7 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($self->{nc} eq 0x003E) { # >
+      } elsif ($self->{nc} == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no PUBLIC literal');
         
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
@@ -3856,7 +3898,7 @@ sub _get_next_token ($) {
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
-      } elsif ($self->{nc} == -1) {
+      } elsif ($self->{nc} == EOF_CHAR) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
@@ -3869,7 +3911,7 @@ sub _get_next_token ($) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         }
         
-        ## reconsume
+        ## Reconsume.
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } elsif ($self->{is_xml} and
@@ -4074,10 +4116,12 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
+    } elsif ($self->{state} == AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE or
+             $self->{state} == BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDS_STATE) {
       if ($is_space->{$self->{nc}}) {
         
-        ## Stay in the state
+        ## Stay in or switch to the state.
+        $self->{state} = BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDS_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -4091,7 +4135,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x0022) { # "
-        
+        if ($self->{state} == AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before system literal'); # XXX documentation
+        } else {
+          
+        }
         $self->{ct}->{sysid} = ''; # DOCTYPE/ENTITY/NOTATION
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
@@ -4107,7 +4156,12 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{nc} == 0x0027) { # '
-        
+        if ($self->{state} == AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before system literal'); # XXX documentation
+        } else {
+          
+        }
         $self->{ct}->{sysid} = ''; # DOCTYPE/ENTITY/NOTATION
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
@@ -4155,7 +4209,7 @@ sub _get_next_token ($) {
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
-      } elsif ($self->{nc} == -1) {
+      } elsif ($self->{nc} == EOF_CHAR) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
@@ -4167,8 +4221,8 @@ sub _get_next_token ($) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         }
-        
-        ## reconsume
+
+        ## Reconsume.
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{is_xml} and
@@ -4215,6 +4269,67 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+        redo A;
+      }
+    } elsif ($self->{state} == AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE) {
+      if ($is_space->{$self->{nc}}) {
+        
+        $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == EOF_CHAR) {
+        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
+          $self->{state} = DATA_STATE;
+          $self->{s_kwd} = '';
+          $self->{ct}->{quirks} = 1;
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
+          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        }
+        
+        ## Reconsume.
+        return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
+        redo A;
+      } elsif ($self->{is_xml} and
+               $self->{ct}->{type} == DOCTYPE_TOKEN and
+               $self->{nc} == 0x005B) { # [
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
+
+        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
+        $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
+        $self->{in_subset} = 1;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($self->{ct}); # DOCTYPE
+        redo A;
+      } else {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before system literal'); # XXX documentation
+        $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE) {
@@ -4291,7 +4406,7 @@ sub _get_next_token ($) {
 
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
-      } elsif ($self->{nc} == -1) {
+      } elsif ($self->{nc} == EOF_CHAR) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
@@ -4304,7 +4419,7 @@ sub _get_next_token ($) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         }
         
-        ## reconsume
+        ## Reconsume.
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($self->{is_xml} and
@@ -6100,6 +6215,7 @@ sub _get_next_token ($) {
             0x0054, # T
             0x0049, # I
             0x0054, # T
+            NEVER_CHAR, # (Y)
           ]->[length $self->{kwd}] or
           $self->{nc} == [
             undef,
@@ -6107,6 +6223,7 @@ sub _get_next_token ($) {
             0x0074, # t
             0x0069, # i
             0x0074, # t
+            NEVER_CHAR, # (y)
           ]->[length $self->{kwd}]) {
         ## Stay in the state.
         $self->{kwd} .= chr $self->{nc};
@@ -6166,6 +6283,7 @@ sub _get_next_token ($) {
            0x004D, # M
            0x0045, # E
            0x004E, # N
+           NEVER_CHAR, # (T)
           ]->[length $self->{kwd}] or
           $self->{nc} == [
            undef,
@@ -6174,6 +6292,7 @@ sub _get_next_token ($) {
            0x006D, # m
            0x0065, # e
            0x006E, # n
+           NEVER_CHAR, # (t)
           ]->[length $self->{kwd}]) {
         ## Stay in the state.
         $self->{kwd} .= chr $self->{nc};
@@ -6233,6 +6352,7 @@ sub _get_next_token ($) {
            0x004C, # L
            0x0049, # I
            0x0053, # S
+           NEVER_CHAR, # (T)
           ]->[length $self->{kwd}] or
           $self->{nc} == [
            undef,
@@ -6241,6 +6361,7 @@ sub _get_next_token ($) {
            0x006C, # l
            0x0069, # i
            0x0073, # s
+           NEVER_CHAR, # (t)
           ]->[length $self->{kwd}]) {
         ## Stay in the state.
         $self->{kwd} .= chr $self->{nc};
@@ -6302,6 +6423,7 @@ sub _get_next_token ($) {
            0x0054, # T
            0x0049, # I
            0x004F, # O
+           NEVER_CHAR, # (N)
           ]->[length $self->{kwd}] or
           $self->{nc} == [
            undef,
@@ -6311,6 +6433,7 @@ sub _get_next_token ($) {
            0x0074, # t
            0x0069, # i
            0x006F, # o
+           NEVER_CHAR, # (n)
           ]->[length $self->{kwd}]) {
         ## Stay in the state.
         $self->{kwd} .= chr $self->{nc};
@@ -7854,12 +7977,14 @@ sub _get_next_token ($) {
             0x0044, # D
             0x0041, # A
             0x0054, # T
+            NEVER_CHAR, # (A)
           ]->[length $self->{kwd}] or
           $self->{nc} == [
             undef, 
             0x0064, # d
             0x0061, # a
             0x0074, # t
+            NEVER_CHAR, # (a)
           ]->[length $self->{kwd}]) {
         
         ## Stay in the state.
