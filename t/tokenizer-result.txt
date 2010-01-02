@@ -1,7 +1,7 @@
 1..1154
 # Running under perl version 5.010001 for linux
-# Current time local: Sat Jan  2 12:48:41 2010
-# Current time GMT:   Sat Jan  2 03:48:41 2010
+# Current time local: Sat Jan  2 13:25:41 2010
+# Current time GMT:   Sat Jan  2 04:25:41 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tokenizer.t line 37.
 Found = in conditional, should be == at t/HTML-tokenizer.t line 128.
@@ -170,17 +170,9 @@ ok 113
 ok 114
 ok 115
 ok 116
-not ok 117
-# Test 117 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 221 fail #117)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (<!doctype! public>: qq'<!doctype! public>')
-#     Got 1 extra line at line 4:
-#      + "          qq'ParseError',\n"
+ok 117
 ok 118
-not ok 119
-# Test 119 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 221 fail #119)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (<!doctype! public?: qq'<!doctype! public?')
-#     Got 1 extra line at line 4:
-#      + "          qq'ParseError',\n"
+ok 119
 not ok 120
 # Test 120 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            qq'',\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 221 fail #120)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            qq'',\n            undef,\n            0\n          ]\n        ];\n" (<!doctype! public'': qq'<!doctype! public\x{27}\x{27}')
@@ -223,17 +215,9 @@ not ok 127
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            qq'#',\n            undef,\n            0\n          ]\n        ];\n" (<!doctype! public"#: qq'<!doctype! public"#')
 #     Got 1 extra line at line 4:
 #      + "          qq'ParseError',\n"
-not ok 128
-# Test 128 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 221 fail #128)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (<!doctype! system>: qq'<!doctype! system>')
-#     Got 1 extra line at line 4:
-#      + "          qq'ParseError',\n"
+ok 128
 ok 129
-not ok 130
-# Test 130 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 221 fail #130)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (<!doctype! system?: qq'<!doctype! system?')
-#     Got 1 extra line at line 4:
-#      + "          qq'ParseError',\n"
+ok 130
 not ok 131
 # Test 131 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            qq'',\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 221 fail #131)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'!',\n            undef,\n            qq'',\n            0\n          ]\n        ];\n" (<!doctype! system'': qq'<!doctype! system\x{27}\x{27}')

@@ -123,7 +123,7 @@
 
 {"description": "PUBLIC>",
 "input": "<!DOCTYPE html PUBLIC>",
-"output": ["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "PUBLIC{EOF}",
 "input": "<!DOCTYPE html PUBLIC",
@@ -139,7 +139,7 @@
 
 {"description":"PUBLICbogus",
 "input":"<!DOCTYPE html PUBLICbogus>",
-"output":["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output":["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description":"PUBLIC bogus",
 "input":"<!DOCTYPE html PUBLIC bogus>",
@@ -187,7 +187,7 @@
 
 {"description":"SYSTEM>",
 "input":"<!DOCTYPE html SYSTEM>",
-"output":["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output":["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description":"SYSTEM{EOF}",
 "input":"<!DOCTYPE html SYSTEM",
@@ -287,7 +287,7 @@
 
 {"description": "<!DOCTYPE HTML publication>",
 "input": "<!DOCTYPE HTML publication>",
-"output": ["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML publi>",
 "input": "<!DOCTYPE HTML publi>",
@@ -295,7 +295,7 @@
 
 {"description": "<!DOCTYPE HTML PUBLICID>",
 "input": "<!DOCTYPE HTML PUBLICID>",
-"output": ["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "<!DOCTYPE HTML S ''>",
 "input": "<!DOCTYPE HTML S ''>",
@@ -319,7 +319,7 @@
 
 {"description": "<!DOCTYPE HTML systemid>",
 "input": "<!DOCTYPE HTML systemid>",
-"output": ["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description":"<!---x-->",
 "input":"<!---x-->",

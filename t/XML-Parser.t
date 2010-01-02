@@ -9,7 +9,7 @@ my $DEBUG = $ENV{DEBUG};
 my $test_dir_name = 't/xml/';
 
 use Test;
-BEGIN { plan tests => 1603 }
+BEGIN { plan tests => 1649 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;

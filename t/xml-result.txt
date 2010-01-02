@@ -1,7 +1,7 @@
-1..1603
+1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Sat Jan  2 12:48:44 2010
-# Current time GMT:   Sat Jan  2 03:48:44 2010
+# Current time local: Sat Jan  2 13:25:42 2010
+# Current time GMT:   Sat Jan  2 04:25:42 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 24.
@@ -933,7 +933,6 @@ ok 886
 ok 887
 ok 888
 ok 889
-# t/xml/eldecls-1.dat
 ok 890
 ok 891
 ok 892
@@ -942,6 +941,7 @@ ok 894
 ok 895
 ok 896
 ok 897
+# t/xml/eldecls-1.dat
 ok 898
 ok 899
 ok 900
@@ -992,7 +992,6 @@ ok 944
 ok 945
 ok 946
 ok 947
-# t/xml/attlists-1.dat
 ok 948
 ok 949
 ok 950
@@ -1001,6 +1000,7 @@ ok 952
 ok 953
 ok 954
 ok 955
+# t/xml/attlists-1.dat
 ok 956
 ok 957
 ok 958
@@ -1072,32 +1072,30 @@ ok 1023
 ok 1024
 ok 1025
 ok 1026
-not ok 1027
-# Test 1027 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 154 fail #455)
-#      Expected: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d> ]><a/>\"\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>')
-#      Lines 2-2 are missing:
-#       - "  <!ELEMENT b >\n"
-#       - "    c ID () EXPLICIT \"d> ]><a/>\"\n"
+ok 1027
 ok 1028
 ok 1029
 ok 1030
 ok 1031
 ok 1032
-not ok 1033
-# Test 1033 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 154 fail #458)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d"')
+ok 1033
 ok 1034
-ok 1035
+not ok 1035
+# Test 1035 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 154 fail #459)
+#      Expected: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d> ]><a/>\"\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>')
+#      Lines 2-2 are missing:
+#       - "  <!ELEMENT b >\n"
+#       - "    c ID () EXPLICIT \"d> ]><a/>\"\n"
 ok 1036
 ok 1037
 ok 1038
 ok 1039
 ok 1040
-ok 1041
+not ok 1041
+# Test 1041 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 154 fail #462)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d"')
 ok 1042
-not ok 1043
-# Test 1043 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 154 fail #463)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID \x{27}d\x{27}')
+ok 1043
 ok 1044
 ok 1045
 ok 1046
@@ -1105,7 +1103,9 @@ ok 1047
 ok 1048
 ok 1049
 ok 1050
-ok 1051
+not ok 1051
+# Test 1051 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 154 fail #467)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID \x{27}d\x{27}')
 ok 1052
 ok 1053
 ok 1054
@@ -1256,7 +1256,6 @@ ok 1198
 ok 1199
 ok 1200
 ok 1201
-# t/xml/entities-1.dat
 ok 1202
 ok 1203
 ok 1204
@@ -1265,6 +1264,7 @@ ok 1206
 ok 1207
 ok 1208
 ok 1209
+# t/xml/entities-1.dat
 ok 1210
 ok 1211
 ok 1212
@@ -1400,7 +1400,6 @@ ok 1341
 ok 1342
 ok 1343
 ok 1344
-# t/xml/entities-2.dat
 ok 1345
 ok 1346
 ok 1347
@@ -1433,6 +1432,7 @@ ok 1373
 ok 1374
 ok 1375
 ok 1376
+# t/xml/entities-2.dat
 ok 1377
 ok 1378
 ok 1379
@@ -1470,7 +1470,6 @@ ok 1410
 ok 1411
 ok 1412
 ok 1413
-# t/xml/notations-1.dat
 ok 1414
 ok 1415
 ok 1416
@@ -1515,6 +1514,7 @@ ok 1454
 ok 1455
 ok 1456
 ok 1457
+# t/xml/notations-1.dat
 ok 1458
 ok 1459
 ok 1460
@@ -1555,7 +1555,6 @@ ok 1494
 ok 1495
 ok 1496
 ok 1497
-# t/xml/entrefs-1.dat
 ok 1498
 ok 1499
 ok 1500
@@ -1596,13 +1595,13 @@ ok 1534
 ok 1535
 ok 1536
 ok 1537
-# t/xml/entrefs-2.dat
 ok 1538
 ok 1539
 ok 1540
 ok 1541
 ok 1542
 ok 1543
+# t/xml/entrefs-1.dat
 ok 1544
 ok 1545
 ok 1546
@@ -1643,6 +1642,7 @@ ok 1580
 ok 1581
 ok 1582
 ok 1583
+# t/xml/entrefs-2.dat
 ok 1584
 ok 1585
 ok 1586
@@ -1663,3 +1663,49 @@ ok 1600
 ok 1601
 ok 1602
 ok 1603
+ok 1604
+ok 1605
+ok 1606
+ok 1607
+ok 1608
+ok 1609
+ok 1610
+ok 1611
+ok 1612
+ok 1613
+ok 1614
+ok 1615
+ok 1616
+ok 1617
+ok 1618
+ok 1619
+ok 1620
+ok 1621
+ok 1622
+ok 1623
+ok 1624
+ok 1625
+ok 1626
+ok 1627
+ok 1628
+ok 1629
+ok 1630
+ok 1631
+ok 1632
+ok 1633
+ok 1634
+ok 1635
+ok 1636
+ok 1637
+ok 1638
+ok 1639
+ok 1640
+ok 1641
+ok 1642
+ok 1643
+ok 1644
+ok 1645
+ok 1646
+ok 1647
+ok 1648
+ok 1649

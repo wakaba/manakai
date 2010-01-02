@@ -2615,49 +2615,32 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
-    } elsif ($self->{state} == AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE) {
-      if ($is_space->{$self->{nc}}) {
-        !!!cp (181.1);
-        $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
-        !!!next-input-character;
-        redo A;
-      } elsif ($self->{nc} == EOF_CHAR) {
-        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
-          !!!cp (181.2);
-          !!!parse-error (type => 'unclosed DOCTYPE');
-          $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
-          $self->{ct}->{quirks} = 1;
-        } else {
-          !!!cp (181.3);
-          !!!parse-error (type => 'unclosed md'); ## TODO: type
-          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-        }
-        
-        ## Reconsume.
-        !!!emit ($self->{ct}); # DOCTYPE
-        redo A;
-      } else {
-        !!!cp (181.4);
-        !!!parse-error (type => 'no space before pubid literal'); # XXX documentation
-        $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
-        ## Reconsume.
-        redo A;
-      }
-    } elsif ($self->{state} == BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
+    } elsif ($self->{state} == AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE or
+             $self->{state} == BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
       if ($is_space->{$self->{nc}}) {
         !!!cp (181.5);
-        ## Stay in the state
+        ## Stay in or switch to the state.
+        $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x0022) { # "
-        !!!cp (182);
+        if ($self->{state} == AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE) {
+          !!!cp (181.6);
+          !!!parse-error (type => 'no space before pubid literal'); # XXX documentation
+        } else {
+          !!!cp (182);
+        }
         $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x0027) { # '
-        !!!cp (183);
+        if ($self->{state} == AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE) {
+          !!!cp (182.1);
+          !!!parse-error (type => 'no space before pubid literal'); # XXX documentation
+        } else {
+          !!!cp (183);
+        }
         $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
         !!!next-input-character;
@@ -2911,61 +2894,32 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       }
-    } elsif ($self->{state} == AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE) {
-      if ($is_space->{$self->{nc}}) {
-        !!!cp (201.1);
-        $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
-        !!!next-input-character;
-        redo A;
-      } elsif ($self->{nc} == EOF_CHAR) {
-        if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
-          !!!cp (201.2);
-          !!!parse-error (type => 'unclosed DOCTYPE');
-          $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
-          $self->{ct}->{quirks} = 1;
-        } else {
-          !!!cp (201.3);
-          !!!parse-error (type => 'unclosed md'); ## TODO: type
-          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-        }
-        
-        ## Reconsume.
-        !!!emit ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
-        redo A;
-      } elsif ($self->{is_xml} and
-               $self->{ct}->{type} == DOCTYPE_TOKEN and
-               $self->{nc} == 0x005B) { # [
-        !!!cp (201.4);
-        !!!parse-error (type => 'no SYSTEM literal');
-
-        $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-        $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
-        $self->{in_subset} = 1;
-        !!!next-input-character;
-        !!!emit ($self->{ct}); # DOCTYPE
-        redo A;
-      } else {
-        !!!cp (201.5);
-        !!!parse-error (type => 'no space before system literal'); # XXX documentation
-        $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
-        ## Reconsume.
-        redo A;
-      }
-    } elsif ($self->{state} == BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE) {
+    } elsif ($self->{state} == AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE or
+             $self->{state} == BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE) {
       if ($is_space->{$self->{nc}}) {
         !!!cp (201);
-        ## Stay in the state
+        ## Stay in or switch to the state.
+        $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x0022) { # "
-        !!!cp (202);
+        if ($self->{state} == AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE) {
+          !!!cp (201.6);
+          !!!parse-error (type => 'no space before system literal'); # XXX documentation
+        } else {
+          !!!cp (202);
+        }
         $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         !!!next-input-character;
         redo A;
       } elsif ($self->{nc} == 0x0027) { # '
-        !!!cp (203);
+        if ($self->{state} == AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE) {
+          !!!cp (201.7);
+          !!!parse-error (type => 'no space before system literal'); # XXX documentation
+        } else {
+          !!!cp (203);
+        }
         $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         !!!next-input-character;

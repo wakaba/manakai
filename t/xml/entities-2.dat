@@ -46,6 +46,54 @@
 
 #data
 <!DOCTYPE a[
+<!ENTITY % bc PUBLIC>
+]><a/>
+#errors
+2;21;no PUBLIC literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC >
+]><a/>
+#errors
+2;22;no PUBLIC literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc SYSTEM>
+]><a/>
+#errors
+2;21;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "" "" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc SYSTEM >
+]><a/>
+#errors
+2;22;no SYSTEM literal;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities
+| <!ENTITY % bc "" "" "" >
+
+#data
+<!DOCTYPE a[
 <!ENTITY % bc PUBLIC "x" "y">
 ]><a/>
 #errors
