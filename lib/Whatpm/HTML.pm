@@ -3882,6 +3882,48 @@ sub _tree_construction_main ($) {
             
             #
           }
+        } elsif ($token->{tag_name} eq 'form') {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'form in table', token => $token); # XXX documentation
+          
+          if ($self->{form_element}) {
+            ## Ignore the token.
+            $token = $self->_get_next_token;
+            
+            next B;
+          } else {
+            
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
+    }
+  
+            $self->{form_element} = $self->{open_elements}->[-1]->[0];
+            
+            pop @{$self->{open_elements}};
+            
+            $token = $self->_get_next_token;
+            
+            next B;
+          }
         } else {
           
           #

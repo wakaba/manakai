@@ -3362,6 +3362,24 @@ sub _tree_construction_main ($) {
             !!!cp ('t227.4');
             #
           }
+        } elsif ($token->{tag_name} eq 'form') {
+          !!!parse-error (type => 'form in table', token => $token); # XXX documentation
+          
+          if ($self->{form_element}) {
+            ## Ignore the token.
+            !!!next-token;
+            !!!nack ('t227.5');
+            next B;
+          } else {
+            !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
+            $self->{form_element} = $self->{open_elements}->[-1]->[0];
+            
+            pop @{$self->{open_elements}};
+            
+            !!!next-token;
+            !!!nack ('t227.6');
+            next B;
+          }
         } else {
           !!!cp ('t227');
           #

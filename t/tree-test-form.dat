@@ -316,3 +316,103 @@ unmatched </keygen>
 |             <select>
 |               <script>
 |                 "a<b>c"
+
+#data
+<!DOCTYPE html>
+<table><form><!--a--></form><!--b--></table>
+#errors
+<form> in table
+</form> in table
+ubmatched </form>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <form>
+|       <!-- a -->
+|       <!-- b -->
+
+#data
+<!DOCTYPE html>
+<table><form><!--a--><form><!--b--></form><!--c--></table>
+#errors
+<form> in table
+<form> in table
+</form> in table
+ubmatched </form>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <form>
+|       <!-- a -->
+|       <!-- b -->
+|       <!-- c -->
+
+#data
+<!DOCTYPE html>
+<table><form><!--a--><tr><td><form><!--b--></td></tr><form><!--c--></table>
+#errors
+<form> in table
+<form> in form
+<form> in form
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <form>
+|       <!-- a -->
+|       <tbody>
+|         <tr>
+|           <td>
+|             <!-- b -->
+|         <!-- c -->
+
+#data
+<!DOCTYPE html>
+<table><form><!--a--><tr></form><td><form><!--b--></td></tr><form><!--c--></table>
+#errors
+<form> in table
+</form> in table
+unmatched </form>
+no </form>
+<form> in form
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <form>
+|       <!-- a -->
+|       <tbody>
+|         <tr>
+|           <td>
+|             <form>
+|               <!-- b -->
+|         <!-- c -->
+
+#data
+<!DOCTYPE html>
+<table><div><form><!--a--></form><!--b--></table>
+#errors
+<div> in table
+<form> in table
+</form> in table
+unmatched </form>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <form>
+|       <!-- a -->
+|       <!-- b -->
+|     <table>

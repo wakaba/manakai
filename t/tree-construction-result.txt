@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Fri Jan  1 14:09:45 2010
-# Current time GMT:   Fri Jan  1 05:09:45 2010
+# Current time local: Sat Jan  9 19:15:25 2010
+# Current time GMT:   Sat Jan  9 10:15:25 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -2982,9 +2982,7 @@ ok 2541
 ok 2542
 ok 2543
 ok 2544
-not ok 2545
-# Test 2545 got: "3" (t/HTML-tree.t at line 104 fail #849)
-#      Expected: "4" (Parse error: qq'<!DOCTYPE HTML><table><tr><form><td></td></form></table>'; 1:33:in table, 1:49:in table:/, 1:49:unmatched end tag;<form> in table, form not closed, </form> in table, ubmatched </form>)
+ok 2545
 ok 2546
 ok 2547
 ok 2548
@@ -5468,7 +5466,6 @@ ok 4953
 ok 4954
 ok 4955
 ok 4956
-# t/tree-test-frames.dat
 ok 4957
 ok 4958
 ok 4959
@@ -5484,6 +5481,7 @@ ok 4968
 ok 4969
 ok 4970
 ok 4971
+# t/tree-test-frames.dat
 ok 4972
 ok 4973
 ok 4974
@@ -5553,7 +5551,6 @@ ok 5037
 ok 5038
 ok 5039
 ok 5040
-# t/tree-test-foreign.dat
 ok 5041
 ok 5042
 ok 5043
@@ -5569,6 +5566,7 @@ ok 5052
 ok 5053
 ok 5054
 ok 5055
+# t/tree-test-foreign.dat
 ok 5056
 ok 5057
 ok 5058
@@ -5734,14 +5732,10 @@ ok 5217
 ok 5218
 ok 5219
 ok 5220
-not ok 5221
-# Test 5221 got: "4" (t/HTML-tree.t at line 104 fail #1741)
-#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 5221
 ok 5222
 ok 5223
-not ok 5224
-# Test 5224 got: "4" (t/HTML-tree.t at line 104 fail #1742)
-#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 5224
 ok 5225
 ok 5226
 ok 5227
@@ -5753,10 +5747,14 @@ ok 5232
 ok 5233
 ok 5234
 ok 5235
-ok 5236
+not ok 5236
+# Test 5236 got: "4" (t/HTML-tree.t at line 104 fail #1746)
+#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5237
 ok 5238
-ok 5239
+not ok 5239
+# Test 5239 got: "4" (t/HTML-tree.t at line 104 fail #1747)
+#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5240
 ok 5241
 ok 5242
@@ -5882,9 +5880,7 @@ ok 5361
 ok 5362
 ok 5363
 ok 5364
-not ok 5365
-# Test 5365 got: "2" (t/HTML-tree.t at line 104 fail #1789)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
+ok 5365
 ok 5366
 ok 5367
 ok 5368
@@ -5896,8 +5892,25 @@ ok 5373
 ok 5374
 ok 5375
 ok 5376
-not ok 5377
-# Test 5377 got: "2" (t/HTML-tree.t at line 104 fail #1793)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5377
 ok 5378
 ok 5379
+not ok 5380
+# Test 5380 got: "2" (t/HTML-tree.t at line 104 fail #1794)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
+ok 5381
+ok 5382
+ok 5383
+ok 5384
+ok 5385
+ok 5386
+ok 5387
+ok 5388
+ok 5389
+ok 5390
+ok 5391
+not ok 5392
+# Test 5392 got: "2" (t/HTML-tree.t at line 104 fail #1798)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5393
+ok 5394
