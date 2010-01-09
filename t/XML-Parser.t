@@ -103,7 +103,7 @@ sub test ($) {
   }
 
   if ($test->{'xml-encoding'}) {
-    if ($test->{'xml-encoding'}->[1]->[0] eq 'null') {
+    if (($test->{'xml-encoding'}->[1]->[0] || '') eq 'null') {
       ok $doc->xml_encoding, undef, 
         'XML encoding: ' . Data::Dumper::qquote ($test->{data}->[0]);
     } else {

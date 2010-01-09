@@ -52,3 +52,20 @@ aa]]>bb
 #document
 | <!--  -->
 | "]]>"
+
+#data
+<>
+#errors
+1;1;bare stago;;;m
+1;1;text outside of root element;;;m
+1;2;no root element;;;m
+#document
+| "<>"
+
+#data
+<p><></p>
+#errors
+1;4;bare stago;;;m
+#document
+| <{} p>
+|   "<>"

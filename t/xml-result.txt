@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Sat Jan  2 13:25:42 2010
-# Current time GMT:   Sat Jan  2 04:25:42 2010
+# Current time local: Sat Jan  9 19:40:16 2010
+# Current time GMT:   Sat Jan  9 10:40:16 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 24.
@@ -178,11 +178,11 @@ ok 165
 ok 166
 ok 167
 ok 168
-# t/xml/cdata-1.dat
 ok 169
 ok 170
 ok 171
 ok 172
+# t/xml/cdata-1.dat
 ok 173
 ok 174
 ok 175
@@ -205,11 +205,11 @@ ok 191
 ok 192
 ok 193
 ok 194
-# t/xml/charref-1.dat
 ok 195
 ok 196
 ok 197
 ok 198
+# t/xml/charref-1.dat
 ok 199
 ok 200
 ok 201
@@ -235,31 +235,31 @@ ok 220
 ok 221
 ok 222
 ok 223
-not ok 224
-# Test 224 got: "<{} a>\n  \"\x{D800}\"\n" (t/XML-Parser.t at line 154 fail #112)
-#     Expected: "<{} a>\n  \"\x{FFFD}\"\n" (Document tree: qq'<a>&#xd800;</a>')
-#  t/XML-Parser.t line 154 is:   ok $result, $test->{document}->[0],
+ok 224
 ok 225
-not ok 226
-# Test 226 got: "<{} a>\n  \"\x{D800}\"\n" (t/XML-Parser.t at line 154 fail #113)
-#     Expected: "<{} a>\n  \"\x{FFFD}\"\n" (Document tree: qq'<a>&#55296;</a>')
+ok 226
 ok 227
 not ok 228
-# Test 228 got: "<{} a>\n  \"\x{DFFF}\"\n" (t/XML-Parser.t at line 154 fail #114)
-#     Expected: "<{} a>\n  \"\x{FFFD}\"\n" (Document tree: qq'<a>&#xdfff;</a>')
+# Test 228 got: "<{} a>\n  \"\x{D800}\"\n" (t/XML-Parser.t at line 154 fail #114)
+#     Expected: "<{} a>\n  \"\x{FFFD}\"\n" (Document tree: qq'<a>&#xd800;</a>')
+#  t/XML-Parser.t line 154 is:   ok $result, $test->{document}->[0],
 ok 229
 not ok 230
-# Test 230 got: "<{} a>\n  \"\x{DFFF}\"\n" (t/XML-Parser.t at line 154 fail #115)
-#     Expected: "<{} a>\n  \"\x{FFFD}\"\n" (Document tree: qq'<a>&#57343;</a>')
+# Test 230 got: "<{} a>\n  \"\x{D800}\"\n" (t/XML-Parser.t at line 154 fail #115)
+#     Expected: "<{} a>\n  \"\x{FFFD}\"\n" (Document tree: qq'<a>&#55296;</a>')
 ok 231
-ok 232
+not ok 232
+# Test 232 got: "<{} a>\n  \"\x{DFFF}\"\n" (t/XML-Parser.t at line 154 fail #116)
+#     Expected: "<{} a>\n  \"\x{FFFD}\"\n" (Document tree: qq'<a>&#xdfff;</a>')
 ok 233
-ok 234
-# t/xml/comments-2.dat
+not ok 234
+# Test 234 got: "<{} a>\n  \"\x{DFFF}\"\n" (t/XML-Parser.t at line 154 fail #117)
+#     Expected: "<{} a>\n  \"\x{FFFD}\"\n" (Document tree: qq'<a>&#57343;</a>')
 ok 235
 ok 236
 ok 237
 ok 238
+# t/xml/comments-2.dat
 ok 239
 ok 240
 ok 241
@@ -286,11 +286,11 @@ ok 261
 ok 262
 ok 263
 ok 264
-# t/xml/pis-1.dat
 ok 265
 ok 266
 ok 267
 ok 268
+# t/xml/pis-1.dat
 ok 269
 ok 270
 ok 271
@@ -345,11 +345,11 @@ ok 319
 ok 320
 ok 321
 ok 322
-# t/xml/pis-2.dat
 ok 323
 ok 324
 ok 325
 ok 326
+# t/xml/pis-2.dat
 ok 327
 ok 328
 ok 329
@@ -378,11 +378,11 @@ ok 351
 ok 352
 ok 353
 ok 354
-# t/xml/xmldecls-1.dat
 ok 355
 ok 356
 ok 357
 ok 358
+# t/xml/xmldecls-1.dat
 ok 359
 ok 360
 ok 361
@@ -437,22 +437,18 @@ ok 409
 ok 410
 ok 411
 ok 412
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 413
 ok 414
 ok 415
 ok 416
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 417
 ok 418
 ok 419
 ok 420
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 421
 ok 422
 ok 423
 ok 424
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 425
 ok 426
 ok 427
@@ -461,12 +457,10 @@ ok 429
 ok 430
 ok 431
 ok 432
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 433
 ok 434
 ok 435
 ok 436
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 437
 ok 438
 ok 439
@@ -479,41 +473,34 @@ ok 445
 ok 446
 ok 447
 ok 448
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 449
 ok 450
 ok 451
 ok 452
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 453
 ok 454
 ok 455
 ok 456
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 457
 ok 458
 ok 459
 ok 460
 ok 461
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 462
 ok 463
 ok 464
 ok 465
 ok 466
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 467
 ok 468
 ok 469
 ok 470
 ok 471
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 472
 ok 473
 ok 474
 ok 475
 ok 476
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 477
 ok 478
 ok 479
@@ -579,7 +566,6 @@ ok 538
 ok 539
 ok 540
 ok 541
-Use of uninitialized value in string eq at t/XML-Parser.t line 106.
 ok 542
 ok 543
 ok 544
@@ -618,22 +604,22 @@ ok 576
 ok 577
 ok 578
 ok 579
-# t/xml/tree-1.dat
 ok 580
 ok 581
 ok 582
 ok 583
+# t/xml/tree-1.dat
 ok 584
 ok 585
 ok 586
 ok 587
 ok 588
 ok 589
-# t/xml/ns-elements-1.dat
 ok 590
 ok 591
 ok 592
 ok 593
+# t/xml/ns-elements-1.dat
 ok 594
 ok 595
 ok 596
@@ -678,11 +664,11 @@ ok 634
 ok 635
 ok 636
 ok 637
-# t/xml/ns-attrs-1.dat
 ok 638
 ok 639
 ok 640
 ok 641
+# t/xml/ns-attrs-1.dat
 ok 642
 ok 643
 ok 644
@@ -811,11 +797,11 @@ ok 766
 ok 767
 ok 768
 ok 769
-# t/xml/doctypes-1.dat
 ok 770
 ok 771
 ok 772
 ok 773
+# t/xml/doctypes-1.dat
 ok 774
 ok 775
 ok 776
@@ -826,11 +812,11 @@ ok 780
 ok 781
 ok 782
 ok 783
-# t/xml/doctypes-2.dat
 ok 784
 ok 785
 ok 786
 ok 787
+# t/xml/doctypes-2.dat
 ok 788
 ok 789
 ok 790
@@ -941,11 +927,11 @@ ok 894
 ok 895
 ok 896
 ok 897
-# t/xml/eldecls-1.dat
 ok 898
 ok 899
 ok 900
 ok 901
+# t/xml/eldecls-1.dat
 ok 902
 ok 903
 ok 904
@@ -1000,11 +986,11 @@ ok 952
 ok 953
 ok 954
 ok 955
-# t/xml/attlists-1.dat
 ok 956
 ok 957
 ok 958
 ok 959
+# t/xml/attlists-1.dat
 ok 960
 ok 961
 ok 962
@@ -1080,36 +1066,36 @@ ok 1031
 ok 1032
 ok 1033
 ok 1034
-not ok 1035
-# Test 1035 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 154 fail #459)
+ok 1035
+ok 1036
+ok 1037
+ok 1038
+not ok 1039
+# Test 1039 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 154 fail #461)
 #      Expected: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d> ]><a/>\"\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>')
 #      Lines 2-2 are missing:
 #       - "  <!ELEMENT b >\n"
 #       - "    c ID () EXPLICIT \"d> ]><a/>\"\n"
-ok 1036
-ok 1037
-ok 1038
-ok 1039
 ok 1040
-not ok 1041
-# Test 1041 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 154 fail #462)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d"')
+ok 1041
 ok 1042
 ok 1043
 ok 1044
-ok 1045
+not ok 1045
+# Test 1045 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 154 fail #464)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d"')
 ok 1046
 ok 1047
 ok 1048
 ok 1049
 ok 1050
-not ok 1051
-# Test 1051 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 154 fail #467)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID \x{27}d\x{27}')
+ok 1051
 ok 1052
 ok 1053
 ok 1054
-ok 1055
+not ok 1055
+# Test 1055 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 154 fail #469)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID \x{27}d\x{27}')
 ok 1056
 ok 1057
 ok 1058
@@ -1264,11 +1250,11 @@ ok 1206
 ok 1207
 ok 1208
 ok 1209
-# t/xml/entities-1.dat
 ok 1210
 ok 1211
 ok 1212
 ok 1213
+# t/xml/entities-1.dat
 ok 1214
 ok 1215
 ok 1216
@@ -1432,11 +1418,11 @@ ok 1373
 ok 1374
 ok 1375
 ok 1376
-# t/xml/entities-2.dat
 ok 1377
 ok 1378
 ok 1379
 ok 1380
+# t/xml/entities-2.dat
 ok 1381
 ok 1382
 ok 1383
@@ -1514,11 +1500,11 @@ ok 1454
 ok 1455
 ok 1456
 ok 1457
-# t/xml/notations-1.dat
 ok 1458
 ok 1459
 ok 1460
 ok 1461
+# t/xml/notations-1.dat
 ok 1462
 ok 1463
 ok 1464
@@ -1601,11 +1587,11 @@ ok 1540
 ok 1541
 ok 1542
 ok 1543
-# t/xml/entrefs-1.dat
 ok 1544
 ok 1545
 ok 1546
 ok 1547
+# t/xml/entrefs-1.dat
 ok 1548
 ok 1549
 ok 1550
@@ -1642,11 +1628,11 @@ ok 1580
 ok 1581
 ok 1582
 ok 1583
-# t/xml/entrefs-2.dat
 ok 1584
 ok 1585
 ok 1586
 ok 1587
+# t/xml/entrefs-2.dat
 ok 1588
 ok 1589
 ok 1590
@@ -1709,3 +1695,7 @@ ok 1646
 ok 1647
 ok 1648
 ok 1649
+ok 1650
+ok 1651
+ok 1652
+ok 1653

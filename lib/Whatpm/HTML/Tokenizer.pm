@@ -728,31 +728,6 @@ sub _get_next_token ($) {
     }
   
           redo A;
-        } elsif ($self->{nc} == 0x003E) { # >
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty start tag',
-                          line => $self->{line_prev},
-                          column => $self->{column_prev});
-          $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
-          
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-
-          return  ({type => CHARACTER_TOKEN, data => '<>',
-                    line => $self->{line_prev},
-                    column => $self->{column_prev},
-                   });
-
-          redo A;
         } elsif ($self->{nc} == 0x003F) { # ?
           if ($self->{is_xml}) {
             
@@ -782,7 +757,9 @@ sub _get_next_token ($) {
             ## $self->{nc} is intentionally left as is
             redo A;
           }
-        } elsif (not $self->{is_xml} or $is_space->{$self->{nc}}) {
+        } elsif (not $self->{is_xml} or
+                 $is_space->{$self->{nc}} or
+                 $self->{nc} == 0x003E) { # >
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare stago',
                           line => $self->{line_prev},

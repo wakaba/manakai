@@ -608,21 +608,6 @@ sub _get_next_token ($) {
           $self->{state} = TAG_NAME_STATE;
           !!!next-input-character;
           redo A;
-        } elsif ($self->{nc} == 0x003E) { # >
-          !!!cp (21);
-          !!!parse-error (type => 'empty start tag',
-                          line => $self->{line_prev},
-                          column => $self->{column_prev});
-          $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
-          !!!next-input-character;
-
-          !!!emit ({type => CHARACTER_TOKEN, data => '<>',
-                    line => $self->{line_prev},
-                    column => $self->{column_prev},
-                   });
-
-          redo A;
         } elsif ($self->{nc} == 0x003F) { # ?
           if ($self->{is_xml}) {
             !!!cp (22.1);
@@ -642,7 +627,9 @@ sub _get_next_token ($) {
             ## $self->{nc} is intentionally left as is
             redo A;
           }
-        } elsif (not $self->{is_xml} or $is_space->{$self->{nc}}) {
+        } elsif (not $self->{is_xml} or
+                 $is_space->{$self->{nc}} or
+                 $self->{nc} == 0x003E) { # >
           !!!cp (23);
           !!!parse-error (type => 'bare stago',
                           line => $self->{line_prev},
