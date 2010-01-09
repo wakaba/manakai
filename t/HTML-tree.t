@@ -52,6 +52,12 @@ sub test ($) {
   my $test = shift;
   my $data = $test->{data}->[0];
 
+  if ($test->{skip}->[1]->[0]) {
+#line 1 "HTML-tree.t test () skip"
+    skip 1;
+    return;
+  }
+
   if ($test->{'document-fragment'}) {
     if (@{$test->{'document-fragment'}->[1]}) {
       ## NOTE: Old format.
@@ -99,6 +105,7 @@ sub test ($) {
   
   warn "No #errors section ($test->{data}->[0])" unless $test->{errors};
     
+#line 1 "HTML-tree.t test () ok"
   ok scalar @errors, scalar @{$test->{errors}->[0] or []},
     'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' . 
     join (', ', @errors) . ';' . join (', ', @{$test->{errors}->[0] or []});
