@@ -151,32 +151,6 @@ NULL
 #document-fragment p escaped
 | "\u000A\u000A"
 
-#data
-<script><!-- </script> --></script>
-#errors
-#document-fragment p
-| <script>
-|   "<!-- </script> -->"
-
-#data
-<style><!-- </style> --></style>
-#errors
-#document-fragment p
-| <style>
-|   "<!-- </style> -->"
-
-#data
-<script><!----x></script>foo
-#errors
-no DOCTYPE
-no --></script> before EOF
-#document
-| <html>
-|   <head>
-|     <script>
-|       "<!----x></script>foo"
-|   <body>
-
 #data escaped
 \u0001
 #errors

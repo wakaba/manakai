@@ -403,6 +403,8 @@ sub _get_next_token ($) {
   }
 
   A: {
+    
+
     if ($self->{state} == PCDATA_STATE) {
       ## NOTE: Same as |DATA_STATE|, but only for |PCDATA| content model.
 
@@ -1669,6 +1671,16 @@ sub _get_next_token ($) {
                   line => $self->{line_prev}, column => $self->{column_prev}});
         redo A;
       } elsif ($self->{nc} == 0x003C) { # <
+        my $token;
+        if ({
+          (SCRIPT_DATA_DOUBLE_ESCAPED_STATE) => 1,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE) => 1,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE) => 1,
+        }->{$self->{state}}) {
+          $token = {type => CHARACTER_TOKEN,
+                    data => '<',
+                    line => $self->{line}, column => $self->{column}};
+        }
         $self->{state} = {
           (SCRIPT_DATA_ESCAPED_STATE) => SCRIPT_DATA_ESCAPED_LT_STATE,
           (SCRIPT_DATA_ESCAPED_DASH_STATE) => SCRIPT_DATA_ESCAPED_LT_STATE,
@@ -1692,6 +1704,9 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+        if ($token) {
+          return  ($token);
+        }
         redo A;
       } elsif (($self->{state} == SCRIPT_DATA_ESCAPED_DASH_DASH_STATE or
                 $self->{state} == SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE) and
@@ -1732,7 +1747,6 @@ sub _get_next_token ($) {
           (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE)
               => SCRIPT_DATA_DOUBLE_ESCAPED_STATE,
         }->{$self->{state}} or die "$self->{state}'s next state not found";
-        $self->{state} = SCRIPT_DATA_ESCAPED_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1775,12 +1789,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+        return  ($token);
         redo A;
       } elsif (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A) { # A..Z
         my $token = {type => CHARACTER_TOKEN, data => chr ($self->{nc}),
                      line => $self->{line},
                      column => $self->{column}};
-        $self->{kwd} = chr ($self->{nc} + 0x0020); # "temporary buffer".
+        $self->{kwd} .= chr ($self->{nc} + 0x0020); # "temporary buffer".
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -1800,7 +1815,7 @@ sub _get_next_token ($) {
         my $token = {type => CHARACTER_TOKEN, data => chr ($self->{nc}),
                      line => $self->{line},
                      column => $self->{column}};
-        $self->{kwd} = chr $self->{nc}; # "temporary buffer" in the spec.
+        $self->{kwd} .= chr $self->{nc}; # "temporary buffer" in the spec.
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {

@@ -145,5 +145,8 @@ while (<>) {
       }
     } : ''
   }ge;
+  s{!!!debug\s*(\{.*\})\s*;}{
+    $DEBUG ? $1 : ''
+  }ge;
   print;
 }

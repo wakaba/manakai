@@ -8,12 +8,28 @@ unmatched </script>
 | " -->"
 
 #data
+<script><!-- <script>abc</script> --></script>
+#errors
+#document-fragment p
+| <script>
+|   "<!-- <script>abc</script> -->"
+
+#data
 <style><!-- </style> --></style>
 #errors
 unmatched </style>
 #document-fragment p
 | <style>
 |   "<!-- "
+| " -->"
+
+#data
+<style><!-- <style>abc</style> --></style>
+#errors
+unmatched </style>
+#document-fragment p
+| <style>
+|   "<!-- <style>abc"
 | " -->"
 
 #data
@@ -25,5 +41,17 @@ no DOCTYPE
 |   <head>
 |     <script>
 |       "<!----x>"
+|   <body>
+|     "foo"
+
+#data
+<script><!-- <script></script> --x></script>foo
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <script>
+|       "<!-- <script></script> --x>"
 |   <body>
 |     "foo"
