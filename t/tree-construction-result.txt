@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 10 17:35:56 2010
-# Current time GMT:   Sun Jan 10 08:35:56 2010
+# Current time local: Sun Jan 10 17:43:12 2010
+# Current time GMT:   Sun Jan 10 08:43:12 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -61,9 +61,13 @@ ok 51
 ok 52
 ok 53
 ok 54
-ok 55
+not ok 55
+# Test 55 got: "1" (HTML-tree.t test () ok at line 3 fail #19)
+#    Expected: "0" (Parse error: qq'<style><!-- </style> --></style>'; 1:32:unmatched end tag;)
 ok 56
-ok 57
+not ok 57
+# Test 57 got: "<style>\n  \"<!-- \"\n\" -->\"\n" (HTML-tree.t test () ok at line 9 fail #19)
+#    Expected: "<style>\n  \"<!-- </style> -->\"\n" (Document tree: qq'<style><!-- </style> --></style>')
 ok 58
 ok 59
 ok 60
@@ -567,9 +571,20 @@ ok 444
 ok 445
 ok 446
 ok 447
-ok 448
+not ok 448
+# Test 448 got: "1" (HTML-tree.t test () ok at line 3 fail #150)
+#     Expected: "2" (Parse error: qq'<style><!--</style><meta><script>--><link></script>'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE., Line: 1 Col: 51 Unexpected end of file. Expected end tag (style).)
 ok 449
-ok 450
+not ok 450
+# Test 450 got: "<html>\n  <head>\n    <style>\n      \"<!--\"\n    <meta>\n    <script>\n      \"--><link>\"\n  <body>\n" (HTML-tree.t test () ok at line 9 fail #150)
+#     Expected: "<html>\n  <head>\n    <style>\n      \"<!--</style><meta><script>--><link></script>\"\n  <body>\n" (Document tree: qq'<style><!--</style><meta><script>--><link></script>')
+#     Line 4 is changed:
+#      - "      \"<!--</style><meta><script>--><link></script>\"\n"
+#      + "      \"<!--\"\n"
+#     Got 3 extra lines at line 5:
+#      + "    <meta>\n"
+#      + "    <script>\n"
+#      + "      \"--><link>\"\n"
 ok 451
 ok 452
 ok 453
@@ -1013,42 +1028,54 @@ ok 802
 ok 803
 ok 804
 # t/tree-construction/tests5.dat
-ok 805
+not ok 805
+# Test 805 got: "1" (HTML-tree.t test () ok at line 3 fail #269)
+#     Expected: "2" (Parse error: qq'<style> <!-- </style>x'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE., Line: 1 Col: 22 Unexpected end of file. Expected end tag (style).)
 ok 806
-ok 807
-ok 808
+not ok 807
+# Test 807 got: "<html>\n  <head>\n    <style>\n      \" <!-- \"\n  <body>\n    \"x\"\n" (HTML-tree.t test () ok at line 9 fail #269)
+#     Expected: "<html>\n  <head>\n    <style>\n      \" <!-- </style>x\"\n  <body>\n" (Document tree: qq'<style> <!-- </style>x')
+#     Line 4 is changed:
+#      - "      \" <!-- </style>x\"\n"
+#      + "      \" <!-- \"\n"
+#     Got 1 extra line at line 6:
+#      + "    \"x\"\n"
+not ok 808
+# Test 808 got: "2" (HTML-tree.t test () ok at line 3 fail #270)
+#     Expected: "1" (Parse error: qq'<style> <!-- </style> --> </style>x'; 1:8:no DOCTYPE, 1:35:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE.)
 ok 809
-ok 810
+not ok 810
+# Test 810 got: "<html>\n  <head>\n    <style>\n      \" <!-- \"\n    \" \"\n  <body>\n    \"--> x\"\n" (HTML-tree.t test () ok at line 9 fail #270)
+#     Expected: "<html>\n  <head>\n    <style>\n      \" <!-- </style> --> \"\n  <body>\n    \"x\"\n" (Document tree: qq'<style> <!-- </style> --> </style>x')
+#     Line 4 is changed:
+#      - "      \" <!-- </style> --> \"\n"
+#      + "      \" <!-- \"\n"
+#     Got 1 extra line at line 5:
+#      + "    \" \"\n"
+#     Line 7 is changed:
+#      - "    \"x\"\n"
+#      + "    \"--> x\"\n"
 ok 811
 ok 812
 ok 813
-not ok 814
-# Test 814 got: "2" (HTML-tree.t test () ok at line 3 fail #272)
-#     Expected: "1" (Parse error: qq'<style> <!---> </style>x'; 1:8:no DOCTYPE, 1:24:not closed;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE.)
+ok 814
 ok 815
-not ok 816
-# Test 816 got: "<html>\n  <head>\n    <style>\n      \" <!---> </style>x\"\n  <body>\n" (HTML-tree.t test () ok at line 9 fail #272)
-#     Expected: "<html>\n  <head>\n    <style>\n      \" <!---> \"\n  <body>\n    \"x\"\n" (Document tree: qq'<style> <!---> </style>x')
-#     Line 4 is changed:
-#      - "      \" <!---> \"\n"
-#      + "      \" <!---> </style>x\"\n"
-#     Line 6 is missing:
-#      - "    \"x\"\n"
-not ok 817
-# Test 817 got: "2" (HTML-tree.t test () ok at line 3 fail #273)
-#     Expected: "1" (Parse error: qq'<iframe> <!---> </iframe>x'; 1:9:no DOCTYPE, 1:26:not closed;Line: 1 Col: 8 Unexpected start tag (iframe). Expected DOCTYPE.)
+ok 816
+ok 817
 ok 818
-not ok 819
-# Test 819 got: "<html>\n  <head>\n  <body>\n    <iframe>\n      \" <!---> </iframe>x\"\n" (HTML-tree.t test () ok at line 9 fail #273)
-#     Expected: "<html>\n  <head>\n  <body>\n    <iframe>\n      \" <!---> \"\n    \"x\"\n" (Document tree: qq'<iframe> <!---> </iframe>x')
-#     Line 5 is changed:
-#      - "      \" <!---> \"\n"
-#      + "      \" <!---> </iframe>x\"\n"
-#     Line 6 is missing:
-#      - "    \"x\"\n"
-ok 820
+ok 819
+not ok 820
+# Test 820 got: "3" (HTML-tree.t test () ok at line 3 fail #274)
+#     Expected: "1" (Parse error: qq'<iframe> <!--- </iframe>->x</iframe> --> </iframe>x'; 1:9:no DOCTYPE, 1:37:unmatched end tag, 1:51:unmatched end tag;Line: 1 Col: 8 Unexpected start tag (iframe). Expected DOCTYPE.)
 ok 821
-ok 822
+not ok 822
+# Test 822 got: "<html>\n  <head>\n  <body>\n    <iframe>\n      \" <!--- \"\n    \"->x --> x\"\n" (HTML-tree.t test () ok at line 9 fail #274)
+#     Expected: "<html>\n  <head>\n  <body>\n    <iframe>\n      \" <!--- </iframe>->x</iframe> --> \"\n    \"x\"\n" (Document tree: qq'<iframe> <!--- </iframe>->x</iframe> --> </iframe>x')
+#     Lines 5-6 are changed:
+#      - "      \" <!--- </iframe>->x</iframe> --> \"\n"
+#      + "      \" <!--- \"\n"
+#      - "    \"x\"\n"
+#      + "    \"->x --> x\"\n"
 ok 823
 ok 824
 ok 825
