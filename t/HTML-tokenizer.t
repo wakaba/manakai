@@ -180,6 +180,12 @@ for my $file_name (grep {$_} split /\s+/, qq[
         PCDATA => Whatpm::HTML::PCDATA_CONTENT_MODEL (),
         PLAINTEXT => Whatpm::HTML::PLAINTEXT_CONTENT_MODEL (),
       }->{$cm};
+      $p->{state} = {
+        CDATA => Whatpm::HTML::RAWDATA_STATE (),
+        RCDATA => Whatpm::HTML::RCDATA_STATE (),
+        PCDATA => Whatpm::HTML::DATA_STATE (),
+        PLAINTEXT => Whatpm::HTML::PLAINTEXT_STATE (),
+      }->{$cm};
       $p->{last_stag_name} = $last_start_tag;
 
       while (1) {
@@ -218,6 +224,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
       
       my $expected_dump = Dumper ($test->{output});
       my $parser_dump = Dumper (\@token);
+#line 1 "HTML-tokenizer.t ok"
       ok $parser_dump, $expected_dump,
         $test->{description} . ': ' . Data::Dumper::qquote ($test->{input});
     }

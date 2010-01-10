@@ -110,8 +110,11 @@ sub PLAINTEXT_STATE () { 110 }
 sub TAG_OPEN_STATE () { 2 }
 sub RCDATA_LT_STATE () { 111 }
 sub RAWDATA_LT_STATE () { 112 }
-sub SCRIPT_DATA_LT_STATE () { 113 } # last
+sub SCRIPT_DATA_LT_STATE () { 113 }
 sub CLOSE_TAG_OPEN_STATE () { 3 }
+sub RCDATA_END_TAG_OPEN_STATE () { 114 }
+sub RAWDATA_END_TAG_OPEN_STATE () { 115 }
+sub SCRIPT_DATA_END_TAG_OPEN_STATE () { 116 } # last
 sub TAG_NAME_STATE () { 4 }
 sub BEFORE_ATTRIBUTE_NAME_STATE () { 5 }
 sub ATTRIBUTE_NAME_STATE () { 6 }
@@ -152,7 +155,7 @@ sub CDATA_SECTION_STATE () { 35 }
 sub MD_HYPHEN_STATE () { 36 } # "markup declaration open state" in the spec
 sub MD_DOCTYPE_STATE () { 37 } # "markup declaration open state" in the spec
 sub MD_CDATA_STATE () { 38 } # "markup declaration open state" in the spec
-sub CDATA_RCDATA_CLOSE_TAG_STATE () { 39 } # "close tag open state" in the spec
+#sub CDATA_RCDATA_CLOSE_TAG_STATE () { 39 } # "close tag open state" in the spec
 sub CDATA_SECTION_MSE1_STATE () { 40 } # "CDATA section state" in the spec
 sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 sub PUBLIC_STATE () { 42 } # "after DOCTYPE name state" in the spec
@@ -1354,7 +1357,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-          $self->{state} = CLOSE_TAG_OPEN_STATE;
+          $self->{state} = {
+              (RCDATA_LT_STATE) => RCDATA_END_TAG_OPEN_STATE,
+              (RAWDATA_LT_STATE) => RAWDATA_END_TAG_OPEN_STATE,
+              (SCRIPT_DATA_LT_STATE) => SCRIPT_DATA_END_TAG_OPEN_STATE,
+          }->{$self->{state}} or die "$self->{state}'s next state not found";
+          $self->{kwd} = '';
+          $self->{s_kwd} = '';
           redo A;
         } elsif ($self->{nc} == 0x0021) { # !
           
@@ -1367,7 +1376,11 @@ sub _get_next_token ($) {
         }
 
         ## reconsume
-        $self->{state} = DATA_STATE;
+        $self->{state} = {
+          (RCDATA_LT_STATE) => RCDATA_STATE,
+          (RAWDATA_LT_STATE) => RAWDATA_STATE,
+          (SCRIPT_DATA_LT_STATE) => SCRIPT_DATA_STATE,
+        }->{$self->{state}} or die "$self->{state}'s next state not found";
         return  ({type => CHARACTER_TOKEN, data => '<',
                   line => $self->{line_prev},
                   column => $self->{column_prev},
@@ -1516,32 +1529,9 @@ sub _get_next_token ($) {
         die "$0: $self->{content_model} in tag open";
       }
     } elsif ($self->{state} == CLOSE_TAG_OPEN_STATE) {
-      ## NOTE: The "close tag open state" in the spec is implemented as
-      ## |CLOSE_TAG_OPEN_STATE| and |CDATA_RCDATA_CLOSE_TAG_STATE|.
-
       ## XML5: "end tag state".
 
       my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1); # "<"of"</"
-      if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
-        if (defined $self->{last_stag_name}) {
-          $self->{state} = CDATA_RCDATA_CLOSE_TAG_STATE;
-          $self->{kwd} = '';
-          ## Reconsume.
-          redo A;
-        } else {
-          ## No start tag token has ever been emitted
-          ## NOTE: See <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>.
-          
-          $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
-          ## Reconsume.
-          return  ({type => CHARACTER_TOKEN, data => '</',
-                    line => $l, column => $c,
-                   });
-          redo A;
-        }
-      }
-
       if (0x0041 <= $self->{nc} and
           $self->{nc} <= 0x005A) { # A..Z
         
@@ -1677,7 +1667,33 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == CDATA_RCDATA_CLOSE_TAG_STATE) {
+    } elsif ({
+      (RCDATA_END_TAG_OPEN_STATE) => 1,
+      (RAWDATA_END_TAG_OPEN_STATE) => 1,
+      (SCRIPT_DATA_END_TAG_OPEN_STATE) => 1,
+    }->{$self->{state}}) {
+      my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1); # "<"of"</"
+      if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
+        if (defined $self->{last_stag_name}) {
+          #
+        } else {
+          ## No start tag token has ever been emitted
+          ## NOTE: See <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>.
+          
+          $self->{state} = {
+            (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
+            (RAWDATA_END_TAG_OPEN_STATE) => RAWDATA_STATE,
+            (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
+          }->{$self->{state}} or die "$self->{state}'s next state not found";
+          $self->{s_kwd} = '';
+          ## Reconsume.
+          return  ({type => CHARACTER_TOKEN, data => '</',
+                    line => $l, column => $c,
+                   });
+          redo A;
+        }
+      }
+
       my $ch = substr $self->{last_stag_name}, length $self->{kwd}, 1;
       if (length $ch) {
         my $CH = $ch;
@@ -1701,7 +1717,11 @@ sub _get_next_token ($) {
           redo A;
         } else {
           
-          $self->{state} = DATA_STATE;
+          $self->{state} = {
+            (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
+            (RAWDATA_END_TAG_OPEN_STATE) => RAWDATA_STATE,
+            (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
+          }->{$self->{state}} or die "$self->{state}'s next state not found";
           $self->{s_kwd} = '';
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
@@ -1711,7 +1731,7 @@ sub _get_next_token ($) {
                    });
           redo A;
         }
-      } else { # after "<{tag-name}"
+      } else { # after "</{tag-name}"
         unless ($is_space->{$self->{nc}} or
 	        {
                  0x003E => 1, # >
@@ -1720,7 +1740,11 @@ sub _get_next_token ($) {
                 }->{$self->{nc}}) {
           
           ## Reconsume.
-          $self->{state} = DATA_STATE;
+          $self->{state} = {
+            (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
+            (RAWDATA_END_TAG_OPEN_STATE) => RAWDATA_STATE,
+            (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
+          }->{$self->{state}} or die "$self->{state}'s next state not found";
           $self->{s_kwd} = '';
           return  ({type => CHARACTER_TOKEN,
                     data => '</' . $self->{kwd},
