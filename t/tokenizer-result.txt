@@ -1,7 +1,7 @@
 1..1154
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 10 17:04:32 2010
-# Current time GMT:   Sun Jan 10 08:04:32 2010
+# Current time local: Sun Jan 10 17:35:55 2010
+# Current time GMT:   Sun Jan 10 08:35:55 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tokenizer.t line 37.
 Found = in conditional, should be == at t/HTML-tokenizer.t line 128.
@@ -800,14 +800,43 @@ ok 255
 ok 256
 ok 257
 # t/tokenizer/escapeFlag.test
-ok 258
+not ok 258
+# Test 258 got: "$VAR1 = [\n          [\n            qq'Character',\n            qq'foo<!--'\n          ],\n          [\n            qq'EndTag',\n            qq'pre'\n          ],\n          [\n            qq'Character',\n            qq'-->'\n          ],\n          [\n            qq'EndTag',\n            qq'pre'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #258)
+#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'foo<!--</pre>-->'\n          ],\n          [\n            qq'EndTag',\n            qq'pre'\n          ]\n        ];\n" (Commented close tag in [R]CDATA: qq'foo<!--</pre>--></pre>')
+#     Line 4 is changed:
+#      - "            qq'foo<!--</pre>-->'\n"
+#      + "            qq'foo<!--'\n"
+#     Got 8 extra lines at line 5:
+#      + "          ],\n"
+#      + "          [\n"
+#      + "            qq'EndTag',\n"
+#      + "            qq'pre'\n"
+#      + "          ],\n"
+#      + "          [\n"
+#      + "            qq'Character',\n"
+#      + "            qq'-->'\n"
 ok 259
 ok 260
 ok 261
 ok 262
 ok 263
-ok 264
-ok 265
+not ok 264
+# Test 264 got: "$VAR1 = [\n          [\n            qq'Character',\n            qq' & <!-- & --> & '\n          ],\n          [\n            qq'EndTag',\n            qq'pre'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #264)
+#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq' & <!-- &amp; --> & '\n          ],\n          [\n            qq'EndTag',\n            qq'pre'\n          ]\n        ];\n" (Commented entities in RCDATA: qq' &amp; <!-- &amp; --> &amp; </pre>')
+#     Line 4 is changed:
+#      - "            qq' & <!-- &amp; --> & '\n"
+#      + "            qq' & <!-- & --> & '\n"
+not ok 265
+# Test 265 got: "$VAR1 = [\n          [\n            qq'Character',\n            qq'foo<!-- x --x>x-- >x--!>x--<>'\n          ],\n          [\n            qq'EndTag',\n            qq'pre'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #265)
+#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'foo<!-- x --x>x-- >x--!>x--<></pre>'\n          ]\n        ];\n" (Incorrect comment ending sequences in [R]CDATA: qq'foo<!-- x --x>x-- >x--!>x--<></pre>')
+#     Line 4 is changed:
+#      - "            qq'foo<!-- x --x>x-- >x--!>x--<></pre>'\n"
+#      + "            qq'foo<!-- x --x>x-- >x--!>x--<>'\n"
+#     Got 4 extra lines at line 5:
+#      + "          ],\n"
+#      + "          [\n"
+#      + "            qq'EndTag',\n"
+#      + "            qq'pre'\n"
 ok 266
 # t/tokenizer/entities.test
 ok 267

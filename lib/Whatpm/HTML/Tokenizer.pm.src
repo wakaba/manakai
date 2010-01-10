@@ -562,140 +562,45 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == RCDATA_STATE) {
       $self->{s_kwd} = '' unless defined $self->{s_kwd};
       if ($self->{nc} == 0x0026) { # &
+        !!!cp (14.1);
         $self->{s_kwd} = '';
-	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
-            not $self->{escape}) {
-          !!!cp (1);
-          ## NOTE: In the spec, the tokenizer is switched to the 
-          ## "entity data state".  In this implementation, the tokenizer
-          ## is switched to the |ENTITY_STATE|, which is an implementation
-          ## of the "consume a character reference" algorithm.
-          $self->{entity_add} = -1;
-          $self->{prev_state} = DATA_STATE;
-          $self->{state} = ENTITY_STATE;
-          !!!next-input-character;
-          redo A;
-        } else {
-          !!!cp (2);
-          #
-        }
-      } elsif ($self->{nc} == 0x002D) { # -
-	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
-          if ($self->{s_kwd} eq '<!-') {
-            !!!cp (3);
-            $self->{escape} = 1; # unless $self->{escape};
-            $self->{s_kwd} = '--';
-            #
-          } elsif ($self->{s_kwd} eq '-') {
-            !!!cp (4);
-            $self->{s_kwd} = '--';
-            #
-          } elsif ($self->{s_kwd} eq '<!' or $self->{s_kwd} eq '-') {
-            !!!cp (4.1);
-            $self->{s_kwd} .= '-';
-            #
-          } else {
-            !!!cp (5);
-            $self->{s_kwd} = '-';
-            #
-          }
-        }
-        
-        #
-      } elsif ($self->{nc} == 0x0021) { # !
-        if (length $self->{s_kwd}) {
-          !!!cp (5.1);
-          $self->{s_kwd} .= '!';
-          #
-        } else {
-          !!!cp (5.2);
-          #$self->{s_kwd} = '';
-          #
-        }
-        #
+        ## NOTE: In the spec, the tokenizer is switched to the
+        ## "character reference in RCDATA state".  In this
+        ## implementation, the tokenizer is switched to the
+        ## |ENTITY_STATE|, which is an implementation of the "consume
+        ## a character reference" algorithm.
+        $self->{entity_add} = -1;
+        $self->{prev_state} = RCDATA_STATE;
+        $self->{state} = ENTITY_STATE;
+        !!!next-input-character;
+        redo A;
       } elsif ($self->{nc} == 0x003C) { # <
-        if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
-            (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
-             not $self->{escape})) {
-          !!!cp (6);
-          $self->{state} = RCDATA_LT_STATE;
-          !!!next-input-character;
-          redo A;
-        } else {
-          !!!cp (7);
-          $self->{s_kwd} = '';
-          #
-        }
-      } elsif ($self->{nc} == 0x003E) { # >
-        if ($self->{escape} and
-            ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
-          if ($self->{s_kwd} eq '--') {
-            !!!cp (8);
-            delete $self->{escape};
-            #
-          } else {
-            !!!cp (9);
-            #
-          }
-        } elsif ($self->{is_xml} and $self->{s_kwd} eq ']]') {
-          !!!cp (9.1);
-          !!!parse-error (type => 'unmatched mse', ## TODO: type
-                          line => $self->{line_prev},
-                          column => $self->{column_prev} - 1);
-          #
-        } else {
-          !!!cp (10);
-          #
-        }
-        
-        $self->{s_kwd} = '';
-        #
-      } elsif ($self->{nc} == 0x005D) { # ]
-        if ($self->{s_kwd} eq ']' or $self->{s_kwd} eq '') {
-          !!!cp (10.1);
-          $self->{s_kwd} .= ']';
-        } elsif ($self->{s_kwd} eq ']]') {
-          !!!cp (10.2);
-          #
-        } else {
-          !!!cp (10.3);
-          $self->{s_kwd} = '';
-        }
-        #
-      } elsif ($self->{nc} == -1) {
-        !!!cp (11);
+        !!!cp (14.2);
+        $self->{state} = RCDATA_LT_STATE;
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{nc} == EOF_CHAR) {
+        !!!cp (14.3);
         $self->{s_kwd} = '';
         !!!emit ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
-        last A; ## TODO: ok?
+        last A;
       } else {
-        !!!cp (12);
+        !!!cp (14.4);
         $self->{s_kwd} = '';
-        #
-      }
+        my $token = {type => CHARACTER_TOKEN,
+                     data => chr $self->{nc},
+                     line => $self->{line}, column => $self->{column}};
+        if ($self->{read_until}->($token->{data}, q{<&},
+                                  length $token->{data})) {
+          $self->{s_kwd} = '';
+        }
 
-      # Anything else
-      my $token = {type => CHARACTER_TOKEN,
-                   data => chr $self->{nc},
-                   line => $self->{line}, column => $self->{column},
-                  };
-      if ($self->{read_until}->($token->{data}, q{-!<>&\]},
-                                length $token->{data})) {
-        $self->{s_kwd} = '';
-      }
-
-      ## Stay in the data state.
-      if (not $self->{is_xml} and
-          $self->{content_model} == PCDATA_CONTENT_MODEL) {
-        !!!cp (13);
-        $self->{state} = PCDATA_STATE;
-      } else {
-        !!!cp (14);
         ## Stay in the state.
+        !!!next-input-character;
+        !!!emit ($token);
+        redo A;
       }
-      !!!next-input-character;
-      !!!emit ($token);
-      redo A;
     } elsif ($self->{state} == RAWDATA_STATE) {
       $self->{s_kwd} = '' unless defined $self->{s_kwd};
       if ($self->{nc} == 0x0026) { # &
@@ -3840,7 +3745,8 @@ sub _get_next_token ($) {
       ## appended to the parent element or the attribute value in later
       ## process of the tokenizer.
 
-      if ($self->{prev_state} == DATA_STATE) {
+      if ($self->{prev_state} == DATA_STATE or
+          $self->{prev_state} == RCDATA_STATE) {
         !!!cp (997);
         $self->{state} = $self->{prev_state};
         $self->{s_kwd} = '';
@@ -3890,7 +3796,8 @@ sub _get_next_token ($) {
         ## and then "&#" is appended to the parent element or the attribute 
         ## value in the later processing.
 
-        if ($self->{prev_state} == DATA_STATE) {
+        if ($self->{prev_state} == DATA_STATE or
+            $self->{prev_state} == RCDATA_STATE) {
           !!!cp (1019);
           $self->{state} = $self->{prev_state};
           $self->{s_kwd} = '';
@@ -3950,7 +3857,8 @@ sub _get_next_token ($) {
         $code = 0xFFFD;
       }
 
-      if ($self->{prev_state} == DATA_STATE) {
+      if ($self->{prev_state} == DATA_STATE or
+          $self->{prev_state} == RCDATA_STATE) {
         !!!cp (992);
         $self->{state} = $self->{prev_state};
         $self->{s_kwd} = '';
@@ -3988,7 +3896,8 @@ sub _get_next_token ($) {
         ## and then "&#" followed by "X" or "x" is appended to the parent
         ## element or the attribute value in the later processing.
 
-        if ($self->{prev_state} == DATA_STATE) {
+        if ($self->{prev_state} == DATA_STATE or
+            $self->{prev_state} == RCDATA_STATE) {
           !!!cp (1005);
           $self->{state} = $self->{prev_state};
           $self->{s_kwd} = '';
@@ -4065,7 +3974,8 @@ sub _get_next_token ($) {
         $code = 0xFFFD;
       }
 
-      if ($self->{prev_state} == DATA_STATE) {
+      if ($self->{prev_state} == DATA_STATE or
+          $self->{prev_state} == RCDATA_STATE) {
         !!!cp (988);
         $self->{state} = $self->{prev_state};
         $self->{s_kwd} = '';
@@ -4166,6 +4076,7 @@ sub _get_next_token ($) {
       } elsif ($self->{entity__match} < 0) {
         !!!parse-error (type => 'no refc');
         if ($self->{prev_state} != DATA_STATE and # in attribute
+            $self->{prev_state} != RCDATA_STATE and
             $self->{entity__match} < -1) {
           !!!cp (1024);
           $data = '&' . $self->{kwd};
@@ -4195,7 +4106,8 @@ sub _get_next_token ($) {
       ## that would not be consumed are appended in the data state or in an
       ## appropriate attribute value state anyway.
  
-      if ($self->{prev_state} == DATA_STATE) {
+      if ($self->{prev_state} == DATA_STATE or
+          $self->{prev_state} == RCDATA_STATE) {
         !!!cp (986);
         $self->{state} = $self->{prev_state};
         $self->{s_kwd} = '';

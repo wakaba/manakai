@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Sat Jan  9 19:52:31 2010
-# Current time GMT:   Sat Jan  9 10:52:31 2010
+# Current time local: Sun Jan 10 17:35:56 2010
+# Current time GMT:   Sun Jan 10 08:35:56 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -1052,12 +1052,33 @@ ok 822
 ok 823
 ok 824
 ok 825
-ok 826
+not ok 826
+# Test 826 got: "2" (HTML-tree.t test () ok at line 3 fail #276)
+#     Expected: "1" (Parse error: qq'<title> <!-- </title> --> </title>x'; 1:8:no DOCTYPE, 1:35:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE.)
 ok 827
-ok 828
-ok 829
+not ok 828
+# Test 828 got: "<html>\n  <head>\n    <title>\n      \" <!-- \"\n    \" \"\n  <body>\n    \"--> x\"\n" (HTML-tree.t test () ok at line 9 fail #276)
+#     Expected: "<html>\n  <head>\n    <title>\n      \" <!-- </title> --> \"\n  <body>\n    \"x\"\n" (Document tree: qq'<title> <!-- </title> --> </title>x')
+#     Line 4 is changed:
+#      - "      \" <!-- </title> --> \"\n"
+#      + "      \" <!-- \"\n"
+#     Got 1 extra line at line 5:
+#      + "    \" \"\n"
+#     Line 7 is changed:
+#      - "    \"x\"\n"
+#      + "    \"--> x\"\n"
+not ok 829
+# Test 829 got: "3" (HTML-tree.t test () ok at line 3 fail #277)
+#     Expected: "1" (Parse error: qq'<textarea> <!--- </textarea>->x</textarea> --> </textarea>x'; 1:11:no DOCTYPE, 1:43:unmatched end tag, 1:59:unmatched end tag;Line: 1 Col: 10 Unexpected start tag (textarea). Expected DOCTYPE.)
 ok 830
-ok 831
+not ok 831
+# Test 831 got: "<html>\n  <head>\n  <body>\n    <textarea>\n      \" <!--- \"\n    \"->x --> x\"\n" (HTML-tree.t test () ok at line 9 fail #277)
+#     Expected: "<html>\n  <head>\n  <body>\n    <textarea>\n      \" <!--- </textarea>->x</textarea> --> \"\n    \"x\"\n" (Document tree: qq'<textarea> <!--- </textarea>->x</textarea> --> </textarea>x')
+#     Lines 5-6 are changed:
+#      - "      \" <!--- </textarea>->x</textarea> --> \"\n"
+#      + "      \" <!--- \"\n"
+#      - "    \"x\"\n"
+#      + "    \"->x --> x\"\n"
 ok 832
 ok 833
 ok 834
@@ -1069,10 +1090,22 @@ ok 839
 ok 840
 ok 841
 ok 842
-ok 843
-ok 844
+not ok 843
+# Test 843 got: "<html>\n  <head>\n    <title>\n      \"<!--&-->\"\n  <body>\n" (HTML-tree.t test () ok at line 9 fail #281)
+#     Expected: "<html>\n  <head>\n    <title>\n      \"<!--&amp;-->\"\n  <body>\n" (Document tree: qq'<title><!--&amp;--></title>')
+#     Line 4 is changed:
+#      - "      \"<!--&amp;-->\"\n"
+#      + "      \"<!--&-->\"\n"
+not ok 844
+# Test 844 got: "1" (HTML-tree.t test () ok at line 3 fail #282)
+#     Expected: "2" (Parse error: qq'<title><!--</title>'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE., Line: 1 Col: 19 Unexpected end of file. Expected end tag (title).)
 ok 845
-ok 846
+not ok 846
+# Test 846 got: "<html>\n  <head>\n    <title>\n      \"<!--\"\n  <body>\n" (HTML-tree.t test () ok at line 9 fail #282)
+#     Expected: "<html>\n  <head>\n    <title>\n      \"<!--</title>\"\n  <body>\n" (Document tree: qq'<title><!--</title>')
+#     Line 4 is changed:
+#      - "      \"<!--</title>\"\n"
+#      + "      \"<!--\"\n"
 ok 847
 ok 848
 not ok 849
@@ -1126,7 +1159,12 @@ ok 863
 ok 864
 ok 865
 ok 866
-ok 867
+not ok 867
+# Test 867 got: "<!DOCTYPE html>\n<html>\n  <head>\n    <title>\n      \"<!--&-->\"\n  <body>\n" (HTML-tree.t test () ok at line 9 fail #289)
+#     Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <title>\n      \"<!--&amp;-->\"\n  <body>\n" (Document tree: qq'<!doctype html><title><!--&amp;--></title>')
+#     Line 5 is changed:
+#      - "      \"<!--&amp;-->\"\n"
+#      + "      \"<!--&-->\"\n"
 ok 868
 ok 869
 ok 870
