@@ -1443,7 +1443,6 @@ sub _get_next_token ($) {
 	        {
                  0x003E => 1, # >
                  0x002F => 1, # /
-                 -1 => 1, # EOF # XXX drop this case (HTML5 revision 4177)
                 }->{$self->{nc}}) {
           
           ## Reconsume.

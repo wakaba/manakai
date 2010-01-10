@@ -1,18 +1,50 @@
 #data
-<script><!-- </script> --></script>
+<!DOCTYPE html><style>abc</style
 #errors
-unmatched </script>
-#document-fragment p
-| <script>
-|   "<!-- "
-| " -->"
+no </style>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|     <style>
+|       "abc</style"
+|   <body>
 
 #data
-<script><!-- <script>abc</script> --></script>
+<!DOCTYPE html><title>abc</title
 #errors
-#document-fragment p
-| <script>
-|   "<!-- <script>abc</script> -->"
+no </title>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|     <title>
+|       "abc</title"
+|   <body>
+
+#data
+<!DOCTYPE html><textarea>abc</textarea
+#errors
+no </textarea>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <textarea>
+|       "abc</textarea"
+
+#data
+<!DOCTYPE html><xmp>abc</xmp
+#errors
+no </xmp>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <xmp>
+|       "abc</xmp"
 
 #data
 <style><!-- </style> --></style>
@@ -31,6 +63,22 @@ unmatched </style>
 | <style>
 |   "<!-- <style>abc"
 | " -->"
+
+#data
+<script><!-- </script> --></script>
+#errors
+unmatched </script>
+#document-fragment p
+| <script>
+|   "<!-- "
+| " -->"
+
+#data
+<script><!-- <script>abc</script> --></script>
+#errors
+#document-fragment p
+| <script>
+|   "<!-- <script>abc</script> -->"
 
 #data
 <script><!----x></script>foo
