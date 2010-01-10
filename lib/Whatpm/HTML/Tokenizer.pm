@@ -106,7 +106,6 @@ sub RCDATA_STATE () { 107 }
 sub RAWTEXT_STATE () { 108 }
 sub SCRIPT_DATA_STATE () { 109 }
 sub PLAINTEXT_STATE () { 110 }
-#sub ENTITY_DATA_STATE () { 1 }
 sub TAG_OPEN_STATE () { 2 }
 sub RCDATA_LT_STATE () { 111 }
 sub RAWTEXT_LT_STATE () { 112 }
@@ -115,6 +114,19 @@ sub CLOSE_TAG_OPEN_STATE () { 3 }
 sub RCDATA_END_TAG_OPEN_STATE () { 114 }
 sub RAWTEXT_END_TAG_OPEN_STATE () { 115 }
 sub SCRIPT_DATA_END_TAG_OPEN_STATE () { 116 } # last
+sub SCRIPT_DATA_ESCAPE_START_STATE () { 1 }
+sub SCRIPT_DATA_ESCAPE_START_DASH_STATE () { 12 }
+sub SCRIPT_DATA_ESCAPED_STATE () { 117 }
+sub SCRIPT_DATA_ESCAPED_DASH_STATE () { 118 }
+sub SCRIPT_DATA_ESCAPED_DASH_DASH_STATE () { 119 }
+sub SCRIPT_DATA_ESCAPED_LT_STATE () { 120 }
+sub SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE () { 121 }
+sub SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE () { 122 }
+sub SCRIPT_DATA_DOUBLE_ESCAPED_STATE () { 123 }
+sub SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE () { 124 }
+sub SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE () { 125 }
+sub SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE () { 126 }
+sub SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE () { 127 }
 sub TAG_NAME_STATE () { 4 }
 sub BEFORE_ATTRIBUTE_NAME_STATE () { 5 }
 sub ATTRIBUTE_NAME_STATE () { 6 }
@@ -123,7 +135,6 @@ sub BEFORE_ATTRIBUTE_VALUE_STATE () { 8 }
 sub ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE () { 9 }
 sub ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE () { 10 }
 sub ATTRIBUTE_VALUE_UNQUOTED_STATE () { 11 }
-#sub ENTITY_IN_ATTRIBUTE_VALUE_STATE () { 12 }
 sub MARKUP_DECLARATION_OPEN_STATE () { 13 }
 sub COMMENT_START_STATE () { 14 }
 sub COMMENT_START_DASH_STATE () { 15 }
@@ -1114,6 +1125,7 @@ sub _get_next_token ($) {
         (RCDATA_LT_STATE) => 1,
         (RAWTEXT_LT_STATE) => 1,
         (SCRIPT_DATA_LT_STATE) => 1,
+        (SCRIPT_DATA_ESCAPED_LT_STATE) => 1,
     }->{$self->{state}}) {
       if ($self->{nc} == 0x002F) { # /
         
@@ -1132,31 +1144,84 @@ sub _get_next_token ($) {
           (RCDATA_LT_STATE) => RCDATA_END_TAG_OPEN_STATE,
           (RAWTEXT_LT_STATE) => RAWTEXT_END_TAG_OPEN_STATE,
           (SCRIPT_DATA_LT_STATE) => SCRIPT_DATA_END_TAG_OPEN_STATE,
+          (SCRIPT_DATA_ESCAPED_LT_STATE)
+              => SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE,
         }->{$self->{state}} or die "$self->{state}'s next state not found";
         $self->{kwd} = ''; # "temporary buffer" in the spec.
-        $self->{s_kwd} = '';
         redo A;
-      } elsif ($self->{nc} == 0x0021) { # !
+      } elsif ($self->{state} == SCRIPT_DATA_LT_STATE and
+               $self->{nc} == 0x0021) { # !
         
-        $self->{s_kwd} = $self->{escaped} ? '' : '<';
-        ## XXX script data escape start state (HTML5 revision 4177)
-        #
+        $self->{state} = SCRIPT_DATA_ESCAPE_START_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN, data => '<!',
+                  line => $self->{line_prev},
+                  column => $self->{column_prev}});
+        redo A;
+      } elsif ($self->{state} == SCRIPT_DATA_ESCAPED_LT_STATE and
+               (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A)) { # A..Z
+        
+        my $token = {type => CHARACTER_TOKEN, data => '<' . chr ($self->{nc}),
+                     line => $self->{line},
+                     column => $self->{column}};
+        $self->{kwd} = chr ($self->{nc} + 0x0020); # "temporary buffer".
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($token);
+        redo A;
+      } elsif ($self->{state} == SCRIPT_DATA_ESCAPED_LT_STATE and
+               (0x0061 <= $self->{nc} and $self->{nc} <= 0x007A)) { # a..z
+        
+        my $token = {type => CHARACTER_TOKEN, data => '<' . chr ($self->{nc}),
+                     line => $self->{line},
+                     column => $self->{column}};
+        $self->{kwd} = chr $self->{nc}; # "temporary buffer" in the spec.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($token);
+        redo A;
       } else {
         
-        $self->{s_kwd} = '';
-        #
+        $self->{state} = {
+          (RCDATA_LT_STATE) => RCDATA_STATE,
+          (RAWTEXT_LT_STATE) => RAWTEXT_STATE,
+          (SCRIPT_DATA_LT_STATE) => SCRIPT_DATA_STATE,
+          (SCRIPT_DATA_ESCAPED_LT_STATE) => SCRIPT_DATA_ESCAPED_STATE,
+        }->{$self->{state}} or die "$self->{state}'s next state not found";
+        ## Reconsume.
+        return  ({type => CHARACTER_TOKEN, data => '<',
+                  line => $self->{line_prev},
+                  column => $self->{column_prev}});
+        redo A;
       }
-
-      ## Reconsume.
-      $self->{state} = {
-        (RCDATA_LT_STATE) => RCDATA_STATE,
-        (RAWTEXT_LT_STATE) => RAWTEXT_STATE,
-        (SCRIPT_DATA_LT_STATE) => SCRIPT_DATA_STATE,
-      }->{$self->{state}} or die "$self->{state}'s next state not found";
-      return  ({type => CHARACTER_TOKEN, data => '<',
-                line => $self->{line_prev},
-                column => $self->{column_prev}});
-      redo A;
     } elsif ($self->{state} == CLOSE_TAG_OPEN_STATE) {
       ## XML5: "end tag state".
 
@@ -1300,6 +1365,7 @@ sub _get_next_token ($) {
       (RCDATA_END_TAG_OPEN_STATE) => 1,
       (RAWTEXT_END_TAG_OPEN_STATE) => 1,
       (SCRIPT_DATA_END_TAG_OPEN_STATE) => 1,
+      (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE) => 1,
     }->{$self->{state}}) {
       ## This switch-case implements "RCDATA end tag open state",
       ## "RAWTEXT end tag open state", "script data end tag open
@@ -1319,6 +1385,8 @@ sub _get_next_token ($) {
           (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
           (RAWTEXT_END_TAG_OPEN_STATE) => RAWTEXT_STATE,
           (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
+          (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE)
+              => SCRIPT_DATA_ESCAPED_STATE,
         }->{$self->{state}} or die "$self->{state}'s next state not found";
         $self->{s_kwd} = '';
         ## Reconsume.
@@ -1354,6 +1422,8 @@ sub _get_next_token ($) {
             (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
             (RAWTEXT_END_TAG_OPEN_STATE) => RAWTEXT_STATE,
             (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
+            (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE)
+                => SCRIPT_DATA_ESCAPED_STATE,
           }->{$self->{state}} or die "$self->{state}'s next state not found";
           $self->{s_kwd} = '';
           ## Reconsume.
@@ -1377,6 +1447,8 @@ sub _get_next_token ($) {
             (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
             (RAWTEXT_END_TAG_OPEN_STATE) => RAWTEXT_STATE,
             (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
+            (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE)
+                => SCRIPT_DATA_ESCAPED_STATE,
           }->{$self->{state}} or die "$self->{state}'s next state not found";
           $self->{s_kwd} = '';
           return  ({type => CHARACTER_TOKEN,
@@ -1527,6 +1599,251 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+        redo A;
+      }
+    } elsif ($self->{state} == SCRIPT_DATA_ESCAPE_START_STATE or
+             $self->{state} == SCRIPT_DATA_ESCAPE_START_DASH_STATE) {
+      if ($self->{nc} == 0x002D) { # -
+        $self->{state} = {
+          (SCRIPT_DATA_ESCAPE_START_STATE)
+              => SCRIPT_DATA_ESCAPE_START_DASH_STATE,
+          (SCRIPT_DATA_ESCAPE_START_DASH_STATE) => SCRIPT_DATA_ESCAPED_STATE,
+        }->{$self->{state}} or die "$self->{state}'s next state not found";
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN,
+                  data => '-',
+                  line => $self->{line_prev}, column => $self->{column_prev}});
+        redo A;
+      } else {
+        $self->{state} = SCRIPT_DATA_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ({
+      (SCRIPT_DATA_ESCAPED_STATE) => 1,
+      (SCRIPT_DATA_ESCAPED_DASH_STATE) => 1,
+      (SCRIPT_DATA_ESCAPED_DASH_DASH_STATE) => 1,
+      (SCRIPT_DATA_DOUBLE_ESCAPED_STATE) => 1,
+      (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE) => 1,
+      (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE) => 1,
+    }->{$self->{state}}) {
+      if ($self->{nc} == 0x002D) { # -
+        $self->{state} = {
+          (SCRIPT_DATA_ESCAPED_STATE) => SCRIPT_DATA_ESCAPED_DASH_STATE,
+          (SCRIPT_DATA_ESCAPED_DASH_STATE)
+              => SCRIPT_DATA_ESCAPED_DASH_DASH_STATE,
+          (SCRIPT_DATA_ESCAPED_DASH_DASH_STATE)
+              => SCRIPT_DATA_ESCAPED_DASH_DASH_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE,
+        }->{$self->{state}} or die "$self->{state}'s next state not found";
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN,
+                  data => '-',
+                  line => $self->{line_prev}, column => $self->{column_prev}});
+        redo A;
+      } elsif ($self->{nc} == 0x003C) { # <
+        $self->{state} = {
+          (SCRIPT_DATA_ESCAPED_STATE) => SCRIPT_DATA_ESCAPED_LT_STATE,
+          (SCRIPT_DATA_ESCAPED_DASH_STATE) => SCRIPT_DATA_ESCAPED_LT_STATE,
+          (SCRIPT_DATA_ESCAPED_DASH_DASH_STATE)
+              => SCRIPT_DATA_ESCAPED_LT_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE,
+        }->{$self->{state}} or die "$self->{state}'s next state not found";
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif (($self->{state} == SCRIPT_DATA_ESCAPED_DASH_DASH_STATE or
+                $self->{state} == SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE) and
+               $self->{nc} == 0x003E) { # >
+        $self->{state} = SCRIPT_DATA_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN,
+                  data => '>',
+                  line => $self->{line_prev}, column => $self->{column_prev}});
+        redo A;
+      } elsif ($self->{nc} == EOF_CHAR) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'eof in escaped script data'); # XXX documentation
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        redo A;
+      } else {
+        my $token = {type => CHARACTER_TOKEN,
+                     data => chr $self->{nc},
+                     line => $self->{line}, column => $self->{column}};
+        $self->{state} = {
+          (SCRIPT_DATA_ESCAPED_STATE) => SCRIPT_DATA_ESCAPED_STATE,
+          (SCRIPT_DATA_ESCAPED_DASH_STATE) => SCRIPT_DATA_ESCAPED_STATE,
+          (SCRIPT_DATA_ESCAPED_DASH_DASH_STATE) => SCRIPT_DATA_ESCAPED_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_STATE,
+          (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE)
+              => SCRIPT_DATA_DOUBLE_ESCAPED_STATE,
+        }->{$self->{state}} or die "$self->{state}'s next state not found";
+        $self->{state} = SCRIPT_DATA_ESCAPED_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($token);
+        redo A;
+      }
+    } elsif ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE or
+             $self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE) {
+      if ($is_space->{$self->{nc}} or
+          $self->{nc} == 0x002F or # /
+          $self->{nc} == 0x003E) { # >
+        my $token = {type => CHARACTER_TOKEN,
+                     data => chr $self->{nc},
+                     line => $self->{line}, column => $self->{column}};
+        if ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE) {
+          $self->{state} = $self->{kwd} eq 'script' # "temporary buffer"
+              ? SCRIPT_DATA_DOUBLE_ESCAPED_STATE
+              : SCRIPT_DATA_ESCAPED_STATE;
+        } else {
+          $self->{state} = $self->{kwd} eq 'script' # "temporary buffer"
+              ? SCRIPT_DATA_ESCAPED_STATE
+              : SCRIPT_DATA_DOUBLE_ESCAPED_STATE;
+        }
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A) { # A..Z
+        my $token = {type => CHARACTER_TOKEN, data => chr ($self->{nc}),
+                     line => $self->{line},
+                     column => $self->{column}};
+        $self->{kwd} = chr ($self->{nc} + 0x0020); # "temporary buffer".
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($token);
+        redo A;
+      } elsif (0x0061 <= $self->{nc} and $self->{nc} <= 0x007A) { # a..z
+        
+        my $token = {type => CHARACTER_TOKEN, data => chr ($self->{nc}),
+                     line => $self->{line},
+                     column => $self->{column}};
+        $self->{kwd} = chr $self->{nc}; # "temporary buffer" in the spec.
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ($token);
+        redo A;
+      } else {
+        if ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE) {
+          $self->{state} = SCRIPT_DATA_ESCAPED_STATE;
+        } else {
+          $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPED_STATE;
+        }
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE) {
+      if ($self->{nc} == 0x002F) { # /
+        $self->{kwd} = ''; # "temporary buffer"
+        $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN,
+                  data => '/',
+                  line => $self->{line_prev}, column => $self->{column_prev}});
+        redo A;
+      } else {
+        $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPED_STATE;
+        ## Reconsume.
         redo A;
       }
     } elsif ($self->{state} == BEFORE_ATTRIBUTE_NAME_STATE) {

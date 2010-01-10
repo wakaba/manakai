@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 10 17:43:12 2010
-# Current time GMT:   Sun Jan 10 08:43:12 2010
+# Current time local: Sun Jan 10 19:55:28 2010
+# Current time GMT:   Sun Jan 10 10:55:28 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -58,9 +58,13 @@ ok 48
 ok 49
 ok 50
 ok 51
-ok 52
+not ok 52
+# Test 52 got: "1" (HTML-tree.t test () ok at line 3 fail #18)
+#    Expected: "0" (Parse error: qq'<script><!-- </script> --></script>'; 1:35:unmatched end tag;)
 ok 53
-ok 54
+not ok 54
+# Test 54 got: "<script>\n  \"<!-- \"\n\" -->\"\n" (HTML-tree.t test () ok at line 9 fail #18)
+#    Expected: "<script>\n  \"<!-- </script> -->\"\n" (Document tree: qq'<script><!-- </script> --></script>')
 not ok 55
 # Test 55 got: "1" (HTML-tree.t test () ok at line 3 fail #19)
 #    Expected: "0" (Parse error: qq'<style><!-- </style> --></style>'; 1:32:unmatched end tag;)
@@ -68,9 +72,18 @@ ok 56
 not ok 57
 # Test 57 got: "<style>\n  \"<!-- \"\n\" -->\"\n" (HTML-tree.t test () ok at line 9 fail #19)
 #    Expected: "<style>\n  \"<!-- </style> -->\"\n" (Document tree: qq'<style><!-- </style> --></style>')
-ok 58
+not ok 58
+# Test 58 got: "1" (HTML-tree.t test () ok at line 3 fail #20)
+#    Expected: "2" (Parse error: qq'<script><!----x></script>foo'; 1:9:no DOCTYPE;no DOCTYPE, no --></script> before EOF)
 ok 59
-ok 60
+not ok 60
+# Test 60 got: "<html>\n  <head>\n    <script>\n      \"<!----x>\"\n  <body>\n    \"foo\"\n" (HTML-tree.t test () ok at line 9 fail #20)
+#    Expected: "<html>\n  <head>\n    <script>\n      \"<!----x></script>foo\"\n  <body>\n" (Document tree: qq'<script><!----x></script>foo')
+#    Line 4 is changed:
+#     - "      \"<!----x></script>foo\"\n"
+#     + "      \"<!----x>\"\n"
+#    Got 1 extra line at line 6:
+#     + "    \"foo\"\n"
 ok 61
 ok 62
 ok 63
@@ -412,9 +425,19 @@ ok 336
 ok 337
 ok 338
 ok 339
-ok 340
+not ok 340
+# Test 340 got: "1" (HTML-tree.t test () ok at line 3 fail #114)
+#     Expected: "0" (Parse error: qq'<!DOCTYPE html><script> <!-- </script> --> </script> EOF'; 1:53:unmatched end tag;)
 ok 341
-ok 342
+not ok 342
+# Test 342 got: "<!DOCTYPE html>\n<html>\n  <head>\n    <script>\n      \" <!-- \"\n    \" \"\n  <body>\n    \"-->  EOF\"\n" (HTML-tree.t test () ok at line 9 fail #114)
+#     Expected: "<!DOCTYPE html>\n<html>\n  <head>\n    <script>\n      \" <!-- </script> --> \"\n    \" \"\n  <body>\n    \"EOF\"\n" (Document tree: qq'<!DOCTYPE html><script> <!-- </script> --> </script> EOF')
+#     Line 5 is changed:
+#      - "      \" <!-- </script> --> \"\n"
+#      + "      \" <!-- \"\n"
+#     Line 8 is changed:
+#      - "    \"EOF\"\n"
+#      + "    \"-->  EOF\"\n"
 ok 343
 ok 344
 ok 345
@@ -1076,9 +1099,21 @@ not ok 822
 #      + "      \" <!--- \"\n"
 #      - "    \"x\"\n"
 #      + "    \"->x --> x\"\n"
-ok 823
+not ok 823
+# Test 823 got: "2" (HTML-tree.t test () ok at line 3 fail #275)
+#     Expected: "1" (Parse error: qq'<script> <!-- </script> --> </script>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag;Line: 1 Col: 8 Unexpected start tag (script). Expected DOCTYPE.)
 ok 824
-ok 825
+not ok 825
+# Test 825 got: "<html>\n  <head>\n    <script>\n      \" <!-- \"\n    \" \"\n  <body>\n    \"--> x\"\n" (HTML-tree.t test () ok at line 9 fail #275)
+#     Expected: "<html>\n  <head>\n    <script>\n      \" <!-- </script> --> \"\n  <body>\n    \"x\"\n" (Document tree: qq'<script> <!-- </script> --> </script>x')
+#     Line 4 is changed:
+#      - "      \" <!-- </script> --> \"\n"
+#      + "      \" <!-- \"\n"
+#     Got 1 extra line at line 5:
+#      + "    \" \"\n"
+#     Line 7 is changed:
+#      - "    \"x\"\n"
+#      + "    \"--> x\"\n"
 not ok 826
 # Test 826 got: "2" (HTML-tree.t test () ok at line 3 fail #276)
 #     Expected: "1" (Parse error: qq'<title> <!-- </title> --> </title>x'; 1:8:no DOCTYPE, 1:35:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE.)
