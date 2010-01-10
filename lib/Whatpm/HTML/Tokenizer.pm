@@ -103,17 +103,17 @@ sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
 sub PCDATA_STATE () { 50 } # "data state" in the spec
 sub DATA_STATE () { 0 }
 sub RCDATA_STATE () { 107 }
-sub RAWDATA_STATE () { 108 }
+sub RAWTEXT_STATE () { 108 }
 sub SCRIPT_DATA_STATE () { 109 }
 sub PLAINTEXT_STATE () { 110 }
 #sub ENTITY_DATA_STATE () { 1 }
 sub TAG_OPEN_STATE () { 2 }
 sub RCDATA_LT_STATE () { 111 }
-sub RAWDATA_LT_STATE () { 112 }
+sub RAWTEXT_LT_STATE () { 112 }
 sub SCRIPT_DATA_LT_STATE () { 113 }
 sub CLOSE_TAG_OPEN_STATE () { 3 }
 sub RCDATA_END_TAG_OPEN_STATE () { 114 }
-sub RAWDATA_END_TAG_OPEN_STATE () { 115 }
+sub RAWTEXT_END_TAG_OPEN_STATE () { 115 }
 sub SCRIPT_DATA_END_TAG_OPEN_STATE () { 116 } # last
 sub TAG_NAME_STATE () { 4 }
 sub BEFORE_ATTRIBUTE_NAME_STATE () { 5 }
@@ -701,7 +701,7 @@ sub _get_next_token ($) {
         return  ($token);
         redo A;
       }
-    } elsif ($self->{state} == RAWDATA_STATE) {
+    } elsif ($self->{state} == RAWTEXT_STATE) {
       $self->{s_kwd} = '' unless defined $self->{s_kwd};
       if ($self->{nc} == 0x0026) { # &
         $self->{s_kwd} = '';
@@ -770,7 +770,7 @@ sub _get_next_token ($) {
             (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
              not $self->{escape})) {
           
-          $self->{state} = RAWDATA_LT_STATE;
+          $self->{state} = RAWTEXT_LT_STATE;
           
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1243,7 +1243,7 @@ sub _get_next_token ($) {
       }
     } elsif ({
         (RCDATA_LT_STATE) => 1,
-        (RAWDATA_LT_STATE) => 1,
+        (RAWTEXT_LT_STATE) => 1,
         (SCRIPT_DATA_LT_STATE) => 1,
     }->{$self->{state}}) {
       if ($self->{nc} == 0x002F) { # /
@@ -1261,7 +1261,7 @@ sub _get_next_token ($) {
   
         $self->{state} = {
           (RCDATA_LT_STATE) => RCDATA_END_TAG_OPEN_STATE,
-          (RAWDATA_LT_STATE) => RAWDATA_END_TAG_OPEN_STATE,
+          (RAWTEXT_LT_STATE) => RAWTEXT_END_TAG_OPEN_STATE,
           (SCRIPT_DATA_LT_STATE) => SCRIPT_DATA_END_TAG_OPEN_STATE,
         }->{$self->{state}} or die "$self->{state}'s next state not found";
         $self->{kwd} = ''; # "temporary buffer" in the spec.
@@ -1281,7 +1281,7 @@ sub _get_next_token ($) {
       ## Reconsume.
       $self->{state} = {
         (RCDATA_LT_STATE) => RCDATA_STATE,
-        (RAWDATA_LT_STATE) => RAWDATA_STATE,
+        (RAWTEXT_LT_STATE) => RAWTEXT_STATE,
         (SCRIPT_DATA_LT_STATE) => SCRIPT_DATA_STATE,
       }->{$self->{state}} or die "$self->{state}'s next state not found";
       return  ({type => CHARACTER_TOKEN, data => '<',
@@ -1429,12 +1429,12 @@ sub _get_next_token ($) {
       }
     } elsif ({
       (RCDATA_END_TAG_OPEN_STATE) => 1,
-      (RAWDATA_END_TAG_OPEN_STATE) => 1,
+      (RAWTEXT_END_TAG_OPEN_STATE) => 1,
       (SCRIPT_DATA_END_TAG_OPEN_STATE) => 1,
     }->{$self->{state}}) {
       ## This switch-case implements "RCDATA end tag open state",
-      ## "RAWDATA end tag open state", "script data end tag open
-      ## state", "RCDATA end tag name state", "RAWDATA end tag name
+      ## "RAWTEXT end tag open state", "script data end tag open
+      ## state", "RCDATA end tag name state", "RAWTEXT end tag name
       ## state", and "script end tag name state" jointly with the
       ## implementation of the "tag name" state.
 
@@ -1448,7 +1448,7 @@ sub _get_next_token ($) {
         
         $self->{state} = {
           (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
-          (RAWDATA_END_TAG_OPEN_STATE) => RAWDATA_STATE,
+          (RAWTEXT_END_TAG_OPEN_STATE) => RAWTEXT_STATE,
           (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
         }->{$self->{state}} or die "$self->{state}'s next state not found";
         $self->{s_kwd} = '';
@@ -1483,7 +1483,7 @@ sub _get_next_token ($) {
           
           $self->{state} = {
             (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
-            (RAWDATA_END_TAG_OPEN_STATE) => RAWDATA_STATE,
+            (RAWTEXT_END_TAG_OPEN_STATE) => RAWTEXT_STATE,
             (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
           }->{$self->{state}} or die "$self->{state}'s next state not found";
           $self->{s_kwd} = '';
@@ -1506,7 +1506,7 @@ sub _get_next_token ($) {
           ## Reconsume.
           $self->{state} = {
             (RCDATA_END_TAG_OPEN_STATE) => RCDATA_STATE,
-            (RAWDATA_END_TAG_OPEN_STATE) => RAWDATA_STATE,
+            (RAWTEXT_END_TAG_OPEN_STATE) => RAWTEXT_STATE,
             (SCRIPT_DATA_END_TAG_OPEN_STATE) => SCRIPT_DATA_STATE,
           }->{$self->{state}} or die "$self->{state}'s next state not found";
           $self->{s_kwd} = '';
@@ -1530,7 +1530,7 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == TAG_NAME_STATE) {
       ## This switch-case implements "tag name state", "RCDATA end tag
-      ## name state", "RAWDATA end tag name state", and "script data
+      ## name state", "RAWTEXT end tag name state", and "script data
       ## end tag name state" jointly with the implementation of
       ## "RCDATA end tag open state" and so on.
 

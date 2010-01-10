@@ -181,7 +181,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
         PLAINTEXT => Whatpm::HTML::PLAINTEXT_CONTENT_MODEL (),
       }->{$cm};
       $p->{state} = {
-        CDATA => Whatpm::HTML::RAWDATA_STATE (),
+        CDATA => Whatpm::HTML::RAWTEXT_STATE (),
         RCDATA => Whatpm::HTML::RCDATA_STATE (),
         PCDATA => Whatpm::HTML::DATA_STATE (),
         PLAINTEXT => Whatpm::HTML::PLAINTEXT_STATE (),

@@ -1430,7 +1430,7 @@ sub _tree_construction_main ($) {
     if ($content_model_flag == RCDATA_CONTENT_MODEL) {
       $self->{state} = RCDATA_STATE;
     } else {
-      $self->{state} = RAWDATA_STATE;
+      $self->{state} = RAWTEXT_STATE;
     }
     $self->{content_model} = $content_model_flag; # CDATA or RCDATA
     delete $self->{escape}; # MUST
@@ -5731,7 +5731,7 @@ sub set_inner_html ($$$$;$) {
     } elsif ($p->{content_model} == RCDATA_CONTENT_MODEL) {
       $p->{state} = RCDATA_STATE;
     } elsif ($p->{content_model} == CDATA_CONTENT_MODEL) {
-      $p->{state} = RAWDATA_STATE;
+      $p->{state} = RAWTEXT_STATE;
     } elsif ($p->{content_model} == PLAINTEXT_CONTENT_MODEL) {
       $p->{state} = PLAINTEXT_STATE;
     }
