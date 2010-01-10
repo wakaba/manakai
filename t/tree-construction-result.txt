@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 10 19:55:28 2010
-# Current time GMT:   Sun Jan 10 10:55:28 2010
+# Current time local: Sun Jan 10 21:09:57 2010
+# Current time GMT:   Sun Jan 10 12:09:57 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -58,32 +58,15 @@ ok 48
 ok 49
 ok 50
 ok 51
-not ok 52
-# Test 52 got: "1" (HTML-tree.t test () ok at line 3 fail #18)
-#    Expected: "0" (Parse error: qq'<script><!-- </script> --></script>'; 1:35:unmatched end tag;)
+ok 52
 ok 53
-not ok 54
-# Test 54 got: "<script>\n  \"<!-- \"\n\" -->\"\n" (HTML-tree.t test () ok at line 9 fail #18)
-#    Expected: "<script>\n  \"<!-- </script> -->\"\n" (Document tree: qq'<script><!-- </script> --></script>')
-not ok 55
-# Test 55 got: "1" (HTML-tree.t test () ok at line 3 fail #19)
-#    Expected: "0" (Parse error: qq'<style><!-- </style> --></style>'; 1:32:unmatched end tag;)
+ok 54
+ok 55
 ok 56
-not ok 57
-# Test 57 got: "<style>\n  \"<!-- \"\n\" -->\"\n" (HTML-tree.t test () ok at line 9 fail #19)
-#    Expected: "<style>\n  \"<!-- </style> -->\"\n" (Document tree: qq'<style><!-- </style> --></style>')
-not ok 58
-# Test 58 got: "1" (HTML-tree.t test () ok at line 3 fail #20)
-#    Expected: "2" (Parse error: qq'<script><!----x></script>foo'; 1:9:no DOCTYPE;no DOCTYPE, no --></script> before EOF)
+ok 57
+ok 58
 ok 59
-not ok 60
-# Test 60 got: "<html>\n  <head>\n    <script>\n      \"<!----x>\"\n  <body>\n    \"foo\"\n" (HTML-tree.t test () ok at line 9 fail #20)
-#    Expected: "<html>\n  <head>\n    <script>\n      \"<!----x></script>foo\"\n  <body>\n" (Document tree: qq'<script><!----x></script>foo')
-#    Line 4 is changed:
-#     - "      \"<!----x></script>foo\"\n"
-#     + "      \"<!----x>\"\n"
-#    Got 1 extra line at line 6:
-#     + "    \"foo\"\n"
+ok 60
 ok 61
 ok 62
 ok 63
