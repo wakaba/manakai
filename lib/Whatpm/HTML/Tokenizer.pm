@@ -100,7 +100,12 @@ sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
 
 ## ------ Tokenizer states ------
 
+sub PCDATA_STATE () { 50 } # "data state" in the spec
 sub DATA_STATE () { 0 }
+sub RCDATA_STATE () { 107 }
+sub RAWDATA_STATE () { 108 }
+sub SCRIPT_DATA_STATE () { 109 }
+sub PLAINTEXT_STATE () { 110 } # last
 #sub ENTITY_DATA_STATE () { 1 }
 sub TAG_OPEN_STATE () { 2 }
 sub CLOSE_TAG_OPEN_STATE () { 3 }
@@ -135,7 +140,7 @@ sub BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 28 }
 sub DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE () { 29 }
 sub DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE () { 30 }
 sub BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDS_STATE () { 105 }
-sub AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE () { 106 } ## LAST
+sub AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE () { 106 }
 sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
 sub BOGUS_DOCTYPE_STATE () { 32 }
 sub AFTER_ATTRIBUTE_VALUE_QUOTED_STATE () { 33 }
@@ -159,8 +164,6 @@ sub NCR_NUM_STATE () { 46 }
 sub HEXREF_X_STATE () { 47 }
 sub HEXREF_HEX_STATE () { 48 }
 sub ENTITY_NAME_STATE () { 49 }
-##
-sub PCDATA_STATE () { 50 } # "data state" in the spec
 ##
 ## XML-only states
 sub PI_STATE () { 51 }
@@ -454,6 +457,674 @@ sub _get_next_token ($) {
       return  ($token);
       redo A;
     } elsif ($self->{state} == DATA_STATE) {
+      $self->{s_kwd} = '' unless defined $self->{s_kwd};
+      if ($self->{nc} == 0x0026) { # &
+        $self->{s_kwd} = '';
+	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
+            not $self->{escape}) {
+          
+          ## NOTE: In the spec, the tokenizer is switched to the 
+          ## "entity data state".  In this implementation, the tokenizer
+          ## is switched to the |ENTITY_STATE|, which is an implementation
+          ## of the "consume a character reference" algorithm.
+          $self->{entity_add} = -1;
+          $self->{prev_state} = DATA_STATE;
+          $self->{state} = ENTITY_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          
+          #
+        }
+      } elsif ($self->{nc} == 0x002D) { # -
+	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
+          if ($self->{s_kwd} eq '<!-') {
+            
+            $self->{escape} = 1; # unless $self->{escape};
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '-') {
+            
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '<!' or $self->{s_kwd} eq '-') {
+            
+            $self->{s_kwd} .= '-';
+            #
+          } else {
+            
+            $self->{s_kwd} = '-';
+            #
+          }
+        }
+        
+        #
+      } elsif ($self->{nc} == 0x0021) { # !
+        if (length $self->{s_kwd}) {
+          
+          $self->{s_kwd} .= '!';
+          #
+        } else {
+          
+          #$self->{s_kwd} = '';
+          #
+        }
+        #
+      } elsif ($self->{nc} == 0x003C) { # <
+        if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
+            (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
+             not $self->{escape})) {
+          
+          $self->{state} = TAG_OPEN_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          
+          $self->{s_kwd} = '';
+          #
+        }
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{escape} and
+            ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
+          if ($self->{s_kwd} eq '--') {
+            
+            delete $self->{escape};
+            #
+          } else {
+            
+            #
+          }
+        } elsif ($self->{is_xml} and $self->{s_kwd} eq ']]') {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched mse', ## TODO: type
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 1);
+          #
+        } else {
+          
+          #
+        }
+        
+        $self->{s_kwd} = '';
+        #
+      } elsif ($self->{nc} == 0x005D) { # ]
+        if ($self->{s_kwd} eq ']' or $self->{s_kwd} eq '') {
+          
+          $self->{s_kwd} .= ']';
+        } elsif ($self->{s_kwd} eq ']]') {
+          
+          #
+        } else {
+          
+          $self->{s_kwd} = '';
+        }
+        #
+      } elsif ($self->{nc} == -1) {
+        
+        $self->{s_kwd} = '';
+        return  ({type => END_OF_FILE_TOKEN,
+                  line => $self->{line}, column => $self->{column}});
+        last A; ## TODO: ok?
+      } else {
+        
+        $self->{s_kwd} = '';
+        #
+      }
+
+      # Anything else
+      my $token = {type => CHARACTER_TOKEN,
+                   data => chr $self->{nc},
+                   line => $self->{line}, column => $self->{column},
+                  };
+      if ($self->{read_until}->($token->{data}, q{-!<>&\]},
+                                length $token->{data})) {
+        $self->{s_kwd} = '';
+      }
+
+      ## Stay in the data state.
+      if (not $self->{is_xml} and
+          $self->{content_model} == PCDATA_CONTENT_MODEL) {
+        
+        $self->{state} = PCDATA_STATE;
+      } else {
+        
+        ## Stay in the state.
+      }
+      
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+      return  ($token);
+      redo A;
+    } elsif ($self->{state} == RCDATA_STATE) {
+      $self->{s_kwd} = '' unless defined $self->{s_kwd};
+      if ($self->{nc} == 0x0026) { # &
+        $self->{s_kwd} = '';
+	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
+            not $self->{escape}) {
+          
+          ## NOTE: In the spec, the tokenizer is switched to the 
+          ## "entity data state".  In this implementation, the tokenizer
+          ## is switched to the |ENTITY_STATE|, which is an implementation
+          ## of the "consume a character reference" algorithm.
+          $self->{entity_add} = -1;
+          $self->{prev_state} = DATA_STATE;
+          $self->{state} = ENTITY_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          
+          #
+        }
+      } elsif ($self->{nc} == 0x002D) { # -
+	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
+          if ($self->{s_kwd} eq '<!-') {
+            
+            $self->{escape} = 1; # unless $self->{escape};
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '-') {
+            
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '<!' or $self->{s_kwd} eq '-') {
+            
+            $self->{s_kwd} .= '-';
+            #
+          } else {
+            
+            $self->{s_kwd} = '-';
+            #
+          }
+        }
+        
+        #
+      } elsif ($self->{nc} == 0x0021) { # !
+        if (length $self->{s_kwd}) {
+          
+          $self->{s_kwd} .= '!';
+          #
+        } else {
+          
+          #$self->{s_kwd} = '';
+          #
+        }
+        #
+      } elsif ($self->{nc} == 0x003C) { # <
+        if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
+            (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
+             not $self->{escape})) {
+          
+          $self->{state} = TAG_OPEN_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          
+          $self->{s_kwd} = '';
+          #
+        }
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{escape} and
+            ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
+          if ($self->{s_kwd} eq '--') {
+            
+            delete $self->{escape};
+            #
+          } else {
+            
+            #
+          }
+        } elsif ($self->{is_xml} and $self->{s_kwd} eq ']]') {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched mse', ## TODO: type
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 1);
+          #
+        } else {
+          
+          #
+        }
+        
+        $self->{s_kwd} = '';
+        #
+      } elsif ($self->{nc} == 0x005D) { # ]
+        if ($self->{s_kwd} eq ']' or $self->{s_kwd} eq '') {
+          
+          $self->{s_kwd} .= ']';
+        } elsif ($self->{s_kwd} eq ']]') {
+          
+          #
+        } else {
+          
+          $self->{s_kwd} = '';
+        }
+        #
+      } elsif ($self->{nc} == -1) {
+        
+        $self->{s_kwd} = '';
+        return  ({type => END_OF_FILE_TOKEN,
+                  line => $self->{line}, column => $self->{column}});
+        last A; ## TODO: ok?
+      } else {
+        
+        $self->{s_kwd} = '';
+        #
+      }
+
+      # Anything else
+      my $token = {type => CHARACTER_TOKEN,
+                   data => chr $self->{nc},
+                   line => $self->{line}, column => $self->{column},
+                  };
+      if ($self->{read_until}->($token->{data}, q{-!<>&\]},
+                                length $token->{data})) {
+        $self->{s_kwd} = '';
+      }
+
+      ## Stay in the data state.
+      if (not $self->{is_xml} and
+          $self->{content_model} == PCDATA_CONTENT_MODEL) {
+        
+        $self->{state} = PCDATA_STATE;
+      } else {
+        
+        ## Stay in the state.
+      }
+      
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+      return  ($token);
+      redo A;
+    } elsif ($self->{state} == RAWDATA_STATE) {
+      $self->{s_kwd} = '' unless defined $self->{s_kwd};
+      if ($self->{nc} == 0x0026) { # &
+        $self->{s_kwd} = '';
+	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
+            not $self->{escape}) {
+          
+          ## NOTE: In the spec, the tokenizer is switched to the 
+          ## "entity data state".  In this implementation, the tokenizer
+          ## is switched to the |ENTITY_STATE|, which is an implementation
+          ## of the "consume a character reference" algorithm.
+          $self->{entity_add} = -1;
+          $self->{prev_state} = DATA_STATE;
+          $self->{state} = ENTITY_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          
+          #
+        }
+      } elsif ($self->{nc} == 0x002D) { # -
+	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
+          if ($self->{s_kwd} eq '<!-') {
+            
+            $self->{escape} = 1; # unless $self->{escape};
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '-') {
+            
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '<!' or $self->{s_kwd} eq '-') {
+            
+            $self->{s_kwd} .= '-';
+            #
+          } else {
+            
+            $self->{s_kwd} = '-';
+            #
+          }
+        }
+        
+        #
+      } elsif ($self->{nc} == 0x0021) { # !
+        if (length $self->{s_kwd}) {
+          
+          $self->{s_kwd} .= '!';
+          #
+        } else {
+          
+          #$self->{s_kwd} = '';
+          #
+        }
+        #
+      } elsif ($self->{nc} == 0x003C) { # <
+        if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
+            (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
+             not $self->{escape})) {
+          
+          $self->{state} = TAG_OPEN_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          
+          $self->{s_kwd} = '';
+          #
+        }
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{escape} and
+            ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
+          if ($self->{s_kwd} eq '--') {
+            
+            delete $self->{escape};
+            #
+          } else {
+            
+            #
+          }
+        } elsif ($self->{is_xml} and $self->{s_kwd} eq ']]') {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched mse', ## TODO: type
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 1);
+          #
+        } else {
+          
+          #
+        }
+        
+        $self->{s_kwd} = '';
+        #
+      } elsif ($self->{nc} == 0x005D) { # ]
+        if ($self->{s_kwd} eq ']' or $self->{s_kwd} eq '') {
+          
+          $self->{s_kwd} .= ']';
+        } elsif ($self->{s_kwd} eq ']]') {
+          
+          #
+        } else {
+          
+          $self->{s_kwd} = '';
+        }
+        #
+      } elsif ($self->{nc} == -1) {
+        
+        $self->{s_kwd} = '';
+        return  ({type => END_OF_FILE_TOKEN,
+                  line => $self->{line}, column => $self->{column}});
+        last A; ## TODO: ok?
+      } else {
+        
+        $self->{s_kwd} = '';
+        #
+      }
+
+      # Anything else
+      my $token = {type => CHARACTER_TOKEN,
+                   data => chr $self->{nc},
+                   line => $self->{line}, column => $self->{column},
+                  };
+      if ($self->{read_until}->($token->{data}, q{-!<>&\]},
+                                length $token->{data})) {
+        $self->{s_kwd} = '';
+      }
+
+      ## Stay in the data state.
+      if (not $self->{is_xml} and
+          $self->{content_model} == PCDATA_CONTENT_MODEL) {
+        
+        $self->{state} = PCDATA_STATE;
+      } else {
+        
+        ## Stay in the state.
+      }
+      
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+      return  ($token);
+      redo A;
+    } elsif ($self->{state} == SCRIPT_DATA_STATE) {
+      $self->{s_kwd} = '' unless defined $self->{s_kwd};
+      if ($self->{nc} == 0x0026) { # &
+        $self->{s_kwd} = '';
+	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
+            not $self->{escape}) {
+          
+          ## NOTE: In the spec, the tokenizer is switched to the 
+          ## "entity data state".  In this implementation, the tokenizer
+          ## is switched to the |ENTITY_STATE|, which is an implementation
+          ## of the "consume a character reference" algorithm.
+          $self->{entity_add} = -1;
+          $self->{prev_state} = DATA_STATE;
+          $self->{state} = ENTITY_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          
+          #
+        }
+      } elsif ($self->{nc} == 0x002D) { # -
+	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
+          if ($self->{s_kwd} eq '<!-') {
+            
+            $self->{escape} = 1; # unless $self->{escape};
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '-') {
+            
+            $self->{s_kwd} = '--';
+            #
+          } elsif ($self->{s_kwd} eq '<!' or $self->{s_kwd} eq '-') {
+            
+            $self->{s_kwd} .= '-';
+            #
+          } else {
+            
+            $self->{s_kwd} = '-';
+            #
+          }
+        }
+        
+        #
+      } elsif ($self->{nc} == 0x0021) { # !
+        if (length $self->{s_kwd}) {
+          
+          $self->{s_kwd} .= '!';
+          #
+        } else {
+          
+          #$self->{s_kwd} = '';
+          #
+        }
+        #
+      } elsif ($self->{nc} == 0x003C) { # <
+        if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
+            (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
+             not $self->{escape})) {
+          
+          $self->{state} = TAG_OPEN_STATE;
+          
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+          redo A;
+        } else {
+          
+          $self->{s_kwd} = '';
+          #
+        }
+      } elsif ($self->{nc} == 0x003E) { # >
+        if ($self->{escape} and
+            ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
+          if ($self->{s_kwd} eq '--') {
+            
+            delete $self->{escape};
+            #
+          } else {
+            
+            #
+          }
+        } elsif ($self->{is_xml} and $self->{s_kwd} eq ']]') {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched mse', ## TODO: type
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - 1);
+          #
+        } else {
+          
+          #
+        }
+        
+        $self->{s_kwd} = '';
+        #
+      } elsif ($self->{nc} == 0x005D) { # ]
+        if ($self->{s_kwd} eq ']' or $self->{s_kwd} eq '') {
+          
+          $self->{s_kwd} .= ']';
+        } elsif ($self->{s_kwd} eq ']]') {
+          
+          #
+        } else {
+          
+          $self->{s_kwd} = '';
+        }
+        #
+      } elsif ($self->{nc} == -1) {
+        
+        $self->{s_kwd} = '';
+        return  ({type => END_OF_FILE_TOKEN,
+                  line => $self->{line}, column => $self->{column}});
+        last A; ## TODO: ok?
+      } else {
+        
+        $self->{s_kwd} = '';
+        #
+      }
+
+      # Anything else
+      my $token = {type => CHARACTER_TOKEN,
+                   data => chr $self->{nc},
+                   line => $self->{line}, column => $self->{column},
+                  };
+      if ($self->{read_until}->($token->{data}, q{-!<>&\]},
+                                length $token->{data})) {
+        $self->{s_kwd} = '';
+      }
+
+      ## Stay in the data state.
+      if (not $self->{is_xml} and
+          $self->{content_model} == PCDATA_CONTENT_MODEL) {
+        
+        $self->{state} = PCDATA_STATE;
+      } else {
+        
+        ## Stay in the state.
+      }
+      
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+      return  ($token);
+      redo A;
+    } elsif ($self->{state} == PLAINTEXT_STATE) {
       $self->{s_kwd} = '' unless defined $self->{s_kwd};
       if ($self->{nc} == 0x0026) { # &
         $self->{s_kwd} = '';

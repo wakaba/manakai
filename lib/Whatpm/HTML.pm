@@ -1476,6 +1476,11 @@ sub _tree_construction_main ($) {
   
 
     ## Step 2
+    if ($content_model_flag == RCDATA_CONTENT_MODEL) {
+      $self->{state} = RCDATA_STATE;
+    } else {
+      $self->{state} = RAWDATA_STATE;
+    }
     $self->{content_model} = $content_model_flag; # CDATA or RCDATA
     delete $self->{escape}; # MUST
 
@@ -1519,6 +1524,7 @@ sub _tree_construction_main ($) {
     push @{$self->{open_elements}}, [$script_el, $el_category->{script}];
 
     ## Step 5
+    $self->{state} = SCRIPT_DATA_STATE;
     $self->{content_model} = CDATA_CONTENT_MODEL;
     delete $self->{escape}; # MUST
 
@@ -5573,7 +5579,8 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-          
+        
+        $self->{state} = PLAINTEXT_STATE;
         $self->{content_model} = PLAINTEXT_CONTENT_MODEL;
           
         
@@ -5890,6 +5897,7 @@ sub _tree_construction_main ($) {
 
         ## 3. RCDATA
         $self->{content_model} = RCDATA_CONTENT_MODEL;
+        $self->{state} = RCDATA_STATE;
         delete $self->{escape}; # MUST
 
         ## 4., 6. Insertion mode
@@ -6838,6 +6846,15 @@ sub set_inner_html ($$$$;$) {
     }->{$node_ln};
     $p->{content_model} = PCDATA_CONTENT_MODEL
         unless defined $p->{content_model};
+  if ($node_ln eq 'script') {
+    $p->{state} = SCRIPT_DATA_STATE;
+  } elsif ($p->{content_model} == RCDATA_CONTENT_MODEL) {
+    $p->{state} = RCDATA_STATE;
+  } elsif ($p->{content_model} == CDATA_CONTENT_MODEL) {
+    $p->{state} = RAWDATA_STATE;
+  } elsif ($p->{content_model} == PLAINTEXT_CONTENT_MODEL) {
+    $p->{state} = PLAINTEXT_STATE;
+  }
 
     $p->{inner_html_node} = [$node, $el_category->{$node_ln}];
       ## TODO: Foreign element OK?
