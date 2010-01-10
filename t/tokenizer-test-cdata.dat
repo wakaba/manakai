@@ -47,6 +47,55 @@ no </xmp>
 |       "abc</xmp"
 
 #data
+<!DOCTYPE html><iframe>abc</iframe
+#errors
+no </iframe>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <iframe>
+|       "abc</iframe"
+
+#data
+<!DOCTYPE html><noembed>abc</noembed
+#errors
+no </noembed>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <noembed>
+|       "abc</noembed"
+
+#data
+<!DOCTYPE html><noframes>abc</noframes
+#errors
+no </noframes>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|     <noframes>
+|       "abc</noframes"
+|   <body>
+
+#XXX when scripting is enabled
+#data
+<!DOCTYPE html><noscript>abc</noscript
+#errors
+no </noscript>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <noscript>
+|       "abc</noscript"
+
+#data
 <style><!-- </style> --></style>
 #errors
 unmatched </style>
