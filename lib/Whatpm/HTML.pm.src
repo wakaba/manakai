@@ -5726,10 +5726,10 @@ sub set_inner_html ($$$$;$) {
     }->{$node_ln};
     $p->{content_model} = PCDATA_CONTENT_MODEL
         unless defined $p->{content_model};
-    if ($node_ln eq 'script') {
-      $p->{state} = SCRIPT_DATA_STATE;
-    } elsif ($p->{content_model} == RCDATA_CONTENT_MODEL) {
+    if ($p->{content_model} == RCDATA_CONTENT_MODEL) {
       $p->{state} = RCDATA_STATE;
+    } elsif ($node_ln eq 'script') {
+      $p->{state} = SCRIPT_DATA_STATE;
     } elsif ($p->{content_model} == CDATA_CONTENT_MODEL) {
       $p->{state} = RAWTEXT_STATE;
     } elsif ($p->{content_model} == PLAINTEXT_CONTENT_MODEL) {

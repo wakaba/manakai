@@ -1114,3 +1114,71 @@ no </script>
 |     <script>
 |       "<!--<Script>--><!--<sCriPt></ScripT>-->"
 |   <body>
+
+#data
+</style>
+#errors
+#document-fragment style
+| "</style>"
+
+#data
+</xmp>
+#errors
+#document-fragment xmp
+| "</xmp>"
+
+#data
+</noembed>
+#errors
+#document-fragment noembed
+| "</noembed>"
+
+#data
+</noframes>
+#errors
+#document-fragment noframes
+| "</noframes>"
+
+#data
+</textarea>
+#errors
+#document-fragment textarea
+| "</textarea>"
+
+#data
+</title>
+#errors
+#document-fragment title
+| "</title>"
+
+#XXX when scripting is enabled
+#data
+</noscript>
+#errors
+#document-fragment noscript
+| "</noscript>"
+
+#data
+</plaintext>
+#errors
+#document-fragment plaintext
+| "</plaintext>"
+
+#data
+</script>
+#errors
+#document-fragment script
+| "</script>"
+
+#data
+<!--<script></script>--></script>
+#errors
+#document-fragment script
+| "<!--<script></script>--></script>"
+
+#data
+<!--
+#errors
+EOF in escaped script data
+#document-fragment script
+| "<!--"
