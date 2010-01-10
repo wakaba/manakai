@@ -630,10 +630,8 @@ sub _get_next_token ($) {
       return  ($token);
       redo A;
     } elsif ($self->{state} == RCDATA_STATE) {
-      $self->{s_kwd} = '' unless defined $self->{s_kwd};
       if ($self->{nc} == 0x0026) { # &
         
-        $self->{s_kwd} = '';
         ## NOTE: In the spec, the tokenizer is switched to the
         ## "character reference in RCDATA state".  In this
         ## implementation, the tokenizer is switched to the
@@ -671,20 +669,15 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == EOF_CHAR) {
         
-        $self->{s_kwd} = '';
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
         last A;
       } else {
         
-        $self->{s_kwd} = '';
         my $token = {type => CHARACTER_TOKEN,
                      data => chr $self->{nc},
                      line => $self->{line}, column => $self->{column}};
-        if ($self->{read_until}->($token->{data}, q{<&},
-                                  length $token->{data})) {
-          $self->{s_kwd} = '';
-        }
+        $self->{read_until}->($token->{data}, q{<&}, length $token->{data});
 
         ## Stay in the state.
         
