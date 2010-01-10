@@ -1,0 +1,29 @@
+#data
+<script><!-- </script> --></script>
+#errors
+unmatched </script>
+#document-fragment p
+| <script>
+|   "<!-- "
+| " -->"
+
+#data
+<style><!-- </style> --></style>
+#errors
+unmatched </style>
+#document-fragment p
+| <style>
+|   "<!-- "
+| " -->"
+
+#data
+<script><!----x></script>foo
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <script>
+|       "<!----x>"
+|   <body>
+|     "foo"

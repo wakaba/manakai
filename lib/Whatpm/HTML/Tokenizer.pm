@@ -1175,6 +1175,7 @@ sub _get_next_token ($) {
                      line => $self->{line},
                      column => $self->{column}};
         $self->{kwd} = chr ($self->{nc} + 0x0020); # "temporary buffer".
+        $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1195,6 +1196,7 @@ sub _get_next_token ($) {
                      line => $self->{line},
                      column => $self->{column}};
         $self->{kwd} = chr $self->{nc}; # "temporary buffer" in the spec.
+        $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
