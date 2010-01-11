@@ -5651,21 +5651,51 @@ $Element->{$HTML_NS}->{caption} = {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
 
+    FIGURE: {
+      my $caption = $item->{node};
+      
+      my $table = $caption->parent_node or last FIGURE;
+      last FIGURE if $table->node_type != 1;
+      my $nsurl = $table->namespace_uri;
+      last FIGURE if not defined $nsurl or $nsurl ne $HTML_NS;
+      last FIGURE if $table->manakai_local_name ne 'table';
+
+      my $dd = $table->parent_node or last FIGURE;
+      last FIGURE if $dd->node_type != 1;
+      $nsurl = $dd->namespace_uri;
+      last FIGURE if not defined $nsurl or $nsurl ne $HTML_NS;
+      last FIGURE if $dd->manakai_local_name ne 'dd';
+
+      my $figure = $dd->parent_node or last FIGURE;
+      last FIGURE if $figure->node_type != 1;
+      $nsurl = $figure->namespace_uri;
+      last FIGURE if not defined $nsurl or $nsurl ne $HTML_NS;
+      last FIGURE if $figure->manakai_local_name ne 'figure';
+
+      my @table;
+      for my $node (@{$dd->child_nodes}) {
+        my $nt = $node->node_type;
+        if ($nt == 1) { # Element
+          $nsurl = $node->namespace_uri;
+          last FIGURE if not defined $nsurl or $nsurl ne $HTML_NS;
+          last FIGURE if $node->manakai_local_name ne 'table';
+
+          push @table, $node;
+        } elsif ($nt == 3 or $nt == 4) { # Text / CDATASection
+          last FIGURE if $node->data =~ /[^\x09\x0A\x0C\x0D\x20]/;
+        }
+      }
+
+      last FIGURE if @table != 1;
+
+      $self->{onerror}->(node => $caption,
+                         type => 'element not allowed:figure table caption', ## XXX documentation
+                         level => $self->{level}->{must});
+    } # FIGURE
+
     $HTMLFlowContentChecker{check_end}->(@_);
   },
 }; # caption
-## XXX <p>When a <code>table</code> element is the only content in a
-## <code>figure</code> element's <code>dd</code>, the
-## <code>caption</code> element should be omitted in favor of the
-## <code>dt</code>.</p> (HTML5 revision 3859)
-#
-#    if (($element_state->{has_table} || 0) == 1 and
-#        not $element_state->{has_non_table} and
-#        $element_state->{table_caption_element}) {
-#      $self->{onerror}->(node => $element_state->{table_caption_element},
-#                         type => 'element not allowed',
-#                         level => $self->{level}->{should});
-#    }
 
 my %cellalign = (
   ## HTML4 %cellhalign;

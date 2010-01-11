@@ -55,6 +55,8 @@ sub child_nodes ($) {
 
 sub node_name ($) { return $_[0]->{node_name} }
 
+sub namespace_uri ($) { return undef }
+
 ## NOTE: Only applied to Elements and Documents
 sub append_child ($$) {
   my ($self, $new_child) = @_;
@@ -846,7 +848,7 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008, 2010 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -854,4 +856,3 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2008/12/06 10:00:53 $

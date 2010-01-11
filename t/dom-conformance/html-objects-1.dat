@@ -491,6 +491,196 @@
 /figure/dt/div/figure;element not allowed:minus;m
 
 #data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+    </table>
+  </dd>
+</figure>
+#errors
+/figure/dd;no significant content;s
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+      <caption>aa</caption>
+    </table>
+  </dd>
+</figure>
+#errors
+/figure/dd/table/caption;element not allowed:figure table caption;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd><table>
+      <caption>aa</caption>
+    </table></dd>
+</figure>
+#errors
+/figure/dd/table/caption;element not allowed:figure table caption;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+      <caption>aa</caption>
+    </table>
+    abc
+  </dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <ins>
+      <table>
+        <caption>aa</caption>
+      </table>
+    </ins>
+  </dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <del>
+      <table>
+        <caption>aa</caption>
+      </table>
+    </del>
+  </dd>
+</figure>
+#errors
+/figure/dd;no significant content;s
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    abc
+    <table>
+      <caption>aa</caption>
+    </table>
+  </dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <p>aaA</p>
+    <table>
+      <caption>aa</caption>
+    </table>
+  </dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+      <tbody><caption>aa</caption></tbody>
+    </table>
+  </dd>
+</figure>
+#errors
+/figure/dd/table/tbody/caption;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+      <caption xmlns="">aa</caption>
+    </table>
+  </dd>
+</figure>
+#errors
+/figure/dd/table/caption;element not allowed;m
+/figure/dd/table/caption;unknown element;u
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table xmlns="">
+      <caption xmlns="http://www.w3.org/1999/xhtml">aa</caption>
+    </table>
+  </dd>
+</figure>
+#errors
+/figure/dd/table;element not allowed:flow;m
+/figure/dd/table;unknown element;u
+
+#data
+<dd xmlns="http://www.w3.org/1999/xhtml">
+  <table>
+    <caption>aa</caption>
+  </table>
+</dd>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+      <caption>aa</caption>
+    </table>
+  </dd>
+</details>
+#errors
+
+#data
+<dl xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+      <caption>aa</caption>
+    </table>
+  </dd>
+</dl>
+#errors
+
+#data
+<notfigure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+      <caption>aa</caption>
+    </table>
+  </dd>
+</notfigure>
+#errors
+/notfigure;element not defined;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <table>
+      <caption>aa</caption>
+    </table>
+    <table>
+      <caption>aa</caption>
+    </table>
+  </dd>
+</figure>
+#errors
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml" data=""></object>
 #errors
 /object;no significant content;s
