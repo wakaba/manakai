@@ -166,7 +166,8 @@ $etypes->{$_} = 'unicode should'
 $etypes->{$_} = 'unicode discouraged' for 0x2153 .. 0x217F;
 $etypes->{$_} = 'control char'
     for 0x0001 .. 0x0008, 0x000B, 0x000E .. 0x001F, 0x007F .. 0x009F;
-$etypes->{$_} = 'control char' for 0xD800 .. 0xDFFF;
+#0x0000
+#$etypes->{$_} = 'control char' for 0xD800 .. 0xDFFF;
 
 my $check_char = sub ($$) {
   my ($self, $char_code) = @_;

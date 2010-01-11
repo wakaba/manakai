@@ -540,30 +540,30 @@
 
 {"description":"surrogate character reference",
 "input":"&#xD800;",
-"output":["ParseError", ["Character", "\uD800"]]},
+"output":["ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"surrogate character references",
 "input":"&#xD800;&#xDFFF;",
-"output":["ParseError", ["Character", "\uD800"],
-          "ParseError", ["Character", "\uDFFF"]]},
+"output":["ParseError", ["Character", "\uFFFD"],
+          "ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"surrogate character reference",
 "input":"\uD800&#xDFFF;",
-"output":["ParseError", ["Character", "\uD800"],
-          "ParseError", ["Character", "\uDFFF"]]},
+"output":["ParseError", ["Character", "\uFFFD"],
+          "ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"surrogate character reference",
 "input":"&#xD800;\uDFFF",
-"output":["ParseError", ["Character", "\uD800"],
-          "ParseError", ["Character", "\uDFFF"]]},
+"output":["ParseError", ["Character", "\uFFFD"],
+          "ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"surrogate character reference",
 "input":"&#55296;",
-"output":["ParseError", ["Character", "\uD800"]]},
+"output":["ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"surrogate character reference",
 "input":"&#57343;",
-"output":["ParseError", ["Character", "\uDFFF"]]},
+"output":["ParseError", ["Character", "\uFFFD"]]},
 
 {"description": "U+FDD0 character reference",
 "input": "&#xfdd0;",

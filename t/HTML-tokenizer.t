@@ -138,7 +138,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
         } elsif ($self->{nc} > 0x10FFFF) {
           $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
           push @token, 'ParseError';
-        } elsif ($self->{nc} == 0x0000) { # NULL
+        } elsif ($self->{nc} == 0x0000 or
+                 (0xD800 <= $self->{nc} and $self->{nc} <= 0xDFFF)) {
           $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
           push @token, 'ParseError';
         } elsif ($self->{nc} <= 0x0008 or

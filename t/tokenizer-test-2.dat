@@ -317,37 +317,37 @@ control character
 \ud800
 #errors
 no DOCTYPE
-control character
+surrogate
 #document escaped
 | <html>
 |   <head>
 |   <body>
-|     "\ud800"
+|     "\uFFFD"
 
 #data escaped
 \ud800
 #errors
-control character
+surrogate
 #document-fragment p escaped
-| "\ud800"
+| "\uFFFD"
 
 #data escaped
 \udfff
 #errors
 no DOCTYPE
-control character
+surrogate
 #document escaped
 | <html>
 |   <head>
 |   <body>
-|     "\udfff"
+|     "\uFFFD"
 
 #data escaped
 \udfff
 #errors
-control character
+surrogate
 #document-fragment p escaped
-| "\udfff"
+| "\uFFFD"
 
 #data escaped
 \ufdd0

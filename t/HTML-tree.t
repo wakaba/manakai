@@ -119,6 +119,7 @@ sub test ($) {
 } # test
 
 my @FILES = grep {$_} split /\s+/, qq[
+                      ${test_dir_name}tokenizer-test-chars.dat
                       ${test_dir_name}tokenizer-test-2.dat
                       ${test_dir_name}tokenizer-test-3.dat
                       ${test_dir_name}tokenizer-test-cdata.dat

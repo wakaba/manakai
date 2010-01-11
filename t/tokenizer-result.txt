@@ -1,7 +1,7 @@
 1..1154
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 10 17:43:11 2010
-# Current time GMT:   Sun Jan 10 08:43:11 2010
+# Current time local: Mon Jan 11 17:08:58 2010
+# Current time GMT:   Mon Jan 11 08:08:58 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tokenizer.t line 37.
 Found = in conditional, should be == at t/HTML-tokenizer.t line 128.
@@ -89,17 +89,7 @@ ok 58
 ok 59
 ok 60
 ok 61
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-not ok 62
-# Test 62 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{D869}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{DED6}'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #62)
-#    Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (Hexadecimal entity pair representing a surrogate pair: qq'&#xD869;&#xDED6;')
-#    Line 5 is changed:
-#     - "            qq'\\x{FFFD}'\n"
-#     + "            qq'\x{D869}'\n"
-#    Line 10 is changed:
-#     - "            qq'\\x{FFFD}'\n"
-#     + "            qq'\x{DED6}'\n"
+ok 62
 ok 63
 ok 64
 ok 65
@@ -708,25 +698,7 @@ ok 208
 ok 209
 ok 210
 ok 211
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-not ok 212
-# Test 212 got: "$VAR1 = [\n          [\n            qq'Character',\n            qq'\\x{D7FF}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{D800}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{D801}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{DFFE}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{DFFF}\x{E000}'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #212)
-#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'\\x{D7FF}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{E000}'\n          ]\n        ];\n" (Surrogate code point edge cases: qq'&#xD7FF;&#xD800;&#xD801;&#xDFFE;&#xDFFF;&#xE000;')
-#     Line 9 is changed:
-#      - "            qq'\\x{FFFD}'\n"
-#      + "            qq'\x{D800}'\n"
-#     Line 14 is changed:
-#      - "            qq'\\x{FFFD}'\n"
-#      + "            qq'\x{D801}'\n"
-#     Line 19 is changed:
-#      - "            qq'\\x{FFFD}'\n"
-#      + "            qq'\x{DFFE}'\n"
-#     Line 24 is changed:
-#      - "            qq'\\x{FFFD}\\x{E000}'\n"
-#      + "            qq'\x{DFFF}\x{E000}'\n"
+ok 212
 ok 213
 ok 214
 ok 215
@@ -1651,41 +1623,24 @@ ok 971
 ok 972
 ok 973
 ok 974
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 ok 975
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 ok 976
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 ok 977
 Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 not ok 978
-# Test 978 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{D800}\x{DFFF}'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #978)
-#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{D800}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\x{DFFF}'\n          ]\n        ];\n"Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test.pm line 456.
+# Test 978 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{FFFD}'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #978)
+#     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n"Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test.pm line 456.
  (surrogate character reference: qq'&#xD800;í¿¿')
 #     Lines 3-3 are missing:
 #      - "          [\n"
 #      - "            qq'Character',\n"
-#      - "            qq'\x{D800}'\n"
+#      - "            qq'\\x{FFFD}'\n"
 #      - "          ],\n"
 #     Line 6 is changed:
-#      - "            qq'\x{DFFF}'\n"
-#      + "            qq'\x{D800}\x{DFFF}'\n"
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
+#      - "            qq'\\x{FFFD}'\n"
+#      + "            qq'\\x{FFFD}\\x{FFFD}'\n"
 ok 979
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
 ok 980
 ok 981
 ok 982
