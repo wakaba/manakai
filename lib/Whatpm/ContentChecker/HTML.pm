@@ -3308,7 +3308,10 @@ $Element->{$HTML_NS}->{dl} = {
 
     $HTMLChecker{check_end}->(@_);
   },
-};
+}; # dl
+## XXX Within a single <code>dl</code> element, there should not be
+## more than one <code>dt</code> element for each name.</p> (HTML5
+## revision 3859)
 
 $Element->{$HTML_NS}->{dt} = {
   %HTMLPhrasingContentChecker,
@@ -3319,7 +3322,11 @@ $Element->{$HTML_NS}->{dt} = {
     lang => FEATURE_HTML5_REC,
     sdaform => FEATURE_HTML20_RFC,
   }),
-};
+}; # dt
+## XXX <dd>When the parent node is a <code>figure</code> element:
+## <span>flow content</span>, but with no descendant
+## <code>figure</code> elements.</dd> <dd>Otherwise: <span>phrasing
+## content</span>.</dd> (HTML5 revision 3859)
 
 $Element->{$HTML_NS}->{dd} = {
   %HTMLFlowContentChecker,
@@ -4464,6 +4471,9 @@ $Element->{$HTML_NS}->{figure} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD,
   ## NOTE: legend, Flow | Flow, legend?
+
+  ## XXX <dd>In any order, one <code>dd</code> element, and optionally
+  ## one <code>dt</code> element.</dd> (HTML5 revision 3859)
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -4538,7 +4548,7 @@ $Element->{$HTML_NS}->{figure} = {
     $HTMLFlowContentChecker{check_end}->(@_);
 ## ISSUE: |<figure><legend>aa</legend></figure>| should be an error?
   },
-};
+}; # figure
 
 my $AttrCheckerNotImplemented = sub {
   my ($self, $attr) = @_;
@@ -5634,6 +5644,10 @@ $Element->{$HTML_NS}->{caption} = {
     $HTMLFlowContentChecker{check_end}->(@_);
   },
 }; # caption
+## XXX <p>When a <code>table</code> element is the only content in a
+## <code>figure</code> element's <code>dd</code>, the
+## <code>caption</code> element should be omitted in favor of the
+## <code>dt</code>.</p> (HTML5 revision 3859)
 
 my %cellalign = (
   ## HTML4 %cellhalign;
@@ -7582,7 +7596,11 @@ $Element->{$HTML_NS}->{details} = {
     %HTMLAttrStatus,
     open => FEATURE_HTML5_LC,
   }),
-};
+}; # details
+## XXX <dd>One <code>dt</code> element followed by one <code>dd</code>
+## element.</dd> (HTML5 revision 3859) XXX <dd>Optionally one
+## <code>dt</code> element, followed by one <code>dd</code>
+## element.</dd> (HTML5 revision 4278)
 
 $Element->{$HTML_NS}->{datagrid} = {
   %HTMLFlowContentChecker,
@@ -7912,6 +7930,7 @@ $Element->{$HTML_NS}->{legend} = {
     $HTMLFlowContentChecker{check_end}->(@_);
   },
 }; # legend
+## XXX <dd><span>Phrasing content</span>.</dd> (HTML5 revision 3859)
 
 $Element->{$HTML_NS}->{div} = {
   %HTMLFlowContentChecker,
