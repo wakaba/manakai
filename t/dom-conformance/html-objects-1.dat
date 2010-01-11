@@ -296,6 +296,89 @@
 /figure/legend;element not allowed;m
 
 #data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dd>bb</dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+</figure>
+#errors
+/figure;child element missing;dd;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb</dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dd>bb</dd>
+  <dt>aa</dt>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dd>bb</dd>
+  <dt>aa</dt>
+  <dt>aa</dt>
+</figure>
+#errors
+/figure/dt;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dd>bb</dd>
+  <dt>aa</dt>
+  <dd>aa</dd>
+</figure>
+#errors
+/figure/dd;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dd>bb</dd>
+  <dt>aa</dt>
+  <dt>aa</dt>
+  <dd>aa</dd>
+</figure>
+#errors
+/figure/dt;element not allowed;m
+/figure/dd;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb</dd>
+  <h2>cc</h2>
+</figure>
+#errors
+/figure/h2;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <h2>cc</h2>
+  <dd>bb</dd>
+</figure>
+#errors
+/figure/h2;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <h2>cc</h2>
+  <dt>aa</dt>
+  <dd>bb</dd>
+</figure>
+#errors
+/figure/h2;element not allowed;m
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml" data=""></object>
 #errors
 /object;no significant content;s
