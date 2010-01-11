@@ -2545,9 +2545,10 @@ $Element->{$HTML_NS}->{style} = {
     ## NOTE: RFC 2616's definition of "type/subtype".  According to
     ## the Web Applications 1.0 specification, types with unsupported
     ## parameters are considered as unknown types.  Since we don't
-    ## support any media type with parameters (except for "text/css;
-    ## charset=...", which is very special case), we can safely ignore
-    ## any type specification with parameters entirely.
+    ## support any media type with parameters (and the spec requires
+    ## the impl to treate |charset| parameter as if it is an unknown
+    ## parameter), we can safely ignore any type specification with
+    ## explicit parameters entirely.
     if ($type =~ m[\A(?>(?>\x0D\x0A)?[\x09\x20])*([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+)/([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]+)(?>(?>\x0D\x0A)?[\x09\x20])*\z]) {
       $type = "$1/$2";
       $type =~ tr/A-Z/a-z/; ## NOTE: ASCII case-insensitive
