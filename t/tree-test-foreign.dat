@@ -1764,3 +1764,66 @@ no </svg>
 |     <svg svg>
 |       <svg font>
 |         point-size="14"
+
+#data
+<!DOCTYPE html>
+<table>
+  <tr>
+    <td>
+      <svg>
+        <foreignObject>
+          <table>
+            <td>
+          </table>
+        </foreignObject>
+      </svg>
+    <td>
+      Hi
+  </tr>
+</table>
+there
+#errors
+9:0:missing start tag:tr;
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       "
+|   "
+|       <tbody>
+|         <tr>
+|           "
+|     "
+|           <td>
+|             "
+|       "
+|             <svg svg>
+|               "
+|         "
+|               <svg foreignObject>
+|                 "
+|           "
+|                 <table>
+|                   "
+|             "
+|                   <tbody>
+|                     <tr>
+|                       <td>
+|                         "
+|           "
+|                 "
+|         "
+|               "
+|       "
+|             "
+|     "
+|           <td>
+|             "
+|       Hi
+|   "
+|         "
+| "
+|     "
+| there"

@@ -1261,88 +1261,94 @@ sub _tree_construction_root_element ($) {
 sub _reset_insertion_mode ($) {
   my $self = shift;
 
-    ## Step 1
-    my $last;
-    
-    ## Step 2
-    my $i = -1;
-    my $node = $self->{open_elements}->[$i];
-    
-    ## Step 3
-    S3: {
-      if ($self->{open_elements}->[0]->[0] eq $node->[0]) {
-        $last = 1;
-        if (defined $self->{inner_html_node}) {
-          
-          $node = $self->{inner_html_node};
-        } else {
-          die "_reset_insertion_mode: t27";
-        }
-      }
-      
-      ## Step 4..14
-      my $new_mode;
-      if ($node->[1] & FOREIGN_EL) {
-        
-        ## NOTE: Strictly spaking, the line below only applies to MathML and
-        ## SVG elements.  Currently the HTML syntax supports only MathML and
-        ## SVG elements as foreigners.
-        $new_mode = IN_BODY_IM | IN_FOREIGN_CONTENT_IM;
-      } elsif ($node->[1] == TABLE_CELL_EL) {
-        if ($last) {
-          
-          #
-        } else {
-          
-          $new_mode = IN_CELL_IM;
-        }
-      } else {
-        
-        $new_mode = {
-                      select => IN_SELECT_IM,
-                      ## NOTE: |option| and |optgroup| do not set
-                      ## insertion mode to "in select" by themselves.
-                      tr => IN_ROW_IM,
-                      tbody => IN_TABLE_BODY_IM,
-                      thead => IN_TABLE_BODY_IM,
-                      tfoot => IN_TABLE_BODY_IM,
-                      caption => IN_CAPTION_IM,
-                      colgroup => IN_COLUMN_GROUP_IM,
-                      table => IN_TABLE_IM,
-                      head => IN_BODY_IM, # not in head!
-                      body => IN_BODY_IM,
-                      frameset => IN_FRAMESET_IM,
-                     }->{$node->[0]->manakai_local_name};
-      }
-      $self->{insertion_mode} = $new_mode and return if defined $new_mode;
-      
-      ## Step 15
-      if ($node->[1] == HTML_EL) {
-        ## NOTE: Commented out in the spec (HTML5 revision 3894).
-        #unless (defined $self->{head_element}) {
-          
-          $self->{insertion_mode} = BEFORE_HEAD_IM;
-        #} else {
-          
-        #  $self->{insertion_mode} = AFTER_HEAD_IM;
-        #}
-        return;
-      } else {
-        
-      }
-      
-      ## Step 16
-      $self->{insertion_mode} = IN_BODY_IM and return if $last;
-      
-      ## Step 17
-      $i--;
-      $node = $self->{open_elements}->[$i];
-      
-      ## Step 18
-      redo S3;
-    } # S3
+  ## Step 1
+  my $last;
+  
+  ## Step 2
+  my $foreign;
 
-  die "$0: _reset_insertion_mode: This line should never be reached";
+  ## Step 3
+  my $i = -1;
+  my $node = $self->{open_elements}->[$i];
+    
+  ## LOOP: Step 4
+  LOOP: {
+    if ($self->{open_elements}->[0]->[0] eq $node->[0]) {
+      $last = 1;
+      if (defined $self->{inner_html_node}) {
+        
+        $node = $self->{inner_html_node};
+      } else {
+        die "_reset_insertion_mode: t27";
+      }
+    }
+    
+    ## Step 5..15
+    my $new_mode;
+    if ($node->[1] & FOREIGN_EL) {
+      
+      ## NOTE: Strictly spaking, this case should only applies to
+      ## MathML and SVG elements.  Currently the HTML syntax
+      ## supports only MathML and SVG elements as foreigners.
+      $foreign = 1;
+    } elsif ($node->[1] == TABLE_CELL_EL) {
+      if ($last) {
+        
+        #
+      } else {
+        
+        $new_mode = IN_CELL_IM;
+      }
+    } else {
+      
+      $new_mode = {
+        select => IN_SELECT_IM,
+        ## NOTE: |option| and |optgroup| do not set insertion mode to
+        ## "in select" by themselves.
+        tr => IN_ROW_IM,
+        tbody => IN_TABLE_BODY_IM,
+        thead => IN_TABLE_BODY_IM,
+        tfoot => IN_TABLE_BODY_IM,
+        caption => IN_CAPTION_IM,
+        colgroup => IN_COLUMN_GROUP_IM,
+        table => IN_TABLE_IM,
+        head => IN_BODY_IM, # not in head!
+        body => IN_BODY_IM,
+        frameset => IN_FRAMESET_IM,
+      }->{$node->[0]->manakai_local_name};
+    }
+    $self->{insertion_mode} = $new_mode and last LOOP if defined $new_mode;
+    
+    ## Step 16
+    if ($node->[1] == HTML_EL) {
+      ## NOTE: Commented out in the spec (HTML5 revision 3894).
+      #unless (defined $self->{head_element}) {
+        
+        $self->{insertion_mode} = BEFORE_HEAD_IM;
+      #} else {
+        
+      #  $self->{insertion_mode} = AFTER_HEAD_IM;
+      #}
+      last LOOP;
+    } else {
+      
+    }
+    
+    ## Step 17
+    $self->{insertion_mode} = IN_BODY_IM and last LOOP if $last;
+    
+    ## Step 18
+    $i--;
+    $node = $self->{open_elements}->[$i];
+    
+    ## Step 19
+    redo LOOP;
+  } # LOOP
+  
+  ## END: Step 20
+  if ($foreign) {
+    $self->{insertion_mode} |= IN_FOREIGN_CONTENT_IM;
+  }
 } # _reset_insertion_mode
 
 sub _tree_construction_main ($) {
