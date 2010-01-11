@@ -1318,14 +1318,14 @@ sub _reset_insertion_mode ($) {
       
       ## Step 15
       if ($node->[1] == HTML_EL) {
-        unless (defined $self->{head_element}) {
+        ## NOTE: Commented out in the spec (HTML5 revision 3894).
+        #unless (defined $self->{head_element}) {
           
           $self->{insertion_mode} = BEFORE_HEAD_IM;
-        } else {
-          ## ISSUE: Can this state be reached?
+        #} else {
           
-          $self->{insertion_mode} = AFTER_HEAD_IM;
-        }
+        #  $self->{insertion_mode} = AFTER_HEAD_IM;
+        #}
         return;
       } else {
         
