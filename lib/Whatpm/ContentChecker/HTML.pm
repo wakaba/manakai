@@ -7899,38 +7899,7 @@ $Element->{$HTML_NS}->{legend} = {
     form => FEATURE_HTML5_DROPPED,
     lang => FEATURE_HTML5_REC,
   }),
-  check_child_element => sub {
-    my ($self, $item, $child_el, $child_nsuri, $child_ln,
-        $child_is_transparent, $element_state) = @_;
-    ## XXX This does not work for |<legned><ins><blockquote>|
-    if ($item->{parent_state}->{in_figure}) {
-      $HTMLFlowContentChecker{check_child_element}->(@_);
-    } else {
-      $HTMLPhrasingContentChecker{check_child_element}->(@_);
-    }
-  },
-  check_child_text => sub {
-    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($item->{parent_state}->{in_figure}) {
-      $HTMLFlowContentChecker{check_child_text}->(@_);
-    } else {
-      $HTMLPhrasingContentChecker{check_child_text}->(@_);
-    }
-  },
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {figure => 1}});
-
-    $HTMLFlowContentChecker{check_start}->(@_);
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_remove_minus_elements ($element_state);
-
-    $HTMLFlowContentChecker{check_end}->(@_);
-  },
 }; # legend
-## XXX <dd><span>Phrasing content</span>.</dd> (HTML5 revision 3859)
 
 $Element->{$HTML_NS}->{div} = {
   %HTMLFlowContentChecker,
