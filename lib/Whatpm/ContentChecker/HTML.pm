@@ -2981,7 +2981,7 @@ $Element->{$HTML_NS}->{br} = {
 }; # br
 
 $Element->{$HTML_NS}->{dialog} = {
-  status => FEATURE_HTML5_WD,
+  status => FEATURE_HTML5_DROPPED,
   %HTMLChecker,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -3048,7 +3048,7 @@ $Element->{$HTML_NS}->{dialog} = {
 
     $HTMLChecker{check_end}->(@_);
   },
-};
+}; # dialog
 
 $Element->{$HTML_NS}->{pre} = {
   %HTMLPhrasingContentChecker,
