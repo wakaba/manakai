@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Jan 11 14:20:06 2010
-# Current time GMT:   Mon Jan 11 05:20:06 2010
+# Current time local: Mon Jan 11 14:25:27 2010
+# Current time GMT:   Mon Jan 11 05:25:27 2010
 # Using Test.pm version 1.25_02
 # t/content-model-1.dat
 ok 1
@@ -5695,9 +5695,7 @@ ok 5518
 ok 5519
 ok 5520
 ok 5521
-not ok 5522
-# Test 5522 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (t/content-checker.pl at line 69 fail #5522)
-#      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
+ok 5522
 ok 5523
 ok 5524
 ok 5525
@@ -5708,7 +5706,9 @@ ok 5529
 ok 5530
 ok 5531
 ok 5532
-ok 5533
+not ok 5533
+# Test 5533 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (t/content-checker.pl at line 69 fail #5533)
+#      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
 ok 5534
 ok 5535
 ok 5536
@@ -5870,7 +5870,6 @@ ok 5691
 ok 5692
 ok 5693
 ok 5694
-# t/dom-conformance/html-scripting-1.dat
 ok 5695
 ok 5696
 ok 5697
@@ -5882,6 +5881,7 @@ ok 5702
 ok 5703
 ok 5704
 ok 5705
+# t/dom-conformance/html-scripting-1.dat
 ok 5706
 ok 5707
 ok 5708
@@ -5925,7 +5925,6 @@ ok 5745
 ok 5746
 ok 5747
 ok 5748
-# t/dom-conformance/html-scripting-2.dat
 ok 5749
 ok 5750
 ok 5751
@@ -5937,6 +5936,7 @@ ok 5756
 ok 5757
 ok 5758
 ok 5759
+# t/dom-conformance/html-scripting-2.dat
 ok 5760
 ok 5761
 ok 5762
@@ -5973,7 +5973,6 @@ ok 5792
 ok 5793
 ok 5794
 ok 5795
-# t/dom-conformance/html-repetitions.dat
 ok 5796
 ok 5797
 ok 5798
@@ -5985,6 +5984,7 @@ ok 5803
 ok 5804
 ok 5805
 ok 5806
+# t/dom-conformance/html-repetitions.dat
 ok 5807
 ok 5808
 ok 5809
@@ -6035,7 +6035,6 @@ ok 5853
 ok 5854
 ok 5855
 ok 5856
-# t/dom-conformance/html-datatemplate.dat
 ok 5857
 ok 5858
 ok 5859
@@ -6047,6 +6046,7 @@ ok 5864
 ok 5865
 ok 5866
 ok 5867
+# t/dom-conformance/html-datatemplate.dat
 ok 5868
 ok 5869
 ok 5870
@@ -6175,11 +6175,7 @@ ok 5992
 ok 5993
 ok 5994
 ok 5995
-not ok 5996
-# Test 5996 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (t/content-checker.pl at line 69 fail #5996)
-#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
-#      Line 1 is missing:
-#       - "/rule/footer/h1;element not allowed:minus;m\n"
+ok 5996
 ok 5997
 ok 5998
 ok 5999
@@ -6190,7 +6186,11 @@ ok 6003
 ok 6004
 ok 6005
 ok 6006
-ok 6007
+not ok 6007
+# Test 6007 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (t/content-checker.pl at line 69 fail #6007)
+#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
+#      Line 1 is missing:
+#       - "/rule/footer/h1;element not allowed:minus;m\n"
 ok 6008
 ok 6009
 ok 6010
@@ -6369,3 +6369,14 @@ ok 6182
 ok 6183
 ok 6184
 ok 6185
+ok 6186
+ok 6187
+ok 6188
+ok 6189
+ok 6190
+ok 6191
+ok 6192
+ok 6193
+ok 6194
+ok 6195
+ok 6196

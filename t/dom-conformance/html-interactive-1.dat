@@ -389,6 +389,100 @@
 /details/"aaa";character not allowed;m
 
 #data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb</dd>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dd>bb</dd>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dd>bb</dd>
+  <dt>aa</dt>
+</details>
+#errors
+/details/dt;element not allowed;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb</dd>
+  <dt>cc</dt>
+</details>
+#errors
+/details/dt;element not allowed;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb</dd>
+  <dt>cc</dt>
+  <dd>dd</dd>
+</details>
+#errors
+/details/dt;element not allowed;m
+/details/dd;element not allowed;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+</details>
+#errors
+/details;child element missing;dd;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dd>aa</dd>
+  <h1>bb</h1>
+</details>
+#errors
+/details/h1;element not allowed;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <!---->xxx<!---->
+  <dd>aa</dd>
+</details>
+#errors
+/details/"xxx";character not allowed;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <h1>bb</h1>
+  <dd>bb</dd>
+</details>
+#errors
+/details/h1;element not allowed;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <h1>bb</h1>
+  <dt>aa</dt>
+  <dd>bb</dd>
+</details>
+#errors
+/details/h1;element not allowed;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <details>
+      <dt>bb</dt>
+      <dd>cc</dd>
+    </details>
+  </dd>
+</details>
+#errors
+
+#data
 <bb xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb;no significant content;s
