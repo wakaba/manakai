@@ -6802,10 +6802,6 @@ $Element->{$HTML_NS}->{button} = {
     $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
     $FAECheckStart->($self, $item, $element_state);
 
-    ## XXXISSUE: "The value attribute must not be present unless the
-    ## form [content] attribute is present.": Wrong?  Maybe it should
-    ## also be allowed when there is an ancestor |form| element.
-    
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{formaction}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
