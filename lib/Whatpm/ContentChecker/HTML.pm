@@ -7567,7 +7567,7 @@ $Element->{$HTML_NS}->{'event-source'} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
-};
+}; # event-source
 
 $Element->{$HTML_NS}->{eventsource} = {
   %HTMLEmptyChecker,
@@ -7585,10 +7585,11 @@ $Element->{$HTML_NS}->{eventsource} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
-};
+}; # eventsource
 
 $Element->{$HTML_NS}->{details} = {
-  %{$Element->{$HTML_NS}->{fieldset}},
+  ## Content: dt?, dd
+  %HTMLChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
     open => $GetHTMLBooleanAttrChecker->('open'),
@@ -7596,11 +7597,67 @@ $Element->{$HTML_NS}->{details} = {
     %HTMLAttrStatus,
     open => FEATURE_HTML5_LC,
   }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{phase} = 'before dt';
+
+    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($element_state->{phase} eq 'before dt') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+        $element_state->{phase} = 'before dd';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+        $element_state->{phase} = 'after dd';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($element_state->{phase} eq 'before dd') {
+      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+        $element_state->{phase} = 'after dd';
+      } else {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($element_state->{phase} eq 'after dd') {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
+    } else {
+      die "check_child_element: Bad |details| phase: $element_state->{phase}";
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    if ($element_state->{phase} ne 'after dd') {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing', text => 'dd',
+                         level => $self->{level}->{must});
+    }
+
+    $HTMLChecker{check_end}->(@_);
+  },
 }; # details
-## XXX <dd>One <code>dt</code> element followed by one <code>dd</code>
-## element.</dd> (HTML5 revision 3859) XXX <dd>Optionally one
-## <code>dt</code> element, followed by one <code>dd</code>
-## element.</dd> (HTML5 revision 4278)
 
 $Element->{$HTML_NS}->{datagrid} = {
   %HTMLFlowContentChecker,

@@ -285,81 +285,108 @@
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"></details>
 #errors
-/details;no significant content;s
-/details;child element missing;legend;m
+/details;child element missing;dd;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">   </details>
 #errors
-/details;no significant content;s
-/details;child element missing;legend;m
+/details;child element missing;dd;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">xxxx</details>
 #errors
-/details;child element missing;legend;m
+/details;child element missing;dd;m
+/details/"xxxx";character not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><p></p></details>
 #errors
-/details;child element missing;legend;m
-/details;no significant content;s
+/details;child element missing;dd;m
 /details/p;no significant content;s
+/details/p;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><p>xxx</p></details>
 #errors
-/details;child element missing;legend;m
+/details;child element missing;dd;m
+/details/p;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend>xxx</details>
 #errors
+/details;child element missing;dd;m
+/details/legend;element not allowed;m
+/details/"xxx";character not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend><p>xxx</p></details>
 #errors
+/details;child element missing;dd;m
+/details/legend;element not allowed;m
+/details/p;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend><style scoped="scoped"></style><p>xxx</p></details>
 #errors
+/details;child element missing;dd;m
 /details/style;SUBDOC
+/details/legend;element not allowed;m
+/details/style;element not allowed;m
+/details/p;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <legend>xx</legend>
 <style scoped="scoped"></style><p>xxx</p></details>
 #errors
+/details;child element missing;dd;m
 /details/style;SUBDOC
+/details/legend;element not allowed;m
+/details/style;element not allowed;m
+/details/p;element not allowed;m
 
 #data
-<details xmlns="http://www.w3.org/1999/xhtml">
-xx<legend>xx</legend></details>
+<details xmlns="http://www.w3.org/1999/xhtml"
+>xx<legend>xx</legend></details>
 #errors
-/details/legend;element not allowed:details legend;m
+/details;child element missing;dd;m
+/details/"xx";character not allowed;m
+/details/legend;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <p>xx</p><legend>xx</legend></details>
 #errors
-/details/legend;element not allowed:details legend;m
+/details;child element missing;dd;m
+/details/p;element not allowed;m
+/details/legend;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <legend>yy</legend><legend>xx</legend></details>
 #errors
-/details/legend;element not allowed:details legend;m
+/details;child element missing;dd;m
+/details/legend;element not allowed;m
+/details/legend;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <ins><legend>xx</legend>aa</ins></details>
 #errors
+/details;child element missing;dd;m
+/details/ins;element not allowed;m
+/details/ins/legend;element not allowed;m
+/details/ins/"aa";character not allowed;m
 
 #data
-<details xmlns="http://www.w3.org/1999/xhtml">
-zzz<legend>yy</legend><legend>xx</legend>aaa</details>
+<details xmlns="http://www.w3.org/1999/xhtml"
+>zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
-/details/legend;element not allowed:details legend;m
-/details/legend;element not allowed:details legend;m
+/details;child element missing;dd;m
+/details/"zzz";character not allowed;m
+/details/legend;element not allowed;m
+/details/legend;element not allowed;m
+/details/"aaa";character not allowed;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"></bb>
@@ -546,8 +573,11 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 <details><legend>x</legend>a</details>
 </bb>
 #errors
-/bb/details;element not allowed:minus;m
 /bb;element not defined;m
+/bb/details;element not allowed:minus;m
+/bb/details;child element missing;dd;m
+/bb/details/legend;element not allowed;m
+/bb/details/"a";character not allowed;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -641,33 +671,28 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details;no significant content;s
-/details;child element missing;legend;m
+/details;child element missing;dd;m
 
 #data
 <details open="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details;no significant content;s
-/details;child element missing;legend;m
+/details;child element missing;dd;m
 
 #data
 <details open="open" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details;no significant content;s
-/details;child element missing;legend;m
+/details;child element missing;dd;m
 
 #data
 <details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details;no significant content;s
-/details;child element missing;legend;m
+/details;child element missing;dd;m
 
 #data
 <details open="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details/@open;boolean:invalid;m
-/details;no significant content;s
-/details;child element missing;legend;m
+/details;child element missing;dd;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>
@@ -852,7 +877,8 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </datagrid>
 #errors
 /datagrid;no significant content;s
-/datagrid/details;no significant content;s
+/datagrid/details;child element missing;dd;m
+/datagrid/details/legend;element not allowed;m
 /datagrid/details/legend;no significant content;s
 /datagrid;element not defined;m
 
@@ -864,8 +890,9 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 </a>
 #errors
 /a;no significant content;s
-/a/details;no significant content;s
+/a/details;child element missing;dd;m
 /a/details/legend;no significant content;s
+/a/details/legend;element not allowed;m
 /a/details;element not allowed:minus;m
 
 #data
@@ -877,9 +904,10 @@ zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
 /a;no significant content;s
 /a/span;no significant content;s
-/a/span/details;no significant content;s
-/a/span/details/legend;no significant content;s
+/a/span/details;child element missing;dd;m
 /a/span/details;element not allowed:minus;m
+/a/span/details/legend;element not allowed;m
+/a/span/details/legend;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
