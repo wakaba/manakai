@@ -324,6 +324,22 @@
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt></dt>
+  <dd>bb</dd>
+</figure>
+#errors
+/figure/dt;no significant content;s
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd></dd>
+</figure>
+#errors
+/figure/dd;no significant content;s
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
   <dd>bb</dd>
   <dt>aa</dt>
   <dt>aa</dt>
@@ -377,6 +393,102 @@
 </figure>
 #errors
 /figure/h2;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd><p>bb</p></dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt><p>aa</p></dt>
+  <dd>bb</dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa<dl><dt>cc</dt><dd>dd</dd></dl></dt>
+  <dd>bb</dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa<dl><dt>cc</dt><dd><p>dd</p></dd></dl></dt>
+  <dd>bb</dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa<dl><dt><p>cc</p></dt><dd>dd</dd></dl></dt>
+  <dd>bb</dd>
+</figure>
+#errors
+/figure/dt/dl/dt/p;element not allowed:phrasing;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb<dl><dt>cc</dt><dd>dd</dd></dl></dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb<dl><dt>cc</dt><dd><p>dd</p></dd></dl></dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb<dl><dt><p>cc</p></dt><dd>dd</dd></dl></dd>
+</figure>
+#errors
+/figure/dd/dl/dt/p;element not allowed:phrasing;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>
+    <figure>
+      <dt>cc</dt>
+      <dd>dd</dd>
+    </figure>
+  </dd>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt>
+    <figure>
+      <dt>aa</dt>
+      <dd>bb</dd>
+    </figure>
+  </dt>
+  <dd>cc</dd>
+</figure>
+#errors
+/figure/dt/figure;element not allowed:minus;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+  <dt><div>
+    <figure>
+      <dt>aa</dt>
+      <dd>bb</dd>
+    </figure>
+  </div></dt>
+  <dd>cc</dd>
+</figure>
+#errors
+/figure/dt/div/figure;element not allowed:minus;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml" data=""></object>

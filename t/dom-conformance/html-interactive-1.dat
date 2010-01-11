@@ -483,6 +483,106 @@
 #errors
 
 #data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd><p>bb</p></dd>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt><p>aa</p></dt>
+  <dd>bb</dd>
+</details>
+#errors
+/details/dt/p;element not allowed:phrasing;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt></dt>
+  <dd>bb</dd>
+</details>
+#errors
+/details/dt;no significant content;s
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd></dd>
+</details>
+#errors
+/details/dd;no significant content;s
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd>bb</dd>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd><dl><dt>bb</dt><dd>cc</dd></dl></dd>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd><dl><dt><p>bb</p></dt><dd>cc</dd></dl></dd>
+</details>
+#errors
+/details/dd/dl/dt/p;element not allowed:phrasing;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd><dl><dt>bb</dt><dd><p>cc</p></dd></dl></dd>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt><dl><dt>bb</dt><dd>cc</dd></dl></dt>
+  <dd>aa</dd>
+</details>
+#errors
+/details/dt/dl;element not allowed:phrasing;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt><dl><dt>bb</dt><dd><p>cc</p></dd></dl></dt>
+  <dd>aa</dd>
+</details>
+#errors
+/details/dt/dl;element not allowed:phrasing;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt><dl><dt><p>bb</p></dt><dd>cc</dd></dl></dt>
+  <dd>aa</dd>
+</details>
+#errors
+/details/dt/dl;element not allowed:phrasing;m
+/details/dt/dl/dt/p;element not allowed:phrasing;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt>aa</dt>
+  <dd><figure><dt>bb</dt><dd>cc</dd></figure></dd>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <dt><figure><dt>bb</dt><dd>cc</dd></figure></dt>
+  <dd>aa</dd>
+</details>
+#errors
+/details/dt/figure;element not allowed:phrasing;m
+
+#data
 <bb xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb;no significant content;s
