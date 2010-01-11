@@ -444,7 +444,7 @@ my $HTMLLinkTypesAttrChecker = sub {
   my %word;
   for my $word (grep {length $_}
                 split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
-    $word =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    $word =~ tr/A-Z/a-z/ unless $word =~ /:/; ## ASCII case-insensitive.
 
     unless ($word{$word}) {
       $word{$word} = 1;
@@ -523,6 +523,17 @@ my $HTMLLinkTypesAttrChecker = sub {
                          type => 'unknown link type',
                          value => $word,
                          level => $self->{level}->{uncertain});
+    }
+
+    if ($word =~ /:/) {
+      ## XXX MUST be an absolute URL (HTML5 revision 4533)
+      Whatpm::URIChecker->check_iri_reference ($word, sub {
+        $self->{onerror}->(value => $word, @_, node => $attr);
+      }, $self->{level});
+      
+      ## TODO: absolute
+      push @{$self->{return}->{uri}->{$word} ||= []},
+          {node => $attr, type => {'linktype' => 1}};
     }
   }
   $is_hyperlink = 1 if $word{alternate} and not $word{stylesheet};

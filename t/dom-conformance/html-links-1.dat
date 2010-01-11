@@ -1037,3 +1037,18 @@ x</div>
 /area/@rel;link type:proposed;s
 /area/@rel;link type:bad context;m
 
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="" rel="http://foo.test/ http://FOO.test/">aa</a>
+#errors
+/a/@rel;URL:uppercase host;w
+/a/@rel;unknown link type;u
+/a/@rel;unknown link type;u
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="" rel="[http://FOO.test/]">aa</a>
+#errors
+/a/@rel;URL:uppercase host;w
+/a/@rel;syntax error:iriref3987;m
+/a/@rel;unknown link type;u
