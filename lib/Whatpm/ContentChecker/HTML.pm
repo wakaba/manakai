@@ -4468,12 +4468,17 @@ $Element->{$HTML_NS}->{del} = {
 };
 
 $Element->{$HTML_NS}->{figure} = {
-  %HTMLFlowContentChecker,
+  ## Content: dt? & dd
+  %HTMLChecker,
   status => FEATURE_HTML5_WD,
-  ## NOTE: legend, Flow | Flow, legend?
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
 
-  ## XXX <dd>In any order, one <code>dd</code> element, and optionally
-  ## one <code>dt</code> element.</dd> (HTML5 revision 3859)
+    $element_state->{in_figure} = 1;
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -4482,71 +4487,44 @@ $Element->{$HTML_NS}->{figure} = {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
-      $element_state->{has_non_legend} = 1;
-      $element_state->{has_non_table} = 1;
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-      $element_state->{has_non_table} = 1;
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'legend') {
-      if ($element_state->{has_legend_at_first}) {
-        $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:figure legend',
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+      if ($element_state->{has_dt}) {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed',
                            level => $self->{level}->{must});
-      } elsif ($element_state->{has_legend}) {
-        $self->{onerror}->(node => $element_state->{has_legend},
-                           type => 'element not allowed:figure legend',
-                           level => $self->{level}->{must});
-        $element_state->{has_legend} = $child_el;
-      } elsif ($element_state->{has_non_legend}) {
-        $element_state->{has_legend} = $child_el;
       } else {
-        $element_state->{has_legend_at_first} = 1;
+        $element_state->{has_dt} = 1;
       }
-      delete $element_state->{has_non_legend};
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+      if ($element_state->{has_dd}) {
+        $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                           level => $self->{level}->{must});
+      } else {
+        $element_state->{has_dd} = 1;
+      }
     } else {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'table') {
-        $element_state->{has_table}++;
-      } else {
-        $element_state->{has_non_table}++;
-      }
-      $HTMLFlowContentChecker{check_child_element}->(@_);
-      $element_state->{has_non_legend} = 1 unless $child_is_transparent;
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
     }
   },
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $element_state->{in_figure} = 1;
-  }, # check_start
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
-      $element_state->{has_non_legend} = 1;
-      $element_state->{has_non_table}++;
+      $self->{onerror}->(node => $child_node, type => 'character not allowed',
+                         level => $self->{level}->{must});
     }
-  }, # check_child_text
+  },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
 
-    if ($element_state->{has_legend_at_first}) {
-      #
-    } elsif ($element_state->{has_legend}) {
-      if ($element_state->{has_non_legend}) {
-        $self->{onerror}->(node => $element_state->{has_legend},
-                           type => 'element not allowed:figure legend',
-                           level => $self->{level}->{must});
-      }
+    unless ($element_state->{has_dd}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing', text => 'dd',
+                         level => $self->{level}->{must});
     }
 
-    if (($element_state->{has_table} || 0) == 1 and
-        not $element_state->{has_non_table} and
-        $element_state->{table_caption_element}) {
-      $self->{onerror}->(node => $element_state->{table_caption_element},
-                         type => 'element not allowed',
-                         level => $self->{level}->{should});
-    }
-
-    $HTMLFlowContentChecker{check_end}->(@_);
-## ISSUE: |<figure><legend>aa</legend></figure>| should be an error?
+    $HTMLChecker{check_end}->(@_);
   },
 }; # figure
 
@@ -5648,6 +5626,14 @@ $Element->{$HTML_NS}->{caption} = {
 ## <code>figure</code> element's <code>dd</code>, the
 ## <code>caption</code> element should be omitted in favor of the
 ## <code>dt</code>.</p> (HTML5 revision 3859)
+#
+#    if (($element_state->{has_table} || 0) == 1 and
+#        not $element_state->{has_non_table} and
+#        $element_state->{table_caption_element}) {
+#      $self->{onerror}->(node => $element_state->{table_caption_element},
+#                         type => 'element not allowed',
+#                         level => $self->{level}->{should});
+#    }
 
 my %cellalign = (
   ## HTML4 %cellhalign;
@@ -7602,7 +7588,6 @@ $Element->{$HTML_NS}->{details} = {
 
     $element_state->{phase} = 'before dt';
 
-    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },

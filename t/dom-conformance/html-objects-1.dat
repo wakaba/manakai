@@ -2,14 +2,15 @@
 <figure xmlns="http://www.w3.org/1999/xhtml">
 </figure>
 #errors
-/figure;no significant content;s
+/figure;child element missing;dd;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
 <legend/>
 </figure>
 #errors
-/figure;no significant content;s
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
 /figure/legend;no significant content;s
 
 #data
@@ -17,83 +18,115 @@
 <legend>x</legend>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-x
+<!---->x<!---->
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/"x";character not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-x<legend>y</legend>
+<!---->x<legend>y</legend>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/"x";character not allowed;m
+/figure/legend;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-<legend>x</legend>y
+<legend>x</legend>y<!---->
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/"y";character not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
 <legend>x</legend><legend>y</legend>
 </figure>
 #errors
-/figure/legend;element not allowed:figure legend;m
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/legend;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-y<legend>x</legend>z
+<!---->y<legend>x</legend>z<!---->
 </figure>
 #errors
-/figure/legend;element not allowed:figure legend;m
+/figure;child element missing;dd;m
+/figure/"y";character not allowed;m
+/figure/legend;element not allowed;m
+/figure/"z";character not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-x<legend>x</legend><legend>y</legend>
+<!---->x<legend>x</legend><legend>y</legend>
 </figure>
 #errors
-/figure/legend;element not allowed:figure legend;m
+/figure;child element missing;dd;m
+/figure/"x";character not allowed;m
+/figure/legend;element not allowed;m
+/figure/legend;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-<legend>x</legend><legend>y</legend>z
+<legend>x</legend><legend>y</legend>z<!---->
 </figure>
 #errors
-/figure/legend;element not allowed:figure legend;m
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/legend;element not allowed;m
+/figure/"z";character not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-x<legend>y</legend><legend>z</legend>w
+<!---->x<legend>y</legend><legend>z</legend>w<!---->
 </figure>
 #errors
-/figure/legend;element not allowed:figure legend;m
-/figure/legend;element not allowed:figure legend;m
+/figure;child element missing;dd;m
+/figure/"x";character not allowed;m
+/figure/legend;element not allowed;m
+/figure/legend;element not allowed;m
+/figure/"w";character not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-x<legend>y</legend><legend>z</legend><legend>w</legend>v
+<!---->x<legend>y</legend><legend>z</legend><legend>w</legend>v<!---->
 </figure>
 #errors
-/figure/legend;element not allowed:figure legend;m
-/figure/legend;element not allowed:figure legend;m
-/figure/legend;element not allowed:figure legend;m
+/figure;child element missing;dd;m
+/figure/"x";character not allowed;m
+/figure/legend;element not allowed;m
+/figure/legend;element not allowed;m
+/figure/legend;element not allowed;m
+/figure/"v";character not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-<p>x</p><legend>y</legend><legend>z</legend>w
+<p>x</p><legend>y</legend><legend>z</legend>w<!---->
 </figure>
 #errors
-/figure/legend;element not allowed:figure legend;m
-/figure/legend;element not allowed:figure legend;m
+/figure;child element missing;dd;m
+/figure/p;element not allowed;m
+/figure/legend;element not allowed;m
+/figure/legend;element not allowed;m
+/figure/"w";character not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
 <table><tr><td>x</td></tr></table>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/table;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -101,6 +134,9 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 <legend>x</legend>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/table;element not allowed;m
+/figure/legend;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -108,6 +144,9 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 <table><tr><td>x</td></tr></table>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/table;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -116,6 +155,10 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 <table><tr><td>x</td></tr></table>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/table;element not allowed;m
+/figure/table;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -125,7 +168,9 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 <tr><td>x</td></tr></table>
 </figure>
 #errors
-/figure/table/caption;element not allowed;s
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/table;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -136,6 +181,9 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 </table>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/table;element not allowed;m
 /figure/table/caption;element not allowed;m
 
 #data
@@ -146,7 +194,9 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 <tr><td>x</td></tr></table>
 </figure>
 #errors
-/figure/table/caption;element not allowed;s
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/table;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -157,7 +207,9 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 <tr><td>x</td></tr></table>
 </figure>
 #errors
-/figure/table/caption;element not allowed;s
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/table;element not allowed;m
 /figure/table/caption;element not allowed;m
 
 #data
@@ -166,9 +218,13 @@ x<legend>y</legend><legend>z</legend><legend>w</legend>v
 <table>
 <caption>y</caption>
 <tr><td>x</td></tr></table>
-x
+<!---->x<!---->
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/table;element not allowed;m
+/figure/"x";character not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -179,16 +235,24 @@ x
 <p>x</p>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/table;element not allowed;m
+/figure/p;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
 <table>
 <caption>y</caption>
 <tr><td>x</td></tr></table>
-x
+<!---->x<!---->
 <legend>x</legend>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/table;element not allowed;m
+/figure/"x";character not allowed;m
+/figure/legend;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -198,7 +262,9 @@ x
 <legend>x</legend>
 </figure>
 #errors
-/figure/table/caption;element not allowed;s
+/figure;child element missing;dd;m
+/figure/table;element not allowed;m
+/figure/legend;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -209,6 +275,10 @@ x
 <legend>x</legend>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/ins;element not allowed;m
+/figure/ins/table;element not allowed;m
+/figure/legend;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -220,6 +290,10 @@ x
 <legend>x</legend>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/ins;element not allowed;m
+/figure/ins/table;element not allowed;m
+/figure/legend;element not allowed;m
 
 #data
 <object xmlns="http://www.w3.org/1999/xhtml" data=""></object>

@@ -2523,37 +2523,77 @@ aaa
 
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml">
-<legend><p>XXX</p></legend>
+<legend><p>Xyz</p></legend>
 </fieldset>
 #errors
 /fieldset/legend/p;element not allowed:phrasing;m
 
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml">
-<legend><blockquote><p>XXX</p></blockquote></legend>
+<legend><blockquote><p>Xyz</p></blockquote></legend>
 </fieldset>
 #errors
 /fieldset/legend/blockquote;element not allowed:phrasing;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-<legend>XXX</legend>
+<legend>Xyz</legend>
 <img src="" alt="x"/>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/img;element not allowed;m
 
 #data
-<figure xmlns="http://www.w3.org/1999/xhtml"><legend><p>XXX</p></legend></figure>
+<figure xmlns="http://www.w3.org/1999/xhtml"><legend><p>Xyz</p></legend></figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
 /figure/legend/p;element not allowed:phrasing;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-<legend><p>XXX</p></legend>
+<legend><p>XyX</p></legend>
 <img src="" alt="x"/>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
 /figure/legend/p;element not allowed:phrasing;m
+/figure/img;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><blockquote><p>XyX</p></blockquote></legend>
+<img src="" alt="x"/>
+</figure>
+#errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/legend/blockquote;element not allowed:phrasing;m
+/figure/img;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>XyX</legend>
+<img src="" alt="x"/>
+</figure>
+#errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/img;element not allowed;m
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><p>XyX</p></legend>
+<img src="" alt="x"/>
+</figure>
+#errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
+/figure/legend/p;element not allowed:phrasing;m
+/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2561,54 +2601,47 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
 /figure/legend/blockquote;element not allowed:phrasing;m
+/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-<legend>XXX</legend>
+<legend><ins><blockquote><p>XyX</p></blockquote></ins></legend>
 <img src="" alt="x"/>
 </figure>
 #errors
-
-#data
-<figure xmlns="http://www.w3.org/1999/xhtml">
-<legend><p>XXX</p></legend>
-<img src="" alt="x"/>
-</figure>
-#errors
-/figure/legend/p;element not allowed:phrasing;m
-
-#data
-<figure xmlns="http://www.w3.org/1999/xhtml">
-<legend><blockquote><p>XXX</p></blockquote></legend>
-<img src="" alt="x"/>
-</figure>
-#errors
-/figure/legend/blockquote;element not allowed:phrasing;m
-
-#data
-<figure xmlns="http://www.w3.org/1999/xhtml">
-<legend><ins><blockquote><p>XXX</p></blockquote></ins></legend>
-<img src="" alt="x"/>
-</figure>
-#errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
 /figure/legend/ins/blockquote;element not allowed:phrasing;m
+/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-<legend><figure><p>XXX</p></figure></legend>
+<legend><figure><p>XyX</p></figure></legend>
 <img src="" alt="x"/>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
 /figure/legend/figure;element not allowed:phrasing;m
+/figure/legend/figure;child element missing;dd;m
+/figure/legend/figure/p;element not allowed;m
+/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
-<legend><div><figure><p>XXX</p></figure></div></legend>
+<legend><div><figure><p>XyX</p></figure></div></legend>
 <img src="" alt="x"/>
 </figure>
 #errors
+/figure;child element missing;dd;m
+/figure/legend;element not allowed;m
 /figure/legend/div;element not allowed:phrasing;m
+/figure/legend/div/figure;child element missing;dd;m
+/figure/legend/div/figure/p;element not allowed;m
+/figure/img;element not allowed;m
 
 #data
 <?xml version="1.1"?>
