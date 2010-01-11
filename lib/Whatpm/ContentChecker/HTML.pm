@@ -2966,6 +2966,7 @@ $Element->{$HTML_NS}->{hr} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
+    color => FEATURE_HTML5_OBSOLETE,
     lang => FEATURE_HTML5_REC,
     noshade => FEATURE_HTML5_OBSOLETE,
     sdapref => FEATURE_HTML20_RFC,
@@ -8152,6 +8153,8 @@ Access & XHTML2: access (LC)
 XML Events & XForms (for XHTML2 support; very, very low priority)
 
 # XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart
+
+XXX nobr/wbr/bgsound/multicol FEATURE_HTML5_OBSOLETE
 
 =cut
 
