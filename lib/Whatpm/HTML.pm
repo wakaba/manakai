@@ -172,7 +172,6 @@ my $el_category = {
   datagrid => MISC_SPECIAL_EL,
   dd => DTDD_EL,
   details => MISC_SPECIAL_EL,
-  dialog => MISC_SPECIAL_EL,
   dir => MISC_SPECIAL_EL,
   div => ADDRESS_DIV_EL,
   dl => MISC_SPECIAL_EL,
@@ -5185,7 +5184,7 @@ sub _tree_construction_main ($) {
                 address => 1, article => 1, aside => 1, blockquote => 1,
                 center => 1,
                 #datagrid => 1,
-                details => 1, dialog => 1,
+                details => 1,
                 dir => 1, div => 1, dl => 1, fieldset => 1, figure => 1,
                 footer => 1, h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1,
                 h6 => 1, header => 1, hgroup => 1,
@@ -6303,7 +6302,7 @@ sub _tree_construction_main ($) {
                 address => 1, article => 1, aside => 1, blockquote => 1,
                 center => 1,
                 #datagrid => 1,
-                details => 1, dialog => 1,
+                details => 1,
                 dir => 1, div => 1, dl => 1, fieldset => 1, figure => 1,
                 footer => 1, header => 1, hgroup => 1,
                 listing => 1, menu => 1, nav => 1,
@@ -6952,4 +6951,3 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
-# $Date: 2009/09/06 23:32:06 $
