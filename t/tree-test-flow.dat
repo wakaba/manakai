@@ -977,3 +977,63 @@ no </a> at the end of file
 |       <object>
 |         <xmp>
 |           "a"
+
+#data
+<!DOCTYPE html><ul><li><ul></li>a
+#errors
+unmatched </li>
+missing </ul>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <ul>
+|           "a"
+
+#data
+<!DOCTYPE html><ul><li><ol></li>a
+#errors
+unmatched </li>
+missing </ul>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <ol>
+|           "a"
+
+#data
+<!DOCTYPE html><ul><li><dl></li>a
+#errors
+missing </dl>
+missing </ul>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <dl>
+|       "a"
+
+#data
+<!DOCTYPE html><ul><li><ul><li></li>a
+#errors
+missing </ul>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <ul>
+|           <li>
+|           "a"

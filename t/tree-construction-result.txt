@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Jan 11 11:50:35 2010
-# Current time GMT:   Mon Jan 11 02:50:35 2010
+# Current time local: Mon Jan 11 12:07:16 2010
+# Current time GMT:   Mon Jan 11 03:07:16 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -5739,81 +5739,83 @@ ok 5151
 ok 5152
 ok 5153
 ok 5154
-# t/tree-test-phrasing.dat
 ok 5155
 ok 5156
 ok 5157
 ok 5158
 ok 5159
 ok 5160
-ok 5161
+not ok 5161
+# Test 5161 got: "2" (HTML-tree.t test () ok at line 3 fail #1720)
+#      Expected: "1" (Parse error: qq'<!DOCTYPE html><ul><li><dl></li>a'; 1:33:not closed, 1:33:in body:#eof;missing </ul>)
 ok 5162
 ok 5163
 ok 5164
 ok 5165
 ok 5166
+# t/tree-test-phrasing.dat
 ok 5167
 ok 5168
 ok 5169
 ok 5170
 ok 5171
 ok 5172
-# t/tree-test-form.dat
-not ok 5173
-# Test 5173 got: "2" (HTML-tree.t test () ok at line 3 fail #1724)
-#      Expected: "1" (Parse error: qq'<option>x'; 1:9:no DOCTYPE, 1:9:in body:#eof;no DOCTYPE)
+ok 5173
 ok 5174
 ok 5175
-not ok 5176
-# Test 5176 got: "2" (HTML-tree.t test () ok at line 3 fail #1725)
-#      Expected: "1" (Parse error: qq'<option></option>x'; 1:9:no DOCTYPE, 1:18:not closed;no DOCTYPE)
+ok 5176
 ok 5177
 ok 5178
-not ok 5179
-# Test 5179 got: "2" (HTML-tree.t test () ok at line 3 fail #1726)
-#      Expected: "1" (Parse error: qq'<optgroup>x'; 1:11:no DOCTYPE, 1:11:in body:#eof;no DOCTYPE)
+ok 5179
 ok 5180
 ok 5181
-not ok 5182
-# Test 5182 got: "2" (HTML-tree.t test () ok at line 3 fail #1727)
-#      Expected: "1" (Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE, 1:22:not closed;no DOCTYPE)
+ok 5182
 ok 5183
 ok 5184
+# t/tree-test-form.dat
 not ok 5185
 # Test 5185 got: "2" (HTML-tree.t test () ok at line 3 fail #1728)
-#      Expected: "1" (Parse error: qq'<optgroup><option>x'; 1:11:no DOCTYPE, 1:19:in body:#eof;no DOCTYPE)
+#      Expected: "1" (Parse error: qq'<option>x'; 1:9:no DOCTYPE, 1:9:in body:#eof;no DOCTYPE)
 ok 5186
 ok 5187
 not ok 5188
 # Test 5188 got: "2" (HTML-tree.t test () ok at line 3 fail #1729)
-#      Expected: "1" (Parse error: qq'<optgroup><optgroup>'; 1:11:no DOCTYPE, 1:20:in body:#eof;no DOCTYPE)
+#      Expected: "1" (Parse error: qq'<option></option>x'; 1:9:no DOCTYPE, 1:18:not closed;no DOCTYPE)
 ok 5189
 ok 5190
 not ok 5191
-# Test 5191 got: "3" (HTML-tree.t test () ok at line 3 fail #1730)
-#      Expected: "1" (Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:not closed, 1:16:in body:#eof;no DOCTYPE)
+# Test 5191 got: "2" (HTML-tree.t test () ok at line 3 fail #1730)
+#      Expected: "1" (Parse error: qq'<optgroup>x'; 1:11:no DOCTYPE, 1:11:in body:#eof;no DOCTYPE)
 ok 5192
 ok 5193
 not ok 5194
-# Test 5194 got: "3" (HTML-tree.t test () ok at line 3 fail #1731)
-#      Expected: "1" (Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:not closed, 1:18:in body:#eof;no DOCTYPE)
+# Test 5194 got: "2" (HTML-tree.t test () ok at line 3 fail #1731)
+#      Expected: "1" (Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE, 1:22:not closed;no DOCTYPE)
 ok 5195
 ok 5196
 not ok 5197
-# Test 5197 got: "3" (HTML-tree.t test () ok at line 3 fail #1732)
-#      Expected: "2" (Parse error: qq'<option><span><optgroup>'; 1:9:no DOCTYPE, 1:24:not closed, 1:24:in body:#eof;no DOCTYPE, no </span>)
+# Test 5197 got: "2" (HTML-tree.t test () ok at line 3 fail #1732)
+#      Expected: "1" (Parse error: qq'<optgroup><option>x'; 1:11:no DOCTYPE, 1:19:in body:#eof;no DOCTYPE)
 ok 5198
 ok 5199
-ok 5200
+not ok 5200
+# Test 5200 got: "2" (HTML-tree.t test () ok at line 3 fail #1733)
+#      Expected: "1" (Parse error: qq'<optgroup><optgroup>'; 1:11:no DOCTYPE, 1:20:in body:#eof;no DOCTYPE)
 ok 5201
 ok 5202
-ok 5203
+not ok 5203
+# Test 5203 got: "3" (HTML-tree.t test () ok at line 3 fail #1734)
+#      Expected: "1" (Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:not closed, 1:16:in body:#eof;no DOCTYPE)
 ok 5204
 ok 5205
-ok 5206
+not ok 5206
+# Test 5206 got: "3" (HTML-tree.t test () ok at line 3 fail #1735)
+#      Expected: "1" (Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:not closed, 1:18:in body:#eof;no DOCTYPE)
 ok 5207
 ok 5208
-ok 5209
+not ok 5209
+# Test 5209 got: "3" (HTML-tree.t test () ok at line 3 fail #1736)
+#      Expected: "2" (Parse error: qq'<option><span><optgroup>'; 1:9:no DOCTYPE, 1:24:not closed, 1:24:in body:#eof;no DOCTYPE, no </span>)
 ok 5210
 ok 5211
 ok 5212
@@ -5873,7 +5875,6 @@ ok 5265
 ok 5266
 ok 5267
 ok 5268
-# t/tree-test-frames.dat
 ok 5269
 ok 5270
 ok 5271
@@ -5886,6 +5887,7 @@ ok 5277
 ok 5278
 ok 5279
 ok 5280
+# t/tree-test-frames.dat
 ok 5281
 ok 5282
 ok 5283
@@ -5958,7 +5960,6 @@ ok 5349
 ok 5350
 ok 5351
 ok 5352
-# t/tree-test-foreign.dat
 ok 5353
 ok 5354
 ok 5355
@@ -5971,6 +5972,7 @@ ok 5361
 ok 5362
 ok 5363
 ok 5364
+# t/tree-test-foreign.dat
 ok 5365
 ok 5366
 ok 5367
@@ -6139,14 +6141,10 @@ ok 5529
 ok 5530
 ok 5531
 ok 5532
-not ok 5533
-# Test 5533 got: "4" (HTML-tree.t test () ok at line 3 fail #1844)
-#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 5533
 ok 5534
 ok 5535
-not ok 5536
-# Test 5536 got: "4" (HTML-tree.t test () ok at line 3 fail #1845)
-#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
+ok 5536
 ok 5537
 ok 5538
 ok 5539
@@ -6155,10 +6153,14 @@ ok 5541
 ok 5542
 ok 5543
 ok 5544
-ok 5545
+not ok 5545
+# Test 5545 got: "4" (HTML-tree.t test () ok at line 3 fail #1848)
+#      Expected: "3" (Parse error: qq'<option><svg><foreignobject></option>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag, 1:38:not closed, 1:38:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5546
 ok 5547
-ok 5548
+not ok 5548
+# Test 5548 got: "4" (HTML-tree.t test () ok at line 3 fail #1849)
+#      Expected: "3" (Parse error: qq'<optgroup><svg><foreignobject></optgroup>x'; 1:11:no DOCTYPE, 1:42:unmatched end tag, 1:42:not closed, 1:42:in body:#eof;no DOCTYPE, unmatched end tag, EOF in foreign content)
 ok 5549
 ok 5550
 ok 5551
@@ -6287,9 +6289,7 @@ ok 5673
 ok 5674
 ok 5675
 ok 5676
-not ok 5677
-# Test 5677 got: "2" (HTML-tree.t test () ok at line 3 fail #1892)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
+ok 5677
 ok 5678
 ok 5679
 ok 5680
@@ -6303,9 +6303,23 @@ ok 5687
 ok 5688
 not ok 5689
 # Test 5689 got: "2" (HTML-tree.t test () ok at line 3 fail #1896)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
 ok 5690
 ok 5691
 ok 5692
 ok 5693
 ok 5694
+ok 5695
+ok 5696
+ok 5697
+ok 5698
+ok 5699
+ok 5700
+not ok 5701
+# Test 5701 got: "2" (HTML-tree.t test () ok at line 3 fail #1900)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5702
+ok 5703
+ok 5704
+ok 5705
+ok 5706

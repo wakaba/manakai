@@ -5217,6 +5217,11 @@ sub _tree_construction_main ($) {
           } elsif ($node->[1] & SCOPING_EL) {
             !!!cp ('t411');
             last INSCOPE;
+          } elsif ($token->{tag_name} eq 'li' and
+                   {ul => 1, ol => 1}->{$node->[0]->manakai_local_name}) {
+            ## Has an element in list item scope
+            !!!cp ('t411.4');
+            last INSCOPE;
           }
         } # INSCOPE
 
