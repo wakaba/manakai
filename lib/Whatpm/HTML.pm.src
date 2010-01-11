@@ -1144,79 +1144,87 @@ sub _tree_construction_initial ($) {
 sub _tree_construction_root_element ($) {
   my $self = shift;
 
-  ## NOTE: "before html" insertion mode.
+  ## NOTE: The "before html" insertion mode.
   
   B: {
-      if ($token->{type} == DOCTYPE_TOKEN) {
-        !!!cp ('t19');
-        !!!parse-error (type => 'in html:#DOCTYPE', token => $token);
-        ## Ignore the token
-        ## Stay in the insertion mode.
-        !!!next-token;
-        redo B;
-      } elsif ($token->{type} == COMMENT_TOKEN) {
-        !!!cp ('t20');
-        my $comment = $self->{document}->create_comment ($token->{data});
-        $self->{document}->append_child ($comment);
-        ## Stay in the insertion mode.
-        !!!next-token;
-        redo B;
-      } elsif ($token->{type} == CHARACTER_TOKEN) {
-        if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
-          ## Ignore the token.
-
-          unless (length $token->{data}) {
-            !!!cp ('t21');
-            ## Stay in the insertion mode.
-            !!!next-token;
-            redo B;
-          } else {
-            !!!cp ('t22');
-          }
-        } else {
-          !!!cp ('t23');
-        }
-
-        $self->{application_cache_selection}->(undef);
-
-        #
-      } elsif ($token->{type} == START_TAG_TOKEN) {
-        if ($token->{tag_name} eq 'html') {
-          my $root_element;
-          !!!create-element ($root_element, $HTML_NS, $token->{tag_name}, $token->{attributes}, $token);
-          $self->{document}->append_child ($root_element);
-          push @{$self->{open_elements}},
-              [$root_element, $el_category->{html}];
-
-          if ($token->{attributes}->{manifest}) {
-            !!!cp ('t24');
-            ## XXX resolve URL and drop fragment
-            ## <http://html5.org/tools/web-apps-tracker?from=3479&to=3480>
-            ## <http://manakai.g.hatena.ne.jp/task/2/95>
-            $self->{application_cache_selection}
-                ->($token->{attributes}->{manifest}->{value});
-          } else {
-            !!!cp ('t25');
-            $self->{application_cache_selection}->(undef);
-          }
-
-          !!!nack ('t25c');
-
+    if ($token->{type} == DOCTYPE_TOKEN) {
+      !!!cp ('t19');
+      !!!parse-error (type => 'in html:#DOCTYPE', token => $token);
+      ## Ignore the token.
+      !!!next-token;
+      redo B;
+    } elsif ($token->{type} == COMMENT_TOKEN) {
+      !!!cp ('t20');
+      my $comment = $self->{document}->create_comment ($token->{data});
+      $self->{document}->append_child ($comment);
+      !!!next-token;
+      redo B;
+    } elsif ($token->{type} == CHARACTER_TOKEN) {
+      if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
+        ## Ignore the token.
+        
+        unless (length $token->{data}) {
+          !!!cp ('t21');
           !!!next-token;
-          return; ## Go to the "before head" insertion mode.
+          redo B;
         } else {
-          !!!cp ('t25.1');
-          #
+          !!!cp ('t22');
         }
-      } elsif ({
-                END_TAG_TOKEN, 1,
-                END_OF_FILE_TOKEN, 1,
-               }->{$token->{type}}) {
-        !!!cp ('t26');
+      } else {
+        !!!cp ('t23');
+      }
+      
+      $self->{application_cache_selection}->(undef);
+      
+      #
+    } elsif ($token->{type} == START_TAG_TOKEN) {
+      if ($token->{tag_name} eq 'html') {
+        my $root_element;
+        !!!create-element ($root_element, $HTML_NS, $token->{tag_name}, $token->{attributes}, $token);
+        $self->{document}->append_child ($root_element);
+        push @{$self->{open_elements}}, [$root_element, $el_category->{html}];
+        
+        if ($token->{attributes}->{manifest}) {
+          !!!cp ('t24');
+          ## XXX resolve URL and drop fragment
+          ## <http://html5.org/tools/web-apps-tracker?from=3479&to=3480>
+          ## <http://manakai.g.hatena.ne.jp/task/2/95>
+          $self->{application_cache_selection}
+              ->($token->{attributes}->{manifest}->{value});
+        } else {
+          !!!cp ('t25');
+          $self->{application_cache_selection}->(undef);
+        }
+        
+        !!!nack ('t25.1');
+        
+        !!!next-token;
+        return; ## Go to the "before head" insertion mode.
+      } else {
+        !!!cp ('t25.2');
+        #
+      }
+    } elsif ($token->{type} == END_TAG_TOKEN) {
+      if ({
+        head => 1, body => 1, html => 1, br => 1,
+      }->{$token->{tag_name}}) {
+        !!!cp ('t25.3');
         #
       } else {
-        die "$0: $token->{type}: Unknown token type";
+        !!!cp ('t25.4');
+        !!!parse-error (type => 'unmatched end tag',
+                        text => $token->{tag_name},
+                        token => $token);
+        ## Ignore the token.
+        !!!next-token;
+        redo B;
       }
+    } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+      !!!cp ('t26');
+      #
+    } else {
+      die "$0: $token->{type}: Unknown token type";
+    }
 
     my $root_element;
     !!!create-element ($root_element, $HTML_NS, 'html',, $token);

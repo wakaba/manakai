@@ -1144,46 +1144,43 @@ sub _tree_construction_initial ($) {
 sub _tree_construction_root_element ($) {
   my $self = shift;
 
-  ## NOTE: "before html" insertion mode.
+  ## NOTE: The "before html" insertion mode.
   
   B: {
-      if ($token->{type} == DOCTYPE_TOKEN) {
+    if ($token->{type} == DOCTYPE_TOKEN) {
+      
+      $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#DOCTYPE', token => $token);
+      ## Ignore the token.
+      $token = $self->_get_next_token;
+      redo B;
+    } elsif ($token->{type} == COMMENT_TOKEN) {
+      
+      my $comment = $self->{document}->create_comment ($token->{data});
+      $self->{document}->append_child ($comment);
+      $token = $self->_get_next_token;
+      redo B;
+    } elsif ($token->{type} == CHARACTER_TOKEN) {
+      if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
+        ## Ignore the token.
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#DOCTYPE', token => $token);
-        ## Ignore the token
-        ## Stay in the insertion mode.
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{type} == COMMENT_TOKEN) {
-        
-        my $comment = $self->{document}->create_comment ($token->{data});
-        $self->{document}->append_child ($comment);
-        ## Stay in the insertion mode.
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{type} == CHARACTER_TOKEN) {
-        if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
-          ## Ignore the token.
-
-          unless (length $token->{data}) {
-            
-            ## Stay in the insertion mode.
-            $token = $self->_get_next_token;
-            redo B;
-          } else {
-            
-          }
+        unless (length $token->{data}) {
+          
+          $token = $self->_get_next_token;
+          redo B;
         } else {
           
         }
-
-        $self->{application_cache_selection}->(undef);
-
-        #
-      } elsif ($token->{type} == START_TAG_TOKEN) {
-        if ($token->{tag_name} eq 'html') {
-          my $root_element;
-          
+      } else {
+        
+      }
+      
+      $self->{application_cache_selection}->(undef);
+      
+      #
+    } elsif ($token->{type} == START_TAG_TOKEN) {
+      if ($token->{tag_name} eq 'html') {
+        my $root_element;
+        
       $root_element = $self->{document}->create_element_ns
         ($HTML_NS, [undef,  $token->{tag_name}]);
     
@@ -1201,39 +1198,50 @@ sub _tree_construction_root_element ($) {
         $root_element->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-          $self->{document}->append_child ($root_element);
-          push @{$self->{open_elements}},
-              [$root_element, $el_category->{html}];
-
-          if ($token->{attributes}->{manifest}) {
-            
-            ## XXX resolve URL and drop fragment
-            ## <http://html5.org/tools/web-apps-tracker?from=3479&to=3480>
-            ## <http://manakai.g.hatena.ne.jp/task/2/95>
-            $self->{application_cache_selection}
-                ->($token->{attributes}->{manifest}->{value});
-          } else {
-            
-            $self->{application_cache_selection}->(undef);
-          }
-
+        $self->{document}->append_child ($root_element);
+        push @{$self->{open_elements}}, [$root_element, $el_category->{html}];
+        
+        if ($token->{attributes}->{manifest}) {
           
-
-          $token = $self->_get_next_token;
-          return; ## Go to the "before head" insertion mode.
+          ## XXX resolve URL and drop fragment
+          ## <http://html5.org/tools/web-apps-tracker?from=3479&to=3480>
+          ## <http://manakai.g.hatena.ne.jp/task/2/95>
+          $self->{application_cache_selection}
+              ->($token->{attributes}->{manifest}->{value});
         } else {
           
-          #
+          $self->{application_cache_selection}->(undef);
         }
-      } elsif ({
-                END_TAG_TOKEN, 1,
-                END_OF_FILE_TOKEN, 1,
-               }->{$token->{type}}) {
+        
+        
+        
+        $token = $self->_get_next_token;
+        return; ## Go to the "before head" insertion mode.
+      } else {
+        
+        #
+      }
+    } elsif ($token->{type} == END_TAG_TOKEN) {
+      if ({
+        head => 1, body => 1, html => 1, br => 1,
+      }->{$token->{tag_name}}) {
         
         #
       } else {
-        die "$0: $token->{type}: Unknown token type";
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
+                        text => $token->{tag_name},
+                        token => $token);
+        ## Ignore the token.
+        $token = $self->_get_next_token;
+        redo B;
       }
+    } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+      
+      #
+    } else {
+      die "$0: $token->{type}: Unknown token type";
+    }
 
     my $root_element;
     

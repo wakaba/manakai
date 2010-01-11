@@ -1,0 +1,138 @@
+#data
+</html><!---->
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+| <!--  -->
+
+#data
+</br><!---->
+#errors
+no DOCTYPE
+unmatched </br>
+#document
+| <html>
+|   <head>
+|   <body>
+|     <br>
+|     <!--  -->
+
+#data
+</head><!---->
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <!--  -->
+|   <body>
+
+#data
+</body><!---->
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|   <!--  -->
+
+#data
+</p><!---->
+#errors
+unexpected </p>
+no DOCTYPE
+#document
+| <!--  -->
+| <html>
+|   <head>
+|   <body>
+
+#data
+</abc><!---->
+#errors
+unexpected </abc>
+no DOCTYPE
+#document
+| <!--  -->
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE html></html><!---->
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+| <!--  -->
+
+#data
+<!DOCTYPE html></br><!---->
+#errors
+unmatched </br>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <br>
+|     <!--  -->
+
+#data
+<!DOCTYPE html></head><!---->
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <!--  -->
+|   <body>
+
+#data
+<!DOCTYPE html></body><!---->
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|   <!--  -->
+
+#data
+<!DOCTYPE html></p><!---->
+#errors
+unexpected </p>
+#document
+| <!DOCTYPE html>
+| <!--  -->
+| <html>
+|   <head>
+|   <body>
+
+#data
+<!DOCTYPE html></abc><!---->
+#errors
+unexpected </abc>
+#document
+| <!DOCTYPE html>
+| <!--  -->
+| <html>
+|   <head>
+|   <body>
+
+#data
+</head><!-- --><html>
+#errors
+no DOCTYPE
+second <html>
+#document
+| <html>
+|   <head>
+|   <!--   -->
+|   <body>

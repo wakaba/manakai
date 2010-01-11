@@ -137,6 +137,7 @@ my @FILES = grep {$_} split /\s+/, qq[
                       ${test_dir_name}tree-test-1.dat
                       ${test_dir_name}tree-test-2.dat
                       ${test_dir_name}tree-test-3.dat
+                      ${test_dir_name}tree-test-struct.dat
                       ${test_dir_name}tree-test-void.dat
                       ${test_dir_name}tree-test-flow.dat
                       ${test_dir_name}tree-test-phrasing.dat
