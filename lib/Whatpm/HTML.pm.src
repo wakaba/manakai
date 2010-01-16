@@ -1341,6 +1341,10 @@ sub _reset_insertion_mode ($) {
 sub _tree_construction_main ($) {
   my $self = shift;
 
+  ## "List of active formatting elements".  Each item in this array is
+  ## an array reference, which contains: [0] - the element node; [1] -
+  ## the local name of the element; [2] - the token that is used to
+  ## create [0].
   my $active_formatting_elements = [];
 
   my $reconstruct_active_formatting_elements = sub { # MUST
@@ -1616,11 +1620,13 @@ sub _tree_construction_main ($) {
         
         ## Step 2
         my $node_i_in_active;
+        my $node_token;
         S7S2: {
           for (reverse 0..$#$active_formatting_elements) {
             if ($active_formatting_elements->[$_]->[0] eq $node->[0]) {
               !!!cp ('t63');
               $node_i_in_active = $_;
+              $node_token = $active_formatting_elements->[$_]->[2];
               last S7S2;
             }
           }
@@ -1640,10 +1646,13 @@ sub _tree_construction_main ($) {
         ## Step 5
         if ($node->[0]->has_child_nodes ()) {
           !!!cp ('t65');
-          my $clone = [$node->[0]->clone_node (0), $node->[1]];
-          $active_formatting_elements->[$node_i_in_active] = $clone;
-          $self->{open_elements}->[$node_i_in_open] = $clone;
-          $node = $clone;
+          my $new_element = [];
+          !!!create-element ($new_element->[0], $HTML_NS, $node_token->{tag_name}, $node_token->{attributes}, $node_token);
+          $new_element->[1] = $node->[1];
+          $new_element->[2] = $node_token;
+          $active_formatting_elements->[$node_i_in_active] = $new_element;
+          $self->{open_elements}->[$node_i_in_open] = $new_element;
+          $node = $new_element;
         }
         
         ## Step 6
@@ -1681,15 +1690,17 @@ sub _tree_construction_main ($) {
       }
       
       ## Step 9
-      my $clone = [$formatting_element->[0]->clone_node (0),
-                   $formatting_element->[1]];
+      my $new_element = [];
+      !!!create-element ($new_element->[0], $HTML_NS, $formatting_element->[2]->{tag_name}, $formatting_element->[2]->{attributes}, $formatting_element->[2]);
+      $new_element->[1] = $formatting_element->[1];
+      $new_element->[2] = $formatting_element->[2];
       
       ## Step 10
       my @cn = @{$furthest_block->[0]->child_nodes};
-      $clone->[0]->append_child ($_) for @cn;
+      $new_element->[0]->append_child ($_) for @cn;
       
       ## Step 11
-      $furthest_block->[0]->append_child ($clone->[0]);
+      $furthest_block->[0]->append_child ($new_element->[0]);
       
       ## Step 12
       my $i;
@@ -1703,7 +1714,7 @@ sub _tree_construction_main ($) {
           $i = $_;
         }
       } # AFE
-      splice @$active_formatting_elements, $i + 1, 0, $clone;
+      splice @$active_formatting_elements, $i + 1, 0, $new_element;
       
       ## Step 13
       undef $i;
@@ -1717,7 +1728,7 @@ sub _tree_construction_main ($) {
           $i = $_;
         }
       } # OE
-      splice @{$self->{open_elements}}, $i + 1, 0, $clone;
+      splice @{$self->{open_elements}}, $i + 1, 0, $new_element;
       
       ## Step 14
       redo FET;
@@ -3140,8 +3151,8 @@ sub _tree_construction_main ($) {
           $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
           $self->{insertion_mode} = IN_CELL_IM;
 
-          push @$active_formatting_elements, ['#marker', ''];
-              
+          push @$active_formatting_elements, ['#marker', '', undef];
+          
           !!!nack ('t207.1');
           !!!next-token;
           next B;
@@ -3265,16 +3276,16 @@ sub _tree_construction_main ($) {
                     tbody => 1, tfoot => 1, thead => 1,
                    }->{$token->{tag_name}}) {
             ## Clear back to table context
-                while (not ($self->{open_elements}->[-1]->[1]
-                                & TABLE_SCOPING_EL)) {
-                  !!!cp ('t220');
-                  ## ISSUE: Can this state be reached?
-                  pop @{$self->{open_elements}};
-                }
-                
-            push @$active_formatting_elements, ['#marker', '']
+            while (not ($self->{open_elements}->[-1]->[1]
+                        & TABLE_SCOPING_EL)) {
+              !!!cp ('t220');
+              ## ISSUE: Can this state be reached?
+              pop @{$self->{open_elements}};
+            }
+            
+            push @$active_formatting_elements, ['#marker', '', undef]
                 if $token->{tag_name} eq 'caption';
-                
+            
             !!!insert-element ($token->{tag_name}, $token->{attributes}, $token);
             $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
             $self->{insertion_mode} = {
@@ -4792,7 +4803,10 @@ sub _tree_construction_main ($) {
         $reconstruct_active_formatting_elements->($insert_to_current);
 
         !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
-        push @$active_formatting_elements, $self->{open_elements}->[-1];
+        push @$active_formatting_elements,
+            [$self->{open_elements}->[-1]->[0],
+             $self->{open_elements}->[-1]->[1],
+             $token];
 
         !!!nack ('t374.1');
         !!!next-token;
@@ -4817,7 +4831,10 @@ sub _tree_construction_main ($) {
         } # INSCOPE
         
         !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
-        push @$active_formatting_elements, $self->{open_elements}->[-1];
+        push @$active_formatting_elements,
+            [$self->{open_elements}->[-1]->[0],
+             $self->{open_elements}->[-1]->[1],
+             $token];
         
         !!!nack ('t377.1');
         !!!next-token;
@@ -4845,7 +4862,7 @@ sub _tree_construction_main ($) {
 
         ## TODO: associate with $self->{form_element} if defined
 
-        push @$active_formatting_elements, ['#marker', ''];
+        push @$active_formatting_elements, ['#marker', '', undef];
 
         delete $self->{frameset_ok};
 
@@ -5092,7 +5109,7 @@ sub _tree_construction_main ($) {
             }->{$token->{tag_name}}) {
           !!!cp ('t380');
 
-          push @$active_formatting_elements, ['#marker', ''];
+          push @$active_formatting_elements, ['#marker', '', undef];
 
           delete $self->{frameset_ok};
 
@@ -5103,7 +5120,10 @@ sub _tree_construction_main ($) {
                   strong => 1, tt => 1, u => 1,
                  }->{$token->{tag_name}}) {
           !!!cp ('t375');
-          push @$active_formatting_elements, $self->{open_elements}->[-1];
+          push @$active_formatting_elements,
+              [$self->{open_elements}->[-1]->[0],
+               $self->{open_elements}->[-1]->[1],
+               $token];
           !!!nack ('t375.1');
         } elsif ($token->{tag_name} eq 'input') {
           !!!cp ('t388');

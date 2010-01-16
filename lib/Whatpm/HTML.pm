@@ -1682,11 +1682,13 @@ sub _tree_construction_main ($) {
         
         ## Step 2
         my $node_i_in_active;
+        my $node_token;
         S7S2: {
           for (reverse 0..$#$active_formatting_elements) {
             if ($active_formatting_elements->[$_]->[0] eq $node->[0]) {
               
               $node_i_in_active = $_;
+              $node_token = $active_formatting_elements->[$_]->[2];
               last S7S2;
             }
           }
@@ -1706,10 +1708,30 @@ sub _tree_construction_main ($) {
         ## Step 5
         if ($node->[0]->has_child_nodes ()) {
           
-          my $clone = [$node->[0]->clone_node (0), $node->[1]];
-          $active_formatting_elements->[$node_i_in_active] = $clone;
-          $self->{open_elements}->[$node_i_in_open] = $clone;
-          $node = $clone;
+          my $new_element = [];
+          
+      $new_element->[0] = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $node_token->{tag_name}]);
+    
+        for my $attr_name (keys %{ $node_token->{attributes}}) {
+          my $attr_t =  $node_token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $new_element->[0]->set_attribute_node_ns ($attr);
+        }
+      
+        $new_element->[0]->set_user_data (manakai_source_line => $node_token->{line})
+            if defined $node_token->{line};
+        $new_element->[0]->set_user_data (manakai_source_column => $node_token->{column})
+            if defined $node_token->{column};
+      
+          $new_element->[1] = $node->[1];
+          $new_element->[2] = $node_token;
+          $active_formatting_elements->[$node_i_in_active] = $new_element;
+          $self->{open_elements}->[$node_i_in_open] = $new_element;
+          $node = $new_element;
         }
         
         ## Step 6
@@ -1747,15 +1769,34 @@ sub _tree_construction_main ($) {
       }
       
       ## Step 9
-      my $clone = [$formatting_element->[0]->clone_node (0),
-                   $formatting_element->[1]];
+      my $new_element = [];
+      
+      $new_element->[0] = $self->{document}->create_element_ns
+        ($HTML_NS, [undef,  $formatting_element->[2]->{tag_name}]);
+    
+        for my $attr_name (keys %{ $formatting_element->[2]->{attributes}}) {
+          my $attr_t =  $formatting_element->[2]->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $new_element->[0]->set_attribute_node_ns ($attr);
+        }
+      
+        $new_element->[0]->set_user_data (manakai_source_line => $formatting_element->[2]->{line})
+            if defined $formatting_element->[2]->{line};
+        $new_element->[0]->set_user_data (manakai_source_column => $formatting_element->[2]->{column})
+            if defined $formatting_element->[2]->{column};
+      
+      $new_element->[1] = $formatting_element->[1];
+      $new_element->[2] = $formatting_element->[2];
       
       ## Step 10
       my @cn = @{$furthest_block->[0]->child_nodes};
-      $clone->[0]->append_child ($_) for @cn;
+      $new_element->[0]->append_child ($_) for @cn;
       
       ## Step 11
-      $furthest_block->[0]->append_child ($clone->[0]);
+      $furthest_block->[0]->append_child ($new_element->[0]);
       
       ## Step 12
       my $i;
@@ -1769,7 +1810,7 @@ sub _tree_construction_main ($) {
           $i = $_;
         }
       } # AFE
-      splice @$active_formatting_elements, $i + 1, 0, $clone;
+      splice @$active_formatting_elements, $i + 1, 0, $new_element;
       
       ## Step 13
       undef $i;
@@ -1783,7 +1824,7 @@ sub _tree_construction_main ($) {
           $i = $_;
         }
       } # OE
-      splice @{$self->{open_elements}}, $i + 1, 0, $clone;
+      splice @{$self->{open_elements}}, $i + 1, 0, $new_element;
       
       ## Step 14
       redo FET;
@@ -3597,8 +3638,8 @@ sub _tree_construction_main ($) {
           $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
           $self->{insertion_mode} = IN_CELL_IM;
 
-          push @$active_formatting_elements, ['#marker', ''];
-              
+          push @$active_formatting_elements, ['#marker', '', undef];
+          
           
           $token = $self->_get_next_token;
           next B;
@@ -3737,16 +3778,16 @@ sub _tree_construction_main ($) {
                     tbody => 1, tfoot => 1, thead => 1,
                    }->{$token->{tag_name}}) {
             ## Clear back to table context
-                while (not ($self->{open_elements}->[-1]->[1]
-                                & TABLE_SCOPING_EL)) {
-                  
-                  ## ISSUE: Can this state be reached?
-                  pop @{$self->{open_elements}};
-                }
-                
-            push @$active_formatting_elements, ['#marker', '']
+            while (not ($self->{open_elements}->[-1]->[1]
+                        & TABLE_SCOPING_EL)) {
+              
+              ## ISSUE: Can this state be reached?
+              pop @{$self->{open_elements}};
+            }
+            
+            push @$active_formatting_elements, ['#marker', '', undef]
                 if $token->{tag_name} eq 'caption';
-                
+            
             
     {
       my $el;
@@ -5668,7 +5709,10 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-        push @$active_formatting_elements, $self->{open_elements}->[-1];
+        push @$active_formatting_elements,
+            [$self->{open_elements}->[-1]->[0],
+             $self->{open_elements}->[-1]->[1],
+             $token];
 
         
         $token = $self->_get_next_token;
@@ -5721,7 +5765,10 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-        push @$active_formatting_elements, $self->{open_elements}->[-1];
+        push @$active_formatting_elements,
+            [$self->{open_elements}->[-1]->[0],
+             $self->{open_elements}->[-1]->[1],
+             $token];
         
         
         $token = $self->_get_next_token;
@@ -5777,7 +5824,7 @@ sub _tree_construction_main ($) {
 
         ## TODO: associate with $self->{form_element} if defined
 
-        push @$active_formatting_elements, ['#marker', ''];
+        push @$active_formatting_elements, ['#marker', '', undef];
 
         delete $self->{frameset_ok};
 
@@ -6196,7 +6243,7 @@ sub _tree_construction_main ($) {
             }->{$token->{tag_name}}) {
           
 
-          push @$active_formatting_elements, ['#marker', ''];
+          push @$active_formatting_elements, ['#marker', '', undef];
 
           delete $self->{frameset_ok};
 
@@ -6207,7 +6254,10 @@ sub _tree_construction_main ($) {
                   strong => 1, tt => 1, u => 1,
                  }->{$token->{tag_name}}) {
           
-          push @$active_formatting_elements, $self->{open_elements}->[-1];
+          push @$active_formatting_elements,
+              [$self->{open_elements}->[-1]->[0],
+               $self->{open_elements}->[-1]->[1],
+               $token];
           
         } elsif ($token->{tag_name} eq 'input') {
           
