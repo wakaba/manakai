@@ -166,6 +166,7 @@ my $el_category = {
   button => BUTTON_EL,
   caption => CAPTION_EL,
   center => MISC_SPECIAL_EL,
+  code => FORMATTING_EL,
   col => MISC_SPECIAL_EL,
   colgroup => MISC_SPECIAL_EL,
   command => MISC_SPECIAL_EL,
@@ -6243,7 +6244,7 @@ sub _tree_construction_main ($) {
 
           
         } elsif ({
-                  b => 1, big => 1, em => 1, font => 1, i => 1,
+                  b => 1, big => 1, code => 1, em => 1, font => 1, i => 1,
                   s => 1, small => 1, strike => 1,
                   strong => 1, tt => 1, u => 1,
                  }->{$token->{tag_name}}) {
@@ -6592,7 +6593,7 @@ sub _tree_construction_main ($) {
         next B;
       } elsif ({
                 a => 1,
-                b => 1, big => 1, em => 1, font => 1, i => 1,
+                b => 1, big => 1, code => 1, em => 1, font => 1, i => 1,
                 nobr => 1, s => 1, small => 1, strike => 1,
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
