@@ -1366,6 +1366,10 @@ sub _reset_insertion_mode ($) {
 sub _tree_construction_main ($) {
   my $self = shift;
 
+  ## "List of active formatting elements".  Each item in this array is
+  ## an array reference, which contains: [0] - the element node; [1] -
+  ## the local name of the element; [2] - the token that is used to
+  ## create [0].
   my $active_formatting_elements = [];
 
   my $reconstruct_active_formatting_elements = sub { # MUST
@@ -1660,27 +1664,20 @@ sub _tree_construction_main ($) {
       my $common_ancestor_node = $self->{open_elements}->[$formatting_element_i_in_open - 1];
       
       ## Step 5
-      my $furthest_block_parent = $furthest_block->[0]->parent_node;
-      if (defined $furthest_block_parent) {
-        
-        $furthest_block_parent->remove_child ($furthest_block->[0]);
-      }
-      
-      ## Step 6
       my $bookmark_prev_el
         = $active_formatting_elements->[$formatting_element_i_in_active - 1]
           ->[0];
       
-      ## Step 7
+      ## Step 6
       my $node = $furthest_block;
       my $node_i_in_open = $furthest_block_i_in_open;
       my $last_node = $furthest_block;
       S7: {
-        ## Step 1
+        ## Step 6.1
         $node_i_in_open--;
         $node = $self->{open_elements}->[$node_i_in_open];
         
-        ## Step 2
+        ## Step 6.2
         my $node_i_in_active;
         my $node_token;
         S7S2: {
@@ -1696,20 +1693,18 @@ sub _tree_construction_main ($) {
           redo S7;
         } # S7S2
         
-        ## Step 3
+        ## Step 6.3
         last S7 if $node->[0] eq $formatting_element->[0];
         
-        ## Step 4
+        ## Step 6.4
         if ($last_node->[0] eq $furthest_block->[0]) {
           
           $bookmark_prev_el = $node->[0];
         }
         
-        ## Step 5
-        if ($node->[0]->has_child_nodes ()) {
-          
-          my $new_element = [];
-          
+        ## Step 6.5
+        my $new_element = [];
+        
       $new_element->[0] = $self->{document}->create_element_ns
         ($HTML_NS, [undef,  $node_token->{tag_name}]);
     
@@ -1727,24 +1722,23 @@ sub _tree_construction_main ($) {
         $new_element->[0]->set_user_data (manakai_source_column => $node_token->{column})
             if defined $node_token->{column};
       
-          $new_element->[1] = $node->[1];
-          $new_element->[2] = $node_token;
-          $active_formatting_elements->[$node_i_in_active] = $new_element;
-          $self->{open_elements}->[$node_i_in_open] = $new_element;
-          $node = $new_element;
-        }
+        $new_element->[1] = $node->[1];
+        $new_element->[2] = $node_token;
+        $active_formatting_elements->[$node_i_in_active] = $new_element;
+        $self->{open_elements}->[$node_i_in_open] = $new_element;
+        $node = $new_element;
         
-        ## Step 6
+        ## Step 6.6
         $node->[0]->append_child ($last_node->[0]);
         
-        ## Step 7
+        ## Step 6.7
         $last_node = $node;
         
-        ## Step 8
+        ## Step 6.8
         redo S7;
       } # S7  
       
-      ## Step 8
+      ## Step 7
       if ($common_ancestor_node->[1] & TABLE_ROWS_EL) {
         ## Foster parenting.
         my $foster_parent_element;
@@ -1768,7 +1762,7 @@ sub _tree_construction_main ($) {
         $common_ancestor_node->[0]->append_child ($last_node->[0]);
       }
       
-      ## Step 9
+      ## Step 8
       my $new_element = [];
       
       $new_element->[0] = $self->{document}->create_element_ns
@@ -1791,14 +1785,14 @@ sub _tree_construction_main ($) {
       $new_element->[1] = $formatting_element->[1];
       $new_element->[2] = $formatting_element->[2];
       
-      ## Step 10
+      ## Step 9
       my @cn = @{$furthest_block->[0]->child_nodes};
       $new_element->[0]->append_child ($_) for @cn;
       
-      ## Step 11
+      ## Step 10
       $furthest_block->[0]->append_child ($new_element->[0]);
       
-      ## Step 12
+      ## Step 11
       my $i;
       AFE: for (reverse 0..$#$active_formatting_elements) {
         if ($active_formatting_elements->[$_]->[0] eq $formatting_element->[0]) {
@@ -1812,7 +1806,7 @@ sub _tree_construction_main ($) {
       } # AFE
       splice @$active_formatting_elements, $i + 1, 0, $new_element;
       
-      ## Step 13
+      ## Step 12
       undef $i;
       OE: for (reverse 0..$#{$self->{open_elements}}) {
         if ($self->{open_elements}->[$_]->[0] eq $formatting_element->[0]) {
@@ -1826,7 +1820,7 @@ sub _tree_construction_main ($) {
       } # OE
       splice @{$self->{open_elements}}, $i + 1, 0, $new_element;
       
-      ## Step 14
+      ## Step 13
       redo FET;
     } # FET
   }; # $formatting_end_tag

@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Sat Jan 16 18:00:02 2010
-# Current time GMT:   Sat Jan 16 09:00:02 2010
+# Current time local: Sat Jan 16 18:22:59 2010
+# Current time GMT:   Sat Jan 16 09:22:59 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -781,7 +781,11 @@ ok 680
 ok 681
 ok 682
 ok 683
-ok 684
+not ok 684
+# Test 684 got: "<html>\n  <head>\n  <body>\n    <cite>\n      <b>\n        <cite>\n          <i>\n            <cite>\n              <i>\n                <cite>\n                  <i>\n      <i>\n        <i>\n          <i>\n            <div>\n              <b>\n                \"X\"\n              \"TEST\"\n" (HTML-tree.t test () ok at line 9 fail #228)
+#     Expected: "<html>\n  <head>\n  <body>\n    <cite>\n      <b>\n        <cite>\n          <i>\n            <cite>\n              <i>\n                <cite>\n      <i>\n        <i>\n          <i>\n            <div>\n              <b>\n                \"X\"\n              \"TEST\"\n" (Document tree: qq'<cite><b><cite><i><cite><i><cite><i><div>X</b>TEST')
+#     Got 1 extra line at line 11:
+#      + "                  <i>\n"
 No #errors section () at HTML-tree.t test () skip line 50.
 not ok 685
 # Test 685 got: "1" (HTML-tree.t test () ok at line 3 fail #229)
