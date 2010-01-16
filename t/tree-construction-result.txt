@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Sat Jan 16 18:38:49 2010
-# Current time GMT:   Sat Jan 16 09:38:49 2010
+# Current time local: Sat Jan 16 19:05:17 2010
+# Current time GMT:   Sat Jan 16 10:05:17 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -6379,7 +6379,9 @@ not ok 5740
 #      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;)
 ok 5741
 ok 5742
-ok 5743
+not ok 5743
+# Test 5743 got: "2" (HTML-tree.t test () ok at line 3 fail #1914)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font>abc</font></svg>'; 2:22:unmatched end tag, 2:27:not closed;)
 ok 5744
 ok 5745
 ok 5746
@@ -6388,11 +6390,14 @@ ok 5748
 ok 5749
 ok 5750
 ok 5751
-not ok 5752
-# Test 5752 got: "2" (HTML-tree.t test () ok at line 3 fail #1917)
-#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
+ok 5752
 ok 5753
 ok 5754
-ok 5755
+not ok 5755
+# Test 5755 got: "2" (HTML-tree.t test () ok at line 3 fail #1918)
+#      Expected: "0" (Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;)
 ok 5756
 ok 5757
+ok 5758
+ok 5759
+ok 5760

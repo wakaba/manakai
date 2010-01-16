@@ -1712,6 +1712,19 @@ bad namespace
 
 #data
 <!DOCTYPE html>
+<svg><font>abc</font></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg font>
+|         "abc"
+
+#data
+<!DOCTYPE html>
 <svg><font color=red></font>
 #errors
 no </svg>
