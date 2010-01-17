@@ -7736,7 +7736,15 @@ $Element->{$HTML_NS}->{command} = {
     default => $GetHTMLBooleanAttrChecker->('default'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     icon => $HTMLURIAttrChecker,
-    label => sub { }, ## NOTE: No requirement
+    label => sub {
+      my ($self, $attr, $item, $element_state) = @_;
+      unless (length $attr->value) {
+        $self->{onerror}->(node => $attr,
+                           type => 'empty command label', # XXX documentation
+                           level => $self->{level}->{must});
+      }
+      $element_state->{has_label} = 1;
+    },
     radiogroup => sub { }, ## NOTE: No requirement for the value
     type => $GetHTMLEnumeratedAttrChecker->({
       command => 1, checkbox => 1, radio => 1,
@@ -7793,6 +7801,18 @@ $Element->{$HTML_NS}->{command} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    
+    unless ($element_state->{has_label}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'label',
+                         level => $self->{level}->{must});
+    }
+    
+    $HTMLEmptyChecker{check_end}->(@_);
+  }, # check_end
 }; # command
 
 $Element->{$HTML_NS}->{bb} = {
@@ -8165,3 +8185,16 @@ XXX nobr/wbr/bgsound/multicol FEATURE_HTML5_OBSOLETE
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 
 1;
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
