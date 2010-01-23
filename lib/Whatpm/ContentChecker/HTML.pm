@@ -3889,28 +3889,90 @@ $Element->{$HTML_NS}->{time} = {
   }, # check_end
 }; # time
 
-$Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the value is to include it as contents of the element"
-## TODO: value inequalities (HTML5 revision 1463)
-## TODO: content checking
-## TODO: content or value must contain number (rev 2053)
+## XXX labelable element
+$Element->{$HTML_NS}->{meter} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_WD,
+  status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
-    value => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
-    min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
-    low => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
-    high => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
-    max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
-    optimum => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+    form => $HTMLFormAttrChecker,
+    high => sub { 1 }, ## checked in |check_attrs2|
+    low => sub { 1 }, ## checked in |check_attrs2|
+    max => sub { 1 }, ## checked in |check_attrs2|
+    min => sub { 1 }, ## checked in |check_attrs2|
+    optimum => sub { 1 }, ## checked in |check_attrs2|
+    value => sub { 1 }, ## checked in |check_attrs2|
   }, {
     %HTMLAttrStatus,
-    high => FEATURE_HTML5_DEFAULT,
-    low => FEATURE_HTML5_DEFAULT,
-    max => FEATURE_HTML5_DEFAULT,
-    min => FEATURE_HTML5_DEFAULT,
-    optimum => FEATURE_HTML5_DEFAULT,
-    value => FEATURE_HTML5_DEFAULT,
+    form => FEATURE_HTML5_LC,
+    high => FEATURE_HTML5_LC,
+    low => FEATURE_HTML5_LC,
+    max => FEATURE_HTML5_LC,
+    min => FEATURE_HTML5_LC,
+    optimum => FEATURE_HTML5_LC,
+    value => FEATURE_HTML5_LC,
   }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my %attr;
+    my %value = (
+        min => 0,
+        max => 1,
+        value => 0,
+    );
+    for my $attr_name (qw(high low max min optimum value)) {
+      $attr{$attr_name} = $item->{node}->get_attribute_node_ns
+          (undef, $attr_name);
+      if ($attr{$attr_name}) {
+        $GetHTMLFloatingPointNumberAttrChecker->(sub {
+          $value{$attr_name} = $_[0];
+          return 1;
+        })->($self, $attr{$attr_name});
+      }
+    }
+    
+    unless ($attr{value}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'value',
+                         level => $self->{level}->{must});
+    }
+
+    $value{low} = $value{min} unless defined $value{low};
+    $value{high} = $value{max} unless defined $value{high};
+    $value{optimum} = ($value{min} + $value{max}) / 2
+        unless defined $value{optimum};
+    
+    for my $attr_name (qw(value low high optimum)) {
+      next unless $attr{$attr_name};
+
+      unless ($value{min} <= $value{$attr_name}) {
+        $self->{onerror}->(node => $attr{$attr_name},
+                           type => 'meter:out of range:min',
+                           text => $attr_name,
+                           value => $value{min},
+                           level => $self->{level}->{must});
+      }
+      
+      unless ($value{$attr_name} <= $value{max}) {
+        $self->{onerror}->(node => $attr{$attr_name},
+                           type => 'meter:out of range:max',
+                           text => $attr_name,
+                           value => $value{max},
+                           level => $self->{level}->{must});
+      }
+    }
+
+    if ($attr{low} and $attr{high}) {
+      unless ($value{low} <= $value{high}) {
+        $self->{onerror}->(node => $attr{low},
+                           type => 'meter:out of range:high',
+                           value => $value{high},
+                           level => $self->{level}->{must});
+      }
+    }
+
+ }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {$HTML_NS => {meter => 1}});
@@ -3921,29 +3983,11 @@ $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the va
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
 
-    ## XXX Work in progress
-
-    my $tc = $item->{node}->text_content;
-    my $n1;
-    my $denominator;
-    my $n2;
-    if ($tc =~ s/^([0-9.]+)//) {
-      $n1 = $1;
-
-      if ($tc =~ s/^[^0-9.]+([0-9.]+)//) {
-        $n2 = $1;
-      } elsif ($tc =~ s/^([\x{0025}\x{066A}\x{FE6A}\x{FF05}\x{2030}\x{2031}])//) {
-        $denominator = $1;
-      }
-    }
-
-    if ($tc =~ /[0-9.]/) {
-      undef $n1;
-      undef $n2;
-    }
-
     $HTMLPhrasingContentChecker{check_end}->(@_);
   }, # check_end
+
+  ## XXX "Authors are encouraged ... textual representation" - Add a
+  ## note in significant text warning's documentation.
 }; # meter
 
 # XXX labelable

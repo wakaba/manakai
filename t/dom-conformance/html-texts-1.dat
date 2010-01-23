@@ -1280,6 +1280,7 @@
 <meter value="111" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;meter:out of range:max;value;m
 
 #data
 <meter value="0001" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1295,11 +1296,13 @@
 <meter value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;meter:out of range:min;value;m
 
 #data
 <meter value="-1000" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;meter:out of range:min;value;m
 
 #data
 <meter value="-0" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1320,6 +1323,7 @@
 <meter value="1.1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;meter:out of range:max;value;m
 
 #data
 <meter value=".1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1420,73 +1424,208 @@
 <meter min="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter;attribute missing;value;m
 
 #data
 <meter min="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/meter/@min;float:syntax error;m
+/meter;attribute missing;value;m
 /meter;no significant content;s
+/meter/@min;float:syntax error;m
 
 #data
 <meter low="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter;attribute missing;value;m
+/meter/@low;meter:out of range:max;low;m
 
 #data
 <meter low="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@low;float:syntax error;m
 /meter;no significant content;s
+/meter;attribute missing;value;m
 
 #data
 <meter high="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter;attribute missing;value;m
+/meter/@high;meter:out of range:max;high;m
 
 #data
 <meter high="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@high;float:syntax error;m
+/meter;attribute missing;value;m
 /meter;no significant content;s
 
 #data
 <meter max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter;attribute missing;value;m
 
 #data
 <meter max="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@max;float:syntax error;m
 /meter;no significant content;s
+/meter;attribute missing;value;m
 
 #data
 <meter optimum="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter;attribute missing;value;m
+/meter/@optimum;meter:out of range:max;optimum;m
 
 #data
 <meter optimum="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter/@optimum;float:syntax error;m
+/meter;attribute missing;value;m
 /meter;no significant content;s
 
 #data
 <meter min="43" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter;attribute missing;value;m
 
 #data
 <meter value="43" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meter;no significant content;s
+/meter/@value;meter:out of range:max;value;m
 
 #data
 <meter xmlns="http://www.w3.org/1999/xhtml">
   <meter>0.1</meter>
 </meter>
 #errors
+/meter;attribute missing;value;m
 /meter/meter;element not allowed:minus;m
+/meter/meter;attribute missing;value;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="10" value="3"
+>a</meter>
+#errors
+/meter/@value;meter:out of range:min;value;m
+/meter/@value;meter:out of range:max;value;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="-20" value="-10"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    value="3" max="10"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    value="3" max="2"
+>a</meter>
+#errors
+/meter/@value;meter:out of range:max;value;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    low="3" max="7" value="1"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="2" low="3" max="10" value="2"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="2" low="1" max="10" value="2"
+>a</meter>
+#errors
+/meter/@low;meter:out of range:min;low;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="2" low="5" value="2" max="3"
+>a</meter>
+#errors
+/meter/@low;meter:out of range:max;low;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    high="3" max="7" value="1"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="0.002" high="3" value="1" max="1200"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="0.002" high="-3" value="1"
+>a</meter>
+#errors
+/meter/@high;meter:out of range:min;high;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="0.002" high="3" value="1"
+>a</meter>
+#errors
+/meter/@high;meter:out of range:max;high;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="0.002" low="2" high="3" value="1" max="200"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="0.002" low="20" high="3" value="1" max="200"
+>a</meter>
+#errors
+/meter/@low;meter:out of range:high;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    min="0.5" optimum="3" max="7" value="1"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    optimum="3" max="7" value="1"
+>a</meter>
+#errors
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    optimum="-9" max="7" value="1"
+>a</meter>
+#errors
+/meter/@optimum;meter:out of range:min;optimum;m
+
+#data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    optimum="9" max="7" value="1"
+>a</meter>
+#errors
+/meter/@optimum;meter:out of range:max;optimum;m
 
 #data
 <progress max="2" xmlns="http://www.w3.org/1999/xhtml"/>

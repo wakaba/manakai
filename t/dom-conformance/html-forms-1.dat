@@ -952,6 +952,30 @@ disabled="">z</output>
 #errors
 
 #data
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    form=""
+    value="0">x</meter>
+#errors
+/meter/@form;no referenced form;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml" id="a">
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    value="2" max="3"
+    form="a">a</meter>
+</form>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">b</form>
+<meter xmlns="http://www.w3.org/1999/xhtml"
+    value="2" max="3"
+    form="a">a</meter>
+</div>
+#errors
+
+#data
 <form xmlns="http://www.w3.org/1999/xhtml"
     action=""
     accept="">x</form>
