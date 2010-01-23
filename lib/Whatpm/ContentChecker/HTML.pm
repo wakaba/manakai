@@ -173,6 +173,9 @@ sub FEATURE_HTML32_REC_OBSOLETE () {
 sub FEATURE_RFC2659 () { ## Experimental RFC
   Whatpm::ContentChecker::FEATURE_STATUS_CR
 }
+## NOTE: Where RFC 2659 allows additional attributes is unclear.
+## We added them only to |a|.  |link| and |form| might also allow them
+## in theory.
 
 ## NOTE: HTML 2.x - diff from HTML 2.0 and not in newer versions.
 sub FEATURE_HTML2X_RFC () { ## Proposed Standard, obsolete
@@ -1837,12 +1840,18 @@ my %HTMLTransparentChecker = %HTMLFlowContentChecker;
 ## ISSUE: Significant content rule should be applied to transparent element
 ## with parent?
 
+# ------ Elements ------
+
 our $Element;
 our $ElementDefault;
+
+# ---- Default HTML elements ----
 
 $Element->{$HTML_NS}->{''} = {
   %HTMLChecker,
 };
+
+# ---- The root element ----
 
 $Element->{$HTML_NS}->{html} = {
   status => FEATURE_HTML5_REC,
@@ -1948,6 +1957,8 @@ $Element->{$HTML_NS}->{html} = {
     $HTMLChecker{check_end}->(@_);
   },
 };
+
+# ---- Document metadata ----
 
 $Element->{$HTML_NS}->{head} = {
   status => FEATURE_HTML5_REC,
@@ -2102,6 +2113,20 @@ $Element->{$HTML_NS}->{base} = {
     })->($self, $item, $element_state);
   },
 };
+
+$Element->{$HTML_NS}->{basefont} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: color, face, size
+  }, {
+    %HTMLAttrStatus,
+    color => FEATURE_M12N10_REC_DEPRECATED,
+    face => FEATURE_M12N10_REC_DEPRECATED,
+    id => FEATURE_HTML5_REC,
+    size => FEATURE_M12N10_REC_DEPRECATED,
+  }),
+}; # basefont
 
 $Element->{$HTML_NS}->{link} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -2639,6 +2664,289 @@ $Element->{$HTML_NS}->{style} = {
 }; # style
 ## ISSUE: Relationship to significant content check?
 
+# ---- Scripting ----
+
+$Element->{$HTML_NS}->{script} = {
+  %HTMLChecker,
+  status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    charset => sub {
+      my ($self, $attr) = @_;
+
+      unless ($attr->owner_element->has_attribute_ns (undef, 'src')) {
+        $self->{onerror}->(type => 'attribute not allowed',
+                           node => $attr,
+                           level => $self->{level}->{must});
+      }
+
+      ## XXXresource: MUST match the charset of the referenced
+      ## resource (HTML5 revision 2967).
+
+      $HTMLCharsetChecker->($attr->value, @_);
+    },
+    language => sub {}, ## NOTE: No syntax constraint according to HTML4.
+      src => $HTMLURIAttrChecker, ## TODO: pointed resource MUST be in type of type="" (resource error)
+      defer => $GetHTMLBooleanAttrChecker->('defer'),
+      async => $GetHTMLBooleanAttrChecker->('async'),
+      type => $HTMLIMTAttrChecker, ## TODO: MUST NOT: |charset=""| parameter
+  }, {
+    %HTMLAttrStatus,
+    async => FEATURE_HTML5_WD,
+    charset => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    defer => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    event => FEATURE_HTML4_REC_RESERVED,
+    for => FEATURE_HTML4_REC_RESERVED,
+    href => FEATURE_RDFA_REC,
+    id => FEATURE_HTML5_REC,
+    language => FEATURE_HTML5_OBSOLETE, # XXX allowed in some cases
+    src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+  }),
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my $el = $item->{node};
+    if ($el->has_attribute_ns (undef, 'defer') and
+        not $el->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $el,
+                         type => 'attribute missing',
+                         text => 'src',
+                         level => $self->{level}->{must});
+    }
+  },
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    if ($item->{node}->has_attribute_ns (undef, 'src')) {
+      $element_state->{inline_documentation_only} = 1;
+    } else {
+      ## NOTE: No content model conformance in HTML5 spec.
+      my $type = $item->{node}->get_attribute_ns (undef, 'type');
+      my $language = $item->{node}->get_attribute_ns (undef, 'language');
+      if ((defined $type and $type eq '') or
+          (defined $language and $language eq '')) {
+        $type = 'text/javascript';
+      } elsif (defined $type) {
+        #
+      } elsif (defined $language) {
+        $type = 'text/' . $language;
+      } else {
+        $type = 'text/javascript';
+      }
+
+      if ($type =~ m[\A(?>(?>\x0D\x0A)?[\x09\x20])*([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+)(?>(?>\x0D\x0A)?[\x09\x20])*/(?>(?>\x0D\x0A)?[\x09\x20])*([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+)(?>(?>\x0D\x0A)?[\x09\x20])*(?>;|\z)]) {
+        $type = "$1/$2";
+        $type =~ tr/A-Z/a-z/; ## NOTE: ASCII case-insensitive
+        ## TODO: Though we strip prameter here, it should not be ignored for the purpose of conformance checking...
+      }
+      $element_state->{script_type} = $type;
+    }
+
+    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+
+    $element_state->{text} = '';
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } else {
+      if ($element_state->{inline_documentation_only}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:empty',
+                           level => $self->{level}->{must});
+      }
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    $element_state->{text} .= $child_node->data;
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    if ($element_state->{inline_documentation_only}) {
+      if (length $element_state->{text}) {
+        $self->{onsubdoc}->({s => $element_state->{text},
+                             container_node => $item->{node},
+                             media_type => 'text/x-script-inline-documentation',
+                             is_char_string => 1});
+      }
+    } else {
+      if ($element_state->{script_type} =~ m![+/][Xx][Mm][Ll]\z!) {
+        ## NOTE: XML content should be checked by THIS instance of checker
+        ## as part of normal tree validation.
+        $self->{onerror}->(node => $item->{node},
+                           type => 'XML script lang',
+                           text => $element_state->{script_type},
+                           level => $self->{level}->{uncertain});
+        ## ISSUE: Should we raise some kind of error for
+        ## <script type="text/xml">aaaaa</script>?
+        ## NOTE: ^^^ This is why we throw an "uncertain" error.
+      } else {
+        $self->{onsubdoc}->({s => $element_state->{text},
+                             container_node => $item->{node},
+                             media_type => $element_state->{script_type},
+                             is_char_string => 1});
+      }
+    }
+
+    if (length $element_state->{text}) {
+      $self->{onsubdoc}->({s => $element_state->{text},
+                           container_node => $item->{node},
+                           media_type => 'text/x-script-element-text',
+                           is_char_string => 1});
+    }
+
+    $HTMLChecker{check_end}->(@_);
+  },
+  ## TODO: There MUST be |type| unless the script type is JavaScript. (resource error)
+  ## NOTE: "When used to include script data, the script data must be embedded
+  ## inline, the format of the data must be given using the type attribute,
+  ## and the src attribute must not be specified." - not testable.
+      ## TODO: It would be possible to err <script type=text/plain src=...>
+}; # script
+## ISSUE: Significant check and text child node
+
+## NOTE: When script is disabled.
+$Element->{$HTML_NS}->{noscript} = {
+  %HTMLTransparentChecker,
+  status => FEATURE_HTML5_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    lang => FEATURE_HTML5_REC,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    unless ($item->{node}->owner_document->manakai_is_html) {
+      $self->{onerror}->(node => $item->{node}, type => 'in XML:noscript',
+                         level => $self->{level}->{must});
+    }
+
+    unless ($self->{flag}->{in_head}) {
+      $self->_add_minus_elements ($element_state,
+                                  {$HTML_NS => {noscript => 1}});
+    }
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{flag}->{in_head}) {
+      if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:minus',
+                           level => $self->{level}->{must});
+      } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+        #
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'link') {
+        #
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
+        if ($child_el->has_attribute_ns (undef, 'scoped')) {
+          $self->{onerror}->(node => $child_el,
+                             type => 'element not allowed:head noscript',
+                             level => $self->{level}->{must});
+        }
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'meta') {
+        my $http_equiv_attr
+            = $child_el->get_attribute_node_ns (undef, 'http-equiv');
+        if ($http_equiv_attr) {
+          ## TODO: case
+          if (lc $http_equiv_attr->value eq 'content-type') {
+            $self->{onerror}->(node => $child_el,
+                               type => 'element not allowed:head noscript',
+                               level => $self->{level}->{must});
+          } else {
+            #
+          }
+        } else {
+          $self->{onerror}->(node => $child_el,
+                             type => 'element not allowed:head noscript',
+                             level => $self->{level}->{must});
+        }
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:head noscript',
+                           level => $self->{level}->{must});
+      }
+    } else {
+      $HTMLTransparentChecker{check_child_element}->(@_);
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($self->{flag}->{in_head}) {
+      if ($has_significant) {
+        $self->{onerror}->(node => $child_node,
+                           type => 'character not allowed',
+                           level => $self->{level}->{must});
+      }
+    } else {
+      $HTMLTransparentChecker{check_child_text}->(@_);
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+    if ($self->{flag}->{in_head}) {
+      $HTMLChecker{check_end}->(@_);
+    } else {
+      $HTMLPhrasingContentChecker{check_end}->(@_);
+    }
+  },
+};
+## ISSUE: Scripting is disabled: <head><noscript><html a></noscript></head>
+
+$Element->{$HTML_NS}->{'event-source'} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_LC_DROPPED,
+  check_attrs => $GetHTMLAttrsChecker->({
+    src => $HTMLURIAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    src => FEATURE_HTML5_LC_DROPPED,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+}; # event-source
+
+$Element->{$HTML_NS}->{eventsource} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_DROPPED,
+  check_attrs => $GetHTMLAttrsChecker->({
+    src => $HTMLURIAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    src => FEATURE_HTML5_DROPPED,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+}; # eventsource
+
+# ---- Sections ----
+
 $Element->{$HTML_NS}->{body} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
@@ -2753,28 +3061,6 @@ $Element->{$HTML_NS}->{article} = {
     $HTMLFlowContentChecker{check_end}->(@_);
   }, # check_end
 }; # article
-
-$Element->{$HTML_NS}->{blockquote} = {
-  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  %HTMLFlowContentChecker,
-  check_attrs => $GetHTMLAttrsChecker->({
-    cite => $HTMLURIAttrChecker,
-  }, {
-    %HTMLAttrStatus,
-    %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML2X_RFC,
-    cite => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
-    sdaform => FEATURE_HTML20_RFC,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-  
-    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-};
 
 $Element->{$HTML_NS}->{aside} = {
   status => FEATURE_HTML5_LC,
@@ -2941,6 +3227,8 @@ $Element->{$HTML_NS}->{address} = {
   },
 };
 
+# ---- Grouping content ----
+
 $Element->{$HTML_NS}->{p} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
@@ -2992,6 +3280,68 @@ $Element->{$HTML_NS}->{br} = {
     title => FEATURE_HTML5_REC,
   }),
 }; # br
+
+$Element->{$HTML_NS}->{pre} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    lang => FEATURE_HTML5_REC,
+    sdaform => FEATURE_HTML20_RFC,
+    width => FEATURE_HTML5_OBSOLETE,
+  }),
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+  
+    ## TODO: Flag to enable/disable IDL checking?
+    my $class = $item->{node}->get_attribute_ns (undef, 'class');
+    if (defined $class and
+        $class =~ /\bidl(?>-code)?\b/) { ## TODO: use classList.has
+      ## NOTE: pre.idl: WHATWG, XHR, Selectors API, CSSOM specs
+      ## NOTE: pre.code > code.idl-code: WebIDL spec
+      ## NOTE: pre.idl-code: DOM1 spec
+      ## NOTE: div.idl-code > pre: DOM, ProgressEvent specs
+      ## NOTE: pre.schema: ReSpec-generated specs
+      $self->{onsubdoc}->({s => $item->{node}->text_content,
+                           container_node => $item->{node},
+                           media_type => 'text/x-webidl',
+                           is_char_string => 1});
+    }
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  },
+};
+
+## XXX xmp FEATURE_HTML5_OBSOLETE
+## XXX listing FEAUTRE_HTML5_OBSOLETE
+## XXX plaintext FEATURE_HTML5_OBSOLETE
+## TODO: ^^^ lang, dir, id, class [HTML 2.x] sdaform [HTML 2.0]
+## xmp, listing sdapref[HTML2,0]
+
+$Element->{$HTML_NS}->{blockquote} = {
+  status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  %HTMLFlowContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
+    cite => $HTMLURIAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    align => FEATURE_HTML2X_RFC,
+    cite => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_REC,
+    sdaform => FEATURE_HTML20_RFC,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+  
+    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+};
 
 $Element->{$HTML_NS}->{dialog} = {
   status => FEATURE_HTML5_DROPPED,
@@ -3062,40 +3412,6 @@ $Element->{$HTML_NS}->{dialog} = {
     $HTMLChecker{check_end}->(@_);
   },
 }; # dialog
-
-$Element->{$HTML_NS}->{pre} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-  }, {
-    %HTMLAttrStatus,
-    %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-    sdaform => FEATURE_HTML20_RFC,
-    width => FEATURE_HTML5_OBSOLETE,
-  }),
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-  
-    ## TODO: Flag to enable/disable IDL checking?
-    my $class = $item->{node}->get_attribute_ns (undef, 'class');
-    if (defined $class and
-        $class =~ /\bidl(?>-code)?\b/) { ## TODO: use classList.has
-      ## NOTE: pre.idl: WHATWG, XHR, Selectors API, CSSOM specs
-      ## NOTE: pre.code > code.idl-code: WebIDL spec
-      ## NOTE: pre.idl-code: DOM1 spec
-      ## NOTE: div.idl-code > pre: DOM, ProgressEvent specs
-      ## NOTE: pre.schema: ReSpec-generated specs
-      $self->{onsubdoc}->({s => $item->{node}->text_content,
-                           container_node => $item->{node},
-                           media_type => 'text/x-webidl',
-                           is_char_string => 1});
-    }
-
-    $HTMLPhrasingContentChecker{check_end}->(@_);
-  },
-};
 
 $Element->{$HTML_NS}->{ol} = {
   %HTMLChecker,
@@ -3384,6 +3700,68 @@ $Element->{$HTML_NS}->{dd} = {
   }),
 };
 
+$Element->{$HTML_NS}->{div} = {
+  %HTMLFlowContentChecker,
+  status => FEATURE_HTML5_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    align => FEATURE_HTML5_OBSOLETE,
+    datafld => FEATURE_HTML4_REC_RESERVED,
+    dataformatas => FEATURE_HTML4_REC_RESERVED,
+    datasrc => FEATURE_HTML4_REC_RESERVED,
+    lang => FEATURE_HTML5_REC,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+};
+
+$Element->{$HTML_NS}->{center} = {
+  %HTMLFlowContentChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    lang => FEATURE_HTML5_REC,
+  }),
+}; # center
+
+$Element->{$HTML_NS}->{font} = {
+  %HTMLTransparentChecker,
+  status => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    ## TODO: HTML4 |size|, |color|, |face|
+  }, {
+    %HTMLAttrStatus,
+    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    color => FEATURE_M12N10_REC_DEPRECATED,
+    dir => FEATURE_HTML5_REC,
+    face => FEATURE_M12N10_REC_DEPRECATED,
+    id => FEATURE_HTML5_REC,
+    lang => FEATURE_HTML5_REC,
+    size => FEATURE_M12N10_REC_DEPRECATED,
+    style => FEATURE_HTML5_REC,
+    title => FEATURE_HTML5_REC,
+  }),
+  ## NOTE: When the |font| element was defined in the HTML5 specification,
+  ## it is allowed only in a document with the WYSIWYG signature.  The
+  ## checker does not check whether there is the signature, since the
+  ## signature is dropped, too, and has never been implemented.  (In addition,
+  ## for any |font| element an "element not defined" error is raised anyway,
+  ## such that we don't have to raise an additional error.)
+}; # font
+
+# ---- Text-level semantics ----
+
 $Element->{$HTML_NS}->{a} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -3507,44 +3885,6 @@ $Element->{$HTML_NS}->{a} = {
   },
 };
 
-$Element->{$HTML_NS}->{q} = {
-  status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  %HTMLPhrasingContentChecker,
-  check_attrs => $GetHTMLAttrsChecker->({
-    cite => $HTMLURIAttrChecker,
-  }, {
-    %HTMLAttrStatus,
-    %HTMLM12NXHTML2CommonAttrStatus,
-    cite => FEATURE_HTML5_AT_RISK | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
-    sdapref => FEATURE_HTML2X_RFC,
-    sdasuff => FEATURE_HTML2X_RFC,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-};
-## TODO: "Quotation punctuation (such as quotation marks), if any, must be
-## placed inside the <code>q</code> element."  Though we cannot test the
-## element against this requirement since it incluides a semantic bit,
-## it might be possible to inform of the existence of quotation marks OUTSIDE
-## the |q| element.
-
-$Element->{$HTML_NS}->{cite} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
-    %HTMLAttrStatus,
-    %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-    sdaform => FEATURE_HTML20_RFC,
-  }),
-};
-
 $Element->{$HTML_NS}->{em} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
@@ -3587,10 +3927,43 @@ $Element->{$HTML_NS}->{big} = {
   }),
 };
 
-$Element->{$HTML_NS}->{mark} = {
-  status => FEATURE_HTML5_WD,
+$Element->{$HTML_NS}->{cite} = {
   %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    lang => FEATURE_HTML5_REC,
+    sdaform => FEATURE_HTML20_RFC,
+  }),
 };
+
+$Element->{$HTML_NS}->{q} = {
+  status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+  %HTMLPhrasingContentChecker,
+  check_attrs => $GetHTMLAttrsChecker->({
+    cite => $HTMLURIAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    cite => FEATURE_HTML5_AT_RISK | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+    lang => FEATURE_HTML5_REC,
+    sdapref => FEATURE_HTML2X_RFC,
+    sdasuff => FEATURE_HTML2X_RFC,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+};
+## TODO: "Quotation punctuation (such as quotation marks), if any, must be
+## placed inside the <code>q</code> element."  Though we cannot test the
+## element against this requirement since it incluides a semantic bit,
+## it might be possible to inform of the existence of quotation marks OUTSIDE
+## the |q| element.
 
 $Element->{$HTML_NS}->{dfn} = {
   %HTMLPhrasingContentChecker,
@@ -3889,167 +4262,6 @@ $Element->{$HTML_NS}->{time} = {
   }, # check_end
 }; # time
 
-## XXX labelable element
-$Element->{$HTML_NS}->{meter} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_LC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    form => $HTMLFormAttrChecker,
-    high => sub { 1 }, ## checked in |check_attrs2|
-    low => sub { 1 }, ## checked in |check_attrs2|
-    max => sub { 1 }, ## checked in |check_attrs2|
-    min => sub { 1 }, ## checked in |check_attrs2|
-    optimum => sub { 1 }, ## checked in |check_attrs2|
-    value => sub { 1 }, ## checked in |check_attrs2|
-  }, {
-    %HTMLAttrStatus,
-    form => FEATURE_HTML5_LC,
-    high => FEATURE_HTML5_LC,
-    low => FEATURE_HTML5_LC,
-    max => FEATURE_HTML5_LC,
-    min => FEATURE_HTML5_LC,
-    optimum => FEATURE_HTML5_LC,
-    value => FEATURE_HTML5_LC,
-  }), # check_attrs
-  check_attrs2 => sub {
-    my ($self, $item, $element_state) = @_;
-
-    my %attr;
-    my %value = (
-        min => 0,
-        max => 1,
-        value => 0,
-    );
-    for my $attr_name (qw(high low max min optimum value)) {
-      $attr{$attr_name} = $item->{node}->get_attribute_node_ns
-          (undef, $attr_name);
-      if ($attr{$attr_name}) {
-        $GetHTMLFloatingPointNumberAttrChecker->(sub {
-          $value{$attr_name} = $_[0];
-          return 1;
-        })->($self, $attr{$attr_name});
-      }
-    }
-    
-    unless ($attr{value}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'attribute missing',
-                         text => 'value',
-                         level => $self->{level}->{must});
-    }
-
-    $value{low} = $value{min} unless defined $value{low};
-    $value{high} = $value{max} unless defined $value{high};
-    $value{optimum} = ($value{min} + $value{max}) / 2
-        unless defined $value{optimum};
-    
-    for my $attr_name (qw(value low high optimum)) {
-      next unless $attr{$attr_name};
-
-      unless ($value{min} <= $value{$attr_name}) {
-        $self->{onerror}->(node => $attr{$attr_name},
-                           type => 'meter:out of range:min',
-                           text => $attr_name,
-                           value => $value{min},
-                           level => $self->{level}->{must});
-      }
-      
-      unless ($value{$attr_name} <= $value{max}) {
-        $self->{onerror}->(node => $attr{$attr_name},
-                           type => 'meter:out of range:max',
-                           text => $attr_name,
-                           value => $value{max},
-                           level => $self->{level}->{must});
-      }
-    }
-
-    if ($attr{low} and $attr{high}) {
-      unless ($value{low} <= $value{high}) {
-        $self->{onerror}->(node => $attr{low},
-                           type => 'meter:out of range:high',
-                           value => $value{high},
-                           level => $self->{level}->{must});
-      }
-    }
-
- }, # check_attrs2
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {meter => 1}});
-
-    $HTMLPhrasingContentChecker{check_start}->(@_);
-  }, # check_start
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_remove_minus_elements ($element_state);
-
-    $HTMLPhrasingContentChecker{check_end}->(@_);
-  }, # check_end
-
-  ## XXX "Authors are encouraged ... textual representation" - Add a
-  ## note in significant text warning's documentation.
-}; # meter
-
-# XXX labelable
-$Element->{$HTML_NS}->{progress} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_LC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    form => $HTMLFormAttrChecker,
-    max => sub { }, ## checked in |check_attrs2|
-    value => sub { }, ## checked in |check_attrs2|
-  }, {
-    %HTMLAttrStatus,
-    form => FEATURE_HTML5_LC,
-    max => FEATURE_HTML5_LC,
-    value => FEATURE_HTML5_LC,
-  }), # check_attrs
-  check_attrs2 => sub {
-    my ($self, $item, $element_state) = @_;
-
-    my $max = 1;
-    my $max_attr = $item->{node}->get_attribute_node_ns (undef, 'max');
-    if ($max_attr) {
-      $GetHTMLFloatingPointNumberAttrChecker->(sub {
-        my $num = $_[0];
-        $max = $num;
-        return $num > 0; ## >, not >=
-      })->($self, $max_attr);
-    }
-
-    my $value_attr = $item->{node}->get_attribute_node_ns (undef, 'value');
-    if ($value_attr) {
-      $GetHTMLFloatingPointNumberAttrChecker->(sub {
-        my $num = $_[0];
-
-        unless ($num <= $max) {
-          $self->{onerror}->(node => $value_attr,
-                             type => 'progress value out of range',
-                             value => $max, # XXX document error type
-                             level => $self->{level}->{must});
-        }
-        
-        return $num >= 0; ## >=, not >
-      })->($self, $value_attr);
-    }
-  }, # check_attrs2
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {progress => 1}});
-
-    $HTMLPhrasingContentChecker{check_start}->(@_);
-  }, # check_start
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_remove_minus_elements ($element_state);
-
-    $HTMLPhrasingContentChecker{check_end}->(@_);
-  }, # check_end
-
-  ## XXX "Authors are encouraged ... text inside the element" - Add a
-  ## note in significant text warning's documentation.
-}; # progress
-
 $Element->{$HTML_NS}->{code} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
@@ -4107,20 +4319,6 @@ $Element->{$HTML_NS}->{sub} = {
 
 $Element->{$HTML_NS}->{sup} = $Element->{$HTML_NS}->{sub};
 
-$Element->{$HTML_NS}->{span} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
-    %HTMLAttrStatus,
-    %HTMLM12NXHTML2CommonAttrStatus,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
-    lang => FEATURE_HTML5_REC,
-    sdaform => FEATURE_HTML2X_RFC,
-  }),
-};
-
 # XXX Warning for "authors are encouraged to consider whether other
 # elements might be more applicable"
 $Element->{$HTML_NS}->{i} = {
@@ -4161,30 +4359,9 @@ $Element->{$HTML_NS}->{strike} = $Element->{$HTML_NS}->{s};
 
 $Element->{$HTML_NS}->{u} = $Element->{$HTML_NS}->{s};
 
-$Element->{$HTML_NS}->{bdo} = {
+$Element->{$HTML_NS}->{mark} = {
+  status => FEATURE_HTML5_WD,
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_REC,
-  check_attrs => sub {
-    my ($self, $item, $element_state) = @_;
-    $GetHTMLAttrsChecker->({}, {
-      %HTMLAttrStatus,
-      class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      dir => FEATURE_HTML5_REC,
-      id => FEATURE_HTML5_REC,
-      style => FEATURE_HTML5_REC,
-      title => FEATURE_HTML5_REC,
-      lang => FEATURE_HTML5_REC,
-      sdapref => FEATURE_HTML2X_RFC,
-      sdasuff => FEATURE_HTML2X_RFC,
-    })->($self, $item, $element_state);
-    unless ($item->{node}->has_attribute_ns (undef, 'dir')) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'attribute missing',
-                         text => 'dir',
-                         level => $self->{level}->{must});
-    }
-  },
-  ## ISSUE: The spec does not directly say that |dir| is a enumerated attr.
 };
 
 $Element->{$HTML_NS}->{ruby} = {
@@ -4475,6 +4652,50 @@ $Element->{$HTML_NS}->{rp} = {
   }),
 }; # rp
 
+## XXX CR: rbc rtc @rbspan (M12NXHTML2Common)
+
+$Element->{$HTML_NS}->{bdo} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_REC,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
+    $GetHTMLAttrsChecker->({}, {
+      %HTMLAttrStatus,
+      class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+      dir => FEATURE_HTML5_REC,
+      id => FEATURE_HTML5_REC,
+      style => FEATURE_HTML5_REC,
+      title => FEATURE_HTML5_REC,
+      lang => FEATURE_HTML5_REC,
+      sdapref => FEATURE_HTML2X_RFC,
+      sdasuff => FEATURE_HTML2X_RFC,
+    })->($self, $item, $element_state);
+    unless ($item->{node}->has_attribute_ns (undef, 'dir')) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'dir',
+                         level => $self->{level}->{must});
+    }
+  },
+  ## ISSUE: The spec does not directly say that |dir| is a enumerated attr.
+};
+
+$Element->{$HTML_NS}->{span} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    datafld => FEATURE_HTML4_REC_RESERVED,
+    dataformatas => FEATURE_HTML4_REC_RESERVED,
+    datasrc => FEATURE_HTML4_REC_RESERVED,
+    lang => FEATURE_HTML5_REC,
+    sdaform => FEATURE_HTML2X_RFC,
+  }),
+};
+
+# ---- Edits ----
+
 =pod
 
 ## TODO: 
@@ -4553,6 +4774,8 @@ $Element->{$HTML_NS}->{del} = {
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
+
+# ---- Embedded content ----
 
 $Element->{$HTML_NS}->{figure} = {
   ## Content: dt? & dd
@@ -5532,6 +5755,8 @@ $Element->{$HTML_NS}->{area} = {
   },
 };
 
+# ---- Tabular data ----
+
 $Element->{$HTML_NS}->{table} = {
   %HTMLChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -6019,6 +6244,8 @@ $Element->{$HTML_NS}->{th} = {
   }),
 }; # th
 
+# ---- Forms ----
+
 $Element->{$HTML_NS}->{form} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD | FEATURE_WF2X | FEATURE_M12N10_REC,
@@ -6164,6 +6391,93 @@ $Element->{$HTML_NS}->{fieldset} = {
   ## NOTE: This definition is partially reused by |details| element's
   ## checker.
 };
+
+$Element->{$HTML_NS}->{legend} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+# XXX
+#    align => $GetHTMLEnumeratedAttrChecker->({
+#      top => 1, bottom => 1, left => 1, right => 1,
+#    }),
+    form => $HTMLFormAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    accesskey => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
+    align => FEATURE_HTML5_OBSOLETE,
+    form => FEATURE_HTML5_DROPPED,
+    lang => FEATURE_HTML5_REC,
+  }),
+}; # legend
+
+$Element->{$HTML_NS}->{label} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_REC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    for => sub {
+      my ($self, $attr) = @_;
+      
+      ## NOTE: MUST be an ID of a labelable element.
+      
+      push @{$self->{idref}}, ['labelable', $attr->value, $attr];
+    },
+    form => $HTMLFormAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    accesskey => FEATURE_HTML5_FD | FEATURE_WF2 | FEATURE_M12N10_REC,
+    for => FEATURE_HTML5_REC,
+    form => FEATURE_HTML5_LC,
+    lang => FEATURE_HTML5_REC,
+    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+  }),
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {label => 1}});
+
+    ## If $self->{flag}->{has_label} is true, then there is at least
+    ## an ancestor |label| element.
+
+    ## If $self->{flag}->{has_labelable} is equal to 1, then there is
+    ## an ancestor |label| element with its |for| attribute specified.
+    ## If the value is equal to 2, then there is an ancestor |label|
+    ## element with its |for| attribute unspecified but there is an
+    ## associated form control element.
+
+    $element_state->{has_label_original} = $self->{flag}->{has_label};
+    $element_state->{has_labelable_original} = $self->{flag}->{has_labelable};
+    $element_state->{label_for_original} = $self->{flag}->{label_for};
+
+    $self->{flag}->{has_label} = 1;
+    $self->{flag}->{has_labelable}
+        = $item->{node}->has_attribute_ns (undef, 'for') ? 1 : 0;
+    $self->{flag}->{label_for}
+        = $item->{node}->get_attribute_ns (undef, 'for');
+
+    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+    
+    if ($self->{flag}->{has_labelable} == 1) { # has for="" but no labelable
+      $self->{flag}->{has_labelable}
+          = $element_state->{has_labelable_original};
+    }
+    delete $self->{flag}->{has_label}
+        unless $element_state->{has_label_original};
+    $self->{flag}->{label_for} = $element_state->{label_for_original};
+
+    ## TODO: Warn if no labelable descendant?  <input type=hidden>?
+
+    ## NOTE: |<label for=a><input id=a></label>| is non-conforming.
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  },
+}; # label
 
 $Element->{$HTML_NS}->{input} = {
   %HTMLEmptyChecker,
@@ -6863,74 +7177,6 @@ $Element->{$HTML_NS}->{button} = {
   }, # check_end
 }; # button
 
-$Element->{$HTML_NS}->{label} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    for => sub {
-      my ($self, $attr) = @_;
-      
-      ## NOTE: MUST be an ID of a labelable element.
-      
-      push @{$self->{idref}}, ['labelable', $attr->value, $attr];
-    },
-    form => $HTMLFormAttrChecker,
-  }, {
-    %HTMLAttrStatus,
-    %HTMLM12NXHTML2CommonAttrStatus,
-    accesskey => FEATURE_HTML5_FD | FEATURE_WF2 | FEATURE_M12N10_REC,
-    for => FEATURE_HTML5_REC,
-    form => FEATURE_HTML5_LC,
-    lang => FEATURE_HTML5_REC,
-    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {label => 1}});
-
-    ## If $self->{flag}->{has_label} is true, then there is at least
-    ## an ancestor |label| element.
-
-    ## If $self->{flag}->{has_labelable} is equal to 1, then there is
-    ## an ancestor |label| element with its |for| attribute specified.
-    ## If the value is equal to 2, then there is an ancestor |label|
-    ## element with its |for| attribute unspecified but there is an
-    ## associated form control element.
-
-    $element_state->{has_label_original} = $self->{flag}->{has_label};
-    $element_state->{has_labelable_original} = $self->{flag}->{has_labelable};
-    $element_state->{label_for_original} = $self->{flag}->{label_for};
-
-    $self->{flag}->{has_label} = 1;
-    $self->{flag}->{has_labelable}
-        = $item->{node}->has_attribute_ns (undef, 'for') ? 1 : 0;
-    $self->{flag}->{label_for}
-        = $item->{node}->get_attribute_ns (undef, 'for');
-
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_remove_minus_elements ($element_state);
-    
-    if ($self->{flag}->{has_labelable} == 1) { # has for="" but no labelable
-      $self->{flag}->{has_labelable}
-          = $element_state->{has_labelable_original};
-    }
-    delete $self->{flag}->{has_label}
-        unless $element_state->{has_label_original};
-    $self->{flag}->{label_for} = $element_state->{label_for_original};
-
-    ## TODO: Warn if no labelable descendant?  <input type=hidden>?
-
-    ## NOTE: |<label for=a><input id=a></label>| is non-conforming.
-
-    $HTMLPhrasingContentChecker{check_end}->(@_);
-  },
-}; # label
-
 $Element->{$HTML_NS}->{select} = {
   %HTMLChecker,
   ## ISSUE: HTML5 has no requirement like these:
@@ -7382,6 +7628,167 @@ $Element->{$HTML_NS}->{output} = {
   }),
 };
 
+# XXX labelable
+$Element->{$HTML_NS}->{progress} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_LC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    form => $HTMLFormAttrChecker,
+    max => sub { }, ## checked in |check_attrs2|
+    value => sub { }, ## checked in |check_attrs2|
+  }, {
+    %HTMLAttrStatus,
+    form => FEATURE_HTML5_LC,
+    max => FEATURE_HTML5_LC,
+    value => FEATURE_HTML5_LC,
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my $max = 1;
+    my $max_attr = $item->{node}->get_attribute_node_ns (undef, 'max');
+    if ($max_attr) {
+      $GetHTMLFloatingPointNumberAttrChecker->(sub {
+        my $num = $_[0];
+        $max = $num;
+        return $num > 0; ## >, not >=
+      })->($self, $max_attr);
+    }
+
+    my $value_attr = $item->{node}->get_attribute_node_ns (undef, 'value');
+    if ($value_attr) {
+      $GetHTMLFloatingPointNumberAttrChecker->(sub {
+        my $num = $_[0];
+
+        unless ($num <= $max) {
+          $self->{onerror}->(node => $value_attr,
+                             type => 'progress value out of range',
+                             value => $max, # XXX document error type
+                             level => $self->{level}->{must});
+        }
+        
+        return $num >= 0; ## >=, not >
+      })->($self, $value_attr);
+    }
+  }, # check_attrs2
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {progress => 1}});
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
+  }, # check_start
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  }, # check_end
+
+  ## XXX "Authors are encouraged ... text inside the element" - Add a
+  ## note in significant text warning's documentation.
+}; # progress
+
+## XXX labelable element
+$Element->{$HTML_NS}->{meter} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_LC,
+  check_attrs => $GetHTMLAttrsChecker->({
+    form => $HTMLFormAttrChecker,
+    high => sub { 1 }, ## checked in |check_attrs2|
+    low => sub { 1 }, ## checked in |check_attrs2|
+    max => sub { 1 }, ## checked in |check_attrs2|
+    min => sub { 1 }, ## checked in |check_attrs2|
+    optimum => sub { 1 }, ## checked in |check_attrs2|
+    value => sub { 1 }, ## checked in |check_attrs2|
+  }, {
+    %HTMLAttrStatus,
+    form => FEATURE_HTML5_LC,
+    high => FEATURE_HTML5_LC,
+    low => FEATURE_HTML5_LC,
+    max => FEATURE_HTML5_LC,
+    min => FEATURE_HTML5_LC,
+    optimum => FEATURE_HTML5_LC,
+    value => FEATURE_HTML5_LC,
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my %attr;
+    my %value = (
+        min => 0,
+        max => 1,
+        value => 0,
+    );
+    for my $attr_name (qw(high low max min optimum value)) {
+      $attr{$attr_name} = $item->{node}->get_attribute_node_ns
+          (undef, $attr_name);
+      if ($attr{$attr_name}) {
+        $GetHTMLFloatingPointNumberAttrChecker->(sub {
+          $value{$attr_name} = $_[0];
+          return 1;
+        })->($self, $attr{$attr_name});
+      }
+    }
+    
+    unless ($attr{value}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'value',
+                         level => $self->{level}->{must});
+    }
+
+    $value{low} = $value{min} unless defined $value{low};
+    $value{high} = $value{max} unless defined $value{high};
+    $value{optimum} = ($value{min} + $value{max}) / 2
+        unless defined $value{optimum};
+    
+    for my $attr_name (qw(value low high optimum)) {
+      next unless $attr{$attr_name};
+
+      unless ($value{min} <= $value{$attr_name}) {
+        $self->{onerror}->(node => $attr{$attr_name},
+                           type => 'meter:out of range:min',
+                           text => $attr_name,
+                           value => $value{min},
+                           level => $self->{level}->{must});
+      }
+      
+      unless ($value{$attr_name} <= $value{max}) {
+        $self->{onerror}->(node => $attr{$attr_name},
+                           type => 'meter:out of range:max',
+                           text => $attr_name,
+                           value => $value{max},
+                           level => $self->{level}->{must});
+      }
+    }
+
+    if ($attr{low} and $attr{high}) {
+      unless ($value{low} <= $value{high}) {
+        $self->{onerror}->(node => $attr{low},
+                           type => 'meter:out of range:high',
+                           value => $value{high},
+                           level => $self->{level}->{must});
+      }
+    }
+
+ }, # check_attrs2
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_add_minus_elements ($element_state, {$HTML_NS => {meter => 1}});
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
+  }, # check_start
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $self->_remove_minus_elements ($element_state);
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  }, # check_end
+
+  ## XXX "Authors are encouraged ... textual representation" - Add a
+  ## note in significant text warning's documentation.
+}; # meter
+
 $Element->{$HTML_NS}->{isindex} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE,
@@ -7407,284 +7814,7 @@ $Element->{$HTML_NS}->{isindex} = {
   },
 }; # isindex
 
-$Element->{$HTML_NS}->{script} = {
-  %HTMLChecker,
-  status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    charset => sub {
-      my ($self, $attr) = @_;
-
-      unless ($attr->owner_element->has_attribute_ns (undef, 'src')) {
-        $self->{onerror}->(type => 'attribute not allowed',
-                           node => $attr,
-                           level => $self->{level}->{must});
-      }
-
-      ## XXXresource: MUST match the charset of the referenced
-      ## resource (HTML5 revision 2967).
-
-      $HTMLCharsetChecker->($attr->value, @_);
-    },
-    language => sub {}, ## NOTE: No syntax constraint according to HTML4.
-      src => $HTMLURIAttrChecker, ## TODO: pointed resource MUST be in type of type="" (resource error)
-      defer => $GetHTMLBooleanAttrChecker->('defer'),
-      async => $GetHTMLBooleanAttrChecker->('async'),
-      type => $HTMLIMTAttrChecker, ## TODO: MUST NOT: |charset=""| parameter
-  }, {
-    %HTMLAttrStatus,
-    async => FEATURE_HTML5_WD,
-    charset => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    defer => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    event => FEATURE_HTML4_REC_RESERVED,
-    for => FEATURE_HTML4_REC_RESERVED,
-    href => FEATURE_RDFA_REC,
-    id => FEATURE_HTML5_REC,
-    language => FEATURE_HTML5_OBSOLETE, # XXX allowed in some cases
-    src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-  }),
-  check_attrs2 => sub {
-    my ($self, $item, $element_state) = @_;
-
-    my $el = $item->{node};
-    if ($el->has_attribute_ns (undef, 'defer') and
-        not $el->has_attribute_ns (undef, 'src')) {
-      $self->{onerror}->(node => $el,
-                         type => 'attribute missing',
-                         text => 'src',
-                         level => $self->{level}->{must});
-    }
-  },
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    if ($item->{node}->has_attribute_ns (undef, 'src')) {
-      $element_state->{inline_documentation_only} = 1;
-    } else {
-      ## NOTE: No content model conformance in HTML5 spec.
-      my $type = $item->{node}->get_attribute_ns (undef, 'type');
-      my $language = $item->{node}->get_attribute_ns (undef, 'language');
-      if ((defined $type and $type eq '') or
-          (defined $language and $language eq '')) {
-        $type = 'text/javascript';
-      } elsif (defined $type) {
-        #
-      } elsif (defined $language) {
-        $type = 'text/' . $language;
-      } else {
-        $type = 'text/javascript';
-      }
-
-      if ($type =~ m[\A(?>(?>\x0D\x0A)?[\x09\x20])*([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+)(?>(?>\x0D\x0A)?[\x09\x20])*/(?>(?>\x0D\x0A)?[\x09\x20])*([\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+)(?>(?>\x0D\x0A)?[\x09\x20])*(?>;|\z)]) {
-        $type = "$1/$2";
-        $type =~ tr/A-Z/a-z/; ## NOTE: ASCII case-insensitive
-        ## TODO: Though we strip prameter here, it should not be ignored for the purpose of conformance checking...
-      }
-      $element_state->{script_type} = $type;
-    }
-
-    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-
-    $element_state->{text} = '';
-  },
-  check_child_element => sub {
-    my ($self, $item, $child_el, $child_nsuri, $child_ln,
-        $child_is_transparent, $element_state) = @_;
-    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
-      $self->{onerror}->(node => $child_el,
-                         type => 'element not allowed:minus',
-                         level => $self->{level}->{must});
-    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-      #
-    } else {
-      if ($element_state->{inline_documentation_only}) {
-        $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:empty',
-                           level => $self->{level}->{must});
-      }
-    }
-  },
-  check_child_text => sub {
-    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    $element_state->{text} .= $child_node->data;
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    if ($element_state->{inline_documentation_only}) {
-      if (length $element_state->{text}) {
-        $self->{onsubdoc}->({s => $element_state->{text},
-                             container_node => $item->{node},
-                             media_type => 'text/x-script-inline-documentation',
-                             is_char_string => 1});
-      }
-    } else {
-      if ($element_state->{script_type} =~ m![+/][Xx][Mm][Ll]\z!) {
-        ## NOTE: XML content should be checked by THIS instance of checker
-        ## as part of normal tree validation.
-        $self->{onerror}->(node => $item->{node},
-                           type => 'XML script lang',
-                           text => $element_state->{script_type},
-                           level => $self->{level}->{uncertain});
-        ## ISSUE: Should we raise some kind of error for
-        ## <script type="text/xml">aaaaa</script>?
-        ## NOTE: ^^^ This is why we throw an "uncertain" error.
-      } else {
-        $self->{onsubdoc}->({s => $element_state->{text},
-                             container_node => $item->{node},
-                             media_type => $element_state->{script_type},
-                             is_char_string => 1});
-      }
-    }
-
-    if (length $element_state->{text}) {
-      $self->{onsubdoc}->({s => $element_state->{text},
-                           container_node => $item->{node},
-                           media_type => 'text/x-script-element-text',
-                           is_char_string => 1});
-    }
-
-    $HTMLChecker{check_end}->(@_);
-  },
-  ## TODO: There MUST be |type| unless the script type is JavaScript. (resource error)
-  ## NOTE: "When used to include script data, the script data must be embedded
-  ## inline, the format of the data must be given using the type attribute,
-  ## and the src attribute must not be specified." - not testable.
-      ## TODO: It would be possible to err <script type=text/plain src=...>
-}; # script
-## ISSUE: Significant check and text child node
-
-## NOTE: When script is disabled.
-$Element->{$HTML_NS}->{noscript} = {
-  %HTMLTransparentChecker,
-  status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
-    %HTMLAttrStatus,
-    %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    unless ($item->{node}->owner_document->manakai_is_html) {
-      $self->{onerror}->(node => $item->{node}, type => 'in XML:noscript',
-                         level => $self->{level}->{must});
-    }
-
-    unless ($self->{flag}->{in_head}) {
-      $self->_add_minus_elements ($element_state,
-                                  {$HTML_NS => {noscript => 1}});
-    }
-
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-  check_child_element => sub {
-    my ($self, $item, $child_el, $child_nsuri, $child_ln,
-        $child_is_transparent, $element_state) = @_;
-    if ($self->{flag}->{in_head}) {
-      if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
-        $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:minus',
-                           level => $self->{level}->{must});
-      } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-        #
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'link') {
-        #
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
-        if ($child_el->has_attribute_ns (undef, 'scoped')) {
-          $self->{onerror}->(node => $child_el,
-                             type => 'element not allowed:head noscript',
-                             level => $self->{level}->{must});
-        }
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'meta') {
-        my $http_equiv_attr
-            = $child_el->get_attribute_node_ns (undef, 'http-equiv');
-        if ($http_equiv_attr) {
-          ## TODO: case
-          if (lc $http_equiv_attr->value eq 'content-type') {
-            $self->{onerror}->(node => $child_el,
-                               type => 'element not allowed:head noscript',
-                               level => $self->{level}->{must});
-          } else {
-            #
-          }
-        } else {
-          $self->{onerror}->(node => $child_el,
-                             type => 'element not allowed:head noscript',
-                             level => $self->{level}->{must});
-        }
-      } else {
-        $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:head noscript',
-                           level => $self->{level}->{must});
-      }
-    } else {
-      $HTMLTransparentChecker{check_child_element}->(@_);
-    }
-  },
-  check_child_text => sub {
-    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($self->{flag}->{in_head}) {
-      if ($has_significant) {
-        $self->{onerror}->(node => $child_node,
-                           type => 'character not allowed',
-                           level => $self->{level}->{must});
-      }
-    } else {
-      $HTMLTransparentChecker{check_child_text}->(@_);
-    }
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_remove_minus_elements ($element_state);
-    if ($self->{flag}->{in_head}) {
-      $HTMLChecker{check_end}->(@_);
-    } else {
-      $HTMLPhrasingContentChecker{check_end}->(@_);
-    }
-  },
-};
-## ISSUE: Scripting is disabled: <head><noscript><html a></noscript></head>
-
-$Element->{$HTML_NS}->{'event-source'} = {
-  %HTMLEmptyChecker,
-  status => FEATURE_HTML5_LC_DROPPED,
-  check_attrs => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker,
-  }, {
-    %HTMLAttrStatus,
-    src => FEATURE_HTML5_LC_DROPPED,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-}; # event-source
-
-$Element->{$HTML_NS}->{eventsource} = {
-  %HTMLEmptyChecker,
-  status => FEATURE_HTML5_DROPPED,
-  check_attrs => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker,
-  }, {
-    %HTMLAttrStatus,
-    src => FEATURE_HTML5_DROPPED,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-}; # eventsource
+# ---- Interactive elements ----
 
 $Element->{$HTML_NS}->{details} = {
   ## Content: dt?, dd
@@ -7970,6 +8100,10 @@ $Element->{$HTML_NS}->{menu} = {
   }, # check_end
 }; # menu
 
+# XXXX device
+
+# ---- Data templates ----
+
 $Element->{$HTML_NS}->{datatemplate} = {
   %HTMLChecker,
   status => FEATURE_HTML5_DROPPED,
@@ -8057,98 +8191,11 @@ $Element->{$HTML_NS}->{nest} = {
   }),
 };
 
-$Element->{$HTML_NS}->{legend} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  check_attrs => $GetHTMLAttrsChecker->({
-# XXX
-#    align => $GetHTMLEnumeratedAttrChecker->({
-#      top => 1, bottom => 1, left => 1, right => 1,
-#    }),
-    form => $HTMLFormAttrChecker,
-  }, {
-    %HTMLAttrStatus,
-    %HTMLM12NCommonAttrStatus,
-    accesskey => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
-    align => FEATURE_HTML5_OBSOLETE,
-    form => FEATURE_HTML5_DROPPED,
-    lang => FEATURE_HTML5_REC,
-  }),
-}; # legend
+# ---- Microdata ----
 
-$Element->{$HTML_NS}->{div} = {
-  %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    align => $GetHTMLEnumeratedAttrChecker->({
-      left => 1, center => 1, right => 1, justify => 1,
-    }),
-  }, {
-    %HTMLAttrStatus,
-    %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
-    lang => FEATURE_HTML5_REC,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
+# XXXX
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-};
-
-$Element->{$HTML_NS}->{center} = {
-  %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
-    %HTMLAttrStatus,
-    %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-}; # center
-
-$Element->{$HTML_NS}->{font} = {
-  %HTMLTransparentChecker,
-  status => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
-  check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: HTML4 |size|, |color|, |face|
-  }, {
-    %HTMLAttrStatus,
-    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    color => FEATURE_M12N10_REC_DEPRECATED,
-    dir => FEATURE_HTML5_REC,
-    face => FEATURE_M12N10_REC_DEPRECATED,
-    id => FEATURE_HTML5_REC,
-    lang => FEATURE_HTML5_REC,
-    size => FEATURE_M12N10_REC_DEPRECATED,
-    style => FEATURE_HTML5_REC,
-    title => FEATURE_HTML5_REC,
-  }),
-  ## NOTE: When the |font| element was defined in the HTML5 specification,
-  ## it is allowed only in a document with the WYSIWYG signature.  The
-  ## checker does not check whether there is the signature, since the
-  ## signature is dropped, too, and has never been implemented.  (In addition,
-  ## for any |font| element an "element not defined" error is raised anyway,
-  ## such that we don't have to raise an additional error.)
-}; # font
-
-$Element->{$HTML_NS}->{basefont} = {
-  %HTMLEmptyChecker,
-  status => FEATURE_HTML5_OBSOLETE,
-  check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: color, face, size
-  }, {
-    %HTMLAttrStatus,
-    color => FEATURE_M12N10_REC_DEPRECATED,
-    face => FEATURE_M12N10_REC_DEPRECATED,
-    id => FEATURE_HTML5_REC,
-    size => FEATURE_M12N10_REC_DEPRECATED,
-  }),
-}; # basefont
+# ---- Frames ----
 
 $Element->{$HTML_NS}->{frameset} = {
   %HTMLEmptyChecker, # XXX
@@ -8187,42 +8234,27 @@ $Element->{$HTML_NS}->{frameset} = {
 ## frameborder longdesc marginheight marginwidth noresize scrolling src name(deprecated) class,id,title,style(x10)
 ## noframes FEATURE_HTML5_OBSOLETE Common, lang(xhtml10)
 
-## TODO: CR: rbc rtc @rbspan (M12NXHTML2Common)
-
-## XXX xmp FEATURE_HTML5_OBSOLETE
-## XXX listing FEAUTRE_HTML5_OBSOLETE
-## XXX plaintext FEATURE_HTML5_OBSOLETE
-## TODO: ^^^ lang, dir, id, class [HTML 2.x] sdaform [HTML 2.0]
-## xmp, listing sdapref[HTML2,0]
+## XXX HTML 2.0 nextid @n FEATURE_HTML5_OBSOLETE
 ## XXX noembed FEATURE_HTML5_OBSOLETE
 ## XXX blink FEATURE_HTML5_OBSOLETE
 ## XXX spacer FEATURE_HTML5_OBSOLETE
-
-=pod
-
-HTML 2.0 nextid @n FEATURE_HTML5_OBSOLETE
-
-RFC 2659: CERTS CRYPTOPTS 
-
-ISO-HTML: pre-html, divN
-
-XHTML2: blockcode (Common), h (Common), separator (Common), l (Common),
-di (Common), nl (Common), handler (Common, type), standby (Common),
-summary (Common)
-
-Access & XHTML2: access (LC)
-
-XML Events & XForms (for XHTML2 support; very, very low priority)
-
-# XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart
-
-XXX nobr/wbr/bgsound/multicol FEATURE_HTML5_OBSOLETE
-
-=cut
-
-## NOTE: Where RFC 2659 allows additional attributes is unclear.
-## We added them only to |a|.  |link| and |form| might also allow them
-## in theory.
+## XXX RFC 2659: CERTS CRYPTOPTS 
+## XXX ISO-HTML: pre-html
+## XXX ISO-HTML: divN
+## XXX XHTML2: blockcode (Common)
+## XXX XHTML2 h (Common)
+## XXX XHTML2 separator (Common)
+## XXX XHTML2 l (Common)
+## XXX XHTML2 di (Common)
+## XXX XHTML2 nl (Common)
+## XXX XHTML2 handler (Common, type)
+## XXX XHTML2 standby (Common)
+## XXX XHTML2 summary (Common)
+## XXX Access & XHTML2: access (LC)
+## XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart
+## XXX nobr/wbr FEATURE_HTML5_OBSOLETE
+## XXX bgsound FEATURE_HTML5_OBSOLETE
+## XXX multicol FEATURE_HTML5_OBSOLETE
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 
