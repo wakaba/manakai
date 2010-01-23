@@ -928,6 +928,30 @@ disabled="">z</output>
 #errors
 
 #data
+<progress xmlns="http://www.w3.org/1999/xhtml"
+    form=""
+    value="2" max="3">x</progress>
+#errors
+/progress/@form;no referenced form;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml" id="a">
+<progress xmlns="http://www.w3.org/1999/xhtml"
+    value="2" max="3"
+    form="a">a</progress>
+</form>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<form id="a">b</form>
+<progress xmlns="http://www.w3.org/1999/xhtml"
+    value="2" max="3"
+    form="a">a</progress>
+</div>
+#errors
+
+#data
 <form xmlns="http://www.w3.org/1999/xhtml"
     action=""
     accept="">x</form>

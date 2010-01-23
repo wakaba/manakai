@@ -3946,16 +3946,19 @@ $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the va
   }, # check_end
 }; # meter
 
+# XXX labelable
 $Element->{$HTML_NS}->{progress} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_WD,
+  status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
-    value => sub { }, ## checked in |check_attrs2|
+    form => $HTMLFormAttrChecker,
     max => sub { }, ## checked in |check_attrs2|
+    value => sub { }, ## checked in |check_attrs2|
   }, {
     %HTMLAttrStatus,
-    max => FEATURE_HTML5_DEFAULT,
-    value => FEATURE_HTML5_DEFAULT,
+    form => FEATURE_HTML5_LC,
+    max => FEATURE_HTML5_LC,
+    value => FEATURE_HTML5_LC,
   }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -3972,11 +3975,6 @@ $Element->{$HTML_NS}->{progress} = {
 
     my $value_attr = $item->{node}->get_attribute_node_ns (undef, 'value');
     if ($value_attr) {
-      $self->{onerror}->(node => $value_attr,
-                         type => 'attribute not allowed',
-                         text => 'value',
-                         level => $self->{level}->{should}); # RECOMMENDED
-
       $GetHTMLFloatingPointNumberAttrChecker->(sub {
         my $num = $_[0];
 
@@ -3991,9 +3989,6 @@ $Element->{$HTML_NS}->{progress} = {
       })->($self, $value_attr);
     }
   }, # check_attrs2
-  # XXX warn if the value from the content is greater than |max|
-  # attribute value.
-  # XXX warn if the element content does not contain one or two numbers.
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {$HTML_NS => {progress => 1}});
@@ -4006,6 +4001,9 @@ $Element->{$HTML_NS}->{progress} = {
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
   }, # check_end
+
+  ## XXX "Authors are encouraged ... text inside the element" - Add a
+  ## note in significant text warning's documentation.
 }; # progress
 
 $Element->{$HTML_NS}->{code} = {
