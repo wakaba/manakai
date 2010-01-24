@@ -9,9 +9,16 @@ use base qw(Test::Class);
 use Test::More;
 use Test::Differences;
 use Whatpm::HTML::Table;
-use Message::DOM::DOMImplementation;
 
-my $dom = Message::DOM::DOMImplementation->new;
+my $dom;
+my $domimpl = $ENV{MANAKAI_DOMIMPL} || '';
+if ($domimpl eq 'nanodom') {
+  require Whatpm::NanoDOM;
+  $dom = Whatpm::NanoDOM::DOMImplementation->new;
+} else {
+  require Message::DOM::DOMImplementation;
+  $dom = Message::DOM::DOMImplementation->new;
+}
 
 sub serialize_node ($);
 sub serialize_node ($) {
@@ -22,8 +29,9 @@ sub serialize_node ($) {
     return [map { serialize_node $_ } @$obj];
   } elsif (ref $obj eq 'HASH') {
     return {map { serialize_node $_ } %$obj};
-  } elsif ($obj->isa ('Message::DOM::Node')) {
-    return $obj->node_name . ' ' . $obj->text_content;
+  } elsif ($obj->isa ('Message::DOM::Node') or
+           $obj->isa ('Whatpm::NanoDOM::Node')) {
+    return $obj->manakai_local_name . ' ' . $obj->text_content;
   } else {
     return $obj;
   }
@@ -90,10 +98,7 @@ sub remove_tbody ($) {
   $table_el->remove_child ($table_el->first_child); # tbody
 } # remove_tbody
 
-sub _form_table : Test(2) {
-  my $doc = $dom->create_document;
-  $doc->manakai_is_html (1);
-
+sub _form_table : Test(5) {
   for (
     {
       input => q[<tr><td>1<td>2<tr><th>3<th>4],
@@ -121,11 +126,86 @@ sub _form_table : Test(2) {
         width => 2, height => 2, element => 'table 1234',
       },
     },
+    {
+      input => q[<tr><td id=a>1<td id=a>2<tr id=c><th id=b>3<th>4],
+      without_tbody => 1,
+      result => {
+        column_group => [], column => [cr 'dh', cr 'dh'],
+        row_group => [], row => [cr 'd/tr 12', cr 'h/tr 34'],
+        cell => [
+          [[cell '0,0,1,1/td 1'], [cell '0,1,1,1/th 3']],
+          [[cell '1,0,1,1/td 2'], [cell '1,1,1,1/th 4']],
+        ],
+        width => 2, height => 2, element => 'table 1234',
+      },
+    },
+    {
+      input => q[<tr><td id=a>1<td id=a>2<tr id=c><th id=b>3<th>4],
+      body => q[%s],
+      without_tbody => 1,
+      result => {
+        column_group => [], column => [cr 'dh', cr 'dh'],
+        row_group => [], row => [cr 'd/tr 12', cr 'h/tr 34'],
+        cell => [
+          [[cell '0,0,1,1/td 1'], [cell '0,1,1,1/th 3']],
+          [[cell '1,0,1,1/td 2'], [cell '1,1,1,1/th 4']],
+        ],
+        id_cell => {
+          a => cell '0,0,1,1/td 1',
+          b => cell '0,1,1,1/th 3',
+        },
+        width => 2, height => 2, element => 'table 1234',
+      },
+    },
+    {
+      input => q[<tr><td id=a>1<td id=a>2<tr id=c><th id=b>3<th>4],
+      body => q[<p id=b></p>%s<p id=a></p>],
+      without_tbody => 1,
+      result => {
+        column_group => [], column => [cr 'dh', cr 'dh'],
+        row_group => [], row => [cr 'd/tr 12', cr 'h/tr 34'],
+        cell => [
+          [[cell '0,0,1,1/td 1'], [cell '0,1,1,1/th 3']],
+          [[cell '1,0,1,1/td 2'], [cell '1,1,1,1/th 4']],
+        ],
+        id_cell => {
+          a => cell '0,0,1,1/td 1',
+        },
+        width => 2, height => 2, element => 'table 1234',
+      },
+    },
   ) {
-    my $table_el = $doc->create_element ('table');
+    my $doc = $dom->create_document;
+    $doc->manakai_is_html (1);
+
+    my $table_el;
+    if ($_->{body}) {
+      $doc->append_child
+          ($doc->create_element_ns
+               ('http://www.w3.org/1999/xhtml', [undef, 'html']))
+          ->inner_html (q[<head><body>]);
+      my $body = $doc->last_child->last_child;
+      my $body_inner = $_->{body};
+      $body_inner =~ s[%s][<table></table>]g;
+      $body->inner_html ($body_inner);
+      my @node = ($body);
+      while (@node) {
+        my $node = shift @node;
+        next unless $node->node_type == 1;
+        if ($node->manakai_local_name eq 'table') {
+          $table_el = $node;
+          last;
+        } else {
+          push @node, @{$node->child_nodes};
+        }
+      }
+    } else {
+      $table_el = $doc->create_element_ns
+          ('http://www.w3.org/1999/xhtml', [undef, 'table']);
+    }
     $table_el->inner_html ($_->{input});
     remove_tbody $table_el if $_->{without_tbody};
-    
+
     my $table = Whatpm::HTML::Table->form_table ($table_el);
     eq_or_diff serialize_node $table, $_->{result};
   }
@@ -282,7 +362,7 @@ sub _get_assigned_headers : Test(103) {
       ],
     },
   ) {
-    my $table_el = $doc->create_element ('table');
+    my $table_el = $doc->create_element_ns (undef, [undef, 'table']);
     $table_el->inner_html ($_->{input});
     my $table = Whatpm::HTML::Table->form_table ($table_el);
     

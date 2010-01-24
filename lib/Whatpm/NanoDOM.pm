@@ -14,11 +14,18 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.31';
 
 require Scalar::Util;
 
 package Whatpm::NanoDOM::DOMImplementation;
+
+sub new ($) {
+  my $class = shift;
+  my $self = bless {}, $class;
+  return $self;
+} # new
 
 sub create_document ($) {
   return Whatpm::NanoDOM::Document->new;
@@ -62,7 +69,7 @@ sub append_child ($$) {
   my ($self, $new_child) = @_;
   if (defined $new_child->{parent_node}) {
     my $parent_list = $new_child->{parent_node}->{child_nodes};
-    for (0..$#$parent_list) {
+    for (reverse 0..$#$parent_list) {
       if ($parent_list->[$_] eq $new_child) {
         splice @$parent_list, $_, 1;
       }
@@ -413,6 +420,21 @@ sub document_uri ($;$) {
   return $_[0]->{document_uri};
 }
 
+sub get_element_by_id ($$) {
+  my @nodes = @{$_[0]->child_nodes};
+  N: while (@nodes) {
+    my $node = shift @nodes;
+    next N unless $node->node_type == 1; # ELEMENT_NODE
+    for my $attr (@{$node->attributes}) {
+      if ($attr->manakai_local_name eq 'id' and $attr->value eq $_[1]) {
+        return $node;
+      }
+    }
+    unshift @nodes, @{$node->child_nodes};
+  } # N
+  return undef;
+} # get_element_by_id
+
 package Whatpm::NanoDOM::Element;
 push our @ISA, 'Whatpm::NanoDOM::Node';
 
@@ -550,11 +572,35 @@ sub set_attribute_ns ($$$$) {
 sub set_attribute_node_ns ($$) {
   my $self = shift;
   my $attr = shift;
-  $self->{attributes}->{$attr->namespace_uri}->{$attr->manakai_local_name}
+  my $ns = $attr->namespace_uri;
+  $self->{attributes}->{defined $ns ? $ns : ''}->{$attr->manakai_local_name}
       = $attr;
   $attr->{owner_element} = $self;
   Scalar::Util::weaken ($attr->{owner_element});
 } # set_attribute_node_ns
+
+sub manakai_ids ($) {
+  my $self = shift;
+  my $id = $self->get_attribute_ns (undef, 'id');
+  if (defined $id) {
+    return [$id];
+  } else {
+    return [];
+  }
+} # manakai_ids
+
+sub inner_html ($;$) {
+  my $self = $_[0];
+
+  if (@_ > 1) {
+    require Whatpm::HTML;
+    Whatpm::HTML->set_inner_html ($self, $_[1]);
+    return unless defined wantarray;
+  }
+  
+  require Whatpm::HTML::Serializer;
+  return ${ Whatpm::HTML::Serializer->get_inner_html ($self) };
+} # inner_html
 
 package Whatpm::NanoDOM::Attr;
 push our @ISA, 'Whatpm::NanoDOM::Node';

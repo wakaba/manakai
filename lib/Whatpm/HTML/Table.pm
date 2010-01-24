@@ -4,10 +4,12 @@ use warnings;
 our $VERSION = '1.2';
 
 ## An implementation of "Forming a table" algorithm in HTML5
-sub form_table ($$;$$) {
-  my (undef, $table_el, $onerror, $levels) = @_;
+sub form_table ($$;$$$) {
+  my (undef, $table_el, $onerror, $levels, $id_to_el) = @_;
   $onerror ||= sub { };
   $levels ||= {must => 'm'};
+  my $doc = $table_el->owner_document;
+  $id_to_el ||= sub { $doc->get_element_by_id ($_[0]) };
   
   ## Step 1
   my $x_width = 0;
@@ -348,6 +350,16 @@ sub form_table ($$;$$) {
         }
       }
       ## NOTE: Entity references are not supported
+
+      my $ids = $current_cell->manakai_ids; # ID attribute values
+      for my $id (@$ids) {
+        ## ID attribute values do not always assign an ID to the
+        ## element.
+        my $el = $doc->get_element_by_id ($id) or next;
+        $el eq $current_cell or next;
+
+        $table->{id_cell}->{$id} = $cell;
+      }
       
       ## Step 14
       if ($cell_grows_downward) {
@@ -597,7 +609,6 @@ sub _scan_and_assign ($$$$$$$) {
   } # LOOP
 } # _scan_and_assign
 
-## XXX This is untested code.
 ## O(table_width * table_height)
 sub get_assigned_headers ($$$$) {
   my (undef, $table, $p_x, $p_y) = @_;
@@ -616,11 +627,11 @@ sub get_assigned_headers ($$$$) {
     my $id_list = map { length $_ } split /[\x09\x0A\x0C\x0D\x20]+/, $headers;
     
     ## 3.A.2.
+    for my $cell (map { $table->{id_cell}->{$_} } @$id_list) {
+      next if $cell->{x} == $p_x and $cell->{y} == $p_y;
 
-    ## XXX For each token in the id list, if the first element in the
-    ## Document with an ID equal to the token is a cell in the same
-    ## table, and that cell is not the principal cell, then add that
-    ## cell to header list.
+      push @$header_list, $cell;
+    }
   } else {
     ## 3.B.1.
     my $p_w = $p_cell->{width};
