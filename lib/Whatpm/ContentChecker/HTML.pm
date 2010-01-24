@@ -5896,11 +5896,11 @@ $Element->{$HTML_NS}->{table} = {
     my ($self, $item, $element_state) = @_;
 
     ## Table model errors
-    require Whatpm::HTMLTable;
-    my $table = Whatpm::HTMLTable->form_table ($item->{node}, sub {
+    require Whatpm::HTML::Table;
+    my $table = Whatpm::HTML::Table->form_table ($item->{node}, sub {
       $self->{onerror}->(@_);
     }, $self->{level});
-    Whatpm::HTMLTable->assign_header
+    Whatpm::HTML::Table->assign_header
         ($table, $self->{onerror}, $self->{level});
     push @{$self->{return}->{table}}, $table;
 
@@ -6179,10 +6179,10 @@ $Element->{$HTML_NS}->{td} = {
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
-      ## NOTE: Will be checked by Whatpm::HTMLTable->assign_header.
-      ## Though that method does not check the |headers| attribute of a
-      ## |td| element if the element does not form a table, in that case
-      ## the |td| element is non-conforming anyway.
+      ## NOTE: Will be checked by Whatpm::HTML::Table->assign_header.
+      ## Though that method does not check the |headers| attribute of
+      ## a |td| element if the element does not form a table, in that
+      ## case the |td| element is non-conforming anyway.
     },
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),

@@ -1,5 +1,7 @@
-package Whatpm::HTMLTable;
+package Whatpm::HTML::Table;
 use strict;
+use warnings;
+our $VERSION = '1.2';
 
 ## An implementation of "Forming a table" algorithm in HTML5
 sub form_table ($$$;$) {
@@ -661,4 +663,16 @@ sub assign_header ($$;$$) {
 } # assign_header
 
 1;
-## $Date: 2008/09/20 11:25:56 $
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut

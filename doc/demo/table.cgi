@@ -45,7 +45,7 @@ if ($mode eq '/table') {
   print STDOUT "Content-Type: text/html; charset=utf-8\n\n";
   
   use JSON;
-  require Whatpm::HTMLTable;
+  require Whatpm::HTML::Table;
 
   print STDOUT '<!DOCTYPE html>
 <html lang="en">
@@ -62,8 +62,8 @@ if ($mode eq '/table') {
   for my $table_el (@table_el) {
     $i++; print STDOUT "<h1>Table $i</h1>\n";
 
-    my $table = Whatpm::HTMLTable->form_table ($table_el);
-    Whatpm::HTMLTable->assign_header ($table);
+    my $table = Whatpm::HTML::Table->form_table ($table_el);
+    Whatpm::HTML::Table->assign_header ($table);
 
     delete $table->{element};
 
@@ -113,11 +113,9 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =cut
-
-## $Date: 2008/05/06 08:47:09 $
