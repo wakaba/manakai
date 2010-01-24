@@ -211,9 +211,7 @@ sub _form_table : Test(5) {
   }
 } # _form_table
 
-sub _get_assigned_headers : Test(103) {
-  my $doc = $dom->create_document;
-
+sub _get_assigned_headers : Test(123) {
   for (
     {
       input => q[<tr><th>1<th>2<tr><td>3<td>4],
@@ -361,9 +359,66 @@ sub _get_assigned_headers : Test(103) {
         [3, 4 => [cell '3,0,1,1/th 3', cell '0,3,1,1/th(rg) 31', cell '0,4,1,1/th(r) 41']],
       ],
     },
+    {
+      input => q[<tr><th id=a>1<th>2<tr><td>3<td headers=a>4],
+      in_doc => 1,
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [0, 1 => [cell '0,0,1,1/th 1']],
+        [1, 1 => [cell '0,0,1,1/th 1']],
+      ],
+    },
+    {
+      input => q[<tr><th id=a>1<th id=b>2<tr><td>3<td headers="a a b">4],
+      in_doc => 1,
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [0, 1 => [cell '0,0,1,1/th 1']],
+        [1, 1 => [cell '0,0,1,1/th 1', cell '1,0,1,1/th 2']],
+      ],
+    },
+    {
+      input => q[<tr><th id=a>1<th id=a>2<tr><td>3<td headers="a a b">4],
+      in_doc => 1,
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [0, 1 => [cell '0,0,1,1/th 1']],
+        [1, 1 => [cell '0,0,1,1/th 1']],
+      ],
+    },
+    {
+      input => q[<tr><th>1<th>2<tr><td id=c>3<td headers="c d" id=d>4],
+      in_doc => 1,
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [0, 1 => [cell '0,0,1,1/th 1']],
+        [1, 1 => [cell '0,1,1,1/td 3']],
+      ],
+    },
+    {
+      input => q[<tr><th>1<th>2<tr><td id=c headers=d>3<td headers=c id=d>4],
+      in_doc => 1,
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [0, 1 => [cell '1,1,1,1/td 4']],
+        [1, 1 => [cell '0,1,1,1/td 3']],
+      ],
+    },
   ) {
+    my $doc = $dom->create_document;
+    $doc->manakai_is_html (1);
+  
     my $table_el = $doc->create_element_ns (undef, [undef, 'table']);
     $table_el->inner_html ($_->{input});
+    if ($_->{in_doc}) {
+      $doc->inner_html ('<!DOCTYPE html>');
+      $doc->last_child->last_child->append_child ($table_el);
+    }
     my $table = Whatpm::HTML::Table->form_table ($table_el);
     
     for (@{$_->{results}}) {
@@ -379,3 +434,12 @@ sub _get_assigned_headers : Test(103) {
 __PACKAGE__->runtests;
 
 1;
+
+=head1 LICENSE
+
+Copyright 2010 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

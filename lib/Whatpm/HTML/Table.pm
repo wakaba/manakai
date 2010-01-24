@@ -624,10 +624,12 @@ sub get_assigned_headers ($$$$) {
   my $headers = $p_cell->{element}->get_attribute_ns (undef, 'headers');
   if (defined $headers) {
     ## 3.A.1.
-    my $id_list = map { length $_ } split /[\x09\x0A\x0C\x0D\x20]+/, $headers;
+    my $id_list = [grep { length $_ }
+                   split /[\x09\x0A\x0C\x0D\x20]+/, $headers];
     
     ## 3.A.2.
     for my $cell (map { $table->{id_cell}->{$_} } @$id_list) {
+      next unless $cell;
       next if $cell->{x} == $p_x and $cell->{y} == $p_y;
 
       push @$header_list, $cell;
