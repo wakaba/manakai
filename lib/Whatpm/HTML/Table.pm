@@ -540,7 +540,7 @@ sub _scan_and_assign ($$$$$$$) {
     return if $y < 0;
 
     ## 7.
-    my $current_cells = $table->{cell}->[$x]->[$y];
+    my $current_cells = $table->{cell}->[$x]->[$y] || [];
     redo LOOP unless @$current_cells == 1;
 
     ## 8.
@@ -646,7 +646,7 @@ sub get_assigned_headers ($$$$) {
           my $h_cell = $table->{cell}->[$x]->[$y]->[0] or next;
           $h_cell->{is_header} or next;
           $h_cell->{scope} eq 'rowgroup' or next;
-          my $h_rg = $table->{row_group}->[$y]->[0] or next;
+          my $h_rg = $table->{row_group}->[$y] or next;
           $h_rg->{y} == $p_rg->{y} or next;
           push @$header_list, $h_cell;
         }
@@ -661,7 +661,7 @@ sub get_assigned_headers ($$$$) {
           my $h_cell = $table->{cell}->[$x]->[$y]->[0] or next;
           $h_cell->{is_header} or next;
           $h_cell->{scope} eq 'colgroup' or next;
-          my $h_cg = $table->{column_group}->[$x]->[0] or next;
+          my $h_cg = $table->{column_group}->[$x] or next;
           $h_cg->{x} == $p_cg->{x} or next;
           push @$header_list, $h_cell;
         }

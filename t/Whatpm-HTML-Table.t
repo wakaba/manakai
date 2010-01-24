@@ -56,7 +56,13 @@ sub cell ($) {
 
     if ($r->{element} =~ /^th/) {
       $r->{is_header} = 1;
-      $r->{scope} = '';
+      if ($r->{element} =~ s/^th\(([rc]g?)\)/th/) {
+        $r->{scope} = {
+          r => 'row', c => 'col', rg => 'rowgroup', cg => 'colgroup',
+        }->{$1};
+      } else {
+        $r->{scope} = '';
+      }
     }
   }
   
@@ -125,7 +131,7 @@ sub _form_table : Test(2) {
   }
 } # _form_table
 
-sub _get_assigned_headers : Test(4) {
+sub _get_assigned_headers : Test(103) {
   my $doc = $dom->create_document;
 
   for (
@@ -136,6 +142,143 @@ sub _get_assigned_headers : Test(4) {
         [1, 0 => []],
         [0, 1 => [cell '0,0,1,1/th 1']],
         [1, 1 => [cell '1,0,1,1/th 2']],
+        [1, 2 => []],
+        [2, 2 => []],
+        [-1, 0 => []],
+      ],
+    },
+    {
+      input => q[<tr><th colspan=2>1<tr><td>3<td>4<tr><td>5<td>6],
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [0, 1 => [cell '0,0,2,1/th 1']],
+        [1, 1 => [cell '0,0,2,1/th 1']],
+        [0, 2 => [cell '0,0,2,1/th 1']],
+        [1, 2 => [cell '0,0,2,1/th 1']],
+      ],
+    },
+    {
+      input => q[<tr><th colspan=2>1<tr><td>3<td>4<td>5<td>6],
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [0, 1 => [cell '0,0,2,1/th 1']],
+        [1, 1 => [cell '0,0,2,1/th 1']],
+        [2, 1 => []],
+        [3, 1 => []],
+      ],
+    },
+    {
+      input => q[<tr><th>1<th>2<th>3<tr><th scope=row>4<td>5<td>6<tr><td>7<td>8<td>9],
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [2, 0 => []],
+        [0, 1 => [cell '0,0,1,1/th 1']],
+        [1, 1 => [cell '1,0,1,1/th 2', cell '0,1,1,1/th(r) 4']],
+        [2, 1 => [cell '2,0,1,1/th 3', cell '0,1,1,1/th(r) 4']],
+        [0, 2 => [cell '0,0,1,1/th 1']], # not 4
+        [1, 2 => [cell '1,0,1,1/th 2']],
+        [2, 2 => [cell '2,0,1,1/th 3']],
+      ],
+    },
+    {
+      input => q[<tr><th>1<th>2<th>3<tr><th>4<td>5<td>6<tr><td>7<td>8<td>9],
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [2, 0 => []],
+        [0, 1 => [cell '0,0,1,1/th 1']],
+        [1, 1 => [cell '1,0,1,1/th 2']],
+        [2, 1 => [cell '2,0,1,1/th 3']],
+        [0, 2 => [cell '0,0,1,1/th 1']], # not 4
+        [1, 2 => [cell '1,0,1,1/th 2']],
+        [2, 2 => [cell '2,0,1,1/th 3']],
+      ],
+    },
+    {
+      ## From Web Applications 1.0 example
+      input => q[<thead><tr><th rowspan=2>1<th rowspan=2>2<th colspan=2>3<th rowspan=2>4<th rowspan=2>5<tr><th>11<th>12<tbody><tr><td>21<td>22<td>23<td>24<td>25<td>26<tr><td>31<td>32<td>33<td>34<td>35<td>36<tr><td>41<td>42<td>43<td>44<td>45<td>46],
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [2, 0 => []],
+        [3, 0 => []],
+        [4, 0 => []],
+        [5, 0 => []],
+        [0, 1 => [cell '0,0,1,2/th 1']],
+        [1, 1 => [cell '1,0,1,2/th 2']],
+        [2, 1 => [cell '2,0,2,1/th 3']],
+        [3, 1 => [cell '2,0,2,1/th 3']],
+        [4, 1 => [cell '4,0,1,2/th 4']],
+        [5, 1 => [cell '5,0,1,2/th 5']],
+        [0, 2 => [cell '0,0,1,2/th 1']],
+        [1, 2 => [cell '1,0,1,2/th 2']],
+        [2, 2 => [cell '2,0,2,1/th 3', cell '2,1,1,1/th 11']],
+        [3, 2 => [cell '2,0,2,1/th 3', cell '3,1,1,1/th 12']],
+        [4, 2 => [cell '4,0,1,2/th 4']],
+        [5, 2 => [cell '5,0,1,2/th 5']],
+        [0, 3 => [cell '0,0,1,2/th 1']],
+        [1, 3 => [cell '1,0,1,2/th 2']],
+        [2, 3 => [cell '2,0,2,1/th 3', cell '2,1,1,1/th 11']],
+        [3, 3 => [cell '2,0,2,1/th 3', cell '3,1,1,1/th 12']],
+        [4, 3 => [cell '4,0,1,2/th 4']],
+        [5, 3 => [cell '5,0,1,2/th 5']],
+        [0, 4 => [cell '0,0,1,2/th 1']],
+        [1, 4 => [cell '1,0,1,2/th 2']],
+        [2, 4 => [cell '2,0,2,1/th 3', cell '2,1,1,1/th 11']],
+        [3, 4 => [cell '2,0,2,1/th 3', cell '3,1,1,1/th 12']],
+        [4, 4 => [cell '4,0,1,2/th 4']],
+        [5, 4 => [cell '5,0,1,2/th 5']],
+      ],
+    },
+    {
+      ## From Web Applications 1.0 example
+      input => q[<thead><tr><th> <th>1<th>2<th>3<tbody><tr><th>11<td>12<td>13<td>14<tr><th>21<td>22<td>23<td>24<tbody><tr><th>31<td>32<td>33<td>34<tfoot><tr><th>41<td>42<td>43<td>44],
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [2, 0 => []],
+        [3, 0 => []],
+        [0, 1 => []],
+        [1, 1 => [cell '1,0,1,1/th 1', cell '0,1,1,1/th 11']],
+        [2, 1 => [cell '2,0,1,1/th 2', cell '0,1,1,1/th 11']],
+        [3, 1 => [cell '3,0,1,1/th 3', cell '0,1,1,1/th 11']],
+        [0, 2 => []],
+        [1, 2 => [cell '1,0,1,1/th 1', cell '0,2,1,1/th 21']],
+        [2, 2 => [cell '2,0,1,1/th 2', cell '0,2,1,1/th 21']],
+        [3, 2 => [cell '3,0,1,1/th 3', cell '0,2,1,1/th 21']],
+        [0, 3 => []],
+        [1, 3 => [cell '1,0,1,1/th 1', cell '0,3,1,1/th 31']],
+        [2, 3 => [cell '2,0,1,1/th 2', cell '0,3,1,1/th 31']],
+        [3, 3 => [cell '3,0,1,1/th 3', cell '0,3,1,1/th 31']],
+      ],
+    },
+    {
+      ## From Web Applications 1.0 example
+      input => q[<colgroup><col><colgroup><col><col><col><thead><tr><th><th>1<th>2<th>3<tbody><tr><th scope=rowgroup>11<td>12<td>13<td>14<tr><th scope=row>21<td>22<td>23<td>24<tbody><tr><th scope=rowgroup>31<td>32<td>33<td>34<tr><th scope=row>41<td>42<td>43<td>44],
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [2, 0 => []],
+        [3, 0 => []],
+        [0, 1 => [cell '0,1,1,1/th(rg) 11']],
+        [1, 1 => [cell '1,0,1,1/th 1', cell '0,1,1,1/th(rg) 11']],
+        [2, 1 => [cell '2,0,1,1/th 2', cell '0,1,1,1/th(rg) 11']],
+        [3, 1 => [cell '3,0,1,1/th 3', cell '0,1,1,1/th(rg) 11']],
+        [0, 2 => [cell '0,1,1,1/th(rg) 11']],
+        [1, 2 => [cell '1,0,1,1/th 1', cell '0,1,1,1/th(rg) 11', cell '0,2,1,1/th(r) 21']],
+        [2, 2 => [cell '2,0,1,1/th 2', cell '0,1,1,1/th(rg) 11', cell '0,2,1,1/th(r) 21']],
+        [3, 2 => [cell '3,0,1,1/th 3', cell '0,1,1,1/th(rg) 11', cell '0,2,1,1/th(r) 21']],
+        [0, 3 => [cell '0,3,1,1/th(rg) 31']],
+        [1, 3 => [cell '1,0,1,1/th 1', cell '0,3,1,1/th(rg) 31']],
+        [2, 3 => [cell '2,0,1,1/th 2', cell '0,3,1,1/th(rg) 31']],
+        [3, 3 => [cell '3,0,1,1/th 3', cell '0,3,1,1/th(rg) 31']],
+        [0, 4 => [cell '0,3,1,1/th(rg) 31']],
+        [1, 4 => [cell '1,0,1,1/th 1', cell '0,3,1,1/th(rg) 31', cell '0,4,1,1/th(r) 41']],
+        [2, 4 => [cell '2,0,1,1/th 2', cell '0,3,1,1/th(rg) 31', cell '0,4,1,1/th(r) 41']],
+        [3, 4 => [cell '3,0,1,1/th 3', cell '0,3,1,1/th(rg) 31', cell '0,4,1,1/th(r) 41']],
       ],
     },
   ) {
@@ -146,6 +289,8 @@ sub _get_assigned_headers : Test(4) {
     for (@{$_->{results}}) {
       my $headers = Whatpm::HTML::Table->get_assigned_headers
           ($table, $_->[0], $_->[1]);
+      $headers = [sort {$a->{x} <=> $b->{x} || $a->{y} <=> $b->{y}} @$headers];
+      $_->[2] = [sort {$a->{x} <=> $b->{x} || $a->{y} <=> $b->{y}} @{$_->[2]}];
       eq_or_diff serialize_node $headers, $_->[2];
     }
   }
