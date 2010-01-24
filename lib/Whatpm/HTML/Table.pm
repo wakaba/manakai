@@ -644,6 +644,7 @@ sub get_assigned_headers ($$$$) {
       for my $x (0 .. ($p_x + $p_w - 1)) {
         for my $y (0 .. ($p_y + $p_h - 1)) {
           my $h_cell = $table->{cell}->[$x]->[$y]->[0] or next;
+          $h_cell->{is_header} or next;
           $h_cell->{scope} eq 'rowgroup' or next;
           my $h_rg = $table->{row_group}->[$y]->[0] or next;
           $h_rg->{y} == $p_rg->{y} or next;
@@ -658,6 +659,7 @@ sub get_assigned_headers ($$$$) {
       for my $x (0 .. ($p_x + $p_w - 1)) {
         for my $y (0 .. ($p_y + $p_h - 1)) {
           my $h_cell = $table->{cell}->[$x]->[$y]->[0] or next;
+          $h_cell->{is_header} or next;
           $h_cell->{scope} eq 'colgroup' or next;
           my $h_cg = $table->{column_group}->[$x]->[0] or next;
           $h_cg->{x} == $p_cg->{x} or next;

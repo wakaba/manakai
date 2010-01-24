@@ -125,6 +125,32 @@ sub _form_table : Test(2) {
   }
 } # _form_table
 
+sub _get_assigned_headers : Test(4) {
+  my $doc = $dom->create_document;
+
+  for (
+    {
+      input => q[<tr><th>1<th>2<tr><td>3<td>4],
+      results => [
+        [0, 0 => []],
+        [1, 0 => []],
+        [0, 1 => [cell '0,0,1,1/th 1']],
+        [1, 1 => [cell '1,0,1,1/th 2']],
+      ],
+    },
+  ) {
+    my $table_el = $doc->create_element ('table');
+    $table_el->inner_html ($_->{input});
+    my $table = Whatpm::HTML::Table->form_table ($table_el);
+    
+    for (@{$_->{results}}) {
+      my $headers = Whatpm::HTML::Table->get_assigned_headers
+          ($table, $_->[0], $_->[1]);
+      eq_or_diff serialize_node $headers, $_->[2];
+    }
+  }
+} # _get_assigned_headers
+
 __PACKAGE__->runtests;
 
 1;
