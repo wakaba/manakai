@@ -11,11 +11,13 @@ require Message::DOM::DOMImplementation;
 
 my $dom = Message::DOM::DOMImplementation->new;
 
-sub _test1 : Test(40) {
+sub _test1 : Test(41) {
   my $doc = $dom->create_document;
 
   my $at = $doc->create_attribute_definition ('ad');
   my $list = $at->allowed_tokens;
+
+  isa_ok $list, 'Message::IF::DOMStringList';
 
   ## length (0)
   is 0+@$list, 0, 'DOMStringList @{} 0+ [0]';
@@ -100,13 +102,16 @@ sub _test1 : Test(40) {
   is 0+@$list, 2, 'DOMStringList @{} 0+ [7]';
 } # _test1
 
-sub _test2 : Test(28) {
+sub _test2 : Test(30) {
   my $doc = $dom->create_document;
 
   my $at1 = $doc->create_attribute_definition ('ad');
   my $list1 = $at1->allowed_tokens;
   my $at2 = $doc->create_attribute_definition ('ad');
   my $list2 = $at2->allowed_tokens;
+
+  isa_ok $list1, 'Message::IF::DOMStringList';
+  isa_ok $list2, 'Message::IF::DOMStringList';
 
   is $list1 == $list1 ? 1 : 0, 1, 'a == a [0]';
   is $list1 != $list1 ? 1 : 0, 0, 'a != a [0]';
@@ -150,6 +155,12 @@ sub _test2 : Test(28) {
   is $list1 eq $list2 ? 1 : 0, 0, 'a eq b [4]';
   is $list1 ne $list2 ? 1 : 0, 1, 'a ne b [4]';
 } # _test2
+
+sub _static_as_array : Test(1) {
+  require Message::DOM::DOMStringList;
+  my $l = bless [qw(a b c)], 'Message::DOM::DOMStringList::StaticList';
+  is_deeply [@$l], [qw(a b c)];
+} # _static_as_array
 
 __PACKAGE__->runtests;
 

@@ -1,11 +1,13 @@
 package Message::DOM::DOMStringList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.4';
 push our @ISA, 'Tie::Array', 'Message::IF::DOMStringList';
 require Tie::Array;
 
 use overload
     '@{}' => sub {
+      return $_[0] if ref $_[0] eq 'Message::DOM::DOMStringList::StaticList';
       tie my @list, ref $_[0], $_[0];
       return \@list;
     },
@@ -192,9 +194,13 @@ sub TIEARRAY ($$) { $_[1] }
 
 package Message::IF::DOMStringList;
 
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -202,4 +208,3 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
