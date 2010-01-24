@@ -226,6 +226,8 @@ sub form_table ($$;$$$) {
   }; # $growing_downward_growing_cells
 
   my $process_row = sub {
+    my $in_row_group = $_[1];
+
     ## Step 1
     $y_height++ if $y_height == $y_current;
     
@@ -304,11 +306,20 @@ sub form_table ($$;$$$) {
       };
       $cell->{is_header} = 1 if $current_cell->manakai_local_name eq 'th';
       if ($cell->{is_header}) {
-        $cell->{scope} = $current_cell->get_attribute_ns (undef, 'scope') || '';
+        my $scope_attr = $current_cell->get_attribute_node_ns (undef, 'scope');
+        $cell->{scope} = $scope_attr ? $scope_attr->value : '';
         $cell->{scope} =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
         $cell->{scope} = '' unless {
           row => 1, col => 1, rowgroup => 1, colgroup => 1,
         }->{$cell->{scope}};
+
+        if (($cell->{scope} eq 'rowgroup' and not $in_row_group) or
+            ($cell->{scope} eq 'colgroup' and
+             not $table->{column_group}->[$cell->{x}])) {
+          $onerror->(type => 'scope not allowed', # XXX documentation
+                     node => $scope_attr,
+                     level => $levels->{must});
+        }
       }
       $column_has_anchored_cell[$x_current] = 1;
       $row_has_anchored_cell[$y_current] = 1;
@@ -395,7 +406,7 @@ sub form_table ($$;$$$) {
       $_->namespace_uri eq q<http://www.w3.org/1999/xhtml> and
       $_->manakai_local_name eq 'tr'
     } @{$element_being_processed->child_nodes}) {
-      $process_row->($_);
+      $process_row->($_, 'in_row_group');
     }
 
     ## Step 3
@@ -759,7 +770,7 @@ sub assign_header ($$;$$) {
             ## TODO: Should we raise a warning?
           } elsif ($scope eq 'colgroup') {
             if ($table->{column_group}->[$x] and
-                $table->{column_group}->{width} and
+                $table->{column_group}->[$x]->{width} and
                 $table->{column_group}->[$x]->{x} == $x) { # anchored
               for my $_x ($x .. 
                           $table->{column_group}->[$x]->{x} + 

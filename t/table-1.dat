@@ -141,3 +141,31 @@
 #errors
 /table/tr/td;colspan creates column with no anchored cell;m
 
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+  <tbody>
+    <tr><th scope="rowgroup">a</th></tr>
+  </tbody>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+  <tr><th scope="rowgroup">a</th></tr>
+</table>
+#errors
+/table/tr/th/@scope;scope not allowed;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+  <colgroup/>
+  <tr><th scope="colgroup">a</th></tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+  <tr><th scope="colgroup">a</th></tr>
+</table>
+#errors
+/table/tr/th/@scope;scope not allowed;m
