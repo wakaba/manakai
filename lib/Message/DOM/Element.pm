@@ -171,6 +171,7 @@ sub inner_html ($;$) {
   my $self = $_[0];
 
   if (@_ > 1) {
+    require Whatpm::HTML;
     ## TODO: Setter ...
     Whatpm::HTML->set_inner_html ($self, $_[1]);
     return unless defined wantarray;
