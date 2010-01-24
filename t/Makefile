@@ -67,7 +67,7 @@ dom1core:
 
 test: 
 	$(PROVE) \
-	  DOM-Node.t \
+	  DOM-Node.t DOM-Element.t \
 	  Whatpm-*.t
 
 #	$(PERL_TEST_) *$(PT_SUFFIX)
