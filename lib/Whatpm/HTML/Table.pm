@@ -64,7 +64,7 @@ sub form_table ($$$;$) {
     ## Step 20
     for (0 .. $x_width - 1) {
       unless ($column_has_anchored_cell[$_]) {
-        if ($table->{column}->[$_]) {
+        if ($table->{column}->[$_] and $table->{column}->[$_]->{element}) {
           $onerror->(type => 'column with no anchored cell',
                      node => $table->{column}->[$_]->{element},
                      level => $levels->{must});
@@ -78,7 +78,7 @@ sub form_table ($$$;$) {
     }
     for (0 .. $y_height - 1) {
       unless ($row_has_anchored_cell[$_]) {
-        if ($table->{row}->[$_]) {
+        if ($table->{row}->[$_] and $table->{row}->[$_]->{element}) {
           $onerror->(type => 'row with no anchored cell',
                      node => $table->{row}->[$_]->{element},
                      level => $levels->{must});
@@ -232,7 +232,7 @@ sub form_table ($$$;$) {
 
     ## Step 5
     my $tr = shift;
-    $table->{row}->[$y_current] = {element => $tr};
+    $table->{row}->[$y_current]->{element} = $tr;
     my @tdth = grep {
       $_->node_type == 1 and
       defined $_->namespace_uri and
@@ -266,7 +266,7 @@ sub form_table ($$$;$) {
       
       ## Step 9
       my $rowspan = 1;
-      my $attr_value = $current_cell->get_attribute_ns (undef, 'rowspan');
+      $attr_value = $current_cell->get_attribute_ns (undef, 'rowspan');
       if (defined $attr_value and
           $attr_value =~ /^[\x09\x0A\x0C\x0D\x20]*([0-9]+)/) {
         $rowspan = $1;
@@ -281,14 +281,14 @@ sub form_table ($$$;$) {
       
       ## Step 11
       if ($x_width < $x_current + $colspan) { 
-        @column_generated_by[$_] = $current_cell
+        $column_generated_by[$_] = $current_cell
           for $x_width .. $x_current + $colspan - 1;
         $x_width = $x_current + $colspan;
       }
       
       ## Step 12
       if ($y_height < $y_current + $rowspan) {
-        @row_generated_by[$_] = $current_cell
+        $row_generated_by[$_] = $current_cell
             for $y_height .. $y_current + $rowspan - 1;
         $y_height = $y_current + $rowspan;
         $y_max_node = $current_cell;
@@ -296,11 +296,18 @@ sub form_table ($$$;$) {
       
       ## Step 13
       my $cell = {
-                  is_header => ($current_cell->manakai_local_name eq 'th'),
-                  element => $current_cell,
-                  x => $x_current, y => $y_current,
-                  width => $colspan, height => $rowspan,
-                 };
+        is_header => ($current_cell->manakai_local_name eq 'th'),
+        element => $current_cell,
+        x => $x_current, y => $y_current,
+        width => $colspan, height => $rowspan,
+      };
+      if ($cell->{is_header}) {
+        $cell->{scope} = $current_cell->get_attribute_ns (undef, 'scope') || '';
+        $cell->{scope} =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+        $cell->{scope} = '' unless {
+          row => 1, col => 1, rowgroup => 1, colgroup => 1,
+        }->{$cell->{scope}};
+      }
       $column_has_anchored_cell[$x_current] = 1;
       $row_has_anchored_cell[$y_current] = 1;
       for my $x ($x_current .. ($x_current + $colspan - 1)) {
@@ -317,23 +324,30 @@ sub form_table ($$$;$) {
         }
       }
 
+      for my $x ($x_current .. ($x_current + $colspan - 1)) {
+        $table->{column}->[$x]->{has_header} = 1 if $cell->{is_header};
+        $table->{column}->[$x]->{has_data} = 1 unless $cell->{is_header};
+      }
+      for my $y ($y_current .. ($y_current + $rowspan - 1)) {
+        $table->{row}->[$y]->{has_header} = 1 if $cell->{is_header};
+        $table->{row}->[$y]->{has_data} = 1 unless $cell->{is_header};
+      }
+
       ## Whether the cell is an empty data cell or not
-      if (not $cell->{is_header}) {
-        $cell->{is_empty} = 1;
-        for my $node (@{$current_cell->child_nodes}) {
-          my $nt = $node->node_type;
-          if ($nt == 3 or $nt == 4) { # TEXT_NODE / CDATA_SECTION_NODE
-            if ($node->data =~ /\P{WhiteSpace}/) {
-              delete $cell->{is_empty};
-              last;
-            }
-          } elsif ($nt == 1) { # ELEMENT_NODE
+      $cell->{is_empty} = 1;
+      for my $node (@{$current_cell->child_nodes}) {
+        my $nt = $node->node_type;
+        if ($nt == 3 or $nt == 4) { # TEXT_NODE / CDATA_SECTION_NODE
+          if ($node->data =~ /\P{WhiteSpace}/) {
             delete $cell->{is_empty};
             last;
           }
+        } elsif ($nt == 1) { # ELEMENT_NODE
+          delete $cell->{is_empty};
+          last;
         }
-        ## NOTE: Entity references are not supported
       }
+      ## NOTE: Entity references are not supported
       
       ## Step 14
       if ($cell_grows_downward) {
@@ -463,14 +477,214 @@ sub form_table ($$$;$) {
   return $table;
 } # form_table
 
+sub _is_column_header ($$) {
+  my ($table, $cell) = @_;
+  return 0 unless $cell->{is_header};
+  
+  return 1 if $cell->{scope} eq 'col';
+  return 0 if $cell->{scope};
+
+  for my $y ($cell->{y} .. ($cell->{y} + $cell->{height} - 1)) {
+    return 0 if $table->{row}->[$y]->{has_data};
+  }
+
+  return 1;
+} # _is_column_header
+
+sub _is_row_header ($$) {
+  my ($table, $cell) = @_;
+  return 0 unless $cell->{is_header};
+  
+  return 1 if $cell->{scope} eq 'row';
+  return 0 if $cell->{scope};
+
+  return 0 if _is_column_header ($table, $cell);
+
+  for my $x ($cell->{x} .. ($cell->{x} + $cell->{width} - 1)) {
+    return 0 if $table->{column}->[$x]->{has_data};
+  }
+
+  return 1;
+} # _is_row_header
+
+sub _scan_and_assign ($$$$$$$) {
+  my ($table, $p_cell, $header_list, $x, $y, $d_x, $d_y) = @_;
+
+  ## 1.
+  #my $x = $init_x;
+
+  ## 2.
+  #my $y = $init_y;
+
+  ## 3.
+  my $opaque_headers = [];
+
+  ## 4.
+  my $in_header_block;
+  my $headers_from_current = [];;
+  if ($p_cell->{is_header}) {
+    $in_header_block = 1;
+    push @$headers_from_current, $p_cell;
+  }
+
+  ## 5. Loop
+  my $blocked;
+  LOOP: {
+    $x += $d_x;
+    $y += $d_y;
+
+    ## 6.
+    return if $x < 0;
+    return if $y < 0;
+
+    ## 7.
+    my $current_cells = $table->{cell}->[$x]->[$y];
+    redo LOOP unless @$current_cells == 1;
+
+    ## 8.
+    my $current_cell = $current_cells->[0];
+
+    ## 9.
+    if ($current_cell->{is_header}) {
+      ## 9.A.1.
+      $in_header_block = 1;
+      
+      ## 9.A.2.
+      push @$headers_from_current, $current_cell;
+      
+      ## 9.A.3.
+      $blocked = 0;
+
+      ## 9.A.4.
+      if ($d_x == 0) {
+        if (_is_column_header ($table, $current_cell)) {
+          for my $cell (@$opaque_headers) {
+            if ($cell->{x} == $current_cell->{x} and
+                $cell->{width} == $current_cell->{width}) {
+              $blocked = 1;
+              last;
+            }
+          }
+        } else {
+          $blocked = 1;
+        }
+      } else {
+        if (_is_row_header ($table, $current_cell)) {
+          for my $cell (@$opaque_headers) {
+            if ($cell->{y} == $current_cell->{y} and
+                $cell->{height} == $current_cell->{height}) {
+              $blocked = 1;
+              last;
+            }
+          }
+        } else {
+          $blocked = 1;
+        }
+      }
+
+      ## 9.A.5.
+      push @$header_list, $current_cell unless $blocked;
+    } elsif ($in_header_block) {
+      $in_header_block = 0;
+      push @$opaque_headers, @$headers_from_current;
+      @$headers_from_current = ();
+    }
+    
+    ## 10.
+    redo LOOP;
+  } # LOOP
+} # _scan_and_assign
+
+## XXX This is untested code.
+## O(table_width * table_height)
+sub get_assigned_headers ($$$$) {
+  my (undef, $table, $p_x, $p_y) = @_;
+
+  ## 1.
+  my $header_list = [];
+
+  ## 2.
+  #my ($p_x, $p_y) = ($p_cell->{x}, $p_cell->{y});
+  my $p_cell = $table->{cell}->[$p_x]->[$p_y]->[0] or return $header_list;
+
+  ## 3.
+  my $headers = $p_cell->{element}->get_attribute_ns (undef, 'headers');
+  if (defined $headers) {
+    ## 3.A.1.
+    my $id_list = map { length $_ } split /[\x09\x0A\x0C\x0D\x20]+/, $headers;
+    
+    ## 3.A.2.
+
+    ## XXX For each token in the id list, if the first element in the
+    ## Document with an ID equal to the token is a cell in the same
+    ## table, and that cell is not the principal cell, then add that
+    ## cell to header list.
+  } else {
+    ## 3.B.1.
+    my $p_w = $p_cell->{width};
+    
+    ## 3.B.2.
+    my $p_h = $p_cell->{height};
+    
+    ## 3.B.3.
+    for my $y ($p_y .. ($p_y + $p_h - 1)) {
+      _scan_and_assign ($table, $p_cell, $header_list, $p_x, $y, -1, 0);
+    }
+
+    ## 3.B.4.
+    for my $x ($p_x .. ($p_x + $p_w - 1)) {
+      _scan_and_assign ($table, $p_cell, $header_list, $x, $p_y, 0, -1);
+    }
+
+    ## 3.B.5.
+    my $p_rg = $table->{row_group}->[$p_y];
+    if ($p_rg) {
+      for my $x (0 .. ($p_x + $p_w - 1)) {
+        for my $y (0 .. ($p_y + $p_h - 1)) {
+          my $h_cell = $table->{cell}->[$x]->[$y]->[0] or next;
+          $h_cell->{scope} eq 'rowgroup' or next;
+          my $h_rg = $table->{row_group}->[$y]->[0] or next;
+          $h_rg->{y} == $p_rg->{y} or next;
+          push @$header_list, $h_cell;
+        }
+      }
+    }
+
+    ## 3.B.6.
+    my $p_cg = $table->{column_group}->[$p_x];
+    if ($p_cg) {
+      for my $x (0 .. ($p_x + $p_w - 1)) {
+        for my $y (0 .. ($p_y + $p_h - 1)) {
+          my $h_cell = $table->{cell}->[$x]->[$y]->[0] or next;
+          $h_cell->{scope} eq 'colgroup' or next;
+          my $h_cg = $table->{column_group}->[$x]->[0] or next;
+          $h_cg->{x} == $p_cg->{x} or next;
+          push @$header_list, $h_cell;
+        }
+      }
+    }
+  }
+
+  ## 4.
+  @$header_list = grep { not $_->{is_empty} } @$header_list;
+
+  ## 5.
+  @$header_list = values %{{map { ($_->{x} . '-' . $_->{y} => $_) } @$header_list}};
+
+  ## 6.
+  return $header_list;
+} # get_assigned_header
+
+## XXX Obsolete (old HTML5 algorithm)
 sub assign_header ($$;$$) {
   my (undef, $table, $onerror, $levels) = @_;
   $onerror ||= sub { };
   $levels ||= {must => 'm'};
 
+  warn "Whatpm::HTML::Table::assign_header is OBSOLETE!\n";
+
   my $assign_header = sub ($$$) {
-    my $_cell = shift;
-    my ($x, $y) = @_;
+    my $_cell = shift;    my ($x, $y) = @_;
 
     for my $__cell (@{$_cell or []}) {
       if ($__cell and $__cell->{element} and
@@ -499,7 +713,8 @@ sub assign_header ($$;$$) {
           }
 
           my $scope = $cell->{element}->get_attribute_ns (undef, 'scope');
-          $scope = $scope ? lc $scope : ''; ## TODO: case
+          $scope = '' unless defined $scope;
+          $scope =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
           if ($scope eq 'row') {
             for my $_x ($x + $cell->{width} .. $table->{width} - 1) {
               for my $_y ($y .. $y + $cell->{height} - 1) {
@@ -618,7 +833,10 @@ sub assign_header ($$;$$) {
 
             ## 14. End
             # (we have already done)
+
+            $scope = '';
           }
+          $cell->{scope} = $scope;
         } else { # data cell
           if ($cell->{element} and
               $cell->{element}->has_attribute_ns (undef, 'headers')) {
