@@ -4,7 +4,7 @@ use warnings;
 our $VERSION = '1.2';
 
 ## An implementation of "Forming a table" algorithm in HTML5
-sub form_table ($$$;$) {
+sub form_table ($$;$$) {
   my (undef, $table_el, $onerror, $levels) = @_;
   $onerror ||= sub { };
   $levels ||= {must => 'm'};
@@ -296,11 +296,11 @@ sub form_table ($$$;$) {
       
       ## Step 13
       my $cell = {
-        is_header => ($current_cell->manakai_local_name eq 'th'),
         element => $current_cell,
         x => $x_current, y => $y_current,
         width => $colspan, height => $rowspan,
       };
+      $cell->{is_header} = 1 if $current_cell->manakai_local_name eq 'th';
       if ($cell->{is_header}) {
         $cell->{scope} = $current_cell->get_attribute_ns (undef, 'scope') || '';
         $cell->{scope} =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
@@ -371,6 +371,8 @@ sub form_table ($$$;$) {
   }; # $process_row
 
   $process_row_group = sub ($) {
+    my $element_being_processed = $_[0];
+
     ## Step 1
     my $y_start = $y_height;
 
@@ -380,13 +382,13 @@ sub form_table ($$$;$) {
       defined $_->namespace_uri and
       $_->namespace_uri eq q<http://www.w3.org/1999/xhtml> and
       $_->manakai_local_name eq 'tr'
-    } @{$_[0]->child_nodes}) {
+    } @{$element_being_processed->child_nodes}) {
       $process_row->($_);
     }
 
     ## Step 3
     if ($y_height > $y_start) {
-      my $rg = {element => $current_element, ## ISSUE: "element being processed"?  Otherwise, $current_element may be a thead element while the element being processed is a tfoot element, for example.
+      my $rg = {element => $element_being_processed,
                 x => 0, y => $y_start,
                 height => $y_height - $y_start};
       $table->{row_group}->[$_] = $rg for $y_start .. $y_height - 1;
