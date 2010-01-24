@@ -1,9 +1,9 @@
 1..2646
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 24 22:40:58 2010
-# Current time GMT:   Sun Jan 24 13:40:58 2010
+# Current time local: Sun Jan 24 22:45:40 2010
+# Current time GMT:   Sun Jan 24 13:45:40 2010
 # Using Test.pm version 1.25_02
-# t/content-model-atom-1.dat
+# ../t/content-model-atom-1.dat
 ok 1
 ok 2
 ok 3
@@ -52,7 +52,7 @@ ok 45
 ok 46
 ok 47
 not ok 48
-# Test 48 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;message/rfc822;u\n/entry;child element missing:atom;summary;m" (t/content-checker.pl at line 69 fail #48)
+# Test 48 got: "/entry/content/@type;IMT:composite;m\n/entry/content/@type;IMT:unknown subtype;u\n/entry/content;atom|content not supported;message/rfc822;u\n/entry;child element missing:atom;summary;m" (content-checker.pl at line 69 fail #48)
 #    Expected: "/entry/content/@type;IMT:composite;m\n/entry/content;atom|content not supported;image/png;u\n/entry;child element missing:atom;summary;m" (<entry xmlns="http://www.w3.org/2005/Atom">
 #<id>about:</id>
 #<author><name>x</name></author>
@@ -64,7 +64,7 @@ not ok 48
 ok 49
 ok 50
 ok 51
-# t/content-model-atom-2.dat
+# ../t/content-model-atom-2.dat
 ok 52
 ok 53
 ok 54
@@ -89,9 +89,9 @@ ok 72
 ok 73
 ok 74
 ok 75
-# t/content-model-atom-threading-1.dat
+# ../t/content-model-atom-threading-1.dat
 not ok 76
-# Test 76 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/content-checker.pl at line 69 fail #76)
+# Test 76 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (content-checker.pl at line 69 fail #76)
 #    Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -122,7 +122,7 @@ not ok 76
 #     </entry>
 #   </feed>)
 not ok 77
-# Test 77 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (t/content-checker.pl at line 69 fail #77)
+# Test 77 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (content-checker.pl at line 69 fail #77)
 #    Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">

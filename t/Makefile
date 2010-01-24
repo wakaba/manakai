@@ -148,13 +148,13 @@ content-checker-files: \
   content-checker-xml-result.txt
 
 content-checker-html-result.txt: always
-	cd .. && $(PERL_) t/ContentChecker-HTML.t &> t/$@
+	$(PERL_) ContentChecker-HTML.t &> $@
 
 content-checker-atom-result.txt: always
-	cd .. && $(PERL_) t/ContentChecker-Atom.t &> t/$@
+	$(PERL_) ContentChecker-Atom.t &> $@
 
 content-checker-xml-result.txt: always
-	cd .. && $(PERL_) t/ContentChecker-XML.t &> t/$@
+	$(PERL_) ContentChecker-XML.t &> $@
 
 langtag-files: langtag-result.txt
 
