@@ -6,6 +6,7 @@ use base qw(Test::Class);
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 use Test::More;
+use Test::Differences;
 
 require Message::DOM::DOMImplementation;
 
@@ -169,6 +170,39 @@ sub _schema_type_info_2 : Test(3) {
   is $sti->type_name, undef, 'sti type_name [2]';
   is $sti->type_namespace, undef, 'sti type_namespace [2]';
 } # _schema_type_info_2
+
+sub _manakai_ids : Test(12) {
+  my $doc = $dom->create_document;
+
+  my $el1 = $doc->create_element_ns ('http://www.w3.org/1999/xhtml', 'e');
+  my $ids1 = $el1->manakai_ids;
+  isa_ok $ids1, 'Message::IF::DOMStringList';
+  eq_or_diff [@$ids1], [];
+
+  $el1->set_attribute (id => 'id1');
+  my $ids2 = $el1->manakai_ids;
+  isa_ok $ids2, 'Message::IF::DOMStringList';
+  eq_or_diff [@$ids2], [qw(id1)];
+
+  my $el2 = $doc->create_element ('e');
+  $el2->set_attribute (id => 'id2');
+  my $ids3 = $el2->manakai_ids;
+  isa_ok $ids3, 'Message::IF::DOMStringList';
+  eq_or_diff [@$ids3], [];
+  
+  $el2->set_attribute_ns ('http://www.w3.org/XML/1998/namespace', 'id', 'id3');
+  my $ids4 = $el2->manakai_ids;
+  isa_ok $ids4, 'Message::IF::DOMStringList';
+  eq_or_diff [@$ids4], [qw(id3)];
+  
+  $el1->set_attribute_ns ('http://www.w3.org/XML/1998/namespace', 'id', 'id3');
+  my $ids5 = $el1->manakai_ids;
+  isa_ok $ids5, 'Message::IF::DOMStringList';
+  eq_or_diff [@$ids5], [qw(id1 id3)];
+
+  eq_or_diff [@$ids1], [];
+  eq_or_diff [@$ids2], [qw(id1)];
+} # _manakai_ids
 
 __PACKAGE__->runtests;
 

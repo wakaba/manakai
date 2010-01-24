@@ -1,8 +1,7 @@
-## NOTE: This module will be renamed as Element.pm.
-
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.32';
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element',
     'Message::IF::ElementSelector', # MUST in Selectors API spec.
     'Message::IF::ElementCSSInlineStyle';
@@ -833,6 +832,16 @@ sub set_id_attribute_node ($$$$) {
   return;
 } # set_id_attribute_node
 
+sub manakai_ids ($) {
+  my $self = shift;
+  my $ids = {};
+  for my $attr (@{$self->attributes}) {
+    $ids->{$attr->value} = 1 if $attr->is_id;
+  }
+  require Message::DOM::DOMStringList;
+  return bless [keys %$ids], 'Message::DOM::DOMStringList::StaticList';
+} # ids
+
 ## |ElementSelector| methods
 
 sub query_selector ($$;$);
@@ -1290,9 +1299,13 @@ sub create_element_ns ($$$) {
   return $r;
 } # create_element_ns
 
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -1300,4 +1313,3 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/11/09 14:06:24 $
