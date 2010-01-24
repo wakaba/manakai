@@ -13,7 +13,6 @@ BEGIN {
 test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
   t/content-model-1.dat
   t/content-model-7.dat
-  t/table-1.dat
   t/dom-conformance/html-1.dat
   t/dom-conformance/html-global-1.dat
   t/dom-conformance/html-dataset.dat
@@ -24,6 +23,7 @@ test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
   t/dom-conformance/html-links-1.dat
   t/dom-conformance/html-objects-1.dat
   t/dom-conformance/html-tables-1.dat
+  t/dom-conformance/html-tables-2.dat
   t/dom-conformance/html-forms-1.dat
   t/dom-conformance/html-form-label.dat
   t/dom-conformance/html-form-input-1.dat
@@ -40,4 +40,3 @@ test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
 ]);
 
 ## License: Public Domain.
-## $Date: 2009/08/22 06:05:55 $

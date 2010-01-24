@@ -1,7 +1,5 @@
 use strict;
-
-## ISSUE: Currently we require manakai XML parser to test arbitrary XML tree.
-use lib qw[/home/wakaba/work/manakai2/lib];
+use warnings;
 
 use Test;
 
@@ -17,7 +15,7 @@ require Message::DOM::Atom::AtomElement;
 sub test_files (@) {
   my @FILES = @_;
 
-  require 't/testfiles.pl';
+  require 'testfiles.pl';
   execute_test ($_, {
     data => {is_prefixed => 1},
     errors => {is_list => 1},
@@ -29,7 +27,9 @@ sub test ($) {
 
   $test->{parse_as} = 'xml';
   $test->{parse_as} = 'html'
-      if $test->{data}->[1] and $test->{data}->[1]->[0] eq 'html';
+      if $test->{data}->[1] and
+          $test->{data}->[1]->[0] and
+          $test->{data}->[1]->[0] eq 'html';
 
   unless ($test->{data}) {
     warn "No #data field\n";
@@ -118,4 +118,4 @@ Public Domain.
 
 =cut
 
-1; ## $Date: 2008/12/06 10:00:58 $
+1;

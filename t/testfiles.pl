@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 
 sub execute_test ($$$) {
   my $file_name = shift;
@@ -9,7 +10,7 @@ sub execute_test ($$$) {
 
   my @tests;
   {
-    open my $file, '<:utf8', $file_name or die "$0: $file_name: $!";
+    open my $file, '<:encoding(utf8)', $file_name or die "$0: $file_name: $!";
     local $/ = undef;
     my $content = <$file>;
     $content =~ s/\x0D\x0A/\x0A/g;
@@ -72,3 +73,12 @@ sub execute_test ($$$) {
 } # execute_test
 
 1;
+
+=head1 LICENSE
+
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
