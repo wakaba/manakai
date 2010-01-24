@@ -142,12 +142,13 @@ xml-result.txt: always
 swml-result.txt: always
 	cd .. && $(PERL_) t/SWML-Parser.t &> t/$@
 
-content-checker-files: content-checker-result.txt \
+content-checker-files: \
+  content-checker-html-result.txt \
   content-checker-atom-result.txt \
   content-checker-xml-result.txt
 
-content-checker-result.txt: always
-	cd .. && $(PERL_) t/ContentChecker.t &> t/$@
+content-checker-html-result.txt: always
+	cd .. && $(PERL_) t/ContentChecker-HTML.t &> t/$@
 
 content-checker-atom-result.txt: always
 	cd .. && $(PERL_) t/ContentChecker-Atom.t &> t/$@
