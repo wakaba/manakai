@@ -7,14 +7,23 @@ WriteMakefile (
     VERSION => '0.4.0',
     PREREQ_PM => {
       'Carp' => 0,
-      'Char::Class::XML' => 0,
+      #'Char::Class::XML' => 0,
       'Encode' => 0,
-      'Test' => 0,
       'Time::Local' => 0,
-    
-# Exporter, Config, Test::Simple
-# Getopt::Long, Socket
-# Jcode, Win32::Registry
+      'Exporter' => 0,
+      'Config' => 0,
+      'Getopt::Long' => 0,
+      'Socket' => 0,
+      'Path::Class' => 0,
+      #'Jcode' => 0,
+      #'Win32::Registry' => 0,
+    },
+    BUILD_REQUIRES => {
+      'Test' => 0,
+      'Test::Simple' => 0,
+      'Test::More' => 0,
+      'Test::Class' => 0,
+      'Test::Differences' => 0,
     },
     dist         => {COMPRESS => 'gzip', SUFFIX => '.gz'},
     AUTHOR       => q(Wakaba <w@suika.fam.cx>),
