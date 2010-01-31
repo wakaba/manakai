@@ -317,7 +317,6 @@ sub _initialize_tokenizer ($) {
   #$self->{is_xml} (if XML)
 
   $self->{state} = DATA_STATE; # MUST
-  $self->{s_kwd} = ''; # Data state keyword
   #$self->{kwd} = ''; # State-dependent keyword; initialized when used
   #$self->{entity__value}; # initialized when used
   #$self->{entity__match}; # initialized when used
@@ -449,7 +448,6 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         
-        $self->{s_kwd} = '';
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
         last A;
@@ -480,10 +478,7 @@ sub _get_next_token ($) {
                    data => chr $self->{nc},
                    line => $self->{line}, column => $self->{column},
                   };
-      if ($self->{read_until}->($token->{data}, q{<>&\]},
-                                length $token->{data})) {
-        $self->{s_kwd} = '';
-      }
+      $self->{read_until}->($token->{data}, q{<>&\]}, length $token->{data});
 
       ## Stay in the state.
       
@@ -608,7 +603,6 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} == SCRIPT_DATA_STATE) {
-      $self->{s_kwd} = '' unless defined $self->{s_kwd};
       if ($self->{nc} == 0x003C) { # <
         
         $self->{state} = SCRIPT_DATA_LT_STATE;
@@ -626,13 +620,11 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         
-        $self->{s_kwd} = '';
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
         last A;
       } else {
         
-        $self->{s_kwd} = '';
         #
       }
 
@@ -641,9 +633,7 @@ sub _get_next_token ($) {
                    data => chr $self->{nc},
                    line => $self->{line}, column => $self->{column},
                   };
-      if ($self->{read_until}->($token->{data}, q{<}, length $token->{data})) {
-        $self->{s_kwd} = '';
-      }
+      $self->{read_until}->($token->{data}, q{<}, length $token->{data});
 
       ## Stay in the state.
       
@@ -795,7 +785,6 @@ sub _get_next_token ($) {
                         line => $self->{line_prev},
                         column => $self->{column_prev});
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## reconsume
 
         return  ({type => CHARACTER_TOKEN, data => '<',
@@ -976,7 +965,6 @@ sub _get_next_token ($) {
                         line => $self->{line_prev}, ## "<" in "</>"
                         column => $self->{column_prev} - 1);
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         if ($self->{is_xml}) {
           
           ## XML5: No parse error.
@@ -1020,7 +1008,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == -1) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare etago');
-        $self->{s_kwd} = '';
         $self->{state} = DATA_STATE;
         # reconsume
 
@@ -1094,7 +1081,6 @@ sub _get_next_token ($) {
           (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE)
               => SCRIPT_DATA_ESCAPED_STATE,
         }->{$self->{state}} or die "$self->{state}'s next state not found";
-        $self->{s_kwd} = '';
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => '</',
                   line => $l, column => $c});
@@ -1131,7 +1117,6 @@ sub _get_next_token ($) {
             (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE)
                 => SCRIPT_DATA_ESCAPED_STATE,
           }->{$self->{state}} or die "$self->{state}'s next state not found";
-          $self->{s_kwd} = '';
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
                     data => '</' . $self->{kwd},
@@ -1155,7 +1140,6 @@ sub _get_next_token ($) {
             (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE)
                 => SCRIPT_DATA_ESCAPED_STATE,
           }->{$self->{state}} or die "$self->{state}'s next state not found";
-          $self->{s_kwd} = '';
           return  ({type => CHARACTER_TOKEN,
                     data => '</' . $self->{kwd},
                     line => $self->{line_prev},
@@ -1212,7 +1196,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1266,7 +1249,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         # reconsume
 
         ## Discard the token.
@@ -1431,7 +1413,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'eof in escaped script data'); # XXX documentation
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## Reconsume.
         redo A;
       } else {
@@ -1672,7 +1653,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1740,7 +1720,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         # reconsume
 
         ## Discard the token.
@@ -1851,7 +1830,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1927,7 +1905,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         # reconsume
 
         ## Discard the token.
@@ -2019,7 +1996,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -2094,7 +2070,6 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
-        $self->{s_kwd} = '';
         $self->{state} = DATA_STATE;
         # reconsume
 
@@ -2211,7 +2186,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -2245,7 +2219,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## reconsume
 
         ## Discard the token.
@@ -2357,7 +2330,6 @@ sub _get_next_token ($) {
           $self->{last_stag_name} = $self->{ct}->{tag_name};
 
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           ## reconsume
           return  ($self->{ct}); # start tag
           redo A;
@@ -2372,7 +2344,6 @@ sub _get_next_token ($) {
           }
 
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           ## reconsume
 
           ## Discard the token.
@@ -2494,7 +2465,6 @@ sub _get_next_token ($) {
           $self->{last_stag_name} = $self->{ct}->{tag_name};
 
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           ## reconsume
 
           ## Discard the token.
@@ -2512,7 +2482,6 @@ sub _get_next_token ($) {
           }
 
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           ## reconsume
 
           ## Discard the token.
@@ -2616,7 +2585,6 @@ sub _get_next_token ($) {
           $self->{last_stag_name} = $self->{ct}->{tag_name};
 
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -2641,7 +2609,6 @@ sub _get_next_token ($) {
           }
 
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -2681,7 +2648,6 @@ sub _get_next_token ($) {
           $self->{last_stag_name} = $self->{ct}->{tag_name};
 
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           ## reconsume
 
           ## Discard the token.
@@ -2700,7 +2666,6 @@ sub _get_next_token ($) {
           }
 
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           ## reconsume
 
           ## Discard the token.
@@ -2786,7 +2751,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -2834,7 +2798,6 @@ sub _get_next_token ($) {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## Reconsume.
 
         ## Discard the token.
@@ -2870,7 +2833,6 @@ sub _get_next_token ($) {
         }
 
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -2904,7 +2866,6 @@ sub _get_next_token ($) {
         }
         ## XML5: "Tag attribute name before state".
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## Reconsume.
 
         ## Discard the token.
@@ -2932,7 +2893,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -2955,7 +2915,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## reconsume
 
@@ -3259,7 +3218,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -3284,7 +3242,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## reconsume
 
@@ -3333,7 +3290,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -3358,7 +3314,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## reconsume
 
@@ -3409,7 +3364,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## reconsume
 
@@ -3463,7 +3417,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## reconsume
 
@@ -3499,7 +3452,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -3585,7 +3537,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## Reconsume.
 
@@ -3623,7 +3574,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -3664,7 +3614,6 @@ sub _get_next_token ($) {
         } else {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## Reconsume.
 
@@ -3745,7 +3694,6 @@ sub _get_next_token ($) {
         ## XML5: No parse error.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3783,7 +3731,6 @@ sub _get_next_token ($) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## reconsume
 
         return  ($self->{ct}); # DOCTYPE (quirks)
@@ -3849,7 +3796,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -3887,7 +3833,6 @@ sub _get_next_token ($) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## reconsume
 
         $self->{ct}->{quirks} = 1;
@@ -3952,7 +3897,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         } else {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md def'); ## TODO: type
@@ -3977,7 +3921,6 @@ sub _get_next_token ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4317,7 +4260,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4342,7 +4284,6 @@ sub _get_next_token ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4421,7 +4362,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4447,7 +4387,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4499,7 +4438,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4525,7 +4463,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4624,7 +4561,6 @@ sub _get_next_token ($) {
             
           }
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         } else {
           if ($self->{ct}->{type} == NOTATION_TOKEN) {
             
@@ -4654,7 +4590,6 @@ sub _get_next_token ($) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
@@ -4787,7 +4722,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4801,7 +4735,6 @@ sub _get_next_token ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4881,7 +4814,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4907,7 +4839,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -4958,7 +4889,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed SYSTEM literal');
 
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -4981,7 +4911,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -5036,7 +4965,6 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
           
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         } else {
           
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -5079,7 +5007,6 @@ sub _get_next_token ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
           $self->{ct}->{quirks} = 1;
         } else {
           
@@ -5212,7 +5139,6 @@ sub _get_next_token ($) {
       if ($self->{nc} == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -5249,7 +5175,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == -1) {
         
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## reconsume
 
         return  ($self->{ct}); # DOCTYPE
@@ -5305,7 +5230,6 @@ sub _get_next_token ($) {
         }
 
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## Reconsume.
         if (length $self->{ct}->{data}) { # character
           
@@ -5369,7 +5293,6 @@ sub _get_next_token ($) {
 
       if ($self->{nc} == 0x003E) { # >
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -5487,7 +5410,6 @@ sub _get_next_token ($) {
           $self->{prev_state} == RCDATA_STATE) {
         
         $self->{state} = $self->{prev_state};
-        $self->{s_kwd} = '';
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => '&',
                   line => $self->{line_prev},
@@ -5498,7 +5420,6 @@ sub _get_next_token ($) {
         
         $self->{ca}->{value} .= '&';
         $self->{state} = $self->{prev_state};
-        $self->{s_kwd} = '';
         ## Reconsume.
         redo A;
       }
@@ -5568,7 +5489,6 @@ sub _get_next_token ($) {
             $self->{prev_state} == RCDATA_STATE) {
           
           $self->{state} = $self->{prev_state};
-          $self->{s_kwd} = '';
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
                     data => '&#',
@@ -5580,7 +5500,6 @@ sub _get_next_token ($) {
           
           $self->{ca}->{value} .= '&#';
           $self->{state} = $self->{prev_state};
-          $self->{s_kwd} = '';
           ## Reconsume.
           redo A;
         }
@@ -5649,7 +5568,6 @@ sub _get_next_token ($) {
           $self->{prev_state} == RCDATA_STATE) {
         
         $self->{state} = $self->{prev_state};
-        $self->{s_kwd} = '';
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => chr $code,
                   has_reference => 1,
@@ -5661,7 +5579,6 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= chr $code;
         $self->{ca}->{has_reference} = 1;
         $self->{state} = $self->{prev_state};
-        $self->{s_kwd} = '';
         ## Reconsume.
         redo A;
       }
@@ -5688,7 +5605,6 @@ sub _get_next_token ($) {
             $self->{prev_state} == RCDATA_STATE) {
           
           $self->{state} = $self->{prev_state};
-          $self->{s_kwd} = '';
           ## Reconsume.
           return  ({type => CHARACTER_TOKEN,
                     data => '&' . $self->{kwd},
@@ -5700,7 +5616,6 @@ sub _get_next_token ($) {
           
           $self->{ca}->{value} .= '&' . $self->{kwd};
           $self->{state} = $self->{prev_state};
-          $self->{s_kwd} = '';
           ## Reconsume.
           redo A;
         }
@@ -5806,7 +5721,6 @@ sub _get_next_token ($) {
           $self->{prev_state} == RCDATA_STATE) {
         
         $self->{state} = $self->{prev_state};
-        $self->{s_kwd} = '';
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => chr $code,
                   has_reference => 1,
@@ -5818,7 +5732,6 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= chr $code;
         $self->{ca}->{has_reference} = 1;
         $self->{state} = $self->{prev_state};
-        $self->{s_kwd} = '';
         ## Reconsume.
         redo A;
       }
@@ -5968,7 +5881,6 @@ sub _get_next_token ($) {
           $self->{prev_state} == RCDATA_STATE) {
         
         $self->{state} = $self->{prev_state};
-        $self->{s_kwd} = '';
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN,
                   data => $data,
@@ -5982,7 +5894,6 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= $data;
         $self->{ca}->{has_reference} = 1 if $has_ref;
         $self->{state} = $self->{prev_state};
-        $self->{s_kwd} = '';
         ## Reconsume.
         redo A;
       }
@@ -6055,7 +5966,6 @@ sub _get_next_token ($) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         } else {
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## Reconsume.
         return  ($self->{ct}); # pi
@@ -6131,7 +6041,6 @@ sub _get_next_token ($) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state"
         } else {
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         ## Reprocess.
         return  ($self->{ct}); # pi
@@ -6163,7 +6072,6 @@ sub _get_next_token ($) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         } else {
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -6214,7 +6122,6 @@ sub _get_next_token ($) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         } else {
           $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
         }
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -6323,7 +6230,6 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed internal subset'); ## TODO: type
         delete $self->{in_subset};
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## Reconsume.
         return  ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
@@ -6350,7 +6256,6 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == DOCTYPE_INTERNAL_SUBSET_AFTER_STATE) {
       if ($self->{nc} == 0x003E) { # >
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -6367,7 +6272,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## Reconsume.
         return  ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
@@ -6392,7 +6296,6 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == BOGUS_DOCTYPE_INTERNAL_SUBSET_AFTER_STATE) {
       if ($self->{nc} == 0x003E) { # >
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -6408,7 +6311,6 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{nc} == -1) {
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## Reconsume.
         return  ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
@@ -6459,7 +6361,6 @@ sub _get_next_token ($) {
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare stago');
         $self->{state} = DATA_STATE;
-        $self->{s_kwd} = '';
         ## Reconsume.
         redo A;
       } else {
