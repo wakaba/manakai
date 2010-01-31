@@ -1364,8 +1364,8 @@ sub _reset_insertion_mode ($) {
   }
 } # _reset_insertion_mode
 
-  my $parse_rcdata = sub ($$$) {
-    my ($self, $insert, $parse_refs) = @_;
+  my $parse_rcdata = sub ($$$$) {
+    my ($self, $insert, $open_tables, $parse_refs) = @_;
 
     ## Step 1
     my $start_tag_name = $token->{tag_name};
@@ -1390,7 +1390,7 @@ sub _reset_insertion_mode ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -1410,8 +1410,8 @@ sub _reset_insertion_mode ($) {
     $token = $self->_get_next_token;
   }; # $parse_rcdata
 
-  my $script_start_tag = sub ($$) {
-    my ($self, $insert) = @_;
+  my $script_start_tag = sub ($$$) {
+    my ($self, $insert, $open_tables) = @_;
 
     ## Step 1
     my $script_el;
@@ -1441,7 +1441,7 @@ sub _reset_insertion_mode ($) {
     ## TODO: Mark as "already executed", if ...
 
     ## Step 4 (HTML5 revision 2702)
-    $insert->($script_el);
+    $insert->($self, $script_el, $open_tables);
     push @{$self->{open_elements}}, [$script_el, $el_category->{script}];
 
     ## Step 5
@@ -1718,8 +1718,8 @@ sub _reset_insertion_mode ($) {
     } # FET
   }; # $formatting_end_tag
 
-  my $reconstruct_active_formatting_elements = sub { # MUST
-    my ($self, $insert, $active_formatting_elements) = @_;
+  my $reconstruct_active_formatting_elements = sub ($$$$) {
+    my ($self, $insert, $active_formatting_elements, $open_tables) = @_;
 
     ## Step 1
     return unless @$active_formatting_elements;
@@ -1778,7 +1778,7 @@ sub _reset_insertion_mode ($) {
       my $clone = [$entry->[0]->clone_node (0), $entry->[1]];
     
       ## Step 9
-      $insert->($clone->[0]);
+      $insert->($self, $clone->[0], $open_tables);
       push @{$self->{open_elements}}, $clone;
       
       ## Step 10
@@ -1798,16 +1798,8 @@ sub _reset_insertion_mode ($) {
     } # S7
   }; # $reconstruct_active_formatting_elements
 
-sub _tree_construction_main ($) {
-  my $self = shift;
-
-  ## "List of active formatting elements".  Each item in this array is
-  ## an array reference, which contains: [0] - the element node; [1] -
-  ## the local name of the element; [2] - the token that is used to
-  ## create [0].
-  my $active_formatting_elements = [];
-
-  my $clear_up_to_marker = sub {
+  my $clear_up_to_marker = sub ($) {
+    my $active_formatting_elements = $_[0];
     for (reverse 0..$#$active_formatting_elements) {
       if ($active_formatting_elements->[$_]->[0] eq '#marker') {
         
@@ -1818,23 +1810,16 @@ sub _tree_construction_main ($) {
 
     
   }; # $clear_up_to_marker
-
-  my $insert;
-
-  ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
-  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
-  ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
-  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
-
-  $insert = my $insert_to_current = sub {
-    $self->{open_elements}->[-1]->[0]->append_child ($_[0]);
+  my $insert_to_current = sub {
+    #my ($self, $child, $open_tables) = @_;
+    $_[0]->{open_elements}->[-1]->[0]->append_child ($_[1]);
   }; # $insert_to_current
 
   ## Foster parenting.  Note that there are three "foster parenting"
   ## code in the parser: for elements (this one), for texts, and for
   ## elements in the AAA code.
   my $insert_to_foster = sub {
-    my $child = shift;
+    my ($self, $child, $open_tables) = @_;
     if ($self->{open_elements}->[-1]->[1] & TABLE_ROWS_EL) {
       # MUST
       my $foster_parent_element;
@@ -1858,6 +1843,24 @@ sub _tree_construction_main ($) {
       $self->{open_elements}->[-1]->[0]->append_child ($child);
     }
   }; # $insert_to_foster
+
+sub _tree_construction_main ($) {
+  my $self = shift;
+
+  ## "List of active formatting elements".  Each item in this array is
+  ## an array reference, which contains: [0] - the element node; [1] -
+  ## the local name of the element; [2] - the token that is used to
+  ## create [0].
+  my $active_formatting_elements = [];
+
+  my $insert;
+
+  ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
+  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
+  ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
+  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
+
+  $insert = $insert_to_current;
 
   ## NOTE: Insert a character (MUST): When a character is inserted, if
   ## the last node that was inserted by the parser is a Text node and
@@ -1917,7 +1920,8 @@ sub _tree_construction_main ($) {
 
         ## NOTE: As if in body, but insert into the foster parent element.
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_foster, $active_formatting_elements);
+            ->($self, $insert_to_foster, $active_formatting_elements,
+               $open_tables);
             
         if ($self->{open_elements}->[-1]->[1] & TABLE_ROWS_EL) {
           # MUST
@@ -2205,7 +2209,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, ($el_category_f->{$nsuri}->{ $tag_name} || 0) | FOREIGN_EL];
 
       if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($nsuri)) {
@@ -2681,7 +2685,7 @@ sub _tree_construction_main ($) {
           }
 
           ## NOTE: There is a "as if in head" code clone.
-          $parse_rcdata->($self, $insert, 1); # RCDATA
+          $parse_rcdata->($self, $insert, $open_tables, 1); # RCDATA
 
           ## NOTE: At this point the stack of open elements contain
           ## the |head| element (index == -2) and the |script| element
@@ -2708,7 +2712,7 @@ sub _tree_construction_main ($) {
           } else {
             
           }
-          $parse_rcdata->($self, $insert, 0); # RAWTEXT
+          $parse_rcdata->($self, $insert, $open_tables, 0); # RAWTEXT
           ## ISSUE: A spec bug [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1, () # <head>
               if ($self->{insertion_mode} & IM_MASK) == AFTER_HEAD_IM;
@@ -2780,7 +2784,7 @@ sub _tree_construction_main ($) {
           }
 
           ## NOTE: There is a "as if in head" code clone.
-          $script_start_tag->($self, $insert);
+          $script_start_tag->($self, $insert, $open_tables);
           ## ISSUE: A spec bug  [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1 # <head>
               if ($self->{insertion_mode} & IM_MASK) == AFTER_HEAD_IM;
@@ -3119,7 +3123,8 @@ sub _tree_construction_main ($) {
       if ($token->{type} == CHARACTER_TOKEN) {
         
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements);
+            ->($self, $insert_to_current, $active_formatting_elements,
+               $open_tables);
         
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
@@ -3214,7 +3219,7 @@ sub _tree_construction_main ($) {
                 
                 splice @{$self->{open_elements}}, $i;
                 
-                $clear_up_to_marker->();
+                $clear_up_to_marker->($active_formatting_elements);
                 
                 $self->{insertion_mode} = IN_TABLE_IM;
                 
@@ -3275,7 +3280,7 @@ sub _tree_construction_main ($) {
                 
                 splice @{$self->{open_elements}}, $i;
                 
-                $clear_up_to_marker->();
+                $clear_up_to_marker->($active_formatting_elements);
                 
                 $self->{insertion_mode} = IN_ROW_IM;
                 
@@ -3336,7 +3341,7 @@ sub _tree_construction_main ($) {
                 
                 splice @{$self->{open_elements}}, $i;
                 
-                $clear_up_to_marker->();
+                $clear_up_to_marker->($active_formatting_elements);
                 
                 $self->{insertion_mode} = IN_TABLE_IM;
                 
@@ -3444,7 +3449,7 @@ sub _tree_construction_main ($) {
 
               splice @{$self->{open_elements}}, $i;
 
-              $clear_up_to_marker->();
+              $clear_up_to_marker->($active_formatting_elements);
 
               $self->{insertion_mode} = IN_TABLE_IM;
 
@@ -3884,13 +3889,13 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'style') {
           
           ## NOTE: This is a "as if in head" code clone.
-          $parse_rcdata->($self, $insert, 0); # RAWTEXT
+          $parse_rcdata->($self, $insert, $open_tables, 0); # RAWTEXT
           $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
           next B;
         } elsif ($token->{tag_name} eq 'script') {
           
           ## NOTE: This is a "as if in head" code clone.
-          $script_start_tag->($self, $insert);
+          $script_start_tag->($self, $insert, $open_tables);
           $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
           next B;
         } elsif ($token->{tag_name} eq 'input') {
@@ -4565,7 +4570,7 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'script') {
           
           ## NOTE: This is an "as if in head" code clone
-          $script_start_tag->($self, $insert);
+          $script_start_tag->($self, $insert, $open_tables);
           next B;
         } else {
           
@@ -4734,7 +4739,8 @@ sub _tree_construction_main ($) {
           my $data = $1;
           ## As if in body
           $reconstruct_active_formatting_elements
-              ->($self, $insert_to_current, $active_formatting_elements);
+              ->($self, $insert_to_current, $active_formatting_elements,
+                 $open_tables);
               
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
           
@@ -4924,7 +4930,7 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'noframes') {
           
           ## NOTE: As if in head.
-          $parse_rcdata->($self, $insert, 0); # RAWTEXT
+          $parse_rcdata->($self, $insert, $open_tables, 0); # RAWTEXT
           next B;
 
           ## NOTE: |<!DOCTYPE HTML><frameset></frameset></html><noframes></noframes>|
@@ -5019,12 +5025,12 @@ sub _tree_construction_main ($) {
       if ($token->{tag_name} eq 'script') {
         
         ## NOTE: This is an "as if in head" code clone
-        $script_start_tag->($self, $insert);
+        $script_start_tag->($self, $insert, $open_tables);
         next B;
       } elsif ($token->{tag_name} eq 'style') {
         
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->($self, $insert, 0); # RAWTEXT
+        $parse_rcdata->($self, $insert, $open_tables, 0); # RAWTEXT
         next B;
       } elsif ({
                 base => 1, command => 1, link => 1,
@@ -5052,7 +5058,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5083,7 +5089,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5142,7 +5148,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'title') {
         
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->($self, $insert, 1); # RCDATA
+        $parse_rcdata->($self, $insert, $open_tables, 1); # RCDATA
         next B;
       } elsif ($token->{tag_name} eq 'body') {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body', text => 'body', token => $token);
@@ -5209,7 +5215,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5308,7 +5314,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5474,7 +5480,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5583,7 +5589,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5632,7 +5638,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5681,7 +5687,8 @@ sub _tree_construction_main ($) {
         } # AFE
           
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements);
+            ->($self, $insert_to_current, $active_formatting_elements,
+               $open_tables);
 
         
     {
@@ -5704,7 +5711,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5718,7 +5725,8 @@ sub _tree_construction_main ($) {
         next B;
       } elsif ($token->{tag_name} eq 'nobr') {
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements);
+            ->($self, $insert_to_current, $active_formatting_elements,
+               $open_tables);
 
         ## has a |nobr| element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -5761,7 +5769,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5795,7 +5803,8 @@ sub _tree_construction_main ($) {
         } # INSCOPE
           
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements);
+            ->($self, $insert_to_current, $active_formatting_elements,
+               $open_tables);
           
         
     {
@@ -5818,7 +5827,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5861,7 +5870,8 @@ sub _tree_construction_main ($) {
           } # INSCOPE
 
           $reconstruct_active_formatting_elements
-              ->($self, $insert_to_current, $active_formatting_elements);
+              ->($self, $insert_to_current, $active_formatting_elements,
+                 $open_tables);
 
           delete $self->{frameset_ok};
         } elsif ($token->{tag_name} eq 'iframe') {
@@ -5871,7 +5881,7 @@ sub _tree_construction_main ($) {
           
         }
         ## NOTE: There is an "as if in body" code clone.
-        $parse_rcdata->($self, $insert, 0); # RAWTEXT
+        $parse_rcdata->($self, $insert, $open_tables, 0); # RAWTEXT
         next B;
       } elsif ($token->{tag_name} eq 'isindex') {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'isindex', token => $token);
@@ -5951,7 +5961,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -5998,7 +6008,8 @@ sub _tree_construction_main ($) {
         } # INSCOPE
 
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements);
+            ->($self, $insert_to_current, $active_formatting_elements,
+               $open_tables);
 
         
     {
@@ -6021,7 +6032,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -6080,7 +6091,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -6091,7 +6102,8 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'math' or
                $token->{tag_name} eq 'svg') {
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements);
+            ->($self, $insert_to_current, $active_formatting_elements,
+               $open_tables);
 
         ## "Adjust MathML attributes" ('math' only) - done in insert-element-f
 
@@ -6131,7 +6143,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL];
 
       if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS)) {
@@ -6194,7 +6206,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -6214,7 +6226,8 @@ sub _tree_construction_main ($) {
 
         ## NOTE: There is an "as if <br>" code clone.
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements);
+            ->($self, $insert_to_current, $active_formatting_elements,
+               $open_tables);
         
         
     {
@@ -6237,7 +6250,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-      $insert->($el);
+      $insert->($self, $el, $open_tables);
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
@@ -6433,7 +6446,7 @@ sub _tree_construction_main ($) {
           splice @{$self->{open_elements}}, $i;
 
           ## Step 4.
-          $clear_up_to_marker->()
+          $clear_up_to_marker->($active_formatting_elements)
               if {
                 applet => 1, button => 1, marquee => 1, object => 1,
               }->{$token->{tag_name}};
@@ -6594,7 +6607,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-          $insert->($el);
+          $insert->($self, $el, $open_tables);
           ## NOTE: Not inserted into |$self->{open_elements}|.
         }
 
@@ -6617,7 +6630,8 @@ sub _tree_construction_main ($) {
 
         ## As if <br>
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements);
+            ->($self, $insert_to_current, $active_formatting_elements,
+               $open_tables);
         
         my $el;
         
@@ -6629,7 +6643,7 @@ sub _tree_construction_main ($) {
         $el->set_user_data (manakai_source_column => $token->{column})
             if defined $token->{column};
       
-        $insert->($el);
+        $insert->($self, $el, $open_tables);
         
         ## Ignore the token.
         $token = $self->_get_next_token;

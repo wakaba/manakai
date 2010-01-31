@@ -31,7 +31,7 @@ while (<>) {
     {
       my \$el;
       !!!create-element (\$el, $1, $2, $3, $4);
-      \$insert->(\$el);
+      \$insert->(\$self, \$el, \$open_tables);
       push \@{\$self->{open_elements}}, [\$el, (\$el_category_f->{$1}->{$2} || 0) | FOREIGN_EL];
 
       if ($3\->{xmlns} and $3\->{xmlns}->{value} ne ($1)) {
@@ -48,7 +48,7 @@ while (<>) {
     {
       my \$el;
       !!!create-element (\$el, \$HTML_NS, $1, $2, $3);
-      \$insert->(\$el);
+      \$insert->(\$self, \$el, \$open_tables);
       push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
   }}ge;
