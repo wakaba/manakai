@@ -1364,111 +1364,8 @@ sub _reset_insertion_mode ($) {
   }
 } # _reset_insertion_mode
 
-sub _tree_construction_main ($) {
-  my $self = shift;
-
-  ## "List of active formatting elements".  Each item in this array is
-  ## an array reference, which contains: [0] - the element node; [1] -
-  ## the local name of the element; [2] - the token that is used to
-  ## create [0].
-  my $active_formatting_elements = [];
-
-  my $reconstruct_active_formatting_elements = sub { # MUST
-    my $insert = shift;
-
-    ## Step 1
-    return unless @$active_formatting_elements;
-
-    ## Step 3
-    my $i = -1;
-    my $entry = $active_formatting_elements->[$i];
-
-    ## Step 2
-    return if $entry->[0] eq '#marker';
-    for (@{$self->{open_elements}}) {
-      if ($entry->[0] eq $_->[0]) {
-        
-        return;
-      }
-    }
-    
-    S4: {
-      ## Step 4
-      last S4 if $active_formatting_elements->[0]->[0] eq $entry->[0];
-
-      ## Step 5
-      $i--;
-      $entry = $active_formatting_elements->[$i];
-
-      ## Step 6
-      if ($entry->[0] eq '#marker') {
-        
-        #
-      } else {
-        my $in_open_elements;
-        OE: for (@{$self->{open_elements}}) {
-          if ($entry->[0] eq $_->[0]) {
-            
-            $in_open_elements = 1;
-            last OE;
-          }
-        }
-        if ($in_open_elements) {
-          
-          #
-        } else {
-          ## NOTE: <!DOCTYPE HTML><p><b><i><u></p> <p>X
-          
-          redo S4;
-        }
-      }
-
-      ## Step 7
-      $i++;
-      $entry = $active_formatting_elements->[$i];
-    } # S4
-
-    S7: {
-      ## Step 8
-      my $clone = [$entry->[0]->clone_node (0), $entry->[1]];
-    
-      ## Step 9
-      $insert->($clone->[0]);
-      push @{$self->{open_elements}}, $clone;
-      
-      ## Step 10
-      $active_formatting_elements->[$i] = $self->{open_elements}->[-1];
-
-      ## Step 11
-      unless ($clone->[0] eq $active_formatting_elements->[-1]->[0]) {
-        
-        ## Step 7'
-        $i++;
-        $entry = $active_formatting_elements->[$i];
-        
-        redo S7;
-      }
-
-      
-    } # S7
-  }; # $reconstruct_active_formatting_elements
-
-  my $clear_up_to_marker = sub {
-    for (reverse 0..$#$active_formatting_elements) {
-      if ($active_formatting_elements->[$_]->[0] eq '#marker') {
-        
-        splice @$active_formatting_elements, $_;
-        return;
-      }
-    }
-
-    
-  }; # $clear_up_to_marker
-
-  my $insert;
-
-  my $parse_rcdata = sub ($) {
-    my ($parse_refs) = @_;
+  my $parse_rcdata = sub ($$$) {
+    my ($self, $insert, $parse_refs) = @_;
 
     ## Step 1
     my $start_tag_name = $token->{tag_name};
@@ -1513,7 +1410,9 @@ sub _tree_construction_main ($) {
     $token = $self->_get_next_token;
   }; # $parse_rcdata
 
-  my $script_start_tag = sub () {
+  my $script_start_tag = sub ($$) {
+    my ($self, $insert) = @_;
+
     ## Step 1
     my $script_el;
     
@@ -1556,13 +1455,8 @@ sub _tree_construction_main ($) {
     $token = $self->_get_next_token;
   }; # $script_start_tag
 
-  ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
-  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
-  ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
-  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
-
   my $formatting_end_tag = sub {
-    my $end_tag_token = shift;
+    my ($self, $active_formatting_elements, $open_tables, $end_tag_token) = @_;
     my $tag_name = $end_tag_token->{tag_name};
 
     ## NOTE: The adoption agency algorithm (AAA).
@@ -1824,6 +1718,114 @@ sub _tree_construction_main ($) {
     } # FET
   }; # $formatting_end_tag
 
+  my $reconstruct_active_formatting_elements = sub { # MUST
+    my ($self, $insert, $active_formatting_elements) = @_;
+
+    ## Step 1
+    return unless @$active_formatting_elements;
+
+    ## Step 3
+    my $i = -1;
+    my $entry = $active_formatting_elements->[$i];
+
+    ## Step 2
+    return if $entry->[0] eq '#marker';
+    for (@{$self->{open_elements}}) {
+      if ($entry->[0] eq $_->[0]) {
+        
+        return;
+      }
+    }
+    
+    S4: {
+      ## Step 4
+      last S4 if $active_formatting_elements->[0]->[0] eq $entry->[0];
+
+      ## Step 5
+      $i--;
+      $entry = $active_formatting_elements->[$i];
+
+      ## Step 6
+      if ($entry->[0] eq '#marker') {
+        
+        #
+      } else {
+        my $in_open_elements;
+        OE: for (@{$self->{open_elements}}) {
+          if ($entry->[0] eq $_->[0]) {
+            
+            $in_open_elements = 1;
+            last OE;
+          }
+        }
+        if ($in_open_elements) {
+          
+          #
+        } else {
+          ## NOTE: <!DOCTYPE HTML><p><b><i><u></p> <p>X
+          
+          redo S4;
+        }
+      }
+
+      ## Step 7
+      $i++;
+      $entry = $active_formatting_elements->[$i];
+    } # S4
+
+    S7: {
+      ## Step 8
+      my $clone = [$entry->[0]->clone_node (0), $entry->[1]];
+    
+      ## Step 9
+      $insert->($clone->[0]);
+      push @{$self->{open_elements}}, $clone;
+      
+      ## Step 10
+      $active_formatting_elements->[$i] = $self->{open_elements}->[-1];
+
+      ## Step 11
+      unless ($clone->[0] eq $active_formatting_elements->[-1]->[0]) {
+        
+        ## Step 7'
+        $i++;
+        $entry = $active_formatting_elements->[$i];
+        
+        redo S7;
+      }
+
+      
+    } # S7
+  }; # $reconstruct_active_formatting_elements
+
+sub _tree_construction_main ($) {
+  my $self = shift;
+
+  ## "List of active formatting elements".  Each item in this array is
+  ## an array reference, which contains: [0] - the element node; [1] -
+  ## the local name of the element; [2] - the token that is used to
+  ## create [0].
+  my $active_formatting_elements = [];
+
+  my $clear_up_to_marker = sub {
+    for (reverse 0..$#$active_formatting_elements) {
+      if ($active_formatting_elements->[$_]->[0] eq '#marker') {
+        
+        splice @$active_formatting_elements, $_;
+        return;
+      }
+    }
+
+    
+  }; # $clear_up_to_marker
+
+  my $insert;
+
+  ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
+  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
+  ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
+  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
+
   $insert = my $insert_to_current = sub {
     $self->{open_elements}->[-1]->[0]->append_child ($_[0]);
   }; # $insert_to_current
@@ -1914,7 +1916,8 @@ sub _tree_construction_main ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in table:#text', token => $token);
 
         ## NOTE: As if in body, but insert into the foster parent element.
-        $reconstruct_active_formatting_elements->($insert_to_foster);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_foster, $active_formatting_elements);
             
         if ($self->{open_elements}->[-1]->[1] & TABLE_ROWS_EL) {
           # MUST
@@ -2678,7 +2681,7 @@ sub _tree_construction_main ($) {
           }
 
           ## NOTE: There is a "as if in head" code clone.
-          $parse_rcdata->(1); # RCDATA
+          $parse_rcdata->($self, $insert, 1); # RCDATA
 
           ## NOTE: At this point the stack of open elements contain
           ## the |head| element (index == -2) and the |script| element
@@ -2705,7 +2708,7 @@ sub _tree_construction_main ($) {
           } else {
             
           }
-          $parse_rcdata->(0); # RAWTEXT
+          $parse_rcdata->($self, $insert, 0); # RAWTEXT
           ## ISSUE: A spec bug [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1, () # <head>
               if ($self->{insertion_mode} & IM_MASK) == AFTER_HEAD_IM;
@@ -2777,7 +2780,7 @@ sub _tree_construction_main ($) {
           }
 
           ## NOTE: There is a "as if in head" code clone.
-          $script_start_tag->();
+          $script_start_tag->($self, $insert);
           ## ISSUE: A spec bug  [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1 # <head>
               if ($self->{insertion_mode} & IM_MASK) == AFTER_HEAD_IM;
@@ -3115,7 +3118,8 @@ sub _tree_construction_main ($) {
     } elsif ($self->{insertion_mode} & BODY_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_current, $active_formatting_elements);
         
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
@@ -3880,13 +3884,13 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'style') {
           
           ## NOTE: This is a "as if in head" code clone.
-          $parse_rcdata->(0); # RAWTEXT
+          $parse_rcdata->($self, $insert, 0); # RAWTEXT
           $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
           next B;
         } elsif ($token->{tag_name} eq 'script') {
           
           ## NOTE: This is a "as if in head" code clone.
-          $script_start_tag->();
+          $script_start_tag->($self, $insert);
           $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
           next B;
         } elsif ($token->{tag_name} eq 'input') {
@@ -4561,7 +4565,7 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'script') {
           
           ## NOTE: This is an "as if in head" code clone
-          $script_start_tag->();
+          $script_start_tag->($self, $insert);
           next B;
         } else {
           
@@ -4729,7 +4733,8 @@ sub _tree_construction_main ($) {
         if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
           my $data = $1;
           ## As if in body
-          $reconstruct_active_formatting_elements->($insert_to_current);
+          $reconstruct_active_formatting_elements
+              ->($self, $insert_to_current, $active_formatting_elements);
               
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
           
@@ -4919,7 +4924,7 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'noframes') {
           
           ## NOTE: As if in head.
-          $parse_rcdata->(0); # RAWTEXT
+          $parse_rcdata->($self, $insert, 0); # RAWTEXT
           next B;
 
           ## NOTE: |<!DOCTYPE HTML><frameset></frameset></html><noframes></noframes>|
@@ -5014,12 +5019,12 @@ sub _tree_construction_main ($) {
       if ($token->{tag_name} eq 'script') {
         
         ## NOTE: This is an "as if in head" code clone
-        $script_start_tag->();
+        $script_start_tag->($self, $insert);
         next B;
       } elsif ($token->{tag_name} eq 'style') {
         
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->(0); # RAWTEXT
+        $parse_rcdata->($self, $insert, 0); # RAWTEXT
         next B;
       } elsif ({
                 base => 1, command => 1, link => 1,
@@ -5137,7 +5142,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'title') {
         
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->(1); # RCDATA
+        $parse_rcdata->($self, $insert, 1); # RCDATA
         next B;
       } elsif ($token->{tag_name} eq 'body') {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body', text => 'body', token => $token);
@@ -5651,7 +5656,8 @@ sub _tree_construction_main ($) {
      # <a>
             $token = {type => END_TAG_TOKEN, tag_name => 'a',
                       line => $token->{line}, column => $token->{column}};
-            $formatting_end_tag->($token);
+            $formatting_end_tag->($self, $active_formatting_elements,
+                                  $open_tables, $token);
             
             AFE2: for (reverse 0..$#$active_formatting_elements) {
               if ($active_formatting_elements->[$_]->[0] eq $node->[0]) {
@@ -5674,7 +5680,8 @@ sub _tree_construction_main ($) {
           }
         } # AFE
           
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_current, $active_formatting_elements);
 
         
     {
@@ -5710,7 +5717,8 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{tag_name} eq 'nobr') {
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_current, $active_formatting_elements);
 
         ## has a |nobr| element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -5786,7 +5794,8 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
           
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_current, $active_formatting_elements);
           
         
     {
@@ -5851,7 +5860,8 @@ sub _tree_construction_main ($) {
             }
           } # INSCOPE
 
-          $reconstruct_active_formatting_elements->($insert_to_current);
+          $reconstruct_active_formatting_elements
+              ->($self, $insert_to_current, $active_formatting_elements);
 
           delete $self->{frameset_ok};
         } elsif ($token->{tag_name} eq 'iframe') {
@@ -5861,7 +5871,7 @@ sub _tree_construction_main ($) {
           
         }
         ## NOTE: There is an "as if in body" code clone.
-        $parse_rcdata->(0); # RAWTEXT
+        $parse_rcdata->($self, $insert, 0); # RAWTEXT
         next B;
       } elsif ($token->{tag_name} eq 'isindex') {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'isindex', token => $token);
@@ -5987,7 +5997,8 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
 
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_current, $active_formatting_elements);
 
         
     {
@@ -6079,7 +6090,8 @@ sub _tree_construction_main ($) {
         redo B;
       } elsif ($token->{tag_name} eq 'math' or
                $token->{tag_name} eq 'svg') {
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_current, $active_formatting_elements);
 
         ## "Adjust MathML attributes" ('math' only) - done in insert-element-f
 
@@ -6201,7 +6213,8 @@ sub _tree_construction_main ($) {
         }
 
         ## NOTE: There is an "as if <br>" code clone.
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_current, $active_formatting_elements);
         
         
     {
@@ -6594,7 +6607,8 @@ sub _tree_construction_main ($) {
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
         
-        $formatting_end_tag->($token);
+        $formatting_end_tag->($self, $active_formatting_elements,
+                              $open_tables, $token);
         next B;
       } elsif ($token->{tag_name} eq 'br') {
         
@@ -6602,7 +6616,8 @@ sub _tree_construction_main ($) {
                         text => 'br', token => $token);
 
         ## As if <br>
-        $reconstruct_active_formatting_elements->($insert_to_current);
+        $reconstruct_active_formatting_elements
+            ->($self, $insert_to_current, $active_formatting_elements);
         
         my $el;
         
