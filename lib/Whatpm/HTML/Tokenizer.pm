@@ -373,28 +373,12 @@ my $is_space = {
   0x0020 => 1, # SPACE (SP)
 };
 
-sub _get_next_token ($) {
-  my $self = shift;
+our $StateImpl;
 
-  if ($self->{self_closing}) {
-    ## NOTE: The |$self->{self_closing}| flag will never set to tokens
-    ## except for start tag tokens.  A start tag token is always set
-    ## to |$self->{ct}| before it is emitted.
-    $self->{parse_error}->(level => $self->{level}->{must}, type => 'nestc', token => $self->{ct});
-    delete $self->{self_closing};
-  }
-
-  if (@{$self->{token}}) {
-    $self->{self_closing} = $self->{token}->[0]->{self_closing};
-    return shift @{$self->{token}};
-  }
-
-  A: {
-    
-
-    if ($self->{state} == DATA_STATE) {
-      ## NOTE: Same as |DATA_STATE|, but only for |PCDATA| content model.
-
+#BEGIN {
+$StateImpl->[DATA_STATE] = sub {
+my $self = $_[0];
+#    if ($self->{state} == DATA_STATE) {
       if ($self->{nc} == 0x0026) { # &
         
         ## NOTE: In the spec, the tokenizer is switched to the 
@@ -415,6 +399,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003C) { # <
         
@@ -430,11 +415,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == -1) {
         
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
+return 1;
         last A;
       } elsif ($self->{is_xml} and $self->{nc} == 0x005D) { # ]
         
@@ -452,6 +439,7 @@ sub _get_next_token ($) {
   
         return  ({type => CHARACTER_TOKEN, data => ']',
                   line => $self->{line_prev}, column => $self->{column_prev}});
+return;
         redo A;
       } else {
         
@@ -478,8 +466,12 @@ sub _get_next_token ($) {
     }
   
       return  ($token);
+return;
       redo A;
-    } elsif ($self->{state} == RCDATA_STATE) {
+};
+$StateImpl->[RCDATA_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == RCDATA_STATE) {
       if ($self->{nc} == 0x0026) { # &
         
         ## NOTE: In the spec, the tokenizer is switched to the
@@ -501,6 +493,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003C) { # <
         
@@ -516,11 +509,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == EOF_CHAR) {
         
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
+return 1;
         last A;
       } else {
         
@@ -542,9 +537,13 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       }
-    } elsif ($self->{state} == RAWTEXT_STATE) {
+};
+$StateImpl->[RAWTEXT_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == RAWTEXT_STATE) {
       if ($self->{nc} == 0x003C) { # <
         
         $self->{state} = RAWTEXT_LT_STATE;
@@ -559,11 +558,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == EOF_CHAR) {
         
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
+return 1;
         last A;
       } else {
         
@@ -585,9 +586,13 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       }
-    } elsif ($self->{state} == SCRIPT_DATA_STATE) {
+};
+$StateImpl->[SCRIPT_DATA_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == SCRIPT_DATA_STATE) {
       if ($self->{nc} == 0x003C) { # <
         
         $self->{state} = SCRIPT_DATA_LT_STATE;
@@ -602,11 +607,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == -1) {
         
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
+return 1;
         last A;
       } else {
         
@@ -633,12 +640,17 @@ sub _get_next_token ($) {
     }
   
       return  ($token);
+return;
       redo A;
-    } elsif ($self->{state} == PLAINTEXT_STATE) {
+};
+$StateImpl->[PLAINTEXT_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == PLAINTEXT_STATE) {
       if ($self->{nc} == -1) {
         
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
+return 1;
         last A;
       } else {
         
@@ -660,9 +672,13 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       }
-    } elsif ($self->{state} == TAG_OPEN_STATE) {
+};
+$StateImpl->[TAG_OPEN_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == TAG_OPEN_STATE) {
       ## XML5: "tag state".
 
       if ($self->{nc} == 0x0021) { # !
@@ -679,6 +695,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x002F) { # /
         
@@ -694,6 +711,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A) { # A..Z
         
@@ -714,6 +732,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif (0x0061 <= $self->{nc} and $self->{nc} <= 0x007A) { # a..z
         
@@ -733,6 +752,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003F) { # ?
         if ($self->{is_xml}) {
@@ -749,6 +769,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
           redo A;
         } else {
           
@@ -761,6 +782,7 @@ sub _get_next_token ($) {
                          column => $self->{column_prev},
                         };
           ## $self->{nc} is intentionally left as is
+return;
           redo A;
         }
       } elsif (not $self->{is_xml} or
@@ -777,6 +799,7 @@ sub _get_next_token ($) {
                   column => $self->{column_prev},
                  });
         
+return;
         redo A;
       } else {
         ## XML5: "<:" is a parse error.
@@ -797,14 +820,22 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       }
-    } elsif ({
-        (RCDATA_LT_STATE) => 1,
-        (RAWTEXT_LT_STATE) => 1,
-        (SCRIPT_DATA_LT_STATE) => 1,
-        (SCRIPT_DATA_ESCAPED_LT_STATE) => 1,
-    }->{$self->{state}}) {
+};
+
+$StateImpl->[RCDATA_LT_STATE] =
+$StateImpl->[RAWTEXT_LT_STATE] =
+$StateImpl->[SCRIPT_DATA_LT_STATE] = 
+$StateImpl->[SCRIPT_DATA_ESCAPED_LT_STATE] = sub {
+my $self = $_[0];
+#    } elsif ({
+#        (RCDATA_LT_STATE) => 1,
+#        (RAWTEXT_LT_STATE) => 1,
+#        (SCRIPT_DATA_LT_STATE) => 1,
+#        (SCRIPT_DATA_ESCAPED_LT_STATE) => 1,
+#    }->{$self->{state}}) {
       if ($self->{nc} == 0x002F) { # /
         
         
@@ -826,6 +857,7 @@ sub _get_next_token ($) {
               => SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE,
         }->{$self->{state}} or die "$self->{state}'s next state not found";
         $self->{kwd} = ''; # "temporary buffer" in the spec.
+return;
         redo A;
       } elsif ($self->{state} == SCRIPT_DATA_LT_STATE and
                $self->{nc} == 0x0021) { # !
@@ -845,6 +877,7 @@ sub _get_next_token ($) {
         return  ({type => CHARACTER_TOKEN, data => '<!',
                   line => $self->{line_prev},
                   column => $self->{column_prev}});
+return;
         redo A;
       } elsif ($self->{state} == SCRIPT_DATA_ESCAPED_LT_STATE and
                (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A)) { # A..Z
@@ -866,6 +899,7 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       } elsif ($self->{state} == SCRIPT_DATA_ESCAPED_LT_STATE and
                (0x0061 <= $self->{nc} and $self->{nc} <= 0x007A)) { # a..z
@@ -887,6 +921,7 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       } else {
         
@@ -900,9 +935,13 @@ sub _get_next_token ($) {
         return  ({type => CHARACTER_TOKEN, data => '<',
                   line => $self->{line_prev},
                   column => $self->{column_prev}});
+return;
         redo A;
       }
-    } elsif ($self->{state} == CLOSE_TAG_OPEN_STATE) {
+};
+$StateImpl->[CLOSE_TAG_OPEN_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == CLOSE_TAG_OPEN_STATE) {
       ## XML5: "end tag state".
 
       my ($l, $c) = ($self->{line_prev}, $self->{column_prev} - 1); # "<"of"</"
@@ -925,6 +964,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif (0x0061 <= $self->{nc} and
                $self->{nc} <= 0x007A) { # a..z
@@ -944,6 +984,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty end tag',
@@ -989,6 +1030,7 @@ sub _get_next_token ($) {
     }
   
         }
+return;
         redo A;
       } elsif ($self->{nc} == -1) {
         
@@ -1000,6 +1042,7 @@ sub _get_next_token ($) {
                   line => $l, column => $c,
                  });
 
+return;
         redo A;
       } elsif (not $self->{is_xml} or
                $is_space->{$self->{nc}}) {
@@ -1018,6 +1061,7 @@ sub _get_next_token ($) {
         ## it will be included to the |data| of the comment token
         ## generated from the bogus end tag, as defined in the
         ## "bogus comment state" entry.
+return;
         redo A;
       } else {
         ## XML5: "</:" is a parse error.
@@ -1037,14 +1081,21 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       }
-    } elsif ({
-      (RCDATA_END_TAG_OPEN_STATE) => 1,
-      (RAWTEXT_END_TAG_OPEN_STATE) => 1,
-      (SCRIPT_DATA_END_TAG_OPEN_STATE) => 1,
-      (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE) => 1,
-    }->{$self->{state}}) {
+};
+$StateImpl->[RCDATA_END_TAG_OPEN_STATE] =
+$StateImpl->[RAWTEXT_END_TAG_OPEN_STATE]=
+$StateImpl->[SCRIPT_DATA_END_TAG_OPEN_STATE]=
+$StateImpl->[SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE] = sub {
+my $self = $_[0];
+#    } elsif ({
+#      (RCDATA_END_TAG_OPEN_STATE) => 1,
+#      (RAWTEXT_END_TAG_OPEN_STATE) => 1,
+#      (SCRIPT_DATA_END_TAG_OPEN_STATE) => 1,
+#      (SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE) => 1,
+#    }->{$self->{state}}) {
       ## This switch-case implements "RCDATA end tag open state",
       ## "RAWTEXT end tag open state", "script data end tag open
       ## state", "RCDATA end tag name state", "RAWTEXT end tag name
@@ -1069,6 +1120,7 @@ sub _get_next_token ($) {
         ## Reconsume.
         return  ({type => CHARACTER_TOKEN, data => '</',
                   line => $l, column => $c});
+return;
         redo A;
       }
 
@@ -1092,6 +1144,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
           redo A;
         } else {
           
@@ -1108,6 +1161,7 @@ sub _get_next_token ($) {
                     line => $self->{line_prev},
                     column => $self->{column_prev} - 1 - length $self->{kwd},
                    });
+return;
           redo A;
         }
       } else { # after "</{tag-name}"
@@ -1130,6 +1184,7 @@ sub _get_next_token ($) {
                     line => $self->{line_prev},
                     column => $self->{column_prev} - 1 - length $self->{kwd},
                    });
+return;
           redo A;
         } else {
           
@@ -1140,10 +1195,14 @@ sub _get_next_token ($) {
                  column => $self->{column_prev} - 1 - length $self->{kwd}};
           $self->{state} = TAG_NAME_STATE;
           ## Reconsume.
+return;
           redo A;
         }
       }
-    } elsif ($self->{state} == TAG_NAME_STATE) {
+};
+$StateImpl->[TAG_NAME_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == TAG_NAME_STATE) {
       ## This switch-case implements "tag name state", "RCDATA end tag
       ## name state", "RAWTEXT end tag name state", and "script data
       ## end tag name state" jointly with the implementation of
@@ -1163,6 +1222,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
@@ -1194,6 +1254,7 @@ sub _get_next_token ($) {
 
         return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } elsif (0x0041 <= $self->{nc} and
                $self->{nc} <= 0x005A) { # A..Z
@@ -1213,6 +1274,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == -1) {
         ## NOTE: PCDATA ("tag name state") case only.
@@ -1237,6 +1299,7 @@ sub _get_next_token ($) {
         ## Discard the token.
         #return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } elsif ($self->{nc} == 0x002F) { # /
         
@@ -1252,6 +1315,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } else {
         
@@ -1269,10 +1333,15 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       }
-    } elsif ($self->{state} == SCRIPT_DATA_ESCAPE_START_STATE or
-             $self->{state} == SCRIPT_DATA_ESCAPE_START_DASH_STATE) {
+};
+$StateImpl->[SCRIPT_DATA_ESCAPE_START_STATE] =
+$StateImpl->[SCRIPT_DATA_ESCAPE_START_DASH_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == SCRIPT_DATA_ESCAPE_START_STATE or
+#             $self->{state} == SCRIPT_DATA_ESCAPE_START_DASH_STATE) {
       if ($self->{nc} == 0x002D) { # -
         $self->{state} = {
           (SCRIPT_DATA_ESCAPE_START_STATE)
@@ -1293,20 +1362,30 @@ sub _get_next_token ($) {
         return  ({type => CHARACTER_TOKEN,
                   data => '-',
                   line => $self->{line_prev}, column => $self->{column_prev}});
+return;
         redo A;
       } else {
         $self->{state} = SCRIPT_DATA_STATE;
         ## Reconsume.
+return;
         redo A;
       }
-    } elsif ({
-      (SCRIPT_DATA_ESCAPED_STATE) => 1,
-      (SCRIPT_DATA_ESCAPED_DASH_STATE) => 1,
-      (SCRIPT_DATA_ESCAPED_DASH_DASH_STATE) => 1,
-      (SCRIPT_DATA_DOUBLE_ESCAPED_STATE) => 1,
-      (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE) => 1,
-      (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE) => 1,
-    }->{$self->{state}}) {
+};
+$StateImpl->[SCRIPT_DATA_ESCAPED_STATE] = 
+$StateImpl->[SCRIPT_DATA_ESCAPED_DASH_STATE] =
+$StateImpl->[SCRIPT_DATA_ESCAPED_DASH_DASH_STATE] = 
+$StateImpl->[SCRIPT_DATA_DOUBLE_ESCAPED_STATE] =
+$StateImpl->[SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE] = 
+$StateImpl->[SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE] = sub {
+my $self = $_[0];
+#    } elsif ({
+#      (SCRIPT_DATA_ESCAPED_STATE) => 1,
+#      (SCRIPT_DATA_ESCAPED_DASH_STATE) => 1,
+#      (SCRIPT_DATA_ESCAPED_DASH_DASH_STATE) => 1,
+#      (SCRIPT_DATA_DOUBLE_ESCAPED_STATE) => 1,
+#      (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE) => 1,
+#      (SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE) => 1,
+#    }->{$self->{state}}) {
       if ($self->{nc} == 0x002D) { # -
         $self->{state} = {
           (SCRIPT_DATA_ESCAPED_STATE) => SCRIPT_DATA_ESCAPED_DASH_STATE,
@@ -1335,6 +1414,7 @@ sub _get_next_token ($) {
         return  ({type => CHARACTER_TOKEN,
                   data => '-',
                   line => $self->{line_prev}, column => $self->{column_prev}});
+return;
         redo A;
       } elsif ($self->{nc} == 0x003C) { # <
         my $token;
@@ -1373,6 +1453,7 @@ sub _get_next_token ($) {
         if ($token) {
           return  ($token);
         }
+return;
         redo A;
       } elsif (($self->{state} == SCRIPT_DATA_ESCAPED_DASH_DASH_STATE or
                 $self->{state} == SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE) and
@@ -1392,11 +1473,13 @@ sub _get_next_token ($) {
         return  ({type => CHARACTER_TOKEN,
                   data => '>',
                   line => $self->{line_prev}, column => $self->{column_prev}});
+return;
         redo A;
       } elsif ($self->{nc} == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'eof in escaped script data'); # XXX documentation
         $self->{state} = DATA_STATE;
         ## Reconsume.
+return;
         redo A;
       } else {
         my $token = {type => CHARACTER_TOKEN,
@@ -1425,10 +1508,15 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       }
-    } elsif ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE or
-             $self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE) {
+};
+$StateImpl->[SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE] =
+$StateImpl->[SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE or
+#             $self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE) {
       if ($is_space->{$self->{nc}} or
           $self->{nc} == 0x002F or # /
           $self->{nc} == 0x003E) { # >
@@ -1456,6 +1544,7 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       } elsif (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A) { # A..Z
         my $token = {type => CHARACTER_TOKEN, data => chr ($self->{nc}),
@@ -1475,6 +1564,7 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       } elsif (0x0061 <= $self->{nc} and $self->{nc} <= 0x007A) { # a..z
         
@@ -1495,6 +1585,7 @@ sub _get_next_token ($) {
     }
   
         return  ($token);
+return;
         redo A;
       } else {
         if ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE) {
@@ -1503,9 +1594,13 @@ sub _get_next_token ($) {
           $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPED_STATE;
         }
         ## Reconsume.
+return;
         redo A;
       }
-    } elsif ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE) {
+};
+$StateImpl->[SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE) {
       if ($self->{nc} == 0x002F) { # /
         $self->{kwd} = ''; # "temporary buffer"
         $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE;
@@ -1523,13 +1618,18 @@ sub _get_next_token ($) {
         return  ({type => CHARACTER_TOKEN,
                   data => '/',
                   line => $self->{line_prev}, column => $self->{column_prev}});
+return;
         redo A;
       } else {
         $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPED_STATE;
         ## Reconsume.
+return;
         redo A;
       }
-    } elsif ($self->{state} == DATA_MSE1_STATE) {
+};
+$StateImpl->[DATA_MSE1_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == DATA_MSE1_STATE) {
       ## XML5: Part of the "data state".
       
       if ($self->{nc} == 0x005D) { # ]
@@ -1548,14 +1648,19 @@ sub _get_next_token ($) {
   
         return  ({type => CHARACTER_TOKEN, data => ']',
                   line => $self->{line_prev}, column => $self->{column_prev}});
+return;
         redo A;
       } else {
         
         $self->{state} = DATA_STATE;
         ## Reconsume.
+return;
         redo A;
       }
-    } elsif ($self->{state} == DATA_MSE2_STATE) {
+};
+$StateImpl->[DATA_MSE2_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == DATA_MSE2_STATE) {
       ## XML5: Part of the "data state".
       
       if ($self->{nc} == 0x003E) { # >
@@ -1578,6 +1683,7 @@ sub _get_next_token ($) {
   
         return  ({type => CHARACTER_TOKEN, data => '>',
                   line => $self->{line_prev}, column => $self->{column_prev}});
+return;
         redo A;
       } elsif ($self->{nc} == 0x005D) { # ]
         
@@ -1595,14 +1701,19 @@ sub _get_next_token ($) {
   
         return  ({type => CHARACTER_TOKEN, data => ']',
                   line => $self->{line_prev}, column => $self->{column_prev}});
+return;
         redo A;
       } else {
         
         $self->{state} = DATA_STATE;
         ## Reconsume.
+return;
         redo A;
       }
-    } elsif ($self->{state} == BEFORE_ATTRIBUTE_NAME_STATE) {
+};
+$StateImpl->[BEFORE_ATTRIBUTE_NAME_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == BEFORE_ATTRIBUTE_NAME_STATE) {
       ## XML5: "Tag attribute name before state".
 
       if ($is_space->{$self->{nc}}) {
@@ -1619,6 +1730,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
@@ -1649,6 +1761,7 @@ sub _get_next_token ($) {
 
         return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } elsif (0x0041 <= $self->{nc} and
                $self->{nc} <= 0x005A) { # A..Z
@@ -1669,6 +1782,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x002F) { # /
         
@@ -1684,6 +1798,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
@@ -1706,6 +1821,7 @@ sub _get_next_token ($) {
         ## Discard the token.
         #return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } else {
         if ({
@@ -1737,9 +1853,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       }
-    } elsif ($self->{state} == ATTRIBUTE_NAME_STATE) {
+};
+$StateImpl->[ATTRIBUTE_NAME_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == ATTRIBUTE_NAME_STATE) {
       ## XML5: "Tag attribute name state".
 
       my $before_leave = sub {
@@ -1771,6 +1891,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003D) { # =
         
@@ -1787,6 +1908,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
         if ($self->{is_xml}) {
@@ -1824,6 +1946,7 @@ sub _get_next_token ($) {
 
         return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } elsif (0x0041 <= $self->{nc} and
                $self->{nc} <= 0x005A) { # A..Z
@@ -1842,6 +1965,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x002F) { # /
         if ($self->{is_xml}) {
@@ -1865,6 +1989,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
@@ -1889,6 +2014,7 @@ sub _get_next_token ($) {
         ## Discard the token.
         #return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } else {
         if ({
@@ -1915,9 +2041,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       }
-    } elsif ($self->{state} == AFTER_ATTRIBUTE_NAME_STATE) {
+};
+$StateImpl->[AFTER_ATTRIBUTE_NAME_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == AFTER_ATTRIBUTE_NAME_STATE) {
       ## XML5: "Tag attribute name after state".
       
       if ($is_space->{$self->{nc}}) {
@@ -1934,6 +2064,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003D) { # =
         
@@ -1949,6 +2080,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
         if ($self->{is_xml}) {
@@ -1988,6 +2120,7 @@ sub _get_next_token ($) {
 
         return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } elsif (0x0041 <= $self->{nc} and
                $self->{nc} <= 0x005A) { # A..Z
@@ -2008,6 +2141,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x002F) { # /
         if ($self->{is_xml}) {
@@ -2030,6 +2164,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
@@ -2053,6 +2188,7 @@ sub _get_next_token ($) {
         ## Discard the token.
         #return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } else {
         if ($self->{is_xml}) {
@@ -2090,9 +2226,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;        
       }
-    } elsif ($self->{state} == BEFORE_ATTRIBUTE_VALUE_STATE) {
+};
+$StateImpl->[BEFORE_ATTRIBUTE_VALUE_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == BEFORE_ATTRIBUTE_VALUE_STATE) {
       ## XML5: "Tag attribute value before state".
 
       if ($is_space->{$self->{nc}}) {
@@ -2109,6 +2249,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x0022) { # "
         
@@ -2124,11 +2265,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x0026) { # &
         
         $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         ## reconsume
+return;
         redo A;
       } elsif ($self->{nc} == 0x0027) { # '
         
@@ -2144,6 +2287,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       } elsif ($self->{nc} == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty unquoted attribute value');
@@ -2176,6 +2320,7 @@ sub _get_next_token ($) {
 
         return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } elsif ($self->{nc} == -1) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
@@ -2199,6 +2344,7 @@ sub _get_next_token ($) {
         ## Discard the token.
         #return  ($self->{ct}); # start tag or end tag
 
+return;
         redo A;
       } else {
         if ({
@@ -2229,9 +2375,49 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
+return;
         redo A;
       }
-    } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
+      };
+#}
+
+sub _get_next_token ($) {
+  my $self = shift;
+
+  if ($self->{self_closing}) {
+    ## NOTE: The |$self->{self_closing}| flag will never set to tokens
+    ## except for start tag tokens.  A start tag token is always set
+    ## to |$self->{ct}| before it is emitted.
+    $self->{parse_error}->(level => $self->{level}->{must}, type => 'nestc', token => $self->{ct});
+    delete $self->{self_closing};
+  }
+
+  if (@{$self->{token}}) {
+    $self->{self_closing} = $self->{token}->[0]->{self_closing};
+    return shift @{$self->{token}};
+  }
+
+  A: {
+    
+
+if (my $impl = $StateImpl->[$self->{state}]) {
+  my $result = $impl->($self);
+  if ($result) {
+    return $result;
+  } else {
+    redo A;
+  }
+}
+#if ({
+
+
+#};
+#
+
+BEGIN {
+$StateImpl->[ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
       ## XML5: "Tag attribute value double quoted state" and "DOCTYPE
       ## ATTLIST attribute value double quoted state".
       
@@ -2365,7 +2551,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
+};
+$StateImpl->[ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
       ## XML5: "Tag attribute value single quoted state" and "DOCTYPE
       ## ATTLIST attribute value single quoted state".
 
@@ -2502,7 +2691,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == ATTRIBUTE_VALUE_UNQUOTED_STATE) {
+};
+$StateImpl->[ATTRIBUTE_VALUE_UNQUOTED_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == ATTRIBUTE_VALUE_UNQUOTED_STATE) {
       ## XML5: "Tag attribute value unquoted state".
 
       if ($is_space->{$self->{nc}}) {
@@ -2689,7 +2881,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == AFTER_ATTRIBUTE_VALUE_QUOTED_STATE) {
+};
+$StateImpl->[AFTER_ATTRIBUTE_VALUE_QUOTED_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == AFTER_ATTRIBUTE_VALUE_QUOTED_STATE) {
       if ($is_space->{$self->{nc}}) {
         
         $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
@@ -2781,7 +2976,10 @@ sub _get_next_token ($) {
         ## reconsume
         redo A;
       }
-    } elsif ($self->{state} == SELF_CLOSING_START_TAG_STATE) {
+};
+$StateImpl->[SELF_CLOSING_START_TAG_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == SELF_CLOSING_START_TAG_STATE) {
       ## XML5: "Empty tag state".
 
       if ($self->{nc} == 0x003E) { # >
@@ -2849,7 +3047,10 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
-    } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
+};
+$StateImpl->[BOGUS_COMMENT_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
       ## XML5: "Bogus comment state" and "DOCTYPE bogus comment state".
 
       ## NOTE: Unlike spec's "bogus comment state", this implementation
@@ -2910,7 +3111,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
+};
+$StateImpl->[MARKUP_DECLARATION_OPEN_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## XML5: "Markup declaration state".
       
       if ($self->{nc} == 0x002D) { # -
@@ -2979,7 +3183,10 @@ sub _get_next_token ($) {
                                 column => $self->{column_prev} - 1,
                                };
       redo A;
-    } elsif ($self->{state} == MD_HYPHEN_STATE) {
+};
+$StateImpl->[MD_HYPHEN_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == MD_HYPHEN_STATE) {
       if ($self->{nc} == 0x002D) { # -
         
         $self->{ct} = {type => COMMENT_TOKEN, data => '',
@@ -3013,7 +3220,10 @@ sub _get_next_token ($) {
                                  };
         redo A;
       }
-    } elsif ($self->{state} == MD_DOCTYPE_STATE) {
+};
+$StateImpl->[MD_DOCTYPE_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == MD_DOCTYPE_STATE) {
       ## ASCII case-insensitive.
       if ($self->{nc} == [
             undef,
@@ -3094,7 +3304,10 @@ sub _get_next_token ($) {
                                  };
         redo A;
       }
-    } elsif ($self->{state} == MD_CDATA_STATE) {
+};
+$StateImpl->[MD_CDATA_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == MD_CDATA_STATE) {
       if ($self->{nc} == {
             '[' => 0x0043, # C
             '[C' => 0x0044, # D
@@ -3163,7 +3376,10 @@ sub _get_next_token ($) {
                                  };
         redo A;
       }
-    } elsif ($self->{state} == COMMENT_START_STATE) {
+};
+$StateImpl->[COMMENT_START_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == COMMENT_START_STATE) {
       if ($self->{nc} == 0x002D) { # -
         
         $self->{state} = COMMENT_START_DASH_STATE;
@@ -3235,7 +3451,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == COMMENT_START_DASH_STATE) {
+};
+$StateImpl->[COMMENT_START_DASH_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == COMMENT_START_DASH_STATE) {
       if ($self->{nc} == 0x002D) { # -
         
         $self->{state} = COMMENT_END_STATE;
@@ -3307,7 +3526,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == COMMENT_STATE) {
+};
+$StateImpl->[COMMENT_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == COMMENT_STATE) {
       ## XML5: "Comment state" and "DOCTYPE comment state".
 
       if ($self->{nc} == 0x002D) { # -
@@ -3360,7 +3582,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == COMMENT_END_DASH_STATE) {
+};
+$StateImpl->[COMMENT_END_DASH_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == COMMENT_END_DASH_STATE) {
       ## XML5: "Comment dash state" and "DOCTYPE comment dash state".
 
       if ($self->{nc} == 0x002D) { # -
@@ -3409,8 +3634,12 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == COMMENT_END_STATE or
-             $self->{state} == COMMENT_END_BANG_STATE) {
+};
+$StateImpl->[COMMENT_END_STATE] =
+$StateImpl->[COMMENT_END_BANG_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == COMMENT_END_STATE or
+#             $self->{state} == COMMENT_END_BANG_STATE) {
       ## XML5: "Comment end state" and "DOCTYPE comment end state".
       ## (No comment end bang state.)
 
@@ -3533,7 +3762,10 @@ sub _get_next_token ($) {
   
         redo A;
       } 
-    } elsif ($self->{state} == COMMENT_END_SPACE_STATE) {
+};
+$StateImpl->[COMMENT_END_SPACE_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == COMMENT_END_SPACE_STATE) {
       ## XML5: Not exist.
 
       if ($self->{nc} == 0x003E) { # >
@@ -3606,7 +3838,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == DOCTYPE_STATE) {
+};
+$StateImpl->[DOCTYPE_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == DOCTYPE_STATE) {
       if ($is_space->{$self->{nc}}) {
         
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
@@ -3640,7 +3875,10 @@ sub _get_next_token ($) {
         ## reconsume
         redo A;
       }
-    } elsif ($self->{state} == BEFORE_DOCTYPE_NAME_STATE) {
+};
+$StateImpl->[BEFORE_DOCTYPE_NAME_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == BEFORE_DOCTYPE_NAME_STATE) {
       ## XML5: "DOCTYPE root name before state".
 
       if ($is_space->{$self->{nc}}) {
@@ -3742,7 +3980,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == DOCTYPE_NAME_STATE) {
+};
+$StateImpl->[DOCTYPE_NAME_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == DOCTYPE_NAME_STATE) {
       ## XML5: "DOCTYPE root name state".
 
       ## ISSUE: Redundant "First," in the spec.
@@ -3843,7 +4084,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == AFTER_DOCTYPE_NAME_STATE) {
+};
+$StateImpl->[AFTER_DOCTYPE_NAME_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == AFTER_DOCTYPE_NAME_STATE) {
       ## XML5: Corresponding to XML5's "DOCTYPE root name after
       ## state", but implemented differently.
 
@@ -4015,7 +4259,10 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} == PUBLIC_STATE) {
+};
+$StateImpl->[PUBLIC_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == PUBLIC_STATE) {
       ## ASCII case-insensitive
       if ($self->{nc} == [
             undef, 
@@ -4089,7 +4336,10 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
-    } elsif ($self->{state} == SYSTEM_STATE) {
+};
+$StateImpl->[SYSTEM_STATE] = sub {
+my $self = $_[0];
+#    } elsif ($self->{state} == SYSTEM_STATE) {
       ## ASCII case-insensitive
       if ($self->{nc} == [
             undef, 
@@ -4163,7 +4413,10 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       }
-    } elsif ($self->{state} == AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE or
+};
+}
+#    } els
+if ($self->{state} == AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE or
              $self->{state} == BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
       if ($is_space->{$self->{nc}}) {
         
