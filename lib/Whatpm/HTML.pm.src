@@ -1744,24 +1744,6 @@ sub _reset_insertion_mode ($) {
     }
   }; # $insert_to_foster
 
-sub _tree_construction_main ($) {
-  my $self = shift;
-
-  ## "List of active formatting elements".  Each item in this array is
-  ## an array reference, which contains: [0] - the element node; [1] -
-  ## the local name of the element; [2] - the token that is used to
-  ## create [0].
-  my $active_formatting_elements = [];
-
-  my $insert;
-
-  ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
-  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
-  ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
-  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
-
-  $insert = $insert_to_current;
-
   ## NOTE: Insert a character (MUST): When a character is inserted, if
   ## the last node that was inserted by the parser is a Text node and
   ## the character has to be inserted after that node, then the
@@ -1780,6 +1762,22 @@ sub _tree_construction_main ($) {
   ## TODO: |<body><script>document.write("a<br>");
   ## document.body.removeChild (document.body.lastChild);
   ## document.write ("b")</script>|
+
+sub _tree_construction_main ($) {
+  my $self = shift;
+
+  ## "List of active formatting elements".  Each item in this array is
+  ## an array reference, which contains: [0] - the element node; [1] -
+  ## the local name of the element; [2] - the token that is used to
+  ## create [0].
+  my $active_formatting_elements = [];
+
+  my $insert = $insert_to_current;
+
+  ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
+  ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
+  ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
+  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
 
   B: while (1) {
 
