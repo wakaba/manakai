@@ -84,20 +84,6 @@ package Whatpm::HTML;
 
 BEGIN { Whatpm::HTML::Tokenizer->import (':token') }
 
-## ------ Content model flags ------
-
-## Old versions of HTML5 specification has concept of "content model
-## flags", which is now specified as tokenizer states.
-
-sub CM_ENTITY () { 0b001 } # & markup in data
-sub CM_LIMITED_MARKUP () { 0b010 } # < markup in data (limited)
-sub CM_FULL_MARKUP () { 0b100 } # < markup in data (any)
-
-sub PLAINTEXT_CONTENT_MODEL () { 0 }
-sub CDATA_CONTENT_MODEL () { CM_LIMITED_MARKUP }
-sub RCDATA_CONTENT_MODEL () { CM_ENTITY | CM_LIMITED_MARKUP }
-sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
-
 ## ------ Tokenizer states ------
 
 sub DATA_STATE () { 0 }
@@ -320,7 +306,6 @@ sub _initialize_tokenizer ($) {
   #$self->{kwd} = ''; # State-dependent keyword; initialized when used
   #$self->{entity__value}; # initialized when used
   #$self->{entity__match}; # initialized when used
-  $self->{content_model} = PCDATA_CONTENT_MODEL; # be
   undef $self->{ct}; # current token
   undef $self->{ca}; # current attribute
   undef $self->{last_stag_name}; # last emitted start tag name
@@ -1184,7 +1169,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           #if ($self->{ct}->{attributes}) {
           #  ## NOTE: This should never be reached.
           #  !!! cp (36);
@@ -1237,7 +1221,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           #if ($self->{ct}->{attributes}) {
           #  ## NOTE: This state should never be reached.
           #  !!! cp (40);
@@ -1642,7 +1625,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -1709,7 +1691,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -1822,7 +1803,6 @@ sub _get_next_token ($) {
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
           }
@@ -1893,7 +1873,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -1984,7 +1963,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2059,7 +2037,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2174,7 +2151,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2207,7 +2183,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2334,7 +2309,6 @@ sub _get_next_token ($) {
           return  ($self->{ct}); # start tag
           redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2472,7 +2446,6 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2599,7 +2572,6 @@ sub _get_next_token ($) {
           return  ($self->{ct}); # start tag
           redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2656,7 +2628,6 @@ sub _get_next_token ($) {
           redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2739,7 +2710,6 @@ sub _get_next_token ($) {
           
           $self->{last_stag_name} = $self->{ct}->{tag_name};
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
@@ -2819,7 +2789,6 @@ sub _get_next_token ($) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'nestc', token => $self->{ct});
           ## TODO: Different type than slash in start tag
-          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{ct}->{attributes}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');

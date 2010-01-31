@@ -1468,7 +1468,7 @@ sub _tree_construction_main ($) {
   my $insert;
 
   my $parse_rcdata = sub ($) {
-    my ($content_model_flag) = @_;
+    my ($parse_refs) = @_;
 
     ## Step 1
     my $start_tag_name = $token->{tag_name};
@@ -1499,12 +1499,11 @@ sub _tree_construction_main ($) {
   
 
     ## Step 2
-    if ($content_model_flag == RCDATA_CONTENT_MODEL) {
+    if ($parse_refs) {
       $self->{state} = RCDATA_STATE;
     } else {
       $self->{state} = RAWTEXT_STATE;
     }
-    $self->{content_model} = $content_model_flag; # CDATA or RCDATA
     delete $self->{escape}; # MUST
 
     ## Step 3, 4
@@ -1548,7 +1547,6 @@ sub _tree_construction_main ($) {
 
     ## Step 5
     $self->{state} = SCRIPT_DATA_STATE;
-    $self->{content_model} = CDATA_CONTENT_MODEL;
     delete $self->{escape}; # MUST
 
     ## Step 6-7
@@ -2680,7 +2678,7 @@ sub _tree_construction_main ($) {
           }
 
           ## NOTE: There is a "as if in head" code clone.
-          $parse_rcdata->(RCDATA_CONTENT_MODEL);
+          $parse_rcdata->(1); # RCDATA
 
           ## NOTE: At this point the stack of open elements contain
           ## the |head| element (index == -2) and the |script| element
@@ -2707,7 +2705,7 @@ sub _tree_construction_main ($) {
           } else {
             
           }
-          $parse_rcdata->(CDATA_CONTENT_MODEL);
+          $parse_rcdata->(0); # RAWTEXT
           ## ISSUE: A spec bug [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1, () # <head>
               if ($self->{insertion_mode} & IM_MASK) == AFTER_HEAD_IM;
@@ -3882,7 +3880,7 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'style') {
           
           ## NOTE: This is a "as if in head" code clone.
-          $parse_rcdata->(CDATA_CONTENT_MODEL);
+          $parse_rcdata->(0); # RAWTEXT
           $open_tables->[-1]->[2] = 0 if @$open_tables; # ~node inserted
           next B;
         } elsif ($token->{tag_name} eq 'script') {
@@ -4921,7 +4919,7 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'noframes') {
           
           ## NOTE: As if in head.
-          $parse_rcdata->(CDATA_CONTENT_MODEL);
+          $parse_rcdata->(0); # RAWTEXT
           next B;
 
           ## NOTE: |<!DOCTYPE HTML><frameset></frameset></html><noframes></noframes>|
@@ -5021,7 +5019,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'style') {
         
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->(CDATA_CONTENT_MODEL);
+        $parse_rcdata->(0); # RAWTEXT
         next B;
       } elsif ({
                 base => 1, command => 1, link => 1,
@@ -5139,7 +5137,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'title') {
         
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->(RCDATA_CONTENT_MODEL);
+        $parse_rcdata->(1); # RCDATA
         next B;
       } elsif ($token->{tag_name} eq 'body') {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body', text => 'body', token => $token);
@@ -5635,7 +5633,6 @@ sub _tree_construction_main ($) {
   
         
         $self->{state} = PLAINTEXT_STATE;
-        $self->{content_model} = PLAINTEXT_CONTENT_MODEL;
           
         
         $token = $self->_get_next_token;
@@ -5864,7 +5861,7 @@ sub _tree_construction_main ($) {
           
         }
         ## NOTE: There is an "as if in body" code clone.
-        $parse_rcdata->(CDATA_CONTENT_MODEL);
+        $parse_rcdata->(0); # RAWTEXT
         next B;
       } elsif ($token->{tag_name} eq 'isindex') {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'isindex', token => $token);
@@ -5956,7 +5953,6 @@ sub _tree_construction_main ($) {
         $self->{ignore_newline} = 1;
 
         ## 3. RCDATA
-        $self->{content_model} = RCDATA_CONTENT_MODEL;
         $self->{state} = RCDATA_STATE;
         delete $self->{escape}; # MUST
 
@@ -6904,27 +6900,21 @@ sub set_inner_html ($$$$;$) {
 
     ## F4.1. content model flag
     my $node_ln = $node->manakai_local_name;
-    $p->{content_model} = {
-      title => RCDATA_CONTENT_MODEL,
-      textarea => RCDATA_CONTENT_MODEL,
-      style => CDATA_CONTENT_MODEL,
-      script => CDATA_CONTENT_MODEL,
-      xmp => CDATA_CONTENT_MODEL,
-      iframe => CDATA_CONTENT_MODEL,
-      noembed => CDATA_CONTENT_MODEL,
-      noframes => CDATA_CONTENT_MODEL,
-      noscript => CDATA_CONTENT_MODEL,
-      plaintext => PLAINTEXT_CONTENT_MODEL,
-    }->{$node_ln};
-    $p->{content_model} = PCDATA_CONTENT_MODEL
-        unless defined $p->{content_model};
-    if ($p->{content_model} == RCDATA_CONTENT_MODEL) {
+    if ($node_ln eq 'title' or $node_ln eq 'text') {
       $p->{state} = RCDATA_STATE;
     } elsif ($node_ln eq 'script') {
       $p->{state} = SCRIPT_DATA_STATE;
-    } elsif ($p->{content_model} == CDATA_CONTENT_MODEL) {
+    } elsif ({
+      style => 1,
+      script => 1,
+      xmp => 1,
+      iframe => 1,
+      noembed => 1,
+      noframes => 1,
+      noscript => 1,
+    }->{$node_ln}) {
       $p->{state} = RAWTEXT_STATE;
-    } elsif ($p->{content_model} == PLAINTEXT_CONTENT_MODEL) {
+    } elsif ($node_ln eq 'plaintext') {
       $p->{state} = PLAINTEXT_STATE;
     }
 
