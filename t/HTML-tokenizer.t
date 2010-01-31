@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Path::Class;
+use lib file (__FILE__)->dir->subdir ('lib')->stringify;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 
 my $DEBUG = $ENV{DEBUG};
