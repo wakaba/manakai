@@ -1,7 +1,7 @@
 1..5376
 # Running under perl version 5.010001 for linux
-# Current time local: Sat Jan 16 19:05:17 2010
-# Current time GMT:   Sat Jan 16 10:05:17 2010
+# Current time local: Sun Jan 31 19:18:04 2010
+# Current time GMT:   Sun Jan 31 10:18:04 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 34.
@@ -1067,8 +1067,8 @@ ok 844
 ok 845
 ok 846
 # t/tree-construction/tests2.dat
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
+utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
 ok 847
 ok 848
 ok 849
@@ -1504,20 +1504,20 @@ not ok 1158
 #       - "      \"<!--</noscript>-->\"\n"
 #       + "      <!-- </noscript> -->\n"
 # t/tree-construction/tests6.dat
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x93, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
-Malformed UTF-8 character (unexpected continuation byte 0x94, with no preceding start byte) in transliteration (tr///) at t/testfiles.pl line 16, <$file> chunk 1.
+utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
 ok 1159
 ok 1160
 ok 1161
@@ -1530,8 +1530,7 @@ not ok 1164
 #       + "    \" \"\n"
 not ok 1165
 # Test 1165 got: "1" (HTML-tree.t test () ok at line 3 fail #389)
-#      Expected: "2"Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test.pm line 456.
- (Parse error: qq'<!doctype html></body><meta>'; 1:28:after body;22: Stray end tag “body”., 28: “meta” element outside “head”.)
+#      Expected: "2" (Parse error: qq'<!doctype html></body><meta>'; 1:28:after body;22: Stray end tag \x93body\x94., 28: \x93meta\x94 element outside \x93head\x94.)
 ok 1166
 not ok 1167
 # Test 1167 got: "<!DOCTYPE html>\n<html>\n  <head>\n  <body>\n    <meta>\n" (HTML-tree.t test () ok at line 9 fail #389)
@@ -1680,8 +1679,7 @@ ok 1295
 ok 1296
 not ok 1297
 # Test 1297 got: "1" (HTML-tree.t test () ok at line 3 fail #433)
-#      Expected: "2"Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test.pm line 456.
- (Parse error: qq'<html></html><!-- foo -->'; 1:7:no DOCTYPE;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 13: Stray end tag “html”.)
+#      Expected: "2" (Parse error: qq'<html></html><!-- foo -->'; 1:7:no DOCTYPE;6: Start tag seen without seeing a doctype first. Expected \x93<!DOCTYPE html>\x94., 13: Stray end tag \x93html\x94.)
 ok 1298
 not ok 1299
 # Test 1299 got: "<html>\n  <head>\n  <body>\n<!--  foo  -->\n" (HTML-tree.t test () ok at line 9 fail #433)

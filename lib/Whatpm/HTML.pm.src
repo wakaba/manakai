@@ -5746,7 +5746,7 @@ sub set_inner_html ($$$$;$) {
 
     ## F4.1. content model flag
     my $node_ln = $node->manakai_local_name;
-    if ($node_ln eq 'title' or $node_ln eq 'text') {
+    if ($node_ln eq 'title' or $node_ln eq 'textarea') {
       $p->{state} = RCDATA_STATE;
     } elsif ($node_ln eq 'script') {
       $p->{state} = SCRIPT_DATA_STATE;
