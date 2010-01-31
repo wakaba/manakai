@@ -25,12 +25,12 @@ require IO::Handle;
 
 ## Namespace URLs
 
-my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
-my $MML_NS = q<http://www.w3.org/1998/Math/MathML>;
-my $SVG_NS = q<http://www.w3.org/2000/svg>;
-my $XLINK_NS = q<http://www.w3.org/1999/xlink>;
-my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
-my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
+sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
+sub MML_NS () { q<http://www.w3.org/1998/Math/MathML> }
+sub SVG_NS () { q<http://www.w3.org/2000/svg> }
+sub XLINK_NS () { q<http://www.w3.org/1999/xlink> }
+sub XML_NS () { q<http://www.w3.org/XML/1998/namespace> }
+sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
 ## Element categories
 
@@ -252,7 +252,7 @@ my $el_category = {
 };
 
 my $el_category_f = {
-  $MML_NS => {
+  (MML_NS) => {
     'annotation-xml' => MML_AXML_EL,
     mi => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     mo => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
@@ -260,7 +260,7 @@ my $el_category_f = {
     ms => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     mtext => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
   },
-  $SVG_NS => {
+  (SVG_NS) => {
     foreignObject => SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     desc => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     title => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
@@ -334,18 +334,18 @@ my $svg_attr_name = {
 };
 
 my $foreign_attr_xname = {
-  'xlink:actuate' => [$XLINK_NS, ['xlink', 'actuate']],
-  'xlink:arcrole' => [$XLINK_NS, ['xlink', 'arcrole']],
-  'xlink:href' => [$XLINK_NS, ['xlink', 'href']],
-  'xlink:role' => [$XLINK_NS, ['xlink', 'role']],
-  'xlink:show' => [$XLINK_NS, ['xlink', 'show']],
-  'xlink:title' => [$XLINK_NS, ['xlink', 'title']],
-  'xlink:type' => [$XLINK_NS, ['xlink', 'type']],
-  'xml:base' => [$XML_NS, ['xml', 'base']],
-  'xml:lang' => [$XML_NS, ['xml', 'lang']],
-  'xml:space' => [$XML_NS, ['xml', 'space']],
-  'xmlns' => [$XMLNS_NS, [undef, 'xmlns']],
-  'xmlns:xlink' => [$XMLNS_NS, ['xmlns', 'xlink']],
+  'xlink:actuate' => [XLINK_NS, ['xlink', 'actuate']],
+  'xlink:arcrole' => [XLINK_NS, ['xlink', 'arcrole']],
+  'xlink:href' => [XLINK_NS, ['xlink', 'href']],
+  'xlink:role' => [XLINK_NS, ['xlink', 'role']],
+  'xlink:show' => [XLINK_NS, ['xlink', 'show']],
+  'xlink:title' => [XLINK_NS, ['xlink', 'title']],
+  'xlink:type' => [XLINK_NS, ['xlink', 'type']],
+  'xml:base' => [XML_NS, ['xml', 'base']],
+  'xml:lang' => [XML_NS, ['xml', 'lang']],
+  'xml:space' => [XML_NS, ['xml', 'space']],
+  'xmlns' => [XMLNS_NS, [undef, 'xmlns']],
+  'xmlns:xlink' => [XMLNS_NS, ['xmlns', 'xlink']],
 };
 
 ## ISSUE: xmlns:xlink="non-xlink-ns" is not an error.
@@ -1185,7 +1185,7 @@ sub _tree_construction_root_element ($) {
     } elsif ($token->{type} == START_TAG_TOKEN) {
       if ($token->{tag_name} eq 'html') {
         my $root_element;
-        !!!create-element ($root_element, $HTML_NS, $token->{tag_name}, $token->{attributes}, $token);
+        !!!create-element ($root_element, HTML_NS, $token->{tag_name}, $token->{attributes}, $token);
         $self->{document}->append_child ($root_element);
         push @{$self->{open_elements}}, [$root_element, $el_category->{html}];
         
@@ -1232,7 +1232,7 @@ sub _tree_construction_root_element ($) {
     }
 
     my $root_element;
-    !!!create-element ($root_element, $HTML_NS, 'html',, $token);
+    !!!create-element ($root_element, HTML_NS, 'html',, $token);
     $self->{document}->append_child ($root_element);
     push @{$self->{open_elements}}, [$root_element, $el_category->{html}];
 
@@ -1366,7 +1366,7 @@ sub _reset_insertion_mode ($) {
 
     ## Step 1
     my $script_el;
-    !!!create-element ($script_el, $HTML_NS, 'script', $token->{attributes}, $token);
+    !!!create-element ($script_el, HTML_NS, 'script', $token->{attributes}, $token);
 
     ## Step 2
     ## TODO: mark as "parser-inserted"
@@ -1531,7 +1531,7 @@ sub _reset_insertion_mode ($) {
         
         ## Step 6.5
         my $new_element = [];
-        !!!create-element ($new_element->[0], $HTML_NS, $node_token->{tag_name}, $node_token->{attributes}, $node_token);
+        !!!create-element ($new_element->[0], HTML_NS, $node_token->{tag_name}, $node_token->{attributes}, $node_token);
         $new_element->[1] = $node->[1];
         $new_element->[2] = $node_token;
         $active_formatting_elements->[$node_i_in_active] = $new_element;
@@ -1574,7 +1574,7 @@ sub _reset_insertion_mode ($) {
       
       ## Step 8
       my $new_element = [];
-      !!!create-element ($new_element->[0], $HTML_NS, $formatting_element->[2]->{tag_name}, $formatting_element->[2]->{attributes}, $formatting_element->[2]);
+      !!!create-element ($new_element->[0], HTML_NS, $formatting_element->[2]->{tag_name}, $formatting_element->[2]->{attributes}, $formatting_element->[2]);
       $new_element->[1] = $formatting_element->[1];
       $new_element->[2] = $formatting_element->[2];
       
@@ -2029,7 +2029,7 @@ sub _tree_construction_main ($) {
         } else {
           my $nsuri = $self->{open_elements}->[-1]->[0]->namespace_uri;
           my $tag_name = $token->{tag_name};
-          if ($nsuri eq $SVG_NS) {
+          if ($nsuri eq SVG_NS) {
             $tag_name = {
                altglyph => 'altGlyph',
                altglyphdef => 'altGlyphDef',
@@ -2150,7 +2150,7 @@ sub _tree_construction_main ($) {
         if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
           !!!cp ('t89');
           ## As if <head>
-          !!!create-element ($self->{head_element}, $HTML_NS, 'head',, $token);
+          !!!create-element ($self->{head_element}, HTML_NS, 'head',, $token);
           $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
           push @{$self->{open_elements}},
               [$self->{head_element}, $el_category->{head}];
@@ -2190,7 +2190,7 @@ sub _tree_construction_main ($) {
         if ($token->{tag_name} eq 'head') {
           if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
             !!!cp ('t93');
-            !!!create-element ($self->{head_element}, $HTML_NS, $token->{tag_name}, $token->{attributes}, $token);
+            !!!create-element ($self->{head_element}, HTML_NS, $token->{tag_name}, $token->{attributes}, $token);
             $self->{open_elements}->[-1]->[0]->append_child
                 ($self->{head_element});
             push @{$self->{open_elements}},
@@ -2219,7 +2219,7 @@ sub _tree_construction_main ($) {
         } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
           !!!cp ('t96');
           ## As if <head>
-          !!!create-element ($self->{head_element}, $HTML_NS, 'head',, $token);
+          !!!create-element ($self->{head_element}, HTML_NS, 'head',, $token);
           $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
           push @{$self->{open_elements}},
               [$self->{head_element}, $el_category->{head}];
@@ -2560,7 +2560,7 @@ sub _tree_construction_main ($) {
           if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
             !!!cp ('t132');
             ## As if <head>
-            !!!create-element ($self->{head_element}, $HTML_NS, 'head',, $token);
+            !!!create-element ($self->{head_element}, HTML_NS, 'head',, $token);
             $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
             push @{$self->{open_elements}},
                 [$self->{head_element}, $el_category->{head}];
@@ -2604,7 +2604,7 @@ sub _tree_construction_main ($) {
           if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
             !!!cp ('t142.2');
             ## (before head) as if <head>, (in head) as if </head>
-            !!!create-element ($self->{head_element}, $HTML_NS, 'head',, $token);
+            !!!create-element ($self->{head_element}, HTML_NS, 'head',, $token);
             $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
             $self->{insertion_mode} = AFTER_HEAD_IM;
   
@@ -2659,7 +2659,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t149.1');
 
           ## NOTE: As if <head>
-          !!!create-element ($self->{head_element}, $HTML_NS, 'head',, $token);
+          !!!create-element ($self->{head_element}, HTML_NS, 'head',, $token);
           $self->{open_elements}->[-1]->[0]->append_child
               ($self->{head_element});
           #push @{$self->{open_elements}},
@@ -5063,7 +5063,7 @@ sub _tree_construction_main ($) {
 
         ## "adjust foreign attributes" - done in insert-element-f
         
-        !!!insert-element-f ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS, $token->{tag_name}, $token->{attributes}, $token);
+        !!!insert-element-f ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS, $token->{tag_name}, $token->{attributes}, $token);
         
         if ($self->{self_closing}) {
           pop @{$self->{open_elements}};
@@ -5458,7 +5458,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t415.1');
           ## As if <p>, then reprocess the current token
           my $el;
-          !!!create-element ($el, $HTML_NS, 'p',, $token);
+          !!!create-element ($el, HTML_NS, 'p',, $token);
           $insert->($self, $el, $open_tables);
           ## NOTE: Not inserted into |$self->{open_elements}|.
         }
@@ -5486,7 +5486,7 @@ sub _tree_construction_main ($) {
                $open_tables);
         
         my $el;
-        !!!create-element ($el, $HTML_NS, 'br',, $token);
+        !!!create-element ($el, HTML_NS, 'br',, $token);
         $insert->($self, $el, $open_tables);
         
         ## Ignore the token.

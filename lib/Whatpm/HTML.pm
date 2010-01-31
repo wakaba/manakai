@@ -25,12 +25,12 @@ require IO::Handle;
 
 ## Namespace URLs
 
-my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
-my $MML_NS = q<http://www.w3.org/1998/Math/MathML>;
-my $SVG_NS = q<http://www.w3.org/2000/svg>;
-my $XLINK_NS = q<http://www.w3.org/1999/xlink>;
-my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
-my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
+sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
+sub MML_NS () { q<http://www.w3.org/1998/Math/MathML> }
+sub SVG_NS () { q<http://www.w3.org/2000/svg> }
+sub XLINK_NS () { q<http://www.w3.org/1999/xlink> }
+sub XML_NS () { q<http://www.w3.org/XML/1998/namespace> }
+sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
 ## Element categories
 
@@ -252,7 +252,7 @@ my $el_category = {
 };
 
 my $el_category_f = {
-  $MML_NS => {
+  (MML_NS) => {
     'annotation-xml' => MML_AXML_EL,
     mi => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     mo => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
@@ -260,7 +260,7 @@ my $el_category_f = {
     ms => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     mtext => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
   },
-  $SVG_NS => {
+  (SVG_NS) => {
     foreignObject => SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     desc => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     title => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
@@ -334,18 +334,18 @@ my $svg_attr_name = {
 };
 
 my $foreign_attr_xname = {
-  'xlink:actuate' => [$XLINK_NS, ['xlink', 'actuate']],
-  'xlink:arcrole' => [$XLINK_NS, ['xlink', 'arcrole']],
-  'xlink:href' => [$XLINK_NS, ['xlink', 'href']],
-  'xlink:role' => [$XLINK_NS, ['xlink', 'role']],
-  'xlink:show' => [$XLINK_NS, ['xlink', 'show']],
-  'xlink:title' => [$XLINK_NS, ['xlink', 'title']],
-  'xlink:type' => [$XLINK_NS, ['xlink', 'type']],
-  'xml:base' => [$XML_NS, ['xml', 'base']],
-  'xml:lang' => [$XML_NS, ['xml', 'lang']],
-  'xml:space' => [$XML_NS, ['xml', 'space']],
-  'xmlns' => [$XMLNS_NS, [undef, 'xmlns']],
-  'xmlns:xlink' => [$XMLNS_NS, ['xmlns', 'xlink']],
+  'xlink:actuate' => [XLINK_NS, ['xlink', 'actuate']],
+  'xlink:arcrole' => [XLINK_NS, ['xlink', 'arcrole']],
+  'xlink:href' => [XLINK_NS, ['xlink', 'href']],
+  'xlink:role' => [XLINK_NS, ['xlink', 'role']],
+  'xlink:show' => [XLINK_NS, ['xlink', 'show']],
+  'xlink:title' => [XLINK_NS, ['xlink', 'title']],
+  'xlink:type' => [XLINK_NS, ['xlink', 'type']],
+  'xml:base' => [XML_NS, ['xml', 'base']],
+  'xml:lang' => [XML_NS, ['xml', 'lang']],
+  'xml:space' => [XML_NS, ['xml', 'space']],
+  'xmlns' => [XMLNS_NS, [undef, 'xmlns']],
+  'xmlns:xlink' => [XMLNS_NS, ['xmlns', 'xlink']],
 };
 
 ## ISSUE: xmlns:xlink="non-xlink-ns" is not an error.
@@ -1187,7 +1187,7 @@ sub _tree_construction_root_element ($) {
         my $root_element;
         
       $root_element = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
@@ -1251,7 +1251,7 @@ sub _tree_construction_root_element ($) {
     my $root_element;
     
       $root_element = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'html']);
+        (HTML_NS, [undef,  'html']);
     
         $root_element->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -1374,7 +1374,7 @@ sub _reset_insertion_mode ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -1417,7 +1417,7 @@ sub _reset_insertion_mode ($) {
     my $script_el;
     
       $script_el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'script']);
+        (HTML_NS, [undef,  'script']);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
@@ -1599,7 +1599,7 @@ sub _reset_insertion_mode ($) {
         my $new_element = [];
         
       $new_element->[0] = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $node_token->{tag_name}]);
+        (HTML_NS, [undef,  $node_token->{tag_name}]);
     
         for my $attr_name (keys %{ $node_token->{attributes}}) {
           my $attr_t =  $node_token->{attributes}->{$attr_name};
@@ -1659,7 +1659,7 @@ sub _reset_insertion_mode ($) {
       my $new_element = [];
       
       $new_element->[0] = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $formatting_element->[2]->{tag_name}]);
+        (HTML_NS, [undef,  $formatting_element->[2]->{tag_name}]);
     
         for my $attr_name (keys %{ $formatting_element->[2]->{attributes}}) {
           my $attr_t =  $formatting_element->[2]->{attributes}->{$attr_name};
@@ -2129,7 +2129,7 @@ sub _tree_construction_main ($) {
         } else {
           my $nsuri = $self->{open_elements}->[-1]->[0]->namespace_uri;
           my $tag_name = $token->{tag_name};
-          if ($nsuri eq $SVG_NS) {
+          if ($nsuri eq SVG_NS) {
             $tag_name = {
                altglyph => 'altGlyph',
                altglyphdef => 'altGlyphDef',
@@ -2188,9 +2188,9 @@ sub _tree_construction_main ($) {
           @{
             $foreign_attr_xname->{$attr_name} ||
             [undef, [undef,
-                     ($nsuri) eq $SVG_NS ?
+                     ($nsuri) eq SVG_NS ?
                          ($svg_attr_name->{$attr_name} || $attr_name) :
-                     ($nsuri) eq $MML_NS ?
+                     ($nsuri) eq MML_NS ?
                          ($attr_name eq 'definitionurl' ?
                              'definitionURL' : $attr_name) :
                          $attr_name]]
@@ -2296,7 +2296,7 @@ sub _tree_construction_main ($) {
           ## As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'head']);
+        (HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -2338,7 +2338,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'body']);
+        (HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -2359,7 +2359,7 @@ sub _tree_construction_main ($) {
             
             
       $self->{head_element} = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
           my $attr_t =  $token->{attributes}->{$attr_name};
@@ -2405,7 +2405,7 @@ sub _tree_construction_main ($) {
           ## As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'head']);
+        (HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -2452,7 +2452,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -2495,7 +2495,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -2533,7 +2533,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -2583,7 +2583,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -2724,7 +2724,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -2816,7 +2816,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -2883,7 +2883,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'body']);
+        (HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -2913,7 +2913,7 @@ sub _tree_construction_main ($) {
             ## As if <head>
             
       $self->{head_element} = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'head']);
+        (HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -2965,7 +2965,7 @@ sub _tree_construction_main ($) {
             ## (before head) as if <head>, (in head) as if </head>
             
       $self->{head_element} = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'head']);
+        (HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -3012,7 +3012,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'body']);
+        (HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -3043,7 +3043,7 @@ sub _tree_construction_main ($) {
           ## NOTE: As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'head']);
+        (HTML_NS, [undef,  'head']);
     
         $self->{head_element}->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -3099,7 +3099,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'body']);
+        (HTML_NS, [undef,  'body']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -3518,7 +3518,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'tbody']);
+        (HTML_NS, [undef,  'tbody']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -3555,7 +3555,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -3586,7 +3586,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'tr']);
+        (HTML_NS, [undef,  'tr']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -3615,7 +3615,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -3756,7 +3756,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'colgroup']);
+        (HTML_NS, [undef,  'colgroup']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -3793,7 +3793,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -3910,7 +3910,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -3961,7 +3961,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4317,7 +4317,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4429,7 +4429,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4474,7 +4474,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4870,7 +4870,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -4901,7 +4901,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5040,7 +5040,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5071,7 +5071,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5197,7 +5197,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5296,7 +5296,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5462,7 +5462,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5571,7 +5571,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5620,7 +5620,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5693,7 +5693,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5751,7 +5751,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5809,7 +5809,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -5943,7 +5943,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6014,7 +6014,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6073,7 +6073,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6114,7 +6114,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS, [undef,   $token->{tag_name}]);
+        ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS, [undef,   $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6122,9 +6122,9 @@ sub _tree_construction_main ($) {
           @{
             $foreign_attr_xname->{$attr_name} ||
             [undef, [undef,
-                     ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS) eq $SVG_NS ?
+                     ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS) eq SVG_NS ?
                          ($svg_attr_name->{$attr_name} || $attr_name) :
-                     ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS) eq $MML_NS ?
+                     ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS) eq MML_NS ?
                          ($attr_name eq 'definitionurl' ?
                              'definitionURL' : $attr_name) :
                          $attr_name]]
@@ -6142,9 +6142,9 @@ sub _tree_construction_main ($) {
             if defined $token->{column};
       
       $insert->($self, $el, $open_tables);
-      push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL];
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? MML_NS : SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL];
 
-      if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($token->{tag_name} eq 'math' ? $MML_NS : $SVG_NS)) {
+      if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS)) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
 ## TODO: Error type documentation
       }
@@ -6188,7 +6188,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6232,7 +6232,7 @@ sub _tree_construction_main ($) {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  $token->{tag_name}]);
+        (HTML_NS, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           my $attr_t =   $token->{attributes}->{$attr_name};
@@ -6598,7 +6598,7 @@ sub _tree_construction_main ($) {
           my $el;
           
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'p']);
+        (HTML_NS, [undef,  'p']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};
@@ -6634,7 +6634,7 @@ sub _tree_construction_main ($) {
         my $el;
         
       $el = $self->{document}->create_element_ns
-        ($HTML_NS, [undef,  'br']);
+        (HTML_NS, [undef,  'br']);
     
         $el->set_user_data (manakai_source_line => $token->{line})
             if defined $token->{line};

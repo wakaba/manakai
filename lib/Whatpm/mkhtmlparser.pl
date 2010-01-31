@@ -47,7 +47,7 @@ while (<>) {
   s{!!!insert-element-t\s*\(([^(),]+),([^(),]+),([^(),]+)\)\s*;}{qq{
     {
       my \$el;
-      !!!create-element (\$el, \$HTML_NS, $1, $2, $3);
+      !!!create-element (\$el, HTML_NS, $1, $2, $3);
       \$insert->(\$self, \$el, \$open_tables);
       push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
@@ -55,7 +55,7 @@ while (<>) {
   s{!!!insert-element\s*\(([^(),]+),\s*,([^(),]+)\)\s*;}{qq{
     {
       my \$el;
-      !!!create-element (\$el, \$HTML_NS, $1,, $2);
+      !!!create-element (\$el, HTML_NS, $1,, $2);
       \$self->{open_elements}->[-1]->[0]->append_child (\$el);
       push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
@@ -63,7 +63,7 @@ while (<>) {
   s{!!!insert-element\s*\(([^(),]+),([^(),]+),([^(),]+)\)\s*;}{qq{
     {
       my \$el;
-      !!!create-element (\$el, \$HTML_NS, $1, $2, $3);
+      !!!create-element (\$el, HTML_NS, $1, $2, $3);
       \$self->{open_elements}->[-1]->[0]->append_child (\$el);
       push \@{\$self->{open_elements}}, [\$el, \$el_category->{$1} || 0];
     }
@@ -78,7 +78,7 @@ while (<>) {
     };
     if (defined $attrs and length $attrs) {
       my $attr_xname;
-      if ($nsuri eq q<$HTML_NS>) {
+      if ($nsuri eq q<HTML_NS>) {
         $attr_xname = q[undef, [undef, $attr_name]];
       } else {
         ## NOTE: "Adjust SVG attributes" (SVG only),
@@ -88,9 +88,9 @@ while (<>) {
           \@{
             \$foreign_attr_xname->{\$attr_name} ||
             [undef, [undef,
-                     ($nsuri) eq \$SVG_NS ?
+                     ($nsuri) eq SVG_NS ?
                          (\$svg_attr_name->{\$attr_name} || \$attr_name) :
-                     ($nsuri) eq \$MML_NS ?
+                     ($nsuri) eq MML_NS ?
                          (\$attr_name eq 'definitionurl' ?
                              'definitionURL' : \$attr_name) :
                          \$attr_name]]
