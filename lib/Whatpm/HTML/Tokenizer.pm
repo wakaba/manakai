@@ -100,7 +100,6 @@ sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
 
 ## ------ Tokenizer states ------
 
-# 50: OBSOLETE
 sub DATA_STATE () { 0 }
 sub RCDATA_STATE () { 107 }
 sub RAWTEXT_STATE () { 108 }
@@ -113,7 +112,7 @@ sub SCRIPT_DATA_LT_STATE () { 113 }
 sub CLOSE_TAG_OPEN_STATE () { 3 }
 sub RCDATA_END_TAG_OPEN_STATE () { 114 }
 sub RAWTEXT_END_TAG_OPEN_STATE () { 115 }
-sub SCRIPT_DATA_END_TAG_OPEN_STATE () { 116 } # last
+sub SCRIPT_DATA_END_TAG_OPEN_STATE () { 116 }
 sub SCRIPT_DATA_ESCAPE_START_STATE () { 1 }
 sub SCRIPT_DATA_ESCAPE_START_DASH_STATE () { 12 }
 sub SCRIPT_DATA_ESCAPED_STATE () { 117 }
@@ -183,6 +182,8 @@ sub HEXREF_HEX_STATE () { 48 }
 sub ENTITY_NAME_STATE () { 49 }
 ##
 ## XML-only states
+sub DATA_MSE1_STATE () { 50 }
+sub DATA_MSE2_STATE () { 128 } # last
 sub PI_STATE () { 51 }
 sub PI_TARGET_STATE () { 52 }
 sub PI_TARGET_AFTER_STATE () { 53 }
@@ -452,34 +453,23 @@ sub _get_next_token ($) {
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
         last A;
-      } elsif ($self->{is_xml}) {
-        if ($self->{nc} == 0x003E) { # >
-          if ($self->{s_kwd} eq ']]') {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched mse', ## TODO: type
-                            line => $self->{line_prev},
-                            column => $self->{column_prev} - 1);
-              #
-          } else {
-            
-            #
-          }
-          
-          $self->{s_kwd} = '';
-          #
-        } elsif ($self->{nc} == 0x005D) { # ]
-          if ($self->{s_kwd} eq ']' or $self->{s_kwd} eq '') {
-            
-            $self->{s_kwd} .= ']';
-          } elsif ($self->{s_kwd} eq ']]') {
-            
-            #
-          } else {
-            
-            $self->{s_kwd} = '';
-          }
-          #
-        }
+      } elsif ($self->{is_xml} and $self->{nc} == 0x005D) { # ]
+        
+        $self->{state} = DATA_MSE1_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN, data => ']',
+                  line => $self->{line_prev}, column => $self->{column_prev}});
+        redo A;
       } else {
         
         #
@@ -1572,6 +1562,79 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{state} = SCRIPT_DATA_DOUBLE_ESCAPED_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == DATA_MSE1_STATE) {
+      ## XML5: Part of the "data state".
+      
+      if ($self->{nc} == 0x005D) { # ]
+        
+        $self->{state} = DATA_MSE2_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN, data => ']',
+                  line => $self->{line_prev}, column => $self->{column_prev}});
+        redo A;
+      } else {
+        
+        $self->{state} = DATA_STATE;
+        ## Reconsume.
+        redo A;
+      }
+    } elsif ($self->{state} == DATA_MSE2_STATE) {
+      ## XML5: Part of the "data state".
+      
+      if ($self->{nc} == 0x003E) { # >
+        
+        ## XML5: Not a parse error.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched mse', ## TODO: type
+                        line => $self->{line_prev},
+                        column => $self->{column_prev} - 1);
+        $self->{state} = DATA_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN, data => '>',
+                  line => $self->{line_prev}, column => $self->{column_prev}});
+        redo A;
+      } elsif ($self->{nc} == 0x005D) { # ]
+        
+        ## Stay in the state.
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        return  ({type => CHARACTER_TOKEN, data => ']',
+                  line => $self->{line_prev}, column => $self->{column_prev}});
+        redo A;
+      } else {
+        
+        $self->{state} = DATA_STATE;
         ## Reconsume.
         redo A;
       }

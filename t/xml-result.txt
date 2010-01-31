@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Jan 11 17:09:01 2010
-# Current time GMT:   Mon Jan 11 08:09:01 2010
+# Current time local: Sun Jan 31 16:32:56 2010
+# Current time GMT:   Sun Jan 31 07:32:56 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -166,6 +166,10 @@ ok 154
 ok 155
 ok 156
 # t/xml/texts-1.dat
+UTF-16 surrogate 0xd800 at t/testfiles.pl line 59.
+UTF-16 surrogate 0xd801 at t/testfiles.pl line 59.
+UTF-16 surrogate 0xdff0 at t/testfiles.pl line 59.
+UTF-16 surrogate 0xdfff at t/testfiles.pl line 59.
 Malformed UTF-8 character (fatal) at t/XML-Parser.t line 26.
 ok 157
 Malformed UTF-8 character (fatal) at t/XML-Parser.t line 26.
@@ -186,11 +190,11 @@ ok 171
 ok 172
 ok 173
 ok 174
-# t/xml/cdata-1.dat
 ok 175
 ok 176
 ok 177
 ok 178
+# t/xml/cdata-1.dat
 ok 179
 ok 180
 ok 181
@@ -213,11 +217,11 @@ ok 197
 ok 198
 ok 199
 ok 200
-# t/xml/charref-1.dat
 ok 201
 ok 202
 ok 203
 ok 204
+# t/xml/charref-1.dat
 ok 205
 ok 206
 ok 207
@@ -254,11 +258,11 @@ ok 237
 ok 238
 ok 239
 ok 240
-# t/xml/comments-2.dat
 ok 241
 ok 242
 ok 243
 ok 244
+# t/xml/comments-2.dat
 ok 245
 ok 246
 ok 247
@@ -285,11 +289,11 @@ ok 267
 ok 268
 ok 269
 ok 270
-# t/xml/pis-1.dat
 ok 271
 ok 272
 ok 273
 ok 274
+# t/xml/pis-1.dat
 ok 275
 ok 276
 ok 277
@@ -344,11 +348,11 @@ ok 325
 ok 326
 ok 327
 ok 328
-# t/xml/pis-2.dat
 ok 329
 ok 330
 ok 331
 ok 332
+# t/xml/pis-2.dat
 ok 333
 ok 334
 ok 335
@@ -377,11 +381,11 @@ ok 357
 ok 358
 ok 359
 ok 360
-# t/xml/xmldecls-1.dat
 ok 361
 ok 362
 ok 363
 ok 364
+# t/xml/xmldecls-1.dat
 ok 365
 ok 366
 ok 367
@@ -603,22 +607,22 @@ ok 582
 ok 583
 ok 584
 ok 585
-# t/xml/tree-1.dat
 ok 586
 ok 587
 ok 588
 ok 589
+# t/xml/tree-1.dat
 ok 590
 ok 591
 ok 592
 ok 593
 ok 594
 ok 595
-# t/xml/ns-elements-1.dat
 ok 596
 ok 597
 ok 598
 ok 599
+# t/xml/ns-elements-1.dat
 ok 600
 ok 601
 ok 602
@@ -663,11 +667,11 @@ ok 640
 ok 641
 ok 642
 ok 643
-# t/xml/ns-attrs-1.dat
 ok 644
 ok 645
 ok 646
 ok 647
+# t/xml/ns-attrs-1.dat
 ok 648
 ok 649
 ok 650
@@ -796,11 +800,11 @@ ok 772
 ok 773
 ok 774
 ok 775
-# t/xml/doctypes-1.dat
 ok 776
 ok 777
 ok 778
 ok 779
+# t/xml/doctypes-1.dat
 ok 780
 ok 781
 ok 782
@@ -811,11 +815,11 @@ ok 786
 ok 787
 ok 788
 ok 789
-# t/xml/doctypes-2.dat
 ok 790
 ok 791
 ok 792
 ok 793
+# t/xml/doctypes-2.dat
 ok 794
 ok 795
 ok 796
@@ -926,11 +930,11 @@ ok 900
 ok 901
 ok 902
 ok 903
-# t/xml/eldecls-1.dat
 ok 904
 ok 905
 ok 906
 ok 907
+# t/xml/eldecls-1.dat
 ok 908
 ok 909
 ok 910
@@ -985,11 +989,11 @@ ok 958
 ok 959
 ok 960
 ok 961
-# t/xml/attlists-1.dat
 ok 962
 ok 963
 ok 964
 ok 965
+# t/xml/attlists-1.dat
 ok 966
 ok 967
 ok 968
@@ -1065,37 +1069,37 @@ ok 1037
 ok 1038
 ok 1039
 ok 1040
-not ok 1041
-# Test 1041 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 164 fail #462)
+ok 1041
+ok 1042
+ok 1043
+ok 1044
+not ok 1045
+# Test 1045 got: "<!DOCTYPE a>\n" (t/XML-Parser.t at line 164 fail #464)
 #      Expected: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d> ]><a/>\"\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>')
 #      Lines 2-2 are missing:
 #       - "  <!ELEMENT b >\n"
 #       - "    c ID () EXPLICIT \"d> ]><a/>\"\n"
 #  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
-ok 1042
-ok 1043
-ok 1044
-ok 1045
 ok 1046
-not ok 1047
-# Test 1047 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 164 fail #465)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d"')
+ok 1047
 ok 1048
 ok 1049
 ok 1050
-ok 1051
+not ok 1051
+# Test 1051 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 164 fail #467)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d"')
 ok 1052
 ok 1053
 ok 1054
 ok 1055
 ok 1056
-not ok 1057
-# Test 1057 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 164 fail #470)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID \x{27}d\x{27}')
+ok 1057
 ok 1058
 ok 1059
 ok 1060
-ok 1061
+not ok 1061
+# Test 1061 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 164 fail #472)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID \x{27}d\x{27}')
 ok 1062
 ok 1063
 ok 1064
@@ -1250,11 +1254,11 @@ ok 1212
 ok 1213
 ok 1214
 ok 1215
-# t/xml/entities-1.dat
 ok 1216
 ok 1217
 ok 1218
 ok 1219
+# t/xml/entities-1.dat
 ok 1220
 ok 1221
 ok 1222
@@ -1418,11 +1422,11 @@ ok 1379
 ok 1380
 ok 1381
 ok 1382
-# t/xml/entities-2.dat
 ok 1383
 ok 1384
 ok 1385
 ok 1386
+# t/xml/entities-2.dat
 ok 1387
 ok 1388
 ok 1389
@@ -1500,11 +1504,11 @@ ok 1460
 ok 1461
 ok 1462
 ok 1463
-# t/xml/notations-1.dat
 ok 1464
 ok 1465
 ok 1466
 ok 1467
+# t/xml/notations-1.dat
 ok 1468
 ok 1469
 ok 1470
@@ -1587,11 +1591,11 @@ ok 1546
 ok 1547
 ok 1548
 ok 1549
-# t/xml/entrefs-1.dat
 ok 1550
 ok 1551
 ok 1552
 ok 1553
+# t/xml/entrefs-1.dat
 ok 1554
 ok 1555
 ok 1556
@@ -1628,11 +1632,11 @@ ok 1586
 ok 1587
 ok 1588
 ok 1589
-# t/xml/entrefs-2.dat
 ok 1590
 ok 1591
 ok 1592
 ok 1593
+# t/xml/entrefs-2.dat
 ok 1594
 ok 1595
 ok 1596
@@ -1695,3 +1699,7 @@ ok 1652
 ok 1653
 ok 1654
 ok 1655
+ok 1656
+ok 1657
+ok 1658
+ok 1659
