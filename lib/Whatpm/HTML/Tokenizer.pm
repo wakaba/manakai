@@ -754,19 +754,10 @@ sub _get_next_token ($) {
       }
     } elsif ($self->{state} == SCRIPT_DATA_STATE) {
       $self->{s_kwd} = '' unless defined $self->{s_kwd};
-      if ($self->{nc} == 0x0026) { # &
-        $self->{s_kwd} = '';
-	if ($self->{content_model} & CM_ENTITY and # PCDATA | RCDATA
-            not $self->{escape}) {
-          
-          ## NOTE: In the spec, the tokenizer is switched to the 
-          ## "entity data state".  In this implementation, the tokenizer
-          ## is switched to the |ENTITY_STATE|, which is an implementation
-          ## of the "consume a character reference" algorithm.
-          $self->{entity_add} = -1;
-          $self->{prev_state} = DATA_STATE;
-          $self->{state} = ENTITY_STATE;
-          
+      if ($self->{nc} == 0x003C) { # <
+        
+        $self->{state} = SCRIPT_DATA_LT_STATE;
+        
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -777,110 +768,13 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-          redo A;
-        } else {
-          
-          #
-        }
-      } elsif ($self->{nc} == 0x002D) { # -
-	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
-          if ($self->{s_kwd} eq '<!-') {
-            
-            $self->{escape} = 1; # unless $self->{escape};
-            $self->{s_kwd} = '--';
-            #
-          } elsif ($self->{s_kwd} eq '-') {
-            
-            $self->{s_kwd} = '--';
-            #
-          } elsif ($self->{s_kwd} eq '<!' or $self->{s_kwd} eq '-') {
-            
-            $self->{s_kwd} .= '-';
-            #
-          } else {
-            
-            $self->{s_kwd} = '-';
-            #
-          }
-        }
-        
-        #
-      } elsif ($self->{nc} == 0x0021) { # !
-        if (length $self->{s_kwd}) {
-          
-          $self->{s_kwd} .= '!';
-          #
-        } else {
-          
-          #$self->{s_kwd} = '';
-          #
-        }
-        #
-      } elsif ($self->{nc} == 0x003C) { # <
-        if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
-            (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
-             not $self->{escape})) {
-          
-          $self->{state} = SCRIPT_DATA_LT_STATE;
-          
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-          redo A;
-        } else {
-          
-          $self->{s_kwd} = '';
-          #
-        }
-      } elsif ($self->{nc} == 0x003E) { # >
-        if ($self->{escape} and
-            ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
-          if ($self->{s_kwd} eq '--') {
-            
-            delete $self->{escape};
-            #
-          } else {
-            
-            #
-          }
-        } elsif ($self->{is_xml} and $self->{s_kwd} eq ']]') {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched mse', ## TODO: type
-                          line => $self->{line_prev},
-                          column => $self->{column_prev} - 1);
-          #
-        } else {
-          
-          #
-        }
-        
-        $self->{s_kwd} = '';
-        #
-      } elsif ($self->{nc} == 0x005D) { # ]
-        if ($self->{s_kwd} eq ']' or $self->{s_kwd} eq '') {
-          
-          $self->{s_kwd} .= ']';
-        } elsif ($self->{s_kwd} eq ']]') {
-          
-          #
-        } else {
-          
-          $self->{s_kwd} = '';
-        }
-        #
+        redo A;
       } elsif ($self->{nc} == -1) {
         
         $self->{s_kwd} = '';
         return  ({type => END_OF_FILE_TOKEN,
                   line => $self->{line}, column => $self->{column}});
-        last A; ## TODO: ok?
+        last A;
       } else {
         
         $self->{s_kwd} = '';
@@ -892,20 +786,11 @@ sub _get_next_token ($) {
                    data => chr $self->{nc},
                    line => $self->{line}, column => $self->{column},
                   };
-      if ($self->{read_until}->($token->{data}, q{-!<>&\]},
-                                length $token->{data})) {
+      if ($self->{read_until}->($token->{data}, q{<}, length $token->{data})) {
         $self->{s_kwd} = '';
       }
 
-      ## Stay in the data state.
-      if (not $self->{is_xml} and
-          $self->{content_model} == PCDATA_CONTENT_MODEL) {
-        
-        $self->{state} = PCDATA_STATE;
-      } else {
-        
-        ## Stay in the state.
-      }
+      ## Stay in the state.
       
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -950,10 +835,10 @@ sub _get_next_token ($) {
     } elsif ($self->{state} == TAG_OPEN_STATE) {
       ## XML5: "tag state".
 
-      if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
-        if ($self->{nc} == 0x002F) { # /
-          
-          
+      if ($self->{nc} == 0x0021) { # !
+        
+        $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
+        
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -964,30 +849,11 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-          $self->{state} = CLOSE_TAG_OPEN_STATE;
-          redo A;
-        } elsif ($self->{nc} == 0x0021) { # !
-          
-          $self->{s_kwd} = $self->{escaped} ? '' : '<';
-          #
-        } else {
-          
-          $self->{s_kwd} = '';
-          #
-        }
-
-        ## reconsume
-        $self->{state} = DATA_STATE;
-        return  ({type => CHARACTER_TOKEN, data => '<',
-                  line => $self->{line_prev},
-                  column => $self->{column_prev},
-                 });
         redo A;
-      } elsif ($self->{content_model} & CM_FULL_MARKUP) { # PCDATA
-        if ($self->{nc} == 0x0021) { # !
-          
-          $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
-          
+      } elsif ($self->{nc} == 0x002F) { # /
+        
+        $self->{state} = CLOSE_TAG_OPEN_STATE;
+        
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -998,31 +864,50 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-          redo A;
-        } elsif ($self->{nc} == 0x002F) { # /
-          
-          $self->{state} = CLOSE_TAG_OPEN_STATE;
-          
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-          redo A;
-        } elsif (0x0041 <= $self->{nc} and
-                 $self->{nc} <= 0x005A) { # A..Z
-          
-          $self->{ct}
+        redo A;
+      } elsif (0x0041 <= $self->{nc} and $self->{nc} <= 0x005A) { # A..Z
+        
+        $self->{ct}
             = {type => START_TAG_TOKEN,
                tag_name => chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020)),
                line => $self->{line_prev},
                column => $self->{column_prev}};
-          $self->{state} = TAG_NAME_STATE;
+        $self->{state} = TAG_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif (0x0061 <= $self->{nc} and $self->{nc} <= 0x007A) { # a..z
+        
+        $self->{ct} = {type => START_TAG_TOKEN,
+                       tag_name => chr ($self->{nc}),
+                       line => $self->{line_prev},
+                       column => $self->{column_prev}};
+        $self->{state} = TAG_NAME_STATE;
+        
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+        redo A;
+      } elsif ($self->{nc} == 0x003F) { # ?
+        if ($self->{is_xml}) {
+          
+          $self->{state} = PI_STATE;
           
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -1034,82 +919,45 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-          redo A;
-        } elsif (0x0061 <= $self->{nc} and
-                 $self->{nc} <= 0x007A) { # a..z
-          
-          $self->{ct} = {type => START_TAG_TOKEN,
-                                    tag_name => chr ($self->{nc}),
-                                    line => $self->{line_prev},
-                                    column => $self->{column_prev}};
-          $self->{state} = TAG_NAME_STATE;
-          
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-          redo A;
-        } elsif ($self->{nc} == 0x003F) { # ?
-          if ($self->{is_xml}) {
-            
-            $self->{state} = PI_STATE;
-            
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-            redo A;
-          } else {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'pio',
-                            line => $self->{line_prev},
-                            column => $self->{column_prev});
-            $self->{state} = BOGUS_COMMENT_STATE;
-            $self->{ct} = {type => COMMENT_TOKEN, data => '',
-                           line => $self->{line_prev},
-                           column => $self->{column_prev},
-                          };
-            ## $self->{nc} is intentionally left as is
-            redo A;
-          }
-        } elsif (not $self->{is_xml} or
-                 $is_space->{$self->{nc}} or
-                 $self->{nc} == 0x003E) { # >
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare stago',
-                          line => $self->{line_prev},
-                          column => $self->{column_prev});
-          $self->{state} = DATA_STATE;
-          $self->{s_kwd} = '';
-          ## reconsume
-
-          return  ({type => CHARACTER_TOKEN, data => '<',
-                    line => $self->{line_prev},
-                    column => $self->{column_prev},
-                   });
-
           redo A;
         } else {
-          ## XML5: "<:" is a parse error.
           
-          $self->{ct} = {type => START_TAG_TOKEN,
-                                    tag_name => chr ($self->{nc}),
-                                    line => $self->{line_prev},
-                                    column => $self->{column_prev}};
-          $self->{state} = TAG_NAME_STATE;
-          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'pio',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev});
+          $self->{state} = BOGUS_COMMENT_STATE;
+          $self->{ct} = {type => COMMENT_TOKEN, data => '',
+                         line => $self->{line_prev},
+                         column => $self->{column_prev},
+                        };
+          ## $self->{nc} is intentionally left as is
+          redo A;
+        }
+      } elsif (not $self->{is_xml} or
+               $is_space->{$self->{nc}} or $self->{nc} == 0x003E) { # >
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare stago',
+                        line => $self->{line_prev},
+                        column => $self->{column_prev});
+        $self->{state} = DATA_STATE;
+        $self->{s_kwd} = '';
+        ## reconsume
+
+        return  ({type => CHARACTER_TOKEN, data => '<',
+                  line => $self->{line_prev},
+                  column => $self->{column_prev},
+                 });
+        
+        redo A;
+      } else {
+        ## XML5: "<:" is a parse error.
+        
+        $self->{ct} = {type => START_TAG_TOKEN,
+                       tag_name => chr ($self->{nc}),
+                       line => $self->{line_prev},
+                       column => $self->{column_prev}};
+        $self->{state} = TAG_NAME_STATE;
+        
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -1120,10 +968,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-          redo A;
-        }
-      } else {
-        die "$0: $self->{content_model} in tag open";
+        redo A;
       }
     } elsif ({
         (RCDATA_LT_STATE) => 1,
