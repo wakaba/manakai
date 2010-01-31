@@ -478,7 +478,7 @@ sub _get_next_token ($) {
                    data => chr $self->{nc},
                    line => $self->{line}, column => $self->{column},
                   };
-      $self->{read_until}->($token->{data}, q{<>&\]}, length $token->{data});
+      $self->{read_until}->($token->{data}, q{<&\]}, length $token->{data});
 
       ## Stay in the state.
       
