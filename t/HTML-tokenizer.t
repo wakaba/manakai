@@ -4,30 +4,14 @@ use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->subdir ('lib')->stringify;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use JSON 1.07;
+$JSON::UnMapping = 1;
+$JSON::UTF8 = 1;
 
 my $DEBUG = $ENV{DEBUG};
 
-my $dir_name;
-my $test_dir_name;
-BEGIN {
-  $test_dir_name = 't/';
-  $dir_name = 't/tokenizer/';
-  #my $skip = "You don't have JSON module";
-  #eval q{
-         use JSON 1.07;
-         #$skip = "You don't have make command";
-         #system ("cd $test_dir_name; make tokenizer-files") == 0 or die
-         #  unless -f $dir_name.'test1.test';
-         #$skip = '';
-  #      };
-  #if ($skip) {
-  #  print "1..1\n";
-  #  print "ok 1 # $skip\n";
-  #  exit;
-  #}
-  $JSON::UnMapping = 1;
-  $JSON::UTF8 = 1;
-}
+my $test_dir_name = 't/';
+my $dir_name = 't/tokenizer/';
 
 use Test;
 BEGIN { plan tests => 1154 }
