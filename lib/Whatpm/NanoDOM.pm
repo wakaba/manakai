@@ -565,7 +565,7 @@ sub has_attribute_ns ($$$) {
 ## to specify qualified name - "[$prefix, $local_name]"
 sub set_attribute_ns ($$$$) {
   my ($self, $nsuri, $qn, $value) = @_;
-  $self->{attributes}->{$nsuri}->{$qn->[1]}
+  $self->{attributes}->{defined $nsuri ? $nsuri : ''}->{$qn->[1]}
     = Whatpm::NanoDOM::Attr->new ($self, $nsuri, $qn->[0], $qn->[1], $value);
 } # set_attribute_ns
 

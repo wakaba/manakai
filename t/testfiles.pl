@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+no warnings 'utf8';
 
 sub execute_test ($$$) {
   my $file_name = shift;
