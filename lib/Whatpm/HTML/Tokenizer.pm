@@ -522,22 +522,22 @@ $Action->[TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = $Action->[TAG_OPEN_STATE]->[0x003E]
 $Action->[RCDATA_LT_STATE]->[0x002F] = {
   name => 'rcdata lt /',
   state => RCDATA_END_TAG_OPEN_STATE,
-  buffer_clear => 1,
+  buffer => {clear => 1},
 };
 $Action->[RAWTEXT_LT_STATE]->[0x002F] = {
   name => 'rawtext lt /',
   state => RAWTEXT_END_TAG_OPEN_STATE,
-  buffer_clear => 1,
+  buffer => {clear => 1},
 };
 $Action->[SCRIPT_DATA_LT_STATE]->[0x002F] = {
   name => 'script data lt /',
   state => SCRIPT_DATA_END_TAG_OPEN_STATE,
-  buffer_clear => 1,
+  buffer => {clear => 1},
 };
 $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[0x002F] = {
   name => 'script data escaped lt /',
   state => SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE,
-  buffer_clear => 1,
+  buffer => {clear => 1},
 };
 $Action->[SCRIPT_DATA_LT_STATE]->[0x0021] = {
   name => 'script data lt !',
@@ -550,9 +550,7 @@ $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[KEY_ULATIN_CHAR] = {
   emit => CHARACTER_TOKEN,
   emit_data => '<',
   emit_data_append => 1,
-  buffer_clear => 1,
-  buffer_append => 1,
-  buffer_append_delta => 0x0020, # UC -> lc
+  buffer => {clear => 1, append => 0x0020}, # UC -> lc
   state => SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE,
 };
 $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[KEY_LLATIN_CHAR] = {
@@ -560,9 +558,7 @@ $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[KEY_LLATIN_CHAR] = {
   emit => CHARACTER_TOKEN,
   emit_data => '<',
   emit_data_append => 1,
-  buffer_clear => 1,
-  buffer_append => 1,
-  buffer_append_delta => 0,
+  buffer => {clear => 1, append => 0x0000},
   state => SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE,
 };
 $Action->[RCDATA_LT_STATE]->[KEY_ELSE_CHAR] = {
@@ -865,15 +861,13 @@ $Action->[SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE]->[KEY_ULATIN_CHAR] =
 $Action->[SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE]->[KEY_ULATIN_CHAR] = {
   name => 'script data double escape start uc',
   emit => CHARACTER_TOKEN,
-  buffer_append => 1,
-  buffer_append_delta => 0x0020, # UC -> lc
+  buffer => {append => 0x0020}, # UC -> lc
 };
 $Action->[SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE]->[KEY_LLATIN_CHAR] =
 $Action->[SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE]->[KEY_LLATIN_CHAR] = {
   name => 'script data double escape start lc',
   emit => CHARACTER_TOKEN,
-  buffer_append => 1,
-  buffer_append_delta => 0,
+  buffer => {append => 0x0000},
 };
 $Action->[SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE]->[KEY_ELSE_CHAR] = {
   name => 'script data double escape start else',
@@ -887,7 +881,7 @@ $Action->[SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE]->[KEY_ELSE_CHAR] = {
 };
 $Action->[SCRIPT_DATA_DOUBLE_ESCAPED_LT_STATE]->[0x002F] = {
   name => 'script data double escaped lt /',
-  buffer_clear => 1,
+  buffer => {clear => 1},
   state => SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE,
   emit => CHARACTER_TOKEN,
   emit_data => '/',
@@ -1248,35 +1242,35 @@ sub _get_next_token ($) {
         }
       }
 
-      if ($action->{ct}) {
-        if (defined $action->{ct}->{type}) {
-          $self->{ct} = {type => $action->{ct}->{type}, tag_name => ''};
-          if ($action->{ct}->{delta}) {
+      if (my $act = $action->{ct}) {
+        if (defined $act->{type}) {
+          $self->{ct} = {type => $act->{type}, tag_name => ''};
+          if ($act->{delta}) {
             $self->{ct}->{line} = $self->{line_prev};
-            $self->{ct}->{column} = $self->{column_prev} - $action->{ct}->{delta} + 1;
+            $self->{ct}->{column} = $self->{column_prev} - $act->{delta} + 1;
           } else {
             $self->{ct}->{line} = $self->{line};
             $self->{ct}->{column} = $self->{column};
           }
         }
         
-        if (defined $action->{ct}->{append_tag_name}) {
-          $self->{ct}->{tag_name} .= chr ($self->{nc} + $action->{ct}->{append_tag_name});
+        if (defined $act->{append_tag_name}) {
+          $self->{ct}->{tag_name} .= chr ($self->{nc} + $act->{append_tag_name});
         }
       }
       
-      if ($action->{ca}) {
-        if ($action->{ca}->{value}) {
+      if (my $aca = $action->{ca}) {
+        if ($aca->{value}) {
           $self->{ca}->{value} .= chr $self->{nc};
-        } elsif (defined $action->{ca}->{name}) {
-          $self->{ca}->{name} .= chr ($self->{nc} + $action->{ca}->{name});
-        } elsif (defined $action->{ca}->{set_name}) {
+        } elsif (defined $aca->{name}) {
+          $self->{ca}->{name} .= chr ($self->{nc} + $aca->{name});
+        } elsif (defined $aca->{set_name}) {
           $self->{ca} = {
-            name => chr ($self->{nc} + $action->{ca}->{set_name}),
+            name => chr ($self->{nc} + $aca->{set_name}),
             value => '',
             line => $self->{line}, column => $self->{column},
           };
-        } elsif ($action->{ca}->{leave}) {
+        } elsif ($aca->{leave}) {
           if (exists $self->{ct}->{attributes}->{$self->{ca}->{name}}) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate attribute', text => $self->{ca}->{name}, line => $self->{ca}->{line}, column => $self->{ca}->{column});
@@ -1289,15 +1283,13 @@ sub _get_next_token ($) {
         }
       }
 
-      if ($action->{buffer_clear}) {
-        $self->{kwd} = '';
-      }
+      if (defined $action->{buffer}) {
+        $self->{kwd} = '' if $action->{buffer}->{clear};
+        $self->{kwd} .= chr ($self->{nc} + $action->{buffer}->{append})
+            if defined $action->{buffer}->{append};
 
-      if ($action->{buffer_append}) {
-        $self->{kwd} .= chr ($self->{nc} + $action->{buffer_append_delta});
+        
       }
-
-      
 
       if (defined $action->{emit}) {
         if ($action->{emit} eq '') {
