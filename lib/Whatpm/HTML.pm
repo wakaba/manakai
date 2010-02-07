@@ -348,8 +348,6 @@ my $foreign_attr_xname = {
   'xmlns:xlink' => [XMLNS_NS, ['xmlns', 'xlink']],
 };
 
-## ISSUE: xmlns:xlink="non-xlink-ns" is not an error.
-
 ## TODO: Invoke the reset algorithm when a resettable element is
 ## created (cf. HTML5 revision 2259).
 
@@ -2711,7 +2709,6 @@ sub _tree_construction_main ($) {
             
           }
           $parse_rcdata->($self, $insert, $open_tables, 0); # RAWTEXT
-          ## ISSUE: A spec bug [Bug 6038]
           splice @{$self->{open_elements}}, -2, 1, () # <head>
               if ($self->{insertion_mode} & IM_MASK) == AFTER_HEAD_IM;
           next B;

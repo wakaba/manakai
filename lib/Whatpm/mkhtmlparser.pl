@@ -4,7 +4,13 @@ use strict;
 my $DEBUG = $ENV{DEBUG};
 
 while (<>) {
-  s/!!!emit\b/return /;
+  s{!!!emit\b}{
+    ($DEBUG ? q{
+      (warn "EMIT " . (join ' ', %$_) . "\n" and
+       return $_)
+        for
+    } : q{return })
+  }e;
   s{!!!next-input-character;}{q{
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
