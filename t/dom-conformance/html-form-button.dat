@@ -1154,3 +1154,123 @@
 </button>
 #errors
 /button/a;element not allowed:minus;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  formaction=""
+>x</button>
+#errors
+/button/@formaction;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  formenctype="application/x-www-form-urlencoded"
+>x</button>
+#errors
+/button/@formenctype;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  formmethod="get"
+>x</button>
+#errors
+/button/@formmethod;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  formtarget="_blank"
+>x</button>
+#errors
+/button/@formtarget;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  formnovalidate=""
+>x</button>
+#errors
+/button/@formnovalidate;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  formaction=""
+>x</button>
+#errors
+/button/@formaction;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  formenctype="application/x-www-form-urlencoded"
+>x</button>
+#errors
+/button/@formenctype;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  formmethod="get"
+>x</button>
+#errors
+/button/@formmethod;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  formtarget="_blank"
+>x</button>
+#errors
+/button/@formtarget;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  formnovalidate=""
+>x</button>
+#errors
+/button/@formnovalidate;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="xyz"
+  formaction=""
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="xyz"
+  formenctype="application/x-www-form-urlencoded"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="xyz"
+  formmethod="get"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="xyz"
+  formtarget="_blank"
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="xyz"
+  formnovalidate=""
+>x</button>
+#errors
+/button/@type;enumerated:invalid;m

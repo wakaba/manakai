@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 24 22:45:30 2010
-# Current time GMT:   Sun Jan 24 13:45:30 2010
+# Current time local: Sun Feb  7 19:27:09 2010
+# Current time GMT:   Sun Feb  7 10:27:09 2010
 # Using Test.pm version 1.25_02
 # ../t/content-model-1.dat
 ok 1
@@ -5586,7 +5586,6 @@ ok 5303
 ok 5304
 ok 5305
 ok 5306
-# ../t/dom-conformance/html-form-select.dat
 ok 5307
 ok 5308
 ok 5309
@@ -5602,6 +5601,7 @@ ok 5318
 ok 5319
 ok 5320
 ok 5321
+# ../t/dom-conformance/html-form-select.dat
 ok 5322
 ok 5323
 ok 5324
@@ -5673,7 +5673,6 @@ ok 5389
 ok 5390
 ok 5391
 ok 5392
-# ../t/dom-conformance/html-form-datalist.dat
 ok 5393
 ok 5394
 ok 5395
@@ -5689,6 +5688,7 @@ ok 5404
 ok 5405
 ok 5406
 ok 5407
+# ../t/dom-conformance/html-form-datalist.dat
 ok 5408
 ok 5409
 ok 5410
@@ -5731,7 +5731,6 @@ ok 5446
 ok 5447
 ok 5448
 ok 5449
-# ../t/dom-conformance/html-form-textarea.dat
 ok 5450
 ok 5451
 ok 5452
@@ -5747,6 +5746,7 @@ ok 5461
 ok 5462
 ok 5463
 ok 5464
+# ../t/dom-conformance/html-form-textarea.dat
 ok 5465
 ok 5466
 ok 5467
@@ -5802,7 +5802,6 @@ ok 5516
 ok 5517
 ok 5518
 ok 5519
-# ../t/dom-conformance/html-form-keygen.dat
 ok 5520
 ok 5521
 ok 5522
@@ -5818,6 +5817,7 @@ ok 5531
 ok 5532
 ok 5533
 ok 5534
+# ../t/dom-conformance/html-form-keygen.dat
 ok 5535
 ok 5536
 ok 5537
@@ -5828,20 +5828,12 @@ ok 5541
 ok 5542
 ok 5543
 ok 5544
-# ../t/dom-conformance/html-interactive-1.dat
 ok 5545
 ok 5546
 ok 5547
 ok 5548
 ok 5549
-not ok 5550
-# Test 5550 got: "/head/noscript/meta/@name;metadata:proposed;keywords;w\n/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (content-checker.pl at line 69 fail #5550)
-#      Expected: "/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (<head xmlns="http://www.w3.org/1999/xhtml">
-#<title/>
-#<noscript>
-#<meta name="keywords" content=""/>
-#</noscript>
-#</head>)
+ok 5550
 ok 5551
 ok 5552
 ok 5553
@@ -5850,17 +5842,21 @@ ok 5555
 ok 5556
 ok 5557
 ok 5558
-not ok 5559
-# Test 5559 got: "/noscript/meta/@name;metadata:proposed;keywords;w\n/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (content-checker.pl at line 69 fail #5559)
-#      Expected: "/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
-#<meta name="keywords" content=""/>
-#</noscript>)
+ok 5559
+# ../t/dom-conformance/html-interactive-1.dat
 ok 5560
 ok 5561
 ok 5562
 ok 5563
 ok 5564
-ok 5565
+not ok 5565
+# Test 5565 got: "/head/noscript/meta/@name;metadata:proposed;keywords;w\n/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (content-checker.pl at line 69 fail #5565)
+#      Expected: "/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<title/>
+#<noscript>
+#<meta name="keywords" content=""/>
+#</noscript>
+#</head>)
 ok 5566
 ok 5567
 ok 5568
@@ -5869,7 +5865,11 @@ ok 5570
 ok 5571
 ok 5572
 ok 5573
-ok 5574
+not ok 5574
+# Test 5574 got: "/noscript/meta/@name;metadata:proposed;keywords;w\n/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (content-checker.pl at line 69 fail #5574)
+#      Expected: "/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
+#<meta name="keywords" content=""/>
+#</noscript>)
 ok 5575
 ok 5576
 ok 5577
@@ -5910,9 +5910,7 @@ ok 5611
 ok 5612
 ok 5613
 ok 5614
-not ok 5615
-# Test 5615 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (content-checker.pl at line 69 fail #5615)
-#      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
+ok 5615
 ok 5616
 ok 5617
 ok 5618
@@ -5927,7 +5925,9 @@ ok 5626
 ok 5627
 ok 5628
 ok 5629
-ok 5630
+not ok 5630
+# Test 5630 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (content-checker.pl at line 69 fail #5630)
+#      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
 ok 5631
 ok 5632
 ok 5633
@@ -5960,43 +5960,43 @@ ok 5659
 ok 5660
 ok 5661
 ok 5662
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5663
 ok 5664
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5665
-Whatpm::HTML::Table::assign_header is OBSOLETE!
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5666
-Whatpm::HTML::Table::assign_header is OBSOLETE!
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5667
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5668
 ok 5669
 ok 5670
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5671
 ok 5672
 ok 5673
 ok 5674
 ok 5675
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5676
 ok 5677
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5678
 ok 5679
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5680
+Whatpm::HTML::Table::assign_header is OBSOLETE!
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5681
+Whatpm::HTML::Table::assign_header is OBSOLETE!
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5682
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5683
 ok 5684
 ok 5685
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5686
 ok 5687
 ok 5688
 ok 5689
 ok 5690
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5691
 ok 5692
 ok 5693
@@ -6094,7 +6094,6 @@ ok 5784
 ok 5785
 ok 5786
 ok 5787
-# ../t/dom-conformance/html-scripting-1.dat
 ok 5788
 ok 5789
 ok 5790
@@ -6110,6 +6109,7 @@ ok 5799
 ok 5800
 ok 5801
 ok 5802
+# ../t/dom-conformance/html-scripting-1.dat
 ok 5803
 ok 5804
 ok 5805
@@ -6149,7 +6149,6 @@ ok 5838
 ok 5839
 ok 5840
 ok 5841
-# ../t/dom-conformance/html-scripting-2.dat
 ok 5842
 ok 5843
 ok 5844
@@ -6165,6 +6164,7 @@ ok 5853
 ok 5854
 ok 5855
 ok 5856
+# ../t/dom-conformance/html-scripting-2.dat
 ok 5857
 ok 5858
 ok 5859
@@ -6197,7 +6197,6 @@ ok 5885
 ok 5886
 ok 5887
 ok 5888
-# ../t/dom-conformance/html-repetitions.dat
 ok 5889
 ok 5890
 ok 5891
@@ -6213,6 +6212,7 @@ ok 5900
 ok 5901
 ok 5902
 ok 5903
+# ../t/dom-conformance/html-repetitions.dat
 ok 5904
 ok 5905
 ok 5906
@@ -6259,7 +6259,6 @@ ok 5946
 ok 5947
 ok 5948
 ok 5949
-# ../t/dom-conformance/html-datatemplate.dat
 ok 5950
 ok 5951
 ok 5952
@@ -6275,6 +6274,7 @@ ok 5961
 ok 5962
 ok 5963
 ok 5964
+# ../t/dom-conformance/html-datatemplate.dat
 ok 5965
 ok 5966
 ok 5967
@@ -6399,11 +6399,7 @@ ok 6085
 ok 6086
 ok 6087
 ok 6088
-not ok 6089
-# Test 6089 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (content-checker.pl at line 69 fail #6089)
-#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
-#      Line 1 is missing:
-#       - "/rule/footer/h1;element not allowed:minus;m\n"
+ok 6089
 ok 6090
 ok 6091
 ok 6092
@@ -6418,7 +6414,11 @@ ok 6100
 ok 6101
 ok 6102
 ok 6103
-ok 6104
+not ok 6104
+# Test 6104 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (content-checker.pl at line 69 fail #6104)
+#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
+#      Line 1 is missing:
+#       - "/rule/footer/h1;element not allowed:minus;m\n"
 ok 6105
 ok 6106
 ok 6107
@@ -6433,15 +6433,10 @@ ok 6115
 ok 6116
 ok 6117
 ok 6118
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6119
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6120
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6121
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6122
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6123
 ok 6124
 ok 6125
@@ -6453,10 +6448,15 @@ ok 6130
 ok 6131
 ok 6132
 ok 6133
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6134
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6135
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6136
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6137
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6138
 ok 6139
 ok 6140
@@ -6491,13 +6491,9 @@ ok 6168
 ok 6169
 ok 6170
 ok 6171
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6172
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6173
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6174
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6175
 ok 6176
 ok 6177
@@ -6510,9 +6506,13 @@ ok 6183
 ok 6184
 ok 6185
 ok 6186
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6187
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6188
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6189
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6190
 ok 6191
 ok 6192
@@ -6602,3 +6602,18 @@ ok 6275
 ok 6276
 ok 6277
 ok 6278
+ok 6279
+ok 6280
+ok 6281
+ok 6282
+ok 6283
+ok 6284
+ok 6285
+ok 6286
+ok 6287
+ok 6288
+ok 6289
+ok 6290
+ok 6291
+ok 6292
+ok 6293

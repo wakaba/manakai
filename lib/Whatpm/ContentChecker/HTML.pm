@@ -7080,9 +7080,6 @@ $Element->{$HTML_NS}->{button} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## XXXISSUE: In HTML5, no "MUST NOT" for using |action|, |method|,
-    ## |enctype|, |target|, and |novalidate| with non-|submit|-|type|
-    ## |button| elements.
     action => $HTMLURIAttrChecker,
     autofocus => $AutofocusAttrChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -7168,6 +7165,22 @@ $Element->{$HTML_NS}->{button} = {
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
     $FAECheckAttrs2->($self, $item, $element_state);
+
+    my $type = $item->{node}->get_attribute_ns (undef, 'type') || '';
+    if ($type eq 'reset' or $type eq 'button') {
+      for (
+        $item->{node}->get_attribute_node_ns (undef, 'formaction'),
+        $item->{node}->get_attribute_node_ns (undef, 'formmethod'),
+        $item->{node}->get_attribute_node_ns (undef, 'formnovalidate'),
+        $item->{node}->get_attribute_node_ns (undef, 'formenctype'),
+        $item->{node}->get_attribute_node_ns (undef, 'formtarget'),
+      ) {
+        next unless $_;
+        $self->{onerror}->(node => $_,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+    }
   }, # check_attrs2
   check_end => sub {
     my ($self, $item, $element_state) = @_;
