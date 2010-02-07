@@ -1,6 +1,7 @@
 package Message::MIME::Type;
 use strict;
 use warnings;
+our $VERSION = '1.0';
 
 # ------ Instantiation ------
 
@@ -196,3 +197,12 @@ sub as_valid_mime_type ($) {
 } # as_valid_mime_type
 
 1;
+
+=head1 LICENSE
+
+Copyright 2010 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut

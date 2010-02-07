@@ -1,0 +1,245 @@
+#data
+#errors
+0;IMT:no type;;m
+
+#data escaped
+\u000A
+#errors
+0;IMT:no type;;m
+
+#data escaped
+\u000D\u000A
+#errors
+0;IMT:no type;;m
+
+#data escaped
+\u000D\u000A\u0020
+3;IMT:no type;;m
+
+#data
+text
+#errors
+4;IMT:no /;;m
+
+#data
+>_<
+#errors
+0;IMT:no type;;m
+
+#data
+text /plain
+#errors
+4;IMT:no /;;m
+
+#data
+text/plain
+#errors
+#result
+text
+plain
+
+#data escaped
+   \u0009text/plain     \u0020
+#errors
+#result
+text
+plain
+
+#data
+text//
+#errors
+5;IMT:no subtype;;m
+
+#data
+text/ plain
+#errors
+5;IMT:no subtype;;m
+
+#data
+text/plain;
+#errors
+11;IMT:no attr;;m
+#result
+text
+plain
+
+#data escaped
+text/plain;\u0009
+#errors
+12;IMT:no attr;;m
+#result
+text
+plain
+
+#data
+Image/PNG; abc
+#errors
+14;IMT:no =;;m
+#result
+image
+png
+
+#data
+text/html;charset=
+#errors
+18;IMT:no value;;m
+#result
+text
+html
+
+#data
+text/HTML ; charset = UTF-8
+#errors
+19;IMT:no =;;m
+#result
+text
+html
+
+#data
+text/html;charset=utf-8;level
+#errors
+29;IMT:no =;;m
+#result
+text
+html
+charset
+utf-8
+
+#data
+text/html; charset=utF-8;level=
+#errors
+31;IMT:no value;;m
+#result
+text
+html
+charset
+utF-8
+
+#data
+text/html;charset=utf-8;level=5
+#errors
+#result
+text
+html
+charset
+utf-8
+level
+5
+
+#data
+text/html;charset=utf-8;;level=76
+#errors
+24;IMT:no attr;;m
+#result
+text
+html
+charset
+utf-8
+
+#data
+text/html;charset="utf-8
+#errors
+18;IMT:no value;;m
+#result
+text
+html
+
+#data
+text/html;charset=""
+#errors
+#result
+| text
+| html
+| charset
+| 
+
+#data
+text/html; charset="ab\\c";level=4
+#errors
+#result
+text
+html
+charset
+ab\c
+level
+4
+
+#data
+text/html; level="\"4"
+#errors
+#result
+text
+html
+level
+"4
+
+#data
+"text"/plain
+#errors
+0;IMT:no type;;m
+#result
+
+#data
+text/plain;"format"=flowed
+#errors
+11;IMT:no attr;;m
+#result
+text
+plain
+
+#data
+text/plain;;text
+#errors
+11;IMT:no attr;;m
+#result
+text
+plain
+
+#data
+text/plain; charset=" utf-8 "
+#errors
+#result escaped
+text
+plain
+charset
+ utf-8\u0020
+
+#data escaped
+text/plain; charset="a\u000A"
+#errors
+20;IMT:no value;;m
+#result
+text
+plain
+
+#data escaped
+text/plain;charset="a\u000D\u000A b"
+#errors
+#result escaped
+text
+plain
+charset
+a\u000D\u000A b
+
+#data
+text/plain;charset=a;charset=b
+#errors
+30;IMT:duplicate attr;charset;w
+#result
+text
+plain
+charset
+a
+
+#data
+text/plain;charset=a;charset=b;format=flowed
+#errors
+30;IMT:duplicate attr;charset;w
+#result
+text
+plain
+charset
+a
+format
+flowed
+

@@ -167,4 +167,12 @@ sub ___report_error ($$) {
 } # ___report_error
 
 1;
-## $Date: 2007/09/21 08:09:16 $
+
+=head1 LICENSE
+
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
