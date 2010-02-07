@@ -156,6 +156,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $p->{read_until} = sub { return 0 };
       
       $p->{parse_error} = sub {
+        my %args = @_;
+        warn $args{type}, "\n" if $DEBUG;
         push @token, 'ParseError';
       };
       

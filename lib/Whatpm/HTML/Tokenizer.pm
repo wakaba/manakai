@@ -1019,6 +1019,117 @@ $Action->[ATTRIBUTE_NAME_STATE]->[KEY_ELSE_CHAR] = {
   name => 'attr name else',
   ca => {name => 0x0000},
 };
+      ## XML5: "Tag attribute name after state".
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[KEY_SPACE_CHAR] = {
+  name => 'after attr name sp',
+};
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[0x003D] = {
+  name => 'after attr name =',
+  state => BEFORE_ATTRIBUTE_VALUE_STATE,
+};
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[0x003E] = {
+  name => 'after attr name >',
+  emit => '',
+  state => DATA_STATE,
+};
+$XMLAction->[AFTER_ATTRIBUTE_NAME_STATE]->[0x003E] = {
+  name => 'after attr name > xml',
+  error => 'no attr value', ## XML5: Not a parse error. # XXXdocumentation
+  emit => '',
+  state => DATA_STATE,
+};
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[KEY_ULATIN_CHAR] = {
+  name => 'after attr name uc',
+  ca => {set_name => 0x0020}, # UC -> lc
+  state => ATTRIBUTE_NAME_STATE,
+};
+$XMLAction->[AFTER_ATTRIBUTE_NAME_STATE]->[KEY_ULATIN_CHAR] = {
+  name => 'after attr name uc xml',
+  ca => {set_name => 0x0000},
+  state => ATTRIBUTE_NAME_STATE,
+};
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[0x002F] = {
+  name => 'after attr name /',
+  state => SELF_CLOSING_START_TAG_STATE,
+};
+$XMLAction->[AFTER_ATTRIBUTE_NAME_STATE]->[0x002F] = {
+  name => 'after attr name / xml',
+  error => 'no attr value', ## XML5: Not a parse error. # XXXdocumentation
+  state => SELF_CLOSING_START_TAG_STATE,
+};
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[KEY_EOF_CHAR] = {
+  name => 'after attr name eof',
+  error => 'unclosed tag',
+  state => DATA_STATE,
+  reconsume => 1,
+};
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[0x0022] =
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[0x0027] =
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[0x003C] = {
+  name => q[after attr name "'<],
+  error => 'bad attribute name', ## XML5: Not a parse error.
+  #error2(xml) => 'no attr value', ## XML5: Not a parse error.
+  ca => {set_name => 0x0000},
+  state => ATTRIBUTE_NAME_STATE,
+};
+$Action->[AFTER_ATTRIBUTE_NAME_STATE]->[KEY_ELSE_CHAR] = {
+  name => q[after attr name else],
+  ca => {set_name => 0x0000},
+  state => ATTRIBUTE_NAME_STATE,
+};
+$XMLAction->[AFTER_ATTRIBUTE_NAME_STATE]->[KEY_ELSE_CHAR] = {
+  name => q[after attr name else],
+  error => 'no attr value', ## XML5: Not a parse error.
+  ca => {set_name => 0x0000},
+  state => ATTRIBUTE_NAME_STATE,
+};
+      ## XML5: "Tag attribute value before state".
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[KEY_SPACE_CHAR] = {
+  name => 'before attr value sp',
+};
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x0022] = {
+  name => 'before attr value "',
+  state => ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE,
+};
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x0026] = {
+  name => 'before attr value &',
+  state => ATTRIBUTE_VALUE_UNQUOTED_STATE,
+  reconsume => 1,
+};
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x0027] = {
+  name => "before attr value '",
+  state => ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE,
+};
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x003E] = {
+  name => 'before attr value >',
+  error => 'empty unquoted attribute value',
+  emit => '',
+  state => DATA_STATE,
+};
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[KEY_EOF_CHAR] = {
+  name => 'before attr value eof',
+  error => 'unclosed tag',
+  state => DATA_STATE,
+};
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x003C] =
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x003D] =
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x0060] = {
+  name => 'before attr value <=`',
+  error => 'bad attribute value', ## XML5: Not a parse error.
+  ca => {value => 1},
+  state => ATTRIBUTE_VALUE_UNQUOTED_STATE,
+};
+$XMLAction->[BEFORE_ATTRIBUTE_VALUE_STATE]->[KEY_ELSE_CHAR] = {
+  name => 'before attr value else xml',
+  error => 'unquoted attr value', ## XML5: Not a parse error. # XXXdocumentation
+  ca => {value => 1},
+  state => ATTRIBUTE_VALUE_UNQUOTED_STATE,
+};
+$Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[KEY_ELSE_CHAR] = {
+  name => 'before attr value else',
+  ca => {value => 1},
+  state => ATTRIBUTE_VALUE_UNQUOTED_STATE,
+};
 
 my $c_to_key = [];
 $c_to_key->[255] = KEY_EOF_CHAR; # EOF_CHAR
@@ -1094,7 +1205,9 @@ sub _get_next_token ($) {
       }
 
       if ($action->{ca}) {
-        if (defined $action->{ca}->{name}) {
+        if ($action->{ca}->{value}) {
+          $self->{ca}->{value} .= chr $self->{nc};
+        } elsif (defined $action->{ca}->{name}) {
           $self->{ca}->{name} .= chr ($self->{nc} + $action->{ca}->{name});
         } elsif (defined $action->{ca}->{set_name}) {
           $self->{ca} = {
@@ -1354,320 +1467,6 @@ sub _get_next_token ($) {
         redo A;
       } else {
         die "$self->{state}/$self->{nc} is implemented";
-      }
-    } elsif ($self->{state} == AFTER_ATTRIBUTE_NAME_STATE) {
-      ## XML5: "Tag attribute name after state".
-      
-      if ($is_space->{$self->{nc}}) {
-        
-        ## Stay in the state
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($self->{nc} == 0x003D) { # =
-        
-        $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($self->{nc} == 0x003E) { # >
-        if ($self->{is_xml}) {
-          
-          ## XML5: Not a parse error.
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr value'); ## TODO: type
-        } else {
-          
-        }
-
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            
-          }
-        } else {
-          die "$0: $self->{ct}->{type}: Unknown token type";
-        }
-        $self->{state} = DATA_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-
-        return  ($self->{ct}); # start tag or end tag
-
-        redo A;
-      } elsif (0x0041 <= $self->{nc} and
-               $self->{nc} <= 0x005A) { # A..Z
-        
-        $self->{ca}
-            = {name => chr ($self->{nc} + ($self->{is_xml} ? 0 : 0x0020)),
-               value => '',
-               line => $self->{line}, column => $self->{column}};
-        $self->{state} = ATTRIBUTE_NAME_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($self->{nc} == 0x002F) { # /
-        if ($self->{is_xml}) {
-          
-          ## XML5: Not a parse error.
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr value'); ## TODO: type
-        } else {
-          
-        }
-        
-        $self->{state} = SELF_CLOSING_START_TAG_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($self->{nc} == -1) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            
-          }
-        } else {
-          die "$0: $self->{ct}->{type}: Unknown token type";
-        }
-        $self->{state} = DATA_STATE;
-        # reconsume
-
-        ## Discard the token.
-        #return  ($self->{ct}); # start tag or end tag
-
-        redo A;
-      } else {
-        if ($self->{is_xml}) {
-          
-          ## XML5: Not a parse error.
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr value'); ## TODO: type
-        } else {
-          
-        }
-
-        if ({
-             0x0022 => 1, # "
-             0x0027 => 1, # '
-             0x003C => 1, # <
-            }->{$self->{nc}}) {
-          
-          ## XML5: Not a parse error.
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute name');
-        } else {
-          
-        }
-        $self->{ca}
-            = {name => chr ($self->{nc}),
-               value => '',
-               line => $self->{line}, column => $self->{column}};
-        $self->{state} = ATTRIBUTE_NAME_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;        
-      }
-    } elsif ($self->{state} == BEFORE_ATTRIBUTE_VALUE_STATE) {
-      ## XML5: "Tag attribute value before state".
-
-      if ($is_space->{$self->{nc}}) {
-        
-        ## Stay in the state
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($self->{nc} == 0x0022) { # "
-        
-        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($self->{nc} == 0x0026) { # &
-        
-        $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
-        ## reconsume
-        redo A;
-      } elsif ($self->{nc} == 0x0027) { # '
-        
-        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($self->{nc} == 0x003E) { # >
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty unquoted attribute value');
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            
-          }
-        } else {
-          die "$0: $self->{ct}->{type}: Unknown token type";
-        }
-        $self->{state} = DATA_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-
-        return  ($self->{ct}); # start tag or end tag
-
-        redo A;
-      } elsif ($self->{nc} == -1) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            
-          }
-        } else {
-          die "$0: $self->{ct}->{type}: Unknown token type";
-        }
-        $self->{state} = DATA_STATE;
-        ## reconsume
-
-        ## Discard the token.
-        #return  ($self->{ct}); # start tag or end tag
-
-        redo A;
-      } else {
-        if ({
-            0x003C => 1, # <
-            0x003D => 1, # =
-            0x0060 => 1, # `
-        }->{$self->{nc}}) {
-          
-          ## XML5: Not a parse error.
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad attribute value');
-        } elsif ($self->{is_xml}) {
-          
-          ## XML5: No parse error.
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unquoted attr value'); ## TODO
-        } else {
-          
-        }
-        $self->{ca}->{value} .= chr ($self->{nc});
-        $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
       }
     } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
       ## XML5: "Tag attribute value double quoted state" and "DOCTYPE
