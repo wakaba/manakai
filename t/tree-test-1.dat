@@ -8431,6 +8431,7 @@ eof in body
 #data
 <!DOCTYPE HTML><ul><li><datagrid><li>
 #errors
+no </datagrid>
 eof in body
 #document
 | <!DOCTYPE html>
@@ -8440,7 +8441,7 @@ eof in body
 |     <ul>
 |       <li>
 |         <datagrid>
-|           <li>
+|       <li>
 
 #data
 <!DOCTYPE HTML><ul><li><details><li>
@@ -9242,6 +9243,7 @@ eof in body
 #data
 <!DOCTYPE HTML><dl><dt><datagrid><dt>
 #errors
+no </datagrid>
 eof in body
 #document
 | <!DOCTYPE html>
@@ -9251,7 +9253,7 @@ eof in body
 |     <dl>
 |       <dt>
 |         <datagrid>
-|           <dt>
+|       <dt>
 
 #data
 <!DOCTYPE HTML><dl><dt><details><dt>
@@ -9512,15 +9514,14 @@ unexpected EOF
 <span><datagrid></span>a
 #errors
 no DOCTYPE
-unmatched end tag
-unexpected EOF
+no </datagrid>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <span>
 |       <datagrid>
-|         "a"
+|     "a"
 
 #data
 <span><details></span>a
