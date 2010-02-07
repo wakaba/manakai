@@ -32,6 +32,52 @@ sub _new_from_type_and_subtype_2 : Test(5) {
   is $mt->as_valid_mime_type, 'text/plain';
 } # _new_from_type_and_subtype_2
 
+sub _parser : Test(63) {
+  require +file (__FILE__)->dir->file ('testfiles.pl')->stringify;
+  
+  execute_test (file (__FILE__)->dir->subdir ('mime')->file ('types.dat'), {
+    data => {is_prefixed => 1},
+    errors => {is_list => 1},
+    result => {is_prefixed => 1},
+  }, sub {
+    my $test = shift;
+    
+    my @errors;
+    my $onerror = sub {
+      my %opt = @_;
+      push @errors, join ';',
+          $opt{index},
+          $opt{type},
+          defined $opt{value} ? $opt{value} : '',
+          $opt{level};
+    }; # $onerror
+    
+    my $parsed = Message::MIME::Type->parse_web_mime_type
+        ($test->{data}->[0], $onerror);
+    
+    if ($test->{errors}) {
+      is join ("\n", sort {$a cmp $b} @errors),
+          join ("\n", sort {$a cmp $b} @{$test->{errors}->[0]}),
+          $test->{data}->[0];
+    } else {
+      warn qq[No #errors section: "$test->{data}->[0]];
+    }
+
+    my $expected_result = $test->{result}->[0] // '';
+    my $actual_result = '';
+    if ($parsed) {
+      $actual_result .= $parsed->type . "\n";
+      $actual_result .= $parsed->subtype . "\n";
+      for my $attr (@{$parsed->attrs}) {
+        $actual_result .= $attr . "\n";
+        $actual_result .= $parsed->param ($attr) . "\n";
+      }
+      $expected_result .= "\n" if length $actual_result;
+    }
+    is $actual_result, $expected_result, '#result of ' . $test->{data}->[0];
+  });
+} # _parser
+
 # ------ Accessors ------
 
 sub _type : Test(3) {
@@ -215,6 +261,13 @@ sub _as_valid_param_13 : Test(2) {
   $mt->param (abc => 'de\"f');
   is $mt->as_valid_mime_type_with_no_params, 'text/css';
   is $mt->as_valid_mime_type, qq[text/css; abc="de\x5C\x5C\x5C"f"];
+} # _as_valid
+
+sub _as_valid_param_14 : Test(2) {
+  my $mt = Message::MIME::Type->new_from_type_and_subtype ('text', 'css');
+  $mt->param (abc => qq[de\x00f]);
+  is $mt->as_valid_mime_type_with_no_params, 'text/css';
+  is $mt->as_valid_mime_type, qq[text/css; abc="de\x5C\x00f"];
 } # _as_valid
 
 __PACKAGE__->runtests;
