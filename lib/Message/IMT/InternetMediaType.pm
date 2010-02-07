@@ -3,6 +3,8 @@ use strict;
 use warnings;
 our $VERSION = '1.4';
 
+## OBSOLETE
+
 package Message::DOM::DOMImplementation;
 
 sub create_internet_media_type ($$$) {
