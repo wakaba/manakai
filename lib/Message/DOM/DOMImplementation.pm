@@ -1,8 +1,11 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.14';
 push our @ISA, 'Message::IF::DOMImplementation',
-    'Message::IF::AtomDOMImplementation';
+    'Message::IF::AtomDOMImplementation',
+    'Message::IF::URIImplementation',
+    'Message::IF::IMTImplementation';
 
 sub ____new ($) {
   my $self = bless {}, shift;
@@ -10,18 +13,21 @@ sub ____new ($) {
 } # ____new
 *new = \&____new;
 
+my $MethodToModule = {
+  create_atom_entry_document => 'Message::DOM::Atom::AtomElement',
+  create_atom_feed_document => 'Message::DOM::Atom::AtomElement',
+  create_document => 'Message::DOM::Document',
+  create_document_type => 'Message::DOM::DocumentType',
+  create_uri_reference => 'Message::URI::URIReference',
+  create_internet_media_type => 'Message::IMT::InternetMediaType',
+};
+
 sub AUTOLOAD {
   my $method_name = our $AUTOLOAD;
   $method_name =~ s/.*:://;
   return if $method_name eq 'DESTROY';
 
-  my $module_name = {
-    create_atom_entry_document => 'Message::DOM::Atom::AtomElement',
-    create_atom_feed_document => 'Message::DOM::Atom::AtomElement',
-    create_document => 'Message::DOM::Document',
-    create_document_type => 'Message::DOM::DocumentType',
-    create_uri_reference => 'Message::URI::URIReference',  
-  }->{$method_name};
+  my $module_name = $MethodToModule->{$method_name};
   if ($module_name) {
     eval qq{ require $module_name } or die $@;
     no strict 'refs';
@@ -31,9 +37,6 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-
-## URIImplementation
-sub create_uri_reference ($$);
 
 our $HasFeature;
 $HasFeature->{core}->{''} = 1;
@@ -101,12 +104,22 @@ sub create_atom_entry_document ($$;$$);
 
 sub create_atom_feed_document ($$;$$);
 
+## |URIImplementation| method
+
+sub create_uri_reference ($$);
+
+## |InternetMediaType| method
+
+sub create_internet_media_type ($$$);
+
 package Message::IF::DOMImplementation;
 package Message::IF::AtomDOMImplementation;
+package Message::IF::URIImplementation;
+package Message::IF::IMTImplementation;
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -114,4 +127,3 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/10/08 07:17:18 $

@@ -1,10 +1,9 @@
 package Message::IMT::InternetMediaType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.4';
 
-package Message::DOM::IF::IMTImplementation;
 package Message::DOM::DOMImplementation;
-push our @ISA, 'Message::DOM::IF::IMTImplementation';
 
 sub create_internet_media_type ($$$) {
   my ($self, $type, $subtype) = @_;
@@ -14,9 +13,9 @@ sub create_internet_media_type ($$$) {
   return $r;
 } # create_internet_media_type
 
-package Message::DOM::IF::InternetMediaType;
+package Message::IF::InternetMediaType;
 package Message::IMT::InternetMediaType;
-push our @ISA, 'Message::DOM::IF::InternetMediaType';
+push our @ISA, 'Message::IF::InternetMediaType';
 
 use overload
   '""' => sub { return $_[0]->imt_text },

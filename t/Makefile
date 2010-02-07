@@ -68,6 +68,7 @@ dom1core:
 test: 
 	$(PROVE) \
 	  DOM-Node.t DOM-Element.t DOM-DOMStringList.t \
+	  URI-URIReference.t IMT-InternetMediaType.t \
 	  Whatpm-*.t
 
 #	$(PERL_TEST_) *$(PT_SUFFIX)
