@@ -384,7 +384,7 @@ my $XMLAction;
 $Action->[DATA_STATE]->[0x0026] = {
   name => 'data &',
   state => ENTITY_STATE, # "entity data state" + "consume a character reference"
-  set => {entity_add => -1, prev_state => DATA_STATE},
+  state_set => {entity_add => -1, prev_state => DATA_STATE},
 };
 $Action->[DATA_STATE]->[0x003C] = {
   name => 'data <',
@@ -393,12 +393,12 @@ $Action->[DATA_STATE]->[0x003C] = {
 $Action->[DATA_STATE]->[KEY_EOF_CHAR] = {
   name => 'data eof',
   emit => END_OF_FILE_TOKEN,
-  no_consume => 1,
+  reconsume => 1,
 };
 $Action->[DATA_STATE]->[KEY_ELSE_CHAR] = {
   name => 'data else',
   emit => CHARACTER_TOKEN,
-  read_until => q{<&},
+  emit_data_read_until => q{<&},
 };
   $XMLAction->[DATA_STATE]->[0x005D] = { # ]
     name => 'data ]',
@@ -408,12 +408,12 @@ $Action->[DATA_STATE]->[KEY_ELSE_CHAR] = {
   $XMLAction->[DATA_STATE]->[KEY_ELSE_CHAR] = {
     name => 'data else xml',
     emit => CHARACTER_TOKEN,
-    read_until => q{<&\]},
+    emit_data_read_until => q{<&\]},
   };
 $Action->[RCDATA_STATE]->[0x0026] = {
   name => 'rcdata &',
   state => ENTITY_STATE, # "entity data state" + "consume a character reference"
-  set => {entity_add => -1, prev_state => RCDATA_STATE},
+  state_set => {entity_add => -1, prev_state => RCDATA_STATE},
 };
 $Action->[RCDATA_STATE]->[0x003C] = {
   name => 'rcdata <',
@@ -423,7 +423,7 @@ $Action->[RCDATA_STATE]->[KEY_EOF_CHAR] = $Action->[DATA_STATE]->[KEY_EOF_CHAR];
 $Action->[RCDATA_STATE]->[KEY_ELSE_CHAR] = {
   name => 'rcdata else',
   emit => CHARACTER_TOKEN,
-  read_until => q{<&},
+  emit_data_read_until => q{<&},
 };
 $Action->[RAWTEXT_STATE]->[0x003C] = {
   name => 'rawtext <',
@@ -433,7 +433,7 @@ $Action->[RAWTEXT_STATE]->[KEY_EOF_CHAR] = $Action->[DATA_STATE]->[KEY_EOF_CHAR]
 $Action->[RAWTEXT_STATE]->[KEY_ELSE_CHAR] = {
   name => 'rawtext else',
   emit => CHARACTER_TOKEN,
-  read_until => q{<},
+  emit_data_read_until => q{<},
 };
 $Action->[SCRIPT_DATA_STATE]->[0x003C] = {
   name => 'script data <',
@@ -445,7 +445,7 @@ $Action->[PLAINTEXT_STATE]->[KEY_EOF_CHAR] = $Action->[DATA_STATE]->[KEY_EOF_CHA
 $Action->[PLAINTEXT_STATE]->[KEY_ELSE_CHAR] = {
   name => 'plaintext else',
   emit => CHARACTER_TOKEN,
-  read_until => q{},
+  emit_data_read_until => q{},
 };
 # "Tag open state" is known as "tag state" in XML5.
 $Action->[TAG_OPEN_STATE]->[0x0021] = {
@@ -458,20 +458,23 @@ $Action->[TAG_OPEN_STATE]->[0x002F] = {
 };
 $Action->[TAG_OPEN_STATE]->[KEY_ULATIN_CHAR] = {
   name => 'tag open uc',
-  set_ct => START_TAG_TOKEN,
-  append_lc_tag_name => 1,
+  ct_set => START_TAG_TOKEN,
+  ct_append_tag_name => 1,
+  ct_append_delta => 0x0020, # UC -> lc
   state => TAG_NAME_STATE,
 };
   $XMLAction->[TAG_OPEN_STATE]->[KEY_ULATIN_CHAR] = {
     name => 'tag open uc xml',
-    set_ct => START_TAG_TOKEN,
-    append_tag_name => 1,
+    ct_set => START_TAG_TOKEN,
+    ct_append_tag_name => 1,
+    ct_append_delta => 0,
     state => TAG_NAME_STATE,
   };
 $Action->[TAG_OPEN_STATE]->[KEY_LLATIN_CHAR] = {
   name => 'tag open lc',
-  set_ct => START_TAG_TOKEN,
-  append_tag_name => 1,
+  ct_set => START_TAG_TOKEN,
+  ct_append_tag_name => 1,
+  ct_append_delta => 0,
   state => TAG_NAME_STATE,
 };
 $Action->[TAG_OPEN_STATE]->[0x003F] = {
@@ -479,7 +482,7 @@ $Action->[TAG_OPEN_STATE]->[0x003F] = {
   state => BOGUS_COMMENT_STATE,
   error => 'pio',
   error_delta => 1,
-  set_ct => COMMENT_TOKEN,
+  ct_set => COMMENT_TOKEN,
   reconsume => 1, ## $self->{nc} is intentionally left as is
 };
   $XMLAction->[TAG_OPEN_STATE]->[0x003F] = { # ?
@@ -500,29 +503,30 @@ $Action->[TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = $Action->[TAG_OPEN_STATE]->[0x003E]
   ## XML5: "<:" has a parse error.
   $XMLAction->[TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
     name => 'tag open else xml',
-    set_ct => START_TAG_TOKEN,
-    append_tag_name => 1,
+    ct_set => START_TAG_TOKEN,
+    ct_append_tag_name => 1,
+    ct_append_delta => 0,
     state => TAG_NAME_STATE,
   };
 $Action->[RCDATA_LT_STATE]->[0x002F] = {
   name => 'rcdata lt /',
   state => RCDATA_END_TAG_OPEN_STATE,
-  clear_buffer => 1,
+  buffer_clear => 1,
 };
 $Action->[RAWTEXT_LT_STATE]->[0x002F] = {
   name => 'rawtext lt /',
   state => RAWTEXT_END_TAG_OPEN_STATE,
-  clear_buffer => 1,
+  buffer_clear => 1,
 };
 $Action->[SCRIPT_DATA_LT_STATE]->[0x002F] = {
   name => 'script data lt /',
   state => SCRIPT_DATA_END_TAG_OPEN_STATE,
-  clear_buffer => 1,
+  buffer_clear => 1,
 };
 $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[0x002F] = {
   name => 'script data escaped lt /',
   state => SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE,
-  clear_buffer => 1,
+  buffer_clear => 1,
 };
 $Action->[SCRIPT_DATA_LT_STATE]->[0x0021] = {
   name => 'script data lt !',
@@ -534,18 +538,20 @@ $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[KEY_ULATIN_CHAR] = {
   name => 'script data escaped lt uc',
   emit => CHARACTER_TOKEN,
   emit_data => '<',
-  emit_append_data => 1,
-  clear_buffer => 1,
-  append_lc_buffer => 1,
+  emit_data_append => 1,
+  buffer_clear => 1,
+  buffer_append => 1,
+  buffer_append_delta => 0x0020, # UC -> lc
   state => SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE,
 };
 $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[KEY_LLATIN_CHAR] = {
   name => 'script data escaped lt lc',
   emit => CHARACTER_TOKEN,
   emit_data => '<',
-  emit_append_data => 1,
-  clear_buffer => 1,
-  append_buffer => 1,
+  emit_data_append => 1,
+  buffer_clear => 1,
+  buffer_append => 1,
+  buffer_append_delta => 0,
   state => SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE,
 };
 $Action->[RCDATA_LT_STATE]->[KEY_ELSE_CHAR] = {
@@ -579,22 +585,25 @@ $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[KEY_ELSE_CHAR] = {
 ## XXX "End tag token" in latest HTML5 and in XML5.
 $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_ULATIN_CHAR] = {
   name => 'end tag open uc',
-  set_ct => END_TAG_TOKEN,
-  append_lc_tag_name => 1,
+  ct_set => END_TAG_TOKEN,
+  ct_append_tag_name => 1,
+  ct_append_delta => 0x0020, # UC -> lc
   ct_delta => 2,
   state => TAG_NAME_STATE,
 };
   $XMLAction->[CLOSE_TAG_OPEN_STATE]->[KEY_ULATIN_CHAR] = {
     name => 'end tag open uc xml',
-    set_ct => END_TAG_TOKEN,
-    append_tag_name => 1,
+    ct_set => END_TAG_TOKEN,
+    ct_append_tag_name => 1,
+    ct_append_delta => 0,
     ct_delta => 2,
     state => TAG_NAME_STATE,
   };
 $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_LLATIN_CHAR] = {
   name => 'end tag open lc',
-  set_ct => END_TAG_TOKEN,
-  append_tag_name => 1,
+  ct_set => END_TAG_TOKEN,
+  ct_append_tag_name => 1,
+  ct_append_delta => 0,
   ct_delta => 2,
   state => TAG_NAME_STATE,
 };
@@ -616,7 +625,7 @@ $Action->[CLOSE_TAG_OPEN_STATE]->[0x003E] = {
     error => 'empty end tag',
     error_delta => 2, # "<" in "</>"
     state => DATA_STATE,
-    set_ct => END_TAG_TOKEN,
+    ct_set => END_TAG_TOKEN,
     ct_delta => 2,
     emit_ct => 1,
   };
@@ -635,7 +644,7 @@ $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
   error => 'bogus end tag',
   error_delta => 2, # "<" of "</"
   state => BOGUS_COMMENT_STATE,
-  set_ct => COMMENT_TOKEN,
+  ct_set => COMMENT_TOKEN,
   ct_delta => 2, # "<" of "</"
   reconsume => 1,
   ## NOTE: $self->{nc} is intentionally left as is.  Although the
@@ -647,13 +656,19 @@ $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
   ## XML5: "</:" is a parse error.
   $XMLAction->[CLOSE_TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
     name => 'end tag open else xml',
-    set_ct => END_TAG_TOKEN,
-    append_tag_name => 1,
+    ct_set => END_TAG_TOKEN,
+    ct_append_tag_name => 1,
+    ct_append_delta => 0,
     ct_delta => 2,
     state => TAG_NAME_STATE, ## XML5: "end tag name state".
   };
 
-
+my $c_to_key = [];
+$c_to_key->[255] = KEY_EOF_CHAR; # EOF_CHAR
+$c_to_key->[$_] = $_ for 0x0000..0x007F;
+$c_to_key->[$_] = KEY_SPACE_CHAR for keys %$is_space;
+$c_to_key->[$_] = KEY_ULATIN_CHAR for 0x0041..0x005A;
+$c_to_key->[$_] = KEY_LLATIN_CHAR for 0x0061..0x007A;
 
 sub _get_next_token ($) {
   my $self = shift;
@@ -674,16 +689,15 @@ sub _get_next_token ($) {
   A: {
     
 
-    my $c = $self->{nc};
-    $c = KEY_ELSE_CHAR if $c > 0x007F;
-    $c = KEY_ULATIN_CHAR if 0x0041 <= $c and $c <= 0x005A;
-    $c = KEY_LLATIN_CHAR if 0x0061 <= $c and $c <= 0x007A;
-    $c = KEY_EOF_CHAR if $c == EOF_CHAR;
-    $c = KEY_SPACE_CHAR if $is_space->{$c};
-    my $action = ($self->{is_xml} ? $XMLAction->[$self->{state}]->[$c] : undef)
-        || $Action->[$self->{state}]->[$c]
-        || ($self->{is_xml} ? $XMLAction->[$self->{state}]->[KEY_ELSE_CHAR] : undef)
-        || $Action->[$self->{state}]->[KEY_ELSE_CHAR];
+    my $c = $self->{nc} > 0x007F ? KEY_ELSE_CHAR : $c_to_key->[$self->{nc}];
+    my $action = $Action->[$self->{state}]->[$c] || $Action->[$self->{state}]->[KEY_ELSE_CHAR];
+    if ($self->{is_xml}) {
+      $action = $XMLAction->[$self->{state}]->[$c]
+          || $Action->[$self->{state}]->[$c]
+          || $XMLAction->[$self->{state}]->[KEY_ELSE_CHAR]
+          || $Action->[$self->{state}]->[KEY_ELSE_CHAR];
+    }
+
     if ($action) {
       
 
@@ -699,16 +713,16 @@ sub _get_next_token ($) {
 
       if (defined $action->{state}) {
         $self->{state} = $action->{state};
-      }
-
-      if ($action->{set}) {
-        for (keys %{$action->{set}}) {
-          $self->{$_} = $action->{set}->{$_};
+        
+        if ($action->{state_set}) {
+          for (keys %{$action->{state_set}}) {
+            $self->{$_} = $action->{state_set}->{$_};
+          }
         }
       }
 
-      if ($action->{set_ct}) {
-        $self->{ct} = {type => $action->{set_ct}};
+      if ($action->{ct_set}) {
+        $self->{ct} = {type => $action->{ct_set}};
         if ($action->{ct_delta}) {
           $self->{ct}->{line} = $self->{line_prev};
           $self->{ct}->{column} = $self->{column_prev} - $action->{ct_delta} + 1;
@@ -718,22 +732,16 @@ sub _get_next_token ($) {
         }
       }
 
-      if ($action->{append_tag_name}) {
-        $self->{ct}->{tag_name} .= chr $self->{nc};
-      } elsif ($action->{append_lc_tag_name}) {
-        $self->{ct}->{tag_name} .= chr ($self->{nc} + 0x0020);
-      } elsif ($action->{append_data}) {
-        $self->{ct}->{data} .= chr $self->{nc};
+      if ($action->{ct_append_tag_name}) {
+        $self->{ct}->{tag_name} .= chr ($self->{nc} + $action->{ct_append_delta});
       }
 
-      if ($action->{clear_buffer}) {
+      if ($action->{buffer_clear}) {
         $self->{kwd} = '';
       }
 
-      if ($action->{append_buffer}) {
-        $self->{kwd} .= chr $self->{nc};
-      } elsif ($action->{append_lc_buffer}) {
-        $self->{kwd} .= chr ($self->{nc} + 0x0020);
+      if ($action->{buffer_append}) {
+        $self->{kwd} .= chr ($self->{nc} + $action->{buffer_append_delta});
       }
 
       
@@ -742,7 +750,7 @@ sub _get_next_token ($) {
         my $token = {type => $action->{emit}};
         if (defined $action->{emit_data}) {
           $token->{data} = $action->{emit_data};
-          if ($action->{emit_append_data}) {
+          if ($action->{emit_data_append}) {
             $token->{data} .= chr $self->{nc};
           }
         } elsif ($action->{emit} == CHARACTER_TOKEN) {
@@ -755,9 +763,9 @@ sub _get_next_token ($) {
           $token->{line} = $self->{line};
           $token->{column} = $self->{column};
         }
-        if (defined $action->{read_until}) {
+        if (defined $action->{emit_data_read_until}) {
           $self->{read_until}->($token->{data},
-                                $action->{read_until},
+                                $action->{emit_data_read_until},
                                 length $token->{data});
         }
 
