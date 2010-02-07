@@ -458,26 +458,29 @@ $Action->[TAG_OPEN_STATE]->[0x002F] = {
 };
 $Action->[TAG_OPEN_STATE]->[KEY_ULATIN_CHAR] = {
   name => 'tag open uc',
-  ct_set => START_TAG_TOKEN,
-  ct_delta => 1,
-  ct_append_tag_name => 1,
-  ct_append_delta => 0x0020, # UC -> lc
+  ct => {
+    type => START_TAG_TOKEN,
+    delta => 1,
+    append_tag_name => 0x0020, # UC -> lc
+  },
   state => TAG_NAME_STATE,
 };
   $XMLAction->[TAG_OPEN_STATE]->[KEY_ULATIN_CHAR] = {
     name => 'tag open uc xml',
-    ct_set => START_TAG_TOKEN,
-    ct_delta => 1,
-    ct_append_tag_name => 1,
-    ct_append_delta => 0,
+    ct => {
+      type => START_TAG_TOKEN,
+      delta => 1,
+      append_tag_name => 0x0000,
+    },
     state => TAG_NAME_STATE,
   };
 $Action->[TAG_OPEN_STATE]->[KEY_LLATIN_CHAR] = {
   name => 'tag open lc',
-  ct_set => START_TAG_TOKEN,
-  ct_delta => 1,
-  ct_append_tag_name => 1,
-  ct_append_delta => 0,
+  ct => {
+    type => START_TAG_TOKEN,
+    delta => 1,
+    append_tag_name => 0x0000,
+  },
   state => TAG_NAME_STATE,
 };
 $Action->[TAG_OPEN_STATE]->[0x003F] = {
@@ -485,7 +488,9 @@ $Action->[TAG_OPEN_STATE]->[0x003F] = {
   state => BOGUS_COMMENT_STATE,
   error => 'pio',
   error_delta => 1,
-  ct_set => COMMENT_TOKEN,
+  ct => {
+    type => COMMENT_TOKEN,
+  },
   reconsume => 1, ## $self->{nc} is intentionally left as is
 };
   $XMLAction->[TAG_OPEN_STATE]->[0x003F] = { # ?
@@ -507,10 +512,11 @@ $Action->[TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = $Action->[TAG_OPEN_STATE]->[0x003E]
   ## XML5: "<:" has a parse error.
   $XMLAction->[TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
     name => 'tag open else xml',
-    ct_set => START_TAG_TOKEN,
-    ct_delta => 1,
-    ct_append_tag_name => 1,
-    ct_append_delta => 0,
+    ct => {
+      type => START_TAG_TOKEN,
+      delta => 1,
+      append_tag_name => 0x0000,
+    },
     state => TAG_NAME_STATE,
   };
 $Action->[RCDATA_LT_STATE]->[0x002F] = {
@@ -590,26 +596,29 @@ $Action->[SCRIPT_DATA_ESCAPED_LT_STATE]->[KEY_ELSE_CHAR] = {
 ## XXX "End tag token" in latest HTML5 and in XML5.
 $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_ULATIN_CHAR] = {
   name => 'end tag open uc',
-  ct_set => END_TAG_TOKEN,
-  ct_append_tag_name => 1,
-  ct_append_delta => 0x0020, # UC -> lc
-  ct_delta => 2,
+  ct => {
+    type => END_TAG_TOKEN,
+    delta => 2,
+    append_tag_name => 0x0020, # UC -> lc
+  },
   state => TAG_NAME_STATE,
 };
   $XMLAction->[CLOSE_TAG_OPEN_STATE]->[KEY_ULATIN_CHAR] = {
     name => 'end tag open uc xml',
-    ct_set => END_TAG_TOKEN,
-    ct_append_tag_name => 1,
-    ct_append_delta => 0,
-    ct_delta => 2,
+    ct => {
+      type => END_TAG_TOKEN,
+      delta => 2,
+      append_tag_name => 0x0000,
+    },
     state => TAG_NAME_STATE,
   };
 $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_LLATIN_CHAR] = {
   name => 'end tag open lc',
-  ct_set => END_TAG_TOKEN,
-  ct_append_tag_name => 1,
-  ct_append_delta => 0,
-  ct_delta => 2,
+  ct => {
+    type => END_TAG_TOKEN,
+    delta => 2,
+    append_tag_name => 0x0000,
+  },
   state => TAG_NAME_STATE,
 };
 $Action->[CLOSE_TAG_OPEN_STATE]->[0x003E] = {
@@ -630,8 +639,10 @@ $Action->[CLOSE_TAG_OPEN_STATE]->[0x003E] = {
     error => 'empty end tag',
     error_delta => 2, # "<" in "</>"
     state => DATA_STATE,
-    ct_set => END_TAG_TOKEN,
-    ct_delta => 2,
+    ct => {
+      type => END_TAG_TOKEN,
+      delta => 2,
+    },
     emit => '',
   };
 $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_EOF_CHAR] = {
@@ -649,8 +660,10 @@ $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
   error => 'bogus end tag',
   error_delta => 2, # "<" of "</"
   state => BOGUS_COMMENT_STATE,
-  ct_set => COMMENT_TOKEN,
-  ct_delta => 2, # "<" of "</"
+  ct => {
+    type => COMMENT_TOKEN,
+    delta => 2, # "<" of "</"
+  },
   reconsume => 1,
   ## NOTE: $self->{nc} is intentionally left as is.  Although the
   ## "anything else" case of the spec not explicitly states that the
@@ -661,10 +674,11 @@ $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
   ## XML5: "</:" is a parse error.
   $XMLAction->[CLOSE_TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
     name => 'end tag open else xml',
-    ct_set => END_TAG_TOKEN,
-    ct_append_tag_name => 1,
-    ct_append_delta => 0,
-    ct_delta => 2,
+    ct => {
+      type => END_TAG_TOKEN,
+      delta => 2,
+      append_tag_name => 0x0000,
+    },
     state => TAG_NAME_STATE, ## XML5: "end tag name state".
   };
       ## This switch-case implements "tag name state", "RCDATA end tag
@@ -682,13 +696,15 @@ $Action->[TAG_NAME_STATE]->[0x003E] = {
 };
 $Action->[TAG_NAME_STATE]->[KEY_ULATIN_CHAR] = {
   name => 'tag name uc',
-  ct_append_tag_name => 1,
-  ct_append_delta => 0x0020, # UC -> lc
+  ct => {
+    append_tag_name => 0x0020, # UC -> lc
+  },
 };
 $XMLAction->[TAG_NAME_STATE]->[KEY_ULATIN_CHAR] = {
   name => 'tag name uc xml',
-  ct_append_tag_name => 1,
-  ct_append_delta => 0,
+  ct => {
+    append_tag_name => 0x0000,
+  },
 };
 $Action->[TAG_NAME_STATE]->[KEY_EOF_CHAR] = {
   name => 'tag name eof',
@@ -702,8 +718,9 @@ $Action->[TAG_NAME_STATE]->[0x002F] = {
 };
 $Action->[TAG_NAME_STATE]->[KEY_ELSE_CHAR] = {
   name => 'tag name else',
-  ct_append_tag_name => 1,
-  ct_append_delta => 0,
+  ct => {
+    append_tag_name => 0x0000,
+  },
 };
 $Action->[SCRIPT_DATA_ESCAPE_START_STATE]->[0x002D] = {
   name => 'script data escape start -',
@@ -1231,21 +1248,23 @@ sub _get_next_token ($) {
         }
       }
 
-      if ($action->{ct_set}) {
-        $self->{ct} = {type => $action->{ct_set}, tag_name => ''};
-        if ($action->{ct_delta}) {
-          $self->{ct}->{line} = $self->{line_prev};
-          $self->{ct}->{column} = $self->{column_prev} - $action->{ct_delta} + 1;
-        } else {
-          $self->{ct}->{line} = $self->{line};
-          $self->{ct}->{column} = $self->{column};
+      if ($action->{ct}) {
+        if (defined $action->{ct}->{type}) {
+          $self->{ct} = {type => $action->{ct}->{type}, tag_name => ''};
+          if ($action->{ct}->{delta}) {
+            $self->{ct}->{line} = $self->{line_prev};
+            $self->{ct}->{column} = $self->{column_prev} - $action->{ct}->{delta} + 1;
+          } else {
+            $self->{ct}->{line} = $self->{line};
+            $self->{ct}->{column} = $self->{column};
+          }
+        }
+        
+        if (defined $action->{ct}->{append_tag_name}) {
+          $self->{ct}->{tag_name} .= chr ($self->{nc} + $action->{ct}->{append_tag_name});
         }
       }
-
-      if ($action->{ct_append_tag_name}) {
-        $self->{ct}->{tag_name} .= chr ($self->{nc} + $action->{ct_append_delta});
-      }
-
+      
       if ($action->{ca}) {
         if ($action->{ca}->{value}) {
           $self->{ca}->{value} .= chr $self->{nc};
