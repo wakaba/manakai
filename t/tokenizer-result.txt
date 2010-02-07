@@ -1,7 +1,7 @@
 1..1154
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Feb  7 16:11:47 2010
-# Current time GMT:   Sun Feb  7 07:11:47 2010
+# Current time local: Sun Feb  7 16:35:06 2010
+# Current time GMT:   Sun Feb  7 07:35:06 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/HTML-tokenizer.t line 22.
 Found = in conditional, should be == at t/HTML-tokenizer.t line 113.
@@ -1875,15 +1875,7 @@ ok 1155
 ok 1156
 ok 1157
 ok 1158
-not ok 1159
-# Test 1159 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1159)
-#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (after attribute value (quoted)): qq'</p class=\x{27}a\x{27}')
-#      Got 1 extra line at line 2:
-#       + "          qq'ParseError',\n"
+ok 1159
 ok 1160
 ok 1161
-not ok 1162
-# Test 1162 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1162)
-#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/')
-#      Got 1 extra line at line 2:
-#       + "          qq'ParseError',\n"
+ok 1162

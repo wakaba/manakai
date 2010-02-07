@@ -1121,6 +1121,48 @@ $Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[KEY_ELSE_CHAR] = {
   state => ATTRIBUTE_VALUE_UNQUOTED_STATE,
 };
 
+$Action->[AFTER_ATTRIBUTE_VALUE_QUOTED_STATE]->[KEY_SPACE_CHAR] = {
+  name => 'after attr value quoted sp',
+  state => BEFORE_ATTRIBUTE_NAME_STATE,
+};
+$Action->[AFTER_ATTRIBUTE_VALUE_QUOTED_STATE]->[0x003E] = {
+  name => 'after attr value quoted >',
+  emit => '',
+  state => DATA_STATE,
+};
+$Action->[AFTER_ATTRIBUTE_VALUE_QUOTED_STATE]->[0x002F] = {
+  name => 'after attr value quoted /',
+  state => SELF_CLOSING_START_TAG_STATE,
+};
+$Action->[AFTER_ATTRIBUTE_VALUE_QUOTED_STATE]->[KEY_EOF_CHAR] = {
+  name => 'after attr value quoted eof',
+  error => 'unclosed tag',
+  state => DATA_STATE,
+  reconsume => 1,
+};
+$Action->[AFTER_ATTRIBUTE_VALUE_QUOTED_STATE]->[KEY_ELSE_CHAR] = {
+  name => 'after attr value quoted else',
+  error => 'no space between attributes',
+  state => BEFORE_ATTRIBUTE_NAME_STATE,
+  reconsume => 1,
+};
+$Action->[SELF_CLOSING_START_TAG_STATE]->[0x003E] = {
+  name => 'self closing start tag >',
+  skip => 1,
+};
+$Action->[SELF_CLOSING_START_TAG_STATE]->[KEY_EOF_CHAR] = {
+  name => 'self closing start tag eof',
+  error => 'unclosed tag',
+  state => DATA_STATE, ## XML5: "Tag attribute name before state".
+  reconsume => 1,
+};
+$Action->[SELF_CLOSING_START_TAG_STATE]->[KEY_ELSE_CHAR] = {
+  name => 'self closing start tag else',
+  error => 'nestc', # XXX This error type is wrong.
+  state => BEFORE_ATTRIBUTE_NAME_STATE,
+  reconsume => 1,
+};
+
 my $c_to_key = [];
 $c_to_key->[255] = KEY_EOF_CHAR; # EOF_CHAR
 $c_to_key->[$_] = $_ for 0x0000..0x007F;
@@ -1726,68 +1768,6 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       }
-    } elsif ($self->{state} == AFTER_ATTRIBUTE_VALUE_QUOTED_STATE) {
-      if ($is_space->{$self->{nc}}) {
-        !!!cp (118);
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
-        !!!next-input-character;
-        redo A;
-      } elsif ($self->{nc} == 0x003E) { # >
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          !!!cp (119);
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            !!!cp (120);
-            !!!parse-error (type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            !!!cp (121);
-          }
-        } else {
-          die "$0: $self->{ct}->{type}: Unknown token type";
-        }
-        $self->{state} = DATA_STATE;
-        !!!next-input-character;
-
-        !!!emit ($self->{ct}); # start tag or end tag
-
-        redo A;
-      } elsif ($self->{nc} == 0x002F) { # /
-        !!!cp (122);
-        $self->{state} = SELF_CLOSING_START_TAG_STATE;
-        !!!next-input-character;
-        redo A;
-      } elsif ($self->{nc} == -1) {
-        !!!parse-error (type => 'unclosed tag'); 
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          !!!cp (122.3);
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            !!!cp (122.1);
-            !!!parse-error (type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            !!!cp (122.2);
-          }
-        } else {
-          die "$0: $self->{ct}->{type}: Unknown token type";
-        }
-        $self->{state} = DATA_STATE;
-        ## Reconsume.
-
-        ## Discard the token.
-        #!!!emit ($self->{ct}); # start tag or end tag
-
-        redo A;
-      } else {
-        !!!cp ('124.1');
-        !!!parse-error (type => 'no space between attributes');
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
-        ## reconsume
-        redo A;
-      }
     } elsif ($self->{state} == SELF_CLOSING_START_TAG_STATE) {
       ## XML5: "Empty tag state".
 
@@ -1795,14 +1775,14 @@ sub _get_next_token ($) {
         if ($self->{ct}->{type} == END_TAG_TOKEN) {
           !!!cp ('124.2');
           !!!parse-error (type => 'nestc', token => $self->{ct});
-          ## TODO: Different type than slash in start tag
+          ## XXX: Different type than slash in start tag
           if ($self->{ct}->{attributes}) {
             !!!cp ('124.4');
             !!!parse-error (type => 'end tag attribute');
           } else {
             !!!cp ('124.5');
           }
-          ## TODO: Test |<title></title/>|
+          ## XXX: Test |<title></title/>|
         } else {
           !!!cp ('124.3');
           $self->{self_closing} = 1;
@@ -1814,37 +1794,8 @@ sub _get_next_token ($) {
         !!!emit ($self->{ct}); # start tag or end tag
 
         redo A;
-      } elsif ($self->{nc} == -1) {
-        !!!parse-error (type => 'unclosed tag');
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          !!!cp (124.7);
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            !!!cp (124.5);
-            !!!parse-error (type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            !!!cp (124.6);
-          }
-        } else {
-          die "$0: $self->{ct}->{type}: Unknown token type";
-        }
-        ## XML5: "Tag attribute name before state".
-        $self->{state} = DATA_STATE;
-        ## Reconsume.
-
-        ## Discard the token.
-        #!!!emit ($self->{ct}); # start tag or end tag
-
-        redo A;
       } else {
-        !!!cp ('124.4');
-        !!!parse-error (type => 'nestc');
-        ## TODO: This error type is wrong.
-        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
-        ## Reconsume.
-        redo A;
+        die "$self->{state}/$self->{nc} is implemented";
       }
     } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
       ## XML5: "Bogus comment state" and "DOCTYPE bogus comment state".
