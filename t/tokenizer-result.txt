@@ -1,12 +1,12 @@
 1..1154
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Jan 11 17:08:58 2010
-# Current time GMT:   Mon Jan 11 08:08:58 2010
+# Current time local: Sun Feb  7 15:26:40 2010
+# Current time GMT:   Sun Feb  7 06:26:40 2010
 # Using Test.pm version 1.25_02
-Subroutine Data::Dumper::qquote redefined at t/HTML-tokenizer.t line 37.
-Found = in conditional, should be == at t/HTML-tokenizer.t line 128.
-Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tokenizer.t line 55.
-Name "Whatpm::HTML::Debug::cp" used only once: possible typo at t/HTML-tokenizer.t line 53.
+Subroutine Data::Dumper::qquote redefined at t/HTML-tokenizer.t line 22.
+Found = in conditional, should be == at t/HTML-tokenizer.t line 113.
+Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tokenizer.t line 40.
+Name "Whatpm::HTML::Debug::cp" used only once: possible typo at t/HTML-tokenizer.t line 38.
 # t/tokenizer/test1.test
 ok 1
 not ok 2
@@ -612,8 +612,8 @@ not ok 172
 #      - "            }\n"
 #      - "          ]\n"
 # t/tokenizer/test4.test
-Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 95.
-Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 95.
+Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 80.
+Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 80.
 not ok 173
 # Test 173 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #173)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'z',\n            {\n              0 => qq'',\n              qq'<' => qq''\n            }\n          ]\n        ];\n" (< in attribute name: qq'<z/0  <')
@@ -1470,8 +1470,8 @@ not ok 848
 ok 849
 ok 850
 # t/tokenizer/xmlViolation.test
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
+Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 31.
+Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 31.
 not ok 851
 # Test 851 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'a\x{FFFF}b'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #851)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'a\\x{FFFD}b'\n          ]\n        ];\n"Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test.pm line 456.
@@ -1493,12 +1493,12 @@ not ok 853
 #      + "            qq' foo -- bar '\n"
 ok 854
 # t/tokenizer-test-1.test
-Unicode character 0x1fffe is illegal at t/HTML-tokenizer.t line 95.
-Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 95.
-Unicode character 0x10fffe is illegal at t/HTML-tokenizer.t line 95.
-Unicode character 0x10fffe is illegal at t/HTML-tokenizer.t line 95.
-Unicode character 0x10ffff is illegal at t/HTML-tokenizer.t line 95.
-Unicode character 0x10ffff is illegal at t/HTML-tokenizer.t line 95.
+Unicode character 0x1fffe is illegal at t/HTML-tokenizer.t line 80.
+Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 80.
+Unicode character 0x10fffe is illegal at t/HTML-tokenizer.t line 80.
+Unicode character 0x10fffe is illegal at t/HTML-tokenizer.t line 80.
+Unicode character 0x10ffff is illegal at t/HTML-tokenizer.t line 80.
+Unicode character 0x10ffff is illegal at t/HTML-tokenizer.t line 80.
 ok 855
 ok 856
 ok 857
@@ -1625,9 +1625,9 @@ ok 973
 ok 974
 ok 975
 ok 976
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
+Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 31.
 ok 977
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
+Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 31.
 not ok 978
 # Test 978 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}\\x{FFFD}'\n          ]\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #978)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n"Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test.pm line 456.
@@ -1647,11 +1647,11 @@ ok 982
 ok 983
 ok 984
 ok 985
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
+Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 31.
+Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 31.
 ok 986
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 46.
+Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 31.
+Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 31.
 ok 987
 ok 988
 ok 989
@@ -1851,19 +1851,47 @@ ok 1143
 ok 1144
 ok 1145
 ok 1146
-ok 1147
+not ok 1147
+# Test 1147 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1147)
+#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (after attribute name): qq'</p class ')
+#      Got 1 extra line at line 2:
+#       + "          qq'ParseError',\n"
 ok 1148
-ok 1149
-ok 1150
-ok 1151
+not ok 1149
+# Test 1149 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1149)
+#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (before attribute value): qq'</p class=')
+#      Got 1 extra line at line 2:
+#       + "          qq'ParseError',\n"
+not ok 1150
+# Test 1150 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1150)
+#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (attribute value double quote): qq'</p class="')
+#      Got 1 extra line at line 2:
+#       + "          qq'ParseError',\n"
+not ok 1151
+# Test 1151 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1151)
+#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (attribute value single quote): qq'</p class=\x{27}')
+#      Got 1 extra line at line 2:
+#       + "          qq'ParseError',\n"
 ok 1152
-ok 1153
+not ok 1153
+# Test 1153 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1153)
+#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (attribute value unquoted): qq'</p class=a')
+#      Got 1 extra line at line 2:
+#       + "          qq'ParseError',\n"
 ok 1154
 ok 1155
 ok 1156
 ok 1157
 ok 1158
-ok 1159
+not ok 1159
+# Test 1159 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1159)
+#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (after attribute value (quoted)): qq'</p class=\x{27}a\x{27}')
+#      Got 1 extra line at line 2:
+#       + "          qq'ParseError',\n"
 ok 1160
 ok 1161
-ok 1162
+not ok 1162
+# Test 1162 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError'\n        ];\n" (HTML-tokenizer.t ok at line 1 fail #1162)
+#      Expected: "$VAR1 = [\n          qq'ParseError'\n        ];\n" (end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/')
+#      Got 1 extra line at line 2:
+#       + "          qq'ParseError',\n"
