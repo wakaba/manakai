@@ -3,7 +3,7 @@ use strict;
 use warnings;
 our $VERSION = '1.0';
 
-# ------ Instantiation ------
+## ------ Instantiation ------
 
 ## NOTE: RFC 2046 sucks, it is a poorly written specification such that
 ## what we should do is not entirely clear and it does define almost nothing
@@ -31,6 +31,7 @@ sub new_from_type_and_subtype ($$$) {
   $self->{type} =~ tr/A-Z/a-z/;
   $self->{subtype} = ''.$_[1];
   $self->{subtype} =~ tr/A-Z/a-z/;
+  $self->{level} = $default_error_levels;
   return $self;
 } # new_from_type_and_subtype
 
@@ -134,10 +135,11 @@ sub parse_web_mime_type ($$;$$) {
                index => pos $value);
   }
 
+  $self->{level} = $levels;
   return $self;
 } # parse_web_mime_type
 
-# ------ Accessors ------
+## ------ Accessors ------
 
 sub type ($;$) {
   my $self = shift;
@@ -175,7 +177,7 @@ sub attrs ($) {
   return [sort {$a cmp $b} keys %{$self->{params}}];
 } # attrs
 
-# ------ Serialization ------
+## ------ Serialization ------
 
 my $non_token = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
 
@@ -217,11 +219,192 @@ sub as_valid_mime_type ($) {
   return $ts;
 } # as_valid_mime_type
 
+## ------ Conformance checking ------
+
+sub validate ($$) {
+  my ($self, $onerror) = @_;
+
+  ## NOTE: Attribute duplication are not error, though its semantics
+  ## is not defined.  See
+  ## <http://suika.fam.cx/gate/2005/sw/%E5%AA%92%E4%BD%93%E5%9E%8B/%E5%BC%95%E6%95%B0>.
+  ## However, a Message::MIME::Type object cannot represent duplicate
+  ## attributes and is reported in the parsing phase.
+
+  my $type = $self->type;
+  my $subtype = $self->subtype;
+
+  ## NOTE: RFC 2045 (MIME), RFC 2616 (HTTP/1.1), and RFC 4288 (IMT
+  ## registration) have different requirements on type and subtype names.
+  if ($type !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
+    $onerror->(type => 'IMT:type syntax error',
+               level => $self->{level}->{must}, # RFC 4288 4.2.
+               value => $type);
+  }
+  if ($subtype !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
+    $onerror->(type => 'IMT:subtype syntax error',
+               level => $self->{level}->{must}, # RFC 4288 4.2.
+               value => $subtype);
+  }
+
+  require Message::MIME::Type::Definitions;
+  my $type_def = $Message::MIME::Type::Definitions::Type->{$type};
+  my $has_param;
+
+  if ($type =~ /^x-/) {
+    $onerror->(type => 'IMT:private type',
+               level => $self->{level}->{mime_strongly_discouraged},
+               value => $type); # RFC 2046 6.
+    ## NOTE: "discouraged" in RFC 4288 3.4.
+  } elsif (not $type_def or not $type_def->{registered}) {
+  #} elsif ($type_def and not $type_def->{registered}) {
+    ## NOTE: Top-level type is seldom added.
+    
+    ## NOTE: RFC 2046 6. "Any format without a rigorous and public
+    ## definition must be named with an "X-" prefix" (strictly
+    ## speaking, this is not an author requirement, but a requirement
+    ## for media type specfication author, and it does not restrict
+    ## use of unregistered value).
+    $onerror->(type => 'IMT:unregistered type',
+               level => $self->{level}->{mime_must},
+               value => $type);
+  }
+
+  if ($type_def) {
+    my $subtype_def = $type_def->{subtype}->{$subtype};
+
+    if ($subtype =~ /^x[-\.]/) {
+      $onerror->(type => 'IMT:private subtype',
+                 level => $self->{level}->{mime_discouraged},
+                 value => $type . '/' . $subtype);
+      ## NOTE: "x." and "x-" are discouraged in RFC 4288 3.4.
+    } elsif ($subtype_def and not $subtype_def->{registered}) {
+      ## NOTE: RFC 2046 6. "Any format without a rigorous and public
+      ## definition must be named with an "X-" prefix" (strictly, this
+      ## is not an author requirement, but a requirement for media
+      ## type specfication author and it does not restrict use of
+      ## unregistered value).
+      $onerror->(type => 'IMT:unregistered subtype',
+                 level => $self->{level}->{mime_must},
+                 value => $type . '/' . $subtype);
+    }
+    
+    if ($subtype_def) {
+      ## NOTE: Semantics and relationship to conformance of the
+      ## "intended usage" keywords in the IMT registration template is
+      ## not defined anywhere.
+      if ($subtype_def->{obsolete}) {
+        $onerror->(type => 'IMT:obsolete subtype',
+                   level => $self->{level}->{warn},
+                   value => $type . '/' . $subtype);
+      } elsif ($subtype_def->{limited_use}) {
+        $onerror->(type => 'IMT:limited use subtype',
+                   level => $self->{level}->{warn},
+                   value => $type . '/' . $subtype);        
+      }
+
+      for my $attr (@{$self->attrs}) {
+        my $value = $self->param ($attr);
+
+        if ($attr !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
+          $onerror->(type => 'IMT:attribute syntax error',
+                     level => $self->{level}->{mime_fact}, # RFC 4288 4.3.
+                     value => $attr);
+        }
+
+        $has_param->{$attr} = 1;
+        my $param_def = $subtype_def->{parameter}->{$attr}
+            || $type_def->{parameter}->{$attr};
+        if ($param_def) {
+          if (defined $param_def->{syntax}) {
+            if ($param_def->{syntax} eq 'mime-charset') { # RFC 2978
+              ## XXX Should be checked against IANA charset registry.
+              if ($value =~ /[^A-Za-z0-9!#\x23%&'+^_`{}~-]/) {
+                $onerror->(type => 'value syntax error:'.$attr, level => 'm');
+              }
+            } elsif ($param_def->{syntax} eq 'token') { # RFC 2046
+              ## NOTE: Though the definition of |token| differs in RFC
+              ## 2046 and in RFC 2616, parameters are defined in terms
+              ## of MIME RFCs such that this should be checked against
+              ## MIME's definition.  Use of "{" and "}" in HTTP
+              ## contexts is rejected anyway at the parsing phase.
+              if ($value =~ /[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]/) {
+                $onerror->(type => 'value syntax error:'.$attr, level => 'm');
+              }
+            }
+            ## XXX add support for syntax |MIME date-time|
+          } elsif ($param_def->{checker}) {
+            $param_def->{checker}->($self, $value, $onerror);
+          }
+           
+          if ($param_def->{obsolete}) {
+            $onerror->(type => 'IMT:obsolete parameter',
+                       level => $self->{level}->{$param_def->{obsolete}},
+                       value => $attr);
+            ## NOTE: The value of |$param_def->{obsolete}|, if it has
+            ## a true value, must be "mime_fact", which represents
+            ## that the parameter is defined in a previous version of
+            ## the MIME specification (or a related specification) and
+            ## then removed or marked as obsolete such that it seems
+            ## that use of that parameter is made non-conforming
+            ## without using any explicit statement on that fact.
+          }
+        }
+        if (not $param_def or not $param_def->{registered}) {
+          if ($subtype =~ /\./ or $subtype =~ /^x-/ or $type =~ /^x-/) {
+            ## NOTE: The parameter names "SHOULD" be fully specified
+            ## for personal or vendor tree subtype [RFC 4288].
+            ## Therefore, there might be unknown parameters and still
+            ## conforming.
+            $onerror->(type => 'IMT:unknown parameter',
+                       level => $self->{level}->{uncertain},
+                       value => $attr);
+          } else {
+            ## NOTE: The parameter names "MUST" be fully specified for
+            ## standard tree.  Therefore, unknown parameter is
+            ## non-conforming, unless it is standardized later.
+            $onerror->(type => 'IMT:parameter not allowed',
+                       level => $self->{level}->{mime_fact},
+                       value => $attr);
+          }
+        }
+      }
+
+      for (keys %{$subtype_def->{parameter} or {}}) {
+        if ($subtype_def->{parameter}->{$_}->{required} and
+            not $has_param->{$_}) {
+          $onerror->(type => 'IMT:parameter missing',
+                     level => $self->{level}->{mime_fact},
+                     text => $_,
+                     value => $type . '/' . $subtype);
+        }
+      }
+    } else {
+      ## NOTE: Since subtypes are frequently added to the IANAREG and
+      ## such that our database might be out-of-date, we don't raise
+      ## an error for an unknown subtype, instead we report an
+      ## "uncertain" status.
+      $onerror->(type => 'IMT:unknown subtype',
+                 level => $self->{level}->{uncertain},
+                 value => $type . '/' . $subtype);
+    }
+
+    for (keys %{$type_def->{parameter} or {}}) {
+      if ($type_def->{parameter}->{$_}->{required} and
+          not $has_param->{$_}) {
+        $onerror->(type => 'IMT:parameter missing',
+                   level => $self->{level}->{mime_fact},
+                   text => $_,
+                   value => $type . '/' . $subtype);
+      }
+    }
+  }
+} # check_imt
+
 1;
 
 =head1 LICENSE
 
-Copyright 2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

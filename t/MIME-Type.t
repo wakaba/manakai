@@ -33,7 +33,7 @@ sub _new_from_type_and_subtype_2 : Test(5) {
 } # _new_from_type_and_subtype_2
 
 sub _parser : Test(63) {
-  require +file (__FILE__)->dir->file ('testfiles.pl')->stringify;
+  require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
   
   execute_test (file (__FILE__)->dir->subdir ('mime')->file ('types.dat'), {
     data => {is_prefixed => 1},
@@ -160,7 +160,7 @@ sub _as_valid_invalid_subtype_2 : Test(2) {
   is $mt->as_valid_mime_type, undef;
 } # _as_valid
 
-sub _as_valid_invalid_subtype_2 : Test(2) {
+sub _as_valid_invalid_subtype_3 : Test(2) {
   my $mt = Message::MIME::Type->new_from_type_and_subtype ('text', 'css');
   $mt->subtype ("\x{FE00}");
   is $mt->as_valid_mime_type_with_no_params, undef;
@@ -269,6 +269,46 @@ sub _as_valid_param_14 : Test(2) {
   is $mt->as_valid_mime_type_with_no_params, 'text/css';
   is $mt->as_valid_mime_type, qq[text/css; abc="de\x5C\x00f"];
 } # _as_valid
+
+## ------ Conformance ------
+
+sub _validate : Test(63) {
+  require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
+  
+  execute_test (file (__FILE__)->dir->subdir ('mime')->file ('type-conformance.dat'), {
+    data => {is_prefixed => 1, is_list => 1},
+    errors => {is_list => 1},
+  }, sub {
+    my $test = shift;
+    
+    my @errors;
+    my $onerror = sub {
+      my %opt = @_;
+      push @errors, join ';',
+          $opt{type},
+          defined $opt{value} ? $opt{value} : '',
+          $opt{level};
+    }; # $onerror
+
+    my $data = [@{$test->{data}->[0]}];
+    
+    my $type = Message::MIME::Type->new_from_type_and_subtype
+        (shift @$data, shift @$data);
+    while (@$data) {
+        $type->param (shift @$data => shift @$data);
+    }
+
+    $type->validate ($onerror);
+    
+    if ($test->{errors}) {
+      is join ("\n", sort {$a cmp $b} @errors),
+          join ("\n", sort {$a cmp $b} @{$test->{errors}->[0]}),
+          join (' ', @{$test->{data}->[0]});
+    } else {
+      warn qq[No #errors section: ] . join ' ', @{$test->{data}->[0]};
+    }
+  });
+} # _validate
 
 __PACKAGE__->runtests;
 
