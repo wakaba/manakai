@@ -51,7 +51,19 @@
 #data
 <script type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@type;IMT:syntax error;m
+/script/@type;MIME:no type;m
+/script;SUBDOC
+
+#data
+<script type="text" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@type;MIME:no /;m
+/script;SUBDOC
+
+#data
+<script type="text/plain; a=b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@type;MIME:parameter not allowed;m
 /script;SUBDOC
 
 #data
@@ -120,6 +132,20 @@
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;w
+
+#data
+<script src="http://test/" type="text/javascript; charset=us-ascii"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@type;IMT:obsolete subtype;w
+/script/@type;IMT:parameter not allowed;m
+
+#data
+<script src="http://test/" type="text/javascript; charSet=us-ascii"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@type;IMT:obsolete subtype;w
+/script/@type;IMT:parameter not allowed;m
 
 #data
 <script src="http://test/%" type="text/javascript"

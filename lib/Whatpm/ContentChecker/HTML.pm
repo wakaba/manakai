@@ -2578,7 +2578,7 @@ $Element->{$HTML_NS}->{style} = {
 
         if (defined $type->param ('charset')) {
           $self->{onerror}->(node => $attr,
-                             type => 'IMT:param not allowed', # XXXdocumentation
+                             type => 'IMT:parameter not allowed', # XXXdocumentation
                              level => $self->{level}->{must});
         }
       }
@@ -2709,6 +2709,8 @@ $Element->{$HTML_NS}->{script} = {
   %HTMLChecker,
   status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    async => $GetHTMLBooleanAttrChecker->('async'),
+    defer => $GetHTMLBooleanAttrChecker->('defer'),
     charset => sub {
       my ($self, $attr) = @_;
 
@@ -2724,10 +2726,19 @@ $Element->{$HTML_NS}->{script} = {
       $HTMLCharsetChecker->($attr->value, @_);
     },
     language => sub {}, ## NOTE: No syntax constraint according to HTML4.
-      src => $HTMLURIAttrChecker, ## TODO: pointed resource MUST be in type of type="" (resource error)
-      defer => $GetHTMLBooleanAttrChecker->('defer'),
-      async => $GetHTMLBooleanAttrChecker->('async'),
-      type => $HTMLIMTAttrChecker, ## TODO: MUST NOT: |charset=""| parameter
+    src => $HTMLURIAttrChecker, ## TODO: pointed resource MUST be in type of type="" (resource error)
+    type => sub {
+      my ($self, $attr) = @_;
+
+      my $type = $MIMETypeChecker->(@_);
+      if ($type) {
+        if (defined $type->param ('charset')) {
+          $self->{onerror}->(node => $attr,
+                             type => 'IMT:parameter not allowed', # XXXdocumentation
+                             level => $self->{level}->{must});
+        }
+      }
+    }, # type
   }, {
     %HTMLAttrStatus,
     async => FEATURE_HTML5_WD,
