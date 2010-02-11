@@ -187,9 +187,15 @@ CSSOM tree, in the form of <a href="#howtouse">the standard
 <dl>
 <dt><a href="Whatpm/ContentType.html"><code>Whatpm::ContentType</code></a></dt>
   <dd>An implementation of HTML5 Content Type sniffing algorithm.</dd>
-<dt><a href="Whatpm/IMTChecker.html"><code>Whatpm::IMTChecker</code></a></dt>
-  <dd>An Internet Media Type (<abbr>aka</abbr> MIME type) label
-  conformance checker.</dd>
+
+<dt id=whatpm-imtchecker><del><code>Whatpm::IMTChecker</code></del>
+
+<dd>An Internet Media Type (<abbr>aka</abbr> MIME type) label
+conformance checker.  This module is <em>removed</em> from the
+package; use <a
+href="../../Message/MIME/Type.html"><code>Message::MIME::Type</code></a>
+instead.
+
 </dl>
 
 <p>Currently, support for parsing of HTTP headers and as such is not

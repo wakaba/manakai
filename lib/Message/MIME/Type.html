@@ -1,0 +1,229 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Message::MIME::Type - MIME Type Object</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#history">HISTORY</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Message::MIME::Type - MIME Type Object</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Message::MIME::Type;</pre>
+<pre>
+  my $type = Message::MIME::Type-&gt;parse_web_mime_type
+      ('text/CSS; charset=&quot;US-ASCII&quot;');
+  
+  is $type-&gt;type, 'text';
+  is $type-&gt;subtype, 'css';
+  is_deeply $type-&gt;attrs, ['charset'];
+  is $type-&gt;param ('charset'), 'US-ASCII';
+  
+  $type-&gt;param (charset =&gt; 'utf-8');
+  is $type-&gt;param ('charset'), 'utf-8';
+  
+  is $type-&gt;as_valid_mime_type, 'text/css; charset=us-ascii';
+  is $type-&gt;as_valid_mime_type_with_no_params, 'text/css';</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>An <code>Message::MIME::Type</code> object represents a MIME type (aka Internet
+Media Type), with or without parameters.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="new_from_type_and_subtype" class="item"><em>$t</em> = Message::MIME::Type-&gt;new_from_type_and_subtype (<em>$type</em>, <em>$subtype</em>)</a></strong></dt>
+
+<dd>
+<p>Returns a new object whoes type is <em>$type</em> (string) and subtype is
+<em>$subtype</em> (string).  <em>$type</em> and <em>$subtype</em> are ASCII
+case-insensitive.</p>
+</dd>
+<dt><strong><a name="parse_web_mime_type" class="item"><em>$t</em> = Message::MIME::Type-&gt;parse_web_mime_type (<em>$string</em>, [<em>$onerror</em>], [<em>$levels</em>])</a></strong></dt>
+
+<dd>
+<p>Parses <em>$string</em> as a MIME type string and returns result object, if
+parsing ends successfully, or <code>undef</code>.</p>
+<p>The <em>$string</em> is assumed as a &quot;valid MIME type&quot; defined in Web
+Applications 1.0 specification.  If <em>$string</em> does not begin with a
+&quot;valid MIME type with no parameters&quot;, the method returns <code>undef</code>.
+Otherwise, the method tries to parse the <em>$string</em> as a &quot;valid MIME
+type&quot; as far as possible.</p>
+<p>If a code reference is specified as the second argument, <em>$onerror</em>,
+it is invoked whenever a parse error or warning is raised.</p>
+<p>The third argument, <em>$levels</em>, can be specified to control error
+levels raised by the parser.</p>
+<p>Although <a href="http://www.ietf.org/rfc/rfc2616.txt" class="rfc">RFC 2616</a>, which is referenced by Web Applications 1.0
+specification, does not define how to parse MIME types, the parser
+does its best to do The Right Thing.</p>
+<p>Strictly speaking, MIME and related specifications do no prohibit
+duplication of <code>attribute</code>s (e.g. <code>charset=a; charset=b</code>).  However,
+it is apparently useless in the real world and the
+<code>Message::MIME::Type</code> module does not support such unusual
+parameters.  The parser reports a warning if there are more than one
+<code>parameter</code>s with same <code>attribute</code>.</p>
+<p>It is inappropriate to use this method to parse MIME types in mail or
+news messages; they have different syntax from HTTP messages.</p>
+</dd>
+<dt><strong><a name="type" class="item"><em>$type</em> = <em>$t</em>-&gt;type ([<em>$type</em>])</a></strong></dt>
+
+<dd>
+<p>On getting, it returns the <a href="#type"><code>type</code></a> part of the MIME type, in
+lowercase.  The <a href="#type"><code>type</code></a> part does not contain <a href="#subtype"><code>subtype</code></a>.</p>
+<p>On setting, it updates the <a href="#type"><code>type</code></a> part of the MIME type.  Note that
+the <a href="#type"><code>type</code></a> is ASCII case-insensitive and therefore normalized by the
+setter.</p>
+</dd>
+<dt><strong><a name="subtype" class="item"><em>$subtype</em> = <em>$t</em>-&gt;subtype ([<em>$subtype</em>])</a></strong></dt>
+
+<dd>
+<p>On getting, it returns the <a href="#subtype"><code>subtype</code></a> part of the MIME type, in
+lowercase.</p>
+<p>On setting, it updates the <a href="#subtype"><code>subtype</code></a> part of the MIME type.  Note
+that the <a href="#subtype"><code>subtype</code></a> is ASCII case-insensitive and therefore normalized
+by the setter.</p>
+</dd>
+<dt><strong><a name="attrs" class="item">[<em>$a1</em>, <em>$a2</em>, ...] = <em>$t</em>-&gt;attrs</a></strong></dt>
+
+<dd>
+<p>Retunrs a snapshot list (array reference) of <code>attribute</code>s (i.e. names
+of <code>parameter</code>s), in lowercase, ordered by alphabetical order.</p>
+</dd>
+<dt><strong><a name="param" class="item"><em>$s</em> = <em>$t</em>-&gt;param (<em>$attr</em>, [<em>$value</em>])</a></strong></dt>
+
+<dd>
+<p>If there is only an argument, <em>$attr</em>, then the method returns the
+value of the <code>parameter</code> whoes <code>attribute</code> matches to <em>$attr</em>.
+Note that <code>attribute</code> is ASCII case-insensitive.  If there is no such
+<code>parameter</code>, then <code>undef</code> is returned.</p>
+<p>If there are two arguments, the method sets the value of the
+<code>parameter</code> whoes <code>attribute</code> matches to <em>$attr</em> to <em>$value</em>.  If
+the parameter already exists, the previous value is discarded.</p>
+<p>Note that the object does not distinguish whether the value is
+represented as a <code>token</code> or a <code>quoted-string</code> in the lexical form.
+Therefore, the method never returnes enclosing <code>&quot;</code> characters nor
+<code>\</code> in <code>quoted-pair</code>.</p>
+</dd>
+<dt><strong><a name="is_styling_lang" class="item"><em>BOOL</em> = <em>$t</em>-&gt;is_styling_lang</a></strong></dt>
+
+<dd>
+<p>Returns whether the type represents a styling language, such as CSS.</p>
+</dd>
+<dt><strong><a name="is_text_based" class="item"><em>BOOL</em> = <em>$t</em>-&gt;is_text_based</a></strong></dt>
+
+<dd>
+<p>Returns whether the type represents a text-based format.</p>
+</dd>
+<dt><strong><a name="is_composed_type" class="item"><em>BOOL</em> = <em>$t</em>-&gt;is_composed_type</a></strong></dt>
+
+<dd>
+<p>Returns whether the <a href="#type"><code>type</code></a> is a composed type, i.e. <code>message</code> or
+<code>multipart</code>.</p>
+</dd>
+<dt><strong><a name="is_xml_mime_type" class="item"><em>BOOL</em> = <em>$t</em>-&gt;is_xml_mime_type</a></strong></dt>
+
+<dd>
+<p>Returns whether the type is an XML MIME type according to Web
+Applications 1.0's definition.</p>
+</dd>
+<dt><strong><a name="as_valid_mime_type_with_no_params" class="item"><em>$s</em> = <em>$t</em>-&gt;as_valid_mime_type_with_no_params</a></strong></dt>
+
+<dd>
+<p>Serializes the object in <a href="#type"><code>type</code></a> and <a href="#subtype"><code>subtype</code></a> pair separated by a
+<code>/</code> character, if possible, or returns <code>undef</code>.  If it returns a
+non-<code>undef</code> value, it is always a &quot;valid MIME type with no
+parameters&quot; as per Web Applications 1.0 specification.  In addition,
+it is always in lowercase.</p>
+</dd>
+<dt><strong><a name="as_valid_mime_type" class="item"><em>$s</em> = <em>$t</em>-&gt;as_valid_mime_type</a></strong></dt>
+
+<dd>
+<p>Serializes the object in the form where <a href="#type"><code>type</code></a> and <a href="#subtype"><code>subtype</code></a> are
+separated by a <code>/</code> character and then followed by <code>parameters</code>, if
+possible, or returns <code>undef</code>.  If it returns a non-<code>undef</code> value, it
+is always a &quot;valid MIME type&quot; as per Web Applications 1.0
+specification.  In addition, <a href="#type"><code>type</code></a>, <a href="#subtype"><code>subtype</code></a>, and <code>attribute</code>s
+are in lowercase.</p>
+</dd>
+<dt><strong><a name="validate" class="item"><em>$t</em>-&gt;validate (<em>$onerror</em>, no_required_params =&gt; <em>BOOL</em>)</a></strong></dt>
+
+<dd>
+<p>Performs conformance checking of the object.  It reports errors or
+wanrings such as &quot;unregistered type error&quot; or &quot;private subtype
+warning&quot; to the code reference, <em>$onerror</em>.</p>
+<p>If the <code>no_required_params</code> parameter is set to true, it does not
+report errors on required parameters.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="history">HISTORY</a></h1>
+<p>Part of this module is originally contained in <code>Whatpm::IMTChecker</code>
+module.  <code>Whatpm::IMTChecker</code> is obsolete and removed from the
+manakai package in favor of this <code>Message::MIME::Type</code> module.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../Message/MIME/Type/Definitions.html">the Message::MIME::Type::Definitions manpage</a>.</p>
+<p>RFC 2048 &quot;Multipurpose Internet Mail Extensions (MIME) Part Two: Media
+Types&quot; &lt;http://tools.ietf.org/html/rfc2046&gt;.</p>
+<p>RFC 2616 &quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;
+&lt;http://tools.ietf.org/html/rfc2616&gt;.</p>
+<p>RFC 3023 &quot;XML Media Types&quot; &lt;http://tools.ietf.org/html/rfc3023&gt;.</p>
+<p>RFC 4288 &quot;Media Type Specifications and Registration Procedures&quot;
+&lt;http://tools.ietf.org/html/rfc4288&gt;.</p>
+<p>Web Applications 1.0
+&lt;http://www.whatwg.org/specs/web-apps/current-work/complete.html&gt;.</p>
+<p>MIME Media Types &lt;http://www.iana.org/assignments/media-types/&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007-2010 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

@@ -9,6 +9,7 @@ all:
 	$(CD) Util && $(MAKE) all
 	$(CD) Markup && $(MAKE) all
 	$(CD) DOM && $(MAKE) all
+	$(CD) MIME && $(MAKE) all
 	$(CD) URI && $(MAKE) all
 	$(CD) CGI && $(MAKE) all
 

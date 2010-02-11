@@ -1,0 +1,191 @@
+=head1 NAME
+
+Message::MIME::Type - MIME Type Object
+
+=head1 SYNOPSIS
+
+  use Message::MIME::Type;
+
+  my $type = Message::MIME::Type->parse_web_mime_type
+      ('text/CSS; charset="US-ASCII"');
+  
+  is $type->type, 'text';
+  is $type->subtype, 'css';
+  is_deeply $type->attrs, ['charset'];
+  is $type->param ('charset'), 'US-ASCII';
+  
+  $type->param (charset => 'utf-8');
+  is $type->param ('charset'), 'utf-8';
+  
+  is $type->as_valid_mime_type, 'text/css; charset=us-ascii';
+  is $type->as_valid_mime_type_with_no_params, 'text/css';
+
+=head1 DESCRIPTION
+
+An C<Message::MIME::Type> object represents a MIME type (aka Internet
+Media Type), with or without parameters.
+
+=head1 METHODS
+
+=over 4
+
+=item I<$t> = Message::MIME::Type->new_from_type_and_subtype (I<$type>, I<$subtype>)
+
+Returns a new object whoes type is I<$type> (string) and subtype is
+I<$subtype> (string).  I<$type> and I<$subtype> are ASCII
+case-insensitive.
+
+=item I<$t> = Message::MIME::Type->parse_web_mime_type (I<$string>, [I<$onerror>], [I<$levels>])
+
+Parses I<$string> as a MIME type string and returns result object, if
+parsing ends successfully, or C<undef>.
+
+The I<$string> is assumed as a "valid MIME type" defined in Web
+Applications 1.0 specification.  If I<$string> does not begin with a
+"valid MIME type with no parameters", the method returns C<undef>.
+Otherwise, the method tries to parse the I<$string> as a "valid MIME
+type" as far as possible.
+
+If a code reference is specified as the second argument, I<$onerror>,
+it is invoked whenever a parse error or warning is raised.
+
+The third argument, I<$levels>, can be specified to control error
+levels raised by the parser.
+
+Although RFC 2616, which is referenced by Web Applications 1.0
+specification, does not define how to parse MIME types, the parser
+does its best to do The Right Thing.
+
+Strictly speaking, MIME and related specifications do no prohibit
+duplication of C<attribute>s (e.g. C<charset=a; charset=b>).  However,
+it is apparently useless in the real world and the
+C<Message::MIME::Type> module does not support such unusual
+parameters.  The parser reports a warning if there are more than one
+C<parameter>s with same C<attribute>.
+
+It is inappropriate to use this method to parse MIME types in mail or
+news messages; they have different syntax from HTTP messages.
+
+=item I<$type> = I<$t>->type ([I<$type>])
+
+On getting, it returns the C<type> part of the MIME type, in
+lowercase.  The C<type> part does not contain C<subtype>.
+
+On setting, it updates the C<type> part of the MIME type.  Note that
+the C<type> is ASCII case-insensitive and therefore normalized by the
+setter.
+
+=item I<$subtype> = I<$t>->subtype ([I<$subtype>])
+
+On getting, it returns the C<subtype> part of the MIME type, in
+lowercase.
+
+On setting, it updates the C<subtype> part of the MIME type.  Note
+that the C<subtype> is ASCII case-insensitive and therefore normalized
+by the setter.
+
+=item [I<$a1>, I<$a2>, ...] = I<$t>->attrs
+
+Retunrs a snapshot list (array reference) of C<attribute>s (i.e. names
+of C<parameter>s), in lowercase, ordered by alphabetical order.
+
+=item I<$s> = I<$t>->param (I<$attr>, [I<$value>])
+
+If there is only an argument, I<$attr>, then the method returns the
+value of the C<parameter> whoes C<attribute> matches to I<$attr>.
+Note that C<attribute> is ASCII case-insensitive.  If there is no such
+C<parameter>, then C<undef> is returned.
+
+If there are two arguments, the method sets the value of the
+C<parameter> whoes C<attribute> matches to I<$attr> to I<$value>.  If
+the parameter already exists, the previous value is discarded.
+
+Note that the object does not distinguish whether the value is
+represented as a C<token> or a C<quoted-string> in the lexical form.
+Therefore, the method never returnes enclosing C<"> characters nor
+C<\> in C<quoted-pair>.
+
+=item I<BOOL> = I<$t>->is_styling_lang
+
+Returns whether the type represents a styling language, such as CSS.
+
+=item I<BOOL> = I<$t>->is_text_based
+
+Returns whether the type represents a text-based format.
+
+=item I<BOOL> = I<$t>->is_composed_type
+
+Returns whether the C<type> is a composed type, i.e. C<message> or
+C<multipart>.
+
+=item I<BOOL> = I<$t>->is_xml_mime_type
+
+Returns whether the type is an XML MIME type according to Web
+Applications 1.0's definition.
+
+=item I<$s> = I<$t>->as_valid_mime_type_with_no_params
+
+Serializes the object in C<type> and C<subtype> pair separated by a
+C</> character, if possible, or returns C<undef>.  If it returns a
+non-C<undef> value, it is always a "valid MIME type with no
+parameters" as per Web Applications 1.0 specification.  In addition,
+it is always in lowercase.
+
+=item I<$s> = I<$t>->as_valid_mime_type
+
+Serializes the object in the form where C<type> and C<subtype> are
+separated by a C</> character and then followed by C<parameters>, if
+possible, or returns C<undef>.  If it returns a non-C<undef> value, it
+is always a "valid MIME type" as per Web Applications 1.0
+specification.  In addition, C<type>, C<subtype>, and C<attribute>s
+are in lowercase.
+
+=item I<$t>->validate (I<$onerror>, no_required_params => I<BOOL>)
+
+Performs conformance checking of the object.  It reports errors or
+wanrings such as "unregistered type error" or "private subtype
+warning" to the code reference, I<$onerror>.
+
+If the C<no_required_params> parameter is set to true, it does not
+report errors on required parameters.
+
+=back
+
+=head1 HISTORY
+
+Part of this module is originally contained in C<Whatpm::IMTChecker>
+module.  C<Whatpm::IMTChecker> is obsolete and removed from the
+manakai package in favor of this C<Message::MIME::Type> module.
+
+=head1 SEE ALSO
+
+L<Message::MIME::Type::Definitions>.
+
+RFC 2048 "Multipurpose Internet Mail Extensions (MIME) Part Two: Media
+Types" <http://tools.ietf.org/html/rfc2046>.
+
+RFC 2616 "Hypertext Transfer Protocol -- HTTP/1.1"
+<http://tools.ietf.org/html/rfc2616>.
+
+RFC 3023 "XML Media Types" <http://tools.ietf.org/html/rfc3023>.
+
+RFC 4288 "Media Type Specifications and Registration Procedures"
+<http://tools.ietf.org/html/rfc4288>.
+
+Web Applications 1.0
+<http://www.whatwg.org/specs/web-apps/current-work/complete.html>.
+
+MIME Media Types <http://www.iana.org/assignments/media-types/>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
