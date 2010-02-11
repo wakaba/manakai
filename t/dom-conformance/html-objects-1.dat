@@ -2894,7 +2894,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <object type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/object/@type;IMT:syntax error;m
+/object/@type;IMT:no type;m
+/object;no significant content;s
+
+#data
+<object type="text" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@type;IMT:no /;m
 /object;no significant content;s
 
 #data
@@ -2907,6 +2913,25 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
+
+#data
+<object type=" text/css " data="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+
+#data
+<object type="text/css; charset=us-ascii" data="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+
+#data
+<object type="text/css;a=b" data="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@type;IMT:parameter not allowed;m
 
 #data
 <object data="" xmlns="http://www.w3.org/1999/xhtml"
@@ -3796,12 +3821,12 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <source src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@type;IMT:syntax error;m
+/source/@type;IMT:no type;m
 
 #data
 <source src="http://test/" type="video" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@type;IMT:syntax error;m
+/source/@type;IMT:no /;m
 
 #data
 <source src="http://test/" type="audio/mpeg"
@@ -3809,10 +3834,16 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 
 #data
+<source src="http://test/" type="audio/mpeg; a=b"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@type;IMT:parameter not allowed;m
+
+#data
 <source src="http://test/" type="video/3gpp2; codecs=sevc,s263"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@type;IMT:syntax error;m
+/source/@type;params:garbage;m
 
 #data
 <source src="http://test/" type="video/3gpp2; codecs=&quot;sevc,s263&quot;"
@@ -3828,7 +3859,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <source src="http://test/" type="video/3gpp2; codecs='sevc, s263'"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@type;IMT:syntax error;m
+/source/@type;params:garbage;m
 
 #data
 <source src="http://test/" media="screen"

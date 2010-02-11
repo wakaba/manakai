@@ -5120,7 +5120,7 @@ $Element->{$HTML_NS}->{object} = {
           ## if any, but is also used as the form control name of the
           ## form control provided by the plugin, if any.
       standby => sub {}, ## NOTE: %Text; in HTML4
-      type => $HTMLIMTAttrChecker,
+      type => $MIMETypeChecker,
       usemap => $HTMLUsemapAttrChecker,
       vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -5408,7 +5408,7 @@ $Element->{$HTML_NS}->{source} = {
       media => $HTMLMQAttrChecker,
       pixelratio => $PositiveFloatingPointNumberAttrChecker,
       src => $HTMLURIAttrChecker,
-      type => $HTMLIMTAttrChecker,
+      type => $MIMETypeChecker,
     }, {
       %HTMLAttrStatus,
       media => FEATURE_HTML5_LC,
