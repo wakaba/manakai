@@ -2539,15 +2539,12 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
-/figure/img;element not allowed;m
+/figure/legend;element not allowed:figure;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml"><legend><p>Xyz</p></legend></figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
+/figure/legend;element not allowed:figure;m
 /figure/legend/p;element not allowed:phrasing;m
 
 #data
@@ -2556,10 +2553,8 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
+/figure/legend;element not allowed:figure;m
 /figure/legend/p;element not allowed:phrasing;m
-/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2567,10 +2562,8 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
+/figure/legend;element not allowed:figure;m
 /figure/legend/blockquote;element not allowed:phrasing;m
-/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2578,9 +2571,7 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
-/figure/img;element not allowed;m
+/figure/legend;element not allowed:figure;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2588,10 +2579,8 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
+/figure/legend;element not allowed:figure;m
 /figure/legend/p;element not allowed:phrasing;m
-/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2599,10 +2588,8 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
+/figure/legend;element not allowed:figure;m
 /figure/legend/blockquote;element not allowed:phrasing;m
-/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2610,10 +2597,8 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
+/figure/legend;element not allowed:figure;m
 /figure/legend/ins/blockquote;element not allowed:phrasing;m
-/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2621,12 +2606,8 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
+/figure/legend;element not allowed:figure;m
 /figure/legend/figure;element not allowed:phrasing;m
-/figure/legend/figure;child element missing;dd;m
-/figure/legend/figure/p;element not allowed;m
-/figure/img;element not allowed;m
 
 #data
 <figure xmlns="http://www.w3.org/1999/xhtml">
@@ -2634,12 +2615,8 @@ aaa
 <img src="" alt="x"/>
 </figure>
 #errors
-/figure;child element missing;dd;m
-/figure/legend;element not allowed;m
+/figure/legend;element not allowed:figure;m
 /figure/legend/div;element not allowed:phrasing;m
-/figure/legend/div/figure;child element missing;dd;m
-/figure/legend/div/figure/p;element not allowed;m
-/figure/img;element not allowed;m
 
 #data
 <?xml version="1.1"?>

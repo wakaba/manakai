@@ -4736,16 +4736,15 @@ $Element->{$HTML_NS}->{del} = {
 # ---- Embedded content ----
 
 $Element->{$HTML_NS}->{figure} = {
-  ## Content: dt? & dd
-  %HTMLChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{in_figure} = 1;
+    $element_state->{phase} = 'initial';
 
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+    $HTMLFlowContentChecker{check_start}->(@_);
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -4757,43 +4756,67 @@ $Element->{$HTML_NS}->{figure} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
-      if ($element_state->{has_dt}) {
-        $self->{onerror}->(node => $child_el, type => 'element not allowed',
-                           level => $self->{level}->{must});
+    } elsif ($element_state->{phase} eq 'flow') {
+      if ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
+        #
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'figcaption') {
+        $element_state->{phase} = 'flow-figcaption';
       } else {
-        $element_state->{has_dt} = 1;
-      }
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
-      if ($element_state->{has_dd}) {
-        $self->{onerror}->(node => $child_el, type => 'element not allowed',
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:figure',
                            level => $self->{level}->{must});
-      } else {
-        $element_state->{has_dd} = 1;
       }
+    } elsif ($element_state->{phase} eq 'figcaption-flow') {
+      if ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
+        #
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:figure',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($element_state->{phase} eq 'figcaption') {
+      if ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
+        $element_state->{phase} = 'figcaption-flow';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:figure',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($element_state->{phase} eq 'initial') {
+      if ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
+        $element_state->{phase} = 'flow';
+      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'figcaption') {
+        $element_state->{phase} = 'figcaption';
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:figure', # XXXdocumentation
+                           level => $self->{level}->{must});        
+      }
+    } elsif ($element_state->{phase} eq 'flow-figcaption') {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:figure', # XXXdocumentation
+                         level => $self->{level}->{must});        
     } else {
-      $self->{onerror}->(node => $child_el, type => 'element not allowed',
-                         level => $self->{level}->{must});
+      die "check_child_element: Bad |figure| phase: $element_state->{phase}";
     }
-  },
+  }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
-      $self->{onerror}->(node => $child_node, type => 'character not allowed',
-                         level => $self->{level}->{must});
+      if ($element_state->{phase} eq 'flow' or
+          $element_state->{phase} eq 'figcaption-flow') {
+        #
+      } elsif ($element_state->{phase} eq 'figcaption') {
+        $element_state->{phase} = 'figcaption-flow';
+      } elsif ($element_state->{phase} eq 'initial') {
+        $element_state->{phase} = 'flow';
+      } else {
+        $self->{onerror}->(node => $child_node,
+                           type => 'character not allowed:figure', # XXXdocumentation
+                           level => $self->{level}->{must});
+      }
     }
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-
-    unless ($element_state->{has_dd}) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'child element missing', text => 'dd',
-                         level => $self->{level}->{must});
-    }
-
-    $HTMLChecker{check_end}->(@_);
-  },
+  }, # check_child_text
 }; # figure
 
 $Element->{$HTML_NS}->{figcaption} = {
