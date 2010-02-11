@@ -3644,31 +3644,7 @@ $Element->{$HTML_NS}->{dt} = {
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
     sdaform => FEATURE_HTML20_RFC,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    if ($item->{parent_state}->{in_figure}) {
-      $self->_add_minus_elements ($element_state, {$HTML_NS => {figure => 1}});
-    }
-
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-  check_child_element => sub {
-    my ($self, $item, $child_el, $child_nsuri, $child_ln,
-        $child_is_transparent, $element_state) = @_;
-    $HTMLPhrasingContentChecker{check_child_element}->(@_);
-  }, # check_child_element
-  check_child_text => sub {
-    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    $HTMLPhrasingContentChecker{check_child_text}->(@_);
-  }, # check_child_text
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_remove_minus_elements ($element_state);
-
-    $HTMLPhrasingContentChecker{check_end}->(@_);
-  }, # check_end
+  }), # check_attrs
 }; # dt
 
 $Element->{$HTML_NS}->{dd} = {
