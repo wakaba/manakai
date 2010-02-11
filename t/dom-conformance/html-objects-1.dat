@@ -4548,16 +4548,30 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <area shape="rect" coords="1,2,3,4"
+    href="http://test/" type="" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@type;IMT:no type;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
     href="http://test/" type="text" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@type;IMT:syntax error;m
+/area/@type;IMT:no /;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" type="text/css" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" type="text/css; a=b" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@type;IMT:parameter not allowed;m
 
 #data
 <area shape="rect" coords="1,2,3,4"

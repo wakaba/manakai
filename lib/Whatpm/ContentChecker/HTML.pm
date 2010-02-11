@@ -3865,17 +3865,17 @@ $Element->{$HTML_NS}->{a} = {
             $HTMLCharsetChecker->($attr->value, @_);
           },
           ## TODO: HTML4 |coords|
-                     target => $HTMLTargetAttrChecker,
-                     href => $HTMLURIAttrChecker,
-                     ping => $HTMLSpaceURIsAttrChecker,
-                     rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
+          href => $HTMLURIAttrChecker,
+          hreflang => $HTMLLanguageTagAttrChecker,
+          media => $HTMLMQAttrChecker,
+          ## TODO: HTML4/XHTML1 |name|
+          ping => $HTMLSpaceURIsAttrChecker,
+          rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
           rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
           ## TODO: HTML4 |shape|
-                     media => $HTMLMQAttrChecker,
-          ## TODO: HTML4/XHTML1 |name|
-                     hreflang => $HTMLLanguageTagAttrChecker,
-                     type => $HTMLIMTAttrChecker,
-                   }->{$attr_ln};
+          target => $HTMLTargetAttrChecker,
+          type => $MIMETypeChecker,
+        }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
@@ -5597,35 +5597,33 @@ $Element->{$HTML_NS}->{area} = {
         }->{$attr_ln};
 
         $checker = {
-                     alt => sub {
-                       ## NOTE: Checked later.
-                     },
-                     shape => $GetHTMLEnumeratedAttrChecker->({
-                       circ => -1, circle => 1,
-                       default => 1,
-                       poly => 1, polygon => -1,
-                       rect => 1, rectangle => -1,
-                     }),
-                     coords => sub {
-                       my ($self, $attr) = @_;
-                       my $value = $attr->value;
-                       if ($value =~ /\A-?[0-9]+(?>,-?[0-9]+)*\z/) {
-                         $coords = [split /,/, $value];
-                       } else {
-                         $self->{onerror}->(node => $attr,
-                                            type => 'coords:syntax error',
-                                            level => $self->{level}->{must});
-                       }
-                     },
+          alt => sub { }, ## Checked later.
+          coords => sub {
+            my ($self, $attr) = @_;
+            my $value = $attr->value;
+            if ($value =~ /\A-?[0-9]+(?>,-?[0-9]+)*\z/) {
+              $coords = [split /,/, $value];
+            } else {
+              $self->{onerror}->(node => $attr,
+                                 type => 'coords:syntax error',
+                                 level => $self->{level}->{must});
+            }
+          },
+          href => $HTMLURIAttrChecker,
+          hreflang => $HTMLLanguageTagAttrChecker,
+          media => $HTMLMQAttrChecker,
           nohref => $GetHTMLBooleanAttrChecker->('nohref'),
+          ping => $HTMLSpaceURIsAttrChecker,
+          rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
+          shape => $GetHTMLEnumeratedAttrChecker->({
+            circ => -1, circle => 1,
+            default => 1,
+            poly => 1, polygon => -1,
+            rect => 1, rectangle => -1,
+          }),
           target => $HTMLTargetAttrChecker,
-                     href => $HTMLURIAttrChecker,
-                     ping => $HTMLSpaceURIsAttrChecker,
-                     rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
-                     media => $HTMLMQAttrChecker,
-                     hreflang => $HTMLLanguageTagAttrChecker,
-                     type => $HTMLIMTAttrChecker,
-                   }->{$attr_ln};
+          type => $MIMETypeChecker,
+        }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and

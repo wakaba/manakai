@@ -559,7 +559,19 @@ x</div>
 <a href="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a;no significant content;s
-/a/@type;IMT:syntax error;m
+/a/@type;IMT:no type;m
+
+#data
+<a href="http://test/" type="text" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+/a/@type;IMT:no /;m
+
+#data
+<a href="http://test/" type="text/plain;a=b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+/a/@type;IMT:parameter not allowed;m
 
 #data
 <a href="http://test/" type="text/html" xmlns="http://www.w3.org/1999/xhtml"/>
