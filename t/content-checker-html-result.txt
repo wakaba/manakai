@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Feb  7 19:27:09 2010
-# Current time GMT:   Sun Feb  7 10:27:09 2010
+# Current time local: Thu Feb 11 12:46:47 2010
+# Current time GMT:   Thu Feb 11 03:46:47 2010
 # Using Test.pm version 1.25_02
 # ../t/content-model-1.dat
 ok 1
@@ -534,8 +534,8 @@ ok 501
 ok 502
 ok 503
 ok 504
-Parse error (bare ero) at line 2 column 19
 ok 505
+Parse error (bare ero) at line 2 column 19
 ok 506
 ok 507
 ok 508
@@ -550,23 +550,23 @@ ok 516
 ok 517
 ok 518
 ok 519
-not ok 520
-# Test 520 got: "/meta/@content;charset:not preferred;m\n/meta/@content;mismatched charset name not checked;u\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (content-checker.pl at line 69 fail #520)
-#     Expected: "/meta;element not allowed:meta charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
-#    http-equiv="content-type"
-#    content="text/html; charset=utf-8"/>)
+ok 520
 not ok 521
 # Test 521 got: "/meta/@content;charset:not preferred;m\n/meta/@content;mismatched charset name not checked;u\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (content-checker.pl at line 69 fail #521)
 #     Expected: "/meta;element not allowed:meta charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
 #    http-equiv="content-type"
-#    content="text/html; charset=UTF-8"/>)
+#    content="text/html; charset=utf-8"/>)
 not ok 522
 # Test 522 got: "/meta/@content;charset:not preferred;m\n/meta/@content;mismatched charset name not checked;u\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (content-checker.pl at line 69 fail #522)
 #     Expected: "/meta;element not allowed:meta charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
 #    http-equiv="content-type"
+#    content="text/html; charset=UTF-8"/>)
+not ok 523
+# Test 523 got: "/meta/@content;charset:not preferred;m\n/meta/@content;mismatched charset name not checked;u\n/meta;element not allowed:meta charset;m\n/meta;in XML:charset;m" (content-checker.pl at line 69 fail #523)
+#     Expected: "/meta;element not allowed:meta charset;m" (<meta xmlns="http://www.w3.org/1999/xhtml"
+#    http-equiv="content-type"
 #    content="text/html; charset=Utf-8"/>)
 Parse error (bad attribute value) at line 2 column 56
-ok 523
 ok 524
 ok 525
 ok 526
@@ -627,8 +627,8 @@ ok 580
 ok 581
 ok 582
 ok 583
-# ../t/dom-conformance/html-metadata-2.dat
 ok 584
+# ../t/dom-conformance/html-metadata-2.dat
 ok 585
 ok 586
 ok 587
@@ -650,8 +650,8 @@ ok 602
 ok 603
 ok 604
 ok 605
-# ../t/dom-conformance/html-flows-1.dat
 ok 606
+# ../t/dom-conformance/html-flows-1.dat
 ok 607
 ok 608
 ok 609
@@ -1097,10 +1097,10 @@ ok 1048
 ok 1049
 ok 1050
 ok 1051
-not ok 1052
-# Test 1052 got: "/address/@align;attribute not defined;m\n/address/@align;unknown attribute;u\n/address;no significant content;s" (content-checker.pl at line 69 fail #1052)
+ok 1052
+not ok 1053
+# Test 1053 got: "/address/@align;attribute not defined;m\n/address/@align;unknown attribute;u\n/address;no significant content;s" (content-checker.pl at line 69 fail #1053)
 #      Expected: "/address/@align;attribute not defined;m\n/address;no significant content;s" (<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>)
-ok 1053
 ok 1054
 ok 1055
 ok 1056
@@ -1132,11 +1132,11 @@ ok 1081
 ok 1082
 ok 1083
 ok 1084
-not ok 1085
-# Test 1085 got: "" (content-checker.pl at line 69 fail #1085)
+ok 1085
+not ok 1086
+# Test 1086 got: "" (content-checker.pl at line 69 fail #1086)
 #      Expected: "/ins/@datetime;datetime:bad year;m" (<ins xmlns="http://www.w3.org/1999/xhtml"
 #    datetime="0000-03-14T14:33Z">x</ins>)
-ok 1086
 ok 1087
 ok 1088
 ok 1089
@@ -1172,11 +1172,11 @@ ok 1118
 ok 1119
 ok 1120
 ok 1121
-not ok 1122
-# Test 1122 got: "" (content-checker.pl at line 69 fail #1122)
+ok 1122
+not ok 1123
+# Test 1123 got: "" (content-checker.pl at line 69 fail #1123)
 #      Expected: "/ins/@datetime;datetime:bad timezone hour;m" (<ins xmlns="http://www.w3.org/1999/xhtml"
 #    datetime="2007-02-21T23:00-24:00">x</ins>)
-ok 1123
 ok 1124
 ok 1125
 ok 1126
@@ -1215,8 +1215,8 @@ ok 1158
 ok 1159
 ok 1160
 ok 1161
-# ../t/dom-conformance/html-texts-1.dat
 ok 1162
+# ../t/dom-conformance/html-texts-1.dat
 ok 1163
 ok 1164
 ok 1165
@@ -1543,8 +1543,8 @@ ok 1485
 ok 1486
 ok 1487
 ok 1488
-# ../t/dom-conformance/html-links-1.dat
 ok 1489
+# ../t/dom-conformance/html-links-1.dat
 ok 1490
 ok 1491
 ok 1492
@@ -1695,8 +1695,8 @@ ok 1636
 ok 1637
 ok 1638
 ok 1639
-# ../t/dom-conformance/html-objects-1.dat
 ok 1640
+# ../t/dom-conformance/html-objects-1.dat
 ok 1641
 ok 1642
 ok 1643
@@ -1709,15 +1709,14 @@ ok 1649
 ok 1650
 ok 1651
 ok 1652
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1653
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1654
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1655
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1656
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1657
 Whatpm::HTML::Table::assign_header is OBSOLETE!
@@ -1738,6 +1737,7 @@ Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1665
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1666
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1667
 ok 1668
 ok 1669
@@ -1761,7 +1761,6 @@ ok 1686
 ok 1687
 ok 1688
 ok 1689
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1690
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1691
@@ -1781,8 +1780,8 @@ Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1698
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1699
-ok 1700
 Whatpm::HTML::Table::assign_header is OBSOLETE!
+ok 1700
 ok 1701
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1702
@@ -1791,8 +1790,9 @@ ok 1703
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1704
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1705
+Whatpm::HTML::Table::assign_header is OBSOLETE!
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 1706
 ok 1707
 ok 1708
@@ -2037,13 +2037,13 @@ ok 1946
 ok 1947
 ok 1948
 ok 1949
-not ok 1950
-# Test 1950 got: "/div/a/@name;attribute not defined;m\n/div/p/img/@usemap;no referenced map;m" (content-checker.pl at line 69 fail #1950)
+ok 1950
+not ok 1951
+# Test 1951 got: "/div/a/@name;attribute not defined;m\n/div/p/img/@usemap;no referenced map;m" (content-checker.pl at line 69 fail #1951)
 #      Expected: "/div/a/@name;attribute not defined;m\n/div/a/@name;unknown attribute;u\n/div/p/img/@usemap;no referenced map;m" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<a name="aa">x</a>
 #<p><img src="http://test/" alt="" usemap="#aa"/></p>
 #</div>)
-ok 1951
 ok 1952
 ok 1953
 ok 1954
@@ -2131,12 +2131,12 @@ ok 2035
 ok 2036
 ok 2037
 ok 2038
-not ok 2039
-# Test 2039 got: "" (content-checker.pl at line 69 fail #2039)
+ok 2039
+not ok 2040
+# Test 2040 got: "" (content-checker.pl at line 69 fail #2040)
 #      Expected: "/html/body/embed/@xml:space;attribute not defined;m" (<!DOCTYPE HTML><title>x</title>
 #<embed src="http://test/"
 #    xml:space=preserve>)
-ok 2040
 ok 2041
 ok 2042
 ok 2043
@@ -2145,23 +2145,23 @@ ok 2045
 ok 2046
 ok 2047
 ok 2048
-not ok 2049
-# Test 2049 got: "" (content-checker.pl at line 69 fail #2049)
-#      Expected: "/embed/@name;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
-#    name="name1"/>)
+ok 2049
 not ok 2050
 # Test 2050 got: "" (content-checker.pl at line 69 fail #2050)
+#      Expected: "/embed/@name;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+#    name="name1"/>)
+not ok 2051
+# Test 2051 got: "" (content-checker.pl at line 69 fail #2051)
 #      Expected: "/embed/@align;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
 #    align="left"/>)
-ok 2051
 ok 2052
 ok 2053
 ok 2054
 ok 2055
 ok 2056
+ok 2057
 Parse error (unmatched end tag) at line 2 column 16
 Parse error (in body:#eof) at line 2 column 24
-ok 2057
 ok 2058
 ok 2059
 ok 2060
@@ -2192,10 +2192,10 @@ ok 2084
 ok 2085
 ok 2086
 ok 2087
-not ok 2088
-# Test 2088 got: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m\n/object;no significant content;s" (content-checker.pl at line 69 fail #2088)
+ok 2088
+not ok 2089
+# Test 2089 got: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m\n/object;no significant content;s" (content-checker.pl at line 69 fail #2089)
 #      Expected: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m" (<object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>)
-ok 2089
 ok 2090
 ok 2091
 ok 2092
@@ -2262,37 +2262,37 @@ ok 2152
 ok 2153
 ok 2154
 ok 2155
-not ok 2156
-# Test 2156 got: "" (content-checker.pl at line 69 fail #2156)
+ok 2156
+not ok 2157
+# Test 2157 got: "" (content-checker.pl at line 69 fail #2157)
 #      Expected: "/video/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <video src="">aa</video>
 #</video>)
-not ok 2157
-# Test 2157 got: "" (content-checker.pl at line 69 fail #2157)
+not ok 2158
+# Test 2158 got: "" (content-checker.pl at line 69 fail #2158)
 #      Expected: "/video/p/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <p><video src="">aa</video></p>
 #</video>)
-not ok 2158
-# Test 2158 got: "" (content-checker.pl at line 69 fail #2158)
+not ok 2159
+# Test 2159 got: "" (content-checker.pl at line 69 fail #2159)
 #      Expected: "/video/ins/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><video src="">aa</video></ins>
 #</video>)
-not ok 2159
-# Test 2159 got: "" (content-checker.pl at line 69 fail #2159)
+not ok 2160
+# Test 2160 got: "" (content-checker.pl at line 69 fail #2160)
 #      Expected: "/video/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <audio src="">aa</audio>
 #</video>)
-not ok 2160
-# Test 2160 got: "" (content-checker.pl at line 69 fail #2160)
+not ok 2161
+# Test 2161 got: "" (content-checker.pl at line 69 fail #2161)
 #      Expected: "/video/p/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <p><audio src="">aa</audio></p>
 #</video>)
-not ok 2161
-# Test 2161 got: "" (content-checker.pl at line 69 fail #2161)
+not ok 2162
+# Test 2162 got: "" (content-checker.pl at line 69 fail #2162)
 #      Expected: "/video/ins/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><audio src="">aa</audio></ins>
 #</video>)
-ok 2162
 ok 2163
 ok 2164
 ok 2165
@@ -2309,37 +2309,37 @@ ok 2175
 ok 2176
 ok 2177
 ok 2178
-not ok 2179
-# Test 2179 got: "" (content-checker.pl at line 69 fail #2179)
+ok 2179
+not ok 2180
+# Test 2180 got: "" (content-checker.pl at line 69 fail #2180)
 #      Expected: "/audio/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <video src="">aa</video>
 #</audio>)
-not ok 2180
-# Test 2180 got: "" (content-checker.pl at line 69 fail #2180)
+not ok 2181
+# Test 2181 got: "" (content-checker.pl at line 69 fail #2181)
 #      Expected: "/audio/p/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <p><video src="">aa</video></p>
 #</audio>)
-not ok 2181
-# Test 2181 got: "" (content-checker.pl at line 69 fail #2181)
+not ok 2182
+# Test 2182 got: "" (content-checker.pl at line 69 fail #2182)
 #      Expected: "/audio/ins/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><video src="">aa</video></ins>
 #</audio>)
-not ok 2182
-# Test 2182 got: "" (content-checker.pl at line 69 fail #2182)
+not ok 2183
+# Test 2183 got: "" (content-checker.pl at line 69 fail #2183)
 #      Expected: "/audio/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <audio src="">aa</audio>
 #</audio>)
-not ok 2183
-# Test 2183 got: "" (content-checker.pl at line 69 fail #2183)
+not ok 2184
+# Test 2184 got: "" (content-checker.pl at line 69 fail #2184)
 #      Expected: "/audio/p/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <p><audio src="">aa</audio></p>
 #</audio>)
-not ok 2184
-# Test 2184 got: "" (content-checker.pl at line 69 fail #2184)
+not ok 2185
+# Test 2185 got: "" (content-checker.pl at line 69 fail #2185)
 #      Expected: "/audio/ins/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><audio src="">aa</audio></ins>
 #</audio>)
-ok 2185
 ok 2186
 ok 2187
 ok 2188
@@ -2507,9 +2507,9 @@ ok 2349
 ok 2350
 ok 2351
 ok 2352
+ok 2353
 # ../t/dom-conformance/html-tables-1.dat
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-ok 2353
 ok 2354
 ok 2355
 ok 2356
@@ -2519,8 +2519,8 @@ ok 2359
 ok 2360
 ok 2361
 ok 2362
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2363
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2364
 ok 2365
 ok 2366
@@ -2530,18 +2530,17 @@ ok 2369
 ok 2370
 ok 2371
 ok 2372
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2373
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2374
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2375
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-not ok 2376
-# Test 2376 got: "/table/@border;attribute not defined;m" (content-checker.pl at line 69 fail #2376)
-#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2376
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-ok 2377
+not ok 2377
+# Test 2377 got: "/table/@border;attribute not defined;m" (content-checker.pl at line 69 fail #2377)
+#      Expected: "/table/@border;attribute not defined;m\n/table/@border;nninteger:syntax error;m" (<table border="" xmlns="http://www.w3.org/1999/xhtml"/>)
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2378
 Whatpm::HTML::Table::assign_header is OBSOLETE!
@@ -2610,6 +2609,7 @@ Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2410
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2411
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2412
 ok 2413
 ok 2414
@@ -2620,10 +2620,10 @@ ok 2418
 ok 2419
 ok 2420
 ok 2421
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2422
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2423
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2424
 ok 2425
 ok 2426
@@ -2725,7 +2725,6 @@ ok 2521
 ok 2522
 ok 2523
 ok 2524
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2525
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2526
@@ -2735,24 +2734,24 @@ Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2528
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2529
-ok 2530
 Whatpm::HTML::Table::assign_header is OBSOLETE!
+ok 2530
 ok 2531
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2532
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2533
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2534
 ok 2535
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2536
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2537
 ok 2538
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2539
-# ../t/dom-conformance/html-tables-2.dat
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2540
+# ../t/dom-conformance/html-tables-2.dat
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2541
 Whatpm::HTML::Table::assign_header is OBSOLETE!
@@ -2762,22 +2761,22 @@ ok 2543
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2544
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
-Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 735.
 ok 2545
 Whatpm::HTML::Table::assign_header is OBSOLETE!
+Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
+Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 735.
 ok 2546
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2547
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
-Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 735.
 ok 2548
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
 Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 735.
 ok 2549
 Whatpm::HTML::Table::assign_header is OBSOLETE!
+Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
+Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 735.
 ok 2550
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2551
@@ -2788,24 +2787,24 @@ ok 2553
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2554
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
-Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 735.
 ok 2555
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
 Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 735.
 ok 2556
 Whatpm::HTML::Table::assign_header is OBSOLETE!
+Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
+Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 735.
 ok 2557
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2558
 Whatpm::HTML::Table::assign_header is OBSOLETE!
-Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
 ok 2559
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
 ok 2560
 Whatpm::HTML::Table::assign_header is OBSOLETE!
+Use of uninitialized value in numeric ne (!=) at ../lib/Whatpm/HTML/Table.pm line 734.
 ok 2561
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2562
@@ -2815,8 +2814,9 @@ Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2564
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2565
-# ../t/dom-conformance/html-forms-1.dat
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 2566
+# ../t/dom-conformance/html-forms-1.dat
 ok 2567
 ok 2568
 ok 2569
@@ -2831,10 +2831,10 @@ ok 2577
 ok 2578
 ok 2579
 ok 2580
-not ok 2581
-# Test 2581 got: "/form/meta/@name;metadata:proposed;keywords;w\n/form/meta;element not allowed:flow;m\n/form;no significant content;s" (content-checker.pl at line 69 fail #2581)
+ok 2581
+not ok 2582
+# Test 2582 got: "/form/meta/@name;metadata:proposed;keywords;w\n/form/meta;element not allowed:flow;m\n/form;no significant content;s" (content-checker.pl at line 69 fail #2582)
 #      Expected: "/form/meta;element not allowed:flow;m\n/form;no significant content;s" (<form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>)
-ok 2582
 ok 2583
 ok 2584
 ok 2585
@@ -2928,11 +2928,11 @@ ok 2672
 ok 2673
 ok 2674
 ok 2675
-not ok 2676
-# Test 2676 got: "/form/a/@name;attribute not defined;m" (content-checker.pl at line 69 fail #2676)
+ok 2676
+not ok 2677
+# Test 2677 got: "/form/a/@name;attribute not defined;m" (content-checker.pl at line 69 fail #2677)
 #      Expected: "/form/a/@name;attribute not defined;m\n/form/a/@name;unknown attribute;u" (<form xmlns="http://www.w3.org/1999/xhtml"
 #    name="a">x<a name="a">u</a></form>)
-ok 2677
 ok 2678
 ok 2679
 ok 2680
@@ -3166,8 +3166,8 @@ ok 2907
 ok 2908
 ok 2909
 ok 2910
-# ../t/dom-conformance/html-form-label.dat
 ok 2911
+# ../t/dom-conformance/html-form-label.dat
 ok 2912
 ok 2913
 ok 2914
@@ -3248,8 +3248,8 @@ ok 2988
 ok 2989
 ok 2990
 ok 2991
-# ../t/dom-conformance/html-form-input-1.dat
 ok 2992
+# ../t/dom-conformance/html-form-input-1.dat
 ok 2993
 ok 2994
 ok 2995
@@ -3808,8 +3808,8 @@ ok 3547
 ok 3548
 ok 3549
 ok 3550
-Parse error (lt in attr value) at line 3 column 12
 ok 3551
+Parse error (lt in attr value) at line 3 column 12
 ok 3552
 ok 3553
 ok 3554
@@ -4836,13 +4836,13 @@ ok 4574
 ok 4575
 ok 4576
 ok 4577
-not ok 4578
-# Test 4578 got: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;hashref:wrong case;m" (content-checker.pl at line 69 fail #4578)
+ok 4578
+not ok 4579
+# Test 4579 got: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;hashref:wrong case;m" (content-checker.pl at line 69 fail #4579)
 #      Expected: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;no referenced map;m" (<map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
 #<input type="image"
 #    usemap="#abc"/>x
 #</map>)
-ok 4579
 ok 4580
 ok 4581
 ok 4582
@@ -5219,27 +5219,27 @@ ok 4952
 ok 4953
 ok 4954
 ok 4955
-not ok 4956
-# Test 4956 got: "" (content-checker.pl at line 69 fail #4956)
-#      Expected: "/input/@value;datetime:bad year;m" (<input type="date" xmlns="http://www.w3.org/1999/xhtml"
-#    value="0000-11-22"/>)
+ok 4956
 not ok 4957
 # Test 4957 got: "" (content-checker.pl at line 69 fail #4957)
-#      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
-#    value="0000-11-22T00:11:22Z"/>)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="date" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11-22"/>)
 not ok 4958
 # Test 4958 got: "" (content-checker.pl at line 69 fail #4958)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11-22T00:11:22Z"/>)
+not ok 4959
+# Test 4959 got: "" (content-checker.pl at line 69 fail #4959)
 #      Expected: "/input/@value;datetime:bad year;m" (<input type="month" xmlns="http://www.w3.org/1999/xhtml"
 #    value="0000-11"/>)
-not ok 4959
-# Test 4959 got: "/input/@value;week:bad year;m" (content-checker.pl at line 69 fail #4959)
+not ok 4960
+# Test 4960 got: "/input/@value;week:bad year;m" (content-checker.pl at line 69 fail #4960)
 #      Expected: "/input/@value;datetime:bad year;m" (<input type="week" xmlns="http://www.w3.org/1999/xhtml"
 #    value="0000-W11"/>)
-not ok 4960
-# Test 4960 got: "" (content-checker.pl at line 69 fail #4960)
+not ok 4961
+# Test 4961 got: "" (content-checker.pl at line 69 fail #4961)
 #      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
 #    value="0000-11-22T00:11:22"/>)
-ok 4961
 ok 4962
 ok 4963
 ok 4964
@@ -5411,8 +5411,8 @@ ok 5129
 ok 5130
 ok 5131
 ok 5132
-# ../t/dom-conformance/html-form-button.dat
 ok 5133
+# ../t/dom-conformance/html-form-button.dat
 ok 5134
 ok 5135
 ok 5136
@@ -5601,8 +5601,8 @@ ok 5318
 ok 5319
 ok 5320
 ok 5321
-# ../t/dom-conformance/html-form-select.dat
 ok 5322
+# ../t/dom-conformance/html-form-select.dat
 ok 5323
 ok 5324
 ok 5325
@@ -5688,8 +5688,8 @@ ok 5404
 ok 5405
 ok 5406
 ok 5407
-# ../t/dom-conformance/html-form-datalist.dat
 ok 5408
+# ../t/dom-conformance/html-form-datalist.dat
 ok 5409
 ok 5410
 ok 5411
@@ -5746,8 +5746,8 @@ ok 5461
 ok 5462
 ok 5463
 ok 5464
-# ../t/dom-conformance/html-form-textarea.dat
 ok 5465
+# ../t/dom-conformance/html-form-textarea.dat
 ok 5466
 ok 5467
 ok 5468
@@ -5817,8 +5817,8 @@ ok 5531
 ok 5532
 ok 5533
 ok 5534
-# ../t/dom-conformance/html-form-keygen.dat
 ok 5535
+# ../t/dom-conformance/html-form-keygen.dat
 ok 5536
 ok 5537
 ok 5538
@@ -5843,21 +5843,21 @@ ok 5556
 ok 5557
 ok 5558
 ok 5559
-# ../t/dom-conformance/html-interactive-1.dat
 ok 5560
+# ../t/dom-conformance/html-interactive-1.dat
 ok 5561
 ok 5562
 ok 5563
 ok 5564
-not ok 5565
-# Test 5565 got: "/head/noscript/meta/@name;metadata:proposed;keywords;w\n/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (content-checker.pl at line 69 fail #5565)
+ok 5565
+not ok 5566
+# Test 5566 got: "/head/noscript/meta/@name;metadata:proposed;keywords;w\n/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (content-checker.pl at line 69 fail #5566)
 #      Expected: "/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (<head xmlns="http://www.w3.org/1999/xhtml">
 #<title/>
 #<noscript>
 #<meta name="keywords" content=""/>
 #</noscript>
 #</head>)
-ok 5566
 ok 5567
 ok 5568
 ok 5569
@@ -5865,12 +5865,12 @@ ok 5570
 ok 5571
 ok 5572
 ok 5573
-not ok 5574
-# Test 5574 got: "/noscript/meta/@name;metadata:proposed;keywords;w\n/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (content-checker.pl at line 69 fail #5574)
+ok 5574
+not ok 5575
+# Test 5575 got: "/noscript/meta/@name;metadata:proposed;keywords;w\n/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (content-checker.pl at line 69 fail #5575)
 #      Expected: "/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
 #<meta name="keywords" content=""/>
 #</noscript>)
-ok 5575
 ok 5576
 ok 5577
 ok 5578
@@ -5925,10 +5925,10 @@ ok 5626
 ok 5627
 ok 5628
 ok 5629
-not ok 5630
-# Test 5630 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (content-checker.pl at line 69 fail #5630)
+ok 5630
+not ok 5631
+# Test 5631 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (content-checker.pl at line 69 fail #5631)
 #      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
-ok 5631
 ok 5632
 ok 5633
 ok 5634
@@ -5975,29 +5975,29 @@ ok 5674
 ok 5675
 ok 5676
 ok 5677
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5678
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5679
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5680
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5681
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5682
 Whatpm::HTML::Table::assign_header is OBSOLETE!
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5683
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5684
 ok 5685
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5686
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5687
 ok 5688
 ok 5689
 ok 5690
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5691
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 5692
 ok 5693
 ok 5694
@@ -6109,8 +6109,8 @@ ok 5799
 ok 5800
 ok 5801
 ok 5802
-# ../t/dom-conformance/html-scripting-1.dat
 ok 5803
+# ../t/dom-conformance/html-scripting-1.dat
 ok 5804
 ok 5805
 ok 5806
@@ -6164,8 +6164,8 @@ ok 5853
 ok 5854
 ok 5855
 ok 5856
-# ../t/dom-conformance/html-scripting-2.dat
 ok 5857
+# ../t/dom-conformance/html-scripting-2.dat
 ok 5858
 ok 5859
 ok 5860
@@ -6212,8 +6212,8 @@ ok 5900
 ok 5901
 ok 5902
 ok 5903
-# ../t/dom-conformance/html-repetitions.dat
 ok 5904
+# ../t/dom-conformance/html-repetitions.dat
 ok 5905
 ok 5906
 ok 5907
@@ -6274,8 +6274,8 @@ ok 5961
 ok 5962
 ok 5963
 ok 5964
-# ../t/dom-conformance/html-datatemplate.dat
 ok 5965
+# ../t/dom-conformance/html-datatemplate.dat
 ok 5966
 ok 5967
 ok 5968
@@ -6414,12 +6414,12 @@ ok 6100
 ok 6101
 ok 6102
 ok 6103
-not ok 6104
-# Test 6104 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (content-checker.pl at line 69 fail #6104)
+ok 6104
+not ok 6105
+# Test 6105 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (content-checker.pl at line 69 fail #6105)
 #      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
 #      Line 1 is missing:
 #       - "/rule/footer/h1;element not allowed:minus;m\n"
-ok 6105
 ok 6106
 ok 6107
 ok 6108
@@ -6448,7 +6448,6 @@ ok 6130
 ok 6131
 ok 6132
 ok 6133
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6134
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6135
@@ -6458,6 +6457,7 @@ Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6137
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6138
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6139
 ok 6140
 ok 6141
@@ -6506,7 +6506,6 @@ ok 6183
 ok 6184
 ok 6185
 ok 6186
-Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6187
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6188
@@ -6514,6 +6513,7 @@ Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6189
 Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6190
+Whatpm::HTML::Table::assign_header is OBSOLETE!
 ok 6191
 ok 6192
 ok 6193
@@ -6617,3 +6617,4 @@ ok 6290
 ok 6291
 ok 6292
 ok 6293
+ok 6294

@@ -780,6 +780,25 @@ my $HTMLIMTAttrChecker = sub {
   }
 }; # $HTMLIMTAttrChecker
 
+my $MIMETypeChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+
+  require Message::MIME::Type;
+  my $onerror = sub {
+    $self->{onerror}->(@_, node => $attr);
+  };
+
+  ## Syntax-level validation
+  my $type = Message::MIME::Type->parse_web_mime_type
+      ($value, $onerror, $self->{level});
+
+  ## Vocabulary-level validation
+  if ($type) {
+    $type->validate ($onerror);
+  }
+}; # $MIMETypeChecker
+
 my $HTMLLanguageTagAttrChecker = sub {
   ## NOTE: See also $AtomLanguageTagAttrChecker in Atom.pm.
 
@@ -2168,7 +2187,7 @@ $Element->{$HTML_NS}->{link} = {
         }
       },
       target => $HTMLTargetAttrChecker,
-      type => $HTMLIMTAttrChecker,
+      type => $MIMETypeChecker,
       ## NOTE: Though |title| has special semantics,
       ## syntactically same as the |title| as global attribute.
     }, {

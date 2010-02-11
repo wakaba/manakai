@@ -1,6 +1,7 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.111 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.111';
 
 require Whatpm::URIChecker;
 
@@ -439,11 +440,12 @@ my $default_error_level = {
   uri_lc_must => 'm',
   uri_lc_should => 'w',
 
-  ## |Whatpm::IMTChecker|
+  ## |Message::MIME::Type|
   mime_must => 'm', # lowercase "must"
   mime_fact => 'm',
   mime_strongly_discouraged => 'w',
   mime_discouraged => 'w',
+  http_fact => 'm',
 
   ## |Whatpm::LangTag|
   langtag_fact => 'm',
@@ -1109,7 +1111,7 @@ sub _check_get_children ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -1117,4 +1119,3 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2009/08/30 03:40:50 $
