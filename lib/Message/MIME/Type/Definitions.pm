@@ -110,18 +110,21 @@ $Type->{text}->{subtype}->{css} = { # RFC 2318
 $Type->{text}->{subtype}->{javascript} = { # RFC 4329
   parameter => {
     charset => {syntax => 'mime-charset', registered => 1}, ## TODO: SHOULD be registered
-    e4x => {checker => sub { # HTML5 (but informative?)
+    e4x => {checker => sub {
       my ($self, $value, $onerror) = @_;
       unless ($value eq '1') {
         $onerror->(type => 'e4x:syntax error',
                    level => $self->{level}->{info},
                    value => $value);
-        ## NOTE: Whether values other than "1" is non-conformant
-        ## or not is not defined actually...
+        ## In fact no spec defines this parameter, except Web
+        ## Applications 1.0 specification defines the UA requirement.
       }
     }},
   },
-  obsolete => 1,
+  ## Though RFC 4329 obsoletes this MIME type, it does not reflect the
+  ## real world.  As Web Applications 1.0 specification states, we
+  ## willfully violates that bogus spec here.
+  #obsolete => 1,
   registered => 1,
 };
 $Type->{text}->{subtype}->{ecmascript} = { # RFC 4329

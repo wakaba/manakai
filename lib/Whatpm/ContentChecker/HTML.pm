@@ -2578,7 +2578,7 @@ $Element->{$HTML_NS}->{style} = {
 
         if (defined $type->param ('charset')) {
           $self->{onerror}->(node => $attr,
-                             type => 'IMT:parameter not allowed', # XXXdocumentation
+                             type => 'IMT:parameter not allowed',
                              level => $self->{level}->{must});
         }
       }
@@ -2734,7 +2734,7 @@ $Element->{$HTML_NS}->{script} = {
       if ($type) {
         if (defined $type->param ('charset')) {
           $self->{onerror}->(node => $attr,
-                             type => 'IMT:parameter not allowed', # XXXdocumentation
+                             type => 'IMT:parameter not allowed',
                              level => $self->{level}->{must});
         }
       }
