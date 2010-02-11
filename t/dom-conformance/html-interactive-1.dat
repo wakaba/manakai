@@ -285,108 +285,98 @@
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"></details>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">   </details>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">xxxx</details>
 #errors
-/details;child element missing;dd;m
-/details/"xxxx";character not allowed;m
+/details;child element missing;summary;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><p></p></details>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 /details/p;no significant content;s
-/details/p;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><p>xxx</p></details>
 #errors
-/details;child element missing;dd;m
-/details/p;element not allowed;m
+/details;child element missing;summary;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend>xxx</details>
 #errors
-/details;child element missing;dd;m
-/details/legend;element not allowed;m
-/details/"xxx";character not allowed;m
+/details;child element missing;summary;m
+/details/legend;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend><p>xxx</p></details>
 #errors
-/details;child element missing;dd;m
-/details/legend;element not allowed;m
-/details/p;element not allowed;m
+/details;child element missing;summary;m
+/details/legend;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend><style scoped="scoped"></style><p>xxx</p></details>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
 /details/style;SUBDOC
-/details/legend;element not allowed;m
-/details/style;element not allowed;m
-/details/p;element not allowed;m
+/details/legend;element not allowed:flow;m
+/details/style;element not allowed:flow style;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <legend>xx</legend>
 <style scoped="scoped"></style><p>xxx</p></details>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
 /details/style;SUBDOC
-/details/legend;element not allowed;m
-/details/style;element not allowed;m
-/details/p;element not allowed;m
+/details/legend;element not allowed:flow;m
+/details/style;element not allowed:flow style;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"
 >xx<legend>xx</legend></details>
 #errors
-/details;child element missing;dd;m
-/details/"xx";character not allowed;m
-/details/legend;element not allowed;m
+/details;child element missing;summary;m
+/details/legend;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <p>xx</p><legend>xx</legend></details>
 #errors
-/details;child element missing;dd;m
-/details/p;element not allowed;m
-/details/legend;element not allowed;m
+/details;child element missing;summary;m
+/details/legend;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <legend>yy</legend><legend>xx</legend></details>
 #errors
-/details;child element missing;dd;m
-/details/legend;element not allowed;m
-/details/legend;element not allowed;m
+/details;child element missing;summary;m
+/details/legend;element not allowed:flow;m
+/details/legend;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <ins><legend>xx</legend>aa</ins></details>
 #errors
-/details;child element missing;dd;m
-/details/ins;element not allowed;m
-/details/ins/legend;element not allowed;m
-/details/ins/"aa";character not allowed;m
+/details;child element missing;summary;m
+/details/ins/legend;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"
 >zzz<legend>yy</legend><legend>xx</legend>aaa</details>
 #errors
-/details;child element missing;dd;m
-/details/"zzz";character not allowed;m
-/details/legend;element not allowed;m
-/details/legend;element not allowed;m
-/details/"aaa";character not allowed;m
+/details;child element missing;summary;m
+/details/legend;element not allowed:flow;m
+/details/legend;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -394,12 +384,17 @@
   <dd>bb</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
   <dd>bb</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -407,7 +402,9 @@
   <dt>aa</dt>
 </details>
 #errors
-/details/dt;element not allowed;m
+/details;child element missing;summary;m
+/details/dd;element not allowed:flow;m
+/details/dt;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -416,7 +413,10 @@
   <dt>cc</dt>
 </details>
 #errors
-/details/dt;element not allowed;m
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
+/details/dt;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -426,15 +426,19 @@
   <dd>dd</dd>
 </details>
 #errors
-/details/dt;element not allowed;m
-/details/dd;element not allowed;m
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
   <dt>aa</dt>
 </details>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -442,7 +446,8 @@
   <h1>bb</h1>
 </details>
 #errors
-/details/h1;element not allowed;m
+/details;child element missing;summary;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -450,7 +455,8 @@
   <dd>aa</dd>
 </details>
 #errors
-/details/"xxx";character not allowed;m
+/details;child element missing;summary;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -459,7 +465,9 @@
   <dd>bb</dd>
 </details>
 #errors
-/details/h1;element not allowed;m
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -468,7 +476,9 @@
   <dd>bb</dd>
 </details>
 #errors
-/details/h1;element not allowed;m
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -481,6 +491,12 @@
   </dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
+/details/dd/details;child element missing;summary;m
+/details/dd/details/dt;element not allowed:flow;m
+/details/dd/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -488,6 +504,9 @@
   <dd><p>bb</p></dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -495,6 +514,9 @@
   <dd>bb</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 /details/dt/p;element not allowed:phrasing;m
 
 #data
@@ -503,6 +525,9 @@
   <dd>bb</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 /details/dt;no significant content;s
 
 #data
@@ -511,6 +536,9 @@
   <dd></dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 /details/dd;no significant content;s
 
 #data
@@ -519,6 +547,9 @@
   <dd>bb</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -526,6 +557,9 @@
   <dd><dl><dt>bb</dt><dd>cc</dd></dl></dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -533,6 +567,9 @@
   <dd><dl><dt><p>bb</p></dt><dd>cc</dd></dl></dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 /details/dd/dl/dt/p;element not allowed:phrasing;m
 
 #data
@@ -541,6 +578,9 @@
   <dd><dl><dt>bb</dt><dd><p>cc</p></dd></dl></dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -548,6 +588,9 @@
   <dd>aa</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 /details/dt/dl;element not allowed:phrasing;m
 
 #data
@@ -556,6 +599,9 @@
   <dd>aa</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 /details/dt/dl;element not allowed:phrasing;m
 
 #data
@@ -564,6 +610,9 @@
   <dd>aa</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 /details/dt/dl;element not allowed:phrasing;m
 /details/dt/dl/dt/p;element not allowed:phrasing;m
 
@@ -573,6 +622,11 @@
   <dd><figure><dt>bb</dt><dd>cc</dd></figure></dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
+/details/dd/figure/dt;element not allowed:figure;m
+/details/dd/figure/dd;element not allowed:figure;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -580,7 +634,88 @@
   <dd>aa</dd>
 </details>
 #errors
+/details;child element missing;summary;m
+/details/dt;element not allowed:flow;m
+/details/dd;element not allowed:flow;m
 /details/dt/figure;element not allowed:phrasing;m
+/details/dt/figure/dt;element not allowed:figure;m
+/details/dt/figure/dd;element not allowed:figure;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <summary>aa</summary>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <summary>aa</summary>
+  abc
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <summary>aa</summary>
+  <span>bb</span>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <summary>aa</summary>
+  <p>aa</p>
+  <span>bb</span>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <summary>aa</summary>
+   aa <!----> bb
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <summary>aa</summary>
+  <p>a</p><b>a</b>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <p>abc</p>
+  <summary>aa</summary>
+</details>
+#errors
+/details/summary;element not allowed:details summary;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  abc
+  <summary>aa</summary>
+</details>
+#errors
+/details/summary;element not allowed:details summary;m
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <summary>aa</summary>
+  <details>
+    <summary>ah</summary>
+  </details>
+</details>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+  <summary>aa</summary>
+  <p>aa</p>
+  <summary>ss</summary>
+</details>
+#errors
+/details/summary;element not allowed:details summary;m
 
 #data
 <summary xmlns="http://www.w3.org/1999/xhtml"></summary>
@@ -801,9 +936,8 @@
 #errors
 /bb;element not defined;m
 /bb/details;element not allowed:minus;m
-/bb/details;child element missing;dd;m
-/bb/details/legend;element not allowed;m
-/bb/details/"a";character not allowed;m
+/bb/details;child element missing;summary;m
+/bb/details/legend;element not allowed:flow;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -897,28 +1031,33 @@
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 
 #data
 <details open="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 
 #data
 <details open="open" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 
 #data
 <details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 
 #data
 <details open="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /details/@open;boolean:invalid;m
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1103,8 +1242,9 @@
 </datagrid>
 #errors
 /datagrid;no significant content;s
-/datagrid/details;child element missing;dd;m
-/datagrid/details/legend;element not allowed;m
+/datagrid/details;child element missing;summary;m
+/datagrid/details;no significant content;s
+/datagrid/details/legend;element not allowed:flow;m
 /datagrid/details/legend;no significant content;s
 /datagrid;element not defined;m
 
@@ -1116,9 +1256,10 @@
 </a>
 #errors
 /a;no significant content;s
-/a/details;child element missing;dd;m
+/a/details;child element missing;summary;m
+/a/details;no significant content;s
 /a/details/legend;no significant content;s
-/a/details/legend;element not allowed;m
+/a/details/legend;element not allowed:flow;m
 /a/details;element not allowed:minus;m
 
 #data
@@ -1130,9 +1271,10 @@
 #errors
 /a;no significant content;s
 /a/span;no significant content;s
-/a/span/details;child element missing;dd;m
+/a/span/details;child element missing;summary;m
+/a/span/details;no significant content;s
 /a/span/details;element not allowed:minus;m
-/a/span/details/legend;element not allowed;m
+/a/span/details/legend;element not allowed:flow;m
 /a/span/details/legend;no significant content;s
 
 #data

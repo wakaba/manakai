@@ -349,9 +349,8 @@ x</div>
 </a>
 #errors
 /a/details;element not allowed:minus;m
-/a/details;child element missing;dd;m
-/a/details/legend;element not allowed;m
-/a/details/"x";character not allowed;m
+/a/details;child element missing;summary;m
+/a/details/legend;element not allowed:flow;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -359,9 +358,8 @@ x</div>
 </a>
 #errors
 /a/span/details;element not allowed:minus;m
-/a/span/details;child element missing;dd;m
-/a/span/details/legend;element not allowed;m
-/a/span/details/"x";character not allowed;m
+/a/span/details;child element missing;summary;m
+/a/span/details/legend;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -370,12 +368,10 @@ x</div>
 </div>
 #errors
 /div/a/details;element not allowed:minus;m
-/div/a/details;child element missing;dd;m
-/div/a/details/legend;element not allowed;m
-/div/a/details/"x";character not allowed;m
-/div/details;child element missing;dd;m
-/div/details/legend;element not allowed;m
-/div/details/"y";character not allowed;m
+/div/a/details;child element missing;summary;m
+/div/a/details/legend;element not allowed:flow;m
+/div/details;child element missing;summary;m
+/div/details/legend;element not allowed:flow;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -529,20 +525,21 @@ x</div>
 <p><a/></p>
 </details>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 /details/legend;no significant content;s
-/details/legend;element not allowed;m
+/details/legend;element not allowed:flow;m
 /details/p;no significant content;s
-/details/p;element not allowed;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <legend><a/></legend>
 </details>
 #errors
-/details;child element missing;dd;m
+/details;child element missing;summary;m
+/details;no significant content;s
 /details/legend;no significant content;s
-/details/legend;element not allowed;m
+/details/legend;element not allowed:flow;m
 
 #data
 <a href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>

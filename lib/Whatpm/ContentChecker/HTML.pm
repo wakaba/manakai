@@ -6346,7 +6346,7 @@ $Element->{$HTML_NS}->{fieldset} = {
     } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'legend') {
       if ($element_state->{has_non_legend}) {
         $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:details legend',
+                           type => 'element not allowed:fieldset legend', # XXXdocumentation
                            level => $self->{level}->{must});
       }
       $element_state->{has_legend} = 1;
@@ -6358,23 +6358,21 @@ $Element->{$HTML_NS}->{fieldset} = {
       ## |<fieldset><object><legend>xx</legend></object>..</fieldset>|
       ## should raise an error.
     }
-  },
+  }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       $element_state->{has_non_legend} = 1;
     }
-  },
+  }, # check_child_text
   check_end => sub {
     my ($self, $item, $element_state) = @_;
 
     ## ISSUE: |<fieldset><legend>aa</legend></fieldset>| error?
 
     $HTMLFlowContentChecker{check_end}->(@_);
-  },
-  ## NOTE: This definition is partially reused by |details| element's
-  ## checker.
-};
+  }, # check_end
+}; # fieldset
 
 $Element->{$HTML_NS}->{legend} = {
   %HTMLPhrasingContentChecker,
@@ -6456,8 +6454,6 @@ $Element->{$HTML_NS}->{label} = {
     $self->{flag}->{label_for} = $element_state->{label_for_original};
 
     ## TODO: Warn if no labelable descendant?  <input type=hidden>?
-
-    ## NOTE: |<label for=a><input id=a></label>| is non-conforming.
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
   },
@@ -7825,8 +7821,7 @@ $Element->{$HTML_NS}->{isindex} = {
 # ---- Interactive elements ----
 
 $Element->{$HTML_NS}->{details} = {
-  ## Content: dt?, dd
-  %HTMLChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
     open => $GetHTMLBooleanAttrChecker->('open'),
@@ -7834,14 +7829,7 @@ $Element->{$HTML_NS}->{details} = {
     %HTMLAttrStatus,
     open => FEATURE_HTML5_LC,
   }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $element_state->{phase} = 'before dt';
-
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
+  ## NOTE: summary, Flow
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -7850,49 +7838,46 @@ $Element->{$HTML_NS}->{details} = {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
+      $element_state->{has_non_summary} = 1;
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($element_state->{phase} eq 'before dt') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
-        $element_state->{phase} = 'before dd';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
-        $element_state->{phase} = 'after dd';
-      } else {
-        $self->{onerror}->(node => $child_el, type => 'element not allowed',
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'summary') {
+      if ($element_state->{has_non_summary}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:details summary', ## XXXdocumentation
                            level => $self->{level}->{must});
       }
-    } elsif ($element_state->{phase} eq 'before dd') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
-        $element_state->{phase} = 'after dd';
-      } else {
-        $self->{onerror}->(node => $child_el, type => 'element not allowed',
-                           level => $self->{level}->{must});
-      }
-    } elsif ($element_state->{phase} eq 'after dd') {
-      $self->{onerror}->(node => $child_el, type => 'element not allowed',
-                         level => $self->{level}->{must});
+      $element_state->{has_summary} = 1;
+      $element_state->{has_non_summary} = 1;
     } else {
-      die "check_child_element: Bad |details| phase: $element_state->{phase}";
+      $HTMLFlowContentChecker{check_child_element}->(@_);
+      $element_state->{has_non_summary} = 1 unless $child_is_transparent;
+      ## TODO:
+      ## |<details><object><summary>xx</summary></object>..</details>|
+      ## should raise an error.
     }
-  },
+  }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
-      $self->{onerror}->(node => $child_node, type => 'character not allowed',
-                         level => $self->{level}->{must});
+      $element_state->{has_non_summary} = 1;
     }
-  },
+  }, # check_child_text
   check_end => sub {
     my ($self, $item, $element_state) = @_;
 
-    if ($element_state->{phase} ne 'after dd') {
+    unless ($element_state->{has_summary}) {
       $self->{onerror}->(node => $item->{node},
-                         type => 'child element missing', text => 'dd',
+                         type => 'child element missing',
+                         text => 'summary',
                          level => $self->{level}->{must});
     }
 
-    $HTMLChecker{check_end}->(@_);
-  },
+    ## XXX |<details><summary>aaa</summary></details> should not raise
+    ## a "no significant content" warnings.
+
+    $HTMLFlowContentChecker{check_end}->(@_);
+  }, # check_end
 }; # details
 
 $Element->{$HTML_NS}->{summary} = {
@@ -8262,7 +8247,6 @@ $Element->{$HTML_NS}->{frameset} = {
 ## XXX XHTML2 nl (Common)
 ## XXX XHTML2 handler (Common, type)
 ## XXX XHTML2 standby (Common)
-## XXX XHTML2 summary (Common)
 ## XXX Access & XHTML2: access (LC)
 ## XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart
 ## XXX nobr/wbr FEATURE_HTML5_OBSOLETE
