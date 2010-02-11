@@ -2689,18 +2689,24 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <embed src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed/@type;IMT:syntax error;m
+/embed/@type;IMT:no type;m
 
 #data
 <embed src="http://test/" type="text"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed/@type;IMT:syntax error;m
+/embed/@type;IMT:no /;m
 
 #data
 <embed src="http://test/" type="text/plain"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<embed src="http://test/" type="text/plain; a=b"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/embed/@type;IMT:parameter not allowed;m
 
 #data
 <embed src="http://test/" id=""

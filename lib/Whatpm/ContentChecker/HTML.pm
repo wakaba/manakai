@@ -5033,7 +5033,7 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $HTMLURIAttrChecker;
           $has_src = 1;
         } elsif ($attr_ln eq 'type') {
-          $checker = $HTMLIMTAttrChecker;
+          $checker = $MIMETypeChecker;
         } elsif ($attr_ln eq 'width' or $attr_ln eq 'height') {
           $checker = $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 });
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and

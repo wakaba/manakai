@@ -54,14 +54,14 @@ sub parse_web_mime_type ($$;$$) {
   if ($value =~ /\G($HTTPToken)/ogc) {
     $type = $1;
   } else {
-    $onerror->(type => 'MIME:no type', # XXXdocumentation
+    $onerror->(type => 'IMT:no type', # XXXdocumentation
                level => $levels->{http_fact},
                index => pos $value);
     return undef;
   }
 
   unless ($value =~ m[\G/]gc) {
-    $onerror->(type => 'MIME:no /', # XXXdocumentation
+    $onerror->(type => 'IMT:no /', # XXXdocumentation
                level => $levels->{http_fact},
                index => pos $value);
     return undef;
@@ -71,7 +71,7 @@ sub parse_web_mime_type ($$;$$) {
   if ($value =~ /\G($HTTPToken)/ogc) {
     $subtype = $1;
   } else {
-    $onerror->(type => 'MIME:no subtype', # XXXdocumentation
+    $onerror->(type => 'IMT:no subtype', # XXXdocumentation
                level => $levels->{http_fact},
                index => pos $value); 
     return undef;
