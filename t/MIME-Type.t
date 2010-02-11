@@ -110,7 +110,23 @@ sub _param : Test(6) {
   is $mt->param ('CHARSET'), 'iso-2022-JP';
 } # _param
 
-# ------ Serialization ------
+## ------ Properties ------
+
+sub _is_styling_lang : Test(6) {
+  for (
+      ['text', 'plain', 0],
+      ['text', 'html', 0],
+      ['text', 'css', 1],
+      ['text', 'xsl', 1],
+      ['text', 'xslt', 0],
+      ['application', 'xslt+xml', 1],
+  ) {
+    my $mt = Message::MIME::Type->new_from_type_and_subtype ($_->[0], $_->[1]);
+    is !!$mt->is_styling_lang, !!$_->[2];
+  }
+} # _is_styling_lang
+
+## ------ Serialization ------
 
 sub _as_valid_1 : Test(2) {
   my $mt = Message::MIME::Type->new_from_type_and_subtype ('text', 'css');
@@ -272,7 +288,7 @@ sub _as_valid_param_14 : Test(2) {
 
 ## ------ Conformance ------
 
-sub _validate : Test(63) {
+sub _validate : Test(3) {
   require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
   
   execute_test (file (__FILE__)->dir->subdir ('mime')->file ('type-conformance.dat'), {

@@ -10,6 +10,8 @@ my $application_xml_charset = { ## TODO: ...
   registered => 1,
 };
 
+## ------ |application| Media Types ------
+
 $Type->{application}->{registered} = 1;
 
 $Type->{application}->{subtype}->{'atom+xml'} = { ## NOTE: RFC 4287
@@ -42,6 +44,12 @@ $Type->{application}->{subtype}->{xml} = { ## TODO: check IANAREG
   registered => 1,
 };
 
+$Type->{application}->{subtype}->{'xslt+xml'} = {
+  is_styling_lang => 1,
+};
+
+## ------ |audio| Media Types ------
+
 $Type->{audio}->{registered} = 1;
 
 $Type->{audio}->{subtype}->{basic} = { ## TODO: check IANAREG
@@ -72,6 +80,8 @@ $Type->{model}->{registered} = 1;
 
 $Type->{multipart}->{registered} = 1;
 
+## ------ |text| Media Types ------
+
 $Type->{text}->{registered} = 1;
 
 $Type->{text}->{subtype}->{plain} = {
@@ -95,6 +105,7 @@ $Type->{text}->{subtype}->{css} = { # RFC 2318
     charset => {registered => 1}, ## TODO: US-ASCII, iso-8859-X, utf-8 are recommended ## TODO: Any charset that is a superset of US-ASCII may be used ## NOTE: Syntax and range are not defined.
   },
   registered => 1,
+  is_styling_lang => 1,
 };
 $Type->{text}->{subtype}->{javascript} = { # RFC 4329
   parameter => {
@@ -119,6 +130,13 @@ $Type->{text}->{subtype}->{ecmascript} = { # RFC 4329
   },
   registered => 1,
 };
+
+$Type->{text}->{subtype}->{xsl} = {
+  is_styling_lang => 1,
+};
+
+## ------ |audio| Media Types ------
+
 $Type->{audio}->{subtype}->{mpeg} = { # RFC 3003
   registered => 1,
 };

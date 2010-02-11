@@ -177,6 +177,31 @@ sub attrs ($) {
   return [sort {$a cmp $b} keys %{$self->{params}}];
 } # attrs
 
+## ------ Type properties ------
+
+sub _type_def ($) {
+  my $self = shift;
+  return $self->{_type_def} ||= do {
+    require Message::MIME::Type::Definitions;
+    $Message::MIME::Type::Definitions::Type->{$self->type};
+  }; # or undef
+} # _type_def
+
+sub _subtype_def ($) {
+  my $self = shift;
+  return $self->{_subtype_def}
+      ||= $self->_type_def->{subtype}->{$self->subtype}; # or undef
+} # _subtype_def
+
+## Whether the media type is a "styling language" or not.  The Web
+## Applications 1.0 specification does not define exactly what is a
+## "styling langauge" except that the spec implies at least |text/css|
+## is a styling language.
+sub is_styling_lang ($) {
+  my $self = shift;
+  return (($self->_subtype_def or {})->{is_styling_lang});
+} # is_styling_lang
+
 ## ------ Serialization ------
 
 my $non_token = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
@@ -246,8 +271,7 @@ sub validate ($$) {
                value => $subtype);
   }
 
-  require Message::MIME::Type::Definitions;
-  my $type_def = $Message::MIME::Type::Definitions::Type->{$type};
+  my $type_def = $self->_type_def;
   my $has_param;
 
   if ($type =~ /^x-/) {

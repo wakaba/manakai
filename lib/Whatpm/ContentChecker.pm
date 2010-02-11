@@ -335,7 +335,7 @@ our $IsInHTMLInteractiveContent = sub {
   ## interactive content.
 
   if ($nsuri eq $HTML_NS and $ln eq 'input') {
-    my $value = $el->get_attribute_ns (undef, 'type');
+    my $value = $el->get_attribute_ns (undef, 'type') || '';
     $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     return ($value ne 'hidden');
   } elsif ($nsuri eq $HTML_NS and ($ln eq 'img' or $ln eq 'object')) {
@@ -343,7 +343,7 @@ our $IsInHTMLInteractiveContent = sub {
   } elsif ($nsuri eq $HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
     return $el->has_attribute_ns (undef, 'controls');
   } elsif ($nsuri eq $HTML_NS and $ln eq 'menu') {
-    my $value = $el->get_attribute_ns (undef, 'type');
+    my $value = $el->get_attribute_ns (undef, 'type') || '';
     $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     return ($value eq 'toolbar');
   } else {
@@ -928,6 +928,7 @@ sub _remove_plus_elements ($$) {
 sub _attr_status_info ($$$) {
   my ($self, $attr, $status_code) = @_;
 
+  $status_code ||= 0;
   if (not ($status_code & FEATURE_ALLOWED)) {
     $self->{onerror}->(node => $attr,
                        type => 'attribute not defined',

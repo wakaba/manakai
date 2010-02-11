@@ -797,6 +797,8 @@ my $MIMETypeChecker = sub {
   if ($type) {
     $type->validate ($onerror);
   }
+
+  return $type; # or undef
 }; # $MIMETypeChecker
 
 my $HTMLLanguageTagAttrChecker = sub {
@@ -1867,6 +1869,7 @@ our $ElementDefault;
 # ---- Default HTML elements ----
 
 $Element->{$HTML_NS}->{''} = {
+  status => 0,
   %HTMLChecker,
 };
 
@@ -2562,7 +2565,24 @@ $Element->{$HTML_NS}->{style} = {
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLChecker,
   check_attrs => $GetHTMLAttrsChecker->({
-    type => $HTMLIMTAttrChecker, ## TODO: MUST be a styling language
+    type => sub {
+      my ($self, $attr) = @_;
+
+      my $type = $MIMETypeChecker->(@_);
+      if ($type) {
+        unless ($type->is_styling_lang) {
+          $self->{onerror}->(node => $attr,
+                             type => 'IMT:not styling lang', # XXXdocumentation
+                             level => $self->{level}->{must});
+        }
+
+        if (defined $type->param ('charset')) {
+          $self->{onerror}->(node => $attr,
+                             type => 'IMT:param not allowed', # XXXdocumentation
+                             level => $self->{level}->{must});
+        }
+      }
+    },
     media => $HTMLMQAttrChecker,
     scoped => $GetHTMLBooleanAttrChecker->('scoped'),
     ## NOTE: |title| has special semantics for |style|s, but is syntactically

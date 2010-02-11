@@ -2303,12 +2303,17 @@ p {color: green}
 #data
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style/@type;IMT:syntax error;m
+/style/@type;MIME:no type;m
 
 #data
 <style type="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style/@type;IMT:syntax error;m
+/style/@type;MIME:no /;m
+
+#data
+<style type="text/CSS; unknown=2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/style/@type;IMT:parameter not allowed;m
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2327,10 +2332,23 @@ p {color: green}
 
 #data
 <style type="text/css; charset=us-ascii" xmlns="http://www.w3.org/1999/xhtml">
-  <!-- NOTE: |charset| parameter here is meaningless (or harmful?),
-       but syntactically correct. -->
 </style>
 #errors
+/style/@type;IMT:param not allowed;m
+
+#data
+<style type="text/xsl" xmlns="http://www.w3.org/1999/xhtml">
+</style>
+#errors
+/style/@type;IMT:unregistered subtype;m
+/style;SUBDOC
+
+#data
+<style type="text/plain" xmlns="http://www.w3.org/1999/xhtml">
+</style>
+#errors
+/style/@type;IMT:not styling lang;m
+/style;SUBDOC
 
 #data
 <style media="all" xmlns="http://www.w3.org/1999/xhtml"/>
