@@ -4796,6 +4796,11 @@ $Element->{$HTML_NS}->{figure} = {
   },
 }; # figure
 
+$Element->{$HTML_NS}->{figcaption} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_DEFAULT,
+}; # figcaption
+
 my $AttrCheckerNotImplemented = sub {
   my ($self, $attr) = @_;
   $self->{onerror}->(node => $attr,
@@ -7866,6 +7871,11 @@ $Element->{$HTML_NS}->{details} = {
     $HTMLChecker{check_end}->(@_);
   },
 }; # details
+
+$Element->{$HTML_NS}->{summary} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_DEFAULT,
+}; # summary
 
 $Element->{$HTML_NS}->{datagrid} = {
   %HTMLFlowContentChecker,

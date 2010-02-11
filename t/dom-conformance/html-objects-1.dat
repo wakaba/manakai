@@ -685,6 +685,48 @@
 #errors
 
 #data
+<figcaption xmlns="http://www.w3.org/1999/xhtml"></figcaption>
+#errors
+/figcaption;no significant content;s
+
+#data
+<figcaption xmlns="http://www.w3.org/1999/xhtml">  </figcaption>
+#errors
+/figcaption;no significant content;s
+
+#data
+<figcaption xmlns="http://www.w3.org/1999/xhtml">abc</figcaption>
+#errors
+
+#data
+<figcaption xmlns="http://www.w3.org/1999/xhtml">xyz<span>a</span></figcaption>
+#errors
+
+#data
+<figcaption xmlns="http://www.w3.org/1999/xhtml"><img src="a" alt="b"/></figcaption>
+#errors
+
+#data
+<figcaption xmlns="http://www.w3.org/1999/xhtml"><p>aa</p></figcaption>
+#errors
+/figcaption/p;element not allowed:phrasing;m
+
+#data
+<figcaption xmlns="http://www.w3.org/1999/xhtml"><li>aa</li></figcaption>
+#errors
+/figcaption/li;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><figcaption>aa</figcaption></p>
+#errors
+/p/figcaption;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><figcaption>aa</figcaption></div>
+#errors
+/div/figcaption;element not allowed:flow;m
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml" data=""></object>
 #errors
 /object;no significant content;s

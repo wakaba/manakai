@@ -583,6 +583,38 @@
 /details/dt/figure;element not allowed:phrasing;m
 
 #data
+<summary xmlns="http://www.w3.org/1999/xhtml"></summary>
+#errors
+/summary;no significant content;s
+
+#data
+<summary xmlns="http://www.w3.org/1999/xhtml">  </summary>
+#errors
+/summary;no significant content;s
+
+#data
+<summary xmlns="http://www.w3.org/1999/xhtml">abc</summary>
+#errors
+
+#data
+<summary xmlns="http://www.w3.org/1999/xhtml">xyz<span>a</span></summary>
+#errors
+
+#data
+<summary xmlns="http://www.w3.org/1999/xhtml"><img src="a" alt="b"/></summary>
+#errors
+
+#data
+<summary xmlns="http://www.w3.org/1999/xhtml"><p>aa</p></summary>
+#errors
+/summary/p;element not allowed:phrasing;m
+
+#data
+<summary xmlns="http://www.w3.org/1999/xhtml"><li>aa</li></summary>
+#errors
+/summary/li;element not allowed:phrasing;m
+
+#data
 <bb xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
 /bb;no significant content;s
