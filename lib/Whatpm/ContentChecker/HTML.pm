@@ -880,7 +880,7 @@ my $AcceptAttrChecker = sub {
   $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive
 
   ## A set of comma-separated tokens.
-  my @value = length $value ? split /,/, $value, -1 : ('');
+  my @value = length $value ? split /,/, $value, -1 : ();
 
   my %has_value;
   for my $v (@value) {
@@ -898,22 +898,26 @@ my $AcceptAttrChecker = sub {
     
     if ($v eq 'audio/*' or $v eq 'video/*' or $v eq 'image/*') {
       #
-    } elsif ($v =~ m[\A$IMTNoParameter\z]) {
-      ## ISSUE: HTML5 references RFC 2046, but maybe HTML5 should
-      ## define its own syntax citing RFC 4288.
-      
-      ## NOTE: Parameters not allowed.
-      require Whatpm::IMTChecker;
-      my $ic = Whatpm::IMTChecker->new;
-      $ic->{level} = $self->{level};
-      $ic->check_imt (sub {
-        $self->{onerror}->(@_, node => $attr);
-      }, $1, $2);
     } else {
-      $self->{onerror}->(node => $attr,
-                         type => 'IMTnp:syntax error', ## TODOC: type
-                         value => $v,
-                         level => $self->{level}->{must});
+      require Message::MIME::Type;
+      my $onerror = sub {
+        $self->{onerror}->(value => $v, @_, node => $attr);
+      };
+      
+      ## Syntax-level validation
+      my $type = Message::MIME::Type->parse_web_mime_type
+          ($v, $onerror, $self->{level});
+
+      if ($type) {
+        if (@{$type->attrs}) {
+          $self->{onerror}->(node => $attr,
+                             type => 'IMT:no param allowed',
+                             level => $self->{level}->{must});
+        }
+        
+        ## Vocabulary-level validation
+        $type->validate ($onerror, no_required_param => 1);
+      }
     }
   }
 }; # $AcceptAttrChecker

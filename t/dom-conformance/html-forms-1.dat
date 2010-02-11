@@ -980,7 +980,14 @@ disabled="">z</output>
     action=""
     accept="">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action=""
+    accept=" ">x</form>
+#errors
+/form/@accept;IMT:no type;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -988,7 +995,7 @@ disabled="">z</output>
     action=""
     accept=",">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:no type;m
 /form/@accept;duplicate token;m
 /form/@accept;attribute not defined;m
 
@@ -1018,7 +1025,7 @@ disabled="">z</output>
     action=""
     accept="text/plain,">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:no type;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1033,7 +1040,7 @@ disabled="">z</output>
     action=""
     accept=",image/png">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:no type;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1041,7 +1048,7 @@ disabled="">z</output>
     action=""
     accept="image/png,,image/jpeg">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:no type;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1077,7 +1084,7 @@ disabled="">z</output>
     action=""
     accept="text/*">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:subtype syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1086,14 +1093,14 @@ disabled="">z</output>
     accept="multipart/*">x</form>
 #errors
 /form/@accept;attribute not defined;m
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:subtype syntax error;m
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"
     action=""
     accept="model/*">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:subtype syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1101,7 +1108,7 @@ disabled="">z</output>
     action=""
     accept="application/*">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:subtype syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1109,7 +1116,7 @@ disabled="">z</output>
     action=""
     accept="message/*">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:subtype syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1117,7 +1124,8 @@ disabled="">z</output>
     action=""
     accept="font/*">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:subtype syntax error;m
+/form/@accept;IMT:unregistered type;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1125,7 +1133,8 @@ disabled="">z</output>
     action=""
     accept="*/*">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:type syntax error;m
+/form/@accept;IMT:subtype syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1133,7 +1142,8 @@ disabled="">z</output>
     action=""
     accept="*/*+xml">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:type syntax error;m
+/form/@accept;IMT:subtype syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1141,7 +1151,7 @@ disabled="">z</output>
     action=""
     accept="*/xml">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:type syntax error;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1157,7 +1167,7 @@ disabled="">z</output>
     accept="image/ png,video/*">x</form>
 #errors
 /form/@accept;attribute not defined;m
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:no subtype;m
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"
@@ -1238,7 +1248,8 @@ disabled="">z</output>
     action=""
     accept="text/javascript; version=1.1">x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;IMT:no param allowed;m
+/form/@accept;IMT:parameter not allowed;m
 /form/@accept;attribute not defined;m
 
 #data
@@ -1246,9 +1257,9 @@ disabled="">z</output>
     action=""
     accept='text/plain;x-param="image/png,image/jpeg,image/svg+xml"'>x</form>
 #errors
-/form/@accept;IMTnp:syntax error;m
 /form/@accept;attribute not defined;m
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;params:no value;m
+/form/@accept;params:garbage;m
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"
@@ -1256,8 +1267,8 @@ disabled="">z</output>
     accept='text/plain;x-param="image/png,image/JPEG,image/svg+xml",image/jpeg'>x</form>
 #errors
 /form/@accept;attribute not defined;m
-/form/@accept;IMTnp:syntax error;m
-/form/@accept;IMTnp:syntax error;m
+/form/@accept;params:no value;m
+/form/@accept;params:garbage;m
 /form/@accept;duplicate token;m
 
 #data

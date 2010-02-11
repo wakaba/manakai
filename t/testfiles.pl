@@ -38,7 +38,7 @@ sub execute_test ($$$) {
         $v =~ s/\x0A\| /\x0A/g;
       }
       if ($field_props->{$field_name}->{is_list}) {
-        my @v = split /\x0A/, $v;
+        my @v = split /\x0A/, $v, -1;
         my $field_escaped = (@field_opt and $field_opt[-1] eq 'escaped');
         if ($field_escaped) {
           pop @field_opt;

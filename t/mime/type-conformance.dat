@@ -10,7 +10,6 @@ plain
 /value/
 #errors
 IMT:type syntax error;?text;m
-IMT:unregistered type;?text;m
 IMT:subtype syntax error;<plain>;m
 
 #data
@@ -18,4 +17,47 @@ texT
 %plaIn%
 #errors
 IMT:subtype syntax error;%plain%;m
-IMT:unknown subtype;text/%plain%;u
+
+#data
+text
+plain
+<unknown>
+value
+#errors
+IMT:attribute syntax error;<unknown>;m
+
+#data
+text
+plain
+charset
+us-ascii
+#errors
+
+#data
+text
+plain
+abc
+def
+#errors
+IMT:parameter not allowed;abc;m
+
+#data
+multipart
+mixed
+#errors
+IMT:parameter missing;multipart/mixed;m
+
+#data
+multipart
+mixed
+boundary
+abc
+#errors
+
+#data
+| multipart
+| mixed
+| boundary
+| 
+#errors
+boundary:syntax error;;m

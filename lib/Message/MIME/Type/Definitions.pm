@@ -196,6 +196,9 @@ $Type->{application}->{subtype}->{ecmascript} = { # RFC 4329
   },
   registered => 1,
 };
+
+## ------ |multipart| Media Types ------
+
 $Type->{multipart}->{parameter}->{boundary} = {
   checker => sub {
     my ($self, $value, $onerror) = @_;
@@ -208,6 +211,13 @@ $Type->{multipart}->{parameter}->{boundary} = {
   required => 1,
   registered => 1,
 };
+
+$Type->{multipart}->{subtype}->{mixed} = {
+  registered => 1,
+}; # multipart/mixed
+
+## ------ |message| Media Types ------
+
 $Type->{message}->{subtype}->{partial} = {
   parameter => {
     id => {required => 1, registered => 1}, # RFC 2046

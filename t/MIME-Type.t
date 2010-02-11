@@ -288,7 +288,7 @@ sub _as_valid_param_14 : Test(2) {
 
 ## ------ Conformance ------
 
-sub _validate : Test(3) {
+sub _validate : Test(9) {
   require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
   
   execute_test (file (__FILE__)->dir->subdir ('mime')->file ('type-conformance.dat'), {

@@ -246,8 +246,8 @@ sub as_valid_mime_type ($) {
 
 ## ------ Conformance checking ------
 
-sub validate ($$) {
-  my ($self, $onerror) = @_;
+sub validate ($$;%) {
+  my ($self, $onerror, %args) = @_;
 
   ## NOTE: Attribute duplication are not error, though its semantics
   ## is not defined.  See
@@ -260,15 +260,19 @@ sub validate ($$) {
 
   ## NOTE: RFC 2045 (MIME), RFC 2616 (HTTP/1.1), and RFC 4288 (IMT
   ## registration) have different requirements on type and subtype names.
+  my $type_syntax_error;
+  my $subtype_syntax_error;
   if ($type !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
     $onerror->(type => 'IMT:type syntax error',
                level => $self->{level}->{must}, # RFC 4288 4.2.
                value => $type);
+    $type_syntax_error = 1;
   }
   if ($subtype !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
     $onerror->(type => 'IMT:subtype syntax error',
                level => $self->{level}->{must}, # RFC 4288 4.2.
                value => $subtype);
+    $subtype_syntax_error = 1;
   }
 
   my $type_def = $self->_type_def;
@@ -290,7 +294,8 @@ sub validate ($$) {
     ## use of unregistered value).
     $onerror->(type => 'IMT:unregistered type',
                level => $self->{level}->{mime_must},
-               value => $type);
+               value => $type)
+        unless $type_syntax_error;
   }
 
   if ($type_def) {
@@ -329,10 +334,12 @@ sub validate ($$) {
       for my $attr (@{$self->attrs}) {
         my $value = $self->param ($attr);
 
+        my $attr_syntax_error;
         if ($attr !~ /\A[A-Za-z0-9!#\$&.+^_-]{1,127}\z/) {
           $onerror->(type => 'IMT:attribute syntax error',
                      level => $self->{level}->{mime_fact}, # RFC 4288 4.3.
                      value => $attr);
+          $attr_syntax_error = 1;
         }
 
         $has_param->{$attr} = 1;
@@ -373,7 +380,9 @@ sub validate ($$) {
             ## without using any explicit statement on that fact.
           }
         }
-        if (not $param_def or not $param_def->{registered}) {
+        if ($attr_syntax_error) {
+          #
+        } elsif (not $param_def or not $param_def->{registered}) {
           if ($subtype =~ /\./ or $subtype =~ /^x-/ or $type =~ /^x-/) {
             ## NOTE: The parameter names "SHOULD" be fully specified
             ## for personal or vendor tree subtype [RFC 4288].
@@ -393,13 +402,15 @@ sub validate ($$) {
         }
       }
 
-      for (keys %{$subtype_def->{parameter} or {}}) {
-        if ($subtype_def->{parameter}->{$_}->{required} and
-            not $has_param->{$_}) {
-          $onerror->(type => 'IMT:parameter missing',
-                     level => $self->{level}->{mime_fact},
-                     text => $_,
-                     value => $type . '/' . $subtype);
+      unless ($args{no_required_param}) {
+        for (keys %{$subtype_def->{parameter} or {}}) {
+          if ($subtype_def->{parameter}->{$_}->{required} and
+              not $has_param->{$_}) {
+            $onerror->(type => 'IMT:parameter missing',
+                       level => $self->{level}->{mime_fact},
+                       text => $_,
+                       value => $type . '/' . $subtype);
+          }
         }
       }
     } else {
@@ -409,16 +420,19 @@ sub validate ($$) {
       ## "uncertain" status.
       $onerror->(type => 'IMT:unknown subtype',
                  level => $self->{level}->{uncertain},
-                 value => $type . '/' . $subtype);
+                 value => $type . '/' . $subtype)
+          unless $subtype_syntax_error;
     }
 
-    for (keys %{$type_def->{parameter} or {}}) {
-      if ($type_def->{parameter}->{$_}->{required} and
-          not $has_param->{$_}) {
-        $onerror->(type => 'IMT:parameter missing',
-                   level => $self->{level}->{mime_fact},
-                   text => $_,
-                   value => $type . '/' . $subtype);
+    unless ($args{no_required_param}) {
+      for (keys %{$type_def->{parameter} or {}}) {
+        if ($type_def->{parameter}->{$_}->{required} and
+            not $has_param->{$_}) {
+          $onerror->(type => 'IMT:parameter missing',
+                     level => $self->{level}->{mime_fact},
+                     text => $_,
+                     value => $type . '/' . $subtype);
+        }
       }
     }
   }

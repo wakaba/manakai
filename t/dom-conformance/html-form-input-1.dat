@@ -3278,21 +3278,20 @@
     type="file"
     accept=""/>
 #errors
-/input/@accept;IMTnp:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="  "/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:no type;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept=","/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:no type;m
 /input/@accept;duplicate token;m
 
 #data
@@ -3300,7 +3299,7 @@
     type="file"
     accept="  , "/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:no type;m
 /input/@accept;duplicate token;m
 
 #data
@@ -3326,7 +3325,7 @@
     type="file"
     accept="text/plain,"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:no type;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3339,14 +3338,14 @@
     type="file"
     accept=",image/png"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:no type;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="image/png,,image/jpeg"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:no type;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3377,63 +3376,66 @@
     type="file"
     accept="text/*"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:subtype syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="multipart/*"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:subtype syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="model/*"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:subtype syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="application/*"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:subtype syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="message/*"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:subtype syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="font/*"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:subtype syntax error;m
+/input/@accept;IMT:unregistered type;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="*/*"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:type syntax error;m
+/input/@accept;IMT:subtype syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="*/*+xml"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:type syntax error;m
+/input/@accept;IMT:subtype syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept="*/xml"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:type syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3488,7 +3490,7 @@
     type="file"
     accept="application/XML, ,image/png"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:no type;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3523,24 +3525,42 @@
     type="file"
     accept="text/javascript; version=1.1"/>
 #errors
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;IMT:no param allowed;m
+/input/@accept;IMT:parameter not allowed;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept='text/plain;x-param="image/png,image/jpeg,image/svg+xml"'/>
 #errors
-/input/@accept;IMTnp:syntax error;m
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;params:no value;m
+/input/@accept;params:garbage;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="file"
     accept='text/plain;x-param="image/png,image/JPEG,image/svg+xml",image/jpeg'/>
 #errors
-/input/@accept;IMTnp:syntax error;m
-/input/@accept;IMTnp:syntax error;m
+/input/@accept;params:no value;m
+/input/@accept;params:garbage;m
 /input/@accept;duplicate token;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/javascript;version=1.0,text/javascript;version=1.1"/>
+#errors
+/input/@accept;IMT:no param allowed;m
+/input/@accept;IMT:no param allowed;m
+/input/@accept;IMT:parameter not allowed;m
+/input/@accept;IMT:parameter not allowed;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    accept="text/plain;"/>
+#errors
+/input/@accept;params:no attr;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -4412,7 +4432,6 @@
     autocomplete="inherit"/>
 #errors
 /input/@autocomplete;enumerated:invalid;m
-
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9362,14 +9381,12 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="hidden"
     accept-charset="us-ascii"/>
 #errors
 /input/@accept-charset;attribute not defined;m
-
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9399,14 +9416,12 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="datetime"
     accept-charset="us-ascii"/>
 #errors
 /input/@accept-charset;attribute not defined;m
-
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9415,14 +9430,12 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="month"
     accept-charset="us-ascii"/>
 #errors
 /input/@accept-charset;attribute not defined;m
-
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9431,7 +9444,6 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="time"
@@ -9439,14 +9451,12 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="datetime-local"
     accept-charset="us-ascii"/>
 #errors
 /input/@accept-charset;attribute not defined;m
-
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9476,14 +9486,12 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="radio"
     accept-charset="us-ascii"/>
 #errors
 /input/@accept-charset;attribute not defined;m
-
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -9492,14 +9500,12 @@
 #errors
 /input/@accept-charset;attribute not defined;m
 
-
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="submit"
     accept-charset="us-ascii"/>
 #errors
 /input/@accept-charset;attribute not defined;m
-
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -10874,7 +10880,6 @@
 #errors
 /input/@usemap;attribute not defined;m
 /input/@usemap;hashref:syntax error;m
-
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
