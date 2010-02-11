@@ -190,7 +190,7 @@ sub _type_def ($) {
 sub _subtype_def ($) {
   my $self = shift;
   return $self->{_subtype_def}
-      ||= $self->_type_def->{subtype}->{$self->subtype}; # or undef
+      ||= ($self->_type_def or {})->{subtype}->{$self->subtype}; # or undef
 } # _subtype_def
 
 ## Whether the media type is a "styling language" or not.  The Web
@@ -201,6 +201,19 @@ sub is_styling_lang ($) {
   my $self = shift;
   return (($self->_subtype_def or {})->{is_styling_lang});
 } # is_styling_lang
+
+## What is "text-based" media type is unclear.
+sub is_text_based ($) {
+  my $self = shift;
+
+  my $type = $self->type;
+  return 1 if {text => 1, message => 1, multipart => 1}->{$type};
+
+  my $subtype = $self->subtype;
+  return 1 if $subtype =~ /\+xml\z/;
+
+  return (($self->_subtype_def or {})->{is_text_based});
+} # is_text_based
 
 ## ------ Serialization ------
 

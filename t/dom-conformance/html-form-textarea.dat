@@ -443,3 +443,42 @@
     placeholder="&#xd;"/>
 #errors
 /textarea/@placeholder;newline in value;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    accept="">a</textarea>
+#errors
+/textarea/@accept;IMT:no type;m
+/textarea/@accept;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    accept="text/html">a</textarea>
+#errors
+/textarea/@accept;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    accept="image/svg+xml">a</textarea>
+#errors
+/textarea/@accept;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    accept="text/plain; charset=us-ascii">a</textarea>
+#errors
+/textarea/@accept;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    accept="text/plain; a=b">a</textarea>
+#errors
+/textarea/@accept;IMT:parameter not allowed;m
+/textarea/@accept;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    accept="application/octet-stream">a</textarea>
+#errors
+/textarea/@accept;IMT:not text-based;m
+/textarea/@accept;attribute not defined;m

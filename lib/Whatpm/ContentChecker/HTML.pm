@@ -739,47 +739,7 @@ my $HTMLLengthAttrChecker = sub {
   ## of percentage value at all (!).
 }; # $HTMLLengthAttrChecker
 
-my $MIMEToken = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
-my $TypeOrSubtype = qr/[A-Za-z0-9!#\$&.+^_-]{1,127}/; # RFC 4288
-my $IMTNoParameter = qr[($TypeOrSubtype)/($TypeOrSubtype)];
-
-## "A valid MIME type, optionally with parameters. [RFC 2046]"
-## ISSUE: RFC 2046 does not define syntax of media types.
-## ISSUE: The definition of "a valid MIME type" is unknown.
-## Syntactical correctness?
-my $HTMLIMTAttrChecker = sub {
-  my ($self, $attr) = @_;
-  my $value = $attr->value;
-  ## ISSUE: RFC 2045 Content-Type header field allows insertion
-  ## of LWS/comments between tokens.  Is it allowed in HTML?  Maybe no.
-  ## ISSUE: RFC 2231 extension?  Maybe no.
-  my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
-  my $qs = qr/"(?>[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
-  if ($value =~ m#\A$lws0($MIMEToken)$lws0/$lws0($MIMEToken)$lws0((?>;$lws0$MIMEToken$lws0=$lws0(?>$MIMEToken|$qs)$lws0)*)\z#) {
-    my @type = ($1, $2);
-    my $param = $3;
-    while ($param =~ s/^;$lws0($MIMEToken)$lws0=$lws0(?>($MIMEToken)|($qs))$lws0//) {
-      if (defined $2) {
-        push @type, $1 => $2;
-      } else {
-        my $n = $1;
-        my $v = $3;
-        $v =~ s/\\(.)/$1/gs;
-        push @type, $n => substr ($v, 1, length ($v) - 2);
-      }
-    }
-    require Whatpm::IMTChecker;
-    my $ic = Whatpm::IMTChecker->new;
-    $ic->{level} = $self->{level};
-    $ic->check_imt (sub {
-      $self->{onerror}->(@_, node => $attr);
-    }, @type);
-  } else {
-    $self->{onerror}->(node => $attr, type => 'IMT:syntax error',
-                       level => $self->{level}->{must});
-  }
-}; # $HTMLIMTAttrChecker
-
+## "Valid MIME type"
 my $MIMETypeChecker = sub {
   my ($self, $attr) = @_;
   my $value = $attr->value;
@@ -5109,7 +5069,7 @@ $Element->{$HTML_NS}->{object} = {
       border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       classid => $HTMLURIAttrChecker,
       codebase => $HTMLURIAttrChecker,
-      codetype => $HTMLIMTAttrChecker,
+      codetype => $MIMETypeChecker,
           ## TODO: "RECOMMENDED when |classid| is specified" [HTML4]
       data => $HTMLURIAttrChecker,
       declare => $GetHTMLBooleanAttrChecker->('declare'),
@@ -5223,7 +5183,7 @@ $Element->{$HTML_NS}->{param} = {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
       name => sub { },
-      type => $HTMLIMTAttrChecker,
+      type => $MIMETypeChecker,
       value => sub { },
       valuetype => $GetHTMLEnumeratedAttrChecker->({
         data => 1, ref => 1, object => 1,
@@ -7506,7 +7466,18 @@ $Element->{$HTML_NS}->{textarea} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    accept => $HTMLIMTAttrChecker, ## TODO: MUST be a text-based type [WF2]
+    accept => sub {
+      my ($self, $attr) = @_;
+
+      my $type = $MIMETypeChecker->(@_);
+      if ($type) {
+        unless ($type->is_text_based) {
+          $self->{onerror}->(node => $attr,
+                             type => 'IMT:not text-based', # XXXdocumentation
+                             level => $self->{level}->{must});
+        }
+      }
+    }, # accept
     autofocus => $AutofocusAttrChecker,
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),

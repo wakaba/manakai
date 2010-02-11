@@ -112,7 +112,7 @@ sub _param : Test(6) {
 
 ## ------ Properties ------
 
-sub _is_styling_lang : Test(6) {
+sub _is_styling_lang : Test(7) {
   for (
       ['text', 'plain', 0],
       ['text', 'html', 0],
@@ -120,11 +120,38 @@ sub _is_styling_lang : Test(6) {
       ['text', 'xsl', 1],
       ['text', 'xslt', 0],
       ['application', 'xslt+xml', 1],
+      ['x-unknown', 'x-unknown', 0],
   ) {
     my $mt = Message::MIME::Type->new_from_type_and_subtype ($_->[0], $_->[1]);
     is !!$mt->is_styling_lang, !!$_->[2];
   }
 } # _is_styling_lang
+
+sub _is_text_based : Test(18) {
+  for (
+      ['text', 'plain', 1],
+      ['text', 'html', 1],
+      ['text', 'css', 1],
+      ['text', 'xsl', 1],
+      ['text', 'xslt', 1],
+      ['application', 'xslt+xml', 1],
+      ['image', 'bmp', 0],
+      ['message', 'rfc822', 1],
+      ['message', 'x-unknown', 1],
+      ['x-unknown', 'x-unknown', 0],
+      ['application', 'xhtml+xml', 1],
+      ['model', 'x-unknown', 0],
+      ['image', 'svg+xml', 1],
+      ['application', 'octet-stream', 0],
+      ['text', 'x-unknown', 1],
+      ['video', 'x-unknown+xml', 1],
+      ['text', 'xml', 1],
+      ['application', 'xml', 1],
+  ) {
+    my $mt = Message::MIME::Type->new_from_type_and_subtype ($_->[0], $_->[1]);
+    is !!$mt->is_text_based, !!$_->[2];
+  }
+} # _is_text_based
 
 ## ------ Serialization ------
 

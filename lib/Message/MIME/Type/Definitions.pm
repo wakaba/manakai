@@ -42,6 +42,7 @@ $Type->{application}->{subtype}->{'rss+xml'} = {
 
 $Type->{application}->{subtype}->{xml} = { ## TODO: check IANAREG
   registered => 1,
+  is_text_based => 1,
 };
 
 $Type->{application}->{subtype}->{'xslt+xml'} = {

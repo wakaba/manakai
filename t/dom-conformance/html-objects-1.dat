@@ -3156,13 +3156,20 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" codetype="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@codetype;attribute not defined;m
-/object/@codetype;IMT:syntax error;m
+/object/@codetype;IMT:no type;m
 /object;no significant content;s
 
 #data
 <object data="" codetype="text/html" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@codetype;attribute not defined;m
+/object;no significant content;s
+
+#data
+<object data="" codetype="text/plain; a=b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@codetype;attribute not defined;m
+/object/@codetype;IMT:parameter not allowed;m
 /object;no significant content;s
 
 #data
@@ -3366,12 +3373,18 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <param name="a" value="b" type="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /param/@type;attribute not defined;m
-/param/@type;IMT:syntax error;m
+/param/@type;IMT:no /;m
 
 #data
 <param name="a" value="b" type="text/html" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /param/@type;attribute not defined;m
+
+#data
+<param name="a" value="b" type="text/html; a=b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param/@type;attribute not defined;m
+/param/@type;IMT:parameter not allowed;m
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"/>
