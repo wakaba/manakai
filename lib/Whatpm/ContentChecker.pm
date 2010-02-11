@@ -51,6 +51,30 @@ sub load_ns_module ($) {
   }
 } # load_ns_module
 
+## ------ Attribute conformance checkers ------
+
+## Web Applications 1.0 "Valid MIME type"
+our $MIMETypeChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+
+  require Message::MIME::Type;
+  my $onerror = sub {
+    $self->{onerror}->(@_, node => $attr);
+  };
+
+  ## Syntax-level validation
+  my $type = Message::MIME::Type->parse_web_mime_type
+      ($value, $onerror, $self->{level});
+
+  ## Vocabulary-level validation
+  if ($type) {
+    $type->validate ($onerror);
+  }
+
+  return $type; # or undef
+}; # $MIMETypeChecker
+
 our $AttrChecker = {
   $XML_NS => {
     space => sub {

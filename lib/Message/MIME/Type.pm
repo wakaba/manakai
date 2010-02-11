@@ -215,6 +215,34 @@ sub is_text_based ($) {
   return (($self->_subtype_def or {})->{is_text_based});
 } # is_text_based
 
+sub is_composite_type ($) {
+  my $self = shift;
+  my $type = $self->type;
+  return ($type eq 'multipart' or $type eq 'message');
+} # is_composite_type
+
+## This method returns whether the type is an "XML MIME type"
+## according to the Web Applications 1.0's definition.
+##
+## Although Atom 1.0 [RFC 4287] cites "XML media types" from RFC 3023
+## (which titles "XML Media Types"), RFC 3023 does not define the term
+## "XML media types" or "XML MIME types.  Note that RFC 3023 does not
+## use the term "XML media types" other than as the document title but
+## does use "XML MIME types" in its appendix.
+sub is_xml_mime_type ($) {
+  my $self = shift;
+
+  my $subtype = $self->subtype;
+  if ($subtype eq 'xml') {
+    my $type = $self->type;
+    return ($type eq 'text' or $type eq 'application');
+  } elsif ($subtype =~ /\+xml\z/) {
+    return 1;
+  } else {
+    return 0;
+  }
+} # is_xml_mime_type
+
 ## ------ Serialization ------
 
 my $non_token = qr/[^\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7A\x7C\x7E]/;
@@ -434,7 +462,7 @@ sub validate ($$;%) {
       $onerror->(type => 'IMT:unknown subtype',
                  level => $self->{level}->{uncertain},
                  value => $type . '/' . $subtype)
-          unless $subtype_syntax_error;
+          if not $subtype_syntax_error and not $subtype =~ /^x[-.]/;
     }
 
     unless ($args{no_required_param}) {

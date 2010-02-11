@@ -153,6 +153,69 @@ sub _is_text_based : Test(18) {
   }
 } # _is_text_based
 
+sub _is_composite : Test(21) {
+  for (
+      ['text', 'plain', 0],
+      ['text', 'html', 0],
+      ['text', 'css', 0],
+      ['text', 'xsl', 0],
+      ['text', 'xslt', 0],
+      ['application', 'xslt+xml', 0],
+      ['image', 'bmp', 0],
+      ['message', 'rfc822', 1],
+      ['message', 'x-unknown', 1],
+      ['x-unknown', 'x-unknown', 0],
+      ['application', 'xhtml+xml', 0],
+      ['model', 'x-unknown', 0],
+      ['image', 'svg+xml', 0],
+      ['application', 'octet-stream', 0],
+      ['text', 'x-unknown', 0],
+      ['video', 'x-unknown+xml', 0],
+      ['text', 'xml', 0],
+      ['application', 'xml', 0],
+      ['multipart', 'mixed', 1],
+      ['multipart', 'example', 1],
+      ['multipart', 'rfc822+xml', 1],
+  ) {
+    my $mt = Message::MIME::Type->new_from_type_and_subtype ($_->[0], $_->[1]);
+    is !!$mt->is_composite_type, !!$_->[2];
+  }
+} # _is_composite
+
+sub _is_xmt : Test(26) {
+  for (
+      ['text', 'plain', 0],
+      ['text', 'html', 0],
+      ['text', 'css', 0],
+      ['text', 'xsl', 0],
+      ['text', 'xslt', 0],
+      ['application', 'xslt+xml', 1],
+      ['image', 'bmp', 0],
+      ['message', 'rfc822', 0],
+      ['message', 'x-unknown', 0],
+      ['x-unknown', 'x-unknown', 0],
+      ['application', 'xhtml+xml', 1],
+      ['model', 'x-unknown', 0],
+      ['image', 'svg+xml', 1],
+      ['application', 'octet-stream', 0],
+      ['text', 'x-unknown', 0],
+      ['video', 'x-unknown+xml', 1],
+      ['text', 'xml', 1],
+      ['application', 'xml', 1],
+      ['multipart', 'mixed', 0],
+      ['multipart', 'example', 0],
+      ['unknown', 'unknown+XML', 1],
+      ['TEXT', 'XML', 1],
+      ['audio', 'xml', 0],
+      ['message', 'mime+xml', 1],
+      ['text', 'csv+xml+html', 0],
+      ['text+xml', 'plain', 0],
+  ) {
+    my $mt = Message::MIME::Type->new_from_type_and_subtype ($_->[0], $_->[1]);
+    is !!$mt->is_xml_mime_type, !!$_->[2], join ' ', 'xmt', @$_;
+  }
+} # _is_xmt
+
 ## ------ Serialization ------
 
 sub _as_valid_1 : Test(2) {
@@ -315,7 +378,7 @@ sub _as_valid_param_14 : Test(2) {
 
 ## ------ Conformance ------
 
-sub _validate : Test(9) {
+sub _validate : Test(17) {
   require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
   
   execute_test (file (__FILE__)->dir->subdir ('mime')->file ('type-conformance.dat'), {

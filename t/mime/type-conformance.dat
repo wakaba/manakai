@@ -61,3 +61,51 @@ abc
 | 
 #errors
 boundary:syntax error;;m
+
+#data
+text
+unknown
+#errors
+IMT:unknown subtype;text/unknown;u
+
+#data
+text
+x-unknown
+#errors
+IMT:private subtype;text/x-unknown;w
+
+#data
+text
+x.unknown
+#errors
+IMT:private subtype;text/x.unknown;w
+
+#data
+text
+xunknown
+#errors
+IMT:unknown subtype;text/xunknown;u
+
+#data
+unknown
+unknown
+#errors
+IMT:unregistered type;unknown;m
+
+#data
+x.unknown
+unknown
+#errors
+IMT:unregistered type;x.unknown;m
+
+#data
+xunknown
+unknown
+#errors
+IMT:unregistered type;xunknown;m
+
+#data
+x-unknown
+unknown
+#errors
+IMT:private type;x-unknown;w

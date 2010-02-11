@@ -27,6 +27,13 @@ our $IsInHTMLInteractiveContent; # See Whatpm::ContentChecker.
 
 our $AttrChecker;
 
+## Atom 1.0 [RFC 4287] cites RFC 4288 (Media Type Registration) for
+## "MIME media type".  However, RFC 4288 only defines syntax of
+## component such as |type|, |subtype|, and |parameter-name| and does
+## not define the whole syntax.  We use Web Applications 1.0's "valid
+## MIME type" definition here.
+our $MIMETypeChecker; ## See |Whatpm::ContentChecker|.
+
 ## Any element MAY have xml:base, xml:lang
 my $GetAtomAttrsChecker = sub {
   my $element_specific_checker = shift;
@@ -698,49 +705,23 @@ $Element->{$ATOM_NS}->{content} = {
       if ($value eq 'text' or $value eq 'html' or $value eq 'xhtml') {
         # MUST
       } else {
-        ## NOTE: MUST be a MIME media type.  What is "MIME media type"?
-        my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
-        my $token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
-        my $qs = qr/"(?>[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
-        if ($value =~ m#\A$lws0($token)$lws0/$lws0($token)$lws0((?>;$lws0$token$lws0=$lws0(?>$token|$qs)$lws0)*)\z#) {
-          my @type = ($1, $2);
-          my $param = $3;
-          while ($param =~ s/^;$lws0($token)$lws0=$lws0(?>($token)|($qs))$lws0//) {
-            if (defined $2) {
-              push @type, $1 => $2;
-            } else {
-              my $n = $1;
-              my $v = $2;
-              $v =~ s/\\(.)/$1/gs;
-              push @type, $n => $v;
-            }
+        my $type = $MIMETypeChecker->(@_);
+        if ($type) {
+          if ($type->is_composite_type) {
+            $self->{onerror}->(node => $attr, type => 'IMT:composite',
+                               level => $self->{level}->{must});
           }
-          require Whatpm::IMTChecker;
-          my $ic = Whatpm::IMTChecker->new;
-          $ic->{level} = $self->{level};
-          $ic->check_imt (sub {
-            $self->{onerror}->(@_, node => $attr);
-          }, @type);
-        } else {
-          $self->{onerror}->(node => $attr, type => 'IMT:syntax error',
-                             level => $self->{level}->{must});
-        }
-      }
 
-      if ({text => 1, html => 1, xhtml => 1}->{$value}) {
-        #
-      } elsif ($value =~ m![+/][Xx][Mm][Ll]\z!) {
-        ## ISSUE: There is no definition for "XML media type" in RFC 3023.
-        ## Is |application/xml-dtd| an XML media type?
-        $value = 'xml';
-      } elsif ($value =~ m!^[Tt][Ee][Xx][Tt]/!) {
-        $value = 'mime_text';
-      } elsif ($value =~ m!^(?>message|multipart)/!i) {
-        $self->{onerror}->(node => $attr, type => 'IMT:composite',
-                           level => $self->{level}->{must});
-        $item->{parent_state}->{require_summary} = 1;
-      } else {
-        $item->{parent_state}->{require_summary} = 1;
+          if ($type->is_xml_mime_type) {
+            $value = 'xml';
+          } elsif ($type->type eq 'text') {
+            $value = 'mime_text';
+          } else {
+            $item->{parent_state}->{require_summary} = 1;
+          }
+        } else {
+          $item->{parent_state}->{require_summary} = 1;
+        }
       }
 
       $element_state->{type} = $value;
@@ -874,8 +855,7 @@ $Element->{$ATOM_NS}->{content} = {
 
     $AtomChecker{check_end}->(@_);
   },
-};
-## TODO: Tests for <html:nest/> in <atom:content/>
+}; # atom:content
 
 $Element->{$ATOM_NS}->{author} = \%AtomPersonConstruct;
 

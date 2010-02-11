@@ -739,27 +739,7 @@ my $HTMLLengthAttrChecker = sub {
   ## of percentage value at all (!).
 }; # $HTMLLengthAttrChecker
 
-## "Valid MIME type"
-my $MIMETypeChecker = sub {
-  my ($self, $attr) = @_;
-  my $value = $attr->value;
-
-  require Message::MIME::Type;
-  my $onerror = sub {
-    $self->{onerror}->(@_, node => $attr);
-  };
-
-  ## Syntax-level validation
-  my $type = Message::MIME::Type->parse_web_mime_type
-      ($value, $onerror, $self->{level});
-
-  ## Vocabulary-level validation
-  if ($type) {
-    $type->validate ($onerror);
-  }
-
-  return $type; # or undef
-}; # $MIMETypeChecker
+our $MIMETypeChecker; ## See |Whatpm::ContentChecker|.
 
 my $HTMLLanguageTagAttrChecker = sub {
   ## NOTE: See also $AtomLanguageTagAttrChecker in Atom.pm.

@@ -1,7 +1,7 @@
 1..2646
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 24 22:45:40 2010
-# Current time GMT:   Sun Jan 24 13:45:40 2010
+# Current time local: Thu Feb 11 16:58:17 2010
+# Current time GMT:   Thu Feb 11 07:58:17 2010
 # Using Test.pm version 1.25_02
 # ../t/content-model-atom-1.dat
 ok 1
@@ -64,7 +64,6 @@ not ok 48
 ok 49
 ok 50
 ok 51
-# ../t/content-model-atom-2.dat
 ok 52
 ok 53
 ok 54
@@ -72,6 +71,7 @@ ok 55
 ok 56
 ok 57
 ok 58
+# ../t/content-model-atom-2.dat
 ok 59
 ok 60
 ok 61
@@ -89,9 +89,16 @@ ok 72
 ok 73
 ok 74
 ok 75
+ok 76
+ok 77
+ok 78
+ok 79
+ok 80
+ok 81
+ok 82
 # ../t/content-model-atom-threading-1.dat
-not ok 76
-# Test 76 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (content-checker.pl at line 69 fail #76)
+not ok 83
+# Test 83 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (content-checker.pl at line 69 fail #83)
 #    Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -121,8 +128,8 @@ not ok 76
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-not ok 77
-# Test 77 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (content-checker.pl at line 69 fail #77)
+not ok 84
+# Test 84 got: "/feed/entry/in-reply-to/@type;IMT:unknown subtype;u\n/feed/entry/link/@type;IMT:unknown subtype;u\n/feed;element missing:atom:link:self;s" (content-checker.pl at line 69 fail #84)
 #    Expected: "/feed;child element missing:atom:link:self;s" (<!-- From RFC 4685 -->
 #   <feed xmlns="http://www.w3.org/2005/Atom"
 #         xmlns:thr="http://purl.org/syndication/thread/1.0">
@@ -148,13 +155,6 @@ not ok 77
 #       <summary>This is a response to the original entry</summary>
 #     </entry>
 #   </feed>)
-ok 78
-ok 79
-ok 80
-ok 81
-ok 82
-ok 83
-ok 84
 ok 85
 ok 86
 ok 87
@@ -162,3 +162,10 @@ ok 88
 ok 89
 ok 90
 ok 91
+ok 92
+ok 93
+ok 94
+ok 95
+ok 96
+ok 97
+ok 98

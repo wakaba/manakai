@@ -40,6 +40,14 @@ $Type->{application}->{subtype}->{'rss+xml'} = {
   ## NOTE: Not registered
 };
 
+$Type->{application}->{subtype}->{smil} = {
+  registered => 1, # XXX?
+};
+
+$Type->{application}->{subtype}->{'smil+xml'} = {
+  registered => 1, # XXX?
+};
+
 $Type->{application}->{subtype}->{xml} = { ## TODO: check IANAREG
   registered => 1,
   is_text_based => 1,
