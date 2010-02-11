@@ -48,6 +48,10 @@ $Type->{application}->{subtype}->{'smil+xml'} = {
   registered => 1, # XXX?
 };
 
+$Type->{application}->{subtype}->{'xhtml+xml'} = {
+  registered => 1, # XXX?
+};
+
 $Type->{application}->{subtype}->{xml} = { ## TODO: check IANAREG
   registered => 1,
   is_text_based => 1,

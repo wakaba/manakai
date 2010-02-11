@@ -663,13 +663,13 @@ $Element->{$ATOM_NS}->{feed} = {
     }
     unless ($element_state->{has_element}->{updated}) { # MUST
       $self->{onerror}->(node => $item->{node},
-                         type => 'element missing:atom',
+                         type => 'child element missing:atom',
                          text => 'updated',
                          level => $self->{level}->{must});
     }
     unless ($element_state->{has_element}->{'link.self'}) {
       $self->{onerror}->(node => $item->{node}, 
-                         type => 'element missing:atom:link:self',
+                         type => 'child element missing:atom:link:self',
                          level => $self->{level}->{should});
     }
 
@@ -974,37 +974,6 @@ $Element->{$ATOM_NS}->{id} = {
   },
 };
 
-my $AtomIMTAttrChecker = sub {
-      my ($self, $attr) = @_;
-      my $value = $attr->value;
-      my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
-      my $token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
-      my $qs = qr/"(?>[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
-      if ($value =~ m#\A$lws0($token)$lws0/$lws0($token)$lws0((?>;$lws0$token$lws0=$lws0(?>$token|$qs)$lws0)*)\z#) {
-        my @type = ($1, $2);
-        my $param = $3;
-        while ($param =~ s/^;$lws0($token)$lws0=$lws0(?>($token)|($qs))$lws0//) {
-          if (defined $2) {
-            push @type, $1 => $2;
-          } else {
-            my $n = $1;
-            my $v = $2;
-            $v =~ s/\\(.)/$1/gs;
-            push @type, $n => $v;
-          }
-        }
-        require Whatpm::IMTChecker;
-        my $ic = Whatpm::IMTChecker->new;
-        $ic->{level} = $self->{level};
-        $ic->check_imt (sub {
-          $self->{onerror}->(@_, node => $attr);
-        }, @type);
-      } else {
-        $self->{onerror}->(node => $attr, type => 'IMT:syntax error',
-                           level => $self->{level}->{must});
-      }
-}; # $AtomIMTAttrChecker
-
 my $AtomIRIReferenceAttrChecker = sub {
   my ($self, $attr) = @_;
   ## NOTE: There MUST NOT be any white space.
@@ -1040,8 +1009,7 @@ $Element->{$ATOM_NS}->{link} = {
       ## MUST NOT "unspecified" and other rel=license
     },
     title => sub { }, # No MUST
-    type => $AtomIMTAttrChecker,
-    ## NOTE: MUST be a MIME media type.  What is "MIME media type"?
+    type => $MIMETypeChecker,
   }, {
     href => FEATURE_RFC4287,
     hreflang => FEATURE_RFC4287,
@@ -1226,8 +1194,7 @@ $Element->{$THR_NS}->{'in-reply-to'} = {
     source => $AtomIRIReferenceAttrChecker,
         ## TODO: fact-level.
         ## TODO: MUST be dereferencable.
-    type => $AtomIMTAttrChecker,
-        ## TODO: fact-level.
+    type => $MIMETypeChecker,
   }, {
     href => FEATURE_RFC4685,
     source => FEATURE_RFC4685,
