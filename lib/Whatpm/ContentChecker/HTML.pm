@@ -3657,30 +3657,18 @@ $Element->{$HTML_NS}->{dt} = {
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
-    if ($item->{parent_state}->{in_figure}) {
-      $HTMLFlowContentChecker{check_child_element}->(@_);
-    } else {
-      $HTMLPhrasingContentChecker{check_child_element}->(@_);
-    }
+    $HTMLPhrasingContentChecker{check_child_element}->(@_);
   }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($item->{parent_state}->{in_figure}) {
-      $HTMLFlowContentChecker{check_child_text}->(@_);
-    } else {
-      $HTMLPhrasingContentChecker{check_child_text}->(@_);
-    }
+    $HTMLPhrasingContentChecker{check_child_text}->(@_);
   }, # check_child_text
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
 
-    if ($item->{parent_state}->{in_figure}) {
-      $HTMLFlowContentChecker{check_end}->(@_);
-    } else {
-      $HTMLPhrasingContentChecker{check_end}->(@_);
-    }
-  },
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  }, # check_end
 }; # dt
 
 $Element->{$HTML_NS}->{dd} = {
