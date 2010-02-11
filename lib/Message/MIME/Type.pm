@@ -5,6 +5,26 @@ our $VERSION = '1.0';
 
 # ------ Instantiation ------
 
+## NOTE: RFC 2046 sucks, it is a poorly written specification such that
+## what we should do is not entirely clear and it does define almost nothing
+## from the today's viewpoint...  Suprisingly, it's even worse than
+## RFC 1521, the previous version of that specification, which does
+## contain BNF rules for parameter values at least.
+
+my $default_error_levels = {
+  must => 'm',
+  warn => 'w',
+  info => 'i',
+  uncertain => 'u',
+
+  mime_must => 'm', # lowercase "must"
+  mime_fact => 'm',
+  mime_strongly_discouraged => 'w',
+  mime_discouraged => 'w',
+
+  http_fact => 'm',
+};
+
 sub new_from_type_and_subtype ($$$) {
   my $self = bless {}, shift;
   $self->{type} = ''.$_[0];
@@ -19,12 +39,13 @@ my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
 my $HTTP11QS = qr/"(?>[\x20\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
 
 ## Web Applications 1.0 "valid MIME type"'s "MUST".
-sub parse_web_mime_type ($$;$) {
-  my ($class, $value, $onerror) = @_;
+sub parse_web_mime_type ($$;$$) {
+  my ($class, $value, $onerror, $levels) = @_;
   $onerror ||= sub {
     my %args = @_;
     warn sprintf "$args{type} at position $args{index}\n";
   };
+  $levels ||= $default_error_levels;
 
   $value =~ /\G$lws0/ogc;
 
@@ -32,15 +53,15 @@ sub parse_web_mime_type ($$;$) {
   if ($value =~ /\G($HTTPToken)/ogc) {
     $type = $1;
   } else {
-    $onerror->(type => 'IMT:no type', # XXXdocumentation
-               level => 'm',
+    $onerror->(type => 'MIME:no type', # XXXdocumentation
+               level => $levels->{http_fact},
                index => pos $value);
     return undef;
   }
 
   unless ($value =~ m[\G/]gc) {
-    $onerror->(type => 'IMT:no /', # XXXdocumentation
-               level => 'm',
+    $onerror->(type => 'MIME:no /', # XXXdocumentation
+               level => $levels->{http_fact},
                index => pos $value);
     return undef;
   }
@@ -49,9 +70,9 @@ sub parse_web_mime_type ($$;$) {
   if ($value =~ /\G($HTTPToken)/ogc) {
     $subtype = $1;
   } else {
-    $onerror->(type => 'IMT:no subtype', # XXXdocumentation
-               level => 'm',
-               index => pos $value);
+    $onerror->(type => 'MIME:no subtype', # XXXdocumentation
+               level => $levels->{http_fact},
+               index => pos $value); 
     return undef;
   }
 
@@ -66,15 +87,15 @@ sub parse_web_mime_type ($$;$) {
     if ($value =~ /\G($HTTPToken)/ogc) {
       $attr = $1;
     } else {
-      $onerror->(type => 'IMT:no attr', # XXXdocumentation
-                 level => 'm',
+      $onerror->(type => 'params:no attr', # XXXdocumentation
+                 level => $levels->{http_fact},
                  index => pos $value);
       return $self;
     }
 
     unless ($value =~ /\G=/gc) {
-      $onerror->(type => 'IMT:no =', # XXXdocumentation
-                 level => 'm',
+      $onerror->(type => 'params:no =', # XXXdocumentation
+                 level => $levels->{http_fact},
                  index => pos $value);
       return $self;
     }
@@ -86,8 +107,8 @@ sub parse_web_mime_type ($$;$) {
       $v = substr $1, 1, length ($1) - 2;
       $v =~ s/\\(.)/$1/gs;
     } else {
-      $onerror->(type => 'IMT:no value', # XXXdocumentation
-                 level => 'm',
+      $onerror->(type => 'params:no value', # XXXdocumentation
+                 level => $levels->{http_fact},
                  index => pos $value);
       return $self;
     }
@@ -97,8 +118,8 @@ sub parse_web_mime_type ($$;$) {
     my $current = $self->param ($attr);
     if (defined $current) {
       ## Surprisingly this is not a violation to the MIME or HTTP spec!
-      $onerror->(type => 'IMT:duplicate attr', # XXXdocumentation
-                 level => 'w',
+      $onerror->(type => 'params:duplicate attr', # XXXdocumentation
+                 level => $levels->{warn},
                  value => $attr,
                  index => pos $value);
       next;
@@ -108,8 +129,8 @@ sub parse_web_mime_type ($$;$) {
   }
 
   if (pos $value < length $value) {
-    $onerror->(type => 'IMT:garbage', # XXXdocumentation
-               level => 'm',
+    $onerror->(type => 'params:garbage', # XXXdocumentation
+               level => $levels->{http_fact},
                index => pos $value);
   }
 
