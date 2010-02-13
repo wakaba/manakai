@@ -1,6 +1,7 @@
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.32';
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::DocumentSelector', # MUST in Selectors API spec
@@ -1225,6 +1226,14 @@ sub manakai_is_html ($;$) {
   return ${$_[0]}->{manakai_is_html};
 } # manakai_is_html
 
+sub manakai_is_srcdoc ($;$) {
+  if (@_ > 1) {
+    ${$_[0]}->{manakai_is_srcdoc} = !!$_[1];
+  }
+
+  return ${$_[0]}->{manakai_is_srcdoc};
+} # manakai_is_srcdoc
+
 package Message::IF::Document;
 package Message::IF::DocumentTraversal;
 package Message::IF::DocumentXDoctype;
@@ -1265,7 +1274,7 @@ sub create_document ($;$$$) {
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -1273,4 +1282,3 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2008/10/21 07:51:59 $

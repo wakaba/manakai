@@ -199,11 +199,13 @@ sub _string_props : Test(18) {
   }
 } # _string_props
 
-sub _bool_props : Test(10) {
+sub _bool_props : Test(15) {
   my $dom = Message::DOM::DOMImplementation->new;
   my $doc = $dom->create_document;
   
-  for my $prop (qw/all_declarations_processed manakai_has_bom/) {
+  for my $prop (qw/
+      all_declarations_processed manakai_has_bom manakai_is_srcdoc
+  /) {
     is $doc->can ($prop) ? 1 : 0, 1, 'can ' . $prop;
     
     for (1, 0, '') {

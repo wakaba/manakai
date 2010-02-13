@@ -16,5 +16,4 @@ clean:
 distclean: clean
 	$(RMALL) $(HTML_FILES)
 
-## $Date: 2007/08/25 07:02:11 $
 ## License: Public Domain.

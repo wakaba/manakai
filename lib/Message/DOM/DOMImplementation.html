@@ -1,15 +1,19 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Message::DOM::DOMImplementation - manakai - The C&lt;DOMImplementation&gt; Interface</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -21,9 +25,11 @@
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
@@ -50,19 +56,31 @@ in the DOM Level 3 Core specification.</p>
 <hr />
 <h1><a name="methods">METHODS</a></h1>
 <dl>
-<dt><strong><a name="item_new"><em>$impl</em> = Message::DOM::DOMImplementation-&gt;new;</a></strong><br />
-</dt>
+<dt><strong><a name="new" class="item"><em>$impl</em> = Message::DOM::DOMImplementation-&gt;new;</a></strong></dt>
+
 <dd>
-Creates a new instance of the DOM implementation
-and returns it.
+<p>Creates a new instance of the DOM implementation
+and returns it.</p>
 </dd>
-<p></p></dl>
+</dl>
 <p>Any methods defined for <code>DOMImplementation</code> interface
 and other interface such as <code>URIImplementation</code> can
-be invoked via the object returned by the <a href="#item_new"><code>new</code></a> method.
+be invoked via the object returned by the <a href="#new"><code>new</code></a> method.
 For example, a DOM <code>Document</code> object can be created by:</p>
 <pre>
   $doc = $impl-&gt;create_document;</pre>
+<p>For the full explainations for DOM methods and attributes, see DOM
+specification listed in the <a href="#see_also">SEE ALSO</a> section below.</p>
+<p>Methods and attributes supported by manakai includes:</p>
+<dl>
+<dt><strong><a name="document_object" class="item"><code>Document</code> object</a></strong></dt>
+
+<dl>
+<dt><strong><a name="manakai_is_srcdoc" class="item">$doc-&gt;manakai_is_srcdoc [manakai extension]</a></strong></dt>
+
+</dl>
+</dd>
+</dl>
 <p>
 </p>
 <hr />
@@ -79,7 +97,7 @@ For example, a DOM <code>Document</code> object can be created by:</p>
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>Copyright 2007-2010 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
 <p>This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.</p>
 

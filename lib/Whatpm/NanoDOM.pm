@@ -354,6 +354,14 @@ sub manakai_compat_mode ($;$) {
   }
 } # manakai_compat_mode
 
+sub manakai_is_srcdoc ($;$) {
+  if (@_ > 1) {
+    $_[0]->{manakai_is_srcdoc} = !!$_[1];
+  }
+
+  return $_[0]->{manakai_is_srcdoc};
+} # manakai_is_srcdoc
+
 sub manakai_head ($) {
   my $html = $_[0]->manakai_html;
   return undef unless defined $html;
@@ -894,7 +902,7 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2008, 2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
