@@ -67,7 +67,7 @@ dom1core:
 
 test: 
 	$(PROVE) \
-	  DOM-Node.t DOM-Element.t DOM-DOMStringList.t \
+	  DOM-Node.t DOM-Document.t DOM-Element.t DOM-DOMStringList.t \
 	  URI-URIReference.t \
           MIME-Type.t IMT-InternetMediaType.t \
 	  Whatpm-*.t
