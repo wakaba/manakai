@@ -1100,9 +1100,13 @@ sub _tree_construction_initial ($) {
               END_TAG_TOKEN, 1,
               END_OF_FILE_TOKEN, 1,
              }->{$token->{type}}) {
-      
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE', token => $token);
-      $self->{document}->manakai_compat_mode ('quirks');
+      unless ($self->{document}->manakai_is_srcdoc) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE', token => $token);
+        $self->{document}->manakai_compat_mode ('quirks');
+      } else {
+        
+      }
       ## Go to the "before html" insertion mode.
       ## reprocess
       
@@ -1122,9 +1126,14 @@ sub _tree_construction_initial ($) {
       } else {
         
       }
-
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE', token => $token);
-      $self->{document}->manakai_compat_mode ('quirks');
+      
+      unless ($self->{document}->manakai_is_srcdoc) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE', token => $token);
+        $self->{document}->manakai_compat_mode ('quirks');
+      } else {
+        
+      }
       ## Go to the "before html" insertion mode.
       ## reprocess
       return;

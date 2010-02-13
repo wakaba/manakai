@@ -78,6 +78,10 @@ sub test ($) {
     exit;
   };
 
+  if ($test->{issrcdoc}->[1]) {
+    $doc->manakai_is_srcdoc (1);
+  }
+
   my $onerror = sub {
     my %opt = @_;
     if ($opt{level} eq 's') {

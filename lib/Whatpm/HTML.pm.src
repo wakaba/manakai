@@ -1100,9 +1100,13 @@ sub _tree_construction_initial ($) {
               END_TAG_TOKEN, 1,
               END_OF_FILE_TOKEN, 1,
              }->{$token->{type}}) {
-      !!!cp ('t14');
-      !!!parse-error (type => 'no DOCTYPE', token => $token);
-      $self->{document}->manakai_compat_mode ('quirks');
+      unless ($self->{document}->manakai_is_srcdoc) {
+        !!!cp ('t14.1');
+        !!!parse-error (type => 'no DOCTYPE', token => $token);
+        $self->{document}->manakai_compat_mode ('quirks');
+      } else {
+        !!!cp ('t14.2');
+      }
       ## Go to the "before html" insertion mode.
       ## reprocess
       !!!ack-later;
@@ -1122,9 +1126,14 @@ sub _tree_construction_initial ($) {
       } else {
         !!!cp ('t17');
       }
-
-      !!!parse-error (type => 'no DOCTYPE', token => $token);
-      $self->{document}->manakai_compat_mode ('quirks');
+      
+      unless ($self->{document}->manakai_is_srcdoc) {
+        !!!cp ('t17.1');
+        !!!parse-error (type => 'no DOCTYPE', token => $token);
+        $self->{document}->manakai_compat_mode ('quirks');
+      } else {
+        !!!cp ('t17.2');
+      }
       ## Go to the "before html" insertion mode.
       ## reprocess
       return;

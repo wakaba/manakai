@@ -136,3 +136,35 @@ second <html>
 |   <head>
 |   <!--   -->
 |   <body>
+
+#data
+abc
+#issrcdoc 1
+#errors
+#document
+| <html>
+|   <head>
+|   <body>
+|     "abc"
+
+#data
+<p>
+#issrcdoc 1
+#errors
+#document
+| <html>
+|   <head>
+|   <body>
+|     <p>
+
+#data
+</div>abc
+#issrcdoc 1
+#errors
+unmatched </div>
+#document
+| <html>
+|   <head>
+|   <body>
+|     "abc"
+
