@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 package test::Whatpm::HTML::Parser;
 use strict;
 use warnings;
@@ -26,7 +25,7 @@ sub _html_parser_gc : Test(2) {
 
   undef $doc;
   is $doc_destroy_called, 1;
-}
+} # _html_parser_gc
 
 sub _html_fragment_parser_gc : Test(6) {
   my $parser_destroy_called = 0;
@@ -52,8 +51,28 @@ sub _html_fragment_parser_gc : Test(6) {
   undef $doc;
   is $doc_destroy_called, 2; # $doc
   is $el_destroy_called, 2;
-}
+} # _html_fragment_parser_gc
+
+sub _html_parser_srcdoc : Test(3) {
+  my $doc = Message::DOM::DOMImplementation->new->create_document;
+  $doc->manakai_is_srcdoc (1);
+
+  Whatpm::HTML->parse_char_string (q<<p>abc</p>> => $doc);
+
+  ok $doc->manakai_is_html;
+  is $doc->compat_mode, 'CSS1Compat';
+  is $doc->manakai_compat_mode, 'no quirks';
+} # _html_parser_srcdoc
 
 __PACKAGE__->runtests;
 
 1;
+
+=head1 LICENSE
+
+Copyright 2009-2010 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
