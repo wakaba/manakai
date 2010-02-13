@@ -2833,6 +2833,17 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /iframe/@height;nninteger:syntax error;m
 
+#data html
+<!DOCTYPE HTML><title>a</title>
+<iframe srcdoc="">a</iframe>
+#errors
+/html/body/iframe/@srcdoc;SUBDOC;text/x-html-srcdoc
+
+#data
+<iframe srcdoc="" xmlns="http://www.w3.org/1999/xhtml">a</iframe>
+#errors
+/iframe/@srcdoc;SUBDOC;text/xml
+
 #data
 <iframe src="" xmlns="http://www.w3.org/1999/xhtml"
     height="0">x</iframe>

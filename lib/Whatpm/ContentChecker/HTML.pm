@@ -2743,6 +2743,8 @@ $Element->{$HTML_NS}->{script} = {
         $type =~ tr/A-Z/a-z/; ## NOTE: ASCII case-insensitive
         ## TODO: Though we strip prameter here, it should not be ignored for the purpose of conformance checking...
       }
+
+      # XXX this is wrong - unknown parameters MUST be ignored.
       $element_state->{script_type} = $type;
     }
 
@@ -4912,8 +4914,7 @@ $Element->{$HTML_NS}->{img} = {
 
 $Element->{$HTML_NS}->{iframe} = {
   %HTMLTextChecker, # XXX content model restriction
-  status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-      ## NOTE: Not part of M12N10 Strict
+  status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     name => $HTMLBrowsingContextNameAttrChecker,
@@ -4922,6 +4923,16 @@ $Element->{$HTML_NS}->{iframe} = {
     }),
     seemless => $GetHTMLBooleanAttrChecker->('seemless'),
     src => $HTMLURIAttrChecker,
+    srcdoc => sub {
+      my ($self, $attr) = @_;
+      
+      my $type = $attr->owner_document->manakai_is_html
+          ? 'text/x-html-srcdoc' : 'text/xml';
+      $self->{onsubdoc}->({s => $attr->value,
+                           container_node => $attr,
+                           media_type => $type,
+                           is_char_string => 1});
+    }, # srcdoc
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
@@ -4935,11 +4946,12 @@ $Element->{$HTML_NS}->{iframe} = {
     marginheight => FEATURE_HTML5_OBSOLETE,
     marginwidth => FEATURE_HTML5_OBSOLETE,
     #name => FEATURE_HTML5_WD | FEATURE_M12N10_REC_DEPRECATED,
-    name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    sandbox => FEATURE_HTML5_WD,
+    name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    sandbox => FEATURE_HTML5_LC,
     scrolling => FEATURE_HTML5_OBSOLETE,
-    seemless => FEATURE_HTML5_WD,
-    src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    seemless => FEATURE_HTML5_LC,
+    src => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    srcdoc => FEATURE_HTML5_LC,
     title => FEATURE_HTML5_REC,
     width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   }),
