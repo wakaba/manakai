@@ -49,25 +49,25 @@
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><ins>xx</ins></form>
 #errors
-/form/style;SUBDOC
+/form/style;SUBDOC;text/css
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml">xx<style scoped=""/>yy</form>
 #errors
-/form/style;SUBDOC
+/form/style;SUBDOC;text/css
 /form/style;element not allowed:flow style;m
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><style scoped=""/>xx</form>
 #errors
-/form/style;SUBDOC
-/form/style;SUBDOC
+/form/style;SUBDOC;text/css
+/form/style;SUBDOC;text/css
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"><style/><style scoped=""/>xx</form>
 #errors
-/form/style;SUBDOC
-/form/style;SUBDOC
+/form/style;SUBDOC;text/css
+/form/style;SUBDOC;text/css
 /form/style;element not allowed:flow style;m
 
 #data
@@ -152,7 +152,7 @@
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</fieldset>
 #errors
-/fieldset/style;SUBDOC
+/fieldset/style;SUBDOC;text/css
 
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml"><legend>y</legend>x</fieldset>
@@ -235,7 +235,7 @@
 <fieldset xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style><legend>y</legend>x</fieldset>
 #errors
 /fieldset/legend;element not allowed:fieldset legend;m
-/fieldset/style;SUBDOC
+/fieldset/style;SUBDOC;text/css
 
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml"

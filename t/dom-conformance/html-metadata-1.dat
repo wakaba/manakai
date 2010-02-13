@@ -184,7 +184,7 @@
 </head>
 #errors
 /head;child element missing;title;m
-/head/script;SUBDOC
+/head/script;SUBDOC;text/javascript
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -192,7 +192,7 @@
 </head>
 #errors
 /head;child element missing;title;m
-/head/style;SUBDOC
+/head/style;SUBDOC;text/css
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml"></head>
@@ -335,7 +335,7 @@
 <title/>
 </head>
 #errors
-/head/script;SUBDOC
+/head/script;SUBDOC;text/javascript
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -343,7 +343,7 @@
 <script type="text/javascript"/>
 </head>
 #errors
-/head/script;SUBDOC
+/head/script;SUBDOC;text/javascript
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -351,7 +351,7 @@
 <title/>
 </head>
 #errors
-/head/style;SUBDOC
+/head/style;SUBDOC;text/css
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -359,7 +359,7 @@
 <style type="text/css"/>
 </head>
 #errors
-/head/style;SUBDOC
+/head/style;SUBDOC;text/css
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title></title><title></title></head><body></body></html>
@@ -919,7 +919,7 @@ a
 </noscript>
 </head>
 #errors
-/head/noscript/style;SUBDOC
+/head/noscript/style;SUBDOC;text/css
 /head/noscript;in XML:noscript;m
 
 #data
@@ -931,7 +931,7 @@ a
 </head>
 #errors
 /head/noscript/style;element not allowed:head noscript;m
-/head/noscript/style;SUBDOC
+/head/noscript/style;SUBDOC;text/css
 /head/noscript;in XML:noscript;m
 
 #data
@@ -960,14 +960,14 @@ a
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml">
 p {color: green}
 </style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml" version="">
@@ -2359,17 +2359,17 @@ p {color: green}
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style type="Text/CSS" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style type="TEXT/CSS" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style type="text/css; charset=us-ascii" xmlns="http://www.w3.org/1999/xhtml">
@@ -2388,25 +2388,25 @@ p {color: green}
 </style>
 #errors
 /style/@type;IMT:unregistered subtype;m
-/style;SUBDOC
+/style;SUBDOC;text/xsl
 
 #data
 <style type="text/plain" xmlns="http://www.w3.org/1999/xhtml">
 </style>
 #errors
 /style/@type;IMT:not styling lang;m
-/style;SUBDOC
+/style;SUBDOC;text/plain
 
 #data
 <style media="all" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 /style/@media;media query;u
 
 #data
 <style media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 /style/@media;media query;u
 
 #data
@@ -2415,7 +2415,7 @@ p {color: green}
 <style scoped=""/>
 </head>
 #errors
-/head/style;SUBDOC
+/head/style;SUBDOC;text/css
 /head/style;element not allowed:head style;m
 
 #data
@@ -2424,7 +2424,7 @@ p {color: green}
 </article>
 #errors
 /article/style;element not allowed:flow style;m
-/article/style;SUBDOC
+/article/style;SUBDOC;text/css
 /article;no significant content;s
 
 #data
@@ -2432,7 +2432,7 @@ p {color: green}
 <style scoped=""/>
 </article>
 #errors
-/article/style;SUBDOC
+/article/style;SUBDOC;text/css
 /article;no significant content;s
 
 #data
@@ -2441,7 +2441,7 @@ p {color: green}
 </aside>
 #errors
 /aside/style;element not allowed:flow style;m
-/aside/style;SUBDOC
+/aside/style;SUBDOC;text/css
 /aside;no significant content;s
 
 #data
@@ -2449,7 +2449,7 @@ p {color: green}
 <style scoped=""/>
 </aside>
 #errors
-/aside/style;SUBDOC
+/aside/style;SUBDOC;text/css
 /aside;no significant content;s
 
 #data
@@ -2458,7 +2458,7 @@ p {color: green}
 </div>
 #errors
 /div/style;element not allowed:flow style;m
-/div/style;SUBDOC
+/div/style;SUBDOC;text/css
 /div;no significant content;s
 
 #data
@@ -2466,7 +2466,7 @@ p {color: green}
 <style scoped=""/>
 </div>
 #errors
-/div/style;SUBDOC
+/div/style;SUBDOC;text/css
 /div;no significant content;s
 
 #data
@@ -2475,7 +2475,7 @@ p {color: green}
 </section>
 #errors
 /section/style;element not allowed:flow style;m
-/section/style;SUBDOC
+/section/style;SUBDOC;text/css
 /section;no significant content;s
 
 #data
@@ -2483,7 +2483,7 @@ p {color: green}
 <style scoped=""/>
 </section>
 #errors
-/section/style;SUBDOC
+/section/style;SUBDOC;text/css
 /section;no significant content;s
 
 #data
@@ -2493,19 +2493,19 @@ p {color: green}
 #errors
 /section/style/@scope;attribute not defined;m
 /section/style;element not allowed:flow style;m
-/section/style;SUBDOC
+/section/style;SUBDOC;text/css
 /section;no significant content;s
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!----></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!--
 --></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">
@@ -2513,80 +2513,80 @@ p {color: green}
 -->
 </style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!---->
 &lt;!----></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!&lt;!---->--</style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!---->--></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!-------></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!-- aewafew ae--></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!--&lt;!---->--></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!--&lt;!----></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!--&lt;/style>--></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!---->
 &lt;!--</style>
 #errors
 /style;style:unclosed cdo;m
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!--></style>
 #errors
 /style;style:unclosed cdo;m
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!-->&lt;!-->--></style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!-</style>
 #errors
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!---<p>-></p></style>
 #errors
 /style/p;element not allowed;m
-/style;SUBDOC
+/style;SUBDOC;text/css
 
 #data
 <style xmlns="http://www.w3.org/1999/xhtml">&lt;!<p>---</p>-></style>
 #errors
 /style/p;element not allowed;m
-/style;SUBDOC
+/style;SUBDOC;text/css

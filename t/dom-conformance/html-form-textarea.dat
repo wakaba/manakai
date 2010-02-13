@@ -50,7 +50,7 @@
 <textarea xmlns="http://www.w3.org/1999/xhtml"
     pattern="">x</textarea>
 #errors
-/textarea/@pattern;SUBDOC
+/textarea/@pattern;SUBDOC;text/x-regexp-js
 /textarea/@pattern;attribute not defined;m
 /textarea;attribute missing;title;s
 
@@ -58,7 +58,7 @@
 <textarea xmlns="http://www.w3.org/1999/xhtml"
     pattern="" title="empty">x</textarea>
 #errors
-/textarea/@pattern;SUBDOC
+/textarea/@pattern;SUBDOC;text/x-regexp-js
 /textarea/@pattern;attribute not defined;m
 
 #data
@@ -411,7 +411,7 @@
 >1234567890</textarea>
 #errors
 /textarea/@pattern;attribute not defined;m
-/textarea/@pattern;SUBDOC
+/textarea/@pattern;SUBDOC;text/x-regexp-js
 /textarea;attribute missing;title;s
 
 #data
@@ -420,7 +420,7 @@
 >1234567890</textarea>
 #errors
 /textarea/@pattern;attribute not defined;m
-/textarea/@pattern;SUBDOC
+/textarea/@pattern;SUBDOC;text/x-regexp-js
 
 #data
 <textarea xmlns="http://www.w3.org/1999/xhtml"

@@ -66,7 +66,8 @@ sub test ($) {
        }
      }, sub {
        my $opt = shift;
-       push @error, get_node_path ($opt->{container_node}) . ';SUBDOC';
+       push @error, get_node_path ($opt->{container_node}) . ';SUBDOC;'
+           . $opt->{media_type};
      });
 
 #line 1 "content-checker-test-ok"  

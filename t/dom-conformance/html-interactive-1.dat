@@ -41,7 +41,7 @@
 </head>
 #errors
 /head/noscript;in XML:noscript;m
-/head/noscript/style;SUBDOC
+/head/noscript/style;SUBDOC;text/css
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -53,7 +53,7 @@
 #errors
 /head/noscript;in XML:noscript;m
 /head/noscript/script;element not allowed:head noscript;m
-/head/noscript/script;SUBDOC
+/head/noscript/script;SUBDOC;text/javascript
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -124,7 +124,7 @@
 </head>
 #errors
 /head/noscript;in XML:noscript;m
-/head/noscript/style;SUBDOC
+/head/noscript/style;SUBDOC;text/css
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -140,7 +140,7 @@
 /head/noscript;in XML:noscript;m
 /head/noscript/noscript;in XML:noscript;m
 /head/noscript/noscript;element not allowed:head noscript;m
-/head/noscript/noscript/style;SUBDOC
+/head/noscript/noscript/style;SUBDOC;text/css
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -213,7 +213,7 @@
 /noscript;no significant content;s
 /noscript;in XML:noscript;m
 /noscript/style;element not allowed:flow style;m
-/noscript/style;SUBDOC
+/noscript/style;SUBDOC;text/css
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -222,7 +222,7 @@
 #errors
 /noscript;no significant content;s
 /noscript;in XML:noscript;m
-/noscript/style;SUBDOC
+/noscript/style;SUBDOC;text/css
 
 #data
 <noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -327,7 +327,7 @@
 <details xmlns="http://www.w3.org/1999/xhtml"><legend>xx</legend><style scoped="scoped"></style><p>xxx</p></details>
 #errors
 /details;child element missing;summary;m
-/details/style;SUBDOC
+/details/style;SUBDOC;text/css
 /details/legend;element not allowed:flow;m
 /details/style;element not allowed:flow style;m
 
@@ -337,7 +337,7 @@
 <style scoped="scoped"></style><p>xxx</p></details>
 #errors
 /details;child element missing;summary;m
-/details/style;SUBDOC
+/details/style;SUBDOC;text/css
 /details/legend;element not allowed:flow;m
 /details/style;element not allowed:flow style;m
 
@@ -792,8 +792,8 @@
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">x<script>y</script></bb>
 #errors
-/bb/script;SUBDOC
-/bb/script;SUBDOC
+/bb/script;SUBDOC;text/javascript
+/bb/script;SUBDOC;text/x-script-element-text
 /bb;element not defined;m
 
 #data
@@ -848,7 +848,7 @@
 <p xmlns="http://www.w3.org/1999/xhtml"><bb><style></style>x</bb></p>
 #errors
 /p/bb/style;element not allowed:phrasing;m
-/p/bb/style;SUBDOC
+/p/bb/style;SUBDOC;text/css
 /p/bb;element not defined;m
 
 #data

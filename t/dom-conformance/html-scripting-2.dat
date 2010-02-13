@@ -2,7 +2,7 @@
 <script defer="" xmlns="http://www.w3.org/1999/xhtml"></script>
 #errors
 /script;attribute missing;src;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script src="" defer="" xmlns="http://www.w3.org/1999/xhtml"></script>
@@ -13,8 +13,8 @@
 | 
 | </script>
 #errors
-/script;SUBDOC
-/script;SUBDOC
+/script;SUBDOC;text/x-script-inline-documentation
+/script;SUBDOC;text/x-script-element-text
 
 #data
 | <script src="xyz" xmlns="http://www.w3.org/1999/xhtml">
@@ -22,8 +22,8 @@
 | -->
 | </script>
 #errors
-/script;SUBDOC
-/script;SUBDOC
+/script;SUBDOC;text/x-script-inline-documentation
+/script;SUBDOC;text/x-script-element-text
 
 #data
 | <script src="xyz" xmlns="http://www.w3.org/1999/xhtml">
@@ -32,91 +32,91 @@
 | */
 | </script>
 #errors
-/script;SUBDOC
-/script;SUBDOC
+/script;SUBDOC;text/x-script-inline-documentation
+/script;SUBDOC;text/x-script-element-text
 
 #data
 | <script src="xyz" xmlns="http://www.w3.org/1999/xhtml">
 |    // abc
 | </script>
 #errors
-/script;SUBDOC
-/script;SUBDOC
+/script;SUBDOC;text/x-script-inline-documentation
+/script;SUBDOC;text/x-script-element-text
 
 #data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:no type;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script type="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:no /;m
-/script;SUBDOC
+/script;SUBDOC;text
 
 #data
 <script type="text/plain; a=b" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:parameter not allowed;m
-/script;SUBDOC
+/script;SUBDOC;text/plain
 
 #data
 <script type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script type="text/javascript;e4x=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:parameter not allowed;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script type="text/JavaScript;E4X=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:parameter not allowed;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script type="text/javascript;e4x=&quot;1&quot;"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:parameter not allowed;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script type="text/javascript;e4x=&quot;\1&quot;"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:parameter not allowed;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script type="text/javascript; ~=a"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:attribute syntax error;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script type="text~/javascript"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:type syntax error;m
-/script;SUBDOC
+/script;SUBDOC;text~/javascript
 
 #data
 <script type="text/javascript~"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:subtype syntax error;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript~
 
 #data
 <script src="http://test/" type="text/javascript"
@@ -144,7 +144,7 @@
 #data
 <script defer="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 /script;attribute missing;src;m
 
 #data
@@ -155,7 +155,7 @@
 #data
 <script defer="defer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 /script;attribute missing;src;m
 
 #data
@@ -166,14 +166,14 @@
 #data
 <script defer="DEFER" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 /script;attribute missing;src;m
 
 #data
 <script defer="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@defer;boolean:invalid;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 /script;attribute missing;src;m
 
 #data
@@ -185,7 +185,7 @@
 #data
 <script async="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script src="http://test/" async=""
@@ -195,7 +195,7 @@
 #data
 <script async="async" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script src="http://test/" async="async"
@@ -206,7 +206,7 @@
 <script async="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@async;boolean:invalid;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script src="http://test/" async="true"
@@ -222,13 +222,13 @@
 #data
 <script defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 /script;attribute missing;src;m
 
 #data
 <script defer="defer" async="async" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 /script;attribute missing;src;m
 
 #data
@@ -239,49 +239,49 @@
 <script language="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script langauge="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@langauge;attribute not defined;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script langage="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@langage;attribute not defined;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script languege="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@languege;attribute not defined;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script language="JavaScript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script language="jscript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;SUBDOC
+/script;SUBDOC;text/jscript
 
 #data
 <script language="javascript1.2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript1.2
 
 #data
 <script language="vbscript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@language;attribute not defined;m
-/script;SUBDOC
+/script;SUBDOC;text/vbscript
 
 #data
 <script language="XML" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -293,7 +293,7 @@
 <script charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@charset;attribute not allowed;m
-/script;SUBDOC
+/script;SUBDOC;text/javascript
 
 #data
 <script src="" charset="" xmlns="http://www.w3.org/1999/xhtml"/>
