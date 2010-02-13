@@ -2418,9 +2418,14 @@ $Element->{$HTML_NS}->{meta} = {
 
         $check_charset_decl->();
 
-        unless ($item->{node}->owner_document->manakai_is_html) {
+        my $doc = $item->{node}->owner_document;
+        if (not $doc->manakai_is_html) {
           $self->{onerror}->(node => $item->{node},
                              type => 'in XML:charset',
+                             level => $self->{level}->{must});
+        } elsif ($doc->manakai_is_srcdoc) {
+          $self->{onerror}->(node => $item->{node},
+                             type => 'srcdoc:charset', # XXXdocumentation
                              level => $self->{level}->{must});
         }
 
@@ -2496,15 +2501,19 @@ $Element->{$HTML_NS}->{meta} = {
       $check_charset_decl->();
       $check_charset->($charset_attr, $value);
 
-      if (not $item->{node}->owner_document->manakai_is_html and
-          not $value =~ /\A[Uu][Tt][Ff]-8\z/) {
+      my $doc = $item->{node}->owner_document;
+      if (not $doc->manakai_is_html and not $value =~ /\A[Uu][Tt][Ff]-8\z/) {
         $self->{onerror}->(node => $item->{node},
                            type => 'in XML:charset',
                            level => $self->{level}->{must});
+      } elsif ($doc->manakai_is_srcdoc) {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'srcdoc:charset', # XXXdocumentation
+                           level => $self->{level}->{must});
       }
     }
-  },
-};
+  }, # check_attrs
+}; # meta
 
 $Element->{$HTML_NS}->{style} = {
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,

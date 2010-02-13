@@ -726,6 +726,45 @@
 /svg/foreignObject;unknown element;u
 
 #data
+<meta charset="UTF-8" xmlns="http://www.w3.org/1999/xhtml"/>
+#issrcdoc 1
+#errors
+/meta;srcdoc:charset;m
+/meta/@charset;charset:not preferred;m
+/meta/@charset;mismatched charset name not checked;u
+/meta;element not allowed:meta charset;m
+
+#data
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#issrcdoc 1
+#errors
+/meta;in XML:charset;m
+/meta/@content;charset:not preferred;m
+/meta/@content;mismatched charset name not checked;u
+/meta;element not allowed:meta charset;m
+
+#data html
+<!DOCTYPE html>
+<meta charset=UTF-8>
+a
+#issrcdoc 1
+#errors
+/html/head/meta;srcdoc:charset;m
+/html/head/meta/@charset;charset:not preferred;m
+/html/head/meta/@charset;mismatched charset name not checked;u
+
+#data html
+<!DOCTYPE html>
+<meta http-equiv=content-type content="text/html;charset=UTF-8">
+a
+#issrcdoc 1
+#errors
+/html/head/meta;srcdoc:charset;m
+/html/head/meta/@content;charset:not preferred;m
+/html/head/meta/@content;mismatched charset name not checked;u
+
+#data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <title>x</title>
 <noscript>
