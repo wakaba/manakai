@@ -1989,7 +1989,8 @@ $Element->{$HTML_NS}->{head} = {
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
-    unless ($element_state->{has_title}) {
+    if (not $element_state->{has_title} and
+        not $item->{node}->owner_document->manakai_is_srcdoc) {
       $self->{onerror}->(node => $item->{node},
                          type => 'child element missing',
                          text => 'title',

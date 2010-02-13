@@ -49,6 +49,10 @@ sub test ($) {
   }
   $doc->document_uri (q<thismessage:/>);
 
+  if ($test->{issrcdoc}->[1]) {
+    $doc->manakai_is_srcdoc (1);
+  }
+
   my @error;
   Whatpm::ContentChecker->check_element
     ($doc->document_element, sub {
@@ -64,7 +68,8 @@ sub test ($) {
        my $opt = shift;
        push @error, get_node_path ($opt->{container_node}) . ';SUBDOC';
      });
-  
+
+#line 1 "content-checker-test-ok"  
   ok join ("\n", sort {$a cmp $b} @error),
     join ("\n", sort {$a cmp $b} @{$test->{errors}->[0]}), $test->{data}->[0];
 } # test
