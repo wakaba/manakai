@@ -5115,11 +5115,19 @@ $Element->{$HTML_NS}->{iframe} = {
   %HTMLTextChecker, # XXX content model restriction
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      bottom => 1, middle => 1, top => 1, left => 1, right => 1,
+    }),
+    frameborder => $GetHTMLEnumeratedAttrChecker->({1 => 1, 0 => 1}),
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    longdesc => $HTMLURIAttrChecker,
+    marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     name => $HTMLBrowsingContextNameAttrChecker,
     sandbox => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->({
       'allow-same-origin' => 1, 'allow-forms' => 1, 'allow-scripts' => 1,
     }),
+    scrolling => $GetHTMLEnumeratedAttrChecker->({yes => 1, no => 1, auto => 1}),
     seemless => $GetHTMLBooleanAttrChecker->('seemless'),
     src => $HTMLURIAttrChecker,
     srcdoc => sub {
