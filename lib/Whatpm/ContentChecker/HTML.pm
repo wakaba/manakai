@@ -928,7 +928,7 @@ my $HTMLTargetAttrChecker = sub {
   my ($self, $attr) = @_;
   my $value = $attr->value;
   if ($value =~ /^_/) {
-    $value = lc $value; ## ISSUE: ASCII case-insentitive?
+    $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     unless ({
              _blank => 1,_self => 1, _parent => 1, _top => 1,
             }->{$value}) {
