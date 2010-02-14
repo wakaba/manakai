@@ -6583,10 +6583,9 @@ $Element->{$HTML_NS}->{legend} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-# XXX
-#    align => $GetHTMLEnumeratedAttrChecker->({
-#      top => 1, bottom => 1, left => 1, right => 1,
-#    }),
+    align => $GetHTMLEnumeratedAttrChecker->({
+      top => 1, bottom => 1, left => 1, right => 1,
+    }),
     form => $HTMLFormAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -6595,7 +6594,7 @@ $Element->{$HTML_NS}->{legend} = {
     align => FEATURE_HTML5_OBSOLETE,
     form => FEATURE_HTML5_DROPPED,
     lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
 }; # legend
 
 $Element->{$HTML_NS}->{label} = {

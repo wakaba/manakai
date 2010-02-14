@@ -2287,3 +2287,95 @@ x<br autofocus=""/>
 >x</form>
 #errors
 /form/@autocomplete;enumerated:invalid;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align=""
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+/legend/@align;enumerated:invalid;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="   "
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+/legend/@align;enumerated:invalid;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="top"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="bottom"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="left"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="right"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="center"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+/legend/@align;enumerated:invalid;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="left "
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+/legend/@align;enumerated:invalid;m
+
+#data escaped
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0130ght"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+/legend/@align;enumerated:invalid;m
+
+#data escaped
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0131ght"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+/legend/@align;enumerated:invalid;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="align"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+/legend/@align;enumerated:invalid;m
+
+#data
+<legend xmlns="http://www.w3.org/1999/xhtml"
+    align="justify"
+>a</legend>
+#errors
+/legend/@align;attribute not defined;m
+/legend/@align;enumerated:invalid;m
