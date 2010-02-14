@@ -2232,6 +2232,20 @@ aa<map name="x">b<map name="y">bb</map></map>
 </a>
 #errors
 
+#data escaped
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="\u0130smap"/>
+</a>
+#errors
+/a/img/@ismap;boolean:invalid;m
+
+#data escaped
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="\u0131smap"/>
+</a>
+#errors
+/a/img/@ismap;boolean:invalid;m
+
 #data
 <a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
 <img alt="" src="http://test/" ismap="true"/>

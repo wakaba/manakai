@@ -405,7 +405,8 @@ my $GetHTMLBooleanAttrChecker = sub {
   my $local_name = shift;
   return sub {
     my ($self, $attr) = @_;
-    my $value = lc $attr->value; ## TODO: case
+    my $value = $attr->value;
+    $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     unless ($value eq $local_name or $value eq '') {
       $self->{onerror}->(node => $attr, type => 'boolean:invalid',
                          level => $self->{level}->{must});
@@ -1640,6 +1641,7 @@ my $GetHTMLAttrsChecker = sub {
       if ($attr_ns eq '') {
         if ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
             $attr_ln !~ /[A-Z]/) {
+          ## XML-compatible + no uppercase letter
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -2245,6 +2247,7 @@ $Element->{$HTML_NS}->{meta} = {
           $checker = sub {};
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
+          ## XML-compatible + no uppercase letter
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -3796,6 +3799,7 @@ $Element->{$HTML_NS}->{a} = {
           $attr{$attr_ln} = $attr;
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
+          ## XML-compatible + no uppercase letter
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -4996,11 +5000,13 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 });
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
+          ## XML-compatible + no uppercase letter
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
-        } elsif ($attr_ln !~ /^[Xx][Mm][Ll]/ and
+        } elsif ($attr_ln !~ /^xml/ and
                  $attr_ln !~ /[A-Z]/ and
                  $attr_ln =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+          ## XML-compatible + no uppercase letter
           $checker = $HTMLAttrChecker->{$attr_ln}
             || sub { }; ## NOTE: Any local attribute is ok.
           $status = FEATURE_HTML5_WD | FEATURE_ALLOWED;
@@ -5582,6 +5588,7 @@ $Element->{$HTML_NS}->{area} = {
           $attr{$attr_ln} = $attr;
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
+          ## XML-compatible + no uppercase letter
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {
@@ -6989,6 +6996,7 @@ $Element->{$HTML_NS}->{input} = {
           }
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
+          ## XML-compatible + no uppercase letter
           $checker = $HTMLDatasetAttrChecker;
           $status = $HTMLDatasetAttrStatus;
         } else {

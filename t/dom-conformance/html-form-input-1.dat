@@ -5768,6 +5768,20 @@
     required="RequireD"/>
 #errors
 
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    required="requ\u0130red"/>
+#errors
+/input/@required;boolean:invalid;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    required="requ\u0131red"/>
+#errors
+/input/@required;boolean:invalid;m
+
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="text"
@@ -8957,6 +8971,20 @@
 #errors
 /input/@multiple;boolean:invalid;m
 
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    multiple="mult\u0130ple"/>
+#errors
+/input/@multiple;boolean:invalid;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    multiple="mult\u0131ple"/>
+#errors
+/input/@multiple;boolean:invalid;m
+
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="email"
@@ -11126,6 +11154,16 @@
 #data
 <input type="hidden" disabled="DISABLED" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data escaped
+<input type="hidden" disabled="d\u0130sabled" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@disabled;boolean:invalid;m
+
+#data escaped
+<input type="hidden" disabled="d\u0131sabled" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@disabled;boolean:invalid;m
 
 #data
 <input type="hidden" disabled="no" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -13642,6 +13680,20 @@
     formnovalidate="Formnovalidate"
 />
 #errors
+
+#data escaped
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    formnovalidate="formnoval\u0130date"
+/>
+#errors
+/input/@formnovalidate;boolean:invalid;m
+
+#data escaped
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    formnovalidate="formnoval\u0131date"
+/>
+#errors
+/input/@formnovalidate;boolean:invalid;m
 
 #data
 <input type="submit" xmlns="http://www.w3.org/1999/xhtml"

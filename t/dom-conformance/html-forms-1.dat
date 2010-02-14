@@ -2132,6 +2132,20 @@ x<br autofocus=""/>
 >x</form>
 #errors
 
+#data escaped
+<form xmlns="http://www.w3.org/1999/xhtml"
+    novalidate="noval\u0130date"
+>x</form>
+#errors
+/form/@novalidate;boolean:invalid;m
+
+#data escaped
+<form xmlns="http://www.w3.org/1999/xhtml"
+    novalidate="noval\u0131date"
+>x</form>
+#errors
+/form/@novalidate;boolean:invalid;m
+
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"
     novalidate="yes"

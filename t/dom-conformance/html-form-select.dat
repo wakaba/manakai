@@ -116,6 +116,18 @@
 #errors
 /select/@multiple;boolean:invalid;m
 
+#data escaped
+<select xmlns="http://www.w3.org/1999/xhtml"
+    multiple="mult\u0130ple"/>
+#errors
+/select/@multiple;boolean:invalid;m
+
+#data escaped
+<select xmlns="http://www.w3.org/1999/xhtml"
+    multiple="mult\u0131ple"/>
+#errors
+/select/@multiple;boolean:invalid;m
+
 #data
 <select xmlns="http://www.w3.org/1999/xhtml"
     multiple="yes"/>

@@ -583,6 +583,16 @@ id=""><span id="">x</span></p>
 <p hidden="hidden" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 
+#data escaped
+<p hidden="h\u0130dden" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
+#data escaped
+<p hidden="h\u0131dden" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@hidden;boolean:invalid;m
+
 #data
 <p hidden="irrelevant" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
