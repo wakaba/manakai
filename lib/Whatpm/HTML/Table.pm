@@ -696,13 +696,14 @@ sub get_assigned_headers ($$$$) {
     }
   }
 
-  ## 4.
-  @$header_list = grep { not $_->{is_empty} } @$header_list;
+  ## 4., 6.
+  @$header_list = grep { not $_->{is_empty} and not $_ eq $p_cell }
+      @$header_list;
 
   ## 5.
   @$header_list = values %{{map { ($_->{x} . '-' . $_->{y} => $_) } @$header_list}};
 
-  ## 6.
+  ## 7.
   return $header_list;
 } # get_assigned_header
 

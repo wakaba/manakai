@@ -212,7 +212,7 @@ sub _form_table : Test(5) {
   }
 } # _form_table
 
-sub _get_assigned_headers : Test(123) {
+sub _get_assigned_headers : Test(140) {
   for (
     {
       input => q[<tr><th>1<th>2<tr><td>3<td>4],
@@ -286,12 +286,12 @@ sub _get_assigned_headers : Test(123) {
         [3, 0 => []],
         [4, 0 => []],
         [5, 0 => []],
-        [0, 1 => [cell '0,0,1,2/th 1']],
-        [1, 1 => [cell '1,0,1,2/th 2']],
+        [0, 1 => []],
+        [1, 1 => []],
         [2, 1 => [cell '2,0,2,1/th 3']],
         [3, 1 => [cell '2,0,2,1/th 3']],
-        [4, 1 => [cell '4,0,1,2/th 4']],
-        [5, 1 => [cell '5,0,1,2/th 5']],
+        [4, 1 => []],
+        [5, 1 => []],
         [0, 2 => [cell '0,0,1,2/th 1']],
         [1, 2 => [cell '1,0,1,2/th 2']],
         [2, 2 => [cell '2,0,2,1/th 3', cell '2,1,1,1/th 11']],
@@ -342,7 +342,7 @@ sub _get_assigned_headers : Test(123) {
         [1, 0 => []],
         [2, 0 => []],
         [3, 0 => []],
-        [0, 1 => [cell '0,1,1,1/th(rg) 11']],
+        [0, 1 => []],
         [1, 1 => [cell '1,0,1,1/th 1', cell '0,1,1,1/th(rg) 11']],
         [2, 1 => [cell '2,0,1,1/th 2', cell '0,1,1,1/th(rg) 11']],
         [3, 1 => [cell '3,0,1,1/th 3', cell '0,1,1,1/th(rg) 11']],
@@ -350,7 +350,7 @@ sub _get_assigned_headers : Test(123) {
         [1, 2 => [cell '1,0,1,1/th 1', cell '0,1,1,1/th(rg) 11', cell '0,2,1,1/th(r) 21']],
         [2, 2 => [cell '2,0,1,1/th 2', cell '0,1,1,1/th(rg) 11', cell '0,2,1,1/th(r) 21']],
         [3, 2 => [cell '3,0,1,1/th 3', cell '0,1,1,1/th(rg) 11', cell '0,2,1,1/th(r) 21']],
-        [0, 3 => [cell '0,3,1,1/th(rg) 31']],
+        [0, 3 => []],
         [1, 3 => [cell '1,0,1,1/th 1', cell '0,3,1,1/th(rg) 31']],
         [2, 3 => [cell '2,0,1,1/th 2', cell '0,3,1,1/th(rg) 31']],
         [3, 3 => [cell '3,0,1,1/th 3', cell '0,3,1,1/th(rg) 31']],
@@ -408,6 +408,59 @@ sub _get_assigned_headers : Test(123) {
         [1, 0 => []],
         [0, 1 => [cell '1,1,1,1/td 4 ->c<-']],
         [1, 1 => [cell '0,1,1,1/td 3 ->d<-']],
+      ],
+    },
+    {
+      input => q[<colgroup span=2><tr><th scope=colgroup>1<td>2<tr><td>3<td>4],
+      in_doc => 1,
+      results => [
+        [0, 0 => []],
+        [1, 0 => [cell '0,0,1,1/th(cg) 1']],
+        [0, 1 => [cell '0,0,1,1/th(cg) 1']],
+        [1, 1 => [cell '0,0,1,1/th(cg) 1']],
+      ],
+    },
+    {
+      input => q[<colgroup span=2><tr><th scope=colgroup>1<th>2<tr><td>3<td>4],
+      in_doc => 1,
+      results => [
+        [0, 0 => []],
+        [1, 0 => [cell '0,0,1,1/th(cg) 1']],
+        [0, 1 => [cell '0,0,1,1/th(cg) 1']],
+        [1, 1 => [cell '0,0,1,1/th(cg) 1', cell '1,0,1,1/th 2']],
+      ],
+    },
+    {
+      input => q[<tr><th id=a headers=a>a],
+      in_doc => 1,
+      results => [
+        [0, 0 => []],
+      ],
+    },
+    {
+      input => q[<tr><th id=a headers=b>1<th id=b headers=a>2],
+      in_doc => 1,
+      results => [
+        [0, 0 => [cell '1,0,1,1/th 2 ->a<-']],
+        [1, 0 => [cell '0,0,1,1/th 1 ->b<-']],
+      ],
+    },
+    {
+      input => q[<tr><th id=a headers=b>1<th id=b headers=c>2<th id=c>3],
+      in_doc => 1,
+      results => [
+        [0, 0 => [cell '1,0,1,1/th 2 ->c<-']],
+        [1, 0 => [cell '2,0,1,1/th 3']],
+        [2, 0 => []],
+      ],
+    },
+    {
+      input => q[<tr><th id=a headers=b>1<td id=b headers=c>2<th id=c>3],
+      in_doc => 1,
+      results => [
+        [0, 0 => [cell '1,0,1,1/td 2 ->c<-']],
+        [1, 0 => [cell '2,0,1,1/th 3']],
+        [2, 0 => []],
       ],
     },
   ) {
