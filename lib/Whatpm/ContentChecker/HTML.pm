@@ -1638,6 +1638,125 @@ my $HTMLDatasetAttrChecker = sub {
 
 my $HTMLDatasetAttrStatus = FEATURE_HTML5_LC;
 
+my $ShapeCoordsChecker = sub ($$$) {
+  my ($self, $item, $attrs) = @_;
+  
+  my $coords;
+  if ($attrs->{coords}) {
+    my $coords_value = $attrs->{coords}->value;
+    if ($coords_value =~ /\A-?[0-9]+(?>,-?[0-9]+)*\z/) {
+      $coords = [split /,/, $coords_value];
+    } else {
+      $self->{onerror}->(node => $attrs->{coords},
+                         type => 'coords:syntax error',
+                         level => $self->{level}->{must});
+    }
+  }
+
+  my $shape = 'rectangle';
+  if (defined $attrs->{shape}) {
+    $shape = {
+        circ => 'circle', circle => 'circle',
+        default => 'default',
+        poly => 'polygon', polygon => 'polygon',
+        rect => 'rectangle', rectangle => 'rectangle',
+    }->{lc $attrs->{shape}->value} || 'rectangle';
+    ## TODO: ASCII lowercase?
+  }
+  
+  if ($shape eq 'circle') {
+    if (defined $attrs->{coords}) {
+      if (defined $coords) {
+        if (@$coords == 3) {
+          if ($coords->[2] < 0) {
+            $self->{onerror}->(node => $attrs->{coords},
+                               type => 'coords:out of range',
+                               index => 2,
+                               value => $coords->[2],
+                               level => $self->{level}->{must});
+          }
+        } else {
+          $self->{onerror}->(node => $attrs->{coords},
+                             type => 'coords:number not 3',
+                             text => 0+@$coords,
+                             level => $self->{level}->{must});
+        }
+      } else {
+        ## NOTE: A syntax error has been reported.
+      }
+    } else {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'coords',
+                         level => $self->{level}->{must});
+    }
+  } elsif ($shape eq 'default') {
+    if (defined $attrs->{coords}) {
+      $self->{onerror}->(node => $attrs->{coords},
+                         type => 'attribute not allowed',
+                         level => $self->{level}->{must});
+    }
+  } elsif ($shape eq 'polygon') {
+    if (defined $attrs->{coords}) {
+      if (defined $coords) {
+        if (@$coords >= 6) {
+          unless (@$coords % 2 == 0) {
+            $self->{onerror}->(node => $attrs->{coords},
+                               type => 'coords:number not even',
+                               text => 0+@$coords,
+                               level => $self->{level}->{must});
+          }
+        } else {
+          $self->{onerror}->(node => $attrs->{coords},
+                             type => 'coords:number lt 6',
+                             text => 0+@$coords,
+                             level => $self->{level}->{must});
+        }
+      } else {
+        ## NOTE: A syntax error has been reported.
+      }
+    } else {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'coords',
+                         level => $self->{level}->{must});
+    }
+  } elsif ($shape eq 'rectangle') {
+    if (defined $attrs->{coords}) {
+      if (defined $coords) {
+        if (@$coords == 4) {
+          unless ($coords->[0] < $coords->[2]) {
+            $self->{onerror}->(node => $attrs->{coords},
+                               type => 'coords:out of range',
+                               index => 0,
+                               value => $coords->[0],
+                               level => $self->{level}->{must});
+          }
+          unless ($coords->[1] < $coords->[3]) {
+            $self->{onerror}->(node => $attrs->{coords},
+                               type => 'coords:out of range',
+                               index => 1,
+                               value => $coords->[1],
+                               level => $self->{level}->{must});
+          }
+        } else {
+          $self->{onerror}->(node => $attrs->{coords},
+                             type => 'coords:number not 4',
+                             text => 0+@$coords,
+                             level => $self->{level}->{must});
+        }
+      } else {
+        ## NOTE: A syntax error has been reported.
+      }
+    } else {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'coords',
+                         level => $self->{level}->{must});
+    }
+  }
+}; # $ShapeCoordsChecker
+
 my $GetHTMLAttrsChecker = sub {
   my $element_specific_checker = shift;
   my $element_specific_status = shift;
@@ -5561,7 +5680,6 @@ $Element->{$HTML_NS}->{area} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     my %attr;
-    my $coords;
     for my $attr (@{$item->{node}->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
@@ -5592,17 +5710,7 @@ $Element->{$HTML_NS}->{area} = {
 
         $checker = {
           alt => sub { }, ## Checked later.
-          coords => sub {
-            my ($self, $attr) = @_;
-            my $value = $attr->value;
-            if ($value =~ /\A-?[0-9]+(?>,-?[0-9]+)*\z/) {
-              $coords = [split /,/, $value];
-            } else {
-              $self->{onerror}->(node => $attr,
-                                 type => 'coords:syntax error',
-                                 level => $self->{level}->{must});
-            }
-          },
+          coords => sub { }, ## Checked in $ShapeCoordsChecker
           href => $HTMLURIAttrChecker,
           hreflang => $HTMLLanguageTagAttrChecker,
           media => $HTMLMQAttrChecker,
@@ -5683,108 +5791,7 @@ $Element->{$HTML_NS}->{area} = {
       }
     }
 
-    my $shape = 'rectangle';
-    if (defined $attr{shape}) {
-      $shape = {
-                circ => 'circle', circle => 'circle',
-                default => 'default',
-                poly => 'polygon', polygon => 'polygon',
-                rect => 'rectangle', rectangle => 'rectangle',
-               }->{lc $attr{shape}->value} || 'rectangle';
-      ## TODO: ASCII lowercase?
-    }
-
-    if ($shape eq 'circle') {
-      if (defined $attr{coords}) {
-        if (defined $coords) {
-          if (@$coords == 3) {
-            if ($coords->[2] < 0) {
-              $self->{onerror}->(node => $attr{coords},
-                                 type => 'coords:out of range',
-                                 index => 2,
-                                 value => $coords->[2],
-                                 level => $self->{level}->{must});
-            }
-          } else {
-            $self->{onerror}->(node => $attr{coords},
-                               type => 'coords:number not 3',
-                               text => 0+@$coords,
-                               level => $self->{level}->{must});
-          }
-        } else {
-          ## NOTE: A syntax error has been reported.
-        }
-      } else {
-        $self->{onerror}->(node => $item->{node},
-                           type => 'attribute missing',
-                           text => 'coords',
-                           level => $self->{level}->{must});
-      }
-    } elsif ($shape eq 'default') {
-      if (defined $attr{coords}) {
-        $self->{onerror}->(node => $attr{coords},
-                           type => 'attribute not allowed',
-                           level => $self->{level}->{must});
-      }
-    } elsif ($shape eq 'polygon') {
-      if (defined $attr{coords}) {
-        if (defined $coords) {
-          if (@$coords >= 6) {
-            unless (@$coords % 2 == 0) {
-              $self->{onerror}->(node => $attr{coords},
-                                 type => 'coords:number not even',
-                                 text => 0+@$coords,
-                                 level => $self->{level}->{must});
-            }
-          } else {
-            $self->{onerror}->(node => $attr{coords},
-                               type => 'coords:number lt 6',
-                               text => 0+@$coords,
-                               level => $self->{level}->{must});
-          }
-        } else {
-          ## NOTE: A syntax error has been reported.
-        }
-      } else {
-        $self->{onerror}->(node => $item->{node},
-                           type => 'attribute missing',
-                           text => 'coords',
-                           level => $self->{level}->{must});
-      }
-    } elsif ($shape eq 'rectangle') {
-      if (defined $attr{coords}) {
-        if (defined $coords) {
-          if (@$coords == 4) {
-            unless ($coords->[0] < $coords->[2]) {
-              $self->{onerror}->(node => $attr{coords},
-                                 type => 'coords:out of range',
-                                 index => 0,
-                                 value => $coords->[0],
-                                 level => $self->{level}->{must});
-            }
-            unless ($coords->[1] < $coords->[3]) {
-              $self->{onerror}->(node => $attr{coords},
-                                 type => 'coords:out of range',
-                                 index => 1,
-                                 value => $coords->[1],
-                                 level => $self->{level}->{must});
-            }
-          } else {
-            $self->{onerror}->(node => $attr{coords},
-                               type => 'coords:number not 4',
-                               text => 0+@$coords,
-                               level => $self->{level}->{must});
-          }
-        } else {
-          ## NOTE: A syntax error has been reported.
-        }
-      } else {
-        $self->{onerror}->(node => $item->{node},
-                           type => 'attribute missing',
-                           text => 'coords',
-                           level => $self->{level}->{must});
-      }
-    }
+    $ShapeCoordsChecker->($self, $item, \%attr);
 
     $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },
@@ -5800,7 +5807,7 @@ $Element->{$HTML_NS}->{area} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
-};
+}; # area
 
 # ---- Tabular data ----
 
