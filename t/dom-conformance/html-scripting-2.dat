@@ -304,3 +304,34 @@
 #data
 <script src="" charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<script event="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@event;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script for="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@for;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script for="abc" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@for;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script for="#xyz" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@for;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script for="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@for;attribute not defined;m
+/script/@for;syntax error:iriref3987;m
+/script;SUBDOC;text/javascript

@@ -2841,6 +2841,8 @@ $Element->{$HTML_NS}->{script} = {
 
       $HTMLCharsetChecker->($attr->value, @_);
     },
+    event => sub { }, ## Reserved in HTML4 without no restriction.
+    for => $HTMLURIAttrChecker, ## Reserved in HTML4
     language => sub {}, ## NOTE: No syntax constraint according to HTML4.
     src => $HTMLURIAttrChecker, ## TODO: pointed resource MUST be in type of type="" (resource error)
     type => sub {
@@ -5881,6 +5883,7 @@ $Element->{$HTML_NS}->{table} = {
     }, # border
     cellpadding => $HTMLLengthAttrChecker,
     cellspacing => $HTMLLengthAttrChecker,
+    datapagesize => sub { }, ## CDATA [HTML4]
     frame => $GetHTMLEnumeratedAttrChecker->({
       void => 1, above => 1, below => 1, hsides => 1, vsides => 1,
       lhs => 1, rhs => 1, box => 1, border => 1,
