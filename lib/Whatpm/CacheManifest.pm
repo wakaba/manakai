@@ -37,6 +37,7 @@ sub _parse ($$$$$$) {
 
   my $m_uri = Message::DOM::DOMImplementation->create_uri_reference ($_[2]);
   my $m_scheme = $m_uri->uri_scheme;
+  $m_scheme =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
 
   my $onerror = $_[4];
   my $levels = $_[5] || $default_error_levels;
@@ -60,7 +61,9 @@ sub _parse ($$$$$$) {
     ## it must also return 0.
     
     ## 4.
-    unless (lc $u1->uri_scheme eq lc $m_scheme) { ## TODO: case
+    my $u1_scheme = $u1->uri_scheme;
+    $u1_scheme =~ tr/A-Z/a-z/; ## ASCII case-insensitive
+    unless ($u1_scheme eq $m_scheme) {
       return 0;
     }
     ## TODO: Return if $u1->uri_scheme is not a supported scheme.
@@ -212,6 +215,7 @@ sub _parse ($$$$$$) {
       }
 
       my $scheme = $uri->uri_scheme;
+      $scheme =~ tr/A-Z/a-z/ if defined $scheme; ## ASCII case-insensitive.
       unless (defined $scheme and $scheme eq $m_scheme) {
         $onerror->(type => 'different scheme from manifest',
                    level => $levels->{info},
@@ -299,6 +303,7 @@ sub _parse ($$$$$$) {
       }
 
       my $u2_scheme = $u2->uri_scheme;
+      $u2_scheme =~ tr/A-Z/a-z/ if defined $u2_scheme; ## ASCII case-insensitive.
       unless (defined $u2_scheme and $u2_scheme eq $m_scheme) {
         $onerror->(type => 'different scheme from manifest',
                    level => $levels->{info},
@@ -339,6 +344,7 @@ sub _parse ($$$$$$) {
       }
 
       my $scheme = $uri->uri_scheme;
+      $scheme =~ tr/A-Z/a-z/ if defined $scheme; ## ASCII case-insensitive.
       unless (defined $scheme and $scheme eq $m_scheme) {
         $onerror->(type => 'different scheme from manifest',
                    level => $levels->{info},
