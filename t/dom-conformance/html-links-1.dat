@@ -1152,3 +1152,58 @@ x</div>
 #errors
 /link/@rev;attribute not defined;m
 /link;attribute missing;rel;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    shape=""
+>a
+</a>
+#errors
+/a/@shape;attribute not defined;m
+/a/@shape;enumerated:invalid;m
+/a;attribute missing;coords;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    shape="   "
+>a
+</a>
+#errors
+/a/@shape;attribute not defined;m
+/a/@shape;enumerated:invalid;m
+/a;attribute missing;coords;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    shape="default"
+>a
+</a>
+#errors
+/a/@shape;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    shape="rect"
+    coords="1,2,3,4"
+>a
+</a>
+#errors
+/a/@shape;attribute not defined;m
+/a/@coords;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    shape="rect"
+    coords="1,2,3,4,5"
+>
+a
+</a>
+#errors
+/a/@shape;attribute not defined;m
+/a/@coords;attribute not defined;m
+/a/@coords;coords:number not 4;5;m

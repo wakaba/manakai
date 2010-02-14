@@ -1639,7 +1639,7 @@ my $HTMLDatasetAttrChecker = sub {
 my $HTMLDatasetAttrStatus = FEATURE_HTML5_LC;
 
 my $ShapeCoordsChecker = sub ($$$) {
-  my ($self, $item, $attrs) = @_;
+  my ($self, $item, $attrs, $shape) = @_;
   
   my $coords;
   if ($attrs->{coords}) {
@@ -1653,7 +1653,6 @@ my $ShapeCoordsChecker = sub ($$$) {
     }
   }
 
-  my $shape = 'rectangle';
   if (defined $attrs->{shape}) {
     $shape = {
         circ => 'circle', circle => 'circle',
@@ -3936,7 +3935,7 @@ $Element->{$HTML_NS}->{a} = {
             my ($self, $attr) = @_;
             $HTMLCharsetChecker->($attr->value, @_);
           },
-          ## TODO: HTML4 |coords|
+          coords => sub { }, ## Checked in $ShapeCoordsChecker.
           href => $HTMLURIAttrChecker,
           hreflang => $HTMLLanguageTagAttrChecker,
           media => $HTMLMQAttrChecker,
@@ -3944,7 +3943,12 @@ $Element->{$HTML_NS}->{a} = {
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
           rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
-          ## TODO: HTML4 |shape|
+          shape => $GetHTMLEnumeratedAttrChecker->({
+            circ => -1, circle => 1,
+            default => 1,
+            poly => 1, polygon => -1,
+            rect => 1, rectangle => -1,
+          }),
           target => $HTMLTargetAttrChecker,
           type => $MIMETypeChecker,
         }->{$attr_ln};
@@ -3992,6 +3996,8 @@ $Element->{$HTML_NS}->{a} = {
         }
       }
     }
+
+    $ShapeCoordsChecker->($self, $item, \%attr, 'missing');
 
     $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },
@@ -5791,7 +5797,7 @@ $Element->{$HTML_NS}->{area} = {
       }
     }
 
-    $ShapeCoordsChecker->($self, $item, \%attr);
+    $ShapeCoordsChecker->($self, $item, \%attr, 'rectangle');
 
     $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },
