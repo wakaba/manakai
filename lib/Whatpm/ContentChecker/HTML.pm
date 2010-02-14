@@ -5153,15 +5153,15 @@ $Element->{$HTML_NS}->{iframe} = {
     srcdoc => FEATURE_HTML5_LC,
     title => FEATURE_HTML5_REC,
     width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-};
+  }, # check_start
+}; # iframe
 
 $Element->{$HTML_NS}->{embed} = {
   %HTMLEmptyChecker,
@@ -8385,7 +8385,7 @@ $Element->{$HTML_NS}->{nest} = {
     filter => FEATURE_HTML5_DROPPED,
     mode => FEATURE_HTML5_DROPPED,
   }),
-};
+}; # nest
 
 # ---- Microdata ----
 
@@ -8477,9 +8477,46 @@ $Element->{$HTML_NS}->{frameset} = {
   }, # check_end
 }; # frameset
 
-## frame FEATURE_HTML5_OBSOLETE
-## frameborder longdesc marginheight marginwidth noresize scrolling src name(deprecated) class,id,title,style(x10)
-## noframes FEATURE_HTML5_OBSOLETE Common, lang(xhtml10)
+$Element->{$HTML_NS}->{frame} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    frameborder => $GetHTMLEnumeratedAttrChecker->({1 => 1, 0 => 1}),
+    longdesc => $HTMLURIAttrChecker,
+    marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    name => $HTMLBrowsingContextNameAttrChecker,
+    noresize => $GetHTMLBooleanAttrChecker->('noresize'),
+    scrolling => $GetHTMLEnumeratedAttrChecker->({yes => 1, no => 1, auto => 1}),
+    src => $HTMLURIAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    frameborder => FEATURE_M12N10_REC,
+    id => FEATURE_HTML5_REC,
+    longdesc => FEATURE_M12N10_REC,
+    marginheight => FEATURE_M12N10_REC,
+    marginwidth => FEATURE_M12N10_REC,
+    name => FEATURE_M12N10_REC,
+    noresize => FEATURE_M12N10_REC,
+    scrolling => FEATURE_M12N10_REC,
+    src => FEATURE_M12N10_REC,
+    style => FEATURE_HTML5_REC,
+    title => FEATURE_HTML5_REC,
+  }), # check_attrs
+}; # frame
+
+$Element->{$HTML_NS}->{noframes} = {
+  %HTMLTextChecker, # XXX content model restriction
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    #
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+    lang => FEATURE_HTML5_REC,
+  }), # check_attrs
+}; # noframes
 
 ## XXX HTML 2.0 nextid @n FEATURE_HTML5_OBSOLETE
 ## XXX noembed FEATURE_HTML5_OBSOLETE

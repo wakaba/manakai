@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Feb 14 21:31:47 2010
-# Current time GMT:   Sun Feb 14 12:31:47 2010
+# Current time local: Sun Feb 14 22:28:04 2010
+# Current time GMT:   Sun Feb 14 13:28:04 2010
 # Using Test.pm version 1.25_02
 # ../t/content-model-1.dat
 ok 1
@@ -7033,144 +7033,110 @@ ok 6841
 ok 6842
 ok 6843
 ok 6844
-not ok 6845
-# Test 6845 got: "/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6845)
-#      Expected: "/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <frameset>
-#    <frame src="a"/>
-#  </frameset>
-#</frameset>)
-not ok 6846
-# Test 6846 got: "/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6846)
-#      Expected: "/frameset/frameset/frame;element not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <frameset>
-#    <frame src="a"/>
-#  </frameset>
-#  <frameset>
-#    <frame src="a"/>
-#  </frameset>
-#</frameset>)
-#      Got 2 extra lines at line 1:
-#       + "/frameset/frameset/frame/@src;attribute not defined;m\n"
-#       + "/frameset/frameset/frame/@src;attribute not defined;m\n"
-not ok 6847
-# Test 6847 got: "/frameset/frame/@src;attribute not defined;m\n/frameset/frame;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6847)
-#      Expected: "/frameset/frame;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <frame src="a"/>
-#</frameset>)
-not ok 6848
-# Test 6848 got: "/frameset/frame/@src;attribute not defined;m\n/frameset/frame;element not defined;m\n/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6848)
-#      Expected: "/frameset/frame;element not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <frameset>
-#    <frame src="a"/>
-#  </frameset>
-#  <frame src="a"/>
-#</frameset>)
-#      Got 1 extra line at line 1:
-#       + "/frameset/frame/@src;attribute not defined;m\n"
-#      Got 1 extra line at line 3:
-#       + "/frameset/frameset/frame/@src;attribute not defined;m\n"
-not ok 6849
-# Test 6849 got: "/frameset/frame/@src;attribute not defined;m\n/frameset/frame;element not defined;m\n/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6849)
-#      Expected: "/frameset/frame;element not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <frame src="a"/>
-#  <frameset>
-#    <frame src="a"/>
-#  </frameset>
-#</frameset>)
-#      Got 1 extra line at line 1:
-#       + "/frameset/frame/@src;attribute not defined;m\n"
-#      Got 1 extra line at line 3:
-#       + "/frameset/frameset/frame/@src;attribute not defined;m\n"
-not ok 6850
-# Test 6850 got: "/frameset/frame/@src;attribute not defined;m\n/frameset/frame;element not defined;m\n/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset/noframes;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6850)
-#      Expected: "/frameset/frame;element not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset/noframes;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <noframes></noframes>
-#  <frame src="a"/>
-#  <frameset>
-#    <frame src="a"/>
-#  </frameset>
-#</frameset>)
-#      Got 1 extra line at line 1:
-#       + "/frameset/frame/@src;attribute not defined;m\n"
-#      Got 1 extra line at line 3:
-#       + "/frameset/frameset/frame/@src;attribute not defined;m\n"
-not ok 6851
-# Test 6851 got: "/frameset/frame/@src;attribute not defined;m\n/frameset/frame;element not defined;m\n/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset/noframes;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6851)
-#      Expected: "/frameset/frame;element not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset/noframes;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <frame src="a"/>
-#  <frameset>
-#    <frame src="a"/>
-#  </frameset>
-#  <noframes></noframes>
-#</frameset>)
-#      Got 1 extra line at line 1:
-#       + "/frameset/frame/@src;attribute not defined;m\n"
-#      Got 1 extra line at line 3:
-#       + "/frameset/frameset/frame/@src;attribute not defined;m\n"
-not ok 6852
-# Test 6852 got: "/frameset/frame/@src;attribute not defined;m\n/frameset/frame;element not defined;m\n/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset/noframes;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6852)
-#      Expected: "/frameset/frame;element not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset/noframes;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <frame src="a"/>
-#  <noframes></noframes>
-#  <frameset>
-#    <frame src="a"/>
-#  </frameset>
-#</frameset>)
-#      Got 1 extra line at line 1:
-#       + "/frameset/frame/@src;attribute not defined;m\n"
-#      Got 1 extra line at line 3:
-#       + "/frameset/frameset/frame/@src;attribute not defined;m\n"
-not ok 6853
-# Test 6853 got: "/frameset/frame/@src;attribute not defined;m\n/frameset/frame;element not defined;m\n/frameset/frameset/frame/@src;attribute not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset/noframes;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6853)
-#      Expected: "/frameset/frame;element not defined;m\n/frameset/frameset/frame;element not defined;m\n/frameset/frameset/noframes;element not defined;m\n/frameset/frameset;element not defined;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <frame src="a"/>
-#  <frameset>
-#    <noframes></noframes>
-#    <frame src="a"/>
-#  </frameset>
-#</frameset>)
-#      Got 1 extra line at line 1:
-#       + "/frameset/frame/@src;attribute not defined;m\n"
-#      Got 1 extra line at line 3:
-#       + "/frameset/frameset/frame/@src;attribute not defined;m\n"
-not ok 6854
-# Test 6854 got: "/frameset/noframes;element not defined;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6854)
-#      Expected: "/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <noframes></noframes>
-#</frameset>)
+ok 6845
+ok 6846
+ok 6847
+ok 6848
+ok 6849
+ok 6850
+ok 6851
+ok 6852
+ok 6853
+ok 6854
 not ok 6855
 # Test 6855 got: "/frameset/noframes;element not allowed;m\n/frameset/noframes;element not defined;m\n/frameset/noframes;element not defined;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6855)
 #      Expected: "/frameset/noframes;element not allowed;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
 #  <noframes></noframes>
 #  <noframes></noframes>
 #</frameset>)
-not ok 6856
-# Test 6856 got: "/frameset/frameset/noframes;element not defined;m\n/frameset/frameset;child element missing:frame|frameset;m\n/frameset/frameset;element not defined;m\n/frameset/noframes;element not defined;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6856)
-#      Expected: "/frameset/frameset;child element missing:frame|frameset;m\n/frameset/noframes;element not allowed;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <noframes></noframes>
-#  <frameset>
-#    <noframes></noframes>
-#  </frameset>
-#</frameset>)
-not ok 6857
-# Test 6857 got: "/frameset/p;element not allowed:frameset;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6857)
-#      Expected: "/frameset/frameset;child element missing:frame|frameset;m\n/frameset/p;element not allowed:frameset;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <p>aa</p>
-#</frameset>)
-#      Line 1 is missing:
-#       - "/frameset/frameset;child element missing:frame|frameset;m\n"
-not ok 6858
-# Test 6858 got: "/frameset/span;element not allowed:frameset;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6858)
-#      Expected: "/frameset/frameset;child element missing:frame|frameset;m\n/frameset/span;element not allowed:frameset;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <span>aa</span>
-#</frameset>)
-#      Line 1 is missing:
-#       - "/frameset/frameset;child element missing:frame|frameset;m\n"
-not ok 6859
-# Test 6859 got: "/frameset/\"aa\";character not allowed:frameset;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (content-checker-test-ok at line 2 fail #6859)
-#      Expected: "/frameset/\"aa\";character not allowed:frameset;m\n/frameset/frameset;child element missing:frame|frameset;m\n/frameset;child element missing:frame|frameset;m\n/frameset;element not defined;m" (<frameset xmlns="http://www.w3.org/1999/xhtml">
-#  <!---->aa<!---->
-#</frameset>)
-#      Line 2 is missing:
-#       - "/frameset/frameset;child element missing:frame|frameset;m\n"
+ok 6856
+ok 6857
+ok 6858
+ok 6859
+ok 6860
+ok 6861
+ok 6862
+ok 6863
+ok 6864
+ok 6865
+ok 6866
+ok 6867
+ok 6868
+ok 6869
+ok 6870
+ok 6871
+ok 6872
+ok 6873
+ok 6874
+ok 6875
+ok 6876
+ok 6877
+ok 6878
+ok 6879
+ok 6880
+ok 6881
+ok 6882
+ok 6883
+ok 6884
+ok 6885
+ok 6886
+ok 6887
+ok 6888
+ok 6889
+ok 6890
+ok 6891
+ok 6892
+ok 6893
+ok 6894
+ok 6895
+ok 6896
+ok 6897
+ok 6898
+ok 6899
+ok 6900
+ok 6901
+ok 6902
+ok 6903
+ok 6904
+ok 6905
+ok 6906
+ok 6907
+ok 6908
+ok 6909
+ok 6910
+ok 6911
+ok 6912
+ok 6913
+ok 6914
+ok 6915
+ok 6916
+ok 6917
+ok 6918
+ok 6919
+ok 6920
+ok 6921
+ok 6922
+ok 6923
+ok 6924
+ok 6925
+ok 6926
+ok 6927
+ok 6928
+ok 6929
+ok 6930
+ok 6931
+ok 6932
+ok 6933
+ok 6934
+ok 6935
+ok 6936
+ok 6937
+ok 6938
+ok 6939
+ok 6940
+ok 6941
+ok 6942
+ok 6943
+ok 6944
+ok 6945
+ok 6946
