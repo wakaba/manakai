@@ -173,6 +173,16 @@
 /label/em/i/select;multiple labelable fae;m
 
 #data
+<label for="">x</label>
+#errors
+/label/@for;no referenced form control;m
+
+#data
+<label for="   ">x</label>
+#errors
+/label/@for;no referenced form control;m
+
+#data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <label for="a">x</label>
 <input id="a"/>

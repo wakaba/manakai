@@ -581,6 +581,11 @@ x</div>
 /a;no significant content;s
 
 #data
+<a href="http://test/" rel="   " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
 <a href="http://test/" rel="author contributor"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -662,6 +667,36 @@ x</div>
 /a;no significant content;s
 
 #data
+<area xmlns="http://www.w3.org/1999/xhtml" alt="x"
+    shape="default" href=""
+    rel=""/>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" alt="x"
+    shape="default" href=""
+    rel="   "/>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" alt="x"
+    shape="default" href=""
+    rel="noreferrer up"/>
+#errors
+
+#data
+<a href="http://test/" ping=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
+<a href="http://test/" ping=" "
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a;no significant content;s
+
+#data
 <a href="http://test/" ping="http://a.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -709,6 +744,31 @@ x</div>
     xmlns="http://www.w3.org/1999/xhtml">a</a>
 #errors
 /a/@ping;duplicate token;m
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" alt="x"
+    shape="default" href=""
+    ping=""/>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" alt="x"
+    shape="default" href=""
+    ping="    "/>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" alt="x"
+    shape="default" href=""
+    ping="a b"/>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml" alt="x"
+    shape="default" href=""
+    ping="[]"/>
+#errors
+/area/@ping;syntax error:iriref3987;m
 
 #data
 <a href="http://test/" hreflang=""
@@ -811,6 +871,11 @@ x</div>
 /a/@rev;attribute not defined;m
 
 #data
+<a rev="  " xmlns="http://www.w3.org/1999/xhtml">x</a>
+#errors
+/a/@rev;attribute not defined;m
+
+#data
 <a rev="made" xmlns="http://www.w3.org/1999/xhtml">x</a>
 #errors
 /a/@rev;attribute not defined;m
@@ -871,6 +936,14 @@ x</div>
 </p>
 #errors
 /p/i/a/@type;attribute not allowed;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rel=""/>
+#errors
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rel="    "/>
+#errors
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -1061,3 +1134,21 @@ x</div>
 /a/@rel;URL:uppercase host;w
 /a/@rel;syntax error:iriref3987;m
 /a/@rel;unknown link type;u
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rev=""/>
+#errors
+/link/@rev;attribute not defined;m
+/link;attribute missing;rel;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rev="    "/>
+#errors
+/link/@rev;attribute not defined;m
+/link;attribute missing;rel;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="" rev="made"/>
+#errors
+/link/@rev;attribute not defined;m
+/link;attribute missing;rel;m

@@ -926,6 +926,22 @@
 /td/@char;char:syntax error;m
 
 #data
+<td headers="" xmlns="http://www.w3.org/1999/xhtml">a</td>
+#errors
+
+#data
+<th headers="" xmlns="http://www.w3.org/1999/xhtml">a</th>
+#errors
+
+#data
+<td headers="   " xmlns="http://www.w3.org/1999/xhtml">a</td>
+#errors
+
+#data
+<th headers="   " xmlns="http://www.w3.org/1999/xhtml">a</th>
+#errors
+
+#data
 <table xmlns="http://www.w3.org/1999/xhtml">
 <tr><td headers="a">x</td><th id="a">x</th></tr>
 </table>
