@@ -958,7 +958,7 @@
 <tr><td headers=" b">x</td><th id="a">x</th><td id="b">y</td></tr>
 </table>
 #errors
-/table/tr/td/@headers;no referenced header cell;m
+/table/tr/td/@headers;not th;m
 
 #data
 <td header="c" xmlns="http://www.w3.org/1999/xhtml">x</td>
@@ -988,6 +988,283 @@
 </table>
 #errors
 /table/tr/td/@headers;no referenced header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <th id="a">a</th>
+  <td headers="a">b</td>
+</tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="a">a</th>
+</tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <td headers="a">c</td>
+  <th id="a">a</th>
+</tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <th headers="a">b</th>
+  <th id="a">a</th>
+</tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="a">a</th>
+  <th id="b">b</th>
+</tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a b">b</td>
+  <th id="a">a</th>
+  <th id="b">b</th>
+</tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="a">a</th>
+</tr>
+<tr>
+  <th headers="a">c</th>
+</tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="a">a</th>
+</tr>
+<tr>
+  <td headers="a b">c</td>
+  <th id="c">d</th>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="a">a</th>
+</tr>
+<tr>
+  <td headers="a c">c</td>
+  <th id="c">d</th>
+</tr>
+</table>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <td id="a">a</td>
+  <th id="a">a</th>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;not th;m
+/table/tr/th/@id;duplicate ID;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="a">a</th>
+  <td id="a">a</td>
+</tr>
+</table>
+#errors
+/table/tr/td/@id;duplicate ID;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a c">b</td>
+  <th id="a">a</th>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="ax">a</th>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="a">a</th>
+  <th id="a">a</th>
+</tr>
+</table>
+#errors
+/table/tr/th/@id;duplicate ID;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr id="a">
+  <td headers="a">b</td>
+  <th>a</th>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <td><p id="a">a</p></td>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <td><table><tr><th id="a">a</th></tr></table></td>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <td><p id="a">a</p></td>
+  <th id="a">c</th>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;no referenced header cell;m
+/table/tr/th/@id;duplicate ID;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <td id="a">a</td>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;not th;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td id="a" headers="a">b</td>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;not th;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <th id="a" headers="a">b</th>
+</tr>
+</table>
+#errors
+/table/tr/th/@headers;self targeted;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a a">b</td>
+  <th id="a">a</th>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;duplicate token;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a">b</td>
+  <th id="a" headers="a">a</th>
+</tr>
+</table>
+#errors
+/table/tr/th/@headers;self targeted;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <th id="a" headers="b">a</th>
+  <th id="b" headers="a">b</th>
+</tr>
+</table>
+#errors
+/table/tr/th/@headers;self targeted;m
+/table/tr/th/@headers;self targeted;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <td headers="a" id="b">b</td>
+  <th id="a" headers="b">a</th>
+</tr>
+</table>
+#errors
+/table/tr/td/@headers;self targeted;m
+/table/tr/th/@headers;not th;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tr>
+  <th headers="a" id="b">b</th>
+  <th id="a" headers="c">a</th>
+  <th id="c" headers="d">d</th>
+  <th id="d" headers="b">e</th>
+</tr>
+</table>
+#errors
+/table/tr/th/@headers;self targeted;m
+/table/tr/th/@headers;self targeted;m
+/table/tr/th/@headers;self targeted;m
+/table/tr/th/@headers;self targeted;m
 
 #data
 <thead xmlns="http://www.w3.org/1999/xhtml">

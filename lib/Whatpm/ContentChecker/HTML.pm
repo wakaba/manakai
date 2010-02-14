@@ -5902,17 +5902,77 @@ $Element->{$HTML_NS}->{table} = {
     my ($self, $item, $element_state) = @_;
 
     ## Table model errors
+
     require Whatpm::HTML::Table;
     my $table = Whatpm::HTML::Table->form_table ($item->{node}, sub {
       $self->{onerror}->(@_);
     }, $self->{level});
-    Whatpm::HTML::Table->assign_header
-        ($table, $self->{onerror}, $self->{level});
+
+    my @headers_cell;
+    for my $x (0..$#{$table->{cell}}) {
+      for my $y (0..$#{$table->{cell}->[$x]}) {
+        my $cell = $table->{cell}->[$x]->[$y] or next;
+        $cell = $cell->[0];
+        next unless $cell->{x} == $x;
+        next unless $cell->{y} == $y;
+
+        push @headers_cell, $cell if $cell->{header_ids};
+      }
+    }
+
+    my @id;
+    for my $headers_cell (@headers_cell) {
+      my $headers_attr = $headers_cell->{element}->get_attribute_node_ns
+          (undef, 'headers');
+      my %word;
+      for my $word (@{$headers_cell->{header_ids}}) {
+        unless ($word{$word}) {
+          my $referenced_cell = $table->{id_cell}->{$word};
+          if ($referenced_cell) {
+            if ($referenced_cell->{element}->manakai_local_name eq 'th') {
+              push @id, $word;
+            } else {
+              $self->{onerror}->(node => $headers_attr,
+                                 value => $word,
+                                 type => 'not th', # XXXdocumentation
+                                 level => $self->{level}->{must});
+            }
+          } else {
+            $self->{onerror}->(node => $headers_attr,
+                               value => $word,
+                               type => 'no referenced header cell', # XXXdocumentation
+                               level => $self->{level}->{must});
+          }
+          $word{$word} = 1;
+        } else {
+          $self->{onerror}->(node => $headers_attr,
+                             value => $word,
+                             type => 'duplicate token',
+                             level => $self->{level}->{must});
+        }
+      }
+
+      my %checked_id;
+      while (@id) {
+        my $id = shift @id;
+        next if $checked_id{$id};
+        my $referenced_cell = $table->{id_cell}->{$id};
+        if ($referenced_cell->{element} eq $headers_cell->{element}) {
+          $self->{onerror}->(node => $headers_attr,
+                             type => 'self targeted', # XXXdocumentation
+                             level => $self->{level}->{must});
+          last;
+        }
+        push @id, @{$referenced_cell->{header_ids} or []};
+        $checked_id{$id} = 1;
+      }
+    } # $headers_cell
+
     push @{$self->{return}->{table}}, $table;
 
     $HTMLChecker{check_end}->(@_);
-  },
-};
+  }, # check_end
+}; # table
 
 $Element->{$HTML_NS}->{caption} = {
   %HTMLFlowContentChecker,
@@ -6185,10 +6245,10 @@ $Element->{$HTML_NS}->{td} = {
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
-      ## NOTE: Will be checked by Whatpm::HTML::Table->assign_header.
-      ## Though that method does not check the |headers| attribute of
-      ## a |td| element if the element does not form a table, in that
-      ## case the |td| element is non-conforming anyway.
+      ## NOTE: Will be checked as part of |table| element checker.
+      ## Although the conformance of |headers| attribute is not
+      ## checked if the element does not form a part of a table, the
+      ## element is non-conforming in that case anyway.
     },
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
@@ -6224,7 +6284,12 @@ $Element->{$HTML_NS}->{th} = {
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
-    ## TODO: HTML4(?) |headers|
+    headers => sub {
+      ## NOTE: Will be checked as part of |table| element checker.
+      ## Although the conformance of |headers| attribute is not
+      ## checked if the element does not form a part of a table, the
+      ## element is non-conforming in that case anyway.
+    },
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker

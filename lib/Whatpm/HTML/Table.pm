@@ -372,6 +372,11 @@ sub form_table ($$;$$$) {
         $table->{id_cell}->{$id} = $cell;
       }
       
+      my $headers = $current_cell->get_attribute_ns (undef, 'headers');
+      $cell->{header_ids} = [grep { length $_ }
+                             split /[\x09\x0A\x0C\x0D\x20]+/, $headers]
+          if defined $headers;
+
       ## Step 14
       if ($cell_grows_downward) {
         push @downward_growing_cells, [$cell, $x_current, $colspan];
@@ -632,11 +637,9 @@ sub get_assigned_headers ($$$$) {
   my $p_cell = $table->{cell}->[$p_x]->[$p_y]->[0] or return $header_list;
 
   ## 3.
-  my $headers = $p_cell->{element}->get_attribute_ns (undef, 'headers');
-  if (defined $headers) {
+  if ($p_cell->{header_ids}) {
     ## 3.A.1.
-    my $id_list = [grep { length $_ }
-                   split /[\x09\x0A\x0C\x0D\x20]+/, $headers];
+    my $id_list = $p_cell->{header_ids};
     
     ## 3.A.2.
     for my $cell (map { $table->{id_cell}->{$_} } @$id_list) {
