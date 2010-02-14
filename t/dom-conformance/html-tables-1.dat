@@ -120,15 +120,252 @@
 /table/@summary;attribute not defined;m
 
 #data
+<table width="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+
+#data
+<table width="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+
+#data
+<table width="1%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+
+#data
+<table width="1000%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+
+#data
+<table width="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table width="1 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table width=" 4" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table width="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table width="1,45" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table width="1*" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table width="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table width="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table width="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@width;attribute not defined;m
+/table/@width;length:syntax error;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:invalid;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="left">
+</table>
+#errors
+/table/@align;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="center">
+</table>
+#errors
+/table/@align;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="right">
+</table>
+#errors
+/table/@align;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="justify">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:invalid;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="middle">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:invalid;m
+
+#data escaped
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0301ght">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:invalid;m
+
+#data escaped
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0302ght">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:invalid;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="left ">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:invalid;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="align">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:invalid;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="top">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:invalid;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">
+</table>
+#errors
+/table/@bgcolor;attribute not defined;m
+/table/@bgcolor;color:syntax error;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">
+</table>
+#errors
+/table/@bgcolor;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">
+</table>
+#errors
+/table/@bgcolor;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">
+</table>
+#errors
+/table/@bgcolor;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">
+</table>
+#errors
+/table/@bgcolor;attribute not defined;m
+/table/@bgcolor;color:syntax error;m
+
+#data
 <table border="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /table/@border;attribute not defined;m
-/table/@border;nninteger:syntax error;m
 
 #data
 <table border="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /table/@border;attribute not defined;m
+
+#data
+<table border="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not defined;m
+/table/@border;tableborder:syntax error;m
+
+#data
+<table border="   " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not defined;m
+/table/@border;tableborder:syntax error;m
+
+#data
+<table border="abc" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not defined;m
+/table/@border;tableborder:syntax error;m
+
+#data
+<table border="-120" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not defined;m
+/table/@border;tableborder:syntax error;m
+
+#data
+<table border="10.55" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not defined;m
+/table/@border;tableborder:syntax error;m
+
+#data
+<table border="34 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not defined;m
+/table/@border;tableborder:syntax error;m
+
+#data
+<table border="border" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not defined;m
+/table/@border;tableborder:syntax error;m
 
 #data
 <table frame="border" xmlns="http://www.w3.org/1999/xhtml"/>

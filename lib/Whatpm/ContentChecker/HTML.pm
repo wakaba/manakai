@@ -3501,7 +3501,6 @@ $Element->{$HTML_NS}->{ul} = {
 }; # ul
 
 $Element->{$HTML_NS}->{dir} = {
-## TODO: %block; is not allowed [HTML4] ## TODO: Empty list allowed?
   %{$Element->{$HTML_NS}->{ul}},
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3515,7 +3514,7 @@ $Element->{$HTML_NS}->{dir} = {
     sdaform => FEATURE_HTML20_RFC,
     sdapref => FEATURE_HTML20_RFC,
   }),
-};
+}; # dir
 
 $Element->{$HTML_NS}->{li} = {
   %HTMLFlowContentChecker,
@@ -5799,6 +5798,19 @@ $Element->{$HTML_NS}->{table} = {
   %HTMLChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1,
+    }),
+    bgcolor => $HTMLColorAttrChecker,
+    border => sub {
+      my ($self, $attr) = @_;
+      ## HTML4 definition: %Pixels; = [0-9]+; with <table border> support.
+      unless ($attr->value =~ /\A[0-9]*\z/) {
+        $self->{onerror}->(node => $attr,
+                           type => 'tableborder:syntax error', # XXXdocumentation
+                           level => $self->{level}->{must});
+      }
+    }, # border
     cellpadding => $HTMLLengthAttrChecker,
     cellspacing => $HTMLLengthAttrChecker,
     frame => $GetHTMLEnumeratedAttrChecker->({
@@ -5808,8 +5820,8 @@ $Element->{$HTML_NS}->{table} = {
     rules => $GetHTMLEnumeratedAttrChecker->({
       none => 1, groups => 1, rows => 1, cols => 1, all => 1,
     }),
-    summary => sub {}, ## NOTE: %Text; in HTML4.
-    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## %Pixels;
+    summary => sub { }, ## %Text; [HTML4]
+    width => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,

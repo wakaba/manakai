@@ -2942,6 +2942,16 @@ aaa
 /dir/@type;attribute not defined;m
 
 #data
+<dir xmlns="http://www.w3.org/1999/xhtml"><li><p>a</p></li></dir>
+#errors
+/dir;element not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"><li><span>a</span></li></dir>
+#errors
+/dir;element not defined;m
+
+#data
 <div xmlns="http://www.w3.org/1999/xhtml"><dir><li/></dir></div>
 #errors
 /div;no significant content;s
