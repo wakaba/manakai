@@ -1948,6 +1948,48 @@ x<br autofocus=""/>
 #errors
 /form/@enctype;enumerated:invalid;m
 
+#data escaped
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="appl\u0130cation/x-www-form-urlencoded"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data escaped
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="appl\u0131cation/x-www-form-urlencoded"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data escaped
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="mult\u0130part/form-data"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data escaped
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="mult\u0131part/form-data"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data escaped
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="text/pla\u0130n"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
+#data escaped
+<form xmlns="http://www.w3.org/1999/xhtml"
+    enctype="text/pla\u0131n"
+>x</form>
+#errors
+/form/@enctype;enumerated:invalid;m
+
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"
     enctype="application/x-sgml-urlencoded"

@@ -1630,6 +1630,18 @@
 /command/@type;enumerated:invalid;m
 /command;attribute missing;label;m
 
+#data escaped
+<command type="rad\u0130o" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;enumerated:invalid;m
+/command;attribute missing;label;m
+
+#data escaped
+<command type="rad\u0131o" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;enumerated:invalid;m
+/command;attribute missing;label;m
+
 #data
 <command icon="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -1784,6 +1796,18 @@
 
 #data
 <menu type="context " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/menu/@type;enumerated:invalid;m
+/menu;no significant content;s
+
+#data
+<menu type="list" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/menu/@type;enumerated:invalid;m
+/menu;no significant content;s
+
+#data
+<menu type="context menu" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /menu/@type;enumerated:invalid;m
 /menu;no significant content;s

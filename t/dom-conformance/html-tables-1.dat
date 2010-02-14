@@ -151,6 +151,18 @@
 /table/@frame;attribute not defined;m
 /table/@frame;enumerated:invalid;m
 
+#data escaped
+<table frame="vo\u0130d" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@frame;attribute not defined;m
+/table/@frame;enumerated:invalid;m
+
+#data escaped
+<table frame="vo\u0131d" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@frame;attribute not defined;m
+/table/@frame;enumerated:invalid;m
+
 #data
 <table rules="none" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -355,6 +367,18 @@
 
 #data
 <caption align="justify" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+/caption/@align;enumerated:invalid;m
+
+#data escaped
+<caption align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@align;attribute not defined;m
+/caption/@align;enumerated:invalid;m
+
+#data escaped
+<caption align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml">x</caption>
 #errors
 /caption/@align;attribute not defined;m
 /caption/@align;enumerated:invalid;m
@@ -823,6 +847,18 @@
 /tr/@align;attribute not defined;m
 /tr/@align;enumerated:invalid;m
 
+#data escaped
+<tr align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"><th>x</th></tr>
+#errors
+/tr/@align;attribute not defined;m
+/tr/@align;enumerated:invalid;m
+
+#data escaped
+<tr align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"><th>x</th></tr>
+#errors
+/tr/@align;attribute not defined;m
+/tr/@align;enumerated:invalid;m
+
 #data
 <th align="top" xmlns="http://www.w3.org/1999/xhtml">x</th>
 #errors
@@ -864,6 +900,18 @@
 
 #data
 <td valign="center" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@valign;attribute not defined;m
+/td/@valign;enumerated:invalid;m
+
+#data escaped
+<td valign="m\u0130ddle" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@valign;attribute not defined;m
+/td/@valign;enumerated:invalid;m
+
+#data escaped
+<td valign="m\u0131ddle" xmlns="http://www.w3.org/1999/xhtml">x</td>
 #errors
 /td/@valign;attribute not defined;m
 /td/@valign;enumerated:invalid;m

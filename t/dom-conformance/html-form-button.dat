@@ -927,6 +927,20 @@
 #errors
 /button/@formenctype;enumerated:invalid;m
 
+#data escaped
+<button type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    formenctype="text/pla\u0130n"
+>a</button>
+#errors
+/button/@formenctype;enumerated:invalid;m
+
+#data escaped
+<button type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    formenctype="text/pla\u0131n"
+>a</button>
+#errors
+/button/@formenctype;enumerated:invalid;m
+
 #data
 <button type="submit" xmlns="http://www.w3.org/1999/xhtml"
     formenctype="application/x-sgml-urlencoded"

@@ -388,7 +388,8 @@ my $GetHTMLEnumeratedAttrChecker = sub {
   my $states = shift; # {value => conforming ? 1 : -1}
   return sub {
     my ($self, $attr) = @_;
-    my $value = lc $attr->value; ## TODO: ASCII case insensitibility?
+    my $value = $attr->value;
+    $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     if ($states->{$value} and $states->{$value} > 0) {
       #
     } elsif ($states->{$value}) {

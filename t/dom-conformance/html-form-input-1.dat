@@ -362,6 +362,18 @@
 #errors
 /input/@type;enumerated:invalid;m
 
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="ema\u0130l"/>
+#errors
+/input/@type;enumerated:invalid;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="ema\u0131l"/>
+#errors
+/input/@type;enumerated:invalid;m
+
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
   <form id="a">x</form>
@@ -10329,6 +10341,22 @@
 /input/@align;attribute not defined;m
 /input/@align;enumerated:invalid;m
 
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    align="r\u0130ght"/>
+#errors
+/input/@align;attribute not defined;m
+/input/@align;enumerated:invalid;m
+
+#data escaped
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    align="r\u0131ght"/>
+#errors
+/input/@align;attribute not defined;m
+/input/@align;enumerated:invalid;m
+
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
     type="image" src="" alt="x"
@@ -13489,6 +13517,20 @@
     formenctype="TEXT/plain"
 />
 #errors
+
+#data escaped
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    formenctype="appl\u0130cation/x-www-form-urlencoded"
+/>
+#errors
+/input/@formenctype;enumerated:invalid;m
+
+#data escaped
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    formenctype="appl\u0131cation/x-www-form-urlencoded"
+/>
+#errors
+/input/@formenctype;enumerated:invalid;m
 
 #data
 <input type="submit" xmlns="http://www.w3.org/1999/xhtml"

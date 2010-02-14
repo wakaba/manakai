@@ -3321,11 +3321,35 @@ aaa
 #errors
 /h2/@align;attribute not defined;m
 
+#data escaped
+<h2 align="just\u0130fy" xmlns="http://www.w3.org/1999/xhtml">x</h2>
+#errors
+/h2/@align;attribute not defined;m
+/h2/@align;enumerated:invalid;m
+
+#data escaped
+<h2 align="just\u0131fy" xmlns="http://www.w3.org/1999/xhtml">x</h2>
+#errors
+/h2/@align;attribute not defined;m
+/h2/@align;enumerated:invalid;m
+
 #data
 <address align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /address/@align;attribute not defined;m
 /address;no significant content;s
+
+#data escaped
+<address align="just\u0130fy" xmlns="http://www.w3.org/1999/xhtml">x</address>
+#errors
+/address/@align;attribute not defined;m
+/address/@align;enumerated:invalid;m
+
+#data escaped
+<address align="just\u0131fy" xmlns="http://www.w3.org/1999/xhtml">x</address>
+#errors
+/address/@align;attribute not defined;m
+/address/@align;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -3353,6 +3377,18 @@ aaa
 #errors
 /p/@align;attribute not defined;m
 /p;no significant content;s
+
+#data escaped
+<p align="just\u0130fy" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@align;attribute not defined;m
+/p/@align;enumerated:invalid;m
+
+#data escaped
+<p align="just\u0131fy" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@align;attribute not defined;m
+/p/@align;enumerated:invalid;m
 
 #data
 <hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3385,6 +3421,18 @@ aaa
 <div align="justify" xmlns="http://www.w3.org/1999/xhtml">x</div>
 #errors
 /div/@align;attribute not defined;m
+
+#data escaped
+<div align="just\u0130fy" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+/div/@align;enumerated:invalid;m
+
+#data escaped
+<div align="just\u0131fy" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@align;attribute not defined;m
+/div/@align;enumerated:invalid;m
 
 #data
 <div align="xxx" xmlns="http://www.w3.org/1999/xhtml">x</div>

@@ -2618,6 +2618,18 @@ aa<map name="x">b<map name="y">bb</map></map>
 #errors
 /img/@align;attribute not defined;m
 
+#data escaped
+<img alt="" src="" align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid;m
+
+#data escaped
+<img alt="" src="" align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid;m
+
 #data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -3492,6 +3504,20 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /object;no significant content;s
 /object/@align;attribute not defined;m
+
+#data escaped
+<object data="" align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:invalid;m
+
+#data escaped
+<object data="" align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:invalid;m
 
 #data
 <object name="" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
@@ -4557,6 +4583,30 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <area shape="XXX" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data escaped
+<area shape="c\u0130rcle" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data escaped
+<area shape="c\u0131rcle" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data escaped
+<area shape="c\u0130rc" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data escaped
+<area shape="c\u0131rc" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@shape;enumerated:invalid;m
