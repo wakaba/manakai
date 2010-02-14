@@ -741,6 +741,16 @@ my $HTMLLengthAttrChecker = sub {
   ## of percentage value at all (!).
 }; # $HTMLLengthAttrChecker
 
+## HTML4 %MultiLength;
+my $MultiLengthChecker = sub {
+  my ($self, $attr) = @_;
+  unless ($attr->value =~ /\A(?>[0-9]+[%*]?|\*)\z/) {
+    $self->{onerror}->(node => $attr,
+                       type => 'multilength:syntax error', # XXXdocumentation
+                       level => $self->{level}->{html4_fact});
+  }
+}; # $MultiLengthChecker
+
 our $MIMETypeChecker; ## See |Whatpm::ContentChecker|.
 
 my $HTMLLanguageTagAttrChecker = sub {
@@ -6121,6 +6131,7 @@ $Element->{$HTML_NS}->{colgroup} = {
       ## TODO: "attribute not supported" if |col|.
       ## ISSUE: MUST NOT if any |col|?
       ## ISSUE: MUST NOT for |<colgroup span="1"><any><col/></any></colgroup>| (though non-conforming)?
+    width => $MultiLengthChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -6156,7 +6167,7 @@ $Element->{$HTML_NS}->{colgroup} = {
                          level => $self->{level}->{must});
     }
   },
-};
+}; # colgroup
 
 $Element->{$HTML_NS}->{col} = {
   %HTMLEmptyChecker,
@@ -6164,6 +6175,7 @@ $Element->{$HTML_NS}->{col} = {
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
     span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    width => $MultiLengthChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -6294,10 +6306,12 @@ $Element->{$HTML_NS}->{td} = {
       ## checked if the element does not form a part of a table, the
       ## element is non-conforming in that case anyway.
     },
+    height => $HTMLLengthAttrChecker,
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker
         ->({row => 1, col => 1, rowgroup => 1, colgroup => 1}),
+    width => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -6334,10 +6348,12 @@ $Element->{$HTML_NS}->{th} = {
       ## checked if the element does not form a part of a table, the
       ## element is non-conforming in that case anyway.
     },
+    height => $HTMLLengthAttrChecker,
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rowspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     scope => $GetHTMLEnumeratedAttrChecker
         ->({row => 1, col => 1, rowgroup => 1, colgroup => 1}),
+    width => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
