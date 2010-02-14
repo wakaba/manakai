@@ -937,7 +937,6 @@ sub _tree_construction_initial ($) {
       my $doctype = $self->{document}->create_document_type_definition
           ($doctype_name);
 
-      $doctype_name =~ tr/A-Z/a-z/; # ASCII case-insensitive.
       if ($doctype_name ne 'html') {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $token);
