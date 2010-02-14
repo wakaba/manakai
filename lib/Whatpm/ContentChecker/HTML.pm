@@ -1654,13 +1654,14 @@ my $ShapeCoordsChecker = sub ($$$) {
   }
 
   if (defined $attrs->{shape}) {
+    my $sv = $attrs->{shape}->value;
+    $sv =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     $shape = {
         circ => 'circle', circle => 'circle',
         default => 'default',
         poly => 'polygon', polygon => 'polygon',
         rect => 'rectangle', rectangle => 'rectangle',
-    }->{lc $attrs->{shape}->value} || 'rectangle';
-    ## TODO: ASCII lowercase?
+    }->{$sv} || 'rectangle';
   }
   
   if ($shape eq 'circle') {
