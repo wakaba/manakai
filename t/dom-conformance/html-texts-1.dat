@@ -1952,3 +1952,261 @@
 #errors
 /rule;element not defined;m
 /rule/u;element not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="  ">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="1">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="2">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="3">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="4">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="5">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="6">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="7">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="+1">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="+2">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="+3">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="+6">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="-6">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="-1">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="0">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="abc">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="-123">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="+213">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="0123">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="0001">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    size="1.0">a</font>
+#errors
+/font;element not defined;m
+/font/@size;attribute not defined;m
+/font/@size;fontsize:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="yellow">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="#C0C0C0">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="RED">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="color">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="   ">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="rgb(1,2,3)">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    face="">a</font>
+#errors
+/font;element not defined;m
+/font/@face;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    face="  ">a</font>
+#errors
+/font;element not defined;m
+/font/@face;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    face="abc">a</font>
+#errors
+/font;element not defined;m
+/font/@face;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    face="XTA a">a</font>
+#errors
+/font;element not defined;m
+/font/@face;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    face="a,b">a</font>
+#errors
+/font;element not defined;m
+/font/@face;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    face="a,,b">a</font>
+#errors
+/font;element not defined;m
+/font/@face;attribute not defined;m

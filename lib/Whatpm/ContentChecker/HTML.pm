@@ -1107,6 +1107,15 @@ my $HTMLColorAttrChecker = sub {
   ## TODO: HTML4 has some guideline on usage of color.
 }; # $HTMLColorAttrChecker
 
+my $FontSizeChecker = sub {
+  my ($self, $attr) = @_;
+  unless ($attr->value =~ /\A[+-]?[1-7]\z/) { ## HTML4 definition is vague.
+    $self->{onerror}->(node => $attr,
+                       type => 'fontsize:syntax error',
+                       level => $self->{level}->{html4_fact});
+  }
+}; # $FontSizeChecker
+
 my $HTMLRefOrTemplateAttrChecker = sub {
   my ($self, $attr) = @_;
   $HTMLURIAttrChecker->(@_);
@@ -2218,7 +2227,9 @@ $Element->{$HTML_NS}->{basefont} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: color, face, size
+    color => $HTMLColorAttrChecker,
+    face => sub { }, ## Comma-separated font names (cdata) [HTML4]
+    size => $FontSizeChecker,
   }, {
     %HTMLAttrStatus,
     color => FEATURE_M12N10_REC_DEPRECATED,
@@ -3865,7 +3876,9 @@ $Element->{$HTML_NS}->{font} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: HTML4 |size|, |color|, |face|
+    color => $HTMLColorAttrChecker,
+    face => sub { }, ## Comma-separated font names (cdata) [HTML4]
+    size => $FontSizeChecker,
   }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -5214,6 +5227,7 @@ $Element->{$HTML_NS}->{embed} = {
 ## TODO:
 ## {applet} FEATURE_HTML5_OBSOLETE
 ## class, id, title, alt, archive, code, codebase, height, object, width name style,hspace,vspace(xhtml10)
+## <http://www.w3.org/TR/html4/struct/objects.html#edef-APPLET>
 
 $Element->{$HTML_NS}->{object} = {
   %HTMLTransparentChecker,
