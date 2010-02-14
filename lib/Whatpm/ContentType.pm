@@ -271,7 +271,7 @@ sub get_sniffed_type ($%) {
 
       ## Step 4
       return ('text/plain', 'text/plain')
-          unless $bytes =~ /$binary_data_bytes/;
+          unless $bytes =~ /$binary_data_bytes/o;
 
       ## Step 5
       ROW: for my $row (@UnknownSniffingTable) {
@@ -338,7 +338,7 @@ sub get_sniffed_type ($%) {
 
     ## Step 4
     return ($official_type, 'text/plain')
-        unless $bytes =~ /$binary_data_bytes/;
+        unless $bytes =~ /$binary_data_bytes/o;
 
     ## Step 5
     return ($official_type, 'application/octet-stream');
