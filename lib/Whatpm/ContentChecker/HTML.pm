@@ -3400,7 +3400,12 @@ $Element->{$HTML_NS}->{hr} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: HTML4 |align|, |noshade|, |size|, |width|
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1,
+    }),
+    noshade => $GetHTMLBooleanAttrChecker->('noshade'),
+    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## HTML4 %Pixels;
+    width => $HTMLLengthAttrChecker, ## HTML4 %Length;
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -3411,7 +3416,7 @@ $Element->{$HTML_NS}->{hr} = {
     sdapref => FEATURE_HTML20_RFC,
     size => FEATURE_HTML5_OBSOLETE,
     width => FEATURE_HTML5_OBSOLETE,
-  }),
+  }), # check_attrs
 }; # hr
 
 $Element->{$HTML_NS}->{br} = {

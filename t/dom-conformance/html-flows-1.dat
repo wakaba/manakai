@@ -3814,9 +3814,347 @@ a
 /p/@align;enumerated:invalid;m
 
 #data
+<hr align="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+/hr/@align;enumerated:invalid;m
+
+#data
+<hr align=" " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+/hr/@align;enumerated:invalid;m
+
+#data
 <hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /hr/@align;attribute not defined;m
+
+#data
+<hr align="right" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+
+#data
+<hr align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+
+#data
+<hr align="left " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+/hr/@align;enumerated:invalid;m
+
+#data
+<hr align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+/hr/@align;enumerated:invalid;m
+
+#data
+<hr align="top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+/hr/@align;enumerated:invalid;m
+
+#data
+<hr align="middle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+/hr/@align;enumerated:invalid;m
+
+#data escaped
+<hr align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+/hr/@align;enumerated:invalid;m
+
+#data escaped
+<hr align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not defined;m
+/hr/@align;enumerated:invalid;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade=""/>
+#errors
+/hr/@noshade;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade="noshade"/>
+#errors
+/hr/@noshade;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade="  "/>
+#errors
+/hr/@noshade;attribute not defined;m
+/hr/@noshade;boolean:invalid;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade="abc"/>
+#errors
+/hr/@noshade;attribute not defined;m
+/hr/@noshade;boolean:invalid;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade="shade"/>
+#errors
+/hr/@noshade;attribute not defined;m
+/hr/@noshade;boolean:invalid;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade="true"/>
+#errors
+/hr/@noshade;attribute not defined;m
+/hr/@noshade;boolean:invalid;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade="false"/>
+#errors
+/hr/@noshade;attribute not defined;m
+/hr/@noshade;boolean:invalid;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade="NoShade"/>
+#errors
+/hr/@noshade;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    noshade="NOSHADE"/>
+#errors
+/hr/@noshade;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size=""/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="0"/>
+#errors
+/hr/@size;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="1"/>
+#errors
+/hr/@size;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="1234"/>
+#errors
+/hr/@size;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="01200"/>
+#errors
+/hr/@size;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="abc"/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="   "/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="+33"/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="-434"/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="30.54334"/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="12%"/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="10*"/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size=".3"/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    size="43 "/>
+#errors
+/hr/@size;attribute not defined;m
+/hr/@size;nninteger:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width=""/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="0"/>
+#errors
+/hr/@width;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="1"/>
+#errors
+/hr/@width;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="1234"/>
+#errors
+/hr/@width;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="01200"/>
+#errors
+/hr/@width;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="abc"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="   "/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="+33"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="-434"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="30.54334"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="12%"/>
+#errors
+/hr/@width;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="0%"/>
+#errors
+/hr/@width;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="-12%"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="+12%"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="12.4%"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="12%%"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="10*"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width=".3"/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    width="43 "/>
+#errors
+/hr/@width;attribute not defined;m
+/hr/@width;length:syntax error;m
 
 #data
 <div align="" xmlns="http://www.w3.org/1999/xhtml">x</div>
