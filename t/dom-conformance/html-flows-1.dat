@@ -940,6 +940,120 @@ para
 #errors
 
 #data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="  ">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="disc">
+</ul>
+#errors
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="circle">
+</ul>
+#errors
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="square">
+</ul>
+#errors
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="circ">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="DISC">
+</ul>
+#errors
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="SQUARE">
+</ul>
+#errors
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="cirCle">
+</ul>
+#errors
+/ul/@type;attribute not defined;m
+
+#data escaped
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="c\u0130rcle">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data escaped
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="c\u0131rcle">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="1">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="i">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="A">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    type="circle ">
+</ul>
+#errors
+/ul/@type;enumerated:invalid;m
+/ul/@type;attribute not defined;m
+
+#data
 <ol xmlns="http://www.w3.org/1999/xhtml">
 <li></li>
 </ol>
@@ -978,6 +1092,129 @@ para
 #errors
 
 #data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="">
+</ol>
+#errors
+/ol/@type;oltype:invalid;m
+/ol/@type;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="   ">
+</ol>
+#errors
+/ol/@type;oltype:invalid;m
+/ol/@type;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="1">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="a">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="A">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="i">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="I">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="2">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="II">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="circle">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="disc">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="squARE">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="iroha">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="z">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="a ">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    type="type">
+</ol>
+#errors
+/ol/@type;attribute not defined;m
+/ol/@type;oltype:invalid;m
+
+#data
 <menu xmlns="http://www.w3.org/1999/xhtml">
 <li></li>
 </menu>
@@ -1014,6 +1251,11 @@ para
 <li><p>XXX</p>YYY</li>
 </menu>
 #errors
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml" type="1">a</menu>
+#errors
+/menu/@type;enumerated:invalid;m
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -2694,6 +2936,12 @@ aaa
 /dir/p;no significant content;s
 
 #data
+<dir xmlns="http://www.w3.org/1999/xhtml" type=""><li>a</li></dir>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
 <div xmlns="http://www.w3.org/1999/xhtml"><dir><li/></dir></div>
 #errors
 /div;no significant content;s
@@ -3190,6 +3438,171 @@ aaa
 /li/@value;integer:syntax error;m
 /li/@value;non-ol li value;m
 /li;no significant content;s
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+/li/@type;litype:invalid;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="a">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="A">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="1">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="i">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="I">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="circle">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="disc">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="square">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="CIRCLE">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="SquArE">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="disc">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="disk">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+/li/@type;litype:invalid;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="Circle ">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+/li/@type;litype:invalid;m
+
+#data escaped
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="c\u0130rcle">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+/li/@type;litype:invalid;m
+
+#data escaped
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="c\u0131rcle">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+/li/@type;litype:invalid;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="   ">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+/li/@type;litype:invalid;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    type="type">
+a
+</li>
+#errors
+/li/@type;attribute not defined;m
+/li/@type;litype:invalid;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml">
+<li type="1">aa</li>
+</ul>
+#errors
+/ul/li/@type;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml">
+<li type="square">aa</li>
+</ol>
+#errors
+/ol/li/@type;attribute not defined;m
 
 #data
 <ol compact="" xmlns="http://www.w3.org/1999/xhtml"/>

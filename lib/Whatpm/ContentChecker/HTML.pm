@@ -1828,11 +1828,12 @@ $Element->{$HTML_NS}->{html} = {
   check_attrs => $GetHTMLAttrsChecker->({
     manifest => $HTMLURIAttrChecker,
     version => sub {
-      ## NOTE: According to HTML4 prose, this is a "cdata" attribute.
-      ## Though DTDs of various versions of HTML define the attribute
-      ## as |#FIXED|, this conformance checker does no check for
-      ## the attribute value, since what kind of check should be done
-      ## is unknown.
+      ## According to HTML4 prose, the |version| attribute's value is
+      ## "cdata".  Various DTDs of versions of HTML and XHTML define
+      ## their |version| attribute as |#FIXED| and gives their public
+      ## identifiers as the value, but it had not been speced anywhere
+      ## at all.  We can't test the attribute value against unexisting
+      ## conformance criteria.
     },
   }, {
     %HTMLAttrStatus,
@@ -3430,7 +3431,17 @@ $Element->{$HTML_NS}->{ol} = {
     compact => $GetHTMLBooleanAttrChecker->('compact'),
     reversed => $GetHTMLBooleanAttrChecker->('reversed'),
     start => $HTMLIntegerAttrChecker,
-    ## TODO: HTML4 |type|
+    type => sub {
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      unless ({
+          1 => 1, a => 1, A => 1, i => 1, I => 1,
+      }->{$value}) {
+        $self->{onerror}->(node => $attr,
+                           type => 'oltype:invalid', # XXXdocumentation
+                           level => $self->{level}->{must});
+      }
+    }, # type
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3474,7 +3485,9 @@ $Element->{$HTML_NS}->{ul} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     compact => $GetHTMLBooleanAttrChecker->('compact'),
-    ## TODO: HTML4 |type|
+    type => $GetHTMLEnumeratedAttrChecker->({
+      disc => 1, square => 1, circle => 1,
+    }),
     ## TODO: sdaform, align
   }, {
     %HTMLAttrStatus,
@@ -3484,7 +3497,7 @@ $Element->{$HTML_NS}->{ul} = {
     lang => FEATURE_HTML5_REC,
     sdaform => FEATURE_HTML20_RFC,
     type => FEATURE_HTML5_OBSOLETE,
-  }),
+  }), # check_attrs
 }; # ul
 
 $Element->{$HTML_NS}->{dir} = {
@@ -3508,7 +3521,18 @@ $Element->{$HTML_NS}->{li} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: HTML4 |type|
+    type => sub {
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      ## HTML4's definition of |type| attribute of |li| element is
+      ## very vague.  See
+      ## <http://suika.fam.cx/%7Ewakaba/wiki/sw/n/type$13186>.
+      unless ($value =~ /\A(?:[Cc][Ii][Rr][Cc][Ll][Ee]|[Dd][Ii][Ss][Cc]|[Ss][Qq][Uu][Aa][Rr][Ee]|[1aAiI])\z/) {
+        $self->{onerror}->(node => $attr,
+                           type => 'litype:invalid', # XXXdocumentation
+                           level => $self->{level}->{must});
+      }
+    }, # type
     value => sub {
       my ($self, $attr) = @_;
 
