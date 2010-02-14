@@ -37,6 +37,7 @@ test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
   t/dom-conformance/html-scripting-2.dat
   t/dom-conformance/html-repetitions.dat
   t/dom-conformance/html-datatemplate.dat
+  t/dom-conformance/html-frames.dat
 ]);
 
 ## License: Public Domain.

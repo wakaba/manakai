@@ -751,6 +751,23 @@ my $MultiLengthChecker = sub {
   }
 }; # $MultiLengthChecker
 
+## HTML4 multilength-list (set of comma-separated tokens [HTML5] where
+## each token is %MultiLength; [HTML4])
+my $MultiLengthListChecker = sub {
+  my ($self, $attr) = @_;
+  for my $ml (split /,/, $attr->value, -1) {
+    $ml =~ s/\A[\x09\x0A\x0C\x0D\x20]+//;
+    $ml =~ s/[\x09\x0A\x0C\x0D\x20]+\z//;
+    
+    unless ($ml =~ /\A(?>[0-9]+[%*]?|\*)\z/) {
+      $self->{onerror}->(node => $attr,
+                         value => $ml,
+                         type => 'multilength:syntax error', # XXXdocumentation
+                         level => $self->{level}->{html4_fact});
+    }
+  }
+}; # $MultiLengthListChecker
+
 our $MIMETypeChecker; ## See |Whatpm::ContentChecker|.
 
 my $HTMLLanguageTagAttrChecker = sub {
@@ -8377,10 +8394,10 @@ $Element->{$HTML_NS}->{nest} = {
 # ---- Frames ----
 
 $Element->{$HTML_NS}->{frameset} = {
-  %HTMLEmptyChecker, # XXX
+  %HTMLChecker,
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## XXX
+    cols => $MultiLengthListChecker,
     onafterprint => $HTMLEventHandlerAttrChecker,
     onbeforeprint => $HTMLEventHandlerAttrChecker,
     onbeforeunload => $HTMLEventHandlerAttrChecker,
@@ -8400,13 +8417,64 @@ $Element->{$HTML_NS}->{frameset} = {
     onstorage => $HTMLEventHandlerAttrChecker,
     onundo => $HTMLEventHandlerAttrChecker,
     onunload => $HTMLEventHandlerAttrChecker,
+    rows => $MultiLengthListChecker,
   }, {
     %HTMLAttrStatus,
-    ## XXX class title id cols rows style(x10)
-    ## XXX
-    onload => FEATURE_M12N10_REC,
-    onunload => FEATURE_M12N10_REC,
-  }),
+    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    cols => FEATURE_M12N10_REC,
+    id => FEATURE_HTML5_REC,
+    onload => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    onunload => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    rows => FEATURE_M12N10_REC,
+    style => FEATURE_HTML5_REC,
+    title => FEATURE_HTML5_REC,
+  }), # check_attrs
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and
+             ($child_ln eq 'frameset' or $child_ln eq 'frame')) {
+      $item->{has_frame_or_frameset} = 1;
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'noframes') {
+      if ($item->{has_noframes}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed',
+                           level => $self->{level}->{html4_fact});
+      } else {
+        $item->{has_noframes} = 1;
+      }
+    } else {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:frameset', # XXXdocumentation
+                         level => $self->{level}->{must});
+    }
+  }, # check_child_element
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node,
+                         type => 'character not allowed:frameset', # XXXdocumentation
+                         level => $self->{level}->{must});
+    }
+  }, # check_child_text
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    unless ($item->{has_frame_or_frameset}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing:frame|frameset', # XXXdocumentation
+                         level => $self->{level}->{must});
+    }
+
+    $HTMLChecker{check_end}->(@_);
+  }, # check_end
 }; # frameset
 
 ## frame FEATURE_HTML5_OBSOLETE
