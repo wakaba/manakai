@@ -1599,16 +1599,21 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   typeof => FEATURE_RDFA_REC,
 );
 
-for (qw/
-         onabort onblur onchange onclick oncontextmenu
-         ondblclick ondrag ondragend ondragenter ondragleave ondragover
-         ondragstart ondrop onerror onfocus onkeydown onkeypress
-         onkeyup onload onmousedown onmousemove onmouseout
-         onmouseover onmouseup onmousewheel onscroll onselect
-         onsubmit
-     /) {
+for (qw(
+  onabort oncanplay oncanplaythrough onchange onclick oncontextmenu
+  ondblclick ondrag ondragend ondragenter ondragleave ondragover
+  ondragstart ondrop ondurationchange onemptied onended onformchange
+  onforminput oninput oninvalid onkeydown onkeypress onkeyup
+  onloadeddata onloadedmetadata onloadstart onmousedown onmousemove
+  onmouseout onmouseover onmouseup onmousewheel onpause onplay
+  onplaying onprogress onratechange onreadystatechange onscroll
+  onseeked onseeking onselect onshow onstalled onsubmit onsuspend
+  ontimeupdate onvolumechange onwaiting
+
+  onblur onerror onfocus onload
+)) {
   $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
-  $HTMLAttrStatus{$_} = FEATURE_HTML5_DEFAULT;
+  $HTMLAttrStatus{$_} = FEATURE_HTML5_LC;
 }
 
 for (qw/
@@ -6572,8 +6577,6 @@ $Element->{$HTML_NS}->{form} = {
     #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
     name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     novalidate => FEATURE_HTML5_LC,
-    onformchange => FEATURE_WF2_INFORMATIVE,
-    onforminput => FEATURE_WF2_INFORMATIVE,
     onreceived => FEATURE_WF2,
     onreset => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onsubmit => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -6856,11 +6859,6 @@ $Element->{$HTML_NS}->{input} = {
          multiple => '',
          name => $FormControlNameAttrChecker,
          novalidate => '',
-         onformchange => $HTMLEventHandlerAttrChecker, # [WF2]
-         onforminput => $HTMLEventHandlerAttrChecker, # [WF2]
-         oninput => $HTMLEventHandlerAttrChecker, # [WF2]
-         oninvalid => $HTMLEventHandlerAttrChecker, # [WF2]
-         ## TODO: tests for four attributes above
          pattern => '',
          placeholder => '',
          readonly => '',
@@ -7370,8 +7368,6 @@ $Element->{$HTML_NS}->{button} = {
     }),
     name => $FormControlNameAttrChecker,
     novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
-    onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
-    onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
     ## NOTE: According to Web Forms 2.0, |button| attribute has |template|
@@ -7404,8 +7400,6 @@ $Element->{$HTML_NS}->{button} = {
     novalidate => FEATURE_HTML5_DROPPED,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onformchange => FEATURE_WF2_INFORMATIVE,
-    onforminput => FEATURE_WF2_INFORMATIVE,
     replace => FEATURE_WF2,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
@@ -7487,11 +7481,7 @@ $Element->{$HTML_NS}->{select} = {
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onformchange => FEATURE_WF2_INFORMATIVE,
-    onforminput => FEATURE_WF2_INFORMATIVE,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    oninput => FEATURE_WF2,
-    oninvalid => FEATURE_WF2,
     sdaform => FEATURE_HTML20_RFC,
     sdapref => FEATURE_HTML20_RFC,
     size => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -7764,16 +7754,11 @@ $Element->{$HTML_NS}->{textarea} = {
       }
     },
     name => $FormControlNameAttrChecker,
-    onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
-    onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
-    oninput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     pattern => $PatternAttrChecker,
     placeholder => $PlaceholderAttrChecker,
     readonly => $GetHTMLBooleanAttrChecker->('readonly'),
     required => $GetHTMLBooleanAttrChecker->('required'),
     rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
-    oninput => $HTMLEventHandlerAttrChecker, ## TODO: tests
-    oninvalid => $HTMLEventHandlerAttrChecker, ## TODO: tests
     sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
     sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
     wrap => $GetHTMLEnumeratedAttrChecker->({soft => 1, hard => 1}),
@@ -7794,10 +7779,6 @@ $Element->{$HTML_NS}->{textarea} = {
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onformchange => FEATURE_WF2_INFORMATIVE, ## TODO: tests
-    onforminput => FEATURE_WF2_INFORMATIVE, ## TODO: tests
-    oninput => FEATURE_WF2, ## TODO: tests
-    oninvalid => FEATURE_WF2, ## TODO: tests
     onselect => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     pattern => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     placeholder => FEATURE_HTML5_LC,
@@ -7904,18 +7885,13 @@ $Element->{$HTML_NS}->{output} = {
     },
     form => $HTMLFormAttrChecker,
     name => $FormControlNameAttrChecker,
-    onformchange => $HTMLEventHandlerAttrChecker, ## TODO: tests
-    onforminput => $HTMLEventHandlerAttrChecker, ## TODO: tests
   }, {
     %HTMLAttrStatus,
     for => FEATURE_HTML5_LC | FEATURE_WF2X,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     name => FEATURE_HTML5_LC | FEATURE_WF2X,
-    onchange => FEATURE_HTML5_DEFAULT | FEATURE_WF2,
-    onformchange => FEATURE_WF2,
-    onforminput => FEATURE_WF2,
   }),
-};
+}; # output
 
 # XXX labelable
 $Element->{$HTML_NS}->{progress} = {
