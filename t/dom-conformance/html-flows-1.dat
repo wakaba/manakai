@@ -1054,6 +1054,72 @@ para
 /ul/@type;attribute not defined;m
 
 #data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align=""></ul>
+#errors
+/ul/@align;attribute not defined;m
+/ul/@align;enumerated:invalid;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="   "></ul>
+#errors
+/ul/@align;attribute not defined;m
+/ul/@align;enumerated:invalid;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="abc"></ul>
+#errors
+/ul/@align;attribute not defined;m
+/ul/@align;enumerated:invalid;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="left"></ul>
+#errors
+/ul/@align;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="right"></ul>
+#errors
+/ul/@align;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="center"></ul>
+#errors
+/ul/@align;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="justify"></ul>
+#errors
+/ul/@align;attribute not defined;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="right "></ul>
+#errors
+/ul/@align;attribute not defined;m
+/ul/@align;enumerated:invalid;m
+
+#data escaped
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0130ght"></ul>
+#errors
+/ul/@align;attribute not defined;m
+/ul/@align;enumerated:invalid;m
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0131ght"></ul>
+#errors
+/ul/@align;attribute not defined;m
+/ul/@align;enumerated:invalid;m
+
+#data
 <ol xmlns="http://www.w3.org/1999/xhtml">
 <li></li>
 </ol>
@@ -3058,6 +3124,72 @@ aaa
 /blockquote;no significant content;s
 
 #data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+/blockquote/@align;enumerated:invalid;m
+
+#data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="   ">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+/blockquote/@align;enumerated:invalid;m
+
+#data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="abc">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+/blockquote/@align;enumerated:invalid;m
+
+#data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="left">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+
+#data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="right">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+
+#data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="center">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+
+#data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="justify">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+
+#data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="right ">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+/blockquote/@align;enumerated:invalid;m
+
+#data escaped
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0130ght">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+/blockquote/@align;enumerated:invalid;m
+
+#data
+<blockquote xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0131ght">a</blockquote>
+#errors
+/blockquote/@align;attribute not defined;m
+/blockquote/@align;enumerated:invalid;m
+
+#data
 <dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /dialog;element not defined;m
@@ -3296,6 +3428,72 @@ aaa
 <ol reversed="reverse" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /ol/@reversed;boolean:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align=""></ol>
+#errors
+/ol/@align;attribute not defined;m
+/ol/@align;enumerated:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="   "></ol>
+#errors
+/ol/@align;attribute not defined;m
+/ol/@align;enumerated:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="abc"></ol>
+#errors
+/ol/@align;attribute not defined;m
+/ol/@align;enumerated:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="left"></ol>
+#errors
+/ol/@align;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="right"></ol>
+#errors
+/ol/@align;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="center"></ol>
+#errors
+/ol/@align;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="justify"></ol>
+#errors
+/ol/@align;attribute not defined;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="right "></ol>
+#errors
+/ol/@align;attribute not defined;m
+/ol/@align;enumerated:invalid;m
+
+#data escaped
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0130ght"></ol>
+#errors
+/ol/@align;attribute not defined;m
+/ol/@align;enumerated:invalid;m
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0131ght"></ol>
+#errors
+/ol/@align;attribute not defined;m
+/ol/@align;enumerated:invalid;m
 
 #data
 <ol xmlns="http://www.w3.org/1999/xhtml">
@@ -3615,6 +3813,72 @@ a
 /ol/li/@type;attribute not defined;m
 
 #data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="">a</li>
+#errors
+/li/@align;attribute not defined;m
+/li/@align;enumerated:invalid;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="   ">a</li>
+#errors
+/li/@align;attribute not defined;m
+/li/@align;enumerated:invalid;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="abc">a</li>
+#errors
+/li/@align;attribute not defined;m
+/li/@align;enumerated:invalid;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="left">a</li>
+#errors
+/li/@align;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="right">a</li>
+#errors
+/li/@align;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="center">a</li>
+#errors
+/li/@align;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="justify">a</li>
+#errors
+/li/@align;attribute not defined;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="right ">a</li>
+#errors
+/li/@align;attribute not defined;m
+/li/@align;enumerated:invalid;m
+
+#data escaped
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0130ght">a</li>
+#errors
+/li/@align;attribute not defined;m
+/li/@align;enumerated:invalid;m
+
+#data
+<li xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0131ght">a</li>
+#errors
+/li/@align;attribute not defined;m
+/li/@align;enumerated:invalid;m
+
+#data
 <ol compact="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /ol/@compact;attribute not defined;m
@@ -3682,6 +3946,12 @@ a
 /dir;element not defined;m
 
 #data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    align="abc"></dir>
+#errors
+/dir/@align;attribute not defined;m
+
+#data
 <menu compact="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /menu/@compact;attribute not defined;m
@@ -3707,6 +3977,72 @@ a
 /menu;no significant content;s
 
 #data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+/menu/@align;enumerated:invalid;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="   ">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+/menu/@align;enumerated:invalid;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="abc">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+/menu/@align;enumerated:invalid;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="left">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="right">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="center">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="justify">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="right ">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+/menu/@align;enumerated:invalid;m
+
+#data escaped
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0130ght">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+/menu/@align;enumerated:invalid;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    align="r\u0131ght">a</menu>
+#errors
+/menu/@align;attribute not defined;m
+/menu/@align;enumerated:invalid;m
+
+#data
 <dl compact="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /dl/@compact;attribute not defined;m
@@ -3726,6 +4062,12 @@ a
 #errors
 /dl/@compact;attribute not defined;m
 /dl/@compact;boolean:invalid;m
+
+#data
+<dl xmlns="http://www.w3.org/1999/xhtml"
+    align="abc"></dl>
+#errors
+/dl/@align;attribute not defined;m
 
 #data
 <h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>

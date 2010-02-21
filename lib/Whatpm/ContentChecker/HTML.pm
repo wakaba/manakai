@@ -3391,10 +3391,9 @@ $Element->{$HTML_NS}->{address} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    ## TODO: add test
-    #align => $GetHTMLEnumeratedAttrChecker->({
-    #  left => 1, center => 1, right => 1, justify => 1,
-    #}),
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3402,7 +3401,7 @@ $Element->{$HTML_NS}->{address} = {
     lang => FEATURE_HTML5_REC,
     sdaform => FEATURE_HTML20_RFC,
     sdapref => FEATURE_HTML20_RFC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements
@@ -3525,6 +3524,9 @@ $Element->{$HTML_NS}->{blockquote} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLFlowContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
     cite => $HTMLURIAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -3533,7 +3535,7 @@ $Element->{$HTML_NS}->{blockquote} = {
     cite => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_REC,
     sdaform => FEATURE_HTML20_RFC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
   
@@ -3619,6 +3621,9 @@ $Element->{$HTML_NS}->{ol} = {
   %HTMLChecker,
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
     reversed => $GetHTMLBooleanAttrChecker->('reversed'),
     start => $HTMLIntegerAttrChecker,
@@ -3644,7 +3649,7 @@ $Element->{$HTML_NS}->{ol} = {
     #start => FEATURE_HTML5_WD | FEATURE_M12N10_REC_DEPRECATED,
     start => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_OBSOLETE,
-  }),
+  }), # check_attrs
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -3675,6 +3680,9 @@ $Element->{$HTML_NS}->{ul} = {
   %{$Element->{$HTML_NS}->{ol}},
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
     type => $GetHTMLEnumeratedAttrChecker->({
       disc => 1, square => 1, circle => 1,
@@ -3695,6 +3703,9 @@ $Element->{$HTML_NS}->{dir} = {
   %{$Element->{$HTML_NS}->{ul}},
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
   }, {
     %HTMLAttrStatus,
@@ -3711,6 +3722,9 @@ $Element->{$HTML_NS}->{li} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
     type => sub {
       my ($self, $attr) = @_;
       my $value = $attr->value;
@@ -8248,6 +8262,9 @@ $Element->{$HTML_NS}->{menu} = {
   status => FEATURE_M12N10_REC | FEATURE_HTML5_WD,
       ## NOTE: We don't want any |menu| element warned as deprecated.
   check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, center => 1, right => 1, justify => 1,
+    }),
     autosubmit => $GetHTMLBooleanAttrChecker->('autosubmit'),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
     ## ISSUE: <menu id=""><p contextmenu=""> match?  (In the current
