@@ -1996,6 +1996,7 @@ $Element->{$HTML_NS}->{html} = {
   is_root => 1,
   check_attrs => $GetHTMLAttrsChecker->({
     manifest => $HTMLURIAttrChecker,
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
     version => sub {
       ## According to HTML4 prose, the |version| attribute's value is
       ## "cdata".  Various DTDs of versions of HTML and XHTML define
@@ -2179,7 +2180,9 @@ $Element->{$HTML_NS}->{head} = {
 $Element->{$HTML_NS}->{title} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %XHTML2CommonAttrStatus,
     class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_HTML2X_RFC,
@@ -2287,6 +2290,7 @@ $Element->{$HTML_NS}->{link} = {
       rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
       media => $HTMLMQAttrChecker,
       hreflang => $HTMLLanguageTagAttrChecker,
+      sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
       sizes => sub {
         my ($self, $attr) = @_;
         $sizes_attr = $attr;
@@ -3265,6 +3269,7 @@ $Element->{$HTML_NS}->{h1} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3394,6 +3399,8 @@ $Element->{$HTML_NS}->{address} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3430,6 +3437,7 @@ $Element->{$HTML_NS}->{p} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3447,6 +3455,7 @@ $Element->{$HTML_NS}->{hr} = {
       left => 1, center => 1, right => 1,
     }),
     noshade => $GetHTMLBooleanAttrChecker->('noshade'),
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
     size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## HTML4 %Pixels;
     width => $HTMLLengthAttrChecker, ## HTML4 %Length;
   }, {
@@ -3469,6 +3478,7 @@ $Element->{$HTML_NS}->{br} = {
     clear => $GetHTMLEnumeratedAttrChecker->({
       left => 1, all => 1, right => 1, none => 1,
     }),
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -3484,6 +3494,7 @@ $Element->{$HTML_NS}->{pre} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
@@ -3518,7 +3529,9 @@ $Element->{$HTML_NS}->{pre} = {
 ## XXX listing FEAUTRE_HTML5_OBSOLETE
 ## XXX plaintext FEATURE_HTML5_OBSOLETE
 ## TODO: ^^^ lang, dir, id, class [HTML 2.x] sdaform [HTML 2.0]
+##    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
 ## xmp, listing sdapref[HTML2,0]
+##    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
 
 $Element->{$HTML_NS}->{blockquote} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -3528,6 +3541,7 @@ $Element->{$HTML_NS}->{blockquote} = {
       left => 1, center => 1, right => 1, justify => 1,
     }),
     cite => $HTMLURIAttrChecker,
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3626,6 +3640,7 @@ $Element->{$HTML_NS}->{ol} = {
     }),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
     reversed => $GetHTMLBooleanAttrChecker->('reversed'),
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
     start => $HTMLIntegerAttrChecker,
     type => sub {
       my ($self, $attr) = @_;
@@ -3684,10 +3699,10 @@ $Element->{$HTML_NS}->{ul} = {
       left => 1, center => 1, right => 1, justify => 1,
     }),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
     type => $GetHTMLEnumeratedAttrChecker->({
       disc => 1, square => 1, circle => 1,
     }),
-    ## TODO: sdaform, align
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3707,6 +3722,8 @@ $Element->{$HTML_NS}->{dir} = {
       left => 1, center => 1, right => 1, justify => 1,
     }),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -3725,6 +3742,7 @@ $Element->{$HTML_NS}->{li} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
     type => sub {
       my ($self, $attr) = @_;
       my $value = $attr->value;
@@ -3796,6 +3814,8 @@ $Element->{$HTML_NS}->{dl} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     compact => $GetHTMLBooleanAttrChecker->('compact'),
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3884,7 +3904,9 @@ $Element->{$HTML_NS}->{dl} = {
 $Element->{$HTML_NS}->{dt} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -3895,7 +3917,9 @@ $Element->{$HTML_NS}->{dt} = {
 $Element->{$HTML_NS}->{dd} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4020,6 +4044,7 @@ $Element->{$HTML_NS}->{a} = {
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
           rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
+          sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
           shape => $GetHTMLEnumeratedAttrChecker->({
             circ => -1, circle => 1,
             default => 1,
@@ -4099,7 +4124,9 @@ $Element->{$HTML_NS}->{a} = {
 $Element->{$HTML_NS}->{em} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4110,7 +4137,9 @@ $Element->{$HTML_NS}->{em} = {
 $Element->{$HTML_NS}->{strong} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4141,7 +4170,9 @@ $Element->{$HTML_NS}->{big} = {
 $Element->{$HTML_NS}->{cite} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4154,6 +4185,8 @@ $Element->{$HTML_NS}->{q} = {
   %HTMLPhrasingContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdasuff => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -4478,7 +4511,9 @@ $Element->{$HTML_NS}->{time} = {
 $Element->{$HTML_NS}->{code} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4489,7 +4524,9 @@ $Element->{$HTML_NS}->{code} = {
 $Element->{$HTML_NS}->{var} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4500,7 +4537,9 @@ $Element->{$HTML_NS}->{var} = {
 $Element->{$HTML_NS}->{samp} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4511,7 +4550,9 @@ $Element->{$HTML_NS}->{samp} = {
 $Element->{$HTML_NS}->{kbd} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4522,7 +4563,9 @@ $Element->{$HTML_NS}->{kbd} = {
 $Element->{$HTML_NS}->{sub} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4537,7 +4580,9 @@ $Element->{$HTML_NS}->{sup} = $Element->{$HTML_NS}->{sub};
 $Element->{$HTML_NS}->{i} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4550,7 +4595,9 @@ $Element->{$HTML_NS}->{b} = $Element->{$HTML_NS}->{i};
 $Element->{$HTML_NS}->{tt} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4873,7 +4920,10 @@ $Element->{$HTML_NS}->{bdo} = {
   status => FEATURE_HTML5_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
-    $GetHTMLAttrsChecker->({}, {
+    $GetHTMLAttrsChecker->({
+      sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
+      sdasuff => sub { }, ## Constant [RFC 2070], but we don't check the value
+    }, {
       %HTMLAttrStatus,
       class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
       dir => FEATURE_HTML5_REC,
@@ -4897,7 +4947,9 @@ $Element->{$HTML_NS}->{bdo} = {
 $Element->{$HTML_NS}->{span} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -5113,6 +5165,7 @@ $Element->{$HTML_NS}->{img} = {
       ## TODO: HTML4 |name|
       height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+      sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
       width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     }, {
       %HTMLAttrStatus,
@@ -6524,6 +6577,8 @@ $Element->{$HTML_NS}->{form} = {
     onforminput => $HTMLEventHandlerAttrChecker,
     onreceived => $HTMLEventHandlerAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdasuff => sub { }, ## Constant [RFC 2070], but we don't check the value
     target => $HTMLTargetAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -6833,6 +6888,7 @@ $Element->{$HTML_NS}->{input} = {
          readonly => '',
          replace => '',
          required => '',
+         sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
          size => '',
          src => '',
          step => '',
@@ -7437,6 +7493,8 @@ $Element->{$HTML_NS}->{select} = {
     onforminput => $HTMLEventHandlerAttrChecker,
     oninput => $HTMLEventHandlerAttrChecker,
     oninvalid => $HTMLEventHandlerAttrChecker,
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
     size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
   }, {
     %HTMLAttrStatus,
@@ -7661,6 +7719,8 @@ $Element->{$HTML_NS}->{option} = {
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     label => sub {}, ## NOTE: No restriction.
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
     selected => $GetHTMLBooleanAttrChecker->('selected'), ## ISSUE: Not a "boolean attribute"
     value => sub {}, ## NOTE: No restriction.
   }, {
@@ -7736,7 +7796,8 @@ $Element->{$HTML_NS}->{textarea} = {
     rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     oninput => $HTMLEventHandlerAttrChecker, ## TODO: tests
     oninvalid => $HTMLEventHandlerAttrChecker, ## TODO: tests
-    ## NOTE: |title| had special semantics if |pattern| was specified [WF2].
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
     wrap => $GetHTMLEnumeratedAttrChecker->({soft => 1, hard => 1}),
   }, {
     %HTMLAttrStatus,
@@ -8044,6 +8105,7 @@ $Element->{$HTML_NS}->{isindex} = {
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
     prompt => sub {}, ## NOTE: Text [M12N]
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -8272,6 +8334,8 @@ $Element->{$HTML_NS}->{menu} = {
     ## ISSUE: <menu id=""><p contextmenu=""> match?  (In the current
     ## implementation, it does not match.)
     label => sub { }, ## NOTE: No conformance creteria
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
     type => $GetHTMLEnumeratedAttrChecker->({context => 1, toolbar => 1}),
   }, {
     %HTMLAttrStatus,
