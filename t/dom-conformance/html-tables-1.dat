@@ -576,6 +576,17 @@
 /table/@datapagesize;attribute not defined;m
 
 #data
+<table xmlns="http://www.w3.org/1999/xhtml" cols=""/>
+#errors
+/table/@cols;attribute not defined;m
+/table/@cols;nninteger:syntax error;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml" cols="123"/>
+#errors
+/table/@cols;attribute not defined;m
+
+#data
 <caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /caption/@align;attribute not defined;m

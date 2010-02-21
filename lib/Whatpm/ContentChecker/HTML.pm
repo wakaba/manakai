@@ -5982,6 +5982,7 @@ $Element->{$HTML_NS}->{table} = {
     }, # border
     cellpadding => $HTMLLengthAttrChecker,
     cellspacing => $HTMLLengthAttrChecker,
+    cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     datapagesize => sub { }, ## CDATA [HTML4]
     frame => $GetHTMLEnumeratedAttrChecker->({
       void => 1, above => 1, below => 1, hsides => 1, vsides => 1,
