@@ -2061,7 +2061,12 @@ $Element->{$HTML_NS}->{html} = {
 
     $HTMLChecker{check_end}->(@_);
   },
-};
+}; # html
+
+$Element->{$HTML_NS}->{'pre-html'} = {
+  %{$Element->{$HTML_NS}->{html}},
+  status => FEATURE_ISOHTML_PREPARATION,
+}; # pre-html
 
 # ---- Document metadata ----
 
@@ -3963,6 +3968,17 @@ $Element->{$HTML_NS}->{center} = {
     lang => FEATURE_HTML5_REC,
   }),
 }; # center
+
+$Element->{$HTML_NS}->{div1} = {
+  %{$Element->{$HTML_NS}->{div}},
+  status => FEATURE_ISOHTML_PREPARATION,
+}; # div1
+
+$Element->{$HTML_NS}->{div2} = $Element->{$HTML_NS}->{div1};
+$Element->{$HTML_NS}->{div3} = $Element->{$HTML_NS}->{div1};
+$Element->{$HTML_NS}->{div4} = $Element->{$HTML_NS}->{div1};
+$Element->{$HTML_NS}->{div5} = $Element->{$HTML_NS}->{div1};
+$Element->{$HTML_NS}->{div6} = $Element->{$HTML_NS}->{div1};
 
 $Element->{$HTML_NS}->{font} = {
   %HTMLTransparentChecker,
@@ -8713,8 +8729,6 @@ $Element->{$HTML_NS}->{noframes} = {
 ## XXX noembed FEATURE_HTML5_OBSOLETE
 ## XXX blink FEATURE_HTML5_OBSOLETE
 ## XXX spacer FEATURE_HTML5_OBSOLETE
-## XXX ISO-HTML: pre-html
-## XXX ISO-HTML: divN
 ## XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart
 ## XXX nobr/wbr FEATURE_HTML5_OBSOLETE
 ## XXX bgsound FEATURE_HTML5_OBSOLETE
