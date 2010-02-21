@@ -2861,3 +2861,60 @@ p {color: green}
 #errors
 /basefont;element not defined;m
 /basefont/@face;attribute not defined;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/nextid;element not defined;m
+/nextid;attribute missing;n;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml">  </nextid>
+#errors
+/nextid;element not defined;m
+/nextid;attribute missing;n;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml">aa</nextid>
+#errors
+/nextid;element not defined;m
+/nextid/"aa";character not allowed:empty;m
+/nextid;attribute missing;n;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml"><p>aa</p></nextid>
+#errors
+/nextid;element not defined;m
+/nextid;attribute missing;n;m
+/nextid/p;element not allowed:empty;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml" n=""/>
+#errors
+/nextid;element not defined;m
+/nextid/@n;attribute not defined;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml" n="12345"/>
+#errors
+/nextid;element not defined;m
+/nextid/@n;attribute not defined;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml" n="n33"/>
+#errors
+/nextid;element not defined;m
+/nextid/@n;attribute not defined;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml" n="xyzzy"/>
+#errors
+/nextid;element not defined;m
+/nextid/@n;attribute not defined;m
+
+#data
+<nextid xmlns="http://www.w3.org/1999/xhtml" n="n"/>
+#errors
+/nextid;element not defined;m
+/nextid/@n;attribute not defined;m
+

@@ -2239,6 +2239,30 @@ $Element->{$HTML_NS}->{basefont} = {
   }),
 }; # basefont
 
+$Element->{$HTML_NS}->{nextid} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    n => sub { }, ## CDATA [HTML 2.0]
+        ## XXX "It should be distinct from all NAME attribute values
+        ## on <A> elements." [HTML 2.0]
+  }, {
+    %HTMLAttrStatus,
+    n => FEATURE_HTML20_RFC,
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    my $el = $item->{node};
+    unless ($el->has_attribute_ns (undef, 'n')) {
+      $self->{onerror}->(node => $el,
+                         type => 'attribute missing',
+                         text => 'n',
+                         level => $self->{level}->{must});
+    }
+  }, # check_attrs2
+}; # nextid
+
 $Element->{$HTML_NS}->{link} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLEmptyChecker,
@@ -2866,7 +2890,7 @@ $Element->{$HTML_NS}->{script} = {
                          text => 'src',
                          level => $self->{level}->{must});
     }
-  },
+  }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -8687,7 +8711,6 @@ $Element->{$HTML_NS}->{noframes} = {
   }), # check_attrs
 }; # noframes
 
-## XXX HTML 2.0 nextid @n FEATURE_HTML5_OBSOLETE
 ## XXX noembed FEATURE_HTML5_OBSOLETE
 ## XXX blink FEATURE_HTML5_OBSOLETE
 ## XXX spacer FEATURE_HTML5_OBSOLETE
