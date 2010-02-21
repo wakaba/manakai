@@ -154,28 +154,8 @@ sub FEATURE_ISOHTML_PREPARATION () { ## Informative documentation
   Whatpm::ContentChecker::FEATURE_STATUS_CR
 }
 
-## NOTE: HTML4 status is based on its transitional and frameset DTDs (HTML
-## 4.01).  Only missing attributes from XHTML10 are added.
-sub FEATURE_HTML4_REC_RESERVED () {
-  Whatpm::ContentChecker::FEATURE_STATUS_WD
-}
-
-## TODO: According to HTML4 definition, authors SHOULD use style sheets
-## rather than presentational attributes (deprecated or not deprecated).
-
-## NOTE: Diff from HTML4.
-sub FEATURE_HTML32_REC_OBSOLETE () {
-  Whatpm::ContentChecker::FEATURE_STATUS_CR |
-  Whatpm::ContentChecker::FEATURE_DEPRECATED_SHOULD
-      ## NOTE: Lowercase normative "should".
-}
-
-sub FEATURE_RFC2659 () { ## Experimental RFC
-  Whatpm::ContentChecker::FEATURE_STATUS_CR
-}
-## NOTE: Where RFC 2659 allows additional attributes is unclear.
-## We added them only to |a|.  |link| and |form| might also allow them
-## in theory.
+## We don't support RFC 2659 (Experimental RFC) - it's too vague to
+## implement, and it has never affected the real world at all.
 
 ## NOTE: HTML 2.x - diff from HTML 2.0 and not in newer versions.
 sub FEATURE_HTML2X_RFC () { ## Proposed Standard, obsolete
@@ -2882,8 +2862,8 @@ $Element->{$HTML_NS}->{script} = {
     async => FEATURE_HTML5_WD,
     charset => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     defer => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    event => FEATURE_HTML4_REC_RESERVED,
-    for => FEATURE_HTML4_REC_RESERVED,
+    event => FEATURE_HTML5_OBSOLETE,
+    for => FEATURE_HTML5_OBSOLETE,
     href => FEATURE_RDFA_REC,
     id => FEATURE_HTML5_REC,
     language => FEATURE_HTML5_OBSOLETE, # XXX allowed in some cases
@@ -4007,8 +3987,6 @@ $Element->{$HTML_NS}->{a} = {
           accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
           charset => FEATURE_HTML5_OBSOLETE,
           coords => FEATURE_HTML5_OBSOLETE,
-          cryptopts => FEATURE_RFC2659,
-          dn => FEATURE_RFC2659,
           href => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
               FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_WD | FEATURE_XHTML2_ED |
@@ -4017,7 +3995,6 @@ $Element->{$HTML_NS}->{a} = {
           media => FEATURE_HTML5_WD | FEATURE_XHTML2_ED,
           methods => FEATURE_HTML5_OBSOLETE,
           name => FEATURE_HTML5_OBSOLETE, # XXX allowed in some cases
-          nonce => FEATURE_RFC2659,
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
@@ -8643,7 +8620,6 @@ $Element->{$HTML_NS}->{noframes} = {
 ## XXX noembed FEATURE_HTML5_OBSOLETE
 ## XXX blink FEATURE_HTML5_OBSOLETE
 ## XXX spacer FEATURE_HTML5_OBSOLETE
-## XXX RFC 2659: CERTS CRYPTOPTS 
 ## XXX ISO-HTML: pre-html
 ## XXX ISO-HTML: divN
 ## XXX XHTML2: blockcode (Common)
