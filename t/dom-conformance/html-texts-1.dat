@@ -1032,6 +1032,7 @@
 /ruby/rbc/rb;element not defined;m
 /ruby/rtc;element not defined;m
 /ruby/rtc;element not allowed:ruby base;m
+/ruby/rtc;child element missing;rt;m
 /ruby/rt;no significant content before;s
 
 #data
@@ -1105,6 +1106,34 @@
 /p/rt;element not allowed:phrasing;m
 
 #data
+<rt xmlns="http://www.w3.org/1999/xhtml" rbspan="">a</rt>
+#errors
+/rt/@rbspan;nninteger:syntax error;m
+/rt/@rbspan;attribute not defined;m
+
+#data
+<rt xmlns="http://www.w3.org/1999/xhtml" rbspan="0">a</rt>
+#errors
+/rt/@rbspan;nninteger:out of range;m
+/rt/@rbspan;attribute not defined;m
+
+#data
+<rt xmlns="http://www.w3.org/1999/xhtml" rbspan="1">a</rt>
+#errors
+/rt/@rbspan;attribute not defined;m
+
+#data
+<rt xmlns="http://www.w3.org/1999/xhtml" rbspan="120">a</rt>
+#errors
+/rt/@rbspan;attribute not defined;m
+
+#data
+<rt xmlns="http://www.w3.org/1999/xhtml" rbspan="-123">a</rt>
+#errors
+/rt/@rbspan;nninteger:syntax error;m
+/rt/@rbspan;attribute not defined;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml"><rp>x</rp></p>
 #errors
 /p/rp;element not allowed:phrasing;m
@@ -1146,6 +1175,129 @@
 #errors
 /rb;element not defined;m
 /rb/p;element not allowed:phrasing;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml"></rbc>
+#errors
+/rbc;child element missing;rb;m
+/rbc;element not defined;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml">   </rbc>
+#errors
+/rbc;child element missing;rb;m
+/rbc;element not defined;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml">reeree</rbc>
+#errors
+/rbc;child element missing;rb;m
+/rbc;element not defined;m
+/rbc/"reeree";character not allowed;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb></rbc>
+#errors
+/rbc;element not defined;m
+/rbc/rb;element not defined;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb><rb>b</rb></rbc>
+#errors
+/rbc;element not defined;m
+/rbc/rb;element not defined;m
+/rbc/rb;element not defined;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb><rb>b</rb>
+<rb>c</rb></rbc>
+#errors
+/rbc;element not defined;m
+/rbc/rb;element not defined;m
+/rbc/rb;element not defined;m
+/rbc/rb;element not defined;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb><rb>b</rb>
+<rt>c</rt></rbc>
+#errors
+/rbc;element not defined;m
+/rbc/rb;element not defined;m
+/rbc/rb;element not defined;m
+/rbc/rt;element not allowed;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb>
+<p>aa</p></rbc>
+#errors
+/rbc;element not defined;m
+/rbc/rb;element not defined;m
+/rbc/p;element not allowed;m
+
+#data
+<rbc xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb>aaa</rbc>
+#errors
+/rbc;element not defined;m
+/rbc/rb;element not defined;m
+/rbc/"aaa";character not allowed;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml"></rtc>
+#errors
+/rtc;child element missing;rt;m
+/rtc;element not defined;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml">   </rtc>
+#errors
+/rtc;child element missing;rt;m
+/rtc;element not defined;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml">reeree</rtc>
+#errors
+/rtc;child element missing;rt;m
+/rtc;element not defined;m
+/rtc/"reeree";character not allowed;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml"><rt>aa</rt></rtc>
+#errors
+/rtc;element not defined;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml"><rt>aa</rt><rt>b</rt></rtc>
+#errors
+/rtc;element not defined;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml"><rt>aa</rt><rt>b</rt>
+<rt>c</rt></rtc>
+#errors
+/rtc;element not defined;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml"><rt>aa</rt>
+<p>aa</p></rtc>
+#errors
+/rtc;element not defined;m
+/rtc/p;element not allowed;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb>
+<p>aa</p></rtc>
+#errors
+/rtc;child element missing;rt;m
+/rtc;element not defined;m
+/rtc/rb;element not defined;m
+/rtc/rb;element not allowed;m
+/rtc/p;element not allowed;m
+
+#data
+<rtc xmlns="http://www.w3.org/1999/xhtml"><rt>aa</rt>aaa</rtc>
+#errors
+/rtc;element not defined;m
+/rtc/"aaa";character not allowed;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb></div>

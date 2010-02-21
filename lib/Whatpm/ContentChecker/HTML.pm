@@ -65,6 +65,13 @@ sub FEATURE_HTML5_LC_DROPPED () {
 ## section.
 use constant FEATURE_HTML5_OBSOLETE => 0;
 
+## -- Obsolete specifications --
+
+## Following historical specifications are obsolete; though some of
+## them are still "live" specifications according to corresponding
+## standardization bodies, they are not "applicable specification"s
+## [WA1] and therefore cannot form parts of the HTML langauge anymore.
+
 sub FEATURE_WF2X () {
   ## NOTE: Defined in WF2 (whether deprecated or not) and then
   ## incorporated into the HTML5 spec.
@@ -4883,10 +4890,13 @@ $Element->{$HTML_NS}->{rb} = {
 $Element->{$HTML_NS}->{rt} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_WD | FEATURE_RUBY_REC,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    rbspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
+    rbspan => FEATURE_RUBY_REC,
   }),
 }; # rt
 
@@ -4900,7 +4910,97 @@ $Element->{$HTML_NS}->{rp} = {
   }),
 }; # rp
 
-## XXX CR: rbc rtc @rbspan (M12NXHTML2Common)
+$Element->{$HTML_NS}->{rbc} = {
+  %HTMLChecker,
+  status => FEATURE_RUBY_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    lang => FEATURE_HTML5_REC,
+  }), # check_attrs
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'rb') {
+      $element_state->{has_rb} = 1;
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    unless ($element_state->{has_rb}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing',
+                         text => 'rb',
+                         level => $self->{level}->{must});
+    }
+
+    $HTMLChecker{check_end}->(@_);
+  }, # check_end
+}; # rbc
+
+$Element->{$HTML_NS}->{rtc} = {
+  %HTMLChecker,
+  status => FEATURE_RUBY_REC,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    lang => FEATURE_HTML5_REC,
+  }), # check_attrs
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'rt') {
+      $element_state->{has_rt} = 1;
+    } else {
+      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
+  check_child_text => sub {
+    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
+    if ($has_significant) {
+      $self->{onerror}->(node => $child_node, type => 'character not allowed',
+                         level => $self->{level}->{must});
+    }
+  },
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    unless ($element_state->{has_rt}) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'child element missing',
+                         text => 'rt',
+                         level => $self->{level}->{must});
+    }
+
+    $HTMLChecker{check_end}->(@_);
+  }, # check_end
+}; # rtc
 
 $Element->{$HTML_NS}->{bdo} = {
   %HTMLPhrasingContentChecker,
