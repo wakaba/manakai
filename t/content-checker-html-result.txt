@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Feb 21 14:38:41 2010
-# Current time GMT:   Sun Feb 21 05:38:41 2010
+# Current time local: Sun Feb 21 16:19:57 2010
+# Current time GMT:   Sun Feb 21 07:19:57 2010
 # Using Test.pm version 1.25_02
 # ../t/content-model-1.dat
 ok 1
@@ -1306,10 +1306,7 @@ ok 1257
 ok 1258
 ok 1259
 ok 1260
-not ok 1261
-# Test 1261 got: "/dir/@align;attribute not defined;m\n/dir/@align;enumerated:invalid;m\n/dir;element not defined;m" (content-checker-test-ok at line 2 fail #1261)
-#      Expected: "/dir/@align;attribute not defined;m" (<dir xmlns="http://www.w3.org/1999/xhtml"
-#    align="abc"></dir>)
+ok 1261
 ok 1262
 ok 1263
 ok 1264
@@ -1327,7 +1324,10 @@ ok 1275
 ok 1276
 ok 1277
 ok 1278
-ok 1279
+not ok 1279
+# Test 1279 got: "/dir/@align;attribute not defined;m\n/dir/@align;enumerated:invalid;m\n/dir;element not defined;m" (content-checker-test-ok at line 2 fail #1279)
+#      Expected: "/dir/@align;attribute not defined;m" (<dir xmlns="http://www.w3.org/1999/xhtml"
+#    align="abc"></dir>)
 ok 1280
 ok 1281
 ok 1282
@@ -1425,10 +1425,7 @@ ok 1373
 ok 1374
 ok 1375
 ok 1376
-not ok 1377
-# Test 1377 got: "" (content-checker-test-ok at line 2 fail #1377)
-#      Expected: "/ins/@datetime;datetime:bad year;m" (<ins xmlns="http://www.w3.org/1999/xhtml"
-#    datetime="0000-03-14T14:33Z">x</ins>)
+ok 1377
 ok 1378
 ok 1379
 ok 1380
@@ -1446,7 +1443,10 @@ ok 1391
 ok 1392
 ok 1393
 ok 1394
-ok 1395
+not ok 1395
+# Test 1395 got: "" (content-checker-test-ok at line 2 fail #1395)
+#      Expected: "/ins/@datetime;datetime:bad year;m" (<ins xmlns="http://www.w3.org/1999/xhtml"
+#    datetime="0000-03-14T14:33Z">x</ins>)
 ok 1396
 ok 1397
 ok 1398
@@ -1465,10 +1465,7 @@ ok 1410
 ok 1411
 ok 1412
 ok 1413
-not ok 1414
-# Test 1414 got: "" (content-checker-test-ok at line 2 fail #1414)
-#      Expected: "/ins/@datetime;datetime:bad timezone hour;m" (<ins xmlns="http://www.w3.org/1999/xhtml"
-#    datetime="2007-02-21T23:00-24:00">x</ins>)
+ok 1414
 ok 1415
 ok 1416
 ok 1417
@@ -1486,7 +1483,10 @@ ok 1428
 ok 1429
 ok 1430
 ok 1431
-ok 1432
+not ok 1432
+# Test 1432 got: "" (content-checker-test-ok at line 2 fail #1432)
+#      Expected: "/ins/@datetime;datetime:bad timezone hour;m" (<ins xmlns="http://www.w3.org/1999/xhtml"
+#    datetime="2007-02-21T23:00-24:00">x</ins>)
 ok 1433
 ok 1434
 ok 1435
@@ -1508,7 +1508,6 @@ ok 1450
 ok 1451
 ok 1452
 ok 1453
-# ../t/dom-conformance/html-texts-1.dat
 ok 1454
 ok 1455
 ok 1456
@@ -1527,6 +1526,7 @@ ok 1468
 ok 1469
 ok 1470
 ok 1471
+# ../t/dom-conformance/html-texts-1.dat
 ok 1472
 ok 1473
 ok 1474
@@ -1871,7 +1871,6 @@ ok 1812
 ok 1813
 ok 1814
 ok 1815
-# ../t/dom-conformance/html-links-1.dat
 ok 1816
 ok 1817
 ok 1818
@@ -1890,6 +1889,7 @@ ok 1830
 ok 1831
 ok 1832
 ok 1833
+# ../t/dom-conformance/html-links-1.dat
 ok 1834
 ok 1835
 ok 1836
@@ -2047,7 +2047,6 @@ ok 1987
 ok 1988
 ok 1989
 ok 1990
-# ../t/dom-conformance/html-objects-1.dat
 ok 1991
 ok 1992
 ok 1993
@@ -2066,6 +2065,7 @@ ok 2005
 ok 2006
 ok 2007
 ok 2008
+# ../t/dom-conformance/html-objects-1.dat
 ok 2009
 ok 2010
 ok 2011
@@ -2385,12 +2385,7 @@ ok 2324
 ok 2325
 ok 2326
 ok 2327
-not ok 2328
-# Test 2328 got: "/div/a/@name;attribute not defined;m\n/div/p/img/@usemap;no referenced map;m" (content-checker-test-ok at line 2 fail #2328)
-#      Expected: "/div/a/@name;attribute not defined;m\n/div/a/@name;unknown attribute;u\n/div/p/img/@usemap;no referenced map;m" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<a name="aa">x</a>
-#<p><img src="http://test/" alt="" usemap="#aa"/></p>
-#</div>)
+ok 2328
 ok 2329
 ok 2330
 ok 2331
@@ -2408,7 +2403,12 @@ ok 2342
 ok 2343
 ok 2344
 ok 2345
-ok 2346
+not ok 2346
+# Test 2346 got: "/div/a/@name;attribute not defined;m\n/div/p/img/@usemap;no referenced map;m" (content-checker-test-ok at line 2 fail #2346)
+#      Expected: "/div/a/@name;attribute not defined;m\n/div/a/@name;unknown attribute;u\n/div/p/img/@usemap;no referenced map;m" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<a name="aa">x</a>
+#<p><img src="http://test/" alt="" usemap="#aa"/></p>
+#</div>)
 ok 2347
 ok 2348
 ok 2349
@@ -2548,11 +2548,7 @@ ok 2482
 ok 2483
 ok 2484
 ok 2485
-not ok 2486
-# Test 2486 got: "" (content-checker-test-ok at line 2 fail #2486)
-#      Expected: "/html/body/embed/@xml:space;attribute not defined;m" (<!DOCTYPE HTML><title>x</title>
-#<embed src="http://test/"
-#    xml:space=preserve>)
+ok 2486
 ok 2487
 ok 2488
 ok 2489
@@ -2562,34 +2558,36 @@ ok 2492
 ok 2493
 ok 2494
 ok 2495
-not ok 2496
-# Test 2496 got: "" (content-checker-test-ok at line 2 fail #2496)
-#      Expected: "/embed/@name;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
-#    name="name1"/>)
-not ok 2497
-# Test 2497 got: "" (content-checker-test-ok at line 2 fail #2497)
-#      Expected: "/embed/@align;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
-#    align="left"/>)
+ok 2496
+ok 2497
 ok 2498
 ok 2499
 ok 2500
 ok 2501
 ok 2502
 ok 2503
-ok 2504
+not ok 2504
+# Test 2504 got: "" (content-checker-test-ok at line 2 fail #2504)
+#      Expected: "/html/body/embed/@xml:space;attribute not defined;m" (<!DOCTYPE HTML><title>x</title>
+#<embed src="http://test/"
+#    xml:space=preserve>)
 ok 2505
 ok 2506
 ok 2507
-Parse error (unmatched end tag) at line 2 column 16
-Parse error (in body:#eof) at line 2 column 24
 ok 2508
 ok 2509
 ok 2510
 ok 2511
 ok 2512
 ok 2513
-ok 2514
-ok 2515
+not ok 2514
+# Test 2514 got: "" (content-checker-test-ok at line 2 fail #2514)
+#      Expected: "/embed/@name;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+#    name="name1"/>)
+not ok 2515
+# Test 2515 got: "" (content-checker-test-ok at line 2 fail #2515)
+#      Expected: "/embed/@align;attribute not defined;m" (<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+#    align="left"/>)
 ok 2516
 ok 2517
 ok 2518
@@ -2600,6 +2598,8 @@ ok 2522
 ok 2523
 ok 2524
 ok 2525
+Parse error (unmatched end tag) at line 2 column 16
+Parse error (in body:#eof) at line 2 column 24
 ok 2526
 ok 2527
 ok 2528
@@ -2613,9 +2613,7 @@ ok 2535
 ok 2536
 ok 2537
 ok 2538
-not ok 2539
-# Test 2539 got: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m\n/object;no significant content;s" (content-checker-test-ok at line 2 fail #2539)
-#      Expected: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m" (<object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 2539
 ok 2540
 ok 2541
 ok 2542
@@ -2633,7 +2631,9 @@ ok 2553
 ok 2554
 ok 2555
 ok 2556
-ok 2557
+not ok 2557
+# Test 2557 got: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m\n/object;no significant content;s" (content-checker-test-ok at line 2 fail #2557)
+#      Expected: "/object/@archive;attribute not defined;m\n/object/@archive;duplicate token;m" (<object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 2558
 ok 2559
 ok 2560
@@ -2687,36 +2687,12 @@ ok 2607
 ok 2608
 ok 2609
 ok 2610
-not ok 2611
-# Test 2611 got: "" (content-checker-test-ok at line 2 fail #2611)
-#      Expected: "/video/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <video src="">aa</video>
-#</video>)
-not ok 2612
-# Test 2612 got: "" (content-checker-test-ok at line 2 fail #2612)
-#      Expected: "/video/p/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <p><video src="">aa</video></p>
-#</video>)
-not ok 2613
-# Test 2613 got: "" (content-checker-test-ok at line 2 fail #2613)
-#      Expected: "/video/ins/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <ins><video src="">aa</video></ins>
-#</video>)
-not ok 2614
-# Test 2614 got: "" (content-checker-test-ok at line 2 fail #2614)
-#      Expected: "/video/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <audio src="">aa</audio>
-#</video>)
-not ok 2615
-# Test 2615 got: "" (content-checker-test-ok at line 2 fail #2615)
-#      Expected: "/video/p/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <p><audio src="">aa</audio></p>
-#</video>)
-not ok 2616
-# Test 2616 got: "" (content-checker-test-ok at line 2 fail #2616)
-#      Expected: "/video/ins/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <ins><audio src="">aa</audio></ins>
-#</video>)
+ok 2611
+ok 2612
+ok 2613
+ok 2614
+ok 2615
+ok 2616
 ok 2617
 ok 2618
 ok 2619
@@ -2729,41 +2705,41 @@ ok 2625
 ok 2626
 ok 2627
 ok 2628
-ok 2629
-ok 2630
-ok 2631
-ok 2632
-ok 2633
+not ok 2629
+# Test 2629 got: "" (content-checker-test-ok at line 2 fail #2629)
+#      Expected: "/video/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <video src="">aa</video>
+#</video>)
+not ok 2630
+# Test 2630 got: "" (content-checker-test-ok at line 2 fail #2630)
+#      Expected: "/video/p/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <p><video src="">aa</video></p>
+#</video>)
+not ok 2631
+# Test 2631 got: "" (content-checker-test-ok at line 2 fail #2631)
+#      Expected: "/video/ins/video;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <ins><video src="">aa</video></ins>
+#</video>)
+not ok 2632
+# Test 2632 got: "" (content-checker-test-ok at line 2 fail #2632)
+#      Expected: "/video/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <audio src="">aa</audio>
+#</video>)
+not ok 2633
+# Test 2633 got: "" (content-checker-test-ok at line 2 fail #2633)
+#      Expected: "/video/p/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <p><audio src="">aa</audio></p>
+#</video>)
 not ok 2634
 # Test 2634 got: "" (content-checker-test-ok at line 2 fail #2634)
-#      Expected: "/audio/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <video src="">aa</video>
-#</audio>)
-not ok 2635
-# Test 2635 got: "" (content-checker-test-ok at line 2 fail #2635)
-#      Expected: "/audio/p/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <p><video src="">aa</video></p>
-#</audio>)
-not ok 2636
-# Test 2636 got: "" (content-checker-test-ok at line 2 fail #2636)
-#      Expected: "/audio/ins/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <ins><video src="">aa</video></ins>
-#</audio>)
-not ok 2637
-# Test 2637 got: "" (content-checker-test-ok at line 2 fail #2637)
-#      Expected: "/audio/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <audio src="">aa</audio>
-#</audio>)
-not ok 2638
-# Test 2638 got: "" (content-checker-test-ok at line 2 fail #2638)
-#      Expected: "/audio/p/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#  <p><audio src="">aa</audio></p>
-#</audio>)
-not ok 2639
-# Test 2639 got: "" (content-checker-test-ok at line 2 fail #2639)
-#      Expected: "/audio/ins/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#      Expected: "/video/ins/audio;element not allowed:minus;m" (<video src="" xmlns="http://www.w3.org/1999/xhtml">
 #  <ins><audio src="">aa</audio></ins>
-#</audio>)
+#</video>)
+ok 2635
+ok 2636
+ok 2637
+ok 2638
+ok 2639
 ok 2640
 ok 2641
 ok 2642
@@ -2776,12 +2752,36 @@ ok 2648
 ok 2649
 ok 2650
 ok 2651
-ok 2652
-ok 2653
-ok 2654
-ok 2655
-ok 2656
-ok 2657
+not ok 2652
+# Test 2652 got: "" (content-checker-test-ok at line 2 fail #2652)
+#      Expected: "/audio/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <video src="">aa</video>
+#</audio>)
+not ok 2653
+# Test 2653 got: "" (content-checker-test-ok at line 2 fail #2653)
+#      Expected: "/audio/p/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <p><video src="">aa</video></p>
+#</audio>)
+not ok 2654
+# Test 2654 got: "" (content-checker-test-ok at line 2 fail #2654)
+#      Expected: "/audio/ins/video;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <ins><video src="">aa</video></ins>
+#</audio>)
+not ok 2655
+# Test 2655 got: "" (content-checker-test-ok at line 2 fail #2655)
+#      Expected: "/audio/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <audio src="">aa</audio>
+#</audio>)
+not ok 2656
+# Test 2656 got: "" (content-checker-test-ok at line 2 fail #2656)
+#      Expected: "/audio/p/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <p><audio src="">aa</audio></p>
+#</audio>)
+not ok 2657
+# Test 2657 got: "" (content-checker-test-ok at line 2 fail #2657)
+#      Expected: "/audio/ins/audio;element not allowed:minus;m" (<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#  <ins><audio src="">aa</audio></ins>
+#</audio>)
 ok 2658
 ok 2659
 ok 2660
@@ -2939,7 +2939,6 @@ ok 2811
 ok 2812
 ok 2813
 ok 2814
-# ../t/dom-conformance/html-tables-1.dat
 ok 2815
 ok 2816
 ok 2817
@@ -2958,6 +2957,7 @@ ok 2829
 ok 2830
 ok 2831
 ok 2832
+# ../t/dom-conformance/html-tables-1.dat
 ok 2833
 ok 2834
 ok 2835
@@ -3306,7 +3306,6 @@ ok 3177
 ok 3178
 ok 3179
 ok 3180
-# ../t/dom-conformance/html-tables-2.dat
 ok 3181
 ok 3182
 ok 3183
@@ -3325,6 +3324,7 @@ ok 3195
 ok 3196
 ok 3197
 ok 3198
+# ../t/dom-conformance/html-tables-2.dat
 ok 3199
 ok 3200
 ok 3201
@@ -3333,7 +3333,6 @@ ok 3203
 ok 3204
 ok 3205
 ok 3206
-# ../t/dom-conformance/html-forms-1.dat
 ok 3207
 ok 3208
 ok 3209
@@ -3349,11 +3348,10 @@ ok 3218
 ok 3219
 ok 3220
 ok 3221
-not ok 3222
-# Test 3222 got: "/form/meta/@name;metadata:proposed;keywords;w\n/form/meta;element not allowed:flow;m\n/form;no significant content;s" (content-checker-test-ok at line 2 fail #3222)
-#      Expected: "/form/meta;element not allowed:flow;m\n/form;no significant content;s" (<form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>)
+ok 3222
 ok 3223
 ok 3224
+# ../t/dom-conformance/html-forms-1.dat
 ok 3225
 ok 3226
 ok 3227
@@ -3369,7 +3367,9 @@ ok 3236
 ok 3237
 ok 3238
 ok 3239
-ok 3240
+not ok 3240
+# Test 3240 got: "/form/meta/@name;metadata:proposed;keywords;w\n/form/meta;element not allowed:flow;m\n/form;no significant content;s" (content-checker-test-ok at line 2 fail #3240)
+#      Expected: "/form/meta;element not allowed:flow;m\n/form;no significant content;s" (<form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>)
 ok 3241
 ok 3242
 ok 3243
@@ -3446,10 +3446,7 @@ ok 3313
 ok 3314
 ok 3315
 ok 3316
-not ok 3317
-# Test 3317 got: "/form/a/@name;attribute not defined;m" (content-checker-test-ok at line 2 fail #3317)
-#      Expected: "/form/a/@name;attribute not defined;m\n/form/a/@name;unknown attribute;u" (<form xmlns="http://www.w3.org/1999/xhtml"
-#    name="a">x<a name="a">u</a></form>)
+ok 3317
 ok 3318
 ok 3319
 ok 3320
@@ -3467,7 +3464,10 @@ ok 3331
 ok 3332
 ok 3333
 ok 3334
-ok 3335
+not ok 3335
+# Test 3335 got: "/form/a/@name;attribute not defined;m" (content-checker-test-ok at line 2 fail #3335)
+#      Expected: "/form/a/@name;attribute not defined;m\n/form/a/@name;unknown attribute;u" (<form xmlns="http://www.w3.org/1999/xhtml"
+#    name="a">x<a name="a">u</a></form>)
 ok 3336
 ok 3337
 ok 3338
@@ -3705,7 +3705,6 @@ ok 3569
 ok 3570
 ok 3571
 ok 3572
-# ../t/dom-conformance/html-form-label.dat
 ok 3573
 ok 3574
 ok 3575
@@ -3724,6 +3723,7 @@ ok 3587
 ok 3588
 ok 3589
 ok 3590
+# ../t/dom-conformance/html-form-label.dat
 ok 3591
 ok 3592
 ok 3593
@@ -3789,7 +3789,6 @@ ok 3652
 ok 3653
 ok 3654
 ok 3655
-# ../t/dom-conformance/html-form-input-1.dat
 ok 3656
 ok 3657
 ok 3658
@@ -3808,6 +3807,7 @@ ok 3670
 ok 3671
 ok 3672
 ok 3673
+# ../t/dom-conformance/html-form-input-1.dat
 ok 3674
 ok 3675
 ok 3676
@@ -4353,7 +4353,6 @@ ok 4215
 ok 4216
 ok 4217
 ok 4218
-Parse error (lt in attr value) at line 3 column 12
 ok 4219
 ok 4220
 ok 4221
@@ -4372,6 +4371,7 @@ ok 4233
 ok 4234
 ok 4235
 ok 4236
+Parse error (lt in attr value) at line 3 column 12
 ok 4237
 ok 4238
 ok 4239
@@ -5388,12 +5388,7 @@ ok 5249
 ok 5250
 ok 5251
 ok 5252
-not ok 5253
-# Test 5253 got: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;hashref:wrong case;m" (content-checker-test-ok at line 2 fail #5253)
-#      Expected: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;no referenced map;m" (<map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
-#<input type="image"
-#    usemap="#abc"/>x
-#</map>)
+ok 5253
 ok 5254
 ok 5255
 ok 5256
@@ -5411,7 +5406,12 @@ ok 5267
 ok 5268
 ok 5269
 ok 5270
-ok 5271
+not ok 5271
+# Test 5271 got: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;hashref:wrong case;m" (content-checker-test-ok at line 2 fail #5271)
+#      Expected: "/map/input/@usemap;attribute not defined;m\n/map/input/@usemap;no referenced map;m" (<map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
+#<input type="image"
+#    usemap="#abc"/>x
+#</map>)
 ok 5272
 ok 5273
 ok 5274
@@ -5773,26 +5773,11 @@ ok 5629
 ok 5630
 ok 5631
 ok 5632
-not ok 5633
-# Test 5633 got: "" (content-checker-test-ok at line 2 fail #5633)
-#      Expected: "/input/@value;datetime:bad year;m" (<input type="date" xmlns="http://www.w3.org/1999/xhtml"
-#    value="0000-11-22"/>)
-not ok 5634
-# Test 5634 got: "" (content-checker-test-ok at line 2 fail #5634)
-#      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
-#    value="0000-11-22T00:11:22Z"/>)
-not ok 5635
-# Test 5635 got: "" (content-checker-test-ok at line 2 fail #5635)
-#      Expected: "/input/@value;datetime:bad year;m" (<input type="month" xmlns="http://www.w3.org/1999/xhtml"
-#    value="0000-11"/>)
-not ok 5636
-# Test 5636 got: "/input/@value;week:bad year;m" (content-checker-test-ok at line 2 fail #5636)
-#      Expected: "/input/@value;datetime:bad year;m" (<input type="week" xmlns="http://www.w3.org/1999/xhtml"
-#    value="0000-W11"/>)
-not ok 5637
-# Test 5637 got: "" (content-checker-test-ok at line 2 fail #5637)
-#      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
-#    value="0000-11-22T00:11:22"/>)
+ok 5633
+ok 5634
+ok 5635
+ok 5636
+ok 5637
 ok 5638
 ok 5639
 ok 5640
@@ -5806,11 +5791,26 @@ ok 5647
 ok 5648
 ok 5649
 ok 5650
-ok 5651
-ok 5652
-ok 5653
-ok 5654
-ok 5655
+not ok 5651
+# Test 5651 got: "" (content-checker-test-ok at line 2 fail #5651)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="date" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11-22"/>)
+not ok 5652
+# Test 5652 got: "" (content-checker-test-ok at line 2 fail #5652)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11-22T00:11:22Z"/>)
+not ok 5653
+# Test 5653 got: "" (content-checker-test-ok at line 2 fail #5653)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="month" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11"/>)
+not ok 5654
+# Test 5654 got: "/input/@value;week:bad year;m" (content-checker-test-ok at line 2 fail #5654)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="week" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-W11"/>)
+not ok 5655
+# Test 5655 got: "" (content-checker-test-ok at line 2 fail #5655)
+#      Expected: "/input/@value;datetime:bad year;m" (<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
+#    value="0000-11-22T00:11:22"/>)
 ok 5656
 ok 5657
 ok 5658
@@ -5969,7 +5969,6 @@ ok 5810
 ok 5811
 ok 5812
 ok 5813
-# ../t/dom-conformance/html-form-button.dat
 ok 5814
 ok 5815
 ok 5816
@@ -5988,6 +5987,7 @@ ok 5828
 ok 5829
 ok 5830
 ok 5831
+# ../t/dom-conformance/html-form-button.dat
 ok 5832
 ok 5833
 ok 5834
@@ -6161,7 +6161,6 @@ ok 6001
 ok 6002
 ok 6003
 ok 6004
-# ../t/dom-conformance/html-form-select.dat
 ok 6005
 ok 6006
 ok 6007
@@ -6180,6 +6179,7 @@ ok 6019
 ok 6020
 ok 6021
 ok 6022
+# ../t/dom-conformance/html-form-select.dat
 ok 6023
 ok 6024
 ok 6025
@@ -6250,7 +6250,6 @@ ok 6089
 ok 6090
 ok 6091
 ok 6092
-# ../t/dom-conformance/html-form-datalist.dat
 ok 6093
 ok 6094
 ok 6095
@@ -6269,6 +6268,7 @@ ok 6107
 ok 6108
 ok 6109
 ok 6110
+# ../t/dom-conformance/html-form-datalist.dat
 ok 6111
 ok 6112
 ok 6113
@@ -6308,7 +6308,6 @@ ok 6146
 ok 6147
 ok 6148
 ok 6149
-# ../t/dom-conformance/html-form-textarea.dat
 ok 6150
 ok 6151
 ok 6152
@@ -6327,6 +6326,7 @@ ok 6164
 ok 6165
 ok 6166
 ok 6167
+# ../t/dom-conformance/html-form-textarea.dat
 ok 6168
 ok 6169
 ok 6170
@@ -6389,7 +6389,6 @@ ok 6226
 ok 6227
 ok 6228
 ok 6229
-# ../t/dom-conformance/html-form-keygen.dat
 ok 6230
 ok 6231
 ok 6232
@@ -6408,6 +6407,7 @@ ok 6244
 ok 6245
 ok 6246
 ok 6247
+# ../t/dom-conformance/html-form-keygen.dat
 ok 6248
 ok 6249
 ok 6250
@@ -6415,20 +6415,12 @@ ok 6251
 ok 6252
 ok 6253
 ok 6254
-# ../t/dom-conformance/html-interactive-1.dat
 ok 6255
 ok 6256
 ok 6257
 ok 6258
 ok 6259
-not ok 6260
-# Test 6260 got: "/head/noscript/meta/@name;metadata:proposed;keywords;w\n/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (content-checker-test-ok at line 2 fail #6260)
-#      Expected: "/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (<head xmlns="http://www.w3.org/1999/xhtml">
-#<title/>
-#<noscript>
-#<meta name="keywords" content=""/>
-#</noscript>
-#</head>)
+ok 6260
 ok 6261
 ok 6262
 ok 6263
@@ -6437,20 +6429,24 @@ ok 6265
 ok 6266
 ok 6267
 ok 6268
-not ok 6269
-# Test 6269 got: "/noscript/meta/@name;metadata:proposed;keywords;w\n/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (content-checker-test-ok at line 2 fail #6269)
-#      Expected: "/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
-#<meta name="keywords" content=""/>
-#</noscript>)
+ok 6269
 ok 6270
 ok 6271
 ok 6272
+# ../t/dom-conformance/html-interactive-1.dat
 ok 6273
 ok 6274
 ok 6275
 ok 6276
 ok 6277
-ok 6278
+not ok 6278
+# Test 6278 got: "/head/noscript/meta/@name;metadata:proposed;keywords;w\n/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (content-checker-test-ok at line 2 fail #6278)
+#      Expected: "/head/noscript/meta;element not allowed:head noscript;m\n/head/noscript;in XML:noscript;m" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<title/>
+#<noscript>
+#<meta name="keywords" content=""/>
+#</noscript>
+#</head>)
 ok 6279
 ok 6280
 ok 6281
@@ -6459,7 +6455,11 @@ ok 6283
 ok 6284
 ok 6285
 ok 6286
-ok 6287
+not ok 6287
+# Test 6287 got: "/noscript/meta/@name;metadata:proposed;keywords;w\n/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (content-checker-test-ok at line 2 fail #6287)
+#      Expected: "/noscript/meta;element not allowed:flow;m\n/noscript;in XML:noscript;m\n/noscript;no significant content;s" (<noscript xmlns="http://www.w3.org/1999/xhtml">
+#<meta name="keywords" content=""/>
+#</noscript>)
 ok 6288
 ok 6289
 ok 6290
@@ -6514,9 +6514,7 @@ ok 6338
 ok 6339
 ok 6340
 ok 6341
-not ok 6342
-# Test 6342 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (content-checker-test-ok at line 2 fail #6342)
-#      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
+ok 6342
 ok 6343
 ok 6344
 ok 6345
@@ -6534,7 +6532,9 @@ ok 6356
 ok 6357
 ok 6358
 ok 6359
-ok 6360
+not ok 6360
+# Test 6360 got: "/bb/meta/@name;metadata:proposed;keywords;w\n/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (content-checker-test-ok at line 2 fail #6360)
+#      Expected: "/bb/meta;element not allowed:phrasing;m\n/bb;element not defined;m\n/bb;no significant content;s" (<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>)
 ok 6361
 ok 6362
 ok 6363
@@ -6693,7 +6693,6 @@ ok 6515
 ok 6516
 ok 6517
 ok 6518
-# ../t/dom-conformance/html-scripting-1.dat
 ok 6519
 ok 6520
 ok 6521
@@ -6712,6 +6711,7 @@ ok 6533
 ok 6534
 ok 6535
 ok 6536
+# ../t/dom-conformance/html-scripting-1.dat
 ok 6537
 ok 6538
 ok 6539
@@ -6748,7 +6748,6 @@ ok 6569
 ok 6570
 ok 6571
 ok 6572
-# ../t/dom-conformance/html-scripting-2.dat
 ok 6573
 ok 6574
 ok 6575
@@ -6767,6 +6766,7 @@ ok 6587
 ok 6588
 ok 6589
 ok 6590
+# ../t/dom-conformance/html-scripting-2.dat
 ok 6591
 ok 6592
 ok 6593
@@ -6805,7 +6805,6 @@ ok 6625
 ok 6626
 ok 6627
 ok 6628
-# ../t/dom-conformance/html-repetitions.dat
 ok 6629
 ok 6630
 ok 6631
@@ -6824,6 +6823,7 @@ ok 6643
 ok 6644
 ok 6645
 ok 6646
+# ../t/dom-conformance/html-repetitions.dat
 ok 6647
 ok 6648
 ok 6649
@@ -6867,7 +6867,6 @@ ok 6686
 ok 6687
 ok 6688
 ok 6689
-# ../t/dom-conformance/html-datatemplate.dat
 ok 6690
 ok 6691
 ok 6692
@@ -6886,6 +6885,7 @@ ok 6704
 ok 6705
 ok 6706
 ok 6707
+# ../t/dom-conformance/html-datatemplate.dat
 ok 6708
 ok 6709
 ok 6710
@@ -7007,11 +7007,7 @@ ok 6825
 ok 6826
 ok 6827
 ok 6828
-not ok 6829
-# Test 6829 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (content-checker-test-ok at line 2 fail #6829)
-#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
-#      Line 1 is missing:
-#       - "/rule/footer/h1;element not allowed:minus;m\n"
+ok 6829
 ok 6830
 ok 6831
 ok 6832
@@ -7029,7 +7025,11 @@ ok 6843
 ok 6844
 ok 6845
 ok 6846
-ok 6847
+not ok 6847
+# Test 6847 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (content-checker-test-ok at line 2 fail #6847)
+#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
+#      Line 1 is missing:
+#       - "/rule/footer/h1;element not allowed:minus;m\n"
 ok 6848
 ok 6849
 ok 6850
@@ -7201,7 +7201,6 @@ ok 7015
 ok 7016
 ok 7017
 ok 7018
-# ../t/dom-conformance/html-frames.dat
 ok 7019
 ok 7020
 ok 7021
@@ -7220,6 +7219,7 @@ ok 7033
 ok 7034
 ok 7035
 ok 7036
+# ../t/dom-conformance/html-frames.dat
 ok 7037
 ok 7038
 ok 7039
@@ -7347,3 +7347,21 @@ ok 7160
 ok 7161
 ok 7162
 ok 7163
+ok 7164
+ok 7165
+ok 7166
+ok 7167
+ok 7168
+ok 7169
+ok 7170
+ok 7171
+ok 7172
+ok 7173
+ok 7174
+ok 7175
+ok 7176
+ok 7177
+ok 7178
+ok 7179
+ok 7180
+ok 7181

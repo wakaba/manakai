@@ -3487,15 +3487,33 @@ $Element->{$HTML_NS}->{pre} = {
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
   },
-};
+}; # pre
 
-## XXX xmp FEATURE_HTML5_OBSOLETE
-## XXX listing FEAUTRE_HTML5_OBSOLETE
-## XXX plaintext FEATURE_HTML5_OBSOLETE
-## TODO: ^^^ lang, dir, id, class [HTML 2.x] sdaform [HTML 2.0]
-##    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
-## xmp, listing sdapref[HTML2,0]
-##    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+$Element->{$HTML_NS}->{xmp} = {
+  %HTMLTextChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
+    %HTMLAttrStatus,
+    sdaform => FEATURE_HTML20_RFC,
+    sdapref => FEATURE_HTML20_RFC,
+  }), # check_attrs
+}; # xmp
+
+$Element->{$HTML_NS}->{listing} = $Element->{$HTML_NS}->{xmp};
+
+$Element->{$HTML_NS}->{plaintext} = {
+  %HTMLTextChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+  }, {
+    %HTMLAttrStatus,
+    sdaform => FEATURE_HTML20_RFC,
+  }), # check_attrs
+}; # plaintext
 
 $Element->{$HTML_NS}->{blockquote} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,

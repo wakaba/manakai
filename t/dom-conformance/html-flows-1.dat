@@ -3265,6 +3265,102 @@ aaa
 /pre;no significant content;s
 
 #data
+<xmp xmlns="http://www.w3.org/1999/xhtml"></xmp>
+#errors
+/xmp;element not defined;m
+
+#data
+<xmp xmlns="http://www.w3.org/1999/xhtml">   </xmp>
+#errors
+/xmp;element not defined;m
+
+#data
+<xmp xmlns="http://www.w3.org/1999/xhtml">abcc</xmp>
+#errors
+/xmp;element not defined;m
+
+#data
+<xmp xmlns="http://www.w3.org/1999/xhtml">ab&lt;br>cd</xmp>
+#errors
+/xmp;element not defined;m
+
+#data
+<xmp xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></xmp>
+#errors
+/xmp;element not defined;m
+/xmp/p;element not allowed:text;m
+
+#data
+<xmp xmlns="http://www.w3.org/1999/xhtml"><span>aa</span></xmp>
+#errors
+/xmp;element not defined;m
+/xmp/span;element not allowed:text;m
+
+#data
+<listing xmlns="http://www.w3.org/1999/xhtml"></listing>
+#errors
+/listing;element not defined;m
+
+#data
+<listing xmlns="http://www.w3.org/1999/xhtml">   </listing>
+#errors
+/listing;element not defined;m
+
+#data
+<listing xmlns="http://www.w3.org/1999/xhtml">abcc</listing>
+#errors
+/listing;element not defined;m
+
+#data
+<listing xmlns="http://www.w3.org/1999/xhtml">ab&lt;br>cd</listing>
+#errors
+/listing;element not defined;m
+
+#data
+<listing xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></listing>
+#errors
+/listing;element not defined;m
+/listing/p;element not allowed:text;m
+
+#data
+<listing xmlns="http://www.w3.org/1999/xhtml"><span>aa</span></listing>
+#errors
+/listing;element not defined;m
+/listing/span;element not allowed:text;m
+
+#data
+<plaintext xmlns="http://www.w3.org/1999/xhtml"></plaintext>
+#errors
+/plaintext;element not defined;m
+
+#data
+<plaintext xmlns="http://www.w3.org/1999/xhtml">   </plaintext>
+#errors
+/plaintext;element not defined;m
+
+#data
+<plaintext xmlns="http://www.w3.org/1999/xhtml">abcc</plaintext>
+#errors
+/plaintext;element not defined;m
+
+#data
+<plaintext xmlns="http://www.w3.org/1999/xhtml">ab&lt;br>cd</plaintext>
+#errors
+/plaintext;element not defined;m
+
+#data
+<plaintext xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></plaintext>
+#errors
+/plaintext;element not defined;m
+/plaintext/p;element not allowed:text;m
+
+#data
+<plaintext xmlns="http://www.w3.org/1999/xhtml"><span>aa</span></plaintext>
+#errors
+/plaintext;element not defined;m
+/plaintext/span;element not allowed:text;m
+
+#data
 <ol start="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /ol/@start;integer:syntax error;m
