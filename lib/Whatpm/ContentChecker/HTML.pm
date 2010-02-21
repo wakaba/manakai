@@ -1797,7 +1797,6 @@ my $GetHTMLAttrsChecker = sub {
         $self->{onerror}->(node => $attr,
                            type => 'unknown attribute',
                            level => $self->{level}->{uncertain});
-        ## ISSUE: No conformance createria for unknown attributes in the spec
       }
       $self->_attr_status_info ($attr, $status);
     }
@@ -2438,7 +2437,6 @@ $Element->{$HTML_NS}->{meta} = {
         $self->{onerror}->(node => $attr,
                            type => 'unknown attribute',
                            level => $self->{level}->{uncertain});
-        ## ISSUE: No conformance createria for unknown attributes in the spec
       }
 
       $self->_attr_status_info ($attr, $status);
@@ -4085,7 +4083,6 @@ $Element->{$HTML_NS}->{a} = {
         $self->{onerror}->(node => $attr,
                            type => 'unknown attribute',
                            level => $self->{level}->{uncertain});
-        ## ISSUE: No conformance createria for unknown attributes in the spec
       }
 
       $self->_attr_status_info ($attr, $status);
@@ -8718,15 +8715,6 @@ $Element->{$HTML_NS}->{noframes} = {
 ## XXX spacer FEATURE_HTML5_OBSOLETE
 ## XXX ISO-HTML: pre-html
 ## XXX ISO-HTML: divN
-## XXX XHTML2: blockcode (Common)
-## XXX XHTML2 h (Common)
-## XXX XHTML2 separator (Common)
-## XXX XHTML2 l (Common)
-## XXX XHTML2 di (Common)
-## XXX XHTML2 nl (Common)
-## XXX XHTML2 handler (Common, type)
-## XXX XHTML2 standby (Common)
-## XXX Access & XHTML2: access (LC)
 ## XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart
 ## XXX nobr/wbr FEATURE_HTML5_OBSOLETE
 ## XXX bgsound FEATURE_HTML5_OBSOLETE
