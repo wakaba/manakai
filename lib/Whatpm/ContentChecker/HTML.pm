@@ -4870,7 +4870,15 @@ $Element->{$HTML_NS}->{ruby} = {
   },
 };
 
-# XXX rb FEATURE_HTML5_OBSOLETE
+$Element->{$HTML_NS}->{rb} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    lang => FEATURE_HTML5_REC,
+  }),
+}; # rb
 
 $Element->{$HTML_NS}->{rt} = {
   %HTMLPhrasingContentChecker,
@@ -4880,7 +4888,7 @@ $Element->{$HTML_NS}->{rt} = {
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
   }),
-};
+}; # rt
 
 $Element->{$HTML_NS}->{rp} = {
   %HTMLPhrasingContentChecker,

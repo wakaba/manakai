@@ -1021,6 +1021,7 @@
 #errors
 /ruby/rb;element not defined;m
 /ruby/rb;element not allowed:ruby base;m
+/ruby/rb;no significant content;s
 
 #data
 <ruby xmlns="http://www.w3.org/1999/xhtml"><rbc><rb>x</rb><rb>c</rb></rbc><rtc/><rt>y</rt><rt>d</rt></ruby>
@@ -1117,6 +1118,46 @@
 <p xmlns="http://www.w3.org/1999/xhtml"><rp>)</rp></p>
 #errors
 /p/rp;element not allowed:phrasing;m
+
+#data
+<rb xmlns="http://www.w3.org/1999/xhtml"></rb>
+#errors
+/rb;element not defined;m
+/rb;no significant content;s
+
+#data
+<rb xmlns="http://www.w3.org/1999/xhtml">    </rb>
+#errors
+/rb;element not defined;m
+/rb;no significant content;s
+
+#data
+<rb xmlns="http://www.w3.org/1999/xhtml">fweweee</rb>
+#errors
+/rb;element not defined;m
+
+#data
+<rb xmlns="http://www.w3.org/1999/xhtml"><span>aa</span></rb>
+#errors
+/rb;element not defined;m
+
+#data
+<rb xmlns="http://www.w3.org/1999/xhtml"><p>aa</p></rb>
+#errors
+/rb;element not defined;m
+/rb/p;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb></div>
+#errors
+/div/rb;element not defined;m
+/div/rb;element not allowed:flow;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><rb>aa</rb></span>
+#errors
+/span/rb;element not defined;m
+/span/rb;element not allowed:phrasing;m
 
 #data
 <br clear="" xmlns="http://www.w3.org/1999/xhtml"/>
