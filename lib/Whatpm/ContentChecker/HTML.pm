@@ -6794,7 +6794,8 @@ $Element->{$HTML_NS}->{input} = {
          ## applicable for a specific set of states.
          accept => '',
          'accept-charset' => $HTMLCharsetsAttrChecker,
-             ## NOTE: To which states it applies is not defined in RFC 2070.
+             ## It is unclear which |type=""| values this attribute is
+             ## applied to in RFC 2070.
          action => '',
          align => '',
          alt => '',
@@ -7691,6 +7692,7 @@ $Element->{$HTML_NS}->{textarea} = {
         }
       }
     }, # accept
+    'accept-charset' => $HTMLCharsetsAttrChecker,
     autofocus => $AutofocusAttrChecker,
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
