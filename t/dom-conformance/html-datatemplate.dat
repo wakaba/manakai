@@ -53,6 +53,7 @@
 </head>
 #errors
 /head/datatemplate;element not defined;m
+/head/datatemplate;element not allowed:metadata;m
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -61,6 +62,7 @@
 #errors
 /body;no significant content;s
 /body/datatemplate;element not defined;m
+/body/datatemplate;element not allowed:flow;m
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -69,6 +71,7 @@
 #errors
 /section;no significant content;s
 /section/datatemplate;element not defined;m
+/section/datatemplate;element not allowed:flow;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -1997,12 +2000,13 @@
 <nest></nest>
 </div>
 #errors
-/div/datatemplate/nest;element not allowed:datatemplate;m
-/div/nest;element not allowed:flow;m
 /div;no significant content;s
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 /div/datatemplate/rule;element not defined;m
+/div/datatemplate/nest;element not allowed:datatemplate;m
 /div/datatemplate/nest;element not defined;m
+/div/nest;element not allowed:flow;m
 /div/nest;element not defined;m
 
 #data
@@ -2010,10 +2014,11 @@
 <datatemplate><rule></rule><nest></nest></datatemplate>
 </div>
 #errors
-/div/datatemplate/nest;element not allowed:datatemplate;m
 /div;no significant content;s
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 /div/datatemplate/rule;element not defined;m
+/div/datatemplate/nest;element not allowed:datatemplate;m
 /div/datatemplate/nest;element not defined;m
 
 #data
@@ -2268,6 +2273,7 @@
 #errors
 /div/@template;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2275,8 +2281,9 @@
   <p template="#a">x</p>
 </div>
 #errors
-/div/p/@template;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
+/div/p/@template;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2286,6 +2293,7 @@
 #errors
 /div/p/@template;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2294,6 +2302,7 @@
 #errors
 /div/div/@template;attribute not defined;m
 /div/div/datatemplate;element not defined;m
+/div/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2335,9 +2344,10 @@
 </div>
 #errors
 /div/p/@template;template:not template;m
-/div/datatemplate/@id;empty attribute value;m
 /div/p/@template;attribute not defined;m
+/div/datatemplate/@id;empty attribute value;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"
@@ -2365,6 +2375,7 @@
 </div>
 #errors
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 /div/datatemplate/@template;fragment points itself;m
 /div/datatemplate/@template;attribute not defined;m
 
@@ -2378,6 +2389,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2389,6 +2401,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2401,6 +2414,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2411,6 +2425,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2422,6 +2437,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2432,6 +2448,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2442,6 +2459,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2452,6 +2470,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2463,6 +2482,7 @@
 /div/div/@template;attribute not defined;m
 /div/div/@ref;attribute not defined;m
 /div/datatemplate;element not defined;m
+/div/datatemplate;element not allowed:flow;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>

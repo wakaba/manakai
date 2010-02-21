@@ -169,8 +169,7 @@ sub FEATURE_HTML20_RFC () { ## Proposed Standard, obsolete
 my $HTMLMetadataContent = {
   $HTML_NS => {
     title => 1, base => 1, link => 1, style => 1, script => 1, noscript => 1,
-    'event-source' => 1, eventsource => 1,
-    command => 1, datatemplate => 1,
+    command => 1,
     ## NOTE: A |meta| with no |name| element is not allowed as
     ## a metadata content other than |head| element.
     meta => 1,
@@ -188,10 +187,8 @@ my $HTMLFlowContent = {
     footer => 1, address => 1, p => 1, hr => 1, dialog => 1, pre => 1,
     ol => 1, ul => 1, dl => 1, menu => 1, figure => 1, table => 1,
     form => 1, fieldset => 1,
-    details => 1, ## ISSUE: "Flow element" in spec.
-    datagrid => 1, ## ISSUE: "Flow element" in spec.
-    datatemplate => 1,
-    div => 1, ## ISSUE: No category in spec.
+    details => 1,
+    div => 1,
     ## NOTE: |style| is only allowed if |scoped| attribute is specified.
     ## Additionally, it must be before any other element or
     ## non-inter-element-whitespace text node.
@@ -202,11 +199,10 @@ my $HTMLFlowContent = {
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, ruby => 1,
-    script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
-    command => 1, bb => 1,
+    script => 1, noscript => 1,
+    command => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
     textarea => 1, keygen => 1, output => 1,
-    datagrid => 1,
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
 
@@ -233,7 +229,7 @@ my $HTMLSectioningContent = {
 
 my $HTMLSectioningRoot = {
   $HTML_NS => {
-    blockquote => 1, datagrid => 1, figure => 1, td => 1,
+    blockquote => 1, figure => 1, td => 1,
   },
 };
 
@@ -250,11 +246,10 @@ my $HTMLPhrasingContent = {
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, ruby => 1,
-    script => 1, noscript => 1, 'event-source' => 1, eventsource => 1,
-    command => 1, bb => 1,
+    script => 1, noscript => 1,
+    command => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
     textarea => 1, keygen => 1, output => 1,
-    datagrid => 1,
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
 
@@ -280,7 +275,6 @@ my $HTMLInteractiveContent = {
     a => 1,
     label => 1, button => 1, select => 1, textarea => 1,
     keygen => 1, details => 1,
-    datagrid => 1, bb => 1, ## dropped
     iframe => 1, embed => 1,
 
     ## NOTE: When the |usemap| attribute is specified.

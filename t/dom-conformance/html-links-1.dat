@@ -378,7 +378,7 @@ x</div>
 <datagrid>x</datagrid>
 </a>
 #errors
-/a/datagrid;element not allowed:minus;m
+/a/datagrid;element not allowed:flow;m
 /a/datagrid;element not defined;m
 
 #data
@@ -386,7 +386,7 @@ x</div>
 <span><datagrid>x</datagrid></span>
 </a>
 #errors
-/a/span/datagrid;element not allowed:minus;m
+/a/span/datagrid;element not allowed:phrasing;m
 /a/span/datagrid;element not defined;m
 
 #data
@@ -395,9 +395,10 @@ x</div>
 <datagrid>y</datagrid>
 </div>
 #errors
-/div/a/datagrid;element not allowed:minus;m
+/div/a/datagrid;element not allowed:flow;m
 /div/a/datagrid;element not defined;m
 /div/datagrid;element not defined;m
+/div/datagrid;element not allowed:flow;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -445,7 +446,7 @@ x</div>
 <bb>x</bb>
 </a>
 #errors
-/a/bb;element not allowed:minus;m
+/a/bb;element not allowed:flow;m
 /a/bb;element not defined;m
 
 #data
@@ -453,7 +454,7 @@ x</div>
 <span><bb>x</bb></span>
 </a>
 #errors
-/a/span/bb;element not allowed:minus;m
+/a/span/bb;element not allowed:phrasing;m
 /a/span/bb;element not defined;m
 
 #data
@@ -462,9 +463,10 @@ x</div>
 <bb>y</bb>
 </div>
 #errors
-/div/a/bb;element not allowed:minus;m
+/div/a/bb;element not allowed:flow;m
 /div/a/bb;element not defined;m
 /div/bb;element not defined;m
+/div/bb;element not allowed:flow;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -518,6 +520,7 @@ x</div>
 /div/ol/li;no significant content;s
 /div/ol/li/datagrid;no significant content;s
 /div/ol/li/datagrid;element not defined;m
+/div/ol/li/datagrid;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">

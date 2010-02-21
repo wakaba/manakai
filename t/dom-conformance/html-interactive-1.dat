@@ -263,24 +263,28 @@
 #errors
 /em;no significant content;s
 /em/eventsource;element not defined;m
+/em/eventsource;element not allowed:phrasing;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><eventsource/></p>
 #errors
 /p;no significant content;s
 /p/eventsource;element not defined;m
+/p/eventsource;element not allowed:phrasing;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><eventsource/></div>
 #errors
 /div;no significant content;s
 /div/eventsource;element not defined;m
+/div/eventsource;element not allowed:flow;m
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><eventsource/></section>
 #errors
 /section;no significant content;s
 /section/eventsource;element not defined;m
+/section/eventsource;element not allowed:flow;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"></details>
@@ -811,11 +815,13 @@
 <p xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></p>
 #errors
 /p/bb;element not defined;m
+/p/bb;element not allowed:phrasing;m
 
 #data
 <em xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></em>
 #errors
 /em/bb;element not defined;m
+/em/bb;element not allowed:phrasing;m
 
 #data
 <br xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></br>
@@ -833,16 +839,19 @@
 <td xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></td>
 #errors
 /td/bb;element not defined;m
+/td/bb;element not allowed:flow;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"><bb>x</bb></ins>
 #errors
 /ins/bb;element not defined;m
+/ins/bb;element not allowed:flow;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><del><bb>x</bb></del>y</p>
 #errors
 /p/del/bb;element not defined;m
+/p/del/bb;element not allowed:phrasing;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><bb><style></style>x</bb></p>
@@ -850,6 +859,7 @@
 /p/bb/style;element not allowed:phrasing;m
 /p/bb/style;SUBDOC;text/css
 /p/bb;element not defined;m
+/p/bb;element not allowed:phrasing;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
@@ -944,8 +954,8 @@
 <datagrid>a</datagrid>
 </bb>
 #errors
-/bb/datagrid;element not allowed:minus;m
 /bb;element not defined;m
+/bb/datagrid;element not allowed:phrasing;m
 /bb/datagrid;element not defined;m
 
 #data
@@ -953,8 +963,8 @@
 <bb>a</bb>
 </bb>
 #errors
-/bb/bb;element not allowed:minus;m
 /bb;element not defined;m
+/bb/bb;element not allowed:phrasing;m
 /bb/bb;element not defined;m
 
 #data
@@ -1214,18 +1224,20 @@
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><datagrid/></datagrid>
 #errors
 /datagrid;no significant content;s
-/datagrid/datagrid;no significant content;s
 /datagrid;element not defined;m
+/datagrid/datagrid;no significant content;s
 /datagrid/datagrid;element not defined;m
+/datagrid/datagrid;element not allowed:flow;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml"><div><datagrid/></div></datagrid>
 #errors
-/datagrid/div/datagrid;no significant content;s
 /datagrid;no significant content;s
-/datagrid/div;no significant content;s
 /datagrid;element not defined;m
+/datagrid/div;no significant content;s
+/datagrid/div/datagrid;no significant content;s
 /datagrid/div/datagrid;element not defined;m
+/datagrid/div/datagrid;element not allowed:flow;m
 
 #data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">
@@ -1282,7 +1294,7 @@
 <datagrid/>
 </a>
 #errors
-/a/datagrid;element not allowed:minus;m
+/a/datagrid;element not allowed:flow;m
 /a/datagrid;no significant content;s
 /a;no significant content;s
 /a/datagrid;element not defined;m
@@ -1292,7 +1304,7 @@
 <span><datagrid/></span>
 </a>
 #errors
-/a/span/datagrid;element not allowed:minus;m
+/a/span/datagrid;element not allowed:phrasing;m
 /a/span/datagrid;no significant content;s
 /a;no significant content;s
 /a/span;no significant content;s
