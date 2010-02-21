@@ -2278,6 +2278,7 @@ $Element->{$HTML_NS}->{link} = {
       rel => sub { $HTMLLinkTypesAttrChecker->(0, $item, @_) },
       rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
       media => $HTMLMQAttrChecker,
+      methods => sub { }, ## Space-separated values [HTML 2.0]
       hreflang => $HTMLLanguageTagAttrChecker,
       sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
       sizes => sub {
@@ -2305,8 +2306,7 @@ $Element->{$HTML_NS}->{link} = {
       },
       target => $HTMLTargetAttrChecker,
       type => $MIMETypeChecker,
-      ## NOTE: Though |title| has special semantics,
-      ## syntactically same as the |title| as global attribute.
+      urn => $HTMLURIAttrChecker,
     }, {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
@@ -4044,6 +4044,7 @@ $Element->{$HTML_NS}->{a} = {
           href => $HTMLURIAttrChecker,
           hreflang => $HTMLLanguageTagAttrChecker,
           media => $HTMLMQAttrChecker,
+          methods => sub { }, ## Space-separated values [HTML 2.0]
           ## TODO: HTML4/XHTML1 |name|
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
@@ -4057,6 +4058,7 @@ $Element->{$HTML_NS}->{a} = {
           }),
           target => $HTMLTargetAttrChecker,
           type => $MIMETypeChecker,
+          urn => $HTMLURIAttrChecker,
         }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;

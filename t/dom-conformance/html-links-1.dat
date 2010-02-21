@@ -1220,3 +1220,34 @@ a
 </a>
 #errors
 /a/@coords;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="a"
+    urn="">a</a>
+#errors
+/a/@urn;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="a"
+    urn="[]">a</a>
+#errors
+/a/@urn;attribute not defined;m
+/a/@urn;syntax error:iriref3987;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="a"
+    methods="">a</a>
+#errors
+/a/@methods;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="a"
+    methods="get post">a</a>
+#errors
+/a/@methods;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="a"
+    methods="OPTIONS">a</a>
+#errors
+/a/@methods;attribute not defined;m

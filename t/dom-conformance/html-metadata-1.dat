@@ -1796,6 +1796,37 @@ p {color: green}
 /a/@sizes;attribute not defined;m
 
 #data
+<link xmlns="http://www.w3.org/1999/xhtml" href="a"
+    urn="" rel="alternate"/>
+#errors
+/link/@urn;attribute not defined;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="a"
+    urn="[]" rel="alternate"/>
+#errors
+/link/@urn;attribute not defined;m
+/link/@urn;syntax error:iriref3987;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="a"
+    methods="" rel="alternate"/>
+#errors
+/link/@methods;attribute not defined;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="a"
+    methods="get post" rel="alternate"/>
+#errors
+/link/@methods;attribute not defined;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="a"
+    methods="OPTIONS" rel="alternate"/>
+#errors
+/link/@methods;attribute not defined;m
+
+#data
 <meta xmlns="http://www.w3.org/1999/xhtml">
   <!-- TODO: <meta> tests are not complete -->
 </meta>
