@@ -1073,3 +1073,107 @@ id=""><span id="">x</span></p>
 >a</p>
 #errors
 /p/@spellcheck;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    datasrc="">a</p>
+#errors
+/p/@datasrc;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    datasrc="abcd">a</p>
+#errors
+/p/@datasrc;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    datasrc="[]">a</p>
+#errors
+/p/@datasrc;attribute not defined;m
+/p/@datasrc;syntax error:iriref3987;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    datafld="">a</p>
+#errors
+/p/@datafld;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    datafld="abc">a</p>
+#errors
+/p/@datafld;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="abc">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="dataformatas">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="plaintext">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="html">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="PlainText">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="HTML">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="html ">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="text ">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m
+
+#data escaped
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="pla\u0130ntext">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m
+
+#data escaped
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="pla\u0131ntext">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m

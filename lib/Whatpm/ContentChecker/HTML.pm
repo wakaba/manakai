@@ -1242,6 +1242,10 @@ my $HTMLAttrChecker = {
     }
   }, # accesskey
 
+  datasrc => $HTMLURIAttrChecker,
+  datafld => sub { }, ## Reserved in HTML4, CDATA
+  dataformatas => $GetHTMLEnumeratedAttrChecker->({plaintext => 1, html => 1}),
+
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
     my ($self, $attr, $item, $element_state) = @_;
@@ -1471,6 +1475,9 @@ my %HTMLAttrStatus = (
   class => FEATURE_HTML5_LC,
   contenteditable => FEATURE_HTML5_REC,
   contextmenu => FEATURE_HTML5_WD,
+  datafld => FEATURE_HTML5_OBSOLETE,
+  dataformatas => FEATURE_HTML5_OBSOLETE,
+  datasrc => FEATURE_HTML5_OBSOLETE,
   dir => FEATURE_HTML5_REC,
   draggable => FEATURE_HTML5_LC,
   hidden => FEATURE_HTML5_LC,
@@ -1497,6 +1504,9 @@ my %HTMLM12NCommonAttrStatus = (
   about => FEATURE_RDFA_REC,
   class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   content => FEATURE_RDFA_REC,
+  datafld => FEATURE_HTML5_OBSOLETE,
+  dataformatas => FEATURE_HTML5_OBSOLETE,
+  datasrc => FEATURE_HTML5_OBSOLETE,
   datatype => FEATURE_RDFA_REC,
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
@@ -1590,6 +1600,9 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   about => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   content => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
+  datafld => FEATURE_HTML5_OBSOLETE,
+  dataformatas => FEATURE_HTML5_OBSOLETE,
+  datasrc => FEATURE_HTML5_OBSOLETE,
   datatype => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
@@ -1831,6 +1844,7 @@ my %HTMLChecker = (
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -2005,6 +2019,7 @@ $Element->{$HTML_NS}->{html} = {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before head';
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{manifest}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -2751,6 +2766,7 @@ $Element->{$HTML_NS}->{style} = {
     }
     $element_state->{style_type} = $type;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
 
@@ -2912,6 +2928,7 @@ $Element->{$HTML_NS}->{script} = {
       $element_state->{script_type} = $type;
     }
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -3007,6 +3024,7 @@ $Element->{$HTML_NS}->{noscript} = {
                                   {$HTML_NS => {noscript => 1}});
     }
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -3091,6 +3109,7 @@ $Element->{$HTML_NS}->{'event-source'} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -3109,6 +3128,7 @@ $Element->{$HTML_NS}->{eventsource} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -3179,6 +3199,7 @@ $Element->{$HTML_NS}->{body} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -3255,6 +3276,7 @@ $Element->{$HTML_NS}->{h1} = {
     my ($self, $item, $element_state) = @_;
     $self->{flag}->{has_hn} = 1;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -3327,6 +3349,7 @@ $Element->{$HTML_NS}->{header} = {
     $element_state->{has_hn_original} = $self->{flag}->{has_hn};
     $self->{flag}->{has_hn} = 0;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
@@ -3352,6 +3375,7 @@ $Element->{$HTML_NS}->{footer} = {
     $self->_add_minus_elements ($element_state,
                                 {$HTML_NS => {header => 1, footer => 1}});
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
@@ -3386,6 +3410,7 @@ $Element->{$HTML_NS}->{address} = {
          {$HTML_NS => {header => 1, footer => 1, address => 1}},
          $HTMLSectioningContent, $HTMLHeadingContent);
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -3512,6 +3537,7 @@ $Element->{$HTML_NS}->{blockquote} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
   
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -3525,6 +3551,7 @@ $Element->{$HTML_NS}->{dialog} = {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before dt';
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -3768,6 +3795,7 @@ $Element->{$HTML_NS}->{dl} = {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before dt';
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -3872,9 +3900,6 @@ $Element->{$HTML_NS}->{div} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
     lang => FEATURE_HTML5_REC,
   }),
   check_start => sub {
@@ -4043,6 +4068,7 @@ $Element->{$HTML_NS}->{a} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -4125,6 +4151,7 @@ $Element->{$HTML_NS}->{q} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -4186,6 +4213,7 @@ $Element->{$HTML_NS}->{dfn} = {
     ## ISSUE: The HTML5 definition for the defined term does not work with
     ## |ruby| unless |dfn| has |title|.
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -4549,6 +4577,7 @@ $Element->{$HTML_NS}->{ruby} = {
     $element_state->{phase} = 'before-rb';
     #$element_state->{has_sig}
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -4857,9 +4886,6 @@ $Element->{$HTML_NS}->{span} = {
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
     lang => FEATURE_HTML5_REC,
     sdaform => FEATURE_HTML2X_RFC,
   }),
@@ -4906,6 +4932,7 @@ $Element->{$HTML_NS}->{ins} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -4940,6 +4967,7 @@ $Element->{$HTML_NS}->{del} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -5106,6 +5134,7 @@ $Element->{$HTML_NS}->{img} = {
 
     ## TODO: external resource check
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{lowsrc}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{dynsrc}->{type}->{embedded} = 1;
@@ -5167,6 +5196,7 @@ $Element->{$HTML_NS}->{iframe} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -5252,6 +5282,7 @@ $Element->{$HTML_NS}->{embed} = {
 
     ## TODO: external resource check
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
   },
 };
@@ -5306,9 +5337,6 @@ $Element->{$HTML_NS}->{object} = {
       codetype => FEATURE_HTML5_OBSOLETE,
       'content-length' => FEATURE_XHTML2_ED,
       data => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-      datafld => FEATURE_HTML4_REC_RESERVED,
-      dataformatas => FEATURE_HTML4_REC_RESERVED,
-      datasrc => FEATURE_HTML4_REC_RESERVED,
       declare => FEATURE_HTML5_OBSOLETE,
       form => FEATURE_HTML5_LC,
       height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -5476,6 +5504,7 @@ $Element->{$HTML_NS}->{video} = {
     $element_state->{has_source} ||= $element_state->{allow_source} * -1;
       ## NOTE: It might be set true by |check_element|.
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{poster}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
@@ -5593,6 +5622,7 @@ $Element->{$HTML_NS}->{source} = {
                          level => $self->{level}->{must});
     }
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
 
     ## NOTE: The |pixelratio| attribute should have been forbidden
@@ -5705,6 +5735,7 @@ $Element->{$HTML_NS}->{map} = {
         ## |alt=""| attribute, then the value contains an array
         ## reference that contains all of such |area| elements.
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -5857,6 +5888,7 @@ $Element->{$HTML_NS}->{area} = {
                          level => $self->{level}->{must});
     }
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -5902,10 +5934,7 @@ $Element->{$HTML_NS}->{table} = {
     cellpadding => FEATURE_HTML5_OBSOLETE,
     cellspacing => FEATURE_HTML5_OBSOLETE,
     cols => FEATURE_RFC1942,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
     datapagesize => FEATURE_M12N10_REC,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
     frame => FEATURE_HTML5_OBSOLETE,
     lang => FEATURE_HTML5_REC,
     rules => FEATURE_HTML5_OBSOLETE,
@@ -6510,6 +6539,7 @@ $Element->{$HTML_NS}->{form} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {$HTML_NS => {form => 1}});
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
@@ -6645,6 +6675,7 @@ $Element->{$HTML_NS}->{label} = {
     $self->{flag}->{label_for}
         = $item->{node}->get_attribute_ns (undef, 'for');
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -6696,9 +6727,6 @@ $Element->{$HTML_NS}->{input} = {
          autocomplete => FEATURE_HTML5_LC | FEATURE_WF2X,
          autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
          checked => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-         datafld => FEATURE_HTML4_REC_RESERVED,
-         dataformatas => FEATURE_HTML4_REC_RESERVED,
-         datasrc => FEATURE_HTML4_REC_RESERVED,
          disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
          form => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -7245,7 +7273,7 @@ $Element->{$HTML_NS}->{input} = {
     ## TODO: Warn unless value = min * x where x is an integer.
  
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
-    $element_state->{uri_info}->{action}->{type}->{formaction} = 1;
+    $element_state->{uri_info}->{formaction}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
@@ -7313,9 +7341,6 @@ $Element->{$HTML_NS}->{button} = {
     accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
     action => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -7404,9 +7429,6 @@ $Element->{$HTML_NS}->{select} = {
     accesskey => FEATURE_HTML5_FD | FEATURE_WF2,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     data => FEATURE_WF2,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     lang => FEATURE_HTML5_REC,
@@ -7482,6 +7504,7 @@ $Element->{$HTML_NS}->{datalist} = {
 
     $element_state->{phase} = 'any'; # any | phrasing | option
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -7707,9 +7730,6 @@ $Element->{$HTML_NS}->{textarea} = {
     accesskey => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     cols => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    datafld => FEATURE_HTML4_REC_RESERVED,
-    dataformatas => FEATURE_HTML4_REC_RESERVED,
-    datasrc => FEATURE_HTML4_REC_RESERVED,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
@@ -7738,6 +7758,7 @@ $Element->{$HTML_NS}->{textarea} = {
     my ($self, $item, $element_state) = @_;
     $FAECheckStart->($self, $item, $element_state);
     
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -7794,6 +7815,7 @@ $Element->{$HTML_NS}->{keygen} = {
     my ($self, $item, $element_state) = @_;
     $FAECheckStart->($self, $item, $element_state);
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
@@ -8020,6 +8042,7 @@ $Element->{$HTML_NS}->{isindex} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -8175,6 +8198,7 @@ $Element->{$HTML_NS}->{command} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{icon}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -8206,6 +8230,7 @@ $Element->{$HTML_NS}->{bb} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
@@ -8245,6 +8270,7 @@ $Element->{$HTML_NS}->{menu} = {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'li or phrasing';
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
     $element_state->{id_type} = 'menu';
@@ -8359,6 +8385,7 @@ $Element->{$HTML_NS}->{rule} = {
     $element_state->{in_rule_original} = $self->{flag}->{in_rule};
     $self->{flag}->{in_rule} = 1;
 
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
