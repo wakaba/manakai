@@ -3463,6 +3463,12 @@ $Element->{$HTML_NS}->{hr} = {
   }), # check_attrs
 }; # hr
 
+$Element->{$HTML_NS}->{spacer} = {
+  %HTMLEmptyChecker,
+  # XXX attributes
+  status => FEATURE_HTML5_OBSOLETE,
+}; # wbr
+
 $Element->{$HTML_NS}->{br} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
@@ -3979,6 +3985,21 @@ $Element->{$HTML_NS}->{div3} = $Element->{$HTML_NS}->{div1};
 $Element->{$HTML_NS}->{div4} = $Element->{$HTML_NS}->{div1};
 $Element->{$HTML_NS}->{div5} = $Element->{$HTML_NS}->{div1};
 $Element->{$HTML_NS}->{div6} = $Element->{$HTML_NS}->{div1};
+
+$Element->{$HTML_NS}->{marquee} = {
+  %HTMLFlowContentChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    # XXX attributes, onbounce/onfinish/onstart
+  }),
+}; # marquee
+
+$Element->{$HTML_NS}->{multicol} = {
+  %HTMLFlowContentChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+  # XXX attributes
+}; # multicol
 
 $Element->{$HTML_NS}->{font} = {
   %HTMLTransparentChecker,
@@ -5851,6 +5872,12 @@ $Element->{$HTML_NS}->{source} = {
     ## but the attribute itself has been dropped from the spec.
   },
 }; # source
+
+$Element->{$HTML_NS}->{bgsound} = {
+  %HTMLEmptyChecker,
+  # XXX attirbutes
+  status => FEATURE_HTML5_OBSOLETE,
+}; # bgsound
 
 $Element->{$HTML_NS}->{canvas} = {
   %HTMLTransparentChecker,
@@ -8759,11 +8786,6 @@ $Element->{$HTML_NS}->{noframes} = {
     lang => FEATURE_HTML5_REC,
   }), # check_attrs
 }; # noframes
-
-## XXX spacer FEATURE_HTML5_OBSOLETE
-## XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart
-## XXX bgsound FEATURE_HTML5_OBSOLETE
-## XXX multicol FEATURE_HTML5_OBSOLETE
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 

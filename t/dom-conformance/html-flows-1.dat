@@ -3103,6 +3103,74 @@ aaa
 /centre;element not defined;m
 
 #data
+<marquee  xmlns="http://www.w3.org/1999/xhtml"></marquee>
+#errors
+/marquee;element not defined;m
+/marquee;no significant content;s
+
+#data
+<marquee  xmlns="http://www.w3.org/1999/xhtml">   </marquee>
+#errors
+/marquee;element not defined;m
+/marquee;no significant content;s
+
+#data
+<marquee  xmlns="http://www.w3.org/1999/xhtml">x</marquee>
+#errors
+/marquee;element not defined;m
+
+#data
+<marquee  xmlns="http://www.w3.org/1999/xhtml">x<p>y</p></marquee>
+#errors
+/marquee;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><marquee>x</marquee></div>
+#errors
+/div/marquee;element not defined;m
+/div/marquee;element not allowed:flow;m
+
+#data
+<b xmlns="http://www.w3.org/1999/xhtml"><marquee>x</marquee></b>
+#errors
+/b/marquee;element not defined;m
+/b/marquee;element not allowed:phrasing;m
+
+#data
+<multicol  xmlns="http://www.w3.org/1999/xhtml"></multicol>
+#errors
+/multicol;element not defined;m
+/multicol;no significant content;s
+
+#data
+<multicol  xmlns="http://www.w3.org/1999/xhtml">   </multicol>
+#errors
+/multicol;element not defined;m
+/multicol;no significant content;s
+
+#data
+<multicol  xmlns="http://www.w3.org/1999/xhtml">x</multicol>
+#errors
+/multicol;element not defined;m
+
+#data
+<multicol  xmlns="http://www.w3.org/1999/xhtml">x<p>y</p></multicol>
+#errors
+/multicol;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><multicol>x</multicol></div>
+#errors
+/div/multicol;element not defined;m
+/div/multicol;element not allowed:flow;m
+
+#data
+<b xmlns="http://www.w3.org/1999/xhtml"><multicol>x</multicol></b>
+#errors
+/b/multicol;element not defined;m
+/b/multicol;element not allowed:phrasing;m
+
+#data
 <dir xmlns="http://www.w3.org/1999/xhtml"></dir>
 #errors
 /dir;element not defined;m
@@ -4725,6 +4793,42 @@ a
 #errors
 /hr/@width;attribute not defined;m
 /hr/@width;length:syntax error;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"></spacer>
+#errors
+/spacer;element not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml">   </spacer>
+#errors
+/spacer;element not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml">abc</spacer>
+#errors
+/spacer;element not defined;m
+/spacer/"abc";character not allowed:empty;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></spacer>
+#errors
+/spacer;element not defined;m
+/spacer/p;element not allowed:empty;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><spacer/></p>
+#errors
+/p/spacer;element not defined;m
+/p/spacer;element not allowed:phrasing;m
+/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><spacer/></div>
+#errors
+/div/spacer;element not defined;m
+/div/spacer;element not allowed:flow;m
+/div;no significant content;s
 
 #data
 <div align="" xmlns="http://www.w3.org/1999/xhtml">x</div>

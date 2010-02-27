@@ -4767,6 +4767,42 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /source/@pixelratio;float:syntax error;m
 
 #data
+<bgsound xmlns="http://www.w3.org/1999/xhtml"></bgsound>
+#errors
+/bgsound;element not defined;m
+
+#data
+<bgsound xmlns="http://www.w3.org/1999/xhtml">   </bgsound>
+#errors
+/bgsound;element not defined;m
+
+#data
+<bgsound xmlns="http://www.w3.org/1999/xhtml">abc</bgsound>
+#errors
+/bgsound;element not defined;m
+/bgsound/"abc";character not allowed:empty;m
+
+#data
+<bgsound xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></bgsound>
+#errors
+/bgsound;element not defined;m
+/bgsound/p;element not allowed:empty;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><bgsound/></p>
+#errors
+/p/bgsound;element not defined;m
+/p/bgsound;element not allowed:phrasing;m
+/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><bgsound/></div>
+#errors
+/div/bgsound;element not defined;m
+/div/bgsound;element not allowed:flow;m
+/div;no significant content;s
+
+#data
 <canvas xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas;no significant content;s
