@@ -453,6 +453,10 @@ my $default_error_level = {
   html4_fact => 'm',
   html5_no_may => 'm', # XXX
 
+  ## Web Applications 1.0 "obsolete but conforming" (a class of
+  ## SHOULD-level requirements).
+  obsconforming => 's',
+
   xml_error => 'm', ## TODO: correct?
   xml_id_error => 'm', ## TODO: ?
   nc => 'm', ## XML Namespace Constraints ## TODO: correct?

@@ -2370,11 +2370,13 @@ $Element->{$HTML_NS}->{meta} = {
   %HTMLEmptyChecker,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
+    my $el = $item->{node};
+
     my $name_attr;
     my $http_equiv_attr;
     my $charset_attr;
     my $content_attr;
-    for my $attr (@{$item->{node}->attributes}) {
+    for my $attr (@{$el->attributes}) {
       my $attr_ns = $attr->namespace_uri;
       $attr_ns = '' unless defined $attr_ns;
       my $attr_ln = $attr->manakai_local_name;
@@ -2455,7 +2457,7 @@ $Element->{$HTML_NS}->{meta} = {
       if (defined $content_attr) {
         $metadata_value = $content_attr->value;
       } else {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'attribute missing',
                            text => 'content',
                            level => $self->{level}->{must});
@@ -2468,7 +2470,7 @@ $Element->{$HTML_NS}->{meta} = {
                            level => $self->{level}->{must});
       }
       unless (defined $content_attr) {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'attribute missing',
                            text => 'content',
                            level => $self->{level}->{must});
@@ -2484,25 +2486,25 @@ $Element->{$HTML_NS}->{meta} = {
         $self->{onerror}->(node => $content_attr,
                            type => 'attribute not allowed',
                            level => $self->{level}->{must});
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'attribute missing:name|http-equiv',
                            level => $self->{level}->{must});
       } else {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'attribute missing:name|http-equiv|charset',
                            level => $self->{level}->{must});
       }
     }
 
     my $check_charset_decl = sub () {
-      my $parent = $item->{node}->manakai_parent_element;
+      my $parent = $el->manakai_parent_element;
       my $head = $parent ? $parent->owner_document->manakai_head : undef;
       if ($parent and $head and $parent eq $head) {
-        for my $el (@{$parent->child_nodes}) {
-          next unless $el->node_type == 1; # ELEMENT_NODE
-          unless ($el eq $item->{node}) {
+        for my $cel (@{$parent->child_nodes}) {
+          next unless $cel->node_type == 1; # ELEMENT_NODE
+          unless ($cel eq $el) {
             ## NOTE: Not the first child element.
-            $self->{onerror}->(node => $item->{node},
+            $self->{onerror}->(node => $el,
                                type => 'element not allowed:meta charset',
                                level => $self->{level}->{must});
           }
@@ -2510,7 +2512,7 @@ $Element->{$HTML_NS}->{meta} = {
           ## NOTE: Entity references are not supported.
         }
       } else {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'element not allowed:meta charset',
                            level => $self->{level}->{must});
       }
@@ -2523,7 +2525,7 @@ $Element->{$HTML_NS}->{meta} = {
       ($charset, $charset_value)
           = $HTMLCharsetChecker->($charset_value, $self, $attr);
 
-      my $ic = $item->{node}->owner_document->input_encoding;
+      my $ic = $el->owner_document->input_encoding;
       if (defined $ic) {
         ## TODO: Test for this case
         my $ic_charset = $Message::Charset::Info::IANACharset->{$ic};
@@ -2562,9 +2564,11 @@ $Element->{$HTML_NS}->{meta} = {
           (name => $name,
            name_attr => $name_attr,
            content => $content_attr ? $content_attr->value : '',
-           content_attr => $content_attr || $item->{node},
+           content_attr => $content_attr || $el,
            checker => $self);
     }
+
+    my $doc = $el->owner_document;
 
     ## -- The |http-equiv| attribute (pragmas)
     if (defined $http_equiv_attr) { ## An enumerated attribute
@@ -2584,13 +2588,12 @@ $Element->{$HTML_NS}->{meta} = {
 
         $check_charset_decl->();
 
-        my $doc = $item->{node}->owner_document;
         if (not $doc->manakai_is_html) {
-          $self->{onerror}->(node => $item->{node},
+          $self->{onerror}->(node => $el,
                              type => 'in XML:charset',
                              level => $self->{level}->{must});
         } elsif ($doc->manakai_is_srcdoc) {
-          $self->{onerror}->(node => $item->{node},
+          $self->{onerror}->(node => $el,
                              type => 'srcdoc:charset', # XXXdocumentation
                              level => $self->{level}->{must});
         }
@@ -2644,7 +2647,9 @@ $Element->{$HTML_NS}->{meta} = {
           }, $self->{level});
         }
 
-        ## XXX This is conforming but obsolete.
+        $self->{onerror}->(node => $el,
+                           type => 'content-language', # XXX documentation
+                           level => $self->{level}->{obsconforming});
       } else {
         ## NOTE: |Content-Style-Type| and |Content-Script-Type|
         ## pragmas are listed in the table of the spec in the
@@ -2667,13 +2672,12 @@ $Element->{$HTML_NS}->{meta} = {
       $check_charset_decl->();
       $check_charset->($charset_attr, $value);
 
-      my $doc = $item->{node}->owner_document;
       if (not $doc->manakai_is_html and not $value =~ /\A[Uu][Tt][Ff]-8\z/) {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'in XML:charset',
                            level => $self->{level}->{must});
       } elsif ($doc->manakai_is_srcdoc) {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'srcdoc:charset', # XXXdocumentation
                            level => $self->{level}->{must});
       }
