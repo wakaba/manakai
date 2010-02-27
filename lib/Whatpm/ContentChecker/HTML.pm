@@ -4638,10 +4638,25 @@ $Element->{$HTML_NS}->{strike} = $Element->{$HTML_NS}->{s};
 
 $Element->{$HTML_NS}->{u} = $Element->{$HTML_NS}->{s};
 
+$Element->{$HTML_NS}->{blink} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+}; # blink
+
 $Element->{$HTML_NS}->{mark} = {
   status => FEATURE_HTML5_WD,
   %HTMLPhrasingContentChecker,
 };
+
+$Element->{$HTML_NS}->{nobr} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+}; # nobr
+
+$Element->{$HTML_NS}->{wbr} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_OBSOLETE,
+}; # wbr
 
 $Element->{$HTML_NS}->{ruby} = {
   %HTMLPhrasingContentChecker,
@@ -5477,11 +5492,6 @@ $Element->{$HTML_NS}->{embed} = {
 $Element->{$HTML_NS}->{noembed} = {
   %HTMLTextChecker, # XXX content model restriction
   status => FEATURE_HTML5_OBSOLETE,
-  check_attrs => $GetHTMLAttrsChecker->({
-    #
-  }, {
-    %HTMLAttrStatus,
-  }), # check_attrs
 }; # noembed
 
 ## TODO:
@@ -8750,10 +8760,8 @@ $Element->{$HTML_NS}->{noframes} = {
   }), # check_attrs
 }; # noframes
 
-## XXX blink FEATURE_HTML5_OBSOLETE
 ## XXX spacer FEATURE_HTML5_OBSOLETE
 ## XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart
-## XXX nobr/wbr FEATURE_HTML5_OBSOLETE
 ## XXX bgsound FEATURE_HTML5_OBSOLETE
 ## XXX multicol FEATURE_HTML5_OBSOLETE
 

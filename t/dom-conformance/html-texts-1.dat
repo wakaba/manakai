@@ -2147,6 +2147,130 @@
 /rule/u;element not defined;m
 
 #data
+<blink xmlns="http://www.w3.org/1999/xhtml"></blink>
+#errors
+/blink;element not defined;m
+/blink;no significant content;s
+
+#data
+<blink xmlns="http://www.w3.org/1999/xhtml">   </blink>
+#errors
+/blink;element not defined;m
+/blink;no significant content;s
+
+#data
+<blink xmlns="http://www.w3.org/1999/xhtml">abc</blink>
+#errors
+/blink;element not defined;m
+
+#data
+<blink xmlns="http://www.w3.org/1999/xhtml"><p>aa</p></blink>
+#errors
+/blink;element not defined;m
+/blink/p;element not allowed:phrasing;m
+
+#data
+<blink xmlns="http://www.w3.org/1999/xhtml"><span>aa</span></blink>
+#errors
+/blink;element not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><blink>aa</blink></p>
+#errors
+/p/blink;element not defined;m
+/p/blink;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><blink>aa</blink></div>
+#errors
+/div/blink;element not defined;m
+/div/blink;element not allowed:flow;m
+
+#data
+<nobr xmlns="http://www.w3.org/1999/xhtml"></nobr>
+#errors
+/nobr;element not defined;m
+/nobr;no significant content;s
+
+#data
+<nobr xmlns="http://www.w3.org/1999/xhtml">   </nobr>
+#errors
+/nobr;element not defined;m
+/nobr;no significant content;s
+
+#data
+<nobr xmlns="http://www.w3.org/1999/xhtml">abc</nobr>
+#errors
+/nobr;element not defined;m
+
+#data
+<nobr xmlns="http://www.w3.org/1999/xhtml"><p>aa</p></nobr>
+#errors
+/nobr;element not defined;m
+/nobr/p;element not allowed:phrasing;m
+
+#data
+<nobr xmlns="http://www.w3.org/1999/xhtml"><span>aa</span></nobr>
+#errors
+/nobr;element not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><nobr>aa</nobr></p>
+#errors
+/p/nobr;element not defined;m
+/p/nobr;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><nobr>aa</nobr></div>
+#errors
+/div/nobr;element not defined;m
+/div/nobr;element not allowed:flow;m
+
+#data
+<wbr xmlns="http://www.w3.org/1999/xhtml"></wbr>
+#errors
+/wbr;element not defined;m
+
+#data
+<wbr xmlns="http://www.w3.org/1999/xhtml">   </wbr>
+#errors
+/wbr;element not defined;m
+
+#data
+<wbr xmlns="http://www.w3.org/1999/xhtml">abc</wbr>
+#errors
+/wbr;element not defined;m
+/wbr/"abc";character not allowed:empty;m
+
+#data
+<wbr xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></wbr>
+#errors
+/wbr;element not defined;m
+/wbr/p;element not allowed:empty;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><wbr/></p>
+#errors
+/p/wbr;element not defined;m
+/p/wbr;element not allowed:phrasing;m
+/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><wbr/></div>
+#errors
+/div/wbr;element not defined;m
+/div/wbr;element not allowed:flow;m
+/div;no significant content;s
+
+#data
+<nobr xmlns="http://www.w3.org/1999/xhtml"><wbr/></nobr>
+#errors
+/nobr/wbr;element not defined;m
+/nobr/wbr;element not allowed:phrasing;m
+/nobr;no significant content;s
+/nobr;element not defined;m
+
+#data
 <font xmlns="http://www.w3.org/1999/xhtml"
     size="">a</font>
 #errors
