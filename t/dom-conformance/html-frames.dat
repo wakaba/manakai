@@ -1207,6 +1207,30 @@
 /noframes;element not defined;m
 
 #data
+<noframes xmlns="http://www.w3.org/1999/xhtml"><p>abc</p>cd</noframes>
+#errors
+/noframes;element not defined;m
+/noframes/p;element not allowed:text;m
+
+#data
+<noframes xmlns="http://www.w3.org/1999/xhtml"><span>abc</span>cd</noframes>
+#errors
+/noframes;element not defined;m
+/noframes/span;element not allowed:text;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><noframes>aa</noframes></p>
+#errors
+/p/noframes;element not allowed:phrasing;m
+/p/noframes;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><noframes>aa</noframes></div>
+#errors
+/div/noframes;element not allowed:flow;m
+/div/noframes;element not defined;m
+
+#data
 <noframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /noframe;element not defined;m
