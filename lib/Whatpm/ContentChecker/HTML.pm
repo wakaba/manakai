@@ -5647,6 +5647,9 @@ $Element->{$HTML_NS}->{video} = {
                          type => 'attribute not allowed',
                          level => $self->{level}->{warn});
 
+      ## In addition, the |preload| attribute is ignored if the
+      ## |autoplay| attribute is specified.
+
       $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
     },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
@@ -5657,6 +5660,9 @@ $Element->{$HTML_NS}->{video} = {
     loopstart => sub { },
     playcount => sub { },
     poster => $HTMLURIAttrChecker,
+    preload => $GetHTMLEnumeratedAttrChecker->({
+      'none' => 1, 'metadata' => 1, 'auto' => 1, '' => 1,
+    }),
     src => $HTMLURIAttrChecker,
     start => sub { },
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -5666,7 +5672,7 @@ $Element->{$HTML_NS}->{video} = {
     ## author requirement is defined.
   }, {
     %HTMLAttrStatus,
-    autobuffer => FEATURE_HTML5_LC,
+    autobuffer => FEATURE_HTML5_DROPPED,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
     end => FEATURE_HTML5_DROPPED,
@@ -5676,6 +5682,7 @@ $Element->{$HTML_NS}->{video} = {
     loopstart => FEATURE_HTML5_DROPPED,
     playcount => FEATURE_HTML5_DROPPED,
     poster => FEATURE_HTML5_LC,
+    preload => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_LC,
     start => FEATURE_HTML5_DROPPED,
     width => FEATURE_HTML5_LC,
@@ -5756,6 +5763,9 @@ $Element->{$HTML_NS}->{audio} = {
                          type => 'attribute not allowed',
                          level => $self->{level}->{warn});
 
+      ## In addition, the |preload| attribute is ignored if the
+      ## |autoplay| attribute is specified.
+
       $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
     },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
@@ -5764,6 +5774,9 @@ $Element->{$HTML_NS}->{audio} = {
     loopend => sub { },
     loopstart => sub { },
     playcount => sub { },
+    preload => $GetHTMLEnumeratedAttrChecker->({
+      'none' => 1, 'metadata' => 1, 'auto' => 1, '' => 1,
+    }),
     src => $HTMLURIAttrChecker,
     start => sub { },
 
@@ -5772,7 +5785,7 @@ $Element->{$HTML_NS}->{audio} = {
     ## author requirement is defined.
   }, {
     %HTMLAttrStatus,
-    autobuffer => FEATURE_HTML5_LC,
+    autobuffer => FEATURE_HTML5_DROPPED,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
     end => FEATURE_HTML5_DROPPED,
@@ -5780,6 +5793,7 @@ $Element->{$HTML_NS}->{audio} = {
     loopend => FEATURE_HTML5_DROPPED,
     loopstart => FEATURE_HTML5_DROPPED,
     playcount => FEATURE_HTML5_DROPPED,
+    preload => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_LC,
     start => FEATURE_HTML5_DROPPED,
   }), # check_attrs

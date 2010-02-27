@@ -4066,12 +4066,14 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /video;no significant content;s
 /video;child element missing;source;m
+/video/@autobuffer;attribute not defined;m
 
 #data
 <video autobuffer="autobuffer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
 /video;child element missing;source;m
+/video/@autobuffer;attribute not defined;m
 
 #data
 <video autobuffer="true" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4079,12 +4081,14 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /video;no significant content;s
 /video/@autobuffer;boolean:invalid;m
 /video;child element missing;source;m
+/video/@autobuffer;attribute not defined;m
 
 #data
 <video autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /video;no significant content;s
 /video;child element missing;source;m
+/video/@autobuffer;attribute not defined;m
 
 #data
 <video autoplay="" autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4092,6 +4096,51 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /video;no significant content;s
 /video;child element missing;source;m
 /video/@autoplay;attribute not allowed;w
+/video/@autobuffer;attribute not defined;m
+
+#data
+<video preload="" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="auto" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="none" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="metadata" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="NONE" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="AUTO" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="preload" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@preload;enumerated:invalid;m
+
+#data
+<video preload="true" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@preload;enumerated:invalid;m
+
+#data
+<video preload="  " src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@preload;enumerated:invalid;m
+
+#data
+<video preload="all" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@preload;enumerated:invalid;m
 
 #data
 <video controls="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4268,18 +4317,21 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /audio;no significant content;s
 /audio;child element missing;source;m
+/audio/@autobuffer;attribute not defined;m
 
 #data
 <audio autobuffer="autobuffer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
 /audio;child element missing;source;m
+/audio/@autobuffer;attribute not defined;m
 
 #data
 <audio autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /audio;no significant content;s
 /audio;child element missing;source;m
+/audio/@autobuffer;attribute not defined;m
 
 #data
 <audio autobuffer="true" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4287,6 +4339,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /audio/@autobuffer;boolean:invalid;m
 /audio;no significant content;s
 /audio;child element missing;source;m
+/audio/@autobuffer;attribute not defined;m
 
 #data
 <audio autoplay="" autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -4294,6 +4347,51 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /audio;no significant content;s
 /audio;child element missing;source;m
 /audio/@autoplay;attribute not allowed;w
+/audio/@autobuffer;attribute not defined;m
+
+#data
+<audio preload="" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="auto" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="none" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="metadata" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="NONE" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="AUTO" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="preload" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@preload;enumerated:invalid;m
+
+#data
+<audio preload="true" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@preload;enumerated:invalid;m
+
+#data
+<audio preload="  " src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@preload;enumerated:invalid;m
+
+#data
+<audio preload="all" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@preload;enumerated:invalid;m
 
 #data
 <audio controls="" xmlns="http://www.w3.org/1999/xhtml"/>
