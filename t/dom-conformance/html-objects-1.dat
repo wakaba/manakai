@@ -1556,6 +1556,264 @@ xxxx
 /p/applet;element not allowed:phrasing;m
 
 #data
+<applet code="a" alt="b" width="1" height="1" hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet/@hspace;attribute not defined;m
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" hspace="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet/@hspace;attribute not defined;m
+/applet;no significant content;s
+/applet/@hspace;nninteger:syntax error;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" vspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@vspace;attribute not defined;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" vspace="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@vspace;attribute not defined;m
+/applet/@vspace;nninteger:syntax error;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:invalid;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="char" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:invalid;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:invalid;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:invalid;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="bottom" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="middle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" align="right" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data escaped
+<applet code="a" alt="b" width="1" height="1" align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:invalid;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data escaped
+<applet code="a" alt="b" width="1" height="1" align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:invalid;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" xmlns="http://www.w3.org/1999/xhtml"
+    height="">x</iframe>
+#errors
+/applet/@height;nninteger:syntax error;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" xmlns="http://www.w3.org/1999/xhtml"
+    height="0">x</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" xmlns="http://www.w3.org/1999/xhtml"
+    height="120">x</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    width="">x</applet>
+#errors
+/applet/@width;nninteger:syntax error;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    width="0">x</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    width="120">x</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" codebase="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet/@codebase;attribute not defined;m
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" codebase="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet/@codebase;attribute not defined;m
+/applet/@codebase;syntax error:iriref3987;m
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
 <video xmlns="http://www.w3.org/1999/xhtml"></video>
 #errors
 /video;no significant content;s
