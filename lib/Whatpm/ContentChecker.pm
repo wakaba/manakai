@@ -391,7 +391,7 @@ my $HTMLTransparentElements = {
 ## NOTE: Now that the term "semi-transparent content model" is dropped
 ## from the spec, but the concept is not.
 my $HTMLSemiTransparentElements = {
-  $HTML_NS => {object => 1, video => 1, audio => 1},
+  $HTML_NS => {object => 1, applet => 1, video => 1, audio => 1},
 }; # $HTMLSemiTransparentElements
 
 our $Element = {};
@@ -728,7 +728,7 @@ next unless $code;## TODO: temp.
           } else {
             if ($item->{parent_def} and # has parent
                 $el_nsuri eq $HTML_NS) { ## $HTMLSemiTransparentElements
-              if ($el_ln eq 'object') {
+              if ($el_ln eq 'object' or $el_ln eq 'applet') {
                 if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
                   #
                 } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'param') {

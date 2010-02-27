@@ -1166,6 +1166,396 @@ xxxx
 /p/object/style;SUBDOC;text/css
 
 #data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc"></applet>
+#errors
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+</applet>
+#errors
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">xxxx</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc"><p>xx</p></applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc"><p></p></applet>
+#errors
+/applet;no significant content;s
+/applet/p;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+</applet>
+#errors
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<param name="v" value="w"/>
+</applet>
+#errors
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<param name="v" value="w"/>
+<param name="a" value="b"/>
+</applet>
+#errors
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+zzz
+</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<p>zzz</p>
+</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/><p>
+zzz</p><img src="" alt="a"/>
+</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<param name="z" value="w"/>
+zzz
+</applet>
+#errors
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+zzz
+<param name="a" value="y"/>
+</applet>
+#errors
+/applet/param;element not allowed:flow;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+aaa
+<param name="x" value="y"/>
+</applet>
+#errors
+/applet/param;element not allowed:flow;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<?xml version="1.1"?>
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+&#x0b;
+<param name="x" value="y"/>
+</applet>
+#errors
+/applet/param;element not allowed:flow;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<p>zxx</p>
+<param name="x" value="y"/>
+</applet>
+#errors
+/applet/param;element not allowed:flow;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<style scoped=""/>
+</applet>
+#errors
+/applet/style;SUBDOC;text/css
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<style scoped=""/>
+aaa
+</applet>
+#errors
+/applet/style;SUBDOC;text/css
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<style scoped=""/>
+<p>xxx</p>
+</applet>
+#errors
+/applet/style;SUBDOC;text/css
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<style scoped=""/>
+<param name="xz" value=""/>
+</applet>
+#errors
+/applet/style;SUBDOC;text/css
+/applet/param;element not allowed:flow;m
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<style scoped=""/>
+<param name="x" value="y"/>
+</applet>
+#errors
+/applet/style;SUBDOC;text/css
+/applet;no significant content;s
+/applet/param;element not allowed:flow;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<p>xxx</p>
+<style scoped=""/>
+</applet>
+#errors
+/applet/style;SUBDOC;text/css
+/applet/style;element not allowed:flow style;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="abc">
+<param name="x" value="y"/>
+<style/>
+</applet>
+#errors
+/applet/style;SUBDOC;text/css
+/applet;no significant content;s
+/applet/style;element not allowed:flow style;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<param name="x" value="y"/>
+<style scoped=""/>
+</applet>
+</p>
+#errors
+/p/applet/style;SUBDOC;text/css
+/p/applet/style;element not allowed:phrasing;m
+/p/applet;element not defined;m
+/p/applet/@code;attribute not defined;m
+/p/applet;element not allowed:phrasing;m
+/p;no significant content;s
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<param name="x" value="y"/>
+xxxx
+</applet>
+</p>
+#errors
+/p/applet;element not defined;m
+/p/applet/@code;attribute not defined;m
+/p/applet;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</applet>
+</p>
+#errors
+/p/applet/p;element not allowed:phrasing;m
+/p/applet;element not defined;m
+/p/applet/@code;attribute not defined;m
+/p/applet;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</applet>
+</div>
+#errors
+/div/applet;element not defined;m
+/div/applet/@code;attribute not defined;m
+/div/applet;element not allowed:flow;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<p>xxxx</p>
+<param name="x" value="y"/>
+</applet>
+</div>
+#errors
+/div/applet/param;element not allowed:flow;m
+/div/applet;element not defined;m
+/div/applet/@code;attribute not defined;m
+/div/applet;element not allowed:flow;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<applet code="abc">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</applet>
+</applet>
+</div>
+#errors
+/div/applet;element not defined;m
+/div/applet/@code;attribute not defined;m
+/div/applet/applet;element not defined;m
+/div/applet/applet/@code;attribute not defined;m
+/div/applet;element not allowed:flow;m
+/div/applet/applet;element not allowed:flow;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</applet>
+</span>
+#errors
+/span/applet/p;element not allowed:phrasing;m
+/span/applet;element not defined;m
+/span/applet/@code;attribute not defined;m
+/span/applet;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<ins>
+<applet code="abc">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</applet>
+</ins>
+</span>
+#errors
+/span/ins/applet/p;element not allowed:phrasing;m
+/span/ins/applet;element not defined;m
+/span/ins/applet/@code;attribute not defined;m
+/span/ins/applet;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<applet code="abc">
+<param name="x" value="y"/>
+<p>xxxx</p>
+</applet>
+</applet>
+</span>
+#errors
+/span/applet/applet/p;element not allowed:phrasing;m
+/span/applet/applet;element not allowed:phrasing;m
+/span/applet/applet;element not defined;m
+/span/applet/applet/@code;attribute not defined;m
+/span/applet;element not defined;m
+/span/applet/@code;attribute not defined;m
+/span/applet;element not allowed:phrasing;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<applet code="abc">
+<applet code="abc">
+<p>xxxx</p>
+<param name="x" value="y"/>
+</applet>
+</applet>
+</span>
+#errors
+/span/applet/applet/param;element not allowed:phrasing;m
+/span/applet;element not defined;m
+/span/applet/@code;attribute not defined;m
+/span/applet/applet;element not allowed:phrasing;m
+/span/applet/applet;element not defined;m
+/span/applet/applet/@code;attribute not defined;m
+/span/applet;element not allowed:phrasing;m
+/span/applet/applet/p;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><applet code="abc"><p>xx</p></applet></p>
+#errors
+/p/applet/p;element not allowed:phrasing;m
+/p/applet;element not defined;m
+/p/applet/@code;attribute not defined;m
+/p/applet;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><applet code="abc"><style scoped=""></style>xx</applet></p>
+#errors
+/p/applet/style;element not allowed:phrasing;m
+/p/applet/style;SUBDOC;text/css
+/p/applet;element not defined;m
+/p/applet/@code;attribute not defined;m
+/p/applet;element not allowed:phrasing;m
+
+#data
 <video xmlns="http://www.w3.org/1999/xhtml"></video>
 #errors
 /video;no significant content;s

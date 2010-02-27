@@ -2109,13 +2109,6 @@ $Element->{$HTML_NS}->{head} = {
       }
     } elsif ($HTMLMetadataContent->{$child_nsuri}->{$child_ln}) {
       #
-      
-      ## NOTE: |meta| is a metadata content.  However, strictly speaking,
-      ## a |meta| element with none of |charset|, |name|,
-      ## or |http-equiv| attribute is not allowed.  It is non-conforming
-      ## anyway.
-
-      ## TODO: |form| MUST be empty and in XML [WF2].
     } else {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:metadata',
@@ -2150,7 +2143,7 @@ $Element->{$HTML_NS}->{title} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
+    sdaform => sub { }, ## Constant [RFC 1866], but we don't check the value
   }, {
     %HTMLAttrStatus,
     %XHTML2CommonAttrStatus,
@@ -2712,8 +2705,6 @@ $Element->{$HTML_NS}->{style} = {
     },
     media => $HTMLMQAttrChecker,
     scoped => $GetHTMLBooleanAttrChecker->('scoped'),
-    ## NOTE: |title| has special semantics for |style|s, but is syntactically
-    ## not different
   }, {
     %HTMLAttrStatus,
     %XHTML2CommonAttrStatus,
@@ -2801,16 +2792,14 @@ $Element->{$HTML_NS}->{style} = {
     } elsif ($element_state->{style_type} =~ m![+/][Xx][Mm][Ll]\z!) {
       ## NOTE: XML content should be checked by THIS instance of
       ## checker as part of normal tree validation.  However, we don't
-      ## know of any XML-based styling language that can be used in
-      ## HTML <style> element, such that we throw a "style language
+      ## know any XML-based styling language that can be used in HTML
+      ## <style> element at the moment, so it throws a "style language
       ## not supported" error here.
       $self->{onerror}->(node => $item->{node},
                          type => 'XML style lang',
                          text => $element_state->{style_type},
                          level => $self->{level}->{uncertain});
     } else {
-      ## NOTE: Should we raise some kind of error for, say, <style
-      ## type="text/plain">?
       $self->{onsubdoc}->({s => $element_state->{text},
                            container_node => $item->{node},
                            media_type => $element_state->{style_type},
@@ -3047,8 +3036,9 @@ $Element->{$HTML_NS}->{noscript} = {
         my $http_equiv_attr
             = $child_el->get_attribute_node_ns (undef, 'http-equiv');
         if ($http_equiv_attr) {
-          ## TODO: case
-          if (lc $http_equiv_attr->value eq 'content-type') {
+          my $value = $http_equiv_attr->value;
+          $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+          if ($value eq 'content-type') {
             $self->{onerror}->(node => $child_el,
                                type => 'element not allowed:head noscript',
                                level => $self->{level}->{must});
@@ -5515,11 +5505,6 @@ $Element->{$HTML_NS}->{noembed} = {
   status => FEATURE_HTML5_OBSOLETE,
 }; # noembed
 
-## TODO:
-## {applet} FEATURE_HTML5_OBSOLETE
-## class, id, title, alt, archive, code, codebase, height, object, width name style,hspace,vspace(xhtml10)
-## <http://www.w3.org/TR/html4/struct/objects.html#edef-APPLET>
-
 $Element->{$HTML_NS}->{object} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -5589,7 +5574,7 @@ $Element->{$HTML_NS}->{object} = {
     $element_state->{uri_info}->{data}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{classid}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
-    ## TODO: archive
+    $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   ## NOTE: param*, transparent (Flow)
@@ -5637,6 +5622,64 @@ $Element->{$HTML_NS}->{object} = {
 ## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
 ## What about |<section><object data><style scoped></style>x</object></section>|?
 ## |<section><ins></ins><object data><style scoped></style>x</object></section>|?
+
+$Element->{$HTML_NS}->{applet} = {
+  %{$Element->{$HTML_NS}->{object}},
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => sub {
+    my ($self, $item, $element_state) = @_;
+    $GetHTMLAttrsChecker->({
+      align => $GetHTMLEnumeratedAttrChecker->({
+        bottom => 1, middle => 1, top => 1, left => 1, right => 1,
+      }),
+      alt => sub { }, ## CDATA [HTML4] # XXX required
+      archive => $HTMLSpaceURIsAttrChecker, # XXX comma-separated
+          ## TODO: Relative to @codebase
+      code => sub { }, ## CDATA [HTML4]
+      codebase => $HTMLURIAttrChecker,
+          ## XXX more restriction [HTML4]
+      height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), # XXX required
+      hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+      name => sub { }, ## XXX <a name> / <img name>
+      object => sub {
+        # XXX "Authors should use this feature with extreme caution."
+        # [HTML4]
+      },
+      vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+      width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## XXX required
+    }, {
+      %HTMLAttrStatus,
+      align => FEATURE_XHTML10_REC,
+      alt => FEATURE_M12N10_REC_DEPRECATED,
+      archive => FEATURE_M12N10_REC_DEPRECATED,
+      class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+      code => FEATURE_M12N10_REC_DEPRECATED,
+      codebase => FEATURE_M12N10_REC_DEPRECATED,
+      height => FEATURE_M12N10_REC_DEPRECATED,
+      hspace => FEATURE_XHTML10_REC,
+      id => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+      name => FEATURE_M12N10_REC_DEPRECATED,
+      object => FEATURE_M12N10_REC_DEPRECATED,
+      style => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+      title => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+      vspace => FEATURE_XHTML10_REC,
+      width => FEATURE_M12N10_REC_DEPRECATED,
+    })->($self, $item, $element_state);
+    unless ($item->{node}->has_attribute_ns (undef, 'code')) {
+      unless ($item->{node}->has_attribute_ns (undef, 'object')) {
+        $self->{onerror}->(node => $item->{node},
+                           type => 'attribute missing:code|object', # XXX documentation
+                           level => $self->{level}->{must});
+      }
+    }
+
+    $element_state->{uri_info}->{data}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{classid}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
+    $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  },
+}; # applet
 
 $Element->{$HTML_NS}->{param} = {
   %HTMLEmptyChecker,
