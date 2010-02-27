@@ -3774,10 +3774,9 @@ $Element->{$HTML_NS}->{li} = {
       }
 
       unless ($parent_is_ol) {
-        ## ISSUE: No "MUST" in the spec.
         $self->{onerror}->(node => $attr,
                            type => 'non-ol li value',
-                           level => $self->{level}->{html5_fact});
+                           level => $self->{level}->{must});
       }
       
       $HTMLIntegerAttrChecker->($self, $attr);
