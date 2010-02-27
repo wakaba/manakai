@@ -5666,11 +5666,23 @@ $Element->{$HTML_NS}->{applet} = {
   }),
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
+    my $el = $item->{node};
 
-    unless ($item->{node}->has_attribute_ns (undef, 'code')) {
-      unless ($item->{node}->has_attribute_ns (undef, 'object')) {
-        $self->{onerror}->(node => $item->{node},
+    unless ($el->has_attribute_ns (undef, 'code')) {
+      unless ($el->has_attribute_ns (undef, 'object')) {
+        $self->{onerror}->(node => $el,
                            type => 'attribute missing:code|object', # XXX documentation
+                           level => $self->{level}->{must});
+      }
+    }
+    
+    for my $attr_name (qw(width height alt)) {
+      ## |width| and |height| are REQUIRED according to HTML4.
+      ## |alt| is required according to XHTML m12n.
+      unless ($el->has_attribute_ns (undef, $attr_name)) {
+        $self->{onerror}->(node => $el,
+                           type => 'attribute missing',
+                           text => $attr_name,
                            level => $self->{level}->{must});
       }
     }
