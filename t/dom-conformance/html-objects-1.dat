@@ -1670,6 +1670,55 @@ xxxx
 /p/applet;attribute missing;alt;m
 
 #data
+<applet xmlns="http://www.w3.org/1999/xhtml">a</applet>
+#errors
+/applet;element not defined;m
+/applet;attribute missing:code|object;m
+/applet;attribute missing;width;m
+/applet;attribute missing;height;m
+/applet;attribute missing;alt;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" object="aa">a</applet>
+#errors
+/applet;element not defined;m
+/applet;attribute missing;width;m
+/applet;attribute missing;height;m
+/applet;attribute missing;alt;m
+/applet/@object;attribute not defined;m
+/applet/@object;applet object;s
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="a" object="b">a</applet>
+#errors
+/applet;element not defined;m
+/applet;attribute missing;width;m
+/applet;attribute missing;height;m
+/applet;attribute missing;alt;m
+/applet/@code;attribute not defined;m
+/applet/@object;attribute not defined;m
+/applet/@object;applet object;s
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="aa" alt="">a</applet>
+#errors
+/applet;element not defined;m
+/applet;attribute missing;width;m
+/applet;attribute missing;height;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" data="aa" alt="">a</applet>
+#errors
+/applet;element not defined;m
+/applet;attribute missing;width;m
+/applet;attribute missing;height;m
+/applet/@data;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet;attribute missing:code|object;m
+
+#data
 <applet code="a" alt="b" width="1" height="1" hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /applet/@hspace;attribute not defined;m

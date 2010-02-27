@@ -5631,21 +5631,25 @@ $Element->{$HTML_NS}->{applet} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       bottom => 1, middle => 1, top => 1, left => 1, right => 1,
     }),
-    alt => sub { }, ## CDATA [HTML4] # XXX required
+    alt => sub { }, ## CDATA [HTML4]
     archive => $HTMLSpaceURIsAttrChecker, # XXX comma-separated
         ## TODO: Relative to @codebase
     code => sub { }, ## CDATA [HTML4]
     codebase => $HTMLURIAttrChecker,
         ## XXX more restriction [HTML4]
-    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), # XXX required
+    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     name => sub { }, ## XXX <a name> / <img name>
     object => sub {
-      # XXX "Authors should use this feature with extreme caution."
-      # [HTML4]
+      my ($self, $attr) = @_;
+      ## "Authors should use this feature with extreme caution."
+      ## [HTML4]
+      $self->{onerror}->(node => $attr,
+                         type => 'applet object', # XXX documentation
+                         level => $self->{level}->{should});
     },
     vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## XXX required
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
     align => FEATURE_XHTML10_REC,
