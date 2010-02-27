@@ -5474,6 +5474,16 @@ $Element->{$HTML_NS}->{embed} = {
   },
 };
 
+$Element->{$HTML_NS}->{noembed} = {
+  %HTMLTextChecker, # XXX content model restriction
+  status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    #
+  }, {
+    %HTMLAttrStatus,
+  }), # check_attrs
+}; # noembed
+
 ## TODO:
 ## {applet} FEATURE_HTML5_OBSOLETE
 ## class, id, title, alt, archive, code, codebase, height, object, width name style,hspace,vspace(xhtml10)
@@ -8740,7 +8750,6 @@ $Element->{$HTML_NS}->{noframes} = {
   }), # check_attrs
 }; # noframes
 
-## XXX noembed FEATURE_HTML5_OBSOLETE
 ## XXX blink FEATURE_HTML5_OBSOLETE
 ## XXX spacer FEATURE_HTML5_OBSOLETE
 ## XXX marquee FEATURE_HTML5_OBSOLETE onbounce/onfinish/onstart

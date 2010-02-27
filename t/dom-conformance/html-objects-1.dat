@@ -3490,6 +3490,45 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /embed/@align;attribute not defined;m
 
 #data
+<noembed xmlns="http://www.w3.org/1999/xhtml"></noembed>
+#errors
+/noembed;element not defined;m
+
+#data
+<noembed xmlns="http://www.w3.org/1999/xhtml">  </noembed>
+#errors
+/noembed;element not defined;m
+
+#data
+<noembed xmlns="http://www.w3.org/1999/xhtml">abccd</noembed>
+#errors
+/noembed;element not defined;m
+
+#data
+<noembed xmlns="http://www.w3.org/1999/xhtml"><p>abc</p>cd</noembed>
+#errors
+/noembed;element not defined;m
+/noembed/p;element not allowed:text;m
+
+#data
+<noembed xmlns="http://www.w3.org/1999/xhtml"><span>abc</span>cd</noembed>
+#errors
+/noembed;element not defined;m
+/noembed/span;element not allowed:text;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><noembed>aa</noembed></p>
+#errors
+/p/noembed;element not allowed:phrasing;m
+/p/noembed;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><noembed>aa</noembed></div>
+#errors
+/div/noembed;element not allowed:flow;m
+/div/noembed;element not defined;m
+
+#data
 <object xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;attribute missing:data|type;m
