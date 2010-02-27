@@ -5508,61 +5508,62 @@ $Element->{$HTML_NS}->{noembed} = {
 $Element->{$HTML_NS}->{object} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  check_attrs => sub {
+  check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      bottom => 1, middle => 1, top => 1, left => 1, right => 1,
+    }),
+    archive => $HTMLSpaceURIsAttrChecker,
+        ## TODO: Relative to @codebase
+    border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    classid => $HTMLURIAttrChecker,
+    codebase => $HTMLURIAttrChecker,
+    codetype => $MIMETypeChecker,
+        ## TODO: "RECOMMENDED when |classid| is specified" [HTML4]
+    data => $HTMLURIAttrChecker,
+    declare => $GetHTMLBooleanAttrChecker->('declare'),
+        ## NOTE: "The object MUST be instantiated by a subsequent OBJECT ..."
+        ## [HTML4] but we don't know how to test this.
+    form => $HTMLFormAttrChecker,
+    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    name => $HTMLBrowsingContextNameAttrChecker,
+        ## NOTE: |name| attribute of the |object| element defines
+        ## the name of the browsing context created by the element,
+        ## if any, but is also used as the form control name of the
+        ## form control provided by the plugin, if any.
+    standby => sub {}, ## NOTE: %Text; in HTML4
+    type => $MIMETypeChecker,
+    usemap => $HTMLUsemapAttrChecker,
+    vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  }, {
+    %HTMLAttrStatus,
+    %HTMLM12NXHTML2CommonAttrStatus,
+    align => FEATURE_HTML5_OBSOLETE,
+    archive => FEATURE_HTML5_OBSOLETE,
+    border => FEATURE_HTML5_OBSOLETE,
+    classid => FEATURE_HTML5_OBSOLETE,
+    code => FEATURE_HTML5_OBSOLETE,
+    codebase => FEATURE_HTML5_OBSOLETE,
+    codetype => FEATURE_HTML5_OBSOLETE,
+    'content-length' => FEATURE_XHTML2_ED,
+    data => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    declare => FEATURE_HTML5_OBSOLETE,
+    form => FEATURE_HTML5_LC,
+    height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    hspace => FEATURE_HTML5_OBSOLETE,
+    lang => FEATURE_HTML5_REC,
+    name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    standby => FEATURE_HTML5_OBSOLETE,
+    tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    usemap => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    vspace => FEATURE_HTML5_OBSOLETE,
+    width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+  }),
+  check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
-    $GetHTMLAttrsChecker->({
-      align => $GetHTMLEnumeratedAttrChecker->({
-        bottom => 1, middle => 1, top => 1, left => 1, right => 1,
-      }),
-      archive => $HTMLSpaceURIsAttrChecker,
-          ## TODO: Relative to @codebase
-      border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      classid => $HTMLURIAttrChecker,
-      codebase => $HTMLURIAttrChecker,
-      codetype => $MIMETypeChecker,
-          ## TODO: "RECOMMENDED when |classid| is specified" [HTML4]
-      data => $HTMLURIAttrChecker,
-      declare => $GetHTMLBooleanAttrChecker->('declare'),
-          ## NOTE: "The object MUST be instantiated by a subsequent OBJECT ..."
-          ## [HTML4] but we don't know how to test this.
-      form => $HTMLFormAttrChecker,
-      height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      name => $HTMLBrowsingContextNameAttrChecker,
-          ## NOTE: |name| attribute of the |object| element defines
-          ## the name of the browsing context created by the element,
-          ## if any, but is also used as the form control name of the
-          ## form control provided by the plugin, if any.
-      standby => sub {}, ## NOTE: %Text; in HTML4
-      type => $MIMETypeChecker,
-      usemap => $HTMLUsemapAttrChecker,
-      vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    }, {
-      %HTMLAttrStatus,
-      %HTMLM12NXHTML2CommonAttrStatus,
-      align => FEATURE_HTML5_OBSOLETE,
-      archive => FEATURE_HTML5_OBSOLETE,
-      border => FEATURE_HTML5_OBSOLETE,
-      classid => FEATURE_HTML5_OBSOLETE,
-      code => FEATURE_HTML5_OBSOLETE,
-      codebase => FEATURE_HTML5_OBSOLETE,
-      codetype => FEATURE_HTML5_OBSOLETE,
-      'content-length' => FEATURE_XHTML2_ED,
-      data => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-      declare => FEATURE_HTML5_OBSOLETE,
-      form => FEATURE_HTML5_LC,
-      height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      hspace => FEATURE_HTML5_OBSOLETE,
-      lang => FEATURE_HTML5_REC,
-      name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-      standby => FEATURE_HTML5_OBSOLETE,
-      tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-      usemap => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      vspace => FEATURE_HTML5_OBSOLETE,
-      width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    })->($self, $item, $element_state);
+
     unless ($item->{node}->has_attribute_ns (undef, 'data')) {
       unless ($item->{node}->has_attribute_ns (undef, 'type')) {
         $self->{onerror}->(node => $item->{node},
@@ -5576,7 +5577,7 @@ $Element->{$HTML_NS}->{object} = {
     $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-  },
+  }, # check_attrs2
   ## NOTE: param*, transparent (Flow)
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -5618,7 +5619,7 @@ $Element->{$HTML_NS}->{object} = {
                          type => 'no significant content');
     }
   },
-};
+}; # object
 ## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
 ## What about |<section><object data><style scoped></style>x</object></section>|?
 ## |<section><ins></ins><object data><style scoped></style>x</object></section>|?
@@ -5626,45 +5627,46 @@ $Element->{$HTML_NS}->{object} = {
 $Element->{$HTML_NS}->{applet} = {
   %{$Element->{$HTML_NS}->{object}},
   status => FEATURE_HTML5_OBSOLETE,
-  check_attrs => sub {
+  check_attrs => $GetHTMLAttrsChecker->({
+    align => $GetHTMLEnumeratedAttrChecker->({
+      bottom => 1, middle => 1, top => 1, left => 1, right => 1,
+    }),
+    alt => sub { }, ## CDATA [HTML4] # XXX required
+    archive => $HTMLSpaceURIsAttrChecker, # XXX comma-separated
+        ## TODO: Relative to @codebase
+    code => sub { }, ## CDATA [HTML4]
+    codebase => $HTMLURIAttrChecker,
+        ## XXX more restriction [HTML4]
+    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), # XXX required
+    hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    name => sub { }, ## XXX <a name> / <img name>
+    object => sub {
+      # XXX "Authors should use this feature with extreme caution."
+      # [HTML4]
+    },
+    vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## XXX required
+  }, {
+    %HTMLAttrStatus,
+    align => FEATURE_XHTML10_REC,
+    alt => FEATURE_M12N10_REC_DEPRECATED,
+    archive => FEATURE_M12N10_REC_DEPRECATED,
+    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    code => FEATURE_M12N10_REC_DEPRECATED,
+    codebase => FEATURE_M12N10_REC_DEPRECATED,
+    height => FEATURE_M12N10_REC_DEPRECATED,
+    hspace => FEATURE_XHTML10_REC,
+    id => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    name => FEATURE_M12N10_REC_DEPRECATED,
+    object => FEATURE_M12N10_REC_DEPRECATED,
+    style => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    title => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    vspace => FEATURE_XHTML10_REC,
+    width => FEATURE_M12N10_REC_DEPRECATED,
+  }),
+  check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
-    $GetHTMLAttrsChecker->({
-      align => $GetHTMLEnumeratedAttrChecker->({
-        bottom => 1, middle => 1, top => 1, left => 1, right => 1,
-      }),
-      alt => sub { }, ## CDATA [HTML4] # XXX required
-      archive => $HTMLSpaceURIsAttrChecker, # XXX comma-separated
-          ## TODO: Relative to @codebase
-      code => sub { }, ## CDATA [HTML4]
-      codebase => $HTMLURIAttrChecker,
-          ## XXX more restriction [HTML4]
-      height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), # XXX required
-      hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      name => sub { }, ## XXX <a name> / <img name>
-      object => sub {
-        # XXX "Authors should use this feature with extreme caution."
-        # [HTML4]
-      },
-      vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## XXX required
-    }, {
-      %HTMLAttrStatus,
-      align => FEATURE_XHTML10_REC,
-      alt => FEATURE_M12N10_REC_DEPRECATED,
-      archive => FEATURE_M12N10_REC_DEPRECATED,
-      class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      code => FEATURE_M12N10_REC_DEPRECATED,
-      codebase => FEATURE_M12N10_REC_DEPRECATED,
-      height => FEATURE_M12N10_REC_DEPRECATED,
-      hspace => FEATURE_XHTML10_REC,
-      id => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      name => FEATURE_M12N10_REC_DEPRECATED,
-      object => FEATURE_M12N10_REC_DEPRECATED,
-      style => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      title => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      vspace => FEATURE_XHTML10_REC,
-      width => FEATURE_M12N10_REC_DEPRECATED,
-    })->($self, $item, $element_state);
+
     unless ($item->{node}->has_attribute_ns (undef, 'code')) {
       unless ($item->{node}->has_attribute_ns (undef, 'object')) {
         $self->{onerror}->(node => $item->{node},
@@ -5678,30 +5680,30 @@ $Element->{$HTML_NS}->{applet} = {
     $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-  },
+  }, # check_attrs2
 }; # applet
 
 $Element->{$HTML_NS}->{param} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => sub {
+  check_attrs => $GetHTMLAttrsChecker->({
+    name => sub { },
+    type => $MIMETypeChecker,
+    value => sub { },
+    valuetype => $GetHTMLEnumeratedAttrChecker->({
+      data => 1, ref => 1, object => 1,
+    }),
+  }, {
+    %HTMLAttrStatus,
+    href => FEATURE_RDFA_REC,
+    id => FEATURE_HTML5_REC,
+    name => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+    type => FEATURE_HTML5_OBSOLETE,
+    value => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+    valuetype => FEATURE_HTML5_OBSOLETE,
+  }), # check_attrs
+  check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
-    $GetHTMLAttrsChecker->({
-      name => sub { },
-      type => $MIMETypeChecker,
-      value => sub { },
-      valuetype => $GetHTMLEnumeratedAttrChecker->({
-        data => 1, ref => 1, object => 1,
-      }),
-    }, {
-      %HTMLAttrStatus,
-      href => FEATURE_RDFA_REC,
-      id => FEATURE_HTML5_REC,
-      name => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      type => FEATURE_HTML5_OBSOLETE,
-      value => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      valuetype => FEATURE_HTML5_OBSOLETE,
-    })->(@_);
     unless ($item->{node}->has_attribute_ns (undef, 'name')) {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing',
@@ -5714,8 +5716,8 @@ $Element->{$HTML_NS}->{param} = {
                          text => 'value',
                          level => $self->{level}->{must});
     }
-  },
-};
+  }, # check_attrs2
+}; # param
 
 $Element->{$HTML_NS}->{video} = {
   %HTMLTransparentChecker,
