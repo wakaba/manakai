@@ -4072,10 +4072,44 @@ $Element->{$HTML_NS}->{div6} = $Element->{$HTML_NS}->{div1};
 $Element->{$HTML_NS}->{marquee} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_OBSOLETE,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    behavior => $GetHTMLEnumeratedAttrChecker->({
+      scroll => -1, slide => -1, alternate => -1,
+    }),
+    bgcolor => $HTMLColorAttrChecker,
+    direction => $GetHTMLEnumeratedAttrChecker->({
+      left => -1, right => -1, up => -1, down => -1,
+    }),
+    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    loop => $HTMLIntegerAttrChecker,
+    onbounce => $HTMLEventHandlerAttrChecker,
+    onfinish => $HTMLEventHandlerAttrChecker,
+    onstart => $HTMLEventHandlerAttrChecker,
+    scrollamount => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    scrolldelay => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    truespeed => $GetHTMLEnumeratedAttrChecker->({
+      true => -1, false => -1,
+    }),
+    vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  }, {
     %HTMLAttrStatus,
-    # XXX attributes, onbounce/onfinish/onstart
-  }),
+    behavior => FEATURE_HTML5_OBSOLETE,
+    #bgcolor
+    direction => FEATURE_HTML5_OBSOLETE,
+    #height
+    #hspace
+    #loop
+    onbounce => FEATURE_HTML5_OBSOLETE,
+    onfinish => FEATURE_HTML5_OBSOLETE,
+    onstart => FEATURE_HTML5_OBSOLETE,
+    #scrollamount
+    #scrolldelay
+    truespeed => FEATURE_HTML5_OBSOLETE,
+    #vspace
+    #width
+  }), # check_attrs
 }; # marquee
 
 $Element->{$HTML_NS}->{multicol} = {

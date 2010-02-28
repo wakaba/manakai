@@ -3137,6 +3137,460 @@ aaa
 /b/marquee;element not allowed:phrasing;m
 
 #data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@bgcolor;attribute not defined;m
+/marquee/@bgcolor;color:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="yellow">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@bgcolor;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="scroll">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="slide">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="alternate">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="none">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:invalid;m
+
+#data escaped
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="sl\u0130de">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="sl\u0131de">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="ALTERNATE">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behavior="alternate ">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behavior;attribute not defined;m
+/marquee/@behavior;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    behaviour="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@behaviour;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    bahavior="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@bahavior;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="left">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="right">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="up">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="down">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="UP">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="yes">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction=" up">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="center">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:invalid;m
+
+#data escaped
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="r\u0130ght">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    direction="r\u0131ght">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@direction;attribute not defined;m
+/marquee/@direction;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    height="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@height;attribute not defined;m
+/marquee/@height;nninteger:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    height="123">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@height;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    height="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@height;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    hspace="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@hspace;attribute not defined;m
+/marquee/@hspace;nninteger:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    hspace="123">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@hspace;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    hspace="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@hspace;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    width="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@width;attribute not defined;m
+/marquee/@width;nninteger:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    width="123">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@width;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    width="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@width;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    vspace="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@vspace;attribute not defined;m
+/marquee/@vspace;nninteger:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    vspace="123">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@vspace;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    vspace="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@vspace;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    loop="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@loop;attribute not defined;m
+/marquee/@loop;integer:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    loop="123">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@loop;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    loop="-123">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@loop;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    loop="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@loop;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    scrollamount="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@scrollamount;attribute not defined;m
+/marquee/@scrollamount;nninteger:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    scrollamount="123">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@scrollamount;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    scrollamount="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@scrollamount;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    scrolldelay="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@scrolldelay;attribute not defined;m
+/marquee/@scrolldelay;nninteger:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    scrolldelay="123">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@scrolldelay;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    scrolldelay="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@scrolldelay;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="true">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="false">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="yes">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="no">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="on">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="off">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="true ">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="truespeed">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:invalid;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    truespeed="TruE">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@truespeed;attribute not defined;m
+/marquee/@truespeed;enumerated:non-conforming;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    onbounce="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@onbounce;attribute not defined;m
+/marquee/@onbounce;event handler;u
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    onfinish="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@onfinish;attribute not defined;m
+/marquee/@onfinish;event handler;u
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    onstart="">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@onstart;attribute not defined;m
+/marquee/@onstart;event handler;u
+
+#data
 <multicol  xmlns="http://www.w3.org/1999/xhtml"></multicol>
 #errors
 /multicol;element not defined;m
