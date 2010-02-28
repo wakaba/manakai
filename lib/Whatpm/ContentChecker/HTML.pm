@@ -633,14 +633,18 @@ my $GetHTMLNonNegativeIntegerAttrChecker = sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
     if ($value =~ /\A[0-9]+\z/) {
-      unless ($range_check->($value + 0)) {
+      if ($range_check->($value + 0)) {
+        return 1;
+      } else {
         $self->{onerror}->(node => $attr, type => 'nninteger:out of range',
                            level => $self->{level}->{must});
+        return 0;
       }
     } else {
       $self->{onerror}->(node => $attr,
                          type => 'nninteger:syntax error',
                          level => $self->{level}->{must});
+      return 0;
     }
   };
 }; # $GetHTMLNonNegativeIntegerAttrChecker
@@ -5297,7 +5301,25 @@ $Element->{$HTML_NS}->{img} = {
         bottom => 1, middle => 1, top => 1, left => 1, right => 1,
       }),
       alt => sub { }, ## NOTE: No syntactical requirement
-      border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+      border => sub {
+        my ($self, $attr) = @_;
+
+        my $value = $attr->value;
+        if ($value eq '0') {
+          $self->{onerror}->(node => $attr,
+                             type => 'img border:0', # XXXdocumentation
+                             level => $self->{level}->{obsconforming});
+        } else {
+          if ($GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_)) {
+            ## A non-negative integer.
+            $self->{onerror}->(node => $attr,
+                               type => 'img border:nninteger', # XXX documentation
+                               level => $self->{level}->{must});
+          } else {
+            ## Not a non-negative integer.
+          }
+        }
+      }, # border
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
       hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -5321,7 +5343,7 @@ $Element->{$HTML_NS}->{img} = {
       %HTMLM12NXHTML2CommonAttrStatus,
       align => FEATURE_HTML5_OBSOLETE,
       alt => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      border => FEATURE_HTML5_OBSOLETE,
+      border => FEATURE_HTML5_LC,
       height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
       hspace => FEATURE_HTML5_OBSOLETE,
       ismap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
