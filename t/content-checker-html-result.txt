@@ -1,7 +1,7 @@
 1..4464
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Feb 28 12:17:21 2010
-# Current time GMT:   Sun Feb 28 03:17:21 2010
+# Current time local: Sun Feb 28 12:46:06 2010
+# Current time GMT:   Sun Feb 28 03:46:06 2010
 # Using Test.pm version 1.25_02
 # ../t/content-model-1.dat
 ok 1
@@ -7037,7 +7037,6 @@ ok 6855
 ok 6856
 ok 6857
 ok 6858
-# ../t/dom-conformance/html-repetitions.dat
 ok 6859
 ok 6860
 ok 6861
@@ -7047,6 +7046,7 @@ ok 6864
 ok 6865
 ok 6866
 ok 6867
+# ../t/dom-conformance/html-repetitions.dat
 ok 6868
 ok 6869
 ok 6870
@@ -7099,7 +7099,6 @@ ok 6916
 ok 6917
 ok 6918
 ok 6919
-# ../t/dom-conformance/html-datatemplate.dat
 ok 6920
 ok 6921
 ok 6922
@@ -7109,6 +7108,7 @@ ok 6925
 ok 6926
 ok 6927
 ok 6928
+# ../t/dom-conformance/html-datatemplate.dat
 ok 6929
 ok 6930
 ok 6931
@@ -7208,9 +7208,7 @@ ok 7024
 ok 7025
 ok 7026
 ok 7027
-not ok 7028
-# Test 7028 got: "/rule/rb/nest;element not defined;m\n/rule/rb;element not defined;m\n/rule/rb;no significant content;s\n/rule;element not defined;m" (content-checker-test-ok at line 2 fail #7028)
-#      Expected: "/rule/rb/nest;element not defined;m\n/rule/rb;element not defined;m\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><rb><nest/></rb></rule>)
+ok 7028
 ok 7029
 ok 7030
 ok 7031
@@ -7219,7 +7217,9 @@ ok 7033
 ok 7034
 ok 7035
 ok 7036
-ok 7037
+not ok 7037
+# Test 7037 got: "/rule/rb/nest;element not defined;m\n/rule/rb;element not defined;m\n/rule/rb;no significant content;s\n/rule;element not defined;m" (content-checker-test-ok at line 2 fail #7037)
+#      Expected: "/rule/rb/nest;element not defined;m\n/rule/rb;element not defined;m\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><rb><nest/></rb></rule>)
 ok 7038
 ok 7039
 ok 7040
@@ -7241,11 +7241,7 @@ ok 7055
 ok 7056
 ok 7057
 ok 7058
-not ok 7059
-# Test 7059 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (content-checker-test-ok at line 2 fail #7059)
-#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
-#      Line 1 is missing:
-#       - "/rule/footer/h1;element not allowed:minus;m\n"
+ok 7059
 ok 7060
 ok 7061
 ok 7062
@@ -7254,7 +7250,11 @@ ok 7064
 ok 7065
 ok 7066
 ok 7067
-ok 7068
+not ok 7068
+# Test 7068 got: "/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (content-checker-test-ok at line 2 fail #7068)
+#      Expected: "/rule/footer/h1;element not allowed:minus;m\n/rule/footer/h1;no significant content;s\n/rule/footer/nest;element not defined;m\n/rule/footer;no significant content;s\n/rule;element not defined;m" (<rule xmlns="http://www.w3.org/1999/xhtml"><footer><nest/><h1/></footer></rule>)
+#      Line 1 is missing:
+#       - "/rule/footer/h1;element not allowed:minus;m\n"
 ok 7069
 ok 7070
 ok 7071
@@ -7435,7 +7435,6 @@ ok 7245
 ok 7246
 ok 7247
 ok 7248
-# ../t/dom-conformance/html-frames.dat
 ok 7249
 ok 7250
 ok 7251
@@ -7445,6 +7444,7 @@ ok 7254
 ok 7255
 ok 7256
 ok 7257
+# ../t/dom-conformance/html-frames.dat
 ok 7258
 ok 7259
 ok 7260
@@ -7585,3 +7585,12 @@ ok 7394
 ok 7395
 ok 7396
 ok 7397
+ok 7398
+ok 7399
+ok 7400
+ok 7401
+ok 7402
+ok 7403
+ok 7404
+ok 7405
+ok 7406

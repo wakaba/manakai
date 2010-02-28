@@ -2846,7 +2846,7 @@ $Element->{$HTML_NS}->{script} = {
     },
     event => sub { }, ## Reserved in HTML4 without no restriction.
     for => $HTMLURIAttrChecker, ## Reserved in HTML4
-    language => sub {}, ## NOTE: No syntax constraint according to HTML4.
+    language => sub {},
     src => $HTMLURIAttrChecker, ## TODO: pointed resource MUST be in type of type="" (resource error)
     type => sub {
       my ($self, $attr) = @_;
@@ -2869,17 +2869,15 @@ $Element->{$HTML_NS}->{script} = {
     for => FEATURE_HTML5_OBSOLETE,
     href => FEATURE_RDFA_REC,
     id => FEATURE_HTML5_REC,
-    language => FEATURE_HTML5_OBSOLETE, # XXX allowed in some cases
+    language => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
   }),
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
-
     my $el = $item->{node};
-    my $has_src = $el->has_attribute_ns (undef, 'src');
-
-    unless ($has_src) {
+    
+    unless ($el->has_attribute_ns (undef, 'src')) {
       my $charset_attr = $el->get_attribute_node_ns (undef, 'charset');
       if ($charset_attr) {
         $self->{onerror}->(type => 'attribute not allowed',
@@ -2891,6 +2889,29 @@ $Element->{$HTML_NS}->{script} = {
         $self->{onerror}->(node => $el,
                            type => 'attribute missing',
                            text => 'src',
+                           level => $self->{level}->{must});
+      }
+    }
+
+    my $lang_attr = $el->get_attribute_node_ns (undef, 'language');
+    if ($lang_attr) {
+      my $lang = $lang_attr->value;
+      $lang =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+      if ($lang eq 'javascript') {
+        my $type = $el->get_attribute_ns (undef, 'type');
+        $type =~ tr/A-Z/a-z/ if defined $type; ## ASCII case-insensitive.
+        if (not defined $type or $type eq 'text/javascript') {
+          $self->{onerror}->(node => $lang_attr,
+                             type => 'script language', # XXXdocumentatoion
+                             level => $self->{level}->{obsconforming});
+        } else {
+          $self->{onerror}->(node => $lang_attr,
+                             type => 'script language:ne type', # XXXdocmentation
+                             level => $self->{level}->{must});
+        }
+      } else {
+        $self->{onerror}->(node => $lang_attr,
+                           type => 'script language:not js', # XXXdocmentation
                            level => $self->{level}->{must});
       }
     }

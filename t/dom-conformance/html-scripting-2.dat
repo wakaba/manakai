@@ -238,7 +238,7 @@
 #data
 <script language="javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@language;attribute not defined;m
+/script/@language;script language;s
 /script;SUBDOC;text/javascript
 
 #data
@@ -262,32 +262,88 @@
 #data
 <script language="JavaScript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@language;attribute not defined;m
+/script/@language;script language;s
 /script;SUBDOC;text/javascript
 
 #data
 <script language="jscript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@language;attribute not defined;m
+/script/@language;script language:not js;m
 /script;SUBDOC;text/jscript
 
 #data
 <script language="javascript1.2" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@language;attribute not defined;m
+/script/@language;script language:not js;m
 /script;SUBDOC;text/javascript1.2
 
 #data
 <script language="vbscript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@language;attribute not defined;m
+/script/@language;script language:not js;m
 /script;SUBDOC;text/vbscript
 
 #data
 <script language="XML" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@language;attribute not defined;m
+/script/@language;script language:not js;m
 /script;XML script lang;text/xml;u
+
+#data
+<script langage="javascript" type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@langage;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script langage="JavaScript" type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@langage;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script language="javascript" type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;script language;s
+/script;SUBDOC;text/javascript
+
+#data
+<script language="JavaScript" type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;script language;s
+/script;SUBDOC;text/javascript
+
+#data
+<script language="javascript" type="TEXt/javaScript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;script language;s
+/script;SUBDOC;text/javascript
+
+#data
+<script language="java script" type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;script language:not js;m
+/script;SUBDOC;text/javascript
+
+#data
+<script language="javascript" type="text/vbscript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;script language:ne type;m
+/script;SUBDOC;text/vbscript
+/script/@type;IMT:unknown subtype;u
+
+#data
+<script language="jscript" type="text/vbscript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;script language:not js;m
+/script;SUBDOC;text/vbscript
+/script/@type;IMT:unknown subtype;u
+
+#data
+<script language="jscript" type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@language;script language:not js;m
+/script;SUBDOC;text/javascript
 
 #data
 <script charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
