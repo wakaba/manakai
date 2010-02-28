@@ -6353,7 +6353,12 @@ $Element->{$HTML_NS}->{table} = {
     rules => $GetHTMLEnumeratedAttrChecker->({
       none => 1, groups => 1, rows => 1, cols => 1, all => 1,
     }),
-    summary => sub { }, ## %Text; [HTML4]
+    summary => sub {
+      my ($self, $attr) = @_;
+      $self->{onerror}->(node => $attr,
+                         type => 'table summary', # XXX documentatin
+                         level => $self->{level}->{obsconforming});
+    },
     width => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -6368,7 +6373,7 @@ $Element->{$HTML_NS}->{table} = {
     frame => FEATURE_HTML5_OBSOLETE,
     lang => FEATURE_HTML5_REC,
     rules => FEATURE_HTML5_OBSOLETE,
-    summary => FEATURE_M12N10_REC,
+    summary => FEATURE_HTML5_LC,
     width => FEATURE_HTML5_OBSOLETE,
   }),
   check_start => sub {
