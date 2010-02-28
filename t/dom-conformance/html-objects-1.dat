@@ -2109,6 +2109,22 @@ xxxx
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
+  <span xml:id="abc">aa</span>
+  <applet src="" alt="a" name="abc">a</applet>
+</div>
+#errors
+/div/applet/@name;id name confliction;m
+/div/applet/@name;attribute not defined;m
+/div/applet/@src;attribute not defined;m
+/div/applet/@alt;attribute not defined;m
+/div/applet;attribute missing:code|object;m
+/div/applet;attribute missing;height;m
+/div/applet;attribute missing;width;m
+/div/applet;element not allowed:flow;m
+/div/applet;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
   <applet src="" alt="a" name="abc">a</applet>
   <span id="abc">aa</span>
 </div>
@@ -2116,6 +2132,101 @@ xxxx
 /div/applet/@name;attribute not defined;m
 /div/applet/@name;anchor name;s
 /div/span/@id;id name confliction;m
+/div/applet/@src;attribute not defined;m
+/div/applet/@alt;attribute not defined;m
+/div/applet;attribute missing:code|object;m
+/div/applet;attribute missing;height;m
+/div/applet;attribute missing;width;m
+/div/applet;element not allowed:flow;m
+/div/applet;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <applet src="" alt="a" name="abc">a</applet>
+  <span xml:id="abc">aa</span>
+</div>
+#errors
+/div/applet/@name;attribute not defined;m
+/div/applet/@name;anchor name;s
+/div/span/@id;id name confliction;m
+/div/applet/@src;attribute not defined;m
+/div/applet/@alt;attribute not defined;m
+/div/applet;attribute missing:code|object;m
+/div/applet;attribute missing;height;m
+/div/applet;attribute missing;width;m
+/div/applet;element not allowed:flow;m
+/div/applet;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <applet src="" alt="a" name="abc" id="abd">a</applet>
+</div>
+#errors
+/div/applet/@name;attribute not defined;m
+/div/applet/@name;anchor name;s
+/div/applet/@src;attribute not defined;m
+/div/applet/@alt;attribute not defined;m
+/div/applet;attribute missing:code|object;m
+/div/applet;attribute missing;height;m
+/div/applet;attribute missing;width;m
+/div/applet;element not allowed:flow;m
+/div/applet;element not defined;m
+/div/applet/@name;id name mismatch;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <applet src="" alt="a" name="abc" xml:id="abd">a</applet>
+</div>
+#errors
+/div/applet/@name;attribute not defined;m
+/div/applet/@name;anchor name;s
+/div/applet/@src;attribute not defined;m
+/div/applet/@alt;attribute not defined;m
+/div/applet;attribute missing:code|object;m
+/div/applet;attribute missing;height;m
+/div/applet;attribute missing;width;m
+/div/applet;element not allowed:flow;m
+/div/applet;element not defined;m
+/div/applet/@name;id name mismatch;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <applet src="" alt="a" name="abc" xml:id="abd" id="abe">a</applet>
+</div>
+#errors
+/div/applet/@name;attribute not defined;m
+/div/applet/@name;anchor name;s
+/div/applet/@src;attribute not defined;m
+/div/applet/@alt;attribute not defined;m
+/div/applet;attribute missing:code|object;m
+/div/applet;attribute missing;height;m
+/div/applet;attribute missing;width;m
+/div/applet;element not allowed:flow;m
+/div/applet;element not defined;m
+/div/applet/@name;id name mismatch;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <applet src="" alt="a" name="abc" xml:id="abd" id="abc">a</applet>
+</div>
+#errors
+/div/applet/@name;attribute not defined;m
+/div/applet/@name;anchor name;s
+/div/applet/@src;attribute not defined;m
+/div/applet/@alt;attribute not defined;m
+/div/applet;attribute missing:code|object;m
+/div/applet;attribute missing;height;m
+/div/applet;attribute missing;width;m
+/div/applet;element not allowed:flow;m
+/div/applet;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <applet src="" alt="a" name="abc" xml:id="abc" id="abd">a</applet>
+</div>
+#errors
+/div/applet/@name;attribute not defined;m
+/div/applet/@name;anchor name;s
 /div/applet/@src;attribute not defined;m
 /div/applet/@alt;attribute not defined;m
 /div/applet;attribute missing:code|object;m
@@ -3649,6 +3760,15 @@ aa<map name="x">b<map name="y">bb</map></map>
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
+  <span xml:id="abc">aa</span>
+  <img src="" alt="a" name="abc"/>
+</div>
+#errors
+/div/img/@name;id name confliction;m
+/div/img/@name;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
   <img src="" alt="a" name="abc"/>
   <span id="abc">aa</span>
 </div>
@@ -3656,6 +3776,59 @@ aa<map name="x">b<map name="y">bb</map></map>
 /div/img/@name;attribute not defined;m
 /div/img/@name;anchor name;s
 /div/span/@id;id name confliction;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc"/>
+  <span xml:id="abc">aa</span>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;anchor name;s
+/div/span/@id;id name confliction;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" id="abd"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;anchor name;s
+/div/img/@name;id name mismatch;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" id="abd" xml:id="abe"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;anchor name;s
+/div/img/@name;id name mismatch;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" id="abd" xml:id="abc"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;anchor name;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" id="abc" xml:id="abd"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;anchor name;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" xml:id="abd"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;anchor name;s
+/div/img/@name;id name mismatch;m
 
 #data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>

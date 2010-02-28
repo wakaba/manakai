@@ -1223,8 +1223,9 @@ my $HTMLAttrChecker = {
         $self->{onerror}->(node => $attr, type => 'duplicate ID',
                            level => $self->{level}->{must});
         push @{$self->{id}->{$value}}, $attr;
-      } elsif ($self->{name}->{$value}) {
-        $self->{onerror}->(node => $attr,
+      } elsif ($self->{name}->{$value} and
+               $self->{name}->{$value}->[-1]->owner_element ne $item->{node}) {
+       $self->{onerror}->(node => $attr,
                            type => 'id name confliction', # XXXdocumentation
                            value => $value,
                            level => $self->{level}->{must});
@@ -1234,6 +1235,8 @@ my $HTMLAttrChecker = {
         $self->{id}->{$value} = [$attr];
         $self->{id_type}->{$value} = $element_state->{id_type} || '';
       }
+      push @{$element_state->{element_ids} ||= []}, $value;
+
       if ($value =~ /[\x09\x0A\x0C\x0D\x20]/) {
         $self->{onerror}->(node => $attr, type => 'space in ID',
                            level => $self->{level}->{must});
@@ -1653,7 +1656,7 @@ my $HTMLDatasetAttrChecker = sub {
 
 my $HTMLDatasetAttrStatus = FEATURE_HTML5_LC;
 
-my $NameChecker = sub {
+my $NameAttrChecker = sub {
   my ($self, $attr, $item, $element_state) = @_;
   my $value = $attr->value;
   if ($value eq '') {
@@ -1666,7 +1669,8 @@ my $NameChecker = sub {
                          type => 'duplicate anchor name', # XXXdocumentation
                          value => $value,
                          level => $self->{level}->{must});
-    } elsif ($self->{id}->{$value}) {
+    } elsif ($self->{id}->{$value} and
+             $self->{id}->{$value}->[-1]->owner_element ne $item->{node}) {
       $self->{onerror}->(node => $attr,
                          type => 'id name confliction', # XXXdocumentation
                          value => $value,
@@ -1680,7 +1684,28 @@ my $NameChecker = sub {
     push @{$self->{name}->{$value} ||= []}, $attr;
     $element_state->{element_name} = $value;
   }
-}; # $NameChecker
+}; # $NameAttrChecker
+
+my $NameAttrCheckEnd = sub {
+  my ($self, $item, $element_state) = @_;
+  if (defined $element_state->{element_name}) {
+    my $has_id;
+    
+    for my $id (@{$element_state->{element_ids} or []}) {
+      if ($id eq $element_state->{element_name}) {
+        undef $has_id;
+        last;
+      }
+      $has_id = 1;
+    }
+
+    if ($has_id) {
+      $self->{onerror}->(node => $item->{node}->get_attribute_node_ns (undef, 'name'),
+                         type => 'id name mismatch', # XXXdocumentation
+                         level => $self->{level}->{must});
+    }
+  }
+}; # $NameAttrCheckEnd
 
 my $ShapeCoordsChecker = sub ($$$$) {
   my ($self, $item, $attrs, $shape) = @_;
@@ -4138,7 +4163,7 @@ $Element->{$HTML_NS}->{a} = {
           hreflang => $HTMLLanguageTagAttrChecker,
           media => $HTMLMQAttrChecker,
           methods => sub { }, ## Space-separated values [HTML 2.0]
-          name => $NameChecker,
+          name => $NameAttrChecker,
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
           rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
@@ -4215,6 +4240,7 @@ $Element->{$HTML_NS}->{a} = {
     delete $self->{flag}->{in_a_href}
         unless $element_state->{in_a_href_original};
 
+    $NameAttrCheckEnd->(@_);
     $HTMLTransparentChecker{check_end}->(@_);
   },
 };
@@ -5394,7 +5420,7 @@ $Element->{$HTML_NS}->{img} = {
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
       longdesc => $HTMLURIAttrChecker,
-      name => $NameChecker,
+      name => $NameAttrChecker,
       height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
@@ -5438,8 +5464,14 @@ $Element->{$HTML_NS}->{img} = {
     $element_state->{uri_info}->{lowsrc}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{dynsrc}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{longdesc}->{type}->{cite} = 1;
-  },
-};
+  }, # check_attrs
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    
+    $NameAttrCheckEnd->(@_);
+    $HTMLEmptyChecker{check_end}->(@_);
+  }, # check_end
+}; # img
 
 $Element->{$HTML_NS}->{iframe} = {
   %HTMLTextChecker, # XXX content model restriction
@@ -5704,6 +5736,8 @@ $Element->{$HTML_NS}->{object} = {
                          level => $self->{level}->{should},
                          type => 'no significant content');
     }
+    
+    $NameAttrCheckEnd->(@_); # for <img name>
   },
 }; # object
 ## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
@@ -5725,7 +5759,7 @@ $Element->{$HTML_NS}->{applet} = {
         ## XXX more restriction [HTML4]
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    name => $NameChecker,
+    name => $NameAttrChecker,
     object => sub {
       my ($self, $attr) = @_;
       ## "Authors should use this feature with extreme caution."

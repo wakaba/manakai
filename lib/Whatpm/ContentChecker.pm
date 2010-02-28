@@ -158,7 +158,8 @@ our $AttrChecker = {
                            type => 'duplicate ID',
                            level => $self->{level}->{xml_id_error});
         push @{$self->{id}->{$value}}, $attr;
-      } elsif ($self->{name}->{$value}) {
+      } elsif ($self->{name}->{$value} and
+               $self->{name}->{$value}->[-1]->owner_element ne $item->{node}) {
         $self->{onerror}->(node => $attr,
                            type => 'id name confliction', # XXXdocumentation
                            value => $value,
@@ -169,6 +170,7 @@ our $AttrChecker = {
         $self->{id}->{$value} = [$attr];
         $self->{id_type}->{$value} = $element_state->{id_type} || '';
       }
+      push @{$element_state->{element_ids} ||= []}, $value;
     },
   },
   $XMLNS_NS => {
