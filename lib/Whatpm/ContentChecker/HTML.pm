@@ -2839,12 +2839,6 @@ $Element->{$HTML_NS}->{script} = {
     charset => sub {
       my ($self, $attr) = @_;
 
-      unless ($attr->owner_element->has_attribute_ns (undef, 'src')) {
-        $self->{onerror}->(type => 'attribute not allowed',
-                           node => $attr,
-                           level => $self->{level}->{must});
-      }
-
       ## XXXresource: MUST match the charset of the referenced
       ## resource (HTML5 revision 2967).
 
@@ -2883,12 +2877,22 @@ $Element->{$HTML_NS}->{script} = {
     my ($self, $item, $element_state) = @_;
 
     my $el = $item->{node};
-    if ($el->has_attribute_ns (undef, 'defer') and
-        not $el->has_attribute_ns (undef, 'src')) {
-      $self->{onerror}->(node => $el,
-                         type => 'attribute missing',
-                         text => 'src',
-                         level => $self->{level}->{must});
+    my $has_src = $el->has_attribute_ns (undef, 'src');
+
+    unless ($has_src) {
+      my $charset_attr = $el->get_attribute_node_ns (undef, 'charset');
+      if ($charset_attr) {
+        $self->{onerror}->(type => 'attribute not allowed',
+                           node => $charset_attr,
+                           level => $self->{level}->{must});
+      }
+
+      if ($el->has_attribute_ns (undef, 'defer')) {
+        $self->{onerror}->(node => $el,
+                           type => 'attribute missing',
+                           text => 'src',
+                           level => $self->{level}->{must});
+      }
     }
   }, # check_attrs2
   check_start => sub {
