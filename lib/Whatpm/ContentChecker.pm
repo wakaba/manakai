@@ -158,6 +158,13 @@ our $AttrChecker = {
                            type => 'duplicate ID',
                            level => $self->{level}->{xml_id_error});
         push @{$self->{id}->{$value}}, $attr;
+      } elsif ($self->{name}->{$value}) {
+        $self->{onerror}->(node => $attr,
+                           type => 'id name confliction', # XXXdocumentation
+                           value => $value,
+                           level => $self->{level}->{must});
+        $self->{id}->{$value} = [$attr];
+        $self->{id_type}->{$value} = $element_state->{id_type} || '';
       } else {
         $self->{id}->{$value} = [$attr];
         $self->{id_type}->{$value} = $element_state->{id_type} || '';
@@ -627,6 +634,7 @@ sub check_element ($$$;$) {
   $self->{minus_elements} = {};
   $self->{id} = {};
   $self->{id_type} = {}; # 'form' / 'labelable' / 'menu'
+  $self->{name} = {};
   $self->{form} = {}; # form/@name
   #$self->{has_autofocus};
   $self->{idref} = []; # @form, @for, @contextmenu
@@ -645,6 +653,7 @@ sub check_element ($$$;$) {
   $self->{return} = {
     class => {},
     id => $self->{id},
+    name => $self->{name},
     table => [], # table objects returned by Whatpm::HTMLTable
     term => $self->{term},
     uri => {}, # URIs other than those in RDF triples
@@ -891,6 +900,7 @@ next unless $code;## TODO: temp.
   delete $self->{onerror};
   delete $self->{id};
   delete $self->{id_type};
+  delete $self->{name};
   delete $self->{form};
   delete $self->{has_autofocus};
   delete $self->{idref};

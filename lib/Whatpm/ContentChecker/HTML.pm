@@ -1223,6 +1223,13 @@ my $HTMLAttrChecker = {
         $self->{onerror}->(node => $attr, type => 'duplicate ID',
                            level => $self->{level}->{must});
         push @{$self->{id}->{$value}}, $attr;
+      } elsif ($self->{name}->{$value}) {
+        $self->{onerror}->(node => $attr,
+                           type => 'id name confliction', # XXXdocumentation
+                           value => $value,
+                           level => $self->{level}->{must});
+        $self->{id}->{$value} = [$attr];
+        $self->{id_type}->{$value} = $element_state->{id_type} || '';
       } else {
         $self->{id}->{$value} = [$attr];
         $self->{id_type}->{$value} = $element_state->{id_type} || '';
@@ -1646,7 +1653,36 @@ my $HTMLDatasetAttrChecker = sub {
 
 my $HTMLDatasetAttrStatus = FEATURE_HTML5_LC;
 
-my $ShapeCoordsChecker = sub ($$$) {
+my $NameChecker = sub {
+  my ($self, $attr, $item, $element_state) = @_;
+  my $value = $attr->value;
+  if ($value eq '') {
+    $self->{onerror}->(node => $attr,
+                       type => 'anchor name:empty', # XXXdocumentation
+                       level => $self->{level}->{must});
+  } else {
+    if ($self->{name}->{$value}) {
+      $self->{onerror}->(node => $attr,
+                         type => 'duplicate anchor name', # XXXdocumentation
+                         value => $value,
+                         level => $self->{level}->{must});
+    } elsif ($self->{id}->{$value}) {
+      $self->{onerror}->(node => $attr,
+                         type => 'id name confliction', # XXXdocumentation
+                         value => $value,
+                         level => $self->{level}->{must});
+    } else {
+      $self->{onerror}->(node => $attr,
+                         type => 'anchor name', # XXX documentation
+                         level => $self->{level}->{obsconforming});
+    }
+
+    push @{$self->{name}->{$value} ||= []}, $attr;
+    $element_state->{element_name} = $value;
+  }
+}; # $NameChecker
+
+my $ShapeCoordsChecker = sub ($$$$) {
   my ($self, $item, $attrs, $shape) = @_;
   
   my $coords;
@@ -4078,7 +4114,7 @@ $Element->{$HTML_NS}->{a} = {
           lang => FEATURE_HTML5_REC,
           media => FEATURE_HTML5_WD | FEATURE_XHTML2_ED,
           methods => FEATURE_HTML5_OBSOLETE,
-          name => FEATURE_HTML5_OBSOLETE, # XXX allowed in some cases
+          name => FEATURE_HTML5_LC,
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
@@ -4102,7 +4138,7 @@ $Element->{$HTML_NS}->{a} = {
           hreflang => $HTMLLanguageTagAttrChecker,
           media => $HTMLMQAttrChecker,
           methods => sub { }, ## Space-separated values [HTML 2.0]
-          ## TODO: HTML4/XHTML1 |name|
+          name => $NameChecker,
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
           rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
@@ -5358,7 +5394,7 @@ $Element->{$HTML_NS}->{img} = {
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
       longdesc => $HTMLURIAttrChecker,
-      ## TODO: HTML4 |name|
+      name => $NameChecker,
       height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
@@ -5689,7 +5725,7 @@ $Element->{$HTML_NS}->{applet} = {
         ## XXX more restriction [HTML4]
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    name => sub { }, ## XXX <a name> / <img name>
+    name => $NameChecker,
     object => sub {
       my ($self, $attr) = @_;
       ## "Authors should use this feature with extreme caution."

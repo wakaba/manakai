@@ -1251,3 +1251,49 @@ a
     methods="OPTIONS">a</a>
 #errors
 /a/@methods;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    name="">a</a>
+#errors
+/a/@name;anchor name:empty;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    name="   ">a</a>
+#errors
+/a/@name;anchor name;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    name="abcdefg">a</a>
+#errors
+/a/@name;anchor name;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    name="abc"><span id="abcd">a</span></a>
+#errors
+/a/@name;anchor name;s
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    name="abc"><span id="abc">a</span></a>
+#errors
+/a/@name;anchor name;s
+/a/span/@id;id name confliction;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"
+    id="abc"><a name="abc">a</a></span>
+#errors
+/span/a/@name;id name confliction;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <a name="abc">a</a>
+  <a name="abc">a</a>
+</div>
+#errors
+/div/a/@name;anchor name;s
+/div/a/@name;duplicate anchor name;m
