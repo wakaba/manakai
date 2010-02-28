@@ -798,7 +798,7 @@ sub new ($) {
     level => {
       must => 'm',
       should => 's',
-      obsconform => 's',
+      obsconforming => 's',
       warn => 'w',
       info => 'i',
       uncertain => 'u',
@@ -952,7 +952,7 @@ sub _tree_construction_initial ($) {
             (not defined $token->{sysid} or $token->{sysid} eq $xsysid)) {
           !!!cp ('t2');
           !!!parse-error (type => 'obs DOCTYPE', token => $token,
-                          level => $self->{level}->{obsconform});
+                          level => $self->{level}->{obsconforming});
         } else {
           !!!cp ('t2.1');
           !!!parse-error (type => 'not HTML5', token => $token);
