@@ -6376,7 +6376,9 @@ $Element->{$HTML_NS}->{table} = {
   check_attrs => $GetHTMLAttrsChecker->({
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1,
+      absmiddle => -1, middle => -1, abscenter => -1,
     }),
+    background => $HTMLURIAttrChecker,
     bgcolor => $HTMLColorAttrChecker,
     border => sub {
       my ($self, $attr) = @_;
@@ -6387,6 +6389,7 @@ $Element->{$HTML_NS}->{table} = {
                            level => $self->{level}->{must});
       }
     }, # border
+    bordercolor => $HTMLColorAttrChecker,
     cellpadding => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     cellspacing => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -6412,8 +6415,10 @@ $Element->{$HTML_NS}->{table} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
+    #background WA1 prose
     bgcolor => FEATURE_HTML5_OBSOLETE,
     border => FEATURE_HTML5_OBSOLETE,
+    #bordercolor WA1 prose
     cellpadding => FEATURE_HTML5_OBSOLETE,
     cellspacing => FEATURE_HTML5_OBSOLETE,
     cols => FEATURE_RFC1942,
@@ -6431,6 +6436,7 @@ $Element->{$HTML_NS}->{table} = {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before caption';
 
+    $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
@@ -6769,16 +6775,25 @@ $Element->{$HTML_NS}->{tbody} = {
   %HTMLChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    background => $HTMLURIAttrChecker,
+    bgcolor => $HTMLColorAttrChecker,
     %cellalign,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
+    #background WA1 prose
+    #bgcolor WA1 prose
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
     lang => FEATURE_HTML5_REC,
     valign => FEATURE_HTML5_OBSOLETE,
   }),
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+  }, # check_attrs2
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -6824,19 +6839,26 @@ $Element->{$HTML_NS}->{tr} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
+    background => $HTMLURIAttrChecker,
     bgcolor => $HTMLColorAttrChecker,
     height => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
+    #background WA1 prose
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
     #height WA1 prose
     lang => FEATURE_HTML5_REC,
     valign => FEATURE_HTML5_OBSOLETE,
-  }),
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+  }, # check_attrs2
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -6876,6 +6898,7 @@ $Element->{$HTML_NS}->{td} = {
     %cellalign,
     abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
+    background => $HTMLURIAttrChecker,
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
@@ -6896,6 +6919,7 @@ $Element->{$HTML_NS}->{td} = {
     abbr => FEATURE_HTML5_OBSOLETE,
     align => FEATURE_HTML5_OBSOLETE,
     axis => FEATURE_HTML5_OBSOLETE,
+    #background WA1 prose
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
@@ -6909,6 +6933,11 @@ $Element->{$HTML_NS}->{td} = {
     valign => FEATURE_HTML5_OBSOLETE,
     width => FEATURE_HTML5_OBSOLETE,
   }),
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+  }, # check_attrs2
 }; # td
 
 $Element->{$HTML_NS}->{th} = {
@@ -6918,6 +6947,7 @@ $Element->{$HTML_NS}->{th} = {
     %cellalign,
     abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
+    background => $HTMLURIAttrChecker,
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
@@ -6938,6 +6968,7 @@ $Element->{$HTML_NS}->{th} = {
     abbr => FEATURE_HTML5_OBSOLETE,
     align => FEATURE_HTML5_OBSOLETE,
     axis => FEATURE_HTML5_OBSOLETE,
+    #background WA1 prose
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_M12N10_REC,
     charoff => FEATURE_HTML5_OBSOLETE,
@@ -6951,6 +6982,11 @@ $Element->{$HTML_NS}->{th} = {
     valign => FEATURE_HTML5_OBSOLETE,
     width => FEATURE_HTML5_OBSOLETE,
   }),
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+  }, # check_attrs2
 }; # th
 
 # ---- Forms ----

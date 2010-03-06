@@ -458,6 +458,30 @@
 </table>
 #errors
 /table/@align;attribute not defined;m
+/table/@align;enumerated:non-conforming;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="absmiddle">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:non-conforming;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="abscenter">
+</table>
+#errors
+/table/@align;attribute not defined;m
+/table/@align;enumerated:non-conforming;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    align="absleft">
+</table>
+#errors
+/table/@align;attribute not defined;m
 /table/@align;enumerated:invalid;m
 
 #data escaped
@@ -501,6 +525,22 @@
 /table/@align;enumerated:invalid;m
 
 #data
+<table background="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@background;attribute not defined;m
+
+#data
+<table background="a.png" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@background;attribute not defined;m
+
+#data
+<table background="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@background;attribute not defined;m
+/table/@background;syntax error:iriref3987;m
+
+#data
 <table xmlns="http://www.w3.org/1999/xhtml"
     bgcolor="">
 </table>
@@ -536,6 +576,43 @@
 #errors
 /table/@bgcolor;attribute not defined;m
 /table/@bgcolor;color:syntax error;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="">
+</table>
+#errors
+/table/@bordercolor;attribute not defined;m
+/table/@bordercolor;color:syntax error;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="#c0c0c0">
+</table>
+#errors
+/table/@bordercolor;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="gray">
+</table>
+#errors
+/table/@bordercolor;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="GRAY">
+</table>
+#errors
+/table/@bordercolor;attribute not defined;m
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="abc">
+</table>
+#errors
+/table/@bordercolor;attribute not defined;m
+/table/@bordercolor;color:syntax error;m
 
 #data
 <table border="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1333,6 +1410,59 @@
 /col/@width;length:syntax error;m
 
 #data
+<thead background="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@background;attribute not defined;m
+
+#data
+<thead background="a.png" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@background;attribute not defined;m
+
+#data
+<thead background="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@background;attribute not defined;m
+/thead/@background;syntax error:iriref3987;m
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">
+</thead>
+#errors
+/thead/@bgcolor;attribute not defined;m
+/thead/@bgcolor;color:syntax error;m
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">
+</thead>
+#errors
+/thead/@bgcolor;attribute not defined;m
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">
+</thead>
+#errors
+/thead/@bgcolor;attribute not defined;m
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">
+</thead>
+#errors
+/thead/@bgcolor;attribute not defined;m
+
+#data
+<thead xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">
+</thead>
+#errors
+/thead/@bgcolor;attribute not defined;m
+/thead/@bgcolor;color:syntax error;m
+
+#data
 <thead charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /thead/@charoff;attribute not defined;m
@@ -1347,6 +1477,59 @@
 #errors
 /thead/@charoff;attribute not defined;m
 /thead/@charoff;length:syntax error;m
+
+#data
+<tbody background="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@background;attribute not defined;m
+
+#data
+<tbody background="a.png" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@background;attribute not defined;m
+
+#data
+<tbody background="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@background;attribute not defined;m
+/tbody/@background;syntax error:iriref3987;m
+
+#data
+<tbody xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">
+</tbody>
+#errors
+/tbody/@bgcolor;attribute not defined;m
+/tbody/@bgcolor;color:syntax error;m
+
+#data
+<tbody xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">
+</tbody>
+#errors
+/tbody/@bgcolor;attribute not defined;m
+
+#data
+<tbody xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">
+</tbody>
+#errors
+/tbody/@bgcolor;attribute not defined;m
+
+#data
+<tbody xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">
+</tbody>
+#errors
+/tbody/@bgcolor;attribute not defined;m
+
+#data
+<tbody xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">
+</tbody>
+#errors
+/tbody/@bgcolor;attribute not defined;m
+/tbody/@bgcolor;color:syntax error;m
 
 #data
 <tbody charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1365,6 +1548,59 @@
 /tbody/@charoff;length:syntax error;m
 
 #data
+<tfoot background="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@background;attribute not defined;m
+
+#data
+<tfoot background="a.png" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@background;attribute not defined;m
+
+#data
+<tfoot background="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@background;attribute not defined;m
+/tfoot/@background;syntax error:iriref3987;m
+
+#data
+<tfoot xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">
+</tfoot>
+#errors
+/tfoot/@bgcolor;attribute not defined;m
+/tfoot/@bgcolor;color:syntax error;m
+
+#data
+<tfoot xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">
+</tfoot>
+#errors
+/tfoot/@bgcolor;attribute not defined;m
+
+#data
+<tfoot xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">
+</tfoot>
+#errors
+/tfoot/@bgcolor;attribute not defined;m
+
+#data
+<tfoot xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">
+</tfoot>
+#errors
+/tfoot/@bgcolor;attribute not defined;m
+
+#data
+<tfoot xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">
+</tfoot>
+#errors
+/tfoot/@bgcolor;attribute not defined;m
+/tfoot/@bgcolor;color:syntax error;m
+
+#data
 <tfoot charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /tfoot/@charoff;attribute not defined;m
@@ -1381,9 +1617,57 @@
 /tfoot/@charoff;length:syntax error;m
 
 #data
-<tr bgcolor="blue" xmlns="http://www.w3.org/1999/xhtml"><td>x</td></tr>
+<tr background="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@background;attribute not defined;m
+
+#data
+<tr background="a.png" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@background;attribute not defined;m
+
+#data
+<tr background="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@background;attribute not defined;m
+/tr/@background;syntax error:iriref3987;m
+
+#data
+<tr xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">
+</tr>
 #errors
 /tr/@bgcolor;attribute not defined;m
+/tr/@bgcolor;color:syntax error;m
+
+#data
+<tr xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">
+</tr>
+#errors
+/tr/@bgcolor;attribute not defined;m
+
+#data
+<tr xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">
+</tr>
+#errors
+/tr/@bgcolor;attribute not defined;m
+
+#data
+<tr xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">
+</tr>
+#errors
+/tr/@bgcolor;attribute not defined;m
+
+#data
+<tr xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">
+</tr>
+#errors
+/tr/@bgcolor;attribute not defined;m
+/tr/@bgcolor;color:syntax error;m
 
 #data
 <tr charoff="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1496,6 +1780,112 @@
 #errors
 /td/@rowspan;nninteger:out of range;m
 /td;no significant content;s
+
+#data
+<td background="" xmlns="http://www.w3.org/1999/xhtml">a</td>
+#errors
+/td/@background;attribute not defined;m
+
+#data
+<td background="a.png" xmlns="http://www.w3.org/1999/xhtml">a</td>
+#errors
+/td/@background;attribute not defined;m
+
+#data
+<td background="[]" xmlns="http://www.w3.org/1999/xhtml">a</td>
+#errors
+/td/@background;attribute not defined;m
+/td/@background;syntax error:iriref3987;m
+
+#data
+<td xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">a
+</td>
+#errors
+/td/@bgcolor;attribute not defined;m
+/td/@bgcolor;color:syntax error;m
+
+#data
+<td xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">a
+</td>
+#errors
+/td/@bgcolor;attribute not defined;m
+
+#data
+<td xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">a
+</td>
+#errors
+/td/@bgcolor;attribute not defined;m
+
+#data
+<td xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">a
+</td>
+#errors
+/td/@bgcolor;attribute not defined;m
+
+#data
+<td xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">a
+</td>
+#errors
+/td/@bgcolor;attribute not defined;m
+/td/@bgcolor;color:syntax error;m
+
+#data
+<th background="" xmlns="http://www.w3.org/1999/xhtml">a</th>
+#errors
+/th/@background;attribute not defined;m
+
+#data
+<th background="a.png" xmlns="http://www.w3.org/1999/xhtml">a</th>
+#errors
+/th/@background;attribute not defined;m
+
+#data
+<th background="[]" xmlns="http://www.w3.org/1999/xhtml">a</th>
+#errors
+/th/@background;attribute not defined;m
+/th/@background;syntax error:iriref3987;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">a
+</th>
+#errors
+/th/@bgcolor;attribute not defined;m
+/th/@bgcolor;color:syntax error;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">a
+</th>
+#errors
+/th/@bgcolor;attribute not defined;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">a
+</th>
+#errors
+/th/@bgcolor;attribute not defined;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">a
+</th>
+#errors
+/th/@bgcolor;attribute not defined;m
+
+#data
+<th xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">a
+</th>
+#errors
+/th/@bgcolor;attribute not defined;m
+/th/@bgcolor;color:syntax error;m
 
 #data
 <td charoff="1" xmlns="http://www.w3.org/1999/xhtml">x</td>
@@ -1672,28 +2062,6 @@
 <th axis="" xmlns="http://www.w3.org/1999/xhtml">x</th>
 #errors
 /th/@axis;attribute not defined;m
-
-#data
-<td bgcolor="" xmlns="http://www.w3.org/1999/xhtml">x</td>
-#errors
-/td/@bgcolor;attribute not defined;m
-/td/@bgcolor;color:syntax error;m
-
-#data
-<th bgcolor="" xmlns="http://www.w3.org/1999/xhtml">x</th>
-#errors
-/th/@bgcolor;attribute not defined;m
-/th/@bgcolor;color:syntax error;m
-
-#data
-<td bgcolor="blue" xmlns="http://www.w3.org/1999/xhtml">x</td>
-#errors
-/td/@bgcolor;attribute not defined;m
-
-#data
-<th bgcolor="blue" xmlns="http://www.w3.org/1999/xhtml">x</th>
-#errors
-/th/@bgcolor;attribute not defined;m
 
 #data
 <tbody align="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
