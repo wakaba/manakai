@@ -1730,11 +1730,34 @@ xxxx
 /applet/@height;attribute not defined;m
 
 #data
+<applet code="a" alt="b" width="1" height="1" hspace="10%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet/@hspace;attribute not defined;m
+/applet;no significant content;s
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
 <applet code="a" alt="b" width="1" height="1" hspace="none" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /applet/@hspace;attribute not defined;m
 /applet;no significant content;s
-/applet/@hspace;nninteger:syntax error;m
+/applet/@hspace;length:syntax error;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" hspace="%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet/@hspace;attribute not defined;m
+/applet;no significant content;s
+/applet/@hspace;length:syntax error;m
 /applet;element not defined;m
 /applet/@code;attribute not defined;m
 /applet/@alt;attribute not defined;m
@@ -1753,11 +1776,34 @@ xxxx
 /applet/@height;attribute not defined;m
 
 #data
+<applet code="a" alt="b" width="1" height="1" vspace="10%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@vspace;attribute not defined;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
 <applet code="a" alt="b" width="1" height="1" vspace="none" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /applet;no significant content;s
 /applet/@vspace;attribute not defined;m
-/applet/@vspace;nninteger:syntax error;m
+/applet/@vspace;length:syntax error;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1" vspace="%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@vspace;attribute not defined;m
+/applet/@vspace;length:syntax error;m
 /applet;element not defined;m
 /applet/@code;attribute not defined;m
 /applet/@alt;attribute not defined;m
@@ -1805,7 +1851,7 @@ xxxx
 #errors
 /applet;no significant content;s
 /applet/@align;attribute not defined;m
-/applet/@align;enumerated:invalid;m
+/applet/@align;enumerated:non-conforming;m
 /applet;element not defined;m
 /applet/@code;attribute not defined;m
 /applet/@alt;attribute not defined;m
@@ -1892,8 +1938,73 @@ xxxx
 /applet/@height;attribute not defined;m
 
 #data
+<applet code="a" alt="b" width="1" height="1"
+    align="texttop" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:non-conforming;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1"
+    align="text-top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:invalid;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1"
+    align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:non-conforming;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1"
+    align="abscenter" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:non-conforming;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
+<applet code="a" alt="b" width="1" height="1"
+    align="baseline" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;no significant content;s
+/applet/@align;attribute not defined;m
+/applet/@align;enumerated:non-conforming;m
+/applet;element not defined;m
+/applet/@code;attribute not defined;m
+/applet/@alt;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@height;attribute not defined;m
+
+#data
 <applet code="a" alt="b" width="1" xmlns="http://www.w3.org/1999/xhtml"
-    height="">x</iframe>
+    height="">x</applet>
 #errors
 /applet/@height;nninteger:syntax error;m
 /applet;element not defined;m
@@ -3106,6 +3217,30 @@ aa<map name="x">b<map name="y">bb</map></map>
 /img/@longdesc;syntax error:iriref3987;m
 
 #data
+<img alt="" src="" hspace="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
+<img alt="" src="" hspace="  " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="  " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
 <img alt="" src="" hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
@@ -3126,64 +3261,84 @@ aa<map name="x">b<map name="y">bb</map></map>
 /img/@vspace;attribute not defined;m
 
 #data
+<img alt="" src="" hspace="120%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+
+#data
+<img alt="" src="" vspace="120%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+
+#data
+<img alt="" src="" hspace="1 %" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="1 %" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
 <img alt="" src="" hspace="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error;m
+/img/@hspace;length:syntax error;m
 
 #data
 <img alt="" src="" vspace="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@vspace;attribute not defined;m
-/img/@vspace;nninteger:syntax error;m
+/img/@vspace;length:syntax error;m
 
 #data
 <img alt="" src="" hspace="10px" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error;m
+/img/@hspace;length:syntax error;m
 
 #data
 <img alt="" src="" vspace="10px" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@vspace;attribute not defined;m
-/img/@vspace;nninteger:syntax error;m
+/img/@vspace;length:syntax error;m
 
 #data
 <img alt="" src="" hspace="0 " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error;m
+/img/@hspace;length:syntax error;m
 
 #data
 <img alt="" src="" vspace=" 0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img/@vspace;nninteger:syntax error;m
 /img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
 
 #data
 <img alt="" src="" hspace="0%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" vspace="20%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@vspace;attribute not defined;m
-/img/@vspace;nninteger:syntax error;m
 
 #data
 <img alt="" src="" hspace="-0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@hspace;attribute not defined;m
-/img/@hspace;nninteger:syntax error;m
+/img/@hspace;length:syntax error;m
 
 #data
 <img alt="" src="" vspace="-0" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@vspace;attribute not defined;m
-/img/@vspace;nninteger:syntax error;m
+/img/@vspace;length:syntax error;m
 
 #data
 <img alt="" src="" border="0" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3666,6 +3821,36 @@ aa<map name="x">b<map name="y">bb</map></map>
 <img alt="" src="" align="center" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="abscenter" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="texttop" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="BASELINE" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="text-top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
 /img/@align;enumerated:invalid;m
 
 #data
@@ -4097,6 +4282,96 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 
 #data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace=""/>
+#errors
+/iframe/@hspace;attribute not defined;m
+/iframe/@hspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="0"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="1"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="0%"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="10%"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="%"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+/iframe/@hspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="auto"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+/iframe/@hspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace=""/>
+#errors
+/iframe/@vspace;attribute not defined;m
+/iframe/@vspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="0"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="1"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="0%"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="10%"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="%"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+/iframe/@vspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="auto"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+/iframe/@vspace;length:syntax error;m
+
+#data
 <iframe xmlns="http://www.w3.org/1999/xhtml"
     longdesc=""/>
 #errors
@@ -4143,7 +4418,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <iframe src="" align="center" xmlns="http://www.w3.org/1999/xhtml"></iframe>
 #errors
 /iframe/@align;attribute not defined;m
-/iframe/@align;enumerated:invalid;m
+/iframe/@align;enumerated:non-conforming;m
 
 #data
 <iframe src="" align="bottom" xmlns="http://www.w3.org/1999/xhtml"></iframe>
@@ -4169,6 +4444,36 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <iframe src="" align="right" xmlns="http://www.w3.org/1999/xhtml"></iframe>
 #errors
 /iframe/@align;attribute not defined;m
+
+#data
+<iframe src="" align="abscenter" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="texttop" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="baseline" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="TEXT-top" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:invalid;m
 
 #data escaped
 <iframe src="" align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"></iframe>
@@ -4213,7 +4518,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     frameborder="no"/>
 #errors
 /iframe/@frameborder;attribute not defined;m
-/iframe/@frameborder;enumerated:invalid;m
+/iframe/@frameborder;enumerated:non-conforming;m
 
 #data
 <iframe xmlns="http://www.w3.org/1999/xhtml"
@@ -4597,6 +4902,96 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 
 #data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace=""/>
+#errors
+/embed/@hspace;attribute not defined;m
+/embed/@hspace;length:syntax error;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="0"/>
+#errors
+/embed/@hspace;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="1"/>
+#errors
+/embed/@hspace;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="0%"/>
+#errors
+/embed/@hspace;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="10%"/>
+#errors
+/embed/@hspace;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="%"/>
+#errors
+/embed/@hspace;attribute not defined;m
+/embed/@hspace;length:syntax error;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="auto"/>
+#errors
+/embed/@hspace;attribute not defined;m
+/embed/@hspace;length:syntax error;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace=""/>
+#errors
+/embed/@vspace;attribute not defined;m
+/embed/@vspace;length:syntax error;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="0"/>
+#errors
+/embed/@vspace;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="1"/>
+#errors
+/embed/@vspace;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="0%"/>
+#errors
+/embed/@vspace;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="10%"/>
+#errors
+/embed/@vspace;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="%"/>
+#errors
+/embed/@vspace;attribute not defined;m
+/embed/@vspace;length:syntax error;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="auto"/>
+#errors
+/embed/@vspace;attribute not defined;m
+/embed/@vspace;length:syntax error;m
+
+#data
 <embed src="http://test/" a="b" c="d" checked="checked"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -4720,9 +5115,117 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align=""/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:invalid;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="  "/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:invalid;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
     align="left"/>
 #errors
 /embed/@align;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="center"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:non-conforming;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="right"/>
+#errors
+/embed/@align;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="TOP"/>
+#errors
+/embed/@align;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="middle"/>
+#errors
+/embed/@align;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="bottom"/>
+#errors
+/embed/@align;attribute not defined;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="texttop"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:non-conforming;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="absmiddle"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:non-conforming;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="abscenter"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:non-conforming;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="baseline"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:non-conforming;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="none"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:invalid;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="text-top"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:invalid;m
+
+#data
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="ALIGN"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:invalid;m
+
+#data escaped
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="r\u0130ght"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:invalid;m
+
+#data escaped
+<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+    align="r\u0131ght"/>
+#errors
+/embed/@align;attribute not defined;m
+/embed/@align;enumerated:invalid;m
 
 #data
 <noembed xmlns="http://www.w3.org/1999/xhtml"></noembed>
@@ -4824,7 +5327,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <object data="" xmlns="http://www.w3.org/1999/xhtml"
-    height="">x</iframe>
+    height="">x</object>
 #errors
 /object/@height;nninteger:syntax error;m
 
@@ -5087,30 +5590,94 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /object;no significant content;s
 
 #data
-<object data="" hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    hspace="">a</object>
 #errors
 /object/@hspace;attribute not defined;m
-/object;no significant content;s
+/object/@hspace;length:syntax error;m
 
 #data
-<object data="" hspace="none" xmlns="http://www.w3.org/1999/xhtml"/>
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    hspace="0">a</object>
 #errors
 /object/@hspace;attribute not defined;m
-/object;no significant content;s
-/object/@hspace;nninteger:syntax error;m
 
 #data
-<object data="" vspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    hspace="1">a</object>
 #errors
-/object;no significant content;s
+/object/@hspace;attribute not defined;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    hspace="0%">a</object>
+#errors
+/object/@hspace;attribute not defined;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    hspace="10%">a</object>
+#errors
+/object/@hspace;attribute not defined;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    hspace="%">a</object>
+#errors
+/object/@hspace;attribute not defined;m
+/object/@hspace;length:syntax error;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    hspace="auto">a</object>
+#errors
+/object/@hspace;attribute not defined;m
+/object/@hspace;length:syntax error;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    vspace="">a</object>
+#errors
+/object/@vspace;attribute not defined;m
+/object/@vspace;length:syntax error;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    vspace="0">a</object>
+#errors
 /object/@vspace;attribute not defined;m
 
 #data
-<object data="" vspace="none" xmlns="http://www.w3.org/1999/xhtml"/>
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    vspace="1">a</object>
 #errors
-/object;no significant content;s
 /object/@vspace;attribute not defined;m
-/object/@vspace;nninteger:syntax error;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    vspace="0%">a</object>
+#errors
+/object/@vspace;attribute not defined;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    vspace="10%">a</object>
+#errors
+/object/@vspace;attribute not defined;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    vspace="%">a</object>
+#errors
+/object/@vspace;attribute not defined;m
+/object/@vspace;length:syntax error;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml" data="a"
+    vspace="auto">a</object>
+#errors
+/object/@vspace;attribute not defined;m
+/object/@vspace;length:syntax error;m
 
 #data
 <object data="" align="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5135,6 +5702,41 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <object data="" align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:non-conforming;m
+
+#data
+<object data="" align="abscenter" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:non-conforming;m
+
+#data
+<object data="" align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:non-conforming;m
+
+#data
+<object data="" align="texttop" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:non-conforming;m
+
+#data
+<object data="" align="baseline" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;no significant content;s
+/object/@align;attribute not defined;m
+/object/@align;enumerated:non-conforming;m
+
+#data
+<object data="" align="text-top" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
 /object/@align;attribute not defined;m

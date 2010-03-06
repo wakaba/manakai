@@ -4155,6 +4155,50 @@ aaa
 /pre;no significant content;s
 
 #data
+<pre wrap="" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@wrap;attribute not defined;m
+
+#data
+<pre wrap="wrap" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@wrap;attribute not defined;m
+
+#data
+<pre wrap="WRAP" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@wrap;attribute not defined;m
+
+#data
+<pre wrap="  " xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@wrap;attribute not defined;m
+/pre/@wrap;boolean:invalid;m
+
+#data
+<pre wrap="true" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@wrap;attribute not defined;m
+/pre/@wrap;boolean:invalid;m
+
+#data
+<pre wrap="yes" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@wrap;attribute not defined;m
+/pre/@wrap;boolean:invalid;m
+
+#data
+<pre wrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@wrap;attribute not defined;m
+/pre/@wrap;boolean:invalid;m
+
+#data
+<pre nowrap="" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@nowrap;attribute not defined;m
+
+#data
 <xmp xmlns="http://www.w3.org/1999/xhtml"></xmp>
 #errors
 /xmp;element not defined;m
@@ -4935,7 +4979,9 @@ a
 <dir xmlns="http://www.w3.org/1999/xhtml"
     align="abc"></dir>
 #errors
+/dir;element not defined;m
 /dir/@align;attribute not defined;m
+/dir/@align;enumerated:invalid;m
 
 #data
 <menu compact="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5203,6 +5249,38 @@ a
 #errors
 /hr/@align;attribute not defined;m
 /hr/@align;enumerated:invalid;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    color=""/>
+#errors
+/hr/@color;attribute not defined;m
+/hr/@color;color:syntax error;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    color="#c0c0c0"/>
+#errors
+/hr/@color;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    color="gray"/>
+#errors
+/hr/@color;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    color="GRAY"/>
+#errors
+/hr/@color;attribute not defined;m
+
+#data
+<hr xmlns="http://www.w3.org/1999/xhtml"
+    color="abc"/>
+#errors
+/hr/@color;attribute not defined;m
+/hr/@color;color:syntax error;m
 
 #data
 <hr xmlns="http://www.w3.org/1999/xhtml"

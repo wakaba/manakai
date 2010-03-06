@@ -10339,6 +10339,46 @@
     align="center"/>
 #errors
 /input/@align;attribute not defined;m
+/input/@align;enumerated:non-conforming;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    align="abscenter"/>
+#errors
+/input/@align;attribute not defined;m
+/input/@align;enumerated:non-conforming;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    align="AbsMiddle"/>
+#errors
+/input/@align;attribute not defined;m
+/input/@align;enumerated:non-conforming;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    align="BaseLine"/>
+#errors
+/input/@align;attribute not defined;m
+/input/@align;enumerated:non-conforming;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    align="textTop"/>
+#errors
+/input/@align;attribute not defined;m
+/input/@align;enumerated:non-conforming;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    align="text-top"/>
+#errors
+/input/@align;attribute not defined;m
 /input/@align;enumerated:invalid;m
 
 #data escaped
@@ -10363,7 +10403,7 @@
     align="texttop"/>
 #errors
 /input/@align;attribute not defined;m
-/input/@align;enumerated:invalid;m
+/input/@align;enumerated:non-conforming;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -10433,6 +10473,778 @@
 #errors
 /input/@align;attribute not defined;m
 /input/@align;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;text;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;email;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;url;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;password;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;datetime;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;date;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;month;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;week;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;time;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;datetime-local;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;number;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="checkbox"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;checkbox;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="radio"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;radio;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;file;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="submit"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;submit;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="reset"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;reset;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="button"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;button;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="add"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;add;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="remove"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;remove;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-up"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;move-up;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;input attr not applicable;move-down;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    hspace=""/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;length:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    hspace="  "/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;length:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    hspace="0"/>
+#errors
+/input/@hspace;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    hspace="1"/>
+#errors
+/input/@hspace;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    hspace="010%"/>
+#errors
+/input/@hspace;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    hspace="0.3"/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;length:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    hspace="auto"/>
+#errors
+/input/@hspace;attribute not defined;m
+/input/@hspace;length:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;text;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;email;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;url;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;password;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;datetime;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;date;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;month;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;week;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;time;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;datetime-local;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;number;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="checkbox"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;checkbox;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="radio"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;radio;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;file;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="submit"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;submit;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="reset"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;reset;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="button"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;button;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="add"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;add;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="remove"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;remove;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-up"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;move-up;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;input attr not applicable;move-down;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    vspace=""/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;length:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    vspace="  "/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;length:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    vspace="0"/>
+#errors
+/input/@vspace;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    vspace="1"/>
+#errors
+/input/@vspace;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    vspace="010%"/>
+#errors
+/input/@vspace;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    vspace="0.3"/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;length:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    vspace="auto"/>
+#errors
+/input/@vspace;attribute not defined;m
+/input/@vspace;length:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="hidden"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;hidden;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="text"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;text;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="email"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;email;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="url"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;url;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="search"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;search;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="password"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;password;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;datetime;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="date"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;date;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="month"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;month;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="week"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;week;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="time"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;time;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="datetime-local"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;datetime-local;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;number;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="range"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;range;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="color"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;color;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="checkbox"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;checkbox;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="radio"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;radio;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="file"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;file;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="submit"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;submit;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="reset"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;reset;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="button"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;button;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="add"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;add;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="remove"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;remove;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-up"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;move-up;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="move-down"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;input attr not applicable;move-down;m
+/input/@type;enumerated:invalid;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    border=""/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    border="  "/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    border="0"/>
+#errors
+/input/@border;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    border="1"/>
+#errors
+/input/@border;attribute not defined;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    border="010%"/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    border="0.3"/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="image" src="" alt="x"
+    border="auto"/>
+#errors
+/input/@border;attribute not defined;m
+/input/@border;nninteger:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"

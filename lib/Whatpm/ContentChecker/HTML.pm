@@ -1826,6 +1826,11 @@ my $ShapeCoordsChecker = sub ($$$$) {
   }
 }; # $ShapeCoordsChecker
 
+my $EmbeddedAlignChecker = $GetHTMLEnumeratedAttrChecker->({
+  bottom => 1, middle => 1, top => 1, left => 1, right => 1, center => -1,
+  baseline => -1, texttop => -1, abscenter => -1, absmiddle => -1,
+});
+
 my $GetHTMLAttrsChecker = sub {
   my $element_specific_checker = shift;
   my $element_specific_status = shift;
@@ -3538,10 +3543,11 @@ $Element->{$HTML_NS}->{hr} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1,
     }),
+    color => $HTMLColorAttrChecker,
     noshade => $GetHTMLBooleanAttrChecker->('noshade'),
     sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
-    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }), ## HTML4 %Pixels;
-    width => $HTMLLengthAttrChecker, ## HTML4 %Length;
+    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    width => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -3566,7 +3572,7 @@ $Element->{$HTML_NS}->{br} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     clear => $GetHTMLEnumeratedAttrChecker->({
-      left => 1, all => 1, right => 1, none => 1,
+      left => 1, all => 1, right => 1, none => 1, both => -1,
     }),
     sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
   }, {
@@ -3586,12 +3592,14 @@ $Element->{$HTML_NS}->{pre} = {
   check_attrs => $GetHTMLAttrsChecker->({
     sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    wrap => $GetHTMLBooleanAttrChecker->('wrap'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     lang => FEATURE_HTML5_REC,
     sdaform => FEATURE_HTML20_RFC,
     width => FEATURE_HTML5_OBSOLETE,
+    #wrap WA1 prose
   }),
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -5426,9 +5434,7 @@ $Element->{$HTML_NS}->{img} = {
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     $GetHTMLAttrsChecker->({
-      align => $GetHTMLEnumeratedAttrChecker->({
-        bottom => 1, middle => 1, top => 1, left => 1, right => 1,
-      }),
+      align => $EmbeddedAlignChecker,
       alt => sub { }, ## NOTE: No syntactical requirement
       border => sub {
         my ($self, $attr) = @_;
@@ -5449,9 +5455,8 @@ $Element->{$HTML_NS}->{img} = {
           }
         }
       }, # border
-      src => $HTMLURIAttrChecker,
-      usemap => $HTMLUsemapAttrChecker,
-      hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+      height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+      hspace => $HTMLLengthAttrChecker,
       ismap => sub {
         my ($self, $attr, $parent_item) = @_;
         if (not $self->{flag}->{in_a_href}) {
@@ -5463,9 +5468,10 @@ $Element->{$HTML_NS}->{img} = {
       },
       longdesc => $HTMLURIAttrChecker,
       name => $NameAttrChecker,
-      height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-      vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
+      src => $HTMLURIAttrChecker,
+      usemap => $HTMLUsemapAttrChecker,
+      vspace => $HTMLLengthAttrChecker,
       width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     }, {
       %HTMLAttrStatus,
@@ -5519,11 +5525,13 @@ $Element->{$HTML_NS}->{iframe} = {
   %HTMLTextChecker, # XXX content model restriction
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    align => $GetHTMLEnumeratedAttrChecker->({
-      bottom => 1, middle => 1, top => 1, left => 1, right => 1,
+    align => $EmbeddedAlignChecker,
+    frameborder => $GetHTMLEnumeratedAttrChecker->({
+        1 => 1, 0 => 1,
+        no => -1,
     }),
-    frameborder => $GetHTMLEnumeratedAttrChecker->({1 => 1, 0 => 1}),
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    hspace => $HTMLLengthAttrChecker,
     longdesc => $HTMLURIAttrChecker,
     marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -5547,6 +5555,7 @@ $Element->{$HTML_NS}->{iframe} = {
                            media_type => $type,
                            is_char_string => 1});
     }, # srcdoc
+    vspace => $HTMLLengthAttrChecker,
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
@@ -5555,6 +5564,7 @@ $Element->{$HTML_NS}->{iframe} = {
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     frameborder => FEATURE_HTML5_OBSOLETE,
     height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    #hspace WA1 prose
     id => FEATURE_HTML5_REC,
     longdesc => FEATURE_HTML5_OBSOLETE,
     marginheight => FEATURE_HTML5_OBSOLETE,
@@ -5567,6 +5577,7 @@ $Element->{$HTML_NS}->{iframe} = {
     src => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     srcdoc => FEATURE_HTML5_FD,
     title => FEATURE_HTML5_REC,
+    #vspace WA1 prose
     width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   }), # check_attrs
   check_start => sub {
@@ -5595,10 +5606,12 @@ $Element->{$HTML_NS}->{embed} = {
         %HTMLAttrStatus,
         align => FEATURE_HTML5_OBSOLETE,
         height => FEATURE_HTML5_LC,
+        #hspace WA1 prose
         name => FEATURE_HTML5_OBSOLETE,
         src => FEATURE_HTML5_WD,
         type => FEATURE_HTML5_WD,
         width => FEATURE_HTML5_LC,
+        #vspace WA1 prose
       }->{$attr_ln};
 
       if ($attr_ns eq '') {
@@ -5609,6 +5622,10 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $MIMETypeChecker;
         } elsif ($attr_ln eq 'width' or $attr_ln eq 'height') {
           $checker = $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 });
+        } elsif ($attr_ln eq 'hspace' or $attr_ln eq 'vspace') {
+          $checker = $HTMLLengthAttrChecker;
+        } elsif ($attr_ln eq 'align') {
+          $checker = $EmbeddedAlignChecker;
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
           ## XML-compatible + no uppercase letter
@@ -5672,9 +5689,7 @@ $Element->{$HTML_NS}->{object} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    align => $GetHTMLEnumeratedAttrChecker->({
-      bottom => 1, middle => 1, top => 1, left => 1, right => 1,
-    }),
+    align => $EmbeddedAlignChecker,
     archive => $HTMLSpaceURIsAttrChecker,
         ## TODO: Relative to @codebase
     border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -5688,7 +5703,7 @@ $Element->{$HTML_NS}->{object} = {
         ## [HTML4] but we don't know how to test this.
     form => $HTMLFormAttrChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    hspace => $HTMLLengthAttrChecker,
     name => $HTMLBrowsingContextNameAttrChecker,
         ## NOTE: |name| attribute of the |object| element defines
         ## the name of the browsing context created by the element,
@@ -5697,7 +5712,7 @@ $Element->{$HTML_NS}->{object} = {
     standby => sub {}, ## NOTE: %Text; in HTML4
     type => $MIMETypeChecker,
     usemap => $HTMLUsemapAttrChecker,
-    vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    vspace => $HTMLLengthAttrChecker,
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
@@ -5793,9 +5808,7 @@ $Element->{$HTML_NS}->{applet} = {
   %{$Element->{$HTML_NS}->{object}},
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
-    align => $GetHTMLEnumeratedAttrChecker->({
-      bottom => 1, middle => 1, top => 1, left => 1, right => 1,
-    }),
+    align => $EmbeddedAlignChecker,
     alt => sub { }, ## CDATA [HTML4]
     archive => $HTMLSpaceURIsAttrChecker, # XXX comma-separated
         ## TODO: Relative to @codebase
@@ -5803,7 +5816,7 @@ $Element->{$HTML_NS}->{applet} = {
     codebase => $HTMLURIAttrChecker,
         ## XXX more restriction [HTML4]
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    hspace => $HTMLLengthAttrChecker,
     name => $NameAttrChecker,
     object => sub {
       my ($self, $attr) = @_;
@@ -5813,7 +5826,7 @@ $Element->{$HTML_NS}->{applet} = {
                          type => 'applet object', # XXX documentation
                          level => $self->{level}->{should});
     },
-    vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    vspace => $HTMLLengthAttrChecker,
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
@@ -7141,7 +7154,7 @@ $Element->{$HTML_NS}->{legend} = {
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $GetHTMLEnumeratedAttrChecker->({
-      top => 1, bottom => 1, left => 1, right => 1,
+      left => 1, center => 1, right => 1,
     }),
     form => $HTMLFormAttrChecker,
   }, {
@@ -7250,6 +7263,7 @@ $Element->{$HTML_NS}->{input} = {
          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          autocomplete => FEATURE_HTML5_LC | FEATURE_WF2X,
          autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
+         #border WA1 prose
          checked => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
@@ -7260,6 +7274,7 @@ $Element->{$HTML_NS}->{input} = {
          formnovalidate => FEATURE_HTML5_LC,
          formtarget => FEATURE_HTML5_LC,
          height => FEATURE_HTML5_LC,
+         #hspace WA1 prose
          inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X |
              FEATURE_XHTMLBASIC11_CR,
          ismap => FEATURE_M12N10_REC,
@@ -7291,6 +7306,7 @@ $Element->{$HTML_NS}->{input} = {
          type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          usemap => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
          value => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+         #vspace WA1 prose
          width => FEATURE_HTML5_LC,
         }->{$attr_ln};
 
@@ -7308,6 +7324,7 @@ $Element->{$HTML_NS}->{input} = {
          autocomplete => '',
          autofocus => $AutofocusAttrChecker,
              ## NOTE: <input type=hidden disabled> is not disallowed.
+         border => '',
          checked => '',
          disabled => $GetHTMLBooleanAttrChecker->('disabled'),
              ## NOTE: <input type=hidden disabled> is not disallowed.
@@ -7319,6 +7336,7 @@ $Element->{$HTML_NS}->{input} = {
          formnovalidate => '',
          formtarget => '',
          height => '',
+         hspace => '',
          inputmode => '',
          ismap => '', ## NOTE: "MUST" be type=image [HTML4]
          list => '',
@@ -7350,6 +7368,7 @@ $Element->{$HTML_NS}->{input} = {
          }),
          usemap => '',
          value => '',
+         vspace => '',
          width => '',
         }->{$attr_ln};
 
@@ -7493,9 +7512,7 @@ $Element->{$HTML_NS}->{input} = {
             $checker =
             {
              action => $HTMLURIAttrChecker,
-             align => $GetHTMLEnumeratedAttrChecker->({
-               top => 1, middle => 1, bottom => 1, left => 1, right => 1,
-             }),
+             align => $EmbeddedAlignChecker,
              alt => sub {
                my ($self, $attr) = @_;
                my $value = $attr->value;
@@ -7505,6 +7522,7 @@ $Element->{$HTML_NS}->{input} = {
                                     level => $self->{level}->{must});
                }
              },
+             border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              enctype => $GetHTMLEnumeratedAttrChecker->({
                'application/x-www-form-urlencoded' => 1,
                'multipart/form-data' => 1,
@@ -7522,6 +7540,7 @@ $Element->{$HTML_NS}->{input} = {
              formnovalidate => $GetHTMLBooleanAttrChecker->('formnovalidate'),
              formtarget => $HTMLTargetAttrChecker,
              height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+             hspace => $HTMLLengthAttrChecker,
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
@@ -7534,6 +7553,7 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: There is requirements on the referenced resource.
              target => $HTMLTargetAttrChecker,
              usemap => $HTMLUsemapAttrChecker,
+             vspace => $HTMLLengthAttrChecker,
              width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
             }->{$attr_ln} || $checker;
             ## TODO: alt & src are required.
