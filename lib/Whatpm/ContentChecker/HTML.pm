@@ -6728,10 +6728,6 @@ $Element->{$HTML_NS}->{colgroup} = {
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
     span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
-      ## NOTE: Defined only if "the |colgroup| element contains no |col| elements"
-      ## TODO: "attribute not supported" if |col|.
-      ## ISSUE: MUST NOT if any |col|?
-      ## ISSUE: MUST NOT for |<colgroup span="1"><any><col/></any></colgroup>| (though non-conforming)?
     width => $MultiLengthChecker,
   }, {
     %HTMLAttrStatus,
@@ -6755,16 +6751,22 @@ $Element->{$HTML_NS}->{colgroup} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'col') {
-      #
+      if ($item->{node}->has_attribute_ns (undef, 'span')) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:colgroup', # XXXdocumentation
+                           level => $self->{level}->{must});
+      }
     } else {
-      $self->{onerror}->(node => $child_el, type => 'element not allowed',
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:colgroup', # XXXdocumentation
                          level => $self->{level}->{must});
     }
   },
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
-      $self->{onerror}->(node => $child_node, type => 'character not allowed',
+      $self->{onerror}->(node => $child_node,
+                         type => 'character not allowed:colgroup', # XXXdocumentation
                          level => $self->{level}->{must});
     }
   },

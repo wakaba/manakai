@@ -977,6 +977,31 @@
 #errors
 
 #data
+<colgroup xmlns="http://www.w3.org/1999/xhtml">
+</colgroup>
+#errors
+
+#data
+<colgroup xmlns="http://www.w3.org/1999/xhtml">
+  <col/>
+</colgroup>
+#errors
+
+#data
+<colgroup xmlns="http://www.w3.org/1999/xhtml">
+  <p>aa</p>
+</colgroup>
+#errors
+/colgroup/p;element not allowed:colgroup;m
+
+#data
+<colgroup xmlns="http://www.w3.org/1999/xhtml">
+  <!---->a<!---->
+</colgroup>
+#errors
+/colgroup/"a";character not allowed:colgroup;m
+
+#data
 <colgroup span="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /colgroup/@span;nninteger:syntax error;m
@@ -984,6 +1009,32 @@
 #data
 <colgroup span="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<colgroup xmlns="http://www.w3.org/1999/xhtml" span="1">
+</colgroup>
+#errors
+
+#data
+<colgroup xmlns="http://www.w3.org/1999/xhtml" span="1">
+  <col/>
+</colgroup>
+#errors
+/colgroup/col;element not allowed:colgroup;m
+
+#data
+<colgroup xmlns="http://www.w3.org/1999/xhtml" span="1">
+  <p>aa</p>
+</colgroup>
+#errors
+/colgroup/p;element not allowed:colgroup;m
+
+#data
+<colgroup xmlns="http://www.w3.org/1999/xhtml" span="1">
+  <!---->a<!---->
+</colgroup>
+#errors
+/colgroup/"a";character not allowed:colgroup;m
 
 #data
 <colgroup span="0000000000001" xmlns="http://www.w3.org/1999/xhtml"/>
