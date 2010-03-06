@@ -408,6 +408,48 @@
 /frameset;child element missing:frame|frameset;m
 
 #data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor=""/>
+#errors
+/frameset;element not defined;m
+/frameset;child element missing:frame|frameset;m
+/frameset/@bordercolor;attribute not defined;m
+/frameset/@bordercolor;color:syntax error;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="#c0c0c0"/>
+#errors
+/frameset;element not defined;m
+/frameset;child element missing:frame|frameset;m
+/frameset/@bordercolor;attribute not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="gray"/>
+#errors
+/frameset;element not defined;m
+/frameset;child element missing:frame|frameset;m
+/frameset/@bordercolor;attribute not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="GRAY"/>
+#errors
+/frameset;element not defined;m
+/frameset;child element missing:frame|frameset;m
+/frameset/@bordercolor;attribute not defined;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="abc"/>
+#errors
+/frameset;element not defined;m
+/frameset;child element missing:frame|frameset;m
+/frameset/@bordercolor;attribute not defined;m
+/frameset/@bordercolor;color:syntax error;m
+
+#data
 <frameset xmlns="http://www.w3.org/1999/xhtml">
   <frameset>
     <frame src="a"/>
@@ -788,11 +830,27 @@
 #errors
 /frame;element not defined;m
 /frame/@frameborder;attribute not defined;m
-/frame/@frameborder;enumerated:invalid;m
+/frame/@frameborder;enumerated:non-conforming;m
 
 #data
 <frame xmlns="http://www.w3.org/1999/xhtml"
     frameborder="no"/>
+#errors
+/frame;element not defined;m
+/frame/@frameborder;attribute not defined;m
+/frame/@frameborder;enumerated:non-conforming;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="y"/>
+#errors
+/frame;element not defined;m
+/frame/@frameborder;attribute not defined;m
+/frame/@frameborder;enumerated:invalid;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="yet"/>
 #errors
 /frame;element not defined;m
 /frame/@frameborder;attribute not defined;m
@@ -845,6 +903,43 @@
 /frame;element not defined;m
 /frame/@frameborder;attribute not defined;m
 /frame/@frameborder;enumerated:invalid;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor=""/>
+#errors
+/frame;element not defined;m
+/frame/@bordercolor;attribute not defined;m
+/frame/@bordercolor;color:syntax error;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="#c0c0c0"/>
+#errors
+/frame;element not defined;m
+/frame/@bordercolor;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="gray"/>
+#errors
+/frame;element not defined;m
+/frame/@bordercolor;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="GRAY"/>
+#errors
+/frame;element not defined;m
+/frame/@bordercolor;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    bordercolor="abc"/>
+#errors
+/frame;element not defined;m
+/frame/@bordercolor;attribute not defined;m
+/frame/@bordercolor;color:syntax error;m
 
 #data
 <frame xmlns="http://www.w3.org/1999/xhtml"

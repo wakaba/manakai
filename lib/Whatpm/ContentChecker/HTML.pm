@@ -4097,7 +4097,7 @@ $Element->{$HTML_NS}->{marquee} = {
       left => -1, right => -1, up => -1, down => -1,
     }),
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    hspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    hspace => $HTMLLengthAttrChecker,
     loop => $HTMLIntegerAttrChecker,
     onbounce => $HTMLEventHandlerAttrChecker,
     onfinish => $HTMLEventHandlerAttrChecker,
@@ -4107,24 +4107,24 @@ $Element->{$HTML_NS}->{marquee} = {
     truespeed => $GetHTMLEnumeratedAttrChecker->({
       true => -1, false => -1,
     }),
-    vspace => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    vspace => $HTMLLengthAttrChecker,
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
     behavior => FEATURE_HTML5_OBSOLETE,
-    #bgcolor
+    #bgcolor WA1 prose
     direction => FEATURE_HTML5_OBSOLETE,
-    #height
-    #hspace
-    #loop
+    #height WA1 prose
+    #hspace WA1 prose
+    #loop WA1 prose
     onbounce => FEATURE_HTML5_OBSOLETE,
     onfinish => FEATURE_HTML5_OBSOLETE,
     onstart => FEATURE_HTML5_OBSOLETE,
-    #scrollamount
-    #scrolldelay
+    #scrollamount WA1 prose
+    #scrolldelay WA1 prose
     truespeed => FEATURE_HTML5_OBSOLETE,
-    #vspace
-    #width
+    #vspace WA1 prose
+    #width WA1 prose
   }), # check_attrs
 }; # marquee
 
@@ -5527,8 +5527,8 @@ $Element->{$HTML_NS}->{iframe} = {
   check_attrs => $GetHTMLAttrsChecker->({
     align => $EmbeddedAlignChecker,
     frameborder => $GetHTMLEnumeratedAttrChecker->({
-        1 => 1, 0 => 1,
-        no => -1,
+      1 => 1, 0 => 1,
+      yes => -1, no => -1,
     }),
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $HTMLLengthAttrChecker,
@@ -8251,7 +8251,11 @@ $Element->{$HTML_NS}->{textarea} = {
     rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     sdaform => sub { }, ## Constant [RFC 2070], but we don't check the value
     sdapref => sub { }, ## Constant [RFC 2070], but we don't check the value
-    wrap => $GetHTMLEnumeratedAttrChecker->({soft => 1, hard => 1}),
+    wrap => $GetHTMLEnumeratedAttrChecker->({
+      soft => 1, hard => 1,
+      ## |off| affects rendering, but it is not a keyword according to
+      ## Web Applications 1.0.
+    }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -8961,6 +8965,7 @@ $Element->{$HTML_NS}->{frameset} = {
   %HTMLChecker,
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
+    bordercolor => $HTMLColorAttrChecker,
     cols => $MultiLengthListChecker,
     onafterprint => $HTMLEventHandlerAttrChecker,
     onbeforeprint => $HTMLEventHandlerAttrChecker,
@@ -8984,6 +8989,7 @@ $Element->{$HTML_NS}->{frameset} = {
     rows => $MultiLengthListChecker,
   }, {
     %HTMLAttrStatus,
+    #bordercolor WA1 prose
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     cols => FEATURE_M12N10_REC,
     id => FEATURE_HTML5_REC,
@@ -9061,7 +9067,11 @@ $Element->{$HTML_NS}->{frame} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
-    frameborder => $GetHTMLEnumeratedAttrChecker->({1 => 1, 0 => 1}),
+    bordercolor => $HTMLColorAttrChecker,
+    frameborder => $GetHTMLEnumeratedAttrChecker->({
+      1 => 1, 0 => 1,
+      yes => -1, no => -1,
+    }),
     longdesc => $HTMLURIAttrChecker,
     marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -9074,6 +9084,7 @@ $Element->{$HTML_NS}->{frame} = {
     src => $HTMLURIAttrChecker,
   }, {
     %HTMLAttrStatus,
+    #bordercolor WA1 prose
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     frameborder => FEATURE_M12N10_REC,
     id => FEATURE_HTML5_REC,

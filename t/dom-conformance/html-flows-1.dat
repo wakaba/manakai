@@ -3349,11 +3349,19 @@ aaa
 
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"
+    height="12%">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@height;attribute not defined;m
+/marquee/@height;nninteger:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
     hspace="">a</marquee>
 #errors
 /marquee;element not defined;m
 /marquee/@hspace;attribute not defined;m
-/marquee/@hspace;nninteger:syntax error;m
+/marquee/@hspace;length:syntax error;m
 
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"
@@ -3365,6 +3373,13 @@ aaa
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"
     hspace="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@hspace;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    hspace="123%">a</marquee>
 #errors
 /marquee;element not defined;m
 /marquee/@hspace;attribute not defined;m
@@ -3393,11 +3408,19 @@ aaa
 
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"
+    width="120%">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@width;attribute not defined;m
+/marquee/@width;nninteger:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
     vspace="">a</marquee>
 #errors
 /marquee;element not defined;m
 /marquee/@vspace;attribute not defined;m
-/marquee/@vspace;nninteger:syntax error;m
+/marquee/@vspace;length:syntax error;m
 
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"
@@ -3409,6 +3432,13 @@ aaa
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"
     vspace="0">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@vspace;attribute not defined;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    vspace="120%">a</marquee>
 #errors
 /marquee;element not defined;m
 /marquee/@vspace;attribute not defined;m

@@ -4511,7 +4511,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     frameborder="yes"/>
 #errors
 /iframe/@frameborder;attribute not defined;m
-/iframe/@frameborder;enumerated:invalid;m
+/iframe/@frameborder;enumerated:non-conforming;m
 
 #data
 <iframe xmlns="http://www.w3.org/1999/xhtml"
@@ -4519,6 +4519,27 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /iframe/@frameborder;attribute not defined;m
 /iframe/@frameborder;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="y"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="yet"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="no "/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
 
 #data
 <iframe xmlns="http://www.w3.org/1999/xhtml"
