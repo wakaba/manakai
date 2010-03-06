@@ -215,6 +215,22 @@
 #errors
 
 #data
+<head xmlns="http://www.w3.org/1999/xhtml"></head>
+#titlemetadata
+#errors
+/head;child element missing;title;m
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml"></head>
+#titlemetadata 0
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml"></head>
+#titlemetadata abc
+#errors
+
+#data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title></title></head><body></body></html>
 #errors
 /html/body;no significant content;s

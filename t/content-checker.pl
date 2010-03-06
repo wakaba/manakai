@@ -49,8 +49,12 @@ sub test ($) {
   }
   $doc->document_uri (q<thismessage:/>);
 
-  if ($test->{issrcdoc}->[1]) {
+  if ($test->{issrcdoc}->[1] and $test->{issrcdoc}->[1]->[0]) {
     $doc->manakai_is_srcdoc (1);
+  }
+
+  if ($test->{titlemetadata}) {
+    $doc->set_user_data(manakai_title_metadata => $test->{titlemetadata}->[1]->[0]);
   }
 
   my @error;

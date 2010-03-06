@@ -2196,12 +2196,18 @@ $Element->{$HTML_NS}->{head} = {
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
-    if (not $element_state->{has_title} and
-        not $item->{node}->owner_document->manakai_is_srcdoc) {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'child element missing',
-                         text => 'title',
-                         level => $self->{level}->{must});
+    unless ($element_state->{has_title}) {
+      my $el = $item->{node};
+      my $od = $el->owner_document;
+      my $tmd = $od->get_user_data('manakai_title_metadata');
+      if ((defined $tmd and length $tmd) or $od->manakai_is_srcdoc) {
+        #
+      } else {
+        $self->{onerror}->(node => $el,
+                           type => 'child element missing',
+                           text => 'title',
+                           level => $self->{level}->{must});
+      }
     }
     $self->{flag}->{in_head} = $element_state->{in_head_original};
 
