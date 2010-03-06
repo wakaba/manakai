@@ -3225,6 +3225,8 @@ $Element->{$HTML_NS}->{body} = {
     background => $HTMLURIAttrChecker,
     bgcolor => $HTMLColorAttrChecker,
     link => $HTMLColorAttrChecker,
+    marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     onafterprint => $HTMLEventHandlerAttrChecker,
     onbeforeprint => $HTMLEventHandlerAttrChecker,
     onbeforeunload => $HTMLEventHandlerAttrChecker,
@@ -3244,7 +3246,9 @@ $Element->{$HTML_NS}->{body} = {
     onstorage => $HTMLEventHandlerAttrChecker,
     onundo => $HTMLEventHandlerAttrChecker,
     onunload => $HTMLEventHandlerAttrChecker,
+    rightmargin => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     text => $HTMLColorAttrChecker,
+    topmargin => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     vlink => $HTMLColorAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -3254,6 +3258,8 @@ $Element->{$HTML_NS}->{body} = {
     bgcolor => FEATURE_HTML5_OBSOLETE,
     lang => FEATURE_HTML5_REC,
     link => FEATURE_HTML5_OBSOLETE,
+    #marginheight WA1 prose
+    #marginwidth WA1 prose
     onafterprint => FEATURE_HTML5_LC,
     onbeforeprint => FEATURE_HTML5_LC,
     onbeforeunload => FEATURE_HTML5_LC,
@@ -3273,9 +3279,11 @@ $Element->{$HTML_NS}->{body} = {
     onstorage => FEATURE_HTML5_LC,
     onundo => FEATURE_HTML5_LC,
     onunload => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    #rightmargin WA1 prose
     text => FEATURE_HTML5_OBSOLETE,
+    #topmargin WA1 prose
     vlink => FEATURE_HTML5_OBSOLETE,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -3283,7 +3291,7 @@ $Element->{$HTML_NS}->{body} = {
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
+  }, # check_start
 }; # body
 
 $Element->{$HTML_NS}->{section} = {
@@ -5523,7 +5531,10 @@ $Element->{$HTML_NS}->{iframe} = {
     sandbox => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->({
       'allow-same-origin' => 1, 'allow-forms' => 1, 'allow-scripts' => 1,
     }),
-    scrolling => $GetHTMLEnumeratedAttrChecker->({yes => 1, no => 1, auto => 1}),
+    scrolling => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1, auto => 1,
+      on => -1, scroll => -1, off => -1, noscroll => -1,
+    }),
     seemless => $GetHTMLBooleanAttrChecker->('seemless'),
     src => $HTMLURIAttrChecker,
     srcdoc => sub {
@@ -6376,14 +6387,16 @@ $Element->{$HTML_NS}->{table} = {
                            level => $self->{level}->{must});
       }
     }, # border
-    cellpadding => $HTMLLengthAttrChecker,
-    cellspacing => $HTMLLengthAttrChecker,
+    cellpadding => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    cellspacing => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     datapagesize => sub { }, ## CDATA [HTML4]
     frame => $GetHTMLEnumeratedAttrChecker->({
       void => 1, above => 1, below => 1, hsides => 1, vsides => 1,
       lhs => 1, rhs => 1, box => 1, border => 1,
     }),
+    height => $HTMLLengthAttrChecker,
+    hspace => $HTMLLengthAttrChecker,
     rules => $GetHTMLEnumeratedAttrChecker->({
       none => 1, groups => 1, rows => 1, cols => 1, all => 1,
     }),
@@ -6393,6 +6406,7 @@ $Element->{$HTML_NS}->{table} = {
                          type => 'table summary', # XXX documentatin
                          level => $self->{level}->{obsconforming});
     },
+    vspace => $HTMLLengthAttrChecker,
     width => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -6405,10 +6419,13 @@ $Element->{$HTML_NS}->{table} = {
     cols => FEATURE_RFC1942,
     datapagesize => FEATURE_M12N10_REC,
     frame => FEATURE_HTML5_OBSOLETE,
+    #height WA1 prose
+    #hspace WA1 prose
     lang => FEATURE_HTML5_REC,
     rules => FEATURE_HTML5_OBSOLETE,
     summary => FEATURE_HTML5_LC,
     width => FEATURE_HTML5_OBSOLETE,
+    #vspace WA1 prose
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -6734,7 +6751,7 @@ $Element->{$HTML_NS}->{col} = {
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
     span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
-    width => $MultiLengthChecker,
+    width => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -6808,6 +6825,7 @@ $Element->{$HTML_NS}->{tr} = {
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
     bgcolor => $HTMLColorAttrChecker,
+    height => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -6815,6 +6833,7 @@ $Element->{$HTML_NS}->{tr} = {
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
+    #height WA1 prose
     lang => FEATURE_HTML5_REC,
     valign => FEATURE_HTML5_OBSOLETE,
   }),
@@ -8992,7 +9011,10 @@ $Element->{$HTML_NS}->{frame} = {
     marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     name => $HTMLBrowsingContextNameAttrChecker,
     noresize => $GetHTMLBooleanAttrChecker->('noresize'),
-    scrolling => $GetHTMLEnumeratedAttrChecker->({yes => 1, no => 1, auto => 1}),
+    scrolling => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1, auto => 1,
+      on => -1, scroll => -1, off => -1, noscroll => -1,
+    }),
     src => $HTMLURIAttrChecker,
   }, {
     %HTMLAttrStatus,

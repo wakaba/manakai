@@ -1014,6 +1014,46 @@
 /frame/@scrolling;enumerated:invalid;m
 
 #data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="Scroll"/>
+#errors
+/frame;element not defined;m
+/frame/@scrolling;attribute not defined;m
+/frame/@scrolling;enumerated:non-conforming;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="off"/>
+#errors
+/frame;element not defined;m
+/frame/@scrolling;attribute not defined;m
+/frame/@scrolling;enumerated:non-conforming;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="ON"/>
+#errors
+/frame;element not defined;m
+/frame/@scrolling;attribute not defined;m
+/frame/@scrolling;enumerated:non-conforming;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="noScroll"/>
+#errors
+/frame;element not defined;m
+/frame/@scrolling;attribute not defined;m
+/frame/@scrolling;enumerated:non-conforming;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="Scrolling"/>
+#errors
+/frame;element not defined;m
+/frame/@scrolling;attribute not defined;m
+/frame/@scrolling;enumerated:invalid;m
+
+#data
 <frame marginwidth="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /frame/@marginwidth;attribute not defined;m

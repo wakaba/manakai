@@ -4336,6 +4336,41 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /iframe/@scrolling;enumerated:invalid;m
 
 #data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="Scroll"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="off"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="ON"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="noScroll"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="Scrolling"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:invalid;m
+
+#data
 <iframe marginwidth="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /iframe/@marginwidth;attribute not defined;m
