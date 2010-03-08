@@ -6434,7 +6434,7 @@ $Element->{$HTML_NS}->{table} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
-    #background WA1 prose
+    background => FEATURE_HTML5_OBSOLETE,
     bgcolor => FEATURE_HTML5_OBSOLETE,
     border => FEATURE_HTML5_OBSOLETE,
     #bordercolor WA1 prose
@@ -6803,7 +6803,7 @@ $Element->{$HTML_NS}->{tbody} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
-    #background WA1 prose
+    background => FEATURE_HTML5_OBSOLETE,
     #bgcolor WA1 prose
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
@@ -6867,7 +6867,7 @@ $Element->{$HTML_NS}->{tr} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
-    #background WA1 prose
+    background => FEATURE_HTML5_OBSOLETE,
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
@@ -6940,7 +6940,7 @@ $Element->{$HTML_NS}->{td} = {
     abbr => FEATURE_HTML5_OBSOLETE,
     align => FEATURE_HTML5_OBSOLETE,
     axis => FEATURE_HTML5_OBSOLETE,
-    #background WA1 prose
+    background => FEATURE_HTML5_OBSOLETE,
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
@@ -6989,7 +6989,7 @@ $Element->{$HTML_NS}->{th} = {
     abbr => FEATURE_HTML5_OBSOLETE,
     align => FEATURE_HTML5_OBSOLETE,
     axis => FEATURE_HTML5_OBSOLETE,
-    #background WA1 prose
+    background => FEATURE_HTML5_OBSOLETE,
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_M12N10_REC,
     charoff => FEATURE_HTML5_OBSOLETE,
