@@ -252,8 +252,6 @@ for (qw/space lang base id/) {
 
 $AttrStatus->{$XMLNS_NS}->{''} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
 
-## TODO: xsi:schemaLocation for XHTML2 support (very, very low priority)
-
 our %AnyChecker = (
   ## NOTE: |check_start| is invoked before anything on the element's
   ## attributes and contents is checked.
@@ -523,8 +521,6 @@ sub check_document ($$$;$) {
             id => {}, table => [], term => {},
            };
   }
-
-  ## ISSUE: Unexpanded entity references and HTML5 conformance
   
   my $docel_nsuri = $docel->namespace_uri;
   if (defined $docel_nsuri) {
