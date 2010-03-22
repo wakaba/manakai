@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use Test;
+use Test::More;
+use Test::Differences;
 
 require Whatpm::ContentChecker;
 require Whatpm::XML::Parser;
@@ -74,9 +75,14 @@ sub test ($) {
            . $opt->{media_type};
      });
 
+  my $actual = join ("\n", sort {$a cmp $b} @error);
+  my $expected = join ("\n", sort {$a cmp $b} @{$test->{errors}->[0]});
+  if ($actual eq $expected) {
+    is $actual, $expected;
+  } else {
 #line 1 "content-checker-test-ok"  
-  ok join ("\n", sort {$a cmp $b} @error),
-    join ("\n", sort {$a cmp $b} @{$test->{errors}->[0]}), $test->{data}->[0];
+    eq_or_diff $actual, $expected, $test->{data}->[0];
+  }
 } # test
 
 sub get_node_path ($) {

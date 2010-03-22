@@ -7,7 +7,7 @@ use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 
 BEGIN {
   require 'content-checker.pl';
-  plan (tests => 4464);
+  plan (tests => 7891);
 }
 
 test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
