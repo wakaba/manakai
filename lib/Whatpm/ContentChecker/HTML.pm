@@ -1101,66 +1101,6 @@ my $FontSizeChecker = sub {
   }
 }; # $FontSizeChecker
 
-my $HTMLRefOrTemplateAttrChecker = sub {
-  my ($self, $attr) = @_;
-  $HTMLURIAttrChecker->(@_);
-
-  my $attr_name = $attr->name;
-
-  if ($attr_name eq 'ref') {
-    unless ($attr->owner_element->has_attribute_ns (undef, 'template')) {
-      $self->{onerror}->(node => $attr, type => 'attribute not allowed',
-                         level => $self->{level}->{must});
-    }
-  }
-
-  require Message::URL;
-  my $doc = $attr->owner_document;
-  my $doc_uri = $doc->document_uri;
-  my $uri = Message::URL->new_abs ($attr->value, $doc_uri);
-  my $no_frag_uri = $uri->clone;
-  $no_frag_uri->uri_fragment (undef);
-  if ((defined $doc_uri and $doc_uri eq $no_frag_uri) or
-      (not defined $doc_uri and $no_frag_uri eq '')) {
-    my $fragid = $uri->uri_fragment;
-    if (defined $fragid) {
-      push @{$self->{$attr_name}}, [$fragid => $attr];
-    } else {
-      DOCEL: {
-        last DOCEL unless $attr_name eq 'template';
-
-        my $docel = $doc->document_element;
-        if ($docel) {
-          my $nsuri = $docel->namespace_uri;
-          if (defined $nsuri and $nsuri eq $HTML_NS) {
-            if ($docel->manakai_local_name eq 'datatemplate') {
-              last DOCEL;
-            }
-          }
-        }
-        
-        $self->{onerror}->(node => $attr, type => 'template:not template',
-                           level => $self->{level}->{must});
-      } # DOCEL
-    }
-  } else {
-    ## An external document is referenced.
-
-    ## NOTE: Maybe the same-policy restriction should be posed to the
-    ## referenced document, but the spec did not define such
-    ## requirements and the entire feature has already been dropped
-    ## from the spec anyway.
-
-    ## XXXresource:
-    ## - The document MUST be an HTML or XML document.
-    ## - If there is a fragment identifier, it MUST point a part of the doc.
-    ## - If the attribute is |template|, the pointed part MUST be a
-    ##   |datatemplat| element.
-    ## - If no fragment identifier is specified, the root element MUST be
-    ##   a |datatemplate| element when the attribute is |template|.
-  }
-}; # $HTMLRefOrTemplateAttrChecker
-
 my $HTMLRepeatIndexAttrChecker = sub {
   my ($self, $attr) = @_;
 
@@ -1296,28 +1236,6 @@ my $HTMLAttrChecker = {
   },
   hidden => $GetHTMLBooleanAttrChecker->('hidden'),
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
-  ref => $HTMLRefOrTemplateAttrChecker,
-  registrationmark => sub {
-    my ($self, $attr, $item, $element_state) = @_;
-
-    ## NOTE: Any value is conforming.
-
-    if ($self->{flag}->{in_rule}) {
-      my $el = $attr->owner_element;
-      my $ln = $el->manakai_local_name;
-      if ($ln eq 'nest' or
-          ($ln eq 'rule' and not $element_state->{in_rule_original})) {
-        my $nsuri = $el->namespace_uri;
-        if (defined $nsuri and $nsuri eq $HTML_NS) {
-          $self->{onerror}->(node => $attr, type => 'attribute not allowed',
-                             level => $self->{level}->{must});
-        }
-      }
-    } else {
-      $self->{onerror}->(node => $attr, type => 'attribute not allowed',
-                         level => $self->{level}->{must});
-    }
-  },
   repeat => sub {
     my ($self, $attr) = @_;
 
@@ -1387,7 +1305,6 @@ my $HTMLAttrChecker = {
     ## be tested.
   },
   tabindex => $HTMLIntegerAttrChecker,
-  template => $HTMLRefOrTemplateAttrChecker,
 
   ## The |xml:lang| attribute in the null namespace, which is
   ## different from the |lang| attribute in the XML's namespace.
@@ -7286,6 +7203,7 @@ $Element->{$HTML_NS}->{input} = {
          src => '',
          step => '',
          target => '',
+         template => '',
          type => $GetHTMLEnumeratedAttrChecker->({
            hidden => 1, text => 1, search => 1, url => 1,
            tel => 1, email => 1, password => 1,
@@ -7501,6 +7419,7 @@ $Element->{$HTML_NS}->{input} = {
              ## introduced as part of the data template feature.
              ## NOTE: |template| attribute as defined in Web Forms 2.0
              ## has no author requirement.
+             template => sub { }, # XXXobsvocab
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
           } else { # Text, Search, E-mail, URL, Telephone, Password
@@ -8775,96 +8694,6 @@ $Element->{$HTML_NS}->{menu} = {
 }; # menu
 
 # XXXX device
-
-# ---- Data templates ----
-
-$Element->{$HTML_NS}->{datatemplate} = {
-  %HTMLChecker,
-  status => FEATURE_HTML5_DROPPED,
-  check_child_element => sub {
-    my ($self, $item, $child_el, $child_nsuri, $child_ln,
-        $child_is_transparent, $element_state) = @_;
-    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
-      $self->{onerror}->(node => $child_el,
-                         type => 'element not allowed:minus',
-                         level => $self->{level}->{must});
-    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-      #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'rule') {
-      #
-    } else {
-      $self->{onerror}->(node => $child_el,
-                         type => 'element not allowed:datatemplate',
-                         level => $self->{level}->{must});
-    }
-  },
-  check_child_text => sub {
-    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($has_significant) {
-      $self->{onerror}->(node => $child_node, type => 'character not allowed',
-                         level => $self->{level}->{must});
-    }
-  },
-  is_xml_root => 1,
-};
-
-$Element->{$HTML_NS}->{rule} = {
-  %HTMLChecker,
-  status => FEATURE_HTML5_DROPPED,
-  check_attrs => $GetHTMLAttrsChecker->({
-    condition => $HTMLSelectorsAttrChecker,
-    mode => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
-  }, {
-    %HTMLAttrStatus,
-    condition => FEATURE_HTML5_DROPPED,
-    mode => FEATURE_HTML5_DROPPED,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $self->_add_plus_elements ($element_state, {$HTML_NS => {nest => 1}});
-    $element_state->{in_rule_original} = $self->{flag}->{in_rule};
-    $self->{flag}->{in_rule} = 1;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-  check_child_element => sub { },
-  check_child_text => sub { },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $self->_remove_plus_elements ($element_state);
-    delete $self->{flag}->{in_rule} unless $element_state->{in_rule_original};
-
-    $HTMLChecker{check_end}->(@_);
-  },
-  ## NOTE: "MAY be anything that, when the parent |datatemplate|
-  ## is applied to some conforming data, results in a conforming DOM tree.":
-  ## We don't check against this.
-};
-
-$Element->{$HTML_NS}->{nest} = {
-  %HTMLEmptyChecker,
-  status => FEATURE_HTML5_DROPPED,
-  check_attrs => $GetHTMLAttrsChecker->({
-    filter => $HTMLSelectorsAttrChecker,
-    mode => sub {
-      my ($self, $attr) = @_;
-      my $value = $attr->value;
-      if ($value !~ /\A[^\x09\x0A\x0C\x0D\x20]+\z/) {
-        $self->{onerror}->(node => $attr, type => 'mode:syntax error',
-                           level => $self->{level}->{must});
-      }
-    },
-  }, {
-    %HTMLAttrStatus,
-    filter => FEATURE_HTML5_DROPPED,
-    mode => FEATURE_HTML5_DROPPED,
-  }),
-}; # nest
 
 # ---- Microdata ----
 
