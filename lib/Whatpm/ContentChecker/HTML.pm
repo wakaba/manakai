@@ -67,6 +67,15 @@ use constant FEATURE_HTML5_OBSOLETE => 0;
 
 ## -- Obsolete specifications --
 
+## The manakai specification for conformance checking of obsolete HTML
+## vocabulary,
+## <http://suika.fam.cx/www/markup/html/exts/manakai-obsvocab>.  The
+## document defines conformance checking requirements for numbers of
+## obsolete HTML elements and attributes historically specified or
+## implemented but no longer considered part of the HTML language
+## proper.
+sub FEATURE_OBSVOCAB () { 0 }
+
 ## Following historical specifications are obsolete; though some of
 ## them are still "live" specifications according to corresponding
 ## standardization bodies, they are not "applicable specification"s
@@ -1536,34 +1545,35 @@ for (qw/
   $HTMLAttrStatus{$_} = FEATURE_HTML5_DROPPED;
 }
 
-## NOTE: Non-standard global attributes in the HTML namespace.
+## ------ Attributes in the HTML namespace ------
+
+## Global attributes whoes namespace URL is the HTML namespace,
+## i.e. <http://www.w3.org/1999/xhtml>, e.g. |html:class|.  They are
+## all non-conforming.
+
 $AttrChecker->{$HTML_NS}->{''} = sub {}; # no syntactical checks
-$AttrStatus->{$HTML_NS}->{''} = 0; # disallowed and not part of any standard
+$AttrStatus->{$HTML_NS}->{''} = 0;
 
-$AttrStatus->{$HTML_NS}->{active} = FEATURE_HTML5_DROPPED;
-for (qw/repeat repeat-max repeat-min repeat-start repeat-template/) {
+for (qw(
+  class dir id title
+  onclick ondblclick onmousedown onmouseup onmouseover onmousemove
+  onmouseout onkeypress onkeydown onkeyup
+  repeat repeat-max repeat-min repeat-start repeat-template
+  about content datatype property rel resource rev typeof
+  role
+)) {
   $AttrChecker->{$HTML_NS}->{$_} = $HTMLAttrChecker->{$_};
-  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_WF2;
+  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_OBSVOCAB;
 }
 
-for (qw/about content datatype property rel resource rev/) {
-  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_RDFA_REC | FEATURE_XHTML2_ED;
-}
-$AttrStatus->{$HTML_NS}->{instanceof} = FEATURE_RDFA_LC_DROPPED | FEATURE_XHTML2_ED;
-$AttrStatus->{$HTML_NS}->{typeof} = FEATURE_RDFA_REC;
-$AttrStatus->{$HTML_NS}->{role} = FEATURE_ROLE_LC;
-for (qw/cite coords datetime edit encoding href hreflang hrefmedia hreftype
-        ismap layout media nextfocus prevfocus shape src srctype style
-        target usemap/) {
-  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_XHTML2_ED;
-}
-for (qw/class dir id title/) {
-  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_M12N11_LC | FEATURE_XHTML2_ED;
-}
-for (qw/onclick ondblclick onmousedown onmouseup onmouseover onmousemove
-        onmouseout onkeypress onkeydown onkeyup/) {
-  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_M12N11_LC;
-}
+## Following attributes are not supported: html:active [WA1 draft],
+## html:instanceof [RDFa draft], html:cite, html:coords,
+## html:datetime, html:edit, html:encoding, html:href, html:hreflang,
+## html:hrefmedia, html:hreftype, html:ismap, html:layout, html:media,
+## html:nextfocus, html:prevfocus, html:shape, html:src, html:srctype,
+## html:style, html:target, html:usemap [XHTML2 ED]
+
+## ------ ------
 
 my $HTMLDatasetAttrChecker = sub {
   ## NOTE: "Authors should ... when the attributes are ignored and
