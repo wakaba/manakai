@@ -1988,3 +1988,131 @@ id=""><span id="">x</span></p>
 #errors
 /unknown;element not defined;m
 /unknown/@disabled;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    content="">a</p>
+#errors
+/p/@content;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    content="  ">a</p>
+#errors
+/p/@content;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    content="abc">a</p>
+#errors
+/p/@content;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    content="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@content;attribute not defined;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:content="">a</p>
+#errors
+/p;unknown element;u
+/p/@content;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    datatype="">a</p>
+#errors
+/p/@datatype;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    datatype="  ">a</p>
+#errors
+/p/@datatype;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    datatype="abc">a</p>
+#errors
+/p/@datatype;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    datatype="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@datatype;attribute not defined;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:datatype="">a</p>
+#errors
+/p;unknown element;u
+/p/@datatype;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    typeof="">a</p>
+#errors
+/p/@typeof;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    typeof="  ">a</p>
+#errors
+/p/@typeof;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    typeof="abc">a</p>
+#errors
+/p/@typeof;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    typeof="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@typeof;attribute not defined;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:typeof="">a</p>
+#errors
+/p;unknown element;u
+/p/@typeof;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    property="">a</p>
+#errors
+/p/@property;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    property="  ">a</p>
+#errors
+/p/@property;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    property="abc">a</p>
+#errors
+/p/@property;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    property="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@property;attribute not defined;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:property="">a</p>
+#errors
+/p;unknown element;u
+/p/@property;attribute not defined;m

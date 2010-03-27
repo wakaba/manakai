@@ -1232,6 +1232,7 @@ my $HTMLAttrChecker = {
       }
     }
   },
+  content => sub { },
   contenteditable => $GetHTMLEnumeratedAttrChecker->({
     true => 1, false => 1, '' => 1,
   }),
@@ -1244,10 +1245,12 @@ my $HTMLAttrChecker = {
     ## of the Document tree is in the DOM?  A menu Element node that
     ## belong to another Document tree is in the DOM?
   },
+  datatype => sub { },
   disabled => $GetHTMLBooleanAttrChecker->('disabled'),
   hidden => $GetHTMLBooleanAttrChecker->('hidden'),
   hidefocus => $GetHTMLBooleanAttrChecker->('hidefocus'),
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
+  property => sub { },
   repeat => sub {
     my ($self, $attr) = @_;
 
@@ -1318,6 +1321,7 @@ my $HTMLAttrChecker = {
     ## be tested.
   },
   tabindex => $HTMLIntegerAttrChecker,
+  typeof => sub { },
   unselectable => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
   ## The |xml:lang| attribute in the null namespace, which is
   ## different from the |lang| attribute in the XML's namespace.
@@ -1383,11 +1387,13 @@ my %HTMLAttrStatus = (
   accesskey => FEATURE_HTML5_FD,
   atomicselection => FEATURE_OBSVOCAB,
   class => FEATURE_HTML5_LC,
+  content => FEATURE_OBSVOCAB,
   contenteditable => FEATURE_HTML5_REC,
   contextmenu => FEATURE_HTML5_WD,
   datafld => FEATURE_HTML5_OBSOLETE,
   dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
+  datatype => FEATURE_OBSVOCAB,
   dir => FEATURE_HTML5_REC,
   disabled => FEATURE_OBSVOCAB,
   draggable => FEATURE_HTML5_LC,
@@ -1396,6 +1402,7 @@ my %HTMLAttrStatus = (
   id => FEATURE_HTML5_REC,
   irrelevant => FEATURE_HTML5_DROPPED,
   lang => FEATURE_HTML5_REC,
+  property => FEATURE_OBSVOCAB,
   ref => FEATURE_HTML5_DROPPED,
   registrationmark => FEATURE_HTML5_DROPPED,
   repeat => FEATURE_WF2,
@@ -1410,21 +1417,19 @@ my %HTMLAttrStatus = (
   tabindex => FEATURE_HTML5_DEFAULT,
   template => FEATURE_HTML5_DROPPED,
   title => FEATURE_HTML5_REC,  
+  typeof => FEATURE_OBSVOCAB,
   unselectable => FEATURE_OBSVOCAB,
   xmlns => FEATURE_HTML5_WD,
 );
 
 my %HTMLM12NCommonAttrStatus = (
   class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  content => FEATURE_RDFA_REC,
   datafld => FEATURE_HTML5_OBSOLETE,
   dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
-  datatype => FEATURE_RDFA_REC,
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
   id => FEATURE_HTML5_REC,
-  instanceof => FEATURE_RDFA_LC_DROPPED,
   onclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   ondblclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onmousedown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -1435,12 +1440,10 @@ my %HTMLM12NCommonAttrStatus = (
   onkeypress => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeydown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  property => FEATURE_RDFA_REC,
   rel => FEATURE_RDFA_REC,
   rev => FEATURE_RDFA_REC,
   style => FEATURE_HTML5_REC,
   title => FEATURE_HTML5_REC,
-  typeof => FEATURE_RDFA_REC,
 );
 
 my %XHTML2CommonAttrStatus = (
@@ -1487,10 +1490,6 @@ my %XHTML2CommonAttrStatus = (
   media => FEATURE_XHTML2_ED,
 
   ## Metadata
-  content => FEATURE_XHTML2_ED,
-  datatype => FEATURE_XHTML2_ED,
-  instanceof => FEATURE_XHTML2_ED,
-  property => FEATURE_XHTML2_ED,
   rel => FEATURE_XHTML2_ED,
   rev => FEATURE_XHTML2_ED,
 
@@ -1506,21 +1505,16 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   %XHTML2CommonAttrStatus,
 
   class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  content => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   datafld => FEATURE_HTML5_OBSOLETE,
   dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
-  datatype => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
   id => FEATURE_HTML5_REC,
-  instanceof => FEATURE_RDFA_LC_DROPPED | FEATURE_XHTML2_ED,
-  property => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   rel => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   rev => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   style => FEATURE_HTML5_REC,
   title => FEATURE_HTML5_REC,
-  typeof => FEATURE_RDFA_REC,
 );
 
 for (qw(
