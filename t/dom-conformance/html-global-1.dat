@@ -1636,3 +1636,59 @@ id=""><span id="">x</span></p>
 #errors
 /x;unknown element;u
 /x/@media;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    about="">a</p>
+#errors
+/p/@about;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    about="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@about;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    about="[]">a</p>
+#errors
+/p/@about;attribute not defined;m
+/p/@about;syntax error:iriref3987;m
+
+#data
+<x xmlns:html="http://www.w3.org/1999/xhtml"
+    html:about="[]">a</x>
+#errors
+/x;unknown element;u
+/x/@about;attribute not defined;m
+/x/@about;syntax error:iriref3987;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    resource="">a</p>
+#errors
+/p/@resource;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    resource="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@resource;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    resource="[]">a</p>
+#errors
+/p/@resource;attribute not defined;m
+/p/@resource;syntax error:iriref3987;m
+
+#data
+<x xmlns:html="http://www.w3.org/1999/xhtml"
+    html:resource="[]">a</x>
+#errors
+/x;unknown element;u
+/x/@resource;attribute not defined;m
+/x/@resource;syntax error:iriref3987;m

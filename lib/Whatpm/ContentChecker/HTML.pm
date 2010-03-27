@@ -1135,6 +1135,7 @@ my $PlaceholderAttrChecker = sub {
 }; # $PlaceholderAttrChecker
 
 my $HTMLAttrChecker = {
+  about => $HTMLURIAttrChecker,
   accesskey => sub {
     my ($self, $attr) = @_;
     
@@ -1297,6 +1298,7 @@ my $HTMLAttrChecker = {
     ## is not a repetition block.  In anyway, the repetition template
     ## feature has been removed from the HTML5 specification.
   },
+  resource => $HTMLURIAttrChecker,
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
   spellcheck => $GetHTMLEnumeratedAttrChecker->({
     true => 1, false => 1, '' => 1,
@@ -1375,6 +1377,7 @@ my $HTMLAttrChecker = {
 };
 
 my %HTMLAttrStatus = (
+  about => FEATURE_OBSVOCAB,
   accesskey => FEATURE_HTML5_FD,
   class => FEATURE_HTML5_LC,
   contenteditable => FEATURE_HTML5_REC,
@@ -1395,6 +1398,7 @@ my %HTMLAttrStatus = (
   'repeat-min' => FEATURE_WF2,
   'repeat-start' => FEATURE_WF2,
   'repeat-template' => FEATURE_WF2,
+  resource => FEATURE_OBSVOCAB,
   role => 0,
   spellcheck => FEATURE_HTML5_WD,
   style => FEATURE_HTML5_REC,
@@ -1405,7 +1409,6 @@ my %HTMLAttrStatus = (
 );
 
 my %HTMLM12NCommonAttrStatus = (
-  about => FEATURE_RDFA_REC,
   class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   content => FEATURE_RDFA_REC,
   datafld => FEATURE_HTML5_OBSOLETE,
@@ -1428,7 +1431,6 @@ my %HTMLM12NCommonAttrStatus = (
   onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   property => FEATURE_RDFA_REC,
   rel => FEATURE_RDFA_REC,
-  resource => FEATURE_RDFA_REC,
   rev => FEATURE_RDFA_REC,
   style => FEATURE_HTML5_REC,
   title => FEATURE_HTML5_REC,
@@ -1479,13 +1481,11 @@ my %XHTML2CommonAttrStatus = (
   media => FEATURE_XHTML2_ED,
 
   ## Metadata
-  about => FEATURE_XHTML2_ED,
   content => FEATURE_XHTML2_ED,
   datatype => FEATURE_XHTML2_ED,
   instanceof => FEATURE_XHTML2_ED,
   property => FEATURE_XHTML2_ED,
   rel => FEATURE_XHTML2_ED,
-  resource => FEATURE_XHTML2_ED,
   rev => FEATURE_XHTML2_ED,
 
   ## Role
@@ -1499,7 +1499,6 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   %HTMLM12NCommonAttrStatus,
   %XHTML2CommonAttrStatus,
 
-  about => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   content => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   datafld => FEATURE_HTML5_OBSOLETE,
@@ -1512,7 +1511,6 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   instanceof => FEATURE_RDFA_LC_DROPPED | FEATURE_XHTML2_ED,
   property => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   rel => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
-  resource => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   rev => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   style => FEATURE_HTML5_REC,
   title => FEATURE_HTML5_REC,
