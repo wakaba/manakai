@@ -1159,7 +1159,7 @@ my $HTMLAttrChecker = {
       }
     }
   }, # accesskey
-
+  atomicselection => $GetHTMLEnumeratedAttrChecker->({true => 1, false => 1}),
   datasrc => $HTMLURIAttrChecker,
   datafld => sub { }, ## Reserved in HTML4, CDATA
   dataformatas => $GetHTMLEnumeratedAttrChecker->({plaintext => 1, html => 1}),
@@ -1244,7 +1244,9 @@ my $HTMLAttrChecker = {
     ## of the Document tree is in the DOM?  A menu Element node that
     ## belong to another Document tree is in the DOM?
   },
+  disabled => $GetHTMLBooleanAttrChecker->('disabled'),
   hidden => $GetHTMLBooleanAttrChecker->('hidden'),
+  hidefocus => $GetHTMLBooleanAttrChecker->('hidefocus'),
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   repeat => sub {
     my ($self, $attr) = @_;
@@ -1316,7 +1318,7 @@ my $HTMLAttrChecker = {
     ## be tested.
   },
   tabindex => $HTMLIntegerAttrChecker,
-
+  unselectable => $GetHTMLEnumeratedAttrChecker->({on => 1, off => 1}),
   ## The |xml:lang| attribute in the null namespace, which is
   ## different from the |lang| attribute in the XML's namespace.
   'xml:lang' => sub {
@@ -1379,6 +1381,7 @@ my $HTMLAttrChecker = {
 my %HTMLAttrStatus = (
   about => FEATURE_OBSVOCAB,
   accesskey => FEATURE_HTML5_FD,
+  atomicselection => FEATURE_OBSVOCAB,
   class => FEATURE_HTML5_LC,
   contenteditable => FEATURE_HTML5_REC,
   contextmenu => FEATURE_HTML5_WD,
@@ -1386,8 +1389,10 @@ my %HTMLAttrStatus = (
   dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
   dir => FEATURE_HTML5_REC,
+  disabled => FEATURE_OBSVOCAB,
   draggable => FEATURE_HTML5_LC,
   hidden => FEATURE_HTML5_LC,
+  hidefocus => FEATURE_OBSVOCAB,
   id => FEATURE_HTML5_REC,
   irrelevant => FEATURE_HTML5_DROPPED,
   lang => FEATURE_HTML5_REC,
@@ -1405,6 +1410,7 @@ my %HTMLAttrStatus = (
   tabindex => FEATURE_HTML5_DEFAULT,
   template => FEATURE_HTML5_DROPPED,
   title => FEATURE_HTML5_REC,  
+  unselectable => FEATURE_OBSVOCAB,
   xmlns => FEATURE_HTML5_WD,
 );
 
@@ -2861,6 +2867,7 @@ $Element->{$HTML_NS}->{script} = {
     for => FEATURE_HTML5_OBSOLETE,
     href => FEATURE_RDFA_REC,
     id => FEATURE_HTML5_REC,
+    #implements [XHTML 1.2]
     language => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
