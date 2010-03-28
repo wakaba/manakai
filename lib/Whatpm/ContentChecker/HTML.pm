@@ -1553,14 +1553,25 @@ for (qw(
   $HTMLAttrStatus{$_} = FEATURE_HTML5_LC;
 }
 
-for (qw/
-         onbeforeunload onhashchange onresize onstorage onunload
-         ondataunavailable
-         onmessage
-     /) {
+for (qw(
+  onactivate onafterupdate onbeforeactivate onbeforecopy onbeforecut
+  onbeforedeactivate onbeforeeditfocus onbeforepaste onbeforeupdate
+  oncellchange oncontrolselect oncopy oncut ondataavailable
+  ondatasetchanged ondatasetcomplete ondeactivate onerrorupdate
+  onfilterchange onfocusin onfocusout ongesturechange ongestureend
+  ongesturestart onhelp onlayoutcomplete onlosecapture onmouseenter
+  onmouseleave onmove onmoveend onmovestart onorientationchange
+  onpaste onpropertychange onresizeend onresizestart onrowenter
+  onrowexit onrowsdelete onrowsinserted onselectstart onsearch
+  ontouchcancel ontouchend ontouchmove ontouchstart
+)) {
   $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
-  $HTMLAttrStatus{$_} = FEATURE_HTML5_DROPPED;
+  $HTMLAttrStatus{$_} = FEATURE_OBSVOCAB;
 }
+
+## Following attributes are not supported (at least as global
+## attributes): onbeforeunload, onhashchange, onresize, onstorage,
+## onunload, ondataunavailable, onmessage.
 
 ## ------ Attributes in the HTML namespace ------
 
@@ -1588,7 +1599,7 @@ for (qw(
 ## html:datetime, html:edit, html:encoding, html:href, html:hreflang,
 ## html:hrefmedia, html:hreftype, html:ismap, html:layout, html:media,
 ## html:nextfocus, html:prevfocus, html:shape, html:src, html:srctype,
-## html:style, html:target, html:usemap [XHTML2 ED]
+## html:style, html:target, html:usemap [XHTML2 ED].
 
 ## ------ ------
 

@@ -6,7 +6,6 @@
 #data
 <p onbeforeunload="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onbeforeunload;event handler;u
 /p/@onbeforeunload;attribute not defined;m
 
 #data
@@ -25,16 +24,84 @@
 /p/@onclick;event handler;u
 
 #data
+<p html:onclick="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onclick;attribute not defined;m
+/p/@onclick;event handler;u
+
+#data
+<p html:ondblclick="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@ondblclick;attribute not defined;m
+/p/@ondblclick;event handler;u
+
+#data
+<p html:onkeydown="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onkeydown;attribute not defined;m
+/p/@onkeydown;event handler;u
+
+#data
+<p html:onkeyup="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onkeyup;attribute not defined;m
+/p/@onkeyup;event handler;u
+
+#data
+<p html:onkeypress="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onkeypress;attribute not defined;m
+/p/@onkeypress;event handler;u
+
+#data
+<p html:onmousedown="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onmousedown;attribute not defined;m
+/p/@onmousedown;event handler;u
+
+#data
+<p html:onmouseup="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onmouseup;attribute not defined;m
+/p/@onmouseup;event handler;u
+
+#data
+<p html:onmousemove="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onmousemove;attribute not defined;m
+/p/@onmousemove;event handler;u
+
+#data
+<p html:onmouseover="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onmouseover;attribute not defined;m
+/p/@onmouseover;event handler;u
+
+#data
+<p html:onmouseout="alert(1);" xmlns:html="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p;unknown element;u
+/p/@onmouseout;attribute not defined;m
+/p/@onmouseout;event handler;u
+
+#data
 <p onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
-/p/@onstorage;event handler;u
 /p/@onstorage;attribute not defined;m
 
 #data
 <unknown onstorage="" xmlns="http://www.w3.org/1999/xhtml">x</unknown>
 #errors
 /unknown;element not defined;m
-/unknown/@onstorage;event handler;u
 /unknown/@onstorage;attribute not defined;m
 
 #data
@@ -48,7 +115,6 @@
 >x</p>
 #errors
 /p/@ondataunavailable;attribute not defined;m
-/p/@ondataunavailable;event handler;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -56,7 +122,6 @@
 >x</p>
 #errors
 /p/@onmessage;attribute not defined;m
-/p/@onmessage;event handler;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -87,7 +152,6 @@
 >x</p>
 #errors
 /p/@onbeforeunload;attribute not defined;m
-/p/@onbeforeunload;event handler;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -95,7 +159,6 @@
 >x</p>
 #errors
 /p/@onhashchange;attribute not defined;m
-/p/@onhashchange;event handler;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -103,7 +166,6 @@
 >x</p>
 #errors
 /p/@onresize;attribute not defined;m
-/p/@onresize;event handler;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -111,7 +173,6 @@
 >x</p>
 #errors
 /p/@onstorage;attribute not defined;m
-/p/@onstorage;event handler;u
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -119,7 +180,93 @@
 >x</p>
 #errors
 /p/@onunload;attribute not defined;m
-/p/@onunload;event handler;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    onactivate="">a</p>
+#errors
+/p/@onactivate;event handler;u
+/p/@onactivate;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onactivate="">a</body>
+#errors
+/body/@onactivate;event handler;u
+/body/@onactivate;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    onactivate="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@onactivate;event handler;u
+/unknown/@onactivate;attribute not defined;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:onactivate="">a</p>
+#errors
+/p;unknown element;u
+/p/@onactivate;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    onrowexit="">a</p>
+#errors
+/p/@onrowexit;event handler;u
+/p/@onrowexit;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    onrowexit="">a</body>
+#errors
+/body/@onrowexit;event handler;u
+/body/@onrowexit;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    onrowexit="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@onrowexit;event handler;u
+/unknown/@onrowexit;attribute not defined;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:onrowexit="">a</p>
+#errors
+/p;unknown element;u
+/p/@onrowexit;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    ontouchstart="">a</p>
+#errors
+/p/@ontouchstart;event handler;u
+/p/@ontouchstart;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    ontouchstart="">a</body>
+#errors
+/body/@ontouchstart;event handler;u
+/body/@ontouchstart;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    ontouchstart="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@ontouchstart;event handler;u
+/unknown/@ontouchstart;attribute not defined;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:ontouchstart="">a</p>
+#errors
+/p;unknown element;u
+/p/@ontouchstart;attribute not defined;m
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"
