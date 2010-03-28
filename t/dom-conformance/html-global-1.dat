@@ -1145,6 +1145,7 @@ id=""><span id="">x</span></p>
     dataformatas="plaintext">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1157,6 +1158,7 @@ id=""><span id="">x</span></p>
     dataformatas="PlainText">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
+/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1170,6 +1172,12 @@ id=""><span id="">x</span></p>
 #errors
 /p/@dataformatas;attribute not defined;m
 /p/@dataformatas;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="text">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1191,6 +1199,33 @@ id=""><span id="">x</span></p>
 #errors
 /p/@dataformatas;attribute not defined;m
 /p/@dataformatas;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="localized-text">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="LOCALIZED-text">a</p>
+#errors
+/p/@dataformatas;attribute not defined;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="localized">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@dataformatas;attribute not defined;m
+/unknown/@dataformatas;enumerated:invalid;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:dataformatas="localized">a</p>
+#errors
+/p;unknown element;u
+/p/@dataformatas;attribute not defined;m
 
 #data
 <tt xmlns="http://www.w3.org/1999/xhtml"

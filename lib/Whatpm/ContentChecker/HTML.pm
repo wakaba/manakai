@@ -1162,7 +1162,10 @@ my $HTMLAttrChecker = {
   atomicselection => $GetHTMLEnumeratedAttrChecker->({true => 1, false => 1}),
   datasrc => $HTMLURIAttrChecker,
   datafld => sub { },
-  dataformatas => $GetHTMLEnumeratedAttrChecker->({plaintext => 1, html => 1}),
+  dataformatas => $GetHTMLEnumeratedAttrChecker->({
+    text => 1, html => 1, 'localized-text' => 1,
+    ## See <http://suika.fam.cx/~wakaba/wiki/sw/n/dataformatas>.
+  }),
 
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
@@ -1390,8 +1393,8 @@ my %HTMLAttrStatus = (
   content => FEATURE_OBSVOCAB,
   contenteditable => FEATURE_HTML5_REC,
   contextmenu => FEATURE_HTML5_WD,
-  datafld => FEATURE_OBSVOCAB,
-  dataformatas => FEATURE_HTML5_OBSOLETE,
+  datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+  dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   datasrc => FEATURE_HTML5_OBSOLETE,
   datatype => FEATURE_OBSVOCAB,
   dir => FEATURE_HTML5_REC,
@@ -1424,7 +1427,6 @@ my %HTMLAttrStatus = (
 
 my %HTMLM12NCommonAttrStatus = (
   class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
@@ -1504,7 +1506,6 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   %XHTML2CommonAttrStatus,
 
   class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
