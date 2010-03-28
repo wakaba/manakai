@@ -1161,7 +1161,7 @@ my $HTMLAttrChecker = {
   }, # accesskey
   atomicselection => $GetHTMLEnumeratedAttrChecker->({true => 1, false => 1}),
   datasrc => $HTMLURIAttrChecker,
-  datafld => sub { }, ## Reserved in HTML4, CDATA
+  datafld => sub { },
   dataformatas => $GetHTMLEnumeratedAttrChecker->({plaintext => 1, html => 1}),
 
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
@@ -1390,7 +1390,7 @@ my %HTMLAttrStatus = (
   content => FEATURE_OBSVOCAB,
   contenteditable => FEATURE_HTML5_REC,
   contextmenu => FEATURE_HTML5_WD,
-  datafld => FEATURE_HTML5_OBSOLETE,
+  datafld => FEATURE_OBSVOCAB,
   dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
   datatype => FEATURE_OBSVOCAB,
@@ -1424,7 +1424,6 @@ my %HTMLAttrStatus = (
 
 my %HTMLM12NCommonAttrStatus = (
   class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  datafld => FEATURE_HTML5_OBSOLETE,
   dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
   dir => FEATURE_HTML5_REC,
@@ -1505,7 +1504,6 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   %XHTML2CommonAttrStatus,
 
   class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  datafld => FEATURE_HTML5_OBSOLETE,
   dataformatas => FEATURE_HTML5_OBSOLETE,
   datasrc => FEATURE_HTML5_OBSOLETE,
   dir => FEATURE_HTML5_REC,
@@ -8860,6 +8858,24 @@ $Element->{$HTML_NS}->{noframes} = {
     lang => FEATURE_HTML5_REC,
   }), # check_attrs
 }; # noframes
+
+## ------ Elements not supported by this module ------
+
+## Following elements are explicitly not supported: abstract, arg,
+## changed, cmd, epilogue, footnote, hide, htmlplus, margin, message,
+## prologue, quote, removed, render, rev [HTML+], note, fn, banner,
+## lh, bodytext, abbrev, au, bq, bt, credit, fig, figtext, person,
+## lang, tab, math, above, added, array, atop, bar, below, box, ddot,
+## dot, hat, left, of, over, overlay, range, right, root, row, spot,
+## sqrt, tilde, vec [HTML30], access [ACCESS], blockcode, standby, nl,
+## l, h, separator [XHTML2ED], m, x, t, dc, ds, datatemplate, rule,
+## nest, calendar, card, switch, eventsource, sidebar [WA1 draft],
+## repeat [WF2 draft], centre, noflames, noframe, textflow, app,
+## server, htmlarea, animate, h7, h8, h9, entity, hype, key, tbl,
+## audioscope, limittext, nosmartquotes, shadow, sound, noimg,
+## element, attrib, csactionitem, csactions, csaction, csscriptdict,
+## csactiondict, csobj, madebywz, x-sas-window, yomi, fn-contents,
+## module
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 

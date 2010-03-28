@@ -1106,6 +1106,20 @@ id=""><span id="">x</span></p>
 /p/@datafld;attribute not defined;m
 
 #data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    datafld="abc">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@datafld;attribute not defined;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:datafld="abc">a</p>
+#errors
+/p;unknown element;u
+/p/@datafld;attribute not defined;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml"
     dataformatas="">a</p>
 #errors
