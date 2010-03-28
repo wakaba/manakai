@@ -391,3 +391,91 @@
 /script/@for;attribute not defined;m
 /script/@for;syntax error:iriref3987;m
 /script;SUBDOC;text/javascript
+
+#data
+<a language="" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="  " xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="javascript" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+
+#data
+<a language="JavaScript" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+
+#data
+<a language="JAVASCRIPT" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+
+#data
+<a language="javascript " xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="js" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="javascript1.1" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="jscript" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="ecmascript" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="vbScript" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="xml" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<a language="language" xmlns="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a/@language;attribute not defined;m
+/a/@language;script language;m
+
+#data
+<unknown language="" xmlns="http://www.w3.org/1999/xhtml">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@language;attribute not defined;m
+/unknown/@language;script language;m
+
+#data
+<a html:language="" xmlns:html="http://www.w3.org/1999/xhtml">a</a>
+#errors
+/a;unknown element;u
+/a/@language;attribute not defined;m

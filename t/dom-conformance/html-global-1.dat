@@ -1079,6 +1079,7 @@ id=""><span id="">x</span></p>
     datasrc="">a</p>
 #errors
 /p/@datasrc;attribute not defined;m
+/p/@datasrc;url:empty;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1092,6 +1093,21 @@ id=""><span id="">x</span></p>
 #errors
 /p/@datasrc;attribute not defined;m
 /p/@datasrc;syntax error:iriref3987;m
+
+#data
+<unknown xmlns="http://www.w3.org/1999/xhtml"
+    datasrc="">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@datasrc;attribute not defined;m
+/unknown/@datasrc;url:empty;m
+
+#data
+<p xmlns:html="http://www.w3.org/1999/xhtml"
+    html:datasrc="">a</p>
+#errors
+/p;unknown element;u
+/p/@datasrc;attribute not defined;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"

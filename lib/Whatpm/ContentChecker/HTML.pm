@@ -559,6 +559,17 @@ my $HTMLURIAttrChecker = sub {
       $element_state->{uri_info}->{$attr_name};
 }; # $HTMLURIAttrChecker
 
+my $NonEmptyURLChecker = sub {
+  my ($self, $attr) = @_;
+  if ($attr->value eq '') {
+    $self->{onerror}->(type => 'url:empty', # XXX documentation
+                       node => $attr,
+                       level => $self->{level}->{must});
+  } else {
+    $HTMLURIAttrChecker->(@_);
+  }
+}; # $NonEmptyURLChecker
+
 ## "A set of space-separated tokens, each of which MUST be a valid
 ## URL".
 my $HTMLSpaceURIsAttrChecker = sub {
@@ -1160,7 +1171,7 @@ my $HTMLAttrChecker = {
     }
   }, # accesskey
   atomicselection => $GetHTMLEnumeratedAttrChecker->({true => 1, false => 1}),
-  datasrc => $HTMLURIAttrChecker,
+  datasrc => $NonEmptyURLChecker,
   datafld => sub { },
   dataformatas => $GetHTMLEnumeratedAttrChecker->({
     text => 1, html => 1, 'localized-text' => 1,
@@ -1253,6 +1264,16 @@ my $HTMLAttrChecker = {
   hidden => $GetHTMLBooleanAttrChecker->('hidden'),
   hidefocus => $GetHTMLBooleanAttrChecker->('hidefocus'),
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
+  language => sub {
+    my ($self, $attr) = @_;
+    my $value = $attr->value;
+    $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    unless ($value eq 'javascript') {
+      $self->{onerror}->(type => 'script language', # XXXdocumentation
+                         node => $attr,
+                         level => $self->{level}->{must});
+    }
+  }, # language
   property => sub { },
   repeat => sub {
     my ($self, $attr) = @_;
@@ -1395,7 +1416,7 @@ my %HTMLAttrStatus = (
   contextmenu => FEATURE_HTML5_WD,
   datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-  datasrc => FEATURE_HTML5_OBSOLETE,
+  datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   datatype => FEATURE_OBSVOCAB,
   dir => FEATURE_HTML5_REC,
   disabled => FEATURE_OBSVOCAB,
@@ -1405,6 +1426,7 @@ my %HTMLAttrStatus = (
   id => FEATURE_HTML5_REC,
   irrelevant => FEATURE_HTML5_DROPPED,
   lang => FEATURE_HTML5_REC,
+  language => FEATURE_OBSVOCAB,
   property => FEATURE_OBSVOCAB,
   ref => FEATURE_HTML5_DROPPED,
   registrationmark => FEATURE_HTML5_DROPPED,
@@ -1427,7 +1449,6 @@ my %HTMLAttrStatus = (
 
 my %HTMLM12NCommonAttrStatus = (
   class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  datasrc => FEATURE_HTML5_OBSOLETE,
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
   id => FEATURE_HTML5_REC,
@@ -1506,7 +1527,6 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   %XHTML2CommonAttrStatus,
 
   class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  datasrc => FEATURE_HTML5_OBSOLETE,
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
   id => FEATURE_HTML5_REC,
