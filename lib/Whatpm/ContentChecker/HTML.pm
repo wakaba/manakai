@@ -1124,6 +1124,7 @@ my $FontSizeChecker = sub {
 my $HTMLRepeatIndexAttrChecker = sub {
   my ($self, $attr) = @_;
 
+  # XXX
   if (defined $attr->namespace_uri) {
     my $oe = $attr->owner_element;
     my $oe_nsuri = $oe->namespace_uri;
@@ -1131,6 +1132,19 @@ my $HTMLRepeatIndexAttrChecker = sub {
       $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                          level => $self->{level}->{must});
     }
+  }
+
+  my $oe = $attr->owner_element;
+  my $oens = $oe->namespace_uri;
+  my $repeat = (defined $oens and $oens eq $HTML_NS)
+      ? $oe->get_attribute_ns (undef, 'repeat')
+      : $oe->get_attribute_ns ($HTML_NS, 'repeat');
+  if (defined $repeat and $repeat eq 'template') {
+    #
+  } else {
+    $self->{onerror}->(node => $attr,
+                       type => 'attribute not allowed:repeat-*', # XXXdocumentation
+                       level => $self->{level}->{must});
   }
   
   $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_);
@@ -1290,20 +1304,12 @@ my $HTMLAttrChecker = {
     my $value = $attr->value;
     if ($value eq 'template') {
       #
-    } elsif ($value =~ /\A-?[0-9]+\z/) {
+    } elsif ($value =~ /\A-?[0-9]+\z/) { ## A valid integer.
       #
     } else {
       $self->{onerror}->(node => $attr, type => 'repeat:syntax error',
                          level => $self->{level}->{must});
     }
-
-    ## NOTE: Where this attribute is allowed to set was not clearly
-    ## defined in Web Forms 2.0.  The spec said that "Repetition
-    ## templates may occur anywhere", which might imply the attribute
-    ## can be specified to any element, but its primary implication
-    ## would be that the template can be appear in any hierarchy in
-    ## the document structure.  Anyway, the feature has been removed
-    ## from the HTML5 spec.
   },
   'repeat-min' => $HTMLRepeatIndexAttrChecker,
   'repeat-max' => $HTMLRepeatIndexAttrChecker,
@@ -1430,10 +1436,10 @@ my %HTMLAttrStatus = (
   property => FEATURE_OBSVOCAB,
   ref => FEATURE_HTML5_DROPPED,
   registrationmark => FEATURE_HTML5_DROPPED,
-  repeat => FEATURE_WF2,
-  'repeat-max' => FEATURE_WF2,
-  'repeat-min' => FEATURE_WF2,
-  'repeat-start' => FEATURE_WF2,
+  repeat => FEATURE_OBSVOCAB,
+  'repeat-max' => FEATURE_OBSVOCAB,
+  'repeat-min' => FEATURE_OBSVOCAB,
+  'repeat-start' => FEATURE_OBSVOCAB,
   'repeat-template' => FEATURE_WF2,
   resource => FEATURE_OBSVOCAB,
   role => 0,

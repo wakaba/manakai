@@ -323,6 +323,45 @@
 /p/@repeat-start;attribute not defined;m
 
 #data
+<p repeat-min="1" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat-min;attribute not defined;m
+/p/@repeat-min;attribute not allowed:repeat-*;m
+
+#data
+<p repeat-max="1" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat-max;attribute not defined;m
+/p/@repeat-max;attribute not allowed:repeat-*;m
+
+#data
+<p repeat-start="1" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat-start;attribute not defined;m
+/p/@repeat-start;attribute not allowed:repeat-*;m
+
+#data
+<p repeat-min="1" repeat="1" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
+/p/@repeat-min;attribute not allowed:repeat-*;m
+
+#data
+<p repeat-max="1" repeat="1" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
+/p/@repeat-max;attribute not allowed:repeat-*;m
+
+#data
+<p repeat-start="1" repeat="1" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
+/p/@repeat-start;attribute not allowed:repeat-*;m
+
+#data
 <x html:repeat="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
 #errors
 /x;unknown element;u
@@ -335,6 +374,7 @@
 /x;unknown element;u
 /x/@repeat-start;nninteger:syntax error;m
 /x/@repeat-start;attribute not defined;m
+/x/@repeat-start;attribute not allowed:repeat-*;m
 
 #data
 <x html:repeat-min="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
@@ -342,6 +382,7 @@
 /x;unknown element;u
 /x/@repeat-min;nninteger:syntax error;m
 /x/@repeat-min;attribute not defined;m
+/x/@repeat-min;attribute not allowed:repeat-*;m
 
 #data
 <x html:repeat-max="x" xmlns:html="http://www.w3.org/1999/xhtml"/>
@@ -349,6 +390,58 @@
 /x;unknown element;u
 /x/@repeat-max;nninteger:syntax error;m
 /x/@repeat-max;attribute not defined;m
+/x/@repeat-max;attribute not allowed:repeat-*;m
+
+#data
+<x html:repeat-min="1" html:repeat="template"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</x>
+#errors
+/x;unknown element;u
+/x/@repeat;attribute not defined;m
+/x/@repeat-min;attribute not defined;m
+
+#data
+<x html:repeat-max="1" html:repeat="template"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</x>
+#errors
+/x;unknown element;u
+/x/@repeat;attribute not defined;m
+/x/@repeat-max;attribute not defined;m
+
+#data
+<x html:repeat-start="1" html:repeat="template"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</x>
+#errors
+/x;unknown element;u
+/x/@repeat;attribute not defined;m
+/x/@repeat-start;attribute not defined;m
+
+#data
+<x html:repeat-min="1" repeat="template"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</x>
+#errors
+/x;unknown element;u
+/x/@repeat;unknown attribute;u
+/x/@repeat-min;attribute not defined;m
+/x/@repeat-min;attribute not allowed:repeat-*;m
+
+#data
+<x html:repeat-max="1" repeat="template"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</x>
+#errors
+/x;unknown element;u
+/x/@repeat;unknown attribute;u
+/x/@repeat-max;attribute not defined;m
+/x/@repeat-max;attribute not allowed:repeat-*;m
+
+#data
+<x html:repeat-start="1" repeat="template"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</x>
+#errors
+/x;unknown element;u
+/x/@repeat;unknown attribute;u
+/x/@repeat-start;attribute not defined;m
+/x/@repeat-start;attribute not allowed:repeat-*;m
 
 #data
 <x html:repeat-template="x" xmlns:html="http://www.w3.org/1999/xhtml"><p repeat="template" id="x" xmlns="http://www.w3.org/1999/xhtml">x</p></x>
@@ -395,6 +488,39 @@
 /p/@repeat-template;attribute not allowed;m
 /p/@repeat-template;attribute not defined;m
 /p/q/@repeat;attribute not defined;m
+
+#data
+<p html:repeat-min="1" html:repeat="template"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat;attribute not allowed;m
+/p/@repeat-min;attribute not allowed;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-min;attribute not defined;m
+/p/@repeat-min;attribute not allowed:repeat-*;m
+
+#data
+<p html:repeat-max="1" html:repeat="template"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat;attribute not allowed;m
+/p/@repeat-max;attribute not allowed;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-max;attribute not defined;m
+/p/@repeat-max;attribute not allowed:repeat-*;m
+
+#data
+<p html:repeat-start="1" html:repeat="template"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@repeat;attribute not allowed;m
+/p/@repeat-start;attribute not allowed;m
+/p/@repeat;attribute not defined;m
+/p/@repeat-start;attribute not defined;m
+/p/@repeat-start;attribute not allowed:repeat-*;m
 
 #data
 <a html:repeat="" html:b=""
