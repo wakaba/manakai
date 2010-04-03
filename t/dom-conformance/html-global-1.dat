@@ -2181,3 +2181,76 @@ id=""><span id="">x</span></p>
 #errors
 /p;unknown element;u
 /p/@property;attribute not defined;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+/html/body/p/@xml:space;enumerated:invalid;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="  ">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+/html/body/p/@xml:space;enumerated:invalid;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="default">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="Default">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="preserve">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="Preserve">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="default ">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+/html/body/p/@xml:space;enumerated:invalid;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="xml:space">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+/html/body/p/@xml:space;enumerated:invalid;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="space">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+/html/body/p/@xml:space;enumerated:invalid;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="preserved">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+/html/body/p/@xml:space;enumerated:invalid;m
+
+#data html
+<!DOCTYPE html><title>a</title>
+<p xml:space="none">a</p>
+#errors
+/html/body/p/@xml:space;attribute not defined;m
+/html/body/p/@xml:space;enumerated:invalid;m

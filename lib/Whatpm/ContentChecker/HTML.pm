@@ -74,7 +74,7 @@ use constant FEATURE_HTML5_OBSOLETE => 0;
 ## obsolete HTML elements and attributes historically specified or
 ## implemented but no longer considered part of the HTML language
 ## proper.
-sub FEATURE_OBSVOCAB () { 0 }
+sub FEATURE_OBSVOCAB () { "0 but true" }
 
 ## Following historical specifications are obsolete; though some of
 ## them are still "live" specifications according to corresponding
@@ -1407,7 +1407,11 @@ my $HTMLAttrChecker = {
     push @{$self->{return}->{uri}->{$value} ||= []},
         {node => $attr, type => {namespace => 1}};
   },
-};
+
+  ## The |xml:space| attribute in no namespace, which is different
+  ## from the |space| attribute in the XML namespace.
+  'xml:space' => $GetHTMLEnumeratedAttrChecker->({default => 1, preserve => 1}),
+}; # $HTMLAttrChecker
 
 my %HTMLAttrStatus = (
   about => FEATURE_OBSVOCAB,
@@ -1448,6 +1452,7 @@ my %HTMLAttrStatus = (
   typeof => FEATURE_OBSVOCAB,
   unselectable => FEATURE_OBSVOCAB,
   xmlns => FEATURE_HTML5_WD,
+  'xml:space' => FEATURE_OBSVOCAB,
 );
 
 my %HTMLM12NCommonAttrStatus = (
