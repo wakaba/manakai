@@ -4089,25 +4089,51 @@ $Element->{$HTML_NS}->{a} = {
           %HTMLAttrStatus,
           %HTMLM12NXHTML2CommonAttrStatus,
           accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
-          charset => FEATURE_HTML5_OBSOLETE,
-          coords => FEATURE_HTML5_OBSOLETE,
+          charset => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+          coords => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+          cti => FEATURE_OBSVOCAB,
+          directkey => FEATURE_OBSVOCAB,
+          email => FEATURE_OBSVOCAB,
+          eswf => FEATURE_OBSVOCAB,
           href => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
               FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_WD | FEATURE_XHTML2_ED |
               FEATURE_M12N10_REC,
+          ib => FEATURE_OBSVOCAB,
+          ifb => FEATURE_OBSVOCAB,
+          ijam => FEATURE_OBSVOCAB,
+          ilet => FEATURE_OBSVOCAB,
+          irst => FEATURE_OBSVOCAB,
+          ista => FEATURE_OBSVOCAB,
+          iswf => FEATURE_OBSVOCAB,
+          kana => FEATURE_OBSVOCAB,
           lang => FEATURE_HTML5_REC,
+          lcs => FEATURE_OBSVOCAB,
+          loop => FEATURE_OBSVOCAB,
+          mailbody => FEATURE_OBSVOCAB,
+          measure => FEATURE_OBSVOCAB,
           media => FEATURE_HTML5_WD | FEATURE_XHTML2_ED,
-          methods => FEATURE_HTML5_OBSOLETE,
+          memoryname => FEATURE_OBSVOCAB,
+          methods => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
           name => FEATURE_HTML5_LC,
+          nonumber => FEATURE_OBSVOCAB,
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
           rel => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-          shape => FEATURE_HTML5_OBSOLETE,
+          shape => FEATURE_OBSVOCAB,
+          soundstart => FEATURE_OBSVOCAB,
+          src => FEATURE_OBSVOCAB,
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           target => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+          telbook => FEATURE_OBSVOCAB,
           type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-          urn => FEATURE_HTML5_OBSOLETE,
+          urn => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+          utn => FEATURE_OBSVOCAB,
+          viblength => FEATURE_OBSVOCAB,
+          vibration => FEATURE_OBSVOCAB,
+          volume => FEATURE_OBSVOCAB,
+          z => FEATURE_OBSVOCAB,
         }->{$attr_ln};
 
         $checker = {
@@ -4116,6 +4142,21 @@ $Element->{$HTML_NS}->{a} = {
             $HTMLCharsetChecker->($attr->value, @_);
           },
           coords => sub { }, ## Checked in $ShapeCoordsChecker.
+          cti => sub {
+            my ($self, $attr) = @_;
+            my $value = $attr->value;
+            if ($value =~ m[\A[0-9*\x23,/]{1,128}\z]) {
+              if ($value =~ m[//]) {
+                $self->{onerror}->(node => $attr,
+                                   type => 'cti:syntax error', # XXXdocumentation
+                                   level => $self->{level}->{must});
+              }
+            } else {
+              $self->{onerror}->(node => $attr,
+                                 type => 'cti:syntax error', # XXXdocumentation
+                                 level => $self->{level}->{must});
+            }
+          }, # cti
           href => $HTMLURIAttrChecker,
           hreflang => $HTMLLanguageTagAttrChecker,
           media => $HTMLMQAttrChecker,

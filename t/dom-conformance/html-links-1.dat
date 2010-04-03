@@ -1413,3 +1413,70 @@ a
 /unknown;element not defined;m
 /unknown/@rev;attribute not defined;m
 /unknown/@rev;duplicate token;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="">a</a>
+#errors
+/a/@cti;attribute not defined;m
+/a/@cti;cti:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="  ">a</a>
+#errors
+/a/@cti;attribute not defined;m
+/a/@cti;cti:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="1233445">a</a>
+#errors
+/a/@cti;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="aa-grr">a</a>
+#errors
+/a/@cti;attribute not defined;m
+/a/@cti;cti:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="123-11-3333">a</a>
+#errors
+/a/@cti;attribute not defined;m
+/a/@cti;cti:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="+8133333">a</a>
+#errors
+/a/@cti;attribute not defined;m
+/a/@cti;cti:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="1233/*/211122/31">a</a>
+#errors
+/a/@cti;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="122//1111">a</a>
+#errors
+/a/@cti;attribute not defined;m
+/a/@cti;cti:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="#">a</a>
+#errors
+/a/@cti;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    cti="122433 ">a</a>
+#errors
+/a/@cti;attribute not defined;m
+/a/@cti;cti:syntax error;m
