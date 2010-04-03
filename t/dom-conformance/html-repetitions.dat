@@ -108,6 +108,83 @@
 /div/p/@repeat-template;attribute not defined;m
 
 #data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <span id="a">a</span>
+  <span repeat-template="a">b</span>
+</div>
+#errors
+/div/span/@repeat-template;attribute not defined;m
+/div/span/@repeat-template;no referenced repeat-template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <span id="a">a</span>
+  <span id="a" repeat="template">a</span>
+  <span repeat-template="a">b</span>
+</div>
+#errors
+/div/span/@repeat;attribute not defined;m
+/div/span/@id;duplicate ID;m
+/div/span/@repeat-template;attribute not defined;m
+/div/span/@repeat-template;no referenced repeat-template;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <span id="a" repeat="template" repeat-template="a">b</span>
+</div>
+#errors
+/div/span/@repeat;attribute not defined;m
+/div/span/@repeat-template;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:html="http://www.w3.org/1999/xhtml">
+  <span id="a" html:repeat="template">a</span>
+  <span repeat-template="a">b</span>
+</div>
+#errors
+/div/span/@repeat;attribute not defined;m
+/div/span/@repeat;attribute not allowed;m
+/div/span/@repeat-template;attribute not defined;m
+/div/span/@repeat-template;no referenced repeat-template;m
+
+#data
+<x xmlns:html="http://www.w3.org/1999/xhtml">
+  <y xml:id="a" html:repeat="template"/>
+  <y html:repeat-template="a"/>
+</x>
+#errors
+/x;unknown element;u
+/x/y;unknown element;u
+/x/y/@repeat;attribute not defined;m
+/x/y;unknown element;u
+/x/y/@repeat-template;attribute not defined;m
+
+#data
+<x xmlns:html="http://www.w3.org/1999/xhtml">
+  <p id="a" repeat="template" xmlns="http://www.w3.org/1999/xhtml">a</p>
+  <y html:repeat-template="a"/>
+</x>
+#errors
+/x;unknown element;u
+/x/p/@repeat;attribute not defined;m
+/x/y;unknown element;u
+/x/y/@repeat-template;attribute not defined;m
+
+#data
+<x xmlns:html="http://www.w3.org/1999/xhtml">
+  <y html:repeat="template"/>
+  <y html:repeat-template="a"/>
+</x>
+#errors
+/x;unknown element;u
+/x/y;unknown element;u
+/x/y/@repeat;attribute not defined;m
+/x/y;unknown element;u
+/x/y/@repeat-template;attribute not defined;m
+/x/y/@repeat-template;no referenced repeat-template;m
+
+#data
 <p repeate="template" xmlns="http://www.w3.org/1999/xhtml">x</p>
 #errors
 /p/@repeate;attribute not defined;m

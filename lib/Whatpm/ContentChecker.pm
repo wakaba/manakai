@@ -635,7 +635,7 @@ sub check_element ($$$;$) {
   $self->{name} = {};
   $self->{form} = {}; # form/@name
   #$self->{has_autofocus};
-  $self->{idref} = []; # @form, @for, @contextmenu
+  $self->{idref} = [];
   $self->{term} = {};
   $self->{usemap} = [];
   $self->{ref} = []; # datetemplate data references
@@ -879,15 +879,30 @@ next unless $code;## TODO: temp.
       #
     } elsif ($_->[0] eq 'any' and $self->{id}->{$_->[1]}) {
       #
+    } elsif ($_->[0] eq 'repeat-template' and $self->{id}->{$_->[1]}) {
+      my $re = $self->{id}->{$_->[1]}->[0]->owner_element;
+      my $rens = $re->namespace_uri;
+      my $repeat = (defined $rens and $rens eq $HTML_NS)
+          ? $re->get_attribute_ns (undef, 'repeat')
+          : $re->get_attribute_ns ($HTML_NS, 'repeat');
+      if (defined $repeat and $repeat eq 'template') {
+        #
+      } else {
+        $self->{onerror}->(node => $_->[2],
+                           type => 'no referenced repeat-template', # XXXdocumentation,
+                           level => $self->{level}->{must});
+      }
     } else {
       $self->{onerror}->(node => $_->[2],
-                         type => {
-                                  any => 'no referenced element', ## TODOC: type
-                                  form => 'no referenced form',
-                                  labelable => 'no referenced control',
-                                  menu => 'no referenced menu',
-                                  datalist => 'no referenced datalist', ## TODOC: type
-                                 }->{$_->[0]},
+                         type => 
+        {
+          any => 'no referenced element', ## TODOC: type
+          form => 'no referenced form',
+          labelable => 'no referenced control',
+          menu => 'no referenced menu',
+          datalist => 'no referenced datalist', ## TODOC: type
+          'repeat-template' => 'no referenced repeat-template', # XXXdocumentation
+        }->{$_->[0]},
                          value => $_->[1],
                          level => $self->{level}->{must});
     }

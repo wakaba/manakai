@@ -1326,12 +1326,7 @@ my $HTMLAttrChecker = {
       }
     }
     
-    ## NOTE: In the Web Forms 2.0 specification, this attribute had no
-    ## author requirement.  In addition, though the spec said that
-    ## repetition blocks MAY have this attribute specified, it did not
-    ## explicitly prohibit the attribute specified on an element that
-    ## is not a repetition block.  In anyway, the repetition template
-    ## feature has been removed from the HTML5 specification.
+    push @{$self->{idref}}, ['repeat-template', $attr->value, $attr];
   },
   resource => $HTMLURIAttrChecker,
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
@@ -1440,7 +1435,7 @@ my %HTMLAttrStatus = (
   'repeat-max' => FEATURE_OBSVOCAB,
   'repeat-min' => FEATURE_OBSVOCAB,
   'repeat-start' => FEATURE_OBSVOCAB,
-  'repeat-template' => FEATURE_WF2,
+  'repeat-template' => FEATURE_OBSVOCAB,
   resource => FEATURE_OBSVOCAB,
   role => 0,
   spellcheck => FEATURE_HTML5_WD,
