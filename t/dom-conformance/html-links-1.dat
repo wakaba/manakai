@@ -1343,3 +1343,73 @@ a
     name="b" xml:id="c" id="b">a</a>
 #errors
 /a/@name;anchor name;s
+
+#data
+<p rel="" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@rel;attribute not defined;m
+
+#data
+<p rel="abc" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@rel;attribute not defined;m
+
+#data
+<p rel="a a" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@rel;attribute not defined;m
+/p/@rel;duplicate token;m
+
+#data
+<p rev="" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@rev;attribute not defined;m
+
+#data
+<p rev="abc" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@rev;attribute not defined;m
+
+#data
+<p rev="a a" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@rev;attribute not defined;m
+/p/@rev;duplicate token;m
+
+#data
+<unknown rel="" xmlns="http://www.w3.org/1999/xhtml">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@rel;attribute not defined;m
+
+#data
+<unknown rel="abc" xmlns="http://www.w3.org/1999/xhtml">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@rel;attribute not defined;m
+
+#data
+<unknown rel="a a" xmlns="http://www.w3.org/1999/xhtml">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@rel;attribute not defined;m
+/unknown/@rel;duplicate token;m
+
+#data
+<unknown rev="" xmlns="http://www.w3.org/1999/xhtml">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@rev;attribute not defined;m
+
+#data
+<unknown rev="abc" xmlns="http://www.w3.org/1999/xhtml">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@rev;attribute not defined;m
+
+#data
+<unknown rev="a a" xmlns="http://www.w3.org/1999/xhtml">a</unknown>
+#errors
+/unknown;element not defined;m
+/unknown/@rev;attribute not defined;m
+/unknown/@rev;duplicate token;m

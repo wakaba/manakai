@@ -1289,6 +1289,7 @@ my $HTMLAttrChecker = {
     }
   }, # language
   property => sub { },
+  rel => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
   repeat => sub {
     my ($self, $attr) = @_;
 
@@ -1329,6 +1330,7 @@ my $HTMLAttrChecker = {
     push @{$self->{idref}}, ['repeat-template', $attr->value, $attr];
   },
   resource => $HTMLURIAttrChecker,
+  rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
   ## TODO: role [HTML5ROLE] ## TODO: global @role [XHTML1ROLE]
   spellcheck => $GetHTMLEnumeratedAttrChecker->({
     true => 1, false => 1, '' => 1,
@@ -1429,14 +1431,14 @@ my %HTMLAttrStatus = (
   lang => FEATURE_HTML5_REC,
   language => FEATURE_OBSVOCAB,
   property => FEATURE_OBSVOCAB,
-  ref => FEATURE_HTML5_DROPPED,
-  registrationmark => FEATURE_HTML5_DROPPED,
+  rel => FEATURE_OBSVOCAB,
   repeat => FEATURE_OBSVOCAB,
   'repeat-max' => FEATURE_OBSVOCAB,
   'repeat-min' => FEATURE_OBSVOCAB,
   'repeat-start' => FEATURE_OBSVOCAB,
   'repeat-template' => FEATURE_OBSVOCAB,
   resource => FEATURE_OBSVOCAB,
+  rev => FEATURE_OBSVOCAB,
   role => 0,
   spellcheck => FEATURE_HTML5_WD,
   style => FEATURE_HTML5_REC,
@@ -1463,8 +1465,6 @@ my %HTMLM12NCommonAttrStatus = (
   onkeypress => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeydown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  rel => FEATURE_RDFA_REC,
-  rev => FEATURE_RDFA_REC,
   style => FEATURE_HTML5_REC,
   title => FEATURE_HTML5_REC,
 );
@@ -1512,10 +1512,6 @@ my %XHTML2CommonAttrStatus = (
   ## Media
   media => FEATURE_XHTML2_ED,
 
-  ## Metadata
-  rel => FEATURE_XHTML2_ED,
-  rev => FEATURE_XHTML2_ED,
-
   ## Role
   role => FEATURE_XHTML2_ED,
 
@@ -1531,8 +1527,6 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
   dir => FEATURE_HTML5_REC,
   href => FEATURE_RDFA_REC,
   id => FEATURE_HTML5_REC,
-  rel => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
-  rev => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
   style => FEATURE_HTML5_REC,
   title => FEATURE_HTML5_REC,
 );
@@ -2302,7 +2296,6 @@ $Element->{$HTML_NS}->{link} = {
       },
       href => $HTMLURIAttrChecker,
       rel => sub { $HTMLLinkTypesAttrChecker->(0, $item, @_) },
-      rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
       media => $HTMLMQAttrChecker,
       methods => sub { }, ## Space-separated values [HTML 2.0]
       hreflang => $HTMLLanguageTagAttrChecker,
@@ -2346,7 +2339,6 @@ $Element->{$HTML_NS}->{link} = {
       methods => FEATURE_HTML20_RFC,
       rel => FEATURE_HTML5_LC | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
-      rev => FEATURE_HTML5_OBSOLETE,
       sizes => FEATURE_HTML5_LC,
       target => FEATURE_HTML5_OBSOLETE,
       type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -4106,7 +4098,6 @@ $Element->{$HTML_NS}->{a} = {
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
           rel => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-          rev => FEATURE_HTML5_OBSOLETE,
           shape => FEATURE_HTML5_OBSOLETE,
           tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           target => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -4127,7 +4118,6 @@ $Element->{$HTML_NS}->{a} = {
           name => $NameAttrChecker,
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
-          rev => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->(),
           shape => $GetHTMLEnumeratedAttrChecker->({
             circ => -1, circle => 1,
             default => 1,

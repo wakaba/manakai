@@ -2474,7 +2474,6 @@ ok 2343
 ok 2344
 ok 2345
 ok 2346
-# ../t/dom-conformance/html-objects-1.dat
 ok 2347
 ok 2348
 ok 2349
@@ -2487,6 +2486,7 @@ ok 2355
 ok 2356
 ok 2357
 ok 2358
+# ../t/dom-conformance/html-objects-1.dat
 ok 2359
 ok 2360
 ok 2361
@@ -3128,7 +3128,19 @@ ok 2996
 ok 2997
 ok 2998
 ok 2999
-not ok 3000 - <!DOCTYPE HTML><title>x</title>
+ok 3000
+ok 3001
+ok 3002
+ok 3003
+ok 3004
+ok 3005
+ok 3006
+ok 3007
+ok 3008
+ok 3009
+ok 3010
+ok 3011
+not ok 3012 - <!DOCTYPE HTML><title>x</title>
 # <embed src="http://test/"
 #     xml:space=preserve>
 #   Failed test '<!DOCTYPE HTML><title>x</title>
@@ -3140,27 +3152,6 @@ not ok 3000 - <!DOCTYPE HTML><title>x</title>
 # +---+-----+---+-----------------------------------------------------+
 # |   |     *  1|/html/body/embed/@xml:space;attribute not defined;m  *
 # +---+-----+---+-----------------------------------------------------+
-ok 3001
-ok 3002
-ok 3003
-ok 3004
-ok 3005
-ok 3006
-ok 3007
-ok 3008
-ok 3009
-not ok 3010 - <embed xmlns="http://www.w3.org/1999/xhtml" src="x"
-#     name="name1"/>
-#   Failed test '<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
-#     name="name1"/>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+--------------------------------------+
-# | Ln|Got  | Ln|Expected                              |
-# +---+-----+---+--------------------------------------+
-# |   |     *  1|/embed/@name;attribute not defined;m  *
-# +---+-----+---+--------------------------------------+
-ok 3011
-ok 3012
 ok 3013
 ok 3014
 ok 3015
@@ -3170,7 +3161,16 @@ ok 3018
 ok 3019
 ok 3020
 ok 3021
-ok 3022
+not ok 3022 - <embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+#     name="name1"/>
+#   Failed test '<embed xmlns="http://www.w3.org/1999/xhtml" src="x"
+#     name="name1"/>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+--------------------------------------+
+# | Ln|Got  | Ln|Expected                              |
+# +---+-----+---+--------------------------------------+
+# |   |     *  1|/embed/@name;attribute not defined;m  *
+# +---+-----+---+--------------------------------------+
 ok 3023
 ok 3024
 ok 3025
@@ -3224,16 +3224,7 @@ ok 3072
 ok 3073
 ok 3074
 ok 3075
-not ok 3076 - <object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>
-#   Failed test '<object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>'
-#   at content-checker-test-ok line 1.
-# +---+------------------------------------------+---+------------------------------------------+
-# | Ln|Got                                       | Ln|Expected                                  |
-# +---+------------------------------------------+---+------------------------------------------+
-# |  1|/object/@archive;attribute not defined;m  |  1|/object/@archive;attribute not defined;m  |
-# *  2|/object/@archive;duplicate token;m\n      *  2|/object/@archive;duplicate token;m        *
-# *  3|/object;no significant content;s          *   |                                          |
-# +---+------------------------------------------+---+------------------------------------------+
+ok 3076
 ok 3077
 ok 3078
 ok 3079
@@ -3245,7 +3236,16 @@ ok 3084
 ok 3085
 ok 3086
 ok 3087
-ok 3088
+not ok 3088 - <object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>
+#   Failed test '<object data="" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>'
+#   at content-checker-test-ok line 1.
+# +---+------------------------------------------+---+------------------------------------------+
+# | Ln|Got                                       | Ln|Expected                                  |
+# +---+------------------------------------------+---+------------------------------------------+
+# |  1|/object/@archive;attribute not defined;m  |  1|/object/@archive;attribute not defined;m  |
+# *  2|/object/@archive;duplicate token;m\n      *  2|/object/@archive;duplicate token;m        *
+# *  3|/object;no significant content;s          *   |                                          |
+# +---+------------------------------------------+---+------------------------------------------+
 ok 3089
 ok 3090
 ok 3091
@@ -3330,7 +3330,19 @@ ok 3169
 ok 3170
 ok 3171
 ok 3172
-not ok 3173 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+ok 3173
+ok 3174
+ok 3175
+ok 3176
+ok 3177
+ok 3178
+ok 3179
+ok 3180
+ok 3181
+ok 3182
+ok 3183
+ok 3184
+not ok 3185 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <video src="">aa</video>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3342,7 +3354,7 @@ not ok 3173 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+------------------------------------------+
 # |   |     *  1|/video/video;element not allowed:minus;m  *
 # +---+-----+---+------------------------------------------+
-not ok 3174 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3186 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <p><video src="">aa</video></p>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3354,7 +3366,7 @@ not ok 3174 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+--------------------------------------------+
 # |   |     *  1|/video/p/video;element not allowed:minus;m  *
 # +---+-----+---+--------------------------------------------+
-not ok 3175 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3187 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <ins><video src="">aa</video></ins>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3366,7 +3378,7 @@ not ok 3175 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+----------------------------------------------+
 # |   |     *  1|/video/ins/video;element not allowed:minus;m  *
 # +---+-----+---+----------------------------------------------+
-not ok 3176 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3188 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <audio src="">aa</audio>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3378,7 +3390,7 @@ not ok 3176 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+------------------------------------------+
 # |   |     *  1|/video/audio;element not allowed:minus;m  *
 # +---+-----+---+------------------------------------------+
-not ok 3177 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3189 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <p><audio src="">aa</audio></p>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3390,7 +3402,7 @@ not ok 3177 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+--------------------------------------------+
 # |   |     *  1|/video/p/audio;element not allowed:minus;m  *
 # +---+-----+---+--------------------------------------------+
-not ok 3178 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3190 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <ins><audio src="">aa</audio></ins>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3402,18 +3414,6 @@ not ok 3178 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+----------------------------------------------+
 # |   |     *  1|/video/ins/audio;element not allowed:minus;m  *
 # +---+-----+---+----------------------------------------------+
-ok 3179
-ok 3180
-ok 3181
-ok 3182
-ok 3183
-ok 3184
-ok 3185
-ok 3186
-ok 3187
-ok 3188
-ok 3189
-ok 3190
 ok 3191
 ok 3192
 ok 3193
@@ -3429,7 +3429,19 @@ ok 3202
 ok 3203
 ok 3204
 ok 3205
-not ok 3206 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+ok 3206
+ok 3207
+ok 3208
+ok 3209
+ok 3210
+ok 3211
+ok 3212
+ok 3213
+ok 3214
+ok 3215
+ok 3216
+ok 3217
+not ok 3218 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <video src="">aa</video>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3441,7 +3453,7 @@ not ok 3206 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+------------------------------------------+
 # |   |     *  1|/audio/video;element not allowed:minus;m  *
 # +---+-----+---+------------------------------------------+
-not ok 3207 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3219 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <p><video src="">aa</video></p>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3453,7 +3465,7 @@ not ok 3207 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+--------------------------------------------+
 # |   |     *  1|/audio/p/video;element not allowed:minus;m  *
 # +---+-----+---+--------------------------------------------+
-not ok 3208 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3220 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <ins><video src="">aa</video></ins>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3465,7 +3477,7 @@ not ok 3208 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+----------------------------------------------+
 # |   |     *  1|/audio/ins/video;element not allowed:minus;m  *
 # +---+-----+---+----------------------------------------------+
-not ok 3209 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3221 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <audio src="">aa</audio>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3477,7 +3489,7 @@ not ok 3209 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+------------------------------------------+
 # |   |     *  1|/audio/audio;element not allowed:minus;m  *
 # +---+-----+---+------------------------------------------+
-not ok 3210 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3222 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <p><audio src="">aa</audio></p>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3489,7 +3501,7 @@ not ok 3210 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+--------------------------------------------+
 # |   |     *  1|/audio/p/audio;element not allowed:minus;m  *
 # +---+-----+---+--------------------------------------------+
-not ok 3211 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3223 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <ins><audio src="">aa</audio></ins>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -3501,18 +3513,6 @@ not ok 3211 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+----------------------------------------------+
 # |   |     *  1|/audio/ins/audio;element not allowed:minus;m  *
 # +---+-----+---+----------------------------------------------+
-ok 3212
-ok 3213
-ok 3214
-ok 3215
-ok 3216
-ok 3217
-ok 3218
-ok 3219
-ok 3220
-ok 3221
-ok 3222
-ok 3223
 ok 3224
 ok 3225
 ok 3226
@@ -3682,19 +3682,27 @@ ok 3389
 ok 3390
 ok 3391
 ok 3392
-# ../t/dom-conformance/html-tables-1.dat
 ok 3393
 ok 3394
 ok 3395
 ok 3396
 ok 3397
 ok 3398
-ok 3399
+not ok 3399 - <area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>
+#   Failed test '<area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>'
+#   at content-checker-test-ok line 1.
+# +---+------------------------------------+---+--------------------------------------+
+# | Ln|Got                                 | Ln|Expected                              |
+# +---+------------------------------------+---+--------------------------------------+
+# *  1|/area/@rev;attribute not defined;m  *  1|/area/@rev;attribute not defined;m\n  *
+# |   |                                    *  2|/area/@rev;unknown attribute;u        *
+# +---+------------------------------------+---+--------------------------------------+
 ok 3400
 ok 3401
 ok 3402
 ok 3403
 ok 3404
+# ../t/dom-conformance/html-tables-1.dat
 ok 3405
 ok 3406
 ok 3407
@@ -4163,7 +4171,6 @@ ok 3869
 ok 3870
 ok 3871
 ok 3872
-# ../t/dom-conformance/html-tables-2.dat
 ok 3873
 ok 3874
 ok 3875
@@ -4176,6 +4183,7 @@ ok 3881
 ok 3882
 ok 3883
 ok 3884
+# ../t/dom-conformance/html-tables-2.dat
 ok 3885
 ok 3886
 ok 3887
@@ -4190,7 +4198,6 @@ ok 3895
 ok 3896
 ok 3897
 ok 3898
-# ../t/dom-conformance/html-forms-1.dat
 ok 3899
 ok 3900
 ok 3901
@@ -4203,19 +4210,11 @@ ok 3907
 ok 3908
 ok 3909
 ok 3910
+# ../t/dom-conformance/html-forms-1.dat
 ok 3911
 ok 3912
 ok 3913
-not ok 3914 - <form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>
-#   Failed test '<form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------------------+---+---------------------------------------+
-# | Ln|Got                                            | Ln|Expected                               |
-# +---+-----------------------------------------------+---+---------------------------------------+
-# *  1|/form/meta/@name;metadata:proposed;keywords;w  *   |                                       |
-# |  2|/form/meta;element not allowed:flow;m          |  1|/form/meta;element not allowed:flow;m  |
-# |  3|/form;no significant content;s                 |  2|/form;no significant content;s         |
-# +---+-----------------------------------------------+---+---------------------------------------+
+ok 3914
 ok 3915
 ok 3916
 ok 3917
@@ -4227,7 +4226,16 @@ ok 3922
 ok 3923
 ok 3924
 ok 3925
-ok 3926
+not ok 3926 - <form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>
+#   Failed test '<form xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="x"/></form>'
+#   at content-checker-test-ok line 1.
+# +---+-----------------------------------------------+---+---------------------------------------+
+# | Ln|Got                                            | Ln|Expected                               |
+# +---+-----------------------------------------------+---+---------------------------------------+
+# *  1|/form/meta/@name;metadata:proposed;keywords;w  *   |                                       |
+# |  2|/form/meta;element not allowed:flow;m          |  1|/form/meta;element not allowed:flow;m  |
+# |  3|/form;no significant content;s                 |  2|/form;no significant content;s         |
+# +---+-----------------------------------------------+---+---------------------------------------+
 ok 3927
 ok 3928
 ok 3929
@@ -4566,7 +4574,6 @@ ok 4261
 ok 4262
 ok 4263
 ok 4264
-# ../t/dom-conformance/html-form-label.dat
 ok 4265
 ok 4266
 ok 4267
@@ -4579,6 +4586,7 @@ ok 4273
 ok 4274
 ok 4275
 ok 4276
+# ../t/dom-conformance/html-form-label.dat
 ok 4277
 ok 4278
 ok 4279
@@ -4650,7 +4658,6 @@ ok 4344
 ok 4345
 ok 4346
 ok 4347
-# ../t/dom-conformance/html-form-input-1.dat
 ok 4348
 ok 4349
 ok 4350
@@ -4663,6 +4670,7 @@ ok 4356
 ok 4357
 ok 4358
 ok 4359
+# ../t/dom-conformance/html-form-input-1.dat
 ok 4360
 ok 4361
 ok 4362
@@ -5214,7 +5222,6 @@ ok 4907
 ok 4908
 ok 4909
 ok 4910
-Parse error (lt in attr value) at line 3 column 12
 ok 4911
 ok 4912
 ok 4913
@@ -5227,6 +5234,7 @@ ok 4919
 ok 4920
 ok 4921
 ok 4922
+Parse error (lt in attr value) at line 3 column 12
 ok 4923
 ok 4924
 ok 4925
@@ -6350,7 +6358,19 @@ ok 6042
 ok 6043
 ok 6044
 ok 6045
-not ok 6046 - <map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
+ok 6046
+ok 6047
+ok 6048
+ok 6049
+ok 6050
+ok 6051
+ok 6052
+ok 6053
+ok 6054
+ok 6055
+ok 6056
+ok 6057
+not ok 6058 - <map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
 # <input type="image"
 #     usemap="\#abc"/>x
 # </map>
@@ -6365,8 +6385,8 @@ not ok 6046 - <map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
 # |  1|/map/input/@usemap;attribute not defined;m  |/map/input/@usemap;attribute not defined;m  |
 # *  2|/map/input/@usemap;hashref:wrong case;m     |/map/input/@usemap;no referenced map;m      *
 # +---+--------------------------------------------+--------------------------------------------+
-ok 6047
-not ok 6048 - <input xmlns="http://www.w3.org/1999/xhtml"
+ok 6059
+not ok 6060 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="hidden"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6379,7 +6399,7 @@ not ok 6048 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n           *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;hidden;m  *   |                                          |
 # +---+-----------------------------------------------------+---+------------------------------------------+
-not ok 6049 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6061 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="text"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6392,7 +6412,7 @@ not ok 6049 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n         *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;text;m  *   |                                          |
 # +---+---------------------------------------------------+---+------------------------------------------+
-not ok 6050 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6062 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="email"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6405,7 +6425,7 @@ not ok 6050 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n          *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;email;m  *   |                                          |
 # +---+----------------------------------------------------+---+------------------------------------------+
-not ok 6051 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6063 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="url"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6418,7 +6438,7 @@ not ok 6051 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n        *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;url;m  *   |                                          |
 # +---+--------------------------------------------------+---+------------------------------------------+
-not ok 6052 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6064 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="search"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6431,7 +6451,7 @@ not ok 6052 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n           *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;search;m  *   |                                          |
 # +---+-----------------------------------------------------+---+------------------------------------------+
-not ok 6053 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6065 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="password"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6444,7 +6464,7 @@ not ok 6053 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n             *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;password;m  *   |                                          |
 # +---+-------------------------------------------------------+---+------------------------------------------+
-not ok 6054 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6066 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="datetime"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6457,7 +6477,7 @@ not ok 6054 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n             *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;datetime;m  *   |                                          |
 # +---+-------------------------------------------------------+---+------------------------------------------+
-not ok 6055 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6067 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="date"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6470,7 +6490,7 @@ not ok 6055 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n         *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;date;m  *   |                                          |
 # +---+---------------------------------------------------+---+------------------------------------------+
-not ok 6056 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6068 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="month"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6483,7 +6503,7 @@ not ok 6056 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n          *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;month;m  *   |                                          |
 # +---+----------------------------------------------------+---+------------------------------------------+
-not ok 6057 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6069 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="week"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6496,7 +6516,7 @@ not ok 6057 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n         *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;week;m  *   |                                          |
 # +---+---------------------------------------------------+---+------------------------------------------+
-not ok 6058 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6070 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="time"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6509,7 +6529,7 @@ not ok 6058 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n         *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;time;m  *   |                                          |
 # +---+---------------------------------------------------+---+------------------------------------------+
-not ok 6059 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6071 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="datetime-local"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6522,7 +6542,7 @@ not ok 6059 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n                   *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;datetime-local;m  *   |                                          |
 # +---+-------------------------------------------------------------+---+------------------------------------------+
-not ok 6060 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6072 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="number"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6535,7 +6555,7 @@ not ok 6060 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n           *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;number;m  *   |                                          |
 # +---+-----------------------------------------------------+---+------------------------------------------+
-not ok 6061 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6073 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="range"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6548,7 +6568,7 @@ not ok 6061 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n          *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;range;m  *   |                                          |
 # +---+----------------------------------------------------+---+------------------------------------------+
-not ok 6062 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6074 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="color"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6561,7 +6581,7 @@ not ok 6062 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n          *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;color;m  *   |                                          |
 # +---+----------------------------------------------------+---+------------------------------------------+
-not ok 6063 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6075 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="checkbox"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6574,7 +6594,7 @@ not ok 6063 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n             *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;checkbox;m  *   |                                          |
 # +---+-------------------------------------------------------+---+------------------------------------------+
-not ok 6064 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6076 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="radio"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6587,7 +6607,7 @@ not ok 6064 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n          *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;radio;m  *   |                                          |
 # +---+----------------------------------------------------+---+------------------------------------------+
-not ok 6065 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6077 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="file"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6600,7 +6620,7 @@ not ok 6065 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n         *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;file;m  *   |                                          |
 # +---+---------------------------------------------------+---+------------------------------------------+
-not ok 6066 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6078 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="submit"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6613,7 +6633,7 @@ not ok 6066 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n           *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;submit;m  *   |                                          |
 # +---+-----------------------------------------------------+---+------------------------------------------+
-not ok 6067 - <input xmlns="http://www.w3.org/1999/xhtml"
+not ok 6079 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     type="image"
 #     template="a"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
@@ -6626,18 +6646,6 @@ not ok 6067 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@template;attribute not defined;m\n          *  1|/input/@template;attribute not defined;m  *
 # *  2|/input/@template;input attr not applicable;image;m  *   |                                          |
 # +---+----------------------------------------------------+---+------------------------------------------+
-ok 6068
-ok 6069
-ok 6070
-ok 6071
-ok 6072
-ok 6073
-ok 6074
-ok 6075
-ok 6076
-ok 6077
-ok 6078
-ok 6079
 ok 6080
 ok 6081
 ok 6082
@@ -6984,7 +6992,19 @@ ok 6422
 ok 6423
 ok 6424
 ok 6425
-not ok 6426 - <input type="date" xmlns="http://www.w3.org/1999/xhtml"
+ok 6426
+ok 6427
+ok 6428
+ok 6429
+ok 6430
+ok 6431
+ok 6432
+ok 6433
+ok 6434
+ok 6435
+ok 6436
+ok 6437
+not ok 6438 - <input type="date" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-11-22"/>
 #   Failed test '<input type="date" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-11-22"/>'
@@ -6994,7 +7014,7 @@ not ok 6426 - <input type="date" xmlns="http://www.w3.org/1999/xhtml"
 # +---+-----+---+-----------------------------------+
 # |   |     *  1|/input/@value;datetime:bad year;m  *
 # +---+-----+---+-----------------------------------+
-not ok 6427 - <input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+not ok 6439 - <input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-11-22T00:11:22Z"/>
 #   Failed test '<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-11-22T00:11:22Z"/>'
@@ -7004,7 +7024,7 @@ not ok 6427 - <input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
 # +---+-----+---+-----------------------------------+
 # |   |     *  1|/input/@value;datetime:bad year;m  *
 # +---+-----+---+-----------------------------------+
-not ok 6428 - <input type="month" xmlns="http://www.w3.org/1999/xhtml"
+not ok 6440 - <input type="month" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-11"/>
 #   Failed test '<input type="month" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-11"/>'
@@ -7014,7 +7034,7 @@ not ok 6428 - <input type="month" xmlns="http://www.w3.org/1999/xhtml"
 # +---+-----+---+-----------------------------------+
 # |   |     *  1|/input/@value;datetime:bad year;m  *
 # +---+-----+---+-----------------------------------+
-not ok 6429 - <input type="week" xmlns="http://www.w3.org/1999/xhtml"
+not ok 6441 - <input type="week" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-W11"/>
 #   Failed test '<input type="week" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-W11"/>'
@@ -7024,7 +7044,7 @@ not ok 6429 - <input type="week" xmlns="http://www.w3.org/1999/xhtml"
 # +---+-------------------------------+-----------------------------------+
 # *  1|/input/@value;week:bad year;m  |/input/@value;datetime:bad year;m  *
 # +---+-------------------------------+-----------------------------------+
-not ok 6430 - <input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
+not ok 6442 - <input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-11-22T00:11:22"/>
 #   Failed test '<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
 #     value="0000-11-22T00:11:22"/>'
@@ -7034,18 +7054,6 @@ not ok 6430 - <input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
 # +---+-----+---+-----------------------------------+
 # |   |     *  1|/input/@value;datetime:bad year;m  *
 # +---+-----+---+-----------------------------------+
-ok 6431
-ok 6432
-ok 6433
-ok 6434
-ok 6435
-ok 6436
-ok 6437
-ok 6438
-ok 6439
-ok 6440
-ok 6441
-ok 6442
 ok 6443
 ok 6444
 ok 6445
@@ -7210,7 +7218,6 @@ ok 6603
 ok 6604
 ok 6605
 ok 6606
-# ../t/dom-conformance/html-form-button.dat
 ok 6607
 ok 6608
 ok 6609
@@ -7223,6 +7230,7 @@ ok 6615
 ok 6616
 ok 6617
 ok 6618
+# ../t/dom-conformance/html-form-button.dat
 ok 6619
 ok 6620
 ok 6621
@@ -7402,7 +7410,6 @@ ok 6794
 ok 6795
 ok 6796
 ok 6797
-# ../t/dom-conformance/html-form-select.dat
 ok 6798
 ok 6799
 ok 6800
@@ -7415,6 +7422,7 @@ ok 6806
 ok 6807
 ok 6808
 ok 6809
+# ../t/dom-conformance/html-form-select.dat
 ok 6810
 ok 6811
 ok 6812
@@ -7491,7 +7499,6 @@ ok 6882
 ok 6883
 ok 6884
 ok 6885
-# ../t/dom-conformance/html-form-datalist.dat
 ok 6886
 ok 6887
 ok 6888
@@ -7504,6 +7511,7 @@ ok 6894
 ok 6895
 ok 6896
 ok 6897
+# ../t/dom-conformance/html-form-datalist.dat
 ok 6898
 ok 6899
 ok 6900
@@ -7549,7 +7557,6 @@ ok 6939
 ok 6940
 ok 6941
 ok 6942
-# ../t/dom-conformance/html-form-textarea.dat
 ok 6943
 ok 6944
 ok 6945
@@ -7562,6 +7569,7 @@ ok 6951
 ok 6952
 ok 6953
 ok 6954
+# ../t/dom-conformance/html-form-textarea.dat
 ok 6955
 ok 6956
 ok 6957
@@ -7630,7 +7638,6 @@ ok 7019
 ok 7020
 ok 7021
 ok 7022
-# ../t/dom-conformance/html-form-keygen.dat
 ok 7023
 ok 7024
 ok 7025
@@ -7643,6 +7650,7 @@ ok 7031
 ok 7032
 ok 7033
 ok 7034
+# ../t/dom-conformance/html-form-keygen.dat
 ok 7035
 ok 7036
 ok 7037
@@ -7656,13 +7664,25 @@ ok 7044
 ok 7045
 ok 7046
 ok 7047
-# ../t/dom-conformance/html-interactive-1.dat
 ok 7048
 ok 7049
 ok 7050
 ok 7051
 ok 7052
-not ok 7053 - <head xmlns="http://www.w3.org/1999/xhtml">
+ok 7053
+ok 7054
+ok 7055
+ok 7056
+ok 7057
+ok 7058
+ok 7059
+# ../t/dom-conformance/html-interactive-1.dat
+ok 7060
+ok 7061
+ok 7062
+ok 7063
+ok 7064
+not ok 7065 - <head xmlns="http://www.w3.org/1999/xhtml">
 # <title/>
 # <noscript>
 # <meta name="keywords" content=""/>
@@ -7682,15 +7702,15 @@ not ok 7053 - <head xmlns="http://www.w3.org/1999/xhtml">
 # |  2|/head/noscript/meta;element not allowed:head noscript;m  |  1|/head/noscript/meta;element not allowed:head noscript;m  |
 # |  3|/head/noscript;in XML:noscript;m                         |  2|/head/noscript;in XML:noscript;m                         |
 # +---+---------------------------------------------------------+---+---------------------------------------------------------+
-ok 7054
-ok 7055
-ok 7056
-ok 7057
-ok 7058
-ok 7059
-ok 7060
-ok 7061
-not ok 7062 - <noscript xmlns="http://www.w3.org/1999/xhtml">
+ok 7066
+ok 7067
+ok 7068
+ok 7069
+ok 7070
+ok 7071
+ok 7072
+ok 7073
+not ok 7074 - <noscript xmlns="http://www.w3.org/1999/xhtml">
 # <meta name="keywords" content=""/>
 # </noscript>
 #   Failed test '<noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -7705,18 +7725,6 @@ not ok 7062 - <noscript xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/noscript;in XML:noscript;m                        |  2|/noscript;in XML:noscript;m                |
 # |  4|/noscript;no significant content;s                 |  3|/noscript;no significant content;s         |
 # +---+---------------------------------------------------+---+-------------------------------------------+
-ok 7063
-ok 7064
-ok 7065
-ok 7066
-ok 7067
-ok 7068
-ok 7069
-ok 7070
-ok 7071
-ok 7072
-ok 7073
-ok 7074
 ok 7075
 ok 7076
 ok 7077
@@ -7777,17 +7785,7 @@ ok 7131
 ok 7132
 ok 7133
 ok 7134
-not ok 7135 - <bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>
-#   Failed test '<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>'
-#   at content-checker-test-ok line 1.
-# +---+---------------------------------------------+---+-----------------------------------------+
-# | Ln|Got                                          | Ln|Expected                                 |
-# +---+---------------------------------------------+---+-----------------------------------------+
-# *  1|/bb/meta/@name;metadata:proposed;keywords;w  *   |                                         |
-# |  2|/bb/meta;element not allowed:phrasing;m      |  1|/bb/meta;element not allowed:phrasing;m  |
-# |  3|/bb;element not defined;m                    |  2|/bb;element not defined;m                |
-# |  4|/bb;no significant content;s                 |  3|/bb;no significant content;s             |
-# +---+---------------------------------------------+---+-----------------------------------------+
+ok 7135
 ok 7136
 ok 7137
 ok 7138
@@ -7799,7 +7797,17 @@ ok 7143
 ok 7144
 ok 7145
 ok 7146
-ok 7147
+not ok 7147 - <bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>
+#   Failed test '<bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>'
+#   at content-checker-test-ok line 1.
+# +---+---------------------------------------------+---+-----------------------------------------+
+# | Ln|Got                                          | Ln|Expected                                 |
+# +---+---------------------------------------------+---+-----------------------------------------+
+# *  1|/bb/meta/@name;metadata:proposed;keywords;w  *   |                                         |
+# |  2|/bb/meta;element not allowed:phrasing;m      |  1|/bb/meta;element not allowed:phrasing;m  |
+# |  3|/bb;element not defined;m                    |  2|/bb;element not defined;m                |
+# |  4|/bb;no significant content;s                 |  3|/bb;no significant content;s             |
+# +---+---------------------------------------------+---+-----------------------------------------+
 ok 7148
 ok 7149
 ok 7150
@@ -7964,7 +7972,6 @@ ok 7308
 ok 7309
 ok 7310
 ok 7311
-# ../t/dom-conformance/html-scripting-1.dat
 ok 7312
 ok 7313
 ok 7314
@@ -7977,6 +7984,7 @@ ok 7320
 ok 7321
 ok 7322
 ok 7323
+# ../t/dom-conformance/html-scripting-1.dat
 ok 7324
 ok 7325
 ok 7326
@@ -8041,7 +8049,6 @@ ok 7384
 ok 7385
 ok 7386
 ok 7387
-# ../t/dom-conformance/html-scripting-2.dat
 ok 7388
 ok 7389
 ok 7390
@@ -8054,6 +8061,7 @@ ok 7396
 ok 7397
 ok 7398
 ok 7399
+# ../t/dom-conformance/html-scripting-2.dat
 ok 7400
 ok 7401
 ok 7402
@@ -8122,7 +8130,6 @@ ok 7464
 ok 7465
 ok 7466
 ok 7467
-# ../t/dom-conformance/html-repetitions.dat
 ok 7468
 ok 7469
 ok 7470
@@ -8135,6 +8142,7 @@ ok 7476
 ok 7477
 ok 7478
 ok 7479
+# ../t/dom-conformance/html-repetitions.dat
 ok 7480
 ok 7481
 ok 7482
@@ -8152,7 +8160,19 @@ ok 7493
 ok 7494
 ok 7495
 ok 7496
-not ok 7497 - <div xmlns="http://www.w3.org/1999/xhtml">
+ok 7497
+ok 7498
+ok 7499
+ok 7500
+ok 7501
+ok 7502
+ok 7503
+ok 7504
+ok 7505
+ok 7506
+ok 7507
+ok 7508
+not ok 7509 - <div xmlns="http://www.w3.org/1999/xhtml">
 # <button type="add" template="t">x</button>
 # <p repeat="template" id="t">x</p>
 # </div>
@@ -8169,18 +8189,6 @@ not ok 7497 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/div/button/@type;enumerated:invalid;m         |  2|/div/button/@type;enumerated:invalid;m         |
 # |  4|/div/p/@repeat;attribute not defined;m         |  3|/div/p/@repeat;attribute not defined;m         |
 # +---+-----------------------------------------------+---+-----------------------------------------------+
-ok 7498
-ok 7499
-ok 7500
-ok 7501
-ok 7502
-ok 7503
-ok 7504
-ok 7505
-ok 7506
-ok 7507
-ok 7508
-ok 7509
 ok 7510
 ok 7511
 ok 7512
@@ -8222,7 +8230,6 @@ ok 7547
 ok 7548
 ok 7549
 ok 7550
-# ../t/dom-conformance/html-datatemplate.dat
 ok 7551
 ok 7552
 ok 7553
@@ -8235,6 +8242,7 @@ ok 7559
 ok 7560
 ok 7561
 ok 7562
+# ../t/dom-conformance/html-datatemplate.dat
 ok 7563
 ok 7564
 ok 7565
@@ -8516,7 +8524,19 @@ ok 7840
 ok 7841
 ok 7842
 ok 7843
-not ok 7844 - <div xmlns="http://www.w3.org/1999/xhtml"
+ok 7844
+ok 7845
+ok 7846
+ok 7847
+ok 7848
+ok 7849
+ok 7850
+ok 7851
+ok 7852
+ok 7853
+ok 7854
+ok 7855
+not ok 7856 - <div xmlns="http://www.w3.org/1999/xhtml"
 #     template="\#a">x
 #   <datatemplate id="a">
 #   </datatemplate>
@@ -8535,7 +8555,7 @@ not ok 7844 - <div xmlns="http://www.w3.org/1999/xhtml"
 # |  3|/div/datatemplate;element not allowed:flow;m  |  2|/div/datatemplate;element not allowed:flow;m  |
 # |  4|/div/datatemplate;element not defined;m       |  3|/div/datatemplate;element not defined;m       |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7845 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7857 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <datatemplate id="a"></datatemplate>
 #   <p template="\#a">x</p>
 # </div>
@@ -8552,7 +8572,7 @@ not ok 7845 - <div xmlns="http://www.w3.org/1999/xhtml">
 # *  3|/div/p/@template;attribute not defined;m\n    *  3|/div/p/@template;attribute not defined;m      *
 # *  4|/div/p/@template;unknown attribute;u          *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7846 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7858 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <p template="\#a">x</p>
 #   <datatemplate id="a"/>
 # </div>
@@ -8569,7 +8589,7 @@ not ok 7846 - <div xmlns="http://www.w3.org/1999/xhtml">
 # *  3|/div/p/@template;attribute not defined;m\n    *  3|/div/p/@template;attribute not defined;m      *
 # *  4|/div/p/@template;unknown attribute;u          *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7847 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7859 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#a">x<datatemplate id="a"></datatemplate></div>
 # </div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
@@ -8584,7 +8604,7 @@ not ok 7847 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/div/div/datatemplate;element not allowed:flow;m  |  2|/div/div/datatemplate;element not allowed:flow;m  |
 # |  4|/div/div/datatemplate;element not defined;m       |  3|/div/div/datatemplate;element not defined;m       |
 # +---+--------------------------------------------------+---+--------------------------------------------------+
-not ok 7848 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7860 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <p template="\#a">x</p>
 #   <p id="a">y</p>
 # </div>
@@ -8599,7 +8619,7 @@ not ok 7848 - <div xmlns="http://www.w3.org/1999/xhtml">
 # *  1|/div/p/@template;attribute not defined;m\n  *  1|/div/p/@template;attribute not defined;m  *
 # *  2|/div/p/@template;unknown attribute;u        *   |                                          |
 # +---+--------------------------------------------+---+------------------------------------------+
-not ok 7849 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7861 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <p template="\#">x</p>
 # </div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
@@ -8612,7 +8632,7 @@ not ok 7849 - <div xmlns="http://www.w3.org/1999/xhtml">
 # *  1|/div/p/@template;attribute not defined;m\n  *  1|/div/p/@template;attribute not defined;m  *
 # *  2|/div/p/@template;unknown attribute;u        *   |                                          |
 # +---+--------------------------------------------+---+------------------------------------------+
-not ok 7850 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7862 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <p template="">x</p>
 # </div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
@@ -8625,7 +8645,7 @@ not ok 7850 - <div xmlns="http://www.w3.org/1999/xhtml">
 # *  1|/div/p/@template;attribute not defined;m\n  *  1|/div/p/@template;attribute not defined;m  *
 # *  2|/div/p/@template;unknown attribute;u        *   |                                          |
 # +---+--------------------------------------------+---+------------------------------------------+
-not ok 7851 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7863 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <p template="\#no-such-template">x</p>
 # </div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
@@ -8638,7 +8658,7 @@ not ok 7851 - <div xmlns="http://www.w3.org/1999/xhtml">
 # *  1|/div/p/@template;attribute not defined;m\n  *  1|/div/p/@template;attribute not defined;m  *
 # *  2|/div/p/@template;unknown attribute;u        *   |                                          |
 # +---+--------------------------------------------+---+------------------------------------------+
-not ok 7852 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7864 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <p template="\#">x</p>
 #   <datatemplate id=""/>
 # </div>
@@ -8656,7 +8676,7 @@ not ok 7852 - <div xmlns="http://www.w3.org/1999/xhtml">
 # *  4|/div/p/@template;attribute not defined;m\n     *  4|/div/p/@template;attribute not defined;m       *
 # *  5|/div/p/@template;unknown attribute;u           *   |                                               |
 # +---+-----------------------------------------------+---+-----------------------------------------------+
-not ok 7853 - <div xmlns="http://www.w3.org/1999/xhtml"
+not ok 7865 - <div xmlns="http://www.w3.org/1999/xhtml"
 #     template="external-template">x</div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml"
 #     template="external-template">x</div>'
@@ -8667,7 +8687,7 @@ not ok 7853 - <div xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/div/@template;attribute not defined;m\n  *  1|/div/@template;attribute not defined;m  *
 # *  2|/div/@template;unknown attribute;u        *   |                                        |
 # +---+------------------------------------------+---+----------------------------------------+
-not ok 7854 - <div xmlns="http://www.w3.org/1999/xhtml"
+not ok 7866 - <div xmlns="http://www.w3.org/1999/xhtml"
 #     template="external-inline-template\#temlate">x</div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml"
 #     template="external-inline-template\#temlate">x</div>'
@@ -8678,7 +8698,7 @@ not ok 7854 - <div xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/div/@template;attribute not defined;m\n  *  1|/div/@template;attribute not defined;m  *
 # *  2|/div/@template;unknown attribute;u        *   |                                        |
 # +---+------------------------------------------+---+----------------------------------------+
-not ok 7855 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7867 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <p id="itself" template="\#itself">x</p>
 # </div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
@@ -8691,7 +8711,7 @@ not ok 7855 - <div xmlns="http://www.w3.org/1999/xhtml">
 # *  1|/div/p/@template;attribute not defined;m\n  *  1|/div/p/@template;attribute not defined;m  *
 # *  2|/div/p/@template;unknown attribute;u        *   |                                          |
 # +---+--------------------------------------------+---+------------------------------------------+
-not ok 7856 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7868 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <datatemplate id="itself" template="\#itself"/>x
 # </div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
@@ -8706,7 +8726,7 @@ not ok 7856 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/div/datatemplate;element not allowed:flow;m         |  2|/div/datatemplate;element not allowed:flow;m         |
 # |  4|/div/datatemplate;element not defined;m              |  3|/div/datatemplate;element not defined;m              |
 # +---+-----------------------------------------------------+---+-----------------------------------------------------+
-not ok 7857 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7869 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div id="a">x</div>
 #   <div template="\#t" ref="\#a">y</div>
 #   <datatemplate id="t"/>
@@ -8723,11 +8743,10 @@ not ok 7857 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  1|/div/datatemplate;element not allowed:flow;m  |  1|/div/datatemplate;element not allowed:flow;m  |
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@ref;attribute not defined;m         |  3|/div/div/@ref;attribute not defined;m         |
-# *  4|/div/div/@ref;unknown attribute;u\n           *  4|/div/div/@template;attribute not defined;m    *
-# *  5|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  4|/div/div/@template;attribute not defined;m\n  *  4|/div/div/@template;attribute not defined;m    *
+# *  5|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7858 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7870 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#t" ref="\#a">y</div>
 #   <div id="a">x</div>
 #   <datatemplate id="t"/>
@@ -8744,11 +8763,10 @@ not ok 7858 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  1|/div/datatemplate;element not allowed:flow;m  |  1|/div/datatemplate;element not allowed:flow;m  |
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@ref;attribute not defined;m         |  3|/div/div/@ref;attribute not defined;m         |
-# *  4|/div/div/@ref;unknown attribute;u\n           *  4|/div/div/@template;attribute not defined;m    *
-# *  5|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  4|/div/div/@template;attribute not defined;m\n  *  4|/div/div/@template;attribute not defined;m    *
+# *  5|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7859 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7871 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#t" ref="\#">y</div>
 #   <div id="">x</div>
 #   <datatemplate id="t"/>
@@ -8766,11 +8784,10 @@ not ok 7859 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@id;empty attribute value;m          |  3|/div/div/@id;empty attribute value;m          |
 # |  4|/div/div/@ref;attribute not defined;m         |  4|/div/div/@ref;attribute not defined;m         |
-# *  5|/div/div/@ref;unknown attribute;u\n           *  5|/div/div/@template;attribute not defined;m    *
-# *  6|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  7|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  5|/div/div/@template;attribute not defined;m\n  *  5|/div/div/@template;attribute not defined;m    *
+# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7860 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7872 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#t" ref="\#">y</div>
 #   <datatemplate id="t"/>
 # </div>
@@ -8785,11 +8802,10 @@ not ok 7860 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  1|/div/datatemplate;element not allowed:flow;m  |  1|/div/datatemplate;element not allowed:flow;m  |
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@ref;attribute not defined;m         |  3|/div/div/@ref;attribute not defined;m         |
-# *  4|/div/div/@ref;unknown attribute;u\n           *  4|/div/div/@template;attribute not defined;m    *
-# *  5|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  4|/div/div/@template;attribute not defined;m\n  *  4|/div/div/@template;attribute not defined;m    *
+# *  5|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7861 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7873 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#t" ref="\#no-such-element">y</div>
 #   <datatemplate id="t"/>
 # </div>
@@ -8804,11 +8820,10 @@ not ok 7861 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  1|/div/datatemplate;element not allowed:flow;m  |  1|/div/datatemplate;element not allowed:flow;m  |
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@ref;attribute not defined;m         |  3|/div/div/@ref;attribute not defined;m         |
-# *  4|/div/div/@ref;unknown attribute;u\n           *  4|/div/div/@template;attribute not defined;m    *
-# *  5|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  4|/div/div/@template;attribute not defined;m\n  *  4|/div/div/@template;attribute not defined;m    *
+# *  5|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7862 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7874 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#t" ref="external-html">y</div>
 #   <datatemplate id="t"/>
 # </div>
@@ -8823,11 +8838,10 @@ not ok 7862 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  1|/div/datatemplate;element not allowed:flow;m  |  1|/div/datatemplate;element not allowed:flow;m  |
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@ref;attribute not defined;m         |  3|/div/div/@ref;attribute not defined;m         |
-# *  4|/div/div/@ref;unknown attribute;u\n           *  4|/div/div/@template;attribute not defined;m    *
-# *  5|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  4|/div/div/@template;attribute not defined;m\n  *  4|/div/div/@template;attribute not defined;m    *
+# *  5|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7863 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7875 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#t" ref="external-html\#element">y</div>
 #   <datatemplate id="t"/>
 # </div>
@@ -8842,11 +8856,10 @@ not ok 7863 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  1|/div/datatemplate;element not allowed:flow;m  |  1|/div/datatemplate;element not allowed:flow;m  |
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@ref;attribute not defined;m         |  3|/div/div/@ref;attribute not defined;m         |
-# *  4|/div/div/@ref;unknown attribute;u\n           *  4|/div/div/@template;attribute not defined;m    *
-# *  5|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  4|/div/div/@template;attribute not defined;m\n  *  4|/div/div/@template;attribute not defined;m    *
+# *  5|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7864 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7876 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#t" ref="">y</div>
 #   <datatemplate id="t"/>
 # </div>
@@ -8861,11 +8874,10 @@ not ok 7864 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  1|/div/datatemplate;element not allowed:flow;m  |  1|/div/datatemplate;element not allowed:flow;m  |
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@ref;attribute not defined;m         |  3|/div/div/@ref;attribute not defined;m         |
-# *  4|/div/div/@ref;unknown attribute;u\n           *  4|/div/div/@template;attribute not defined;m    *
-# *  5|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  4|/div/div/@template;attribute not defined;m\n  *  4|/div/div/@template;attribute not defined;m    *
+# *  5|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7865 - <div xmlns="http://www.w3.org/1999/xhtml">
+not ok 7877 - <div xmlns="http://www.w3.org/1999/xhtml">
 #   <div template="\#t" id="itself" ref="\#itself">y</div>
 #   <datatemplate id="t"/>
 # </div>
@@ -8880,31 +8892,30 @@ not ok 7865 - <div xmlns="http://www.w3.org/1999/xhtml">
 # |  1|/div/datatemplate;element not allowed:flow;m  |  1|/div/datatemplate;element not allowed:flow;m  |
 # |  2|/div/datatemplate;element not defined;m       |  2|/div/datatemplate;element not defined;m       |
 # |  3|/div/div/@ref;attribute not defined;m         |  3|/div/div/@ref;attribute not defined;m         |
-# *  4|/div/div/@ref;unknown attribute;u\n           *  4|/div/div/@template;attribute not defined;m    *
-# *  5|/div/div/@template;attribute not defined;m    *   |                                              |
-# *  6|/div/div/@template;unknown attribute;u        *   |                                              |
+# *  4|/div/div/@template;attribute not defined;m\n  *  4|/div/div/@template;attribute not defined;m    *
+# *  5|/div/div/@template;unknown attribute;u        *   |                                              |
 # +---+----------------------------------------------+---+----------------------------------------------+
-not ok 7866 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
+not ok 7878 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>'
 #   at content-checker-test-ok line 1.
-# +---+-----------------------------------+-----------------------------------+
-# | Ln|Got                                |Expected                           |
-# +---+-----------------------------------+-----------------------------------+
-# *  1|/div/@ref;attribute not defined;m  |/div/@ref;attribute not allowed;m  *
-# *  2|/div/@ref;unknown attribute;u      |/div/@ref;attribute not defined;m  *
-# +---+-----------------------------------+-----------------------------------+
-not ok 7867 - <div xmlns="http://www.w3.org/1999/xhtml"
+# +---+-----------------------------------+---+-----------------------------------+
+# | Ln|Got                                | Ln|Expected                           |
+# +---+-----------------------------------+---+-----------------------------------+
+# |   |                                   *  1|/div/@ref;attribute not allowed;m  *
+# |  1|/div/@ref;attribute not defined;m  |  2|/div/@ref;attribute not defined;m  |
+# +---+-----------------------------------+---+-----------------------------------+
+not ok 7879 - <div xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</div>'
 #   at content-checker-test-ok line 1.
-# +---+------------------------------------------------+------------------------------------------------+
-# | Ln|Got                                             |Expected                                        |
-# +---+------------------------------------------------+------------------------------------------------+
-# *  1|/div/@registrationmark;attribute not defined;m  |/div/@registrationmark;attribute not allowed;m  *
-# *  2|/div/@registrationmark;unknown attribute;u      |/div/@registrationmark;attribute not defined;m  *
-# +---+------------------------------------------------+------------------------------------------------+
-not ok 7868 - <rule xmlns="http://www.w3.org/1999/xhtml"
+# +---+------------------------------------------------+---+------------------------------------------------+
+# | Ln|Got                                             | Ln|Expected                                        |
+# +---+------------------------------------------------+---+------------------------------------------------+
+# |   |                                                *  1|/div/@registrationmark;attribute not allowed;m  *
+# |  1|/div/@registrationmark;attribute not defined;m  |  2|/div/@registrationmark;attribute not defined;m  |
+# +---+------------------------------------------------+---+------------------------------------------------+
+not ok 7880 - <rule xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</rule>
 #   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</rule>'
@@ -8914,108 +8925,15 @@ not ok 7868 - <rule xmlns="http://www.w3.org/1999/xhtml"
 # +---+-------------------------------------------------+---+-------------------------------------------------+
 # |   |                                                 *  1|/rule/@registrationmark;attribute not allowed;m  *
 # |  1|/rule/@registrationmark;attribute not defined;m  |  2|/rule/@registrationmark;attribute not defined;m  |
-# *  2|/rule/@registrationmark;unknown attribute;u      *   |                                                 |
-# |  3|/rule;element not defined;m                      |  3|/rule;element not defined;m                      |
+# |  2|/rule;element not defined;m                      |  3|/rule;element not defined;m                      |
 # +---+-------------------------------------------------+---+-------------------------------------------------+
-not ok 7869 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="">x</div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="">x</div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# | Ln|Got                                                  | Ln|Expected                                             |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# |  1|/rule/div/@registrationmark;attribute not defined;m  |  1|/rule/div/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/@registrationmark;unknown attribute;u      *   |                                                     |
-# |  3|/rule;element not defined;m                          |  2|/rule;element not defined;m                          |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-not ok 7870 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="xxxx">x</div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="xxxx">x</div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# | Ln|Got                                                  | Ln|Expected                                             |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# |  1|/rule/div/@registrationmark;attribute not defined;m  |  1|/rule/div/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/@registrationmark;unknown attribute;u      *   |                                                     |
-# |  3|/rule;element not defined;m                          |  2|/rule;element not defined;m                          |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-not ok 7871 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="a b c">x</div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="a b c">x</div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# | Ln|Got                                                  | Ln|Expected                                             |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# |  1|/rule/div/@registrationmark;attribute not defined;m  |  1|/rule/div/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/@registrationmark;unknown attribute;u      *   |                                                     |
-# |  3|/rule;element not defined;m                          |  2|/rule;element not defined;m                          |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-not ok 7872 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="a">x</div>
-#   <div registrationmark="a">x</div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="a">x</div>
-#   <div registrationmark="a">x</div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# | Ln|Got                                                  | Ln|Expected                                             |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# |  1|/rule/div/@registrationmark;attribute not defined;m  |  1|/rule/div/@registrationmark;attribute not defined;m  |
-# |  2|/rule/div/@registrationmark;attribute not defined;m  |  2|/rule/div/@registrationmark;attribute not defined;m  |
-# *  3|/rule/div/@registrationmark;unknown attribute;u      *   |                                                     |
-# *  4|/rule/div/@registrationmark;unknown attribute;u      *   |                                                     |
-# |  5|/rule;element not defined;m                          |  3|/rule;element not defined;m                          |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-not ok 7873 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <rule>
-#     <div registrationmark="a">x</div>
-#   </rule>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <rule>
-#     <div registrationmark="a">x</div>
-#   </rule>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
-# | Ln|Got                                                       | Ln|Expected                                                  |
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
-# |  1|/rule/rule/div/@registrationmark;attribute not defined;m  |  1|/rule/rule/div/@registrationmark;attribute not defined;m  |
-# *  2|/rule/rule/div/@registrationmark;unknown attribute;u      *   |                                                          |
-# |  3|/rule/rule;element not defined;m                          |  2|/rule/rule;element not defined;m                          |
-# |  4|/rule;element not defined;m                               |  3|/rule;element not defined;m                               |
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
-not ok 7874 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <rule>
-#   </rule>
-#   <div registrationmark="a">x</div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <rule>
-#   </rule>
-#   <div registrationmark="a">x</div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# | Ln|Got                                                  | Ln|Expected                                             |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# |  1|/rule/div/@registrationmark;attribute not defined;m  |  1|/rule/div/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/@registrationmark;unknown attribute;u      *   |                                                     |
-# |  3|/rule/rule;element not defined;m                     |  2|/rule/rule;element not defined;m                     |
-# |  4|/rule;element not defined;m                          |  3|/rule;element not defined;m                          |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-not ok 7875 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
+ok 7881
+ok 7882
+ok 7883
+ok 7884
+ok 7885
+ok 7886
+not ok 7887 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
 #   <rule>
 #   </rule>
 #   <div registrationmark="a">x</div>
@@ -9031,29 +8949,11 @@ not ok 7875 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
 # +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
 # |   |                                                             *  1|/datatemplate/div/@registrationmark;attribute not allowed;m  *
 # |  1|/datatemplate/div/@registrationmark;attribute not defined;m  |  2|/datatemplate/div/@registrationmark;attribute not defined;m  |
-# *  2|/datatemplate/div/@registrationmark;unknown attribute;u      *   |                                                             |
-# |  3|/datatemplate/rule;element not defined;m                     |  3|/datatemplate/rule;element not defined;m                     |
-# |  4|/datatemplate;element not defined;m                          |  4|/datatemplate;element not defined;m                          |
+# |  2|/datatemplate/rule;element not defined;m                     |  3|/datatemplate/rule;element not defined;m                     |
+# |  3|/datatemplate;element not defined;m                          |  4|/datatemplate;element not defined;m                          |
 # +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
-not ok 7876 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div>
-#     <div registrationmark="a">x</div>
-#   </div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div>
-#     <div registrationmark="a">x</div>
-#   </div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+---------------------------------------------------------+---+---------------------------------------------------------+
-# | Ln|Got                                                      | Ln|Expected                                                 |
-# +---+---------------------------------------------------------+---+---------------------------------------------------------+
-# |  1|/rule/div/div/@registrationmark;attribute not defined;m  |  1|/rule/div/div/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/div/@registrationmark;unknown attribute;u      *   |                                                         |
-# |  3|/rule;element not defined;m                              |  2|/rule;element not defined;m                              |
-# +---+---------------------------------------------------------+---+---------------------------------------------------------+
-not ok 7877 - <rule xmlns="http://www.w3.org/1999/xhtml">
+ok 7888
+not ok 7889 - <rule xmlns="http://www.w3.org/1999/xhtml">
 #   <div>x
 #     <nest registrationmark="a"/>
 #   </div>
@@ -9069,62 +8969,13 @@ not ok 7877 - <rule xmlns="http://www.w3.org/1999/xhtml">
 # +---+----------------------------------------------------------+---+----------------------------------------------------------+
 # |   |                                                          *  1|/rule/div/nest/@registrationmark;attribute not allowed;m  *
 # |  1|/rule/div/nest/@registrationmark;attribute not defined;m  |  2|/rule/div/nest/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/nest/@registrationmark;unknown attribute;u      *   |                                                          |
-# *  3|/rule/div/nest;element not allowed:flow;m                 *   |                                                          |
-# |  4|/rule/div/nest;element not defined;m                      |  3|/rule/div/nest;element not defined;m                      |
-# |  5|/rule;element not defined;m                               |  4|/rule;element not defined;m                               |
+# *  2|/rule/div/nest;element not allowed:flow;m                 *   |                                                          |
+# |  3|/rule/div/nest;element not defined;m                      |  3|/rule/div/nest;element not defined;m                      |
+# |  4|/rule;element not defined;m                               |  4|/rule;element not defined;m                               |
 # +---+----------------------------------------------------------+---+----------------------------------------------------------+
-not ok 7878 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div>
-#     <rule registrationmark="">
-#       x
-#     </rule>
-#   </div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div>
-#     <rule registrationmark="">
-#       x
-#     </rule>
-#   </div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
-# | Ln|Got                                                       | Ln|Expected                                                  |
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
-# |  1|/rule/div/rule/@registrationmark;attribute not defined;m  |  1|/rule/div/rule/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/rule/@registrationmark;unknown attribute;u      *   |                                                          |
-# |  3|/rule/div/rule;element not allowed:flow;m                 |  2|/rule/div/rule;element not allowed:flow;m                 |
-# |  4|/rule/div/rule;element not defined;m                      |  3|/rule/div/rule;element not defined;m                      |
-# |  5|/rule;element not defined;m                               |  4|/rule;element not defined;m                               |
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
-not ok 7879 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="a">x</div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div registrationmark="a">x</div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# | Ln|Got                                                  | Ln|Expected                                             |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# |  1|/rule/div/@registrationmark;attribute not defined;m  |  1|/rule/div/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/@registrationmark;unknown attribute;u      *   |                                                     |
-# |  3|/rule;element not defined;m                          |  2|/rule;element not defined;m                          |
-# +---+-----------------------------------------------------+---+-----------------------------------------------------+
-# ../t/dom-conformance/html-frames.dat
-ok 7880
-ok 7881
-ok 7882
-ok 7883
-ok 7884
-ok 7885
-ok 7886
-ok 7887
-ok 7888
-ok 7889
 ok 7890
 ok 7891
+# ../t/dom-conformance/html-frames.dat
 ok 7892
 ok 7893
 ok 7894
@@ -9279,5 +9130,17 @@ ok 8042
 ok 8043
 ok 8044
 ok 8045
-# Looks like you planned 7891 tests but ran 8045.
-# Looks like you failed 90 tests of 8045 run.
+ok 8046
+ok 8047
+ok 8048
+ok 8049
+ok 8050
+ok 8051
+ok 8052
+ok 8053
+ok 8054
+ok 8055
+ok 8056
+ok 8057
+# Looks like you planned 7891 tests but ran 8057.
+# Looks like you failed 82 tests of 8057 run.
