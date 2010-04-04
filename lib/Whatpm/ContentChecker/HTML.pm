@@ -4184,6 +4184,8 @@ $Element->{$HTML_NS}->{a} = {
           eswf => $ObjectHashIDRefChecker,
           href => $HTMLURIAttrChecker,
           hreflang => $HTMLLanguageTagAttrChecker,
+          ib => $HTMLURIAttrChecker,
+          ifb => $HTMLURIAttrChecker,
           ilet => $ObjectHashIDRefChecker,
           irst => $ObjectHashIDRefChecker,
           iswf => $ObjectHashIDRefChecker,
@@ -4239,7 +4241,7 @@ $Element->{$HTML_NS}->{a} = {
     } else {
       for (qw(
         target ping rel media hreflang type
-        ilet iswf irst
+        ilet iswf irst ib ifb
       )) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
@@ -4250,7 +4252,7 @@ $Element->{$HTML_NS}->{a} = {
     }
 
     if ($attr{target}) {
-      for (qw(ilet iswf irst)) {
+      for (qw(ilet iswf irst ib ifb)) {
         if ($attr{$_}) {
           $self->{onerror}->(node => $attr{target},
                              type => 'attribute not allowed',

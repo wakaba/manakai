@@ -1892,3 +1892,63 @@ a
 #errors
 /a/@irst;attribute not defined;m
 /a/@target;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    ib="">a</a>
+#errors
+/a/@ib;attribute not defined;m
+/a/@ib;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    ib="">a</a>
+#errors
+/a/@ib;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    ib="[]">a</a>
+#errors
+/a/@ib;attribute not defined;m
+/a/@ib;syntax error:iriref3987;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="" target="xyz"
+    ib="abc">a</a>
+#errors
+/a/@ib;attribute not defined;m
+/a/@target;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    ifb="">a</a>
+#errors
+/a/@ifb;attribute not defined;m
+/a/@ifb;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    ifb="">a</a>
+#errors
+/a/@ifb;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href=""
+    ifb="[]">a</a>
+#errors
+/a/@ifb;attribute not defined;m
+/a/@ifb;syntax error:iriref3987;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="" target="xyz"
+    ifb="abc">a</a>
+#errors
+/a/@ifb;attribute not defined;m
+/a/@target;attribute not allowed;m
