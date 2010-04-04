@@ -1952,3 +1952,111 @@ a
 #errors
 /a/@ifb;attribute not defined;m
 /a/@target;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="">x</a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="#">x</a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="  ">x</a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="  #a">x</a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="foo#bar">x</a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="#xyz">x</a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="xyz">x</a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="xyz"><object data="a" id="xyz">x</object></a>
+#errors
+/a/@ijam;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="#x"><object id="x" data="foo">x</object></a>
+#errors
+/a/@ijam;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="#xyZ"><object id="xyZ" data="foo">x</object></a>
+#errors
+/a/@ijam;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="#x"><object id="X" data="foo">x</object></a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ijam="#x"><span id="x">x</span></a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    ijam="#a"><object data="b" id="a">x</object></a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@ijam;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="c" target="d"
+    ijam="#a"><object data="b" id="a">x</object></a>
+#errors
+/a/@ijam;attribute not defined;m
+/a/@target;attribute not allowed;m

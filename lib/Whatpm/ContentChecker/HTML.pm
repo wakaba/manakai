@@ -935,6 +935,19 @@ my $ObjectHashIDRefChecker = sub {
   }
 }; # $ObjectHashIDRefChecker
 
+my $ObjectOptionalHashIDRefChecker = sub {
+  my ($self, $attr) = @_;
+  
+  my $value = $attr->value;
+  if ($value =~ s/^\x23?(?=.)//s) {
+    push @{$self->{idref}}, ['object', $value, $attr];
+  } else {
+    $self->{onerror}->(node => $attr,
+                       type => 'hashref:syntax error',
+                       level => $self->{level}->{must});
+  }
+}; # $ObjectHashIDRefChecker
+
 ## Valid browsing context name
 my $HTMLBrowsingContextNameAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -4186,6 +4199,7 @@ $Element->{$HTML_NS}->{a} = {
           hreflang => $HTMLLanguageTagAttrChecker,
           ib => $HTMLURIAttrChecker,
           ifb => $HTMLURIAttrChecker,
+          ijam => $ObjectOptionalHashIDRefChecker,
           ilet => $ObjectHashIDRefChecker,
           irst => $ObjectHashIDRefChecker,
           iswf => $ObjectHashIDRefChecker,
@@ -4241,7 +4255,7 @@ $Element->{$HTML_NS}->{a} = {
     } else {
       for (qw(
         target ping rel media hreflang type
-        ilet iswf irst ib ifb
+        ilet iswf irst ib ifb ijam
       )) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
@@ -4252,7 +4266,7 @@ $Element->{$HTML_NS}->{a} = {
     }
 
     if ($attr{target}) {
-      for (qw(ilet iswf irst ib ifb)) {
+      for (qw(ilet iswf irst ib ifb ijam)) {
         if ($attr{$_}) {
           $self->{onerror}->(node => $attr{target},
                              type => 'attribute not allowed',
