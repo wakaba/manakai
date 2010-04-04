@@ -2329,6 +2329,13 @@ x<br autofocus=""/>
 
 #data
 <form xmlns="http://www.w3.org/1999/xhtml"
+    lcs="lcs" target="abc">a</form>
+#errors
+/form/@lcs;attribute not defined;m
+/form/@target;attribute not allowed;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
     z="">a</form>
 #errors
 /form/@z;attribute not defined;m
@@ -2365,6 +2372,71 @@ x<br autofocus=""/>
 #errors
 /form/@z;attribute not defined;m
 /form/@z;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    z="z" target="abc">a</form>
+#errors
+/form/@z;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="a"
+    measure="">a</form>
+#errors
+/form/@measure;attribute not defined;m
+/form/@measure;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="a"
+    measure="auto">a</form>
+#errors
+/form/@measure;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="a"
+    measure="cid">a</form>
+#errors
+/form/@measure;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="a"
+    measure="measure">a</form>
+#errors
+/form/@measure;attribute not defined;m
+/form/@measure;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="a"
+    measure="AuTO">a</form>
+#errors
+/form/@measure;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="a"
+    measure="cID">a</form>
+#errors
+/form/@measure;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    action="a"
+    measure="cid ">a</form>
+#errors
+/form/@measure;attribute not defined;m
+/form/@measure;enumerated:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    measure="auto">a</form>
+#errors
+/form/@measure;attribute not defined;m
+/form/@measure;attribute not allowed;m
 
 #data
 <legend xmlns="http://www.w3.org/1999/xhtml"

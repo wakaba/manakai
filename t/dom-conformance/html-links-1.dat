@@ -2249,3 +2249,189 @@ a
     z="">a</a>
 #errors
 /a/@z;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="  ">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="0">b</a>
+#errors
+/a/@loop;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="1">b</a>
+#errors
+/a/@loop;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="120">b</a>
+#errors
+/a/@loop;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="00124">b</a>
+#errors
+/a/@loop;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="infinite">b</a>
+#errors
+/a/@loop;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="-1">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="10.0">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="INFINITE">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="Infinite">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="LOOP">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="122  ">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    loop="+1">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    loop="1">b</a>
+#errors
+/a/@loop;attribute not defined;m
+/a/@loop;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    mailbody="">b</a>
+#errors
+/a/@mailbody;attribute not defined;m
+/a/@mailbody;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="mailto:"
+    mailbody="">b</a>
+#errors
+/a/@mailbody;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="mailto:"
+    mailbody="abc">b</a>
+#errors
+/a/@mailbody;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="mailto:"
+    mailbody="   ">b</a>
+#errors
+/a/@mailbody;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="abc"
+    measure="">b</a>
+#errors
+/a/@measure;attribute not defined;m
+/a/@measure;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="abc"
+    measure="auto">b</a>
+#errors
+/a/@measure;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="abc"
+    measure="cid">b</a>
+#errors
+/a/@measure;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="abc"
+    measure="CId">b</a>
+#errors
+/a/@measure;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="abc"
+    measure="measure">b</a>
+#errors
+/a/@measure;attribute not defined;m
+/a/@measure;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    measure="auto">b</a>
+#errors
+/a/@measure;attribute not defined;m
+/a/@measure;attribute not allowed;m

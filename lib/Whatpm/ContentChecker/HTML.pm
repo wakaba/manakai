@@ -4205,6 +4205,18 @@ $Element->{$HTML_NS}->{a} = {
           iswf => $ObjectHashIDRefChecker,
           kana => sub { },
           lcs => $GetHTMLBooleanAttrChecker->('lcs'),
+          loop => sub {
+            my ($self, $attr) = @_;
+            if ($attr->value =~ /\A(?:[0-9]+|infinite)\z/) {
+              #
+            } else {
+              $self->{onerror}->(node => $attr,
+                                 type => 'nninteger:syntax error', # XXXdocumentation
+                                 level => $self->{level}->{must});
+            }
+          }, # loop
+          mailbody => sub { },
+          measure => $GetHTMLEnumeratedAttrChecker->({cid => 1, auto => 1}),
           media => $HTMLMQAttrChecker,
           methods => sub { }, ## Space-separated values [HTML 2.0]
           memoryname => sub {
@@ -4271,7 +4283,7 @@ $Element->{$HTML_NS}->{a} = {
         target ping rel media hreflang type
         ilet iswf irst ib ifb ijam
         email telbook kana memoryname
-        lcs z
+        lcs z measure loop mailbody
       )) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
@@ -4296,6 +4308,7 @@ $Element->{$HTML_NS}->{a} = {
     # XXX @email -> href=tel:/tel-av:
     # XXX @telbook, @kana -> href=tel:/tel-av:/mailto:
     # XXX @memoryname -> href=tel:/mailto:
+    # XXX @mailbody -> mailto:
 
     $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },
@@ -7030,6 +7043,7 @@ $Element->{$HTML_NS}->{form} = {
       'text/plain' => 1,
     }),
     lcs => $GetHTMLBooleanAttrChecker->('lcs'),
+    measure => $GetHTMLEnumeratedAttrChecker->({cid => 1, auto => 1}),
     method => $GetHTMLEnumeratedAttrChecker->({
       get => 1, post => 1, put => 1, delete => 1,
     }),
@@ -7081,6 +7095,30 @@ $Element->{$HTML_NS}->{form} = {
     target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     z => FEATURE_OBSVOCAB,
   }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    my $el = $item->{node};
+
+    my $target_attr = $el->get_attribute_node_ns (undef, 'target');
+    if ($target_attr) {
+      for (qw(lcs)) {
+        if ($el->has_attribute_ns (undef, $_)) {
+          $self->{onerror}->(node => $target_attr,
+                             type => 'attribute not allowed',
+                             level => $self->{level}->{must});
+        }
+      }
+    }
+
+    my $measure_attr = $el->get_attribute_node_ns (undef, 'measure');
+    if ($measure_attr) {
+      unless ($el->has_attribute_ns (undef, 'action')) {
+        $self->{onerror}->(node => $measure_attr,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+    }
+  }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {$HTML_NS => {form => 1}});
@@ -7115,20 +7153,6 @@ $Element->{$HTML_NS}->{fieldset} = {
     lang => FEATURE_HTML5_REC,
     name => FEATURE_HTML5_LC,
   }), # check_attrs
-  check_attrs2 => sub {
-    my ($self, $item, $element_state) = @_;
-    my $el = $item->{node};
-    my $target_attr = $el->get_attribute_node_ns (undef, 'target');
-    if ($target_attr) {
-      for (qw(lcs)) {
-        if ($el->has_attribute_ns (undef, $_)) {
-          $self->{onerror}->(node => $target_attr,
-                             type => 'attribute not allowed',
-                             level => $self->{level}->{must});
-        }
-      }
-    }
-  }, # check_attrs2
   ## NOTE: legend?, Flow
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
