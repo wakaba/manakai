@@ -4160,6 +4160,14 @@ $Element->{$HTML_NS}->{a} = {
             }
           }, # cti
           directkey => $AccesskeyChecker,
+          email => sub {
+            my ($self, $attr) = @_;
+            unless ($attr->value =~ /\A$ValidEmailAddress\z/) {
+              $self->{onerror}->(node => $attr,
+                                 type => 'email:syntax error', ## XXX documentation
+                                 level => $self->{level}->{must});
+            }
+          }, # email
           href => $HTMLURIAttrChecker,
           hreflang => $HTMLLanguageTagAttrChecker,
           media => $HTMLMQAttrChecker,
@@ -4222,6 +4230,8 @@ $Element->{$HTML_NS}->{a} = {
     }
 
     $ShapeCoordsChecker->($self, $item, \%attr, 'missing');
+
+    # XXX @email -> href=tel:/tel-av:
 
     $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },

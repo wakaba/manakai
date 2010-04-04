@@ -1499,3 +1499,18 @@ a
 #errors
 /a/@directkey;attribute not defined;m
 /a/@directkey;char:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    email="foo@bar.test">a</a>
+#errors
+/a/@email;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    email="foo@bar.test...">a</a>
+#errors
+/a/@email;attribute not defined;m
+/a/@email;email:syntax error;m
