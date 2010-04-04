@@ -2672,3 +2672,55 @@ a
 #errors
 /a/@viblength;attribute not defined;m
 /a/@viblength;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    volume="low">b</a>
+#errors
+/a/@volume;attribute not defined;m
+/a/@volume;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    volume="">b</a>
+#errors
+/a/@volume;attribute not defined;m
+/a/@volume;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    volume="low">b</a>
+#errors
+/a/@volume;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    volume="Middle">b</a>
+#errors
+/a/@volume;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    volume="HIGH">b</a>
+#errors
+/a/@volume;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    volume="3">b</a>
+#errors
+/a/@volume;attribute not defined;m
+/a/@volume;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    volume="mute">b</a>
+#errors
+/a/@volume;attribute not defined;m
+/a/@volume;enumerated:invalid;m

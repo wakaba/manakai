@@ -15465,3 +15465,79 @@
 /input/@viblength;attribute not defined;m
 /input/@viblength;attribute not allowed;m
 /input/@viblength;input attr not applicable;hidden;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    volume="low"/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@volume;attribute not allowed;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    volume=""/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@volume;enumerated:invalid;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    volume="low"/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    volume="Middle"/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    volume="HIGH"/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    volume="hight"/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@volume;enumerated:invalid;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    volume="3"/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@volume;enumerated:invalid;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    volume="mute"/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@volume;enumerated:invalid;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="image" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    volume="high"/>
+#errors
+/input/@volume;attribute not defined;m
+/input/@volume;input attr not applicable;image;m
+

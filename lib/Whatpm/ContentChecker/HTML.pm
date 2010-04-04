@@ -4253,6 +4253,9 @@ $Element->{$HTML_NS}->{a} = {
           vibration => $GetHTMLEnumeratedAttrChecker->({
             select => 1, focus => 1,
           }),
+          volume => $GetHTMLEnumeratedAttrChecker->({
+            high => 1, middle => 1, low => 1,
+          }),
           z => $GetHTMLBooleanAttrChecker->('z'),
         }->{$attr_ln};
         if ($checker) {
@@ -4295,7 +4298,7 @@ $Element->{$HTML_NS}->{a} = {
         ilet iswf irst ib ifb ijam
         email telbook kana memoryname mailbody
         lcs z measure
-        loop soundstart
+        loop soundstart volume
       )) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
@@ -7399,6 +7402,7 @@ $Element->{$HTML_NS}->{input} = {
          value => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          viblength => FEATURE_OBSVOCAB,
          vibration => FEATURE_OBSVOCAB,
+         volume => FEATURE_OBSVOCAB,
          #vspace WA1 prose
          width => FEATURE_HTML5_LC,
         }->{$attr_ln};
@@ -7470,6 +7474,7 @@ $Element->{$HTML_NS}->{input} = {
          vibration => $GetHTMLEnumeratedAttrChecker->({
            select => 1, focus => 1,
          }),
+         volume => '',
          vspace => '',
          width => '',
         }->{$attr_ln};
@@ -7614,6 +7619,9 @@ $Element->{$HTML_NS}->{input} = {
              }),
              target => $HTMLTargetAttrChecker,
              value => sub { }, ## NOTE: No restriction.
+             volume => $GetHTMLEnumeratedAttrChecker->({
+               high => 1, middle => 1, low => 1,
+             }),
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'image') {
             $checker =
@@ -7840,12 +7848,14 @@ $Element->{$HTML_NS}->{input} = {
         }
       }
 
-      my $ss_attr = $el->get_attribute_node_ns (undef, 'soundstart');
-      if ($ss_attr) {
-        unless ($el->has_attribute_ns (undef, 'src')) {
-          $self->{onerror}->(node => $ss_attr,
-                             type => 'attribute not allowed',
-                             level => $self->{level}->{must});
+      unless ($el->has_attribute_ns (undef, 'src')) {
+        for (qw(volume soundstart)) {
+          my $attr = $el->get_attribute_node_ns (undef, $_);
+          if ($attr) {
+            $self->{onerror}->(node => $attr,
+                               type => 'attribute not allowed',
+                               level => $self->{level}->{must});
+          }
         }
       }
     }
