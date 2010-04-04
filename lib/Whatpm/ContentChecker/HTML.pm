@@ -4203,8 +4203,19 @@ $Element->{$HTML_NS}->{a} = {
           ilet => $ObjectHashIDRefChecker,
           irst => $ObjectHashIDRefChecker,
           iswf => $ObjectHashIDRefChecker,
+          kana => sub { },
           media => $HTMLMQAttrChecker,
           methods => sub { }, ## Space-separated values [HTML 2.0]
+          memoryname => sub {
+            my ($self, $attr) = @_;
+            if ($attr->value =~ /.-./s) {
+              #
+            } else {
+              $self->{onerror}->(node => $attr,
+                                 type => 'memoryname:syntax error', # XXXdocumentation
+                                 level => $self->{level}->{must});
+            }
+          }, # memoryname
           name => $NameAttrChecker,
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
@@ -4215,6 +4226,7 @@ $Element->{$HTML_NS}->{a} = {
             rect => 1, rectangle => -1,
           }),
           target => $HTMLTargetAttrChecker,
+          telbook => sub { },
           type => $MIMETypeChecker,
           urn => $HTMLURIAttrChecker,
         }->{$attr_ln};
@@ -4256,6 +4268,7 @@ $Element->{$HTML_NS}->{a} = {
       for (qw(
         target ping rel media hreflang type
         ilet iswf irst ib ifb ijam
+        email telbook kana memoryname
       )) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
@@ -4278,6 +4291,8 @@ $Element->{$HTML_NS}->{a} = {
     $ShapeCoordsChecker->($self, $item, \%attr, 'missing');
 
     # XXX @email -> href=tel:/tel-av:
+    # XXX @telbook, @kana -> href=tel:/tel-av:/mailto:
+    # XXX @memoryname -> href=tel:/mailto:
 
     $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },

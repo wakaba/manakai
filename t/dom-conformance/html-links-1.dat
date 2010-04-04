@@ -1502,6 +1502,13 @@ a
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"
+    email="foo@bar.test">a</a>
+#errors
+/a/@email;attribute not defined;m
+/a/@email;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
     href="tel:12345"
     email="foo@bar.test">a</a>
 #errors
@@ -1514,6 +1521,101 @@ a
 #errors
 /a/@email;attribute not defined;m
 /a/@email;email:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    telbook="foo@bar.test">a</a>
+#errors
+/a/@telbook;attribute not defined;m
+/a/@telbook;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    telbook="foo@bar.test">a</a>
+#errors
+/a/@telbook;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    telbook="foo@bar.test...">a</a>
+#errors
+/a/@telbook;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    kana="foo@bar.test">a</a>
+#errors
+/a/@kana;attribute not defined;m
+/a/@kana;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    kana="foo@bar.test">a</a>
+#errors
+/a/@kana;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    kana="foo@bar.test...">a</a>
+#errors
+/a/@kana;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    memoryname="foo-bar.test">a</a>
+#errors
+/a/@memoryname;attribute not defined;m
+/a/@memoryname;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    memoryname="foo-bar.test">a</a>
+#errors
+/a/@memoryname;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    memoryname="foo-bar.test...">a</a>
+#errors
+/a/@memoryname;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    memoryname="foo-">a</a>
+#errors
+/a/@memoryname;attribute not defined;m
+/a/@memoryname;memoryname:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    memoryname="-foo">a</a>
+#errors
+/a/@memoryname;attribute not defined;m
+/a/@memoryname;memoryname:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    memoryname="-">a</a>
+#errors
+/a/@memoryname;attribute not defined;m
+/a/@memoryname;memoryname:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="tel:12345"
+    memoryname="">a</a>
+#errors
+/a/@memoryname;attribute not defined;m
+/a/@memoryname;memoryname:syntax error;m
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"
