@@ -1502,6 +1502,47 @@ a
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    nonumber="">b</a>
+#errors
+/a/@nonumber;attribute not defined;m
+/a/@nonumber;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    directkey="a" nonumber="">b</a>
+#errors
+/a/@directkey;attribute not defined;m
+/a/@nonumber;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    directkey="a" nonumber="nonumber">b</a>
+#errors
+/a/@directkey;attribute not defined;m
+/a/@nonumber;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    directkey="a" nonumber="NoNumber">b</a>
+#errors
+/a/@directkey;attribute not defined;m
+/a/@nonumber;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    directkey="a" nonumber="xyz">b</a>
+#errors
+/a/@directkey;attribute not defined;m
+/a/@nonumber;attribute not defined;m
+/a/@nonumber;boolean:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
     email="foo@bar.test">a</a>
 #errors
 /a/@email;attribute not defined;m

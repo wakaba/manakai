@@ -15207,3 +15207,48 @@
 #errors
 /input/@directkey;attribute not defined;m
 /input/@directkey;input attr not applicable;password;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    nonumber=""/>
+#errors
+/input/@nonumber;attribute not defined;m
+/input/@nonumber;attribute not allowed;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="a" nonumber="" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@nonumber;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="a" nonumber="nonumber" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@nonumber;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="a" nonumber="NONumber" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@nonumber;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="a" nonumber="abc" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@nonumber;attribute not defined;m
+/input/@nonumber;boolean:invalid;m
+
+#data
+<input type="reset" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="a" nonumber="" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;input attr not applicable;reset;m
+/input/@nonumber;attribute not defined;m
+/input/@nonumber;input attr not applicable;reset;m

@@ -2330,7 +2330,7 @@ $Element->{$HTML_NS}->{link} = {
       href => $HTMLURIAttrChecker,
       rel => sub { $HTMLLinkTypesAttrChecker->(0, $item, @_) },
       media => $HTMLMQAttrChecker,
-      methods => sub { }, ## Space-separated values [HTML 2.0]
+      methods => sub { },
       hreflang => $HTMLLanguageTagAttrChecker,
       sizes => sub {
         my ($self, $attr) = @_;
@@ -4218,7 +4218,7 @@ $Element->{$HTML_NS}->{a} = {
           mailbody => sub { },
           measure => $GetHTMLEnumeratedAttrChecker->({cid => 1, auto => 1}),
           media => $HTMLMQAttrChecker,
-          methods => sub { }, ## Space-separated values [HTML 2.0]
+          methods => sub { },
           memoryname => sub {
             my ($self, $attr) = @_;
             if ($attr->value =~ /.-./s) {
@@ -4230,6 +4230,7 @@ $Element->{$HTML_NS}->{a} = {
             }
           }, # memoryname
           name => $NameAttrChecker,
+          nonumber => $GetHTMLBooleanAttrChecker->('nonumber'),
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
           shape => $GetHTMLEnumeratedAttrChecker->({
@@ -4301,6 +4302,12 @@ $Element->{$HTML_NS}->{a} = {
                              level => $self->{level}->{must});
         }
       }
+    }
+
+    if ($attr{nonumber} and not $attr{directkey}) {
+      $self->{onerror}->(node => $attr{nonumber},
+                         type => 'attribute not allowed',
+                         level => $self->{level}->{must});
     }
 
     $ShapeCoordsChecker->($self, $item, \%attr, 'missing');
@@ -7334,6 +7341,7 @@ $Element->{$HTML_NS}->{input} = {
          min => FEATURE_HTML5_LC | FEATURE_WF2X,
          multiple => FEATURE_HTML5_LC,
          name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+         nonumber => FEATURE_OBSVOCAB,
          novalidate => FEATURE_HTML5_DROPPED,
          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -7394,6 +7402,7 @@ $Element->{$HTML_NS}->{input} = {
          min => '',
          multiple => '',
          name => $FormControlNameAttrChecker,
+         nonumber => '',
          novalidate => '',
          pattern => '',
          placeholder => '',
@@ -7550,6 +7559,7 @@ $Element->{$HTML_NS}->{input} = {
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
+             nonumber => $GetHTMLBooleanAttrChecker->('nonumber'),
              novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
@@ -7758,12 +7768,20 @@ $Element->{$HTML_NS}->{input} = {
       $element_state->{number_value}->{max} = 100
           unless defined $element_state->{number_value}->{max};
     } elsif ($state eq 'submit') {
-      my $attr = $item->{node}->get_attribute_node_ns (undef, 'directkey');
-      if ($attr) {
-        unless ($item->{node}->has_attribute_ns (undef, 'value')) {
-          $self->{onerror}->(node => $attr,
+      my $el = $item->{node};
+      my $dk_attr = $el->get_attribute_node_ns (undef, 'directkey');
+      if ($dk_attr) {
+        unless ($el->has_attribute_ns (undef, 'value')) {
+          $self->{onerror}->(node => $dk_attr,
                              type => 'attribute missing',
                              text => 'value',
+                             level => $self->{level}->{must});
+        }
+      } else {
+        my $nn_attr = $el->get_attribute_node_ns (undef, 'nonumber');
+        if ($nn_attr) {
+          $self->{onerror}->(node => $nn_attr,
+                             type => 'attribute not allowed',
                              level => $self->{level}->{must});
         }
       }
