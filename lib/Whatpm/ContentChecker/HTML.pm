@@ -4242,10 +4242,17 @@ $Element->{$HTML_NS}->{a} = {
           soundstart => $GetHTMLEnumeratedAttrChecker->({
             select => 1, focus => 1,
           }),
+          src => $NonEmptyURLChecker,
           target => $HTMLTargetAttrChecker,
           telbook => sub { },
           type => $MIMETypeChecker,
           urn => $HTMLURIAttrChecker,
+          viblength => $GetHTMLNonNegativeIntegerAttrChecker->(sub {
+            1 <= $_[0] and $_[0] <= 9;
+          }),
+          vibration => $GetHTMLEnumeratedAttrChecker->({
+            select => 1, focus => 1,
+          }),
           z => $GetHTMLBooleanAttrChecker->('z'),
         }->{$attr_ln};
         if ($checker) {
@@ -4310,6 +4317,12 @@ $Element->{$HTML_NS}->{a} = {
 
     if ($attr{nonumber} and not $attr{directkey}) {
       $self->{onerror}->(node => $attr{nonumber},
+                         type => 'attribute not allowed',
+                         level => $self->{level}->{must});
+    }
+
+    if ($attr{viblength} and not $attr{vibration}) {
+      $self->{onerror}->(node => $attr{viblength},
                          type => 'attribute not allowed',
                          level => $self->{level}->{must});
     }
@@ -5499,6 +5512,12 @@ $Element->{$HTML_NS}->{img} = {
       name => $NameAttrChecker,
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
+      viblength => $GetHTMLNonNegativeIntegerAttrChecker->(sub {
+        1 <= $_[0] and $_[0] <= 9;
+      }),
+      vibration => $GetHTMLEnumeratedAttrChecker->({
+        focus => 1,
+      }),
       vspace => $HTMLLengthAttrChecker,
       width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     }, {
@@ -5518,21 +5537,33 @@ $Element->{$HTML_NS}->{img} = {
       vspace => FEATURE_HTML5_OBSOLETE,
       width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     })->($self, $item, $element_state);
-    unless ($item->{node}->has_attribute_ns (undef, 'alt')) {
-      $self->{onerror}->(node => $item->{node},
+
+    my $el = $item->{node};
+
+    unless ($el->has_attribute_ns (undef, 'alt')) {
+      $self->{onerror}->(node => $el,
                          type => 'attribute missing',
                          text => 'alt',
                          level => $self->{level}->{should});
       ## TODO: ...
     }
-    unless ($item->{node}->has_attribute_ns (undef, 'src')) {
-      $self->{onerror}->(node => $item->{node},
+    unless ($el->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $el,
                          type => 'attribute missing',
                          text => 'src',
                          level => $self->{level}->{must});
     }
 
-    ## TODO: external resource check
+    my $vl_attr = $el->get_attribute_node_ns (undef, 'viblength');
+    if ($vl_attr) {
+      unless ($el->has_attribute_ns (undef, 'vibration')) {
+        $self->{onerror}->(node => $vl_attr,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+    }
+
+    ## XXXresource: external resource check
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
@@ -7366,6 +7397,8 @@ $Element->{$HTML_NS}->{input} = {
          type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          usemap => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
          value => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+         viblength => FEATURE_OBSVOCAB,
+         vibration => FEATURE_OBSVOCAB,
          #vspace WA1 prose
          width => FEATURE_HTML5_LC,
         }->{$attr_ln};
@@ -7431,6 +7464,12 @@ $Element->{$HTML_NS}->{input} = {
          }),
          usemap => '',
          value => '',
+         viblength => $GetHTMLNonNegativeIntegerAttrChecker->(sub {
+           1 <= $_[0] and $_[0] <= 9;
+         }),
+         vibration => $GetHTMLEnumeratedAttrChecker->({
+           select => 1, focus => 1,
+         }),
          vspace => '',
          width => '',
         }->{$attr_ln};
@@ -7729,6 +7768,11 @@ $Element->{$HTML_NS}->{input} = {
                                  level => $self->{level}->{should});
             }
           }
+        } else {
+          if ($state eq 'hidden') {
+            $checker = ''
+                if $attr_ln eq 'viblength' or $attr_ln eq 'vibration';
+          }
         }
 
         if (defined $checker) {
@@ -7772,12 +7816,13 @@ $Element->{$HTML_NS}->{input} = {
 
     ## ISSUE: -0/+0
 
+    my $el = $item->{node};
+
     if ($state eq 'range') {
       $element_state->{number_value}->{min} ||= 0;
       $element_state->{number_value}->{max} = 100
           unless defined $element_state->{number_value}->{max};
     } elsif ($state eq 'submit') {
-      my $el = $item->{node};
       my $dk_attr = $el->get_attribute_node_ns (undef, 'directkey');
       if ($dk_attr) {
         unless ($el->has_attribute_ns (undef, 'value')) {
@@ -7802,6 +7847,15 @@ $Element->{$HTML_NS}->{input} = {
                              type => 'attribute not allowed',
                              level => $self->{level}->{must});
         }
+      }
+    }
+
+    my $vl_attr = $el->get_attribute_node_ns (undef, 'viblength');
+    if ($vl_attr) {
+      unless ($el->has_attribute_ns (undef, 'vibration')) {
+        $self->{onerror}->(node => $vl_attr,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
       }
     }
 

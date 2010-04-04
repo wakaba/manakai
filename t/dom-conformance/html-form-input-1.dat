@@ -15317,3 +15317,151 @@
 #errors
 /input/@soundstart;attribute not defined;m
 /input/@soundstart;input attr not applicable;password;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration=""
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@vibration;enumerated:invalid;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="select"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focuS"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="auto"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@vibration;enumerated:invalid;m
+
+#data
+<input type="hidden" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="auto"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@vibration;input attr not applicable;hidden;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength=""
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+/input/@viblength;nninteger:syntax error;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="1"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="8"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="9"/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="10"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+/input/@viblength;nninteger:out of range;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="100"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+/input/@viblength;nninteger:out of range;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="0"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+/input/@viblength;nninteger:out of range;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="+1"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+/input/@viblength;nninteger:syntax error;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="4.00"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+/input/@viblength;nninteger:syntax error;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="vib"
+/>
+#errors
+/input/@vibration;attribute not defined;m
+/input/@viblength;attribute not defined;m
+/input/@viblength;nninteger:syntax error;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+  viblength="3"
+/>
+#errors
+/input/@viblength;attribute not defined;m
+/input/@viblength;attribute not allowed;m
+
+#data
+<input type="hidden" xmlns="http://www.w3.org/1999/xhtml"
+  viblength="3"
+/>
+#errors
+/input/@viblength;attribute not defined;m
+/input/@viblength;attribute not allowed;m
+/input/@viblength;input attr not applicable;hidden;m

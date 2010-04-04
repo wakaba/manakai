@@ -4016,6 +4016,138 @@ aa<map name="x">b<map name="y">bb</map></map>
 /div/img/@name;id name mismatch;m
 
 #data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration=""
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@vibration;enumerated:invalid;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="select"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@vibration;enumerated:invalid;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focuS"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="auto"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@vibration;enumerated:invalid;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength=""
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+/img/@viblength;nninteger:syntax error;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="1"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="8"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="9"/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="10"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+/img/@viblength;nninteger:out of range;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="100"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+/img/@viblength;nninteger:out of range;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="0"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+/img/@viblength;nninteger:out of range;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="+1"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+/img/@viblength;nninteger:syntax error;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="4.00"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+/img/@viblength;nninteger:syntax error;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="vib"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+/img/@viblength;nninteger:syntax error;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  viblength="3"
+/>
+#errors
+/img/@viblength;attribute not defined;m
+/img/@viblength;attribute not allowed;m
+
+#data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 

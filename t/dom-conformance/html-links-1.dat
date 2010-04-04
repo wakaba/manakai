@@ -2521,3 +2521,154 @@ a
 /a/@soundstart;attribute not defined;m
 /a/@soundstart;attribute not allowed;m
 /a/@soundstart;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    src="">b</a>
+#errors
+/a/@src;attribute not defined;m
+/a/@src;url:empty;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    src="[]">b</a>
+#errors
+/a/@src;attribute not defined;m
+/a/@src;syntax error:iriref3987;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    src="abc">b</a>
+#errors
+/a/@src;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration=""
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@vibration;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="select"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focuS"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="auto"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@vibration;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength=""
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+/a/@viblength;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="1"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="8"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="9">b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="10"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+/a/@viblength;nninteger:out of range;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="100"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+/a/@viblength;nninteger:out of range;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="0"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+/a/@viblength;nninteger:out of range;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="+1"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+/a/@viblength;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="4.00"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+/a/@viblength;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="vib"
+>b</a>
+#errors
+/a/@vibration;attribute not defined;m
+/a/@viblength;attribute not defined;m
+/a/@viblength;nninteger:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+  viblength="3"
+>b</a>
+#errors
+/a/@viblength;attribute not defined;m
+/a/@viblength;attribute not allowed;m
