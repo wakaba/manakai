@@ -901,6 +901,7 @@ next unless $code;## TODO: temp.
           labelable => 'no referenced control',
           menu => 'no referenced menu',
           datalist => 'no referenced datalist', ## TODOC: type
+          object => 'no referenced object', # XXXdocumentation
           'repeat-template' => 'no referenced repeat-template', # XXXdocumentation
         }->{$_->[0]},
                          value => $_->[1],

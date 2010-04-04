@@ -1514,3 +1514,381 @@ a
 #errors
 /a/@email;attribute not defined;m
 /a/@email;email:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="">x</a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="#">x</a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="  ">x</a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="  #a">x</a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="foo#bar">x</a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="#xyz">x</a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="#x"><object id="x" data="foo">x</object></a>
+#errors
+/a/@eswf;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="x"><object id="x" data="foo">x</object></a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="#xyZ"><object id="xyZ" data="foo">x</object></a>
+#errors
+/a/@eswf;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="#x"><object id="X" data="foo">x</object></a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    eswf="#x"><span id="x">x</span></a>
+#errors
+/a/@eswf;attribute not defined;m
+/a/@eswf;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="">x</a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="#">x</a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="  ">x</a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="  #a">x</a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="foo#bar">x</a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="#xyz">x</a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="xyz">x</a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="#x"><object id="x" data="foo">x</object></a>
+#errors
+/a/@iswf;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="#xyZ"><object id="xyZ" data="foo">x</object></a>
+#errors
+/a/@iswf;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="#x"><object id="X" data="foo">x</object></a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    iswf="#x"><span id="x">x</span></a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    iswf="#a"><object data="b" id="a">x</object></a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@iswf;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="c" target="d"
+    iswf="#a"><object data="b" id="a">x</object></a>
+#errors
+/a/@iswf;attribute not defined;m
+/a/@target;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="">x</a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="#">x</a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="  ">x</a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="  #a">x</a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="foo#bar">x</a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="#xyz">x</a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="xyz">x</a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="#x"><object id="x" data="foo">x</object></a>
+#errors
+/a/@ilet;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="#xyZ"><object id="xyZ" data="foo">x</object></a>
+#errors
+/a/@ilet;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="#x"><object id="X" data="foo">x</object></a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    ilet="#x"><span id="x">x</span></a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    ilet="#a"><object data="b" id="a">x</object></a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@ilet;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="c" target="d"
+    ilet="#a"><object data="b" id="a">x</object></a>
+#errors
+/a/@ilet;attribute not defined;m
+/a/@target;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="">x</a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="#">x</a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="  ">x</a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="  #a">x</a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="foo#bar">x</a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="#xyz">x</a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="xyz">x</a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;hashref:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="#x"><object id="x" data="foo">x</object></a>
+#errors
+/a/@irst;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="#xyZ"><object id="xyZ" data="foo">x</object></a>
+#errors
+/a/@irst;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="#x"><object id="X" data="foo">x</object></a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    irst="#x"><span id="x">x</span></a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;no referenced object;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    irst="#a"><object data="b" id="a">x</object></a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@irst;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="c" target="d"
+    irst="#a"><object data="b" id="a">x</object></a>
+#errors
+/a/@irst;attribute not defined;m
+/a/@target;attribute not allowed;m

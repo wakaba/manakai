@@ -922,6 +922,19 @@ my $HTMLUsemapAttrChecker = sub {
   ## ISSUE: UA algorithm for matching is case-insensitive; IDs only different in cases should be reported
 }; # $HTMLUsemapAttrChecker
 
+my $ObjectHashIDRefChecker = sub {
+  my ($self, $attr) = @_;
+  
+  my $value = $attr->value;
+  if ($value =~ s/^\x23(?=.)//s) {
+    push @{$self->{idref}}, ['object', $value, $attr];
+  } else {
+    $self->{onerror}->(node => $attr,
+                       type => 'hashref:syntax error',
+                       level => $self->{level}->{must});
+  }
+}; # $ObjectHashIDRefChecker
+
 ## Valid browsing context name
 my $HTMLBrowsingContextNameAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -4168,8 +4181,12 @@ $Element->{$HTML_NS}->{a} = {
                                  level => $self->{level}->{must});
             }
           }, # email
+          eswf => $ObjectHashIDRefChecker,
           href => $HTMLURIAttrChecker,
           hreflang => $HTMLLanguageTagAttrChecker,
+          ilet => $ObjectHashIDRefChecker,
+          irst => $ObjectHashIDRefChecker,
+          iswf => $ObjectHashIDRefChecker,
           media => $HTMLMQAttrChecker,
           methods => sub { }, ## Space-separated values [HTML 2.0]
           name => $NameAttrChecker,
@@ -4220,9 +4237,22 @@ $Element->{$HTML_NS}->{a} = {
       $self->{has_hyperlink_element} = 1;
       $self->{flag}->{in_a_href} = 1;
     } else {
-      for (qw/target ping rel media hreflang type/) {
+      for (qw(
+        target ping rel media hreflang type
+        ilet iswf irst
+      )) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
+                             type => 'attribute not allowed',
+                             level => $self->{level}->{must});
+        }
+      }
+    }
+
+    if ($attr{target}) {
+      for (qw(ilet iswf irst)) {
+        if ($attr{$_}) {
+          $self->{onerror}->(node => $attr{target},
                              type => 'attribute not allowed',
                              level => $self->{level}->{must});
         }
@@ -5695,6 +5725,10 @@ $Element->{$HTML_NS}->{object} = {
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   }, # check_attrs2
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{id_type} = 'object';
+  }, # check_start
   ## NOTE: param*, transparent (Flow)
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
