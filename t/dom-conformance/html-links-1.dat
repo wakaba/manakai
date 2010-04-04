@@ -2476,3 +2476,48 @@ a
 #errors
 /a/@measure;attribute not defined;m
 /a/@measure;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    soundstart="">b</a>
+#errors
+/a/@soundstart;attribute not defined;m
+/a/@soundstart;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    soundstart="focus">b</a>
+#errors
+/a/@soundstart;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    soundstart="select">b</a>
+#errors
+/a/@soundstart;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    soundstart="Focus">b</a>
+#errors
+/a/@soundstart;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    soundstart="soundstart">b</a>
+#errors
+/a/@soundstart;attribute not defined;m
+/a/@soundstart;enumerated:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    soundstart="">b</a>
+#errors
+/a/@soundstart;attribute not defined;m
+/a/@soundstart;attribute not allowed;m
+/a/@soundstart;enumerated:invalid;m

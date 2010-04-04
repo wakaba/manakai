@@ -15252,3 +15252,68 @@
 /input/@directkey;input attr not applicable;reset;m
 /input/@nonumber;attribute not defined;m
 /input/@nonumber;input attr not applicable;reset;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    soundstart=""/>
+#errors
+/input/@soundstart;attribute not defined;m
+/input/@soundstart;enumerated:invalid;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    soundstart="focus"/>
+#errors
+/input/@soundstart;attribute not defined;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    soundstart="select"/>
+#errors
+/input/@soundstart;attribute not defined;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    soundstart="Focus"/>
+#errors
+/input/@soundstart;attribute not defined;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    soundstart="soundstart"/>
+#errors
+/input/@soundstart;attribute not defined;m
+/input/@soundstart;enumerated:invalid;m
+/input/@src;input attr not applicable;submit;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    soundstart=""/>
+#errors
+/input/@soundstart;attribute not defined;m
+/input/@soundstart;attribute not allowed;m
+/input/@soundstart;enumerated:invalid;m
+
+#data
+<input type="image" xmlns="http://www.w3.org/1999/xhtml"
+    src="a"
+    soundstart="focus"/>
+#errors
+/input/@soundstart;attribute not defined;m
+/input/@soundstart;input attr not applicable;image;m
+
+#data
+<input type="password" xmlns="http://www.w3.org/1999/xhtml"
+    soundstart="focus"/>
+#errors
+/input/@soundstart;attribute not defined;m
+/input/@soundstart;input attr not applicable;password;m

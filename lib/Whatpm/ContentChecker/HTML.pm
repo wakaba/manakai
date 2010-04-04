@@ -4239,6 +4239,9 @@ $Element->{$HTML_NS}->{a} = {
             poly => 1, polygon => -1,
             rect => 1, rectangle => -1,
           }),
+          soundstart => $GetHTMLEnumeratedAttrChecker->({
+            select => 1, focus => 1,
+          }),
           target => $HTMLTargetAttrChecker,
           telbook => sub { },
           type => $MIMETypeChecker,
@@ -4283,8 +4286,9 @@ $Element->{$HTML_NS}->{a} = {
       for (qw(
         target ping rel media hreflang type
         ilet iswf irst ib ifb ijam
-        email telbook kana memoryname
-        lcs z measure loop mailbody
+        email telbook kana memoryname mailbody
+        lcs z measure
+        loop soundstart
       )) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
@@ -7353,6 +7357,7 @@ $Element->{$HTML_NS}->{input} = {
          replace => FEATURE_WF2,
          required => FEATURE_HTML5_LC | FEATURE_WF2X,
          size => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
+         soundstart => FEATURE_OBSVOCAB,
          src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          step => FEATURE_HTML5_LC | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -7410,6 +7415,7 @@ $Element->{$HTML_NS}->{input} = {
          replace => '',
          required => '',
          size => '',
+         soundstart => '',
          src => '',
          step => '',
          target => '',
@@ -7563,6 +7569,9 @@ $Element->{$HTML_NS}->{input} = {
              novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
+             }),
+             soundstart => $GetHTMLEnumeratedAttrChecker->({
+               select => 1, focus => 1,
              }),
              target => $HTMLTargetAttrChecker,
              value => sub { }, ## NOTE: No restriction.
@@ -7781,6 +7790,15 @@ $Element->{$HTML_NS}->{input} = {
         my $nn_attr = $el->get_attribute_node_ns (undef, 'nonumber');
         if ($nn_attr) {
           $self->{onerror}->(node => $nn_attr,
+                             type => 'attribute not allowed',
+                             level => $self->{level}->{must});
+        }
+      }
+
+      my $ss_attr = $el->get_attribute_node_ns (undef, 'soundstart');
+      if ($ss_attr) {
+        unless ($el->has_attribute_ns (undef, 'src')) {
+          $self->{onerror}->(node => $ss_attr,
                              type => 'attribute not allowed',
                              level => $self->{level}->{must});
         }
