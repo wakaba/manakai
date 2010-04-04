@@ -1159,31 +1159,33 @@ my $PlaceholderAttrChecker = sub {
   }
 }; # $PlaceholderAttrChecker
 
-my $HTMLAttrChecker = {
-  about => $HTMLURIAttrChecker,
-  accesskey => sub {
-    my ($self, $attr) = @_;
-    
-    ## "Ordered set of unique space-separated tokens"
-    
-    my %keys;
-    my @keys = grep {length} split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value;
-    
-    for my $key (@keys) {
-      unless ($keys{$key}) {
-        $keys{$key} = 1;
-        if (length $key != 1) {
-          $self->{onerror}->(node => $attr, type => 'char:syntax error',
-                             value => $key,
-                             level => $self->{level}->{must});
-        }
-      } else {
-        $self->{onerror}->(node => $attr, type => 'duplicate token',
+my $AccesskeyChecker = sub {
+  my ($self, $attr) = @_;
+  
+  ## "Ordered set of unique space-separated tokens"
+  
+  my %keys;
+  my @keys = grep {length} split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value;
+  
+  for my $key (@keys) {
+    unless ($keys{$key}) {
+      $keys{$key} = 1;
+      if (length $key != 1) {
+        $self->{onerror}->(node => $attr, type => 'char:syntax error',
                            value => $key,
                            level => $self->{level}->{must});
       }
+    } else {
+      $self->{onerror}->(node => $attr, type => 'duplicate token',
+                         value => $key,
+                         level => $self->{level}->{must});
     }
-  }, # accesskey
+  }
+}; # $AccesskeyChecker
+
+my $HTMLAttrChecker = {
+  about => $HTMLURIAttrChecker,
+  accesskey => $AccesskeyChecker,
   atomicselection => $GetHTMLEnumeratedAttrChecker->({true => 1, false => 1}),
   datasrc => $NonEmptyURLChecker,
   datafld => sub { },
@@ -4157,6 +4159,7 @@ $Element->{$HTML_NS}->{a} = {
                                  level => $self->{level}->{must});
             }
           }, # cti
+          directkey => $AccesskeyChecker,
           href => $HTMLURIAttrChecker,
           hreflang => $HTMLLanguageTagAttrChecker,
           media => $HTMLMQAttrChecker,
@@ -7189,6 +7192,7 @@ $Element->{$HTML_NS}->{input} = {
          autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
          #border WA1 prose
          checked => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+         directkey => FEATURE_OBSVOCAB,
          disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
          form => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -7249,6 +7253,7 @@ $Element->{$HTML_NS}->{input} = {
              ## NOTE: <input type=hidden disabled> is not disallowed.
          border => '',
          checked => '',
+         directkey => '',
          disabled => $GetHTMLBooleanAttrChecker->('disabled'),
              ## NOTE: <input type=hidden disabled> is not disallowed.
          enctype => '',
@@ -7405,6 +7410,7 @@ $Element->{$HTML_NS}->{input} = {
             $checker =
             {
              action => $HTMLURIAttrChecker,
+             directkey => $AccesskeyChecker,
              enctype => $GetHTMLEnumeratedAttrChecker->({
                'application/x-www-form-urlencoded' => 1,
                'multipart/form-data' => 1,
@@ -7631,6 +7637,16 @@ $Element->{$HTML_NS}->{input} = {
       $element_state->{number_value}->{min} ||= 0;
       $element_state->{number_value}->{max} = 100
           unless defined $element_state->{number_value}->{max};
+    } elsif ($state eq 'submit') {
+      my $attr = $item->{node}->get_attribute_node_ns (undef, 'directkey');
+      if ($attr) {
+        unless ($item->{node}->has_attribute_ns (undef, 'value')) {
+          $self->{onerror}->(node => $attr,
+                             type => 'attribute missing',
+                             text => 'value',
+                             level => $self->{level}->{must});
+        }
+      }
     }
 
     if (defined $element_state->{date_value}->{min} or

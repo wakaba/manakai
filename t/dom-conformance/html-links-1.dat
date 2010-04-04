@@ -1480,3 +1480,22 @@ a
 #errors
 /a/@cti;attribute not defined;m
 /a/@cti;cti:syntax error;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    directkey="">a</a>
+#errors
+/a/@directkey;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    directkey="b">a</a>
+#errors
+/a/@directkey;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    directkey="ab">a</a>
+#errors
+/a/@directkey;attribute not defined;m
+/a/@directkey;char:syntax error;m

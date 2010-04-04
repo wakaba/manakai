@@ -15138,3 +15138,72 @@
 />
 #errors
 /input/@formtarget;input attr not applicable;button;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;attribute missing;value;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="b"/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;attribute missing;value;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="ab"/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;char:syntax error;m
+/input/@directkey;attribute missing;value;m
+
+#data
+<input type="reset" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="abc"/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;input attr not applicable;reset;m
+
+#data
+<input type="password" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="abc"/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;input attr not applicable;password;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="b" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="ab" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;char:syntax error;m
+
+#data
+<input type="reset" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="abc" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;input attr not applicable;reset;m
+
+#data
+<input type="password" xmlns="http://www.w3.org/1999/xhtml"
+    directkey="abc" value=""/>
+#errors
+/input/@directkey;attribute not defined;m
+/input/@directkey;input attr not applicable;password;m
