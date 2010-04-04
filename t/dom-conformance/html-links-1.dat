@@ -2162,3 +2162,90 @@ a
 #errors
 /a/@ijam;attribute not defined;m
 /a/@target;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    lcs="">a</a>
+#errors
+/a/@lcs;attribute not defined;m
+/a/@lcs;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    lcs="">a</a>
+#errors
+/a/@lcs;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    lcs="lcs">a</a>
+#errors
+/a/@lcs;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    lcs="LCS">a</a>
+#errors
+/a/@lcs;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    lcs="yes">a</a>
+#errors
+/a/@lcs;attribute not defined;m
+/a/@lcs;boolean:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a" target="b"
+    lcs="">a</a>
+#errors
+/a/@lcs;attribute not defined;m
+/a/@target;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    z="">a</a>
+#errors
+/a/@z;attribute not defined;m
+/a/@z;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    z="">a</a>
+#errors
+/a/@z;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    z="z">a</a>
+#errors
+/a/@z;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    z="Z">a</a>
+#errors
+/a/@z;attribute not defined;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a"
+    z="yes">a</a>
+#errors
+/a/@z;attribute not defined;m
+/a/@z;boolean:invalid;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a" target="b"
+    z="">a</a>
+#errors
+/a/@z;attribute not defined;m

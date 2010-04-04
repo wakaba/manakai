@@ -4204,6 +4204,7 @@ $Element->{$HTML_NS}->{a} = {
           irst => $ObjectHashIDRefChecker,
           iswf => $ObjectHashIDRefChecker,
           kana => sub { },
+          lcs => $GetHTMLBooleanAttrChecker->('lcs'),
           media => $HTMLMQAttrChecker,
           methods => sub { }, ## Space-separated values [HTML 2.0]
           memoryname => sub {
@@ -4229,6 +4230,7 @@ $Element->{$HTML_NS}->{a} = {
           telbook => sub { },
           type => $MIMETypeChecker,
           urn => $HTMLURIAttrChecker,
+          z => $GetHTMLBooleanAttrChecker->('z'),
         }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
@@ -4269,6 +4271,7 @@ $Element->{$HTML_NS}->{a} = {
         target ping rel media hreflang type
         ilet iswf irst ib ifb ijam
         email telbook kana memoryname
+        lcs z
       )) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
@@ -4279,7 +4282,7 @@ $Element->{$HTML_NS}->{a} = {
     }
 
     if ($attr{target}) {
-      for (qw(ilet iswf irst ib ifb ijam)) {
+      for (qw(ilet iswf irst ib ifb ijam lcs)) {
         if ($attr{$_}) {
           $self->{onerror}->(node => $attr{target},
                              type => 'attribute not allowed',
@@ -7026,6 +7029,7 @@ $Element->{$HTML_NS}->{form} = {
       'multipart/form-data' => 1,
       'text/plain' => 1,
     }),
+    lcs => $GetHTMLBooleanAttrChecker->('lcs'),
     method => $GetHTMLEnumeratedAttrChecker->({
       get => 1, post => 1, put => 1, delete => 1,
     }),
@@ -7054,6 +7058,7 @@ $Element->{$HTML_NS}->{form} = {
     onreceived => $HTMLEventHandlerAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
+    z => $GetHTMLBooleanAttrChecker->('z'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -7064,6 +7069,7 @@ $Element->{$HTML_NS}->{form} = {
     data => FEATURE_WF2,
     enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_REC,
+    lcs => FEATURE_OBSVOCAB,
     method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
     name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
@@ -7073,7 +7079,8 @@ $Element->{$HTML_NS}->{form} = {
     onsubmit => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     replace => FEATURE_WF2,
     target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  }),
+    z => FEATURE_OBSVOCAB,
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {$HTML_NS => {form => 1}});
@@ -7107,7 +7114,21 @@ $Element->{$HTML_NS}->{fieldset} = {
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     lang => FEATURE_HTML5_REC,
     name => FEATURE_HTML5_LC,
-  }),
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    my $el = $item->{node};
+    my $target_attr = $el->get_attribute_node_ns (undef, 'target');
+    if ($target_attr) {
+      for (qw(lcs)) {
+        if ($el->has_attribute_ns (undef, $_)) {
+          $self->{onerror}->(node => $target_attr,
+                             type => 'attribute not allowed',
+                             level => $self->{level}->{must});
+        }
+      }
+    }
+  }, # check_attrs2
   ## NOTE: legend?, Flow
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,

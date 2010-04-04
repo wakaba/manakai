@@ -2289,6 +2289,84 @@ x<br autofocus=""/>
 /form/@autocomplete;enumerated:invalid;m
 
 #data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    lcs="">a</form>
+#errors
+/form/@lcs;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    lcs="lcs">a</form>
+#errors
+/form/@lcs;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    lcs="LCS">a</form>
+#errors
+/form/@lcs;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    lcs="yes">a</form>
+#errors
+/form/@lcs;attribute not defined;m
+/form/@lcs;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    lcs="lcs ">a</form>
+#errors
+/form/@lcs;attribute not defined;m
+/form/@lcs;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    lcs="  ">a</form>
+#errors
+/form/@lcs;attribute not defined;m
+/form/@lcs;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    z="">a</form>
+#errors
+/form/@z;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    z="z">a</form>
+#errors
+/form/@z;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    z="Z">a</form>
+#errors
+/form/@z;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    z="yes">a</form>
+#errors
+/form/@z;attribute not defined;m
+/form/@z;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    z="z ">a</form>
+#errors
+/form/@z;attribute not defined;m
+/form/@z;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    z="  ">a</form>
+#errors
+/form/@z;attribute not defined;m
+/form/@z;boolean:invalid;m
+
+#data
 <legend xmlns="http://www.w3.org/1999/xhtml"
     align=""
 >a</legend>
