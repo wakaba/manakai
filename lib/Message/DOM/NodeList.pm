@@ -231,7 +231,7 @@ sub EXISTS ($$) {
 } # EXISTS
 
 package Message::DOM::NodeList::StaticNodeList;
-push our @ISA, 'Messaeg::IF::StaticNodeList';
+push our @ISA, 'Message::IF::StaticNodeList';
 
 use overload
     '==' => sub {
