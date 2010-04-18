@@ -986,34 +986,6 @@ my $HTMLTargetAttrChecker = sub {
   }
 }; # $HTMLTargetAttrChecker
 
-my $HTMLSelectorsAttrChecker = sub {
-  my ($self, $attr) = @_;
-
-  ## ISSUE: Namespace resolution?
-  
-  my $value = $attr->value;
-  
-  require Whatpm::CSS::SelectorsParser;
-  my $p = Whatpm::CSS::SelectorsParser->new;
-  $p->{pseudo_class}->{$_} = 1 for qw/
-    active checked disabled empty enabled first-child first-of-type
-    focus hover indeterminate last-child last-of-type link only-child
-    only-of-type root target visited
-    lang nth-child nth-last-child nth-of-type nth-last-of-type not
-    -manakai-contains -manakai-current
-  /;
-
-  $p->{pseudo_element}->{$_} = 1 for qw/
-    after before first-letter first-line
-  /;
-
-  $p->{level} = $self->{level};
-  $p->{onerror} = sub {
-    $self->{onerror}->(@_, node => $attr);
-  };
-  $p->parse_string ($value);
-}; # $HTMLSelectorsAttrChecker
-
 my $HTMLCharsetChecker = sub ($$$;$) {
   my ($charset_value, $self, $attr, $ascii_compat) = @_;
 
