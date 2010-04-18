@@ -5933,9 +5933,15 @@ $Element->{$HTML_NS}->{applet} = {
         $v =~ s/^[\x09\x0A\x0C\x0D\x20]+//;
         $v =~ s/[\x09\x0A\x0C\x0D\x20]+\z//;
 
-        Whatpm::URIChecker->check_iri_reference ($v, sub {
-          $self->{onerror}->(value => $v, @_, node => $attr);
-        }, $self->{level});
+        if ($v eq '') {
+          $self->{onerror}->(type => 'url:empty', # XXX documentation
+                             node => $attr,
+                             level => $self->{level}->{must});
+        } else {
+          Whatpm::URIChecker->check_iri_reference ($v, sub {
+            $self->{onerror}->(value => $v, @_, node => $attr);
+          }, $self->{level});
+        }
 
         ## TODO: absolute
         ## TODO: Relative to @codebase
