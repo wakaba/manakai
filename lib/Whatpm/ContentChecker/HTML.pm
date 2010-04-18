@@ -3547,9 +3547,14 @@ $Element->{$HTML_NS}->{hr} = {
 
 $Element->{$HTML_NS}->{spacer} = {
   %HTMLEmptyChecker,
-  # XXX attributes
-  status => FEATURE_HTML5_OBSOLETE,
-}; # wbr
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+  check_attrs => $GetHTMLAttrsChecker->({
+    align => $EmbeddedAlignChecker,
+  }, {
+    %HTMLAttrStatus,
+    align => FEATURE_OBSVOCAB,
+  }), # check_attrs
+}; # spacer
 
 $Element->{$HTML_NS}->{br} = {
   %HTMLEmptyChecker,
@@ -3565,7 +3570,7 @@ $Element->{$HTML_NS}->{br} = {
     id => FEATURE_HTML5_REC,
     style => FEATURE_HTML5_REC,
     title => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
 }; # br
 
 $Element->{$HTML_NS}->{pre} = {
@@ -5563,7 +5568,7 @@ $Element->{$HTML_NS}->{img} = {
     }, {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
-      align => FEATURE_HTML5_OBSOLETE,
+      align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       alt => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
       border => FEATURE_HTML5_LC,
       height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -5658,7 +5663,7 @@ $Element->{$HTML_NS}->{iframe} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     frameborder => FEATURE_HTML5_OBSOLETE,
     height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -5702,7 +5707,7 @@ $Element->{$HTML_NS}->{embed} = {
 
       my $status = {
         %HTMLAttrStatus,
-        align => FEATURE_HTML5_OBSOLETE,
+        align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
         height => FEATURE_HTML5_LC,
         #hspace WA1 prose
         name => FEATURE_HTML5_OBSOLETE,
@@ -5815,7 +5820,7 @@ $Element->{$HTML_NS}->{object} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     archive => FEATURE_HTML5_OBSOLETE,
     border => FEATURE_HTML5_OBSOLETE,
     classid => FEATURE_HTML5_OBSOLETE,
@@ -5908,10 +5913,10 @@ $Element->{$HTML_NS}->{object} = {
 
 $Element->{$HTML_NS}->{applet} = {
   %{$Element->{$HTML_NS}->{object}},
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $EmbeddedAlignChecker,
-    alt => sub { }, ## CDATA [HTML4]
+    alt => sub { },
     archive => $HTMLSpaceURIsAttrChecker, # XXX comma-separated
         ## TODO: Relative to @codebase
     code => sub { }, ## CDATA [HTML4]
@@ -5932,21 +5937,22 @@ $Element->{$HTML_NS}->{applet} = {
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
-    align => FEATURE_XHTML10_REC,
-    alt => FEATURE_M12N10_REC_DEPRECATED,
-    archive => FEATURE_M12N10_REC_DEPRECATED,
+    align => FEATURE_OBSVOCAB,
+    alt => FEATURE_OBSVOCAB,
+    archive => FEATURE_OBSVOCAB,
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    code => FEATURE_M12N10_REC_DEPRECATED,
-    codebase => FEATURE_M12N10_REC_DEPRECATED,
-    height => FEATURE_M12N10_REC_DEPRECATED,
-    hspace => FEATURE_XHTML10_REC,
+    code => FEATURE_OBSVOCAB,
+    codebase => FEATURE_OBSVOCAB,
+    height => FEATURE_OBSVOCAB,
+    hspace => FEATURE_OBSVOCAB,
     id => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    name => FEATURE_M12N10_REC_DEPRECATED,
-    object => FEATURE_M12N10_REC_DEPRECATED,
+    mayscript => FEATURE_OBSVOCAB,
+    name => FEATURE_OBSVOCAB,
+    object => FEATURE_OBSVOCAB,
     style => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     title => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    vspace => FEATURE_XHTML10_REC,
-    width => FEATURE_M12N10_REC_DEPRECATED,
+    vspace => FEATURE_OBSVOCAB,
+    width => FEATURE_OBSVOCAB,
   }),
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -5960,9 +5966,8 @@ $Element->{$HTML_NS}->{applet} = {
       }
     }
     
-    for my $attr_name (qw(width height alt)) {
+    for my $attr_name (qw(width height)) {
       ## |width| and |height| are REQUIRED according to HTML4.
-      ## |alt| is required according to XHTML m12n.
       unless ($el->has_attribute_ns (undef, $attr_name)) {
         $self->{onerror}->(node => $el,
                            type => 'attribute missing',
@@ -7388,7 +7393,7 @@ $Element->{$HTML_NS}->{input} = {
          'accept-charset' => FEATURE_HTML2X_RFC,
          accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
          action => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
-         align => FEATURE_HTML5_OBSOLETE,
+         align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          autocomplete => FEATURE_HTML5_LC | FEATURE_WF2X,
          autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
