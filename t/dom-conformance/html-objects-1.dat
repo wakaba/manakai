@@ -2306,6 +2306,71 @@ xxxx
 /div/applet;element not defined;m
 
 #data
+<applet code="a" width="1" height="1" archive="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;element not defined;m
+/applet/@archive;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet;no significant content;s
+
+#data
+<applet code="a" width="1" height="1" archive="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;element not defined;m
+/applet/@archive;attribute not defined;m
+/applet/@archive;syntax error:iriref3987;m
+/applet/@code;attribute not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet;no significant content;s
+
+#data
+<applet code="a" width="1" height="1" archive="a,[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;element not defined;m
+/applet/@archive;attribute not defined;m
+/applet/@archive;syntax error:iriref3987;m
+/applet/@code;attribute not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet;no significant content;s
+
+#data
+<applet code="a" width="1" height="1" archive="[],[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;element not defined;m
+/applet/@archive;attribute not defined;m
+/applet/@archive;syntax error:iriref3987;m
+/applet/@archive;syntax error:iriref3987;m
+/applet/@code;attribute not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet;no significant content;s
+
+#data
+<applet code="a" width="1" height="1" archive="a a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;element not defined;m
+/applet/@archive;attribute not defined;m
+/applet/@archive;syntax error:iriref3987;m
+/applet/@code;attribute not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet;no significant content;s
+
+#data
+<applet code="a" width="1" height="1" archives="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/applet;element not defined;m
+/applet/@archives;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet;no significant content;s
+
+#data
 <video xmlns="http://www.w3.org/1999/xhtml"></video>
 #errors
 /video;no significant content;s

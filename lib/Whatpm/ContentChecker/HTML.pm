@@ -578,7 +578,7 @@ my $HTMLSpaceURIsAttrChecker = sub {
   my %word;
   for my $word (grep {length $_}
                 split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
-    $word =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    $word =~ tr/A-Z/a-z/; ## ASCII case-insensitive. # XXX wrong?
 
     unless ($word{$word}) {
       $word{$word} = 1;
@@ -5917,8 +5917,30 @@ $Element->{$HTML_NS}->{applet} = {
   check_attrs => $GetHTMLAttrsChecker->({
     align => $EmbeddedAlignChecker,
     alt => sub { },
-    archive => $HTMLSpaceURIsAttrChecker, # XXX comma-separated
+    archive => sub {
+      my ($self, $attr) = @_;
+
+      ## A set of comma-separated tokens.
+      my $value = $attr->value;
+      my @value = length $value ? split /,/, $value, -1 : ();
+
+      require Whatpm::URIChecker;
+      for my $v (@value) {
+        $v =~ s/^[\x09\x0A\x0C\x0D\x20]+//;
+        $v =~ s/[\x09\x0A\x0C\x0D\x20]+\z//;
+
+        Whatpm::URIChecker->check_iri_reference ($v, sub {
+          $self->{onerror}->(value => $v, @_, node => $attr);
+        }, $self->{level});
+
+        ## TODO: absolute
         ## TODO: Relative to @codebase
+        push @{$self->{return}->{uri}->{$v} ||= []},
+            {node => $attr, type => {resource => 1}};
+      }
+
+      $self->{has_uri_attr} = 1;
+    }, # archive
     code => sub { }, ## CDATA [HTML4]
     codebase => $HTMLURIAttrChecker,
         ## XXX more restriction [HTML4]
