@@ -1646,7 +1646,16 @@ xxxx
 /applet;attribute missing;width;m
 /applet;attribute missing;height;m
 /applet/@object;attribute not defined;m
-/applet/@object;applet object;s
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="a" object="">a</applet>
+#errors
+/applet;element not defined;m
+/applet;attribute missing;width;m
+/applet;attribute missing;height;m
+/applet/@code;attribute not defined;m
+/applet/@object;attribute not defined;m
+/applet/@object;url:empty;m
 
 #data
 <applet xmlns="http://www.w3.org/1999/xhtml" code="a" object="b">a</applet>
@@ -1656,7 +1665,16 @@ xxxx
 /applet;attribute missing;height;m
 /applet/@code;attribute not defined;m
 /applet/@object;attribute not defined;m
-/applet/@object;applet object;s
+
+#data
+<applet xmlns="http://www.w3.org/1999/xhtml" code="a" object="[]">a</applet>
+#errors
+/applet;element not defined;m
+/applet;attribute missing;width;m
+/applet;attribute missing;height;m
+/applet/@code;attribute not defined;m
+/applet/@object;attribute not defined;m
+/applet/@object;syntax error:iriref3987;m
 
 #data
 <applet xmlns="http://www.w3.org/1999/xhtml" code="aa" alt="">a</applet>
@@ -2027,6 +2045,7 @@ xxxx
 <applet code="a" alt="b" width="1" height="1" codebase="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /applet/@codebase;attribute not defined;m
+/applet/@codebase;url:empty;m
 /applet;no significant content;s
 /applet;element not defined;m
 /applet/@code;attribute not defined;m
@@ -2435,6 +2454,101 @@ xxxx
 /applet/@height;attribute not defined;m
 /applet/@width;attribute not defined;m
 /applet/@code;attribute not defined;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript="">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript="  ">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+/applet/@mayscript;boolean:invalid;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript="mayscript">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript="MayScript">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript="MAYSCRIPT">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript="yes">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+/applet/@mayscript;boolean:invalid;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript="may">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+/applet/@mayscript;boolean:invalid;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript="true">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+/applet/@mayscript;boolean:invalid;m
+
+#data
+<applet code="a" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml"
+    mayscript=" mayscript ">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@mayscript;attribute not defined;m
+/applet/@mayscript;boolean:invalid;m
 
 #data
 <video xmlns="http://www.w3.org/1999/xhtml"></video>
@@ -5768,6 +5882,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="" codebase="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object/@codebase;attribute not defined;m
+/object/@codebase;url:empty;m
 /object;no significant content;s
 
 #data
@@ -6116,6 +6231,11 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="a" code="http://foo.test/" xmlns="http://www.w3.org/1999/xhtml">a</object>
 #errors
 /object/@code;attribute not defined;m
+
+#data
+<object data="a" mayscript="yes" xmlns="http://www.w3.org/1999/xhtml">a</object>
+#errors
+/object/@mayscript;attribute not defined;m
 
 #data
 <param xmlns="http://www.w3.org/1999/xhtml"/>

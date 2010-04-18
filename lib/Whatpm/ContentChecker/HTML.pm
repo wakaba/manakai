@@ -5801,7 +5801,7 @@ $Element->{$HTML_NS}->{object} = {
     border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     classid => $HTMLURIAttrChecker,
     code => $NonEmptyURLChecker,
-    codebase => $HTMLURIAttrChecker,
+    codebase => $NonEmptyURLChecker,
     codetype => $MIMETypeChecker,
         ## TODO: "RECOMMENDED when |classid| is specified" [HTML4]
     data => $HTMLURIAttrChecker,
@@ -5829,7 +5829,7 @@ $Element->{$HTML_NS}->{object} = {
     border => FEATURE_HTML5_OBSOLETE,
     classid => FEATURE_HTML5_OBSOLETE,
     code => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    codebase => FEATURE_HTML5_OBSOLETE,
+    codebase => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     codetype => FEATURE_HTML5_OBSOLETE,
     'content-length' => FEATURE_XHTML2_ED,
     data => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
@@ -5952,19 +5952,12 @@ $Element->{$HTML_NS}->{applet} = {
       $self->{has_uri_attr} = 1;
     }, # archive
     code => $NonEmptyURLChecker,
-    codebase => $HTMLURIAttrChecker,
-        ## XXX more restriction [HTML4]
+    codebase => $NonEmptyURLChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $HTMLLengthAttrChecker,
+    mayscript => $GetHTMLBooleanAttrChecker->('mayscript'),
     name => $NameAttrChecker,
-    object => sub {
-      my ($self, $attr) = @_;
-      ## "Authors should use this feature with extreme caution."
-      ## [HTML4]
-      $self->{onerror}->(node => $attr,
-                         type => 'applet object', # XXX documentation
-                         level => $self->{level}->{should});
-    },
+    object => $NonEmptyURLChecker,
     vspace => $HTMLLengthAttrChecker,
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
@@ -6091,7 +6084,7 @@ $Element->{$HTML_NS}->{video} = {
     ## author requirement is defined.
   }, {
     %HTMLAttrStatus,
-    autobuffer => FEATURE_HTML5_DROPPED,
+    autobuffer => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
     end => FEATURE_HTML5_DROPPED,
@@ -6204,7 +6197,7 @@ $Element->{$HTML_NS}->{audio} = {
     ## author requirement is defined.
   }, {
     %HTMLAttrStatus,
-    autobuffer => FEATURE_HTML5_DROPPED,
+    autobuffer => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
     end => FEATURE_HTML5_DROPPED,
@@ -6407,7 +6400,7 @@ $Element->{$HTML_NS}->{area} = {
           hreflang => FEATURE_HTML5_WD,
           lang => FEATURE_HTML5_REC,
           media => FEATURE_HTML5_WD,
-          nohref => FEATURE_HTML5_OBSOLETE,
+          nohref => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
