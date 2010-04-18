@@ -1181,6 +1181,15 @@ my $AccesskeyChecker = sub {
   }
 }; # $AccesskeyChecker
 
+my $TemporalPositionChecker = sub {
+  my ($self, $attr) = @_;
+  unless ($attr->value =~ /\A[0-9:]+\z/) {
+    $self->{onerror}->(node => $attr,
+                       type => 'temporal:syntax error',
+                       level => $self->{level}->{must});
+  }
+}; # $TemporalPositionChecker
+
 my $HTMLAttrChecker = {
   about => $HTMLURIAttrChecker,
   accesskey => $AccesskeyChecker,
@@ -6037,38 +6046,34 @@ $Element->{$HTML_NS}->{video} = {
       $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
     },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
-    end => sub { },
+    end => $TemporalPositionChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     loop => $GetHTMLBooleanAttrChecker->('loop'),
-    loopend => sub { },
-    loopstart => sub { },
+    loopend => $TemporalPositionChecker,
+    loopstart => $TemporalPositionChecker,
     playcount => $HTMLIntegerAttrChecker,
     poster => $HTMLURIAttrChecker,
     preload => $GetHTMLEnumeratedAttrChecker->({
       'none' => 1, 'metadata' => 1, 'auto' => 1, '' => 1,
     }),
     src => $HTMLURIAttrChecker,
-    start => sub { },
+    start => $TemporalPositionChecker,
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-
-    ## NOTE: |start|, |end|, |loopstart|, |loopend|, and |playcount|
-    ## attributes has been deleted from the spec before the exact
-    ## author requirement is defined.
   }, {
     %HTMLAttrStatus,
     autobuffer => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
-    end => FEATURE_HTML5_DROPPED,
+    end => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     height => FEATURE_HTML5_LC,
     loop => FEATURE_HTML5_LC,
-    loopend => FEATURE_HTML5_DROPPED,
-    loopstart => FEATURE_HTML5_DROPPED,
+    loopend => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
+    loopstart => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     playcount => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     poster => FEATURE_HTML5_LC,
     preload => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_LC,
-    start => FEATURE_HTML5_DROPPED,
+    start => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_LC,
   }), # check_attrs
   check_start => sub {
@@ -6153,33 +6158,29 @@ $Element->{$HTML_NS}->{audio} = {
       $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
     },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
-    end => sub { },
+    end => $TemporalPositionChecker,
     loop => $GetHTMLBooleanAttrChecker->('loop'),
-    loopend => sub { },
-    loopstart => sub { },
+    loopend => $TemporalPositionChecker,
+    loopstart => $TemporalPositionChecker,
     playcount => $HTMLIntegerAttrChecker,
     preload => $GetHTMLEnumeratedAttrChecker->({
       'none' => 1, 'metadata' => 1, 'auto' => 1, '' => 1,
     }),
     src => $HTMLURIAttrChecker,
-    start => sub { },
-
-    ## NOTE: |start|, |end|, |loopstart|, |loopend|, and |playcount|
-    ## attributes has been deleted from the spec before the exact
-    ## author requirement is defined.
+    start => $TemporalPositionChecker,
   }, {
     %HTMLAttrStatus,
     autobuffer => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
-    end => FEATURE_HTML5_DROPPED,
+    end => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     loop => FEATURE_HTML5_LC,
-    loopend => FEATURE_HTML5_DROPPED,
-    loopstart => FEATURE_HTML5_DROPPED,
+    loopend => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
+    loopstart => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     playcount => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     preload => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_LC,
-    start => FEATURE_HTML5_DROPPED,
+    start => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # audio
 

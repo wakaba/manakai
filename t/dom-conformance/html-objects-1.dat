@@ -6707,9 +6707,13 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml">a</video>
 #errors
 /video/@start;attribute not defined;m
+/video/@start;temporal:syntax error;m
 /video/@end;attribute not defined;m
+/video/@end;temporal:syntax error;m
 /video/@loopstart;attribute not defined;m
+/video/@loopstart;temporal:syntax error;m
 /video/@loopend;attribute not defined;m
+/video/@loopend;temporal:syntax error;m
 /video/@playcount;attribute not defined;m
 /video/@playcount;integer:syntax error;m
 
@@ -6729,13 +6733,105 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /video/@playcount;attribute not defined;m
 
 #data
+<video src="a" start="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+/video/@start;temporal:syntax error;m
+
+#data
+<video src="a" start="-20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+/video/@start;temporal:syntax error;m
+
+#data
+<video src="a" start="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+
+#data
+<video src="a" start="20:10" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+
+#data
+<video src="a" end="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@end;attribute not defined;m
+/video/@end;temporal:syntax error;m
+
+#data
+<video src="a" end="-20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@end;attribute not defined;m
+/video/@end;temporal:syntax error;m
+
+#data
+<video src="a" end="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@end;attribute not defined;m
+
+#data
+<video src="a" end="20:10" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@end;attribute not defined;m
+
+#data
+<video src="a" loopstart="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopstart;attribute not defined;m
+/video/@loopstart;temporal:syntax error;m
+
+#data
+<video src="a" loopstart="-20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopstart;attribute not defined;m
+/video/@loopstart;temporal:syntax error;m
+
+#data
+<video src="a" loopstart="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopstart;attribute not defined;m
+
+#data
+<video src="a" loopstart="20:10" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopstart;attribute not defined;m
+
+#data
+<video src="a" loopend="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopend;attribute not defined;m
+/video/@loopend;temporal:syntax error;m
+
+#data
+<video src="a" loopend="-20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopend;attribute not defined;m
+/video/@loopend;temporal:syntax error;m
+
+#data
+<video src="a" loopend="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopend;attribute not defined;m
+
+#data
+<video src="a" loopend="20:10" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopend;attribute not defined;m
+
+#data
 <audio src="" start="" end="" loopstart="" loopend="" playcount=""
     xmlns="http://www.w3.org/1999/xhtml">a</audio>
 #errors
 /audio/@start;attribute not defined;m
+/audio/@start;temporal:syntax error;m
 /audio/@end;attribute not defined;m
+/audio/@end;temporal:syntax error;m
 /audio/@loopstart;attribute not defined;m
+/audio/@loopstart;temporal:syntax error;m
 /audio/@loopend;attribute not defined;m
+/audio/@loopend;temporal:syntax error;m
 /audio/@playcount;attribute not defined;m
 /audio/@playcount;integer:syntax error;m
 
@@ -6753,6 +6849,109 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <audio src="a" playcount="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
 #errors
 /audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="0" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="-100" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" start="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+/audio/@start;temporal:syntax error;m
+
+#data
+<audio src="a" start="-20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+/audio/@start;temporal:syntax error;m
+
+#data
+<audio src="a" start="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+
+#data
+<audio src="a" start="20:10" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+
+#data
+<audio src="a" end="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@end;attribute not defined;m
+/audio/@end;temporal:syntax error;m
+
+#data
+<audio src="a" end="-20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@end;attribute not defined;m
+/audio/@end;temporal:syntax error;m
+
+#data
+<audio src="a" end="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@end;attribute not defined;m
+
+#data
+<audio src="a" end="20:10" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@end;attribute not defined;m
+
+#data
+<audio src="a" loopstart="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopstart;attribute not defined;m
+/audio/@loopstart;temporal:syntax error;m
+
+#data
+<audio src="a" loopstart="-20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopstart;attribute not defined;m
+/audio/@loopstart;temporal:syntax error;m
+
+#data
+<audio src="a" loopstart="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopstart;attribute not defined;m
+
+#data
+<audio src="a" loopstart="20:10" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopstart;attribute not defined;m
+
+#data
+<audio src="a" loopend="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopend;attribute not defined;m
+/audio/@loopend;temporal:syntax error;m
+
+#data
+<audio src="a" loopend="-20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopend;attribute not defined;m
+/audio/@loopend;temporal:syntax error;m
+
+#data
+<audio src="a" loopend="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopend;attribute not defined;m
+
+#data
+<audio src="a" loopend="20:10" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopend;attribute not defined;m
 
 #data
 <audio src="" xmlns="http://www.w3.org/1999/xhtml">
