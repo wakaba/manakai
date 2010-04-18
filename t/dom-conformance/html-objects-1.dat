@@ -2371,6 +2371,40 @@ xxxx
 /applet;no significant content;s
 
 #data
+<applet code="" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@code;url:empty;m
+
+#data
+<applet code="[]" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+/applet/@code;syntax error:iriref3987;m
+
+#data
+<applet code="abc/def" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+
+#data
+<applet code="http://foo.test/" width="1" height="1" xmlns="http://www.w3.org/1999/xhtml">a</applet>
+#errors
+/applet;element not defined;m
+/applet/@height;attribute not defined;m
+/applet/@width;attribute not defined;m
+/applet/@code;attribute not defined;m
+
+#data
 <video xmlns="http://www.w3.org/1999/xhtml"></video>
 #errors
 /video;no significant content;s
@@ -5405,6 +5439,28 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /embed/@align;enumerated:invalid;m
 
 #data
+<embed src="a" code="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/embed/@code;attribute not defined;m
+/embed/@code;url:empty;m
+
+#data
+<embed src="a" code="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/embed/@code;attribute not defined;m
+/embed/@code;syntax error:iriref3987;m
+
+#data
+<embed src="a" code="abc/def" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/embed/@code;attribute not defined;m
+
+#data
+<embed src="a" code="http://foo.test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/embed/@code;attribute not defined;m
+
+#data
 <noembed xmlns="http://www.w3.org/1999/xhtml"></noembed>
 #errors
 /noembed;element not defined;m
@@ -6006,6 +6062,28 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #data
 <object name="self" data="" xmlns="http://www.w3.org/1999/xhtml">x</object>
 #errors
+
+#data
+<object data="a" code="" xmlns="http://www.w3.org/1999/xhtml">a</object>
+#errors
+/object/@code;attribute not defined;m
+/object/@code;url:empty;m
+
+#data
+<object data="a" code="[]" xmlns="http://www.w3.org/1999/xhtml">a</object>
+#errors
+/object/@code;attribute not defined;m
+/object/@code;syntax error:iriref3987;m
+
+#data
+<object data="a" code="abc/def" xmlns="http://www.w3.org/1999/xhtml">a</object>
+#errors
+/object/@code;attribute not defined;m
+
+#data
+<object data="a" code="http://foo.test/" xmlns="http://www.w3.org/1999/xhtml">a</object>
+#errors
+/object/@code;attribute not defined;m
 
 #data
 <param xmlns="http://www.w3.org/1999/xhtml"/>

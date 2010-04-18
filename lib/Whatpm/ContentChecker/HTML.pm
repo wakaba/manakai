@@ -5708,6 +5708,7 @@ $Element->{$HTML_NS}->{embed} = {
       my $status = {
         %HTMLAttrStatus,
         align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+        code => FEATURE_OBSVOCAB,
         height => FEATURE_HTML5_LC,
         #hspace WA1 prose
         name => FEATURE_HTML5_OBSOLETE,
@@ -5729,6 +5730,8 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $HTMLLengthAttrChecker;
         } elsif ($attr_ln eq 'align') {
           $checker = $EmbeddedAlignChecker;
+        } elsif ($attr_ln eq 'code') {
+          $checker = $NonEmptyURLChecker;
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
           ## XML-compatible + no uppercase letter
@@ -5797,6 +5800,7 @@ $Element->{$HTML_NS}->{object} = {
         ## TODO: Relative to @codebase
     border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     classid => $HTMLURIAttrChecker,
+    code => $NonEmptyURLChecker,
     codebase => $HTMLURIAttrChecker,
     codetype => $MIMETypeChecker,
         ## TODO: "RECOMMENDED when |classid| is specified" [HTML4]
@@ -5824,7 +5828,7 @@ $Element->{$HTML_NS}->{object} = {
     archive => FEATURE_HTML5_OBSOLETE,
     border => FEATURE_HTML5_OBSOLETE,
     classid => FEATURE_HTML5_OBSOLETE,
-    code => FEATURE_HTML5_OBSOLETE,
+    code => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     codebase => FEATURE_HTML5_OBSOLETE,
     codetype => FEATURE_HTML5_OBSOLETE,
     'content-length' => FEATURE_XHTML2_ED,
@@ -5941,7 +5945,7 @@ $Element->{$HTML_NS}->{applet} = {
 
       $self->{has_uri_attr} = 1;
     }, # archive
-    code => sub { }, ## CDATA [HTML4]
+    code => $NonEmptyURLChecker,
     codebase => $HTMLURIAttrChecker,
         ## XXX more restriction [HTML4]
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
