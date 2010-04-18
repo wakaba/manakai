@@ -1112,10 +1112,10 @@ my $HTMLColorAttrChecker = sub {
 
 my $FontSizeChecker = sub {
   my ($self, $attr) = @_;
-  unless ($attr->value =~ /\A[+-]?[1-7]\z/) { ## HTML4 definition is vague.
+  unless ($attr->value =~ /\A[+-]?[1-7]\z/) {
     $self->{onerror}->(node => $attr,
                        type => 'fontsize:syntax error',
-                       level => $self->{level}->{html4_fact});
+                       level => $self->{level}->{must});
   }
 }; # $FontSizeChecker
 
@@ -2259,18 +2259,17 @@ $Element->{$HTML_NS}->{base} = {
 
 $Element->{$HTML_NS}->{basefont} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     color => $HTMLColorAttrChecker,
-    face => sub { }, ## Comma-separated font names (cdata) [HTML4]
+    face => sub { },
     size => $FontSizeChecker,
   }, {
     %HTMLAttrStatus,
-    color => FEATURE_M12N10_REC_DEPRECATED,
-    face => FEATURE_M12N10_REC_DEPRECATED,
-    id => FEATURE_HTML5_REC,
-    size => FEATURE_M12N10_REC_DEPRECATED,
-  }),
+    color => FEATURE_OBSVOCAB,
+    face => FEATURE_OBSVOCAB,
+    size => FEATURE_OBSVOCAB,
+  }), # check_attrs
 }; # basefont
 
 $Element->{$HTML_NS}->{nextid} = {
