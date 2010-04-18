@@ -6711,6 +6711,22 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /video/@loopstart;attribute not defined;m
 /video/@loopend;attribute not defined;m
 /video/@playcount;attribute not defined;m
+/video/@playcount;integer:syntax error;m
+
+#data
+<video src="a" playcount="0" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@playcount;attribute not defined;m
+
+#data
+<video src="a" playcount="-100" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@playcount;attribute not defined;m
+
+#data
+<video src="a" playcount="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@playcount;attribute not defined;m
 
 #data
 <audio src="" start="" end="" loopstart="" loopend="" playcount=""
@@ -6720,6 +6736,22 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /audio/@end;attribute not defined;m
 /audio/@loopstart;attribute not defined;m
 /audio/@loopend;attribute not defined;m
+/audio/@playcount;attribute not defined;m
+/audio/@playcount;integer:syntax error;m
+
+#data
+<audio src="a" playcount="0" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="-100" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
 /audio/@playcount;attribute not defined;m
 
 #data
