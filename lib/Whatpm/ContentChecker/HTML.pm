@@ -3341,6 +3341,9 @@ $Element->{$HTML_NS}->{h1} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1, both => -1,
+    }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -3469,10 +3472,14 @@ $Element->{$HTML_NS}->{address} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1, both => -1,
+    }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML2X_RFC,
+    align => FEATURE_OBSVOCAB,
+    clear => FEATURE_OBSVOCAB,
     lang => FEATURE_HTML5_REC,
   }), # check_attrs
   check_start => sub {
@@ -3503,10 +3510,14 @@ $Element->{$HTML_NS}->{p} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1, both => -1,
+    }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
+    clear => FEATURE_OBSVOCAB,
     lang => FEATURE_HTML5_REC,
   }),
 };
@@ -3561,6 +3572,9 @@ $Element->{$HTML_NS}->{pre} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1, both => -1,
+    }),
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     wrap => $GetHTMLBooleanAttrChecker->('wrap'),
   }, {
@@ -3595,6 +3609,14 @@ $Element->{$HTML_NS}->{pre} = {
 $Element->{$HTML_NS}->{xmp} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1, both => -1,
+    }),
+  }, {
+    %HTMLAttrStatus,
+    clear => FEATURE_OBSVOCAB,
+  }),
 }; # xmp
 
 $Element->{$HTML_NS}->{listing} = $Element->{$HTML_NS}->{xmp};
@@ -3602,6 +3624,14 @@ $Element->{$HTML_NS}->{listing} = $Element->{$HTML_NS}->{xmp};
 $Element->{$HTML_NS}->{plaintext} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_OBSOLETE,
+  check_attrs => $GetHTMLAttrsChecker->({
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1, both => -1,
+    }),
+  }, {
+    %HTMLAttrStatus,
+    clear => FEATURE_OBSVOCAB,
+  }),
 }; # plaintext
 
 $Element->{$HTML_NS}->{blockquote} = {
@@ -3612,6 +3642,9 @@ $Element->{$HTML_NS}->{blockquote} = {
       left => 1, center => 1, right => 1, justify => 1,
     }),
     cite => $HTMLURIAttrChecker,
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1, both => -1,
+    }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -4004,7 +4037,11 @@ $Element->{$HTML_NS}->{div} = {
 $Element->{$HTML_NS}->{center} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_OBSOLETE,
-  check_attrs => $GetHTMLAttrsChecker->({}, {
+  check_attrs => $GetHTMLAttrsChecker->({
+    clear => $GetHTMLEnumeratedAttrChecker->({
+      left => 1, all => 1, right => 1, none => 1, both => -1,
+    }),
+  }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_REC,
@@ -4521,13 +4558,13 @@ $Element->{$HTML_NS}->{abbr} = {
 
 $Element->{$HTML_NS}->{acronym} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # acronym
 
 $Element->{$HTML_NS}->{time} = {
   status => FEATURE_HTML5_WD,

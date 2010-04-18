@@ -876,6 +876,38 @@ para
 /address/header;element missing:hn;w
 
 #data
+<address clear="" xmlns="http://www.w3.org/1999/xhtml">a</address>
+#errors
+/address/@clear;attribute not defined;m
+/address/@clear;enumerated:invalid;m
+
+#data
+<address clear="left" xmlns="http://www.w3.org/1999/xhtml">a</address>
+#errors
+/address/@clear;attribute not defined;m
+
+#data
+<address clear="right" xmlns="http://www.w3.org/1999/xhtml">a</address>
+#errors
+/address/@clear;attribute not defined;m
+
+#data
+<address clear="all" xmlns="http://www.w3.org/1999/xhtml">a</address>
+#errors
+/address/@clear;attribute not defined;m
+
+#data
+<address clear="none" xmlns="http://www.w3.org/1999/xhtml">a</address>
+#errors
+/address/@clear;attribute not defined;m
+
+#data
+<address clear="both" xmlns="http://www.w3.org/1999/xhtml">a</address>
+#errors
+/address/@clear;attribute not defined;m
+/address/@clear;enumerated:non-conforming;m
+
+#data
 <li xmlns="http://www.w3.org/1999/xhtml"></li>
 #errors
 /li;no significant content;s
@@ -3098,6 +3130,44 @@ aaa
 /b/center;element not allowed:phrasing;m
 
 #data
+<center clear="" xmlns="http://www.w3.org/1999/xhtml">a</center>
+#errors
+/center;element not defined;m
+/center/@clear;attribute not defined;m
+/center/@clear;enumerated:invalid;m
+
+#data
+<center clear="left" xmlns="http://www.w3.org/1999/xhtml">a</center>
+#errors
+/center;element not defined;m
+/center/@clear;attribute not defined;m
+
+#data
+<center clear="right" xmlns="http://www.w3.org/1999/xhtml">a</center>
+#errors
+/center;element not defined;m
+/center/@clear;attribute not defined;m
+
+#data
+<center clear="all" xmlns="http://www.w3.org/1999/xhtml">a</center>
+#errors
+/center;element not defined;m
+/center/@clear;attribute not defined;m
+
+#data
+<center clear="none" xmlns="http://www.w3.org/1999/xhtml">a</center>
+#errors
+/center;element not defined;m
+/center/@clear;attribute not defined;m
+
+#data
+<center clear="both" xmlns="http://www.w3.org/1999/xhtml">a</center>
+#errors
+/center;element not defined;m
+/center/@clear;attribute not defined;m
+/center/@clear;enumerated:non-conforming;m
+
+#data
 <centre xmlns="http://www.w3.org/1999/xhtml"></centre>
 #errors
 /centre;element not defined;m
@@ -4110,6 +4180,38 @@ aaa
 /blockquote/@align;enumerated:invalid;m
 
 #data
+<blockquote clear="" xmlns="http://www.w3.org/1999/xhtml">a</blockquote>
+#errors
+/blockquote/@clear;attribute not defined;m
+/blockquote/@clear;enumerated:invalid;m
+
+#data
+<blockquote clear="left" xmlns="http://www.w3.org/1999/xhtml">a</blockquote>
+#errors
+/blockquote/@clear;attribute not defined;m
+
+#data
+<blockquote clear="right" xmlns="http://www.w3.org/1999/xhtml">a</blockquote>
+#errors
+/blockquote/@clear;attribute not defined;m
+
+#data
+<blockquote clear="all" xmlns="http://www.w3.org/1999/xhtml">a</blockquote>
+#errors
+/blockquote/@clear;attribute not defined;m
+
+#data
+<blockquote clear="none" xmlns="http://www.w3.org/1999/xhtml">a</blockquote>
+#errors
+/blockquote/@clear;attribute not defined;m
+
+#data
+<blockquote clear="both" xmlns="http://www.w3.org/1999/xhtml">a</blockquote>
+#errors
+/blockquote/@clear;attribute not defined;m
+/blockquote/@clear;enumerated:non-conforming;m
+
+#data
 <dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /dialog;element not defined;m
@@ -4229,6 +4331,38 @@ aaa
 /pre/@nowrap;attribute not defined;m
 
 #data
+<pre clear="" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@clear;attribute not defined;m
+/pre/@clear;enumerated:invalid;m
+
+#data
+<pre clear="left" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@clear;attribute not defined;m
+
+#data
+<pre clear="right" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@clear;attribute not defined;m
+
+#data
+<pre clear="all" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@clear;attribute not defined;m
+
+#data
+<pre clear="none" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@clear;attribute not defined;m
+
+#data
+<pre clear="both" xmlns="http://www.w3.org/1999/xhtml">a</pre>
+#errors
+/pre/@clear;attribute not defined;m
+/pre/@clear;enumerated:non-conforming;m
+
+#data
 <xmp xmlns="http://www.w3.org/1999/xhtml"></xmp>
 #errors
 /xmp;element not defined;m
@@ -4259,6 +4393,44 @@ aaa
 #errors
 /xmp;element not defined;m
 /xmp/span;element not allowed:text;m
+
+#data
+<xmp clear="" xmlns="http://www.w3.org/1999/xhtml">a</xmp>
+#errors
+/xmp;element not defined;m
+/xmp/@clear;attribute not defined;m
+/xmp/@clear;enumerated:invalid;m
+
+#data
+<xmp clear="left" xmlns="http://www.w3.org/1999/xhtml">a</xmp>
+#errors
+/xmp;element not defined;m
+/xmp/@clear;attribute not defined;m
+
+#data
+<xmp clear="right" xmlns="http://www.w3.org/1999/xhtml">a</xmp>
+#errors
+/xmp;element not defined;m
+/xmp/@clear;attribute not defined;m
+
+#data
+<xmp clear="all" xmlns="http://www.w3.org/1999/xhtml">a</xmp>
+#errors
+/xmp;element not defined;m
+/xmp/@clear;attribute not defined;m
+
+#data
+<xmp clear="none" xmlns="http://www.w3.org/1999/xhtml">a</xmp>
+#errors
+/xmp;element not defined;m
+/xmp/@clear;attribute not defined;m
+
+#data
+<xmp clear="both" xmlns="http://www.w3.org/1999/xhtml">a</xmp>
+#errors
+/xmp;element not defined;m
+/xmp/@clear;attribute not defined;m
+/xmp/@clear;enumerated:non-conforming;m
 
 #data
 <listing xmlns="http://www.w3.org/1999/xhtml"></listing>
@@ -4293,6 +4465,44 @@ aaa
 /listing/span;element not allowed:text;m
 
 #data
+<listing clear="" xmlns="http://www.w3.org/1999/xhtml">a</listing>
+#errors
+/listing;element not defined;m
+/listing/@clear;attribute not defined;m
+/listing/@clear;enumerated:invalid;m
+
+#data
+<listing clear="left" xmlns="http://www.w3.org/1999/xhtml">a</listing>
+#errors
+/listing;element not defined;m
+/listing/@clear;attribute not defined;m
+
+#data
+<listing clear="right" xmlns="http://www.w3.org/1999/xhtml">a</listing>
+#errors
+/listing;element not defined;m
+/listing/@clear;attribute not defined;m
+
+#data
+<listing clear="all" xmlns="http://www.w3.org/1999/xhtml">a</listing>
+#errors
+/listing;element not defined;m
+/listing/@clear;attribute not defined;m
+
+#data
+<listing clear="none" xmlns="http://www.w3.org/1999/xhtml">a</listing>
+#errors
+/listing;element not defined;m
+/listing/@clear;attribute not defined;m
+
+#data
+<listing clear="both" xmlns="http://www.w3.org/1999/xhtml">a</listing>
+#errors
+/listing;element not defined;m
+/listing/@clear;attribute not defined;m
+/listing/@clear;enumerated:non-conforming;m
+
+#data
 <plaintext xmlns="http://www.w3.org/1999/xhtml"></plaintext>
 #errors
 /plaintext;element not defined;m
@@ -4323,6 +4533,44 @@ aaa
 #errors
 /plaintext;element not defined;m
 /plaintext/span;element not allowed:text;m
+
+#data
+<plaintext clear="" xmlns="http://www.w3.org/1999/xhtml">a</plaintext>
+#errors
+/plaintext;element not defined;m
+/plaintext/@clear;attribute not defined;m
+/plaintext/@clear;enumerated:invalid;m
+
+#data
+<plaintext clear="left" xmlns="http://www.w3.org/1999/xhtml">a</plaintext>
+#errors
+/plaintext;element not defined;m
+/plaintext/@clear;attribute not defined;m
+
+#data
+<plaintext clear="right" xmlns="http://www.w3.org/1999/xhtml">a</plaintext>
+#errors
+/plaintext;element not defined;m
+/plaintext/@clear;attribute not defined;m
+
+#data
+<plaintext clear="all" xmlns="http://www.w3.org/1999/xhtml">a</plaintext>
+#errors
+/plaintext;element not defined;m
+/plaintext/@clear;attribute not defined;m
+
+#data
+<plaintext clear="none" xmlns="http://www.w3.org/1999/xhtml">a</plaintext>
+#errors
+/plaintext;element not defined;m
+/plaintext/@clear;attribute not defined;m
+
+#data
+<plaintext clear="both" xmlns="http://www.w3.org/1999/xhtml">a</plaintext>
+#errors
+/plaintext;element not defined;m
+/plaintext/@clear;attribute not defined;m
+/plaintext/@clear;enumerated:non-conforming;m
 
 #data
 <ol start="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -5161,6 +5409,70 @@ a
 /h2/@align;enumerated:invalid;m
 
 #data
+<h1 clear="" xmlns="http://www.w3.org/1999/xhtml">a</h1>
+#errors
+/h1/@clear;attribute not defined;m
+/h1/@clear;enumerated:invalid;m
+
+#data
+<h1 clear="left" xmlns="http://www.w3.org/1999/xhtml">a</h1>
+#errors
+/h1/@clear;attribute not defined;m
+
+#data
+<h1 clear="right" xmlns="http://www.w3.org/1999/xhtml">a</h1>
+#errors
+/h1/@clear;attribute not defined;m
+
+#data
+<h1 clear="all" xmlns="http://www.w3.org/1999/xhtml">a</h1>
+#errors
+/h1/@clear;attribute not defined;m
+
+#data
+<h1 clear="none" xmlns="http://www.w3.org/1999/xhtml">a</h1>
+#errors
+/h1/@clear;attribute not defined;m
+
+#data
+<h1 clear="both" xmlns="http://www.w3.org/1999/xhtml">a</h1>
+#errors
+/h1/@clear;attribute not defined;m
+/h1/@clear;enumerated:non-conforming;m
+
+#data
+<h2 clear="" xmlns="http://www.w3.org/1999/xhtml">a</h2>
+#errors
+/h2/@clear;attribute not defined;m
+/h2/@clear;enumerated:invalid;m
+
+#data
+<h2 clear="left" xmlns="http://www.w3.org/1999/xhtml">a</h2>
+#errors
+/h2/@clear;attribute not defined;m
+
+#data
+<h2 clear="right" xmlns="http://www.w3.org/1999/xhtml">a</h2>
+#errors
+/h2/@clear;attribute not defined;m
+
+#data
+<h2 clear="all" xmlns="http://www.w3.org/1999/xhtml">a</h2>
+#errors
+/h2/@clear;attribute not defined;m
+
+#data
+<h2 clear="none" xmlns="http://www.w3.org/1999/xhtml">a</h2>
+#errors
+/h2/@clear;attribute not defined;m
+
+#data
+<h2 clear="both" xmlns="http://www.w3.org/1999/xhtml">a</h2>
+#errors
+/h2/@clear;attribute not defined;m
+/h2/@clear;enumerated:non-conforming;m
+
+#data
 <address align="left" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /address/@align;attribute not defined;m
@@ -5216,6 +5528,38 @@ a
 #errors
 /p/@align;attribute not defined;m
 /p/@align;enumerated:invalid;m
+
+#data
+<p clear="" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@clear;attribute not defined;m
+/p/@clear;enumerated:invalid;m
+
+#data
+<p clear="left" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@clear;attribute not defined;m
+
+#data
+<p clear="right" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@clear;attribute not defined;m
+
+#data
+<p clear="all" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@clear;attribute not defined;m
+
+#data
+<p clear="none" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@clear;attribute not defined;m
+
+#data
+<p clear="both" xmlns="http://www.w3.org/1999/xhtml">a</p>
+#errors
+/p/@clear;attribute not defined;m
+/p/@clear;enumerated:non-conforming;m
 
 #data
 <hr align="" xmlns="http://www.w3.org/1999/xhtml"/>
