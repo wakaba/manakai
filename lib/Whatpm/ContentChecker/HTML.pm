@@ -6218,8 +6218,54 @@ $Element->{$HTML_NS}->{source} = {
 
 $Element->{$HTML_NS}->{bgsound} = {
   %HTMLEmptyChecker,
-  # XXX attirbutes
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+  check_attrs => $GetHTMLAttrsChecker->({
+    as => $GetHTMLBooleanAttrChecker->('as'),
+    balance => sub {
+      my ($self, $attr) = @_;
+
+      ## A valid integer.
+
+      if ($attr->value =~ /\A(-?[0-9]+)\z/) {
+        my $n = 0+$1;
+        if (-10000 <= $n and $n <= 10000) {
+          #
+        } else {
+          $self->{onerror}->(node => $attr,
+                             type => 'integer:out of range',
+                             level => $self->{level}->{must});
+        }
+      } else {
+        $self->{onerror}->(node => $attr,
+                           type => 'integer:syntax error',
+                           level => $self->{level}->{must});
+      }
+    }, # balance
+    src => $NonEmptyURLChecker,
+    volume => $GetHTMLEnumeratedAttrChecker->({
+        high => 1, middle => 1, low => 1, 0 => 1,
+    }),
+  }, {
+    %HTMLAttrStatus,
+    as => FEATURE_OBSVOCAB,
+    balance => FEATURE_OBSVOCAB,
+    loop => FEATURE_OBSVOCAB,
+    src => FEATURE_OBSVOCAB,
+    volume => FEATURE_OBSVOCAB,
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+
+    unless ($item->{node}->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $item->{node},
+                         type => 'attribute missing',
+                         text => 'src',
+                         level => $self->{level}->{must});
+    }
+
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+  }, # check_attrs2
 }; # bgsound
 
 $Element->{$HTML_NS}->{canvas} = {
@@ -6232,7 +6278,7 @@ $Element->{$HTML_NS}->{canvas} = {
     %HTMLAttrStatus,
     height => FEATURE_HTML5_REC,
     width => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
 
   # Authors MUST provide alternative content (HTML5 revision 2868) -
   # This requirement cannot be checked, since the alternative content

@@ -7246,23 +7246,27 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <bgsound xmlns="http://www.w3.org/1999/xhtml"></bgsound>
 #errors
 /bgsound;element not defined;m
+/bgsound;attribute missing;src;m
 
 #data
 <bgsound xmlns="http://www.w3.org/1999/xhtml">   </bgsound>
 #errors
 /bgsound;element not defined;m
+/bgsound;attribute missing;src;m
 
 #data
 <bgsound xmlns="http://www.w3.org/1999/xhtml">abc</bgsound>
 #errors
 /bgsound;element not defined;m
 /bgsound/"abc";character not allowed:empty;m
+/bgsound;attribute missing;src;m
 
 #data
 <bgsound xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></bgsound>
 #errors
 /bgsound;element not defined;m
 /bgsound/p;element not allowed:empty;m
+/bgsound;attribute missing;src;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><bgsound/></p>
@@ -7270,13 +7274,361 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /p/bgsound;element not defined;m
 /p/bgsound;element not allowed:phrasing;m
 /p;no significant content;s
+/p/bgsound;attribute missing;src;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><bgsound/></div>
 #errors
 /div/bgsound;element not defined;m
 /div/bgsound;element not allowed:flow;m
+/div/bgsound;attribute missing;src;m
 /div;no significant content;s
+
+#data
+<bgsound src="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;url:empty;m
+/bgsound/@src;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+
+#data
+<bgsound src="[abc]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;syntax error:iriref3987;m
+/bgsound/@src;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance=""/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="  "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="xyz"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="+123"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="10.45"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="+-0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="123 "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="balance"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="infinite"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="0120"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="10000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="-10000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="-120"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="0000034"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="10000000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="-10000000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="10001"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume=""/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="  "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="volume"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="1"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="1234"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="none"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="-0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="low"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="middle"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="high"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="LOW"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="HIGH"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as=""/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as="as"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as="AS"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as="none"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+/bgsound/@as;boolean:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as="1"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+/bgsound/@as;boolean:invalid;m
 
 #data
 <canvas xmlns="http://www.w3.org/1999/xhtml"/>
