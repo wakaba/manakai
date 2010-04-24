@@ -4352,6 +4352,145 @@ aa<map name="x">b<map name="y">bb</map></map>
 /img/@viblength;attribute not allowed;m
 
 #data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop=""/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="  "/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="xyz"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+123"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10.45"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+-0"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="123 "/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="loop"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="infinite"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:syntax error;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="000"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0120"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:out of range;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-2"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:out of range;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-120"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:out of range;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-1"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0000034"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000000"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000000"/>
+#errors
+/img/@loop;attribute not defined;m
+/img/@loop;integer:out of range;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10001"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -7467,6 +7606,187 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /bgsound/@src;attribute not defined;m
 /bgsound/@balance;attribute not defined;m
 /bgsound/@balance;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop=""/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="  "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="xyz"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+123"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10.45"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+-0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="123 "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="loop"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="infinite"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0120"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-2"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-120"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-1"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0000034"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10001"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
 
 #data
 <bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"

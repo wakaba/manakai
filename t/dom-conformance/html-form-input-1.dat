@@ -15541,3 +15541,148 @@
 /input/@volume;attribute not defined;m
 /input/@volume;input attr not applicable;image;m
 
+#data
+<input type="submit" xmlns="http://www.w3.org/1999/xhtml"
+    loop=""/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;input attr not applicable;submit;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop=""/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="  "/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="xyz"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+123"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10.45"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+-0"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="123 "/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="loop"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="infinite"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:syntax error;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0"/>
+#errors
+/input/@loop;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="000"/>
+#errors
+/input/@loop;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0120"/>
+#errors
+/input/@loop;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000"/>
+#errors
+/input/@loop;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:out of range;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-2"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:out of range;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-120"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:out of range;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-1"/>
+#errors
+/input/@loop;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0000034"/>
+#errors
+/input/@loop;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000000"/>
+#errors
+/input/@loop;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000000"/>
+#errors
+/input/@loop;attribute not defined;m
+/input/@loop;integer:out of range;m
+
+#data
+<input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10001"/>
+#errors
+/input/@loop;attribute not defined;m

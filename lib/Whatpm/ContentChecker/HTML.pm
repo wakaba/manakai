@@ -1795,6 +1795,27 @@ my $EmbeddedAlignChecker = $GetHTMLEnumeratedAttrChecker->({
   baseline => -1, texttop => -1, abscenter => -1, absmiddle => -1,
 });
 
+my $LegacyLoopChecker = sub {
+  my ($self, $attr) = @_;
+  
+  ## A valid integer.
+  
+  if ($attr->value =~ /\A(-?[0-9]+)\z/) {
+    my $n = 0+$1;
+    if ($n >= -1) {
+      #
+    } else {
+      $self->{onerror}->(node => $attr,
+                         type => 'integer:out of range',
+                         level => $self->{level}->{must});
+    }
+  } else {
+    $self->{onerror}->(node => $attr,
+                       type => 'integer:syntax error',
+                       level => $self->{level}->{must});
+  }
+}; # $LegacyLoopChecker
+
 my $GetHTMLAttrsChecker = sub {
   my $element_specific_checker = shift;
   my $element_specific_status = shift;
@@ -4852,12 +4873,11 @@ $Element->{$HTML_NS}->{tt} = {
 
 $Element->{$HTML_NS}->{s} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
 }; # s
 
 $Element->{$HTML_NS}->{strike} = $Element->{$HTML_NS}->{s};
@@ -4866,7 +4886,7 @@ $Element->{$HTML_NS}->{u} = $Element->{$HTML_NS}->{s};
 
 $Element->{$HTML_NS}->{blink} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # blink
 
 $Element->{$HTML_NS}->{mark} = {
@@ -5534,6 +5554,7 @@ $Element->{$HTML_NS}->{img} = {
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
       longdesc => $HTMLURIAttrChecker,
+      loop => $LegacyLoopChecker,
       name => $NameAttrChecker,
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
@@ -5556,6 +5577,7 @@ $Element->{$HTML_NS}->{img} = {
       ismap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_REC,
       longdesc => FEATURE_HTML5_OBSOLETE,
+      loop => FEATURE_OBSVOCAB,
       name => FEATURE_HTML5_OBSOLETE,
       src => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       usemap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -6241,6 +6263,7 @@ $Element->{$HTML_NS}->{bgsound} = {
                            level => $self->{level}->{must});
       }
     }, # balance
+    loop => $LegacyLoopChecker,
     src => $NonEmptyURLChecker,
     volume => $GetHTMLEnumeratedAttrChecker->({
         high => 1, middle => 1, low => 1, 0 => 1,
@@ -7458,6 +7481,7 @@ $Element->{$HTML_NS}->{input} = {
          ismap => FEATURE_M12N10_REC,
          lang => FEATURE_HTML5_REC,
          list => FEATURE_HTML5_LC | FEATURE_WF2X,
+         loop => FEATURE_OBSVOCAB,
          max => FEATURE_HTML5_LC | FEATURE_WF2X,
          maxlength => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          method => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
@@ -7523,6 +7547,7 @@ $Element->{$HTML_NS}->{input} = {
          inputmode => '',
          ismap => '', ## NOTE: "MUST" be type=image [HTML4]
          list => '',
+         loop => '',
          max => '',
          maxlength => '',
          method => '',
@@ -7742,6 +7767,7 @@ $Element->{$HTML_NS}->{input} = {
              height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
              hspace => $HTMLLengthAttrChecker,
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
+             loop => $LegacyLoopChecker,
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
