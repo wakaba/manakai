@@ -2986,6 +2986,12 @@ aaa
 /div1/title;element not allowed:flow;m
 
 #data
+<div1 align="left?" xmlns="http://www.w3.org/1999/xhtml">a</div1>
+#errors
+/div1;element not defined;m
+/div1/@align;attribute not defined;m
+
+#data
 <div2 xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /div2;element not defined;m
@@ -3791,6 +3797,7 @@ aaa
 <body background="" xmlns="http://www.w3.org/1999/xhtml">x</body>
 #errors
 /body/@background;attribute not defined;m
+/body/@background;url:empty;m
 
 #data
 <body background="a.png" xmlns="http://www.w3.org/1999/xhtml">x</body>
@@ -6648,3 +6655,48 @@ a
 #errors
 /li/p;no significant content;s
 
+#data
+<layer xmlns="http://www.w3.org/1999/xhtml"
+    background="">a</layer>
+#errors
+/layer;element not defined;m
+/layer/@background;attribute not defined;m
+/layer/@background;url:empty;m
+
+#data
+<layer xmlns="http://www.w3.org/1999/xhtml"
+    background="abc">a</layer>
+#errors
+/layer;element not defined;m
+/layer/@background;attribute not defined;m
+
+#data
+<layer xmlns="http://www.w3.org/1999/xhtml"
+    background="[]">a</layer>
+#errors
+/layer;element not defined;m
+/layer/@background;attribute not defined;m
+/layer/@background;syntax error:iriref3987;m
+
+#data
+<ilayer xmlns="http://www.w3.org/1999/xhtml"
+    background="">a</ilayer>
+#errors
+/ilayer;element not defined;m
+/ilayer/@background;attribute not defined;m
+/ilayer/@background;url:empty;m
+
+#data
+<ilayer xmlns="http://www.w3.org/1999/xhtml"
+    background="abc">a</ilayer>
+#errors
+/ilayer;element not defined;m
+/ilayer/@background;attribute not defined;m
+
+#data
+<ilayer xmlns="http://www.w3.org/1999/xhtml"
+    background="[]">a</ilayer>
+#errors
+/ilayer;element not defined;m
+/ilayer/@background;attribute not defined;m
+/ilayer/@background;syntax error:iriref3987;m

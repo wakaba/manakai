@@ -3211,7 +3211,7 @@ $Element->{$HTML_NS}->{body} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     alink => $HTMLColorAttrChecker,
-    background => $HTMLURIAttrChecker,
+    background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
     link => $HTMLColorAttrChecker,
     marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -3242,13 +3242,14 @@ $Element->{$HTML_NS}->{body} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    alink => FEATURE_HTML5_OBSOLETE,
-    background => FEATURE_HTML5_OBSOLETE,
-    bgcolor => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
-    link => FEATURE_HTML5_OBSOLETE,
-    #marginheight WA1 prose
-    #marginwidth WA1 prose
+    alink => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    bgproperties => FEATURE_OBSVOCAB,
+    link => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    marginheight => FEATURE_OBSVOCAB,
+    marginwidth => FEATURE_OBSVOCAB,
+    nowrap => FEATURE_OBSVOCAB,
     onafterprint => FEATURE_HTML5_LC,
     onbeforeprint => FEATURE_HTML5_LC,
     onbeforeunload => FEATURE_HTML5_LC,
@@ -3268,10 +3269,11 @@ $Element->{$HTML_NS}->{body} = {
     onstorage => FEATURE_HTML5_LC,
     onundo => FEATURE_HTML5_LC,
     onunload => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    #rightmargin WA1 prose
-    text => FEATURE_HTML5_OBSOLETE,
-    #topmargin WA1 prose
-    vlink => FEATURE_HTML5_OBSOLETE,
+    rightmargin => FEATURE_OBSVOCAB,
+    scroll => FEATURE_OBSVOCAB,
+    text => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    topmargin => FEATURE_OBSVOCAB,
+    vlink => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -3654,7 +3656,7 @@ $Element->{$HTML_NS}->{blockquote} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML2X_RFC,
+    align => FEATURE_OBSVOCAB,
     cite => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_REC,
   }), # check_attrs
@@ -4055,7 +4057,7 @@ $Element->{$HTML_NS}->{center} = {
 }; # center
 
 $Element->{$HTML_NS}->{div1} = {
-  %{$Element->{$HTML_NS}->{div}},
+  %HTMLFlowContentChecker,
   status => FEATURE_ISOHTML_PREPARATION,
 }; # div1
 
@@ -4132,7 +4134,7 @@ $Element->{$HTML_NS}->{font} = {
     size => FEATURE_M12N10_REC_DEPRECATED,
     style => FEATURE_HTML5_REC,
     title => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   ## NOTE: When the |font| element was defined in the HTML5 specification,
   ## it is allowed only in a document with the WYSIWYG signature.  The
   ## checker does not check whether there is the signature, since the
@@ -4140,6 +4142,17 @@ $Element->{$HTML_NS}->{font} = {
   ## for any |font| element an "element not defined" error is raised anyway,
   ## such that we don't have to raise an additional error.)
 }; # font
+
+$Element->{$HTML_NS}->{layer} = {
+  %HTMLFlowContentChecker,
+  status => FEATURE_OBSVOCAB,
+  check_attrs => $GetHTMLAttrsChecker->({
+    background => $NonEmptyURLChecker,
+  }, {
+    %HTMLAttrStatus,
+    background => FEATURE_OBSVOCAB,
+  }), # check_attrs
+}; # layer
 
 # ---- Text-level semantics ----
 
@@ -5334,6 +5347,12 @@ $Element->{$HTML_NS}->{span} = {
   }),
 };
 
+$Element->{$HTML_NS}->{ilayer} = {
+  %HTMLPhrasingContentChecker,
+  status => FEATURE_OBSVOCAB,
+  check_attrs => $Element->{$HTML_NS}->{layer}->{check_attrs},
+}; # ilayer
+
 # ---- Edits ----
 
 =pod
@@ -5783,6 +5802,7 @@ $Element->{$HTML_NS}->{embed} = {
 
     ## TODO: external resource check
 
+    $element_state->{uri_info}->{code}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
   },
@@ -5861,6 +5881,7 @@ $Element->{$HTML_NS}->{object} = {
 
     $element_state->{uri_info}->{data}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{classid}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{code}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
@@ -6005,7 +6026,9 @@ $Element->{$HTML_NS}->{applet} = {
 
     $element_state->{uri_info}->{data}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{classid}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{code}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
+    $element_state->{uri_info}->{object}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   }, # check_attrs2
@@ -6564,7 +6587,7 @@ $Element->{$HTML_NS}->{table} = {
       left => 1, center => 1, right => 1,
       absmiddle => -1, middle => -1, abscenter => -1,
     }),
-    background => $HTMLURIAttrChecker,
+    background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
     border => sub {
       my ($self, $attr) = @_;
@@ -6601,7 +6624,7 @@ $Element->{$HTML_NS}->{table} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
-    background => FEATURE_HTML5_OBSOLETE,
+    background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE,
     border => FEATURE_HTML5_OBSOLETE,
     #bordercolor WA1 prose
@@ -6963,20 +6986,20 @@ $Element->{$HTML_NS}->{tbody} = {
   %HTMLChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    background => $HTMLURIAttrChecker,
+    background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
     %cellalign,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
-    background => FEATURE_HTML5_OBSOLETE,
+    background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     #bgcolor WA1 prose
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
     lang => FEATURE_HTML5_REC,
     valign => FEATURE_HTML5_OBSOLETE,
-  }),
+  }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -7027,14 +7050,14 @@ $Element->{$HTML_NS}->{tr} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
-    background => $HTMLURIAttrChecker,
+    background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
     height => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
-    background => FEATURE_HTML5_OBSOLETE,
+    background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
@@ -7086,7 +7109,7 @@ $Element->{$HTML_NS}->{td} = {
     %cellalign,
     abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
-    background => $HTMLURIAttrChecker,
+    background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
@@ -7107,7 +7130,7 @@ $Element->{$HTML_NS}->{td} = {
     abbr => FEATURE_HTML5_OBSOLETE,
     align => FEATURE_HTML5_OBSOLETE,
     axis => FEATURE_HTML5_OBSOLETE,
-    background => FEATURE_HTML5_OBSOLETE,
+    background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
@@ -7135,7 +7158,7 @@ $Element->{$HTML_NS}->{th} = {
     %cellalign,
     abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
-    background => $HTMLURIAttrChecker,
+    background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
@@ -7156,7 +7179,7 @@ $Element->{$HTML_NS}->{th} = {
     abbr => FEATURE_HTML5_OBSOLETE,
     align => FEATURE_HTML5_OBSOLETE,
     axis => FEATURE_HTML5_OBSOLETE,
-    background => FEATURE_HTML5_OBSOLETE,
+    background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE,
     char => FEATURE_M12N10_REC,
     charoff => FEATURE_HTML5_OBSOLETE,
