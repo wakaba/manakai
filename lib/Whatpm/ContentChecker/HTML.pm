@@ -4094,7 +4094,7 @@ $Element->{$HTML_NS}->{marquee} = {
   }, {
     %HTMLAttrStatus,
     behavior => FEATURE_HTML5_OBSOLETE,
-    #bgcolor WA1 prose
+    bgcolor => FEATURE_OBSVOCAB,
     direction => FEATURE_HTML5_OBSOLETE,
     #height WA1 prose
     #hspace WA1 prose
@@ -4148,9 +4148,11 @@ $Element->{$HTML_NS}->{layer} = {
   status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     background => $NonEmptyURLChecker,
+    bgcolor => $HTMLColorAttrChecker,
   }, {
     %HTMLAttrStatus,
     background => FEATURE_OBSVOCAB,
+    bgcolor => FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # layer
 
@@ -6625,7 +6627,7 @@ $Element->{$HTML_NS}->{table} = {
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    bgcolor => FEATURE_HTML5_OBSOLETE,
+    bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     border => FEATURE_HTML5_OBSOLETE,
     #bordercolor WA1 prose
     cellpadding => FEATURE_HTML5_OBSOLETE,
@@ -6994,7 +6996,7 @@ $Element->{$HTML_NS}->{tbody} = {
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    #bgcolor WA1 prose
+    bgcolor => FEATURE_OBSVOCAB,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
     lang => FEATURE_HTML5_REC,
@@ -7058,7 +7060,7 @@ $Element->{$HTML_NS}->{tr} = {
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    bgcolor => FEATURE_HTML5_OBSOLETE,
+    bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
     #height WA1 prose
@@ -7131,7 +7133,7 @@ $Element->{$HTML_NS}->{td} = {
     align => FEATURE_HTML5_OBSOLETE,
     axis => FEATURE_HTML5_OBSOLETE,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    bgcolor => FEATURE_HTML5_OBSOLETE,
+    bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     char => FEATURE_HTML5_OBSOLETE,
     charoff => FEATURE_HTML5_OBSOLETE,
     colspan => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -7180,7 +7182,7 @@ $Element->{$HTML_NS}->{th} = {
     align => FEATURE_HTML5_OBSOLETE,
     axis => FEATURE_HTML5_OBSOLETE,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    bgcolor => FEATURE_HTML5_OBSOLETE,
+    bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     char => FEATURE_M12N10_REC,
     charoff => FEATURE_HTML5_OBSOLETE,
     colspan => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,

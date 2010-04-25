@@ -6700,3 +6700,87 @@ a
 /ilayer;element not defined;m
 /ilayer/@background;attribute not defined;m
 /ilayer/@background;syntax error:iriref3987;m
+
+#data
+<layer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">a
+</layer>
+#errors
+/layer;element not defined;m
+/layer/@bgcolor;attribute not defined;m
+/layer/@bgcolor;color:syntax error;m
+
+#data
+<layer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">a
+</layer>
+#errors
+/layer;element not defined;m
+/layer/@bgcolor;attribute not defined;m
+
+#data
+<layer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">a
+</layer>
+#errors
+/layer;element not defined;m
+/layer/@bgcolor;attribute not defined;m
+
+#data
+<layer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">a
+</layer>
+#errors
+/layer;element not defined;m
+/layer/@bgcolor;attribute not defined;m
+
+#data
+<layer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">a
+</layer>
+#errors
+/layer;element not defined;m
+/layer/@bgcolor;attribute not defined;m
+/layer/@bgcolor;color:syntax error;m
+
+#data
+<ilayer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="">a
+</ilayer>
+#errors
+/ilayer;element not defined;m
+/ilayer/@bgcolor;attribute not defined;m
+/ilayer/@bgcolor;color:syntax error;m
+
+#data
+<ilayer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="#c0c0c0">a
+</ilayer>
+#errors
+/ilayer;element not defined;m
+/ilayer/@bgcolor;attribute not defined;m
+
+#data
+<ilayer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="gray">a
+</ilayer>
+#errors
+/ilayer;element not defined;m
+/ilayer/@bgcolor;attribute not defined;m
+
+#data
+<ilayer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="GRAY">a
+</ilayer>
+#errors
+/ilayer;element not defined;m
+/ilayer/@bgcolor;attribute not defined;m
+
+#data
+<ilayer xmlns="http://www.w3.org/1999/xhtml"
+    bgcolor="abc">a
+</ilayer>
+#errors
+/ilayer;element not defined;m
+/ilayer/@bgcolor;attribute not defined;m
+/ilayer/@bgcolor;color:syntax error;m
