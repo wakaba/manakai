@@ -2015,6 +2015,9 @@ $Element->{$HTML_NS}->{html} = {
   is_root => 1,
   check_attrs => $GetHTMLAttrsChecker->({
     manifest => $HTMLURIAttrChecker,
+    scroll => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1, auto => 1,
+    }),
     version => sub {
       ## According to HTML4 prose, the |version| attribute's value is
       ## "cdata".  Various DTDs of versions of HTML and XHTML define
@@ -2031,8 +2034,9 @@ $Element->{$HTML_NS}->{html} = {
     id => FEATURE_HTML5_REC,
     lang => FEATURE_HTML5_REC,
     manifest => FEATURE_HTML5_WD,
+    scroll => FEATURE_OBSVOCAB,
     version => FEATURE_HTML5_OBSOLETE,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before head';
@@ -2119,6 +2123,11 @@ $Element->{$HTML_NS}->{html} = {
 $Element->{$HTML_NS}->{'pre-html'} = {
   %{$Element->{$HTML_NS}->{html}},
   status => FEATURE_ISOHTML_PREPARATION,
+  check_attrs => $GetHTMLAttrsChecker->({
+    #
+  }, {
+    %HTMLAttrStatus,
+  }), # check_attrs
 }; # pre-html
 
 # ---- Document metadata ----
@@ -3240,6 +3249,9 @@ $Element->{$HTML_NS}->{body} = {
     onundo => $HTMLEventHandlerAttrChecker,
     onunload => $HTMLEventHandlerAttrChecker,
     rightmargin => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    scroll => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1, auto => 1,
+    }),
     text => $HTMLColorAttrChecker,
     topmargin => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     vlink => $HTMLColorAttrChecker,

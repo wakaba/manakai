@@ -88,6 +88,65 @@
 /html/p;no significant content;s
 
 #data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll=""><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+/html/@scroll;enumerated:invalid;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll="   "><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+/html/@scroll;enumerated:invalid;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll="yes"><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll="no"><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll="auto"><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll="YES"><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll="yes "><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+/html/@scroll;enumerated:invalid;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll="true"><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+/html/@scroll;enumerated:invalid;m
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"
+    scroll="fixed"><head><title>a</title></head><body>b</body></html>
+#errors
+/html/@scroll;attribute not defined;m
+/html/@scroll;enumerated:invalid;m
+
+#data
 <pre-html xmlns="http://www.w3.org/1999/xhtml"></pre-html>
 #errors
 /pre-html;element not defined;m
@@ -99,6 +158,30 @@
 #errors
 /pre-html;element not defined;m
 /pre-html/head;child element missing;title;m
+
+#data
+<pre-html xmlns="http://www.w3.org/1999/xhtml"
+    manifest="[]"
+><head><title>b</title></head><body>a</body></pre-html>
+#errors
+/pre-html;element not defined;m
+/pre-html/@manifest;attribute not defined;m
+
+#data
+<pre-html xmlns="http://www.w3.org/1999/xhtml"
+    scroll=""
+><head><title>b</title></head><body>a</body></pre-html>
+#errors
+/pre-html;element not defined;m
+/pre-html/@scroll;attribute not defined;m
+
+#data
+<pre-html xmlns="http://www.w3.org/1999/xhtml"
+    version=""
+><head><title>b</title></head><body>a</body></pre-html>
+#errors
+/pre-html;element not defined;m
+/pre-html/@version;attribute not defined;m
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">

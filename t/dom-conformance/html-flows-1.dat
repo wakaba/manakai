@@ -4240,6 +4240,65 @@ aaa
 /body/@nowrap;boolean:invalid;m
 
 #data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+/body/@scroll;enumerated:invalid;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="   ">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+/body/@scroll;enumerated:invalid;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="yes">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="no">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="auto">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="YES">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="yes ">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+/body/@scroll;enumerated:invalid;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="true">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+/body/@scroll;enumerated:invalid;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    scroll="fixed">a</body>
+#errors
+/body/@scroll;attribute not defined;m
+/body/@scroll;enumerated:invalid;m
+
+#data
 <blockquote cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /blockquote;no significant content;s
