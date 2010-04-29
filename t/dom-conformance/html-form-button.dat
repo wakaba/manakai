@@ -720,7 +720,6 @@
     novalidate="yes"
 >a</button>
 #errors
-/button/@novalidate;boolean:invalid;m
 /button/@novalidate;attribute not defined;m
 
 #data
@@ -728,7 +727,6 @@
     novalidate="no validate"
 >a</button>
 #errors
-/button/@novalidate;boolean:invalid;m
 /button/@novalidate;attribute not defined;m
 
 #data
@@ -1211,6 +1209,42 @@
 
 #data
 <button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  action=""
+>x</button>
+#errors
+/button/@action;attribute not defined;m
+/button/@action;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  enctype="application/x-www-form-urlencoded"
+>x</button>
+#errors
+/button/@enctype;attribute not defined;m
+/button/@enctype;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  method="get"
+>x</button>
+#errors
+/button/@method;attribute not defined;m
+/button/@method;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  target="_blank"
+>x</button>
+#errors
+/button/@target;attribute not defined;m
+/button/@target;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
   type="button"
   formaction=""
 >x</button>
@@ -1248,6 +1282,42 @@
 >x</button>
 #errors
 /button/@formnovalidate;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  action=""
+>x</button>
+#errors
+/button/@action;attribute not defined;m
+/button/@action;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  enctype="application/x-www-form-urlencoded"
+>x</button>
+#errors
+/button/@enctype;attribute not defined;m
+/button/@enctype;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  method="get"
+>x</button>
+#errors
+/button/@method;attribute not defined;m
+/button/@method;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  target="_blank"
+>x</button>
+#errors
+/button/@target;attribute not defined;m
+/button/@target;attribute not allowed;m
 
 #data
 <button xmlns="http://www.w3.org/1999/xhtml"

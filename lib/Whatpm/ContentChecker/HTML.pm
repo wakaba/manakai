@@ -3585,7 +3585,7 @@ $Element->{$HTML_NS}->{br} = {
   }, {
     %HTMLAttrStatus,
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    clear => FEATURE_HTML5_OBSOLETE,
+    clear => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     id => FEATURE_HTML5_REC,
     style => FEATURE_HTML5_REC,
     title => FEATURE_HTML5_REC,
@@ -7532,7 +7532,6 @@ $Element->{$HTML_NS}->{input} = {
          multiple => FEATURE_HTML5_LC,
          name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
          nonumber => FEATURE_OBSVOCAB,
-         novalidate => FEATURE_HTML5_DROPPED,
          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -7540,7 +7539,7 @@ $Element->{$HTML_NS}->{input} = {
          pattern => FEATURE_HTML5_LC | FEATURE_WF2X,
          placeholder => FEATURE_HTML5_LC,
          readonly => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
-         replace => FEATURE_WF2,
+         replace => FEATURE_OBSVOCAB,
          required => FEATURE_HTML5_LC | FEATURE_WF2X,
          size => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          soundstart => FEATURE_OBSVOCAB,
@@ -7598,7 +7597,6 @@ $Element->{$HTML_NS}->{input} = {
          multiple => '',
          name => $FormControlNameAttrChecker,
          nonumber => '',
-         novalidate => '',
          pattern => '',
          placeholder => '',
          readonly => '',
@@ -7763,7 +7761,6 @@ $Element->{$HTML_NS}->{input} = {
                get => 1, post => 1, put => 1, delete => 1,
              }),
              nonumber => $GetHTMLBooleanAttrChecker->('nonumber'),
-             novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
              }),
@@ -7814,7 +7811,6 @@ $Element->{$HTML_NS}->{input} = {
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
-             novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
              }),
@@ -8171,15 +8167,9 @@ $Element->{$HTML_NS}->{button} = {
       get => 1, post => 1, put => 1, delete => 1,
     }),
     name => $FormControlNameAttrChecker,
-    novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
-    ## NOTE: According to Web Forms 2.0, |button| attribute has |template|
-    ## attribute to support the |add| button type (as part of repetition
-    ## template feature).  It conflicts with the |template| global attribute
-    ## introduced as part of the data template feature.
-    ## NOTE: |template| attribute as defined in Web Forms 2.0 has no
-    ## author requirement.
+    ## XXX |template|
     type => $GetHTMLEnumeratedAttrChecker->({
       button => 1, submit => 1, reset => 1,
     }),
@@ -8188,26 +8178,24 @@ $Element->{$HTML_NS}->{button} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
-    action => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+    action => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
-    enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+    enctype => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     formaction => FEATURE_HTML5_LC,
     formenctype => FEATURE_HTML5_LC,
     formmethod => FEATURE_HTML5_LC,
     formnovalidate => FEATURE_HTML5_LC,
     formtarget => FEATURE_HTML5_LC,
-    lang => FEATURE_HTML5_REC,
-    method => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+    method => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    novalidate => FEATURE_HTML5_DROPPED,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    replace => FEATURE_WF2,
+    replace => FEATURE_OBSVOCAB,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
-    template => FEATURE_HTML5_DROPPED | FEATURE_WF2,
+    target => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
+    template => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   }), # check_attrs
@@ -8234,6 +8222,11 @@ $Element->{$HTML_NS}->{button} = {
         $item->{node}->get_attribute_node_ns (undef, 'formnovalidate'),
         $item->{node}->get_attribute_node_ns (undef, 'formenctype'),
         $item->{node}->get_attribute_node_ns (undef, 'formtarget'),
+
+        $item->{node}->get_attribute_node_ns (undef, 'action'),
+        $item->{node}->get_attribute_node_ns (undef, 'method'),
+        $item->{node}->get_attribute_node_ns (undef, 'enctype'),
+        $item->{node}->get_attribute_node_ns (undef, 'target'),
       ) {
         next unless $_;
         $self->{onerror}->(node => $_,
