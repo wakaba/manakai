@@ -2854,6 +2854,58 @@ aaa
 /dialog;element not defined;m
 
 #data
+<dt nowrap="" xmlns="http://www.w3.org/1999/xhtml">x</dt>
+#errors
+/dt/@nowrap;attribute not defined;m
+
+#data
+<dt nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</dt>
+#errors
+/dt/@nowrap;attribute not defined;m
+
+#data
+<dt nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</dt>
+#errors
+/dt/@nowrap;attribute not defined;m
+
+#data
+<dt nowrap="NoWrap" xmlns="http://www.w3.org/1999/xhtml">x</dt>
+#errors
+/dt/@nowrap;attribute not defined;m
+
+#data
+<dt nowrap="yes" xmlns="http://www.w3.org/1999/xhtml">x</dt>
+#errors
+/dt/@nowrap;attribute not defined;m
+/dt/@nowrap;boolean:invalid;m
+
+#data
+<dd nowrap="" xmlns="http://www.w3.org/1999/xhtml">x</dd>
+#errors
+/dd/@nowrap;attribute not defined;m
+
+#data
+<dd nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</dd>
+#errors
+/dd/@nowrap;attribute not defined;m
+
+#data
+<dd nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</dd>
+#errors
+/dd/@nowrap;attribute not defined;m
+
+#data
+<dd nowrap="NoWrap" xmlns="http://www.w3.org/1999/xhtml">x</dd>
+#errors
+/dd/@nowrap;attribute not defined;m
+
+#data
+<dd nowrap="yes" xmlns="http://www.w3.org/1999/xhtml">x</dd>
+#errors
+/dd/@nowrap;attribute not defined;m
+/dd/@nowrap;boolean:invalid;m
+
+#data
 <fieldset xmlns="http://www.w3.org/1999/xhtml">
 <legend>XXX</legend>
 </fieldset>
@@ -4108,6 +4160,84 @@ aaa
 /body/@rightmargin;attribute not defined;m
 /body/@rightmargin;nninteger:syntax error;m
 /body;no significant content;s
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    bgproperties="">a</body>
+#errors
+/body/@bgproperties;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    bgproperties="fixed">a</body>
+#errors
+/body/@bgproperties;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    bgproperties="Fixed">a</body>
+#errors
+/body/@bgproperties;attribute not defined;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    bgproperties="  ">a</body>
+#errors
+/body/@bgproperties;attribute not defined;m
+/body/@bgproperties;enumerated:invalid;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    bgproperties="yes">a</body>
+#errors
+/body/@bgproperties;attribute not defined;m
+/body/@bgproperties;enumerated:invalid;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    bgproperties="scroll">a</body>
+#errors
+/body/@bgproperties;attribute not defined;m
+/body/@bgproperties;enumerated:invalid;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    bgproperties="none">a</body>
+#errors
+/body/@bgproperties;attribute not defined;m
+/body/@bgproperties;enumerated:invalid;m
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"
+    bgproperty="  ">a</body>
+#errors
+/body/@bgproperty;attribute not defined;m
+
+#data
+<body nowrap="" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@nowrap;attribute not defined;m
+
+#data
+<body nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@nowrap;attribute not defined;m
+
+#data
+<body nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@nowrap;attribute not defined;m
+
+#data
+<body nowrap="NoWrap" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@nowrap;attribute not defined;m
+
+#data
+<body nowrap="yes" xmlns="http://www.w3.org/1999/xhtml">x</body>
+#errors
+/body/@nowrap;attribute not defined;m
+/body/@nowrap;boolean:invalid;m
 
 #data
 <blockquote cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -6136,6 +6266,32 @@ a
 #errors
 /div/@align;attribute not defined;m
 /div/@align;enumerated:invalid;m
+
+#data
+<div nowrap="" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@nowrap;attribute not defined;m
+
+#data
+<div nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@nowrap;attribute not defined;m
+
+#data
+<div nowrap="nowrap" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@nowrap;attribute not defined;m
+
+#data
+<div nowrap="NoWrap" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@nowrap;attribute not defined;m
+
+#data
+<div nowrap="yes" xmlns="http://www.w3.org/1999/xhtml">x</div>
+#errors
+/div/@nowrap;attribute not defined;m
+/div/@nowrap;boolean:invalid;m
 
 #data
 <ins cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</ins>

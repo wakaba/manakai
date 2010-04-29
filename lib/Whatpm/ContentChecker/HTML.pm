@@ -3213,9 +3213,13 @@ $Element->{$HTML_NS}->{body} = {
     alink => $HTMLColorAttrChecker,
     background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
+    bgproperties => $GetHTMLEnumeratedAttrChecker->({
+      '' => 1, fixed => 1,
+    }),
     link => $HTMLColorAttrChecker,
     marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     onafterprint => $HTMLEventHandlerAttrChecker,
     onbeforeprint => $HTMLEventHandlerAttrChecker,
     onbeforeunload => $HTMLEventHandlerAttrChecker,
@@ -4000,11 +4004,11 @@ $Element->{$HTML_NS}->{dt} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    #
+    nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
+    nowrap => FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # dt
 
@@ -4012,13 +4016,13 @@ $Element->{$HTML_NS}->{dd} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    #
+    nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+    nowrap => FEATURE_OBSVOCAB,
+  }), # check_attrs
+}; # dd
 
 $Element->{$HTML_NS}->{div} = {
   %HTMLFlowContentChecker,
@@ -4027,20 +4031,21 @@ $Element->{$HTML_NS}->{div} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
-  }),
+    nowrap => FEATURE_OBSVOCAB,
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-};
+  }, # check_start
+}; # div
 
 $Element->{$HTML_NS}->{center} = {
   %HTMLFlowContentChecker,
@@ -6611,6 +6616,7 @@ $Element->{$HTML_NS}->{table} = {
     }),
     height => $HTMLLengthAttrChecker,
     hspace => $HTMLLengthAttrChecker,
+    nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rules => $GetHTMLEnumeratedAttrChecker->({
       none => 1, groups => 1, rows => 1, cols => 1, all => 1,
     }),
@@ -6637,7 +6643,7 @@ $Element->{$HTML_NS}->{table} = {
     frame => FEATURE_HTML5_OBSOLETE,
     #height WA1 prose
     #hspace WA1 prose
-    lang => FEATURE_HTML5_REC,
+    nowrap => FEATURE_OBSVOCAB,
     rules => FEATURE_HTML5_OBSOLETE,
     summary => FEATURE_HTML5_LC,
     width => FEATURE_HTML5_OBSOLETE,
