@@ -1181,6 +1181,19 @@ my $AccesskeyChecker = sub {
   }
 }; # $AccesskeyChecker
 
+my $CharChecker = sub {
+  my ($self, $attr) = @_;
+  
+  ## A character, or string of length = 1.
+  
+  my $value = $attr->value;
+  if (length $value != 1) {
+    $self->{onerror}->(node => $attr,
+                       type => 'char:syntax error',
+                       level => $self->{level}->{must});
+  }
+}; # $CharChecker
+
 my $TemporalPositionChecker = sub {
   my ($self, $attr) = @_;
   unless ($attr->value =~ /\A[0-9:]+\z/) {
@@ -4062,7 +4075,7 @@ $Element->{$HTML_NS}->{div} = {
 
 $Element->{$HTML_NS}->{center} = {
   %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     clear => $GetHTMLEnumeratedAttrChecker->({
       left => 1, all => 1, right => 1, none => 1, both => -1,
@@ -4070,8 +4083,8 @@ $Element->{$HTML_NS}->{center} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
+    clear => FEATURE_OBSVOCAB,
+  }), # check_attrs
 }; # center
 
 $Element->{$HTML_NS}->{div1} = {
@@ -6913,28 +6926,17 @@ $Element->{$HTML_NS}->{caption} = {
 }; # caption
 
 my %cellalign = (
-  ## HTML4 %cellhalign;
   align => $GetHTMLEnumeratedAttrChecker->({
     left => 1, center => 1, right => 1, justify => 1, char => 1,
   }),
-  char => sub {
-    my ($self, $attr) = @_;
-
-    ## NOTE: "character" or |%Character;| in HTML4.
-    
-    my $value = $attr->value;
-    if (length $value != 1) {
-      $self->{onerror}->(node => $attr, type => 'char:syntax error',
-                         level => $self->{level}->{html4_fact});
-    }
-  },
+  ch => $CharChecker,
+  char => $CharChecker,
   charoff => $HTMLLengthAttrChecker,
-
-  ## HTML4 %cellvalign;
+  choff => $HTMLLengthAttrChecker,
   valign => $GetHTMLEnumeratedAttrChecker->({
     top => 1, middle => 1, bottom => 1, baseline => 1,
   }),
-);
+); # %cellalign
 
 $Element->{$HTML_NS}->{colgroup} = {
   %HTMLEmptyChecker,
@@ -6946,14 +6948,15 @@ $Element->{$HTML_NS}->{colgroup} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_M12N10_REC,
-    char => FEATURE_M12N10_REC,
-    charoff => FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
+    align => FEATURE_OBSVOCAB,
+    ch => FEATURE_OBSVOCAB,
+    char => FEATURE_OBSVOCAB,
+    charoff => FEATURE_OBSVOCAB,
+    choff => FEATURE_OBSVOCAB,
     span => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    valign => FEATURE_M12N10_REC,
+    valign => FEATURE_OBSVOCAB,
     width => FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -6996,14 +6999,15 @@ $Element->{$HTML_NS}->{col} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
-    char => FEATURE_HTML5_OBSOLETE,
-    charoff => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    ch => FEATURE_OBSVOCAB,
+    char => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    charoff => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    choff => FEATURE_OBSVOCAB,
     span => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    valign => FEATURE_HTML5_OBSOLETE,
+    valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_OBSOLETE,
-  }),
+  }), # check_attrs
 }; # col
 
 $Element->{$HTML_NS}->{tbody} = {
@@ -7016,13 +7020,14 @@ $Element->{$HTML_NS}->{tbody} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_OBSVOCAB,
-    char => FEATURE_HTML5_OBSOLETE,
-    charoff => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
-    valign => FEATURE_HTML5_OBSOLETE,
+    ch => FEATURE_OBSVOCAB,
+    char => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    charoff => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    choff => FEATURE_OBSVOCAB,
+    valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -7067,7 +7072,7 @@ $Element->{$HTML_NS}->{thead} = {
 
 $Element->{$HTML_NS}->{tfoot} = {
   %{$Element->{$HTML_NS}->{tbody}},
-};
+}; # tfoot
 
 $Element->{$HTML_NS}->{tr} = {
   %HTMLChecker,
@@ -7080,14 +7085,16 @@ $Element->{$HTML_NS}->{tr} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    char => FEATURE_HTML5_OBSOLETE,
-    charoff => FEATURE_HTML5_OBSOLETE,
+    ch => FEATURE_OBSVOCAB,
+    char => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    charoff => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    choff => FEATURE_OBSVOCAB,
     #height WA1 prose
     lang => FEATURE_HTML5_REC,
-    valign => FEATURE_HTML5_OBSOLETE,
+    valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -7130,11 +7137,11 @@ $Element->{$HTML_NS}->{td} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    %cellalign,
     abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
     axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
     background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
+    %cellalign,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
       ## NOTE: Will be checked as part of |table| element checker.
@@ -7152,20 +7159,21 @@ $Element->{$HTML_NS}->{td} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     abbr => FEATURE_HTML5_OBSOLETE,
-    align => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     axis => FEATURE_HTML5_OBSOLETE,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    char => FEATURE_HTML5_OBSOLETE,
-    charoff => FEATURE_HTML5_OBSOLETE,
+    ch => FEATURE_OBSVOCAB,
+    char => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    charoff => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    choff => FEATURE_OBSVOCAB,
     colspan => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     headers => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     height => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
     nowrap => FEATURE_HTML5_OBSOLETE,
     rowspan => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     scope => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    valign => FEATURE_HTML5_OBSOLETE,
+    valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_OBSOLETE,
   }),
   check_attrs2 => sub {

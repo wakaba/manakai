@@ -1321,6 +1321,22 @@
 /colgroup/@charoff;length:syntax error;m
 
 #data
+<colgroup choff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@choff;attribute not defined;m
+
+#data
+<colgroup choff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@choff;attribute not defined;m
+
+#data
+<colgroup choff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@choff;attribute not defined;m
+/colgroup/@choff;length:syntax error;m
+
+#data
 <col xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -1362,6 +1378,22 @@
 #errors
 /col/@charoff;attribute not defined;m
 /col/@charoff;length:syntax error;m
+
+#data
+<col choff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@choff;attribute not defined;m
+
+#data
+<col choff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@choff;attribute not defined;m
+
+#data
+<col choff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@choff;attribute not defined;m
+/col/@choff;length:syntax error;m
 
 #data
 <col xmlns="http://www.w3.org/1999/xhtml"
@@ -1603,6 +1635,22 @@
 /thead/@charoff;length:syntax error;m
 
 #data
+<thead choff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@choff;attribute not defined;m
+
+#data
+<thead choff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@choff;attribute not defined;m
+
+#data
+<thead choff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/thead/@choff;attribute not defined;m
+/thead/@choff;length:syntax error;m
+
+#data
 <tbody background="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /tbody/@background;attribute not defined;m
@@ -1671,6 +1719,22 @@
 #errors
 /tbody/@charoff;attribute not defined;m
 /tbody/@charoff;length:syntax error;m
+
+#data
+<tbody choff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@choff;attribute not defined;m
+
+#data
+<tbody choff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@choff;attribute not defined;m
+
+#data
+<tbody choff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tbody/@choff;attribute not defined;m
+/tbody/@choff;length:syntax error;m
 
 #data
 <tfoot background="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1743,6 +1807,22 @@
 /tfoot/@charoff;length:syntax error;m
 
 #data
+<tfoot choff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@choff;attribute not defined;m
+
+#data
+<tfoot choff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@choff;attribute not defined;m
+
+#data
+<tfoot choff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tfoot/@choff;attribute not defined;m
+/tfoot/@choff;length:syntax error;m
+
+#data
 <tr background="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /tr/@background;attribute not defined;m
@@ -1811,6 +1891,22 @@
 #errors
 /tr/@charoff;attribute not defined;m
 /tr/@charoff;length:syntax error;m
+
+#data
+<tr choff="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@choff;attribute not defined;m
+
+#data
+<tr choff="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@choff;attribute not defined;m
+
+#data
+<tr choff="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/tr/@choff;attribute not defined;m
+/tr/@choff;length:syntax error;m
 
 #data
 <tr height="1" xmlns="http://www.w3.org/1999/xhtml"><td>a</td></tr>
@@ -2047,6 +2143,38 @@
 #errors
 /th/@charoff;attribute not defined;m
 /th/@charoff;length:syntax error;m
+
+#data
+<td choff="1" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@choff;attribute not defined;m
+
+#data
+<td choff="0%" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@choff;attribute not defined;m
+
+#data
+<td choff="1px" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@choff;attribute not defined;m
+/td/@choff;length:syntax error;m
+
+#data
+<th choff="1" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@choff;attribute not defined;m
+
+#data
+<th choff="0%" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@choff;attribute not defined;m
+
+#data
+<th choff="1px" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@choff;attribute not defined;m
+/th/@choff;length:syntax error;m
 
 #data
 <th colspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2355,6 +2483,51 @@
 #errors
 /td/@char;attribute not defined;m
 /td/@char;char:syntax error;m
+
+#data
+<tbody ch="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
+#errors
+/tbody/@ch;attribute not defined;m
+/tbody/@ch;char:syntax error;m
+
+#data
+<thead ch=" " xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
+#errors
+/thead/@ch;attribute not defined;m
+/thead/tr/td;element not allowed:thead td;m
+
+#data
+<tfoot ch="x" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
+#errors
+/tfoot/@ch;attribute not defined;m
+
+#data
+<colgroup ch="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@ch;attribute not defined;m
+/colgroup/@ch;char:syntax error;m
+
+#data
+<col ch="&#x4e00;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@ch;attribute not defined;m
+
+#data
+<tr ch=" x" xmlns="http://www.w3.org/1999/xhtml"><td>x</td></tr>
+#errors
+/tr/@ch;attribute not defined;m
+/tr/@ch;char:syntax error;m
+
+#data
+<th ch="." xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@ch;attribute not defined;m
+
+#data
+<td ch="ch" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@ch;attribute not defined;m
+/td/@ch;char:syntax error;m
 
 #data
 <td headers="" xmlns="http://www.w3.org/1999/xhtml">a</td>
