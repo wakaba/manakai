@@ -249,6 +249,26 @@
 /select/@autofocus;boolean:invalid;m
 
 #data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    data=""/>
+#errors
+/select/@data;attribute not defined;m
+/select/@data;url:empty;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    data="abc"/>
+#errors
+/select/@data;attribute not defined;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml"
+    data="[]"/>
+#errors
+/select/@data;attribute not defined;m
+/select/@data;syntax error:iriref3987;m
+
+#data
 <optgroup xmlns="http://www.w3.org/1999/xhtml"></optgroup>
 #errors
 /optgroup;attribute missing;label;m

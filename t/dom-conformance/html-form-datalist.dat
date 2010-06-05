@@ -111,6 +111,26 @@
 /datalist;no significant content;s
 
 #data
+<datalist xmlns="http://www.w3.org/1999/xhtml"
+    data=""/>
+#errors
+/datalist/@data;attribute not defined;m
+/datalist/@data;url:empty;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"
+    data="abc"/>
+#errors
+/datalist/@data;attribute not defined;m
+
+#data
+<datalist xmlns="http://www.w3.org/1999/xhtml"
+    data="[]"/>
+#errors
+/datalist/@data;attribute not defined;m
+/datalist/@data;syntax error:iriref3987;m
+
+#data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <input type="text" list="a"/>x
 <datalist id="a">

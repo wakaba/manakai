@@ -8287,7 +8287,7 @@ $Element->{$HTML_NS}->{select} = {
   check_attrs => $GetHTMLAttrsChecker->({
     autofocus => $AutofocusAttrChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
+    data => $NonEmptyURLChecker, # XXXreference: referenced document MUST ...
     form => $HTMLFormAttrChecker,
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
     name => $FormControlNameAttrChecker,
@@ -8302,7 +8302,7 @@ $Element->{$HTML_NS}->{select} = {
     %HTMLM12NCommonAttrStatus,
     accesskey => FEATURE_HTML5_FD | FEATURE_WF2,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
-    data => FEATURE_WF2,
+    data => FEATURE_OBSVOCAB,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     lang => FEATURE_HTML5_REC,
@@ -8362,11 +8362,11 @@ $Element->{$HTML_NS}->{datalist} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
-    data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
+    data => $NonEmptyURLChecker, # XXXreference: referenced document MUST ...
   }, {
     %HTMLAttrStatus,
-    data => FEATURE_WF2,
-  }),
+    data => FEATURE_OBSVOCAB,
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
