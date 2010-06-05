@@ -5386,6 +5386,11 @@ $Element->{$HTML_NS}->{ilayer} = {
   check_attrs => $Element->{$HTML_NS}->{layer}->{check_attrs},
 }; # ilayer
 
+$Element->{$HTML_NS}->{comment} = {
+  %HTMLTextChecker,
+  status => FEATURE_OBSVOCAB,
+}; # comment
+
 # ---- Edits ----
 
 =pod
@@ -6955,7 +6960,7 @@ $Element->{$HTML_NS}->{colgroup} = {
     choff => FEATURE_OBSVOCAB,
     span => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     valign => FEATURE_OBSVOCAB,
-    width => FEATURE_M12N10_REC,
+    width => FEATURE_OBSVOCAB,
   }), # check_attrs
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,

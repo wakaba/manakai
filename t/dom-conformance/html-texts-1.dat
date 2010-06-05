@@ -2527,3 +2527,34 @@
 #errors
 /font;element not defined;m
 /font/@face;attribute not defined;m
+
+#data
+<comment xmlns="http://www.w3.org/1999/xhtml"></comment>
+#errors
+/comment;element not defined;m
+
+#data
+<comment xmlns="http://www.w3.org/1999/xhtml">  </comment>
+#errors
+/comment;element not defined;m
+
+#data
+<comment xmlns="http://www.w3.org/1999/xhtml">bac</comment>
+#errors
+/comment;element not defined;m
+
+#data
+<comment xmlns="http://www.w3.org/1999/xhtml">&lt;abc</comment>
+#errors
+/comment;element not defined;m
+
+#data
+<comment xmlns="http://www.w3.org/1999/xhtml"><br/></comment>
+#errors
+/comment;element not defined;m
+/comment/br;element not allowed:text;m
+
+#data
+<comment xmlns="http://www.w3.org/1999/xhtml"><!----></comment>
+#errors
+/comment;element not defined;m
