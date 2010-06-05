@@ -138,14 +138,14 @@
     type="add"
 >x</button>
 #errors
-/button/@type;enumerated:invalid;m
+/button/@type;enumerated:non-conforming;m
 
 #data
 <button xmlns="http://www.w3.org/1999/xhtml"
     type="remove"
 >x</button>
 #errors
-/button/@type;enumerated:invalid;m
+/button/@type;enumerated:non-conforming;m
 
 #data
 <button type="delete" xmlns="http://www.w3.org/1999/xhtml">x</button>
@@ -157,14 +157,14 @@
     type="move-up"
 >x</button>
 #errors
-/button/@type;enumerated:invalid;m
+/button/@type;enumerated:non-conforming;m
 
 #data
 <button xmlns="http://www.w3.org/1999/xhtml"
     type="move-down"
 >x</button>
 #errors
-/button/@type;enumerated:invalid;m
+/button/@type;enumerated:non-conforming;m
 
 #data
 <button xmlns="http://www.w3.org/1999/xhtml"
@@ -1358,3 +1358,146 @@
 >x</button>
 #errors
 /button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="BUTTON"
+  target="_blank"
+>x</button>
+#errors
+/button/@target;attribute not defined;m
+/button/@target;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="ReSet"
+  target="_blank"
+>x</button>
+#errors
+/button/@target;attribute not defined;m
+/button/@target;attribute not allowed;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="Add"
+  target="_blank"
+>x</button>
+#errors
+/button/@target;attribute not defined;m
+/button/@target;attribute not allowed;m
+/button/@type;enumerated:non-conforming;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="submit"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="Submit"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="add?"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="button"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="reset"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="move-up"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+/button/@type;enumerated:non-conforming;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="move-down"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+/button/@type;enumerated:non-conforming;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="remove"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+/button/@type;enumerated:non-conforming;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="delete"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;attribute not allowed;m
+/button/@template;no referenced repeat-template;m
+/button/@type;enumerated:invalid;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="add"
+  template="a"
+>x</button>
+#errors
+/button/@template;attribute not defined;m
+/button/@template;no referenced repeat-template;m
+/button/@type;enumerated:non-conforming;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml"
+  type="add"
+  template="a"
+><span repeat="template" id="a">x</span></button>
+#errors
+/button/@template;attribute not defined;m
+/button/@type;enumerated:non-conforming;m
+/button/span/@repeat;attribute not defined;m

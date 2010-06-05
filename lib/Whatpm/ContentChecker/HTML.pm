@@ -7617,6 +7617,7 @@ $Element->{$HTML_NS}->{input} = {
            checkbox => 1,
            radio => 1, file => 1, submit => 1, image => 1, reset => 1,
            button => 1,
+           add => -1, 'move-up' => -1, 'move-down' => -1, remove => -1,
          }),
          usemap => '',
          value => '',
@@ -8173,6 +8174,7 @@ $Element->{$HTML_NS}->{button} = {
     template => $HTMLAttrChecker->{'repeat-template'},
     type => $GetHTMLEnumeratedAttrChecker->({
       button => 1, submit => 1, reset => 1,
+      add => -1, 'move-up' => -1, 'move-down' => -1, remove => -1,
     }),
     value => sub {}, ## NOTE: No restriction.
   }, {
@@ -8217,7 +8219,10 @@ $Element->{$HTML_NS}->{button} = {
 
     my $type = $item->{node}->get_attribute_ns (undef, 'type') || '';
     $type =~ tr/A-Z/a-z/; ## ASCII case-insensitive
-    if ($type eq 'reset' or $type eq 'button') {
+    if ({
+      button => 1, reset => 1,
+      add => 1, 'move-up' => 1, 'move-down' => 1, remove => 1,
+    }->{$type}) {
       for (
         $item->{node}->get_attribute_node_ns (undef, 'formaction'),
         $item->{node}->get_attribute_node_ns (undef, 'formmethod'),
