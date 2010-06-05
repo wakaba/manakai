@@ -974,6 +974,51 @@
 /caption/@align;enumerated:invalid;m
 
 #data
+<caption valign="" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@valign;attribute not defined;m
+/caption/@valign;enumerated:invalid;m
+
+#data
+<caption valign="top" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@valign;attribute not defined;m
+
+#data
+<caption valign="bottom" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@valign;attribute not defined;m
+
+#data
+<caption valign="Top" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@valign;attribute not defined;m
+
+#data
+<caption valign="middle" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@valign;attribute not defined;m
+/caption/@valign;enumerated:invalid;m
+
+#data
+<caption valign=" top " xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@valign;attribute not defined;m
+/caption/@valign;enumerated:invalid;m
+
+#data
+<caption valign="yes" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@valign;attribute not defined;m
+/caption/@valign;enumerated:invalid;m
+
+#data
+<caption valign="center" xmlns="http://www.w3.org/1999/xhtml">x</caption>
+#errors
+/caption/@valign;attribute not defined;m
+/caption/@valign;enumerated:invalid;m
+
+#data
 <caption xmlns="http://www.w3.org/1999/xhtml">
   <p>aaa</p>
 </caption>

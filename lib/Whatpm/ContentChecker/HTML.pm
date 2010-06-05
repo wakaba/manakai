@@ -6847,11 +6847,14 @@ $Element->{$HTML_NS}->{caption} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       top => 1, bottom => 1, left => 1, right => 1,
     }),
+    valign => $GetHTMLEnumeratedAttrChecker->({
+      top => 1, bottom => 1,
+    }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    valign => FEATURE_OBSVOCAB,
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
