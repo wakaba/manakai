@@ -1327,6 +1327,8 @@ my $HTMLAttrChecker = {
   'repeat-template' => sub {
     my ($self, $attr) = @_;
 
+    ## |repeat-template| and |template|.
+
     if (defined $attr->namespace_uri) {
       my $oe = $attr->owner_element;
       my $oe_nsuri = $oe->namespace_uri;
@@ -1456,7 +1458,6 @@ my %HTMLAttrStatus = (
   spellcheck => FEATURE_HTML5_WD,
   style => FEATURE_HTML5_REC,
   tabindex => FEATURE_HTML5_DEFAULT,
-  template => FEATURE_HTML5_DROPPED,
   title => FEATURE_HTML5_REC,  
   typeof => FEATURE_OBSVOCAB,
   unselectable => FEATURE_OBSVOCAB,
@@ -7547,7 +7548,7 @@ $Element->{$HTML_NS}->{input} = {
          step => FEATURE_HTML5_LC | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
-         template => FEATURE_HTML5_DROPPED | FEATURE_WF2,
+         template => FEATURE_OBSVOCAB,
          type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          usemap => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
          value => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
@@ -7837,7 +7838,7 @@ $Element->{$HTML_NS}->{input} = {
              ## introduced as part of the data template feature.
              ## NOTE: |template| attribute as defined in Web Forms 2.0
              ## has no author requirement.
-             template => sub { }, # XXXobsvocab
+             template => ($state eq 'add' ? $HTMLAttrChecker->{'repeat-template'} : undef),
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
           } else { # Text, Search, E-mail, URL, Telephone, Password
@@ -8169,7 +8170,7 @@ $Element->{$HTML_NS}->{button} = {
     name => $FormControlNameAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
-    ## XXX |template|
+    template => $HTMLAttrChecker->{'repeat-template'},
     type => $GetHTMLEnumeratedAttrChecker->({
       button => 1, submit => 1, reset => 1,
     }),
@@ -8195,7 +8196,7 @@ $Element->{$HTML_NS}->{button} = {
     replace => FEATURE_OBSVOCAB,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     target => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
-    template => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
+    template => FEATURE_OBSVOCAB,
     type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   }), # check_attrs
@@ -8215,6 +8216,7 @@ $Element->{$HTML_NS}->{button} = {
     $FAECheckAttrs2->($self, $item, $element_state);
 
     my $type = $item->{node}->get_attribute_ns (undef, 'type') || '';
+    $type =~ tr/A-Z/a-z/; ## ASCII case-insensitive
     if ($type eq 'reset' or $type eq 'button') {
       for (
         $item->{node}->get_attribute_node_ns (undef, 'formaction'),
@@ -8227,6 +8229,17 @@ $Element->{$HTML_NS}->{button} = {
         $item->{node}->get_attribute_node_ns (undef, 'method'),
         $item->{node}->get_attribute_node_ns (undef, 'enctype'),
         $item->{node}->get_attribute_node_ns (undef, 'target'),
+      ) {
+        next unless $_;
+        $self->{onerror}->(node => $_,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+    }
+
+    unless ($type eq 'add') {
+      for (
+        $item->{node}->get_attribute_node_ns (undef, 'template'),
       ) {
         next unless $_;
         $self->{onerror}->(node => $_,
