@@ -6995,7 +6995,7 @@ $Element->{$HTML_NS}->{col} = {
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
     span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
-    width => $HTMLLengthAttrChecker,
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
@@ -7006,7 +7006,7 @@ $Element->{$HTML_NS}->{col} = {
     choff => FEATURE_OBSVOCAB,
     span => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    width => FEATURE_HTML5_OBSOLETE,
+    width => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # col
 
