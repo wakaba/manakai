@@ -10,11 +10,14 @@ LANGUAGE_SUBTAG_REGISTRY_PM = _LangTagReg.pm
 
 all: \
   _update \
-  Charset-all CSS-all HTML-all XML-all \
+  Atom-all Charset-all CSS-all HTML-all XML-all \
   HTML/Tokenizer.pm \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
   CacheManifest.html WebIDL.html
+
+Atom-all:
+	cd Atom && make all
 
 Charset-all:
 	cd Charset && make all
@@ -99,4 +102,3 @@ XML-clean:
 	cd XML && make clean
 
 ## License: Public Domain.
-## $Date: 2008/10/14 02:27:58 $

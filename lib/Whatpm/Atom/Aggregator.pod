@@ -1,0 +1,71 @@
+=head1 NAME
+
+Whatpm::Atom::Aggregator - Simple Atom Feed Aggregator
+
+=head1 SYNOPSIS
+
+  use Whatpm::Atom::Aggregator;
+  
+  my $feed_doc = Whatpm::Atom::Aggregator->create_feed_from_feeds
+    ({feed_id => q<http://www.example.com/feed.atom>,
+      feed_title => q<My aggregated feed>,
+      feed_lang => 'en'},
+     $source_feed_doc1,
+     $source_feed_doc2,
+     ...);
+  print $feed_doc->inner_html;
+
+=head1 DESCRIPTION
+
+The C<Whatpm::Atom::Aggregator> module provides a simple Atom feed
+aggregator that generate an Atom feed from zero or more source Atom
+feeds.
+
+=head1 METHODS
+
+=over 4
+
+=item $feed_doc = Whatpm::Atom::Aggregator->create_feed_from_feeds ({options...}, $feed1, $feed2, ...)
+
+Generates an Atom feed from zero or more source Atom feeds.  The first
+argument is a hash reference of various options.  The remaining
+arguments are all input Atom feeds.  The input Atom feeds have to be
+DOM C<Document> objects.  The method returns the aggregated Atom feed
+as a DOM C<Document> object.
+
+Options:
+
+=over 4
+
+=item feed_id (REQUIRED)
+
+The ID of the aggregated feed.  It has to be a valid C<atom:id>
+element content.
+
+=item feed_title (REQUIRED)
+
+The title of the aggregated feed.
+
+=item feed_lang
+
+The language of the aggregated feed.  The value has to be a valid
+C<xml:lang> attribute value.  Default value is the empty string,
+denoting the language is unknown.
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2010 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,109 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::Atom::Aggregator - Simple Atom Feed Aggregator</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::Atom::Aggregator - Simple Atom Feed Aggregator</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Whatpm::Atom::Aggregator;
+  
+  my $feed_doc = Whatpm::Atom::Aggregator-&gt;create_feed_from_feeds
+    ({feed_id =&gt; q&lt;<a href="http://www.example.com/feed.atom&gt">http://www.example.com/feed.atom&gt</a>;,
+      feed_title =&gt; q&lt;My aggregated feed&gt;,
+      feed_lang =&gt; 'en'},
+     $source_feed_doc1,
+     $source_feed_doc2,
+     ...);
+  print $feed_doc-&gt;inner_html;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Whatpm::Atom::Aggregator</code> module provides a simple Atom feed
+aggregator that generate an Atom feed from zero or more source Atom
+feeds.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="create_feed_from_feeds" class="item">$feed_doc = Whatpm::Atom::Aggregator-&gt;create_feed_from_feeds ({options...}, $feed1, $feed2, ...)</a></strong></dt>
+
+<dd>
+<p>Generates an Atom feed from zero or more source Atom feeds.  The first
+argument is a hash reference of various options.  The remaining
+arguments are all input Atom feeds.  The input Atom feeds have to be
+DOM <code>Document</code> objects.  The method returns the aggregated Atom feed
+as a DOM <code>Document</code> object.</p>
+<p>Options:</p>
+<dl>
+<dt><strong><a name="feed_id" class="item">feed_id (REQUIRED)</a></strong></dt>
+
+<dd>
+<p>The ID of the aggregated feed.  It has to be a valid <code>atom:id</code>
+element content.</p>
+</dd>
+<dt><strong><a name="feed_title" class="item">feed_title (REQUIRED)</a></strong></dt>
+
+<dd>
+<p>The title of the aggregated feed.</p>
+</dd>
+<dt><strong><a name="feed_lang" class="item">feed_lang</a></strong></dt>
+
+<dd>
+<p>The language of the aggregated feed.  The value has to be a valid
+<code>xml:lang</code> attribute value.  Default value is the empty string,
+denoting the language is unknown.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2010 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

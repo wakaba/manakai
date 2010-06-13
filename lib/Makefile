@@ -6,8 +6,13 @@ RMALL = $(RM) -fv
 MAKE = make
 CD = cd
 
-all: Error.html
+all: Error.html Message-all Whatpm-all
+
+Message-all:
 	$(CD) Message/ && $(MAKE) all
+
+Whatpm-all:
+	$(CD) Whatpm/ && $(MAKE) all
 
 %.html: %.pm
 	$(POD2HTML) $< > $@
@@ -21,5 +26,4 @@ distclean:
 	$(CD) Message/ && $(MAKE) distclean
 	$(RM) Error.html
 
-## $Date: 2007/08/25 06:54:30 $
 ## License: Public Domain.
