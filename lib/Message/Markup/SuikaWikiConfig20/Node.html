@@ -1,0 +1,216 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>manakai --- SuikaWikiConfig/2.0 data object and serialization</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#node_types">NODE TYPES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#history">HISTORY</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Message::Markup::SuikaWikiConfig20::Node: manakai --- SuikaWikiConfig/2.0 data object and serialization</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module provides modeled object tree handling for SuikaWikiConfig/2.0 data
+format.  It also provides a mean of serializing object data tree in
+SuikaWikiConfig/2.0 format.</p>
+<p>Note that to parse plain SuikaWikiConfig/2.0 data and compose object
+tree for it, Message::Markup::SuikaWikiConfig20::Parser
+can be used.</p>
+<p>This module is part of manakai.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="new" class="item">$x = Message::Markup::SuikaWikiConfig20::Node-&gt;new (%options)</a></strong></dt>
+
+<dd>
+<p>Returns new instance of the module.  It is itself a node.</p>
+</dd>
+<dt><strong><a name="append_node" class="item">$x-&gt;append_node ($node)</a></strong></dt>
+
+<dd>
+<p>Appending given node to the object (as the last child).
+If the type of given node is <a href="#fragment"><code>#fragment</code></a>, its all children, not the node
+itself, are appended.</p>
+<p>This method returns the appended node unless the type of given node is <a href="#fragment"><code>#fragment</code></a>.
+In such cases, this node (<code>$x</code>) is returned.</p>
+<p>Available options: <code>node_or_text</code>.</p>
+</dd>
+<dt><strong><a name="append_new_node" class="item">$new_node = $x-&gt;append_new_node (%options)</a></strong></dt>
+
+<dd>
+<p>Appending a new node.  The new node is returned.</p>
+</dd>
+<dt><strong><a name="append_text" class="item">$new_node = $x-&gt;append_text ($text)</a></strong></dt>
+
+<dd>
+<p>Appending given text as a new text node.  The new text node is returned.</p>
+</dd>
+<dt><strong><a name="get_attribute" class="item">$attr_node = $x-&gt;get_attribute ($local_name, %options)</a></strong></dt>
+
+<dd>
+<p>Returns the attribute node whose local-name is <code>$local_name</code>.</p>
+</dd>
+<dt><strong><a name="get_attribute_value" class="item">$attr_val = $x-&gt;get_attribute_value ($local_name)</a></strong></dt>
+
+<dd>
+<p>Returnes the attribute value whose attribute name is <code>$local_name</code>.</p>
+</dd>
+<dt><strong><a name="remove_attribute" class="item">$x-&gt;remove_attribute ($local_name, %options)</a></strong></dt>
+
+<dd>
+<p>Removes an attribute node.</p>
+</dd>
+<dt><strong><a name="child_nodes" class="item">\@children = $x-&gt;child_nodes</a></strong></dt>
+
+<dd>
+<p>Returns an array reference to child nodes.</p>
+</dd>
+<dt><strong><a name="local_name" class="item">$local_name = $x-&gt;local_name ([$new_name])</a></strong></dt>
+
+<dd>
+<p>Returns or set the local-name.</p>
+</dd>
+<dt><strong><a name="node_type" class="item">$type = $x-&gt;node_type</a></strong></dt>
+
+<dd>
+<p>Returns the node type.</p>
+</dd>
+<dt><strong><a name="parent_node" class="item">$node = $x-&gt;parent_node</a></strong></dt>
+
+<dd>
+<p>Returns the parent node.  If there is no parent node, undef is returned.</p>
+</dd>
+<dt><strong><a name="count" class="item">$i = $x-&gt;count</a></strong></dt>
+
+<dd>
+<p>Returns the number of child nodes.</p>
+</dd>
+<dt><strong><a name="inner_text" class="item">$tag = $x-&gt;inner_text</a></strong></dt>
+
+<dd>
+<p>Returns the text content of the node.  (In many case the returned value is same
+as WinIE DOM <a href="#inner_text"><code>inner_text ()</code></a> function's or XPath <code>text()</code> function's.
+But some classes that inherits this module might implement to return other
+value (eg. to return the value of the alt attribute of html:img element).</p>
+</dd>
+<dt><strong><a name="node_path" class="item">$node-&gt;node_path (key =&gt; attr-name)</a></strong></dt>
+
+<dd>
+<p>Represent position in the tree in informal XPath-like expression.</p>
+<p>Note: In current implementation, the format of expressions
+is insufficient to identify a node uniquely and it is
+not XPath compatible.</p>
+<p>Options:</p>
+<dl>
+<dt><strong><a name="key_attr_name_attr_name1_attr_name2" class="item">key =&gt; ( attr-name | [attr-name1, attr-name2, ...] )</a></strong></dt>
+
+<dd>
+<p>An attribute name or an array reference of attribute names that 
+are used as 'key's.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="node_types">NODE TYPES</a></h1>
+<p>This module uses three types of node.</p>
+<dl>
+<dt><strong><a name="comment" class="item">#comment</a></strong></dt>
+
+<dd>
+<p>Comment.  Only #document (root) node and #fragment node
+in well-formed tree can contain this type of node as children.</p>
+<p>Comment has a value, but no child.</p>
+</dd>
+<dt><strong><a name="document" class="item">#document</a></strong></dt>
+
+<dd>
+<p>Document.  This type of node must be the root node.</p>
+<p>Document can have any number of #element and #comment, in any order,
+but no value.</p>
+</dd>
+<dt><strong><a name="element" class="item">#element</a></strong></dt>
+
+<dd>
+<p>Element.</p>
+<p>Element can have any number of children.  Children must also be #element's.
+Element has a value, which can be <code>undef</code> (that is different from
+empty) in case the element has one or more children (cannot be
+<code>undef</code> if it does not have child).</p>
+<p>A value is either a scalar or a list.  List is represented as a reference
+to an array in this module.  Note that list with some multiple-line strings
+cannot be serialized, since SuikaWikiConfig/2.0 text format
+does not allow it.</p>
+</dd>
+<dt><strong><a name="fragment" class="item">#fragment</a></strong></dt>
+
+<dd>
+<p>Fragment of nodes.  It's similar to DOM's fragment node.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><code>Message::Markup::SuikaWikiConfig20::Parser</code>:
+Perl module that parses SuikaWikiConfig/2.0 text format
+document and constructs <code>Message::Markup::SuikaWikiConfig20::Node</code>
+tree instance.</p>
+<p>SuikaWikiConfig/2.0 
+&lt;http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWikiConfig/2.0&gt;:
+Formal specification and informal descriptions of 
+the SuikaWikiConfig/2.0 format.</p>
+<p>Latest version of this module is available at the
+manakai CVS repository
+&lt;http://suika.fam.cx/gate/cvs/messaging/manakai/lib/Message/Markup/SuikaWikiConfig20/Parser.pm&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="history">HISTORY</a></h1>
+<p>SuikaWikiConfig/2.0 format was originally defined
+for SuikaWiki &lt;http://suika.fam.cx/~wakaba/-temp/wiki?SuikaWiki&gt;.</p>
+<p>This module, formally known as <code>SuikaWiki::Markup::SuikaWikiConfig20</code>,
+was part of SuikaWiki distribution.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2003-2004 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

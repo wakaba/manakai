@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>manakai --- SuikaWikiConfig/2.0 parser</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#example">EXAMPLE</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#history">HISTORY</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Message::Markup::SuikaWikiConfig20::Parser: manakai --- SuikaWikiConfig/2.0 parser</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>SuikaWikiConfig/2.0 is a general configuration description format.
+This module can be used to parse such configuration and to
+generate node tree for it.</p>
+<p>This module is part of manakai.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="new" class="item">$x = Message::Markup::SuikaWikiConfig20::Parser-&gt;new (%options)</a></strong></dt>
+
+<dd>
+<p>Returns new instance of parser</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="example">EXAMPLE</a></h1>
+<pre>
+  use Message::Markup::SuikaWikiConfig20::Parser;
+  my $parser = new Message::Markup::SuikaWikiConfig20::Parser;
+  
+  my $conf = $parser-&gt;parse_text ($config);
+  print $conf-&gt;get_attribute ('Some Configuration Item');</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Message::Markup::SuikaWikiConfig20::Node,
+SuikaWiki &lt;http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWiki&gt;,
+&lt;http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWikiConfig/2.0&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="history">HISTORY</a></h1>
+<p>This module was part of SuikaWiki 2, with the name of 
+<code>SuikaWiki::Markup::SuikaWikiConfig20::Parser</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2003 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>
