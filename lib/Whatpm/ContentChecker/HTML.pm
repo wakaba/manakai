@@ -3203,11 +3203,11 @@ $Element->{$HTML_NS}->{'event-source'} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_LC_DROPPED,
   check_attrs => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker,
+    src => $NonEmptyURLChecker,
   }, {
     %HTMLAttrStatus,
-    src => FEATURE_HTML5_LC_DROPPED,
-  }),
+    src => FEATURE_OBSVOCAB,
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -3215,27 +3215,8 @@ $Element->{$HTML_NS}->{'event-source'} = {
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
+  }, # check_start
 }; # event-source
-
-$Element->{$HTML_NS}->{eventsource} = {
-  %HTMLEmptyChecker,
-  status => FEATURE_HTML5_DROPPED,
-  check_attrs => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker,
-  }, {
-    %HTMLAttrStatus,
-    src => FEATURE_HTML5_DROPPED,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{src}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-}; # eventsource
 
 # ---- Sections ----
 
@@ -5770,10 +5751,15 @@ $Element->{$HTML_NS}->{embed} = {
         height => FEATURE_HTML5_LC,
         hspace => FEATURE_OBSVOCAB,
         name => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+        palette => FEATURE_OBSVOCAB,
+        pluginpage => FEATURE_OBSVOCAB,
+        pluginspage => FEATURE_OBSVOCAB,
+        pluginurl => FEATURE_OBSVOCAB,
         src => FEATURE_HTML5_WD,
         type => FEATURE_HTML5_WD,
+        units => FEATURE_OBSVOCAB,
+        vspace => FEATURE_OBSVOCAB,
         width => FEATURE_HTML5_LC,
-        vspac => FEATURE_OBSVOCAB,
       }->{$attr_ln};
 
       if ($attr_ns eq '') {
@@ -5790,10 +5776,24 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $EmbeddedAlignChecker;
         } elsif ($attr_ln eq 'name') {
           $checker = $NameAttrChecker;
+        } elsif ({
+          pluginpage => 1,
+          pluginspage => 1,
+          pluginurl => 1,
+        }->{$attr_ln}) {
+          $checker = $HTMLURIAttrChecker;
         } elsif ($attr_ln eq 'code') {
           $checker = $NonEmptyURLChecker;
         } elsif ($attr_ln eq 'border') {
           $checker = $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 });
+        } elsif ($attr_ln eq 'palette') {
+          $checker = $GetHTMLEnumeratedAttrChecker->({
+            foreground => 1, background => 1,
+          });
+        } elsif ($attr_ln eq 'units') {
+          $checker = $GetHTMLEnumeratedAttrChecker->({
+            pixels => 1, px => 1, en => 1, em => 1,
+          });
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
           ## XML-compatible + no uppercase letter

@@ -1022,6 +1022,12 @@
 /event-source/@src;attribute not defined;m
 
 #data
+<event-source src="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/event-source;element not defined;m
+/event-source/@src;url:empty;m
+
+#data
 <eventsource xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /eventsource;element not defined;m
@@ -1035,7 +1041,6 @@
 #data
 <eventsource src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/eventsource/@src;syntax error:iriref3987;m
 /eventsource/@src;attribute not defined;m
 /eventsource;element not defined;m
 
