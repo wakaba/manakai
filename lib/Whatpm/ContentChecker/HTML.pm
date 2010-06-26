@@ -1653,7 +1653,7 @@ my $NameAttrChecker = sub {
                          type => 'id name confliction', # XXXdocumentation
                          value => $value,
                          level => $self->{level}->{must});
-    } else {
+    } elsif ($attr->owner_element->manakai_local_name eq 'a') {
       $self->{onerror}->(node => $attr,
                          type => 'anchor name', # XXX documentation
                          level => $self->{level}->{obsconforming});
@@ -1829,6 +1829,16 @@ my $LegacyLoopChecker = sub {
                        level => $self->{level}->{must});
   }
 }; # $LegacyLoopChecker
+
+my $LiTypeChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  unless ($value =~ /\A(?:[Cc][Ii][Rr][Cc][Ll][Ee]|[Dd][Ii][Ss][Cc]|[Ss][Qq][Uu][Aa][Rr][Ee]|[1aAiI])\z/) {
+    $self->{onerror}->(node => $attr,
+                       type => 'litype:invalid', # XXXdocumentation
+                       level => $self->{level}->{must});
+  }
+}; # $LiTypeChecker
 
 my $GetHTMLAttrsChecker = sub {
   my $element_specific_checker = shift;
@@ -3852,19 +3862,20 @@ $Element->{$HTML_NS}->{ul} = {
 
 $Element->{$HTML_NS}->{dir} = {
   %{$Element->{$HTML_NS}->{ul}},
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
+    type => $LiTypeChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    align => FEATURE_HTML2X_RFC,
-    compact => FEATURE_M12N10_REC_DEPRECATED,
-    lang => FEATURE_HTML5_REC,
-  }),
+    align => FEATURE_OBSVOCAB,
+    compact => FEATURE_OBSVOCAB,
+    type => FEATURE_OBSVOCAB,
+  }), # check_attrs
 }; # dir
 
 $Element->{$HTML_NS}->{li} = {
@@ -3874,18 +3885,7 @@ $Element->{$HTML_NS}->{li} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
-    type => sub {
-      my ($self, $attr) = @_;
-      my $value = $attr->value;
-      ## HTML4's definition of |type| attribute of |li| element is
-      ## very vague.  See
-      ## <http://suika.fam.cx/%7Ewakaba/wiki/sw/n/type$13186>.
-      unless ($value =~ /\A(?:[Cc][Ii][Rr][Cc][Ll][Ee]|[Dd][Ii][Ss][Cc]|[Ss][Qq][Uu][Aa][Rr][Ee]|[1aAiI])\z/) {
-        $self->{onerror}->(node => $attr,
-                           type => 'litype:invalid', # XXXdocumentation
-                           level => $self->{level}->{must});
-      }
-    }, # type
+    type => $LiTypeChecker,
     value => sub {
       my ($self, $attr) = @_;
 
@@ -3946,10 +3946,8 @@ $Element->{$HTML_NS}->{dl} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    compact => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
-    type => FEATURE_M12N10_REC_DEPRECATED,
-  }),
+    compact => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before dt';
@@ -4061,7 +4059,7 @@ $Element->{$HTML_NS}->{div} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     nowrap => FEATURE_OBSVOCAB,
   }), # check_attrs
   check_start => sub {
@@ -4089,7 +4087,7 @@ $Element->{$HTML_NS}->{center} = {
 
 $Element->{$HTML_NS}->{div1} = {
   %HTMLFlowContentChecker,
-  status => FEATURE_ISOHTML_PREPARATION,
+  status => FEATURE_OBSVOCAB,
 }; # div1
 
 $Element->{$HTML_NS}->{div2} = $Element->{$HTML_NS}->{div1};
@@ -5767,14 +5765,15 @@ $Element->{$HTML_NS}->{embed} = {
       my $status = {
         %HTMLAttrStatus,
         align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+        border => FEATURE_OBSVOCAB,
         code => FEATURE_OBSVOCAB,
         height => FEATURE_HTML5_LC,
-        #hspace WA1 prose
-        name => FEATURE_HTML5_OBSOLETE,
+        hspace => FEATURE_OBSVOCAB,
+        name => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
         src => FEATURE_HTML5_WD,
         type => FEATURE_HTML5_WD,
         width => FEATURE_HTML5_LC,
-        #vspace WA1 prose
+        vspac => FEATURE_OBSVOCAB,
       }->{$attr_ln};
 
       if ($attr_ns eq '') {
@@ -5789,8 +5788,12 @@ $Element->{$HTML_NS}->{embed} = {
           $checker = $HTMLLengthAttrChecker;
         } elsif ($attr_ln eq 'align') {
           $checker = $EmbeddedAlignChecker;
+        } elsif ($attr_ln eq 'name') {
+          $checker = $NameAttrChecker;
         } elsif ($attr_ln eq 'code') {
           $checker = $NonEmptyURLChecker;
+        } elsif ($attr_ln eq 'border') {
+          $checker = $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 });
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
           ## XML-compatible + no uppercase letter
@@ -5844,7 +5847,13 @@ $Element->{$HTML_NS}->{embed} = {
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
   },
-};
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    
+    $NameAttrCheckEnd->(@_); # for <embed name>
+    $HTMLEmptyChecker{check_end}->(@_);
+  }, # check_end
+}; # embed
 
 $Element->{$HTML_NS}->{noembed} = {
   %HTMLTextChecker, # XXX content model restriction
@@ -5968,9 +5977,7 @@ $Element->{$HTML_NS}->{object} = {
                          level => $self->{level}->{should},
                          type => 'no significant content');
     }
-    
-    $NameAttrCheckEnd->(@_); # for <img name>
-  },
+  }, # check_end
 }; # object
 ## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
 ## What about |<section><object data><style scoped></style>x</object></section>|?
@@ -6070,6 +6077,11 @@ $Element->{$HTML_NS}->{applet} = {
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   }, # check_attrs2
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    $Element->{$HTML_NS}->{object}->{check_end}->(@_);
+    $NameAttrCheckEnd->(@_); # for <img name>
+  }, # check_end
 }; # applet
 
 $Element->{$HTML_NS}->{param} = {
@@ -9362,6 +9374,9 @@ $Element->{$HTML_NS}->{noframes} = {
 ## element, attrib, csactionitem, csactions, csaction, csscriptdict,
 ## csactiondict, csobj, madebywz, x-sas-window, yomi, fn-contents,
 ## module
+
+## Following attributes are explicitly not supported: @ht* (XHTML
+## architectural form attributes), @sda* (SDA attributes), dl/@type
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 

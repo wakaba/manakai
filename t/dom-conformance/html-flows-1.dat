@@ -3818,6 +3818,7 @@ aaa
 #errors
 /dir;element not defined;m
 /dir/@type;attribute not defined;m
+/dir/@type;litype:invalid;m
 
 #data
 <dir xmlns="http://www.w3.org/1999/xhtml"><li><p>a</p></li></dir>
@@ -5456,6 +5457,139 @@ a
 /dir;element not defined;m
 /dir/@align;attribute not defined;m
 /dir/@align;enumerated:invalid;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type=""/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+/dir/@type;litype:invalid;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="a"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="A"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="1"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="i"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="I"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="circle"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="disc"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="square"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="CIRCLE"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="SquArE"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="disc"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="disk"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+/dir/@type;litype:invalid;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="Circle "/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+/dir/@type;litype:invalid;m
+
+#data escaped
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="c\u0130rcle"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+/dir/@type;litype:invalid;m
+
+#data escaped
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="c\u0131rcle"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+/dir/@type;litype:invalid;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="   "/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+/dir/@type;litype:invalid;m
+
+#data
+<dir xmlns="http://www.w3.org/1999/xhtml"
+    type="type"/>
+#errors
+/dir;element not defined;m
+/dir/@type;attribute not defined;m
+/dir/@type;litype:invalid;m
 
 #data
 <menu compact="" xmlns="http://www.w3.org/1999/xhtml"/>
