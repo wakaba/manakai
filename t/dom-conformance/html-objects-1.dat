@@ -5553,6 +5553,86 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /iframe/@security;enumerated:invalid;m
 
 #data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border=""/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="  "/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="0"/>
+#errors
+/iframe/@border;attribute not defined;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="1"/>
+#errors
+/iframe/@border;attribute not defined;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="120"/>
+#errors
+/iframe/@border;attribute not defined;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="00001200032"/>
+#errors
+/iframe/@border;attribute not defined;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="10.00"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="+300"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="-0"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="-10000"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="10e44"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="40px"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /embed;attribute missing;src;i
