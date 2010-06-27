@@ -5691,6 +5691,9 @@ $Element->{$HTML_NS}->{iframe} = {
       yes => 1, no => 1, auto => 1,
       on => -1, scroll => -1, off => -1, noscroll => -1,
     }),
+    security => $GetHTMLEnumeratedAttrChecker->({
+      restricted => 1,
+    }),
     seemless => $GetHTMLBooleanAttrChecker->('seemless'),
     src => $HTMLURIAttrChecker,
     srcdoc => sub {
@@ -5723,7 +5726,8 @@ $Element->{$HTML_NS}->{iframe} = {
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     noresize => FEATURE_OBSVOCAB,
     sandbox => FEATURE_HTML5_LC,
-    scrolling => FEATURE_HTML5_OBSOLETE,
+    scrolling => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    security => FEATURE_OBSVOCAB,
     seemless => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     srcdoc => FEATURE_HTML5_FD,
@@ -9347,7 +9351,10 @@ $Element->{$HTML_NS}->{frame} = {
       yes => 1, no => 1, auto => 1,
       on => -1, scroll => -1, off => -1, noscroll => -1,
     }),
-    src => $HTMLURIAttrChecker,
+    security => $GetHTMLEnumeratedAttrChecker->({
+      restricted => 1,
+    }),
+    src => $NonEmptyURLChecker,
   }, {
     %HTMLAttrStatus,
     allowtransparency => FEATURE_OBSVOCAB,
@@ -9360,8 +9367,9 @@ $Element->{$HTML_NS}->{frame} = {
     marginwidth => FEATURE_OBSVOCAB,
     name => FEATURE_OBSVOCAB,
     noresize => FEATURE_OBSVOCAB,
-    scrolling => FEATURE_M12N10_REC,
-    src => FEATURE_M12N10_REC,
+    scrolling => FEATURE_OBSVOCAB,
+    security => FEATURE_OBSVOCAB,
+    src => FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # frame
 

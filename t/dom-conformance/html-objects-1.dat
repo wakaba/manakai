@@ -5513,6 +5513,46 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /iframe/@noresize;boolean:invalid;m
 
 #data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security=""/>
+#errors
+/iframe/@security;attribute not defined;m
+/iframe/@security;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="restricted"/>
+#errors
+/iframe/@security;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="restructed"/>
+#errors
+/iframe/@security;attribute not defined;m
+/iframe/@security;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="safe"/>
+#errors
+/iframe/@security;attribute not defined;m
+/iframe/@security;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="RESTRICTED"/>
+#errors
+/iframe/@security;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="no"/>
+#errors
+/iframe/@security;attribute not defined;m
+/iframe/@security;enumerated:invalid;m
+
+#data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /embed;attribute missing;src;i
