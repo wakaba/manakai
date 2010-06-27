@@ -4128,29 +4128,26 @@ $Element->{$HTML_NS}->{multicol} = {
 
 $Element->{$HTML_NS}->{font} = {
   %HTMLTransparentChecker,
-  status => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     color => $HTMLColorAttrChecker,
-    face => sub { }, ## Comma-separated font names (cdata) [HTML4]
+    face => sub { },
+    'point-size' => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     size => $FontSizeChecker,
+    weight => $GetHTMLNonNegativeIntegerAttrChecker->(sub {
+      return 0 if $_[0] % 100;
+      return 0 if $_[0] < 100;
+      return 0 if $_[0] > 900;
+      return 1;
+    }),
   }, {
     %HTMLAttrStatus,
-    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    color => FEATURE_M12N10_REC_DEPRECATED,
-    dir => FEATURE_HTML5_REC,
-    face => FEATURE_M12N10_REC_DEPRECATED,
-    id => FEATURE_HTML5_REC,
-    lang => FEATURE_HTML5_REC,
-    size => FEATURE_M12N10_REC_DEPRECATED,
-    style => FEATURE_HTML5_REC,
-    title => FEATURE_HTML5_REC,
+    color => FEATURE_OBSVOCAB,
+    face => FEATURE_OBSVOCAB,
+    'point-size' => FEATURE_OBSVOCAB,
+    size => FEATURE_OBSVOCAB,
+    weight => FEATURE_OBSVOCAB,
   }), # check_attrs
-  ## NOTE: When the |font| element was defined in the HTML5 specification,
-  ## it is allowed only in a document with the WYSIWYG signature.  The
-  ## checker does not check whether there is the signature, since the
-  ## signature is dropped, too, and has never been implemented.  (In addition,
-  ## for any |font| element an "element not defined" error is raised anyway,
-  ## such that we don't have to raise an additional error.)
 }; # font
 
 $Element->{$HTML_NS}->{layer} = {
