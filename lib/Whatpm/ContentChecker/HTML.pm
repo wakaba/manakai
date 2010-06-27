@@ -2372,27 +2372,26 @@ $Element->{$HTML_NS}->{link} = {
           }
         }
       },
+      src => $HTMLURIAttrChecker,
       target => $HTMLTargetAttrChecker,
       type => $MIMETypeChecker,
       urn => $HTMLURIAttrChecker,
     }, {
       %HTMLAttrStatus,
       %HTMLM12NXHTML2CommonAttrStatus,
-      charset => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
-          ## NOTE: |charset| attribute had been part of HTML5 spec though
-          ## it had been commented out.
+      charset => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       href => FEATURE_HTML5_LC | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
       hreflang => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      lang => FEATURE_HTML5_REC,
       media => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      methods => FEATURE_HTML20_RFC,
+      methods => FEATURE_OBSVOCAB,
       rel => FEATURE_HTML5_LC | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
       sizes => FEATURE_HTML5_LC,
-      target => FEATURE_HTML5_OBSOLETE,
+      src => FEATURE_OBSVOCAB,
+      target => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      urn => FEATURE_HTML20_RFC,
+      urn => FEATURE_OBSVOCAB,
     })->($self, $item, $element_state);
 
     if ($item->{node}->has_attribute_ns (undef, 'href')) {
@@ -2432,7 +2431,7 @@ $Element->{$HTML_NS}->{link} = {
       }
     }
   },
-};
+}; # link
 
 $Element->{$HTML_NS}->{meta} = {
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -3619,7 +3618,7 @@ $Element->{$HTML_NS}->{pre} = {
 
 $Element->{$HTML_NS}->{xmp} = {
   %HTMLTextChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     clear => $GetHTMLEnumeratedAttrChecker->({
       left => 1, all => 1, right => 1, none => 1, both => -1,
@@ -3627,7 +3626,7 @@ $Element->{$HTML_NS}->{xmp} = {
   }, {
     %HTMLAttrStatus,
     clear => FEATURE_OBSVOCAB,
-  }),
+  }), # check_attrs
 }; # xmp
 
 $Element->{$HTML_NS}->{listing} = $Element->{$HTML_NS}->{xmp};
@@ -3872,9 +3871,8 @@ $Element->{$HTML_NS}->{li} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML2X_RFC,
-    lang => FEATURE_HTML5_REC,
-    type => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_OBSVOCAB,
+    type => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     #value => FEATURE_HTML5_LC | FEATURE_XHTMLBASIC11_CR | 
     #    FEATURE_M12N10_REC_DEPRECATED,
     value => FEATURE_HTML5_LC | FEATURE_XHTML2_ED |
@@ -3883,21 +3881,11 @@ $Element->{$HTML_NS}->{li} = {
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
-    if (0) {
-      ## XXXTODO: In <dir> element, then ...
-      $HTMLPhrasingContentChecker{check_child_element}->(@_);
-    } else {
-      $HTMLFlowContentChecker{check_child_element}->(@_);
-    }
+    $HTMLFlowContentChecker{check_child_element}->(@_);
   }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if (0) {
-      ## XXXTODO: In <dir> element, then ...
-      $HTMLPhrasingContentChecker{check_child_text}->(@_);
-    } else {
-      $HTMLFlowContentChecker{check_child_text}->(@_);
-    }
+    $HTMLFlowContentChecker{check_child_text}->(@_);
   }, # check_child_text
 }; # li
 
@@ -7423,14 +7411,10 @@ $Element->{$HTML_NS}->{legend} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1,
     }),
-    form => $HTMLFormAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accesskey => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
     align => FEATURE_HTML5_OBSOLETE,
-    form => FEATURE_HTML5_DROPPED,
-    lang => FEATURE_HTML5_REC,
   }), # check_attrs
 }; # legend
 

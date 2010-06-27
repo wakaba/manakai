@@ -1157,6 +1157,25 @@ x</div>
 /link;attribute missing;rel;m
 
 #data
+<link xmlns="http://www.w3.org/1999/xhtml" href="aa" rel="alternate"
+    src=""/>
+#errors
+/link/@src;attribute not defined;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="aa" rel="alternate"
+    src="abc"/>
+#errors
+/link/@src;attribute not defined;m
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml" href="aa" rel="alternate"
+    src="[]"/>
+#errors
+/link/@src;attribute not defined;m
+/link/@src;syntax error:iriref3987;m
+
+#data
 <a xmlns="http://www.w3.org/1999/xhtml"
     href=""
     shape=""
