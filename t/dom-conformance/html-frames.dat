@@ -649,6 +649,83 @@
 /frameset;child element missing:frame|frameset;m
 
 #data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing=""/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset;child element missing:frame|frameset;m
+/frameset/@framespacing;nninteger:syntax error;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="1"/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset;child element missing:frame|frameset;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="2"/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset;child element missing:frame|frameset;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="000100"/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset;child element missing:frame|frameset;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="0"/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset;child element missing:frame|frameset;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="1000.0"/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset/@framespacing;nninteger:syntax error;m
+/frameset;child element missing:frame|frameset;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="-10"/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset/@framespacing;nninteger:syntax error;m
+/frameset;child element missing:frame|frameset;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="+100"/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset/@framespacing;nninteger:syntax error;m
+/frameset;child element missing:frame|frameset;m
+
+#data
+<frameset xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="no"/>
+#errors
+/frameset;element not defined;m
+/frameset/@framespacing;attribute not defined;m
+/frameset/@framespacing;nninteger:syntax error;m
+/frameset;child element missing:frame|frameset;m
+
+#data
 <frame xmlns="http://www.w3.org/1999/xhtml"></frame>
 #errors
 /frame;element not defined;m
@@ -1325,6 +1402,194 @@
 /frame/@marginheight;attribute not defined;m
 /frame/@marginheight;nninteger:syntax error;m
 /frame;element not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="" src="abc"/>
+#errors
+/frame;element not defined;m
+/frame/@allowtransparency;attribute not defined;m
+/frame/@allowtransparency;enumerated:invalid;m
+/frame/@src;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="true" src="abc"/>
+#errors
+/frame;element not defined;m
+/frame/@allowtransparency;attribute not defined;m
+/frame/@src;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="false" src="abc"/>
+#errors
+/frame;element not defined;m
+/frame/@allowtransparency;attribute not defined;m
+/frame/@src;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="True" src="abc"/>
+#errors
+/frame;element not defined;m
+/frame/@allowtransparency;attribute not defined;m
+/frame/@src;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="allowtransparency" src="abc"/>
+#errors
+/frame;element not defined;m
+/frame/@allowtransparency;attribute not defined;m
+/frame/@allowtransparency;enumerated:invalid;m
+/frame/@src;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="no" src="abc"/>
+#errors
+/frame;element not defined;m
+/frame/@allowtransparency;attribute not defined;m
+/frame/@allowtransparency;enumerated:invalid;m
+/frame/@src;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application=""/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@application;attribute not defined;m
+/frame/@application;enumerated:invalid;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="yes"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@application;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="no"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@application;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="NO"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@application;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="true"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@application;attribute not defined;m
+/frame/@application;enumerated:invalid;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="false"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@application;attribute not defined;m
+/frame/@application;enumerated:invalid;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="application"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@application;attribute not defined;m
+/frame/@application;enumerated:invalid;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing=""/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+/frame/@framespacing;nninteger:syntax error;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing="1"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing="2"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing="000100"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing="0"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing="1000.0"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+/frame/@framespacing;nninteger:syntax error;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing="-10"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+/frame/@framespacing;nninteger:syntax error;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing="+100"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+/frame/@framespacing;nninteger:syntax error;m
+
+#data
+<frame xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    framespacing="no"/>
+#errors
+/frame;element not defined;m
+/frame/@src;attribute not defined;m
+/frame/@framespacing;attribute not defined;m
+/frame/@framespacing;nninteger:syntax error;m
 
 #data
 <noframes xmlns="http://www.w3.org/1999/xhtml"></noframes>

@@ -2439,6 +2439,92 @@ x<br autofocus=""/>
 /form/@measure;attribute not allowed;m
 
 #data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    data="">a</form>
+#errors
+/form/@data;attribute not defined;m
+/form/@data;url:empty;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    data="abc">a</form>
+#errors
+/form/@data;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    data="[]">a</form>
+#errors
+/form/@data;attribute not defined;m
+/form/@data;syntax error:iriref3987;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn="">a</form>
+#errors
+/form/@utn;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn="utn">a</form>
+#errors
+/form/@utn;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn="UTN">a</form>
+#errors
+/form/@utn;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn="   ">a</form>
+#errors
+/form/@utn;attribute not defined;m
+/form/@utn;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn="abc">a</form>
+#errors
+/form/@utn;attribute not defined;m
+/form/@utn;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn="true">a</form>
+#errors
+/form/@utn;attribute not defined;m
+/form/@utn;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn="no">a</form>
+#errors
+/form/@utn;attribute not defined;m
+/form/@utn;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn=" utn  ">a</form>
+#errors
+/form/@utn;attribute not defined;m
+/form/@utn;boolean:invalid;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    urn="abc">a</form>
+#errors
+/form/@urn;attribute not defined;m
+
+#data
+<form xmlns="http://www.w3.org/1999/xhtml"
+    utn="" target="abc">a</form>
+#errors
+/form/@utn;attribute not defined;m
+/form/@target;attribute not allowed;m
+
+#data
 <legend xmlns="http://www.w3.org/1999/xhtml"
     align=""
 >a</legend>

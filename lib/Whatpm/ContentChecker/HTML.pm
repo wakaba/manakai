@@ -4312,6 +4312,7 @@ $Element->{$HTML_NS}->{a} = {
           telbook => sub { },
           type => $MIMETypeChecker,
           urn => $HTMLURIAttrChecker,
+          utn => $GetHTMLBooleanAttrChecker->('utn'),
           viblength => $GetHTMLNonNegativeIntegerAttrChecker->(sub {
             1 <= $_[0] and $_[0] <= 9;
           }),
@@ -4374,11 +4375,12 @@ $Element->{$HTML_NS}->{a} = {
     }
 
     if ($attr{target}) {
-      for (qw(ilet iswf irst ib ifb ijam lcs)) {
+      for (qw(ilet iswf irst ib ifb ijam lcs utn)) {
         if ($attr{$_}) {
           $self->{onerror}->(node => $attr{target},
                              type => 'attribute not allowed',
                              level => $self->{level}->{must});
+          last;
         }
       }
     }
@@ -5664,16 +5666,24 @@ $Element->{$HTML_NS}->{iframe} = {
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $EmbeddedAlignChecker,
+    allowtransparency => $GetHTMLEnumeratedAttrChecker->({
+      true => 1, false => 1,
+    }),
+    application => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1,
+    }),
     frameborder => $GetHTMLEnumeratedAttrChecker->({
       1 => 1, 0 => 1,
       yes => -1, no => -1,
     }),
+    framespacing => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $HTMLLengthAttrChecker,
     longdesc => $HTMLURIAttrChecker,
     marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     name => $HTMLBrowsingContextNameAttrChecker,
+    noresize => $GetHTMLBooleanAttrChecker->('noresize'),
     sandbox => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->({
       'allow-same-origin' => 1, 'allow-forms' => 1, 'allow-scripts' => 1,
     }),
@@ -5699,16 +5709,19 @@ $Element->{$HTML_NS}->{iframe} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    allowtransparency => FEATURE_OBSVOCAB,
+    application => FEATURE_OBSVOCAB,
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    frameborder => FEATURE_HTML5_OBSOLETE,
+    frameborder => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    framespacing => FEATURE_OBSVOCAB,
     height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     #hspace WA1 prose
-    id => FEATURE_HTML5_REC,
-    longdesc => FEATURE_HTML5_OBSOLETE,
-    marginheight => FEATURE_HTML5_OBSOLETE,
-    marginwidth => FEATURE_HTML5_OBSOLETE,
+    longdesc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    marginheight => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    marginwidth => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     #name => FEATURE_HTML5_WD | FEATURE_M12N10_REC_DEPRECATED,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    noresize => FEATURE_OBSVOCAB,
     sandbox => FEATURE_HTML5_LC,
     scrolling => FEATURE_HTML5_OBSOLETE,
     seemless => FEATURE_HTML5_LC,
@@ -7258,7 +7271,7 @@ $Element->{$HTML_NS}->{form} = {
     autocomplete => $GetHTMLEnumeratedAttrChecker->({
       on => 1, off => 1,
     }),
-    data => $HTMLURIAttrChecker, ## TODO: MUST point ... [WF2]
+    data => $NonEmptyURLChecker, ## XXXreference: MUST point |formdata|
     enctype => $GetHTMLEnumeratedAttrChecker->({
       'application/x-www-form-urlencoded' => 1,
       'multipart/form-data' => 1,
@@ -7294,27 +7307,30 @@ $Element->{$HTML_NS}->{form} = {
     onreceived => $HTMLEventHandlerAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
+    utn => $GetHTMLBooleanAttrChecker->('utn'),
     z => $GetHTMLBooleanAttrChecker->('z'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accept => FEATURE_HTML5_DROPPED | FEATURE_WF2X | FEATURE_M12N10_REC,
+    accept => FEATURE_OBSVOCAB,
     'accept-charset' => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     action => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     autocomplete => FEATURE_HTML5_WD,
-    data => FEATURE_WF2,
+    data => FEATURE_OBSVOCAB,
     enctype => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     lang => FEATURE_HTML5_REC,
     lcs => FEATURE_OBSVOCAB,
+    measure => FEATURE_OBSVOCAB,
     method => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
     #name => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC_DEPRECATED,
     name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     novalidate => FEATURE_HTML5_LC,
-    onreceived => FEATURE_WF2,
+    onreceived => FEATURE_OBSVOCAB,
     onreset => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onsubmit => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    replace => FEATURE_WF2,
+    replace => FEATURE_OBSVOCAB,
     target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+    utn => FEATURE_OBSVOCAB,
     z => FEATURE_OBSVOCAB,
   }), # check_attrs
   check_attrs2 => sub {
@@ -7323,7 +7339,7 @@ $Element->{$HTML_NS}->{form} = {
 
     my $target_attr = $el->get_attribute_node_ns (undef, 'target');
     if ($target_attr) {
-      for (qw(lcs)) {
+      for (qw(lcs utn)) {
         if ($el->has_attribute_ns (undef, $_)) {
           $self->{onerror}->(node => $target_attr,
                              type => 'attribute not allowed',
@@ -9209,6 +9225,7 @@ $Element->{$HTML_NS}->{frameset} = {
   check_attrs => $GetHTMLAttrsChecker->({
     bordercolor => $HTMLColorAttrChecker,
     cols => $MultiLengthListChecker,
+    framespacing => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     onafterprint => $HTMLEventHandlerAttrChecker,
     onbeforeprint => $HTMLEventHandlerAttrChecker,
     onbeforeunload => $HTMLEventHandlerAttrChecker,
@@ -9234,7 +9251,7 @@ $Element->{$HTML_NS}->{frameset} = {
     #bordercolor WA1 prose
     class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     cols => FEATURE_M12N10_REC,
-    id => FEATURE_HTML5_REC,
+    framespacing => FEATURE_OBSVOCAB,
     onafterprint => FEATURE_HTML5_OBSOLETE,
     onbeforeprint => FEATURE_HTML5_OBSOLETE,
     onbeforeunload => FEATURE_HTML5_OBSOLETE,
@@ -9307,13 +9324,20 @@ $Element->{$HTML_NS}->{frameset} = {
 
 $Element->{$HTML_NS}->{frame} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
+    allowtransparency => $GetHTMLEnumeratedAttrChecker->({
+      true => 1, false => 1,
+    }),
+    application => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1,
+    }),
     bordercolor => $HTMLColorAttrChecker,
     frameborder => $GetHTMLEnumeratedAttrChecker->({
       1 => 1, 0 => 1,
       yes => -1, no => -1,
     }),
+    framespacing => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     longdesc => $HTMLURIAttrChecker,
     marginheight => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     marginwidth => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -9326,19 +9350,18 @@ $Element->{$HTML_NS}->{frame} = {
     src => $HTMLURIAttrChecker,
   }, {
     %HTMLAttrStatus,
-    #bordercolor WA1 prose
-    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    frameborder => FEATURE_M12N10_REC,
-    id => FEATURE_HTML5_REC,
-    longdesc => FEATURE_M12N10_REC,
-    marginheight => FEATURE_M12N10_REC,
-    marginwidth => FEATURE_M12N10_REC,
-    name => FEATURE_M12N10_REC,
-    noresize => FEATURE_M12N10_REC,
+    allowtransparency => FEATURE_OBSVOCAB,
+    application => FEATURE_OBSVOCAB,
+    bordercolor => FEATURE_OBSVOCAB,
+    frameborder => FEATURE_OBSVOCAB,
+    framespacing => FEATURE_OBSVOCAB,
+    longdesc => FEATURE_OBSVOCAB,
+    marginheight => FEATURE_OBSVOCAB,
+    marginwidth => FEATURE_OBSVOCAB,
+    name => FEATURE_OBSVOCAB,
+    noresize => FEATURE_OBSVOCAB,
     scrolling => FEATURE_M12N10_REC,
     src => FEATURE_M12N10_REC,
-    style => FEATURE_HTML5_REC,
-    title => FEATURE_HTML5_REC,
   }), # check_attrs
 }; # frame
 
