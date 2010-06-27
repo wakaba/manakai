@@ -7012,7 +7012,6 @@ a
 #errors
 /layer;element not defined;m
 /layer/@background;attribute not defined;m
-/layer/@background;url:empty;m
 
 #data
 <layer xmlns="http://www.w3.org/1999/xhtml"
@@ -7027,7 +7026,6 @@ a
 #errors
 /layer;element not defined;m
 /layer/@background;attribute not defined;m
-/layer/@background;syntax error:iriref3987;m
 
 #data
 <ilayer xmlns="http://www.w3.org/1999/xhtml"
@@ -7035,7 +7033,6 @@ a
 #errors
 /ilayer;element not defined;m
 /ilayer/@background;attribute not defined;m
-/ilayer/@background;url:empty;m
 
 #data
 <ilayer xmlns="http://www.w3.org/1999/xhtml"
@@ -7050,7 +7047,6 @@ a
 #errors
 /ilayer;element not defined;m
 /ilayer/@background;attribute not defined;m
-/ilayer/@background;syntax error:iriref3987;m
 
 #data
 <layer xmlns="http://www.w3.org/1999/xhtml"
@@ -7059,7 +7055,6 @@ a
 #errors
 /layer;element not defined;m
 /layer/@bgcolor;attribute not defined;m
-/layer/@bgcolor;color:syntax error;m
 
 #data
 <layer xmlns="http://www.w3.org/1999/xhtml"
@@ -7092,7 +7087,6 @@ a
 #errors
 /layer;element not defined;m
 /layer/@bgcolor;attribute not defined;m
-/layer/@bgcolor;color:syntax error;m
 
 #data
 <ilayer xmlns="http://www.w3.org/1999/xhtml"
@@ -7101,7 +7095,6 @@ a
 #errors
 /ilayer;element not defined;m
 /ilayer/@bgcolor;attribute not defined;m
-/ilayer/@bgcolor;color:syntax error;m
 
 #data
 <ilayer xmlns="http://www.w3.org/1999/xhtml"
@@ -7134,4 +7127,55 @@ a
 #errors
 /ilayer;element not defined;m
 /ilayer/@bgcolor;attribute not defined;m
-/ilayer/@bgcolor;color:syntax error;m
+
+#data
+<nolayer xmlns="http://www.w3.org/1999/xhtml"></nolayer>
+#errors
+/nolayer;element not defined;m
+/nolayer;no significant content;s
+
+#data
+<nolayer xmlns="http://www.w3.org/1999/xhtml">  </nolayer>
+#errors
+/nolayer;element not defined;m
+/nolayer;no significant content;s
+
+#data
+<nolayer xmlns="http://www.w3.org/1999/xhtml">aa</nolayer>
+#errors
+/nolayer;element not defined;m
+
+#data
+<nolayer xmlns="http://www.w3.org/1999/xhtml"><p>aa</p>bb</nolayer>
+#errors
+/nolayer;element not defined;m
+
+#data
+<nolayer xmlns="http://www.w3.org/1999/xhtml"><span>aa</span></nolayer>
+#errors
+/nolayer;element not defined;m
+
+#data
+<nolayer xmlns="http://www.w3.org/1999/xhtml">aa<br/></nolayer>
+#errors
+/nolayer;element not defined;m
+
+#data
+<nolayer xmlns="http://www.w3.org/1999/xhtml">aa<frame src="a"/></nolayer>
+#errors
+/nolayer;element not defined;m
+/nolayer/frame;element not allowed:flow;m
+/nolayer/frame;element not defined;m
+/nolayer/frame/@src;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><nolayer>aa</nolayer></div>
+#errors
+/div/nolayer;element not defined;m
+/div/nolayer;element not allowed:flow;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><nolayer>aa</nolayer></span>
+#errors
+/span/nolayer;element not defined;m
+/span/nolayer;element not allowed:phrasing;m

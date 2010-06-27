@@ -4136,14 +4136,16 @@ $Element->{$HTML_NS}->{layer} = {
   %HTMLFlowContentChecker,
   status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
-    background => $NonEmptyURLChecker,
-    bgcolor => $HTMLColorAttrChecker,
+    #
   }, {
     %HTMLAttrStatus,
-    background => FEATURE_OBSVOCAB,
-    bgcolor => FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # layer
+
+$Element->{$HTML_NS}->{nolayer} = {
+  %HTMLFlowContentChecker,
+  status => FEATURE_OBSVOCAB,
+}; # nolayer
 
 # ---- Text-level semantics ----
 
@@ -5339,12 +5341,6 @@ $Element->{$HTML_NS}->{span} = {
     lang => FEATURE_HTML5_REC,
   }),
 };
-
-$Element->{$HTML_NS}->{ilayer} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_OBSVOCAB,
-  check_attrs => $Element->{$HTML_NS}->{layer}->{check_attrs},
-}; # ilayer
 
 $Element->{$HTML_NS}->{comment} = {
   %HTMLTextChecker,
@@ -9396,7 +9392,7 @@ $Element->{$HTML_NS}->{noframes} = {
 ## audioscope, limittext, nosmartquotes, shadow, sound, noimg,
 ## element, attrib, csactionitem, csactions, csaction, csscriptdict,
 ## csactiondict, csobj, madebywz, x-sas-window, yomi, fn-contents,
-## module
+## module, ilayer
 
 ## Following attributes are explicitly not supported: @ht* (XHTML
 ## architectural form attributes), @sda* (SDA attributes), dl/@type
