@@ -5513,6 +5513,7 @@ $Element->{$HTML_NS}->{img} = {
       copyright => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1,
       }),
+      dynsrc => $NonEmptyURLChecker,
       height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       hspace => $HTMLLengthAttrChecker,
       ismap => sub {
@@ -5525,15 +5526,18 @@ $Element->{$HTML_NS}->{img} = {
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
       longdesc => $HTMLURIAttrChecker,
+      lowsrc => $NonEmptyURLChecker,
       mediaout => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1,
       }),
       name => $NameAttrChecker,
+      oversrc => $NonEmptyURLChecker,
       private => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1,
       }),
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
+      vrml => $NonEmptyURLChecker,
       vspace => $HTMLLengthAttrChecker,
       width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     }, {
@@ -5544,16 +5548,20 @@ $Element->{$HTML_NS}->{img} = {
       border => FEATURE_HTML5_LC | FEATURE_OBSVOCAB,
       composite => FEATURE_OBSVOCAB,
       copyright => FEATURE_OBSVOCAB,
+      dynsrc => FEATURE_OBSVOCAB,
       height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
       hspace => FEATURE_HTML5_OBSOLETE,
       ismap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_REC,
       longdesc => FEATURE_HTML5_OBSOLETE,
+      lowsrc => FEATURE_OBSVOCAB,
       mediaout => FEATURE_OBSVOCAB,
       name => FEATURE_HTML5_OBSOLETE,
+      oversrc => FEATURE_OBSVOCAB,
       private => FEATURE_OBSVOCAB,
       src => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       usemap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      vrml => FEATURE_OBSVOCAB,
       vspace => FEATURE_HTML5_OBSOLETE,
       width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     })->($self, $item, $element_state);
@@ -5580,6 +5588,8 @@ $Element->{$HTML_NS}->{img} = {
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{lowsrc}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{dynsrc}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{oversrc}->{type}->{embedded} = 1;
+    $element_state->{uri_info}->{vrml}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{longdesc}->{type}->{cite} = 1;
   }, # check_attrs
   check_end => sub {
@@ -7487,6 +7497,7 @@ $Element->{$HTML_NS}->{input} = {
          checked => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          directkey => FEATURE_OBSVOCAB,
          disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
+         dynsrc => FEATURE_OBSVOCAB,
          enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
          form => FEATURE_HTML5_LC | FEATURE_WF2X,
          formaction => FEATURE_HTML5_LC,
@@ -7502,6 +7513,7 @@ $Element->{$HTML_NS}->{input} = {
          lang => FEATURE_HTML5_REC,
          list => FEATURE_HTML5_LC | FEATURE_WF2X,
          loop => FEATURE_OBSVOCAB,
+         lowsrc => FEATURE_OBSVOCAB,
          max => FEATURE_HTML5_LC | FEATURE_WF2X,
          maxlength => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          method => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
@@ -7530,6 +7542,7 @@ $Element->{$HTML_NS}->{input} = {
          viblength => FEATURE_OBSVOCAB,
          vibration => FEATURE_OBSVOCAB,
          volume => FEATURE_OBSVOCAB,
+         vrml => FEATURE_OBSVOCAB,
          #vspace WA1 prose
          width => FEATURE_HTML5_LC,
         }->{$attr_ln};
@@ -7553,6 +7566,7 @@ $Element->{$HTML_NS}->{input} = {
          directkey => '',
          disabled => $GetHTMLBooleanAttrChecker->('disabled'),
              ## NOTE: <input type=hidden disabled> is not disallowed.
+         dynsrc => '',
          enctype => '',
          form => $HTMLFormAttrChecker,
          formaction => '',
@@ -7566,6 +7580,7 @@ $Element->{$HTML_NS}->{input} = {
          ismap => '', ## NOTE: "MUST" be type=image [HTML4]
          list => '',
          loop => '',
+         lowsrc => '',
          max => '',
          maxlength => '',
          method => '',
@@ -7602,6 +7617,7 @@ $Element->{$HTML_NS}->{input} = {
            select => 1, focus => 1,
          }),
          volume => '',
+         vrml => '',
          vspace => '',
          width => '',
         }->{$attr_ln};
@@ -7763,6 +7779,7 @@ $Element->{$HTML_NS}->{input} = {
                }
              },
              border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+             dynsrc => $NonEmptyURLChecker,
              enctype => $GetHTMLEnumeratedAttrChecker->({
                'application/x-www-form-urlencoded' => 1,
                'multipart/form-data' => 1,
@@ -7783,6 +7800,7 @@ $Element->{$HTML_NS}->{input} = {
              hspace => $HTMLLengthAttrChecker,
              ismap => $GetHTMLBooleanAttrChecker->('ismap'),
              loop => $LegacyLoopChecker,
+             lowsrc => $NonEmptyURLChecker,
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
@@ -7793,6 +7811,7 @@ $Element->{$HTML_NS}->{input} = {
                ## TODO: There is requirements on the referenced resource.
              target => $HTMLTargetAttrChecker,
              usemap => $HTMLUsemapAttrChecker,
+             vrml => $NonEmptyURLChecker,
              vspace => $HTMLLengthAttrChecker,
              width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
             }->{$attr_ln} || $checker;

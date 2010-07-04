@@ -15731,3 +15731,102 @@
     loop="10001"/>
 #errors
 /input/@loop;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc=""/>
+#errors
+/input/@dynsrc;attribute not defined;m
+/input/@dynsrc;url:empty;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc="abc"/>
+#errors
+/input/@dynsrc;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc="[]"/>
+#errors
+/input/@dynsrc;attribute not defined;m
+/input/@dynsrc;syntax error:iriref3987;m
+
+#data
+<input type="submit" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc="[]"/>
+#errors
+/input/@dynsrc;attribute not defined;m
+/input/@dynsrc;input attr not applicable;submit;m
+/input/@src;input attr not applicable;submit;m
+/input/@alt;input attr not applicable;submit;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc=""/>
+#errors
+/input/@lowsrc;attribute not defined;m
+/input/@lowsrc;url:empty;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc="abc"/>
+#errors
+/input/@lowsrc;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc="[]"/>
+#errors
+/input/@lowsrc;attribute not defined;m
+/input/@lowsrc;syntax error:iriref3987;m
+
+#data
+<input type="submit" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc="[]"/>
+#errors
+/input/@lowsrc;attribute not defined;m
+/input/@lowsrc;input attr not applicable;submit;m
+/input/@src;input attr not applicable;submit;m
+/input/@alt;input attr not applicable;submit;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml=""/>
+#errors
+/input/@vrml;attribute not defined;m
+/input/@vrml;url:empty;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml="abc"/>
+#errors
+/input/@vrml;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml="[]"/>
+#errors
+/input/@vrml;attribute not defined;m
+/input/@vrml;syntax error:iriref3987;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vmrl="[]"/>
+#errors
+/input/@vmrl;attribute not defined;m
+
+#data
+<input type="submit" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml="[]"/>
+#errors
+/input/@vrml;attribute not defined;m
+/input/@vrml;input attr not applicable;submit;m
+/input/@src;input attr not applicable;submit;m
+/input/@alt;input attr not applicable;submit;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    oversrc="[]"/>
+#errors
+/input/@oversrc;attribute not defined;m

@@ -4563,6 +4563,92 @@ aa<map name="x">b<map name="y">bb</map></map>
 /img/@copyright;enumerated:invalid;m
 
 #data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc=""/>
+#errors
+/img/@dynsrc;attribute not defined;m
+/img/@dynsrc;url:empty;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc="abc"/>
+#errors
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc="[]"/>
+#errors
+/img/@dynsrc;attribute not defined;m
+/img/@dynsrc;syntax error:iriref3987;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc=""/>
+#errors
+/img/@lowsrc;attribute not defined;m
+/img/@lowsrc;url:empty;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc="abc"/>
+#errors
+/img/@lowsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc="[]"/>
+#errors
+/img/@lowsrc;attribute not defined;m
+/img/@lowsrc;syntax error:iriref3987;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml=""/>
+#errors
+/img/@vrml;attribute not defined;m
+/img/@vrml;url:empty;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml="abc"/>
+#errors
+/img/@vrml;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml="[]"/>
+#errors
+/img/@vrml;attribute not defined;m
+/img/@vrml;syntax error:iriref3987;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vmrl="[]"/>
+#errors
+/img/@vmrl;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    oversrc=""/>
+#errors
+/img/@oversrc;attribute not defined;m
+/img/@oversrc;url:empty;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    oversrc="abc"/>
+#errors
+/img/@oversrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    oversrc="[]"/>
+#errors
+/img/@oversrc;attribute not defined;m
+/img/@oversrc;syntax error:iriref3987;m
+
+#data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
