@@ -4090,21 +4090,6 @@ $Element->{$HTML_NS}->{marquee} = {
 $Element->{$HTML_NS}->{multicol} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-  check_attrs => $GetHTMLAttrsChecker->({
-    baseline => $GetHTMLEnumeratedAttrChecker->({vert => 1}),
-    col => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
-    gutter => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-  }, {
-    %HTMLAttrStatus,
-    baseline => FEATURE_OBSVOCAB,
-    col => FEATURE_OBSVOCAB,
-    gutter => FEATURE_OBSVOCAB,
-    height => FEATURE_OBSVOCAB,
-    width => FEATURE_OBSVOCAB,
-  }), # check_attrs
-  # XXX col required
 }; # multicol
 
 $Element->{$HTML_NS}->{font} = {
@@ -9379,17 +9364,19 @@ $Element->{$HTML_NS}->{noframes} = {
 ## lang, tab, math, above, added, array, atop, bar, below, box, ddot,
 ## dot, hat, left, of, over, overlay, range, right, root, row, spot,
 ## sqrt, tilde, vec [HTML30], access [ACCESS], blockcode, standby, nl,
-## l, h, separator [XHTML2ED], m, x, t, dc, ds, datatemplate, rule,
-## nest, calendar, card, switch, eventsource, sidebar [WA1 draft],
-## repeat [WF2 draft], centre, noflames, noframe, textflow, app,
-## server, htmlarea, animate, h7, h8, h9, entity, hype, key, tbl,
+## l, h, separator [XHTML2ED], m, x, t, dc, ds, date, datatemplate,
+## rule, nest, calendar, card, switch, eventsource, sidebar, bb [WA1
+## draft], repeat [WF2 draft], centre, noflames, noframe, textflow,
+## app, server, htmlarea, animate, h7, h8, h9, entity, hype, key, tbl,
 ## audioscope, limittext, nosmartquotes, shadow, sound, noimg,
 ## element, attrib, csactionitem, csactions, csaction, csscriptdict,
 ## csactiondict, csobj, madebywz, x-sas-window, yomi, fn-contents,
 ## module, ilayer
 
 ## Following attributes are explicitly not supported: @ht* (XHTML
-## architectural form attributes), @sda* (SDA attributes), dl/@type
+## architectural form attributes), @sda* (SDA attributes), dl/@type,
+## layer/@*, multicol/@baseline, multicol/@height, multicol/@width,
+## multicol/@gutter, multicol/@cols
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 
