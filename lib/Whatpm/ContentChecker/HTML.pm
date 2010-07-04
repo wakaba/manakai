@@ -2311,26 +2311,7 @@ $Element->{$HTML_NS}->{basefont} = {
 
 $Element->{$HTML_NS}->{nextid} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_OBSOLETE,
-  check_attrs => $GetHTMLAttrsChecker->({
-    n => sub { }, ## CDATA [HTML 2.0]
-        ## XXX "It should be distinct from all NAME attribute values
-        ## on <A> elements." [HTML 2.0]
-  }, {
-    %HTMLAttrStatus,
-    n => FEATURE_HTML20_RFC,
-  }), # check_attrs
-  check_attrs2 => sub {
-    my ($self, $item, $element_state) = @_;
-
-    my $el = $item->{node};
-    unless ($el->has_attribute_ns (undef, 'n')) {
-      $self->{onerror}->(node => $el,
-                         type => 'attribute missing',
-                         text => 'n',
-                         level => $self->{level}->{must});
-    }
-  }, # check_attrs2
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # nextid
 
 $Element->{$HTML_NS}->{link} = {
@@ -9376,7 +9357,7 @@ $Element->{$HTML_NS}->{noframes} = {
 ## Following attributes are explicitly not supported: @ht* (XHTML
 ## architectural form attributes), @sda* (SDA attributes), dl/@type,
 ## layer/@*, multicol/@baseline, multicol/@height, multicol/@width,
-## multicol/@gutter, multicol/@cols
+## multicol/@gutter, multicol/@cols, nextid/@n
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 

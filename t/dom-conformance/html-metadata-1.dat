@@ -3013,26 +3013,22 @@ p {color: green}
 <nextid xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /nextid;element not defined;m
-/nextid;attribute missing;n;m
 
 #data
 <nextid xmlns="http://www.w3.org/1999/xhtml">  </nextid>
 #errors
 /nextid;element not defined;m
-/nextid;attribute missing;n;m
 
 #data
 <nextid xmlns="http://www.w3.org/1999/xhtml">aa</nextid>
 #errors
 /nextid;element not defined;m
 /nextid/"aa";character not allowed:empty;m
-/nextid;attribute missing;n;m
 
 #data
 <nextid xmlns="http://www.w3.org/1999/xhtml"><p>aa</p></nextid>
 #errors
 /nextid;element not defined;m
-/nextid;attribute missing;n;m
 /nextid/p;element not allowed:empty;m
 
 #data
@@ -3065,3 +3061,13 @@ p {color: green}
 /nextid;element not defined;m
 /nextid/@n;attribute not defined;m
 
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <nextid n="x123"/>
+  <a name="x123">aa</a>
+</div>
+#errors
+/div/nextid;element not defined;m
+/div/nextid;element not allowed:flow;m
+/div/nextid/@n;attribute not defined;m
+/div/a/@name;anchor name;s
