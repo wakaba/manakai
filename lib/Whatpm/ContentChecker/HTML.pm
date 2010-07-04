@@ -4152,13 +4152,11 @@ $Element->{$HTML_NS}->{a} = {
           lang => FEATURE_HTML5_REC,
           lcs => FEATURE_OBSVOCAB,
           loop => FEATURE_OBSVOCAB,
-          mailbody => FEATURE_OBSVOCAB,
           measure => FEATURE_OBSVOCAB,
           media => FEATURE_HTML5_WD | FEATURE_XHTML2_ED,
           memoryname => FEATURE_OBSVOCAB,
           methods => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
           name => FEATURE_HTML5_LC,
-          nonumber => FEATURE_OBSVOCAB,
           onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
@@ -4175,7 +4173,6 @@ $Element->{$HTML_NS}->{a} = {
           viblength => FEATURE_OBSVOCAB,
           vibration => FEATURE_OBSVOCAB,
           volume => FEATURE_OBSVOCAB,
-          z => FEATURE_OBSVOCAB,
         }->{$attr_ln};
 
         $checker = {
@@ -4229,7 +4226,6 @@ $Element->{$HTML_NS}->{a} = {
                                  level => $self->{level}->{must});
             }
           }, # loop
-          mailbody => sub { },
           measure => $GetHTMLEnumeratedAttrChecker->({cid => 1, auto => 1}),
           media => $HTMLMQAttrChecker,
           methods => sub { },
@@ -4244,7 +4240,6 @@ $Element->{$HTML_NS}->{a} = {
             }
           }, # memoryname
           name => $NameAttrChecker,
-          nonumber => $GetHTMLBooleanAttrChecker->('nonumber'),
           ping => $HTMLSpaceURIsAttrChecker,
           rel => sub { $HTMLLinkTypesAttrChecker->(1, $item, @_) },
           shape => $GetHTMLEnumeratedAttrChecker->({
@@ -4271,7 +4266,6 @@ $Element->{$HTML_NS}->{a} = {
           volume => $GetHTMLEnumeratedAttrChecker->({
             high => 1, middle => 1, low => 1,
           }),
-          z => $GetHTMLBooleanAttrChecker->('z'),
         }->{$attr_ln};
         if ($checker) {
           $attr{$attr_ln} = $attr;
@@ -4311,8 +4305,8 @@ $Element->{$HTML_NS}->{a} = {
       for (qw(
         target ping rel media hreflang type
         ilet iswf irst ib ifb ijam
-        email telbook kana memoryname mailbody
-        lcs z measure
+        email telbook kana memoryname
+        lcs measure
         loop soundstart volume
       )) {
         if (defined $attr{$_}) {
@@ -4334,12 +4328,6 @@ $Element->{$HTML_NS}->{a} = {
       }
     }
 
-    if ($attr{nonumber} and not $attr{directkey}) {
-      $self->{onerror}->(node => $attr{nonumber},
-                         type => 'attribute not allowed',
-                         level => $self->{level}->{must});
-    }
-
     if ($attr{viblength} and not $attr{vibration}) {
       $self->{onerror}->(node => $attr{viblength},
                          type => 'attribute not allowed',
@@ -4351,7 +4339,6 @@ $Element->{$HTML_NS}->{a} = {
     # XXX @email -> href=tel:/tel-av:
     # XXX @telbook, @kana -> href=tel:/tel-av:/mailto:
     # XXX @memoryname -> href=tel:/mailto:
-    # XXX @mailbody -> mailto:
 
     $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
   },
@@ -5538,7 +5525,6 @@ $Element->{$HTML_NS}->{img} = {
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
       longdesc => $HTMLURIAttrChecker,
-      loop => $LegacyLoopChecker,
       mediaout => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1,
       }),
@@ -5548,12 +5534,6 @@ $Element->{$HTML_NS}->{img} = {
       }),
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
-      viblength => $GetHTMLNonNegativeIntegerAttrChecker->(sub {
-        1 <= $_[0] and $_[0] <= 9;
-      }),
-      vibration => $GetHTMLEnumeratedAttrChecker->({
-        focus => 1,
-      }),
       vspace => $HTMLLengthAttrChecker,
       width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     }, {
@@ -5569,7 +5549,6 @@ $Element->{$HTML_NS}->{img} = {
       ismap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_REC,
       longdesc => FEATURE_HTML5_OBSOLETE,
-      loop => FEATURE_OBSVOCAB,
       mediaout => FEATURE_OBSVOCAB,
       name => FEATURE_HTML5_OBSOLETE,
       private => FEATURE_OBSVOCAB,
@@ -5593,15 +5572,6 @@ $Element->{$HTML_NS}->{img} = {
                          type => 'attribute missing',
                          text => 'src',
                          level => $self->{level}->{must});
-    }
-
-    my $vl_attr = $el->get_attribute_node_ns (undef, 'viblength');
-    if ($vl_attr) {
-      unless ($el->has_attribute_ns (undef, 'vibration')) {
-        $self->{onerror}->(node => $vl_attr,
-                           type => 'attribute not allowed',
-                           level => $self->{level}->{must});
-      }
     }
 
     ## XXXresource: external resource check
@@ -6300,7 +6270,6 @@ $Element->{$HTML_NS}->{bgsound} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
-    as => $GetHTMLBooleanAttrChecker->('as'),
     balance => sub {
       my ($self, $attr) = @_;
 
@@ -6328,7 +6297,6 @@ $Element->{$HTML_NS}->{bgsound} = {
     }),
   }, {
     %HTMLAttrStatus,
-    as => FEATURE_OBSVOCAB,
     balance => FEATURE_OBSVOCAB,
     loop => FEATURE_OBSVOCAB,
     src => FEATURE_OBSVOCAB,
@@ -6644,7 +6612,6 @@ $Element->{$HTML_NS}->{table} = {
     }),
     height => $HTMLLengthAttrChecker,
     hspace => $HTMLLengthAttrChecker,
-    nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
     rules => $GetHTMLEnumeratedAttrChecker->({
       none => 1, groups => 1, rows => 1, cols => 1, all => 1,
     }),
@@ -6671,7 +6638,6 @@ $Element->{$HTML_NS}->{table} = {
     frame => FEATURE_HTML5_OBSOLETE,
     #height WA1 prose
     #hspace WA1 prose
-    nowrap => FEATURE_OBSVOCAB,
     rules => FEATURE_HTML5_OBSOLETE,
     summary => FEATURE_HTML5_LC,
     width => FEATURE_HTML5_OBSOLETE,
@@ -7283,7 +7249,6 @@ $Element->{$HTML_NS}->{form} = {
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
     utn => $GetHTMLBooleanAttrChecker->('utn'),
-    z => $GetHTMLBooleanAttrChecker->('z'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -7306,7 +7271,6 @@ $Element->{$HTML_NS}->{form} = {
     replace => FEATURE_OBSVOCAB,
     target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     utn => FEATURE_OBSVOCAB,
-    z => FEATURE_OBSVOCAB,
   }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -7544,7 +7508,6 @@ $Element->{$HTML_NS}->{input} = {
          min => FEATURE_HTML5_LC | FEATURE_WF2X,
          multiple => FEATURE_HTML5_LC,
          name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-         nonumber => FEATURE_OBSVOCAB,
          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -7609,7 +7572,6 @@ $Element->{$HTML_NS}->{input} = {
          min => '',
          multiple => '',
          name => $FormControlNameAttrChecker,
-         nonumber => '',
          pattern => '',
          placeholder => '',
          readonly => '',
@@ -7774,7 +7736,6 @@ $Element->{$HTML_NS}->{input} = {
              method => $GetHTMLEnumeratedAttrChecker->({
                get => 1, post => 1, put => 1, delete => 1,
              }),
-             nonumber => $GetHTMLBooleanAttrChecker->('nonumber'),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
              }),
@@ -8001,13 +7962,6 @@ $Element->{$HTML_NS}->{input} = {
           $self->{onerror}->(node => $dk_attr,
                              type => 'attribute missing',
                              text => 'value',
-                             level => $self->{level}->{must});
-        }
-      } else {
-        my $nn_attr = $el->get_attribute_node_ns (undef, 'nonumber');
-        if ($nn_attr) {
-          $self->{onerror}->(node => $nn_attr,
-                             type => 'attribute not allowed',
                              level => $self->{level}->{must});
         }
       }
