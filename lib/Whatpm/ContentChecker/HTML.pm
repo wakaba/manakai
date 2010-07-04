@@ -2456,12 +2456,9 @@ $Element->{$HTML_NS}->{meta} = {
           %XHTML2CommonAttrStatus,
           charset => FEATURE_HTML5_WD,
           content => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-          dir => FEATURE_HTML5_REC,
           'http-equiv' => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-          id => FEATURE_HTML5_REC,
-          lang => FEATURE_HTML5_REC,
           name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-          scheme => FEATURE_HTML5_OBSOLETE,
+          scheme => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
         }->{$attr_ln};
 
         if ($attr_ln eq 'content') {
@@ -4073,9 +4070,9 @@ $Element->{$HTML_NS}->{marquee} = {
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
-    behavior => FEATURE_HTML5_OBSOLETE,
+    behavior => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_OBSVOCAB,
-    direction => FEATURE_HTML5_OBSOLETE,
+    direction => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     height => FEATURE_OBSVOCAB,
     hspace => FEATURE_OBSVOCAB,
     loop => FEATURE_OBSVOCAB,
@@ -4092,8 +4089,22 @@ $Element->{$HTML_NS}->{marquee} = {
 
 $Element->{$HTML_NS}->{multicol} = {
   %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
-  # XXX attributes
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+  check_attrs => $GetHTMLAttrsChecker->({
+    baseline => $GetHTMLEnumeratedAttrChecker->({vert => 1}),
+    col => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    gutter => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+  }, {
+    %HTMLAttrStatus,
+    baseline => FEATURE_OBSVOCAB,
+    col => FEATURE_OBSVOCAB,
+    gutter => FEATURE_OBSVOCAB,
+    height => FEATURE_OBSVOCAB,
+    width => FEATURE_OBSVOCAB,
+  }), # check_attrs
+  # XXX col required
 }; # multicol
 
 $Element->{$HTML_NS}->{font} = {
@@ -9104,11 +9115,10 @@ $Element->{$HTML_NS}->{menu} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    align => FEATURE_HTML2X_RFC,
+    align => FEATURE_OBSVOCAB,
     autosubmit => FEATURE_HTML5_DROPPED,
-    compat => FEATURE_HTML5_OBSOLETE,
+    compat => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     label => FEATURE_HTML5_WD,
-    lang => FEATURE_HTML5_REC,
     type => FEATURE_HTML5_WD,
   }), # check_attrs
   check_start => sub {
