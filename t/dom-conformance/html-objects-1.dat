@@ -4471,6 +4471,124 @@ aa<map name="x">b<map name="y">bb</map></map>
 /img/@loop;attribute not defined;m
 
 #data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite=""/>
+#errors
+/img/@composite;attribute not defined;m
+/img/@composite;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="source-over"/>
+#errors
+/img/@composite;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="SOURCE-oVER"/>
+#errors
+/img/@composite;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="sourceover"/>
+#errors
+/img/@composite;attribute not defined;m
+/img/@composite;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="source"/>
+#errors
+/img/@composite;attribute not defined;m
+/img/@composite;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="true"/>
+#errors
+/img/@composite;attribute not defined;m
+/img/@composite;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    private=""/>
+#errors
+/img/@private;attribute not defined;m
+/img/@private;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="yes"/>
+#errors
+/img/@private;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="No"/>
+#errors
+/img/@private;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="true"/>
+#errors
+/img/@private;attribute not defined;m
+/img/@private;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout=""/>
+#errors
+/img/@mediaout;attribute not defined;m
+/img/@mediaout;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="yes"/>
+#errors
+/img/@mediaout;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="No"/>
+#errors
+/img/@mediaout;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="true"/>
+#errors
+/img/@mediaout;attribute not defined;m
+/img/@mediaout;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright=""/>
+#errors
+/img/@copyright;attribute not defined;m
+/img/@copyright;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="yes"/>
+#errors
+/img/@copyright;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="No"/>
+#errors
+/img/@copyright;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="true"/>
+#errors
+/img/@copyright;attribute not defined;m
+/img/@copyright;enumerated:invalid;m
+
+#data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -7005,6 +7123,84 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <object data="a" mayscript="yes" xmlns="http://www.w3.org/1999/xhtml">a</object>
 #errors
 /object/@mayscript;attribute not defined;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="">aa</object>
+#errors
+/object/@private;attribute not defined;m
+/object/@private;enumerated:invalid;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="yes">aa</object>
+#errors
+/object/@private;attribute not defined;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="No">aa</object>
+#errors
+/object/@private;attribute not defined;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="true">aa</object>
+#errors
+/object/@private;attribute not defined;m
+/object/@private;enumerated:invalid;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="">aa</object>
+#errors
+/object/@mediaout;attribute not defined;m
+/object/@mediaout;enumerated:invalid;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="yes">aa</object>
+#errors
+/object/@mediaout;attribute not defined;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="No">aa</object>
+#errors
+/object/@mediaout;attribute not defined;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="true">aa</object>
+#errors
+/object/@mediaout;attribute not defined;m
+/object/@mediaout;enumerated:invalid;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="">aa</object>
+#errors
+/object/@copyright;attribute not defined;m
+/object/@copyright;enumerated:invalid;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="yes">aa</object>
+#errors
+/object/@copyright;attribute not defined;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="No">aa</object>
+#errors
+/object/@copyright;attribute not defined;m
+
+#data
+<object data="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="true">aa</object>
+#errors
+/object/@copyright;attribute not defined;m
+/object/@copyright;enumerated:invalid;m
 
 #data
 <param xmlns="http://www.w3.org/1999/xhtml"/>

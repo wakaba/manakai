@@ -5520,6 +5520,12 @@ $Element->{$HTML_NS}->{img} = {
           }
         }
       }, # border
+      composite => $GetHTMLEnumeratedAttrChecker->({
+        'source-over' => 1,
+      }),
+      copyright => $GetHTMLEnumeratedAttrChecker->({
+        yes => 1, no => 1,
+      }),
       height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       hspace => $HTMLLengthAttrChecker,
       ismap => sub {
@@ -5533,7 +5539,13 @@ $Element->{$HTML_NS}->{img} = {
       },
       longdesc => $HTMLURIAttrChecker,
       loop => $LegacyLoopChecker,
+      mediaout => $GetHTMLEnumeratedAttrChecker->({
+        yes => 1, no => 1,
+      }),
       name => $NameAttrChecker,
+      private => $GetHTMLEnumeratedAttrChecker->({
+        yes => 1, no => 1,
+      }),
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
       viblength => $GetHTMLNonNegativeIntegerAttrChecker->(sub {
@@ -5549,14 +5561,18 @@ $Element->{$HTML_NS}->{img} = {
       %HTMLM12NXHTML2CommonAttrStatus,
       align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       alt => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      border => FEATURE_HTML5_LC,
+      border => FEATURE_HTML5_LC | FEATURE_OBSVOCAB,
+      composite => FEATURE_OBSVOCAB,
+      copyright => FEATURE_OBSVOCAB,
       height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
       hspace => FEATURE_HTML5_OBSOLETE,
       ismap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       lang => FEATURE_HTML5_REC,
       longdesc => FEATURE_HTML5_OBSOLETE,
       loop => FEATURE_OBSVOCAB,
+      mediaout => FEATURE_OBSVOCAB,
       name => FEATURE_HTML5_OBSOLETE,
+      private => FEATURE_OBSVOCAB,
       src => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       usemap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       vspace => FEATURE_HTML5_OBSOLETE,
@@ -5830,6 +5846,9 @@ $Element->{$HTML_NS}->{object} = {
     codebase => $NonEmptyURLChecker,
     codetype => $MIMETypeChecker,
         ## TODO: "RECOMMENDED when |classid| is specified" [HTML4]
+    copyright => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1,
+    }),
     data => $HTMLURIAttrChecker,
     declare => $GetHTMLBooleanAttrChecker->('declare'),
         ## NOTE: "The object MUST be instantiated by a subsequent OBJECT ..."
@@ -5837,11 +5856,17 @@ $Element->{$HTML_NS}->{object} = {
     form => $HTMLFormAttrChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $HTMLLengthAttrChecker,
+    mediaout => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1,
+    }),
     name => $HTMLBrowsingContextNameAttrChecker,
         ## NOTE: |name| attribute of the |object| element defines
         ## the name of the browsing context created by the element,
         ## if any, but is also used as the form control name of the
         ## form control provided by the plugin, if any.
+    private => $GetHTMLEnumeratedAttrChecker->({
+      yes => 1, no => 1,
+    }),
     standby => sub {}, ## NOTE: %Text; in HTML4
     type => $MIMETypeChecker,
     usemap => $HTMLUsemapAttrChecker,
@@ -5858,13 +5883,16 @@ $Element->{$HTML_NS}->{object} = {
     codebase => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     codetype => FEATURE_HTML5_OBSOLETE,
     'content-length' => FEATURE_XHTML2_ED,
+    copyright => FEATURE_OBSVOCAB,
     data => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     declare => FEATURE_HTML5_OBSOLETE,
     form => FEATURE_HTML5_LC,
     height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     hspace => FEATURE_HTML5_OBSOLETE,
     lang => FEATURE_HTML5_REC,
+    mediaout => FEATURE_OBSVOCAB,
     name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    private => FEATURE_OBSVOCAB,
     standby => FEATURE_HTML5_OBSOLETE,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
