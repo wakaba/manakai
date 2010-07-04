@@ -3592,6 +3592,7 @@ aaa
 #errors
 /marquee;element not defined;m
 /marquee/@loop;attribute not defined;m
+/marquee/@loop;integer:out of range;m
 
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"
@@ -3599,6 +3600,39 @@ aaa
 #errors
 /marquee;element not defined;m
 /marquee/@loop;attribute not defined;m
+/marquee/@loop;integer:out of range;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    loop="+120">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@loop;attribute not defined;m
+/marquee/@loop;integer:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    loop="1.000">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@loop;attribute not defined;m
+/marquee/@loop;integer:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    loop="infinity">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@loop;attribute not defined;m
+/marquee/@loop;integer:syntax error;m
+
+#data
+<marquee xmlns="http://www.w3.org/1999/xhtml"
+    loop="loop">a</marquee>
+#errors
+/marquee;element not defined;m
+/marquee/@loop;attribute not defined;m
+/marquee/@loop;integer:syntax error;m
 
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"

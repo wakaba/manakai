@@ -1814,7 +1814,7 @@ my $LegacyLoopChecker = sub {
   
   if ($attr->value =~ /\A(-?[0-9]+)\z/) {
     my $n = 0+$1;
-    if ($n >= -1) {
+    if ($n != 0 and $n >= -1) {
       #
     } else {
       $self->{onerror}->(node => $attr,
@@ -4049,7 +4049,7 @@ $Element->{$HTML_NS}->{div6} = $Element->{$HTML_NS}->{div1};
 
 $Element->{$HTML_NS}->{marquee} = {
   %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     behavior => $GetHTMLEnumeratedAttrChecker->({
       scroll => -1, slide => -1, alternate => -1,
@@ -4060,7 +4060,7 @@ $Element->{$HTML_NS}->{marquee} = {
     }),
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $HTMLLengthAttrChecker,
-    loop => $HTMLIntegerAttrChecker,
+    loop => $LegacyLoopChecker,
     onbounce => $HTMLEventHandlerAttrChecker,
     onfinish => $HTMLEventHandlerAttrChecker,
     onstart => $HTMLEventHandlerAttrChecker,
@@ -4076,17 +4076,17 @@ $Element->{$HTML_NS}->{marquee} = {
     behavior => FEATURE_HTML5_OBSOLETE,
     bgcolor => FEATURE_OBSVOCAB,
     direction => FEATURE_HTML5_OBSOLETE,
-    #height WA1 prose
-    #hspace WA1 prose
-    #loop WA1 prose
-    onbounce => FEATURE_HTML5_OBSOLETE,
-    onfinish => FEATURE_HTML5_OBSOLETE,
-    onstart => FEATURE_HTML5_OBSOLETE,
-    #scrollamount WA1 prose
-    #scrolldelay WA1 prose
-    truespeed => FEATURE_HTML5_OBSOLETE,
-    #vspace WA1 prose
-    #width WA1 prose
+    height => FEATURE_OBSVOCAB,
+    hspace => FEATURE_OBSVOCAB,
+    loop => FEATURE_OBSVOCAB,
+    onbounce => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    onfinish => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    onstart => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    scrollamount => FEATURE_OBSVOCAB,
+    scrolldelay => FEATURE_OBSVOCAB,
+    truespeed => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    vspace => FEATURE_OBSVOCAB,
+    width => FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # marquee
 

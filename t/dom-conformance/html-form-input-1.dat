@@ -15662,12 +15662,14 @@
     loop="0"/>
 #errors
 /input/@loop;attribute not defined;m
+/input/@loop;integer:out of range;m
 
 #data
 <input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
     loop="000"/>
 #errors
 /input/@loop;attribute not defined;m
+/input/@loop;integer:out of range;m
 
 #data
 <input type="image" alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"

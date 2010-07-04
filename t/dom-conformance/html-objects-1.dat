@@ -4397,12 +4397,14 @@ aa<map name="x">b<map name="y">bb</map></map>
     loop="0"/>
 #errors
 /img/@loop;attribute not defined;m
+/img/@loop;integer:out of range;m
 
 #data
 <img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
     loop="000"/>
 #errors
 /img/@loop;attribute not defined;m
+/img/@loop;integer:out of range;m
 
 #data
 <img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
@@ -8323,6 +8325,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /bgsound;element not defined;m
 /bgsound/@src;attribute not defined;m
 /bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
 
 #data
 <bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
@@ -8331,6 +8334,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /bgsound;element not defined;m
 /bgsound/@src;attribute not defined;m
 /bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
 
 #data
 <bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
