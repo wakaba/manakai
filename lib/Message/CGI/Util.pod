@@ -1,0 +1,80 @@
+=head1 NAME
+
+Message::CGI::Util - manakai CGI Utilities
+
+=head1 SYNOPSIS
+
+  use Message::CGI::Util qw(htescape percent_encode);
+  
+  print htescape "ab < cd";
+  print q<http://www.example.com/> . percent_encode "\x{4e00} = 1";
+
+=head1 DESCRIPTION
+
+The C<Message::CGI::Util> module provides various functions which are
+particulary useful in CGI scripts.
+
+=head1 FUNCTIONS
+
+Functions are not exported by default.  You have to explicitly import
+functions you'd like to use as:
+
+  use Message::CGI::Util qw(function1 function2 ...);
+
+=over 4
+
+=item STRING = htescape STRING
+
+Escapes the given string for the use in HTML/XML markups.
+
+=item OCTETS = percent_encode CHARS
+
+Percene-encodes the given character string.  Characters are encode in
+C<utf8> and then percent-encoded.  Any character other than RFC 3986's
+C<unreserved> characters are encoded.
+
+=item OCTETS = percent_encode_na CHARS
+
+Percent-encodes the given character string.  It works as
+C<percent_encode> does, except that this function only encodes
+non-ASCII characters.  Reserved ASCII characters are I<not> encoded.
+
+=item CHARS = percent_decode OCTETS
+
+Percent-decodes the given byte string and then decoded as UTF-8.
+
+=item ABSURL = get_absolute_url RELURL, BASEURL
+
+Resolves the relative reference against the given base URL and returns
+the RFC 3986 absolute URI.
+
+=item STRING = datetime_in_content TIME_T
+
+Formats the given time in the "date or time strings in content" format
+defined in earlier drafts of the Web Applications 1.0 specification.
+
+=item STRING = datetime_for_http TIME_T
+
+Formats the given time in the RFC 1123 format defined in the RFC 2616
+(HTTP/1.1).
+
+=back
+
+=head1 SEE ALSO
+
+The L<URL::PercentEncode> module provides more comprehensive set of
+functions to percent-encode or percent-decode strings.  The module is
+available from <http://suika.fam.cx/gate/git/wi/perl/webutils.git>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>
+
+=head1 LICENSE
+
+Copyright 2008-2010 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
