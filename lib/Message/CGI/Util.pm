@@ -1,8 +1,7 @@
 package Message::CGI::Util;
 use strict;
-
-use Exporter;
-push our @ISA, 'Exporter';
+use warnings;
+use Exporter::Lite;
 
 our @EXPORT_OK = qw/
   htescape
@@ -10,9 +9,8 @@ our @EXPORT_OK = qw/
   percent_decode
   get_absolute_url
   datetime_in_content
+  datetime_for_http
 /;
-
-require Encode;
 
 sub htescape ($) {
   my $s = shift;
@@ -23,18 +21,21 @@ sub htescape ($) {
 } # htescape
 
 sub percent_encode ($) {
+  require Encode;
   my $s = Encode::encode ('utf8', $_[0]);
   $s =~ s/([^A-Za-z0-9_~-])/sprintf '%%%02X', ord $1/ges;
   return $s;
 } # percent_encode
 
 sub percent_encode_na ($) {
+  require Encode;
   my $s = Encode::encode ('utf8', $_[0]);
   $s =~ s/([^\x00-\x7F])/sprintf '%%%02X', ord $1/ges;
   return $s;
 } # percent_encode_na
 
 sub percent_decode ($) { # input should be a byte string.
+  require Encode;
   my $s = shift;
   $s =~ s/%([0-9A-Fa-f]{2})/pack 'C', hex $1/ge;
   return Encode::decode ('utf-8', $s); # non-UTF-8 octet converted to \xHH
@@ -55,4 +56,22 @@ sub datetime_in_content ($) {
       $time[5] + 1900, $time[4] + 1, $time[3], $time[2], $time[1], $time[0];
 } # datetime_in_content
 
+my @MonthName = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+
+sub datetime_for_http ($) {
+  my @time = gmtime shift;
+  return sprintf '%02d %s %04d %02d:%02d:%02d +0000',
+      $time[3], $MonthName[$time[4]], $time[5] + 1900,
+      $time[2], $time[1], $time[0];
+} # datetime_for_http
+
 1;
+
+=head1 LICENSE
+
+Copyright 2010 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

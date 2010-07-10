@@ -70,6 +70,7 @@ test:
 	  DOM-Node.t DOM-Document.t DOM-Element.t DOM-DOMStringList.t \
 	  URI-URIReference.t \
           MIME-Type.t IMT-InternetMediaType.t \
+	  CGI-*.t \
 	  Whatpm-*.t
 
 #	$(PERL_TEST_) *$(PT_SUFFIX)
