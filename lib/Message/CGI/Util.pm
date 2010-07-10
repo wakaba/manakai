@@ -60,7 +60,7 @@ my @MonthName = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 
 sub datetime_for_http ($) {
   my @time = gmtime shift;
-  return sprintf '%02d %s %04d %02d:%02d:%02d +0000',
+  return sprintf '%02d %s %04d %02d:%02d:%02d GMT',
       $time[3], $MonthName[$time[4]], $time[5] + 1900,
       $time[2], $time[1], $time[0];
 } # datetime_for_http
