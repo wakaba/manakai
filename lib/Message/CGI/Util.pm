@@ -56,11 +56,13 @@ sub datetime_in_content ($) {
       $time[5] + 1900, $time[4] + 1, $time[3], $time[2], $time[1], $time[0];
 } # datetime_in_content
 
+my @WeekName = qw(Sun Mon Tue Wed Thr Wed Sat);
 my @MonthName = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 
 sub datetime_for_http ($) {
   my @time = gmtime shift;
-  return sprintf '%02d %s %04d %02d:%02d:%02d GMT',
+  return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT',
+      $WeekName[$time[6]],
       $time[3], $MonthName[$time[4]], $time[5] + 1900,
       $time[2], $time[1], $time[0];
 } # datetime_for_http
