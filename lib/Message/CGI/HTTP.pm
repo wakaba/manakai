@@ -229,7 +229,10 @@ sub request_uri ($;%) {
     $port = '' if $port eq ':80';
   }
   
-  my $host_and_port = $self->get_meta_variable ('HTTP_HOST');
+  my $host_and_port = $self->get_meta_variable ('HTTP_X_FORWARDED_HOST')
+      || $self->get_meta_variable ('HTTP_HOST')
+      || '';
+  $host_and_port = $1 if $host_and_port =~ /,\s*([^,]+)$/;
   if ($host_and_port) {
     $uri = $scheme . '://'
          . $self->__uri_encode ($host_and_port, qr/[^0-9A-Za-z.:-]/)
