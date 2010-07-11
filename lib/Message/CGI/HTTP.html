@@ -1,15 +1,19 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Message::CGI::HTTP - An Object-Oriented HTTP CGI Interface</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -18,12 +22,15 @@
 	<li><a href="#methods">METHODS</a></li>
 	<li><a href="#todo">TODO</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#history">HISTORY</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
@@ -32,24 +39,24 @@
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Message::CGI::HTTP</code> module provides an object-oriented
-interface for inputs and outputs as defined by CGI specification.</p>
+<p>The <code>Message::CGI::HTTP</code> module provides an object-oriented interface
+to handle input parameters (i.e. request) and output (i.e. response)
+of HTTP CGI scripts, as defined by CGI specification.</p>
 <p>This module is part of manakai.</p>
 <p>
 </p>
 <hr />
 <h1><a name="methods">METHODS</a></h1>
 <dl>
-<dt><strong><a name="item_new"><em>$cgi</em> = Message::CGI::HTTP-&gt;new;</a></strong><br />
-</dt>
+<dt><strong><a name="new" class="item"><em>$cgi</em> = Message::CGI::HTTP-&gt;new;</a></strong></dt>
+
 <dd>
-Creates and returns a new instance of HTTP CGI interface object.
+<p>Creates and returns a new instance of HTTP CGI interface object.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_get_meta_variable"><em>$value</em> = <em>$cgi</em>-&gt;get_meta_variable (<em>$name</em>)</a></strong><br />
-</dt>
+<dt><strong><a name="get_meta_variable" class="item"><em>$value</em> = <em>$cgi</em>-&gt;get_meta_variable (<em>$name</em>)</a></strong></dt>
+
 <dd>
-Returns the value of the meta-variable <em>$name</em>.  The name
+<p>Returns the value of the meta-variable <em>$name</em>.  The name
 specified by the <em>$name</em> SHOULD be a meta-variable name
 defined by a CGI specification, e.g. <code>CONTENT_TYPE</code> or
 <code>HTTP_USER_AGENT</code>.  Otherwise, the result is implementation
@@ -57,114 +64,100 @@ dependent.  In an environment where meta-variables are supplied
 as envirnoment variables, specifying an environment variable
 that is not a meta-variable, such as <code>PATH</code>, results in the
 value of that environment variable.  However, CGI scripts
-SHOULD NOT depend on such behavior.
-</dd>
-<dd>
+SHOULD NOT depend on such behavior.</p>
 <p>This method might return <code>undef</code> when the meta-variable
 is not defined or is defined but its value is <code>undef</code>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_meta_variable_names"><em>$list</em> = <em>$cgi</em>-&gt;meta_variable_names;</a></strong><br />
-</dt>
+<dt><strong><a name="meta_variable_names" class="item"><em>$list</em> = <em>$cgi</em>-&gt;meta_variable_names;</a></strong></dt>
+
 <dd>
-Returns list of meta variables.  Note that this list might contain
+<p>Returns list of meta variables.  Note that this list might contain
 other environmental variables than CGI meta variables, since
 they cannot distinglish unless we know what is CGI meta variable
 and what is not.  Unfortunately, there is no complete list of CGI
-meta variables, whilst list of standarized meta variables is available.
-</dd>
-<dd>
+meta variables, whilst list of standarized meta variables is available.</p>
 <p>NOTE: Some application might use an environmental variable named
 'HTTP_HOME', which might make some confusion with CGI meta variable
 for HTTP 'Home:' header field.  Fortunately, such name of HTTP
 header field is not intoroduced as far as I know.</p>
-</dd>
-<dd>
 <p>This method returns a <code>Message::DOM::DOMStringList</code>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_get_parameter"><em>$value</em> = <code>$cgi</code>-&gt;get_parameter ($name);</a></strong><br />
-</dt>
+<dt><strong><a name="get_parameter" class="item"><em>$value</em> = <code>$cgi</code>-&gt;get_parameter ($name);</a></strong></dt>
+
 <dd>
-Returns parameter value if any.
+<p>Returns parameter value if any.
 Parameter value is set by query-string of Request-URI
-and/or entity-body value.
-</dd>
-<dd>
+and/or entity-body value.</p>
 <p>When multiple values with same parameter name is specified,
 the first one is returned in scalar context or
 an array reference of all values is returned in array context.
-(Note that query-string is ``earlier'' than entity-body.)</p>
+(Note that query-string is &quot;earlier&quot; than entity-body.)</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_parameter_names"><em>$keys</em> = <em>$cgi</em>-&gt;parameter_names;</a></strong><br />
-</dt>
+<dt><strong><a name="parameter_names" class="item"><em>$keys</em> = <em>$cgi</em>-&gt;parameter_names;</a></strong></dt>
+
 <dd>
-Returnes a list of parameter names provided.
-</dd>
-<dd>
+<p>Returnes a list of parameter names provided.</p>
 <p>This method returns a <code>Message::DOM::DOMStringList</code>.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_entity_body"><em>$body</em> = <em>$cgi</em>-&gt;entity_body;</a></strong><br />
-</dt>
+<dt><strong><a name="entity_body" class="item"><em>$body</em> = <em>$cgi</em>-&gt;entity_body;</a></strong></dt>
+
 <dd>
-Returns entity-body content if any.
+<p>Returns entity-body content if any.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_request_uri"><em>$uri</em> = <em>$cgi</em>-&gt;request_uri;</a></strong><br />
-</dt>
+<dt><strong><a name="request_uri" class="item"><em>$uri</em> = <em>$cgi</em>-&gt;request_uri;</a></strong></dt>
+
 <dd>
-Returns Request-URI as a <code>Message::URI::URIReference</code> object.
-</dd>
-<dd>
+<p>Returns Request-URI as a <code>Message::URI::URIReference</code> object.</p>
 <p>Note that stringified value of returned value might not be same as the
 URI specified as the Request-URI of HTTP request or (possibly pseudo-)
 URI entered by the user, since no standarized way to get it is
 defined by HTTP and CGI/1.1 specifications.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_path_info"><em>$value</em> = <em>$cgi</em>-&gt;path_info ([<em>$new_value</em>]);</a></strong><br />
-</dt>
+<dt><strong><a name="path_info" class="item"><em>$value</em> = <em>$cgi</em>-&gt;path_info ([<em>$new_value</em>]);</a></strong></dt>
+
+<dt><strong><a name="remote_user" class="item"><em>$value</em> = <em>$cgi</em>-&gt;remote_user ([<em>$new_value</em>]);</a></strong></dt>
+
 <dd>
-This method reflects the meta-variable with the same name (in uppercase).
+<p>These methods reflect meta-variables with the same name (in
+uppercase).</p>
 </dd>
-<p></p></dl>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="todo">TODO</a></h1>
 <dl>
-<dt><strong><a name="item_multipart_2fform_2ddata_support">multipart/form-data support</a></strong><br />
-</dt>
+<dt><strong><a name="multipart_form_data_support" class="item">multipart/form-data support</a></strong></dt>
+
 </dl>
 <p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p>A draft specification for DOM CGI Module
-&lt;http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2005-07-04&gt;
-(This module does not implement the interface defined in this
-specification, however.)</p>
+<p>RFC 3875 (CGI/1.1) &lt;http://tools.ietf.org/html/rfc3875&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="history">HISTORY</a></h1>
+<p>This module was originally developed as part of the SuikaWiki project
+&lt;http://suika.fam.cx/~wakaba/wiki/sw/n/SuikaWiki&gt; to implement the
+SuikaWiki CGI script and then transfered to the manakai project.</p>
+<p>There is outdated draft specification of the DOM-like CGI scripting
+interface module
+&lt;http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2005-07-04&gt;,
+although this module does not strictly conform to the specification.</p>
 <p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
 <p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This module was originally developed as part of SuikaWiki.
-
-</p>
 <p>
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2003, 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;
-
-</p>
-<p>This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
-
-</p>
+<p>Copyright 2003-2010 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
 
 </body>
 
