@@ -4,8 +4,9 @@ Message::CGI::HTTP - An Object-Oriented HTTP CGI Interface
 
 =head1 DESCRIPTION
 
-The C<Message::CGI::HTTP> module provides an object-oriented
-interface for inputs and outputs as defined by CGI specification.
+The C<Message::CGI::HTTP> module provides an object-oriented interface
+to handle input parameters (i.e. request) and output (i.e. response)
+of HTTP CGI scripts, as defined by CGI specification.
 
 This module is part of manakai.
 
@@ -13,7 +14,7 @@ This module is part of manakai.
 
 package Message::CGI::HTTP;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = '1.7';
 push our @ISA, 'Message::IF::CGIRequest', 'Message::IF::HTTPCGIRequest';
 
 =head1 METHODS
@@ -229,7 +230,10 @@ sub request_uri ($;%) {
     $port = '' if $port eq ':80';
   }
   
-  my $host_and_port = $self->get_meta_variable ('HTTP_HOST');
+  my $host_and_port = $self->get_meta_variable ('HTTP_X_FORWARDED_HOST')
+      || $self->get_meta_variable ('HTTP_HOST')
+      || '';
+  $host_and_port = $1 if $host_and_port =~ /,\s*([^,]+)$/;
   if ($host_and_port) {
     $uri = $scheme . '://'
          . $self->__uri_encode ($host_and_port, qr/[^0-9A-Za-z.:-]/)
@@ -297,25 +301,30 @@ package Message::IF::HTTPCGIRequest;
 
 =head1 SEE ALSO
 
-A draft specification for DOM CGI Module
-<http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2005-07-04>
-(This module does not implement the interface defined in this
-specification, however.)
+RFC 3875 (CGI/1.1) <http://tools.ietf.org/html/rfc3875>.
+
+=head1 HISTORY
+
+This module was originally developed as part of the SuikaWiki project
+<http://suika.fam.cx/~wakaba/wiki/sw/n/SuikaWiki> to implement the
+SuikaWiki CGI script and then transfered to the manakai project.
+
+There is outdated draft specification of the DOM-like CGI scripting
+interface module
+<http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2005-07-04>,
+although this module does not strictly conform to the specification.
 
 =head1 AUTHOR
 
 Wakaba <w@suika.fam.cx>
 
-This module was originally developed as part of SuikaWiki.
-
 =head1 LICENSE
 
-Copyright 2003, 2007 Wakaba <w@suika.fam.cx>
+Copyright 2003-2010 Wakaba <w@suika.fam.cx>
 
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
 1;
-# $Date: 2008/11/10 05:30:59 $
