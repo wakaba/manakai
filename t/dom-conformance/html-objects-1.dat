@@ -4649,6 +4649,338 @@ aa<map name="x">b<map name="y">bb</map></map>
 /img/@oversrc;syntax error:iriref3987;m
 
 #data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg=""/>
+#errors
+/img/@galleryimg;attribute not defined;m
+/img/@galleryimg;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="yes"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="NO"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="true"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="false"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="galleryimg"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+/img/@galleryimg;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="on"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+/img/@galleryimg;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="http://foo.test/"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+/img/@galleryimg;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc=""/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="  "/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="123"/>
+#errors
+/img/@localsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="1"/>
+#errors
+/img/@localsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="0"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:deprecated;s
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="abc"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:deprecated;s
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="+120"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="-120"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="0120"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:deprecated;s
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="10.00"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc=" 123 "/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="http://foo/"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave=""/>
+#errors
+/img/@nosave;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="   "/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="nosave"/>
+#errors
+/img/@nosave;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave=" nosave "/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="true"/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="yes"/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="on"/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="NoSave"/>
+#errors
+/img/@nosave;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start=""/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="true"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="fileopen"/>
+#errors
+/img/@start;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mouseover"/>
+#errors
+/img/@start;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="FileOPEN"/>
+#errors
+/img/@start;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="MouseOver"/>
+#errors
+/img/@start;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="onmouseover"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="load"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="10:10:0:0"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="none"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mouseout"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mousemove"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress=""/>
+#errors
+/img/@suppress;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="suppress"/>
+#errors
+/img/@suppress;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="SUPPRESS"/>
+#errors
+/img/@suppress;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="no"/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="yes"/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="on"/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="Supress"/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress=" "/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppres="yes"/>
+#errors
+/img/@suppres;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    supress="yes"/>
+#errors
+/img/@supress;attribute not defined;m
+
+#data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 

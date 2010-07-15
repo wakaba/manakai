@@ -5514,6 +5514,9 @@ $Element->{$HTML_NS}->{img} = {
         yes => 1, no => 1,
       }),
       dynsrc => $NonEmptyURLChecker,
+      galleryimg => $GetHTMLEnumeratedAttrChecker->({
+        yes => 1, no => 1, true => 1, false => 1,
+      }),
       height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
       hspace => $HTMLLengthAttrChecker,
       ismap => sub {
@@ -5525,17 +5528,37 @@ $Element->{$HTML_NS}->{img} = {
         }
         $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_item);
       },
+      localsrc => sub {
+        my ($self, $attr) = @_;
+        my $value = $attr->value;
+        if ($value =~ /\A[1-9][0-9]*\z/) {
+          #
+        } elsif ($value =~ /\A[0-9A-Za-z]+\z/) {
+          $self->{onerror}->(node => $attr,
+                             type => 'localsrc:deprecated', # XXXdocumentation
+                             level => $self->{level}->{should});
+        } else {
+          $self->{onerror}->(node => $attr,
+                             type => 'localsrc:invalid', # XXXdocumentation
+                             level => $self->{level}->{must});
+        }
+      },
       longdesc => $HTMLURIAttrChecker,
       lowsrc => $NonEmptyURLChecker,
       mediaout => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1,
       }),
       name => $NameAttrChecker,
+      nosave => $GetHTMLBooleanAttrChecker->('nosave'),
       oversrc => $NonEmptyURLChecker,
       private => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1,
       }),
+      start => $GetHTMLEnumeratedAttrChecker->({
+        fileopen => 1, mouseover => 1,
+      }),
       src => $HTMLURIAttrChecker,
+      suppress => $GetHTMLBooleanAttrChecker->('suppress'),
       usemap => $HTMLUsemapAttrChecker,
       vrml => $NonEmptyURLChecker,
       vspace => $HTMLLengthAttrChecker,
@@ -5549,20 +5572,24 @@ $Element->{$HTML_NS}->{img} = {
       composite => FEATURE_OBSVOCAB,
       copyright => FEATURE_OBSVOCAB,
       dynsrc => FEATURE_OBSVOCAB,
+      galleryimg => FEATURE_OBSVOCAB,
       height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      hspace => FEATURE_HTML5_OBSOLETE,
+      hspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       ismap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      lang => FEATURE_HTML5_REC,
-      longdesc => FEATURE_HTML5_OBSOLETE,
+      localsrc => FEATURE_OBSVOCAB,
+      longdesc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       lowsrc => FEATURE_OBSVOCAB,
       mediaout => FEATURE_OBSVOCAB,
-      name => FEATURE_HTML5_OBSOLETE,
+      name => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+      nosave => FEATURE_OBSVOCAB,
       oversrc => FEATURE_OBSVOCAB,
       private => FEATURE_OBSVOCAB,
       src => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
+      start => FEATURE_OBSVOCAB,
+      suppress => FEATURE_OBSVOCAB,
       usemap => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       vrml => FEATURE_OBSVOCAB,
-      vspace => FEATURE_HTML5_OBSOLETE,
+      vspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     })->($self, $item, $element_state);
 
@@ -5681,6 +5708,7 @@ $Element->{$HTML_NS}->{iframe} = {
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
+    $element_state->{uri_info}->{longdesc}->{type}->{cite} = 1;
   }, # check_start
 }; # iframe
 
@@ -7532,6 +7560,7 @@ $Element->{$HTML_NS}->{input} = {
          size => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          soundstart => FEATURE_OBSVOCAB,
          src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         start => FEATURE_OBSVOCAB,
          step => FEATURE_HTML5_LC | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
          target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
@@ -7595,6 +7624,7 @@ $Element->{$HTML_NS}->{input} = {
          size => '',
          soundstart => '',
          src => '',
+         start => '',
          step => '',
          target => '',
          template => '',
@@ -7809,6 +7839,9 @@ $Element->{$HTML_NS}->{input} = {
              }),
              src => $HTMLURIAttrChecker,
                ## TODO: There is requirements on the referenced resource.
+             start => $GetHTMLEnumeratedAttrChecker->({
+               fileopen => 1, mouseover => 1,
+             }),
              target => $HTMLTargetAttrChecker,
              usemap => $HTMLUsemapAttrChecker,
              vrml => $NonEmptyURLChecker,
@@ -9323,6 +9356,10 @@ $Element->{$HTML_NS}->{frame} = {
     security => FEATURE_OBSVOCAB,
     src => FEATURE_OBSVOCAB,
   }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{uri_info}->{longdesc}->{type}->{cite} = 1;
+  }, # check_start
 }; # frame
 
 $Element->{$HTML_NS}->{noframes} = {

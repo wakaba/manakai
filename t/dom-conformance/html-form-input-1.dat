@@ -15830,3 +15830,56 @@
     oversrc="[]"/>
 #errors
 /input/@oversrc;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start=""/>
+#errors
+/input/@start;attribute not defined;m
+/input/@start;enumerated:invalid;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="fileopen"/>
+#errors
+/input/@start;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mouseover"/>
+#errors
+/input/@start;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="FILEOPEN"/>
+#errors
+/input/@start;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="none"/>
+#errors
+/input/@start;attribute not defined;m
+/input/@start;enumerated:invalid;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mousemove"/>
+#errors
+/input/@start;attribute not defined;m
+/input/@start;enumerated:invalid;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="onmouseover"/>
+#errors
+/input/@start;attribute not defined;m
+/input/@start;enumerated:invalid;m
+
+#data
+<input type="button" xmlns="http://www.w3.org/1999/xhtml"
+    start=""/>
+#errors
+/input/@start;attribute not defined;m
+/input/@start;input attr not applicable;button;m
