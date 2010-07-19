@@ -1196,7 +1196,7 @@ my $TemporalPositionChecker = sub {
   my ($self, $attr) = @_;
   unless ($attr->value =~ /\A[0-9:]+\z/) {
     $self->{onerror}->(node => $attr,
-                       type => 'temporal:syntax error',
+                       type => 'temporal:syntax error', # XXXdocumentation
                        level => $self->{level}->{must});
   }
 }; # $TemporalPositionChecker
@@ -1205,7 +1205,7 @@ my $TextFormatAttrChecker = sub {
   my ($self, $attr) = @_;
   unless ($attr->value =~ /\A(?>(?>\*|[0-9]*)[AaNnXxMm]|\\.)+\z/s) {
     $self->{onerror}->(node => $attr,
-                       type => 'format:syntax error',
+                       type => 'format:syntax error', # XXXdocumentation
                        level => $self->{level}->{must});
   }
 }; # $TextFormatAttrChecker
@@ -1241,6 +1241,15 @@ my $InputmodeAttrChecker = sub {
     }
   }
 }; # $InputmodeAttrChecker
+
+my $PrecisionAttrChecker = sub {
+  my ($self, $attr) = @_;
+  unless ($attr->value =~ /\A(?>[0-9]+(?>dp|sf)|integer|float)\z/) {
+    $self->{onerror}->(node => $attr,
+                       type => 'precision:syntax error', # XXXdocumentation
+                       level => $self->{level}->{must});
+  }
+}; # $PrecisionAttrChecker
 
 my $HTMLAttrChecker = {
   about => $HTMLURIAttrChecker,
@@ -7585,17 +7594,20 @@ $Element->{$HTML_NS}->{input} = {
          inputmode => FEATURE_OBSVOCAB,
          iprof => FEATURE_OBSVOCAB,
          ismap => FEATURE_M12N10_REC,
+         istyle => FEATURE_OBSVOCAB,
          list => FEATURE_HTML5_LC | FEATURE_WF2X,
          loop => FEATURE_OBSVOCAB,
          lowsrc => FEATURE_OBSVOCAB,
          max => FEATURE_HTML5_LC | FEATURE_WF2X,
          maxlength => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
-         method => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+         method => FEATURE_OBSVOCAB,
          min => FEATURE_HTML5_LC | FEATURE_WF2X,
+         mode => FEATURE_OBSVOCAB,
          multiple => FEATURE_HTML5_LC,
          name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
          pattern => FEATURE_HTML5_LC | FEATURE_WF2X,
          placeholder => FEATURE_HTML5_LC,
+         precision => FEATURE_OBSVOCAB,
          readonly => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          replace => FEATURE_OBSVOCAB,
          required => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -7653,6 +7665,7 @@ $Element->{$HTML_NS}->{input} = {
          inputmode => '',
          iprof => '',
          ismap => '', ## NOTE: "MUST" be type=image [HTML4]
+         istyle => '',
          list => '',
          loop => '',
          lowsrc => '',
@@ -7660,10 +7673,12 @@ $Element->{$HTML_NS}->{input} = {
          maxlength => '',
          method => '',
          min => '',
+         mode => '',
          multiple => '',
          name => $FormControlNameAttrChecker,
          pattern => '',
          placeholder => '',
+         precision => '',
          readonly => '',
          replace => '',
          required => '',
@@ -7752,6 +7767,7 @@ $Element->{$HTML_NS}->{input} = {
              list => $ListAttrChecker,
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+             precision => $PrecisionAttrChecker,
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
@@ -7766,6 +7782,7 @@ $Element->{$HTML_NS}->{input} = {
              list => $ListAttrChecker,
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+             precision => $PrecisionAttrChecker,
              step => $StepAttrChecker,
              value => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
             }->{$attr_ln} || $checker;
@@ -7937,6 +7954,9 @@ $Element->{$HTML_NS}->{input} = {
                address4 => 1, address => 1, birthday1 => 1, birthday2 => 1,
                birthday3 => 1, birthday => 1,
              }),
+             istyle => $GetHTMLEnumeratedAttrChecker->({
+                 1 => 1, 2 => 1, 3 => 1, 4 => 1,
+             }),
              list => $ListAttrChecker,
              maxlength => sub {
                my ($self, $attr, $item, $element_state) = @_;
@@ -7962,6 +7982,10 @@ $Element->{$HTML_NS}->{input} = {
                  }
                }
              },
+             mode => $GetHTMLEnumeratedAttrChecker->({
+               hiragana => 1, katakana => 1, hankakukana => 1,
+               alphabet => 1, numeric => 1,
+             }),
              pattern => $PatternAttrChecker,
              placeholder => $PlaceholderAttrChecker,
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
@@ -8635,6 +8659,9 @@ $Element->{$HTML_NS}->{textarea} = {
       address4 => 1, address => 1, birthday1 => 1, birthday2 => 1,
       birthday3 => 1, birthday => 1,
     }),
+    istyle => $GetHTMLEnumeratedAttrChecker->({
+        1 => 1, 2 => 1, 3 => 1, 4 => 1,
+    }),
     maxlength => sub {
       my ($self, $attr, $item, $element_state) = @_;
       
@@ -8662,6 +8689,10 @@ $Element->{$HTML_NS}->{textarea} = {
         }
       }
     },
+    mode => $GetHTMLEnumeratedAttrChecker->({
+      hiragana => 1, katakana => 1, hankakukana => 1,
+      alphabet => 1, numeric => 1,
+    }),
     name => $FormControlNameAttrChecker,
     pattern => $PatternAttrChecker,
     placeholder => $PlaceholderAttrChecker,
@@ -8688,7 +8719,9 @@ $Element->{$HTML_NS}->{textarea} = {
     format => FEATURE_OBSVOCAB,
     inputmode => FEATURE_OBSVOCAB,
     iprof => FEATURE_OBSVOCAB,
+    istyle => FEATURE_OBSVOCAB,
     maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
+    mode => FEATURE_OBSVOCAB,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     pattern => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     placeholder => FEATURE_HTML5_LC,
