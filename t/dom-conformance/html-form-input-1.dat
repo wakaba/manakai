@@ -16434,3 +16434,42 @@
 #errors
 /input/@format;attribute not defined;m
 /input/@format;input attr not applicable;button;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    incremental=""/>
+#errors
+/input/@incremental;attribute not defined;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    incremental="incremental"/>
+#errors
+/input/@incremental;attribute not defined;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    incremental="INcremental"/>
+#errors
+/input/@incremental;attribute not defined;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    incremental="true"/>
+#errors
+/input/@incremental;attribute not defined;m
+/input/@incremental;boolean:invalid;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    incremental=""/>
+#errors
+/input/@incremental;attribute not defined;m
+/input/@incremental;input attr not applicable;text;m
+
+#data
+<input type="url" xmlns="http://www.w3.org/1999/xhtml"
+    incremental=""/>
+#errors
+/input/@incremental;attribute not defined;m
+/input/@incremental;input attr not applicable;url;m

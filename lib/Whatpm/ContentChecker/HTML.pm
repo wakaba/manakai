@@ -7548,7 +7548,8 @@ $Element->{$HTML_NS}->{input} = {
          formnovalidate => FEATURE_HTML5_LC,
          formtarget => FEATURE_HTML5_LC,
          height => FEATURE_HTML5_LC,
-         #hspace WA1 prose
+         hspace => FEATURE_OBSVOCAB,
+         incremental => FEATURE_OBSVOCAB,
          inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X |
              FEATURE_XHTMLBASIC11_CR,
          ismap => FEATURE_M12N10_REC,
@@ -7586,7 +7587,7 @@ $Element->{$HTML_NS}->{input} = {
          vibration => FEATURE_OBSVOCAB,
          volume => FEATURE_OBSVOCAB,
          vrml => FEATURE_OBSVOCAB,
-         #vspace WA1 prose
+         vspace => FEATURE_OBSVOCAB,
          width => FEATURE_HTML5_LC,
         }->{$attr_ln};
 
@@ -7621,6 +7622,7 @@ $Element->{$HTML_NS}->{input} = {
          formtarget => '',
          height => '',
          hspace => '',
+         incremental => '',
          inputmode => '',
          ismap => '', ## NOTE: "MUST" be type=image [HTML4]
          list => '',
@@ -7972,6 +7974,8 @@ $Element->{$HTML_NS}->{input} = {
                 if $state eq 'email' and $attr_ln eq 'multiple';
             $checker = sub { }
                 if $state eq 'search' and $attr_ln eq 'autosave';
+            $checker = $GetHTMLBooleanAttrChecker->('incremental')
+                if $state eq 'search' and $attr_ln eq 'incremental';
 
             if ($item->{node}->has_attribute_ns (undef, 'pattern') and
                 not $item->{node}->has_attribute_ns (undef, 'title')) {
