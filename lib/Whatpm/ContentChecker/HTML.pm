@@ -7523,12 +7523,14 @@ $Element->{$HTML_NS}->{input} = {
          autocomplete => FEATURE_HTML5_LC | FEATURE_WF2X,
          autocorrect => FEATURE_OBSVOCAB,
          autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
-         #border WA1 prose
+         autosave => FEATURE_OBSVOCAB,
+         border => FEATURE_OBSVOCAB,
          checked => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
          directkey => FEATURE_OBSVOCAB,
          disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          dynsrc => FEATURE_OBSVOCAB,
-         enctype => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+         emptyok => FEATURE_OBSVOCAB,
+         enctype => FEATURE_OBSVOCAB,
          form => FEATURE_HTML5_LC | FEATURE_WF2X,
          formaction => FEATURE_HTML5_LC,
          formenctype => FEATURE_HTML5_LC,
@@ -7591,13 +7593,14 @@ $Element->{$HTML_NS}->{input} = {
          autocomplete => '',
          autocorrect => '',
          autofocus => $AutofocusAttrChecker,
-             ## NOTE: <input type=hidden disabled> is not disallowed.
+         autosave => '',
          border => '',
          checked => '',
          directkey => '',
          disabled => $GetHTMLBooleanAttrChecker->('disabled'),
              ## NOTE: <input type=hidden disabled> is not disallowed.
          dynsrc => '',
+         emptyok => '',
          enctype => '',
          form => $HTMLFormAttrChecker,
          formaction => '',
@@ -7881,6 +7884,9 @@ $Element->{$HTML_NS}->{input} = {
              autocorrect => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
+             emptyok => $GetHTMLEnumeratedAttrChecker->({
+               true => 1, false => 1,
+             }),
              ## TODO: inputmode [WF2]
              list => $ListAttrChecker,
              maxlength => sub {
@@ -7952,6 +7958,8 @@ $Element->{$HTML_NS}->{input} = {
             $checker = '' if $state eq 'password' and $attr_ln eq 'list';
             $checker = $GetHTMLBooleanAttrChecker->('multiple')
                 if $state eq 'email' and $attr_ln eq 'multiple';
+            $checker = sub { }
+                if $state eq 'search' and $attr_ln eq 'autosave';
 
             if ($item->{node}->has_attribute_ns (undef, 'pattern') and
                 not $item->{node}->has_attribute_ns (undef, 'title')) {
@@ -8563,6 +8571,9 @@ $Element->{$HTML_NS}->{textarea} = {
     autofocus => $AutofocusAttrChecker,
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    emptyok => $GetHTMLEnumeratedAttrChecker->({
+      true => 1, false => 1,
+    }),
     form => $HTMLFormAttrChecker,
     ## TODO: inputmode [WF2]
     maxlength => sub {
@@ -8614,9 +8625,9 @@ $Element->{$HTML_NS}->{textarea} = {
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     cols => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
+    emptyok => FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
-    lang => FEATURE_HTML5_REC,
     maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
