@@ -16473,3 +16473,92 @@
 #errors
 /input/@incremental;attribute not defined;m
 /input/@incremental;input attr not applicable;url;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode=""/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="latin"/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="latin KANA"/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="http://foo.example/"/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="http://foo.example/ test"/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="[]"/>
+#errors
+/input/@inputmode;attribute not defined;m
+/input/@inputmode;syntax error:iriref3987;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="0123"/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="digit digit"/>
+#errors
+/input/@inputmode;attribute not defined;m
+/input/@inputmode;duplicate token;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="[] [a]"/>
+#errors
+/input/@inputmode;attribute not defined;m
+/input/@inputmode;syntax error:iriref3987;m
+/input/@inputmode;syntax error:iriref3987;m
+
+#data
+<input type="password" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode=""/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="email" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode=""/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="url" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode=""/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode=""/>
+#errors
+/input/@inputmode;attribute not defined;m
+
+#data
+<input type="button" xmlns="http://www.w3.org/1999/xhtml"
+    inputmode=""/>
+#errors
+/input/@inputmode;attribute not defined;m
+/input/@inputmode;input attr not applicable;button;m

@@ -821,3 +821,61 @@
 #errors
 /textarea/@format;attribute not defined;m
 /textarea/@format;format:syntax error;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode=""/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="latin"/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="latin KANA"/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="http://foo.example/"/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="http://foo.example/ test"/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="[]"/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+/textarea/@inputmode;syntax error:iriref3987;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="0123"/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="latin latin"/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+/textarea/@inputmode;duplicate token;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    inputmode="[] [a]"/>
+#errors
+/textarea/@inputmode;attribute not defined;m
+/textarea/@inputmode;syntax error:iriref3987;m
+/textarea/@inputmode;syntax error:iriref3987;m

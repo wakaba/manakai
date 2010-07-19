@@ -1210,6 +1210,38 @@ my $TextFormatAttrChecker = sub {
   }
 }; # $TextFormatAttrChecker
 
+my $InputmodeAttrChecker = sub {
+  my ($self, $attr) = @_;
+
+  my %word;
+  for my $word (grep {length $_}
+                split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+    unless ($word{$word}) {
+      $word{$word} = 1;
+    } else {
+      $self->{onerror}->(node => $attr, type => 'duplicate token',
+                         value => $word,
+                         level => $self->{level}->{must});
+    }
+  }
+
+  for my $value (keys %word) {
+    if ($value =~ /\A[0-9A-Za-z]+\z/) {
+      #
+    } else {
+      # XXX Valid non-empty URL that is an absolute URL
+      Whatpm::URIChecker->check_iri_reference ($value, sub {
+        $self->{onerror}->(value => $value, @_, node => $attr);
+      }, $self->{level});
+      
+      push @{$self->{return}->{uri}->{$value} ||= []},
+          {node => $attr, type => {namespace => 1}};
+      
+      $self->{has_uri_attr} = 1;
+    }
+  }
+}; # $InputmodeAttrChecker
+
 my $HTMLAttrChecker = {
   about => $HTMLURIAttrChecker,
   accesskey => $AccesskeyChecker,
@@ -7550,8 +7582,7 @@ $Element->{$HTML_NS}->{input} = {
          height => FEATURE_HTML5_LC,
          hspace => FEATURE_OBSVOCAB,
          incremental => FEATURE_OBSVOCAB,
-         inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X |
-             FEATURE_XHTMLBASIC11_CR,
+         inputmode => FEATURE_OBSVOCAB,
          ismap => FEATURE_M12N10_REC,
          lang => FEATURE_HTML5_REC,
          list => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -7901,7 +7932,7 @@ $Element->{$HTML_NS}->{input} = {
                true => 1, false => 1,
              }),
              format => $TextFormatAttrChecker,
-             ## TODO: inputmode [WF2]
+             inputmode => $InputmodeAttrChecker,
              list => $ListAttrChecker,
              maxlength => sub {
                my ($self, $attr, $item, $element_state) = @_;
@@ -8592,7 +8623,7 @@ $Element->{$HTML_NS}->{textarea} = {
     }),
     form => $HTMLFormAttrChecker,
     format => $TextFormatAttrChecker,
-    ## TODO: inputmode [WF2]
+    inputmode => $InputmodeAttrChecker,
     maxlength => sub {
       my ($self, $attr, $item, $element_state) = @_;
       
@@ -8645,7 +8676,7 @@ $Element->{$HTML_NS}->{textarea} = {
     emptyok => FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     format => FEATURE_OBSVOCAB,
-    inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
+    inputmode => FEATURE_OBSVOCAB,
     maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
