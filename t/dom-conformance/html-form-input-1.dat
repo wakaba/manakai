@@ -16562,3 +16562,60 @@
 #errors
 /input/@inputmode;attribute not defined;m
 /input/@inputmode;input attr not applicable;button;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    iprof=""/>
+#errors
+/input/@iprof;attribute not defined;m
+/input/@iprof;enumerated:invalid;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    iprof="kana"/>
+#errors
+/input/@iprof;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    iprof="TEL2"/>
+#errors
+/input/@iprof;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    iprof="auto"/>
+#errors
+/input/@iprof;attribute not defined;m
+/input/@iprof;enumerated:invalid;m
+
+#data
+<input type="email" xmlns="http://www.w3.org/1999/xhtml"
+    iprof="address"/>
+#errors
+/input/@iprof;attribute not defined;m
+
+#data
+<input type="url" xmlns="http://www.w3.org/1999/xhtml"
+    iprof="name2"/>
+#errors
+/input/@iprof;attribute not defined;m
+
+#data
+<input type="password" xmlns="http://www.w3.org/1999/xhtml"
+    iprof="birthday"/>
+#errors
+/input/@iprof;attribute not defined;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    iprof="zip"/>
+#errors
+/input/@iprof;attribute not defined;m
+
+#data
+<input type="button" xmlns="http://www.w3.org/1999/xhtml"
+    iprof=""/>
+#errors
+/input/@iprof;attribute not defined;m
+/input/@iprof;input attr not applicable;button;m
