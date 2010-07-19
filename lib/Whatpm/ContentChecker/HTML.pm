@@ -7514,12 +7514,14 @@ $Element->{$HTML_NS}->{input} = {
          %HTMLAttrStatus,
          %HTMLM12NCommonAttrStatus,
          accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
-         'accept-charset' => FEATURE_HTML2X_RFC,
+         'accept-charset' => FEATURE_OBSVOCAB,
          accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
-         action => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+         action => FEATURE_OBSVOCAB,
          align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
+         autocapitalize => FEATURE_OBSVOCAB,
          autocomplete => FEATURE_HTML5_LC | FEATURE_WF2X,
+         autocorrect => FEATURE_OBSVOCAB,
          autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
          #border WA1 prose
          checked => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
@@ -7582,12 +7584,12 @@ $Element->{$HTML_NS}->{input} = {
          ## applicable for a specific set of states.
          accept => '',
          'accept-charset' => $HTMLCharsetsAttrChecker,
-             ## It is unclear which |type=""| values this attribute is
-             ## applied to in RFC 2070.
          action => '',
          align => '',
          alt => '',
+         autocapitalize => '',
          autocomplete => '',
+         autocorrect => '',
          autofocus => $AutofocusAttrChecker,
              ## NOTE: <input type=hidden disabled> is not disallowed.
          border => '',
@@ -7870,7 +7872,13 @@ $Element->{$HTML_NS}->{input} = {
           } else { # Text, Search, E-mail, URL, Telephone, Password
             $checker =
             {
+             autocapitalize => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
              autocomplete => $GetHTMLEnumeratedAttrChecker->({
+               on => 1, off => 1,
+             }),
+             autocorrect => $GetHTMLEnumeratedAttrChecker->({
                on => 1, off => 1,
              }),
              ## TODO: inputmode [WF2]
@@ -8546,6 +8554,12 @@ $Element->{$HTML_NS}->{textarea} = {
       }
     }, # accept
     'accept-charset' => $HTMLCharsetsAttrChecker,
+    autocapitalize => $GetHTMLEnumeratedAttrChecker->({
+      on => 1, off => 1,
+    }),
+    autocorrect => $GetHTMLEnumeratedAttrChecker->({
+      on => 1, off => 1,
+    }),
     autofocus => $AutofocusAttrChecker,
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -8595,6 +8609,8 @@ $Element->{$HTML_NS}->{textarea} = {
     accept => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
     'accept-charset' => FEATURE_HTML2X_RFC,
     accesskey => FEATURE_HTML5_FD | FEATURE_M12N10_REC,
+    autocapitalize => FEATURE_OBSVOCAB,
+    autocorrect => FEATURE_OBSVOCAB,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     cols => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
