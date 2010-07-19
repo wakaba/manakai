@@ -1201,6 +1201,15 @@ my $TemporalPositionChecker = sub {
   }
 }; # $TemporalPositionChecker
 
+my $TextFormatAttrChecker = sub {
+  my ($self, $attr) = @_;
+  unless ($attr->value =~ /\A(?>(?>\*|[0-9]*)[AaNnXxMm]|\\.)+\z/s) {
+    $self->{onerror}->(node => $attr,
+                       type => 'format:syntax error',
+                       level => $self->{level}->{must});
+  }
+}; # $TextFormatAttrChecker
+
 my $HTMLAttrChecker = {
   about => $HTMLURIAttrChecker,
   accesskey => $AccesskeyChecker,
@@ -7533,6 +7542,7 @@ $Element->{$HTML_NS}->{input} = {
          enctype => FEATURE_OBSVOCAB,
          form => FEATURE_HTML5_LC | FEATURE_WF2X,
          formaction => FEATURE_HTML5_LC,
+         format => FEATURE_OBSVOCAB,
          formenctype => FEATURE_HTML5_LC,
          formmethod => FEATURE_HTML5_LC,
          formnovalidate => FEATURE_HTML5_LC,
@@ -7604,6 +7614,7 @@ $Element->{$HTML_NS}->{input} = {
          enctype => '',
          form => $HTMLFormAttrChecker,
          formaction => '',
+         format => '',
          formenctype => '',
          formmethod => '',
          formnovalidate => '',
@@ -7887,6 +7898,7 @@ $Element->{$HTML_NS}->{input} = {
              emptyok => $GetHTMLEnumeratedAttrChecker->({
                true => 1, false => 1,
              }),
+             format => $TextFormatAttrChecker,
              ## TODO: inputmode [WF2]
              list => $ListAttrChecker,
              maxlength => sub {
@@ -8575,6 +8587,7 @@ $Element->{$HTML_NS}->{textarea} = {
       true => 1, false => 1,
     }),
     form => $HTMLFormAttrChecker,
+    format => $TextFormatAttrChecker,
     ## TODO: inputmode [WF2]
     maxlength => sub {
       my ($self, $attr, $item, $element_state) = @_;
@@ -8627,6 +8640,7 @@ $Element->{$HTML_NS}->{textarea} = {
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     emptyok => FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
+    format => FEATURE_OBSVOCAB,
     inputmode => FEATURE_HTML5_DROPPED | FEATURE_WF2X | FEATURE_XHTMLBASIC11_CR,
     maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
