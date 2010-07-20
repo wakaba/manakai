@@ -16957,3 +16957,69 @@
 #errors
 /input/@precision;attribute not defined;m
 /input/@precision;input attr not applicable;text;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    results=""/>
+#errors
+/input/@results;attribute not defined;m
+/input/@results;nninteger:syntax error;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    results="0"/>
+#errors
+/input/@results;attribute not defined;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    results="1"/>
+#errors
+/input/@results;attribute not defined;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    results="0100"/>
+#errors
+/input/@results;attribute not defined;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    results="+100"/>
+#errors
+/input/@results;attribute not defined;m
+/input/@results;nninteger:syntax error;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    results="20.00"/>
+#errors
+/input/@results;attribute not defined;m
+/input/@results;nninteger:syntax error;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    results="-0"/>
+#errors
+/input/@results;attribute not defined;m
+/input/@results;nninteger:syntax error;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    results="none"/>
+#errors
+/input/@results;attribute not defined;m
+/input/@results;nninteger:syntax error;m
+
+#data
+<input type="search" xmlns="http://www.w3.org/1999/xhtml"
+    result=""/>
+#errors
+/input/@result;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    results=""/>
+#errors
+/input/@results;attribute not defined;m
+/input/@results;input attr not applicable;text;m

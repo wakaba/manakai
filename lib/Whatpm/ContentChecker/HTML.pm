@@ -7611,6 +7611,7 @@ $Element->{$HTML_NS}->{input} = {
          readonly => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          replace => FEATURE_OBSVOCAB,
          required => FEATURE_HTML5_LC | FEATURE_WF2X,
+         results => FEATURE_OBSVOCAB,
          size => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          soundstart => FEATURE_OBSVOCAB,
          src => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -7682,6 +7683,7 @@ $Element->{$HTML_NS}->{input} = {
          readonly => '',
          replace => '',
          required => '',
+         results => '',
          size => '',
          soundstart => '',
          src => '',
@@ -8028,13 +8030,20 @@ $Element->{$HTML_NS}->{input} = {
                }
              },
             }->{$attr_ln} || $checker;
-            $checker = '' if $state eq 'password' and $attr_ln eq 'list';
-            $checker = $GetHTMLBooleanAttrChecker->('multiple')
-                if $state eq 'email' and $attr_ln eq 'multiple';
-            $checker = sub { }
-                if $state eq 'search' and $attr_ln eq 'autosave';
-            $checker = $GetHTMLBooleanAttrChecker->('incremental')
-                if $state eq 'search' and $attr_ln eq 'incremental';
+            if ($state eq 'password') {
+              $checker = '' if $attr_ln eq 'list';
+            } elsif ($state eq 'email') {
+              $checker = $GetHTMLBooleanAttrChecker->('multiple')
+                  if $attr_ln eq 'multiple';
+            } elsif ($state eq 'search') {
+              if ($attr_ln eq 'autosave') {
+                $checker = sub { };
+              } elsif ($attr_ln eq 'incremental') {
+                $checker = $GetHTMLBooleanAttrChecker->('incremental');
+              } elsif ($attr_ln eq 'results') {
+                $checker = $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 });
+              }
+            }
 
             if ($item->{node}->has_attribute_ns (undef, 'pattern') and
                 not $item->{node}->has_attribute_ns (undef, 'title')) {
