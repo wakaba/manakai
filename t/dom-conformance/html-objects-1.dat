@@ -7164,6 +7164,22 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /object/@classid;attribute not defined;m
 /object;no significant content;s
+/object;attribute missing;codetype;s
+
+#data
+<object data="" classid="about:blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@classid;attribute not defined;m
+/object;no significant content;s
+/object;attribute missing;codetype;s
+
+#data
+<object data="" classid="about:blank" xmlns="http://www.w3.org/1999/xhtml"
+    codetype="text/plain"/>
+#errors
+/object/@classid;attribute not defined;m
+/object;no significant content;s
+/object/@codetype;attribute not defined;m
 
 #data
 <object data="" classid="[]" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -7171,6 +7187,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 /object/@classid;attribute not defined;m
 /object/@classid;syntax error:iriref3987;m
 /object;no significant content;s
+/object;attribute missing;codetype;s
 
 #data
 <object data="" codebase="" xmlns="http://www.w3.org/1999/xhtml"/>

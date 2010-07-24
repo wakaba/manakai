@@ -2183,7 +2183,7 @@ $Element->{$HTML_NS}->{html} = {
 
 $Element->{$HTML_NS}->{'pre-html'} = {
   %{$Element->{$HTML_NS}->{html}},
-  status => FEATURE_ISOHTML_PREPARATION,
+  status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     #
   }, {
@@ -2505,7 +2505,6 @@ $Element->{$HTML_NS}->{meta} = {
           $charset_attr = $attr;
           $checker = 1;
         } elsif ($attr_ln eq 'scheme') {
-          ## NOTE: <http://suika.fam.cx/2007/html/standards#html-meta-scheme>
           $checker = sub {};
         } elsif ($attr_ln =~ /^data-\p{InXMLNCNameChar10}+\z/ and
                  $attr_ln !~ /[A-Z]/) {
@@ -3550,11 +3549,10 @@ $Element->{$HTML_NS}->{p} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
-    clear => FEATURE_OBSVOCAB,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    clear => FEATURE_OBSVOCAB | FEATURE_OBSVOCAB,
+  }), # check_attrs
+}; # p
 
 $Element->{$HTML_NS}->{hr} = {
   %HTMLEmptyChecker,
@@ -3618,9 +3616,9 @@ $Element->{$HTML_NS}->{pre} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-    width => FEATURE_HTML5_OBSOLETE,
-    #wrap WA1 prose
+    clear => FEATURE_OBSVOCAB,
+    width => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    wrap => FEATURE_OBSVOCAB,
   }),
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3661,7 +3659,7 @@ $Element->{$HTML_NS}->{listing} = $Element->{$HTML_NS}->{xmp};
 
 $Element->{$HTML_NS}->{plaintext} = {
   %HTMLTextChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     clear => $GetHTMLEnumeratedAttrChecker->({
       left => 1, all => 1, right => 1, none => 1, both => -1,
@@ -3669,7 +3667,7 @@ $Element->{$HTML_NS}->{plaintext} = {
   }, {
     %HTMLAttrStatus,
     clear => FEATURE_OBSVOCAB,
-  }),
+  }), # check_attrs
 }; # plaintext
 
 $Element->{$HTML_NS}->{blockquote} = {
@@ -3795,13 +3793,12 @@ $Element->{$HTML_NS}->{ol} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML2X_RFC,
-    compact => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
+    align => FEATURE_OBSVOCAB,
+    compact => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     reversed => FEATURE_HTML5_WD,
     #start => FEATURE_HTML5_WD | FEATURE_M12N10_REC_DEPRECATED,
     start => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    type => FEATURE_HTML5_OBSOLETE,
+    type => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -4906,7 +4903,7 @@ $Element->{$HTML_NS}->{mark} = {
 
 $Element->{$HTML_NS}->{nobr} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # nobr
 
 $Element->{$HTML_NS}->{wbr} = {
@@ -5895,8 +5892,8 @@ $Element->{$HTML_NS}->{embed} = {
 }; # embed
 
 $Element->{$HTML_NS}->{noembed} = {
-  %HTMLTextChecker, # XXX content model restriction
-  status => FEATURE_HTML5_OBSOLETE,
+  %HTMLTextChecker, # XXX content model restriction (same as iframe)
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # noembed
 
 $Element->{$HTML_NS}->{object} = {
@@ -5907,18 +5904,15 @@ $Element->{$HTML_NS}->{object} = {
     archive => $HTMLSpaceURIsAttrChecker,
         ## TODO: Relative to @codebase
     border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    classid => $HTMLURIAttrChecker,
+    classid => $HTMLURIAttrChecker, # XXX MUST be non-empty, absolute
     code => $NonEmptyURLChecker,
     codebase => $NonEmptyURLChecker,
     codetype => $MIMETypeChecker,
-        ## TODO: "RECOMMENDED when |classid| is specified" [HTML4]
     copyright => $GetHTMLEnumeratedAttrChecker->({
       yes => 1, no => 1,
     }),
     data => $HTMLURIAttrChecker,
     declare => $GetHTMLBooleanAttrChecker->('declare'),
-        ## NOTE: "The object MUST be instantiated by a subsequent OBJECT ..."
-        ## [HTML4] but we don't know how to test this.
     form => $HTMLFormAttrChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $HTMLLengthAttrChecker,
@@ -5942,38 +5936,47 @@ $Element->{$HTML_NS}->{object} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    archive => FEATURE_HTML5_OBSOLETE,
-    border => FEATURE_HTML5_OBSOLETE,
+    archive => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    border => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     classid => FEATURE_HTML5_OBSOLETE,
     code => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     codebase => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    codetype => FEATURE_HTML5_OBSOLETE,
+    codetype => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     'content-length' => FEATURE_XHTML2_ED,
     copyright => FEATURE_OBSVOCAB,
     data => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    declare => FEATURE_HTML5_OBSOLETE,
+    declare => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC,
     height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    hspace => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
+    hspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     mediaout => FEATURE_OBSVOCAB,
     name => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     private => FEATURE_OBSVOCAB,
-    standby => FEATURE_HTML5_OBSOLETE,
+    standby => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     usemap => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    vspace => FEATURE_HTML5_OBSOLETE,
+    vspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
+    my $el = $item->{node};
 
-    unless ($item->{node}->has_attribute_ns (undef, 'data')) {
-      unless ($item->{node}->has_attribute_ns (undef, 'type')) {
-        $self->{onerror}->(node => $item->{node},
+    unless ($el->has_attribute_ns (undef, 'data')) {
+      unless ($el->has_attribute_ns (undef, 'type')) {
+        $self->{onerror}->(node => $el,
                            type => 'attribute missing:data|type',
                            level => $self->{level}->{must});
+      }
+    }
+
+    if ($el->has_attribute_ns (undef, 'classid')) {
+      unless ($el->has_attribute_ns (undef, 'codetype')) {
+        $self->{onerror}->(node => $el,
+                           type => 'attribute missing',
+                           text => 'codetype',
+                           level => $self->{level}->{should});
       }
     }
 
@@ -6147,12 +6150,10 @@ $Element->{$HTML_NS}->{param} = {
     }),
   }, {
     %HTMLAttrStatus,
-    href => FEATURE_RDFA_REC,
-    id => FEATURE_HTML5_REC,
     name => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    type => FEATURE_HTML5_OBSOLETE,
+    type => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     value => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    valuetype => FEATURE_HTML5_OBSOLETE,
+    valuetype => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -7479,7 +7480,7 @@ $Element->{$HTML_NS}->{legend} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # legend
 
@@ -9304,7 +9305,6 @@ $Element->{$HTML_NS}->{menu} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
-    autosubmit => $GetHTMLBooleanAttrChecker->('autosubmit'),
     compact => $GetHTMLBooleanAttrChecker->('compact'),
     ## ISSUE: <menu id=""><p contextmenu=""> match?  (In the current
     ## implementation, it does not match.)
@@ -9314,7 +9314,6 @@ $Element->{$HTML_NS}->{menu} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_OBSVOCAB,
-    autosubmit => FEATURE_HTML5_DROPPED,
     compat => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     label => FEATURE_HTML5_WD,
     type => FEATURE_HTML5_WD,
@@ -9561,14 +9560,13 @@ $Element->{$HTML_NS}->{frame} = {
 }; # frame
 
 $Element->{$HTML_NS}->{noframes} = {
-  %HTMLTextChecker, # XXX content model restriction
-  status => FEATURE_HTML5_OBSOLETE,
+  %HTMLTextChecker, # XXX content model restriction (same as iframe)
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     #
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
   }), # check_attrs
 }; # noframes
 
@@ -9592,8 +9590,8 @@ $Element->{$HTML_NS}->{noframes} = {
 
 ## Following attributes are explicitly not supported: @ht* (XHTML
 ## architectural form attributes), @sda* (SDA attributes), dl/@type,
-## layer/@*, multicol/@baseline, multicol/@height, multicol/@width,
-## multicol/@gutter, multicol/@cols, nextid/@n
+## layer/@*, menu/@autosubmit, multicol/@baseline, multicol/@height,
+## multicol/@width, multicol/@gutter, multicol/@cols, nextid/@n
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 

@@ -5783,6 +5783,12 @@ a
 /menu/@align;enumerated:invalid;m
 
 #data
+<menu xmlns="http://www.w3.org/1999/xhtml"
+    autosubmit="abc">a</menu>
+#errors
+/menu/@autosubmit;attribute not defined;m
+
+#data
 <dl compact="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /dl/@compact;attribute not defined;m
